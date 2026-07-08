@@ -295,6 +295,8 @@ def _distribution_from_profile_column(
 ) -> dict[str, Any]:
     top_values = column.get("top_values") or []
     masked_patterns = column.get("masked_patterns") or []
+    if is_identifier:
+        return {"kind": "synthetic_identifier", "prefix": _identifier_prefix(name, table_name)}
     if masked_patterns:
         return {
             "kind": "masked_patterns",
@@ -331,8 +333,6 @@ def _distribution_from_profile_column(
         return {"kind": "date_range", "min": column.get("min_date"), "max": column.get("max_date")}
     if column.get("min_timestamp") is not None or column.get("max_timestamp") is not None:
         return {"kind": "datetime_range", "min": column.get("min_timestamp"), "max": column.get("max_timestamp")}
-    if is_identifier:
-        return {"kind": "synthetic_identifier", "prefix": _identifier_prefix(name, table_name)}
     return {}
 
 
@@ -388,10 +388,9 @@ def _primary_key_for_columns(columns: list[ColumnSpec]) -> str | None:
 
 
 def _is_identifier(name: str, unique_ratio: float) -> bool:
+    del unique_ratio
     normalized = name.lower()
-    if normalized == "id" or normalized.endswith("_id"):
-        return True
-    return unique_ratio >= 0.95
+    return normalized == "id" or normalized.endswith("_id")
 
 
 def _identifier_prefix(name: str, table_name: str) -> str:

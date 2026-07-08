@@ -12,6 +12,7 @@ from faker import Faker
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.settings import GenerationMode
 from test_data_agent.generation.constraint_solver import solve_constraints
 
 
@@ -19,20 +20,58 @@ def generate_dataset(spec: DatasetSpec, seed: int) -> dict[str, list[dict[str, A
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = Faker()
     faker.seed_instance(seed)
+    mode = spec.generation_settings.mode
+    invalid_ratio = spec.generation_settings.invalid_ratio
     for entity_index, entity in enumerate(spec.entities):
         rng = random.Random(seed + entity_index)
-        rows_by_entity[entity.name] = [generate_row(entity, row_index, rng, faker, seed) for row_index in range(entity.row_count)]
+        rows_by_entity[entity.name] = [
+            generate_row(entity, row_index, rng, faker, seed, mode=mode, invalid_ratio=invalid_ratio)
+            for row_index in range(entity.row_count)
+        ]
     solve_constraints(rows_by_entity, spec, seed=seed)
     return rows_by_entity
 
 
-def generate_row(entity: EntitySpec, row_index: int, rng: random.Random, faker: Faker, seed: int) -> dict[str, Any]:
-    return {field.name: generate_field_value(entity.name, field, row_index, rng, faker, seed) for field in entity.fields}
+def generate_row(
+    entity: EntitySpec,
+    row_index: int,
+    rng: random.Random,
+    faker: Faker,
+    seed: int,
+    *,
+    mode: GenerationMode,
+    invalid_ratio: float,
+) -> dict[str, Any]:
+    return {
+        field.name: generate_field_value(
+            entity.name,
+            field,
+            row_index,
+            rng,
+            faker,
+            seed,
+            mode=mode,
+            invalid_ratio=invalid_ratio,
+        )
+        for field in entity.fields
+    }
 
 
-def generate_field_value(entity_name: str, field: FieldSpec, row_index: int, rng: random.Random, faker: Faker, seed: int) -> Any:
+def generate_field_value(
+    entity_name: str,
+    field: FieldSpec,
+    row_index: int,
+    rng: random.Random,
+    faker: Faker,
+    seed: int,
+    *,
+    mode: GenerationMode,
+    invalid_ratio: float,
+) -> Any:
     if field.nullable and not field.is_identifier and rng.random() < field.null_ratio:
         return None
+    if should_generate_invalid_value(field, rng, mode=mode, invalid_ratio=invalid_ratio):
+        return invalid_value_for_type(field.data_type)
     if field.is_identifier:
         return synthetic_identifier(entity_name, field, row_index, seed)
     if field.sensitive:
@@ -117,3 +156,29 @@ def synthetic_string(field: FieldSpec, rng: random.Random) -> str:
     max_length = int(distribution.get("max_length", max(min_length, 12)))
     length = rng.randint(max(1, min_length), max(1, max_length))
     return "syn_" + "".join(rng.choice(string.ascii_lowercase) for _ in range(length))
+
+
+def should_generate_invalid_value(
+    field: FieldSpec,
+    rng: random.Random,
+    *,
+    mode: GenerationMode,
+    invalid_ratio: float,
+) -> bool:
+    if field.is_identifier:
+        return False
+    if mode == GenerationMode.NEGATIVE:
+        return True
+    if mode != GenerationMode.MIXED:
+        return False
+    return invalid_ratio > 0.0 and rng.random() < invalid_ratio
+
+
+def invalid_value_for_type(data_type: FieldType) -> Any:
+    if data_type in {FieldType.INTEGER, FieldType.FLOAT}:
+        return "not-a-number"
+    if data_type == FieldType.BOOLEAN:
+        return "not-a-boolean"
+    if data_type in {FieldType.DATE, FieldType.DATETIME}:
+        return "not-a-timestamp"
+    return 12345

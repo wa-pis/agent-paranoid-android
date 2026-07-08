@@ -54,7 +54,9 @@ def test_profile_csv_cli_writes_safe_profile(tmp_path) -> None:
 
     profile = json.loads(output.read_text())
     assert profile["source_type"] == "csv"
-    assert profile["row_count"] == 5
+    assert len(profile["entities"]) == 1
+    assert profile["entities"][0]["name"] == "customers"
+    assert profile["entities"][0]["row_count"] == 5
     assert "alice@example.com" not in output.read_text()
 
 
@@ -91,11 +93,16 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     assert len(csv_rows) == 20
     assert len(json_rows) == 20
     assert len(parquet_rows) == 20
-    assert report["row_count"] == 20
-    assert report["expected_row_count"] == 20
-    assert report["error_count"] > 0
-    assert spec["output_format"] == "csv"
+    assert report["valid"] is False
+    assert any(section["failed"] > 0 for section in report["sections"])
+    assert spec["generation_settings"]["seed"] == 123
+    assert spec["generation_settings"]["output_format"] == "csv"
+    assert spec["generation_settings"]["mode"] == "mixed"
+    assert spec["generation_settings"]["invalid_ratio"] == 0.1
+    assert spec["entities"][0]["name"] == "customers"
+    assert spec["entities"][0]["row_count"] == 20
     assert profile["source_type"] == "csv"
+    assert profile["entities"][0]["name"] == "customers"
     assert "alice@example.com" not in (csv_output.parent / "csv_profile.json").read_text()
 
 
