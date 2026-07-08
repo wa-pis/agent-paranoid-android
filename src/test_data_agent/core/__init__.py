@@ -2,21 +2,74 @@
 
 from test_data_agent.core.constraint import Constraint, ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.distribution import (
+    BooleanDistribution,
+    CategoricalDistribution,
+    CategoryWeight,
+    DateRangeDistribution,
+    DateTimeRangeDistribution,
+    FieldDistribution,
+    MaskedPattern,
+    MaskedPatternsDistribution,
+    NumericDistribution,
+    StringPatternDistribution,
+    SyntheticIdentifierDistribution,
+    validate_distribution,
+)
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
+from test_data_agent.core.privacy import (
+    SENSITIVE_NAME_PARTS,
+    PrivacyAction,
+    PrivacyClassification,
+    PrivacyRule,
+    PrivacySettings,
+    infer_sensitive_from_name,
+    is_sensitive_field,
+    mask_pattern,
+    mask_value,
+    semantic_type_is_sensitive,
+)
 from test_data_agent.core.relationship import Relationship, RelationshipType
+from test_data_agent.core.settings import GenerationMode, GenerationSettings, OutputFormat, ValidationSettings
 
 __all__ = [
+    "BooleanDistribution",
+    "CategoricalDistribution",
+    "CategoryWeight",
     "Constraint",
     "ConstraintStatus",
     "ConstraintType",
+    "DateRangeDistribution",
+    "DateTimeRangeDistribution",
     "DatasetProfile",
     "DatasetSpec",
     "EntityProfile",
     "EntitySpec",
+    "FieldDistribution",
     "FieldProfile",
     "FieldSpec",
     "FieldType",
+    "GenerationMode",
+    "GenerationSettings",
+    "MaskedPattern",
+    "MaskedPatternsDistribution",
+    "NumericDistribution",
+    "OutputFormat",
+    "PrivacyAction",
+    "PrivacyClassification",
+    "PrivacyRule",
+    "PrivacySettings",
     "Relationship",
     "RelationshipType",
+    "SENSITIVE_NAME_PARTS",
+    "StringPatternDistribution",
+    "SyntheticIdentifierDistribution",
+    "ValidationSettings",
+    "infer_sensitive_from_name",
+    "is_sensitive_field",
+    "mask_pattern",
+    "mask_value",
+    "semantic_type_is_sensitive",
+    "validate_distribution",
 ]

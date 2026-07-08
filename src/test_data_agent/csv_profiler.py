@@ -15,7 +15,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from test_data_agent.spec import DataType, infer_profile_data_type, infer_sensitive_from_name
+from test_data_agent.core.privacy import infer_sensitive_from_name, mask_pattern, semantic_type_is_sensitive
+from test_data_agent.spec import DataType, infer_profile_data_type
 
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -75,7 +76,7 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
     null_count = row_count - len(non_null)
     semantic_type = infer_semantic_type(name, non_null)
     base_type = infer_data_type(name, non_null, semantic_type)
-    sensitive = infer_sensitive_from_name(name) or semantic_type in {"email", "phone", "ssn"}
+    sensitive = infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
     counts = Counter(non_null)
 
     top_values: list[dict[str, Any]] = []
@@ -187,12 +188,6 @@ def percentile(numbers: list[int | float], ratio: float) -> float:
     upper = min(lower + 1, len(numbers) - 1)
     weight = index - lower
     return float(numbers[lower] * (1 - weight) + numbers[upper] * weight)
-
-
-def mask_pattern(value: str, semantic_type: str | None) -> str:
-    if semantic_type in {"email", "phone", "ssn"}:
-        return semantic_type
-    return f"text_len_{len(value)}"
 
 
 def parse_int(value: str) -> int | None:

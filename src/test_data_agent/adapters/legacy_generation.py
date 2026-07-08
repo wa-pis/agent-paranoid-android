@@ -1,0 +1,306 @@
+"""Normalize legacy profiles and specs into DatasetProfile and DatasetSpec."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Any
+
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
+from test_data_agent.core.entity import EntityProfile, EntitySpec
+from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
+from test_data_agent.core.relationship import Relationship
+from test_data_agent.core.settings import GenerationSettings, OutputFormat
+from test_data_agent.generation.planner import infer_dataset_spec
+from test_data_agent.spec import (
+    ColumnSpec,
+    DataType,
+    GenerationSpec,
+    GenerationStrategy,
+    MultiTableGenerationSpec,
+)
+
+
+def legacy_profile_to_dataset_profile(
+    profile: Mapping[str, Any],
+    *,
+    source_type: str = "legacy_profile",
+) -> DatasetProfile:
+    table_name = str(profile.get("table", "synthetic_table"))
+    row_count = int(profile.get("row_count", 0) or 0)
+    field_profiles = [
+        _field_profile_from_column(table_name, row_count, column)
+        for column in profile.get("columns", [])
+    ]
+
+    primary_key_candidates = [
+        field.name
+        for field in field_profiles
+        if field.is_identifier and field.unique_ratio >= 1.0
+    ]
+
+    return DatasetProfile(
+        source_type=source_type,
+        entities=[
+            EntityProfile(
+                name=table_name,
+                row_count=row_count,
+                fields=field_profiles,
+                primary_key_candidates=primary_key_candidates,
+            )
+        ],
+    )
+
+
+def legacy_profile_to_dataset_spec(
+    profile: Mapping[str, Any],
+    *,
+    count: int | None = None,
+    seed: int | None = None,
+    source_type: str = "legacy_profile",
+) -> DatasetSpec:
+    dataset_spec = infer_dataset_spec(
+        legacy_profile_to_dataset_profile(profile, source_type=source_type),
+        count=count,
+    )
+    if seed is not None:
+        dataset_spec.generation_settings.seed = seed
+    return dataset_spec
+
+
+def generation_spec_to_dataset_spec(spec: GenerationSpec) -> DatasetSpec:
+    entity = EntitySpec(
+        name=spec.table.name,
+        row_count=spec.table.row_count,
+        fields=[_field_spec_from_column_spec(column) for column in spec.table.columns],
+        primary_key=_primary_key_for_columns(spec.table.columns),
+    )
+    return DatasetSpec(
+        entities=[entity],
+        generation_settings=GenerationSettings(
+            seed=spec.seed,
+            output_format=OutputFormat(spec.output_format.value),
+        ),
+    )
+
+
+def multi_table_generation_spec_to_dataset_spec(spec: MultiTableGenerationSpec) -> DatasetSpec:
+    entities = [
+        EntitySpec(
+            name=table.name,
+            row_count=table.row_count,
+            fields=[_field_spec_from_column_spec(column) for column in table.columns],
+            primary_key=_primary_key_for_columns(table.columns),
+        )
+        for table in spec.tables
+    ]
+    relationships = [
+        Relationship(
+            parent_entity=foreign_key.parent_table,
+            parent_field=foreign_key.parent_field,
+            child_entity=foreign_key.child_table,
+            child_field=foreign_key.child_field,
+            confidence=1.0,
+            status="configured",
+        )
+        for foreign_key in spec.foreign_keys
+    ]
+    return DatasetSpec(
+        entities=entities,
+        relationships=relationships,
+        generation_settings=GenerationSettings(
+            seed=spec.seed,
+            output_format=OutputFormat(spec.output_format.value),
+        ),
+    )
+
+
+def _field_profile_from_column(
+    table_name: str,
+    row_count: int,
+    column: Mapping[str, Any],
+) -> FieldProfile:
+    name = str(column.get("name", "column"))
+    unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
+    is_identifier = _is_identifier(name, unique_ratio)
+    return FieldProfile(
+        name=name,
+        data_type=_field_type_from_raw(column.get("data_type", "string")),
+        nullable=bool(column.get("nullable", False)),
+        null_ratio=float(column.get("null_ratio", 0.0) or 0.0),
+        unique_ratio=unique_ratio,
+        sensitive=bool(column.get("sensitive", False)),
+        semantic_type=_optional_string(column.get("semantic_type")),
+        is_identifier=is_identifier,
+        distribution=_distribution_from_profile_column(name, table_name, is_identifier, column),
+    )
+
+
+def _field_spec_from_column_spec(column: ColumnSpec) -> FieldSpec:
+    return FieldSpec(
+        name=column.name,
+        data_type=_field_type_from_legacy_type(column.data_type),
+        nullable=column.nullable,
+        null_ratio=column.null_probability,
+        sensitive=bool(column.sensitive),
+        semantic_type=_semantic_type_for_data_type(column.data_type),
+        is_identifier=_is_identifier(column.name, 1.0)
+        or column.strategy in {GenerationStrategy.SEQUENCE, GenerationStrategy.UUID},
+        distribution=_distribution_from_generation_column(column),
+    )
+
+
+def _field_type_from_raw(value: Any) -> FieldType:
+    if isinstance(value, DataType):
+        return _field_type_from_legacy_type(value)
+    normalized = str(value).lower()
+    if normalized == FieldType.INTEGER.value:
+        return FieldType.INTEGER
+    if normalized == FieldType.FLOAT.value:
+        return FieldType.FLOAT
+    if normalized == FieldType.BOOLEAN.value:
+        return FieldType.BOOLEAN
+    if normalized == FieldType.DATE.value:
+        return FieldType.DATE
+    if normalized == FieldType.DATETIME.value:
+        return FieldType.DATETIME
+    return FieldType.STRING
+
+
+def _field_type_from_legacy_type(data_type: DataType) -> FieldType:
+    if data_type == DataType.INTEGER:
+        return FieldType.INTEGER
+    if data_type == DataType.FLOAT:
+        return FieldType.FLOAT
+    if data_type == DataType.BOOLEAN:
+        return FieldType.BOOLEAN
+    if data_type == DataType.DATE:
+        return FieldType.DATE
+    if data_type == DataType.DATETIME:
+        return FieldType.DATETIME
+    return FieldType.STRING
+
+
+def _semantic_type_for_data_type(data_type: DataType) -> str | None:
+    if data_type in {DataType.EMAIL, DataType.PHONE, DataType.NAME, DataType.ADDRESS}:
+        return data_type.value
+    return None
+
+
+def _distribution_from_profile_column(
+    name: str,
+    table_name: str,
+    is_identifier: bool,
+    column: Mapping[str, Any],
+) -> dict[str, Any]:
+    top_values = column.get("top_values") or []
+    masked_patterns = column.get("masked_patterns") or []
+    if masked_patterns:
+        return {
+            "kind": "masked_patterns",
+            "patterns": [MaskedPattern.model_validate(item).model_dump(mode="json") for item in masked_patterns],
+        }
+    if top_values:
+        return {
+            "kind": "categorical",
+            "categories": [
+                CategoryWeight(value=item.get("value"), count=float(item.get("count", 0) or 0)).model_dump(mode="json")
+                for item in top_values
+            ],
+        }
+
+    numeric_distribution = {
+        "kind": "numeric",
+        "min_value": column.get("min_value"),
+        "max_value": column.get("max_value"),
+        "p05": column.get("p05"),
+        "p95": column.get("p95"),
+    }
+    if any(value is not None for key, value in numeric_distribution.items() if key != "kind"):
+        return numeric_distribution
+
+    if column.get("min_date") is not None or column.get("max_date") is not None:
+        return {"kind": "date_range", "min": column.get("min_date"), "max": column.get("max_date")}
+    if column.get("min_timestamp") is not None or column.get("max_timestamp") is not None:
+        return {"kind": "datetime_range", "min": column.get("min_timestamp"), "max": column.get("max_timestamp")}
+    if is_identifier:
+        return {"kind": "synthetic_identifier", "prefix": _identifier_prefix(name, table_name)}
+    return {}
+
+
+def _distribution_from_generation_column(column: ColumnSpec) -> dict[str, Any]:
+    if column.strategy in {GenerationStrategy.SEQUENCE, GenerationStrategy.UUID}:
+        return {"kind": "synthetic_identifier", "prefix": _identifier_prefix(column.name, column.name)}
+    if column.strategy == GenerationStrategy.CHOICE:
+        return {
+            "kind": "categorical",
+            "categories": [
+                CategoryWeight(value=value, count=1.0).model_dump(mode="json")
+                for value in (column.choices or [])
+            ],
+        }
+    if column.strategy == GenerationStrategy.RANDOM_BOOLEAN:
+        return {"kind": "boolean", "true_ratio": 0.5}
+    if column.strategy in {GenerationStrategy.RANDOM_INT, GenerationStrategy.RANDOM_FLOAT}:
+        return {
+            "kind": "numeric",
+            "min_value": column.min_value,
+            "max_value": column.max_value,
+            "p05": column.min_value,
+            "p95": column.max_value,
+        }
+    if column.strategy == GenerationStrategy.DATE_RANGE:
+        return {
+            "kind": "date_range",
+            "min": column.min_date.isoformat() if column.min_date is not None else None,
+            "max": column.max_date.isoformat() if column.max_date is not None else None,
+        }
+    if column.strategy == GenerationStrategy.DATETIME_RANGE:
+        return {
+            "kind": "datetime_range",
+            "min": column.min_datetime.isoformat() if column.min_datetime is not None else None,
+            "max": column.max_datetime.isoformat() if column.max_datetime is not None else None,
+        }
+    if column.strategy == GenerationStrategy.CONSTANT:
+        return {
+            "kind": "categorical",
+            "categories": [CategoryWeight(value=column.constant, count=1.0).model_dump(mode="json")],
+        }
+    return {}
+
+
+def _primary_key_for_columns(columns: list[ColumnSpec]) -> str | None:
+    for column in columns:
+        if column.strategy in {GenerationStrategy.SEQUENCE, GenerationStrategy.UUID}:
+            return column.name
+    for column in columns:
+        if _is_identifier(column.name, 1.0):
+            return column.name
+    return None
+
+
+def _is_identifier(name: str, unique_ratio: float) -> bool:
+    normalized = name.lower()
+    return unique_ratio >= 0.95 and (normalized == "id" or normalized.endswith("_id"))
+
+
+def _identifier_prefix(name: str, table_name: str) -> str:
+    stem = name.removesuffix("_id")
+    if stem and stem != name:
+        return f"{stem.upper()}-"
+    return f"{table_name.upper()}-"
+
+
+def _optional_string(value: Any) -> str | None:
+    if value in (None, ""):
+        return None
+    return str(value)
+
+
+def _safe_ratio(distinct_count: Any, row_count: int) -> float:
+    if row_count <= 0:
+        return 0.0
+    try:
+        return min(max(float(distinct_count or 0) / row_count, 0.0), 1.0)
+    except (TypeError, ValueError):
+        return 0.0

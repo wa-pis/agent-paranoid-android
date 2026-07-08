@@ -16,7 +16,7 @@ from typing import Any
 import sqlglot
 from sqlglot import exp
 
-from test_data_agent.spec import infer_sensitive_from_name
+from test_data_agent.core.privacy import infer_sensitive_from_name, mask_value
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
@@ -219,15 +219,6 @@ def has_unrestricted_projection_star(tree: exp.Expression) -> bool:
 
 def is_star_column(expression: exp.Expression) -> bool:
     return isinstance(expression, exp.Column) and isinstance(expression.this, exp.Star)
-
-
-def mask_value(value: Any) -> Any:
-    if value is None:
-        return None
-    text = str(value)
-    if len(text) <= 2:
-        return "*" * len(text)
-    return f"{text[0]}***{text[-1]}"
 
 
 def mask_row(row: dict[str, Any]) -> dict[str, Any]:

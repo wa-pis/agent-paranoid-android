@@ -8,8 +8,8 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.privacy import mask_pattern
 from test_data_agent.csv_profiler import (
-    mask_pattern,
     numeric_stats,
     parse_bool,
     parse_date_value,

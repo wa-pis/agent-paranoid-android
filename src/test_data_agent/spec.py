@@ -8,6 +8,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from test_data_agent.core.privacy import SENSITIVE_NAME_PARTS, infer_sensitive_from_name, semantic_type_is_sensitive
+
 
 class DataType(StrEnum):
     INTEGER = "integer"
@@ -42,46 +44,13 @@ class OutputFormat(StrEnum):
     PARQUET = "parquet"
 
 
-SENSITIVE_NAME_PARTS = {
-    "address",
-    "birth",
-    "card",
-    "cc",
-    "credential",
-    "dob",
-    "email",
-    "first_name",
-    "firstname",
-    "full_name",
-    "last_name",
-    "lastname",
-    "mail",
-    "name",
-    "passport",
-    "password",
-    "phone",
-    "secret",
-    "ssn",
-    "tax_id",
-    "token",
-    "user",
-    "username",
-}
-
-
-def infer_sensitive_from_name(name: str) -> bool:
-    """Conservatively mark likely PII/secrets as sensitive by default."""
-    normalized = name.lower().replace("-", "_").replace(" ", "_")
-    return any(part in normalized for part in SENSITIVE_NAME_PARTS)
-
-
 def infer_sensitive_from_profile(column: dict[str, Any]) -> bool:
     if bool(column.get("sensitive")):
         return True
     if infer_sensitive_from_name(str(column.get("name", ""))):
         return True
     semantic_type = str(column.get("semantic_type", "")).lower()
-    if semantic_type in {"email", "phone", "name", "address", "ssn", "token", "secret"}:
+    if semantic_type_is_sensitive(semantic_type):
         return True
     data_type = coerce_profile_type(str(column.get("data_type", "string")))
     return data_type in {DataType.EMAIL, DataType.PHONE, DataType.NAME, DataType.ADDRESS}

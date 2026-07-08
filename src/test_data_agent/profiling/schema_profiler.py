@@ -13,10 +13,10 @@ from typing import Any
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.privacy import infer_sensitive_from_name, mask_pattern, semantic_type_is_sensitive
 from test_data_agent.csv_profiler import (
     infer_data_type,
     infer_semantic_type,
-    mask_pattern,
     numeric_stats,
     parse_bool,
     parse_date_value,
@@ -24,7 +24,6 @@ from test_data_agent.csv_profiler import (
     parse_float,
     parse_int,
 )
-from test_data_agent.spec import infer_sensitive_from_name
 
 MAX_DISTINCT_TRACKED = 200_000
 MAX_CATEGORY_TRACKED = 1_000
@@ -87,7 +86,7 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
     data_type = infer_data_type(name, non_null, semantic_type)
     unique_ratio = distinct_count / len(non_null) if non_null else 0.0
     is_identifier = is_identifier_name(name) or (unique_ratio >= 0.98 and "id" in name.lower())
-    sensitive = infer_sensitive_from_name(name) or semantic_type in {"email", "phone", "ssn"}
+    sensitive = infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
     return FieldProfile(
         name=name,
         data_type=normalize_field_type(data_type.value),
@@ -207,7 +206,7 @@ class FieldAccumulator:
         data_type = self.infer_field_type(semantic_type)
         unique_ratio = self.estimate_unique_ratio()
         is_identifier = is_identifier_name(self.name) or (unique_ratio >= 0.98 and "id" in self.name.lower())
-        sensitive = infer_sensitive_from_name(self.name) or semantic_type in {"email", "phone", "ssn"}
+        sensitive = infer_sensitive_from_name(self.name) or semantic_type_is_sensitive(semantic_type)
         profile = FieldProfile(
             name=self.name,
             data_type=data_type,
