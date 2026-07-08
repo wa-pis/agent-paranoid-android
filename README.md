@@ -3,25 +3,10 @@
 Safe, deterministic synthetic test data generation for database and CSV-driven
 test datasets.
 
-The project is intentionally conservative: it profiles schemas and aggregate
-metadata, detects likely sensitive fields, builds generation specs, generates
-synthetic rows from an explicit seed, validates the result, and exports data in
-common formats. It never copies source rows into generated output.
-
-## What It Does
-
-- Inspects Trino-accessible schemas through a small read-only MCP server.
-- Profiles CSV files into safe reusable metadata.
-- Infers PII and secret-like fields from names, semantic hints, and values.
-- Builds Pydantic generation specifications from explicit JSON, Trino profiles,
-  or CSV profiles.
-- Generates reproducible synthetic rows with Faker and deterministic random
-  generation.
-- Supports controlled invalid records for negative and mixed datasets.
-- Validates generated rows against the requested schema.
-- Exports JSON, CSV, and Parquet.
-- Defines executable business rules for field, row, cross-table, formula,
-  temporal, foreign-key, aggregate, and scenario validation.
+The agent profiles schemas and safe aggregate metadata, detects likely
+sensitive fields, builds generation specs, generates synthetic rows from an
+explicit seed, validates the result, and exports data in common formats. It
+never copies source rows into generated output.
 
 ## Safety Model
 
@@ -37,9 +22,9 @@ safe metadata:
 - date and timestamp ranges
 - masked sensitive patterns
 
-The project treats likely PII as sensitive by default. Sensitive CSV columns do
-not emit raw top values. Trino row-returning queries must be read-only, bounded
-with `LIMIT`, and cannot use unrestricted `SELECT *`.
+Likely PII and secret-like fields are treated as sensitive by default. Sensitive
+CSV columns do not emit raw top values. Trino row-returning queries must be
+read-only, bounded with `LIMIT`, and cannot use unrestricted `SELECT *`.
 
 Forbidden behavior includes copying production rows, exposing raw PII, exporting
 real rows, running DDL/DML SQL, and creating unrestricted SQL tools.
@@ -52,15 +37,25 @@ Use Python 3.11 or newer.
 python -m pip install -e ".[dev]"
 ```
 
-Run the test suite:
+Run tests:
 
 ```bash
-pytest
+python -m pytest
 ```
 
-## Quick Start
+## How To Use It
 
-Create a generation spec:
+There are three normal ways to use the project:
+
+1. Start from a hand-written generation spec.
+2. Start from a CSV file and let the agent infer a safe profile.
+3. Start from safe Trino/profile metadata and generate from that profile.
+
+Each flow produces synthetic data plus validation artifacts.
+
+### 1. Generate From A Spec
+
+Create `spec.json`:
 
 ```json
 {
@@ -83,23 +78,70 @@ Create a generation spec:
 }
 ```
 
-Generate and validate synthetic rows:
+Generate rows:
 
 ```bash
-test-data-agent generate spec.json --output customers.json
-test-data-agent validate spec.json customers.json
+test-data-agent generate spec.json --output out/customers.json
 ```
 
-Set `output_format` to `csv` or `parquet`, or override it from the CLI:
+Validate rows against the spec:
 
 ```bash
-test-data-agent generate spec.json --format csv --output customers.csv
+test-data-agent validate spec.json out/customers.json
 ```
 
-## Generate From A Safe Profile
+The `generate` command also writes:
 
-The agent can infer a generation spec from profile metadata such as
-`examples/orders_profile.json`.
+- `out/generation_spec.json`
+- `out/validation_report.json`
+
+### 2. Generate From A CSV
+
+First create a safe CSV profile:
+
+```bash
+test-data-agent profile-csv data/customers.csv \
+  --output out/customers_profile.json
+```
+
+Inspect the profile before using it. It should contain schema, aggregates,
+distributions, ranges, and masked patterns, not raw sensitive values.
+
+Generate synthetic data from the CSV:
+
+```bash
+test-data-agent generate-from-csv data/customers.csv \
+  --count 1000 \
+  --mode valid \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+```
+
+For a mixed valid/invalid dataset:
+
+```bash
+test-data-agent generate-from-csv data/customers.csv \
+  --count 1000 \
+  --mode mixed \
+  --invalid-ratio 0.02 \
+  --seed 12345 \
+  --format parquet \
+  --output out/customers.parquet
+```
+
+`generate-from-csv` writes:
+
+- the requested output file
+- `csv_profile.json`
+- `generation_spec.json`
+- `validation_report.json`
+
+Supported output formats are `json`, `csv`, and `parquet`.
+
+### 3. Generate From A Profile
+
+Use a safe profile such as `examples/orders_profile.json`:
 
 ```bash
 test-data-agent generate \
@@ -118,120 +160,127 @@ This writes:
 - `out/generation_spec.json`
 - `out/validation_report.json`
 
-`mixed` mode injects controlled invalid values according to `--invalid-ratio`.
-Use `valid` mode for datasets that should fully pass schema validation.
+Profile input should contain safe metadata only. Do not include raw production
+samples.
 
-## CSV Workflow
+## CLI Reference
 
-Profile a CSV into safe metadata:
+Profile a CSV:
 
 ```bash
-test-data-agent profile-csv data/customers.csv \
-  --output out/customers_profile.json
+test-data-agent profile-csv INPUT.csv --output PROFILE.json
 ```
 
-Generate synthetic data directly from a CSV:
+Generate from a spec:
 
 ```bash
-test-data-agent generate-from-csv data/customers.csv \
+test-data-agent generate SPEC.json --output OUTPUT.json
+```
+
+Generate from a safe profile:
+
+```bash
+test-data-agent generate \
+  --profile PROFILE.json \
   --count 1000 \
-  --mode mixed \
-  --invalid-ratio 0.02 \
-  --seed 12345 \
-  --format parquet \
-  --output out/customers.parquet
-```
-
-`generate-from-csv` writes the requested output plus:
-
-- `csv_profile.json`
-- `generation_spec.json`
-- `validation_report.json`
-
-The CSV profiler currently uses Python CSV parsing with header detection via
-`csv.DictReader`. It emits aggregates, distributions, ranges, and masked
-patterns; it does not preserve source rows.
-
-## Business Rules
-
-Business rules are YAML files layered on top of synthetic generation. They can
-validate generated rows, apply deterministic scenario distributions, and create
-controlled invalid cases. Supported modes are `valid`, `mixed`, `negative`,
-`edge`, and `load_test`.
-
-```yaml
-field_rules:
-  - table: orders
-    field: status
-    required: true
-    allowed_values: [paid, refunded]
-
-row_rules:
-  - type: conditional_required
-    table: orders
-    when: {field: status, equals: refunded}
-    required_fields: [refund_reason]
-
-  - type: conditional_allowed_values
-    table: orders
-    field: shipping_method
-    when: {field: status, equals: paid}
-    allowed_values: [ground, air]
-
-  - type: temporal_ordering
-    table: orders
-    start_field: created_at
-    end_field: shipped_at
-
-  - type: formula
-    table: orders
-    field: total
-    expression: quantity * unit_price
-
-cross_table_rules:
-  - type: foreign_key
-    child_table: orders
-    child_field: customer_id
-    parent_table: customers
-    parent_field: customer_id
-
-  - type: aggregate_formula
-    table: orders
-    field: total
-    expression: "100"
-    expected: 100
-
-scenarios:
-  - name: paid_ground
-    weight: 8
-    field_values:
-      orders:
-        status: paid
-        shipping_method: ground
-  - name: refunded
-    weight: 1
-    field_values:
-      orders:
-        status: refunded
-        refund_reason: damaged
-```
-
-Use rules with CSV-derived or Trino-derived profiles:
-
-```bash
-test-data-agent generate-from-csv data/orders.csv \
-  --count 1000 \
-  --mode mixed \
-  --invalid-ratio 0.05 \
   --seed 12345 \
   --format json \
-  --output out/orders.json \
-  --business-rules rules/orders.yaml
+  --output OUTPUT.json
 ```
 
-When rules are provided, the output directory also gets
-`business_validation_report.json` with rule pass/fail counts and failed-rule
-details.
+Generate directly from CSV:
+
+```bash
+test-data-agent generate-from-csv INPUT.csv \
+  --count 1000 \
+  --seed 12345 \
+  --format csv \
+  --output OUTPUT.csv
+```
+
+Validate generated JSON rows:
+
+```bash
+test-data-agent validate SPEC.json ROWS.json
+```
+
+Useful options:
+
+- `--count` overrides or supplies row count.
+- `--seed` makes generation reproducible.
+- `--format json|csv|parquet` selects output format.
+- `--mode valid|mixed` selects all-valid or controlled mixed data.
+- `--invalid-ratio 0.02` injects invalid values in `mixed` mode.
+- `--table NAME` sets the table name for CSV profiling.
+
+## Generation Specs
+
+Specs are Pydantic models serialized as JSON. Supported data types:
+
+- `integer`
+- `float`
+- `boolean`
+- `string`
+- `date`
+- `datetime`
+- `email`
+- `phone`
+- `name`
+- `address`
+- `uuid`
+
+Supported strategies:
+
+- `sequence`
+- `random_int`
+- `random_float`
+- `random_boolean`
+- `faker`
+- `choice`
+- `constant`
+- `date_range`
+- `datetime_range`
+- `uuid`
+
+Example with ranges and nullable values:
+
+```json
+{
+  "seed": 7,
+  "output_format": "csv",
+  "table": {
+    "name": "orders",
+    "row_count": 100,
+    "columns": [
+      {"name": "order_id", "data_type": "integer", "strategy": "sequence"},
+      {
+        "name": "status",
+        "data_type": "string",
+        "strategy": "choice",
+        "choices": ["new", "paid", "shipped", "cancelled"]
+      },
+      {
+        "name": "order_total",
+        "data_type": "float",
+        "min_value": 1,
+        "max_value": 500
+      },
+      {
+        "name": "created_at",
+        "data_type": "datetime",
+        "min_datetime": "2024-01-01T00:00:00",
+        "max_datetime": "2024-12-31T23:59:59"
+      },
+      {
+        "name": "coupon_code",
+        "data_type": "string",
+        "nullable": true,
+        "null_probability": 0.25
+      }
+    ]
+  }
+}
+```
 
 ## Trino MCP Server
 
@@ -270,7 +319,7 @@ uses conservative field-name detection for likely PII and secrets.
 ## Business Rules
 
 Business logic is represented as structured YAML or JSON and enforced by code,
-not by free-form LLM reasoning. The current rule models support:
+not by free-form LLM reasoning. Current rule models support:
 
 - field rules
 - conditional required fields
@@ -314,10 +363,28 @@ scenarios:
         status: cancelled
 ```
 
-Use `test_data_agent.business_rules.load_business_rules`,
-`test_data_agent.rules_engine.apply_business_rules`, and
-`test_data_agent.business_validator.validate_business_rules` from Python code to
-apply and validate these rules.
+Business rules are currently used from Python:
+
+```python
+from pathlib import Path
+
+from test_data_agent.business_rules import load_business_rules
+from test_data_agent.business_validator import validate_business_rules
+from test_data_agent.rules_engine import apply_business_rules
+
+rules = load_business_rules(Path("rules/orders.yaml"))
+rows_by_table = {"orders": rows}
+
+apply_business_rules(
+    rows_by_table,
+    rules,
+    seed=12345,
+    mode="mixed",
+    invalid_ratio=0.02,
+)
+
+report = validate_business_rules(rows_by_table, rules)
+```
 
 ## Python API
 
@@ -355,9 +422,6 @@ spec = GenerationSpec.from_trino_profile(profile, seed=123, row_count=100)
 rows = generate_rows(spec)
 report = validate_rows_report(rows, spec)
 ```
-
-Profile input should contain safe metadata only. Do not pass raw production
-samples into profile dictionaries.
 
 ## Project Layout
 
