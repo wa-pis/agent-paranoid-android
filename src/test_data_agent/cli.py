@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import sys
 from pathlib import Path
@@ -23,6 +22,16 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, 
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.generator import generate_rows
+from test_data_agent.io import (
+    dataset_spec_to_yaml,
+    load_dataset_rows,
+    load_dataset_spec,
+    write_dataset_generation_artifacts,
+    write_dataset_rows,
+    write_generation_artifacts,
+    write_single_entity_rows,
+    write_tabular_rows,
+)
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules_engine import GenerationMode, apply_business_rules
 from test_data_agent.spec import GenerationSpec, OutputFormat
@@ -97,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
         rows = generate_rows(spec)
         business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
         report = validate_rows_report(rows, spec)
-        write_rows(rows, spec, args.output)
+        write_tabular_rows(rows, spec, args.output)
         write_generation_artifacts(spec, report, args.output, business_report=business_report)
         if should_fail_generation(report, business_report, args.mode):
             for error in report.errors:
@@ -204,14 +213,6 @@ def is_dataset_spec_path(path: Path) -> bool:
     return path.suffix.lower() in {".yaml", ".yml"}
 
 
-def load_dataset_spec(path: Path) -> DatasetSpec:
-    return DatasetSpec.model_validate(yaml.safe_load(path.read_text()) or {})
-
-
-def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
-    return yaml.safe_dump(spec.model_dump(mode="json"), sort_keys=False)
-
-
 def generate_dataset_command(args: argparse.Namespace) -> int:
     spec = load_dataset_spec(args.spec)
     output_format = OutputFormat(args.output_format or "csv")
@@ -290,119 +291,6 @@ def should_fail_generation(schema_report: Any, business_report: Any | None, mode
     if not schema_report.valid:
         return True
     return business_report is not None and not business_report.valid
-
-
-def write_rows(rows: list[dict[str, Any]], spec: GenerationSpec, output: Path | None) -> None:
-    if spec.output_format == "parquet":
-        if output is None:
-            raise SystemExit("Parquet output requires --output")
-        write_parquet(rows, output)
-        return
-
-    if spec.output_format == "csv":
-        text = rows_to_csv(rows)
-    else:
-        text = json.dumps(rows, indent=2, sort_keys=True)
-
-    if output is None:
-        print(text)
-    else:
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(text)
-
-
-def write_generation_artifacts(spec: GenerationSpec, report: Any, output: Path | None, business_report: Any | None = None) -> None:
-    artifact_dir = output.parent if output is not None else Path.cwd()
-    artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / "generation_spec.json").write_text(spec.model_dump_json(indent=2))
-    (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
-    if business_report is not None:
-        (artifact_dir / "business_validation_report.json").write_text(business_report.model_dump_json(indent=2))
-
-
-def write_dataset_generation_artifacts(
-    profile: DatasetProfile,
-    spec: DatasetSpec,
-    report: Any,
-    output: Path,
-    business_report: Any | None = None,
-) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    (output.parent / "csv_profile.json").write_text(profile.model_dump_json(indent=2))
-    artifact_dir = output.parent
-    (artifact_dir / "generation_spec.json").write_text(spec.model_dump_json(indent=2))
-    (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
-    if business_report is not None:
-        (artifact_dir / "business_validation_report.json").write_text(business_report.model_dump_json(indent=2))
-
-
-def rows_to_csv(rows: list[dict[str, Any]]) -> str:
-    if not rows:
-        return ""
-    from io import StringIO
-
-    handle = StringIO()
-    writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
-    writer.writeheader()
-    writer.writerows(rows)
-    return handle.getvalue()
-
-
-def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
-    try:
-        import pyarrow as pa
-        import pyarrow.parquet as pq
-    except ImportError as exc:
-        raise SystemExit("Parquet output requires pyarrow") from exc
-
-    output.parent.mkdir(parents=True, exist_ok=True)
-    stable_rows = [
-        {key: None if value is None else str(value) for key, value in row.items()}
-        for row in rows
-    ]
-    pq.write_table(pa.Table.from_pylist(stable_rows), output)
-
-
-def write_dataset_rows(rows_by_entity: dict[str, list[dict[str, Any]]], output_format: OutputFormat, output_folder: Path) -> None:
-    output_folder.mkdir(parents=True, exist_ok=True)
-    for entity_name, rows in rows_by_entity.items():
-        if output_format == OutputFormat.CSV:
-            (output_folder / f"{entity_name}.csv").write_text(rows_to_csv(rows))
-        elif output_format == OutputFormat.JSON:
-            (output_folder / f"{entity_name}.json").write_text(json.dumps(rows, indent=2, sort_keys=True))
-        elif output_format == OutputFormat.PARQUET:
-            write_parquet(rows, output_folder / f"{entity_name}.parquet")
-
-
-def write_single_entity_rows(rows_by_entity: dict[str, list[dict[str, Any]]], output_format: OutputFormat, output: Path) -> None:
-    if len(rows_by_entity) != 1:
-        raise SystemExit("single-entity output requires exactly one generated entity")
-    rows = next(iter(rows_by_entity.values()))
-    if output_format == OutputFormat.CSV:
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(rows_to_csv(rows))
-    elif output_format == OutputFormat.JSON:
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(rows, indent=2, sort_keys=True))
-    elif output_format == OutputFormat.PARQUET:
-        write_parquet(rows, output)
-
-
-def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
-    rows_by_entity: dict[str, list[dict[str, Any]]] = {}
-    for path in sorted(input_folder.iterdir()):
-        if path.suffix == ".csv":
-            with path.open(newline="") as handle:
-                rows_by_entity[path.stem] = [dict(row) for row in csv.DictReader(handle)]
-        elif path.suffix == ".json":
-            rows_by_entity[path.stem] = json.loads(path.read_text())
-        elif path.suffix == ".parquet":
-            try:
-                import pyarrow.parquet as pq
-            except ImportError as exc:
-                raise SystemExit("Parquet input requires pyarrow") from exc
-            rows_by_entity[path.stem] = pq.read_table(path).to_pylist()
-    return rows_by_entity
 
 
 if __name__ == "__main__":
