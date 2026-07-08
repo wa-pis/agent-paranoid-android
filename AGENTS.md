@@ -83,6 +83,14 @@ When implementing:
 * Do not add heavy dependencies unless necessary.
 * Update README with usage examples after adding functionality.
 
+Git workflow:
+
+* Make regular commits at coherent checkpoints instead of one large end-of-session commit.
+* Keep each commit focused on a single logical change.
+* Use clear conventional commit messages, for example `feat: add csv profiling` or `docs: explain usage`.
+* Before committing, run the relevant tests or document why they were not run.
+* Do not include unrelated worktree changes in a commit.
+
 ## CSV Input Support
 
 The agent may use CSV files as a source of schema and profiling information.
