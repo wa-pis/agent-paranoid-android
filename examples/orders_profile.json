@@ -1,0 +1,40 @@
+{
+  "table": "orders",
+  "columns": [
+    {
+      "name": "order_id",
+      "data_type": "bigint",
+      "p05": 1000,
+      "p95": 999999
+    },
+    {
+      "name": "customer_email",
+      "data_type": "varchar",
+      "null_ratio": 0.02
+    },
+    {
+      "name": "status",
+      "data_type": "varchar",
+      "top_values": [
+        {"value": "new", "count": 1200},
+        {"value": "paid", "count": 8000},
+        {"value": "shipped", "count": 6500},
+        {"value": "cancelled", "count": 300}
+      ],
+      "approx_distinct_count": 4
+    },
+    {
+      "name": "order_total",
+      "data_type": "double",
+      "p05": 12.5,
+      "p95": 450.0,
+      "null_ratio": 0.0
+    },
+    {
+      "name": "created_at",
+      "data_type": "timestamp",
+      "min_timestamp": "2024-01-01T00:00:00",
+      "max_timestamp": "2024-12-31T23:59:59"
+    }
+  ]
+}

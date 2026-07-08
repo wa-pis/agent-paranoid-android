@@ -1,0 +1,6 @@
+customer_id,email,status,total,created_at,phone
+1,alice@example.com,new,12.50,2024-01-01T08:30:00,+1-555-0101
+2,bob@example.com,active,99.99,2024-01-02T09:00:00,+1-555-0102
+3,carol@example.com,active,45.25,2024-01-03T10:15:00,+1-555-0103
+4,dana@example.com,paused,123.45,2024-01-04T11:45:00,+1-555-0104
+5,erin@example.com,new,88.10,2024-01-05T12:00:00,+1-555-0105
