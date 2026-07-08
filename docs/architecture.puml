@@ -9,112 +9,191 @@ skinparam defaultTextAlignment center
 actor "User / Agent" as User
 
 package "Inputs" {
-  artifact "Generation Spec\nJSON" as ExplicitSpec
+  file "Single CSV\n(potentially sensitive)" as SingleCsv
+  folder "Example Dataset Folder\n*.csv per entity" as ExampleFolder
   database "Trino\n(read-only)" as Trino
-  file "CSV Source\n(potentially sensitive)" as Csv
+  artifact "GenerationSpec\nJSON" as LegacySpecFile
+  artifact "DatasetSpec\nYAML" as DatasetSpecFile
   artifact "Business Rules\nYAML / JSON" as RuleFile
 }
 
-package "Safe Profiling Layer" {
+package "Interfaces" {
+  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example, validate" as Cli
   component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
-  component "csv_profiler.py\nSafe CSV Profiler" as CsvProfiler
-  component "SQL Safety Checks\nread-only, LIMIT, no SELECT *" as SqlSafety
+}
+
+package "Safety Controls" {
+  component "SQL Safety Checks\nread-only, bounded LIMIT,\nno DDL/DML, no SELECT *" as SqlSafety
   component "PII Detection + Masking\nsensitive by default" as PiiMasking
-  artifact "Safe Profile Metadata\nschema, aggregates, distributions,\nranges, masked patterns" as SafeProfile
+  component "No Raw Row Copying\nsynthetic output only" as NoCopy
 }
 
-package "Spec Planning Layer" {
-  component "spec.py\nPydantic Models" as SpecModels
-  component "Profile -> GenerationSpec\nfrom_csv_profile / from_trino_profile" as SpecInference
-  artifact "GenerationSpec\nseed, table, columns,\nstrategies, output format" as GenerationSpec
+package "Legacy Single-Table Flow" {
+  component "csv_profiler.py\nSingle CSV Profiler" as CsvProfiler
+  component "spec.py\nGenerationSpec / ColumnSpec" as LegacySpec
+  component "generator.py\nDeterministic Row Generator" as LegacyGenerator
+  component "validator.py\nSingle-table Schema Validation" as LegacyValidator
+  artifact "Safe Table Profile\nschema, nulls, ranges,\nmasked patterns" as TableProfile
+  artifact "Synthetic Table Rows" as TableRows
 }
 
-package "Deterministic Generation Layer" {
-  component "generator.py\nSynthetic Row Generator" as Generator
-  component "Faker + seeded random\nreproducible values" as FakerSeed
-  component "rules_engine.py\nScenario + invalid-case application" as RulesEngine
-  artifact "Synthetic Rows\nnever copied from source" as SyntheticRows
+package "Domain-Agnostic Dataset Flow" {
+  package "core/" {
+    component "dataset.py\nDatasetProfile / DatasetSpec" as DatasetModels
+    component "entity.py\nEntityProfile / EntitySpec" as EntityModels
+    component "field.py\nFieldProfile / FieldSpec" as FieldModels
+    component "relationship.py\nRelationship" as RelationshipModel
+    component "constraint.py\nConstraint" as ConstraintModel
+  }
+
+  package "profiling/" {
+    component "schema_profiler.py\nCSV folder schema profiling" as SchemaProfiler
+    component "distribution_profiler.py\nSafe distributions" as DistributionProfiler
+    component "relationship_profiler.py\nFK inference" as RelationshipProfiler
+    component "constraint_miner.py\nFormula, temporal,\nconditional, aggregate inference" as ConstraintMiner
+  }
+
+  package "generation/" {
+    component "planner.py\nDatasetProfile -> DatasetSpec" as Planner
+    component "entity_generator.py\nMulti-entity synthetic generation" as EntityGenerator
+    component "constraint_solver.py\nFK, formula, temporal,\nconditional, aggregate solving" as ConstraintSolver
+  }
+
+  package "validation/" {
+    component "schema_validator.py\nEntity schema validation" as DatasetSchemaValidator
+    component "relationship_validator.py\nRelationship validation" as RelationshipValidator
+    component "constraint_validator.py\nConstraint validation" as ConstraintValidator
+    component "reconciliation.py\nCombined validation report" as Reconciliation
+  }
+
+  artifact "DatasetProfile\nentities, fields,\nrelationships, constraints" as DatasetProfile
+  artifact "DatasetSpec\nentity row counts,\nfields, relationships,\nconstraints" as DatasetSpec
+  artifact "Synthetic Dataset\none output file per entity" as DatasetRows
+  artifact "Dataset Validation Report\nschema, relationships,\nconstraints" as DatasetReport
 }
 
-package "Validation Layer" {
-  component "validator.py\nSchema Validation" as SchemaValidator
+package "Business Rule Layer" {
   component "business_rules.py\nRule Models + Loader" as RuleModels
-  component "business_validator.py\nExecutable Rule Validation" as BusinessValidator
-  artifact "Validation Reports\nschema + business results" as Reports
+  component "rules_engine.py\nScenarios + controlled invalid cases" as RulesEngine
+  component "business_validator.py\nExecutable business validation" as BusinessValidator
+  artifact "Business Validation Report" as BusinessReport
 }
 
-package "Interfaces / Outputs" {
-  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv, validate" as Cli
+package "Outputs" {
   file "CSV" as CsvOut
   file "JSON" as JsonOut
   file "Parquet" as ParquetOut
-  artifact "Artifacts\ngeneration_spec.json\ncsv_profile.json\nvalidation_report.json" as Artifacts
+  artifact "Artifacts\nprofile.json / csv_profile.json\ngeneration_spec.json / dataset_spec.yaml\nvalidation_report.json\nbusiness_validation_report.json" as Artifacts
 }
 
 User --> Cli : runs commands
-User --> ExplicitSpec : writes or reviews
+User --> LegacySpecFile : writes/reviews
+User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
 
-Cli --> CsvProfiler : profile-csv / generate-from-csv
-Csv --> CsvProfiler : read source rows locally
+Cli --> CsvProfiler : profile-csv /\ngenerate-from-csv
+SingleCsv --> CsvProfiler
 CsvProfiler --> PiiMasking
-CsvProfiler --> SafeProfile : emits safe metadata only
+CsvProfiler --> TableProfile : safe metadata only
+TableProfile --> LegacySpec : from_csv_profile
 
 Cli --> TrinoMcp : MCP metadata/profiling calls
 TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
-TrinoMcp --> SafeProfile : metadata, aggregates,\nmasked samples
+TrinoMcp --> TableProfile : metadata, aggregates,\nmasked samples
+TableProfile --> LegacySpec : from_trino_profile
 
-ExplicitSpec --> SpecModels
-SafeProfile --> SpecInference
-SpecInference --> SpecModels
-SpecModels --> GenerationSpec
+LegacySpecFile --> LegacySpec
+LegacySpec --> LegacyGenerator
+LegacyGenerator --> NoCopy
+LegacyGenerator --> TableRows
+TableRows --> LegacyValidator
+LegacySpec --> LegacyValidator
 
-Cli --> GenerationSpec
-GenerationSpec --> Generator
-Generator --> FakerSeed
-Generator --> SyntheticRows
+Cli --> SchemaProfiler : profile-example /\ngenerate-from-example
+ExampleFolder --> SchemaProfiler
+SchemaProfiler --> FieldModels
+SchemaProfiler --> EntityModels
+SchemaProfiler --> DatasetModels
+SchemaProfiler --> PiiMasking
+SchemaProfiler --> DistributionProfiler
+DistributionProfiler --> DatasetProfile
+SchemaProfiler --> RelationshipProfiler
+RelationshipProfiler --> RelationshipModel
+RelationshipProfiler --> DatasetProfile
+DatasetProfile --> ConstraintMiner
+ConstraintMiner --> ConstraintModel
+ConstraintMiner --> DatasetProfile
+
+DatasetProfile --> Planner
+DatasetSpecFile --> DatasetSpec
+Planner --> DatasetSpec
+DatasetSpec --> EntityGenerator
+EntityGenerator --> NoCopy
+EntityGenerator --> ConstraintSolver
+ConstraintSolver --> DatasetRows
+
+DatasetRows --> DatasetSchemaValidator
+DatasetSpec --> DatasetSchemaValidator
+DatasetRows --> RelationshipValidator
+DatasetSpec --> RelationshipValidator
+DatasetRows --> ConstraintValidator
+DatasetSpec --> ConstraintValidator
+DatasetSchemaValidator --> Reconciliation
+RelationshipValidator --> Reconciliation
+ConstraintValidator --> Reconciliation
+Reconciliation --> DatasetReport
 
 RuleFile --> RuleModels
 RuleModels --> RulesEngine
-SyntheticRows --> RulesEngine : optional Python API flow
-RulesEngine --> SyntheticRows : adjusted scenarios /\ncontrolled invalid rows
-
-SyntheticRows --> SchemaValidator
-GenerationSpec --> SchemaValidator
-RuleModels --> BusinessValidator
-SyntheticRows --> BusinessValidator
-SchemaValidator --> Reports
-BusinessValidator --> Reports
+TableRows --> RulesEngine : optional CLI flow
+RulesEngine --> BusinessValidator
+BusinessValidator --> BusinessReport
 
 Cli --> CsvOut
 Cli --> JsonOut
 Cli --> ParquetOut
-Cli --> Artifacts
-Reports --> Artifacts
-GenerationSpec --> Artifacts
-SafeProfile --> Artifacts
+TableRows --> CsvOut
+TableRows --> JsonOut
+TableRows --> ParquetOut
+DatasetRows --> CsvOut
+DatasetRows --> JsonOut
+DatasetRows --> ParquetOut
+TableProfile --> Artifacts
+LegacySpec --> Artifacts
+DatasetProfile --> Artifacts
+DatasetSpec --> Artifacts
+LegacyValidator --> Artifacts
+DatasetReport --> Artifacts
+BusinessReport --> Artifacts
 
-note right of SafeProfile
-  Safe profiles may include names, types,
-  null ratios, approximate counts,
-  enum-like distributions for non-sensitive
-  fields, numeric/date ranges, and masked
-  patterns.
+note right of DatasetProfile
+  Dataset profiles are safe metadata:
+  entities, field types, null ratios,
+  sensitivity flags, distributions,
+  inferred relationships, and inferred
+  constraints. Raw sensitive values are
+  not exposed.
 end note
 
-note bottom of SyntheticRows
-  Output must be synthetic and reproducible
-  from the explicit seed. Source rows are not
-  shuffled, duplicated, or exported.
+note bottom of ConstraintSolver
+  The solver enforces deterministic
+  relationship and constraint consistency
+  after base entity rows are generated.
 end note
 
 note right of SqlSafety
-  Rejects DDL/DML, multiple statements,
-  unbounded row-returning SELECT queries,
-  unrestricted SELECT *, and likely PII
-  projections.
+  Trino access is read-only and bounded.
+  Unsafe SQL, unrestricted SELECT *,
+  multiple statements, and likely PII
+  projections are rejected.
+end note
+
+note bottom of NoCopy
+  Generated rows must be reproducible
+  from seed and must not be shuffled,
+  duplicated, or exported source rows.
 end note
 
 @enduml
