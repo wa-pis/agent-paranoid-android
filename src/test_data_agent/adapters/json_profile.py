@@ -11,6 +11,7 @@ from test_data_agent.adapters.legacy_generation import (
     legacy_profile_to_dataset_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.generation.planner import infer_dataset_spec
 
 
 def load_json_payload(path: Path) -> dict[str, Any]:
@@ -44,12 +45,10 @@ def json_payload_to_dataset_spec(
             spec.generation_settings.seed = seed
         return spec
     if "entities" in payload:
-        return legacy_profile_to_dataset_spec(
-            DatasetProfile.model_validate(payload).model_dump(mode="json"),
-            count=count,
-            seed=seed,
-            source_type=str(payload.get("source_type", "json_profile")),
-        )
+        spec = infer_dataset_spec(DatasetProfile.model_validate(payload), count=count)
+        if seed is not None:
+            spec.generation_settings.seed = seed
+        return spec
     if "columns" in payload:
         source_type = str(payload.get("source_type", "json_profile"))
         return legacy_profile_to_dataset_spec(payload, count=count, seed=seed, source_type=source_type)
@@ -67,3 +66,20 @@ def load_json_dataset_spec(
     seed: int | None = None,
 ) -> DatasetSpec:
     return json_payload_to_dataset_spec(load_json_payload(path), count=count, seed=seed)
+
+
+def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
+    payload = load_json_payload(path)
+    if "privacy_rules" in payload or "generation_settings" in payload or "validation_settings" in payload:
+        return DatasetSpec.model_validate(payload)
+    if "source_type" in payload:
+        try:
+            return DatasetProfile.model_validate(payload)
+        except Exception:
+            return json_payload_to_dataset_profile(payload)
+    if "entities" in payload:
+        first_entity = payload["entities"][0] if payload["entities"] else {}
+        if isinstance(first_entity, dict) and "primary_key_candidates" in first_entity:
+            return DatasetProfile.model_validate(payload)
+        return DatasetSpec.model_validate(payload)
+    return json_payload_to_dataset_profile(payload)

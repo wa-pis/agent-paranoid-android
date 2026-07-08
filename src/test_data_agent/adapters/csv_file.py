@@ -46,3 +46,22 @@ def csv_file_to_dataset_spec(
         count=count,
         seed=seed,
     )
+
+
+def dataset_profile_from_csv_file(path: Path, table_name: str | None = None) -> DatasetProfile:
+    return csv_file_to_dataset_profile(path, table_name=table_name)
+
+
+def dataset_spec_from_csv_file(
+    path: Path,
+    *,
+    table_name: str | None = None,
+    count: int | None = None,
+    seed: int | None = None,
+) -> DatasetSpec:
+    return csv_file_to_dataset_spec(
+        path,
+        table_name=table_name,
+        count=count,
+        seed=seed,
+    )

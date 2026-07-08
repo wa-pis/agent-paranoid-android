@@ -9,16 +9,11 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
+from test_data_agent.core.privacy import is_sensitive_field, mask_pattern
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.spec import (
-    ColumnSpec,
-    DataType,
-    GenerationSpec,
-    GenerationStrategy,
-    MultiTableGenerationSpec,
-)
+from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec, TableSpec
 
 
 def legacy_profile_to_dataset_profile(
@@ -84,6 +79,10 @@ def generation_spec_to_dataset_spec(spec: GenerationSpec) -> DatasetSpec:
     )
 
 
+def dataset_spec_from_generation_spec(spec: GenerationSpec) -> DatasetSpec:
+    return generation_spec_to_dataset_spec(spec)
+
+
 def multi_table_generation_spec_to_dataset_spec(spec: MultiTableGenerationSpec) -> DatasetSpec:
     entities = [
         EntitySpec(
@@ -115,6 +114,27 @@ def multi_table_generation_spec_to_dataset_spec(spec: MultiTableGenerationSpec) 
     )
 
 
+def dataset_spec_to_generation_spec(
+    spec: DatasetSpec,
+    *,
+    seed: int | None = None,
+    output_format: OutputFormat | None = None,
+) -> GenerationSpec:
+    if len(spec.entities) != 1:
+        raise ValueError("legacy GenerationSpec compatibility requires exactly one entity")
+
+    entity = spec.entities[0]
+    return GenerationSpec(
+        seed=spec.generation_settings.seed if seed is None else seed,
+        table=TableSpec(
+            name=entity.name,
+            row_count=entity.row_count,
+            columns=[_column_spec_from_field_spec(field) for field in entity.fields],
+        ),
+        output_format=output_format or spec.generation_settings.output_format,
+    )
+
+
 def _field_profile_from_column(
     table_name: str,
     row_count: int,
@@ -123,16 +143,18 @@ def _field_profile_from_column(
     name = str(column.get("name", "column"))
     unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
     is_identifier = _is_identifier(name, unique_ratio)
+    semantic_type = _optional_string(column.get("semantic_type"))
+    sensitive = bool(column.get("sensitive", False)) or is_sensitive_field(name, semantic_type)
     return FieldProfile(
         name=name,
         data_type=_field_type_from_raw(column.get("data_type", "string")),
         nullable=bool(column.get("nullable", False)),
         null_ratio=float(column.get("null_ratio", 0.0) or 0.0),
         unique_ratio=unique_ratio,
-        sensitive=bool(column.get("sensitive", False)),
-        semantic_type=_optional_string(column.get("semantic_type")),
+        sensitive=sensitive,
+        semantic_type=semantic_type,
         is_identifier=is_identifier,
-        distribution=_distribution_from_profile_column(name, table_name, is_identifier, column),
+        distribution=_distribution_from_profile_column(name, table_name, is_identifier, sensitive, semantic_type, column),
     )
 
 
@@ -147,6 +169,47 @@ def _field_spec_from_column_spec(column: ColumnSpec) -> FieldSpec:
         is_identifier=_is_identifier(column.name, 1.0)
         or column.strategy in {GenerationStrategy.SEQUENCE, GenerationStrategy.UUID},
         distribution=_distribution_from_generation_column(column),
+    )
+
+
+def _column_spec_from_field_spec(field: FieldSpec) -> ColumnSpec:
+    data_type = _legacy_type_from_field_spec(field)
+    distribution = field.distribution
+    kind = str(distribution.get("kind") or "")
+
+    strategy: GenerationStrategy | None = None
+    faker_provider: str | None = None
+    choices: list[Any] | None = None
+
+    if field.is_identifier:
+        strategy = GenerationStrategy.SEQUENCE if data_type == DataType.INTEGER else GenerationStrategy.UUID
+    elif field.sensitive:
+        strategy = GenerationStrategy.FAKER
+        faker_provider = _faker_provider_for_data_type(data_type)
+    elif kind == "categorical":
+        raw_categories = distribution.get("categories") or []
+        choices = [item.get("value") for item in raw_categories if isinstance(item, Mapping) and item.get("value") is not None]
+        strategy = GenerationStrategy.CHOICE if choices else None
+    elif data_type == DataType.DATE:
+        strategy = GenerationStrategy.DATE_RANGE
+    elif data_type == DataType.DATETIME:
+        strategy = GenerationStrategy.DATETIME_RANGE
+
+    return ColumnSpec(
+        name=field.name,
+        data_type=data_type,
+        nullable=field.nullable,
+        sensitive=field.sensitive,
+        strategy=strategy,
+        faker_provider=faker_provider,
+        choices=choices,
+        min_value=_numeric_value(distribution, data_type, "p05", "min_value"),
+        max_value=_numeric_value(distribution, data_type, "p95", "max_value"),
+        min_date=distribution.get("min") if data_type == DataType.DATE else None,
+        max_date=distribution.get("max") if data_type == DataType.DATE else None,
+        min_datetime=distribution.get("min") if data_type == DataType.DATETIME else None,
+        max_datetime=distribution.get("max") if data_type == DataType.DATETIME else None,
+        null_probability=field.null_ratio if field.nullable else 0.0,
     )
 
 
@@ -181,16 +244,53 @@ def _field_type_from_legacy_type(data_type: DataType) -> FieldType:
     return FieldType.STRING
 
 
+def _legacy_type_from_field_spec(field: FieldSpec) -> DataType:
+    semantic_type = field.semantic_type or ""
+    if semantic_type == "email":
+        return DataType.EMAIL
+    if semantic_type == "phone":
+        return DataType.PHONE
+    if semantic_type == "name":
+        return DataType.NAME
+    if semantic_type == "address":
+        return DataType.ADDRESS
+    if field.data_type == FieldType.INTEGER:
+        return DataType.INTEGER
+    if field.data_type == FieldType.FLOAT:
+        return DataType.FLOAT
+    if field.data_type == FieldType.BOOLEAN:
+        return DataType.BOOLEAN
+    if field.data_type == FieldType.DATE:
+        return DataType.DATE
+    if field.data_type == FieldType.DATETIME:
+        return DataType.DATETIME
+    return DataType.STRING
+
+
 def _semantic_type_for_data_type(data_type: DataType) -> str | None:
     if data_type in {DataType.EMAIL, DataType.PHONE, DataType.NAME, DataType.ADDRESS}:
         return data_type.value
     return None
 
 
+def _faker_provider_for_data_type(data_type: DataType) -> str:
+    if data_type == DataType.EMAIL:
+        return "email"
+    if data_type == DataType.PHONE:
+        return "phone_number"
+    if data_type == DataType.NAME:
+        return "name"
+    if data_type == DataType.ADDRESS:
+        return "address"
+    return "word"
+
+
 def _distribution_from_profile_column(
     name: str,
     table_name: str,
     is_identifier: bool,
+    sensitive: bool,
+    semantic_type: str | None,
     column: Mapping[str, Any],
 ) -> dict[str, Any]:
     top_values = column.get("top_values") or []
@@ -199,6 +299,14 @@ def _distribution_from_profile_column(
         return {
             "kind": "masked_patterns",
             "patterns": [MaskedPattern.model_validate(item).model_dump(mode="json") for item in masked_patterns],
+        }
+    if sensitive and top_values:
+        return {
+            "kind": "masked_patterns",
+            "patterns": [
+                MaskedPattern(pattern=mask_pattern(str(item.get("value", "")), semantic_type), count=int(item.get("count", 0) or 0)).model_dump(mode="json")
+                for item in top_values
+            ],
         }
     if top_values:
         return {
@@ -281,7 +389,9 @@ def _primary_key_for_columns(columns: list[ColumnSpec]) -> str | None:
 
 def _is_identifier(name: str, unique_ratio: float) -> bool:
     normalized = name.lower()
-    return unique_ratio >= 0.95 and (normalized == "id" or normalized.endswith("_id"))
+    if normalized == "id" or normalized.endswith("_id"):
+        return True
+    return unique_ratio >= 0.95
 
 
 def _identifier_prefix(name: str, table_name: str) -> str:
@@ -304,3 +414,19 @@ def _safe_ratio(distinct_count: Any, row_count: int) -> float:
         return min(max(float(distinct_count or 0) / row_count, 0.0), 1.0)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _numeric_value(
+    distribution: Mapping[str, Any],
+    data_type: DataType,
+    preferred_key: str,
+    fallback_key: str,
+) -> int | float | None:
+    if data_type not in {DataType.INTEGER, DataType.FLOAT}:
+        return None
+    value = distribution.get(preferred_key, distribution.get(fallback_key))
+    if value is None:
+        return None
+    if data_type == DataType.INTEGER:
+        return int(round(float(value)))
+    return float(value)

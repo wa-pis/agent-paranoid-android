@@ -28,3 +28,16 @@ def trino_profile_to_dataset_spec(
         seed=seed,
         source_type="trino",
     )
+
+
+def dataset_profile_from_trino_profile(profile: Mapping[str, Any]) -> DatasetProfile:
+    return trino_profile_to_dataset_profile(profile)
+
+
+def dataset_spec_from_trino_profile(
+    profile: Mapping[str, Any],
+    *,
+    count: int | None = None,
+    seed: int | None = None,
+) -> DatasetSpec:
+    return trino_profile_to_dataset_spec(profile, count=count, seed=seed)

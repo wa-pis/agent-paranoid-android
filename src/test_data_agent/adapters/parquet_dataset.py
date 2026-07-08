@@ -10,7 +10,9 @@ from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, cs
 
 
 def parquet_file_to_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
-    return csv_profile_to_dataset_profile(_parquet_metadata_as_csv_profile(path, table_name=table_name))
+    profile = csv_profile_to_dataset_profile(_parquet_metadata_as_csv_profile(path, table_name=table_name))
+    profile.source_type = "parquet"
+    return profile
 
 
 def parquet_file_to_dataset_spec(
@@ -22,6 +24,25 @@ def parquet_file_to_dataset_spec(
 ) -> DatasetSpec:
     return csv_profile_to_dataset_spec(
         _parquet_metadata_as_csv_profile(path, table_name=table_name),
+        count=count,
+        seed=seed,
+    )
+
+
+def dataset_profile_from_parquet(path: Path, table_name: str | None = None) -> DatasetProfile:
+    return parquet_file_to_dataset_profile(path, table_name=table_name)
+
+
+def dataset_spec_from_parquet(
+    path: Path,
+    *,
+    table_name: str | None = None,
+    count: int | None = None,
+    seed: int | None = None,
+) -> DatasetSpec:
+    return parquet_file_to_dataset_spec(
+        path,
+        table_name=table_name,
         count=count,
         seed=seed,
     )
