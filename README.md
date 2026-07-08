@@ -25,6 +25,9 @@ safe metadata:
 Likely PII and secret-like fields are treated as sensitive by default. Sensitive
 CSV columns do not emit raw top values. Trino row-returning queries must be
 read-only, bounded with `LIMIT`, and cannot use unrestricted `SELECT *`.
+Local profile caches store only safe profile JSON: schema metadata,
+aggregates, distributions, inferred rules, and masked patterns. They must not
+store source rows or raw PII.
 
 Forbidden behavior includes copying production rows, exposing raw PII, exporting
 real rows, running DDL/DML SQL, and creating unrestricted SQL tools.
@@ -43,13 +46,24 @@ Run tests:
 python -m pytest
 ```
 
+## Documentation
+
+Start here if you want to understand the newer domain-agnostic multi-table
+pipeline:
+
+- [Domain-Agnostic Workflow](docs/domain_agnostic_workflow.md)
+- [Dataset Profile And Spec Reference](docs/dataset_profile_and_spec.md)
+- [Implementation Map](docs/implementation_map.md)
+- [Architecture Diagram](docs/architecture.puml)
+
 ## How To Use It
 
-There are three normal ways to use the project:
+There are four normal ways to use the project:
 
 1. Start from a hand-written generation spec.
 2. Start from a CSV file and let the agent infer a safe profile.
 3. Start from safe Trino/profile metadata and generate from that profile.
+4. Start from an example multi-table CSV folder and infer a dataset spec.
 
 Each flow produces synthetic data plus validation artifacts.
 
@@ -163,7 +177,96 @@ This writes:
 Profile input should contain safe metadata only. Do not include raw production
 samples.
 
+### 4. Generate From An Example Dataset
+
+For domain-agnostic multi-table generation, place one CSV per table in a folder:
+
+```text
+example_dataset/
+  customers.csv
+  orders.csv
+```
+
+Profile the folder without exposing raw PII:
+
+```bash
+test-data-agent profile-example example_dataset \
+  --output out/profile.json
+```
+
+Infer a YAML dataset spec with schema, relationships, distributions, formulas,
+temporal rules, conditional rules, and aggregate mappings:
+
+```bash
+test-data-agent infer-spec out/profile.json \
+  --count 1000 \
+  --output out/dataset_spec.yaml
+```
+
+Generate all related tables:
+
+```bash
+test-data-agent generate out/dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+```
+
+Validate the generated folder:
+
+```bash
+test-data-agent validate out/dataset_spec.yaml out/generated \
+  --output out/generated/validation_report.json
+```
+
+Or run the full flow in one command:
+
+```bash
+test-data-agent generate-from-example example_dataset \
+  --seed 12345 \
+  --count 1000 \
+  --format parquet \
+  --output out/generated
+```
+
+All identifiers are regenerated synthetically. Foreign keys are preserved by
+wiring child rows to generated parent IDs, never by reusing source IDs.
+
+Large CSV folders are profiled in a streaming pass, so the profiler does not
+hold every source row in memory. Schema, null ratios, safe distributions, and
+field metadata are computed across the full files. Relationship and constraint
+mining use a bounded local sample because they need row-level comparisons:
+
+```bash
+test-data-agent profile-example example_dataset \
+  --output out/profile.json \
+  --rule-sample-rows 100000
+```
+
+Profiles are cached by CSV file names, sizes, and modification times:
+
+```bash
+test-data-agent profile-example example_dataset \
+  --output out/profile.json \
+  --cache-dir .test_data_agent_cache/profiles
+```
+
+Use `--no-cache` when you need to force a fresh profile. The cache contains
+safe profile metadata only, not source rows.
+
 ## CLI Reference
+
+Profile an example multi-table CSV folder:
+
+```bash
+test-data-agent profile-example INPUT_FOLDER --output PROFILE.json
+```
+
+Infer a YAML dataset spec:
+
+```bash
+test-data-agent infer-spec PROFILE.json --output DATASET_SPEC.yaml
+```
 
 Profile a CSV:
 
@@ -175,6 +278,7 @@ Generate from a spec:
 
 ```bash
 test-data-agent generate SPEC.json --output OUTPUT.json
+test-data-agent generate DATASET_SPEC.yaml --format csv --output OUTPUT_FOLDER
 ```
 
 Generate from a safe profile:
@@ -198,10 +302,21 @@ test-data-agent generate-from-csv INPUT.csv \
   --output OUTPUT.csv
 ```
 
+Generate directly from an example multi-table folder:
+
+```bash
+test-data-agent generate-from-example INPUT_FOLDER \
+  --count 1000 \
+  --seed 12345 \
+  --format csv \
+  --output OUTPUT_FOLDER
+```
+
 Validate generated JSON rows:
 
 ```bash
 test-data-agent validate SPEC.json ROWS.json
+test-data-agent validate DATASET_SPEC.yaml OUTPUT_FOLDER
 ```
 
 Useful options:
@@ -213,6 +328,11 @@ Useful options:
 - `--invalid-ratio 0.02` injects invalid values in `mixed` mode; `negative`
   mode intentionally makes every generated value invalid.
 - `--table NAME` sets the table name for CSV profiling.
+- `--cache-dir PATH` selects the safe profile cache for example-folder
+  profiling.
+- `--no-cache` disables profile cache reuse.
+- `--rule-sample-rows N` bounds row-level relationship and constraint mining
+  while full-file schema and distribution profiling remains streaming.
 
 ## Architecture
 
@@ -299,7 +419,14 @@ The MCP server exposes small safe tools for metadata and profiling:
 - `list_tables`
 - `describe_table`
 - `profile_table`
+- `profile_table_safe`
 - `profile_column`
+- `profile_foreign_key`
+- `profile_temporal_ordering`
+- `profile_formula_rule`
+- `profile_conditional_required`
+- `profile_conditional_allowed_values`
+- `profile_aggregate_mapping`
 - `sample_rows_masked`
 - `run_safe_select`
 
@@ -327,6 +454,31 @@ When catalog or schema allowlists are configured, arbitrary selects must use
 fully qualified `catalog.schema.table` references that match those allowlists.
 SQL validation uses `sqlglot` AST parsing for Trino syntax. Masked sampling uses
 conservative field-name detection for likely PII and secrets.
+
+For large Trino tables, use safe profiling instead of downloading rows. The
+safe profile path pushes aggregate work into Trino: row counts, null ratios,
+approximate distinct counts, numeric ranges and percentiles, and timestamp
+ranges are returned as compact metadata. Low-cardinality top values are fetched
+only for non-sensitive string columns and always with a bounded `LIMIT`.
+Sensitive columns never return raw top values. Save the resulting profile JSON
+and reuse it for generation so repeated runs do not re-query the source table.
+
+Consistency profiling is also aggregate-only. Use the dedicated rule tools to
+measure whether inferred or proposed rules hold before adding them to a dataset
+spec:
+
+- `profile_foreign_key` returns child checked/matched/orphan counts.
+- `profile_temporal_ordering` returns pass/fail counts for timestamp ordering.
+- `profile_formula_rule` returns pass/fail counts and numeric residuals for
+  simple arithmetic formulas.
+- `profile_conditional_required` returns scoped present/missing counts without
+  echoing condition values.
+- `profile_conditional_allowed_values` returns scoped allowed/violation counts.
+- `profile_aggregate_mapping` compares parent aggregate fields with child
+  `sum` or `count` aggregates.
+
+Each rule profile includes `confidence` and `status`. The tools do not return
+source rows, identifiers, or raw PII values.
 
 ## Multi-Table Generation
 
@@ -471,6 +623,8 @@ report = validate_rows_report(rows, spec)
 - `src/test_data_agent/validator.py` - schema validation for generated rows.
 - `src/test_data_agent/csv_profiler.py` - safe CSV profiling.
 - `src/test_data_agent/mcp_trino_server.py` - safe read-only Trino MCP tools.
+- `src/test_data_agent/profiling/` - domain-agnostic CSV-folder profiling,
+  relationship inference, constraint mining, and safe profile caching.
 - `src/test_data_agent/business_rules.py` - business-rule models and YAML loader.
 - `src/test_data_agent/rules_engine.py` - scenario application and invalid-case injection.
 - `src/test_data_agent/business_validator.py` - executable business-rule validation.

@@ -1,0 +1,5 @@
+order_id,customer_id,status,quantity,unit_price,amount,created_at,fulfilled_at,cancellation_reason
+O1,C1,paid,2,10,20,2024-01-01T08:00:00,2024-01-02T08:00:00,
+O2,C1,cancelled,3,10,30,2024-01-03T08:00:00,2024-01-04T08:00:00,customer request
+O3,C2,paid,1,60,60,2024-01-05T08:00:00,2024-01-06T08:00:00,
+O4,C3,cancelled,2,15,30,2024-01-07T08:00:00,2024-01-08T08:00:00,fraud
