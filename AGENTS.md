@@ -59,6 +59,19 @@ Implementation preference:
 * Keep actual data generation deterministic and testable.
 * Keep Trino MCP tools small, explicit, and safe.
 
+Python implementation guidelines:
+
+* Target Python 3.11+ and use modern type hints.
+* Prefer dataclasses or Pydantic models for structured data instead of untyped dictionaries at module boundaries.
+* Keep pure deterministic logic separate from I/O, MCP, filesystem, and CLI wrappers.
+* Use `pathlib.Path` for filesystem paths.
+* Avoid global mutable state; pass seeds, configs, and dependencies explicitly.
+* Keep random generation local to a seeded `random.Random` instance.
+* Raise specific exceptions for safety violations and validation failures.
+* Do not swallow exceptions silently; convert them to clear CLI errors only at the CLI boundary.
+* Keep imports explicit and avoid wildcard imports.
+* Add dependencies only when they materially simplify safe, testable behavior.
+
 Expected modules:
 
 * mcp_trino_server.py: MCP tools for safe Trino metadata/profiling
