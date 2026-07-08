@@ -9,6 +9,7 @@ from test_data_agent.adapters import (
     dataset_profile_from_parquet,
     dataset_spec_from_generation_spec,
     dataset_spec_from_trino_profile,
+    generate_legacy_rows,
     load_profile_or_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -87,6 +88,26 @@ def test_legacy_generation_spec_adapter_preserves_generation_settings() -> None:
     assert spec.generation_settings.seed == 42
     assert spec.entity("customers").primary_key == "id"
     assert spec.entity("customers").field("email").sensitive is True
+
+
+def test_legacy_generation_adapter_can_generate_rows() -> None:
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+
+    rows = generate_legacy_rows(legacy_spec)
+
+    assert len(rows) == 2
+    assert rows[0]["id"] == 1
+    assert rows[0]["email"] != rows[1]["email"]
 
 
 def test_json_loader_distinguishes_profiles_from_specs(tmp_path) -> None:

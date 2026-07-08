@@ -18,6 +18,7 @@ from test_data_agent.adapters.json_profile import (
 from test_data_agent.adapters.legacy_generation import (
     dataset_spec_to_generation_spec,
     dataset_spec_from_generation_spec,
+    generate_legacy_rows,
     generation_spec_to_dataset_spec,
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
@@ -50,6 +51,7 @@ __all__ = [
     "dataset_spec_from_trino_profile",
     "dataset_spec_to_generation_spec",
     "generation_spec_to_dataset_spec",
+    "generate_legacy_rows",
     "json_payload_to_dataset_profile",
     "json_payload_to_dataset_spec",
     "legacy_profile_to_dataset_profile",

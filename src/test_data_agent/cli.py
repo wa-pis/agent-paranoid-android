@@ -14,6 +14,7 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
     dataset_spec_to_generation_spec,
+    generate_legacy_rows,
 )
 from test_data_agent.business_rules import load_business_rules
 from test_data_agent.business_validator import validate_business_rules
@@ -21,7 +22,6 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.generator import generate_rows
 from test_data_agent.io import (
     dataset_spec_to_yaml,
     load_dataset_rows,
@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
         spec = build_generation_spec(args)
-        rows = generate_rows(spec)
+        rows = generate_legacy_rows(spec)
         business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
         report = validate_rows_report(rows, spec)
         write_tabular_rows(rows, spec, args.output)
@@ -148,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
         apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
         legacy_spec = dataset_spec_to_generation_spec(spec, seed=args.seed, output_format=OutputFormat(args.output_format))
         apply_mode_options(legacy_spec, args.mode, args.invalid_ratio)
-        rows = generate_rows(legacy_spec)
+        rows = generate_legacy_rows(legacy_spec)
         rows_by_entity = {spec.entities[0].name: rows}
         business_report = apply_business_rules_from_args(rows_by_entity, args, args.seed)
         report = validate_dataset(rows_by_entity, spec)

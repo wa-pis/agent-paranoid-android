@@ -13,6 +13,7 @@ from test_data_agent.core.privacy import is_sensitive_field, mask_pattern
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
+from test_data_agent.generator import generate_rows
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec, TableSpec
 
 
@@ -133,6 +134,10 @@ def dataset_spec_to_generation_spec(
         ),
         output_format=output_format or spec.generation_settings.output_format,
     )
+
+
+def generate_legacy_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
+    return generate_rows(spec)
 
 
 def _field_profile_from_column(
