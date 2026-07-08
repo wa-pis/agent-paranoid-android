@@ -6,8 +6,15 @@ import random
 from enum import StrEnum
 from typing import Any
 
-from test_data_agent.business_rules import BusinessRules, ConditionalRequiredRule, FieldRule, FormulaRule, TemporalOrderingRule
-from test_data_agent.business_validator import safe_eval
+from test_data_agent.business_rules import (
+    BusinessRules,
+    ConditionalAllowedValuesRule,
+    ConditionalRequiredRule,
+    FieldRule,
+    FormulaRule,
+    TemporalOrderingRule,
+)
+from test_data_agent.business_validator import condition_matches, parse_datetime, safe_eval
 from test_data_agent.scenario import apply_scenarios
 
 
@@ -50,9 +57,21 @@ def apply_valid_defaults(rows_by_table: dict[str, list[dict[str, Any]]], rules: 
     for rule in rules.row_rules:
         if isinstance(rule, ConditionalRequiredRule):
             for row in rows_by_table.get(rule.table, []):
+                if not condition_matches(row, rule.when):
+                    continue
                 for field in rule.required_fields:
                     if row.get(field) in (None, ""):
                         row[field] = "required"
+        elif isinstance(rule, ConditionalAllowedValuesRule):
+            for row in rows_by_table.get(rule.table, []):
+                if condition_matches(row, rule.when) and row.get(rule.field) not in rule.allowed_values:
+                    row[rule.field] = rule.allowed_values[0]
+        elif isinstance(rule, TemporalOrderingRule):
+            for row in rows_by_table.get(rule.table, []):
+                start = parse_datetime(row.get(rule.start_field))
+                end = parse_datetime(row.get(rule.end_field))
+                if start is not None and (end is None or start > end):
+                    row[rule.end_field] = row.get(rule.start_field)
         elif isinstance(rule, FormulaRule):
             for row in rows_by_table.get(rule.table, []):
                 row[rule.field] = safe_eval(rule.expression, row)

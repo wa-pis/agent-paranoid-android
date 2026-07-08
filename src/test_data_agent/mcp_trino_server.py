@@ -12,6 +12,9 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+import sqlglot
+from sqlglot import exp
+
 from test_data_agent.spec import infer_sensitive_from_name
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
@@ -33,7 +36,6 @@ LIMIT_RE = re.compile(r"\blimit\s+\d+\b", re.IGNORECASE)
 SELECT_STAR_RE = re.compile(r"\bselect\s+(?:distinct\s+)?(?:[a-zA-Z_][\w$]*\s*\.\s*)?\*", re.IGNORECASE)
 TABLE_STAR_RE = re.compile(r"\bselect\b(?:(?!\bfrom\b).)*\b[a-zA-Z_][\w$]*\s*\.\s*\*", re.IGNORECASE | re.DOTALL)
 IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
-
 DEFAULT_LIMIT = 100
 MAX_LIMIT = 1000
 
@@ -98,26 +100,123 @@ def strip_sql_comments(sql: str) -> str:
 
 def normalize_sql(sql: str) -> str:
     cleaned = strip_sql_comments(sql).strip()
-    if cleaned.endswith(";"):
-        cleaned = cleaned[:-1].strip()
-    if ";" in cleaned:
+    semicolon_positions = unquoted_char_positions(cleaned, ";")
+    if len(semicolon_positions) > 1:
         raise SqlSafetyError("multiple SQL statements are not allowed")
+    if semicolon_positions:
+        semicolon = semicolon_positions[0]
+        if cleaned[semicolon + 1 :].strip():
+            raise SqlSafetyError("multiple SQL statements are not allowed")
+        cleaned = cleaned[:semicolon].strip()
+    if not cleaned:
+        raise SqlSafetyError("empty SQL is not allowed")
     return cleaned
 
 
 def validate_safe_select(sql: str, require_limit: bool = True) -> str:
     cleaned = normalize_sql(sql)
-    lowered = cleaned.lower()
-
-    if not (lowered.startswith("select ") or lowered.startswith("with ")):
-        raise SqlSafetyError("only SELECT queries are allowed")
     if FORBIDDEN_SQL_RE.search(cleaned):
         raise SqlSafetyError("DDL, DML, and executable statements are not allowed")
-    if SELECT_STAR_RE.search(cleaned) or TABLE_STAR_RE.search(cleaned):
+    tree = parse_select_ast(cleaned)
+    if has_unrestricted_projection_star(tree):
         raise SqlSafetyError("unrestricted SELECT * is not allowed")
-    if require_limit and not LIMIT_RE.search(cleaned):
+    if selected_sensitive_identifier_names(tree):
+        raise SqlSafetyError("SELECT queries must not project likely PII fields")
+    if require_limit and not has_top_level_limit(tree):
         raise SqlSafetyError("row-returning SELECT queries must include LIMIT")
+    validate_table_references_allowed(tree)
     return cleaned
+
+
+def parse_select_ast(sql: str) -> exp.Expression:
+    try:
+        statements = sqlglot.parse(sql, read="trino")
+    except sqlglot.errors.ParseError as exc:
+        raise SqlSafetyError(f"invalid SQL: {exc}") from exc
+    if len(statements) != 1:
+        raise SqlSafetyError("exactly one SQL statement is allowed")
+    tree = statements[0]
+    if not isinstance(tree, exp.Select):
+        raise SqlSafetyError("only SELECT queries are allowed")
+    return tree
+
+
+def unquoted_char_positions(sql: str, char: str) -> list[int]:
+    positions: list[int] = []
+    quote: str | None = None
+    index = 0
+    while index < len(sql):
+        current = sql[index]
+        if quote:
+            if current == quote:
+                if quote == "'" and index + 1 < len(sql) and sql[index + 1] == "'":
+                    index += 2
+                    continue
+                quote = None
+        elif current in {"'", '"'}:
+            quote = current
+        elif current == char:
+            positions.append(index)
+        index += 1
+    return positions
+
+
+def has_top_level_limit(sql_or_tree: str | exp.Expression) -> bool:
+    tree = parse_select_ast(normalize_sql(sql_or_tree)) if isinstance(sql_or_tree, str) else sql_or_tree
+    limit = tree.args.get("limit")
+    if limit is None:
+        return False
+    expression = limit.expression
+    return isinstance(expression, exp.Literal) and expression.is_int
+
+
+def validate_table_references_allowed(sql_or_tree: str | exp.Expression, config: TrinoConfig | None = None) -> None:
+    config = config or TrinoConfig.from_env()
+    tree = parse_select_ast(normalize_sql(sql_or_tree)) if isinstance(sql_or_tree, str) else sql_or_tree
+    references = extract_table_references(tree)
+    if not references:
+        return
+    for parts in references:
+        if config.allowed_catalogs is not None or config.allowed_schemas is not None:
+            if len(parts) != 3:
+                raise AllowlistError("queries must use fully qualified catalog.schema.table references")
+        catalog = parts[0] if len(parts) == 3 else None
+        schema = parts[1] if len(parts) == 3 else (parts[0] if len(parts) == 2 else None)
+        check_allowlist(catalog=catalog, schema=schema, config=config)
+
+
+def extract_table_references(tree: exp.Expression) -> list[tuple[str, ...]]:
+    cte_aliases = {cte.alias for cte in tree.find_all(exp.CTE) if cte.alias}
+    references: list[tuple[str, ...]] = []
+    for table in tree.find_all(exp.Table):
+        parts = tuple(part.name for part in table.parts)
+        if not parts or parts[-1] in cte_aliases:
+            continue
+        references.append(parts)
+    return references
+
+
+def selected_sensitive_identifier_names(tree: exp.Expression) -> set[str]:
+    sensitive: set[str] = set()
+    for projection in tree.expressions:
+        alias = projection.alias
+        if alias and infer_sensitive_from_name(alias):
+            sensitive.add(alias)
+        for column in projection.find_all(exp.Column):
+            if is_star_column(column):
+                continue
+            name = column.name
+            if name and infer_sensitive_from_name(name):
+                sensitive.add(name)
+    return sensitive
+
+
+def has_unrestricted_projection_star(tree: exp.Expression) -> bool:
+    return any(isinstance(projection, exp.Star) or is_star_column(projection) for projection in tree.expressions)
+
+
+def is_star_column(expression: exp.Expression) -> bool:
+    return isinstance(expression, exp.Column) and isinstance(expression.this, exp.Star)
 
 
 def mask_value(value: Any) -> Any:

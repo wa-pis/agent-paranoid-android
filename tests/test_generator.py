@@ -1,8 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from test_data_agent.generator import generate_rows
-from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, TableSpec
+from test_data_agent.generator import generate_rows, generate_tables
+from test_data_agent.spec import ColumnSpec, DataType, ForeignKeySpec, GenerationSpec, MultiTableGenerationSpec, TableSpec
 from test_data_agent.validator import validate_rows, validate_rows_report
 
 
@@ -170,3 +170,50 @@ def test_invalid_ratio_supports_mixed_mode_and_report_output() -> None:
     assert report.expected_row_count == 4
     assert report.error_count == 4
     assert report.model_dump()["errors"]
+
+
+def test_multi_table_generation_applies_foreign_keys_deterministically() -> None:
+    spec = MultiTableGenerationSpec.from_profiles(
+        [
+            {
+                "table": "customers",
+                "columns": [
+                    {"name": "customer_id", "data_type": "bigint", "p05": 100, "p95": 200},
+                    {
+                        "name": "segment",
+                        "data_type": "varchar",
+                        "top_values": [{"value": "retail"}, {"value": "enterprise"}],
+                        "approx_distinct_count": 2,
+                    },
+                ],
+            },
+            {
+                "table": "orders",
+                "columns": [
+                    {"name": "order_id", "data_type": "bigint", "p05": 1, "p95": 1000},
+                    {"name": "customer_id", "data_type": "bigint", "p05": 1, "p95": 1000},
+                    {"name": "amount", "data_type": "double", "p05": 10, "p95": 20},
+                ],
+            },
+        ],
+        seed=123,
+        row_counts={"customers": 5, "orders": 20},
+        foreign_keys=[
+            ForeignKeySpec(
+                child_table="orders",
+                child_field="customer_id",
+                parent_table="customers",
+                parent_field="customer_id",
+            )
+        ],
+    )
+
+    rows_a = generate_tables(spec)
+    rows_b = generate_tables(spec)
+    customer_ids = {row["customer_id"] for row in rows_a["customers"]}
+    order_customer_ids = {row["customer_id"] for row in rows_a["orders"]}
+
+    assert rows_a == rows_b
+    assert len(rows_a["customers"]) == 5
+    assert len(rows_a["orders"]) == 20
+    assert order_customer_ids <= customer_ids

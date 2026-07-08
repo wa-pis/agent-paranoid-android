@@ -5,7 +5,9 @@ from test_data_agent.mcp_trino_server import (
     SqlSafetyError,
     TrinoConfig,
     check_allowlist,
+    has_top_level_limit,
     mask_row,
+    validate_table_references_allowed,
     validate_safe_select,
 )
 
@@ -49,6 +51,45 @@ def test_safe_select_with_limit_is_allowed() -> None:
     assert validate_safe_select("SELECT id, count(*) AS n FROM users GROUP BY id LIMIT 10") == (
         "SELECT id, count(*) AS n FROM users GROUP BY id LIMIT 10"
     )
+
+
+def test_limit_must_be_top_level_not_inside_literal() -> None:
+    assert has_top_level_limit("SELECT id FROM users WHERE note = 'limit 1'") is False
+    with pytest.raises(SqlSafetyError):
+        validate_safe_select("SELECT id FROM users WHERE note = 'limit 1'")
+
+
+def test_safe_select_rejects_likely_pii_even_with_safe_alias() -> None:
+    with pytest.raises(SqlSafetyError):
+        validate_safe_select("SELECT customer_email AS value FROM analytics.safe_schema.users LIMIT 10")
+
+
+def test_safe_select_enforces_allowlist_for_table_references() -> None:
+    config = TrinoConfig(
+        host="localhost",
+        port=8080,
+        user="agent",
+        http_scheme="http",
+        allowed_catalogs=frozenset({"analytics"}),
+        allowed_schemas=frozenset({"safe_schema"}),
+    )
+
+    validate_table_references_allowed("SELECT id FROM analytics.safe_schema.users LIMIT 10", config=config)
+    with pytest.raises(AllowlistError):
+        validate_table_references_allowed("SELECT id FROM raw.safe_schema.users LIMIT 10", config=config)
+    with pytest.raises(AllowlistError):
+        validate_table_references_allowed("SELECT id FROM users LIMIT 10", config=config)
+
+
+def test_safe_select_uses_env_allowlists(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+
+    validate_safe_select("SELECT id FROM analytics.safe_schema.users LIMIT 10")
+    with pytest.raises(AllowlistError):
+        validate_safe_select("SELECT id FROM raw.safe_schema.users LIMIT 10")
+    with pytest.raises(AllowlistError):
+        validate_safe_select("SELECT id FROM users LIMIT 10")
 
 
 def test_allowlist_rejects_catalog_and_schema() -> None:

@@ -172,6 +172,31 @@ scenarios:
     assert report.rule_fail_count == 6
 
 
+def test_conditional_required_defaults_only_apply_when_condition_matches(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+row_rules:
+  - type: conditional_required
+    table: orders
+    when: {field: status, equals: refunded}
+    required_fields: [refund_reason]
+"""
+    )
+    rules = load_business_rules(rules_path)
+    rows_by_table = {
+        "orders": [
+            {"status": "paid", "refund_reason": None},
+            {"status": "refunded", "refund_reason": None},
+        ]
+    }
+
+    apply_business_rules(rows_by_table, rules, seed=4, mode="valid", invalid_ratio=0)
+
+    assert rows_by_table["orders"][0]["refund_reason"] is None
+    assert rows_by_table["orders"][1]["refund_reason"] == "required"
+
+
 def test_cli_writes_business_validation_report_for_csv_profile(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     output = tmp_path / "out" / "customers.json"
@@ -208,3 +233,42 @@ field_rules:
 
     assert exit_code == 0
     assert report["rule_fail_count"] == 0
+
+
+def test_cli_valid_mode_fails_when_business_rules_fail(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    output = tmp_path / "out" / "customers.json"
+    rules_path.write_text(
+        """
+cross_table_rules:
+  - type: foreign_key
+    child_table: customers
+    child_field: customer_id
+    parent_table: accounts
+    parent_field: customer_id
+"""
+    )
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            "tests/fixtures/customers.csv",
+            "--count",
+            "5",
+            "--mode",
+            "valid",
+            "--seed",
+            "9",
+            "--format",
+            "json",
+            "--output",
+            str(output),
+            "--business-rules",
+            str(rules_path),
+        ]
+    )
+
+    report = json.loads((output.parent / "business_validation_report.json").read_text())
+
+    assert exit_code == 1
+    assert report["rule_fail_count"] > 0

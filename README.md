@@ -209,8 +209,9 @@ Useful options:
 - `--count` overrides or supplies row count.
 - `--seed` makes generation reproducible.
 - `--format json|csv|parquet` selects output format.
-- `--mode valid|mixed` selects all-valid or controlled mixed data.
-- `--invalid-ratio 0.02` injects invalid values in `mixed` mode.
+- `--mode valid|mixed|negative|edge|load_test` selects the generation mode.
+- `--invalid-ratio 0.02` injects invalid values in `mixed` mode; `negative`
+  mode intentionally makes every generated value invalid.
 - `--table NAME` sets the table name for CSV profiling.
 
 ## Architecture
@@ -320,8 +321,41 @@ python -m test_data_agent.mcp_trino_server
 ```
 
 `run_safe_select` rejects DDL, DML, executable statements, multiple statements,
-unbounded row-returning queries, and unrestricted `SELECT *`. Masked sampling
-uses conservative field-name detection for likely PII and secrets.
+unbounded row-returning queries without a top-level `LIMIT`, unrestricted
+`SELECT *`, and projections of likely PII fields even when they are aliased.
+When catalog or schema allowlists are configured, arbitrary selects must use
+fully qualified `catalog.schema.table` references that match those allowlists.
+SQL validation uses `sqlglot` AST parsing for Trino syntax. Masked sampling uses
+conservative field-name detection for likely PII and secrets.
+
+## Multi-Table Generation
+
+Use `MultiTableGenerationSpec` when synthetic tables need deterministic
+relationships such as foreign keys:
+
+```python
+from test_data_agent import ForeignKeySpec, MultiTableGenerationSpec, generate_tables
+
+spec = MultiTableGenerationSpec.from_profiles(
+    profiles=[customers_profile, orders_profile],
+    seed=12345,
+    row_counts={"customers": 100, "orders": 1000},
+    foreign_keys=[
+        ForeignKeySpec(
+            child_table="orders",
+            child_field="customer_id",
+            parent_table="customers",
+            parent_field="customer_id",
+        )
+    ],
+)
+
+tables = generate_tables(spec)
+```
+
+Parent and child rows are generated synthetically from safe CSV-derived or
+Trino-derived profile metadata. Foreign-key values are assigned from generated
+parent rows, never copied from source data.
 
 ## Business Rules
 

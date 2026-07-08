@@ -9,7 +9,7 @@ from uuid import UUID
 
 from faker import Faker
 
-from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy
+from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec
 
 
 def generate_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
@@ -24,6 +24,36 @@ def generate_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
         }
         for row_index in range(spec.table.row_count)
     ]
+
+
+def generate_tables(spec: MultiTableGenerationSpec) -> dict[str, list[dict[str, Any]]]:
+    rows_by_table: dict[str, list[dict[str, Any]]] = {}
+    for table_index, table in enumerate(spec.tables):
+        table_spec = GenerationSpec(
+            seed=spec.seed + table_index,
+            table=table,
+            output_format=spec.output_format,
+        )
+        rows_by_table[table.name] = generate_rows(table_spec)
+    apply_foreign_keys(rows_by_table, spec)
+    return rows_by_table
+
+
+def apply_foreign_keys(rows_by_table: dict[str, list[dict[str, Any]]], spec: MultiTableGenerationSpec) -> None:
+    rng = random.Random(spec.seed)
+    for foreign_key in spec.foreign_keys:
+        parent_rows = rows_by_table.get(foreign_key.parent_table, [])
+        child_rows = rows_by_table.get(foreign_key.child_table, [])
+        parent_values = [
+            row.get(foreign_key.parent_field)
+            for row in parent_rows
+            if row.get(foreign_key.parent_field) is not None
+        ]
+        if not parent_values:
+            continue
+        for child_row in child_rows:
+            if foreign_key.child_field in child_row:
+                child_row[foreign_key.child_field] = rng.choice(parent_values)
 
 
 def generate_value(

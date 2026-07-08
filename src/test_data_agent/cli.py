@@ -62,9 +62,11 @@ def main(argv: list[str] | None = None) -> int:
         report = validate_rows_report(rows, spec)
         write_rows(rows, spec, args.output)
         write_generation_artifacts(spec, report, args.output, business_report=business_report)
-        if not report.valid and args.mode not in {"mixed", "negative"}:
+        if should_fail_generation(report, business_report, args.mode):
             for error in report.errors:
                 print(error, file=sys.stderr)
+            if business_report is not None and not business_report.valid:
+                print("business validation failed", file=sys.stderr)
             return 1
         return 0
 
@@ -88,9 +90,11 @@ def main(argv: list[str] | None = None) -> int:
         report = validate_rows_report(rows, spec)
         write_rows(rows, spec, args.output)
         write_csv_generation_artifacts(profile, spec, report, args.output, business_report=business_report)
-        if not report.valid and args.mode not in {"mixed", "negative"}:
+        if should_fail_generation(report, business_report, args.mode):
             for error in report.errors:
                 print(error, file=sys.stderr)
+            if business_report is not None and not business_report.valid:
+                print("business validation failed", file=sys.stderr)
             return 1
         return 0
 
@@ -152,6 +156,14 @@ def apply_business_rules_from_args(rows_by_table: dict[str, list[dict[str, Any]]
     rules = load_business_rules(rules_path)
     apply_business_rules(rows_by_table, rules, seed=seed, mode=args.mode, invalid_ratio=args.invalid_ratio)
     return validate_business_rules(rows_by_table, rules)
+
+
+def should_fail_generation(schema_report: Any, business_report: Any | None, mode: str) -> bool:
+    if mode in {"mixed", "negative"}:
+        return False
+    if not schema_report.valid:
+        return True
+    return business_report is not None and not business_report.valid
 
 
 def write_rows(rows: list[dict[str, Any]], spec: GenerationSpec, output: Path | None) -> None:

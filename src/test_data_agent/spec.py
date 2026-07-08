@@ -138,6 +138,13 @@ class TableSpec(BaseModel):
         return columns
 
 
+class ForeignKeySpec(BaseModel):
+    child_table: str = Field(min_length=1)
+    child_field: str = Field(min_length=1)
+    parent_table: str = Field(min_length=1)
+    parent_field: str = Field(min_length=1)
+
+
 class GenerationSpec(BaseModel):
     seed: int = Field(ge=0)
     table: TableSpec
@@ -165,6 +172,36 @@ class GenerationSpec(BaseModel):
     def from_csv_profile(cls, profile: dict[str, Any], seed: int, row_count: int) -> GenerationSpec:
         """Infer a generation spec from a safe CSV profile without source rows."""
         return cls.from_mock_profile(profile, seed=seed, row_count=row_count)
+
+
+class MultiTableGenerationSpec(BaseModel):
+    seed: int = Field(ge=0)
+    tables: list[TableSpec] = Field(min_length=1)
+    foreign_keys: list[ForeignKeySpec] = Field(default_factory=list)
+    output_format: OutputFormat = OutputFormat.JSON
+
+    @field_validator("tables")
+    @classmethod
+    def table_names_must_be_unique(cls, tables: list[TableSpec]) -> list[TableSpec]:
+        names = [table.name for table in tables]
+        if len(names) != len(set(names)):
+            raise ValueError("table names must be unique")
+        return tables
+
+    @classmethod
+    def from_profiles(
+        cls,
+        profiles: list[dict[str, Any]],
+        seed: int,
+        row_counts: int | dict[str, int],
+        foreign_keys: list[ForeignKeySpec] | None = None,
+    ) -> MultiTableGenerationSpec:
+        tables: list[TableSpec] = []
+        for profile in profiles:
+            table_name = str(profile.get("table", "synthetic_table"))
+            row_count = row_counts[table_name] if isinstance(row_counts, dict) else row_counts
+            tables.append(GenerationSpec.from_mock_profile(profile, seed=seed, row_count=row_count).table)
+        return cls(seed=seed, tables=tables, foreign_keys=foreign_keys or [])
 
 
 def default_strategy_for_type(data_type: DataType) -> GenerationStrategy:
