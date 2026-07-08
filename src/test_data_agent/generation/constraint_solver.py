@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
 from typing import Any
 
-from test_data_agent.business_validator import condition_matches, safe_eval
 from test_data_agent.core.constraint import ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.rules.conditions import Condition, condition_matches
+from test_data_agent.rules.expressions import parse_datetime, safe_eval
 
 
 def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec, seed: int) -> None:
@@ -55,7 +55,7 @@ def apply_conditional_required_constraints(rows_by_entity: dict[str, list[dict[s
     for constraint in spec.constraints:
         if constraint.type != ConstraintType.CONDITIONAL_REQUIRED or not constraint.condition:
             continue
-        condition = SimpleCondition(**constraint.condition)
+        condition = Condition(**constraint.condition)
         for row in rows_by_entity.get(constraint.entity, []):
             if condition_matches(row, condition):
                 for field in constraint.fields:
@@ -86,26 +86,6 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         for parent_row in rows_by_entity.get(relationship.parent_entity, []):
             key = parent_row.get(relationship.parent_field)
             parent_row[parent_field] = normalize_number(totals.get(key, 0.0))
-
-
-def parse_datetime(value: Any) -> datetime | None:
-    if isinstance(value, datetime):
-        return value
-    if not isinstance(value, str):
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
-
-class SimpleCondition:
-    def __init__(self, field: str, equals: Any | None = None, not_equals: Any | None = None, in_values: list[Any] | None = None):
-        self.field = field
-        self.equals = equals
-        self.not_equals = not_equals
-        self.in_values = in_values
-
 
 def normalize_number(value: float) -> int | float:
     rounded = round(value, 6)

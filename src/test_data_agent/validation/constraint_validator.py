@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
 from typing import Any
 
-from test_data_agent.business_validator import condition_matches, safe_eval
 from test_data_agent.core.constraint import ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.generation.constraint_solver import SimpleCondition
+from test_data_agent.rules.conditions import Condition, condition_matches
+from test_data_agent.rules.expressions import parse_datetime, safe_eval
 
 
 def validate_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> list[str]:
@@ -55,7 +54,7 @@ def validate_temporal(rows_by_entity: dict[str, list[dict[str, Any]]], constrain
 def validate_conditional_required(rows_by_entity: dict[str, list[dict[str, Any]]], constraint: Any) -> list[str]:
     if not constraint.condition:
         return []
-    condition = SimpleCondition(**constraint.condition)
+    condition = Condition(**constraint.condition)
     errors: list[str] = []
     for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
         if not condition_matches(row, condition):
@@ -86,18 +85,6 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
         if not numbers_close(parent_row.get(parent_field), totals.get(key, 0.0)):
             errors.append(f"{relationship.parent_entity}[{index}].{parent_field} aggregate mismatch")
     return errors
-
-
-def parse_datetime(value: Any) -> datetime | None:
-    if isinstance(value, datetime):
-        return value
-    if not isinstance(value, str):
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
 
 def numbers_close(actual: Any, expected: Any, tolerance: float = 0.000001) -> bool:
     try:

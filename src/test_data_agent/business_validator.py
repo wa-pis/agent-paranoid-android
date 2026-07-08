@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import ast
-import operator
-from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -14,12 +11,13 @@ from test_data_agent.business_rules import (
     BusinessRules,
     ConditionalAllowedValuesRule,
     ConditionalRequiredRule,
-    Condition,
     FieldRule,
     ForeignKeyRule,
     FormulaRule,
     TemporalOrderingRule,
 )
+from test_data_agent.rules.conditions import condition_matches
+from test_data_agent.rules.expressions import aggregate, comparable_number, numbers_close, parse_datetime, safe_eval
 
 
 class RuleResult(BaseModel):
@@ -139,89 +137,9 @@ def validate_aggregate_formula(rows_by_table: dict[str, list[dict[str, Any]]], r
     record_result(result, numbers_close(actual, expected, rule.tolerance), f"{rule.table}.{rule.field} aggregate expected {expected}, got {actual}")
     return result
 
-
-def condition_matches(row: dict[str, Any], condition: Condition) -> bool:
-    value = row.get(condition.field)
-    if condition.equals is not None and value != condition.equals:
-        return False
-    if condition.not_equals is not None and value == condition.not_equals:
-        return False
-    if condition.in_values is not None and value not in condition.in_values:
-        return False
-    return True
-
-
 def record_result(result: RuleResult, ok: bool, message: str) -> None:
     if ok:
         result.passed += 1
     else:
         result.failed += 1
         result.errors.append(message)
-
-
-def comparable_number(value: Any) -> float | None:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
-def numbers_close(actual: Any, expected: Any, tolerance: float) -> bool:
-    actual_number = comparable_number(actual)
-    expected_number = comparable_number(expected)
-    return actual_number is not None and expected_number is not None and abs(actual_number - expected_number) <= tolerance
-
-
-def parse_datetime(value: Any) -> datetime | None:
-    if isinstance(value, datetime):
-        return value
-    if not isinstance(value, str):
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-
-
-def aggregate(field: str, rows: list[dict[str, Any]]) -> float:
-    if field == "*":
-        return float(len(rows))
-    return sum(comparable_number(row.get(field)) or 0.0 for row in rows)
-
-
-ALLOWED_OPERATORS = {
-    ast.Add: operator.add,
-    ast.Sub: operator.sub,
-    ast.Mult: operator.mul,
-    ast.Div: operator.truediv,
-    ast.USub: operator.neg,
-}
-
-
-def safe_eval(expression: str, row: dict[str, Any]) -> Any:
-    node = ast.parse(expression, mode="eval")
-    return eval_node(node.body, row)
-
-
-def eval_node(node: ast.AST, row: dict[str, Any]) -> Any:
-    if isinstance(node, ast.Constant):
-        return node.value
-    if isinstance(node, ast.Name):
-        return row.get(node.id)
-    if isinstance(node, ast.BinOp) and type(node.op) in ALLOWED_OPERATORS:
-        return ALLOWED_OPERATORS[type(node.op)](eval_node(node.left, row), eval_node(node.right, row))
-    if isinstance(node, ast.UnaryOp) and type(node.op) in ALLOWED_OPERATORS:
-        return ALLOWED_OPERATORS[type(node.op)](eval_node(node.operand, row))
-    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
-        if node.func.id == "sum":
-            field = expect_field_name(node.args[0])
-            return aggregate(field, row.get("rows", []))
-        if node.func.id == "count":
-            return float(len(row.get("rows", [])))
-    raise ValueError(f"unsupported expression: {ast.dump(node)}")
-
-
-def expect_field_name(node: ast.AST) -> str:
-    if isinstance(node, ast.Constant) and isinstance(node.value, str):
-        return node.value
-    raise ValueError("aggregate field name must be a string literal")

@@ -8,12 +8,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field
 
-
-class Condition(BaseModel):
-    field: str
-    equals: Any | None = None
-    not_equals: Any | None = None
-    in_values: list[Any] | None = None
+from test_data_agent.rules.conditions import Condition
 
 
 class FieldRule(BaseModel):
