@@ -1,0 +1,120 @@
+@startuml
+title Test Data Agent Architecture
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+actor "User / Agent" as User
+
+package "Inputs" {
+  artifact "Generation Spec\nJSON" as ExplicitSpec
+  database "Trino\n(read-only)" as Trino
+  file "CSV Source\n(potentially sensitive)" as Csv
+  artifact "Business Rules\nYAML / JSON" as RuleFile
+}
+
+package "Safe Profiling Layer" {
+  component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
+  component "csv_profiler.py\nSafe CSV Profiler" as CsvProfiler
+  component "SQL Safety Checks\nread-only, LIMIT, no SELECT *" as SqlSafety
+  component "PII Detection + Masking\nsensitive by default" as PiiMasking
+  artifact "Safe Profile Metadata\nschema, aggregates, distributions,\nranges, masked patterns" as SafeProfile
+}
+
+package "Spec Planning Layer" {
+  component "spec.py\nPydantic Models" as SpecModels
+  component "Profile -> GenerationSpec\nfrom_csv_profile / from_trino_profile" as SpecInference
+  artifact "GenerationSpec\nseed, table, columns,\nstrategies, output format" as GenerationSpec
+}
+
+package "Deterministic Generation Layer" {
+  component "generator.py\nSynthetic Row Generator" as Generator
+  component "Faker + seeded random\nreproducible values" as FakerSeed
+  component "rules_engine.py\nScenario + invalid-case application" as RulesEngine
+  artifact "Synthetic Rows\nnever copied from source" as SyntheticRows
+}
+
+package "Validation Layer" {
+  component "validator.py\nSchema Validation" as SchemaValidator
+  component "business_rules.py\nRule Models + Loader" as RuleModels
+  component "business_validator.py\nExecutable Rule Validation" as BusinessValidator
+  artifact "Validation Reports\nschema + business results" as Reports
+}
+
+package "Interfaces / Outputs" {
+  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv, validate" as Cli
+  file "CSV" as CsvOut
+  file "JSON" as JsonOut
+  file "Parquet" as ParquetOut
+  artifact "Artifacts\ngeneration_spec.json\ncsv_profile.json\nvalidation_report.json" as Artifacts
+}
+
+User --> Cli : runs commands
+User --> ExplicitSpec : writes or reviews
+User --> RuleFile : optional rules
+
+Cli --> CsvProfiler : profile-csv / generate-from-csv
+Csv --> CsvProfiler : read source rows locally
+CsvProfiler --> PiiMasking
+CsvProfiler --> SafeProfile : emits safe metadata only
+
+Cli --> TrinoMcp : MCP metadata/profiling calls
+TrinoMcp --> SqlSafety
+TrinoMcp --> Trino : allowed read-only queries
+TrinoMcp --> PiiMasking
+TrinoMcp --> SafeProfile : metadata, aggregates,\nmasked samples
+
+ExplicitSpec --> SpecModels
+SafeProfile --> SpecInference
+SpecInference --> SpecModels
+SpecModels --> GenerationSpec
+
+Cli --> GenerationSpec
+GenerationSpec --> Generator
+Generator --> FakerSeed
+Generator --> SyntheticRows
+
+RuleFile --> RuleModels
+RuleModels --> RulesEngine
+SyntheticRows --> RulesEngine : optional Python API flow
+RulesEngine --> SyntheticRows : adjusted scenarios /\ncontrolled invalid rows
+
+SyntheticRows --> SchemaValidator
+GenerationSpec --> SchemaValidator
+RuleModels --> BusinessValidator
+SyntheticRows --> BusinessValidator
+SchemaValidator --> Reports
+BusinessValidator --> Reports
+
+Cli --> CsvOut
+Cli --> JsonOut
+Cli --> ParquetOut
+Cli --> Artifacts
+Reports --> Artifacts
+GenerationSpec --> Artifacts
+SafeProfile --> Artifacts
+
+note right of SafeProfile
+  Safe profiles may include names, types,
+  null ratios, approximate counts,
+  enum-like distributions for non-sensitive
+  fields, numeric/date ranges, and masked
+  patterns.
+end note
+
+note bottom of SyntheticRows
+  Output must be synthetic and reproducible
+  from the explicit seed. Source rows are not
+  shuffled, duplicated, or exported.
+end note
+
+note right of SqlSafety
+  Rejects DDL/DML, multiple statements,
+  unbounded row-returning SELECT queries,
+  unrestricted SELECT *, and likely PII
+  projections.
+end note
+
+@enduml

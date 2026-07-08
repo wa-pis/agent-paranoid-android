@@ -213,6 +213,13 @@ Useful options:
 - `--invalid-ratio 0.02` injects invalid values in `mixed` mode.
 - `--table NAME` sets the table name for CSV profiling.
 
+## Architecture
+
+The high-level flow is documented as PlantUML in
+`docs/architecture.puml`. It shows the CLI, CSV and Trino profiling paths,
+safe profile metadata, generation spec inference, deterministic generation,
+business-rule validation, and exported artifacts.
+
 ## Generation Specs
 
 Specs are Pydantic models serialized as JSON. Supported data types:
