@@ -5,14 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
-from test_data_agent.adapters import csv_file_to_dataset_profile, csv_file_to_dataset_spec
+from test_data_agent.adapters import csv_file_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
+    write_dataset_profile_artifact,
     write_dataset_review_artifacts,
+    write_dataset_spec_artifact,
     write_dataset_validation_report,
 )
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
@@ -60,6 +62,28 @@ def build_dataset_spec_from_profile(
         spec.generation_settings.output_format = output_format
     apply_dataset_mode_options(spec, mode=mode, invalid_ratio=invalid_ratio)
     return spec
+
+
+def infer_dataset_spec_artifact(
+    profile: DatasetProfile,
+    *,
+    output_path: Path,
+    count: int | None = None,
+) -> DatasetSpec:
+    spec = infer_dataset_spec(profile, count=count)
+    write_dataset_spec_artifact(spec, output_path)
+    return spec
+
+
+def write_csv_profile_artifact(
+    input_path: Path,
+    *,
+    output_path: Path,
+    table_name: str | None = None,
+) -> DatasetProfile:
+    profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
+    write_dataset_profile_artifact(profile, output_path)
+    return profile
 
 
 def generate_single_entity_profile_artifacts(
@@ -133,16 +157,11 @@ def generate_dataset_from_csv_artifacts(
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> tuple[DatasetValidationReport, Any | None]:
     profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
-    spec = csv_file_to_dataset_spec(
-        input_path,
-        table_name=table_name,
+    spec = build_dataset_spec_from_profile(
+        profile,
         count=count,
         seed=seed,
-    )
-    spec.generation_settings.seed = seed
-    spec.generation_settings.output_format = output_format
-    apply_dataset_mode_options(
-        spec,
+        output_format=output_format,
         mode=mode,
         invalid_ratio=invalid_ratio,
     )

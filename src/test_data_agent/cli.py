@@ -8,30 +8,26 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.adapters import (
-    csv_file_to_dataset_profile,
     generate_legacy_compatibility_result,
     load_profile_or_spec,
     validate_legacy_rows_file,
 )
-from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
-from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
     apply_dataset_mode_options,
-    build_dataset_spec_from_profile,
     generate_dataset_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
+    infer_dataset_spec_artifact,
     load_dataset_rows,
     load_dataset_spec,
-    write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
-    write_dataset_spec_artifact,
+    write_csv_profile_artifact,
     write_generation_artifacts,
     write_json_artifact,
-    write_single_entity_rows,
     write_tabular_rows,
 )
 from test_data_agent.profiling import profile_example_folder
@@ -149,14 +145,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "infer-spec":
-        profile = DatasetProfile.model_validate_json(args.profile.read_text())
-        spec = infer_dataset_spec(profile, count=args.count)
-        write_dataset_spec_artifact(spec, args.output)
+        loaded = load_profile_or_spec(args.profile)
+        if isinstance(loaded, DatasetSpec):
+            raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
+        infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
         return 0
 
     if args.command == "profile-csv":
-        profile = csv_file_to_dataset_profile(args.input, table_name=args.table)
-        write_dataset_profile_artifact(profile, args.output)
+        write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
         return 0
 
     if args.command == "generate-from-csv":

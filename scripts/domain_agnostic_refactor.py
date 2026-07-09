@@ -178,7 +178,16 @@ PHASES: tuple[Phase, ...] = (
             "src/test_data_agent/io/writers.py",
             "src/test_data_agent/io/artifacts.py",
         ),
-        test_commands=((PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_domain_agnostic_pipeline.py"),),
+        test_commands=(
+            (
+                PYTHON,
+                "-m",
+                "pytest",
+                "tests/test_cli.py",
+                "tests/test_domain_agnostic_pipeline.py",
+                "tests/test_io_workflows.py",
+            ),
+        ),
     ),
     Phase(
         phase_id="phase7",
