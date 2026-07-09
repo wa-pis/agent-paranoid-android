@@ -15,14 +15,16 @@ from test_data_agent.compat.legacy_workflows import (
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
+    generate_dataset_from_example_artifacts,
+    generate_dataset_from_example_command,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_from_spec_path,
     generate_dataset_command,
-    generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
     is_dataset_spec_path,
     infer_dataset_spec_artifact,
+    profile_example_command,
     profile_example_artifacts,
     should_fail_generation,
     validate_dataset_artifacts,
@@ -127,14 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "profile-example":
-        profile_example_artifacts(
-            args.input_folder,
-            output_path=args.output,
-            cache_dir=args.cache_dir,
-            use_cache=not args.no_cache,
-            rule_sample_rows=args.rule_sample_rows,
-        )
-        return 0
+        return profile_example_command(args)
 
     if args.command == "infer-spec":
         loaded = load_profile_or_spec(args.profile)
@@ -189,16 +184,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "generate-from-example":
-        return generate_dataset_from_example_artifacts(
-            args.input_folder,
-            output_folder=args.output,
-            seed=args.seed,
-            count=args.count,
-            output_format=CoreOutputFormat(args.output_format),
-            cache_dir=args.cache_dir,
-            use_cache=not args.no_cache,
-            rule_sample_rows=args.rule_sample_rows,
-        )
+        return generate_dataset_from_example_command(args)
 
     return 2
 

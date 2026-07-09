@@ -105,6 +105,17 @@ def generate_dataset_from_profile_command(
     return 0
 
 
+def profile_example_command(args: argparse.Namespace) -> int:
+    profile_example_artifacts(
+        args.input_folder,
+        output_path=args.output,
+        cache_dir=args.cache_dir,
+        use_cache=not args.no_cache,
+        rule_sample_rows=args.rule_sample_rows,
+    )
+    return 0
+
+
 def validate_dataset_artifacts(
     spec_path: Path,
     rows_path: Path,
@@ -165,6 +176,19 @@ def generate_dataset_from_example_artifacts(
         output_folder=output_folder,
         output_format=output_format,
         seed=seed,
+    )
+
+
+def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
+    return generate_dataset_from_example_artifacts(
+        args.input_folder,
+        output_folder=args.output,
+        seed=args.seed,
+        count=args.count,
+        output_format=OutputFormat(args.output_format),
+        cache_dir=args.cache_dir,
+        use_cache=not args.no_cache,
+        rule_sample_rows=args.rule_sample_rows,
     )
 
 

@@ -10,10 +10,12 @@ from test_data_agent.io.artifacts import (
 )
 from test_data_agent.io.commands import (
     generate_dataset_command,
+    generate_dataset_from_example_command,
     generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
     is_dataset_spec_path,
+    profile_example_command,
     profile_example_artifacts,
     should_fail_generation,
     validate_dataset_artifacts,
@@ -42,6 +44,7 @@ __all__ = [
     "apply_dataset_mode_options",
     "build_dataset_spec_from_profile",
     "generate_dataset_command",
+    "generate_dataset_from_example_command",
     "generate_dataset_from_example_artifacts",
     "generate_dataset_artifacts",
     "generate_dataset_from_csv_artifacts",
@@ -54,6 +57,7 @@ __all__ = [
     "is_dataset_spec_path",
     "load_dataset_rows",
     "load_dataset_spec",
+    "profile_example_command",
     "profile_example_artifacts",
     "should_fail_generation",
     "validate_dataset_artifacts",

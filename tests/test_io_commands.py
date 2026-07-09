@@ -5,10 +5,12 @@ from pathlib import Path
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.commands import (
     generate_dataset_command,
+    generate_dataset_from_example_command,
     generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
     is_dataset_spec_path,
+    profile_example_command,
     profile_example_artifacts,
     validate_dataset_artifacts,
 )
@@ -178,6 +180,25 @@ def test_profile_example_artifacts_writes_dataset_profile_json(tmp_path) -> None
     assert {entity["name"] for entity in payload["entities"]} == {"customers", "orders"}
 
 
+def test_profile_example_command_routes_args_to_artifact_helper(tmp_path) -> None:
+    output_path = tmp_path / "profile.json"
+
+    exit_code = profile_example_command(
+        Namespace(
+            input_folder=FIXTURE,
+            output=output_path,
+            cache_dir=tmp_path / "cache",
+            no_cache=False,
+            rule_sample_rows=50_000,
+        )
+    )
+
+    payload = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert payload["source_type"] == "csv_folder"
+
+
 def test_generate_dataset_from_example_artifacts_writes_review_bundle(tmp_path) -> None:
     output_folder = tmp_path / "generated"
 
@@ -198,4 +219,26 @@ def test_generate_dataset_from_example_artifacts_writes_review_bundle(tmp_path) 
     assert profile["source_type"] == "csv_folder"
     assert "entities:" in spec_yaml
     assert "customers" in spec_yaml
+    assert report["valid"] is True
+
+
+def test_generate_dataset_from_example_command_routes_args_to_artifact_helper(tmp_path) -> None:
+    output_folder = tmp_path / "generated"
+
+    exit_code = generate_dataset_from_example_command(
+        Namespace(
+            input_folder=FIXTURE,
+            output=output_folder,
+            seed=101,
+            count=4,
+            output_format="json",
+            cache_dir=tmp_path / "cache",
+            no_cache=False,
+            rule_sample_rows=50_000,
+        )
+    )
+
+    report = json.loads((output_folder / "validation_report.json").read_text())
+
+    assert exit_code == 0
     assert report["valid"] is True
