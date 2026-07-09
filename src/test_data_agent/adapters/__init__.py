@@ -22,6 +22,7 @@ from test_data_agent.adapters.json_profile import (
     load_profile_or_spec,
 )
 from test_data_agent.adapters.legacy_generation import (
+    LegacyGenerationResult,
     apply_legacy_mode_options,
     generate_legacy_compatibility_result,
     dataset_spec_to_generation_spec,
@@ -57,6 +58,7 @@ __all__ = [
     "csv_folder_to_dataset_spec",
     "csv_profile_to_dataset_profile",
     "csv_profile_to_dataset_spec",
+    "LegacyGenerationResult",
     "apply_legacy_mode_options",
     "dataset_profile_from_csv_file",
     "dataset_profile_from_csv_folder",

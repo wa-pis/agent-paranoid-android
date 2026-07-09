@@ -304,6 +304,38 @@ def test_validate_legacy_spec_warns_about_deprecated_path(tmp_path, capsys) -> N
     assert "deprecated GenerationSpec compatibility" in captured.err
 
 
+def test_validate_legacy_spec_writes_report_to_output_file(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "legacy_spec.json"
+    rows_path = tmp_path / "rows.json"
+    output_path = tmp_path / "validation_report.json"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "seed": 11,
+                "output_format": "json",
+                "table": {
+                    "name": "customers",
+                    "row_count": 1,
+                    "columns": [
+                        {"name": "customer_id", "data_type": "integer", "strategy": "sequence"},
+                    ],
+                },
+            }
+        )
+    )
+    rows_path.write_text(json.dumps([{"customer_id": 1}]))
+
+    exit_code = main(["validate", str(spec_path), str(rows_path), "--output", str(output_path)])
+
+    captured = capsys.readouterr()
+    report = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert captured.out == ""
+    assert "deprecated GenerationSpec compatibility" in captured.err
+    assert report["valid"] is True
+
+
 def test_generate_legacy_spec_uses_dataset_engine_with_warning(tmp_path, capsys) -> None:
     spec_path = tmp_path / "legacy_spec.json"
     output_path = tmp_path / "out" / "rows.json"
