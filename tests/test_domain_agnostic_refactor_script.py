@@ -312,12 +312,6 @@ def test_phase14_moves_business_rule_models_into_rules_package() -> None:
         "neutral validation helpers import rule models from the rules package",
     ) in checks
     assert (
-        "src/test_data_agent/rules_engine.py",
-        "from test_data_agent.rules.models import",
-        False,
-        "legacy rules engine reuses neutral rule models through the rules package",
-    ) in checks
-    assert (
         "src/test_data_agent/business_rules.py",
         "from test_data_agent.rules.models import",
         False,

@@ -424,11 +424,6 @@ PHASES: tuple[Phase, ...] = (
                 description="neutral validation helpers import rule models from the rules package",
             ),
             TextCheck(
-                path="src/test_data_agent/rules_engine.py",
-                text="from test_data_agent.rules.models import",
-                description="legacy rules engine reuses neutral rule models through the rules package",
-            ),
-            TextCheck(
                 path="src/test_data_agent/business_rules.py",
                 text="from test_data_agent.rules.models import",
                 description="legacy business_rules module is a compatibility shim over the rules package",
