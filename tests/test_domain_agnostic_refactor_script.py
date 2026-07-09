@@ -156,6 +156,54 @@ def test_phase10_runs_focused_workflow_and_cli_suites() -> None:
     )
 
 
+def test_phase21_tracks_legacy_cli_command_boundary() -> None:
+    module = load_refactor_module()
+
+    phase21 = module.phase_by_id("phase21")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase21.text_checks
+    }
+
+    assert "src/test_data_agent/compat/commands.py" in phase21.expected_files
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command",
+        False,
+        "CLI delegates deprecated command routing to compat command helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "generate_legacy_spec_artifacts(",
+        True,
+        "CLI no longer orchestrates deprecated generation workflows directly",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "validate_legacy_spec_artifacts(",
+        True,
+        "CLI no longer orchestrates deprecated validation workflows directly",
+    ) in checks
+
+
+def test_phase21_runs_cli_compat_and_command_suites() -> None:
+    module = load_refactor_module()
+
+    phase21 = module.phase_by_id("phase21")
+
+    assert phase21.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_cli.py",
+            "tests/test_compat_legacy.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_io_commands.py"),
+    )
+
+
 def test_phase11_tracks_compat_owned_legacy_workflow_implementation() -> None:
     module = load_refactor_module()
 
@@ -219,15 +267,15 @@ def test_phase12_narrows_cli_compat_workflow_imports() -> None:
 
     assert (
         "src/test_data_agent/cli.py",
-        "from test_data_agent.compat.legacy_workflows import",
+        "from test_data_agent.compat.",
         False,
-        "CLI imports deprecated workflows from the dedicated compat workflow module",
+        "CLI imports deprecated compatibility helpers from dedicated compat modules",
     ) in checks
     assert (
         "src/test_data_agent/cli.py",
         "from test_data_agent.compat import",
         True,
-        "CLI no longer imports deprecated workflows from the compat package root",
+        "CLI no longer imports deprecated compatibility helpers from the compat package root",
     ) in checks
 
 

@@ -361,17 +361,17 @@ PHASES: tuple[Phase, ...] = (
     Phase(
         phase_id="phase12",
         title="Narrow compat workflow imports",
-        goal="Keep deprecated workflow usage pointed at the dedicated compat workflow module instead of the broad compat package root.",
+        goal="Keep deprecated workflow usage pointed at dedicated compat modules instead of the broad compat package root.",
         text_checks=(
             TextCheck(
                 path="src/test_data_agent/cli.py",
-                text="from test_data_agent.compat.legacy_workflows import",
-                description="CLI imports deprecated workflows from the dedicated compat workflow module",
+                text="from test_data_agent.compat.",
+                description="CLI imports deprecated compatibility helpers from dedicated compat modules",
             ),
             TextCheck(
                 path="src/test_data_agent/cli.py",
                 text="from test_data_agent.compat import",
-                description="CLI no longer imports deprecated workflows from the compat package root",
+                description="CLI no longer imports deprecated compatibility helpers from the compat package root",
                 absent=True,
             ),
         ),
@@ -629,6 +629,35 @@ PHASES: tuple[Phase, ...] = (
         test_commands=(
             (PYTHON, "-m", "pytest", "tests/test_source_adapters.py", "tests/test_domain_agnostic_refactor_script.py"),
             (PYTHON, "-m", "pytest", "tests/test_dataset_spec_contract.py"),
+        ),
+    ),
+    Phase(
+        phase_id="phase21",
+        title="Extract legacy command helpers from CLI",
+        goal="Keep deprecated GenerationSpec CLI command orchestration in compat helpers while cli.py only routes arguments.",
+        expected_files=("src/test_data_agent/compat/commands.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command",
+                description="CLI delegates deprecated command routing to compat command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="generate_legacy_spec_artifacts(",
+                description="CLI no longer orchestrates deprecated generation workflows directly",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="validate_legacy_spec_artifacts(",
+                description="CLI no longer orchestrates deprecated validation workflows directly",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_compat_legacy.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_io_commands.py"),
         ),
     ),
 )

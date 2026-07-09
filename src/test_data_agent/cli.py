@@ -3,14 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.compat.legacy_workflows import (
-    generate_legacy_spec_artifacts,
-    validate_legacy_spec_artifacts,
-)
+from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
     generate_dataset_from_csv_artifacts,
@@ -105,27 +101,14 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
-        legacy_result, business_report = generate_legacy_spec_artifacts(
-            args.spec,
-            row_count=args.count,
-            seed=args.seed,
-            output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
-            output_path=args.output,
-            mode=args.mode,
-            invalid_ratio=args.invalid_ratio,
+        return generate_legacy_command(
+            args,
             business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
                 rows_by_entity,
                 args,
                 seed,
             ),
         )
-        if should_fail_generation(legacy_result.report, business_report, args.mode):
-            for error in legacy_result.report.errors:
-                print(error, file=sys.stderr)
-            if business_report is not None and not business_report.valid:
-                print("business validation failed", file=sys.stderr)
-            return 1
-        return 0
 
     if args.command == "profile-example":
         profile_example_artifacts(
@@ -175,14 +158,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.output is None:
                 print(text)
             return 0 if report.valid else 1
-        report = validate_legacy_spec_artifacts(
-            args.spec,
-            args.rows,
-            output_path=args.output,
-        )
-        if not report.valid:
-            return 1
-        return 0
+        return validate_legacy_command(args)
 
     if args.command == "generate-from-example":
         return generate_dataset_from_example_command(args)

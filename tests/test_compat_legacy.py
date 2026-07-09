@@ -1,5 +1,6 @@
 from test_data_agent import compat
 from test_data_agent.adapters import legacy_generation as adapter_legacy_generation
+from test_data_agent.compat import commands as compat_commands
 from test_data_agent.compat import legacy_outputs as compat_legacy_outputs
 from test_data_agent.compat import legacy_spec as compat_legacy_spec
 from test_data_agent.io import legacy_workflows as io_legacy_workflows
@@ -40,3 +41,8 @@ def test_compat_package_exposes_deprecated_workflow_helpers() -> None:
 def test_compat_legacy_outputs_module_owns_deprecated_row_and_artifact_writers() -> None:
     assert compat_legacy_outputs.write_tabular_rows.__module__ == "test_data_agent.compat.legacy_outputs"
     assert compat_legacy_outputs.write_generation_artifacts.__module__ == "test_data_agent.compat.legacy_outputs"
+
+
+def test_compat_commands_module_owns_deprecated_cli_routing() -> None:
+    assert compat_commands.generate_legacy_command.__module__ == "test_data_agent.compat.commands"
+    assert compat_commands.validate_legacy_command.__module__ == "test_data_agent.compat.commands"

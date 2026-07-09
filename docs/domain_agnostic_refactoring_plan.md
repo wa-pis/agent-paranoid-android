@@ -315,11 +315,11 @@ Expected outcome:
 ### Phase 12: Narrow Compat Workflow Imports
 
 Keep deprecated workflow callers pointed at the dedicated
-`compat/legacy_workflows.py` module instead of the broad `compat` package root.
+`compat/` modules instead of the broad `compat` package root.
 
 Expected outcome:
 
-- `cli.py` imports deprecated workflow helpers from `test_data_agent.compat.legacy_workflows`
+- `cli.py` imports deprecated compatibility helpers from dedicated `test_data_agent.compat.*` modules
 - the `compat` package root remains a user-facing compatibility surface, not an internal workflow dependency
 
 ### Phase 13: Route Package-Root Legacy Shims Through Compat
@@ -415,6 +415,20 @@ Expected outcome:
 - `test_data_agent.adapters.legacy_profile` owns legacy profile to `DatasetProfile` and `DatasetSpec` conversion
 - dataset-oriented CSV, JSON, and Trino adapters import legacy profile helpers from `adapters.legacy_profile`
 - `adapters.legacy_generation` keeps deprecated `GenerationSpec` compatibility behavior while remaining backward compatible for existing imports
+
+### Phase 21: Extract Legacy Command Helpers From CLI
+
+Keep deprecated `GenerationSpec` CLI command orchestration in explicit
+`compat/` helpers so `cli.py` only routes arguments while dataset-oriented
+commands and compatibility commands remain separated.
+
+Expected outcome:
+
+- `test_data_agent.compat.commands` owns deprecated `generate` and `validate`
+  command routing for legacy specs
+- `cli.py` delegates deprecated command execution to compat helpers instead of
+  calling compat workflows inline
+- dataset-oriented CLI helpers remain in `io/commands.py`
 
 - `profile-csv` delegates to dataset-oriented command helpers
 - `infer-spec` delegates to dataset-oriented command helpers
