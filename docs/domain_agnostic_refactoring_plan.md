@@ -120,6 +120,7 @@ src/test_data_agent/
   adapters/
     __init__.py
     csv_file.py
+    csv_folder.py
     trino_profile.py
     json_profile.py
     parquet_dataset.py
@@ -275,6 +276,7 @@ Candidate modules to delete later:
 - `src/test_data_agent/core/settings.py`
 - `src/test_data_agent/adapters/__init__.py`
 - `src/test_data_agent/adapters/csv_file.py`
+- `src/test_data_agent/adapters/csv_folder.py`
 - `src/test_data_agent/adapters/trino_profile.py`
 - `src/test_data_agent/adapters/json_profile.py`
 - `src/test_data_agent/adapters/parquet_dataset.py`

@@ -116,6 +116,7 @@ PHASES: tuple[Phase, ...] = (
         expected_files=(
             "src/test_data_agent/adapters/__init__.py",
             "src/test_data_agent/adapters/csv_file.py",
+            "src/test_data_agent/adapters/csv_folder.py",
             "src/test_data_agent/adapters/trino_profile.py",
             "src/test_data_agent/adapters/json_profile.py",
             "src/test_data_agent/adapters/parquet_dataset.py",
