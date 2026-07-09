@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -167,6 +168,10 @@ def dataset_spec_to_generation_spec(
 
 def generate_legacy_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
     return generate_rows(spec)
+
+
+def load_legacy_generation_spec(path: Path) -> GenerationSpec:
+    return GenerationSpec.model_validate_json(path.read_text())
 
 
 def _field_profile_from_column(

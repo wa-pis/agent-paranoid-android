@@ -23,6 +23,7 @@ from test_data_agent.adapters.legacy_generation import (
     legacy_profile_to_generation_spec,
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
+    load_legacy_generation_spec,
     multi_table_generation_spec_to_dataset_spec,
 )
 from test_data_agent.adapters.parquet_dataset import (
@@ -58,6 +59,7 @@ __all__ = [
     "legacy_profile_to_generation_spec",
     "legacy_profile_to_dataset_profile",
     "legacy_profile_to_dataset_spec",
+    "load_legacy_generation_spec",
     "load_json_dataset_profile",
     "load_json_dataset_spec",
     "load_profile_or_spec",

@@ -6,7 +6,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
@@ -15,6 +15,7 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_spec,
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
+    load_legacy_generation_spec,
     load_profile_or_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -34,9 +35,12 @@ from test_data_agent.io import (
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 from test_data_agent.rules_engine import GenerationMode
-from test_data_agent.spec import GenerationSpec, OutputFormat
+from test_data_agent.spec import OutputFormat
 from test_data_agent.validation import validate_dataset
 from test_data_agent.validator import validate_rows_report
+
+if TYPE_CHECKING:
+    from test_data_agent.spec import GenerationSpec
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -203,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def load_spec(path: Path) -> GenerationSpec:
-    return GenerationSpec.model_validate_json(path.read_text())
+    return load_legacy_generation_spec(path)
 
 
 def is_dataset_spec_path(path: Path) -> bool:

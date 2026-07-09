@@ -11,6 +11,7 @@ from test_data_agent.adapters import (
     dataset_spec_from_trino_profile,
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
+    load_legacy_generation_spec,
     load_profile_or_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -109,6 +110,26 @@ def test_legacy_generation_adapter_can_generate_rows() -> None:
     assert len(rows) == 2
     assert rows[0]["id"] == 1
     assert rows[0]["email"] != rows[1]["email"]
+
+
+def test_legacy_generation_adapter_loads_specs_from_disk(tmp_path) -> None:
+    path = tmp_path / "legacy_spec.json"
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+    path.write_text(legacy_spec.model_dump_json())
+
+    loaded = load_legacy_generation_spec(path)
+
+    assert loaded == legacy_spec
 
 
 def test_legacy_profile_adapter_can_build_generation_spec_via_dataset_spec() -> None:
