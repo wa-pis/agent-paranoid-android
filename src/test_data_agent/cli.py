@@ -108,6 +108,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "generate":
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
+        warn_legacy_path("generate")
         spec = build_generation_spec(args)
         rows = generate_legacy_rows(spec)
         business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
@@ -180,6 +181,7 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print(text)
             return 0 if report.valid else 1
+        warn_legacy_path("validate")
         spec = load_spec(args.spec)
         rows = json.loads(args.rows.read_text())
         report = validate_rows_report(rows, spec)
@@ -208,6 +210,13 @@ def main(argv: list[str] | None = None) -> int:
 
 def load_spec(path: Path) -> GenerationSpec:
     return load_legacy_generation_spec(path)
+
+
+def warn_legacy_path(command: str) -> None:
+    print(
+        f"warning: '{command}' is using deprecated GenerationSpec compatibility; prefer DatasetSpec inputs",
+        file=sys.stderr,
+    )
 
 
 def is_dataset_spec_path(path: Path) -> bool:
