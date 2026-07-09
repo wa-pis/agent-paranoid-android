@@ -7,6 +7,7 @@ from itertools import combinations
 from typing import Any
 
 from test_data_agent.core.constraint import Constraint, ConstraintType
+from test_data_agent.core.distribution import CategoricalDistribution
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldType
 from test_data_agent.csv_profiler import parse_datetime_value, parse_float
@@ -114,11 +115,11 @@ def infer_conditional_required_constraints(entity: str, rows: list[dict[str, str
     constraints: list[Constraint] = []
     categorical_fields = [
         field for field in fields
-        if field.distribution.get("kind") == "categorical" and len(field.distribution.get("categories", [])) <= 10
+        if isinstance(field.typed_distribution, CategoricalDistribution) and len(field.typed_distribution.categories) <= 10
     ]
     nullable_fields = [field for field in fields if field.nullable]
     for condition_field in categorical_fields:
-        values = [item["value"] for item in condition_field.distribution.get("categories", [])]
+        values = [category.value for category in condition_field.typed_distribution.categories]
         for value in values:
             scoped_rows = [row for row in rows if row.get(condition_field.name) == value]
             if not scoped_rows:
