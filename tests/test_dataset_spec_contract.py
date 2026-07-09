@@ -1,3 +1,5 @@
+import json
+
 from test_data_agent.core import (
     CategoricalDistribution,
     DatasetSpec,
@@ -18,6 +20,7 @@ from test_data_agent.adapters import (
     csv_profile_to_dataset_spec,
     generation_spec_to_dataset_spec,
     load_json_dataset_spec,
+    load_profile_or_spec,
     multi_table_generation_spec_to_dataset_spec,
     parquet_file_to_dataset_profile,
     trino_profile_to_dataset_profile,
@@ -245,6 +248,54 @@ def test_legacy_generation_specs_normalize_into_dataset_spec() -> None:
     assert dataset_spec.generation_settings.output_format.value == "csv"
     assert multi_dataset_spec.relationships[0].parent_entity == "customers"
     assert multi_dataset_spec.relationships[0].child_entity == "orders"
+
+
+def test_json_dataset_spec_loader_preserves_explicit_privacy_settings(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "customers",
+                        "row_count": 3,
+                        "fields": [{"name": "email", "data_type": "string", "sensitive": True}],
+                    }
+                ],
+                "privacy_settings": {
+                    "treat_unknown_as_sensitive": False,
+                    "max_safe_categories": 4,
+                },
+            }
+        )
+    )
+
+    dataset_spec = load_json_dataset_spec(spec_path, count=7, seed=11)
+
+    assert dataset_spec.entity("customers").row_count == 7
+    assert dataset_spec.generation_settings.seed == 11
+    assert dataset_spec.privacy_settings.treat_unknown_as_sensitive is False
+    assert dataset_spec.privacy_settings.max_safe_categories == 4
+
+
+def test_json_loader_treats_privacy_settings_only_payload_as_dataset_spec(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "privacy_settings": {
+                    "allow_raw_sensitive_values": False,
+                    "max_safe_categories": 3,
+                }
+            }
+        )
+    )
+
+    loaded = load_profile_or_spec(spec_path)
+
+    assert isinstance(loaded, DatasetSpec)
+    assert loaded.privacy_settings.allow_raw_sensitive_values is False
+    assert loaded.privacy_settings.max_safe_categories == 3
 
 
 def test_json_and_trino_adapters_load_legacy_profile_shapes(tmp_path) -> None:
