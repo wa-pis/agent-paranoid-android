@@ -23,14 +23,16 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, 
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
-    dataset_spec_to_yaml,
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
+    write_dataset_profile_artifact,
     write_dataset_review_artifacts,
+    write_dataset_spec_artifact,
     write_dataset_validation_report,
     write_dataset_rows,
     write_generation_artifacts,
+    write_json_artifact,
     write_single_entity_rows,
     write_tabular_rows,
 )
@@ -130,21 +132,18 @@ def main(argv: list[str] | None = None) -> int:
             use_cache=not args.no_cache,
             rule_sample_rows=args.rule_sample_rows,
         )
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(profile.model_dump_json(indent=2))
+        write_dataset_profile_artifact(profile, args.output)
         return 0
 
     if args.command == "infer-spec":
         profile = DatasetProfile.model_validate_json(args.profile.read_text())
         spec = infer_dataset_spec(profile, count=args.count)
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(dataset_spec_to_yaml(spec))
+        write_dataset_spec_artifact(spec, args.output)
         return 0
 
     if args.command == "profile-csv":
         profile = csv_file_to_dataset_profile(args.input, table_name=args.table)
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(profile.model_dump_json(indent=2))
+        write_dataset_profile_artifact(profile, args.output)
         return 0
 
     if args.command == "generate-from-csv":
@@ -176,8 +175,7 @@ def main(argv: list[str] | None = None) -> int:
             report = validate_dataset(rows_by_entity, spec)
             text = report.model_dump_json(indent=2)
             if args.output is not None:
-                args.output.parent.mkdir(parents=True, exist_ok=True)
-                args.output.write_text(text)
+                write_json_artifact(report, args.output)
             else:
                 print(text)
             return 0 if report.valid else 1

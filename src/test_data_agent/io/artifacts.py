@@ -10,6 +10,23 @@ from test_data_agent.io.writers import dataset_spec_to_yaml
 from test_data_agent.spec import GenerationSpec
 
 
+def write_json_artifact(payload: Any, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if hasattr(payload, "model_dump_json"):
+        output.write_text(payload.model_dump_json(indent=2))
+        return
+    output.write_text(str(payload))
+
+
+def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
+    write_json_artifact(profile, output)
+
+
+def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(dataset_spec_to_yaml(spec))
+
+
 def write_generation_artifacts(
     spec: GenerationSpec,
     report: Any,
@@ -41,8 +58,7 @@ def write_dataset_generation_artifacts(
 
 
 def write_dataset_validation_report(report: Any, output_folder: Path) -> None:
-    output_folder.mkdir(parents=True, exist_ok=True)
-    (output_folder / "validation_report.json").write_text(report.model_dump_json(indent=2))
+    write_json_artifact(report, output_folder / "validation_report.json")
 
 
 def write_dataset_review_artifacts(
@@ -52,6 +68,6 @@ def write_dataset_review_artifacts(
     output_folder: Path,
 ) -> None:
     output_folder.mkdir(parents=True, exist_ok=True)
-    (output_folder / "profile.json").write_text(profile.model_dump_json(indent=2))
-    (output_folder / "dataset_spec.yaml").write_text(dataset_spec_to_yaml(spec))
+    write_dataset_profile_artifact(profile, output_folder / "profile.json")
+    write_dataset_spec_artifact(spec, output_folder / "dataset_spec.yaml")
     write_dataset_validation_report(report, output_folder)
