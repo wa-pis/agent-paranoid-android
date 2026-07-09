@@ -322,6 +322,18 @@ Expected outcome:
 - `cli.py` imports deprecated workflow helpers from `test_data_agent.compat.legacy_workflows`
 - the `compat` package root remains a user-facing compatibility surface, not an internal workflow dependency
 
+### Phase 13: Route Package-Root Legacy Shims Through Compat
+
+Keep deprecated package-root symbols behind explicit `compat/` modules instead
+of importing legacy implementation modules directly from `test_data_agent`.
+
+Expected outcome:
+
+- `test_data_agent.__init__` resolves deprecated `GenerationSpec` and row APIs
+  through `test_data_agent.compat.legacy_spec`
+- callers retain compatibility, but the package root no longer reaches directly
+  into legacy implementation modules
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

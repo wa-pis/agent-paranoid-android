@@ -15,14 +15,14 @@ from test_data_agent.generation import generate_dataset, infer_dataset_spec, sol
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 _LEGACY_EXPORTS = {
-    "ColumnSpec": ("test_data_agent.spec", "ColumnSpec"),
-    "ForeignKeySpec": ("test_data_agent.spec", "ForeignKeySpec"),
-    "GenerationSpec": ("test_data_agent.spec", "GenerationSpec"),
-    "MultiTableGenerationSpec": ("test_data_agent.spec", "MultiTableGenerationSpec"),
-    "TableSpec": ("test_data_agent.spec", "TableSpec"),
-    "generate_rows": ("test_data_agent.generator", "generate_rows"),
-    "generate_tables": ("test_data_agent.generator", "generate_tables"),
-    "validate_rows": ("test_data_agent.validator", "validate_rows"),
+    "ColumnSpec": ("test_data_agent.compat.legacy_spec", "ColumnSpec"),
+    "ForeignKeySpec": ("test_data_agent.compat.legacy_spec", "ForeignKeySpec"),
+    "GenerationSpec": ("test_data_agent.compat.legacy_spec", "GenerationSpec"),
+    "MultiTableGenerationSpec": ("test_data_agent.compat.legacy_spec", "MultiTableGenerationSpec"),
+    "TableSpec": ("test_data_agent.compat.legacy_spec", "TableSpec"),
+    "generate_rows": ("test_data_agent.compat.legacy_spec", "generate_rows"),
+    "generate_tables": ("test_data_agent.compat.legacy_spec", "generate_tables"),
+    "validate_rows": ("test_data_agent.compat.legacy_spec", "validate_rows"),
 }
 
 __all__ = [

@@ -204,6 +204,8 @@ def test_package_root_exposes_domain_agnostic_api_without_dropping_legacy_symbol
     assert test_data_agent.validate_dataset is not None
     with pytest.deprecated_call(match="test_data_agent.GenerationSpec is deprecated"):
         assert test_data_agent.GenerationSpec is GenerationSpec
+    with pytest.deprecated_call(match="test_data_agent.generate_rows is deprecated"):
+        assert test_data_agent.generate_rows is __import__("test_data_agent.compat.legacy_spec", fromlist=["generate_rows"]).generate_rows
 
 
 def test_csv_adapter_normalizes_legacy_profile_into_dataset_shapes() -> None:

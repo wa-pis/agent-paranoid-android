@@ -380,6 +380,28 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_compat_legacy.py"),
         ),
     ),
+    Phase(
+        phase_id="phase13",
+        title="Route package-root legacy shims through compat",
+        goal="Keep deprecated package-root symbols behind explicit compat modules instead of importing legacy modules directly.",
+        expected_files=("src/test_data_agent/compat/legacy_spec.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/__init__.py",
+                text="test_data_agent.compat.legacy_spec",
+                description="package root legacy shims resolve through the compat boundary",
+            ),
+            TextCheck(
+                path="src/test_data_agent/compat/__init__.py",
+                text="from test_data_agent.compat.legacy_spec import",
+                description="compat package root re-exports deprecated legacy spec helpers explicitly",
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_compat_legacy.py", "tests/test_dataset_spec_contract.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+        ),
+    ),
 )
 
 

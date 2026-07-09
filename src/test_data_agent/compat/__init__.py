@@ -17,19 +17,36 @@ from test_data_agent.compat.legacy_generation import (
     validate_legacy_rows_file,
     validate_legacy_rows_report,
 )
+from test_data_agent.compat.legacy_spec import (
+    ColumnSpec,
+    ForeignKeySpec,
+    GenerationSpec,
+    MultiTableGenerationSpec,
+    TableSpec,
+    generate_rows,
+    generate_tables,
+    validate_rows,
+)
 from test_data_agent.compat.legacy_workflows import (
     generate_legacy_spec_artifacts,
     validate_legacy_spec_artifacts,
 )
 
 __all__ = [
+    "ColumnSpec",
+    "ForeignKeySpec",
+    "GenerationSpec",
     "LegacyGenerationResult",
+    "MultiTableGenerationSpec",
+    "TableSpec",
     "apply_legacy_mode_options",
     "dataset_spec_from_generation_spec",
     "dataset_spec_to_generation_spec",
     "generate_legacy_compatibility_result",
     "generate_legacy_rows",
     "generate_legacy_spec_artifacts",
+    "generate_rows",
+    "generate_tables",
     "generation_spec_to_dataset_spec",
     "legacy_profile_to_dataset_profile",
     "legacy_profile_to_dataset_spec",
@@ -37,6 +54,7 @@ __all__ = [
     "load_legacy_generation_spec",
     "multi_table_generation_spec_to_dataset_spec",
     "prepare_legacy_generation_spec",
+    "validate_rows",
     "validate_legacy_rows_file",
     "validate_legacy_rows_report",
     "validate_legacy_spec_artifacts",
