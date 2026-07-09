@@ -21,7 +21,10 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, 
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
+    apply_dataset_mode_options,
+    build_dataset_spec_from_profile,
     generate_dataset_artifacts,
+    generate_single_entity_profile_artifacts,
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
@@ -113,7 +116,11 @@ def main(argv: list[str] | None = None) -> int:
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
         )
-        apply_dataset_mode_options(legacy_result.dataset_spec, args.mode, args.invalid_ratio)
+        apply_dataset_mode_options(
+            legacy_result.dataset_spec,
+            mode=args.mode,
+            invalid_ratio=args.invalid_ratio,
+        )
         business_report = apply_business_rules_from_args(
             {legacy_result.spec.table.name: legacy_result.rows},
             args,
@@ -160,7 +167,11 @@ def main(argv: list[str] | None = None) -> int:
         spec = csv_file_to_dataset_spec(args.input, table_name=args.table, count=args.count, seed=args.seed)
         spec.generation_settings.seed = args.seed
         spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
-        apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
+        apply_dataset_mode_options(
+            spec,
+            mode=args.mode,
+            invalid_ratio=args.invalid_ratio,
+        )
         rows_by_entity = generate_dataset(spec, seed=args.seed)
         business_report = apply_business_rules_from_args(rows_by_entity, args, args.seed)
         report = validate_dataset(rows_by_entity, spec)
@@ -246,29 +257,6 @@ def generate_dataset_command(args: argparse.Namespace) -> int:
 
 
 def generate_dataset_from_profile_command(args: argparse.Namespace) -> int:
-    profile, spec = build_dataset_spec_from_profile(args)
-    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
-    business_report = apply_business_rules_from_args(rows_by_entity, args, spec.generation_settings.seed or 0)
-    report = validate_dataset(rows_by_entity, spec)
-    write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, args.output)
-    write_dataset_generation_artifacts(
-        profile,
-        spec,
-        report,
-        args.output,
-        business_report=business_report,
-        profile_artifact_name="profile.json",
-    )
-    if should_fail_generation(report, business_report, args.mode):
-        for section in report.sections:
-            for error in section.errors:
-                print(error, file=sys.stderr)
-        if business_report is not None and not business_report.valid:
-            print("business validation failed", file=sys.stderr)
-        return 1
-    return 0
-
-def build_dataset_spec_from_profile(args: argparse.Namespace) -> tuple[DatasetProfile, DatasetSpec]:
     if args.spec is not None:
         raise SystemExit("generate accepts either a spec path or --profile, not both")
     if args.profile is None:
@@ -282,26 +270,37 @@ def build_dataset_spec_from_profile(args: argparse.Namespace) -> tuple[DatasetPr
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("--profile expects a dataset profile, not a dataset spec")
     profile = loaded
-    if len(profile.entities) != 1:
-        raise SystemExit("--profile generation currently requires exactly one entity profile")
 
-    spec = infer_dataset_spec(profile, count=args.count)
-    spec.generation_settings.seed = args.seed
-    if args.output_format is not None:
-        spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
-    apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
-    return profile, spec
+    try:
+        spec = build_dataset_spec_from_profile(
+            profile,
+            count=args.count,
+            seed=args.seed,
+            output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
+            mode=args.mode,
+            invalid_ratio=args.invalid_ratio,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
 
-def apply_dataset_mode_options(spec: DatasetSpec, mode: str, invalid_ratio: float) -> None:
-    if mode in {"mixed", "negative"}:
-        if not 0.0 <= invalid_ratio <= 1.0:
-            raise SystemExit("--invalid-ratio must be between 0 and 1")
-        spec.generation_settings.mode = CoreGenerationMode(mode)
-        spec.generation_settings.invalid_ratio = invalid_ratio
-    elif invalid_ratio:
-        raise SystemExit("--invalid-ratio requires --mode mixed or --mode negative")
-    else:
-        spec.generation_settings.mode = CoreGenerationMode(mode)
+    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
+    business_report = apply_business_rules_from_args(rows_by_entity, args, spec.generation_settings.seed or 0)
+    report = generate_single_entity_profile_artifacts(
+        profile,
+        spec,
+        output_path=args.output,
+        rows_by_entity=rows_by_entity,
+        business_report=business_report,
+        profile_artifact_name="profile.json",
+    )
+    if should_fail_generation(report, business_report, args.mode):
+        for section in report.sections:
+            for error in section.errors:
+                print(error, file=sys.stderr)
+        if business_report is not None and not business_report.valid:
+            print("business validation failed", file=sys.stderr)
+        return 1
+    return 0
 
 
 def apply_business_rules_from_args(rows_by_table: dict[str, list[dict[str, Any]]], args: argparse.Namespace, seed: int) -> Any | None:
