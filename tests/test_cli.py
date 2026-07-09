@@ -111,6 +111,38 @@ generation_settings:
     assert [row["customer_id"] for row in first_rows] == ["17000001", "17000002", "17000003"]
 
 
+def test_generate_dataset_spec_uses_embedded_output_format_when_cli_format_is_omitted(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    output_path = tmp_path / "generated"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 2
+    primary_key: customer_id
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+      - name: status
+        data_type: string
+generation_settings:
+  seed: 7
+  output_format: json
+"""
+    )
+
+    exit_code = main(["generate", str(spec_path), "--output", str(output_path)])
+
+    rows = json.loads((output_path / "customers.json").read_text())
+    report = json.loads((output_path / "validation_report.json").read_text())
+
+    assert exit_code == 0
+    assert rows[0]["customer_id"] == 7000001
+    assert report["valid"] is True
+    assert not (output_path / "customers.csv").exists()
+
+
 def test_generate_accepts_dataset_spec_json(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.json"
     output_path = tmp_path / "generated"

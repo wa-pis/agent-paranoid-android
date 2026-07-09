@@ -11,7 +11,8 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.spec import GenerationSpec, OutputFormat
+from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
+from test_data_agent.spec import GenerationSpec
 
 
 def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
@@ -65,32 +66,32 @@ def write_tabular_rows(rows: list[dict[str, Any]], spec: GenerationSpec, output:
 
 def write_dataset_rows(
     rows_by_entity: dict[str, list[dict[str, Any]]],
-    output_format: OutputFormat,
+    output_format: DatasetOutputFormat,
     output_folder: Path,
 ) -> None:
     output_folder.mkdir(parents=True, exist_ok=True)
     for entity_name, rows in rows_by_entity.items():
-        if output_format == OutputFormat.CSV:
+        if output_format == DatasetOutputFormat.CSV:
             (output_folder / f"{entity_name}.csv").write_text(rows_to_csv(rows))
-        elif output_format == OutputFormat.JSON:
+        elif output_format == DatasetOutputFormat.JSON:
             (output_folder / f"{entity_name}.json").write_text(json.dumps(rows, indent=2, sort_keys=True))
-        elif output_format == OutputFormat.PARQUET:
+        elif output_format == DatasetOutputFormat.PARQUET:
             write_parquet(rows, output_folder / f"{entity_name}.parquet")
 
 
 def write_single_entity_rows(
     rows_by_entity: dict[str, list[dict[str, Any]]],
-    output_format: OutputFormat,
+    output_format: DatasetOutputFormat,
     output: Path,
 ) -> None:
     if len(rows_by_entity) != 1:
         raise SystemExit("single-entity output requires exactly one generated entity")
     rows = next(iter(rows_by_entity.values()))
-    if output_format == OutputFormat.CSV:
+    if output_format == DatasetOutputFormat.CSV:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(rows_to_csv(rows))
-    elif output_format == OutputFormat.JSON:
+    elif output_format == DatasetOutputFormat.JSON:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(rows, indent=2, sort_keys=True))
-    elif output_format == OutputFormat.PARQUET:
+    elif output_format == DatasetOutputFormat.PARQUET:
         write_parquet(rows, output)

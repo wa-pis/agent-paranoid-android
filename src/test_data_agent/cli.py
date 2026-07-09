@@ -151,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
         report = validate_dataset(rows_by_entity, spec)
         if args.output is None:
             raise SystemExit("CSV generation requires --output")
-        write_single_entity_rows(rows_by_entity, OutputFormat(args.output_format), args.output)
+        write_single_entity_rows(rows_by_entity, CoreOutputFormat(args.output_format), args.output)
         write_dataset_generation_artifacts(profile, spec, report, args.output, business_report=business_report)
         if should_fail_generation(report, business_report, args.mode):
             for section in report.sections:
@@ -191,7 +191,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         spec = infer_dataset_spec(profile, count=args.count)
         rows_by_entity = generate_dataset(spec, seed=args.seed)
-        output_format = OutputFormat(args.output_format)
+        output_format = CoreOutputFormat(args.output_format)
         write_dataset_rows(rows_by_entity, output_format, args.output)
         report = validate_dataset(rows_by_entity, spec)
         (args.output / "profile.json").write_text(profile.model_dump_json(indent=2))
@@ -220,7 +220,9 @@ def is_dataset_spec_path(path: Path) -> bool:
 
 def generate_dataset_command(args: argparse.Namespace) -> int:
     spec = load_dataset_spec(args.spec)
-    output_format = OutputFormat(args.output_format or "csv")
+    output_format = spec.generation_settings.output_format
+    if args.output_format is not None:
+        output_format = CoreOutputFormat(args.output_format)
     if args.count is not None:
         for entity in spec.entities:
             entity.row_count = args.count
