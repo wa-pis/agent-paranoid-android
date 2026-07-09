@@ -9,7 +9,11 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.io.artifacts import write_dataset_generation_artifacts, write_dataset_validation_report
+from test_data_agent.io.artifacts import (
+    write_dataset_generation_artifacts,
+    write_dataset_review_artifacts,
+    write_dataset_validation_report,
+)
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
@@ -75,6 +79,22 @@ def generate_single_entity_profile_artifacts(
         profile_artifact_name=profile_artifact_name,
     )
     return report
+
+
+def generate_dataset_review_artifacts(
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+    *,
+    output_folder: Path,
+    output_format: OutputFormat,
+    seed: int,
+) -> int:
+    rows_by_entity = generate_dataset(spec, seed=seed)
+    write_dataset_rows(rows_by_entity, output_format, output_folder)
+    report = validate_dataset(rows_by_entity, spec)
+
+    write_dataset_review_artifacts(profile, spec, report, output_folder)
+    return 0 if report.valid else 1
 
 
 def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: float) -> None:

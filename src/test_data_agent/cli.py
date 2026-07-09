@@ -7,8 +7,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
@@ -24,16 +22,15 @@ from test_data_agent.io import (
     apply_dataset_mode_options,
     build_dataset_spec_from_profile,
     generate_dataset_artifacts,
+    generate_dataset_review_artifacts,
     generate_single_entity_profile_artifacts,
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
-    write_dataset_review_artifacts,
     write_dataset_spec_artifact,
     write_generation_artifacts,
     write_json_artifact,
-    write_dataset_rows,
     write_single_entity_rows,
     write_tabular_rows,
 )
@@ -214,12 +211,14 @@ def main(argv: list[str] | None = None) -> int:
             rule_sample_rows=args.rule_sample_rows,
         )
         spec = infer_dataset_spec(profile, count=args.count)
-        rows_by_entity = generate_dataset(spec, seed=args.seed)
         output_format = CoreOutputFormat(args.output_format)
-        write_dataset_rows(rows_by_entity, output_format, args.output)
-        report = validate_dataset(rows_by_entity, spec)
-        write_dataset_review_artifacts(profile, spec, report, args.output)
-        return 0 if report.valid else 1
+        return generate_dataset_review_artifacts(
+            profile,
+            spec,
+            output_folder=args.output,
+            output_format=output_format,
+            seed=args.seed,
+        )
 
     return 2
 
