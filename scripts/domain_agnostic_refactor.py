@@ -315,9 +315,9 @@ PHASES: tuple[Phase, ...] = (
                 absent=True,
             ),
             TextCheck(
-                path="src/test_data_agent/io/legacy_workflows.py",
+                path="src/test_data_agent/compat/legacy_workflows.py",
                 text="_warn_deprecated_generation_spec_compatibility",
-                description="legacy workflows own deprecated warning emission",
+                description="compat-owned legacy workflows emit deprecated warnings",
             ),
         ),
         test_commands=(

@@ -132,10 +132,10 @@ def test_phase10_tracks_legacy_warning_boundary() -> None:
         "dataset-oriented workflows no longer carry deprecated warning helpers",
     ) in checks
     assert (
-        "src/test_data_agent/io/legacy_workflows.py",
+        "src/test_data_agent/compat/legacy_workflows.py",
         "_warn_deprecated_generation_spec_compatibility",
         False,
-        "legacy workflows own deprecated warning emission",
+        "compat-owned legacy workflows emit deprecated warnings",
     ) in checks
 
 
