@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
-from test_data_agent.adapters import (
+from test_data_agent.adapters.legacy_generation import (
     LegacyGenerationResult,
     generate_legacy_compatibility_result,
     validate_legacy_rows_file,

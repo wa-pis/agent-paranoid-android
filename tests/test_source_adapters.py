@@ -4,21 +4,24 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
+import test_data_agent.adapters as adapters_package
 
 from test_data_agent.adapters import (
-    prepare_legacy_generation_spec,
     dataset_profile_from_csv_file,
     dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
     dataset_spec_to_generation_spec,
-    generate_legacy_compatibility_result,
     dataset_spec_from_generation_spec,
     dataset_spec_from_csv_folder,
     dataset_spec_from_trino_profile,
-    generate_legacy_rows,
     legacy_profile_to_generation_spec,
-    load_legacy_generation_spec,
     load_profile_or_spec,
+)
+from test_data_agent.adapters.legacy_generation import (
+    generate_legacy_compatibility_result,
+    generate_legacy_rows,
+    load_legacy_generation_spec,
+    prepare_legacy_generation_spec,
     validate_legacy_rows_file,
     validate_legacy_rows_report,
 )
@@ -382,3 +385,13 @@ def test_parquet_adapter_uses_schema_metadata(tmp_path) -> None:
     assert customers.field("customer_id").is_identifier is True
     assert customers.field("active").data_type == "boolean"
     assert customers.field("score").data_type == "float"
+
+
+def test_adapters_package_keeps_legacy_workflow_helpers_out_of_dataset_oriented_exports() -> None:
+    assert not hasattr(adapters_package, "LegacyGenerationResult")
+    assert not hasattr(adapters_package, "generate_legacy_compatibility_result")
+    assert not hasattr(adapters_package, "generate_legacy_rows")
+    assert not hasattr(adapters_package, "load_legacy_generation_spec")
+    assert not hasattr(adapters_package, "prepare_legacy_generation_spec")
+    assert not hasattr(adapters_package, "validate_legacy_rows_file")
+    assert not hasattr(adapters_package, "validate_legacy_rows_report")
