@@ -23,16 +23,16 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, 
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
+    generate_dataset_artifacts,
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
     write_dataset_review_artifacts,
     write_dataset_spec_artifact,
-    write_dataset_validation_report,
-    write_dataset_rows,
     write_generation_artifacts,
     write_json_artifact,
+    write_dataset_rows,
     write_single_entity_rows,
     write_tabular_rows,
 )
@@ -231,20 +231,16 @@ def is_dataset_spec_path(path: Path) -> bool:
 
 def generate_dataset_command(args: argparse.Namespace) -> int:
     spec = load_dataset_spec(args.spec)
-    output_format = spec.generation_settings.output_format
-    if args.output_format is not None:
-        output_format = CoreOutputFormat(args.output_format)
-    if args.count is not None:
-        for entity in spec.entities:
-            entity.row_count = args.count
-    seed = spec.generation_settings.seed if args.seed is None else args.seed
-    rows_by_entity = generate_dataset(spec, seed=seed or 0)
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
-    write_dataset_rows(rows_by_entity, output_format, args.output)
-    report = validate_dataset(rows_by_entity, spec)
-    write_dataset_validation_report(report, args.output)
-    return 0 if report.valid else 1
+    output_format = None if args.output_format is None else CoreOutputFormat(args.output_format)
+    return generate_dataset_artifacts(
+        spec,
+        output_folder=args.output,
+        output_format=output_format,
+        seed=args.seed,
+        count=args.count,
+    )
 
 
 def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
