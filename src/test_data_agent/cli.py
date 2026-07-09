@@ -13,7 +13,6 @@ import yaml
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
-    dataset_spec_to_generation_spec,
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
 )
@@ -146,10 +145,7 @@ def main(argv: list[str] | None = None) -> int:
         spec.generation_settings.seed = args.seed
         spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
         apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
-        legacy_spec = dataset_spec_to_generation_spec(spec, seed=args.seed, output_format=OutputFormat(args.output_format))
-        apply_mode_options(legacy_spec, args.mode, args.invalid_ratio)
-        rows = generate_legacy_rows(legacy_spec)
-        rows_by_entity = {spec.entities[0].name: rows}
+        rows_by_entity = generate_dataset(spec, seed=args.seed)
         business_report = apply_business_rules_from_args(rows_by_entity, args, args.seed)
         report = validate_dataset(rows_by_entity, spec)
         if args.output is None:
