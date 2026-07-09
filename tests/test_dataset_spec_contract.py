@@ -1,6 +1,8 @@
 from test_data_agent.core import (
     CategoricalDistribution,
     DatasetSpec,
+    FieldProfile,
+    FieldSpec,
     GenerationMode,
     NumericDistribution,
     PrivacyAction,
@@ -10,6 +12,7 @@ from test_data_agent.core import (
     mask_pattern,
     validate_distribution,
 )
+from pydantic import ValidationError
 from test_data_agent.adapters import (
     csv_profile_to_dataset_profile,
     csv_profile_to_dataset_spec,
@@ -118,6 +121,52 @@ def test_typed_distribution_models_validate_known_shapes() -> None:
     assert numeric.p95 == 10
     assert isinstance(categorical, CategoricalDistribution)
     assert categorical.categories[0].value == "active"
+
+
+def test_field_models_normalize_recognized_distribution_shapes() -> None:
+    profile = FieldProfile(
+        name="status",
+        data_type=FieldType.STRING,
+        distribution={
+            "kind": "categorical",
+            "categories": [
+                {"value": "active", "count": 2},
+                {"value": "paused", "count": 1},
+            ],
+        },
+    )
+    spec = FieldSpec(
+        name="amount",
+        data_type=FieldType.FLOAT,
+        distribution={"kind": "numeric", "p05": 1, "p95": 10},
+    )
+
+    assert profile.distribution["kind"] == "categorical"
+    assert profile.distribution["categories"][0] == {"value": "active", "count": 2.0}
+    assert spec.distribution == {"kind": "numeric", "min_value": None, "max_value": None, "p05": 1, "p95": 10}
+
+
+def test_field_models_reject_invalid_typed_distribution_shapes() -> None:
+    try:
+        FieldSpec(
+            name="status",
+            data_type=FieldType.STRING,
+            distribution={"kind": "categorical", "categories": [{"count": 1}]},
+        )
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("expected invalid categorical distribution to fail validation")
+
+
+def test_field_models_preserve_untyped_distribution_metadata() -> None:
+    field = FieldProfile(
+        name="legacy_metric",
+        data_type=FieldType.FLOAT,
+        distribution={"min_value": 1, "max_value": 9},
+    )
+
+    assert field.distribution == {"min_value": 1, "max_value": 9}
 
 
 def test_privacy_policy_is_shared_with_legacy_spec_module() -> None:
