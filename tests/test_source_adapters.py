@@ -7,8 +7,10 @@ import pytest
 
 from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
+    dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
     dataset_spec_from_generation_spec,
+    dataset_spec_from_csv_folder,
     dataset_spec_from_trino_profile,
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
@@ -20,6 +22,7 @@ from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, TableSpec
 
 
 FIXTURE_CSV = Path(__file__).parent / "fixtures" / "customers.csv"
+FIXTURE_FOLDER = Path(__file__).parent / "fixtures" / "example_dataset"
 
 
 def test_csv_file_adapter_builds_safe_one_entity_profile() -> None:
@@ -33,6 +36,34 @@ def test_csv_file_adapter_builds_safe_one_entity_profile() -> None:
     assert email.sensitive is True
     assert email.distribution["kind"] == "masked_patterns"
     assert "alice@example.com" not in profile_json
+
+
+def test_csv_folder_adapter_builds_safe_multi_entity_profile() -> None:
+    profile = dataset_profile_from_csv_folder(FIXTURE_FOLDER, use_cache=False)
+    customers = profile.entity("customers")
+
+    assert profile.source_type == "csv_folder"
+    assert {entity.name for entity in profile.entities} == {"customers", "orders"}
+    assert customers.field("email").sensitive is True
+    assert any(
+        relationship.parent_entity == "customers"
+        and relationship.child_entity == "orders"
+        for relationship in profile.relationships
+    )
+    assert "alice@example.com" not in profile.model_dump_json()
+
+
+def test_csv_folder_adapter_builds_dataset_spec_with_seed_and_relationships() -> None:
+    spec = dataset_spec_from_csv_folder(FIXTURE_FOLDER, count=7, seed=123, use_cache=False)
+
+    assert spec.generation_settings.seed == 123
+    assert spec.entity("customers").row_count == 7
+    assert spec.entity("orders").row_count == 7
+    assert any(
+        relationship.parent_entity == "customers"
+        and relationship.child_entity == "orders"
+        for relationship in spec.relationships
+    )
 
 
 def test_trino_profile_adapter_uses_safe_metadata_only() -> None:

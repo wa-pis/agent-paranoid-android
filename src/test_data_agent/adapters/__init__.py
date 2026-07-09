@@ -8,6 +8,12 @@ from test_data_agent.adapters.csv_file import (
     dataset_profile_from_csv_file,
     dataset_spec_from_csv_file,
 )
+from test_data_agent.adapters.csv_folder import (
+    csv_folder_to_dataset_profile,
+    csv_folder_to_dataset_spec,
+    dataset_profile_from_csv_folder,
+    dataset_spec_from_csv_folder,
+)
 from test_data_agent.adapters.json_profile import (
     json_payload_to_dataset_profile,
     json_payload_to_dataset_spec,
@@ -42,13 +48,17 @@ from test_data_agent.adapters.trino_profile import (
 __all__ = [
     "csv_file_to_dataset_profile",
     "csv_file_to_dataset_spec",
+    "csv_folder_to_dataset_profile",
+    "csv_folder_to_dataset_spec",
     "csv_profile_to_dataset_profile",
     "csv_profile_to_dataset_spec",
     "dataset_profile_from_csv_file",
+    "dataset_profile_from_csv_folder",
     "dataset_profile_from_parquet",
     "dataset_profile_from_trino_profile",
     "dataset_spec_from_generation_spec",
     "dataset_spec_from_csv_file",
+    "dataset_spec_from_csv_folder",
     "dataset_spec_from_parquet",
     "dataset_spec_from_trino_profile",
     "dataset_spec_to_generation_spec",
