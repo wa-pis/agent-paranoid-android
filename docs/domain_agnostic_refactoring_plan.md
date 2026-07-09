@@ -368,6 +368,18 @@ Expected outcome:
 - dataset-spec generate/validate orchestration is reusable without the CLI module
 - legacy compatibility flows remain unchanged
 
+### Phase 17: Extract Example-Dataset Commands From CLI
+
+Keep example-folder profiling and review-bundle generation inside `io/`
+command helpers so `cli.py` no longer orchestrates DatasetSpec example flows
+directly.
+
+Expected outcome:
+
+- `profile-example` delegates to dataset-oriented command helpers
+- `generate-from-example` delegates to dataset-oriented command helpers
+- `cli.py` no longer imports example-folder profiling or DatasetSpec review orchestration directly
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

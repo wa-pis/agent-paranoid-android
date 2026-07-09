@@ -497,6 +497,39 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
         ),
     ),
+    Phase(
+        phase_id="phase17",
+        title="Extract example dataset commands from CLI",
+        goal="Keep example-folder profiling and review-bundle orchestration in io helpers while cli.py only routes arguments.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.io import (\n    generate_dataset_from_example_artifacts,",
+                description="CLI delegates example-dataset generation to io command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="profile_example_artifacts,",
+                description="CLI delegates example-dataset profiling to io command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.profiling import profile_example_folder",
+                description="CLI no longer imports example-folder profiling directly",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="generate_dataset_review_artifacts(",
+                description="CLI no longer orchestrates example review bundles directly",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_io_commands.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_domain_agnostic_pipeline.py"),
+        ),
+    ),
 )
 
 

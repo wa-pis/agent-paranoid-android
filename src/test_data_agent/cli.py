@@ -14,19 +14,17 @@ from test_data_agent.compat.legacy_workflows import (
 )
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
-from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
+    generate_dataset_from_example_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_from_spec_path,
-    generate_dataset_review_artifacts,
-    infer_dataset_spec_artifact,
     is_dataset_spec_path,
+    infer_dataset_spec_artifact,
+    profile_example_artifacts,
     validate_dataset_artifacts,
-    write_dataset_profile_artifact,
     write_csv_profile_artifact,
 )
-from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 
 
@@ -118,13 +116,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "profile-example":
-        profile = profile_example_folder(
+        profile_example_artifacts(
             args.input_folder,
+            output_path=args.output,
             cache_dir=args.cache_dir,
             use_cache=not args.no_cache,
             rule_sample_rows=args.rule_sample_rows,
         )
-        write_dataset_profile_artifact(profile, args.output)
         return 0
 
     if args.command == "infer-spec":
@@ -184,20 +182,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "generate-from-example":
-        profile = profile_example_folder(
+        return generate_dataset_from_example_artifacts(
             args.input_folder,
+            output_folder=args.output,
+            seed=args.seed,
+            count=args.count,
+            output_format=CoreOutputFormat(args.output_format),
             cache_dir=args.cache_dir,
             use_cache=not args.no_cache,
             rule_sample_rows=args.rule_sample_rows,
-        )
-        spec = infer_dataset_spec(profile, count=args.count)
-        output_format = CoreOutputFormat(args.output_format)
-        return generate_dataset_review_artifacts(
-            profile,
-            spec,
-            output_folder=args.output,
-            output_format=output_format,
-            seed=args.seed,
         )
 
     return 2

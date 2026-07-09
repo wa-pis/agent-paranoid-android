@@ -307,6 +307,58 @@ def test_phase16_runs_io_and_cli_focused_suites() -> None:
     )
 
 
+def test_phase17_tracks_example_dataset_command_boundary() -> None:
+    module = load_refactor_module()
+
+    phase17 = module.phase_by_id("phase17")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase17.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.io import (\n    generate_dataset_from_example_artifacts,",
+        False,
+        "CLI delegates example-dataset generation to io command helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "profile_example_artifacts,",
+        False,
+        "CLI delegates example-dataset profiling to io command helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.profiling import profile_example_folder",
+        True,
+        "CLI no longer imports example-folder profiling directly",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "generate_dataset_review_artifacts(",
+        True,
+        "CLI no longer orchestrates example review bundles directly",
+    ) in checks
+
+
+def test_phase17_runs_example_command_and_cli_suites() -> None:
+    module = load_refactor_module()
+
+    phase17 = module.phase_by_id("phase17")
+
+    assert phase17.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_io_commands.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_domain_agnostic_pipeline.py"),
+    )
+
+
 def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
     module = load_refactor_module()
 
