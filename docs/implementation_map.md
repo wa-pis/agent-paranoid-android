@@ -86,16 +86,16 @@ New domain-agnostic commands:
 
 - `profile-example`
 - `infer-spec`
-- `generate` with a YAML dataset spec
-- `validate` with a YAML dataset spec and output folder
+- `generate` with a YAML or JSON `DatasetSpec`
+- `validate` with a YAML or JSON `DatasetSpec` and output folder
 - `generate-from-example`
 
-Existing single-table commands are still supported:
+Compatibility paths are still supported during migration:
 
 - `profile-csv`
 - `generate-from-csv`
-- `generate` with JSON `GenerationSpec`
-- `validate` with JSON rows
+- `generate` with legacy JSON `GenerationSpec`
+- `validate` with legacy JSON rows
 
 ## Trino MCP
 

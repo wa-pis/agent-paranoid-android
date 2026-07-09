@@ -480,34 +480,60 @@ spec:
 Each rule profile includes `confidence` and `status`. The tools do not return
 source rows, identifiers, or raw PII values.
 
-## Multi-Table Generation
+## DatasetSpec Generation
 
-Use `MultiTableGenerationSpec` when synthetic tables need deterministic
-relationships such as foreign keys:
+Use `DatasetSpec` when synthetic datasets need deterministic relationships such
+as foreign keys:
 
 ```python
-from test_data_agent import ForeignKeySpec, MultiTableGenerationSpec, generate_tables
+from test_data_agent.core.constraint import ForeignKeyConstraint
+from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.settings import GenerationSettings
+from test_data_agent.generation.entity_generator import generate_dataset
 
-spec = MultiTableGenerationSpec.from_profiles(
-    profiles=[customers_profile, orders_profile],
-    seed=12345,
-    row_counts={"customers": 100, "orders": 1000},
-    foreign_keys=[
-        ForeignKeySpec(
-            child_table="orders",
+spec = DatasetSpec(
+    entities=[
+        EntitySpec(
+            name="customers",
+            row_count=100,
+            primary_key="customer_id",
+            fields=[
+                FieldSpec(name="customer_id", data_type="integer", is_identifier=True),
+                FieldSpec(name="status", data_type="string"),
+            ],
+        ),
+        EntitySpec(
+            name="orders",
+            row_count=1000,
+            primary_key="order_id",
+            fields=[
+                FieldSpec(name="order_id", data_type="integer", is_identifier=True),
+                FieldSpec(name="customer_id", data_type="integer"),
+            ],
+        ),
+    ],
+    constraints=[
+        ForeignKeyConstraint(
+            name="orders_customer_fk",
+            child_entity="orders",
             child_field="customer_id",
-            parent_table="customers",
+            parent_entity="customers",
             parent_field="customer_id",
         )
     ],
+    generation_settings=GenerationSettings(seed=12345),
 )
 
-tables = generate_tables(spec)
+rows_by_entity = generate_dataset(spec, seed=12345)
 ```
 
 Parent and child rows are generated synthetically from safe CSV-derived or
 Trino-derived profile metadata. Foreign-key values are assigned from generated
-parent rows, never copied from source data.
+parent rows, never copied from source data. Legacy `MultiTableGenerationSpec`
+support remains available through compatibility adapters while downstream code
+migrates.
 
 ## Business Rules
 
@@ -582,52 +608,58 @@ report = validate_business_rules(rows_by_table, rules)
 ## Python API
 
 ```python
-from test_data_agent.generator import generate_rows
-from test_data_agent.spec import GenerationSpec
-from test_data_agent.validator import validate_rows_report
+from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.settings import GenerationSettings
+from test_data_agent.generation.entity_generator import generate_dataset
+from test_data_agent.validation import validate_dataset
 
-profile = {
-    "table": "events",
-    "columns": [
-        {
-            "name": "status",
-            "data_type": "varchar",
-            "top_values": [{"value": "new"}, {"value": "done"}],
-            "approx_distinct_count": 2,
-        },
-        {
-            "name": "amount",
-            "data_type": "double",
-            "p05": 10,
-            "p95": 200,
-            "null_ratio": 0.05,
-        },
-        {
-            "name": "created_at",
-            "data_type": "timestamp",
-            "min_timestamp": "2024-01-01T00:00:00",
-            "max_timestamp": "2024-01-31T23:59:59",
-        },
+spec = DatasetSpec(
+    entities=[
+        EntitySpec(
+            name="events",
+            row_count=100,
+            primary_key="event_id",
+            fields=[
+                FieldSpec(name="event_id", data_type="integer", is_identifier=True),
+                FieldSpec(name="status", data_type="string"),
+                FieldSpec(name="amount", data_type="float"),
+                FieldSpec(name="created_at", data_type="datetime"),
+            ],
+        )
     ],
-}
+    generation_settings=GenerationSettings(seed=123),
+)
 
-spec = GenerationSpec.from_trino_profile(profile, seed=123, row_count=100)
-rows = generate_rows(spec)
-report = validate_rows_report(rows, spec)
+rows_by_entity = generate_dataset(spec, seed=123)
+report = validate_dataset(rows_by_entity, spec)
+events = rows_by_entity["events"]
 ```
+
+Use adapter helpers when converting legacy Trino or CSV profile payloads into a
+`DatasetSpec`. Legacy `GenerationSpec` APIs remain supported for compatibility,
+but new integrations should target the domain-agnostic modules.
 
 ## Project Layout
 
-- `src/test_data_agent/spec.py` - Pydantic generation specs and profile inference.
-- `src/test_data_agent/generator.py` - deterministic synthetic row generation.
-- `src/test_data_agent/validator.py` - schema validation for generated rows.
-- `src/test_data_agent/csv_profiler.py` - safe CSV profiling.
+- `src/test_data_agent/core/` - domain-agnostic dataset, entity, field,
+  constraint, privacy, distribution, and settings models.
+- `src/test_data_agent/generation/` - deterministic synthetic dataset
+  generation.
+- `src/test_data_agent/validation/` - dataset validation and rule checks.
+- `src/test_data_agent/adapters/` - safe adapters from CSV, JSON, Trino, and
+  legacy specs into `DatasetProfile` or `DatasetSpec`.
+- `src/test_data_agent/csv_profiler.py` - safe single-CSV profiling.
 - `src/test_data_agent/mcp_trino_server.py` - safe read-only Trino MCP tools.
 - `src/test_data_agent/profiling/` - domain-agnostic CSV-folder profiling,
   relationship inference, constraint mining, and safe profile caching.
 - `src/test_data_agent/business_rules.py` - business-rule models and YAML loader.
 - `src/test_data_agent/rules_engine.py` - scenario application and invalid-case injection.
 - `src/test_data_agent/business_validator.py` - executable business-rule validation.
+- `src/test_data_agent/spec.py` - legacy single-table compatibility models.
+- `src/test_data_agent/generator.py` - legacy row-generation compatibility path.
+- `src/test_data_agent/validator.py` - legacy row-validation compatibility path.
 - `src/test_data_agent/cli.py` - local command-line interface.
 - `examples/` - safe profile examples.
 - `prompts/` - agent prompt templates.
