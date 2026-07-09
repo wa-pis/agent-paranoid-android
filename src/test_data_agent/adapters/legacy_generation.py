@@ -194,6 +194,37 @@ def load_legacy_generation_spec(path: Path) -> GenerationSpec:
     return GenerationSpec.model_validate_json(path.read_text())
 
 
+def prepare_legacy_generation_spec(
+    path: Path,
+    *,
+    row_count: int | None = None,
+    seed: int | None = None,
+    output_format: OutputFormat | None = None,
+    mode: str = "valid",
+    invalid_ratio: float = 0.0,
+) -> GenerationSpec:
+    spec = load_legacy_generation_spec(path)
+    if row_count is not None:
+        spec.table.row_count = row_count
+    if seed is not None:
+        spec.seed = seed
+    if output_format is not None:
+        spec.output_format = output_format
+    apply_legacy_mode_options(spec, mode=mode, invalid_ratio=invalid_ratio)
+    return spec
+
+
+def apply_legacy_mode_options(spec: GenerationSpec, *, mode: str, invalid_ratio: float) -> None:
+    if mode in {"mixed", "negative"}:
+        if not 0.0 <= invalid_ratio <= 1.0:
+            raise SystemExit("--invalid-ratio must be between 0 and 1")
+        for column in spec.table.columns:
+            column.invalid_ratio = 1.0 if mode == "negative" else invalid_ratio
+        return
+    if invalid_ratio:
+        raise SystemExit("--invalid-ratio requires --mode mixed or --mode negative")
+
+
 def _field_profile_from_column(
     table_name: str,
     row_count: int,

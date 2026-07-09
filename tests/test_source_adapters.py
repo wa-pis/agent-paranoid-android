@@ -6,6 +6,7 @@ import pyarrow.parquet as pq
 import pytest
 
 from test_data_agent.adapters import (
+    prepare_legacy_generation_spec,
     dataset_profile_from_csv_file,
     dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
@@ -165,6 +166,35 @@ def test_legacy_generation_adapter_loads_specs_from_disk(tmp_path) -> None:
         loaded = load_legacy_generation_spec(path)
 
     assert loaded == legacy_spec
+
+
+def test_legacy_generation_adapter_prepares_cli_overrides(tmp_path) -> None:
+    path = tmp_path / "legacy_spec.json"
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+    path.write_text(legacy_spec.model_dump_json())
+
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        prepared = prepare_legacy_generation_spec(
+            path,
+            row_count=5,
+            seed=7,
+            mode="mixed",
+            invalid_ratio=0.25,
+        )
+
+    assert prepared.seed == 7
+    assert prepared.table.row_count == 5
+    assert [column.invalid_ratio for column in prepared.table.columns] == [0.25, 0.25]
 
 
 def test_legacy_generation_adapter_validates_rows_through_compatibility_boundary() -> None:

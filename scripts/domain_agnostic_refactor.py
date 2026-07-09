@@ -196,6 +196,12 @@ PHASES: tuple[Phase, ...] = (
                 description="CLI no longer imports legacy row validator directly",
                 absent=True,
             ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="def build_generation_spec(",
+                description="CLI no longer owns legacy GenerationSpec preparation",
+                absent=True,
+            ),
         ),
         test_commands=((PYTHON, "-m", "pytest"),),
     ),

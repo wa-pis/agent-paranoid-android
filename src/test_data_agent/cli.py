@@ -6,15 +6,15 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import yaml
 
 from test_data_agent.adapters import (
+    prepare_legacy_generation_spec,
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
     generation_spec_to_dataset_spec,
-    load_legacy_generation_spec,
     load_profile_or_spec,
     validate_legacy_rows_report,
 )
@@ -39,9 +39,6 @@ from test_data_agent.io import (
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 from test_data_agent.validation import validate_dataset
-
-if TYPE_CHECKING:
-    from test_data_agent.spec import GenerationSpec, OutputFormat
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -110,7 +107,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
         warn_legacy_path("generate")
-        spec = build_generation_spec(args)
+        spec = prepare_legacy_generation_spec(
+            args.spec,
+            row_count=args.count,
+            seed=args.seed,
+            output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
+            mode=args.mode,
+            invalid_ratio=args.invalid_ratio,
+        )
         dataset_spec = generation_spec_to_dataset_spec(spec)
         apply_dataset_mode_options(dataset_spec, args.mode, args.invalid_ratio)
         rows = next(iter(generate_dataset(dataset_spec, seed=spec.seed).values()))
@@ -181,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(text)
             return 0 if report.valid else 1
         warn_legacy_path("validate")
-        spec = load_spec(args.spec)
+        spec = prepare_legacy_generation_spec(args.spec)
         rows = json.loads(args.rows.read_text())
         report = validate_legacy_rows_report(rows, spec)
         print(report.model_dump_json(indent=2))
@@ -205,11 +209,6 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if report.valid else 1
 
     return 2
-
-
-def load_spec(path: Path) -> GenerationSpec:
-    return load_legacy_generation_spec(path)
-
 
 def warn_legacy_path(command: str) -> None:
     print(
@@ -267,36 +266,6 @@ def generate_dataset_from_profile_command(args: argparse.Namespace) -> int:
         return 1
     return 0
 
-
-def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
-    if args.profile is not None:
-        if args.spec is not None:
-            raise SystemExit("generate accepts either a spec path or --profile, not both")
-        if args.count is None:
-            raise SystemExit("--count is required with --profile")
-        if args.seed is None:
-            raise SystemExit("--seed is required with --profile")
-        profile = json.loads(args.profile.read_text())
-        spec = legacy_profile_to_generation_spec(
-            profile,
-            count=args.count,
-            seed=args.seed,
-        )
-    else:
-        if args.spec is None:
-            raise SystemExit("generate requires a spec path or --profile")
-        spec = load_spec(args.spec)
-        if args.count is not None:
-            spec.table.row_count = args.count
-        if args.seed is not None:
-            spec.seed = args.seed
-
-    if args.output_format is not None:
-        spec.output_format = CoreOutputFormat(args.output_format)
-    apply_mode_options(spec, args.mode, args.invalid_ratio)
-    return spec
-
-
 def build_dataset_spec_from_profile(args: argparse.Namespace) -> tuple[DatasetProfile, DatasetSpec]:
     if args.spec is not None:
         raise SystemExit("generate accepts either a spec path or --profile, not both")
@@ -320,17 +289,6 @@ def build_dataset_spec_from_profile(args: argparse.Namespace) -> tuple[DatasetPr
         spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
     apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
     return profile, spec
-
-
-def apply_mode_options(spec: GenerationSpec, mode: str, invalid_ratio: float) -> None:
-    if mode in {"mixed", "negative"}:
-        if not 0.0 <= invalid_ratio <= 1.0:
-            raise SystemExit("--invalid-ratio must be between 0 and 1")
-        for column in spec.table.columns:
-            column.invalid_ratio = 1.0 if mode == "negative" else invalid_ratio
-    elif invalid_ratio:
-        raise SystemExit("--invalid-ratio requires --mode mixed or --mode negative")
-
 
 def apply_dataset_mode_options(spec: DatasetSpec, mode: str, invalid_ratio: float) -> None:
     if mode in {"mixed", "negative"}:
