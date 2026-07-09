@@ -14,12 +14,12 @@ from test_data_agent.adapters import (
     dataset_spec_from_generation_spec,
     dataset_spec_from_csv_folder,
     dataset_spec_from_trino_profile,
-    legacy_profile_to_generation_spec,
     load_profile_or_spec,
 )
 from test_data_agent.adapters.legacy_generation import (
     generate_legacy_compatibility_result,
     generate_legacy_rows,
+    legacy_profile_to_generation_spec,
     load_legacy_generation_spec,
     prepare_legacy_generation_spec,
     validate_legacy_rows_file,
@@ -391,6 +391,7 @@ def test_adapters_package_keeps_legacy_workflow_helpers_out_of_dataset_oriented_
     assert not hasattr(adapters_package, "LegacyGenerationResult")
     assert not hasattr(adapters_package, "generate_legacy_compatibility_result")
     assert not hasattr(adapters_package, "generate_legacy_rows")
+    assert not hasattr(adapters_package, "legacy_profile_to_generation_spec")
     assert not hasattr(adapters_package, "load_legacy_generation_spec")
     assert not hasattr(adapters_package, "prepare_legacy_generation_spec")
     assert not hasattr(adapters_package, "validate_legacy_rows_file")
