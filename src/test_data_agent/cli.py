@@ -38,7 +38,6 @@ from test_data_agent.io import (
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
-from test_data_agent.rules_engine import GenerationMode
 from test_data_agent.spec import OutputFormat
 from test_data_agent.validation import validate_dataset
 from test_data_agent.validator import validate_rows_report
@@ -55,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     generate_parser.add_argument("spec", nargs="?", type=Path)
     generate_parser.add_argument("--profile", type=Path)
     generate_parser.add_argument("--count", type=int)
-    generate_parser.add_argument("--mode", choices=[item.value for item in GenerationMode], default="valid")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid")
     generate_parser.add_argument("--invalid-ratio", type=float, default=0.0)
     generate_parser.add_argument("--seed", type=int)
     generate_parser.add_argument("--format", choices=[item.value for item in OutputFormat], dest="output_format")
@@ -82,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     generate_csv_parser = subparsers.add_parser("generate-from-csv")
     generate_csv_parser.add_argument("input", type=Path)
     generate_csv_parser.add_argument("--count", type=int, required=True)
-    generate_csv_parser.add_argument("--mode", choices=[item.value for item in GenerationMode], default="valid")
+    generate_csv_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid")
     generate_csv_parser.add_argument("--invalid-ratio", type=float, default=0.0)
     generate_csv_parser.add_argument("--seed", type=int, required=True)
     generate_csv_parser.add_argument("--format", choices=[item.value for item in OutputFormat], required=True, dest="output_format")

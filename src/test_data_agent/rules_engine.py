@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import random
-from enum import StrEnum
 from typing import Any
 
 from test_data_agent.business_rules import (
@@ -14,17 +13,10 @@ from test_data_agent.business_rules import (
     FormulaRule,
     TemporalOrderingRule,
 )
+from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import condition_matches
 from test_data_agent.rules.expressions import parse_datetime, safe_eval
 from test_data_agent.rules.scenarios import apply_scenarios
-
-
-class GenerationMode(StrEnum):
-    VALID = "valid"
-    MIXED = "mixed"
-    NEGATIVE = "negative"
-    EDGE = "edge"
-    LOAD_TEST = "load_test"
 
 
 def apply_business_rules(
