@@ -250,6 +250,52 @@ def test_phase22_runs_cli_and_command_suites() -> None:
     )
 
 
+def test_phase23_tracks_generate_from_csv_command_boundary() -> None:
+    module = load_refactor_module()
+
+    phase23 = module.phase_by_id("phase23")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase23.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/cli.py",
+        "generate_dataset_from_csv_command,",
+        False,
+        "CLI imports the dataset-oriented generate-from-csv command helper",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "return generate_dataset_from_csv_command(",
+        False,
+        "CLI delegates generate-from-csv to the command helper",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "generate_dataset_from_csv_artifacts(",
+        True,
+        "CLI no longer orchestrates CSV generation artifacts directly",
+    ) in checks
+
+
+def test_phase23_runs_cli_and_command_suites() -> None:
+    module = load_refactor_module()
+
+    phase23 = module.phase_by_id("phase23")
+
+    assert phase23.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_cli.py",
+            "tests/test_io_commands.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+    )
+
+
 def test_phase11_tracks_compat_owned_legacy_workflow_implementation() -> None:
     module = load_refactor_module()
 
@@ -364,6 +410,12 @@ def test_phase16_tracks_dataset_command_helper_boundary() -> None:
     }
 
     assert "src/test_data_agent/io/commands.py" in phase16.expected_files
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.io import (",
+        False,
+        "CLI imports dataset-oriented generation helpers from the io command boundary",
+    ) in checks
     assert (
         "src/test_data_agent/cli.py",
         "def is_dataset_spec_path(",

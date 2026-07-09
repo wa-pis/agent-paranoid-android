@@ -469,3 +469,35 @@ field_rules:
     assert exit_code == 0
     assert report["valid"] is True
     assert report["rule_fail_count"] == 0
+
+
+def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path, capsys) -> None:
+    output_path = tmp_path / "out" / "customers.json"
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            str(Path("tests/fixtures/customers.csv")),
+            "--count",
+            "3",
+            "--mode",
+            "valid",
+            "--seed",
+            "15",
+            "--format",
+            "json",
+            "--output",
+            str(output_path),
+            "--table",
+            "customers_cli",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    rows = json.loads(output_path.read_text())
+    profile = json.loads((output_path.parent / "csv_profile.json").read_text())
+
+    assert exit_code == 0
+    assert "deprecated GenerationSpec compatibility" not in captured.err
+    assert len(rows) == 3
+    assert profile["entities"][0]["name"] == "customers_cli"

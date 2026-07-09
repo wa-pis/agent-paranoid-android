@@ -9,7 +9,7 @@ from typing import Any
 from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
-    generate_dataset_from_csv_artifacts,
+    generate_dataset_from_csv_command,
     generate_dataset_from_profile_artifacts,
     generate_dataset_from_spec_path,
 )
@@ -120,25 +120,14 @@ def main(argv: list[str] | None = None) -> int:
         return profile_csv_command(args)
 
     if args.command == "generate-from-csv":
-        report, business_report = generate_dataset_from_csv_artifacts(
-            args.input,
-            count=args.count,
-            seed=args.seed,
-            output_path=args.output,
-            output_format=CoreOutputFormat(args.output_format),
-            table_name=args.table,
-            mode=args.mode,
-            invalid_ratio=args.invalid_ratio,
+        return generate_dataset_from_csv_command(
+            args,
             business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
                 rows_by_entity,
                 args,
                 seed,
             ),
         )
-        if should_fail_generation(report, business_report, args.mode):
-            write_generation_errors(report, business_report)
-            return 1
-        return 0
 
     if args.command == "validate":
         if is_dataset_spec_path(args.spec) or args.rows.is_dir():

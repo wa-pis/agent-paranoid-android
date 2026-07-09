@@ -470,8 +470,8 @@ PHASES: tuple[Phase, ...] = (
         text_checks=(
             TextCheck(
                 path="src/test_data_agent/cli.py",
-                text="from test_data_agent.io import (\n    generate_dataset_from_csv_artifacts,\n    generate_dataset_from_profile_artifacts,\n    generate_dataset_from_spec_path,",
-                description="CLI delegates dataset-spec generation to io command helpers",
+                text="from test_data_agent.io import (",
+                description="CLI imports dataset-oriented generation helpers from the io command boundary",
             ),
             TextCheck(
                 path="src/test_data_agent/cli.py",
@@ -679,6 +679,32 @@ PHASES: tuple[Phase, ...] = (
                 path="src/test_data_agent/cli.py",
                 text="profile_example_artifacts(",
                 description="CLI no longer orchestrates example profiling artifacts directly",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_commands.py", "tests/test_domain_agnostic_refactor_script.py"),
+        ),
+    ),
+    Phase(
+        phase_id="phase23",
+        title="Route CSV generation through command helpers",
+        goal="Keep generate-from-csv routed through dataset-oriented io command helpers while cli.py only dispatches arguments.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="generate_dataset_from_csv_command,",
+                description="CLI imports the dataset-oriented generate-from-csv command helper",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="return generate_dataset_from_csv_command(",
+                description="CLI delegates generate-from-csv to the command helper",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="generate_dataset_from_csv_artifacts(",
+                description="CLI no longer orchestrates CSV generation artifacts directly",
                 absent=True,
             ),
         ),

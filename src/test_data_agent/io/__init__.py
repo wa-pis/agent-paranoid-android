@@ -10,6 +10,7 @@ from test_data_agent.io.artifacts import (
 )
 from test_data_agent.io.commands import (
     generate_dataset_command,
+    generate_dataset_from_csv_command,
     generate_dataset_from_example_command,
     generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
@@ -46,6 +47,7 @@ __all__ = [
     "apply_dataset_mode_options",
     "build_dataset_spec_from_profile",
     "generate_dataset_command",
+    "generate_dataset_from_csv_command",
     "generate_dataset_from_example_command",
     "generate_dataset_from_example_artifacts",
     "generate_dataset_artifacts",

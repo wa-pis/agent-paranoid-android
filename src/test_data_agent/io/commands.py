@@ -14,6 +14,7 @@ from test_data_agent.io.artifacts import write_json_artifact
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     generate_dataset_artifacts,
+    generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
@@ -141,6 +142,28 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
 
 def profile_csv_command(args: argparse.Namespace) -> int:
     write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
+    return 0
+
+
+def generate_dataset_from_csv_command(
+    args: argparse.Namespace,
+    *,
+    business_rules_applier: BusinessRulesApplier | None = None,
+) -> int:
+    report, business_report = generate_dataset_from_csv_artifacts(
+        args.input,
+        count=args.count,
+        seed=args.seed,
+        output_path=args.output,
+        output_format=OutputFormat(args.output_format),
+        table_name=args.table,
+        mode=args.mode,
+        invalid_ratio=args.invalid_ratio,
+        business_rules_applier=business_rules_applier,
+    )
+    if should_fail_generation(report, business_report, args.mode):
+        write_generation_errors(report, business_report)
+        return 1
     return 0
 
 

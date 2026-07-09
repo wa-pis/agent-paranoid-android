@@ -442,6 +442,19 @@ Expected outcome:
 - dataset-oriented CLI helpers remain the single command boundary for example
   profiling
 
+### Phase 23: Route CSV Generation Through Command Helpers
+
+Keep `generate-from-csv` routed through the dataset-oriented `io/commands.py`
+helper so `cli.py` no longer orchestrates one-entity DatasetSpec generation
+directly.
+
+Expected outcome:
+
+- `cli.py` delegates `generate-from-csv` to `generate_dataset_from_csv_command`
+- `cli.py` no longer calls `generate_dataset_from_csv_artifacts` directly
+- dataset-oriented CLI helpers remain the single command boundary for CSV
+  generation
+
 - `profile-csv` delegates to dataset-oriented command helpers
 - `infer-spec` delegates to dataset-oriented command helpers
 - `cli.py` no longer imports profile/spec loaders for these dataset-oriented commands
