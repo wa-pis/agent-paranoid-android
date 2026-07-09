@@ -22,7 +22,6 @@ from test_data_agent.adapters.json_profile import (
     load_profile_or_spec,
 )
 from test_data_agent.adapters.legacy_generation import (
-    dataset_spec_to_generation_spec,
     dataset_spec_from_generation_spec,
     generation_spec_to_dataset_spec,
     legacy_profile_to_dataset_profile,
@@ -58,7 +57,6 @@ __all__ = [
     "dataset_spec_from_csv_folder",
     "dataset_spec_from_parquet",
     "dataset_spec_from_trino_profile",
-    "dataset_spec_to_generation_spec",
     "generation_spec_to_dataset_spec",
     "json_payload_to_dataset_profile",
     "json_payload_to_dataset_spec",
