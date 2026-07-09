@@ -4,6 +4,9 @@ from pathlib import Path
 
 from test_data_agent.cli import main
 from test_data_agent.core.constraint import ConstraintType
+from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.profiling.cache import csv_folder_fingerprint
@@ -63,6 +66,58 @@ def test_deterministic_generation_no_copied_rows_and_validation_passes() -> None
     assert report.valid is True
     assert not copied_rows(rows_a, source_rows)
     assert {row["customer_id"] for row in rows_a["orders"]} <= {row["customer_id"] for row in rows_a["customers"]}
+
+
+def test_generation_uses_typed_distribution_models() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="events",
+                row_count=20,
+                fields=[
+                    FieldSpec(
+                        name="status",
+                        data_type=FieldType.STRING,
+                        distribution={
+                            "kind": "categorical",
+                            "categories": [
+                                {"value": "new", "count": 3},
+                                {"value": "done", "count": 1},
+                            ],
+                        },
+                    ),
+                    FieldSpec(
+                        name="amount",
+                        data_type=FieldType.FLOAT,
+                        distribution={"kind": "numeric", "p05": 10, "p95": 20},
+                    ),
+                    FieldSpec(
+                        name="is_active",
+                        data_type=FieldType.BOOLEAN,
+                        distribution={"kind": "boolean", "true_ratio": 1.0},
+                    ),
+                    FieldSpec(
+                        name="event_date",
+                        data_type=FieldType.DATE,
+                        distribution={"kind": "date_range", "min": "2024-01-01", "max": "2024-01-03"},
+                    ),
+                    FieldSpec(
+                        name="code",
+                        data_type=FieldType.STRING,
+                        distribution={"kind": "string_pattern", "min_length": 4, "max_length": 4},
+                    ),
+                ],
+            )
+        ]
+    )
+
+    rows = generate_dataset(spec, seed=17)["events"]
+
+    assert {row["status"] for row in rows} <= {"new", "done"}
+    assert all(10 <= row["amount"] <= 20 for row in rows)
+    assert all(row["is_active"] is True for row in rows)
+    assert all("2024-01-01" <= row["event_date"] <= "2024-01-03" for row in rows)
+    assert all(len(row["code"]) == 8 for row in rows)
 
 
 def test_cli_profile_infer_generate_validate_and_generate_from_example(tmp_path) -> None:

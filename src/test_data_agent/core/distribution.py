@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Annotated, Any, Literal, TypeAlias
 
 from pydantic import BaseModel, Field, TypeAdapter
@@ -77,9 +78,30 @@ FieldDistribution: TypeAlias = Annotated[
 
 
 _DISTRIBUTION_ADAPTER = TypeAdapter(FieldDistribution)
+_TYPED_DISTRIBUTION_KINDS = frozenset(
+    {
+        "synthetic_identifier",
+        "masked_patterns",
+        "numeric",
+        "boolean",
+        "date_range",
+        "datetime_range",
+        "categorical",
+        "string_pattern",
+    }
+)
 
 
 def validate_distribution(data: dict[str, Any]) -> FieldDistribution:
     """Validate raw profile/spec distribution metadata against known shapes."""
     return _DISTRIBUTION_ADAPTER.validate_python(data)
 
+
+def parse_distribution(data: Mapping[str, Any] | None) -> FieldDistribution | None:
+    """Return a typed distribution when metadata declares a supported kind."""
+    if data is None:
+        return None
+    kind = data.get("kind")
+    if kind not in _TYPED_DISTRIBUTION_KINDS:
+        return None
+    return validate_distribution(dict(data))

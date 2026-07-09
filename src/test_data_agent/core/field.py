@@ -7,28 +7,16 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from test_data_agent.core.distribution import validate_distribution
-
-
-_TYPED_DISTRIBUTION_KINDS = {
-    "synthetic_identifier",
-    "masked_patterns",
-    "numeric",
-    "boolean",
-    "date_range",
-    "datetime_range",
-    "categorical",
-    "string_pattern",
-}
+from test_data_agent.core.distribution import parse_distribution
 
 
 def _normalize_distribution(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         return value
-    kind = value.get("kind")
-    if kind not in _TYPED_DISTRIBUTION_KINDS:
+    distribution = parse_distribution(value)
+    if distribution is None:
         return value
-    return validate_distribution(value).model_dump(mode="json")
+    return distribution.model_dump(mode="json")
 
 
 class FieldType(StrEnum):
