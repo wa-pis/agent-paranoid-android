@@ -111,6 +111,74 @@ generation_settings:
     assert [row["customer_id"] for row in first_rows] == ["17000001", "17000002", "17000003"]
 
 
+def test_generate_accepts_dataset_spec_json(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    output_path = tmp_path / "generated"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "customers",
+                        "row_count": 2,
+                        "primary_key": "customer_id",
+                        "fields": [
+                            {"name": "customer_id", "data_type": "integer", "is_identifier": True},
+                            {"name": "status", "data_type": "string"},
+                        ],
+                    }
+                ],
+                "generation_settings": {"seed": 21, "output_format": "json"},
+            }
+        )
+    )
+
+    exit_code = main(["generate", str(spec_path), "--format", "json", "--output", str(output_path)])
+
+    rows = json.loads((output_path / "customers.json").read_text())
+    report = json.loads((output_path / "validation_report.json").read_text())
+
+    assert exit_code == 0
+    assert len(rows) == 2
+    assert rows[0]["customer_id"] == 21000001
+    assert report["valid"] is True
+
+
+def test_validate_accepts_dataset_spec_json(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "customers",
+                        "row_count": 2,
+                        "primary_key": "customer_id",
+                        "fields": [
+                            {"name": "customer_id", "data_type": "integer", "is_identifier": True},
+                            {"name": "status", "data_type": "string"},
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+    (rows_dir / "customers.json").write_text(
+        json.dumps(
+            [
+                {"customer_id": 1, "status": "active"},
+                {"customer_id": 2, "status": "paused"},
+            ]
+        )
+    )
+
+    exit_code = main(["validate", str(spec_path), str(rows_dir)])
+
+    assert exit_code == 0
+
+
 def test_generate_from_csv_applies_business_rules_via_neutral_rules_helper(tmp_path) -> None:
     output_path = tmp_path / "out" / "customers.json"
     rules_path = tmp_path / "rules.yaml"

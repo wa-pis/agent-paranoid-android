@@ -15,6 +15,7 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_spec,
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
+    load_profile_or_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -206,7 +207,15 @@ def load_spec(path: Path) -> GenerationSpec:
 
 
 def is_dataset_spec_path(path: Path) -> bool:
-    return path.suffix.lower() in {".yaml", ".yml"}
+    suffix = path.suffix.lower()
+    if suffix in {".yaml", ".yml"}:
+        return True
+    if suffix != ".json":
+        return False
+    try:
+        return isinstance(load_profile_or_spec(path), DatasetSpec)
+    except Exception:
+        return False
 
 
 def generate_dataset_command(args: argparse.Namespace) -> int:
