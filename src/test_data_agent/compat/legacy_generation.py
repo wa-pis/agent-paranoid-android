@@ -8,14 +8,16 @@ from test_data_agent.adapters.legacy_generation import (
     generate_legacy_compatibility_result,
     generate_legacy_rows,
     generation_spec_to_dataset_spec,
-    legacy_profile_to_dataset_profile,
-    legacy_profile_to_dataset_spec,
-    legacy_profile_to_generation_spec,
     load_legacy_generation_spec,
     multi_table_generation_spec_to_dataset_spec,
     prepare_legacy_generation_spec,
     validate_legacy_rows_file,
     validate_legacy_rows_report,
+)
+from test_data_agent.adapters.legacy_profile import (
+    legacy_profile_to_dataset_profile,
+    legacy_profile_to_dataset_spec,
+    legacy_profile_to_generation_spec,
 )
 
 __all__ = [

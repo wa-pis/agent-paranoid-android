@@ -404,6 +404,18 @@ Expected outcome:
 - `test_data_agent.compat.legacy_workflows` uses compat-owned output helpers
 - dataset-oriented `io/artifacts.py` and `io/writers.py` no longer import `GenerationSpec`
 
+### Phase 20: Separate Legacy Profile Adapters From Legacy Generation
+
+Keep legacy profile normalization in a dedicated adapter module so
+dataset-oriented CSV, JSON, and Trino adapters do not depend on deprecated
+`GenerationSpec` workflow helpers.
+
+Expected outcome:
+
+- `test_data_agent.adapters.legacy_profile` owns legacy profile to `DatasetProfile` and `DatasetSpec` conversion
+- dataset-oriented CSV, JSON, and Trino adapters import legacy profile helpers from `adapters.legacy_profile`
+- `adapters.legacy_generation` keeps deprecated `GenerationSpec` compatibility behavior while remaining backward compatible for existing imports
+
 - `profile-csv` delegates to dataset-oriented command helpers
 - `infer-spec` delegates to dataset-oriented command helpers
 - `cli.py` no longer imports profile/spec loaders for these dataset-oriented commands

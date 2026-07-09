@@ -586,6 +586,51 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
         ),
     ),
+    Phase(
+        phase_id="phase20",
+        title="Separate legacy profile adapters",
+        goal="Keep dataset-oriented legacy profile normalization separate from deprecated GenerationSpec workflow helpers.",
+        expected_files=("src/test_data_agent/adapters/legacy_profile.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/adapters/csv_file.py",
+                text="from test_data_agent.adapters.legacy_generation import",
+                description="CSV adapter no longer imports legacy generation helpers",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/adapters/json_profile.py",
+                text="from test_data_agent.adapters.legacy_generation import",
+                description="JSON adapter no longer imports legacy generation helpers",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/adapters/trino_profile.py",
+                text="from test_data_agent.adapters.legacy_generation import",
+                description="Trino adapter no longer imports legacy generation helpers",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/adapters/csv_file.py",
+                text="from test_data_agent.adapters.legacy_profile import",
+                description="CSV adapter imports dedicated legacy profile helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/adapters/json_profile.py",
+                text="from test_data_agent.adapters.legacy_profile import",
+                description="JSON adapter imports dedicated legacy profile helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/adapters/trino_profile.py",
+                text="from test_data_agent.adapters.legacy_profile import",
+                description="Trino adapter imports dedicated legacy profile helpers",
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_source_adapters.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_dataset_spec_contract.py"),
+        ),
+    ),
 )
 
 

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.csv_profiler import CSVProfile, profile_csv
-from test_data_agent.adapters.legacy_generation import (
+from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
 )

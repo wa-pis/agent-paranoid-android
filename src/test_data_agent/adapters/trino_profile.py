@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from test_data_agent.adapters.legacy_generation import (
+from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
 )

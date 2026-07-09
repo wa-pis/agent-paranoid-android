@@ -452,6 +452,71 @@ def test_phase19_runs_compat_and_io_focused_suites() -> None:
     )
 
 
+def test_phase20_separates_legacy_profile_adapter_boundary() -> None:
+    module = load_refactor_module()
+
+    phase20 = module.phase_by_id("phase20")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase20.text_checks
+    }
+
+    assert "src/test_data_agent/adapters/legacy_profile.py" in phase20.expected_files
+    assert (
+        "src/test_data_agent/adapters/csv_file.py",
+        "from test_data_agent.adapters.legacy_generation import",
+        True,
+        "CSV adapter no longer imports legacy generation helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/adapters/json_profile.py",
+        "from test_data_agent.adapters.legacy_generation import",
+        True,
+        "JSON adapter no longer imports legacy generation helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/adapters/trino_profile.py",
+        "from test_data_agent.adapters.legacy_generation import",
+        True,
+        "Trino adapter no longer imports legacy generation helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/adapters/csv_file.py",
+        "from test_data_agent.adapters.legacy_profile import",
+        False,
+        "CSV adapter imports dedicated legacy profile helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/adapters/json_profile.py",
+        "from test_data_agent.adapters.legacy_profile import",
+        False,
+        "JSON adapter imports dedicated legacy profile helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/adapters/trino_profile.py",
+        "from test_data_agent.adapters.legacy_profile import",
+        False,
+        "Trino adapter imports dedicated legacy profile helpers",
+    ) in checks
+
+
+def test_phase20_runs_adapter_and_contract_suites() -> None:
+    module = load_refactor_module()
+
+    phase20 = module.phase_by_id("phase20")
+
+    assert phase20.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_source_adapters.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_dataset_spec_contract.py"),
+    )
+
+
 def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
     module = load_refactor_module()
 
