@@ -7,7 +7,6 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.io.writers import dataset_spec_to_yaml
-from test_data_agent.spec import GenerationSpec
 
 
 def write_json_artifact(payload: Any, output: Path) -> None:
@@ -25,20 +24,6 @@ def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> Non
 def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(dataset_spec_to_yaml(spec))
-
-
-def write_generation_artifacts(
-    spec: GenerationSpec,
-    report: Any,
-    output: Path | None,
-    business_report: Any | None = None,
-) -> None:
-    artifact_dir = output.parent if output is not None else Path.cwd()
-    artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / "generation_spec.json").write_text(spec.model_dump_json(indent=2))
-    (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
-    if business_report is not None:
-        (artifact_dir / "business_validation_report.json").write_text(business_report.model_dump_json(indent=2))
 
 
 def write_dataset_generation_artifacts(

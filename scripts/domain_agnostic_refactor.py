@@ -557,6 +557,35 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py"),
         ),
     ),
+    Phase(
+        phase_id="phase19",
+        title="Move legacy output writers into compat",
+        goal="Keep deprecated GenerationSpec row-output and artifact-writing helpers inside compat modules instead of dataset-oriented io helpers.",
+        expected_files=("src/test_data_agent/compat/legacy_outputs.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/compat/legacy_workflows.py",
+                text="from test_data_agent.compat.legacy_outputs import",
+                description="compat workflows use compat-owned legacy output helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/writers.py",
+                text="from test_data_agent.spec import GenerationSpec",
+                description="dataset-oriented writers no longer depend on GenerationSpec",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/artifacts.py",
+                text="from test_data_agent.spec import GenerationSpec",
+                description="dataset-oriented artifacts no longer depend on GenerationSpec",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_compat_legacy.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+        ),
+    ),
 )
 
 

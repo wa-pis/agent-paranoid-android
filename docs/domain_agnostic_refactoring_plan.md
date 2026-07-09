@@ -390,6 +390,22 @@ Expected outcome:
 
 - `profile-csv` delegates to dataset-oriented command helpers
 - `infer-spec` delegates to dataset-oriented command helpers
+- `cli.py` no longer imports profile/spec loaders for dataset-oriented commands
+
+### Phase 19: Move Legacy Output Writers Into Compat
+
+Keep deprecated `GenerationSpec` row-output and artifact-writing helpers inside
+`compat/` so dataset-oriented `io/` modules no longer depend on legacy spec
+types.
+
+Expected outcome:
+
+- `test_data_agent.compat.legacy_outputs` owns deprecated row-output and artifact-writing helpers
+- `test_data_agent.compat.legacy_workflows` uses compat-owned output helpers
+- dataset-oriented `io/artifacts.py` and `io/writers.py` no longer import `GenerationSpec`
+
+- `profile-csv` delegates to dataset-oriented command helpers
+- `infer-spec` delegates to dataset-oriented command helpers
 - `cli.py` no longer imports profile/spec loaders for these dataset-oriented commands
 
 ## 5. Files To Create, Modify, Or Delete

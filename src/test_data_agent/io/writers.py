@@ -12,7 +12,6 @@ import yaml
 
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
-from test_data_agent.spec import GenerationSpec
 
 
 def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
@@ -43,25 +42,6 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
         for row in rows
     ]
     pq.write_table(pa.Table.from_pylist(stable_rows), output)
-
-
-def write_tabular_rows(rows: list[dict[str, Any]], spec: GenerationSpec, output: Path | None) -> None:
-    if spec.output_format == "parquet":
-        if output is None:
-            raise SystemExit("Parquet output requires --output")
-        write_parquet(rows, output)
-        return
-
-    if spec.output_format == "csv":
-        text = rows_to_csv(rows)
-    else:
-        text = json.dumps(rows, indent=2, sort_keys=True)
-
-    if output is None:
-        print(text)
-    else:
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(text)
 
 
 def write_dataset_rows(

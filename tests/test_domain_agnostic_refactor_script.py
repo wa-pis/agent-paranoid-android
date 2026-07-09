@@ -405,6 +405,53 @@ def test_phase18_runs_single_input_command_and_cli_suites() -> None:
     )
 
 
+def test_phase19_moves_legacy_output_writers_into_compat() -> None:
+    module = load_refactor_module()
+
+    phase19 = module.phase_by_id("phase19")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase19.text_checks
+    }
+
+    assert "src/test_data_agent/compat/legacy_outputs.py" in phase19.expected_files
+    assert (
+        "src/test_data_agent/compat/legacy_workflows.py",
+        "from test_data_agent.compat.legacy_outputs import",
+        False,
+        "compat workflows use compat-owned legacy output helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/io/writers.py",
+        "from test_data_agent.spec import GenerationSpec",
+        True,
+        "dataset-oriented writers no longer depend on GenerationSpec",
+    ) in checks
+    assert (
+        "src/test_data_agent/io/artifacts.py",
+        "from test_data_agent.spec import GenerationSpec",
+        True,
+        "dataset-oriented artifacts no longer depend on GenerationSpec",
+    ) in checks
+
+
+def test_phase19_runs_compat_and_io_focused_suites() -> None:
+    module = load_refactor_module()
+
+    phase19 = module.phase_by_id("phase19")
+
+    assert phase19.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_compat_legacy.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+    )
+
+
 def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
     module = load_refactor_module()
 

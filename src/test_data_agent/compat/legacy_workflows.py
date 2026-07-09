@@ -11,9 +11,12 @@ from test_data_agent.adapters.legacy_generation import (
     generate_legacy_compatibility_result,
     validate_legacy_rows_file,
 )
+from test_data_agent.compat.legacy_outputs import (
+    write_generation_artifacts,
+    write_tabular_rows,
+)
 from test_data_agent.core.settings import OutputFormat
-from test_data_agent.io.artifacts import write_generation_artifacts, write_json_artifact
-from test_data_agent.io.writers import write_tabular_rows
+from test_data_agent.io.artifacts import write_json_artifact
 
 
 BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]

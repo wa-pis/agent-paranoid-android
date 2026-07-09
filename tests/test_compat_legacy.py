@@ -1,5 +1,6 @@
 from test_data_agent import compat
 from test_data_agent.adapters import legacy_generation as adapter_legacy_generation
+from test_data_agent.compat import legacy_outputs as compat_legacy_outputs
 from test_data_agent.compat import legacy_spec as compat_legacy_spec
 from test_data_agent.io import legacy_workflows as io_legacy_workflows
 from test_data_agent.spec import (
@@ -34,3 +35,8 @@ def test_compat_package_exposes_deprecated_generation_helpers() -> None:
 def test_compat_package_exposes_deprecated_workflow_helpers() -> None:
     assert compat.generate_legacy_spec_artifacts is io_legacy_workflows.generate_legacy_spec_artifacts
     assert compat.validate_legacy_spec_artifacts is io_legacy_workflows.validate_legacy_spec_artifacts
+
+
+def test_compat_legacy_outputs_module_owns_deprecated_row_and_artifact_writers() -> None:
+    assert compat_legacy_outputs.write_tabular_rows.__module__ == "test_data_agent.compat.legacy_outputs"
+    assert compat_legacy_outputs.write_generation_artifacts.__module__ == "test_data_agent.compat.legacy_outputs"
