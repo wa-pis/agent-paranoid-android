@@ -183,3 +183,5 @@ def test_write_csv_profile_artifact_writes_dataset_profile_json(tmp_path) -> Non
 def test_io_package_keeps_legacy_workflows_out_of_dataset_oriented_exports() -> None:
     assert not hasattr(io_package, "generate_legacy_spec_artifacts")
     assert not hasattr(io_package, "validate_legacy_spec_artifacts")
+    assert not hasattr(io_package, "warn_deprecated_generation_spec_compatibility")
+    assert not hasattr(io_package, "write_tabular_rows")

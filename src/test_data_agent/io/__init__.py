@@ -18,14 +18,12 @@ from test_data_agent.io.workflows import (
     generate_dataset_review_artifacts,
     generate_single_entity_profile_artifacts,
     infer_dataset_spec_artifact,
-    warn_deprecated_generation_spec_compatibility,
     write_csv_profile_artifact,
 )
 from test_data_agent.io.writers import (
     dataset_spec_to_yaml,
     write_dataset_rows,
     write_single_entity_rows,
-    write_tabular_rows,
 )
 
 __all__ = [
@@ -40,7 +38,6 @@ __all__ = [
     "infer_dataset_spec_artifact",
     "load_dataset_rows",
     "load_dataset_spec",
-    "warn_deprecated_generation_spec_compatibility",
     "write_dataset_generation_artifacts",
     "write_csv_profile_artifact",
     "write_dataset_profile_artifact",
@@ -50,5 +47,4 @@ __all__ = [
     "write_dataset_validation_report",
     "write_json_artifact",
     "write_single_entity_rows",
-    "write_tabular_rows",
 ]
