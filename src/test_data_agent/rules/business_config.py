@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.business_rules import BusinessRules, business_rules_from_dict, load_business_rules
+from test_data_agent.rules.models import BusinessRules, business_rules_from_dict, load_business_rules
 from test_data_agent.rules_engine import apply_business_rules
 from test_data_agent.rules.validation import BusinessValidationReport, validate_business_rules
 

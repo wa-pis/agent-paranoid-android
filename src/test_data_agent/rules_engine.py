@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 from typing import Any
 
-from test_data_agent.business_rules import (
+from test_data_agent.rules.models import (
     BusinessRules,
     ConditionalAllowedValuesRule,
     ConditionalRequiredRule,

@@ -402,6 +402,43 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
         ),
     ),
+    Phase(
+        phase_id="phase14",
+        title="Move business rule models into rules package",
+        goal="Keep neutral rule models and loaders in rules/ while business_rules.py becomes a compatibility shim.",
+        expected_files=("src/test_data_agent/rules/models.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/rules/business_config.py",
+                text="from test_data_agent.rules.models import",
+                description="neutral business config helpers import rule models from the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/rules/scenarios.py",
+                text="from test_data_agent.rules.models import",
+                description="neutral scenario helpers import rule models from the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/rules/validation.py",
+                text="from test_data_agent.rules.models import",
+                description="neutral validation helpers import rule models from the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/rules_engine.py",
+                text="from test_data_agent.rules.models import",
+                description="legacy rules engine reuses neutral rule models through the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/business_rules.py",
+                text="from test_data_agent.rules.models import",
+                description="legacy business_rules module is a compatibility shim over the rules package",
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_business_rules.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+        ),
+    ),
 )
 
 

@@ -334,6 +334,17 @@ Expected outcome:
 - callers retain compatibility, but the package root no longer reaches directly
   into legacy implementation modules
 
+### Phase 14: Move Business Rule Models Into Rules Package
+
+Keep the neutral rule models and loaders inside `rules/` while
+`business_rules.py` remains a deprecated compatibility shim.
+
+Expected outcome:
+
+- `test_data_agent.rules` owns business rule models and YAML parsing
+- neutral rules modules no longer import `test_data_agent.business_rules`
+- `test_data_agent.business_rules` remains importable for compatibility only
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create
@@ -350,6 +361,7 @@ Expected outcome:
 - `src/test_data_agent/adapters/legacy_generation.py`
 - `src/test_data_agent/rules/expressions.py`
 - `src/test_data_agent/rules/conditions.py`
+- `src/test_data_agent/rules/models.py`
 - `src/test_data_agent/io/readers.py`
 - `src/test_data_agent/io/writers.py`
 - `src/test_data_agent/io/artifacts.py`

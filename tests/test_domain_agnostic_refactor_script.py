@@ -281,3 +281,56 @@ def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
         ),
         (module.PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
     )
+
+
+def test_phase14_moves_business_rule_models_into_rules_package() -> None:
+    module = load_refactor_module()
+
+    phase14 = module.phase_by_id("phase14")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase14.text_checks
+    }
+
+    assert "src/test_data_agent/rules/models.py" in phase14.expected_files
+    assert (
+        "src/test_data_agent/rules/business_config.py",
+        "from test_data_agent.rules.models import",
+        False,
+        "neutral business config helpers import rule models from the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/rules/scenarios.py",
+        "from test_data_agent.rules.models import",
+        False,
+        "neutral scenario helpers import rule models from the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/rules/validation.py",
+        "from test_data_agent.rules.models import",
+        False,
+        "neutral validation helpers import rule models from the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/rules_engine.py",
+        "from test_data_agent.rules.models import",
+        False,
+        "legacy rules engine reuses neutral rule models through the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/business_rules.py",
+        "from test_data_agent.rules.models import",
+        False,
+        "legacy business_rules module is a compatibility shim over the rules package",
+    ) in checks
+
+
+def test_phase14_runs_business_rules_and_refactor_contract_suites() -> None:
+    module = load_refactor_module()
+
+    phase14 = module.phase_by_id("phase14")
+
+    assert phase14.test_commands == (
+        (module.PYTHON, "-m", "pytest", "tests/test_business_rules.py"),
+        (module.PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+    )

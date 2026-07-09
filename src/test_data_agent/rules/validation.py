@@ -6,7 +6,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from test_data_agent.business_rules import (
+from test_data_agent.rules.models import (
     AggregateFormulaRule,
     BusinessRules,
     ConditionalAllowedValuesRule,

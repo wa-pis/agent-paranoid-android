@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 from typing import Any
 
-from test_data_agent.business_rules import ScenarioRule
+from test_data_agent.rules.models import ScenarioRule
 
 
 def choose_scenario(scenarios: list[ScenarioRule], rng: random.Random) -> ScenarioRule | None:
