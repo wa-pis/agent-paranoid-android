@@ -77,7 +77,10 @@ PHASES: tuple[Phase, ...] = (
                 description="DatasetSpec exposes validation settings",
             ),
         ),
-        test_commands=((PYTHON, "-m", "pytest", "tests/test_domain_agnostic_pipeline.py"),),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_dataset_spec_contract.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_pipeline.py"),
+        ),
     ),
     Phase(
         phase_id="phase2",
@@ -118,7 +121,10 @@ PHASES: tuple[Phase, ...] = (
             "src/test_data_agent/adapters/parquet_dataset.py",
             "src/test_data_agent/adapters/legacy_generation.py",
         ),
-        test_commands=((PYTHON, "-m", "pytest", "tests/test_domain_agnostic_pipeline.py"),),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_source_adapters.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_pipeline.py"),
+        ),
     ),
     Phase(
         phase_id="phase4",
@@ -132,7 +138,10 @@ PHASES: tuple[Phase, ...] = (
                 absent=True,
             ),
         ),
-        test_commands=((PYTHON, "-m", "pytest", "tests/test_csv_profiler.py", "tests/test_domain_agnostic_pipeline.py"),),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_csv_profiler.py", "tests/test_generator.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_pipeline.py"),
+        ),
     ),
     Phase(
         phase_id="phase5",
@@ -330,4 +339,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
