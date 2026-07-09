@@ -267,6 +267,18 @@ Candidate modules to delete later:
 - `src/test_data_agent/business_validator.py`
 - `src/test_data_agent/rules_engine.py`
 
+### Phase 8: Isolate Deprecated Compatibility Surface
+
+Keep deprecated `GenerationSpec` behavior available through an explicit
+`compat/` package so CLI and external callers have a narrow boundary while the
+domain-oriented packages stay focused on `DatasetSpec`.
+
+Expected files:
+
+- `src/test_data_agent/compat/__init__.py`
+- `src/test_data_agent/compat/legacy_generation.py`
+- `src/test_data_agent/compat/legacy_workflows.py`
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

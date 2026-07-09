@@ -254,6 +254,33 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest"),
         ),
     ),
+    Phase(
+        phase_id="phase8",
+        title="Isolate deprecated compatibility surface",
+        goal="Route deprecated GenerationSpec helpers through a dedicated compat package.",
+        expected_files=(
+            "src/test_data_agent/compat/__init__.py",
+            "src/test_data_agent/compat/legacy_generation.py",
+            "src/test_data_agent/compat/legacy_workflows.py",
+        ),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.compat import",
+                description="CLI imports deprecated workflows from compat boundary",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.io.legacy_workflows import",
+                description="CLI no longer imports deprecated workflows from io package",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_compat_legacy.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_source_adapters.py"),
+        ),
+    ),
 )
 
 

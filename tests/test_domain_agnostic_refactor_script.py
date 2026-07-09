@@ -65,3 +65,29 @@ def test_phase7_runs_refactor_script_contract_before_full_pytest() -> None:
         "tests/test_domain_agnostic_refactor_script.py",
     )
     assert phase7.test_commands[-1] == (module.PYTHON, "-m", "pytest")
+
+
+def test_phase8_tracks_compatibility_boundary() -> None:
+    module = load_refactor_module()
+
+    phase8 = module.phase_by_id("phase8")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase8.text_checks
+    }
+
+    assert "src/test_data_agent/compat/__init__.py" in phase8.expected_files
+    assert "src/test_data_agent/compat/legacy_generation.py" in phase8.expected_files
+    assert "src/test_data_agent/compat/legacy_workflows.py" in phase8.expected_files
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.compat import",
+        False,
+        "CLI imports deprecated workflows from compat boundary",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.io.legacy_workflows import",
+        True,
+        "CLI no longer imports deprecated workflows from io package",
+    ) in checks

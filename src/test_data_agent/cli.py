@@ -8,6 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.adapters import load_profile_or_spec
+from test_data_agent.compat import (
+    generate_legacy_spec_artifacts,
+    validate_legacy_spec_artifacts,
+)
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
@@ -22,10 +26,6 @@ from test_data_agent.io import (
     write_dataset_profile_artifact,
     write_csv_profile_artifact,
     write_json_artifact,
-)
-from test_data_agent.io.legacy_workflows import (
-    generate_legacy_spec_artifacts,
-    validate_legacy_spec_artifacts,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
