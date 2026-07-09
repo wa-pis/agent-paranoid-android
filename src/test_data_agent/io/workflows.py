@@ -8,8 +8,6 @@ from typing import Any, Callable
 
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
-    generate_legacy_compatibility_result,
-    validate_legacy_rows_file,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
@@ -21,9 +19,8 @@ from test_data_agent.io.artifacts import (
     write_dataset_review_artifacts,
     write_dataset_spec_artifact,
     write_dataset_validation_report,
-    write_generation_artifacts,
 )
-from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows, write_tabular_rows
+from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 
@@ -202,50 +199,6 @@ def generate_dataset_review_artifacts(
 
     write_dataset_review_artifacts(profile, spec, report, output_folder)
     return 0 if report.valid else 1
-
-
-def generate_legacy_spec_artifacts(
-    spec_path: Path,
-    *,
-    row_count: int | None = None,
-    seed: int | None = None,
-    output_format: OutputFormat | None = None,
-    mode: str = "valid",
-    invalid_ratio: float = 0.0,
-    output_path: Path | None = None,
-    business_rules_applier: BusinessRulesApplier | None = None,
-) -> tuple[Any, Any | None]:
-    legacy_result = generate_legacy_compatibility_result(
-        spec_path,
-        row_count=row_count,
-        seed=seed,
-        output_format=output_format,
-        mode=mode,
-        invalid_ratio=invalid_ratio,
-    )
-    apply_dataset_mode_options(
-        legacy_result.dataset_spec,
-        mode=mode,
-        invalid_ratio=invalid_ratio,
-    )
-    business_report = None
-    if business_rules_applier is not None:
-        business_report = business_rules_applier(
-            {legacy_result.spec.table.name: legacy_result.rows},
-            legacy_result.spec.seed or 0,
-        )
-    write_tabular_rows(legacy_result.rows, legacy_result.spec, output_path)
-    write_generation_artifacts(
-        legacy_result.spec,
-        legacy_result.report,
-        output_path,
-        business_report=business_report,
-    )
-    return legacy_result, business_report
-
-
-def validate_legacy_spec_artifacts(spec_path: Path, rows_path: Path) -> Any:
-    return validate_legacy_rows_file(spec_path, rows_path)
 
 
 def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: float) -> None:

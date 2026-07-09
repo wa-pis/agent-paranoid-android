@@ -10,8 +10,6 @@ from test_data_agent.io.workflows import (
     infer_dataset_spec_artifact,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
-    generate_legacy_spec_artifacts,
-    validate_legacy_spec_artifacts,
     write_csv_profile_artifact,
 )
 
@@ -179,64 +177,3 @@ def test_write_csv_profile_artifact_writes_dataset_profile_json(tmp_path) -> Non
     assert profile.entities[0].name == "orders"
     assert written["source_type"] == "csv"
     assert written["entities"][0]["name"] == "orders"
-
-
-def test_generate_legacy_spec_artifacts_preserves_legacy_outputs(tmp_path) -> None:
-    spec_path = tmp_path / "legacy_spec.json"
-    output_path = tmp_path / "out" / "rows.json"
-    spec_path.write_text(
-        json.dumps(
-            {
-                "seed": 11,
-                "output_format": "json",
-                "table": {
-                    "name": "customers",
-                    "row_count": 2,
-                    "columns": [
-                        {"name": "customer_id", "data_type": "integer", "strategy": "sequence"},
-                        {"name": "status", "data_type": "string", "strategy": "choice", "choices": ["new", "active"]},
-                    ],
-                },
-            }
-        )
-    )
-
-    legacy_result, business_report = generate_legacy_spec_artifacts(
-        spec_path,
-        output_path=output_path,
-    )
-
-    rows = json.loads(output_path.read_text())
-    spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
-    report_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
-
-    assert business_report is None
-    assert legacy_result.spec.table.name == "customers"
-    assert rows[0]["customer_id"] == 11000001
-    assert spec_artifact["table"]["name"] == "customers"
-    assert report_artifact["valid"] is True
-
-
-def test_validate_legacy_spec_artifacts_uses_compatibility_boundary(tmp_path) -> None:
-    spec_path = tmp_path / "legacy_spec.json"
-    rows_path = tmp_path / "rows.json"
-    spec_path.write_text(
-        json.dumps(
-            {
-                "seed": 11,
-                "output_format": "json",
-                "table": {
-                    "name": "customers",
-                    "row_count": 1,
-                    "columns": [
-                        {"name": "customer_id", "data_type": "integer", "strategy": "sequence"},
-                    ],
-                },
-            }
-        )
-    )
-    rows_path.write_text(json.dumps([{"customer_id": 1}]))
-
-    report = validate_legacy_spec_artifacts(spec_path, rows_path)
-
-    assert report.valid is True
