@@ -13,7 +13,7 @@ import yaml
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
-    generate_legacy_rows,
+    generation_spec_to_dataset_spec,
     load_legacy_generation_spec,
     load_profile_or_spec,
 )
@@ -111,7 +111,9 @@ def main(argv: list[str] | None = None) -> int:
             return generate_dataset_command(args)
         warn_legacy_path("generate")
         spec = build_generation_spec(args)
-        rows = generate_legacy_rows(spec)
+        dataset_spec = generation_spec_to_dataset_spec(spec)
+        apply_dataset_mode_options(dataset_spec, args.mode, args.invalid_ratio)
+        rows = next(iter(generate_dataset(dataset_spec, seed=spec.seed).values()))
         business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
         report = validate_rows_report(rows, spec)
         write_tabular_rows(rows, spec, args.output)

@@ -304,6 +304,37 @@ def test_validate_legacy_spec_warns_about_deprecated_path(tmp_path, capsys) -> N
     assert "deprecated GenerationSpec compatibility" in captured.err
 
 
+def test_generate_legacy_spec_uses_dataset_engine_with_warning(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "legacy_spec.json"
+    output_path = tmp_path / "out" / "rows.json"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "seed": 11,
+                "output_format": "json",
+                "table": {
+                    "name": "customers",
+                    "row_count": 2,
+                    "columns": [
+                        {"name": "customer_id", "data_type": "integer", "strategy": "sequence"},
+                        {"name": "status", "data_type": "string", "strategy": "choice", "choices": ["new", "active"]},
+                    ],
+                },
+            }
+        )
+    )
+
+    exit_code = main(["generate", str(spec_path), "--output", str(output_path)])
+
+    captured = capsys.readouterr()
+    rows = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert "deprecated GenerationSpec compatibility" in captured.err
+    assert rows[0]["customer_id"] == 11000001
+    assert {row["status"] for row in rows} <= {"new", "active"}
+
+
 def test_generate_from_csv_applies_business_rules_via_neutral_rules_helper(tmp_path) -> None:
     output_path = tmp_path / "out" / "customers.json"
     rules_path = tmp_path / "rules.yaml"
