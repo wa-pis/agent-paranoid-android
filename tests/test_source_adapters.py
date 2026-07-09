@@ -10,12 +10,12 @@ from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
     dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
-    dataset_spec_from_generation_spec,
     dataset_spec_from_csv_folder,
     dataset_spec_from_trino_profile,
     load_profile_or_spec,
 )
 from test_data_agent.adapters.legacy_generation import (
+    dataset_spec_from_generation_spec,
     dataset_spec_to_generation_spec,
     generate_legacy_compatibility_result,
     generate_legacy_rows,
@@ -132,6 +132,10 @@ def test_legacy_generation_spec_adapter_preserves_generation_settings() -> None:
     assert spec.generation_settings.seed == 42
     assert spec.entity("customers").primary_key == "id"
     assert spec.entity("customers").field("email").sensitive is True
+
+
+def test_adapters_package_root_excludes_redundant_generation_spec_alias() -> None:
+    assert not hasattr(adapters_package, "dataset_spec_from_generation_spec")
 
 
 def test_legacy_generation_adapter_can_generate_rows() -> None:
