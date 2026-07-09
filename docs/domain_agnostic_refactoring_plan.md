@@ -279,6 +279,18 @@ Expected files:
 - `src/test_data_agent/compat/legacy_generation.py`
 - `src/test_data_agent/compat/legacy_workflows.py`
 
+### Phase 9: Tighten Dataset Adapter Exports
+
+Keep the dataset-oriented `adapters/` package focused on source normalization.
+Deprecated `GenerationSpec` conversion helpers should stay importable from
+`adapters.legacy_generation` and `compat/`, but not from the adapter package
+root.
+
+Expected outcome:
+
+- `test_data_agent.adapters` exports only dataset/profile normalization helpers
+- deprecated `GenerationSpec` conversions live behind explicit legacy modules
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

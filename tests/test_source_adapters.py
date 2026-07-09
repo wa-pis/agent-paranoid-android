@@ -393,6 +393,10 @@ def test_parquet_adapter_uses_schema_metadata(tmp_path) -> None:
 
 def test_adapters_package_keeps_legacy_workflow_helpers_out_of_dataset_oriented_exports() -> None:
     assert not hasattr(adapters_package, "LegacyGenerationResult")
+    assert not hasattr(adapters_package, "generation_spec_to_dataset_spec")
+    assert not hasattr(adapters_package, "legacy_profile_to_dataset_profile")
+    assert not hasattr(adapters_package, "legacy_profile_to_dataset_spec")
+    assert not hasattr(adapters_package, "multi_table_generation_spec_to_dataset_spec")
     assert not hasattr(adapters_package, "dataset_spec_to_generation_spec")
     assert not hasattr(adapters_package, "generate_legacy_compatibility_result")
     assert not hasattr(adapters_package, "generate_legacy_rows")

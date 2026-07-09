@@ -281,6 +281,28 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_source_adapters.py"),
         ),
     ),
+    Phase(
+        phase_id="phase9",
+        title="Tighten dataset adapter exports",
+        goal="Keep deprecated GenerationSpec conversions out of the dataset-oriented adapters package root.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/adapters/__init__.py",
+                text="from test_data_agent.adapters.legacy_generation import",
+                description="adapter package root no longer re-exports deprecated GenerationSpec helpers",
+                absent=True,
+            ),
+            TextCheck(
+                path="tests/test_dataset_spec_contract.py",
+                text="from test_data_agent.adapters.legacy_generation import",
+                description="legacy adapter contract tests import deprecated conversions explicitly",
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_source_adapters.py", "tests/test_dataset_spec_contract.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+        ),
+    ),
 )
 
 

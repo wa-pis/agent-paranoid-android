@@ -21,12 +21,14 @@ from pydantic import ValidationError
 from test_data_agent.adapters import (
     csv_profile_to_dataset_profile,
     csv_profile_to_dataset_spec,
-    generation_spec_to_dataset_spec,
     load_json_dataset_spec,
     load_profile_or_spec,
-    multi_table_generation_spec_to_dataset_spec,
     parquet_file_to_dataset_profile,
     trino_profile_to_dataset_profile,
+)
+from test_data_agent.adapters.legacy_generation import (
+    generation_spec_to_dataset_spec,
+    multi_table_generation_spec_to_dataset_spec,
 )
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.core.entity import EntitySpec

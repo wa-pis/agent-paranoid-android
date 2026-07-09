@@ -91,3 +91,26 @@ def test_phase8_tracks_compatibility_boundary() -> None:
         True,
         "CLI no longer imports deprecated workflows from io package",
     ) in checks
+
+
+def test_phase9_tracks_dataset_adapter_exports_boundary() -> None:
+    module = load_refactor_module()
+
+    phase9 = module.phase_by_id("phase9")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase9.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/adapters/__init__.py",
+        "from test_data_agent.adapters.legacy_generation import",
+        True,
+        "adapter package root no longer re-exports deprecated GenerationSpec helpers",
+    ) in checks
+    assert (
+        "tests/test_dataset_spec_contract.py",
+        "from test_data_agent.adapters.legacy_generation import",
+        False,
+        "legacy adapter contract tests import deprecated conversions explicitly",
+    ) in checks
