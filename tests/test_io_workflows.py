@@ -1,5 +1,6 @@
 import csv
 import json
+import test_data_agent.io as io_package
 from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile
@@ -177,3 +178,8 @@ def test_write_csv_profile_artifact_writes_dataset_profile_json(tmp_path) -> Non
     assert profile.entities[0].name == "orders"
     assert written["source_type"] == "csv"
     assert written["entities"][0]["name"] == "orders"
+
+
+def test_io_package_keeps_legacy_workflows_out_of_dataset_oriented_exports() -> None:
+    assert not hasattr(io_package, "generate_legacy_spec_artifacts")
+    assert not hasattr(io_package, "validate_legacy_spec_artifacts")

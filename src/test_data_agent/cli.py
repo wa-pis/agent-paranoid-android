@@ -16,14 +16,16 @@ from test_data_agent.io import (
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
-    generate_legacy_spec_artifacts,
     infer_dataset_spec_artifact,
     load_dataset_rows,
     load_dataset_spec,
-    validate_legacy_spec_artifacts,
     write_dataset_profile_artifact,
     write_csv_profile_artifact,
     write_json_artifact,
+)
+from test_data_agent.io.legacy_workflows import (
+    generate_legacy_spec_artifacts,
+    validate_legacy_spec_artifacts,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
