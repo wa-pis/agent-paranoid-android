@@ -1,9 +1,12 @@
 import json
+from argparse import Namespace
 from pathlib import Path
 
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.commands import (
+    generate_dataset_command,
     generate_dataset_from_example_artifacts,
+    generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
     is_dataset_spec_path,
     profile_example_artifacts,
@@ -84,6 +87,79 @@ generation_settings:
     assert rows[0]["customer_id"] == 12000001
     assert report.valid is True
     assert written_report["valid"] is True
+
+
+def test_generate_dataset_command_uses_dataset_spec_helper(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 2
+    primary_key: customer_id
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+generation_settings:
+  seed: 9
+  output_format: json
+"""
+    )
+    output_folder = tmp_path / "generated"
+
+    exit_code = generate_dataset_command(
+        Namespace(
+            spec=spec_path,
+            output=output_folder,
+            output_format=None,
+            seed=None,
+            count=None,
+        )
+    )
+
+    rows = json.loads((output_folder / "customers.json").read_text())
+
+    assert exit_code == 0
+    assert rows[0]["customer_id"] == 9000001
+
+
+def test_generate_dataset_from_profile_command_writes_generation_bundle(tmp_path) -> None:
+    profile_path = tmp_path / "orders_profile.json"
+    output_path = tmp_path / "out" / "orders.csv"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "table": "orders",
+                "columns": [
+                    {"name": "order_id", "data_type": "bigint", "p05": 1, "p95": 100},
+                    {
+                        "name": "status",
+                        "data_type": "varchar",
+                        "top_values": [{"value": "new"}, {"value": "shipped"}],
+                        "approx_distinct_count": 2,
+                    },
+                ],
+            }
+        )
+    )
+
+    exit_code = generate_dataset_from_profile_command(
+        Namespace(
+            spec=None,
+            profile=profile_path,
+            count=4,
+            seed=22,
+            output=output_path,
+            output_format="csv",
+            mode="valid",
+            invalid_ratio=0.0,
+        )
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert json.loads((output_path.parent / "generation_spec.json").read_text())["generation_settings"]["seed"] == 22
 
 
 def test_profile_example_artifacts_writes_dataset_profile_json(tmp_path) -> None:

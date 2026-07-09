@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import argparse
+import sys
 from pathlib import Path
+from typing import Any, Callable
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.core.dataset import DatasetSpec
@@ -11,11 +14,14 @@ from test_data_agent.io.artifacts import write_json_artifact
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     generate_dataset_artifacts,
+    generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
+
+BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
 
 
 def is_dataset_spec_path(path: Path) -> bool:
@@ -46,6 +52,57 @@ def generate_dataset_from_spec_path(
         seed=seed,
         count=count,
     )
+
+
+def generate_dataset_command(args: argparse.Namespace) -> int:
+    if args.output is None:
+        raise SystemExit("dataset generation requires --output folder")
+    output_format = None if args.output_format is None else OutputFormat(args.output_format)
+    return generate_dataset_from_spec_path(
+        args.spec,
+        output_folder=args.output,
+        output_format=output_format,
+        seed=args.seed,
+        count=args.count,
+    )
+
+
+def generate_dataset_from_profile_command(
+    args: argparse.Namespace,
+    *,
+    business_rules_applier: BusinessRulesApplier | None = None,
+) -> int:
+    if args.spec is not None:
+        raise SystemExit("generate accepts either a spec path or --profile, not both")
+    if args.profile is None:
+        raise SystemExit("generate requires a spec path or --profile")
+    if args.count is None:
+        raise SystemExit("--count is required with --profile")
+    if args.seed is None:
+        raise SystemExit("--seed is required with --profile")
+
+    loaded = load_profile_or_spec(args.profile)
+    if isinstance(loaded, DatasetSpec):
+        raise SystemExit("--profile expects a dataset profile, not a dataset spec")
+    profile = loaded
+
+    try:
+        report, business_report = generate_dataset_from_profile_artifacts(
+            profile,
+            count=args.count,
+            seed=args.seed,
+            output_path=args.output,
+            output_format=None if args.output_format is None else OutputFormat(args.output_format),
+            mode=args.mode,
+            invalid_ratio=args.invalid_ratio,
+            business_rules_applier=business_rules_applier,
+        )
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
+    if should_fail_generation(report, business_report, args.mode):
+        write_generation_errors(report, business_report)
+        return 1
+    return 0
 
 
 def validate_dataset_artifacts(
@@ -109,3 +166,19 @@ def generate_dataset_from_example_artifacts(
         output_format=output_format,
         seed=seed,
     )
+
+
+def write_generation_errors(schema_report: Any, business_report: Any | None) -> None:
+    for section in schema_report.sections:
+        for error in section.errors:
+            print(error, file=sys.stderr)
+    if business_report is not None and not business_report.valid:
+        print("business validation failed", file=sys.stderr)
+
+
+def should_fail_generation(schema_report: Any, business_report: Any | None, mode: str) -> bool:
+    if mode in {"mixed", "negative"}:
+        return False
+    if not schema_report.valid:
+        return True
+    return business_report is not None and not business_report.valid

@@ -9,11 +9,15 @@ from test_data_agent.io.artifacts import (
     write_json_artifact,
 )
 from test_data_agent.io.commands import (
+    generate_dataset_command,
     generate_dataset_from_example_artifacts,
+    generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
     is_dataset_spec_path,
     profile_example_artifacts,
+    should_fail_generation,
     validate_dataset_artifacts,
+    write_generation_errors,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
@@ -37,9 +41,11 @@ __all__ = [
     "dataset_spec_to_yaml",
     "apply_dataset_mode_options",
     "build_dataset_spec_from_profile",
+    "generate_dataset_command",
     "generate_dataset_from_example_artifacts",
     "generate_dataset_artifacts",
     "generate_dataset_from_csv_artifacts",
+    "generate_dataset_from_profile_command",
     "generate_dataset_from_profile_artifacts",
     "generate_dataset_from_spec_path",
     "generate_dataset_review_artifacts",
@@ -49,7 +55,9 @@ __all__ = [
     "load_dataset_rows",
     "load_dataset_spec",
     "profile_example_artifacts",
+    "should_fail_generation",
     "validate_dataset_artifacts",
+    "write_generation_errors",
     "write_dataset_generation_artifacts",
     "write_csv_profile_artifact",
     "write_dataset_profile_artifact",
