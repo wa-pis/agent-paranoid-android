@@ -10,7 +10,14 @@ from typing import Any
 import warnings
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
+from test_data_agent.core.distribution import (
+    CategoricalDistribution,
+    CategoryWeight,
+    DateRangeDistribution,
+    DateTimeRangeDistribution,
+    MaskedPattern,
+    NumericDistribution,
+)
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
 from test_data_agent.core.privacy import is_sensitive_field, mask_pattern
@@ -313,7 +320,7 @@ def _field_spec_from_column_spec(column: ColumnSpec) -> FieldSpec:
 def _column_spec_from_field_spec(field: FieldSpec) -> ColumnSpec:
     data_type = _legacy_type_from_field_spec(field)
     distribution = field.distribution
-    kind = str(distribution.get("kind") or "")
+    typed_distribution = field.typed_distribution
 
     strategy: GenerationStrategy | None = None
     faker_provider: str | None = None
@@ -324,9 +331,8 @@ def _column_spec_from_field_spec(field: FieldSpec) -> ColumnSpec:
     elif field.sensitive:
         strategy = GenerationStrategy.FAKER
         faker_provider = _faker_provider_for_data_type(data_type)
-    elif kind == "categorical":
-        raw_categories = distribution.get("categories") or []
-        choices = [item.get("value") for item in raw_categories if isinstance(item, Mapping) and item.get("value") is not None]
+    elif isinstance(typed_distribution, CategoricalDistribution):
+        choices = [category.value for category in typed_distribution.categories if category.value is not None]
         strategy = GenerationStrategy.CHOICE if choices else None
     elif data_type == DataType.DATE:
         strategy = GenerationStrategy.DATE_RANGE
@@ -341,12 +347,12 @@ def _column_spec_from_field_spec(field: FieldSpec) -> ColumnSpec:
         strategy=strategy,
         faker_provider=faker_provider,
         choices=choices,
-        min_value=_numeric_value(distribution, data_type, "p05", "min_value"),
-        max_value=_numeric_value(distribution, data_type, "p95", "max_value"),
-        min_date=distribution.get("min") if data_type == DataType.DATE else None,
-        max_date=distribution.get("max") if data_type == DataType.DATE else None,
-        min_datetime=distribution.get("min") if data_type == DataType.DATETIME else None,
-        max_datetime=distribution.get("max") if data_type == DataType.DATETIME else None,
+        min_value=_numeric_value(field, distribution, data_type, "p05", "min_value"),
+        max_value=_numeric_value(field, distribution, data_type, "p95", "max_value"),
+        min_date=_distribution_min(field, distribution, data_type, DataType.DATE),
+        max_date=_distribution_max(field, distribution, data_type, DataType.DATE),
+        min_datetime=_distribution_min(field, distribution, data_type, DataType.DATETIME),
+        max_datetime=_distribution_max(field, distribution, data_type, DataType.DATETIME),
         null_probability=field.null_ratio if field.nullable else 0.0,
     )
 
@@ -557,6 +563,7 @@ def _safe_ratio(distinct_count: Any, row_count: int) -> float:
 
 
 def _numeric_value(
+    field: FieldSpec,
     distribution: Mapping[str, Any],
     data_type: DataType,
     preferred_key: str,
@@ -564,9 +571,52 @@ def _numeric_value(
 ) -> int | float | None:
     if data_type not in {DataType.INTEGER, DataType.FLOAT}:
         return None
-    value = distribution.get(preferred_key, distribution.get(fallback_key))
+    typed_distribution = field.typed_distribution
+    if typed_distribution is not None:
+        if isinstance(typed_distribution, NumericDistribution):
+            value = getattr(typed_distribution, preferred_key)
+            if value is None:
+                value = getattr(typed_distribution, fallback_key)
+        else:
+            value = None
+    else:
+        value = distribution.get(preferred_key, distribution.get(fallback_key))
     if value is None:
         return None
     if data_type == DataType.INTEGER:
         return int(round(float(value)))
     return float(value)
+
+
+def _distribution_min(
+    field: FieldSpec,
+    distribution: Mapping[str, Any],
+    data_type: DataType,
+    expected_type: DataType,
+) -> str | None:
+    if data_type != expected_type:
+        return None
+    typed_distribution = field.typed_distribution
+    if typed_distribution is not None:
+        if isinstance(typed_distribution, DateRangeDistribution | DateTimeRangeDistribution):
+            return typed_distribution.min
+        return None
+    value = distribution.get("min")
+    return str(value) if value is not None else None
+
+
+def _distribution_max(
+    field: FieldSpec,
+    distribution: Mapping[str, Any],
+    data_type: DataType,
+    expected_type: DataType,
+) -> str | None:
+    if data_type != expected_type:
+        return None
+    typed_distribution = field.typed_distribution
+    if typed_distribution is not None:
+        if isinstance(typed_distribution, DateRangeDistribution | DateTimeRangeDistribution):
+            return typed_distribution.max
+        return None
+    value = distribution.get("max")
+    return str(value) if value is not None else None

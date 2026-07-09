@@ -10,6 +10,7 @@ from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
     dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
+    dataset_spec_to_generation_spec,
     generate_legacy_compatibility_result,
     dataset_spec_from_generation_spec,
     dataset_spec_from_csv_folder,
@@ -22,6 +23,8 @@ from test_data_agent.adapters import (
     validate_legacy_rows_report,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, TableSpec
 
 
@@ -297,6 +300,55 @@ def test_legacy_profile_adapter_can_build_generation_spec_via_dataset_spec() -> 
     assert spec.table.row_count == 12
     assert spec.table.columns[0].strategy == "sequence"
     assert spec.table.columns[1].choices == ["new", "shipped"]
+
+
+def test_dataset_spec_to_generation_spec_uses_typed_distribution_metadata() -> None:
+    spec = DatasetSpec(
+        generation_settings={"seed": 11},
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=4,
+                fields=[
+                    FieldSpec(
+                        name="status",
+                        data_type=FieldType.STRING,
+                        distribution={
+                            "kind": "categorical",
+                            "categories": [
+                                {"value": "new", "count": 3},
+                                {"value": "shipped", "count": 1},
+                            ],
+                        },
+                    ),
+                    FieldSpec(
+                        name="amount",
+                        data_type=FieldType.FLOAT,
+                        distribution={"kind": "numeric", "p05": 10, "p95": 99},
+                    ),
+                    FieldSpec(
+                        name="created_at",
+                        data_type=FieldType.DATETIME,
+                        distribution={
+                            "kind": "datetime_range",
+                            "min": "2024-01-01T00:00:00",
+                            "max": "2024-12-31T23:59:59",
+                        },
+                    ),
+                ],
+            )
+        ],
+    )
+
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        legacy_spec = dataset_spec_to_generation_spec(spec)
+
+    assert legacy_spec.seed == 11
+    assert legacy_spec.table.columns[0].choices == ["new", "shipped"]
+    assert legacy_spec.table.columns[1].min_value == 10.0
+    assert legacy_spec.table.columns[1].max_value == 99.0
+    assert legacy_spec.table.columns[2].min_datetime.isoformat() == "2024-01-01T00:00:00"
+    assert legacy_spec.table.columns[2].max_datetime.isoformat() == "2024-12-31T23:59:59"
 
 
 def test_json_loader_distinguishes_profiles_from_specs(tmp_path) -> None:
