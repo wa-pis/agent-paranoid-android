@@ -25,7 +25,7 @@ from test_data_agent.io import (
     infer_dataset_spec_command,
     is_dataset_spec_path,
     profile_csv_command,
-    profile_example_command,
+    profile_example_artifacts,
     should_fail_generation,
     validate_dataset_artifacts,
     write_generation_errors,
@@ -128,7 +128,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "profile-example":
-        return profile_example_command(args)
+        profile_example_artifacts(
+            args.input_folder,
+            output_path=args.output,
+            cache_dir=args.cache_dir,
+            use_cache=not args.no_cache,
+            rule_sample_rows=args.rule_sample_rows,
+        )
+        return 0
 
     if args.command == "infer-spec":
         return infer_dataset_spec_command(args)
