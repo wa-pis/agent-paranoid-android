@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
 
 from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
@@ -105,7 +106,8 @@ def test_legacy_generation_adapter_can_generate_rows() -> None:
         ),
     )
 
-    rows = generate_legacy_rows(legacy_spec)
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        rows = generate_legacy_rows(legacy_spec)
 
     assert len(rows) == 2
     assert rows[0]["id"] == 1
@@ -127,28 +129,30 @@ def test_legacy_generation_adapter_loads_specs_from_disk(tmp_path) -> None:
     )
     path.write_text(legacy_spec.model_dump_json())
 
-    loaded = load_legacy_generation_spec(path)
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        loaded = load_legacy_generation_spec(path)
 
     assert loaded == legacy_spec
 
 
 def test_legacy_profile_adapter_can_build_generation_spec_via_dataset_spec() -> None:
-    spec = legacy_profile_to_generation_spec(
-        {
-            "table": "orders",
-            "columns": [
-                {"name": "order_id", "data_type": "bigint", "approx_distinct_count": 100},
-                {
-                    "name": "status",
-                    "data_type": "varchar",
-                    "top_values": [{"value": "new", "count": 60}, {"value": "shipped", "count": 40}],
-                    "approx_distinct_count": 2,
-                },
-            ],
-        },
-        count=12,
-        seed=9,
-    )
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        spec = legacy_profile_to_generation_spec(
+            {
+                "table": "orders",
+                "columns": [
+                    {"name": "order_id", "data_type": "bigint", "approx_distinct_count": 100},
+                    {
+                        "name": "status",
+                        "data_type": "varchar",
+                        "top_values": [{"value": "new", "count": 60}, {"value": "shipped", "count": 40}],
+                        "approx_distinct_count": 2,
+                    },
+                ],
+            },
+            count=12,
+            seed=9,
+        )
 
     assert spec.seed == 9
     assert spec.table.name == "orders"

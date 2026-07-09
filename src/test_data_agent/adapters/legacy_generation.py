@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
+import warnings
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
@@ -24,6 +25,15 @@ from test_data_agent.spec import (
     TableSpec,
     coerce_profile_type,
 )
+
+
+_LEGACY_COMPATIBILITY_WARNING = (
+    "GenerationSpec compatibility is deprecated; prefer DatasetSpec and DatasetProfile APIs"
+)
+
+
+def _warn_legacy_compatibility() -> None:
+    warnings.warn(_LEGACY_COMPATIBILITY_WARNING, DeprecationWarning, stacklevel=2)
 
 
 def legacy_profile_to_dataset_profile(
@@ -81,6 +91,7 @@ def legacy_profile_to_generation_spec(
     output_format: OutputFormat = OutputFormat.JSON,
     source_type: str = "legacy_profile",
 ) -> GenerationSpec:
+    _warn_legacy_compatibility()
     dataset_spec = legacy_profile_to_dataset_spec(
         profile,
         count=count,
@@ -151,6 +162,7 @@ def dataset_spec_to_generation_spec(
     seed: int | None = None,
     output_format: OutputFormat | None = None,
 ) -> GenerationSpec:
+    _warn_legacy_compatibility()
     if len(spec.entities) != 1:
         raise ValueError("legacy GenerationSpec compatibility requires exactly one entity")
 
@@ -167,10 +179,12 @@ def dataset_spec_to_generation_spec(
 
 
 def generate_legacy_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
+    _warn_legacy_compatibility()
     return generate_rows(spec)
 
 
 def load_legacy_generation_spec(path: Path) -> GenerationSpec:
+    _warn_legacy_compatibility()
     return GenerationSpec.model_validate_json(path.read_text())
 
 
