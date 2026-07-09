@@ -45,12 +45,13 @@ def write_dataset_generation_artifacts(
     profile: DatasetProfile,
     spec: DatasetSpec,
     report: Any,
-    output: Path,
+    output: Path | None,
     business_report: Any | None = None,
+    profile_artifact_name: str = "csv_profile.json",
 ) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    (output.parent / "csv_profile.json").write_text(profile.model_dump_json(indent=2))
-    artifact_dir = output.parent
+    artifact_dir = output.parent if output is not None else Path.cwd()
+    artifact_dir.mkdir(parents=True, exist_ok=True)
+    (artifact_dir / profile_artifact_name).write_text(profile.model_dump_json(indent=2))
     (artifact_dir / "generation_spec.json").write_text(spec.model_dump_json(indent=2))
     (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
     if business_report is not None:

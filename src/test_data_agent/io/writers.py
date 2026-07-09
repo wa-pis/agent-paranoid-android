@@ -82,16 +82,26 @@ def write_dataset_rows(
 def write_single_entity_rows(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     output_format: DatasetOutputFormat,
-    output: Path,
+    output: Path | None,
 ) -> None:
     if len(rows_by_entity) != 1:
         raise SystemExit("single-entity output requires exactly one generated entity")
     rows = next(iter(rows_by_entity.values()))
     if output_format == DatasetOutputFormat.CSV:
+        text = rows_to_csv(rows)
+        if output is None:
+            print(text)
+            return
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(rows_to_csv(rows))
+        output.write_text(text)
     elif output_format == DatasetOutputFormat.JSON:
+        text = json.dumps(rows, indent=2, sort_keys=True)
+        if output is None:
+            print(text)
+            return
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(json.dumps(rows, indent=2, sort_keys=True))
+        output.write_text(text)
     elif output_format == DatasetOutputFormat.PARQUET:
+        if output is None:
+            raise SystemExit("Parquet output requires --output")
         write_parquet(rows, output)

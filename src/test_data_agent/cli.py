@@ -14,7 +14,6 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
     generate_legacy_rows,
-    legacy_profile_to_generation_spec,
     load_legacy_generation_spec,
     load_profile_or_spec,
 )
@@ -106,6 +105,8 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "generate":
+        if args.profile is not None:
+            return generate_dataset_from_profile_command(args)
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
         warn_legacy_path("generate")
@@ -241,6 +242,30 @@ def generate_dataset_command(args: argparse.Namespace) -> int:
     )
 
 
+def generate_dataset_from_profile_command(args: argparse.Namespace) -> int:
+    profile, spec = build_dataset_spec_from_profile(args)
+    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
+    business_report = apply_business_rules_from_args(rows_by_entity, args, spec.generation_settings.seed or 0)
+    report = validate_dataset(rows_by_entity, spec)
+    write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, args.output)
+    write_dataset_generation_artifacts(
+        profile,
+        spec,
+        report,
+        args.output,
+        business_report=business_report,
+        profile_artifact_name="profile.json",
+    )
+    if should_fail_generation(report, business_report, args.mode):
+        for section in report.sections:
+            for error in section.errors:
+                print(error, file=sys.stderr)
+        if business_report is not None and not business_report.valid:
+            print("business validation failed", file=sys.stderr)
+        return 1
+    return 0
+
+
 def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
     if args.profile is not None:
         if args.spec is not None:
@@ -268,6 +293,31 @@ def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
         spec.output_format = CoreOutputFormat(args.output_format)
     apply_mode_options(spec, args.mode, args.invalid_ratio)
     return spec
+
+
+def build_dataset_spec_from_profile(args: argparse.Namespace) -> tuple[DatasetProfile, DatasetSpec]:
+    if args.spec is not None:
+        raise SystemExit("generate accepts either a spec path or --profile, not both")
+    if args.profile is None:
+        raise SystemExit("generate requires a spec path or --profile")
+    if args.count is None:
+        raise SystemExit("--count is required with --profile")
+    if args.seed is None:
+        raise SystemExit("--seed is required with --profile")
+
+    loaded = load_profile_or_spec(args.profile)
+    if isinstance(loaded, DatasetSpec):
+        raise SystemExit("--profile expects a dataset profile, not a dataset spec")
+    profile = loaded
+    if len(profile.entities) != 1:
+        raise SystemExit("--profile generation currently requires exactly one entity profile")
+
+    spec = infer_dataset_spec(profile, count=args.count)
+    spec.generation_settings.seed = args.seed
+    if args.output_format is not None:
+        spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
+    apply_dataset_mode_options(spec, args.mode, args.invalid_ratio)
+    return profile, spec
 
 
 def apply_mode_options(spec: GenerationSpec, mode: str, invalid_ratio: float) -> None:

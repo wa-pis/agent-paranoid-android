@@ -57,20 +57,22 @@ def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
     with output_path.open() as handle:
         rows = list(csv.DictReader(handle))
 
+    profile = json.loads((output_path.parent / "profile.json").read_text())
     spec = json.loads((output_path.parent / "generation_spec.json").read_text())
     report = json.loads((output_path.parent / "validation_report.json").read_text())
 
     assert len(rows) == 10
-    assert spec["seed"] == 12345
-    assert spec["output_format"] == "csv"
-    assert spec["table"]["row_count"] == 10
-    assert all(column["invalid_ratio"] == 0.25 for column in spec["table"]["columns"])
-    assert report["row_count"] == 10
-    assert report["expected_row_count"] == 10
-    assert report["error_count"] > 0
+    assert profile["source_type"] == "json_profile"
+    assert spec["generation_settings"]["seed"] == 12345
+    assert spec["generation_settings"]["output_format"] == "csv"
+    assert spec["generation_settings"]["mode"] == "mixed"
+    assert spec["generation_settings"]["invalid_ratio"] == 0.25
+    assert spec["entities"][0]["row_count"] == 10
+    assert report["valid"] is False
+    assert sum(section["failed"] for section in report["sections"]) > 0
 
 
-def test_generate_from_profile_warns_about_legacy_generation_spec_path(tmp_path, capsys) -> None:
+def test_generate_from_profile_uses_dataset_pipeline_without_legacy_warning(tmp_path, capsys) -> None:
     profile_path = tmp_path / "orders_profile.json"
     output_path = tmp_path / "out" / "orders.json"
     profile_path.write_text(
@@ -103,7 +105,7 @@ def test_generate_from_profile_warns_about_legacy_generation_spec_path(tmp_path,
     captured = capsys.readouterr()
 
     assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" in captured.err
+    assert "deprecated GenerationSpec compatibility" not in captured.err
 
 
 def test_generate_dataset_spec_uses_embedded_seed_when_cli_seed_is_omitted(tmp_path) -> None:
