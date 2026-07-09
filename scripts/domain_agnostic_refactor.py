@@ -303,6 +303,28 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
         ),
     ),
+    Phase(
+        phase_id="phase10",
+        title="Detach legacy workflow warnings",
+        goal="Keep deprecated GenerationSpec warnings inside legacy workflow modules instead of dataset-oriented workflow helpers.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/io/workflows.py",
+                text="warn_deprecated_generation_spec_compatibility",
+                description="dataset-oriented workflows no longer carry deprecated warning helpers",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/legacy_workflows.py",
+                text="_warn_deprecated_generation_spec_compatibility",
+                description="legacy workflows own deprecated warning emission",
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_io_workflows.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py"),
+        ),
+    ),
 )
 
 

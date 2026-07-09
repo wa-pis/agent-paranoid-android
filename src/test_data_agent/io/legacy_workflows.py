@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 from typing import Any, Callable
 
 from test_data_agent.adapters.legacy_generation import (
@@ -12,11 +13,17 @@ from test_data_agent.adapters.legacy_generation import (
 )
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_generation_artifacts, write_json_artifact
-from test_data_agent.io.workflows import warn_deprecated_generation_spec_compatibility
 from test_data_agent.io.writers import write_tabular_rows
 
 
 BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
+
+
+def _warn_deprecated_generation_spec_compatibility(command: str) -> None:
+    print(
+        f"warning: '{command}' is using deprecated GenerationSpec compatibility; prefer DatasetSpec inputs",
+        file=sys.stderr,
+    )
 
 
 def generate_legacy_spec_artifacts(
@@ -30,7 +37,7 @@ def generate_legacy_spec_artifacts(
     invalid_ratio: float = 0.0,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> tuple[LegacyGenerationResult, Any | None]:
-    warn_deprecated_generation_spec_compatibility("generate")
+    _warn_deprecated_generation_spec_compatibility("generate")
     result = generate_legacy_compatibility_result(
         spec_path,
         row_count=row_count,
@@ -61,7 +68,7 @@ def validate_legacy_spec_artifacts(
     *,
     output_path: Path | None = None,
 ) -> Any:
-    warn_deprecated_generation_spec_compatibility("validate")
+    _warn_deprecated_generation_spec_compatibility("validate")
     report = validate_legacy_rows_file(spec_path, rows_path)
     if output_path is not None:
         write_json_artifact(report, output_path)

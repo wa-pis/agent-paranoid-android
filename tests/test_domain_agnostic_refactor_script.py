@@ -114,3 +114,43 @@ def test_phase9_tracks_dataset_adapter_exports_boundary() -> None:
         False,
         "legacy adapter contract tests import deprecated conversions explicitly",
     ) in checks
+
+
+def test_phase10_tracks_legacy_warning_boundary() -> None:
+    module = load_refactor_module()
+
+    phase10 = module.phase_by_id("phase10")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase10.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/io/workflows.py",
+        "warn_deprecated_generation_spec_compatibility",
+        True,
+        "dataset-oriented workflows no longer carry deprecated warning helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/io/legacy_workflows.py",
+        "_warn_deprecated_generation_spec_compatibility",
+        False,
+        "legacy workflows own deprecated warning emission",
+    ) in checks
+
+
+def test_phase10_runs_focused_workflow_and_cli_suites() -> None:
+    module = load_refactor_module()
+
+    phase10 = module.phase_by_id("phase10")
+
+    assert phase10.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_io_workflows.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py"),
+    )

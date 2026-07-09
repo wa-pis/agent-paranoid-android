@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import sys
 from typing import Any, Callable
 
 from test_data_agent.adapters import (
@@ -45,13 +44,6 @@ def generate_dataset_artifacts(
     report = validate_dataset(rows_by_entity, spec)
     write_dataset_validation_report(report, output_folder)
     return 0 if report.valid else 1
-
-
-def warn_deprecated_generation_spec_compatibility(command: str) -> None:
-    print(
-        f"warning: '{command}' is using deprecated GenerationSpec compatibility; prefer DatasetSpec inputs",
-        file=sys.stderr,
-    )
 
 
 def build_dataset_spec_from_profile(
