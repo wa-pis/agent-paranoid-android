@@ -1,9 +1,11 @@
 import json
 
-from test_data_agent.business_rules import load_business_rules
+from test_data_agent.business_rules import ScenarioRule, load_business_rules
 from test_data_agent.business_validator import validate_business_rules
+from test_data_agent.rules.scenarios import apply_scenarios as apply_neutral_scenarios
 from test_data_agent.cli import main
 from test_data_agent.rules_engine import apply_business_rules
+from test_data_agent.scenario import apply_scenarios as apply_legacy_scenarios
 
 
 def test_business_validator_supports_every_rule_type(tmp_path) -> None:
@@ -195,6 +197,20 @@ row_rules:
 
     assert rows_by_table["orders"][0]["refund_reason"] is None
     assert rows_by_table["orders"][1]["refund_reason"] == "required"
+
+
+def test_scenario_helpers_remain_deterministic_through_neutral_and_legacy_imports() -> None:
+    scenarios = [
+        ScenarioRule(name="paid", weight=1, field_values={"orders": {"status": "paid"}}),
+        ScenarioRule(name="pending", weight=1, field_values={"orders": {"status": "pending"}}),
+    ]
+    rows_a = {"orders": [{"status": "unknown"} for _ in range(8)]}
+    rows_b = {"orders": [{"status": "unknown"} for _ in range(8)]}
+
+    apply_neutral_scenarios(rows_a, scenarios, seed=11)
+    apply_legacy_scenarios(rows_b, scenarios, seed=11)
+
+    assert rows_a == rows_b
 
 
 def test_cli_writes_business_validation_report_for_csv_profile(tmp_path) -> None:

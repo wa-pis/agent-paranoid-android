@@ -16,7 +16,7 @@ from test_data_agent.business_rules import (
 )
 from test_data_agent.rules.conditions import condition_matches
 from test_data_agent.rules.expressions import parse_datetime, safe_eval
-from test_data_agent.scenario import apply_scenarios
+from test_data_agent.rules.scenarios import apply_scenarios
 
 
 class GenerationMode(StrEnum):
