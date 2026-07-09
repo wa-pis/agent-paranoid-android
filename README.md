@@ -8,6 +8,17 @@ sensitive fields, builds generation specs, generates synthetic rows from an
 explicit seed, validates the result, and exports data in common formats. It
 never copies source rows into generated output.
 
+## Project Status
+
+Current package version: `0.2.0`.
+
+The domain-agnostic `DatasetSpec` pipeline is the primary path for new work. It
+supports safe CSV folder profiling, spec inference, deterministic multi-table
+generation, constraint reconciliation, validation, and CSV/JSON/Parquet export.
+
+Legacy `GenerationSpec` commands and imports remain available for compatibility,
+but they emit deprecation warnings and should be treated as migration paths.
+
 ## Safety Model
 
 Generated data must be synthetic. Source data is used only for structure and
