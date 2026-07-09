@@ -17,8 +17,6 @@ from test_data_agent.adapters import (
     generate_legacy_rows,
     legacy_profile_to_generation_spec,
 )
-from test_data_agent.business_rules import load_business_rules
-from test_data_agent.business_validator import validate_business_rules
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
@@ -34,7 +32,8 @@ from test_data_agent.io import (
     write_tabular_rows,
 )
 from test_data_agent.profiling import profile_example_folder
-from test_data_agent.rules_engine import GenerationMode, apply_business_rules
+from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
+from test_data_agent.rules_engine import GenerationMode
 from test_data_agent.spec import GenerationSpec, OutputFormat
 from test_data_agent.validation import validate_dataset
 from test_data_agent.validator import validate_rows_report
@@ -283,12 +282,13 @@ def apply_dataset_mode_options(spec: DatasetSpec, mode: str, invalid_ratio: floa
 
 
 def apply_business_rules_from_args(rows_by_table: dict[str, list[dict[str, Any]]], args: argparse.Namespace, seed: int) -> Any | None:
-    rules_path = getattr(args, "business_rules", None)
-    if rules_path is None:
-        return None
-    rules = load_business_rules(rules_path)
-    apply_business_rules(rows_by_table, rules, seed=seed, mode=args.mode, invalid_ratio=args.invalid_ratio)
-    return validate_business_rules(rows_by_table, rules)
+    return apply_and_validate_business_rules_from_path(
+        rows_by_table,
+        getattr(args, "business_rules", None),
+        seed=seed,
+        mode=args.mode,
+        invalid_ratio=args.invalid_ratio,
+    )
 
 
 def should_fail_generation(schema_report: Any, business_report: Any | None, mode: str) -> bool:

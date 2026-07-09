@@ -1,5 +1,6 @@
 import csv
 import json
+from pathlib import Path
 
 from test_data_agent.cli import main
 
@@ -108,3 +109,42 @@ generation_settings:
     assert second_exit == 0
     assert first_rows == second_rows
     assert [row["customer_id"] for row in first_rows] == ["17000001", "17000002", "17000003"]
+
+
+def test_generate_from_csv_applies_business_rules_via_neutral_rules_helper(tmp_path) -> None:
+    output_path = tmp_path / "out" / "customers.json"
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: customers
+    field: status
+    required: true
+    allowed_values: [new, active, paused]
+"""
+    )
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            str(Path("tests/fixtures/customers.csv")),
+            "--count",
+            "5",
+            "--mode",
+            "valid",
+            "--seed",
+            "9",
+            "--format",
+            "json",
+            "--output",
+            str(output_path),
+            "--business-rules",
+            str(rules_path),
+        ]
+    )
+
+    report = json.loads((output_path.parent / "business_validation_report.json").read_text())
+
+    assert exit_code == 0
+    assert report["valid"] is True
+    assert report["rule_fail_count"] == 0
