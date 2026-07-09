@@ -7,6 +7,7 @@ from test_data_agent.core import (
     FieldSpec,
     GenerationMode,
     NumericDistribution,
+    OutputFormat as CoreOutputFormat,
     PrivacyAction,
     PrivacyClassification,
     ValidationSettings,
@@ -180,6 +181,11 @@ def test_privacy_policy_is_shared_with_legacy_spec_module() -> None:
     assert infer_sensitive_from_name("favorite_color") is False
     assert mask_pattern("alice@example.com", "email") == "email"
     assert mask_pattern("plain text", None) == "text_len_10"
+
+
+def test_output_format_is_shared_with_legacy_spec_module() -> None:
+    assert OutputFormat is CoreOutputFormat
+    assert OutputFormat.CSV.value == "csv"
 
 
 def test_csv_adapter_normalizes_legacy_profile_into_dataset_shapes() -> None:

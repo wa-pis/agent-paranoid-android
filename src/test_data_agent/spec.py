@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from test_data_agent.core.privacy import SENSITIVE_NAME_PARTS, infer_sensitive_from_name, semantic_type_is_sensitive
+from test_data_agent.core.settings import OutputFormat
 
 
 class DataType(StrEnum):
@@ -36,12 +37,6 @@ class GenerationStrategy(StrEnum):
     DATE_RANGE = "date_range"
     DATETIME_RANGE = "datetime_range"
     UUID = "uuid"
-
-
-class OutputFormat(StrEnum):
-    CSV = "csv"
-    JSON = "json"
-    PARQUET = "parquet"
 
 
 def infer_sensitive_from_profile(column: dict[str, Any]) -> bool:

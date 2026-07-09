@@ -38,12 +38,11 @@ from test_data_agent.io import (
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
-from test_data_agent.spec import OutputFormat
 from test_data_agent.validation import validate_dataset
 from test_data_agent.validator import validate_rows_report
 
 if TYPE_CHECKING:
-    from test_data_agent.spec import GenerationSpec
+    from test_data_agent.spec import GenerationSpec, OutputFormat
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -57,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid")
     generate_parser.add_argument("--invalid-ratio", type=float, default=0.0)
     generate_parser.add_argument("--seed", type=int)
-    generate_parser.add_argument("--format", choices=[item.value for item in OutputFormat], dest="output_format")
+    generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format")
     generate_parser.add_argument("--output", "-o", type=Path)
     generate_parser.add_argument("--business-rules", type=Path)
 
@@ -84,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
     generate_csv_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid")
     generate_csv_parser.add_argument("--invalid-ratio", type=float, default=0.0)
     generate_csv_parser.add_argument("--seed", type=int, required=True)
-    generate_csv_parser.add_argument("--format", choices=[item.value for item in OutputFormat], required=True, dest="output_format")
+    generate_csv_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format")
     generate_csv_parser.add_argument("--output", "-o", type=Path, required=True)
     generate_csv_parser.add_argument("--table", type=str)
     generate_csv_parser.add_argument("--business-rules", type=Path)
@@ -99,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
     generate_example_parser.add_argument("--output", "-o", type=Path, required=True)
     generate_example_parser.add_argument("--seed", type=int, required=True)
     generate_example_parser.add_argument("--count", type=int)
-    generate_example_parser.add_argument("--format", choices=[item.value for item in OutputFormat], required=True, dest="output_format")
+    generate_example_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format")
     generate_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"))
     generate_example_parser.add_argument("--no-cache", action="store_true")
     generate_example_parser.add_argument("--rule-sample-rows", type=int, default=50_000)
@@ -266,7 +265,7 @@ def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
             spec.seed = args.seed
 
     if args.output_format is not None:
-        spec.output_format = OutputFormat(args.output_format)
+        spec.output_format = CoreOutputFormat(args.output_format)
     apply_mode_options(spec, args.mode, args.invalid_ratio)
     return spec
 
