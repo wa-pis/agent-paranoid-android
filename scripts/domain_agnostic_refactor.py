@@ -224,8 +224,35 @@ PHASES: tuple[Phase, ...] = (
                 description="CLI no longer validates legacy rows from loaded JSON directly",
                 absent=True,
             ),
+            TextCheck(
+                path="src/test_data_agent/io/workflows.py",
+                text="generate_legacy_compatibility_result",
+                description="workflow helpers no longer call legacy generation adapters",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/workflows.py",
+                text="validate_legacy_rows_file",
+                description="workflow helpers no longer call legacy validation adapters",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/workflows.py",
+                text="def generate_legacy_spec_artifacts(",
+                description="workflow helpers no longer expose legacy generation workflows",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/workflows.py",
+                text="def validate_legacy_spec_artifacts(",
+                description="workflow helpers no longer expose legacy validation workflows",
+                absent=True,
+            ),
         ),
-        test_commands=((PYTHON, "-m", "pytest"),),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest"),
+        ),
     ),
 )
 
