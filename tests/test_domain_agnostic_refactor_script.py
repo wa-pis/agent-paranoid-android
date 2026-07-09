@@ -81,9 +81,9 @@ def test_phase8_tracks_compatibility_boundary() -> None:
     assert "src/test_data_agent/compat/legacy_workflows.py" in phase8.expected_files
     assert (
         "src/test_data_agent/cli.py",
-        "from test_data_agent.compat import",
+        "from test_data_agent.compat",
         False,
-        "CLI imports deprecated workflows from compat boundary",
+        "CLI imports deprecated workflows from the compat boundary",
     ) in checks
     assert (
         "src/test_data_agent/cli.py",
@@ -205,4 +205,38 @@ def test_phase11_runs_compat_and_cli_focused_suites() -> None:
             "tests/test_domain_agnostic_refactor_script.py",
         ),
         (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+    )
+
+
+def test_phase12_narrows_cli_compat_workflow_imports() -> None:
+    module = load_refactor_module()
+
+    phase12 = module.phase_by_id("phase12")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase12.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.compat.legacy_workflows import",
+        False,
+        "CLI imports deprecated workflows from the dedicated compat workflow module",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.compat import",
+        True,
+        "CLI no longer imports deprecated workflows from the compat package root",
+    ) in checks
+
+
+def test_phase12_runs_cli_and_compat_contract_suites() -> None:
+    module = load_refactor_module()
+
+    phase12 = module.phase_by_id("phase12")
+
+    assert phase12.test_commands == (
+        (module.PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_compat_legacy.py"),
     )

@@ -312,6 +312,16 @@ Expected outcome:
 - `test_data_agent.io.legacy_workflows` only re-exports that behavior
 - dataset-oriented `io/` modules stay focused on `DatasetSpec` workflows
 
+### Phase 12: Narrow Compat Workflow Imports
+
+Keep deprecated workflow callers pointed at the dedicated
+`compat/legacy_workflows.py` module instead of the broad `compat` package root.
+
+Expected outcome:
+
+- `cli.py` imports deprecated workflow helpers from `test_data_agent.compat.legacy_workflows`
+- the `compat` package root remains a user-facing compatibility surface, not an internal workflow dependency
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

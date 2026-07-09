@@ -266,8 +266,8 @@ PHASES: tuple[Phase, ...] = (
         text_checks=(
             TextCheck(
                 path="src/test_data_agent/cli.py",
-                text="from test_data_agent.compat import",
-                description="CLI imports deprecated workflows from compat boundary",
+                text="from test_data_agent.compat",
+                description="CLI imports deprecated workflows from the compat boundary",
             ),
             TextCheck(
                 path="src/test_data_agent/cli.py",
@@ -356,6 +356,28 @@ PHASES: tuple[Phase, ...] = (
         test_commands=(
             (PYTHON, "-m", "pytest", "tests/test_compat_legacy.py", "tests/test_domain_agnostic_refactor_script.py"),
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+        ),
+    ),
+    Phase(
+        phase_id="phase12",
+        title="Narrow compat workflow imports",
+        goal="Keep deprecated workflow usage pointed at the dedicated compat workflow module instead of the broad compat package root.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.compat.legacy_workflows import",
+                description="CLI imports deprecated workflows from the dedicated compat workflow module",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.compat import",
+                description="CLI no longer imports deprecated workflows from the compat package root",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_compat_legacy.py"),
         ),
     ),
 )

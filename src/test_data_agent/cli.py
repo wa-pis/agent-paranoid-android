@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.adapters import load_profile_or_spec
-from test_data_agent.compat import (
+from test_data_agent.compat.legacy_workflows import (
     generate_legacy_spec_artifacts,
     validate_legacy_spec_artifacts,
 )
