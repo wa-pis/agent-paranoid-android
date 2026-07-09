@@ -220,7 +220,8 @@ def generate_dataset_command(args: argparse.Namespace) -> int:
     if args.count is not None:
         for entity in spec.entities:
             entity.row_count = args.count
-    rows_by_entity = generate_dataset(spec, seed=args.seed or 0)
+    seed = spec.generation_settings.seed if args.seed is None else args.seed
+    rows_by_entity = generate_dataset(spec, seed=seed or 0)
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
     write_dataset_rows(rows_by_entity, output_format, args.output)

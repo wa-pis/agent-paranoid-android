@@ -67,3 +67,44 @@ def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
     assert report["row_count"] == 10
     assert report["expected_row_count"] == 10
     assert report["error_count"] > 0
+
+
+def test_generate_dataset_spec_uses_embedded_seed_when_cli_seed_is_omitted(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    output_path = tmp_path / "generated"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 3
+    primary_key: customer_id
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+      - name: status
+        data_type: string
+        distribution:
+          kind: categorical
+          categories:
+            - value: active
+              count: 2
+            - value: paused
+              count: 1
+generation_settings:
+  seed: 17
+  output_format: csv
+"""
+    )
+
+    first_exit = main(["generate", str(spec_path), "--format", "csv", "--output", str(output_path)])
+    first_rows = list(csv.DictReader((output_path / "customers.csv").open()))
+
+    second_output = tmp_path / "generated_again"
+    second_exit = main(["generate", str(spec_path), "--format", "csv", "--output", str(second_output)])
+    second_rows = list(csv.DictReader((second_output / "customers.csv").open()))
+
+    assert first_exit == 0
+    assert second_exit == 0
+    assert first_rows == second_rows
+    assert [row["customer_id"] for row in first_rows] == ["17000001", "17000002", "17000003"]
