@@ -14,7 +14,15 @@ from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.generator import generate_rows
-from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec, TableSpec
+from test_data_agent.spec import (
+    ColumnSpec,
+    DataType,
+    GenerationSpec,
+    GenerationStrategy,
+    MultiTableGenerationSpec,
+    TableSpec,
+    coerce_profile_type,
+)
 
 
 def legacy_profile_to_dataset_profile(
@@ -62,6 +70,27 @@ def legacy_profile_to_dataset_spec(
     if seed is not None:
         dataset_spec.generation_settings.seed = seed
     return dataset_spec
+
+
+def legacy_profile_to_generation_spec(
+    profile: Mapping[str, Any],
+    *,
+    count: int,
+    seed: int,
+    output_format: OutputFormat = OutputFormat.JSON,
+    source_type: str = "legacy_profile",
+) -> GenerationSpec:
+    dataset_spec = legacy_profile_to_dataset_spec(
+        profile,
+        count=count,
+        seed=seed,
+        source_type=source_type,
+    )
+    return dataset_spec_to_generation_spec(
+        dataset_spec,
+        seed=seed,
+        output_format=output_format,
+    )
 
 
 def generation_spec_to_dataset_spec(spec: GenerationSpec) -> DatasetSpec:
@@ -232,7 +261,10 @@ def _field_type_from_raw(value: Any) -> FieldType:
         return FieldType.DATE
     if normalized == FieldType.DATETIME.value:
         return FieldType.DATETIME
-    return FieldType.STRING
+    coerced = coerce_profile_type(normalized)
+    if coerced in {DataType.EMAIL, DataType.PHONE, DataType.NAME, DataType.ADDRESS}:
+        return FieldType.STRING
+    return _field_type_from_legacy_type(coerced)
 
 
 def _field_type_from_legacy_type(data_type: DataType) -> FieldType:

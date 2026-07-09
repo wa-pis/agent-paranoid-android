@@ -15,6 +15,7 @@ from test_data_agent.adapters import (
     csv_file_to_dataset_spec,
     dataset_spec_to_generation_spec,
     generate_legacy_rows,
+    legacy_profile_to_generation_spec,
 )
 from test_data_agent.business_rules import load_business_rules
 from test_data_agent.business_validator import validate_business_rules
@@ -238,7 +239,11 @@ def build_generation_spec(args: argparse.Namespace) -> GenerationSpec:
         if args.seed is None:
             raise SystemExit("--seed is required with --profile")
         profile = json.loads(args.profile.read_text())
-        spec = GenerationSpec.from_trino_profile(profile, seed=args.seed, row_count=args.count)
+        spec = legacy_profile_to_generation_spec(
+            profile,
+            count=args.count,
+            seed=args.seed,
+        )
     else:
         if args.spec is None:
             raise SystemExit("generate requires a spec path or --profile")

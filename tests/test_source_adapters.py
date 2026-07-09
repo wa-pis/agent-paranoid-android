@@ -10,6 +10,7 @@ from test_data_agent.adapters import (
     dataset_spec_from_generation_spec,
     dataset_spec_from_trino_profile,
     generate_legacy_rows,
+    legacy_profile_to_generation_spec,
     load_profile_or_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -108,6 +109,31 @@ def test_legacy_generation_adapter_can_generate_rows() -> None:
     assert len(rows) == 2
     assert rows[0]["id"] == 1
     assert rows[0]["email"] != rows[1]["email"]
+
+
+def test_legacy_profile_adapter_can_build_generation_spec_via_dataset_spec() -> None:
+    spec = legacy_profile_to_generation_spec(
+        {
+            "table": "orders",
+            "columns": [
+                {"name": "order_id", "data_type": "bigint", "approx_distinct_count": 100},
+                {
+                    "name": "status",
+                    "data_type": "varchar",
+                    "top_values": [{"value": "new", "count": 60}, {"value": "shipped", "count": 40}],
+                    "approx_distinct_count": 2,
+                },
+            ],
+        },
+        count=12,
+        seed=9,
+    )
+
+    assert spec.seed == 9
+    assert spec.table.name == "orders"
+    assert spec.table.row_count == 12
+    assert spec.table.columns[0].strategy == "sequence"
+    assert spec.table.columns[1].choices == ["new", "shipped"]
 
 
 def test_json_loader_distinguishes_profiles_from_specs(tmp_path) -> None:
