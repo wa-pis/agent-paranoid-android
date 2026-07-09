@@ -334,3 +334,44 @@ def test_phase14_runs_business_rules_and_refactor_contract_suites() -> None:
         (module.PYTHON, "-m", "pytest", "tests/test_business_rules.py"),
         (module.PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
     )
+
+
+def test_phase15_moves_business_rule_application_into_rules_package() -> None:
+    module = load_refactor_module()
+
+    phase15 = module.phase_by_id("phase15")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase15.text_checks
+    }
+
+    assert "src/test_data_agent/rules/engine.py" in phase15.expected_files
+    assert (
+        "src/test_data_agent/rules/business_config.py",
+        "from test_data_agent.rules.engine import",
+        False,
+        "neutral business config helpers import rule application from the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/rules_engine.py",
+        "from test_data_agent.rules.engine import",
+        False,
+        "legacy rules_engine module is a compatibility shim over the rules package",
+    ) in checks
+    assert (
+        "src/test_data_agent/rules_engine.py",
+        "from test_data_agent.rules.models import",
+        True,
+        "legacy rules_engine module no longer owns neutral rule implementation",
+    ) in checks
+
+
+def test_phase15_runs_business_rules_and_refactor_contract_suites() -> None:
+    module = load_refactor_module()
+
+    phase15 = module.phase_by_id("phase15")
+
+    assert phase15.test_commands == (
+        (module.PYTHON, "-m", "pytest", "tests/test_business_rules.py"),
+        (module.PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+    )

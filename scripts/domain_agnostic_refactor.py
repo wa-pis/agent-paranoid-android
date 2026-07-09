@@ -439,6 +439,34 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
         ),
     ),
+    Phase(
+        phase_id="phase15",
+        title="Move business rule application into rules package",
+        goal="Keep neutral rule application in rules/ while rules_engine.py becomes a compatibility shim.",
+        expected_files=("src/test_data_agent/rules/engine.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/rules/business_config.py",
+                text="from test_data_agent.rules.engine import",
+                description="neutral business config helpers import rule application from the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/rules_engine.py",
+                text="from test_data_agent.rules.engine import",
+                description="legacy rules_engine module is a compatibility shim over the rules package",
+            ),
+            TextCheck(
+                path="src/test_data_agent/rules_engine.py",
+                text="from test_data_agent.rules.models import",
+                description="legacy rules_engine module no longer owns neutral rule implementation",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_business_rules.py"),
+            (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
+        ),
+    ),
 )
 
 

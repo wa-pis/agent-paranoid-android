@@ -3,6 +3,7 @@ import json
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode
 from test_data_agent.business_rules import ScenarioRule, load_business_rules
 from test_data_agent.business_validator import validate_business_rules
+from test_data_agent.rules.engine import apply_business_rules as apply_neutral_business_rules
 from test_data_agent.rules.models import ScenarioRule as NeutralScenarioRule
 from test_data_agent.rules.models import load_business_rules as load_neutral_business_rules
 from test_data_agent.rules.scenarios import apply_scenarios as apply_neutral_scenarios
@@ -13,6 +14,27 @@ from test_data_agent.scenario import apply_scenarios as apply_legacy_scenarios
 
 def test_legacy_rules_engine_mode_aliases_core_generation_mode() -> None:
     assert GenerationMode is CoreGenerationMode
+
+
+def test_rules_engine_module_is_a_compatibility_shim_over_neutral_engine(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, pending]
+"""
+    )
+    rules = load_business_rules(rules_path)
+    legacy_rows = {"orders": [{"status": None}]}
+    neutral_rows = {"orders": [{"status": None}]}
+
+    apply_business_rules(legacy_rows, rules, seed=7, mode="valid", invalid_ratio=0.0)
+    apply_neutral_business_rules(neutral_rows, rules, seed=7, mode="valid", invalid_ratio=0.0)
+
+    assert legacy_rows == neutral_rows
 
 
 def test_business_rules_module_is_a_compatibility_shim_over_neutral_models(tmp_path) -> None:

@@ -345,6 +345,18 @@ Expected outcome:
 - neutral rules modules no longer import `test_data_agent.business_rules`
 - `test_data_agent.business_rules` remains importable for compatibility only
 
+### Phase 15: Move Business Rule Application Into Rules Package
+
+Keep business rule application inside `rules/` while `rules_engine.py` remains
+only a deprecated compatibility shim.
+
+Expected outcome:
+
+- `test_data_agent.rules.engine` owns business rule application and invalid-case
+  injection
+- neutral rule helpers no longer import `test_data_agent.rules_engine`
+- `test_data_agent.rules_engine` remains importable for compatibility only
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create
@@ -362,6 +374,7 @@ Expected outcome:
 - `src/test_data_agent/rules/expressions.py`
 - `src/test_data_agent/rules/conditions.py`
 - `src/test_data_agent/rules/models.py`
+- `src/test_data_agent/rules/engine.py`
 - `src/test_data_agent/io/readers.py`
 - `src/test_data_agent/io/writers.py`
 - `src/test_data_agent/io/artifacts.py`
