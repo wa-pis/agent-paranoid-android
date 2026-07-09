@@ -430,6 +430,18 @@ Expected outcome:
   calling compat workflows inline
 - dataset-oriented CLI helpers remain in `io/commands.py`
 
+### Phase 22: Route Example Profiling Through Command Helpers
+
+Keep `profile-example` routed through the dataset-oriented `io/commands.py`
+helper so `cli.py` stays limited to argument parsing and top-level dispatch.
+
+Expected outcome:
+
+- `cli.py` delegates `profile-example` to `profile_example_command`
+- `cli.py` no longer calls `profile_example_artifacts` directly
+- dataset-oriented CLI helpers remain the single command boundary for example
+  profiling
+
 - `profile-csv` delegates to dataset-oriented command helpers
 - `infer-spec` delegates to dataset-oriented command helpers
 - `cli.py` no longer imports profile/spec loaders for these dataset-oriented commands

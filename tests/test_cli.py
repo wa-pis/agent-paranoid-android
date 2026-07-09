@@ -152,6 +152,27 @@ def test_profile_csv_routes_through_dataset_command_helper(tmp_path) -> None:
     assert payload["entities"][0]["name"] == "customers_cli"
 
 
+def test_profile_example_routes_through_dataset_command_helper(tmp_path) -> None:
+    output_path = tmp_path / "profile.json"
+
+    exit_code = main(
+        [
+            "profile-example",
+            str(Path("tests/fixtures/example_dataset")),
+            "--output",
+            str(output_path),
+            "--cache-dir",
+            str(tmp_path / "cache"),
+        ]
+    )
+
+    payload = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert payload["source_type"] == "csv_folder"
+    assert {entity["name"] for entity in payload["entities"]} == {"customers", "orders"}
+
+
 def test_generate_dataset_spec_uses_embedded_seed_when_cli_seed_is_omitted(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     output_path = tmp_path / "generated"

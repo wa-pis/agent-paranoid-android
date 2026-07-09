@@ -204,6 +204,52 @@ def test_phase21_runs_cli_compat_and_command_suites() -> None:
     )
 
 
+def test_phase22_tracks_profile_example_command_boundary() -> None:
+    module = load_refactor_module()
+
+    phase22 = module.phase_by_id("phase22")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase22.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/cli.py",
+        "profile_example_command,",
+        False,
+        "CLI imports the dataset-oriented profile-example command helper",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "return profile_example_command(args)",
+        False,
+        "CLI delegates profile-example to the command helper",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "profile_example_artifacts(",
+        True,
+        "CLI no longer orchestrates example profiling artifacts directly",
+    ) in checks
+
+
+def test_phase22_runs_cli_and_command_suites() -> None:
+    module = load_refactor_module()
+
+    phase22 = module.phase_by_id("phase22")
+
+    assert phase22.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_cli.py",
+            "tests/test_io_commands.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+    )
+
+
 def test_phase11_tracks_compat_owned_legacy_workflow_implementation() -> None:
     module = load_refactor_module()
 
@@ -372,7 +418,7 @@ def test_phase17_tracks_example_dataset_command_boundary() -> None:
     ) in checks
     assert (
         "src/test_data_agent/cli.py",
-        "profile_example_artifacts,",
+        "profile_example_command,",
         False,
         "CLI delegates example-dataset profiling to io command helpers",
     ) in checks

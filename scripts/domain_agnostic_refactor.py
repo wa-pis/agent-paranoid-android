@@ -509,7 +509,7 @@ PHASES: tuple[Phase, ...] = (
             ),
             TextCheck(
                 path="src/test_data_agent/cli.py",
-                text="profile_example_artifacts,",
+                text="profile_example_command,",
                 description="CLI delegates example-dataset profiling to io command helpers",
             ),
             TextCheck(
@@ -658,6 +658,32 @@ PHASES: tuple[Phase, ...] = (
         test_commands=(
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_compat_legacy.py", "tests/test_domain_agnostic_refactor_script.py"),
             (PYTHON, "-m", "pytest", "tests/test_io_commands.py"),
+        ),
+    ),
+    Phase(
+        phase_id="phase22",
+        title="Route example profiling through command helpers",
+        goal="Keep profile-example routed through dataset-oriented io command helpers while cli.py only dispatches arguments.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="profile_example_command,",
+                description="CLI imports the dataset-oriented profile-example command helper",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="return profile_example_command(args)",
+                description="CLI delegates profile-example to the command helper",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="profile_example_artifacts(",
+                description="CLI no longer orchestrates example profiling artifacts directly",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_commands.py", "tests/test_domain_agnostic_refactor_script.py"),
         ),
     ),
 )
