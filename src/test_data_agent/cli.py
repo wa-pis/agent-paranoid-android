@@ -16,20 +16,18 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
-    generate_dataset_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
+    generate_dataset_from_spec_path,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
-    load_dataset_rows,
-    load_dataset_spec,
+    is_dataset_spec_path,
+    validate_dataset_artifacts,
     write_dataset_profile_artifact,
     write_csv_profile_artifact,
-    write_json_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
-from test_data_agent.validation import validate_dataset
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -167,13 +165,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "validate":
         if is_dataset_spec_path(args.spec) or args.rows.is_dir():
-            spec = load_dataset_spec(args.spec)
-            rows_by_entity = load_dataset_rows(args.rows)
-            report = validate_dataset(rows_by_entity, spec)
+            report = validate_dataset_artifacts(
+                args.spec,
+                args.rows,
+                output_path=args.output,
+            )
             text = report.model_dump_json(indent=2)
-            if args.output is not None:
-                write_json_artifact(report, args.output)
-            else:
+            if args.output is None:
                 print(text)
             return 0 if report.valid else 1
         report = validate_legacy_spec_artifacts(
@@ -205,25 +203,12 @@ def main(argv: list[str] | None = None) -> int:
     return 2
 
 
-def is_dataset_spec_path(path: Path) -> bool:
-    suffix = path.suffix.lower()
-    if suffix in {".yaml", ".yml"}:
-        return True
-    if suffix != ".json":
-        return False
-    try:
-        return isinstance(load_profile_or_spec(path), DatasetSpec)
-    except Exception:
-        return False
-
-
 def generate_dataset_command(args: argparse.Namespace) -> int:
-    spec = load_dataset_spec(args.spec)
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
     output_format = None if args.output_format is None else CoreOutputFormat(args.output_format)
-    return generate_dataset_artifacts(
-        spec,
+    return generate_dataset_from_spec_path(
+        args.spec,
         output_folder=args.output,
         output_format=output_format,
         seed=args.seed,

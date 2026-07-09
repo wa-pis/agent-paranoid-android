@@ -462,6 +462,41 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_domain_agnostic_refactor_script.py"),
         ),
     ),
+    Phase(
+        phase_id="phase16",
+        title="Extract dataset command helpers from CLI",
+        goal="Keep dataset-spec path detection and orchestration in io helpers while cli.py focuses on parsing and command routing.",
+        expected_files=("src/test_data_agent/io/commands.py",),
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.io import (\n    generate_dataset_from_csv_artifacts,\n    generate_dataset_from_profile_artifacts,\n    generate_dataset_from_spec_path,",
+                description="CLI delegates dataset-spec generation to io command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="def is_dataset_spec_path(",
+                description="CLI no longer owns dataset-spec path detection",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="load_dataset_spec(",
+                description="CLI no longer loads dataset specs directly for dataset-oriented commands",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="validate_dataset(",
+                description="CLI no longer validates dataset-oriented rows directly",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_io_commands.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+        ),
+    ),
 )
 
 

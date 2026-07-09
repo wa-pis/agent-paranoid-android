@@ -258,18 +258,70 @@ def test_phase13_routes_package_root_legacy_shims_through_compat() -> None:
         False,
         "package root legacy shims resolve through the compat boundary",
     ) in checks
+
+
+def test_phase16_tracks_dataset_command_helper_boundary() -> None:
+    module = load_refactor_module()
+
+    phase16 = module.phase_by_id("phase16")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase16.text_checks
+    }
+
+    assert "src/test_data_agent/io/commands.py" in phase16.expected_files
     assert (
-        "src/test_data_agent/compat/__init__.py",
-        "from test_data_agent.compat.legacy_spec import",
-        False,
-        "compat package root re-exports deprecated legacy spec helpers explicitly",
+        "src/test_data_agent/cli.py",
+        "def is_dataset_spec_path(",
+        True,
+        "CLI no longer owns dataset-spec path detection",
     ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "load_dataset_spec(",
+        True,
+        "CLI no longer loads dataset specs directly for dataset-oriented commands",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "validate_dataset(",
+        True,
+        "CLI no longer validates dataset-oriented rows directly",
+    ) in checks
+
+
+def test_phase16_runs_io_and_cli_focused_suites() -> None:
+    module = load_refactor_module()
+
+    phase16 = module.phase_by_id("phase16")
+
+    assert phase16.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_io_commands.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+    )
 
 
 def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
     module = load_refactor_module()
 
     phase13 = module.phase_by_id("phase13")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase13.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/compat/__init__.py",
+        "from test_data_agent.compat.legacy_spec import",
+        False,
+        "compat package root re-exports deprecated legacy spec helpers explicitly",
+    ) in checks
 
     assert phase13.test_commands == (
         (

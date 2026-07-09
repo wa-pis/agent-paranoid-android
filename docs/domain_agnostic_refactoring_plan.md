@@ -357,6 +357,17 @@ Expected outcome:
 - neutral rule helpers no longer import `test_data_agent.rules_engine`
 - `test_data_agent.rules_engine` remains importable for compatibility only
 
+### Phase 16: Extract Dataset Command Helpers From CLI
+
+Keep dataset-oriented command detection and spec-path orchestration in `io/`
+helpers so `cli.py` focuses on argument parsing and top-level command routing.
+
+Expected outcome:
+
+- dataset-spec path detection lives outside `cli.py`
+- dataset-spec generate/validate orchestration is reusable without the CLI module
+- legacy compatibility flows remain unchanged
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

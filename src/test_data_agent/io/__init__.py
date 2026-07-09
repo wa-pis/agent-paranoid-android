@@ -8,6 +8,11 @@ from test_data_agent.io.artifacts import (
     write_dataset_validation_report,
     write_json_artifact,
 )
+from test_data_agent.io.commands import (
+    generate_dataset_from_spec_path,
+    is_dataset_spec_path,
+    validate_dataset_artifacts,
+)
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     apply_dataset_mode_options,
@@ -33,11 +38,14 @@ __all__ = [
     "generate_dataset_artifacts",
     "generate_dataset_from_csv_artifacts",
     "generate_dataset_from_profile_artifacts",
+    "generate_dataset_from_spec_path",
     "generate_dataset_review_artifacts",
     "generate_single_entity_profile_artifacts",
     "infer_dataset_spec_artifact",
+    "is_dataset_spec_path",
     "load_dataset_rows",
     "load_dataset_spec",
+    "validate_dataset_artifacts",
     "write_dataset_generation_artifacts",
     "write_csv_profile_artifact",
     "write_dataset_profile_artifact",
