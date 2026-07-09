@@ -15,10 +15,10 @@ from test_data_agent.compat.legacy_workflows import (
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
-    generate_dataset_command,
     generate_dataset_from_example_artifacts,
     generate_dataset_from_csv_artifacts,
-    generate_dataset_from_profile_command,
+    generate_dataset_from_profile_artifacts,
+    generate_dataset_from_spec_path,
     is_dataset_spec_path,
     infer_dataset_spec_artifact,
     profile_example_artifacts,
@@ -92,16 +92,48 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "generate":
         if args.profile is not None:
-            return generate_dataset_from_profile_command(
-                args,
-                business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
-                    rows_by_entity,
-                    args,
-                    seed,
-                ),
-            )
+            if args.spec is not None:
+                raise SystemExit("generate accepts either a spec path or --profile, not both")
+            if args.count is None:
+                raise SystemExit("--count is required with --profile")
+            if args.seed is None:
+                raise SystemExit("--seed is required with --profile")
+
+            loaded = load_profile_or_spec(args.profile)
+            if isinstance(loaded, DatasetSpec):
+                raise SystemExit("--profile expects a dataset profile, not a dataset spec")
+
+            try:
+                report, business_report = generate_dataset_from_profile_artifacts(
+                    loaded,
+                    count=args.count,
+                    seed=args.seed,
+                    output_path=args.output,
+                    output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
+                    mode=args.mode,
+                    invalid_ratio=args.invalid_ratio,
+                    business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+                        rows_by_entity,
+                        args,
+                        seed,
+                    ),
+                )
+            except ValueError as exc:
+                raise SystemExit(str(exc)) from exc
+            if should_fail_generation(report, business_report, args.mode):
+                write_generation_errors(report, business_report)
+                return 1
+            return 0
         if args.spec is not None and is_dataset_spec_path(args.spec):
-            return generate_dataset_command(args)
+            if args.output is None:
+                raise SystemExit("dataset generation requires --output folder")
+            return generate_dataset_from_spec_path(
+                args.spec,
+                output_folder=args.output,
+                output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
+                seed=args.seed,
+                count=args.count,
+            )
         legacy_result, business_report = generate_legacy_spec_artifacts(
             args.spec,
             row_count=args.count,
