@@ -23,6 +23,7 @@ from test_data_agent.adapters.json_profile import (
 )
 from test_data_agent.adapters.legacy_generation import (
     apply_legacy_mode_options,
+    generate_legacy_compatibility_result,
     dataset_spec_to_generation_spec,
     dataset_spec_from_generation_spec,
     generate_legacy_rows,
@@ -33,6 +34,7 @@ from test_data_agent.adapters.legacy_generation import (
     load_legacy_generation_spec,
     multi_table_generation_spec_to_dataset_spec,
     prepare_legacy_generation_spec,
+    validate_legacy_rows_file,
     validate_legacy_rows_report,
 )
 from test_data_agent.adapters.parquet_dataset import (
@@ -66,6 +68,7 @@ __all__ = [
     "dataset_spec_from_parquet",
     "dataset_spec_from_trino_profile",
     "dataset_spec_to_generation_spec",
+    "generate_legacy_compatibility_result",
     "generation_spec_to_dataset_spec",
     "generate_legacy_rows",
     "json_payload_to_dataset_profile",
@@ -83,5 +86,6 @@ __all__ = [
     "prepare_legacy_generation_spec",
     "trino_profile_to_dataset_profile",
     "trino_profile_to_dataset_spec",
+    "validate_legacy_rows_file",
     "validate_legacy_rows_report",
 ]

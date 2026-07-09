@@ -202,6 +202,18 @@ PHASES: tuple[Phase, ...] = (
                 description="CLI no longer owns legacy GenerationSpec preparation",
                 absent=True,
             ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="prepare_legacy_generation_spec",
+                description="CLI no longer prepares legacy GenerationSpec objects directly",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="validate_legacy_rows_report",
+                description="CLI no longer validates legacy rows from loaded JSON directly",
+                absent=True,
+            ),
         ),
         test_commands=((PYTHON, "-m", "pytest"),),
     ),

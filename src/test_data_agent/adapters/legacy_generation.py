@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from dataclasses import dataclass
+import json
 from pathlib import Path
 from typing import Any
 import warnings
@@ -14,6 +16,7 @@ from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
 from test_data_agent.core.privacy import is_sensitive_field, mask_pattern
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, OutputFormat
+from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.generator import generate_rows
 from test_data_agent.spec import (
@@ -31,6 +34,14 @@ from test_data_agent.validator import ValidationReport, validate_rows_report
 _LEGACY_COMPATIBILITY_WARNING = (
     "GenerationSpec compatibility is deprecated; prefer DatasetSpec and DatasetProfile APIs"
 )
+
+
+@dataclass(frozen=True)
+class LegacyGenerationResult:
+    spec: GenerationSpec
+    dataset_spec: DatasetSpec
+    rows: list[dict[str, Any]]
+    report: ValidationReport
 
 
 def _warn_legacy_compatibility() -> None:
@@ -212,6 +223,43 @@ def prepare_legacy_generation_spec(
         spec.output_format = output_format
     apply_legacy_mode_options(spec, mode=mode, invalid_ratio=invalid_ratio)
     return spec
+
+
+def generate_legacy_compatibility_result(
+    path: Path,
+    *,
+    row_count: int | None = None,
+    seed: int | None = None,
+    output_format: OutputFormat | None = None,
+    mode: str = "valid",
+    invalid_ratio: float = 0.0,
+) -> LegacyGenerationResult:
+    spec = prepare_legacy_generation_spec(
+        path,
+        row_count=row_count,
+        seed=seed,
+        output_format=output_format,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
+    )
+    dataset_spec = generation_spec_to_dataset_spec(spec)
+    rows = next(iter(generate_dataset(spec=dataset_spec, seed=spec.seed or 0).values()))
+    report = validate_legacy_rows_report(rows, spec)
+    return LegacyGenerationResult(
+        spec=spec,
+        dataset_spec=dataset_spec,
+        rows=rows,
+        report=report,
+    )
+
+
+def validate_legacy_rows_file(
+    spec_path: Path,
+    rows_path: Path,
+) -> ValidationReport:
+    spec = prepare_legacy_generation_spec(spec_path)
+    rows = json.loads(rows_path.read_text())
+    return validate_legacy_rows_report(rows, spec)
 
 
 def apply_legacy_mode_options(spec: GenerationSpec, *, mode: str, invalid_ratio: float) -> None:

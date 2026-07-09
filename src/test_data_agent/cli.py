@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -11,12 +10,11 @@ from typing import Any
 import yaml
 
 from test_data_agent.adapters import (
-    prepare_legacy_generation_spec,
     csv_file_to_dataset_profile,
     csv_file_to_dataset_spec,
-    generation_spec_to_dataset_spec,
+    generate_legacy_compatibility_result,
     load_profile_or_spec,
-    validate_legacy_rows_report,
+    validate_legacy_rows_file,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -107,7 +105,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
         warn_legacy_path("generate")
-        spec = prepare_legacy_generation_spec(
+        legacy_result = generate_legacy_compatibility_result(
             args.spec,
             row_count=args.count,
             seed=args.seed,
@@ -115,15 +113,21 @@ def main(argv: list[str] | None = None) -> int:
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
         )
-        dataset_spec = generation_spec_to_dataset_spec(spec)
-        apply_dataset_mode_options(dataset_spec, args.mode, args.invalid_ratio)
-        rows = next(iter(generate_dataset(dataset_spec, seed=spec.seed).values()))
-        business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
-        report = validate_legacy_rows_report(rows, spec)
-        write_tabular_rows(rows, spec, args.output)
-        write_generation_artifacts(spec, report, args.output, business_report=business_report)
-        if should_fail_generation(report, business_report, args.mode):
-            for error in report.errors:
+        apply_dataset_mode_options(legacy_result.dataset_spec, args.mode, args.invalid_ratio)
+        business_report = apply_business_rules_from_args(
+            {legacy_result.spec.table.name: legacy_result.rows},
+            args,
+            legacy_result.spec.seed or 0,
+        )
+        write_tabular_rows(legacy_result.rows, legacy_result.spec, args.output)
+        write_generation_artifacts(
+            legacy_result.spec,
+            legacy_result.report,
+            args.output,
+            business_report=business_report,
+        )
+        if should_fail_generation(legacy_result.report, business_report, args.mode):
+            for error in legacy_result.report.errors:
                 print(error, file=sys.stderr)
             if business_report is not None and not business_report.valid:
                 print("business validation failed", file=sys.stderr)
@@ -185,9 +189,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(text)
             return 0 if report.valid else 1
         warn_legacy_path("validate")
-        spec = prepare_legacy_generation_spec(args.spec)
-        rows = json.loads(args.rows.read_text())
-        report = validate_legacy_rows_report(rows, spec)
+        report = validate_legacy_rows_file(args.spec, args.rows)
         print(report.model_dump_json(indent=2))
         if not report.valid:
             return 1

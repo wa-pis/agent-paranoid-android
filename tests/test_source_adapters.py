@@ -10,6 +10,7 @@ from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
     dataset_profile_from_csv_folder,
     dataset_profile_from_parquet,
+    generate_legacy_compatibility_result,
     dataset_spec_from_generation_spec,
     dataset_spec_from_csv_folder,
     dataset_spec_from_trino_profile,
@@ -17,6 +18,7 @@ from test_data_agent.adapters import (
     legacy_profile_to_generation_spec,
     load_legacy_generation_spec,
     load_profile_or_spec,
+    validate_legacy_rows_file,
     validate_legacy_rows_report,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -197,6 +199,32 @@ def test_legacy_generation_adapter_prepares_cli_overrides(tmp_path) -> None:
     assert [column.invalid_ratio for column in prepared.table.columns] == [0.25, 0.25]
 
 
+def test_legacy_generation_adapter_runs_compatibility_workflow(tmp_path) -> None:
+    path = tmp_path / "legacy_spec.json"
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+    path.write_text(legacy_spec.model_dump_json())
+
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        result = generate_legacy_compatibility_result(path, seed=7, row_count=3)
+
+    assert result.spec.seed == 7
+    assert result.spec.table.row_count == 3
+    assert result.dataset_spec.generation_settings.seed == 7
+    assert len(result.rows) == 3
+    assert result.rows[0]["id"] == 7000001
+    assert result.report.valid is True
+
+
 def test_legacy_generation_adapter_validates_rows_through_compatibility_boundary() -> None:
     legacy_spec = GenerationSpec(
         seed=42,
@@ -218,6 +246,30 @@ def test_legacy_generation_adapter_validates_rows_through_compatibility_boundary
 
     assert report.valid is False
     assert report.error_count == 1
+    assert report.errors == ["expected 2 rows, got 1"]
+
+
+def test_legacy_generation_adapter_validates_row_files(tmp_path) -> None:
+    spec_path = tmp_path / "legacy_spec.json"
+    rows_path = tmp_path / "rows.json"
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+    spec_path.write_text(legacy_spec.model_dump_json())
+    rows_path.write_text(json.dumps([{"id": 1, "email": "synthetic@example.test"}]))
+
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        report = validate_legacy_rows_file(spec_path, rows_path)
+
+    assert report.valid is False
     assert report.errors == ["expected 2 rows, got 1"]
 
 
