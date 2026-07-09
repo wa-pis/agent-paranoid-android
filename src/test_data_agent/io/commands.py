@@ -17,6 +17,7 @@ from test_data_agent.io.workflows import (
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
+    write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
@@ -128,6 +129,19 @@ def validate_dataset_artifacts(
     if output_path is not None:
         write_json_artifact(report, output_path)
     return report
+
+
+def infer_dataset_spec_command(args: argparse.Namespace) -> int:
+    loaded = load_profile_or_spec(args.profile)
+    if isinstance(loaded, DatasetSpec):
+        raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
+    infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
+    return 0
+
+
+def profile_csv_command(args: argparse.Namespace) -> int:
+    write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
+    return 0
 
 
 def profile_example_artifacts(

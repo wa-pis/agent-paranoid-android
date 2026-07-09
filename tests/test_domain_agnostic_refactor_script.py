@@ -359,6 +359,52 @@ def test_phase17_runs_example_command_and_cli_suites() -> None:
     )
 
 
+def test_phase18_tracks_single_input_profiling_command_boundary() -> None:
+    module = load_refactor_module()
+
+    phase18 = module.phase_by_id("phase18")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase18.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/cli.py",
+        "infer_dataset_spec_command,",
+        False,
+        "CLI delegates infer-spec to io command helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "profile_csv_command,",
+        False,
+        "CLI delegates profile-csv to io command helpers",
+    ) in checks
+    assert (
+        "src/test_data_agent/cli.py",
+        "from test_data_agent.adapters import load_profile_or_spec",
+        True,
+        "CLI no longer imports profile/spec loaders for dataset-oriented commands",
+    ) in checks
+
+
+def test_phase18_runs_single_input_command_and_cli_suites() -> None:
+    module = load_refactor_module()
+
+    phase18 = module.phase_by_id("phase18")
+
+    assert phase18.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_io_commands.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py"),
+    )
+
+
 def test_phase13_runs_compat_and_package_root_contract_suites() -> None:
     module = load_refactor_module()
 

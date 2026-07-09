@@ -7,12 +7,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.compat.legacy_workflows import (
     generate_legacy_spec_artifacts,
     validate_legacy_spec_artifacts,
 )
-from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
     generate_dataset_from_csv_artifacts,
@@ -24,14 +22,13 @@ from test_data_agent.io import (
     generate_dataset_from_example_command,
     generate_dataset_from_profile_command,
     generate_dataset_command,
+    infer_dataset_spec_command,
     is_dataset_spec_path,
-    infer_dataset_spec_artifact,
+    profile_csv_command,
     profile_example_command,
-    profile_example_artifacts,
     should_fail_generation,
     validate_dataset_artifacts,
     write_generation_errors,
-    write_csv_profile_artifact,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 
@@ -134,15 +131,10 @@ def main(argv: list[str] | None = None) -> int:
         return profile_example_command(args)
 
     if args.command == "infer-spec":
-        loaded = load_profile_or_spec(args.profile)
-        if isinstance(loaded, DatasetSpec):
-            raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
-        infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
-        return 0
+        return infer_dataset_spec_command(args)
 
     if args.command == "profile-csv":
-        write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
-        return 0
+        return profile_csv_command(args)
 
     if args.command == "generate-from-csv":
         report, business_report = generate_dataset_from_csv_artifacts(

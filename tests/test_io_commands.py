@@ -9,7 +9,9 @@ from test_data_agent.io.commands import (
     generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
+    infer_dataset_spec_command,
     is_dataset_spec_path,
+    profile_csv_command,
     profile_example_command,
     profile_example_artifacts,
     validate_dataset_artifacts,
@@ -197,6 +199,60 @@ def test_profile_example_command_routes_args_to_artifact_helper(tmp_path) -> Non
 
     assert exit_code == 0
     assert payload["source_type"] == "csv_folder"
+
+
+def test_infer_dataset_spec_command_writes_dataset_spec_yaml(tmp_path) -> None:
+    profile_path = tmp_path / "orders_profile.json"
+    output_path = tmp_path / "dataset_spec.yaml"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "table": "orders",
+                "columns": [
+                    {"name": "order_id", "data_type": "bigint", "p05": 1, "p95": 100},
+                    {
+                        "name": "status",
+                        "data_type": "varchar",
+                        "top_values": [{"value": "new"}, {"value": "shipped"}],
+                        "approx_distinct_count": 2,
+                    },
+                ],
+            }
+        )
+    )
+
+    exit_code = infer_dataset_spec_command(
+        Namespace(
+            profile=profile_path,
+            output=output_path,
+            count=5,
+        )
+    )
+
+    spec_yaml = output_path.read_text()
+
+    assert exit_code == 0
+    assert "entities:" in spec_yaml
+    assert "name: orders" in spec_yaml
+    assert "row_count: 5" in spec_yaml
+
+
+def test_profile_csv_command_writes_dataset_profile_json(tmp_path) -> None:
+    output_path = tmp_path / "profile.json"
+
+    exit_code = profile_csv_command(
+        Namespace(
+            input=Path("tests/fixtures/customers.csv"),
+            table="customers_alias",
+            output=output_path,
+        )
+    )
+
+    payload = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert payload["source_type"] == "csv"
+    assert payload["entities"][0]["name"] == "customers_alias"
 
 
 def test_generate_dataset_from_example_artifacts_writes_review_bundle(tmp_path) -> None:

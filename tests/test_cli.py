@@ -108,6 +108,50 @@ def test_generate_from_profile_uses_dataset_pipeline_without_legacy_warning(tmp_
     assert "deprecated GenerationSpec compatibility" not in captured.err
 
 
+def test_infer_spec_routes_through_dataset_command_helper(tmp_path) -> None:
+    profile_path = tmp_path / "orders_profile.json"
+    output_path = tmp_path / "dataset_spec.yaml"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "table": "orders",
+                "columns": [
+                    {"name": "order_id", "data_type": "bigint", "p05": 1, "p95": 100},
+                ],
+            }
+        )
+    )
+
+    exit_code = main(["infer-spec", str(profile_path), "--output", str(output_path), "--count", "4"])
+
+    spec_yaml = output_path.read_text()
+
+    assert exit_code == 0
+    assert "name: orders" in spec_yaml
+    assert "row_count: 4" in spec_yaml
+
+
+def test_profile_csv_routes_through_dataset_command_helper(tmp_path) -> None:
+    output_path = tmp_path / "profile.json"
+
+    exit_code = main(
+        [
+            "profile-csv",
+            str(Path("tests/fixtures/customers.csv")),
+            "--table",
+            "customers_cli",
+            "--output",
+            str(output_path),
+        ]
+    )
+
+    payload = json.loads(output_path.read_text())
+
+    assert exit_code == 0
+    assert payload["source_type"] == "csv"
+    assert payload["entities"][0]["name"] == "customers_cli"
+
+
 def test_generate_dataset_spec_uses_embedded_seed_when_cli_seed_is_omitted(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     output_path = tmp_path / "generated"

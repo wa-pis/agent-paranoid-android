@@ -530,6 +530,33 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_domain_agnostic_pipeline.py"),
         ),
     ),
+    Phase(
+        phase_id="phase18",
+        title="Extract single-input profiling commands from CLI",
+        goal="Keep single-input profiling and profile-to-spec orchestration in io helpers while cli.py only routes arguments.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="infer_dataset_spec_command,",
+                description="CLI delegates infer-spec to io command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="profile_csv_command,",
+                description="CLI delegates profile-csv to io command helpers",
+            ),
+            TextCheck(
+                path="src/test_data_agent/cli.py",
+                text="from test_data_agent.adapters import load_profile_or_spec",
+                description="CLI no longer imports profile/spec loaders for dataset-oriented commands",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_io_commands.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py"),
+        ),
+    ),
 )
 
 

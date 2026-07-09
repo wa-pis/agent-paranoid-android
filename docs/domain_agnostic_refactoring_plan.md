@@ -380,6 +380,18 @@ Expected outcome:
 - `generate-from-example` delegates to dataset-oriented command helpers
 - `cli.py` no longer imports example-folder profiling or DatasetSpec review orchestration directly
 
+### Phase 18: Extract Single-Input Profiling Commands From CLI
+
+Keep single-input profiling and spec-inference command orchestration inside
+`io/` helpers so `cli.py` routes `profile-csv` and `infer-spec` without
+inspecting profile payloads directly.
+
+Expected outcome:
+
+- `profile-csv` delegates to dataset-oriented command helpers
+- `infer-spec` delegates to dataset-oriented command helpers
+- `cli.py` no longer imports profile/spec loaders for these dataset-oriented commands
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create
