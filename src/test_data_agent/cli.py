@@ -9,7 +9,6 @@ from typing import Any
 
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
-    csv_file_to_dataset_spec,
     generate_legacy_compatibility_result,
     load_profile_or_spec,
     validate_legacy_rows_file,
@@ -22,8 +21,9 @@ from test_data_agent.io import (
     apply_dataset_mode_options,
     build_dataset_spec_from_profile,
     generate_dataset_artifacts,
+    generate_dataset_from_csv_artifacts,
+    generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
-    generate_single_entity_profile_artifacts,
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
@@ -160,22 +160,21 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "generate-from-csv":
-        profile = csv_file_to_dataset_profile(args.input, table_name=args.table)
-        spec = csv_file_to_dataset_spec(args.input, table_name=args.table, count=args.count, seed=args.seed)
-        spec.generation_settings.seed = args.seed
-        spec.generation_settings.output_format = CoreOutputFormat(args.output_format)
-        apply_dataset_mode_options(
-            spec,
+        report, business_report = generate_dataset_from_csv_artifacts(
+            args.input,
+            count=args.count,
+            seed=args.seed,
+            output_path=args.output,
+            output_format=CoreOutputFormat(args.output_format),
+            table_name=args.table,
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
+            business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+                rows_by_entity,
+                args,
+                seed,
+            ),
         )
-        rows_by_entity = generate_dataset(spec, seed=args.seed)
-        business_report = apply_business_rules_from_args(rows_by_entity, args, args.seed)
-        report = validate_dataset(rows_by_entity, spec)
-        if args.output is None:
-            raise SystemExit("CSV generation requires --output")
-        write_single_entity_rows(rows_by_entity, CoreOutputFormat(args.output_format), args.output)
-        write_dataset_generation_artifacts(profile, spec, report, args.output, business_report=business_report)
         if should_fail_generation(report, business_report, args.mode):
             for section in report.sections:
                 for error in section.errors:
@@ -271,27 +270,22 @@ def generate_dataset_from_profile_command(args: argparse.Namespace) -> int:
     profile = loaded
 
     try:
-        spec = build_dataset_spec_from_profile(
+        report, business_report = generate_dataset_from_profile_artifacts(
             profile,
             count=args.count,
             seed=args.seed,
+            output_path=args.output,
             output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
+            business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+                rows_by_entity,
+                args,
+                seed,
+            ),
         )
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-
-    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
-    business_report = apply_business_rules_from_args(rows_by_entity, args, spec.generation_settings.seed or 0)
-    report = generate_single_entity_profile_artifacts(
-        profile,
-        spec,
-        output_path=args.output,
-        rows_by_entity=rows_by_entity,
-        business_report=business_report,
-        profile_artifact_name="profile.json",
-    )
     if should_fail_generation(report, business_report, args.mode):
         for section in report.sections:
             for error in section.errors:

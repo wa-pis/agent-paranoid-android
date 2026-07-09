@@ -14,6 +14,8 @@ from test_data_agent.io.workflows import (
     apply_dataset_mode_options,
     build_dataset_spec_from_profile,
     generate_dataset_artifacts,
+    generate_dataset_from_csv_artifacts,
+    generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     generate_single_entity_profile_artifacts,
 )
@@ -29,6 +31,8 @@ __all__ = [
     "apply_dataset_mode_options",
     "build_dataset_spec_from_profile",
     "generate_dataset_artifacts",
+    "generate_dataset_from_csv_artifacts",
+    "generate_dataset_from_profile_artifacts",
     "generate_dataset_review_artifacts",
     "generate_single_entity_profile_artifacts",
     "load_dataset_rows",

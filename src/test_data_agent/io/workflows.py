@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
+from test_data_agent.adapters import csv_file_to_dataset_profile, csv_file_to_dataset_spec
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
@@ -16,6 +17,9 @@ from test_data_agent.io.artifacts import (
 )
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
+
+
+BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
 
 
 def generate_dataset_artifacts(
@@ -79,6 +83,77 @@ def generate_single_entity_profile_artifacts(
         profile_artifact_name=profile_artifact_name,
     )
     return report
+
+
+def generate_dataset_from_profile_artifacts(
+    profile: DatasetProfile,
+    *,
+    count: int,
+    seed: int,
+    output_path: Path,
+    output_format: OutputFormat | None = None,
+    mode: str = "valid",
+    invalid_ratio: float = 0.0,
+    business_rules_applier: BusinessRulesApplier | None = None,
+    profile_artifact_name: str = "profile.json",
+) -> tuple[DatasetValidationReport, Any | None]:
+    spec = build_dataset_spec_from_profile(
+        profile,
+        count=count,
+        seed=seed,
+        output_format=output_format,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
+    )
+    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
+    business_report = None
+    if business_rules_applier is not None:
+        business_report = business_rules_applier(rows_by_entity, spec.generation_settings.seed or 0)
+    report = generate_single_entity_profile_artifacts(
+        profile,
+        spec,
+        output_path=output_path,
+        rows_by_entity=rows_by_entity,
+        business_report=business_report,
+        profile_artifact_name=profile_artifact_name,
+    )
+    return report, business_report
+
+
+def generate_dataset_from_csv_artifacts(
+    input_path: Path,
+    *,
+    count: int,
+    seed: int,
+    output_path: Path,
+    output_format: OutputFormat,
+    table_name: str | None = None,
+    mode: str = "valid",
+    invalid_ratio: float = 0.0,
+    business_rules_applier: BusinessRulesApplier | None = None,
+) -> tuple[DatasetValidationReport, Any | None]:
+    profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
+    spec = csv_file_to_dataset_spec(
+        input_path,
+        table_name=table_name,
+        count=count,
+        seed=seed,
+    )
+    spec.generation_settings.seed = seed
+    spec.generation_settings.output_format = output_format
+    apply_dataset_mode_options(
+        spec,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
+    )
+    rows_by_entity = generate_dataset(spec, seed=seed)
+    business_report = None
+    if business_rules_applier is not None:
+        business_report = business_rules_applier(rows_by_entity, seed)
+    report = validate_dataset(rows_by_entity, spec)
+    write_single_entity_rows(rows_by_entity, output_format, output_path)
+    write_dataset_generation_artifacts(profile, spec, report, output_path, business_report=business_report)
+    return report, business_report
 
 
 def generate_dataset_review_artifacts(
