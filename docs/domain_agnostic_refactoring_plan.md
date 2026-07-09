@@ -291,6 +291,27 @@ Expected outcome:
 - `test_data_agent.adapters` exports only dataset/profile normalization helpers
 - deprecated `GenerationSpec` conversions live behind explicit legacy modules
 
+### Phase 10: Detach Legacy Workflow Warnings
+
+Keep deprecated `GenerationSpec` warnings inside legacy workflow modules
+instead of dataset-oriented workflow helpers.
+
+Expected outcome:
+
+- dataset-oriented workflow helpers contain no deprecated warning logic
+- legacy workflow warnings remain available only through explicit legacy modules
+
+### Phase 11: Move Legacy Workflow Implementation To Compat
+
+Keep deprecated `GenerationSpec` workflow implementation inside `compat/`
+modules while `io/legacy_workflows.py` becomes a thin compatibility shim.
+
+Expected outcome:
+
+- `test_data_agent.compat.legacy_workflows` owns deprecated workflow behavior
+- `test_data_agent.io.legacy_workflows` only re-exports that behavior
+- dataset-oriented `io/` modules stay focused on `DatasetSpec` workflows
+
 ## 5. Files To Create, Modify, Or Delete
 
 ### Create

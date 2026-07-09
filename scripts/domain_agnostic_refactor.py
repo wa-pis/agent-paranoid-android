@@ -325,6 +325,39 @@ PHASES: tuple[Phase, ...] = (
             (PYTHON, "-m", "pytest", "tests/test_cli.py"),
         ),
     ),
+    Phase(
+        phase_id="phase11",
+        title="Move legacy workflow implementation to compat",
+        goal="Keep deprecated GenerationSpec workflow implementation inside compat modules while io only provides a thin shim.",
+        text_checks=(
+            TextCheck(
+                path="src/test_data_agent/compat/legacy_workflows.py",
+                text="def generate_legacy_spec_artifacts(",
+                description="compat workflows own deprecated generation implementation",
+            ),
+            TextCheck(
+                path="src/test_data_agent/compat/legacy_workflows.py",
+                text="def validate_legacy_spec_artifacts(",
+                description="compat workflows own deprecated validation implementation",
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/legacy_workflows.py",
+                text="generate_legacy_compatibility_result",
+                description="io legacy workflow shim no longer implements deprecated generation flow",
+                absent=True,
+            ),
+            TextCheck(
+                path="src/test_data_agent/io/legacy_workflows.py",
+                text="_warn_deprecated_generation_spec_compatibility",
+                description="io legacy workflow shim no longer owns deprecated warning logic",
+                absent=True,
+            ),
+        ),
+        test_commands=(
+            (PYTHON, "-m", "pytest", "tests/test_compat_legacy.py", "tests/test_domain_agnostic_refactor_script.py"),
+            (PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+        ),
+    ),
 )
 
 

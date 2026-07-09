@@ -154,3 +154,55 @@ def test_phase10_runs_focused_workflow_and_cli_suites() -> None:
         ),
         (module.PYTHON, "-m", "pytest", "tests/test_cli.py"),
     )
+
+
+def test_phase11_tracks_compat_owned_legacy_workflow_implementation() -> None:
+    module = load_refactor_module()
+
+    phase11 = module.phase_by_id("phase11")
+    checks = {
+        (check.path, check.text, check.absent, check.description)
+        for check in phase11.text_checks
+    }
+
+    assert (
+        "src/test_data_agent/compat/legacy_workflows.py",
+        "def generate_legacy_spec_artifacts(",
+        False,
+        "compat workflows own deprecated generation implementation",
+    ) in checks
+    assert (
+        "src/test_data_agent/compat/legacy_workflows.py",
+        "def validate_legacy_spec_artifacts(",
+        False,
+        "compat workflows own deprecated validation implementation",
+    ) in checks
+    assert (
+        "src/test_data_agent/io/legacy_workflows.py",
+        "generate_legacy_compatibility_result",
+        True,
+        "io legacy workflow shim no longer implements deprecated generation flow",
+    ) in checks
+    assert (
+        "src/test_data_agent/io/legacy_workflows.py",
+        "_warn_deprecated_generation_spec_compatibility",
+        True,
+        "io legacy workflow shim no longer owns deprecated warning logic",
+    ) in checks
+
+
+def test_phase11_runs_compat_and_cli_focused_suites() -> None:
+    module = load_refactor_module()
+
+    phase11 = module.phase_by_id("phase11")
+
+    assert phase11.test_commands == (
+        (
+            module.PYTHON,
+            "-m",
+            "pytest",
+            "tests/test_compat_legacy.py",
+            "tests/test_domain_agnostic_refactor_script.py",
+        ),
+        (module.PYTHON, "-m", "pytest", "tests/test_cli.py", "tests/test_io_workflows.py"),
+    )
