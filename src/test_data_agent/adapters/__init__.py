@@ -31,6 +31,7 @@ from test_data_agent.adapters.legacy_generation import (
     legacy_profile_to_dataset_spec,
     load_legacy_generation_spec,
     multi_table_generation_spec_to_dataset_spec,
+    validate_legacy_rows_report,
 )
 from test_data_agent.adapters.parquet_dataset import (
     dataset_profile_from_parquet,
@@ -78,4 +79,5 @@ __all__ = [
     "parquet_file_to_dataset_spec",
     "trino_profile_to_dataset_profile",
     "trino_profile_to_dataset_spec",
+    "validate_legacy_rows_report",
 ]

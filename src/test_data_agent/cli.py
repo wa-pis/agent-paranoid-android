@@ -16,6 +16,7 @@ from test_data_agent.adapters import (
     generation_spec_to_dataset_spec,
     load_legacy_generation_spec,
     load_profile_or_spec,
+    validate_legacy_rows_report,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -38,7 +39,6 @@ from test_data_agent.io import (
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 from test_data_agent.validation import validate_dataset
-from test_data_agent.validator import validate_rows_report
 
 if TYPE_CHECKING:
     from test_data_agent.spec import GenerationSpec, OutputFormat
@@ -115,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         apply_dataset_mode_options(dataset_spec, args.mode, args.invalid_ratio)
         rows = next(iter(generate_dataset(dataset_spec, seed=spec.seed).values()))
         business_report = apply_business_rules_from_args({spec.table.name: rows}, args, spec.seed)
-        report = validate_rows_report(rows, spec)
+        report = validate_legacy_rows_report(rows, spec)
         write_tabular_rows(rows, spec, args.output)
         write_generation_artifacts(spec, report, args.output, business_report=business_report)
         if should_fail_generation(report, business_report, args.mode):
@@ -183,7 +183,7 @@ def main(argv: list[str] | None = None) -> int:
         warn_legacy_path("validate")
         spec = load_spec(args.spec)
         rows = json.loads(args.rows.read_text())
-        report = validate_rows_report(rows, spec)
+        report = validate_legacy_rows_report(rows, spec)
         print(report.model_dump_json(indent=2))
         if not report.valid:
             return 1

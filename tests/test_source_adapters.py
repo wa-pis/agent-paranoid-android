@@ -16,6 +16,7 @@ from test_data_agent.adapters import (
     legacy_profile_to_generation_spec,
     load_legacy_generation_spec,
     load_profile_or_spec,
+    validate_legacy_rows_report,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, TableSpec
@@ -164,6 +165,30 @@ def test_legacy_generation_adapter_loads_specs_from_disk(tmp_path) -> None:
         loaded = load_legacy_generation_spec(path)
 
     assert loaded == legacy_spec
+
+
+def test_legacy_generation_adapter_validates_rows_through_compatibility_boundary() -> None:
+    legacy_spec = GenerationSpec(
+        seed=42,
+        table=TableSpec(
+            name="customers",
+            row_count=2,
+            columns=[
+                ColumnSpec(name="id", data_type=DataType.INTEGER, strategy="sequence"),
+                ColumnSpec(name="email", data_type=DataType.EMAIL),
+            ],
+        ),
+    )
+
+    with pytest.deprecated_call(match="GenerationSpec compatibility is deprecated"):
+        report = validate_legacy_rows_report(
+            [{"id": 1, "email": "synthetic@example.test"}],
+            legacy_spec,
+        )
+
+    assert report.valid is False
+    assert report.error_count == 1
+    assert report.errors == ["expected 2 rows, got 1"]
 
 
 def test_legacy_profile_adapter_can_build_generation_spec_via_dataset_spec() -> None:

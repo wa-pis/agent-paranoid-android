@@ -25,6 +25,7 @@ from test_data_agent.spec import (
     TableSpec,
     coerce_profile_type,
 )
+from test_data_agent.validator import ValidationReport, validate_rows_report
 
 
 _LEGACY_COMPATIBILITY_WARNING = (
@@ -181,6 +182,11 @@ def dataset_spec_to_generation_spec(
 def generate_legacy_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
     _warn_legacy_compatibility()
     return generate_rows(spec)
+
+
+def validate_legacy_rows_report(rows: list[dict[str, Any]], spec: GenerationSpec) -> ValidationReport:
+    _warn_legacy_compatibility()
+    return validate_rows_report(rows, spec)
 
 
 def load_legacy_generation_spec(path: Path) -> GenerationSpec:
