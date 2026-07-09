@@ -15,11 +15,11 @@ from test_data_agent.compat.legacy_workflows import (
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.io import (
-    generate_dataset_from_example_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_from_spec_path,
     generate_dataset_command,
+    generate_dataset_from_example_artifacts,
     generate_dataset_from_profile_command,
     is_dataset_spec_path,
     infer_dataset_spec_artifact,
