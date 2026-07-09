@@ -5,30 +5,25 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import Any
 
-from test_data_agent.adapters import (
-    generate_legacy_compatibility_result,
-    load_profile_or_spec,
-    validate_legacy_rows_file,
-)
+from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io import (
-    apply_dataset_mode_options,
     generate_dataset_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
+    generate_legacy_spec_artifacts,
     infer_dataset_spec_artifact,
     load_dataset_rows,
     load_dataset_spec,
+    validate_legacy_spec_artifacts,
+    warn_deprecated_generation_spec_compatibility,
     write_dataset_profile_artifact,
     write_csv_profile_artifact,
-    write_generation_artifacts,
     write_json_artifact,
-    write_tabular_rows,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
@@ -100,31 +95,20 @@ def main(argv: list[str] | None = None) -> int:
             return generate_dataset_from_profile_command(args)
         if args.spec is not None and is_dataset_spec_path(args.spec):
             return generate_dataset_command(args)
-        warn_legacy_path("generate")
-        legacy_result = generate_legacy_compatibility_result(
+        warn_deprecated_generation_spec_compatibility("generate")
+        legacy_result, business_report = generate_legacy_spec_artifacts(
             args.spec,
             row_count=args.count,
             seed=args.seed,
             output_format=None if args.output_format is None else CoreOutputFormat(args.output_format),
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
-        )
-        apply_dataset_mode_options(
-            legacy_result.dataset_spec,
-            mode=args.mode,
-            invalid_ratio=args.invalid_ratio,
-        )
-        business_report = apply_business_rules_from_args(
-            {legacy_result.spec.table.name: legacy_result.rows},
-            args,
-            legacy_result.spec.seed or 0,
-        )
-        write_tabular_rows(legacy_result.rows, legacy_result.spec, args.output)
-        write_generation_artifacts(
-            legacy_result.spec,
-            legacy_result.report,
-            args.output,
-            business_report=business_report,
+            output_path=args.output,
+            business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+                rows_by_entity,
+                args,
+                seed,
+            ),
         )
         if should_fail_generation(legacy_result.report, business_report, args.mode):
             for error in legacy_result.report.errors:
@@ -191,8 +175,8 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print(text)
             return 0 if report.valid else 1
-        warn_legacy_path("validate")
-        report = validate_legacy_rows_file(args.spec, args.rows)
+        warn_deprecated_generation_spec_compatibility("validate")
+        report = validate_legacy_spec_artifacts(args.spec, args.rows)
         print(report.model_dump_json(indent=2))
         if not report.valid:
             return 1
@@ -216,12 +200,6 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     return 2
-
-def warn_legacy_path(command: str) -> None:
-    print(
-        f"warning: '{command}' is using deprecated GenerationSpec compatibility; prefer DatasetSpec inputs",
-        file=sys.stderr,
-    )
 
 
 def is_dataset_spec_path(path: Path) -> bool:
