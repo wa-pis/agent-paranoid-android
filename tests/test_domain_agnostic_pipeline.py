@@ -154,6 +154,35 @@ def test_cli_profile_infer_generate_validate_and_generate_from_example(tmp_path)
     assert (generated_direct / "validation_report.json").exists()
 
 
+def test_generate_from_example_writes_review_artifacts(tmp_path) -> None:
+    output_dir = tmp_path / "generated_direct"
+
+    exit_code = main(
+        [
+            "generate-from-example",
+            str(FIXTURE),
+            "--seed",
+            "101",
+            "--count",
+            "4",
+            "--format",
+            "json",
+            "--output",
+            str(output_dir),
+        ]
+    )
+
+    profile = json.loads((output_dir / "profile.json").read_text())
+    spec_yaml = (output_dir / "dataset_spec.yaml").read_text()
+    report = json.loads((output_dir / "validation_report.json").read_text())
+
+    assert exit_code == 0
+    assert profile["source_type"] == "csv_folder"
+    assert "entities:" in spec_yaml
+    assert "customers" in spec_yaml
+    assert report["valid"] is True
+
+
 def test_profile_example_uses_safe_profile_cache(tmp_path) -> None:
     cache_dir = tmp_path / "cache"
 

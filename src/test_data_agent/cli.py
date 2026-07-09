@@ -27,6 +27,8 @@ from test_data_agent.io import (
     load_dataset_rows,
     load_dataset_spec,
     write_dataset_generation_artifacts,
+    write_dataset_review_artifacts,
+    write_dataset_validation_report,
     write_dataset_rows,
     write_generation_artifacts,
     write_single_entity_rows,
@@ -198,9 +200,7 @@ def main(argv: list[str] | None = None) -> int:
         output_format = CoreOutputFormat(args.output_format)
         write_dataset_rows(rows_by_entity, output_format, args.output)
         report = validate_dataset(rows_by_entity, spec)
-        (args.output / "profile.json").write_text(profile.model_dump_json(indent=2))
-        (args.output / "dataset_spec.yaml").write_text(dataset_spec_to_yaml(spec))
-        (args.output / "validation_report.json").write_text(report.model_dump_json(indent=2))
+        write_dataset_review_artifacts(profile, spec, report, args.output)
         return 0 if report.valid else 1
 
     return 2
@@ -236,8 +236,7 @@ def generate_dataset_command(args: argparse.Namespace) -> int:
         raise SystemExit("dataset generation requires --output folder")
     write_dataset_rows(rows_by_entity, output_format, args.output)
     report = validate_dataset(rows_by_entity, spec)
-    args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "validation_report.json").write_text(report.model_dump_json(indent=2))
+    write_dataset_validation_report(report, args.output)
     return 0 if report.valid else 1
 
 

@@ -2,6 +2,8 @@
 
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
+    write_dataset_review_artifacts,
+    write_dataset_validation_report,
     write_generation_artifacts,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
@@ -17,7 +19,9 @@ __all__ = [
     "load_dataset_rows",
     "load_dataset_spec",
     "write_dataset_generation_artifacts",
+    "write_dataset_review_artifacts",
     "write_dataset_rows",
+    "write_dataset_validation_report",
     "write_generation_artifacts",
     "write_single_entity_rows",
     "write_tabular_rows",

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.io.writers import dataset_spec_to_yaml
 from test_data_agent.spec import GenerationSpec
 
 
@@ -37,3 +38,20 @@ def write_dataset_generation_artifacts(
     (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
     if business_report is not None:
         (artifact_dir / "business_validation_report.json").write_text(business_report.model_dump_json(indent=2))
+
+
+def write_dataset_validation_report(report: Any, output_folder: Path) -> None:
+    output_folder.mkdir(parents=True, exist_ok=True)
+    (output_folder / "validation_report.json").write_text(report.model_dump_json(indent=2))
+
+
+def write_dataset_review_artifacts(
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+    report: Any,
+    output_folder: Path,
+) -> None:
+    output_folder.mkdir(parents=True, exist_ok=True)
+    (output_folder / "profile.json").write_text(profile.model_dump_json(indent=2))
+    (output_folder / "dataset_spec.yaml").write_text(dataset_spec_to_yaml(spec))
+    write_dataset_validation_report(report, output_folder)
