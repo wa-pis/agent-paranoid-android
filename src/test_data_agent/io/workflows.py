@@ -16,7 +16,7 @@ from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
-    write_dataset_review_artifacts,
+    write_dataset_review_artifacts as write_dataset_review_bundle,
     write_dataset_spec_artifact,
     write_dataset_validation_report,
 )
@@ -197,7 +197,7 @@ def generate_dataset_review_artifacts(
     write_dataset_rows(rows_by_entity, output_format, output_folder)
     report = validate_dataset(rows_by_entity, spec)
 
-    write_dataset_review_artifacts(profile, spec, report, output_folder)
+    write_dataset_review_bundle(profile, spec, report, output_folder)
     return 0 if report.valid else 1
 
 

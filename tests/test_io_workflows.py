@@ -8,6 +8,7 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.workflows import (
+    generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
@@ -178,6 +179,39 @@ def test_write_csv_profile_artifact_writes_dataset_profile_json(tmp_path) -> Non
     assert profile.entities[0].name == "orders"
     assert written["source_type"] == "csv"
     assert written["entities"][0]["name"] == "orders"
+
+
+def test_generate_dataset_review_artifacts_writes_review_bundle(tmp_path) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=2,
+                primary_key_candidates=["order_id"],
+                fields=[
+                    FieldProfile(name="order_id", data_type="integer", is_identifier=True),
+                    FieldProfile(name="status", data_type="string"),
+                ],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(profile, output_path=tmp_path / "dataset_spec.yaml", count=3)
+    output_folder = tmp_path / "review"
+
+    exit_code = generate_dataset_review_artifacts(
+        profile,
+        spec,
+        output_folder=output_folder,
+        output_format=OutputFormat.JSON,
+        seed=19,
+    )
+
+    assert exit_code == 0
+    assert json.loads((output_folder / "orders.json").read_text())
+    assert json.loads((output_folder / "profile.json").read_text())["entities"][0]["name"] == "orders"
+    assert "generation_settings:" in (output_folder / "dataset_spec.yaml").read_text()
+    assert json.loads((output_folder / "validation_report.json").read_text())["valid"] is True
 
 
 def test_io_package_keeps_legacy_workflows_out_of_dataset_oriented_exports() -> None:
