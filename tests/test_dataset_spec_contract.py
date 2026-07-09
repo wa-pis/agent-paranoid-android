@@ -148,6 +148,10 @@ def test_field_models_normalize_recognized_distribution_shapes() -> None:
     assert profile.distribution["kind"] == "categorical"
     assert profile.distribution["categories"][0] == {"value": "active", "count": 2.0}
     assert spec.distribution == {"kind": "numeric", "min_value": None, "max_value": None, "p05": 1, "p95": 10}
+    assert isinstance(profile.typed_distribution, CategoricalDistribution)
+    assert profile.typed_distribution.categories[0].value == "active"
+    assert isinstance(spec.typed_distribution, NumericDistribution)
+    assert spec.typed_distribution.p95 == 10
 
 
 def test_field_models_reject_invalid_typed_distribution_shapes() -> None:
@@ -171,6 +175,7 @@ def test_field_models_preserve_untyped_distribution_metadata() -> None:
     )
 
     assert field.distribution == {"min_value": 1, "max_value": 9}
+    assert field.typed_distribution is None
 
 
 def test_privacy_policy_is_shared_with_legacy_spec_module() -> None:

@@ -7,7 +7,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from test_data_agent.core.distribution import parse_distribution
+from test_data_agent.core.distribution import FieldDistribution, parse_distribution
 
 
 def _normalize_distribution(value: Any) -> dict[str, Any]:
@@ -46,6 +46,10 @@ class FieldProfile(BaseModel):
     def validate_distribution_shape(cls, value: Any) -> dict[str, Any]:
         return _normalize_distribution(value)
 
+    @property
+    def typed_distribution(self) -> FieldDistribution | None:
+        return parse_distribution(self.distribution)
+
 
 class FieldSpec(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
@@ -63,3 +67,7 @@ class FieldSpec(BaseModel):
     @classmethod
     def validate_distribution_shape(cls, value: Any) -> dict[str, Any]:
         return _normalize_distribution(value)
+
+    @property
+    def typed_distribution(self) -> FieldDistribution | None:
+        return parse_distribution(self.distribution)

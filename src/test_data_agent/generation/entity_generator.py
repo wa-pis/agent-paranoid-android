@@ -17,7 +17,6 @@ from test_data_agent.core.distribution import (
     DateTimeRangeDistribution,
     NumericDistribution,
     StringPatternDistribution,
-    parse_distribution,
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
@@ -86,7 +85,7 @@ def generate_field_value(
     if field.sensitive:
         return synthetic_sensitive_value(field, faker)
     distribution = field.distribution or {}
-    typed_distribution = parse_distribution(distribution)
+    typed_distribution = field.typed_distribution
     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
         return weighted_choice(typed_distribution.categories, rng)
     numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
