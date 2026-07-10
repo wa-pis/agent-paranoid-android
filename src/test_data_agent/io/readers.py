@@ -23,7 +23,9 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
             with path.open(newline="") as handle:
                 rows_by_entity[path.stem] = [dict(row) for row in csv.DictReader(handle)]
         elif path.suffix == ".json":
-            rows_by_entity[path.stem] = json.loads(path.read_text())
+            payload = json.loads(path.read_text())
+            if isinstance(payload, list):
+                rows_by_entity[path.stem] = payload
         elif path.suffix == ".parquet":
             try:
                 import pyarrow.parquet as pq

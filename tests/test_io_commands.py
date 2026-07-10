@@ -94,6 +94,54 @@ generation_settings:
     assert written_report["valid"] is True
 
 
+def test_validate_dataset_artifacts_ignores_json_metadata_files(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 1
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+"""
+    )
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    (rows_dir / "customers.json").write_text(json.dumps([{"customer_id": 1}]))
+    (rows_dir / "generation_manifest.json").write_text(json.dumps({"synthetic": True}))
+    (rows_dir / "validation_report.json").write_text(json.dumps({"valid": True}))
+
+    report = validate_dataset_artifacts(spec_path, rows_dir)
+
+    assert report.valid is True
+
+
+def test_validate_dataset_artifacts_rejects_unexpected_row_files(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 1
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+"""
+    )
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    (rows_dir / "customers.json").write_text(json.dumps([{"customer_id": 1}]))
+    (rows_dir / "extra.json").write_text(json.dumps([{"customer_id": 2}]))
+
+    report = validate_dataset_artifacts(spec_path, rows_dir)
+
+    assert report.valid is False
+    assert "unexpected entity: extra" in report.sections[0].errors
+
+
 def test_generate_dataset_command_uses_dataset_spec_helper(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     spec_path.write_text(

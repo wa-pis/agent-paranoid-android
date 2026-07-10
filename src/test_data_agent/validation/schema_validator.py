@@ -11,6 +11,10 @@ from test_data_agent.csv_profiler import parse_bool, parse_date_value, parse_dat
 
 def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> list[str]:
     errors: list[str] = []
+    expected_entity_names = {entity.name for entity in spec.entities}
+    unexpected_entity_names = sorted(set(rows_by_entity) - expected_entity_names)
+    for entity_name in unexpected_entity_names:
+        errors.append(f"unexpected entity: {entity_name}")
     for entity in spec.entities:
         rows = rows_by_entity.get(entity.name)
         if rows is None:
