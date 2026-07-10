@@ -124,6 +124,10 @@ rows. Generated files stay in the configured workspace. Each bundle includes a
 `generation_manifest.json` with its spec fingerprint, package version, schema
 version, seed, format, row counts, validation status, and synthetic provenance.
 
+The reasons for the two-server boundary, path restrictions, manifest checks,
+and artifact ownership are documented in
+[Generator MCP Design Rationale](mcp_generator_design.md).
+
 ## Local Demo
 
 The included demo starts from a checked-in safe Trino profile and executes spec

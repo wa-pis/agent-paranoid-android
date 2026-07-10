@@ -67,6 +67,7 @@ pipeline:
 - [Domain-Agnostic Workflow](docs/domain_agnostic_workflow.md)
 - [Dataset Profile And Spec Reference](docs/dataset_profile_and_spec.md)
 - [AI Integration](docs/ai_integration.md)
+- [Generator MCP Design Rationale](docs/mcp_generator_design.md)
 - [Roadmap](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 - [Implementation Map](docs/implementation_map.md)
