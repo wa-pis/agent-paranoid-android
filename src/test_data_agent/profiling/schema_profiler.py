@@ -15,6 +15,8 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import infer_sensitive_from_name, mask_pattern, semantic_type_is_sensitive
 from test_data_agent.csv_profiler import (
+    detect_csv_dialect,
+    detect_csv_encoding,
     infer_data_type,
     infer_semantic_type,
     numeric_stats,
@@ -34,8 +36,11 @@ MAX_SEMANTIC_SAMPLE = 100
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
     for path in sorted(input_folder.glob("*.csv")):
-        with path.open(newline="") as handle:
-            reader = csv.DictReader(handle)
+        encoding = detect_csv_encoding(path)
+        with path.open(newline="", encoding=encoding) as handle:
+            sample = handle.read(8192)
+            handle.seek(0)
+            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
             if not reader.fieldnames:
                 raise ValueError(f"CSV must include a header row: {path}")
             rows: list[dict[str, str]] = []
@@ -56,8 +61,11 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
         raise ValueError(f"no CSV files found in {input_folder}")
     for path in csv_paths:
         entity_name = path.stem
-        with path.open(newline="") as handle:
-            reader = csv.DictReader(handle)
+        encoding = detect_csv_encoding(path)
+        with path.open(newline="", encoding=encoding) as handle:
+            sample = handle.read(8192)
+            handle.seek(0)
+            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
             if not reader.fieldnames:
                 raise ValueError(f"CSV must include a header row: {path}")
             accumulators = {name: FieldAccumulator(name=name) for name in reader.fieldnames}

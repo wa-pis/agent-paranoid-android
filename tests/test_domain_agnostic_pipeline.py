@@ -8,7 +8,7 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
-from test_data_agent.profiling import profile_example_folder
+from test_data_agent.profiling import load_csv_folder, profile_example_folder
 from test_data_agent.profiling.cache import csv_folder_fingerprint
 from test_data_agent.validation import validate_dataset
 
@@ -27,6 +27,28 @@ def test_schema_profiling_masks_pii_and_finds_fields() -> None:
     assert "alice@example.com" not in profile_json
     assert "C1" not in profile_json
     assert customers.primary_key_candidates == ["customer_id"]
+
+
+def test_folder_csv_profiling_detects_semicolon_delimiter_and_bom(tmp_path) -> None:
+    source = tmp_path / "customers.csv"
+    source.write_bytes(
+        "\ufeffcustomer_id;email;status\n"
+        "1;alice@example.com;active\n"
+        "2;bob@example.com;paused\n".encode("utf-8")
+    )
+
+    profile = profile_example_folder(tmp_path, cache_dir=None)
+    rows_by_entity = load_csv_folder(tmp_path)
+    customers = profile.entity("customers")
+
+    assert [field.name for field in customers.fields] == ["customer_id", "email", "status"]
+    assert customers.field("email").sensitive is True
+    assert "alice@example.com" not in profile.model_dump_json()
+    assert rows_by_entity["customers"][0] == {
+        "customer_id": "1",
+        "email": "alice@example.com",
+        "status": "active",
+    }
 
 
 def test_relationship_inference() -> None:
