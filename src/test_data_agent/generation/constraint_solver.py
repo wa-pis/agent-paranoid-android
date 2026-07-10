@@ -36,7 +36,10 @@ def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], s
             continue
         target = constraint.fields[0]
         for row in rows_by_entity.get(constraint.entity, []):
-            row[target] = safe_eval(constraint.expression, row)
+            try:
+                row[target] = safe_eval(constraint.expression, row)
+            except Exception:
+                continue
 
 
 def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
@@ -79,7 +82,10 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         totals: dict[Any, float] = defaultdict(float)
         for child_row in rows_by_entity.get(relationship.child_entity, []):
             key = child_row.get(relationship.child_field)
-            totals[key] += float(child_row.get(constraint.target_field) or 0.0)
+            try:
+                totals[key] += float(child_row.get(constraint.target_field) or 0.0)
+            except (TypeError, ValueError):
+                continue
         parent_field = constraint.fields[0] if constraint.fields else None
         if parent_field is None:
             continue
