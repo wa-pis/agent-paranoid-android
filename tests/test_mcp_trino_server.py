@@ -5,6 +5,7 @@ from test_data_agent.mcp_trino_server import (
     SqlSafetyError,
     TrinoConfig,
     check_allowlist,
+    execute_query,
     has_top_level_limit,
     mask_row,
     profile_aggregate_mapping,
@@ -128,6 +129,144 @@ def test_likely_pii_fields_are_masked() -> None:
         "api_token": "s***n",
         "order_id": 123,
     }
+
+
+def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeCursor:
+        description = [("id",)]
+
+        def __init__(self) -> None:
+            self.closed = False
+
+        def execute(self, sql, parameters):
+            assert sql == "SELECT id FROM users LIMIT 1"
+            assert parameters == []
+
+        def fetchall(self):
+            return [(1,)]
+
+        def close(self):
+            self.closed = True
+
+    class FakeConnection:
+        def __init__(self) -> None:
+            self.cursor_instance = FakeCursor()
+            self.closed = False
+
+        def cursor(self):
+            return self.cursor_instance
+
+        def close(self):
+            self.closed = True
+
+    class FakeDbapi:
+        def __init__(self) -> None:
+            self.connection = FakeConnection()
+
+        def connect(self, **kwargs):
+            return self.connection
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbapi()
+
+    fake_trino = FakeTrino()
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+
+    rows, description = execute_query("SELECT id FROM users LIMIT 1")
+
+    assert rows == [(1,)]
+    assert description == [("id",)]
+    assert fake_trino.dbapi.connection.cursor_instance.closed is True
+    assert fake_trino.dbapi.connection.closed is True
+
+
+def test_execute_query_closes_resources_on_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeCursor:
+        description = None
+
+        def __init__(self) -> None:
+            self.closed = False
+
+        def execute(self, sql, parameters):
+            raise RuntimeError("boom")
+
+        def close(self):
+            self.closed = True
+
+    class FakeConnection:
+        def __init__(self) -> None:
+            self.cursor_instance = FakeCursor()
+            self.closed = False
+
+        def cursor(self):
+            return self.cursor_instance
+
+        def close(self):
+            self.closed = True
+
+    class FakeDbapi:
+        def __init__(self) -> None:
+            self.connection = FakeConnection()
+
+        def connect(self, **kwargs):
+            return self.connection
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbapi()
+
+    fake_trino = FakeTrino()
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        execute_query("SELECT id FROM users LIMIT 1")
+
+    assert fake_trino.dbapi.connection.cursor_instance.closed is True
+    assert fake_trino.dbapi.connection.closed is True
+
+
+def test_execute_query_closes_connection_when_cursor_close_fails(monkeypatch: pytest.MonkeyPatch) -> None:
+    class FakeCursor:
+        description = [("id",)]
+
+        def execute(self, sql, parameters):
+            pass
+
+        def fetchall(self):
+            return [(1,)]
+
+        def close(self):
+            raise RuntimeError("cursor close failed")
+
+    class FakeConnection:
+        def __init__(self) -> None:
+            self.closed = False
+
+        def cursor(self):
+            return FakeCursor()
+
+        def close(self):
+            self.closed = True
+
+    class FakeDbapi:
+        def __init__(self) -> None:
+            self.connection = FakeConnection()
+
+        def connect(self, **kwargs):
+            return self.connection
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbapi()
+
+    fake_trino = FakeTrino()
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+
+    with pytest.raises(RuntimeError, match="cursor close failed"):
+        execute_query("SELECT id FROM users LIMIT 1")
+
+    assert fake_trino.dbapi.connection.closed is True
 
 
 def test_profile_table_safe_uses_aggregates_without_sensitive_top_values(monkeypatch: pytest.MonkeyPatch) -> None:

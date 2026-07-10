@@ -245,9 +245,15 @@ def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[li
         http_scheme=config.http_scheme,
     )
     cursor = connection.cursor()
-    cursor.execute(sql, parameters or [])
-    rows = cursor.fetchall()
-    return rows, cursor.description or []
+    try:
+        cursor.execute(sql, parameters or [])
+        rows = cursor.fetchall()
+        return rows, cursor.description or []
+    finally:
+        try:
+            cursor.close()
+        finally:
+            connection.close()
 
 
 def fetch_dicts(sql: str, parameters: Sequence[Any] | None = None) -> list[dict[str, Any]]:

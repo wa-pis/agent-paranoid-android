@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from io import StringIO
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,9 @@ import yaml
 
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
+
+
+SAFE_ARTIFACT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 
 def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
@@ -54,13 +58,23 @@ def write_dataset_rows(
     output_folder: Path,
 ) -> None:
     output_folder.mkdir(parents=True, exist_ok=True)
+    root = output_folder.resolve(strict=True)
     for entity_name, rows in rows_by_entity.items():
         if output_format == DatasetOutputFormat.CSV:
-            (output_folder / f"{entity_name}.csv").write_text(rows_to_csv(rows))
+            safe_entity_artifact_path(root, entity_name, ".csv").write_text(rows_to_csv(rows))
         elif output_format == DatasetOutputFormat.JSON:
-            (output_folder / f"{entity_name}.json").write_text(json.dumps(rows, indent=2, sort_keys=True))
+            safe_entity_artifact_path(root, entity_name, ".json").write_text(json.dumps(rows, indent=2, sort_keys=True))
         elif output_format == DatasetOutputFormat.PARQUET:
-            write_parquet(rows, output_folder / f"{entity_name}.parquet")
+            write_parquet(rows, safe_entity_artifact_path(root, entity_name, ".parquet"))
+
+
+def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str) -> Path:
+    if not SAFE_ARTIFACT_NAME_RE.fullmatch(entity_name):
+        raise ValueError(f"unsafe entity artifact name: {entity_name!r}")
+    path = (output_folder / f"{entity_name}{suffix}").resolve(strict=False)
+    if not path.is_relative_to(output_folder):
+        raise ValueError("entity artifact path escapes output folder")
+    return path
 
 
 def write_single_entity_rows(

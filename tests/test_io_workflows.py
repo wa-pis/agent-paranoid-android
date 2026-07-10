@@ -10,6 +10,7 @@ from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.workflows import (
+    generate_dataset_bundle,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
     generate_dataset_from_csv_artifacts,
@@ -266,6 +267,95 @@ def test_generate_dataset_review_artifacts_writes_review_bundle(tmp_path) -> Non
     assert json.loads((output_folder / "profile.json").read_text())["entities"][0]["name"] == "orders"
     assert "generation_settings:" in (output_folder / "dataset_spec.yaml").read_text()
     assert json.loads((output_folder / "validation_report.json").read_text())["valid"] is True
+
+
+def test_generate_dataset_bundle_does_not_leave_partial_output_on_validation_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=2,
+                fields=[
+                    FieldProfile(name="order_id", data_type="integer", is_identifier=True),
+                    FieldProfile(name="status", data_type="string"),
+                ],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(profile, output_path=tmp_path / "dataset_spec.yaml", count=2)
+
+    def fail_validation(rows_by_entity, spec):
+        raise RuntimeError("validation failed")
+
+    monkeypatch.setattr("test_data_agent.io.workflows.validate_dataset", fail_validation)
+
+    with pytest.raises(RuntimeError, match="validation failed"):
+        generate_dataset_bundle(
+            spec,
+            output_folder=tmp_path / "generated",
+            output_format=OutputFormat.JSON,
+            seed=11,
+        )
+
+    assert not (tmp_path / "generated").exists()
+    assert not list(tmp_path.glob(".generated.*"))
+
+
+def test_generate_dataset_from_profile_artifacts_enforces_configured_row_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_COUNT", "2")
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=10,
+                fields=[FieldProfile(name="order_id", data_type="integer", is_identifier=True)],
+            )
+        ],
+    )
+
+    with pytest.raises(ValueError, match="entity row_count must be <= 2"):
+        generate_dataset_from_profile_artifacts(
+            profile,
+            count=3,
+            seed=11,
+            output_path=tmp_path / "orders.json",
+            output_format=OutputFormat.JSON,
+        )
+
+
+def test_generate_dataset_review_artifacts_enforces_configured_row_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_COUNT", "2")
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=3,
+                fields=[FieldProfile(name="order_id", data_type="integer", is_identifier=True)],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(profile, output_path=tmp_path / "dataset_spec.yaml", count=3)
+
+    with pytest.raises(ValueError, match="entity row_count must be <= 2"):
+        generate_dataset_review_artifacts(
+            profile,
+            spec,
+            output_folder=tmp_path / "review",
+            output_format=OutputFormat.JSON,
+            seed=19,
+        )
 
 
 def test_io_package_keeps_legacy_workflows_out_of_dataset_oriented_exports() -> None:

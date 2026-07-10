@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import shutil
+import tempfile
 from pathlib import Path
 from typing import Any, Callable, Literal
 
@@ -32,6 +35,8 @@ from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 
 BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
+MAX_GENERATION_COUNT_ENV = "TEST_DATA_AGENT_MAX_GENERATION_COUNT"
+DEFAULT_MAX_GENERATION_COUNT = 100_000
 
 
 class DatasetGenerationResult(BaseModel):
@@ -55,11 +60,15 @@ def generate_dataset_bundle(
     if not effective_spec.entities:
         raise ValueError("dataset spec must contain at least one entity")
     effective_output_format = output_format or effective_spec.generation_settings.output_format
+    max_count = max_generation_count()
     if count is not None:
         if count < 1:
             raise ValueError("count must be positive")
+        if count > max_count:
+            raise ValueError(f"count must be <= {max_count}")
         for entity in effective_spec.entities:
             entity.row_count = count
+    enforce_generation_row_count_limits(effective_spec, max_count=max_count)
     effective_seed = effective_spec.generation_settings.seed if seed is None else seed
     if effective_seed is None:
         effective_seed = 0
@@ -69,19 +78,26 @@ def generate_dataset_bundle(
     effective_spec.generation_settings.output_format = effective_output_format
 
     rows_by_entity = generate_dataset(effective_spec, seed=effective_seed)
-    write_dataset_rows(rows_by_entity, effective_output_format, output_folder)
-    report = validate_dataset(rows_by_entity, effective_spec)
-    write_dataset_spec_artifact(effective_spec, output_folder / "dataset_spec.yaml")
-    write_dataset_validation_report(report, output_folder)
+    temp_folder = make_temp_output_folder(output_folder)
+    try:
+        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder)
+        report = validate_dataset(rows_by_entity, effective_spec)
+        write_dataset_spec_artifact(effective_spec, temp_folder / "dataset_spec.yaml")
+        write_dataset_validation_report(report, temp_folder)
+        row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
+        write_generation_manifest(
+            effective_spec,
+            seed=effective_seed,
+            output_format=effective_output_format,
+            row_counts=row_counts,
+            validation_valid=report.valid,
+            output_folder=temp_folder,
+        )
+        commit_temp_output_folder(temp_folder, output_folder)
+    except Exception:
+        shutil.rmtree(temp_folder, ignore_errors=True)
+        raise
     row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
-    write_generation_manifest(
-        effective_spec,
-        seed=effective_seed,
-        output_format=effective_output_format,
-        row_counts=row_counts,
-        validation_valid=report.valid,
-        output_folder=output_folder,
-    )
     return DatasetGenerationResult(
         seed=effective_seed,
         output_format=effective_output_format,
@@ -126,6 +142,7 @@ def build_dataset_spec_from_profile(
     if output_format is not None:
         spec.generation_settings.output_format = output_format
     apply_dataset_mode_options(spec, mode=mode, invalid_ratio=invalid_ratio)
+    enforce_generation_row_count_limits(spec)
     return spec
 
 
@@ -264,6 +281,7 @@ def generate_dataset_review_artifacts(
     effective_spec = spec.model_copy(deep=True)
     effective_spec.generation_settings.seed = seed
     effective_spec.generation_settings.output_format = output_format
+    enforce_generation_row_count_limits(effective_spec)
     rows_by_entity = generate_dataset(effective_spec, seed=seed)
     if source_folder is not None:
         assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
@@ -292,3 +310,38 @@ def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: f
         raise ValueError("--invalid-ratio requires --mode mixed or --mode negative")
     else:
         spec.generation_settings.mode = GenerationMode(mode)
+
+
+def max_generation_count() -> int:
+    raw_value = os.environ.get(MAX_GENERATION_COUNT_ENV)
+    if raw_value is None:
+        return DEFAULT_MAX_GENERATION_COUNT
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ValueError(f"{MAX_GENERATION_COUNT_ENV} must be an integer") from exc
+    if value < 1:
+        raise ValueError(f"{MAX_GENERATION_COUNT_ENV} must be positive")
+    return value
+
+
+def enforce_generation_row_count_limits(spec: DatasetSpec, *, max_count: int | None = None) -> None:
+    effective_max = max_generation_count() if max_count is None else max_count
+    for entity in spec.entities:
+        if entity.row_count > effective_max:
+            raise ValueError(f"entity row_count must be <= {effective_max}: {entity.name}")
+
+
+def make_temp_output_folder(output_folder: Path) -> Path:
+    output_folder.parent.mkdir(parents=True, exist_ok=True)
+    return Path(tempfile.mkdtemp(prefix=f".{output_folder.name}.", dir=output_folder.parent))
+
+
+def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> None:
+    if output_folder.exists():
+        if not output_folder.is_dir():
+            raise ValueError("generation output must be a folder")
+        if any(output_folder.iterdir()):
+            raise ValueError("generation output folder must be empty")
+        output_folder.rmdir()
+    temp_folder.replace(output_folder)

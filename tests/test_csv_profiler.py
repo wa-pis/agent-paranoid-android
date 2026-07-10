@@ -32,6 +32,24 @@ def test_csv_profile_uses_safe_metadata_and_masks_pii() -> None:
     assert total.p95 is not None
 
 
+def test_csv_profile_detects_semicolon_delimiter_and_utf8_bom(tmp_path) -> None:
+    source = tmp_path / "customers_semicolon.csv"
+    source.write_bytes(
+        "\ufeffcustomer_id;email;status\n"
+        "1;alice@example.com;active\n"
+        "2;bob@example.com;paused\n".encode("utf-8")
+    )
+
+    profile = profile_csv(source)
+
+    assert [column.name for column in profile.columns] == ["customer_id", "email", "status"]
+    email = next(column for column in profile.columns if column.name == "email")
+    status = next(column for column in profile.columns if column.name == "status")
+    assert email.sensitive is True
+    assert status.top_values == [{"value": "active", "count": 1}, {"value": "paused", "count": 1}]
+    assert "alice@example.com" not in profile.model_dump_json()
+
+
 def test_csv_profile_infers_generation_spec_without_copying_rows() -> None:
     profile = profile_csv(FIXTURE_CSV)
     spec = GenerationSpec.from_csv_profile(profile.model_dump(), seed=10, row_count=12)

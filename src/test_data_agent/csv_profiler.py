@@ -23,6 +23,9 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_RE = re.compile(r"^\+?[\d\s().-]{7,}$")
 SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
 MAX_ENUM_VALUES = 20
+MAX_TRACKED_DISTINCT_VALUES = 1_000
+MAX_NUMERIC_SAMPLE_VALUES = 10_000
+CSV_SAMPLE_BYTES = 8192
 
 
 class CSVColumnProfile(BaseModel):
@@ -54,21 +57,182 @@ class CSVProfile(BaseModel):
 
 
 def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
-    with path.open(newline="") as handle:
-        reader = csv.DictReader(handle)
+    encoding = detect_csv_encoding(path)
+    sample = read_csv_sample(path, encoding)
+    dialect = detect_csv_dialect(sample)
+    with path.open(newline="", encoding=encoding) as handle:
+        reader = csv.DictReader(handle, dialect=dialect)
         if not reader.fieldnames:
             raise ValueError("CSV must include a header row")
-        columns = {name: [] for name in reader.fieldnames}
+        accumulators = {name: CSVColumnAccumulator(name) for name in reader.fieldnames}
+        row_count = 0
         for row in reader:
+            row_count += 1
             for name in reader.fieldnames:
-                columns[name].append(row.get(name, ""))
-
-    row_count = len(next(iter(columns.values()), []))
+                accumulators[name].add(row.get(name, ""))
     return CSVProfile(
         table=table_name or path.stem,
         row_count=row_count,
-        columns=[profile_column(name, values, row_count) for name, values in columns.items()],
+        columns=[accumulator.to_profile(row_count) for accumulator in accumulators.values()],
     )
+
+
+def detect_csv_encoding(path: Path) -> str:
+    with path.open("rb") as handle:
+        raw = handle.read(CSV_SAMPLE_BYTES)
+    try:
+        raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return "latin-1"
+    return "utf-8-sig"
+
+
+def read_csv_sample(path: Path, encoding: str) -> str:
+    with path.open("rb") as handle:
+        return handle.read(CSV_SAMPLE_BYTES).decode(encoding, errors="replace")
+
+
+def detect_csv_dialect(text: str) -> csv.Dialect:
+    sample = text[:8192]
+    try:
+        return csv.Sniffer().sniff(sample, delimiters=",;\t|")
+    except csv.Error:
+        return csv.excel
+
+
+class CSVColumnAccumulator:
+    def __init__(self, name: str) -> None:
+        self.name = name
+        self.non_null_count = 0
+        self.semantic_sample: list[str] = []
+        self.counts: Counter[str] = Counter()
+        self.distinct_overflow = False
+        self.integer_values: list[int] = []
+        self.float_values: list[float] = []
+        self.date_values: list[date] = []
+        self.datetime_values: list[datetime] = []
+        self.all_int = True
+        self.all_float = True
+        self.all_bool = True
+        self.all_datetime = True
+        self.all_date = True
+
+    def add(self, raw_value: str | None) -> None:
+        value = raw_value.strip() if raw_value is not None else ""
+        if value == "":
+            return
+        self.non_null_count += 1
+        if len(self.semantic_sample) < 100:
+            self.semantic_sample.append(value)
+        self.add_count(value)
+        self.add_typed_samples(value)
+
+    def add_count(self, value: str) -> None:
+        if value in self.counts:
+            self.counts[value] += 1
+            return
+        if len(self.counts) < MAX_TRACKED_DISTINCT_VALUES:
+            self.counts[value] = 1
+            return
+        self.distinct_overflow = True
+
+    def add_typed_samples(self, value: str) -> None:
+        parsed_int = parse_int(value)
+        if parsed_int is None:
+            self.all_int = False
+        elif len(self.integer_values) < MAX_NUMERIC_SAMPLE_VALUES:
+            self.integer_values.append(parsed_int)
+
+        parsed_float = parse_float(value)
+        if parsed_float is None:
+            self.all_float = False
+        elif len(self.float_values) < MAX_NUMERIC_SAMPLE_VALUES:
+            self.float_values.append(parsed_float)
+
+        if parse_bool(value) is None:
+            self.all_bool = False
+
+        parsed_datetime = parse_datetime_value(value)
+        if parsed_datetime is None:
+            self.all_datetime = False
+        elif len(self.datetime_values) < MAX_NUMERIC_SAMPLE_VALUES:
+            self.datetime_values.append(parsed_datetime)
+
+        parsed_date = parse_date_value(value)
+        if parsed_date is None:
+            self.all_date = False
+        elif len(self.date_values) < MAX_NUMERIC_SAMPLE_VALUES:
+            self.date_values.append(parsed_date)
+
+    def to_profile(self, row_count: int) -> CSVColumnProfile:
+        null_count = row_count - self.non_null_count
+        semantic_type = infer_semantic_type(self.name, self.semantic_sample)
+        base_type = self.infer_data_type(semantic_type)
+        sensitive = infer_sensitive_from_name(self.name) or semantic_type_is_sensitive(semantic_type)
+        top_values: list[dict[str, Any]] = []
+        masked_patterns: list[dict[str, Any]] = []
+        if sensitive:
+            pattern_counts: Counter[str] = Counter()
+            for value, count in self.counts.items():
+                pattern_counts[mask_pattern(value, semantic_type)] += count
+            masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
+        elif (
+            base_type == DataType.STRING
+            and not self.distinct_overflow
+            and 0 < len(self.counts) <= MAX_ENUM_VALUES
+        ):
+            top_values = [
+                {"value": value, "count": count}
+                for value, count in self.counts.most_common(MAX_ENUM_VALUES)
+            ]
+        return CSVColumnProfile(
+            name=self.name,
+            data_type=base_type.value,
+            nullable=null_count > 0,
+            null_count=null_count,
+            null_ratio=round(null_count / row_count, 6) if row_count else 0.0,
+            approx_distinct_count=MAX_TRACKED_DISTINCT_VALUES + 1 if self.distinct_overflow else len(self.counts),
+            sensitive=sensitive,
+            semantic_type=semantic_type,
+            top_values=top_values,
+            masked_patterns=masked_patterns,
+            **self.range_stats(base_type),
+        )
+
+    def infer_data_type(self, semantic_type: str | None) -> DataType:
+        if semantic_type == "email":
+            return DataType.EMAIL
+        if semantic_type == "phone":
+            return DataType.PHONE
+        profile_hint = infer_profile_data_type({"name": self.name, "data_type": "string", "semantic_type": semantic_type})
+        if profile_hint != DataType.STRING:
+            return profile_hint
+        if self.non_null_count == 0:
+            return DataType.STRING
+        if self.all_int:
+            return DataType.INTEGER
+        if self.all_float:
+            return DataType.FLOAT
+        if self.all_bool:
+            return DataType.BOOLEAN
+        if self.all_datetime:
+            return DataType.DATETIME
+        if self.all_date:
+            return DataType.DATE
+        return DataType.STRING
+
+    def range_stats(self, data_type: DataType) -> dict[str, Any]:
+        if data_type == DataType.INTEGER:
+            return numeric_stats(sorted(self.integer_values), integer=True)
+        if data_type == DataType.FLOAT:
+            return numeric_stats(sorted(self.float_values), integer=False)
+        if data_type == DataType.DATE:
+            parsed = sorted(self.date_values)
+            return {"min_date": parsed[0].isoformat(), "max_date": parsed[-1].isoformat()} if parsed else {}
+        if data_type == DataType.DATETIME:
+            parsed = sorted(self.datetime_values)
+            return {"min_timestamp": parsed[0].isoformat(), "max_timestamp": parsed[-1].isoformat()} if parsed else {}
+        return {}
 
 
 def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnProfile:

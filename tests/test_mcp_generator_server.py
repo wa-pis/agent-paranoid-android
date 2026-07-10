@@ -232,3 +232,46 @@ def test_validate_dataset_rejects_spec_that_does_not_match_manifest(
 
     with pytest.raises(WorkspacePathError, match="does not match"):
         validate_dataset("different_spec.json", "generated")
+
+
+def test_generate_dataset_rejects_entity_name_path_traversal(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_source_csv(tmp_path)
+    profile_csv("customers.csv", "profile.json", table_name="../escaped")
+    infer_dataset_spec(output_path="spec.json", profile_path="profile.json", count=2)
+
+    with pytest.raises(ValueError, match="unsafe entity artifact name"):
+        generate_dataset("spec.json", "generated", output_format="json", seed=7)
+
+    assert not (tmp_path / "escaped.json").exists()
+
+
+def test_generate_dataset_rejects_count_above_configured_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_COUNT", "3")
+    write_source_csv(tmp_path)
+    profile_csv("customers.csv", "profile.json")
+    infer_dataset_spec(output_path="spec.json", profile_path="profile.json", count=2)
+
+    with pytest.raises(ValueError, match="count must be <= 3"):
+        generate_dataset("spec.json", "generated", output_format="json", count=4)
+
+
+def test_generate_dataset_rejects_spec_row_count_above_configured_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_COUNT", "3")
+    write_source_csv(tmp_path)
+    profile_csv("customers.csv", "profile.json")
+    infer_dataset_spec(output_path="spec.json", profile_path="profile.json", count=4)
+
+    with pytest.raises(ValueError, match="entity row_count must be <= 3"):
+        generate_dataset("spec.json", "generated", output_format="json")
