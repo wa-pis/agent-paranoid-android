@@ -67,7 +67,10 @@ def apply_valid_defaults(rows_by_table: dict[str, list[dict[str, Any]]], rules: 
                     row[rule.end_field] = row.get(rule.start_field)
         elif isinstance(rule, FormulaRule):
             for row in rows_by_table.get(rule.table, []):
-                row[rule.field] = safe_eval(rule.expression, row)
+                try:
+                    row[rule.field] = safe_eval(rule.expression, row)
+                except Exception:
+                    continue
 
 
 def apply_edge_cases(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> None:

@@ -186,6 +186,55 @@ cross_table_rules:
     assert report.rule_fail_count == 3
 
 
+def test_business_validator_reports_formula_evaluation_errors(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+row_rules:
+  - type: formula
+    table: orders
+    field: total
+    expression: quantity / 0
+cross_table_rules:
+  - type: aggregate_formula
+    table: orders
+    field: total
+    expression: sum("total") / 0
+"""
+    )
+    rows_by_table = {"orders": [{"quantity": 2, "total": 10}]}
+
+    report = validate_business_rules(rows_by_table, load_business_rules(rules_path))
+
+    assert report.valid is False
+    assert report.rule_fail_count == 2
+    errors = [error for result in report.results for error in result.errors]
+    assert any("formula evaluation failed" in error for error in errors)
+    assert any("aggregate formula evaluation failed" in error for error in errors)
+
+
+def test_business_rule_application_leaves_bad_formula_for_validation(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+row_rules:
+  - type: formula
+    table: orders
+    field: total
+    expression: quantity / 0
+"""
+    )
+    rules = load_business_rules(rules_path)
+    rows_by_table = {"orders": [{"quantity": 2, "total": 10}]}
+
+    apply_business_rules(rows_by_table, rules, seed=7, mode="valid", invalid_ratio=0.0)
+    report = validate_business_rules(rows_by_table, rules)
+
+    assert rows_by_table["orders"][0]["total"] == 10
+    assert report.valid is False
+    assert "formula evaluation failed" in report.results[0].errors[0]
+
+
 def test_scenario_distribution_and_controlled_invalid_generation_are_deterministic(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     rules_path.write_text(

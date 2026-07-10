@@ -113,7 +113,11 @@ def validate_temporal_ordering(rows_by_table: dict[str, list[dict[str, Any]]], r
 def validate_formula(rows_by_table: dict[str, list[dict[str, Any]]], rule: FormulaRule) -> RuleResult:
     result = RuleResult(rule_type="formula")
     for index, row in enumerate(rows_by_table.get(rule.table, [])):
-        expected = safe_eval(rule.expression, row)
+        try:
+            expected = safe_eval(rule.expression, row)
+        except Exception as exc:
+            record_result(result, False, f"{rule.table}[{index}].{rule.field} formula evaluation failed: {exc}")
+            continue
         actual = row.get(rule.field)
         ok = numbers_close(actual, expected, rule.tolerance)
         record_result(result, ok, f"{rule.table}[{index}].{rule.field} expected {expected}, got {actual}")
@@ -133,7 +137,11 @@ def validate_aggregate_formula(rows_by_table: dict[str, list[dict[str, Any]]], r
     result = RuleResult(rule_type="aggregate_formula")
     rows = rows_by_table.get(rule.table, [])
     actual = aggregate(rule.field, rows)
-    expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows})
+    try:
+        expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows})
+    except Exception as exc:
+        record_result(result, False, f"{rule.table}.{rule.field} aggregate formula evaluation failed: {exc}")
+        return result
     record_result(result, numbers_close(actual, expected, rule.tolerance), f"{rule.table}.{rule.field} aggregate expected {expected}, got {actual}")
     return result
 
