@@ -30,10 +30,11 @@ def cache_path(cache_dir: Path, fingerprint: str) -> Path:
 
 
 def load_cached_profile(input_folder: Path, cache_dir: Path = DEFAULT_PROFILE_CACHE_DIR) -> DatasetProfile | None:
-    path = cache_path(cache_dir, csv_folder_fingerprint(input_folder))
+    fingerprint = csv_folder_fingerprint(input_folder)
+    path = cache_path(cache_dir, fingerprint)
     if not path.exists():
         return None
-    return read_profile_cache_file(path)
+    return read_profile_cache_file(path, expected_fingerprint=fingerprint)
 
 
 def write_cached_profile(input_folder: Path, profile: DatasetProfile, cache_dir: Path = DEFAULT_PROFILE_CACHE_DIR) -> Path:
@@ -47,6 +48,9 @@ def write_cached_profile(input_folder: Path, profile: DatasetProfile, cache_dir:
     return path
 
 
-def read_profile_cache_file(path: Path) -> DatasetProfile:
+def read_profile_cache_file(path: Path, expected_fingerprint: str | None = None) -> DatasetProfile:
     payload = json.loads(path.read_text())
+    cached_fingerprint = payload.get("fingerprint") if isinstance(payload, dict) else None
+    if expected_fingerprint is not None and cached_fingerprint != expected_fingerprint:
+        raise ValueError("profile cache fingerprint mismatch")
     return DatasetProfile.model_validate(payload.get("profile", payload))

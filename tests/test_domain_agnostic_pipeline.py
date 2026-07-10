@@ -9,7 +9,7 @@ from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling import load_csv_folder, profile_example_folder
-from test_data_agent.profiling.cache import csv_folder_fingerprint
+from test_data_agent.profiling.cache import csv_folder_fingerprint, load_cached_profile
 from test_data_agent.validation import validate_dataset
 
 
@@ -232,6 +232,33 @@ def test_profile_example_uses_safe_profile_cache(tmp_path) -> None:
     assert cache_file.exists()
     assert "alice@example.com" not in cache_file.read_text()
     assert profile_a == profile_b
+
+
+def test_profile_cache_rejects_fingerprint_mismatch(tmp_path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "customers.csv").write_text("customer_id,status\n1,active\n")
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    cache_file = cache_dir / f"{csv_folder_fingerprint(source)}.json"
+    cache_file.write_text(
+        json.dumps(
+            {
+                "fingerprint": "wrong",
+                "profile": {
+                    "source_type": "csv_folder",
+                    "entities": [],
+                },
+            }
+        )
+    )
+
+    try:
+        load_cached_profile(source, cache_dir=cache_dir)
+    except ValueError as exc:
+        assert "fingerprint mismatch" in str(exc)
+    else:
+        raise AssertionError("expected cache fingerprint mismatch")
 
 
 def load_source_rows(folder: Path) -> dict[str, list[dict[str, str]]]:
