@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
@@ -26,6 +27,9 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
             )
         expected_fields = [field.name for field in entity.fields]
         for row_index, row in enumerate(rows):
+            if not isinstance(row, Mapping):
+                errors.append(f"{entity.name}[{row_index}] row must be an object")
+                continue
             if list(row.keys()) != expected_fields:
                 errors.append(f"{entity.name}[{row_index}] fields mismatch")
                 continue

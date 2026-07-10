@@ -142,6 +142,29 @@ entities:
     assert "unexpected entity: extra" in report.sections[0].errors
 
 
+def test_validate_dataset_artifacts_reports_non_object_json_rows(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 1
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+"""
+    )
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    (rows_dir / "customers.json").write_text(json.dumps([1]))
+
+    report = validate_dataset_artifacts(spec_path, rows_dir)
+
+    assert report.valid is False
+    assert report.sections[0].errors == ["customers[0] row must be an object"]
+
+
 def test_generate_dataset_command_uses_dataset_spec_helper(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     spec_path.write_text(
