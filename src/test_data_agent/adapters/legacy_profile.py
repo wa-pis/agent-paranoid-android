@@ -182,7 +182,7 @@ def _distribution_from_profile_column(
         return {
             "kind": "categorical",
             "categories": [
-                CategoryWeight(value=item.get("value"), count=float(item.get("count", 0) or 0)).model_dump(mode="json")
+                CategoryWeight(value=item.get("value"), count=float(item.get("count", 1) or 1)).model_dump(mode="json")
                 for item in top_values
             ],
         }

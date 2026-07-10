@@ -172,6 +172,22 @@ def test_field_models_reject_invalid_typed_distribution_shapes() -> None:
         raise AssertionError("expected invalid categorical distribution to fail validation")
 
 
+@pytest.mark.parametrize(
+    "distribution",
+    [
+        {"kind": "numeric", "min_value": 10, "max_value": 1},
+        {"kind": "numeric", "p05": 9, "p95": 2},
+        {"kind": "date_range", "min": "2024-02-01", "max": "2024-01-01"},
+        {"kind": "datetime_range", "min": "2024-02-01T00:00:00", "max": "2024-01-01T00:00:00"},
+        {"kind": "string_pattern", "min_length": 10, "max_length": 2},
+        {"kind": "categorical", "categories": [{"value": "new", "count": 0}]},
+    ],
+)
+def test_field_models_reject_invalid_distribution_bounds(distribution: dict) -> None:
+    with pytest.raises(ValidationError):
+        FieldSpec(name="value", data_type=FieldType.STRING, distribution=distribution)
+
+
 def test_field_models_preserve_untyped_distribution_metadata() -> None:
     field = FieldProfile(
         name="legacy_metric",
@@ -286,6 +302,7 @@ def test_csv_adapter_normalizes_legacy_profile_into_dataset_shapes() -> None:
     assert entity.primary_key_candidates == ["customer_id"]
     assert email.distribution["kind"] == "masked_patterns"
     assert status.distribution["kind"] == "categorical"
+    assert all(category["count"] > 0 for category in status.distribution["categories"])
     assert spec_entity.row_count == 12
     assert dataset_spec.generation_settings.seed == 9
 
