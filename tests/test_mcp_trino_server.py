@@ -67,6 +67,19 @@ def test_limit_must_be_top_level_not_inside_literal() -> None:
         validate_safe_select("SELECT id FROM users WHERE note = 'limit 1'")
 
 
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT id FROM users LIMIT 0",
+        "SELECT id FROM users LIMIT 1001",
+        "SELECT id FROM users LIMIT 10 + 1",
+    ],
+)
+def test_safe_select_rejects_unbounded_or_nonliteral_limit(sql: str) -> None:
+    with pytest.raises(SqlSafetyError, match="LIMIT"):
+        validate_safe_select(sql)
+
+
 def test_safe_select_rejects_likely_pii_even_with_safe_alias() -> None:
     with pytest.raises(SqlSafetyError):
         validate_safe_select("SELECT customer_email AS value FROM analytics.safe_schema.users LIMIT 10")

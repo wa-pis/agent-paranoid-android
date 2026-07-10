@@ -124,8 +124,12 @@ def validate_safe_select(sql: str, require_limit: bool = True) -> str:
         raise SqlSafetyError("unrestricted SELECT * is not allowed")
     if selected_sensitive_identifier_names(tree):
         raise SqlSafetyError("SELECT queries must not project likely PII fields")
-    if require_limit and not has_top_level_limit(tree):
-        raise SqlSafetyError("row-returning SELECT queries must include LIMIT")
+    if require_limit:
+        limit = top_level_limit_value(tree)
+        if limit is None:
+            raise SqlSafetyError("row-returning SELECT queries must include LIMIT")
+        if limit < 1 or limit > MAX_LIMIT:
+            raise SqlSafetyError(f"row-returning SELECT queries must use LIMIT between 1 and {MAX_LIMIT}")
     validate_table_references_allowed(tree)
     return cleaned
 
@@ -164,12 +168,18 @@ def unquoted_char_positions(sql: str, char: str) -> list[int]:
 
 
 def has_top_level_limit(sql_or_tree: str | exp.Expression) -> bool:
+    return top_level_limit_value(sql_or_tree) is not None
+
+
+def top_level_limit_value(sql_or_tree: str | exp.Expression) -> int | None:
     tree = parse_select_ast(normalize_sql(sql_or_tree)) if isinstance(sql_or_tree, str) else sql_or_tree
     limit = tree.args.get("limit")
     if limit is None:
-        return False
+        return None
     expression = limit.expression
-    return isinstance(expression, exp.Literal) and expression.is_int
+    if not isinstance(expression, exp.Literal) or not expression.is_int:
+        return None
+    return int(expression.this)
 
 
 def validate_table_references_allowed(sql_or_tree: str | exp.Expression, config: TrinoConfig | None = None) -> None:
