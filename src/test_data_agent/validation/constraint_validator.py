@@ -31,7 +31,11 @@ def validate_formula(rows_by_entity: dict[str, list[dict[str, Any]]], constraint
     target = constraint.fields[0]
     errors: list[str] = []
     for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
-        expected = safe_eval(constraint.expression, coerce_numeric_row(row))
+        try:
+            expected = safe_eval(constraint.expression, coerce_numeric_row(row))
+        except Exception as exc:
+            errors.append(f"{constraint.entity}[{index}].{target} formula evaluation failed: {exc}")
+            continue
         actual = row.get(target)
         if not numbers_close(actual, expected):
             errors.append(f"{constraint.entity}[{index}].{target} formula mismatch")
@@ -76,10 +80,16 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
     if relationship is None or not constraint.target_field or not constraint.fields:
         return []
     totals: dict[Any, float] = defaultdict(float)
-    for child_row in rows_by_entity.get(relationship.child_entity, []):
-        totals[child_row.get(relationship.child_field)] += float(child_row.get(constraint.target_field) or 0.0)
-    parent_field = constraint.fields[0]
     errors: list[str] = []
+    for index, child_row in enumerate(rows_by_entity.get(relationship.child_entity, [])):
+        value = child_row.get(constraint.target_field)
+        try:
+            numeric_value = float(value or 0.0)
+        except (TypeError, ValueError):
+            errors.append(f"{relationship.child_entity}[{index}].{constraint.target_field} aggregate value is not numeric")
+            continue
+        totals[child_row.get(relationship.child_field)] += numeric_value
+    parent_field = constraint.fields[0]
     for index, parent_row in enumerate(rows_by_entity.get(relationship.parent_entity, [])):
         key = parent_row.get(relationship.parent_field)
         if not numbers_close(parent_row.get(parent_field), totals.get(key, 0.0)):
