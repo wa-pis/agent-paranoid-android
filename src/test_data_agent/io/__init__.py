@@ -1,12 +1,15 @@
 """I/O helpers for DatasetSpec workflows."""
 
 from test_data_agent.io.artifacts import (
+    GenerationManifest,
+    dataset_spec_fingerprint,
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
     write_dataset_review_artifacts,
     write_dataset_spec_artifact,
     write_dataset_validation_report,
     write_json_artifact,
+    write_generation_manifest,
 )
 from test_data_agent.io.commands import (
     generate_dataset_command,
@@ -26,9 +29,11 @@ from test_data_agent.io.commands import (
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
+    DatasetGenerationResult,
     apply_dataset_mode_options,
     build_dataset_spec_from_profile,
     generate_dataset_artifacts,
+    generate_dataset_bundle,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
@@ -37,6 +42,7 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.io.writers import (
+    dataset_spec_to_json,
     dataset_spec_to_yaml,
     write_dataset_rows,
     write_single_entity_rows,
@@ -44,6 +50,9 @@ from test_data_agent.io.writers import (
 
 __all__ = [
     "dataset_spec_to_yaml",
+    "dataset_spec_to_json",
+    "DatasetGenerationResult",
+    "GenerationManifest",
     "apply_dataset_mode_options",
     "build_dataset_spec_from_profile",
     "generate_dataset_command",
@@ -51,6 +60,7 @@ __all__ = [
     "generate_dataset_from_example_command",
     "generate_dataset_from_example_artifacts",
     "generate_dataset_artifacts",
+    "generate_dataset_bundle",
     "generate_dataset_from_csv_artifacts",
     "generate_dataset_from_profile_command",
     "generate_dataset_from_profile_artifacts",
@@ -68,6 +78,7 @@ __all__ = [
     "should_fail_generation",
     "validate_dataset_artifacts",
     "write_generation_errors",
+    "write_generation_manifest",
     "write_dataset_generation_artifacts",
     "write_csv_profile_artifact",
     "write_dataset_profile_artifact",
@@ -77,4 +88,5 @@ __all__ = [
     "write_dataset_validation_report",
     "write_json_artifact",
     "write_single_entity_rows",
+    "dataset_spec_fingerprint",
 ]

@@ -73,6 +73,7 @@ def test_dataset_spec_loads_legacy_shape_with_default_settings() -> None:
     assert spec.privacy_settings.treat_unknown_as_sensitive is True
     assert spec.generation_settings.mode == GenerationMode.VALID
     assert spec.validation_settings == ValidationSettings()
+    assert spec.schema_version == "1.0"
 
 
 def test_dataset_spec_accepts_explicit_privacy_and_runtime_settings() -> None:
@@ -199,6 +200,9 @@ def test_output_format_is_shared_with_legacy_spec_module() -> None:
 
 def test_package_root_exposes_domain_agnostic_api_without_dropping_legacy_symbols() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
+    assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
+    assert test_data_agent.__version__ == "0.3.0"
+    assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None
     assert test_data_agent.infer_dataset_spec is not None
     assert test_data_agent.validate_dataset is not None
@@ -206,6 +210,64 @@ def test_package_root_exposes_domain_agnostic_api_without_dropping_legacy_symbol
         assert test_data_agent.GenerationSpec is GenerationSpec
     with pytest.deprecated_call(match="test_data_agent.generate_rows is deprecated"):
         assert test_data_agent.generate_rows is __import__("test_data_agent.compat.legacy_spec", fromlist=["generate_rows"]).generate_rows
+
+
+def test_dataset_spec_rejects_duplicate_entities_and_dangling_relationships() -> None:
+    with pytest.raises(ValidationError, match="duplicate entity names"):
+        DatasetSpec.model_validate(
+            {
+                "entities": [
+                    {"name": "orders", "row_count": 1, "fields": []},
+                    {"name": "orders", "row_count": 1, "fields": []},
+                ]
+            }
+        )
+
+    with pytest.raises(ValidationError, match="unknown entity"):
+        DatasetSpec.model_validate(
+            {
+                "entities": [
+                    {
+                        "name": "orders",
+                        "row_count": 1,
+                        "fields": [{"name": "customer_id", "data_type": "integer"}],
+                    }
+                ],
+                "relationships": [
+                    {
+                        "parent_entity": "customers",
+                        "parent_field": "customer_id",
+                        "child_entity": "orders",
+                        "child_field": "customer_id",
+                        "confidence": 1.0,
+                    }
+                ],
+            }
+        )
+
+
+def test_entity_spec_rejects_duplicate_fields_and_unknown_primary_key() -> None:
+    with pytest.raises(ValidationError, match="duplicate field names"):
+        EntitySpec.model_validate(
+            {
+                "name": "orders",
+                "row_count": 1,
+                "fields": [
+                    {"name": "id", "data_type": "integer"},
+                    {"name": "id", "data_type": "integer"},
+                ],
+            }
+        )
+
+    with pytest.raises(ValidationError, match="unknown primary key"):
+        EntitySpec.model_validate(
+            {
+                "name": "orders",
+                "row_count": 1,
+                "primary_key": "missing_id",
+                "fields": [{"name": "id", "data_type": "integer"}],
+            }
+        )
 
 
 def test_csv_adapter_normalizes_legacy_profile_into_dataset_shapes() -> None:
@@ -322,6 +384,31 @@ def test_json_loader_treats_privacy_settings_only_payload_as_dataset_spec(tmp_pa
     assert isinstance(loaded, DatasetSpec)
     assert loaded.privacy_settings.allow_raw_sensitive_values is False
     assert loaded.privacy_settings.max_safe_categories == 3
+
+
+def test_json_loader_routes_legacy_trino_profile_with_source_type_and_columns(tmp_path) -> None:
+    profile_path = tmp_path / "trino_profile.json"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "source_type": "trino",
+                "table": "orders",
+                "row_count": 10,
+                "columns": [
+                    {
+                        "name": "order_id",
+                        "data_type": "bigint",
+                        "approx_distinct_count": 10,
+                    }
+                ],
+            }
+        )
+    )
+
+    loaded = load_profile_or_spec(profile_path)
+
+    assert loaded.source_type == "trino"
+    assert loaded.entity("orders").row_count == 10
 
 
 def test_json_and_trino_adapters_load_legacy_profile_shapes(tmp_path) -> None:

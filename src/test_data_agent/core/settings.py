@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class GenerationMode(StrEnum):
@@ -22,6 +22,8 @@ class OutputFormat(StrEnum):
 
 
 class GenerationSettings(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
+
     seed: int | None = Field(default=None, ge=0)
     mode: GenerationMode = GenerationMode.VALID
     invalid_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -30,9 +32,10 @@ class GenerationSettings(BaseModel):
 
 
 class ValidationSettings(BaseModel):
+    model_config = ConfigDict(validate_assignment=True)
+
     validate_schema: bool = True
     validate_relationships: bool = True
     validate_constraints: bool = True
     validate_privacy: bool = True
     fail_fast: bool = False
-

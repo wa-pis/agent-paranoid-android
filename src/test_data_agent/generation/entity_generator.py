@@ -114,12 +114,12 @@ def synthetic_identifier(entity_name: str, field: FieldSpec, row_index: int, see
 
 def synthetic_sensitive_value(field: FieldSpec, faker: Faker) -> str:
     if field.semantic_type == "email":
-        return faker.email()
+        return f"{faker.user_name()}@example.test"
     if field.semantic_type == "phone":
-        return faker.phone_number()
+        return f"+1-202-555-{faker.random_int(min=100, max=199):04d}"
     if field.semantic_type == "ssn":
-        return faker.ssn()
-    return faker.word()
+        return f"000-00-{faker.random_int(min=0, max=9999):04d}"
+    return f"synthetic_{faker.uuid4()[:12]}"
 
 
 def weighted_choice(categories: list[Any], rng: random.Random) -> Any:

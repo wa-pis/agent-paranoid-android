@@ -21,6 +21,7 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
+from test_data_agent.safety import assert_profile_safe
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
@@ -181,6 +182,7 @@ def profile_example_artifacts(
         use_cache=use_cache,
         rule_sample_rows=rule_sample_rows,
     )
+    assert_profile_safe(profile)
     write_json_artifact(profile, output_path)
     return profile
 
@@ -213,6 +215,7 @@ def generate_dataset_from_example_artifacts(
         output_folder=output_folder,
         output_format=output_format,
         seed=seed,
+        source_folder=input_folder,
     )
 
 

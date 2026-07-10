@@ -20,12 +20,15 @@ package "Inputs" {
 package "Interfaces" {
   component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example, validate" as Cli
   component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
+  component "mcp_generator_server.py\nProfile, Infer, Generate,\nValidate, Export" as GeneratorMcp
 }
 
 package "Safety Controls" {
   component "SQL Safety Checks\nread-only, bounded LIMIT,\nno DDL/DML, no SELECT *" as SqlSafety
   component "PII Detection + Masking\nsensitive by default" as PiiMasking
   component "No Raw Row Copying\nsynthetic output only" as NoCopy
+  component "Workspace Path Boundary\nno traversal or symlink escape" as WorkspaceBoundary
+  component "Safe Profile Validation\nno raw sensitive distributions" as ProfileSafety
 }
 
 package "Legacy Single-Table Flow" {
@@ -84,9 +87,11 @@ package "Outputs" {
   file "JSON" as JsonOut
   file "Parquet" as ParquetOut
   artifact "Artifacts\nprofile.json / csv_profile.json\ngeneration_spec.json / dataset_spec.yaml\nvalidation_report.json\nbusiness_validation_report.json" as Artifacts
+  artifact "Generation Manifest\nversion, spec hash, seed, format,\nrow counts, validation, provenance" as Manifest
 }
 
 User --> Cli : runs commands
+User --> GeneratorMcp : MCP synthetic workflow
 User --> LegacySpecFile : writes/reviews
 User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
@@ -102,7 +107,14 @@ TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
 TrinoMcp --> TableProfile : metadata, aggregates,\nmasked samples
+TrinoMcp --> GeneratorMcp : inline safe profile payload
 TableProfile --> LegacySpec : from_trino_profile
+
+GeneratorMcp --> WorkspaceBoundary
+GeneratorMcp --> ProfileSafety
+GeneratorMcp --> Planner : infer_dataset_spec
+GeneratorMcp --> EntityGenerator : generate / export
+GeneratorMcp --> Reconciliation : validate_dataset
 
 LegacySpecFile --> LegacySpec
 LegacySpec --> LegacyGenerator
@@ -167,6 +179,7 @@ DatasetSpec --> Artifacts
 LegacyValidator --> Artifacts
 DatasetReport --> Artifacts
 BusinessReport --> Artifacts
+EntityGenerator --> Manifest
 
 note right of DatasetProfile
   Dataset profiles are safe metadata:

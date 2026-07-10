@@ -19,7 +19,7 @@ This is a map of the codebase for the domain-agnostic generator.
   Formula, temporal, conditional, and aggregate constraint metadata.
 
 - `dataset.py`
-  Top-level `DatasetProfile` and `DatasetSpec`.
+  Top-level `DatasetProfile` and versioned `DatasetSpec` contract validation.
 
 ## Profiling
 
@@ -107,6 +107,19 @@ profiling for foreign keys, temporal ordering, formulas, conditional rules, and
 aggregate mappings. These tools return counts, residuals, `confidence`, and
 `status`; they do not return source rows.
 
+## Generator MCP
+
+`src/test_data_agent/mcp_generator_server.py`
+
+Workspace-bounded tools profile CSV metadata, infer a DatasetSpec from a safe
+file or inline MCP payload, generate/export fresh synthetic datasets, and
+validate generated bundles. Tool responses contain summaries and reports, not
+rows. `src/test_data_agent/safety.py` rejects unsafe sensitive distributions,
+workspace path escapes, and exact source CSV row reuse.
+
+Generation bundles include `generation_manifest.json` for reproducibility and
+provenance auditing.
+
 ## Tests
 
 `tests/test_domain_agnostic_pipeline.py` covers the main pipeline:
@@ -122,3 +135,8 @@ aggregate mappings. These tools return counts, residuals, `confidence`, and
 - generated dataset validation
 - CLI profile/infer/generate/validate flow
 - safe profile cache reuse
+
+`tests/test_mcp_generator_server.py`, `tests/test_safety.py`, and
+`tests/test_ai_trino_workflow.py` cover MCP path isolation, inline Trino profile
+handoff, raw-profile rejection, non-copy checks, manifests, and the complete
+profile-to-CSV workflow.

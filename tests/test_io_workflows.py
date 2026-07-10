@@ -3,6 +3,8 @@ import json
 import test_data_agent.io as io_package
 from pathlib import Path
 
+import pytest
+
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile
@@ -14,6 +16,7 @@ from test_data_agent.io.workflows import (
     generate_dataset_from_profile_artifacts,
     write_csv_profile_artifact,
 )
+from test_data_agent.safety import SourceRowReuseError
 
 
 def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tmp_path) -> None:
@@ -65,6 +68,7 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
     profile_artifact = json.loads((output_path.parent / "profile.json").read_text())
     spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
     validation_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
+    manifest = json.loads((output_path.parent / "generation_manifest.json").read_text())
 
     assert report.valid is True
     assert business_report is None
@@ -73,6 +77,8 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
     assert spec_artifact["generation_settings"]["seed"] == 41
     assert spec_artifact["entities"][0]["row_count"] == 3
     assert validation_artifact["valid"] is True
+    assert manifest["source_rows_copied"] is False
+    assert manifest["seed"] == 41
     assert applied and applied[0][1] == 41
     assert applied[0][0] == rows
 
@@ -102,6 +108,7 @@ def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_a
     profile_artifact = json.loads((output_path.parent / "csv_profile.json").read_text())
     spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
     validation_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
+    manifest = json.loads((output_path.parent / "generation_manifest.json").read_text())
 
     assert report.valid is True
     assert business_report is None
@@ -110,6 +117,8 @@ def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_a
     assert spec_artifact["generation_settings"]["seed"] == 23
     assert spec_artifact["generation_settings"]["output_format"] == "csv"
     assert validation_artifact["valid"] is True
+    assert manifest["source_rows_copied"] is False
+    assert manifest["seed"] == 23
     assert applied and applied[0][1] == 23
     assert [{key: str(value) for key, value in row.items()} for row in applied[0][0]] == rows
 
@@ -142,6 +151,31 @@ def test_generate_dataset_from_csv_artifacts_uses_shared_profile_builder_for_mod
     assert validation_artifact["valid"] is False
 
 
+def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    input_path = tmp_path / "orders.csv"
+    output_path = tmp_path / "generated" / "orders.csv"
+    input_path.write_text("order_id,status\n1,new\n")
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.generate_dataset",
+        lambda spec, seed: {"orders": [{"order_id": "1", "status": "new"}]},
+    )
+
+    with pytest.raises(SourceRowReuseError):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=1,
+            seed=0,
+            output_path=output_path,
+            output_format=OutputFormat.CSV,
+            table_name="orders",
+        )
+
+    assert not output_path.exists()
+
+
 def test_infer_dataset_spec_artifact_writes_dataset_spec_yaml(tmp_path) -> None:
     profile = DatasetProfile(
         source_type="json_profile",
@@ -165,6 +199,26 @@ def test_infer_dataset_spec_artifact_writes_dataset_spec_yaml(tmp_path) -> None:
     assert spec.entities[0].row_count == 4
     assert "generation_settings:" in written
     assert "row_count: 4" in written
+
+
+def test_infer_dataset_spec_artifact_writes_json_for_json_suffix(tmp_path) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=2,
+                fields=[FieldProfile(name="order_id", data_type="integer", is_identifier=True)],
+            )
+        ],
+    )
+    output_path = tmp_path / "dataset_spec.json"
+
+    infer_dataset_spec_artifact(profile, output_path=output_path, count=3)
+
+    payload = json.loads(output_path.read_text())
+    assert payload["schema_version"] == "1.0"
+    assert payload["entities"][0]["row_count"] == 3
 
 
 def test_write_csv_profile_artifact_writes_dataset_profile_json(tmp_path) -> None:

@@ -129,6 +129,7 @@ the profile, but it is intended for generation.
 Small example:
 
 ```yaml
+schema_version: '1.0'
 entities:
 - name: customers
   row_count: 1000
@@ -173,6 +174,12 @@ constraints:
   confidence: 1.0
   status: inferred
 ```
+
+`schema_version` is the serialized contract version and is independent from the
+Python package version. Version `1.0` validates unique entity/field names and
+checks that relationships, constraints, primary keys, and scoped privacy rules
+refer to fields that exist. Older specs without the key load as `1.0` for
+backward compatibility.
 
 ## What You Can Edit
 

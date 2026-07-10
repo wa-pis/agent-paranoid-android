@@ -16,6 +16,10 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
         if rows is None:
             errors.append(f"missing entity: {entity.name}")
             continue
+        if len(rows) != entity.row_count:
+            errors.append(
+                f"{entity.name} row count mismatch: expected {entity.row_count}, got {len(rows)}"
+            )
         expected_fields = [field.name for field in entity.fields]
         for row_index, row in enumerate(rows):
             if list(row.keys()) != expected_fields:

@@ -68,6 +68,23 @@ def test_deterministic_generation_no_copied_rows_and_validation_passes() -> None
     assert {row["customer_id"] for row in rows_a["orders"]} <= {row["customer_id"] for row in rows_a["customers"]}
 
 
+def test_dataset_validation_rejects_wrong_entity_row_count() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="events",
+                row_count=2,
+                fields=[FieldSpec(name="event_id", data_type=FieldType.INTEGER, is_identifier=True)],
+            )
+        ]
+    )
+
+    report = validate_dataset({"events": [{"event_id": 1}]}, spec)
+
+    assert report.valid is False
+    assert report.sections[0].errors == ["events row count mismatch: expected 2, got 1"]
+
+
 def test_generation_uses_typed_distribution_models() -> None:
     spec = DatasetSpec(
         entities=[

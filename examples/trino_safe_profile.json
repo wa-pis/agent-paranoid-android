@@ -1,0 +1,59 @@
+{
+  "source_type": "trino",
+  "table": "orders",
+  "row_count": 10000,
+  "columns": [
+    {
+      "name": "order_id",
+      "data_type": "bigint",
+      "nullable": false,
+      "approx_distinct_count": 10000,
+      "null_ratio": 0.0
+    },
+    {
+      "name": "status",
+      "data_type": "varchar",
+      "nullable": false,
+      "approx_distinct_count": 4,
+      "null_ratio": 0.0,
+      "top_values": [
+        {"value": "new", "count": 1800},
+        {"value": "paid", "count": 6100},
+        {"value": "shipped", "count": 1700},
+        {"value": "cancelled", "count": 400}
+      ]
+    },
+    {
+      "name": "amount",
+      "data_type": "double",
+      "nullable": false,
+      "approx_distinct_count": 7400,
+      "null_ratio": 0.0,
+      "min_value": 1.0,
+      "max_value": 5000.0,
+      "p05": 12.5,
+      "p95": 920.0
+    },
+    {
+      "name": "created_at",
+      "data_type": "timestamp",
+      "nullable": false,
+      "approx_distinct_count": 9800,
+      "null_ratio": 0.0,
+      "min_timestamp": "2025-01-01T00:00:00",
+      "max_timestamp": "2025-12-31T23:59:59"
+    },
+    {
+      "name": "customer_email",
+      "data_type": "varchar",
+      "nullable": false,
+      "approx_distinct_count": 8200,
+      "null_ratio": 0.0,
+      "sensitive": true,
+      "semantic_type": "email",
+      "masked_patterns": [
+        {"pattern": "email", "count": 10000}
+      ]
+    }
+  ]
+}

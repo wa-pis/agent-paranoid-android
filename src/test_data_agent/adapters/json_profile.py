@@ -37,7 +37,8 @@ def json_payload_to_dataset_spec(
     seed: int | None = None,
 ) -> DatasetSpec:
     if (
-        "privacy_rules" in payload
+        "schema_version" in payload
+        or "privacy_rules" in payload
         or "privacy_settings" in payload
         or "generation_settings" in payload
         or "validation_settings" in payload
@@ -76,12 +77,15 @@ def load_json_dataset_spec(
 def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
     payload = load_json_payload(path)
     if (
-        "privacy_rules" in payload
+        "schema_version" in payload
+        or "privacy_rules" in payload
         or "privacy_settings" in payload
         or "generation_settings" in payload
         or "validation_settings" in payload
     ):
         return DatasetSpec.model_validate(payload)
+    if "columns" in payload:
+        return json_payload_to_dataset_profile(payload)
     if "source_type" in payload:
         try:
             return DatasetProfile.model_validate(payload)

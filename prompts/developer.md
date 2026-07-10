@@ -22,8 +22,8 @@ Preferred implementation flow:
 2. profile_table
 3. profile_column for important fields
 4. detect PII
-5. build generation_spec
-6. generate_from_spec
+5. infer_dataset_spec
+6. generate_dataset
 7. validate_dataset
 8. export_dataset
 

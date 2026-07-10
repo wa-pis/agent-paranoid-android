@@ -94,6 +94,10 @@ def generate_value(
 
 
 def generate_faker_value(column: ColumnSpec, faker: Faker) -> Any:
+    if column.data_type == DataType.EMAIL:
+        return f"{faker.user_name()}@example.test"
+    if column.data_type == DataType.PHONE:
+        return f"+1-202-555-{faker.random_int(min=100, max=199):04d}"
     provider_name = column.faker_provider or "word"
     provider = getattr(faker, provider_name, None)
     if provider is None:

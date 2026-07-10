@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "test-data-agent"
-version = "0.2.0"
+version = "0.3.0"
 description = "Safe deterministic synthetic test data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -25,6 +25,8 @@ dev = [
 
 [project.scripts]
 test-data-agent = "test_data_agent.cli:main"
+test-data-agent-mcp-generator = "test_data_agent.mcp_generator_server:main"
+test-data-agent-mcp-trino = "test_data_agent.mcp_trino_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/test_data_agent"]

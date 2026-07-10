@@ -36,6 +36,7 @@ def test_generated_rows_match_requested_schema() -> None:
     assert len(rows) == 5
     assert list(rows[0].keys()) == ["id", "email", "status", "score"]
     assert [row["id"] for row in rows] == [1, 2, 3, 4, 5]
+    assert all(row["email"].endswith("@example.test") for row in rows)
     assert validate_rows(rows, spec) == []
 
 

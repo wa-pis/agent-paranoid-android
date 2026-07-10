@@ -10,9 +10,11 @@ from importlib import import_module
 from typing import Any
 from warnings import warn
 
-from test_data_agent.core import DatasetProfile, DatasetSpec
+from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
+from test_data_agent.io.workflows import DatasetGenerationResult, generate_dataset_bundle
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
+from test_data_agent.version import __version__
 
 _LEGACY_EXPORTS = {
     "ColumnSpec": ("test_data_agent.compat.legacy_spec", "ColumnSpec"),
@@ -28,19 +30,23 @@ _LEGACY_EXPORTS = {
 __all__ = [
     "DatasetProfile",
     "DatasetSpec",
+    "DatasetGenerationResult",
     "DatasetValidationReport",
+    "DATASET_SPEC_SCHEMA_VERSION",
     "ColumnSpec",
     "ForeignKeySpec",
     "GenerationSpec",
     "MultiTableGenerationSpec",
     "TableSpec",
     "generate_dataset",
+    "generate_dataset_bundle",
     "infer_dataset_spec",
     "solve_constraints",
     "generate_rows",
     "generate_tables",
     "validate_dataset",
     "validate_rows",
+    "__version__",
 ]
 
 

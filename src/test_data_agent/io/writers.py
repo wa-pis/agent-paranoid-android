@@ -18,6 +18,10 @@ def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
     return yaml.safe_dump(spec.model_dump(mode="json"), sort_keys=False)
 
 
+def dataset_spec_to_json(spec: DatasetSpec) -> str:
+    return spec.model_dump_json(indent=2)
+
+
 def rows_to_csv(rows: list[dict[str, Any]]) -> str:
     if not rows:
         return ""

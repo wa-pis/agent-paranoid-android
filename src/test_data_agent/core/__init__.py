@@ -1,7 +1,7 @@
 """Domain-agnostic dataset modeling primitives."""
 
 from test_data_agent.core.constraint import Constraint, ConstraintStatus, ConstraintType
-from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
 from test_data_agent.core.distribution import (
     BooleanDistribution,
     CategoricalDistribution,
@@ -42,6 +42,7 @@ __all__ = [
     "ConstraintType",
     "DateRangeDistribution",
     "DateTimeRangeDistribution",
+    "DATASET_SPEC_SCHEMA_VERSION",
     "DatasetProfile",
     "DatasetSpec",
     "EntityProfile",

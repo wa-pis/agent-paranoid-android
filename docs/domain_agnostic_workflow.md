@@ -152,7 +152,9 @@ the YAML `DatasetSpec`, then let generation and validation enforce them.
 `generate` with a YAML spec writes:
 
 - one output file per entity, such as `customers.csv` and `orders.csv`
+- the effective `dataset_spec.yaml`
 - `validation_report.json`
+- `generation_manifest.json`
 
 `generate-from-example` writes:
 
@@ -160,6 +162,7 @@ the YAML `DatasetSpec`, then let generation and validation enforce them.
 - `profile.json`
 - `dataset_spec.yaml`
 - `validation_report.json`
+- `generation_manifest.json`
 
 ## How Relationships Are Preserved
 

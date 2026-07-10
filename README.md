@@ -10,11 +10,13 @@ never copies source rows into generated output.
 
 ## Project Status
 
-Current package version: `0.2.0`.
+Current package version: `0.3.0`.
 
 The domain-agnostic `DatasetSpec` pipeline is the primary path for new work. It
 supports safe CSV folder profiling, spec inference, deterministic multi-table
 generation, constraint reconciliation, validation, and CSV/JSON/Parquet export.
+The generator MCP server now exposes the same profile, infer, generate, validate,
+and export workflow to AI clients without returning dataset rows through MCP.
 
 Legacy `GenerationSpec` commands and imports remain available for compatibility,
 but they emit deprecation warnings and should be treated as migration paths.
@@ -65,61 +67,80 @@ pipeline:
 - [Domain-Agnostic Workflow](docs/domain_agnostic_workflow.md)
 - [Dataset Profile And Spec Reference](docs/dataset_profile_and_spec.md)
 - [AI Integration](docs/ai_integration.md)
+- [Roadmap](docs/roadmap.md)
+- [Changelog](CHANGELOG.md)
 - [Implementation Map](docs/implementation_map.md)
 - [Architecture Diagram](docs/architecture.puml)
 
 ## How To Use It
 
-There are four normal ways to use the project:
+There are five normal ways to use the project:
 
 1. Start from a hand-written generation spec.
 2. Start from a CSV file and let the agent infer a safe profile.
 3. Start from safe Trino/profile metadata and generate from that profile.
 4. Start from an example multi-table CSV folder and infer a dataset spec.
+5. Let an MCP-compatible AI client orchestrate the same safe workflow.
 
 Each flow produces synthetic data plus validation artifacts.
 
 ### 1. Generate From A Spec
 
-Create `spec.json`:
+Create `dataset_spec.yaml`:
 
-```json
-{
-  "seed": 42,
-  "output_format": "json",
-  "table": {
-    "name": "customers",
-    "row_count": 3,
-    "columns": [
-      {"name": "id", "data_type": "integer", "strategy": "sequence"},
-      {"name": "email", "data_type": "email"},
-      {
-        "name": "status",
-        "data_type": "string",
-        "strategy": "choice",
-        "choices": ["new", "active", "paused"]
-      }
-    ]
-  }
-}
+```yaml
+schema_version: '1.0'
+entities:
+- name: customers
+  row_count: 3
+  primary_key: customer_id
+  fields:
+  - name: customer_id
+    data_type: integer
+    is_identifier: true
+    distribution:
+      kind: synthetic_identifier
+  - name: email
+    data_type: string
+    sensitive: true
+    semantic_type: email
+    distribution:
+      kind: masked_patterns
+      patterns:
+      - pattern: email
+        count: 1
+  - name: status
+    data_type: string
+    distribution:
+      kind: categorical
+      categories:
+      - {value: new, count: 1}
+      - {value: active, count: 2}
+relationships: []
+constraints: []
+generation_settings:
+  seed: 42
+  output_format: json
 ```
 
 Generate rows:
 
 ```bash
-test-data-agent generate spec.json --output out/customers.json
+test-data-agent generate dataset_spec.yaml --output out/customers
 ```
 
 Validate rows against the spec:
 
 ```bash
-test-data-agent validate spec.json out/customers.json
+test-data-agent validate out/customers/dataset_spec.yaml out/customers
 ```
 
-The `generate` command also writes:
+The `generate` command writes:
 
-- `out/generation_spec.json`
-- `out/validation_report.json`
+- `out/customers/customers.json`
+- `out/customers/dataset_spec.yaml`
+- `out/customers/validation_report.json`
+- `out/customers/generation_manifest.json`
 
 ### 2. Generate From A CSV
 
@@ -162,6 +183,7 @@ test-data-agent generate-from-csv data/customers.csv \
 - `csv_profile.json`
 - `generation_spec.json`
 - `validation_report.json`
+- `generation_manifest.json`
 
 Supported output formats are `json`, `csv`, and `parquet`.
 
@@ -185,6 +207,7 @@ This writes:
 - `out/orders.csv`
 - `out/generation_spec.json`
 - `out/validation_report.json`
+- `out/generation_manifest.json`
 
 Profile input should contain safe metadata only. Do not include raw production
 samples.
@@ -227,7 +250,7 @@ test-data-agent generate out/dataset_spec.yaml \
 Validate the generated folder:
 
 ```bash
-test-data-agent validate out/dataset_spec.yaml out/generated \
+test-data-agent validate out/generated/dataset_spec.yaml out/generated \
   --output out/generated/validation_report.json
 ```
 
@@ -243,6 +266,8 @@ test-data-agent generate-from-example example_dataset \
 
 All identifiers are regenerated synthetically. Foreign keys are preserved by
 wiring child rows to generated parent IDs, never by reusing source IDs.
+The generated folder also contains the effective `dataset_spec.yaml`,
+`validation_report.json`, and `generation_manifest.json`.
 
 Large CSV folders are profiled in a streaming pass, so the profiler does not
 hold every source row in memory. Schema, null ratios, safe distributions, and
@@ -289,8 +314,9 @@ test-data-agent profile-csv INPUT.csv --output PROFILE.json
 Generate from a spec:
 
 ```bash
-test-data-agent generate SPEC.json --output OUTPUT.json
 test-data-agent generate DATASET_SPEC.yaml --format csv --output OUTPUT_FOLDER
+# Deprecated compatibility path:
+test-data-agent generate LEGACY_GENERATION_SPEC.json --output OUTPUT.json
 ```
 
 Generate from a safe profile:
@@ -324,7 +350,7 @@ test-data-agent generate-from-example INPUT_FOLDER \
   --output OUTPUT_FOLDER
 ```
 
-Validate generated JSON rows:
+Validate generated rows (the first form is the deprecated compatibility path):
 
 ```bash
 test-data-agent validate SPEC.json ROWS.json
@@ -353,9 +379,11 @@ The high-level flow is documented as PlantUML in
 safe profile metadata, generation spec inference, deterministic generation,
 business-rule validation, and exported artifacts.
 
-## Generation Specs
+## Legacy GenerationSpec Compatibility
 
-Specs are Pydantic models serialized as JSON. Supported data types:
+Legacy single-table specs are Pydantic models serialized as JSON. New
+integrations should use the versioned `DatasetSpec` shown above. Legacy data
+types remain:
 
 - `integer`
 - `float`
@@ -492,16 +520,55 @@ spec:
 Each rule profile includes `confidence` and `status`. The tools do not return
 source rows, identifiers, or raw PII values.
 
+## Generator MCP Server
+
+The second MCP server exposes the synthetic pipeline to AI clients:
+
+- `profile_csv`
+- `infer_dataset_spec`
+- `generate_dataset`
+- `validate_dataset`
+- `export_dataset`
+
+Start it from the workspace that contains allowed inputs and outputs:
+
+```bash
+TEST_DATA_AGENT_WORKSPACE_ROOT=/path/to/allowed/workspace \
+  python -m test_data_agent.mcp_generator_server
+```
+
+All tool paths are resolved inside `TEST_DATA_AGENT_WORKSPACE_ROOT`; traversal
+and symlink escapes are rejected. MCP responses contain paths, row counts,
+version metadata, and validation results, never generated rows. `export_dataset`
+always generates fresh synthetic data from a `DatasetSpec`; it cannot convert or
+export arbitrary source rows.
+
+Generated bundles contain `dataset_spec.yaml`, `validation_report.json`, and
+`generation_manifest.json`. The manifest records the package and schema
+versions, spec fingerprint, seed, output format, row counts, validation status,
+and the explicit provenance flags `synthetic: true` and
+`source_rows_copied: false`.
+
+`infer_dataset_spec` accepts exactly one of a workspace `profile_path` or an
+inline `profile_payload` from the Trino MCP server. MCP tools never overwrite
+existing output files, and generation requires a new or empty output folder.
+
+Run the local end-to-end example from safe Trino profile metadata:
+
+```bash
+python scripts/run_ai_demo.py --output out/ai_demo --count 100 --seed 12345
+```
+
 ## DatasetSpec Generation
 
 Use `DatasetSpec` when synthetic datasets need deterministic relationships such
 as foreign keys:
 
 ```python
-from test_data_agent.core.constraint import ForeignKeyConstraint
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings
 from test_data_agent.generation.entity_generator import generate_dataset
 
@@ -526,13 +593,14 @@ spec = DatasetSpec(
             ],
         ),
     ],
-    constraints=[
-        ForeignKeyConstraint(
-            name="orders_customer_fk",
+    relationships=[
+        Relationship(
             child_entity="orders",
             child_field="customer_id",
             parent_entity="customers",
             parent_field="customer_id",
+            confidence=1.0,
+            status="confirmed",
         )
     ],
     generation_settings=GenerationSettings(seed=12345),
@@ -664,6 +732,9 @@ but new integrations should target the domain-agnostic modules.
   legacy specs into `DatasetProfile` or `DatasetSpec`.
 - `src/test_data_agent/csv_profiler.py` - safe single-CSV profiling.
 - `src/test_data_agent/mcp_trino_server.py` - safe read-only Trino MCP tools.
+- `src/test_data_agent/mcp_generator_server.py` - workspace-bounded MCP tools
+  for profiling, spec inference, generation, validation, and export.
+- `src/test_data_agent/safety.py` - profile and source-row reuse safety checks.
 - `src/test_data_agent/profiling/` - domain-agnostic CSV-folder profiling,
   relationship inference, constraint mining, and safe profile caching.
 - `src/test_data_agent/business_rules.py` - business-rule models and YAML loader.
@@ -674,6 +745,7 @@ but new integrations should target the domain-agnostic modules.
 - `src/test_data_agent/validator.py` - legacy row-validation compatibility path.
 - `src/test_data_agent/cli.py` - local command-line interface.
 - `examples/` - safe profile examples.
+- `scripts/run_ai_demo.py` - Trino-profile to synthetic CSV demonstration.
 - `prompts/` - agent prompt templates.
 - `tests/` - unit tests with mocked/local inputs.
 
