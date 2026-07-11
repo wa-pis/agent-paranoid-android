@@ -11,6 +11,7 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.privacy import SENSITIVE_SEMANTIC_TYPES, is_sensitive_field
+from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
 
 
 class ProfileSafetyError(ValueError):
@@ -53,13 +54,16 @@ def assert_no_csv_source_rows(
     generated = list(generated_rows)
     if not generated:
         return
-    with source_path.open(newline="") as handle:
-        reader = csv.DictReader(handle)
-        if not reader.fieldnames:
-            raise ValueError(f"CSV must include a header row: {source_path}")
-        signatures = {_row_signature(row, reader.fieldnames) for row in generated}
+    encoding = detect_csv_encoding(source_path)
+    with source_path.open(newline="", encoding=encoding) as handle:
+        sample = handle.read(8192)
+        handle.seek(0)
+        reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+        fieldnames = validate_csv_headers(reader.fieldnames)
+        reader.fieldnames = fieldnames
+        signatures = {_row_signature(row, fieldnames) for row in generated}
         for source_row in reader:
-            if _row_signature(source_row, reader.fieldnames) in signatures:
+            if _row_signature(source_row, fieldnames) in signatures:
                 label = entity_name or source_path.stem
                 raise SourceRowReuseError(
                     f"generated entity {label!r} repeats a complete source row; generation stopped"

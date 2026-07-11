@@ -85,6 +85,26 @@ def test_safe_select_rejects_likely_pii_even_with_safe_alias() -> None:
         validate_safe_select("SELECT customer_email AS value FROM analytics.safe_schema.users LIMIT 10")
 
 
+def test_safe_select_rejects_pii_hidden_behind_cte_alias() -> None:
+    with pytest.raises(SqlSafetyError):
+        validate_safe_select(
+            "WITH source AS (SELECT customer_email AS value FROM analytics.safe_schema.users) "
+            "SELECT value FROM source LIMIT 1"
+        )
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT a.id FROM analytics.safe_schema.users a CROSS JOIN analytics.safe_schema.users b LIMIT 10",
+        "SELECT id FROM analytics.safe_schema.users ORDER BY rand() LIMIT 10",
+    ],
+)
+def test_safe_select_rejects_work_expanding_query_shapes(sql: str) -> None:
+    with pytest.raises(SqlSafetyError):
+        validate_safe_select(sql)
+
+
 def test_safe_select_enforces_allowlist_for_table_references() -> None:
     config = TrinoConfig(
         host="localhost",

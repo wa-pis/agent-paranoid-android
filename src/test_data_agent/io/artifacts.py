@@ -10,7 +10,7 @@ from typing import Any, Literal
 from pydantic import BaseModel
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.settings import OutputFormat
+from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io.writers import dataset_spec_to_json, dataset_spec_to_yaml
 from test_data_agent.version import __version__
 
@@ -33,7 +33,7 @@ def write_json_artifact(payload: Any, output: Path) -> None:
     if hasattr(payload, "model_dump_json"):
         output.write_text(payload.model_dump_json(indent=2))
         return
-    output.write_text(str(payload))
+    output.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str))
 
 
 def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
@@ -67,7 +67,14 @@ def write_dataset_generation_artifacts(
         seed=spec.generation_settings.seed or 0,
         output_format=spec.generation_settings.output_format,
         row_counts=row_counts or {entity.name: entity.row_count for entity in spec.entities},
-        validation_valid=bool(report.valid),
+        validation_valid=bool(
+            report.valid
+            and (
+                business_report is None
+                or spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
+                or bool(business_report.valid)
+            )
+        ),
         output_folder=artifact_dir,
     )
     if business_report is not None:

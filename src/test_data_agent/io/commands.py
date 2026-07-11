@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -10,21 +11,28 @@ from typing import Any, Callable
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import OutputFormat
+from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import write_json_artifact
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
+    ensure_empty_output_folder,
+    ensure_folders_distinct,
+    ensure_paths_distinct,
+    require_output_suffix,
+    commit_temp_output_folder,
     generate_dataset_artifacts,
     generate_dataset_from_csv_artifacts,
     generate_dataset_from_profile_artifacts,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
+    make_temp_output_folder,
     write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
-BusinessRulesApplier = Callable[[dict[str, list[dict[str, Any]]], int], Any | None]
+BusinessRulesApplier = Callable[..., Any | None]
 
 
 def is_dataset_spec_path(path: Path) -> bool:
@@ -46,6 +54,7 @@ def generate_dataset_from_spec_path(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     spec = load_dataset_spec(spec_path)
     return generate_dataset_artifacts(
@@ -54,10 +63,15 @@ def generate_dataset_from_spec_path(
         output_format=output_format,
         seed=seed,
         count=count,
+        business_rules_applier=business_rules_applier,
     )
 
 
-def generate_dataset_command(args: argparse.Namespace) -> int:
+def generate_dataset_command(
+    args: argparse.Namespace,
+    *,
+    business_rules_applier: BusinessRulesApplier | None = None,
+) -> int:
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
     output_format = None if args.output_format is None else OutputFormat(args.output_format)
@@ -67,6 +81,7 @@ def generate_dataset_command(args: argparse.Namespace) -> int:
         output_format=output_format,
         seed=args.seed,
         count=args.count,
+        business_rules_applier=business_rules_applier,
     )
 
 
@@ -83,6 +98,8 @@ def generate_dataset_from_profile_command(
         raise SystemExit("--count is required with --profile")
     if args.seed is None:
         raise SystemExit("--seed is required with --profile")
+    if args.output is not None:
+        ensure_paths_distinct(args.profile, args.output)
 
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
@@ -134,6 +151,7 @@ def validate_dataset_artifacts(
 
 
 def infer_dataset_spec_command(args: argparse.Namespace) -> int:
+    ensure_paths_distinct(args.profile, args.output)
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
@@ -151,6 +169,7 @@ def generate_dataset_from_csv_command(
     *,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
+    ensure_paths_distinct(args.input, args.output)
     report, business_report = generate_dataset_from_csv_artifacts(
         args.input,
         count=args.count,
@@ -176,6 +195,11 @@ def profile_example_artifacts(
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
 ):
+    require_output_suffix(output_path, {".json"}, "profile output")
+    input_folder_resolved = input_folder.resolve(strict=True)
+    output_resolved = output_path.resolve(strict=False)
+    if output_resolved.parent == input_folder_resolved and output_resolved.suffix.lower() == ".csv":
+        raise ValueError("profile output must not overwrite a source CSV")
     profile = profile_example_folder(
         input_folder,
         cache_dir=cache_dir,
@@ -198,25 +222,30 @@ def generate_dataset_from_example_artifacts(
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
 ) -> int:
+    ensure_folders_distinct(input_folder, output_folder)
+    ensure_empty_output_folder(output_folder)
     profile = profile_example_folder(
         input_folder,
         cache_dir=cache_dir,
         use_cache=use_cache,
         rule_sample_rows=rule_sample_rows,
     )
-    spec = infer_dataset_spec_artifact(
-        profile,
-        output_path=output_folder / "dataset_spec.yaml",
-        count=count,
-    )
-    return generate_dataset_review_artifacts(
-        profile,
-        spec,
-        output_folder=output_folder,
-        output_format=output_format,
-        seed=seed,
-        source_folder=input_folder,
-    )
+    temp_folder = make_temp_output_folder(output_folder)
+    try:
+        spec = infer_dataset_spec(profile, count=count)
+        result = generate_dataset_review_artifacts(
+            profile,
+            spec,
+            output_folder=temp_folder,
+            output_format=output_format,
+            seed=seed,
+            source_folder=input_folder,
+        )
+        commit_temp_output_folder(temp_folder, output_folder)
+        return result
+    except Exception:
+        shutil.rmtree(temp_folder, ignore_errors=True)
+        raise
 
 
 def generate_dataset_from_example_command(args: argparse.Namespace) -> int:

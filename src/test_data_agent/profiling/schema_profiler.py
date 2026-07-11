@@ -25,6 +25,7 @@ from test_data_agent.csv_profiler import (
     parse_datetime_value,
     parse_float,
     parse_int,
+    validate_csv_headers,
 )
 
 MAX_DISTINCT_TRACKED = 200_000
@@ -41,8 +42,8 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
             sample = handle.read(8192)
             handle.seek(0)
             reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
-            if not reader.fieldnames:
-                raise ValueError(f"CSV must include a header row: {path}")
+            fieldnames = validate_csv_headers(reader.fieldnames)
+            reader.fieldnames = fieldnames
             rows: list[dict[str, str]] = []
             for row in reader:
                 rows.append(dict(row))
@@ -66,9 +67,9 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
             sample = handle.read(8192)
             handle.seek(0)
             reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
-            if not reader.fieldnames:
-                raise ValueError(f"CSV must include a header row: {path}")
-            accumulators = {name: FieldAccumulator(name=name) for name in reader.fieldnames}
+            fieldnames = validate_csv_headers(reader.fieldnames)
+            reader.fieldnames = fieldnames
+            accumulators = {name: FieldAccumulator(name=name) for name in fieldnames}
             row_count = 0
             for row in reader:
                 row_count += 1

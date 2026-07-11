@@ -17,6 +17,7 @@ from test_data_agent.core import (
     mask_pattern,
     validate_distribution,
 )
+from test_data_agent.core.constraint import Constraint, ConstraintType
 from pydantic import ValidationError
 from test_data_agent.adapters import (
     csv_profile_to_dataset_profile,
@@ -31,6 +32,7 @@ from test_data_agent.adapters.legacy_generation import (
     multi_table_generation_spec_to_dataset_spec,
 )
 from test_data_agent.csv_profiler import profile_csv
+from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.spec import (
@@ -74,6 +76,86 @@ def test_dataset_spec_loads_legacy_shape_with_default_settings() -> None:
     assert spec.generation_settings.mode == GenerationMode.VALID
     assert spec.validation_settings == ValidationSettings()
     assert spec.schema_version == "1.0"
+
+
+def test_entities_only_json_spec_preserves_primary_key(tmp_path) -> None:
+    path = tmp_path / "dataset_spec.json"
+    path.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "customers",
+                        "row_count": 1,
+                        "primary_key": "customer_id",
+                        "fields": [
+                            {
+                                "name": "customer_id",
+                                "data_type": "integer",
+                                "is_identifier": True,
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    assert load_json_dataset_spec(path).entity("customers").primary_key == "customer_id"
+
+
+def test_primary_key_must_reference_identifier_field() -> None:
+    with pytest.raises(ValidationError, match="must be an identifier field"):
+        EntitySpec(
+            name="customers",
+            row_count=1,
+            primary_key="status",
+            fields=[FieldSpec(name="status", data_type=FieldType.STRING)],
+        )
+
+
+def test_malformed_constraint_is_rejected() -> None:
+    with pytest.raises(ValidationError, match="formula constraint requires"):
+        DatasetSpec(
+            entities=[
+                EntitySpec(
+                    name="orders",
+                    row_count=1,
+                    fields=[FieldSpec(name="total", data_type=FieldType.INTEGER)],
+                )
+            ],
+            constraints=[
+                Constraint(
+                    type=ConstraintType.FORMULA,
+                    entity="orders",
+                    fields=["total"],
+                    confidence=1.0,
+                )
+            ],
+        )
+
+
+def test_partial_timezone_datetime_bound_is_generation_safe() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="events",
+                row_count=1,
+                fields=[
+                    FieldSpec(
+                        name="created_at",
+                        data_type=FieldType.DATETIME,
+                        distribution={
+                            "kind": "datetime_range",
+                            "min": "2024-01-01T00:00:00+00:00",
+                        },
+                    )
+                ],
+            )
+        ]
+    )
+
+    assert generate_dataset(spec, seed=1)["events"][0]["created_at"].endswith("+00:00")
 
 
 def test_dataset_spec_accepts_explicit_privacy_and_runtime_settings() -> None:

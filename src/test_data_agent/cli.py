@@ -7,7 +7,9 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command
+from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
+from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
     generate_dataset_from_csv_command,
     generate_dataset_from_profile_artifacts,
@@ -93,14 +95,23 @@ def main(argv: list[str] | None = None) -> int:
         if args.profile is not None:
             return generate_dataset_from_profile_command(
                 args,
-                business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+                business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
                     rows_by_entity,
                     args,
                     seed,
+                    spec,
                 ),
             )
         if args.spec is not None and is_dataset_spec_path(args.spec):
-            return generate_dataset_command(args)
+            return generate_dataset_command(
+                args,
+                business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
+                    rows_by_entity,
+                    args,
+                    seed,
+                    spec,
+                ),
+            )
         return generate_legacy_command(
             args,
             business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
@@ -122,10 +133,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "generate-from-csv":
         return generate_dataset_from_csv_command(
             args,
-            business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+            business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
                 rows_by_entity,
                 args,
                 seed,
+                spec,
             ),
         )
 
@@ -148,13 +160,28 @@ def main(argv: list[str] | None = None) -> int:
     return 2
 
 
-def apply_business_rules_from_args(rows_by_table: dict[str, list[dict[str, Any]]], args: argparse.Namespace, seed: int) -> Any | None:
+def apply_business_rules_from_args(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    args: argparse.Namespace,
+    seed: int,
+    spec: DatasetSpec | None = None,
+) -> Any | None:
+    field_defaults = None
+    if spec is not None:
+        field_defaults = {
+            entity.name: {
+                field.name: default_value_for_field(field)
+                for field in entity.fields
+            }
+            for entity in spec.entities
+        }
     return apply_and_validate_business_rules_from_path(
         rows_by_table,
         getattr(args, "business_rules", None),
         seed=seed,
         mode=args.mode,
         invalid_ratio=args.invalid_ratio,
+        field_defaults=field_defaults,
     )
 
 

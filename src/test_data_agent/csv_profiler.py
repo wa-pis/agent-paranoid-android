@@ -62,13 +62,13 @@ def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
     dialect = detect_csv_dialect(sample)
     with path.open(newline="", encoding=encoding) as handle:
         reader = csv.DictReader(handle, dialect=dialect)
-        if not reader.fieldnames:
-            raise ValueError("CSV must include a header row")
-        accumulators = {name: CSVColumnAccumulator(name) for name in reader.fieldnames}
+        fieldnames = validate_csv_headers(reader.fieldnames)
+        reader.fieldnames = fieldnames
+        accumulators = {name: CSVColumnAccumulator(name) for name in fieldnames}
         row_count = 0
         for row in reader:
             row_count += 1
-            for name in reader.fieldnames:
+            for name in fieldnames:
                 accumulators[name].add(row.get(name, ""))
     return CSVProfile(
         table=table_name or path.stem,
@@ -98,6 +98,17 @@ def detect_csv_dialect(text: str) -> csv.Dialect:
         return csv.Sniffer().sniff(sample, delimiters=",;\t|")
     except csv.Error:
         return csv.excel
+
+
+def validate_csv_headers(fieldnames: list[str] | None) -> list[str]:
+    if not fieldnames:
+        raise ValueError("CSV must include a header row")
+    normalized = [str(name).strip() for name in fieldnames]
+    if any(not name for name in normalized):
+        raise ValueError("CSV headers must be non-empty")
+    if len(normalized) != len(set(normalized)):
+        raise ValueError("CSV headers must be unique")
+    return normalized
 
 
 class CSVColumnAccumulator:

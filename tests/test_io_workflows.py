@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from test_data_agent.core.dataset import DatasetProfile
-from test_data_agent.core.entity import EntityProfile
-from test_data_agent.core.field import FieldProfile
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.entity import EntityProfile, EntitySpec
+from test_data_agent.core.field import FieldProfile, FieldSpec
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.workflows import (
     generate_dataset_bundle,
@@ -175,6 +175,48 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
         )
 
     assert not output_path.exists()
+
+
+def test_generate_dataset_from_csv_rejects_source_output_collision(tmp_path: Path) -> None:
+    input_path = tmp_path / "orders.csv"
+    input_path.write_text("order_id,status\n1,new\n")
+
+    with pytest.raises(ValueError, match="different"):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=1,
+            seed=0,
+            output_path=input_path,
+            output_format=OutputFormat.CSV,
+        )
+
+
+def test_generation_manifest_includes_business_validation_status(tmp_path: Path) -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[FieldSpec(name="status", data_type="string")],
+            )
+        ]
+    )
+
+    class InvalidBusinessReport:
+        valid = False
+
+        def model_dump_json(self, indent: int) -> str:
+            return '{"valid": false}'
+
+    result = generate_dataset_bundle(
+        spec,
+        output_folder=tmp_path / "generated",
+        business_rules_applier=lambda rows, seed, spec: InvalidBusinessReport(),
+    )
+
+    manifest = json.loads((tmp_path / "generated" / "generation_manifest.json").read_text())
+    assert result.business_validation is not None
+    assert manifest["validation_valid"] is False
 
 
 def test_infer_dataset_spec_artifact_writes_dataset_spec_yaml(tmp_path) -> None:

@@ -10,9 +10,11 @@ from uuid import UUID
 from faker import Faker
 
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec
+from test_data_agent.core.limits import enforce_row_count_limit
 
 
 def generate_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
+    enforce_row_count_limit(spec.table.row_count)
     rng = random.Random(spec.seed)
     faker = Faker()
     faker.seed_instance(spec.seed)
@@ -123,6 +125,10 @@ def generate_date_range_value(column: ColumnSpec, rng: random.Random) -> str:
 def generate_datetime_range_value(column: ColumnSpec, rng: random.Random) -> str:
     min_datetime = column.min_datetime or datetime(2000, 1, 1)
     max_datetime = column.max_datetime or datetime(2030, 12, 31, 23, 59, 59)
+    if min_datetime.tzinfo is not None and max_datetime.tzinfo is None:
+        max_datetime = max_datetime.replace(tzinfo=min_datetime.tzinfo)
+    elif max_datetime.tzinfo is not None and min_datetime.tzinfo is None:
+        min_datetime = min_datetime.replace(tzinfo=max_datetime.tzinfo)
     seconds = max(0, int((max_datetime - min_datetime).total_seconds()))
     return (min_datetime + timedelta(seconds=rng.randint(0, seconds))).isoformat()
 

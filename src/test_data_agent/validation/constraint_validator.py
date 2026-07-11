@@ -77,11 +77,16 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
         ),
         None,
     )
-    if relationship is None or not constraint.target_field or not constraint.fields:
+    if relationship is None or not constraint.fields:
+        return []
+    if constraint.aggregate != "count" and not constraint.target_field:
         return []
     totals: dict[Any, float] = defaultdict(float)
     errors: list[str] = []
     for index, child_row in enumerate(rows_by_entity.get(relationship.child_entity, [])):
+        if constraint.aggregate == "count":
+            totals[child_row.get(relationship.child_field)] += 1
+            continue
         value = child_row.get(constraint.target_field)
         try:
             numeric_value = float(value or 0.0)

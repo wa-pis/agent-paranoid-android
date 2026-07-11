@@ -105,8 +105,13 @@ def validate_optional_date_range(min_value: str | None, max_value: str | None, l
 def validate_optional_datetime_range(min_value: str | None, max_value: str | None, label: str) -> None:
     start = parse_datetime_bound(min_value, label)
     end = parse_datetime_bound(max_value, label)
-    if start is not None and end is not None and start > end:
-        raise ValueError(f"{label} min must be <= max")
+    if start is not None and end is not None:
+        try:
+            ordered = start <= end
+        except TypeError as exc:
+            raise ValueError(f"{label} bounds must use compatible timezone awareness") from exc
+        if not ordered:
+            raise ValueError(f"{label} min must be <= max")
 
 
 def parse_date_bound(value: str | None, label: str) -> date | None:

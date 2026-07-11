@@ -18,7 +18,11 @@ def profile_example_folder(
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
 ) -> DatasetProfile:
     if use_cache and cache_dir is not None:
-        cached = load_cached_profile(input_folder, cache_dir=cache_dir)
+        cached = load_cached_profile(
+            input_folder,
+            cache_dir=cache_dir,
+            rule_sample_rows=rule_sample_rows,
+        )
         if cached is not None:
             return cached
 
@@ -27,7 +31,12 @@ def profile_example_folder(
     profile.relationships = infer_relationships(profile, rows_by_entity)
     profile.constraints = infer_constraints(profile, rows_by_entity)
     if use_cache and cache_dir is not None:
-        write_cached_profile(input_folder, profile, cache_dir=cache_dir)
+        write_cached_profile(
+            input_folder,
+            profile,
+            cache_dir=cache_dir,
+            rule_sample_rows=rule_sample_rows,
+        )
     return profile
 
 

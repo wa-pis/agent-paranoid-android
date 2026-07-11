@@ -234,7 +234,7 @@ def test_profile_example_uses_safe_profile_cache(tmp_path) -> None:
     assert profile_a == profile_b
 
 
-def test_profile_cache_rejects_fingerprint_mismatch(tmp_path) -> None:
+def test_profile_cache_treats_fingerprint_mismatch_as_cache_miss(tmp_path) -> None:
     source = tmp_path / "source"
     source.mkdir()
     (source / "customers.csv").write_text("customer_id,status\n1,active\n")
@@ -253,12 +253,19 @@ def test_profile_cache_rejects_fingerprint_mismatch(tmp_path) -> None:
         )
     )
 
-    try:
-        load_cached_profile(source, cache_dir=cache_dir)
-    except ValueError as exc:
-        assert "fingerprint mismatch" in str(exc)
-    else:
-        raise AssertionError("expected cache fingerprint mismatch")
+    assert load_cached_profile(source, cache_dir=cache_dir) is None
+
+
+def test_profile_cache_key_includes_rule_sample_size(tmp_path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "customers.csv").write_text("customer_id,status\n1,active\n2,paused\n")
+    cache_dir = tmp_path / "cache"
+
+    profile_example_folder(source, cache_dir=cache_dir, rule_sample_rows=1)
+    profile_example_folder(source, cache_dir=cache_dir, rule_sample_rows=2)
+
+    assert len(list(cache_dir.glob("*.json"))) == 2
 
 
 def load_source_rows(folder: Path) -> dict[str, list[dict[str, str]]]:

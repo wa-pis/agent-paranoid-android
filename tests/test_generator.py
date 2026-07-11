@@ -29,6 +29,14 @@ def test_generation_is_deterministic_for_seed() -> None:
     assert generate_rows(spec) != generate_rows(make_spec(seed=43))
 
 
+def test_generation_enforces_configured_row_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_COUNT", "2")
+    spec = make_spec()
+
+    with pytest.raises(ValueError, match="row_count must be <= 2"):
+        generate_rows(spec)
+
+
 def test_generated_rows_match_requested_schema() -> None:
     spec = make_spec()
     rows = generate_rows(spec)

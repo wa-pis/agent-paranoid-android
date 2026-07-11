@@ -47,6 +47,12 @@ class EntitySpec(BaseModel):
             raise ValueError(f"entity spec {self.name!r} has duplicate field names")
         if self.primary_key is not None and self.primary_key not in field_names:
             raise ValueError(f"entity spec {self.name!r} has unknown primary key: {self.primary_key!r}")
+        if self.primary_key is not None:
+            primary_key_field = self.field(self.primary_key)
+            if not primary_key_field.is_identifier:
+                raise ValueError(
+                    f"entity spec {self.name!r} primary key must be an identifier field"
+                )
         return self
 
     def field(self, name: str) -> FieldSpec:

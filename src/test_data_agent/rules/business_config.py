@@ -27,6 +27,7 @@ def apply_and_validate_business_rules(
     seed: int,
     mode: str,
     invalid_ratio: float,
+    field_defaults: dict[str, dict[str, Any]] | None = None,
 ) -> BusinessValidationReport:
     apply_business_rules(
         rows_by_table,
@@ -34,6 +35,7 @@ def apply_and_validate_business_rules(
         seed=seed,
         mode=mode,
         invalid_ratio=invalid_ratio,
+        field_defaults=field_defaults,
     )
     return validate_business_rules(rows_by_table, rules)
 
@@ -45,6 +47,7 @@ def apply_and_validate_business_rules_from_path(
     seed: int,
     mode: str,
     invalid_ratio: float,
+    field_defaults: dict[str, dict[str, Any]] | None = None,
 ) -> BusinessValidationReport | None:
     if rules_path is None:
         return None
@@ -55,4 +58,5 @@ def apply_and_validate_business_rules_from_path(
         seed=seed,
         mode=mode,
         invalid_ratio=invalid_ratio,
+        field_defaults=field_defaults,
     )

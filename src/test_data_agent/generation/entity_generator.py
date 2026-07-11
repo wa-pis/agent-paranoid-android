@@ -20,6 +20,7 @@ from test_data_agent.core.distribution import (
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.limits import enforce_row_count_limit
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.generation.constraint_solver import solve_constraints
 
@@ -31,6 +32,7 @@ def generate_dataset(spec: DatasetSpec, seed: int) -> dict[str, list[dict[str, A
     mode = spec.generation_settings.mode
     invalid_ratio = spec.generation_settings.invalid_ratio
     for entity_index, entity in enumerate(spec.entities):
+        enforce_row_count_limit(entity.row_count)
         rng = random.Random(seed + entity_index)
         rows_by_entity[entity.name] = [
             generate_row(entity, row_index, rng, faker, seed, mode=mode, invalid_ratio=invalid_ratio)
@@ -184,6 +186,10 @@ def ranged_datetime(
     else:
         low = parse_datetime(distribution.get("min")) or datetime(2020, 1, 1)
         high = parse_datetime(distribution.get("max")) or datetime(2025, 1, 1)
+    if low.tzinfo is not None and high.tzinfo is None:
+        high = high.replace(tzinfo=low.tzinfo)
+    elif high.tzinfo is not None and low.tzinfo is None:
+        low = low.replace(tzinfo=high.tzinfo)
     seconds = max(0, int((high - low).total_seconds()))
     value = low + timedelta(seconds=rng.randint(0, seconds))
     return value.date().isoformat() if date_only else value.isoformat()

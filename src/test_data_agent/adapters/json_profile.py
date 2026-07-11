@@ -51,7 +51,14 @@ def json_payload_to_dataset_spec(
             spec.generation_settings.seed = seed
         return spec
     if "entities" in payload:
-        spec = infer_dataset_spec(DatasetProfile.model_validate(payload), count=count)
+        first_entity = payload["entities"][0] if payload["entities"] else {}
+        if isinstance(first_entity, dict) and "primary_key_candidates" in first_entity:
+            spec = infer_dataset_spec(DatasetProfile.model_validate(payload), count=count)
+        else:
+            spec = DatasetSpec.model_validate(payload)
+            if count is not None:
+                for entity in spec.entities:
+                    entity.row_count = count
         if seed is not None:
             spec.generation_settings.seed = seed
         return spec

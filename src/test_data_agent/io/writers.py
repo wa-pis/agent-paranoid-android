@@ -5,6 +5,8 @@ from __future__ import annotations
 import csv
 import json
 import re
+from collections import defaultdict
+from numbers import Number
 from io import StringIO
 from pathlib import Path
 from typing import Any
@@ -45,11 +47,37 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
         raise SystemExit("Parquet output requires pyarrow") from exc
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    stable_rows = [
-        {key: None if value is None else str(value) for key, value in row.items()}
+    pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), output)
+
+
+def parquet_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Preserve homogeneous column types while supporting mixed invalid data."""
+    if not rows:
+        return rows
+    families: dict[str, set[str]] = defaultdict(set)
+    for row in rows:
+        for key, value in row.items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                family = "bool"
+            elif isinstance(value, Number):
+                family = "number"
+            else:
+                family = type(value).__name__
+            families[key].add(family)
+    string_columns = {key for key, types in families.items() if len(types) > 1}
+    if not string_columns:
+        return rows
+    return [
+        {
+            key: None if value is None else str(value)
+            if key in string_columns
+            else value
+            for key, value in row.items()
+        }
         for row in rows
     ]
-    pq.write_table(pa.Table.from_pylist(stable_rows), output)
 
 
 def write_dataset_rows(

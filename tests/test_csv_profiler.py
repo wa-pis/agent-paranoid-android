@@ -1,11 +1,13 @@
 import csv
 import json
+from pathlib import Path
 
 import pyarrow.parquet as pq
 
 from test_data_agent.cli import main
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generator import generate_rows
+from test_data_agent.io.writers import write_parquet
 from test_data_agent.spec import DataType, GenerationSpec
 from test_data_agent.validator import validate_rows_report
 
@@ -122,6 +124,26 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     assert profile["source_type"] == "csv"
     assert profile["entities"][0]["name"] == "customers"
     assert "alice@example.com" not in (csv_output.parent / "csv_profile.json").read_text()
+
+
+def test_parquet_preserves_homogeneous_scalar_types(tmp_path: Path) -> None:
+    output = tmp_path / "rows.parquet"
+    write_parquet([{"id": 1, "active": True, "amount": 1.5}], output)
+
+    schema = pq.read_schema(output)
+    assert str(schema.field("id").type) == "int64"
+    assert str(schema.field("active").type) == "bool"
+    assert str(schema.field("amount").type) == "double"
+
+
+def test_profile_csv_rejects_duplicate_headers(tmp_path: Path) -> None:
+    path = tmp_path / "duplicate.csv"
+    path.write_text("id,status,status\n1,active,paid\n")
+
+    import pytest
+
+    with pytest.raises(ValueError, match="unique"):
+        profile_csv(path)
 
 
 FIXTURE_CSV = __import__("pathlib").Path(__file__).parent / "fixtures" / "customers.csv"

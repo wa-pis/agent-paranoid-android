@@ -2,6 +2,9 @@ import json
 from argparse import Namespace
 from pathlib import Path
 
+import pytest
+
+from test_data_agent.cli import main
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.commands import (
     generate_dataset_command,
@@ -252,6 +255,89 @@ def test_profile_example_artifacts_writes_dataset_profile_json(tmp_path) -> None
     assert profile.source_type == "csv_folder"
     assert payload["source_type"] == "csv_folder"
     assert {entity["name"] for entity in payload["entities"]} == {"customers", "orders"}
+
+
+def test_generate_from_example_rejects_non_empty_output_folder(tmp_path) -> None:
+    output = tmp_path / "generated"
+    output.mkdir()
+    (output / "stale.txt").write_text("old")
+
+    with pytest.raises(ValueError, match="empty"):
+        generate_dataset_from_example_artifacts(
+            FIXTURE,
+            output_folder=output,
+            seed=1,
+            count=2,
+            output_format=OutputFormat.JSON,
+            cache_dir=tmp_path / "cache",
+        )
+
+
+def test_generate_dataset_spec_applies_business_rules(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    rules_path = tmp_path / "rules.yaml"
+    output = tmp_path / "generated"
+    spec_path.write_text(
+        """
+entities:
+  - name: orders
+    row_count: 1
+    fields:
+      - name: status
+        data_type: string
+"""
+    )
+    rules_path.write_text(
+        """
+field_rules:
+  - table: orders
+    field: status
+    allowed_values: [paid]
+"""
+    )
+
+    assert main(
+        [
+            "generate",
+            str(spec_path),
+            "--business-rules",
+            str(rules_path),
+            "--output",
+            str(output),
+        ]
+    ) == 0
+
+    rows = json.loads((output / "orders.json").read_text())
+    assert rows[0]["status"] == "paid"
+    assert (output / "business_validation_report.json").exists()
+
+
+def test_profile_generation_without_output_keeps_stdout_mode(tmp_path, capsys, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "table": "orders",
+                "columns": [{"name": "order_id", "data_type": "bigint", "p05": 1, "p95": 2}],
+            }
+        )
+    )
+
+    assert main(
+        [
+            "generate",
+            "--profile",
+            str(profile_path),
+            "--count",
+            "1",
+            "--seed",
+            "1",
+            "--format",
+            "json",
+        ]
+    ) == 0
+    assert json.loads(capsys.readouterr().out)[0]["order_id"]
 
 
 def test_profile_example_command_routes_args_to_artifact_helper(tmp_path) -> None:

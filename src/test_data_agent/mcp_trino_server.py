@@ -58,6 +58,7 @@ class TrinoConfig:
     http_scheme: str
     allowed_catalogs: frozenset[str] | None
     allowed_schemas: frozenset[str] | None
+    request_timeout: float = 30.0
 
     @classmethod
     def from_env(cls) -> TrinoConfig:
@@ -68,6 +69,7 @@ class TrinoConfig:
             http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "http"),
             allowed_catalogs=parse_allowlist(os.environ.get("TRINO_ALLOWED_CATALOGS")),
             allowed_schemas=parse_allowlist(os.environ.get("TRINO_ALLOWED_SCHEMAS")),
+            request_timeout=float(os.environ.get("TRINO_REQUEST_TIMEOUT_SECONDS", "30")),
         )
 
 
@@ -120,6 +122,7 @@ def validate_safe_select(sql: str, require_limit: bool = True) -> str:
     if FORBIDDEN_SQL_RE.search(cleaned):
         raise SqlSafetyError("DDL, DML, and executable statements are not allowed")
     tree = parse_select_ast(cleaned)
+    validate_safe_select_shape(tree)
     if has_unrestricted_projection_star(tree):
         raise SqlSafetyError("unrestricted SELECT * is not allowed")
     if selected_sensitive_identifier_names(tree):
@@ -132,6 +135,16 @@ def validate_safe_select(sql: str, require_limit: bool = True) -> str:
             raise SqlSafetyError(f"row-returning SELECT queries must use LIMIT between 1 and {MAX_LIMIT}")
     validate_table_references_allowed(tree)
     return cleaned
+
+
+def validate_safe_select_shape(tree: exp.Expression) -> None:
+    """Reject query shapes whose result LIMIT does not bound database work."""
+    if tree.find(exp.Join) or tree.find(exp.CTE) or tree.find(exp.Subquery):
+        raise SqlSafetyError("joins, CTEs, and subqueries are not allowed")
+    if tree.find(exp.Order):
+        raise SqlSafetyError("ORDER BY is not allowed in generic safe SELECT queries")
+    if tree.find(exp.UDTF) or tree.find(exp.TableFromRows) or tree.find(exp.Unnest):
+        raise SqlSafetyError("table functions and UNNEST are not allowed")
 
 
 def parse_select_ast(sql: str) -> exp.Expression:
@@ -210,16 +223,19 @@ def extract_table_references(tree: exp.Expression) -> list[tuple[str, ...]]:
 
 def selected_sensitive_identifier_names(tree: exp.Expression) -> set[str]:
     sensitive: set[str] = set()
-    for projection in tree.expressions:
-        alias = projection.alias
-        if alias and infer_sensitive_from_name(alias):
-            sensitive.add(alias)
-        for column in projection.find_all(exp.Column):
-            if is_star_column(column):
-                continue
-            name = column.name
-            if name and infer_sensitive_from_name(name):
-                sensitive.add(name)
+    for node in tree.walk():
+        if not isinstance(node, exp.Select):
+            continue
+        for projection in node.expressions:
+            alias = projection.alias
+            if alias and infer_sensitive_from_name(alias):
+                sensitive.add(alias)
+            for column in projection.find_all(exp.Column):
+                if is_star_column(column):
+                    continue
+                name = column.name
+                if name and infer_sensitive_from_name(name):
+                    sensitive.add(name)
     return sensitive
 
 
@@ -253,6 +269,7 @@ def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[li
         port=config.port,
         user=config.user,
         http_scheme=config.http_scheme,
+        request_timeout=config.request_timeout,
     )
     cursor = connection.cursor()
     try:

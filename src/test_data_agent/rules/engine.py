@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import random
+from collections.abc import Mapping
 from typing import Any
 
 from test_data_agent.core.settings import GenerationMode
@@ -25,10 +26,11 @@ def apply_business_rules(
     seed: int,
     mode: str = GenerationMode.VALID,
     invalid_ratio: float = 0.0,
+    field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     rng = random.Random(seed)
     apply_scenarios(rows_by_table, rules.scenarios, seed)
-    apply_valid_defaults(rows_by_table, rules)
+    apply_valid_defaults(rows_by_table, rules, field_defaults=field_defaults)
 
     selected_mode = GenerationMode(mode)
     if selected_mode == GenerationMode.EDGE:
@@ -39,11 +41,21 @@ def apply_business_rules(
     return rows_by_table
 
 
-def apply_valid_defaults(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> None:
+def apply_valid_defaults(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rules: BusinessRules,
+    *,
+    field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
+) -> None:
     for rule in rules.field_rules:
         for row in rows_by_table.get(rule.table, []):
             if rule.required and row.get(rule.field) in (None, ""):
-                row[rule.field] = default_value(rule)
+                row[rule.field] = default_value(
+                    rule,
+                    field_defaults.get(rule.table, {}).get(rule.field)
+                    if field_defaults is not None
+                    else None,
+                )
             if rule.allowed_values and row.get(rule.field) not in rule.allowed_values:
                 row[rule.field] = rule.allowed_values[0]
 
@@ -54,7 +66,10 @@ def apply_valid_defaults(rows_by_table: dict[str, list[dict[str, Any]]], rules: 
                     continue
                 for field in rule.required_fields:
                     if row.get(field) in (None, ""):
-                        row[field] = "required"
+                        if field_defaults is not None and field in field_defaults.get(rule.table, {}):
+                            row[field] = field_defaults[rule.table][field]
+                        else:
+                            row[field] = "required"
         elif isinstance(rule, ConditionalAllowedValuesRule):
             for row in rows_by_table.get(rule.table, []):
                 if condition_matches(row, rule.when) and row.get(rule.field) not in rule.allowed_values:
@@ -121,9 +136,11 @@ def break_temporal_rule(row: dict[str, Any], table: str, rules: BusinessRules) -
     return False
 
 
-def default_value(rule: FieldRule) -> Any:
+def default_value(rule: FieldRule, typed_default: Any = None) -> Any:
     if rule.allowed_values:
         return rule.allowed_values[0]
     if rule.min_value is not None:
         return rule.min_value
+    if typed_default is not None:
+        return typed_default
     return "required"

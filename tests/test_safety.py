@@ -115,6 +115,14 @@ def test_no_source_rows_check_accepts_fresh_synthetic_rows(tmp_path: Path) -> No
     )
 
 
+def test_no_source_rows_check_detects_non_comma_csv(tmp_path: Path) -> None:
+    source = tmp_path / "customers.csv"
+    source.write_text("id;status\n1;active\n")
+
+    with pytest.raises(SourceRowReuseError):
+        assert_no_csv_source_rows(source, [{"id": "1", "status": "active"}])
+
+
 def test_folder_source_row_check_uses_entity_file_names(tmp_path: Path) -> None:
     (tmp_path / "customers.csv").write_text("id,status\n1,active\n")
 
