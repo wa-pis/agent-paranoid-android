@@ -13,6 +13,12 @@ or database access.
 The implementation keeps planning and orchestration in the AI layer while all
 generation and validation decisions remain deterministic Python code.
 
+The generic Trino `run_safe_select` tool is intentionally narrower than an
+arbitrary read-only SQL client. It requires a literal bounded `LIMIT`, rejects
+unrestricted projections and likely sensitive fields, and also rejects joins,
+CTEs, subqueries, ordering, table functions, and `UNNEST`. Dedicated aggregate
+profiling tools should be used for expensive multi-table analysis.
+
 ## Why Two MCP Servers
 
 The integration deliberately separates source inspection from generation:

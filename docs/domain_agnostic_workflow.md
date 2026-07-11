@@ -99,7 +99,9 @@ python -m test_data_agent.cli profile-example tests/fixtures/example_dataset \
 ```
 
 Profiles are cached under `.test_data_agent_cache/profiles` by default. The
-cache key is based on CSV file names, sizes, and modification times.
+cache key is based on CSV file names, sizes, modification times, and the
+`--rule-sample-rows` value, because relationship and constraint inference uses
+that bounded sample.
 
 ```bash
 python -m test_data_agent.cli profile-example tests/fixtures/example_dataset \
@@ -110,6 +112,7 @@ python -m test_data_agent.cli profile-example tests/fixtures/example_dataset \
 Use `--no-cache` to force a fresh profile. Cache files contain only profile
 metadata: schemas, aggregates, safe distributions, relationships, constraints,
 and masked patterns. They must never contain source rows or raw PII.
+Cache writes are atomic; an incomplete or stale cache is ignored and rebuilt.
 
 ## Large Trino Tables
 
@@ -163,6 +166,11 @@ the YAML `DatasetSpec`, then let generation and validation enforce them.
 - `dataset_spec.yaml`
 - `validation_report.json`
 - `generation_manifest.json`
+
+Generation output folders must be empty and must not be the source folder. The
+complete bundle is written to a temporary sibling folder and committed as one
+directory replacement. Single-file generation also rejects an output path that
+is identical to its source file.
 
 ## How Relationships Are Preserved
 

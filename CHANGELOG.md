@@ -29,6 +29,19 @@ All notable changes to this project are documented here.
 - Legacy Trino profile JSON containing both `source_type` and `columns` is now
   routed correctly instead of being accepted as an empty DatasetProfile.
 
+### Fixed
+
+- Safe Trino SELECT validation now rejects CTEs, joins, subqueries, ordering,
+  table functions, and likely PII hidden behind aliases.
+- Generation size limits apply to direct and legacy generator APIs, not only
+  CLI workflows.
+- DatasetSpec business rules, primary-key uniqueness, relationship cardinality,
+  typed conditional defaults, and aggregate count mappings are validated.
+- CSV safety checks use detected encoding and delimiter; duplicate headers are
+  rejected and Parquet preserves homogeneous scalar types.
+- Generation bundles and profile caches use collision checks, atomic writes,
+  and cache keys that include rule-sampling configuration.
+
 ## [0.2.0] - 2026-07-10
 
 ### Added

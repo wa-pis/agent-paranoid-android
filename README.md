@@ -45,6 +45,12 @@ store source rows or raw PII.
 Forbidden behavior includes copying production rows, exposing raw PII, exporting
 real rows, running DDL/DML SQL, and creating unrestricted SQL tools.
 
+Generation APIs enforce a configurable per-entity row limit. The default is
+`100000`; override it with `TEST_DATA_AGENT_MAX_GENERATION_COUNT`. Input and
+output paths must be distinct, and folder bundles are assembled atomically.
+Parquet keeps homogeneous numeric and boolean column types; intentionally mixed
+invalid columns are stored as strings so negative datasets remain exportable.
+
 ## Install
 
 Use Python 3.11 or newer.
@@ -281,7 +287,8 @@ test-data-agent profile-example example_dataset \
   --rule-sample-rows 100000
 ```
 
-Profiles are cached by CSV file names, sizes, and modification times:
+Profiles are cached by CSV file names, sizes, modification times, and the
+`--rule-sample-rows` value:
 
 ```bash
 test-data-agent profile-example example_dataset \
@@ -290,7 +297,8 @@ test-data-agent profile-example example_dataset \
 ```
 
 Use `--no-cache` when you need to force a fresh profile. The cache contains
-safe profile metadata only, not source rows.
+safe profile metadata only, not source rows. Cache writes are atomic, and a
+stale or incomplete cache is treated as a miss.
 
 ## CLI Reference
 
@@ -663,7 +671,9 @@ scenarios:
         status: cancelled
 ```
 
-Business rules are currently used from Python:
+Business rules can be applied from the CLI with `--business-rules` on
+`generate`, `generate-from-csv`, and profile-based generation. They are also
+available from Python:
 
 ```python
 from pathlib import Path
