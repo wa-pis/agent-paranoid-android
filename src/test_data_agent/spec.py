@@ -8,7 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from test_data_agent.core.privacy import SENSITIVE_NAME_PARTS, infer_sensitive_from_name, semantic_type_is_sensitive
+from test_data_agent.core.privacy import infer_sensitive_from_name, semantic_type_is_sensitive
 from test_data_agent.core.settings import OutputFormat
 
 

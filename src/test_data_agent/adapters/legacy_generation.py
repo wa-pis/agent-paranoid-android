@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 from typing import Any
 import warnings
+from collections.abc import Mapping
 
 from test_data_agent.adapters.legacy_profile import (
-    legacy_profile_to_dataset_profile,
-    legacy_profile_to_dataset_spec,
-    legacy_profile_to_generation_spec,
+    legacy_profile_to_dataset_profile,  # noqa: F401
+    legacy_profile_to_dataset_spec,  # noqa: F401
+    legacy_profile_to_generation_spec,  # noqa: F401
 )
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.distribution import (

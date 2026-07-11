@@ -65,6 +65,18 @@ Run tests:
 python -m pytest
 ```
 
+Run the same quality checks used by CI:
+
+```bash
+python -m ruff check src tests
+python -m compileall -q src tests
+python -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
+```
+
+CI runs these checks on Python 3.11 and 3.12. The security regression suite
+also uses Hypothesis to exercise variations of PII aliases, SQL statement
+tails, duplicate CSV headers, and sensitive-value masking.
+
 ## Documentation
 
 Start here if you want to understand the newer domain-agnostic multi-table

@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## Unreleased
+
+### Added
+
+- GitHub Actions quality gates for linting, compilation, tests, and an 85%
+  coverage floor on Python 3.11 and 3.12.
+- Hypothesis-based regression tests for SQL/PII and CSV safety boundaries.
+
 ## [0.3.0] - 2026-07-10
 
 ### Added

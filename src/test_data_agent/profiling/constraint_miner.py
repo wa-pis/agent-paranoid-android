@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from itertools import combinations
 from typing import Any
 

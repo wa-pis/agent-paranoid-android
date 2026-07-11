@@ -1,3 +1,5 @@
+import pytest
+
 from test_data_agent.core.constraint import Constraint, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.entity import EntitySpec
@@ -194,4 +196,3 @@ def test_aggregate_count_mapping_counts_child_rows() -> None:
 
     rows = generate_dataset(spec, seed=1)
     assert rows["customers"][0]["order_count"] == 2
-import pytest

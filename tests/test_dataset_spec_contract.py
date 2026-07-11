@@ -34,7 +34,7 @@ from test_data_agent.adapters.legacy_generation import (
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.core.entity import EntitySpec
-from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.field import FieldType
 from test_data_agent.spec import (
     ColumnSpec,
     DataType,
