@@ -56,21 +56,76 @@ invalid columns are stored as strings so negative datasets remain exportable.
 Use Python 3.11 or newer.
 
 ```bash
-python -m pip install -e ".[dev]"
+python3 -m pip install -e ".[dev]"
 ```
+
+## Quickstart
+
+This path uses the checked-in fixture data and writes only local artifacts under
+`out/`.
+
+1. Install the package and run the test suite:
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m pytest
+```
+
+After installation, the `test-data-agent` CLI should be available. If your shell
+cannot find it, run the same commands as `python3 -m test_data_agent.cli ...`.
+
+2. Generate a synthetic single-table CSV from an example source CSV:
+
+```bash
+test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+```
+
+This creates `out/customers.csv` plus review artifacts next to it:
+`csv_profile.json`, `generation_spec.json`, `validation_report.json`, and
+`generation_manifest.json`.
+
+3. Generate a related multi-table dataset from an example CSV folder:
+
+```bash
+test-data-agent generate-from-example tests/fixtures/example_dataset \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/example_dataset
+```
+
+This creates synthetic `customers.csv` and `orders.csv` files, a
+`dataset_spec.yaml`, a validation report, and a generation manifest.
+
+4. Re-run with the same seed when you need identical output:
+
+```bash
+test-data-agent generate-from-example tests/fixtures/example_dataset \
+  --count 25 \
+  --seed 12345 \
+  --format json \
+  --output out/example_dataset_json
+```
+
+The source CSV files are used only for schema and safe profile metadata. The
+generated rows should not copy source rows or expose raw PII.
 
 Run tests:
 
 ```bash
-python -m pytest
+python3 -m pytest
 ```
 
 Run the same quality checks used by CI:
 
 ```bash
-python -m ruff check src tests
-python -m compileall -q src tests
-python -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
+python3 -m ruff check src tests
+python3 -m compileall -q src tests
+python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
 ```
 
 CI runs these checks on Python 3.11 and 3.12. The security regression suite
@@ -505,7 +560,7 @@ TRINO_ALLOWED_SCHEMAS=dev,test,staging
 Start the server:
 
 ```bash
-python -m test_data_agent.mcp_trino_server
+python3 -m test_data_agent.mcp_trino_server
 ```
 
 `run_safe_select` rejects DDL, DML, executable statements, multiple statements,
@@ -555,7 +610,7 @@ Start it from the workspace that contains allowed inputs and outputs:
 
 ```bash
 TEST_DATA_AGENT_WORKSPACE_ROOT=/path/to/allowed/workspace \
-  python -m test_data_agent.mcp_generator_server
+  python3 -m test_data_agent.mcp_generator_server
 ```
 
 All tool paths are resolved inside `TEST_DATA_AGENT_WORKSPACE_ROOT`; traversal
