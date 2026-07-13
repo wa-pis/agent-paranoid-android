@@ -10,7 +10,7 @@ from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.validation import validate_dataset
 
 
-def test_formula_solver_leaves_unappliable_constraints_for_validation() -> None:
+def test_formula_solver_reports_unappliable_constraints_in_valid_mode() -> None:
     spec = DatasetSpec(
         entities=[
             EntitySpec(
@@ -33,12 +33,39 @@ def test_formula_solver_leaves_unappliable_constraints_for_validation() -> None:
         ],
     )
 
+    with pytest.raises(ValueError, match="orders.amount formula failed"):
+        generate_dataset(spec, seed=3)
+
+
+def test_formula_solver_leaves_unappliable_constraints_for_negative_validation() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[
+                    FieldSpec(name="amount", data_type=FieldType.FLOAT),
+                    FieldSpec(name="quantity", data_type=FieldType.FLOAT),
+                ],
+            )
+        ],
+        constraints=[
+            Constraint(
+                type=ConstraintType.FORMULA,
+                entity="orders",
+                fields=["amount"],
+                expression="quantity / 0",
+                confidence=1.0,
+            )
+        ],
+    )
+    spec.generation_settings.mode = GenerationMode.NEGATIVE
+
     rows = generate_dataset(spec, seed=3)
     report = validate_dataset(rows, spec)
 
-    assert rows["orders"][0]["amount"] is not None
+    assert rows["orders"][0]["amount"] == "not-a-number"
     assert report.valid is False
-    assert "formula evaluation failed" in report.sections[2].errors[0]
 
 
 def test_aggregate_solver_does_not_crash_on_controlled_invalid_child_values() -> None:

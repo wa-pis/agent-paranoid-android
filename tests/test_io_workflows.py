@@ -87,7 +87,7 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
 def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_artifacts(tmp_path) -> None:
     input_path = tmp_path / "orders.csv"
     output_path = tmp_path / "generated" / "orders.csv"
-    input_path.write_text("order_id,status\n1,new\n2,shipped\n")
+    input_path.write_text("order_id,status\n101,new\n102,shipped\n")
     applied: list[tuple[list[dict[str, str]], int]] = []
 
     def capture_business_rules(rows_by_entity: dict[str, list[dict[str, str]]], seed: int) -> None:
@@ -127,7 +127,7 @@ def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_a
 def test_generate_dataset_from_csv_artifacts_uses_shared_profile_builder_for_mode_settings(tmp_path) -> None:
     input_path = tmp_path / "orders.csv"
     output_path = tmp_path / "generated" / "orders.json"
-    input_path.write_text("order_id,status\n1,new\n2,shipped\n")
+    input_path.write_text("order_id,status\n101,new\n102,shipped\n")
 
     report, _ = generate_dataset_from_csv_artifacts(
         input_path,
@@ -175,6 +175,37 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
         )
 
     assert not output_path.exists()
+
+
+def test_generate_dataset_from_csv_does_not_publish_rows_when_artifact_write_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    input_path = tmp_path / "orders.csv"
+    output_path = tmp_path / "generated" / "orders.csv"
+    input_path.write_text("order_id,status\n101,new\n102,shipped\n")
+
+    def fail_artifact_write(*args, **kwargs) -> None:
+        raise RuntimeError("artifact write failed")
+
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.write_dataset_generation_artifacts",
+        fail_artifact_write,
+    )
+
+    with pytest.raises(RuntimeError, match="artifact write failed"):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=2,
+            seed=0,
+            output_path=output_path,
+            output_format=OutputFormat.CSV,
+            table_name="orders",
+        )
+
+    assert not output_path.exists()
+    assert not (output_path.parent / "generation_manifest.json").exists()
+    assert list(output_path.parent.iterdir()) == []
 
 
 def test_generate_dataset_from_csv_rejects_source_output_collision(tmp_path: Path) -> None:

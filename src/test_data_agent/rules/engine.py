@@ -84,8 +84,10 @@ def apply_valid_defaults(
             for row in rows_by_table.get(rule.table, []):
                 try:
                     row[rule.field] = safe_eval(rule.expression, row)
-                except Exception:
-                    continue
+                except Exception as exc:
+                    raise ValueError(
+                        f"{rule.table}.{rule.field} formula failed: {exc}"
+                    ) from exc
 
 
 def apply_edge_cases(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> None:

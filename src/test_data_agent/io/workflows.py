@@ -208,17 +208,37 @@ def generate_single_entity_profile_artifacts(
     profile_artifact_name: str = "profile.json",
 ) -> DatasetValidationReport:
     rows_by_entity = rows_by_entity or generate_dataset(spec, seed=spec.generation_settings.seed or 0)
-    write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path)
     report = validate_dataset(rows_by_entity, spec)
-    write_dataset_generation_artifacts(
-        profile,
-        spec,
-        report,
-        output_path,
-        business_report=business_report,
-        profile_artifact_name=profile_artifact_name,
-        row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
-    )
+    if output_path is None:
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path)
+        write_dataset_generation_artifacts(
+            profile,
+            spec,
+            report,
+            output_path,
+            business_report=business_report,
+            profile_artifact_name=profile_artifact_name,
+            row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
+        )
+        return report
+
+    temp_folder = make_temp_output_folder(output_path.parent / output_path.stem)
+    temp_output_path = temp_folder / output_path.name
+    try:
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path)
+        write_dataset_generation_artifacts(
+            profile,
+            spec,
+            report,
+            temp_output_path,
+            business_report=business_report,
+            profile_artifact_name=profile_artifact_name,
+            row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
+        )
+        commit_single_entity_bundle(temp_folder, output_path.parent)
+    except Exception:
+        shutil.rmtree(temp_folder, ignore_errors=True)
+        raise
     return report
 
 
@@ -294,15 +314,13 @@ def generate_dataset_from_csv_artifacts(
             spec,
         )
     assert_no_csv_source_rows(input_path, rows_by_entity[spec.entities[0].name])
-    report = validate_dataset(rows_by_entity, spec)
-    write_single_entity_rows(rows_by_entity, output_format, output_path)
-    write_dataset_generation_artifacts(
+    report = generate_single_entity_profile_artifacts(
         profile,
         spec,
-        report,
-        output_path,
+        output_path=output_path,
+        rows_by_entity=rows_by_entity,
         business_report=business_report,
-        row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
+        profile_artifact_name="csv_profile.json",
     )
     return report, business_report
 
@@ -413,6 +431,13 @@ def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> None:
             raise ValueError("generation output folder must be empty")
         output_folder.rmdir()
     temp_folder.replace(output_folder)
+
+
+def commit_single_entity_bundle(temp_folder: Path, output_folder: Path) -> None:
+    output_folder.mkdir(parents=True, exist_ok=True)
+    for path in sorted(temp_folder.iterdir()):
+        path.replace(output_folder / path.name)
+    temp_folder.rmdir()
 
 
 def ensure_paths_distinct(first: Path, second: Path) -> None:

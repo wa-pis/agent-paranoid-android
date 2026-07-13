@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
@@ -96,8 +98,10 @@ def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
     if "source_type" in payload:
         try:
             return DatasetProfile.model_validate(payload)
-        except Exception:
-            return json_payload_to_dataset_profile(payload)
+        except ValidationError:
+            if "columns" in payload:
+                return json_payload_to_dataset_profile(payload)
+            raise
     if "entities" in payload:
         first_entity = payload["entities"][0] if payload["entities"] else {}
         if isinstance(first_entity, dict) and "primary_key_candidates" in first_entity:

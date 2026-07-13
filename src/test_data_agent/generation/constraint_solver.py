@@ -15,6 +15,7 @@ from test_data_agent.core.distribution import (
 )
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.relationship import RelationshipType
+from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.expressions import parse_datetime, safe_eval
 
@@ -47,6 +48,7 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
 
 
 def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
+    allow_invalid_values = spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
     for constraint in spec.constraints:
         if constraint.type != ConstraintType.FORMULA or not constraint.expression or not constraint.fields:
             continue
@@ -54,8 +56,12 @@ def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], s
         for row in rows_by_entity.get(constraint.entity, []):
             try:
                 row[target] = safe_eval(constraint.expression, row)
-            except Exception:
-                continue
+            except Exception as exc:
+                if allow_invalid_values:
+                    continue
+                raise ValueError(
+                    f"{constraint.entity}.{target} formula failed: {exc}"
+                ) from exc
 
 
 def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:

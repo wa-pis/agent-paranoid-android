@@ -5,6 +5,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 import test_data_agent.adapters as adapters_package
+from pydantic import ValidationError
 
 from test_data_agent.adapters import (
     dataset_profile_from_csv_file,
@@ -46,6 +47,30 @@ def test_csv_file_adapter_builds_safe_one_entity_profile() -> None:
     assert email.sensitive is True
     assert email.distribution["kind"] == "masked_patterns"
     assert "alice@example.com" not in profile_json
+
+
+def test_json_adapter_does_not_treat_broken_dataset_profile_as_legacy(tmp_path) -> None:
+    profile_path = tmp_path / "broken_profile.json"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "source_type": "csv_folder",
+                "entities": [],
+                "relationships": [
+                    {
+                        "parent_entity": "customers",
+                        "parent_field": "customer_id",
+                        "child_entity": "orders",
+                        "child_field": "customer_id",
+                        "confidence": 1.0,
+                    }
+                ],
+            }
+        )
+    )
+
+    with pytest.raises(ValidationError, match="relationship references unknown entity"):
+        load_profile_or_spec(profile_path)
 
 
 def test_csv_folder_adapter_builds_safe_multi_entity_profile() -> None:

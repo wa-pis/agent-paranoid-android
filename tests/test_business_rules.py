@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode
 from test_data_agent.business_rules import ScenarioRule, load_business_rules
 from test_data_agent.business_validator import validate_business_rules
@@ -213,7 +215,7 @@ cross_table_rules:
     assert any("aggregate formula evaluation failed" in error for error in errors)
 
 
-def test_business_rule_application_leaves_bad_formula_for_validation(tmp_path) -> None:
+def test_business_rule_application_reports_bad_formula(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     rules_path.write_text(
         """
@@ -227,12 +229,8 @@ row_rules:
     rules = load_business_rules(rules_path)
     rows_by_table = {"orders": [{"quantity": 2, "total": 10}]}
 
-    apply_business_rules(rows_by_table, rules, seed=7, mode="valid", invalid_ratio=0.0)
-    report = validate_business_rules(rows_by_table, rules)
-
-    assert rows_by_table["orders"][0]["total"] == 10
-    assert report.valid is False
-    assert "formula evaluation failed" in report.results[0].errors[0]
+    with pytest.raises(ValueError, match="orders.total formula failed"):
+        apply_business_rules(rows_by_table, rules, seed=7, mode="valid", invalid_ratio=0.0)
 
 
 def test_scenario_distribution_and_controlled_invalid_generation_are_deterministic(tmp_path) -> None:
