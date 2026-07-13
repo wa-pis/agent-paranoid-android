@@ -61,8 +61,33 @@ python3 -m pip install -e ".[dev]"
 
 ## Quickstart
 
-This path uses the checked-in fixture data and writes only local artifacts under
-`out/`.
+If you have one CSV file and just want synthetic data, start here:
+
+```bash
+test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+```
+
+If you have a folder with related CSV files, one file per table, start here:
+
+```bash
+test-data-agent generate-from-example data/example_dataset \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+```
+
+On success, the CLI prints a short summary with the output location, generated
+row counts, seed, validation status, and the `source rows copied: no` safety
+check. It also writes review artifacts such as `generation_manifest.json` and
+`validation_report.json`.
+
+The example path below uses the checked-in fixture data and writes only local
+artifacts under `out/`.
 
 1. Install the package and run the test suite:
 
@@ -84,7 +109,8 @@ test-data-agent generate-from-csv tests/fixtures/customers.csv \
   --output out/customers.csv
 ```
 
-This creates `out/customers.csv` plus review artifacts next to it:
+This prints a summary and creates `out/customers.csv` plus review artifacts next
+to it:
 `csv_profile.json`, `generation_spec.json`, `validation_report.json`, and
 `generation_manifest.json`.
 
@@ -445,6 +471,9 @@ Useful options:
 - `--cache-dir PATH` selects the safe profile cache for example-folder
   profiling.
 - `--no-cache` disables profile cache reuse.
+- `--overwrite` allows replacing existing single-file outputs such as generated
+  CSV/JSON/Parquet files, profile JSON files, validation reports, and inferred
+  specs. Without it, the CLI refuses to overwrite existing files.
 - `--rule-sample-rows N` bounds row-level relationship and constraint mining
   while full-file schema and distribution profiling remains streaming.
 

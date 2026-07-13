@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -57,7 +58,7 @@ def generate_dataset_from_spec_path(
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     spec = load_dataset_spec(spec_path)
-    return generate_dataset_artifacts(
+    exit_code = generate_dataset_artifacts(
         spec,
         output_folder=output_folder,
         output_format=output_format,
@@ -65,6 +66,8 @@ def generate_dataset_from_spec_path(
         count=count,
         business_rules_applier=business_rules_applier,
     )
+    write_generation_summary(output_folder)
+    return exit_code
 
 
 def generate_dataset_command(
@@ -100,6 +103,7 @@ def generate_dataset_from_profile_command(
         raise SystemExit("--seed is required with --profile")
     if args.output is not None:
         ensure_paths_distinct(args.profile, args.output)
+        ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
 
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
@@ -122,10 +126,12 @@ def generate_dataset_from_profile_command(
     if should_fail_generation(report, business_report, args.mode):
         write_generation_errors(report, business_report)
         return 1
+    write_generation_summary(args.output.parent if args.output is not None else Path.cwd())
     return 0
 
 
 def profile_example_command(args: argparse.Namespace) -> int:
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
     profile_example_artifacts(
         args.input_folder,
         output_path=args.output,
@@ -133,6 +139,7 @@ def profile_example_command(args: argparse.Namespace) -> int:
         use_cache=not args.no_cache,
         rule_sample_rows=args.rule_sample_rows,
     )
+    write_profile_summary(args.output)
     return 0
 
 
@@ -141,26 +148,35 @@ def validate_dataset_artifacts(
     rows_path: Path,
     *,
     output_path: Path | None = None,
+    overwrite: bool = False,
 ) -> DatasetValidationReport:
     spec = load_dataset_spec(spec_path)
     rows_by_entity = load_dataset_rows(rows_path)
     report = validate_dataset(rows_by_entity, spec)
     if output_path is not None:
+        ensure_file_output_available(output_path, overwrite=overwrite)
         write_json_artifact(report, output_path)
     return report
 
 
 def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     ensure_paths_distinct(args.profile, args.output)
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
-    infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
+    spec = infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
+    print(
+        f"Wrote dataset spec: {args.output} ({len(spec.entities)} entities)",
+        file=sys.stderr,
+    )
     return 0
 
 
 def profile_csv_command(args: argparse.Namespace) -> int:
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
     write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
+    write_profile_summary(args.output)
     return 0
 
 
@@ -170,6 +186,7 @@ def generate_dataset_from_csv_command(
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     ensure_paths_distinct(args.input, args.output)
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
     report, business_report = generate_dataset_from_csv_artifacts(
         args.input,
         count=args.count,
@@ -184,6 +201,7 @@ def generate_dataset_from_csv_command(
     if should_fail_generation(report, business_report, args.mode):
         write_generation_errors(report, business_report)
         return 1
+    write_generation_summary(args.output.parent)
     return 0
 
 
@@ -249,7 +267,7 @@ def generate_dataset_from_example_artifacts(
 
 
 def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
-    return generate_dataset_from_example_artifacts(
+    exit_code = generate_dataset_from_example_artifacts(
         args.input_folder,
         output_folder=args.output,
         seed=args.seed,
@@ -259,6 +277,8 @@ def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
         use_cache=not args.no_cache,
         rule_sample_rows=args.rule_sample_rows,
     )
+    write_generation_summary(args.output)
+    return exit_code
 
 
 def write_generation_errors(schema_report: Any, business_report: Any | None) -> None:
@@ -275,3 +295,44 @@ def should_fail_generation(schema_report: Any, business_report: Any | None, mode
     if not schema_report.valid:
         return True
     return business_report is not None and not business_report.valid
+
+
+def ensure_file_output_available(path: Path, *, overwrite: bool = False) -> None:
+    if not path.exists():
+        return
+    if path.is_dir():
+        raise ValueError(f"output path is a directory, expected a file: {path}")
+    if not overwrite:
+        raise ValueError(f"output already exists: {path}. Use --overwrite to replace it.")
+
+
+def write_profile_summary(profile_path: Path) -> None:
+    try:
+        profile = json.loads(profile_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        print(f"Wrote safe profile: {profile_path}", file=sys.stderr)
+        return
+    entity_count = len(profile.get("entities", []))
+    source_type = profile.get("source_type", "profile")
+    print(f"Wrote safe {source_type} profile: {profile_path} ({entity_count} entities)", file=sys.stderr)
+
+
+def write_generation_summary(artifact_folder: Path) -> None:
+    manifest_path = artifact_folder / "generation_manifest.json"
+    if not manifest_path.exists():
+        return
+    try:
+        manifest = json.loads(manifest_path.read_text())
+    except (OSError, json.JSONDecodeError):
+        print(f"Wrote synthetic dataset artifacts: {artifact_folder}", file=sys.stderr)
+        return
+    row_counts = manifest.get("row_counts", {})
+    rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"
+    validation = "passed" if manifest.get("validation_valid") else "failed"
+    copied = "yes" if manifest.get("source_rows_copied") else "no"
+    print(
+        "Generated synthetic dataset: "
+        f"{artifact_folder} | rows: {rows_text} | seed: {manifest.get('seed')} | "
+        f"validation: {validation} | source rows copied: {copied}",
+        file=sys.stderr,
+    )

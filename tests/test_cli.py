@@ -501,3 +501,100 @@ def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path, capsy
     assert "deprecated GenerationSpec compatibility" not in captured.err
     assert len(rows) == 3
     assert profile["entities"][0]["name"] == "customers_cli"
+
+
+def test_missing_csv_reports_friendly_error_without_traceback(tmp_path, capsys) -> None:
+    exit_code = main(
+        [
+            "profile-csv",
+            str(tmp_path / "missing.csv"),
+            "--output",
+            str(tmp_path / "profile.json"),
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Error: file not found:" in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_generate_from_csv_refuses_to_overwrite_existing_output(tmp_path, capsys) -> None:
+    output_path = tmp_path / "customers.csv"
+    output_path.write_text("existing")
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            str(Path("tests/fixtures/customers.csv")),
+            "--count",
+            "3",
+            "--seed",
+            "15",
+            "--format",
+            "csv",
+            "--output",
+            str(output_path),
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "output already exists" in captured.err
+    assert output_path.read_text() == "existing"
+
+
+def test_generate_from_csv_overwrite_replaces_existing_output(tmp_path, capsys) -> None:
+    output_path = tmp_path / "customers.csv"
+    output_path.write_text("existing")
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            str(Path("tests/fixtures/customers.csv")),
+            "--count",
+            "3",
+            "--seed",
+            "15",
+            "--format",
+            "csv",
+            "--output",
+            str(output_path),
+            "--overwrite",
+        ]
+    )
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "Generated synthetic dataset:" in captured.err
+    assert "source rows copied: no" in captured.err
+    assert len(list(csv.DictReader(output_path.open()))) == 3
+
+
+def test_validate_prints_human_summary_to_stderr(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "dataset_spec.yaml"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text(
+        """
+entities:
+  - name: customers
+    row_count: 1
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+"""
+    )
+    (rows_dir / "customers.json").write_text(json.dumps([{"customer_id": 1}]))
+
+    exit_code = main(["validate", str(spec_path), str(rows_dir)])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "Validation passed:" in captured.err
+    assert json.loads(captured.out)["valid"] is True
