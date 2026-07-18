@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- MVP and release checklists, OpenSpec change templates, and golden-path CLI
+  regression coverage for the README quickstart flow.
 - GitHub Actions quality gates for linting, compilation, tests, and an 85%
   coverage floor on Python 3.11 and 3.12.
 - Hypothesis-based regression tests for SQL/PII and CSV safety boundaries.

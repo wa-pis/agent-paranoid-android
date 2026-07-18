@@ -2,7 +2,90 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
+
 from test_data_agent.cli import main
+
+
+FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
+FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
+
+
+def test_cli_help_mentions_quickstart_paths(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--help"])
+
+    captured = capsys.readouterr()
+
+    assert exc_info.value.code == 0
+    assert "generate-from-csv" in captured.out
+    assert "generate-from-example" in captured.out
+    assert "generation_manifest.json" in captured.out
+    assert "synthetic" in captured.out
+
+
+def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:
+    with pytest.raises(SystemExit) as csv_help:
+        main(["generate-from-csv", "--help"])
+
+    csv_output = capsys.readouterr().out
+
+    with pytest.raises(SystemExit) as folder_help:
+        main(["generate-from-example", "--help"])
+
+    folder_output = capsys.readouterr().out
+
+    assert csv_help.value.code == 0
+    assert "tests/fixtures/customers.csv" in csv_output
+    assert "csv_profile.json" in csv_output
+    assert "generation_manifest.json" in csv_output
+    assert folder_help.value.code == 0
+    assert "tests/fixtures/example_dataset" in folder_output
+    assert "dataset_spec.yaml" in folder_output
+    assert "generation_manifest.json" in folder_output
+
+
+def test_quickstart_folder_golden_path_writes_safe_artifacts(tmp_path, capsys) -> None:
+    output_dir = tmp_path / "generated"
+
+    exit_code = main(
+        [
+            "generate-from-example",
+            str(FIXTURE_EXAMPLE_DATASET),
+            "--count",
+            "25",
+            "--seed",
+            "12345",
+            "--format",
+            "csv",
+            "--output",
+            str(output_dir),
+        ]
+    )
+
+    captured = capsys.readouterr()
+    profile_text = (output_dir / "profile.json").read_text()
+    manifest = json.loads((output_dir / "generation_manifest.json").read_text())
+    report = json.loads((output_dir / "validation_report.json").read_text())
+    generated_rows = load_csv_folder(output_dir)
+    source_rows = load_csv_folder(FIXTURE_EXAMPLE_DATASET)
+
+    assert exit_code == 0
+    assert "Generated synthetic dataset:" in captured.err
+    assert "customers=25" in captured.err
+    assert "orders=25" in captured.err
+    assert "seed: 12345" in captured.err
+    assert "source rows copied: no" in captured.err
+    assert manifest["synthetic"] is True
+    assert manifest["source_rows_copied"] is False
+    assert manifest["validation_valid"] is True
+    assert manifest["seed"] == 12345
+    assert manifest["output_format"] == "csv"
+    assert manifest["row_counts"] == {"customers": 25, "orders": 25}
+    assert report["valid"] is True
+    assert "alice@example.com" not in profile_text
+    assert "bob@example.com" not in profile_text
+    assert not copied_rows(generated_rows, source_rows)
 
 
 def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
@@ -137,7 +220,7 @@ def test_profile_csv_routes_through_dataset_command_helper(tmp_path) -> None:
     exit_code = main(
         [
             "profile-csv",
-            str(Path("tests/fixtures/customers.csv")),
+            str(FIXTURE_CUSTOMERS),
             "--table",
             "customers_cli",
             "--output",
@@ -158,7 +241,7 @@ def test_profile_example_routes_through_dataset_command_helper(tmp_path) -> None
     exit_code = main(
         [
             "profile-example",
-            str(Path("tests/fixtures/example_dataset")),
+            str(FIXTURE_EXAMPLE_DATASET),
             "--output",
             str(output_path),
             "--cache-dir",
@@ -448,7 +531,7 @@ field_rules:
     exit_code = main(
         [
             "generate-from-csv",
-            str(Path("tests/fixtures/customers.csv")),
+            str(FIXTURE_CUSTOMERS),
             "--count",
             "5",
             "--mode",
@@ -477,7 +560,7 @@ def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path, capsy
     exit_code = main(
         [
             "generate-from-csv",
-            str(Path("tests/fixtures/customers.csv")),
+            str(FIXTURE_CUSTOMERS),
             "--count",
             "3",
             "--mode",
@@ -527,7 +610,7 @@ def test_generate_from_csv_refuses_to_overwrite_existing_output(tmp_path, capsys
     exit_code = main(
         [
             "generate-from-csv",
-            str(Path("tests/fixtures/customers.csv")),
+            str(FIXTURE_CUSTOMERS),
             "--count",
             "3",
             "--seed",
@@ -553,7 +636,7 @@ def test_generate_from_csv_overwrite_replaces_existing_output(tmp_path, capsys) 
     exit_code = main(
         [
             "generate-from-csv",
-            str(Path("tests/fixtures/customers.csv")),
+            str(FIXTURE_CUSTOMERS),
             "--count",
             "3",
             "--seed",
@@ -572,6 +655,23 @@ def test_generate_from_csv_overwrite_replaces_existing_output(tmp_path, capsys) 
     assert "Generated synthetic dataset:" in captured.err
     assert "source rows copied: no" in captured.err
     assert len(list(csv.DictReader(output_path.open()))) == 3
+
+
+def load_csv_folder(folder: Path) -> dict[str, list[dict[str, str]]]:
+    rows = {}
+    for path in folder.glob("*.csv"):
+        with path.open(newline="") as handle:
+            rows[path.stem] = list(csv.DictReader(handle))
+    return rows
+
+
+def copied_rows(generated: dict[str, list[dict[str, str]]], source: dict[str, list[dict[str, str]]]) -> bool:
+    for table, rows in generated.items():
+        generated_normalized = {tuple(row.items()) for row in rows}
+        source_normalized = {tuple(row.items()) for row in source.get(table, [])}
+        if generated_normalized & source_normalized:
+            return True
+    return False
 
 
 def test_validate_prints_human_summary_to_stderr(tmp_path, capsys) -> None:

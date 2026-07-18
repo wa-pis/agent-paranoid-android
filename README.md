@@ -158,6 +158,46 @@ CI runs these checks on Python 3.11 and 3.12. The security regression suite
 also uses Hypothesis to exercise variations of PII aliases, SQL statement
 tails, duplicate CSV headers, and sensitive-value masking.
 
+## MVP Readiness Checklist
+
+Use this checklist to keep the project scoped to a useful safety-first MVP:
+
+- `generate-from-csv tests/fixtures/customers.csv ...` creates synthetic rows,
+  `csv_profile.json`, `generation_spec.json`, `validation_report.json`, and
+  `generation_manifest.json`.
+- `generate-from-example tests/fixtures/example_dataset ...` creates related
+  synthetic tables plus `profile.json`, `dataset_spec.yaml`,
+  `validation_report.json`, and `generation_manifest.json`.
+- Re-running the same spec with the same seed is deterministic.
+- Generated manifests report `synthetic: true` and `source_rows_copied: false`.
+- CSV profiles contain schema, safe distributions, ranges, and masked patterns,
+  not source rows or raw PII.
+- Dataset validation is performed by deterministic Python code, not by
+  free-form LLM reasoning.
+- Trino-facing queries remain read-only, allowlisted, bounded by `LIMIT`, and
+  covered by unsafe-SQL regression tests.
+- Legacy `GenerationSpec` support is compatibility-only and remains outside the
+  primary quickstart path.
+
+## Release Checklist
+
+Before merging or cutting a release:
+
+- Review the relevant [OpenSpec Baseline](openspec/project.md) capability specs
+  and update them when behavior changes.
+- Run the CI-equivalent quality gates:
+  `python3 -m ruff check src tests`,
+  `python3 -m compileall -q src tests`, and
+  `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
+- Run the quickstart folder flow against `tests/fixtures/example_dataset` and
+  confirm the validation report is valid.
+- Inspect `generation_manifest.json` for seed, row counts, output format,
+  `synthetic: true`, and `source_rows_copied: false`.
+- Update `CHANGELOG.md`, README examples, and docs for user-visible behavior or
+  safety-contract changes.
+- Keep post-MVP features behind explicit OpenSpec changes instead of expanding
+  the MVP silently.
+
 ## Documentation
 
 Start here if you want to understand the newer domain-agnostic multi-table

@@ -12,7 +12,27 @@ date.
 - Runtime raw-profile and source-row reuse protections.
 - End-to-end AI integration demo.
 
-## Next
+## MVP Freeze
+
+Keep the current MVP focused on the reliable golden path:
+
+- CSV file or CSV folder input.
+- Safe profile metadata, not source rows.
+- Reviewable `DatasetSpec`.
+- Deterministic generation by explicit seed.
+- CSV, JSON, and Parquet export.
+- Validation report and generation manifest.
+- MCP responses that return summaries and artifact paths, not dataset rows.
+
+Treat these as non-negotiable release gates rather than new feature work:
+
+- `ruff`, `compileall`, and the full pytest suite pass.
+- Quickstart commands in README run against checked-in fixtures.
+- Generated manifests report `synthetic: true` and
+  `source_rows_copied: false`.
+- OpenSpec baseline stays aligned with implemented behavior.
+
+## Post-MVP Hardening
 
 - Expose structured business-rule configuration through the generator MCP
   server and include business validation in the generation manifest.

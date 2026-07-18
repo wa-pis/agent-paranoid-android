@@ -98,6 +98,14 @@ def main(argv: list[str] | None = None) -> int:
         "generate-from-csv",
         help="Generate a synthetic single-table dataset directly from one CSV file.",
         description="Profile one CSV file, infer a generation spec, generate synthetic rows, and validate the result.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent generate-from-csv tests/fixtures/customers.csv "
+            "--count 25 --seed 12345 --format csv --output out/customers.csv\n\n"
+            "Writes csv_profile.json, generation_spec.json, validation_report.json, "
+            "and generation_manifest.json next to the output file."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     generate_csv_parser.add_argument("input", type=Path, help="Source CSV file used only for safe metadata.")
     generate_csv_parser.add_argument("--count", type=positive_int, required=True, help="Number of synthetic rows to generate.")
@@ -125,6 +133,14 @@ def main(argv: list[str] | None = None) -> int:
         aliases=["generate-from-csv-folder"],
         help="Generate a related multi-table dataset from a folder of CSV examples.",
         description="Profile a CSV folder, infer a DatasetSpec, generate synthetic related tables, and validate them.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent generate-from-example tests/fixtures/example_dataset "
+            "--count 25 --seed 12345 --format csv --output out/example_dataset\n\n"
+            "Writes profile.json, dataset_spec.yaml, validation_report.json, "
+            "generation_manifest.json, and one synthetic data file per entity."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     generate_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
     generate_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Output folder for generated tables and review artifacts.")
