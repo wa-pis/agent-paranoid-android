@@ -158,6 +158,12 @@ CI runs these checks on Python 3.11 and 3.12. The security regression suite
 also uses Hypothesis to exercise variations of PII aliases, SQL statement
 tails, duplicate CSV headers, and sensitive-value masking.
 
+For a local environment and quickstart smoke check:
+
+```bash
+test-data-agent doctor
+```
+
 ## MVP Readiness Checklist
 
 Use this checklist to keep the project scoped to a useful safety-first MVP:
@@ -185,14 +191,10 @@ Before merging or cutting a release:
 
 - Review the relevant [OpenSpec Baseline](openspec/project.md) capability specs
   and update them when behavior changes.
-- Run the CI-equivalent quality gates:
-  `python3 -m ruff check src tests`,
-  `python3 -m compileall -q src tests`, and
-  `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
-- Run the quickstart folder flow against `tests/fixtures/example_dataset` and
-  confirm the validation report is valid.
-- Inspect `generation_manifest.json` for seed, row counts, output format,
-  `synthetic: true`, and `source_rows_copied: false`.
+- Run `scripts/check_release.sh`; it covers linting, compilation, coverage,
+  DatasetSpec schema freshness, and the quickstart fixture smoke flow.
+- Regenerate `schemas/dataset_spec.schema.json` with
+  `python3 scripts/export_dataset_schema.py` when `DatasetSpec` changes.
 - Update `CHANGELOG.md`, README examples, and docs for user-visible behavior or
   safety-contract changes.
 - Keep post-MVP features behind explicit OpenSpec changes instead of expanding
@@ -206,8 +208,11 @@ pipeline:
 - [Domain-Agnostic Workflow](docs/domain_agnostic_workflow.md)
 - [Dataset Profile And Spec Reference](docs/dataset_profile_and_spec.md)
 - [AI Integration](docs/ai_integration.md)
+- [MCP Examples](docs/mcp_examples.md)
 - [Generator MCP Design Rationale](docs/mcp_generator_design.md)
 - [OpenSpec Baseline](openspec/project.md)
+- [Release Process](docs/release.md)
+- [DatasetSpec JSON Schema](schemas/dataset_spec.schema.json)
 - [Roadmap](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 - [Implementation Map](docs/implementation_map.md)
@@ -517,6 +522,15 @@ Useful options:
   specs. Without it, the CLI refuses to overwrite existing files.
 - `--rule-sample-rows N` bounds row-level relationship and constraint mining
   while full-file schema and distribution profiling remains streaming.
+
+Check local setup and run a small fixture smoke test:
+
+```bash
+test-data-agent doctor
+```
+
+Use `test-data-agent doctor --skip-smoke` when you only want dependency and
+Python-version checks.
 
 ## Architecture
 

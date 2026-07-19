@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import importlib
+import json
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +18,7 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, 
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
     generate_dataset_from_csv_command,
+    generate_dataset_from_example_artifacts,
     generate_dataset_from_example_command,
     generate_dataset_from_profile_command,
     generate_dataset_command,
@@ -38,6 +42,7 @@ def main(argv: list[str] | None = None) -> int:
             "Start here:\n"
             "  CSV file:    test-data-agent generate-from-csv data/customers.csv --count 100 --seed 123 --format csv --output out/customers.csv\n"
             "  CSV folder:  test-data-agent generate-from-example data/example_dataset --count 100 --seed 123 --format csv --output out/generated\n"
+            "  Self-check:   test-data-agent doctor\n"
             "  Validate:    test-data-agent validate out/generated/dataset_spec.yaml out/generated\n\n"
             "The generated rows are synthetic. Review generation_manifest.json after generation for the seed, row counts, and safety flags."
         ),
@@ -151,6 +156,13 @@ def main(argv: list[str] | None = None) -> int:
     generate_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
     generate_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
 
+    doctor_parser = subparsers.add_parser(
+        "doctor",
+        help="Run local environment and fixture smoke checks.",
+        description="Check Python version, runtime dependencies, fixture data, and a small synthetic generation smoke test.",
+    )
+    doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
+
     args = parser.parse_args(argv)
 
     try:
@@ -237,6 +249,9 @@ def run_command(args: argparse.Namespace) -> int:
     if args.command in {"generate-from-example", "generate-from-csv-folder"}:
         return generate_dataset_from_example_command(args)
 
+    if args.command == "doctor":
+        return run_doctor(skip_smoke=args.skip_smoke)
+
     return 2
 
 
@@ -276,6 +291,70 @@ def write_validation_summary(report: Any, output: Path | None) -> None:
     status = "passed" if report.valid else "failed"
     destination = f" Report: {output}" if output is not None else ""
     print(f"Validation {status}: {passed} checks passed, {failed} failed.{destination}", file=sys.stderr)
+
+
+def run_doctor(*, skip_smoke: bool = False) -> int:
+    checks: list[str] = []
+    failures: list[str] = []
+
+    if sys.version_info >= (3, 11):
+        checks.append(f"python: ok ({sys.version_info.major}.{sys.version_info.minor})")
+    else:
+        failures.append("python: Python 3.11 or newer is required")
+
+    for module_name in ("faker", "pydantic", "pyarrow", "sqlglot", "trino", "yaml"):
+        try:
+            importlib.import_module(module_name)
+        except ImportError as exc:
+            failures.append(f"dependency {module_name}: missing ({exc})")
+        else:
+            checks.append(f"dependency {module_name}: ok")
+
+    fixture = find_example_fixture()
+    if fixture.is_dir():
+        checks.append(f"fixture: ok ({fixture})")
+    else:
+        failures.append(f"fixture: missing {fixture}")
+
+    if not skip_smoke and not failures:
+        with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
+            output = Path(tmp) / "generated"
+            cache_dir = Path(tmp) / "cache"
+            generate_dataset_from_example_artifacts(
+                fixture,
+                output_folder=output,
+                seed=12345,
+                count=3,
+                output_format=CoreOutputFormat.CSV,
+                cache_dir=cache_dir,
+                use_cache=False,
+            )
+            manifest = json.loads((output / "generation_manifest.json").read_text())
+            if (
+                manifest.get("synthetic") is True
+                and manifest.get("source_rows_copied") is False
+                and manifest.get("validation_valid") is True
+            ):
+                checks.append("quickstart smoke: ok")
+            else:
+                failures.append("quickstart smoke: manifest safety flags are not valid")
+
+    for check in checks:
+        print(check, file=sys.stderr)
+    for failure in failures:
+        print(f"doctor failed: {failure}", file=sys.stderr)
+    if failures:
+        return 1
+    print("doctor passed", file=sys.stderr)
+    return 0
+
+
+def find_example_fixture() -> Path:
+    for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
+        fixture = root / "tests" / "fixtures" / "example_dataset"
+        if fixture.is_dir():
+            return fixture
+    return Path.cwd() / "tests" / "fixtures" / "example_dataset"
 
 
 def apply_business_rules_from_args(

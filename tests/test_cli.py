@@ -20,8 +20,32 @@ def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     assert exc_info.value.code == 0
     assert "generate-from-csv" in captured.out
     assert "generate-from-example" in captured.out
+    assert "doctor" in captured.out
     assert "generation_manifest.json" in captured.out
     assert "synthetic" in captured.out
+
+
+def test_doctor_runs_quickstart_smoke(capsys) -> None:
+    exit_code = main(["doctor"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "python: ok" in captured.err
+    assert "dependency pydantic: ok" in captured.err
+    assert "quickstart smoke: ok" in captured.err
+    assert "doctor passed" in captured.err
+
+
+def test_doctor_can_skip_smoke(capsys) -> None:
+    exit_code = main(["doctor", "--skip-smoke"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "dependency pydantic: ok" in captured.err
+    assert "quickstart smoke: ok" not in captured.err
+    assert "doctor passed" in captured.err
 
 
 def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:

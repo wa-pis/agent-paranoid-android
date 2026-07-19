@@ -1,0 +1,550 @@
+{
+  "$defs": {
+    "Constraint": {
+      "properties": {
+        "aggregate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aggregate"
+        },
+        "condition": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Condition"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "entity": {
+          "title": "Entity",
+          "type": "string"
+        },
+        "expected": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected"
+        },
+        "expression": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expression"
+        },
+        "fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/ConstraintStatus",
+          "default": "inferred"
+        },
+        "target_entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Entity"
+        },
+        "target_field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Field"
+        },
+        "type": {
+          "$ref": "#/$defs/ConstraintType"
+        }
+      },
+      "required": [
+        "type",
+        "entity",
+        "confidence"
+      ],
+      "title": "Constraint",
+      "type": "object"
+    },
+    "ConstraintStatus": {
+      "enum": [
+        "inferred",
+        "confirmed",
+        "rejected"
+      ],
+      "title": "ConstraintStatus",
+      "type": "string"
+    },
+    "ConstraintType": {
+      "enum": [
+        "formula",
+        "temporal",
+        "conditional_required",
+        "aggregate_mapping"
+      ],
+      "title": "ConstraintType",
+      "type": "string"
+    },
+    "EntitySpec": {
+      "properties": {
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldSpec"
+          },
+          "title": "Fields",
+          "type": "array"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "primary_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Key"
+        },
+        "row_count": {
+          "exclusiveMinimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "row_count"
+      ],
+      "title": "EntitySpec",
+      "type": "object"
+    },
+    "FieldSpec": {
+      "properties": {
+        "data_type": {
+          "$ref": "#/$defs/FieldType"
+        },
+        "distribution": {
+          "additionalProperties": true,
+          "title": "Distribution",
+          "type": "object"
+        },
+        "is_identifier": {
+          "default": false,
+          "title": "Is Identifier",
+          "type": "boolean"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "null_ratio": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Null Ratio",
+          "type": "number"
+        },
+        "nullable": {
+          "default": false,
+          "title": "Nullable",
+          "type": "boolean"
+        },
+        "semantic_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Type"
+        },
+        "sensitive": {
+          "default": false,
+          "title": "Sensitive",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "data_type"
+      ],
+      "title": "FieldSpec",
+      "type": "object"
+    },
+    "FieldType": {
+      "enum": [
+        "integer",
+        "float",
+        "boolean",
+        "string",
+        "date",
+        "datetime"
+      ],
+      "title": "FieldType",
+      "type": "string"
+    },
+    "GenerationMode": {
+      "enum": [
+        "valid",
+        "mixed",
+        "negative",
+        "edge",
+        "load_test"
+      ],
+      "title": "GenerationMode",
+      "type": "string"
+    },
+    "GenerationSettings": {
+      "properties": {
+        "invalid_ratio": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Invalid Ratio",
+          "type": "number"
+        },
+        "locale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Locale"
+        },
+        "mode": {
+          "$ref": "#/$defs/GenerationMode",
+          "default": "valid"
+        },
+        "output_format": {
+          "$ref": "#/$defs/OutputFormat",
+          "default": "json"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        }
+      },
+      "title": "GenerationSettings",
+      "type": "object"
+    },
+    "OutputFormat": {
+      "enum": [
+        "csv",
+        "json",
+        "parquet"
+      ],
+      "title": "OutputFormat",
+      "type": "string"
+    },
+    "PrivacyAction": {
+      "enum": [
+        "synthetic",
+        "mask",
+        "suppress"
+      ],
+      "title": "PrivacyAction",
+      "type": "string"
+    },
+    "PrivacyClassification": {
+      "enum": [
+        "public",
+        "internal",
+        "sensitive",
+        "secret"
+      ],
+      "title": "PrivacyClassification",
+      "type": "string"
+    },
+    "PrivacyRule": {
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/PrivacyAction",
+          "default": "synthetic"
+        },
+        "classification": {
+          "$ref": "#/$defs/PrivacyClassification",
+          "default": "sensitive"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entity"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "semantic_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Semantic Type"
+        }
+      },
+      "title": "PrivacyRule",
+      "type": "object"
+    },
+    "PrivacySettings": {
+      "properties": {
+        "allow_raw_sensitive_values": {
+          "default": false,
+          "title": "Allow Raw Sensitive Values",
+          "type": "boolean"
+        },
+        "default_classification": {
+          "$ref": "#/$defs/PrivacyClassification",
+          "default": "internal"
+        },
+        "max_safe_categories": {
+          "default": 20,
+          "minimum": 0,
+          "title": "Max Safe Categories",
+          "type": "integer"
+        },
+        "pii_classification": {
+          "$ref": "#/$defs/PrivacyClassification",
+          "default": "sensitive"
+        },
+        "secret_classification": {
+          "$ref": "#/$defs/PrivacyClassification",
+          "default": "secret"
+        },
+        "treat_unknown_as_sensitive": {
+          "default": true,
+          "title": "Treat Unknown As Sensitive",
+          "type": "boolean"
+        }
+      },
+      "title": "PrivacySettings",
+      "type": "object"
+    },
+    "Relationship": {
+      "properties": {
+        "child_entity": {
+          "title": "Child Entity",
+          "type": "string"
+        },
+        "child_field": {
+          "title": "Child Field",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "parent_entity": {
+          "title": "Parent Entity",
+          "type": "string"
+        },
+        "parent_field": {
+          "title": "Parent Field",
+          "type": "string"
+        },
+        "relationship_type": {
+          "$ref": "#/$defs/RelationshipType",
+          "default": "many_to_one"
+        },
+        "status": {
+          "default": "inferred",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "parent_entity",
+        "parent_field",
+        "child_entity",
+        "child_field",
+        "confidence"
+      ],
+      "title": "Relationship",
+      "type": "object"
+    },
+    "RelationshipType": {
+      "enum": [
+        "many_to_one",
+        "one_to_one"
+      ],
+      "title": "RelationshipType",
+      "type": "string"
+    },
+    "ValidationSettings": {
+      "properties": {
+        "fail_fast": {
+          "default": false,
+          "title": "Fail Fast",
+          "type": "boolean"
+        },
+        "validate_constraints": {
+          "default": true,
+          "title": "Validate Constraints",
+          "type": "boolean"
+        },
+        "validate_privacy": {
+          "default": true,
+          "title": "Validate Privacy",
+          "type": "boolean"
+        },
+        "validate_relationships": {
+          "default": true,
+          "title": "Validate Relationships",
+          "type": "boolean"
+        },
+        "validate_schema": {
+          "default": true,
+          "title": "Validate Schema",
+          "type": "boolean"
+        }
+      },
+      "title": "ValidationSettings",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/wa-pis/agent-paranoid-android/schemas/dataset_spec.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "constraints": {
+      "items": {
+        "$ref": "#/$defs/Constraint"
+      },
+      "title": "Constraints",
+      "type": "array"
+    },
+    "entities": {
+      "items": {
+        "$ref": "#/$defs/EntitySpec"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "generation_settings": {
+      "$ref": "#/$defs/GenerationSettings"
+    },
+    "privacy_rules": {
+      "items": {
+        "$ref": "#/$defs/PrivacyRule"
+      },
+      "title": "Privacy Rules",
+      "type": "array"
+    },
+    "privacy_settings": {
+      "$ref": "#/$defs/PrivacySettings"
+    },
+    "relationships": {
+      "items": {
+        "$ref": "#/$defs/Relationship"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "validation_settings": {
+      "$ref": "#/$defs/ValidationSettings"
+    }
+  },
+  "title": "DatasetSpec",
+  "type": "object",
+  "x-schema-version": "1.0"
+}

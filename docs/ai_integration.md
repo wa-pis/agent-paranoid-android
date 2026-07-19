@@ -126,7 +126,8 @@ version, seed, format, row counts, validation status, and synthetic provenance.
 
 The reasons for the two-server boundary, path restrictions, manifest checks,
 and artifact ownership are documented in
-[Generator MCP Design Rationale](mcp_generator_design.md).
+[Generator MCP Design Rationale](mcp_generator_design.md). Practical
+end-to-end tool sequences are in [MCP Examples](mcp_examples.md).
 
 ## Local Demo
 
