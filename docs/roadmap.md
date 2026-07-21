@@ -11,6 +11,7 @@ date.
 - Versioned DatasetSpec contract and auditable generation manifests.
 - Runtime raw-profile and source-row reuse protections.
 - End-to-end AI integration demo.
+- Review-first agent orchestration with `agent-plan` and `agent-approve`.
 
 ## MVP Freeze
 
@@ -36,8 +37,8 @@ Treat these as non-negotiable release gates rather than new feature work:
 
 - Expose structured business-rule configuration through the generator MCP
   server and include business validation in the generation manifest.
-- Add an optional orchestration tool that profiles an allowlisted Trino table,
-  builds a reviewable DatasetSpec, and stops before generation for approval.
+- Extend agent orchestration to cover allowlisted Trino table planning through
+  MCP without granting the agent raw SQL access.
 - Add configurable output quotas for row counts, total artifact size, and
   execution time.
 - Add signed or externally persisted audit records for teams running the MCP

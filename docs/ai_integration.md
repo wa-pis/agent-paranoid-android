@@ -5,6 +5,7 @@ This project can be used by an AI agent in two practical modes:
 1. As a local CLI tool.
 2. Through two MCP servers that cover safe Trino profiling and synthetic data
    generation.
+3. Through the review-first local agent workflow.
 
 ## CLI Mode
 
@@ -25,6 +26,31 @@ Install the package locally first:
 ```bash
 python3 -m pip install -e ".[dev]"
 ```
+
+## Agent Mode
+
+Use `agent-plan` when an AI client should prepare work but stop before
+generation:
+
+```bash
+test-data-agent agent-plan tests/fixtures/example_dataset \
+  --source-type csv-folder \
+  --workspace out/agent \
+  --count 25 \
+  --seed 12345 \
+  --format csv
+```
+
+The AI client can summarize `out/agent/dataset_spec.yaml` and ask for approval.
+After review, run:
+
+```bash
+test-data-agent agent-approve out/agent
+```
+
+This mode is documented in [Agent Design](agent_design.md). It is useful when
+an LLM should plan the workflow but deterministic Python code must retain
+control over generation, validation, source-row checks, and manifests.
 
 ## MCP Mode
 

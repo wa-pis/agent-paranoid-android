@@ -48,6 +48,45 @@ def test_doctor_can_skip_smoke(capsys) -> None:
     assert "doctor passed" in captured.err
 
 
+def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
+    workspace = tmp_path / "agent"
+
+    plan_exit = main(
+        [
+            "agent-plan",
+            str(FIXTURE_EXAMPLE_DATASET),
+            "--source-type",
+            "csv-folder",
+            "--workspace",
+            str(workspace),
+            "--count",
+            "3",
+            "--seed",
+            "42",
+            "--format",
+            "csv",
+        ]
+    )
+
+    plan_output = capsys.readouterr()
+
+    assert plan_exit == 0
+    assert "Agent plan ready:" in plan_output.err
+    assert (workspace / "dataset_spec.yaml").is_file()
+    assert not (workspace / "generated").exists()
+
+    approve_exit = main(["agent-approve", str(workspace)])
+
+    approve_output = capsys.readouterr()
+    manifest = json.loads((workspace / "generated" / "generation_manifest.json").read_text())
+
+    assert approve_exit == 0
+    assert "Agent generation completed:" in approve_output.err
+    assert "source rows copied: no" in approve_output.err
+    assert manifest["source_rows_copied"] is False
+    assert manifest["row_counts"] == {"customers": 3, "orders": 3}
+
+
 def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:
     with pytest.raises(SystemExit) as csv_help:
         main(["generate-from-csv", "--help"])

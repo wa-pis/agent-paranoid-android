@@ -12,6 +12,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from test_data_agent.agent import AgentRequest, AgentResult, AgentSourceType, approve_agent_workspace, plan_agent_request
 from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -42,6 +43,7 @@ def main(argv: list[str] | None = None) -> int:
             "Start here:\n"
             "  CSV file:    test-data-agent generate-from-csv data/customers.csv --count 100 --seed 123 --format csv --output out/customers.csv\n"
             "  CSV folder:  test-data-agent generate-from-example data/example_dataset --count 100 --seed 123 --format csv --output out/generated\n"
+            "  AI agent:    test-data-agent agent-plan data/example_dataset --source-type csv-folder --workspace out/agent\n"
             "  Self-check:   test-data-agent doctor\n"
             "  Validate:    test-data-agent validate out/generated/dataset_spec.yaml out/generated\n\n"
             "The generated rows are synthetic. Review generation_manifest.json after generation for the seed, row counts, and safety flags."
@@ -163,6 +165,37 @@ def main(argv: list[str] | None = None) -> int:
     )
     doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
 
+    agent_plan_parser = subparsers.add_parser(
+        "agent-plan",
+        help="Plan a safe agent workflow and stop before generation.",
+        description="Profile input data, infer a reviewable DatasetSpec, and require approval before generation.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent agent-plan tests/fixtures/example_dataset "
+            "--source-type csv-folder --workspace out/agent --count 25 --seed 12345 --format csv\n"
+            "  test-data-agent agent-approve out/agent"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_plan_parser.add_argument("source", type=Path, help="CSV file, CSV folder, or safe profile JSON.")
+    agent_plan_parser.add_argument("--source-type", choices=["csv", "csv-folder", "profile"], required=True)
+    agent_plan_parser.add_argument("--workspace", type=Path, required=True, help="Empty folder for agent artifacts.")
+    agent_plan_parser.add_argument("--count", type=positive_int, default=100, help="Synthetic row count per entity.")
+    agent_plan_parser.add_argument("--seed", type=non_negative_int, default=12345, help="Deterministic generation seed.")
+    agent_plan_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], default="csv", dest="output_format")
+    agent_plan_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid")
+    agent_plan_parser.add_argument("--invalid-ratio", type=ratio, default=0.0)
+    agent_plan_parser.add_argument("--table", type=str, help="Table/entity name for single CSV sources.")
+    agent_plan_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000)
+    agent_plan_parser.add_argument("--use-cache", action="store_true", help="Use a safe profile cache inside the agent workspace.")
+
+    agent_approve_parser = subparsers.add_parser(
+        "agent-approve",
+        help="Approve a planned agent workflow and generate synthetic data.",
+        description="Load a prepared agent workspace, use the reviewed DatasetSpec, generate data, and validate it.",
+    )
+    agent_approve_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
+
     args = parser.parse_args(argv)
 
     try:
@@ -251,6 +284,16 @@ def run_command(args: argparse.Namespace) -> int:
 
     if args.command == "doctor":
         return run_doctor(skip_smoke=args.skip_smoke)
+
+    if args.command == "agent-plan":
+        result = plan_agent_request(agent_request_from_args(args))
+        write_agent_result_summary(result)
+        return 0
+
+    if args.command == "agent-approve":
+        result = approve_agent_workspace(args.workspace)
+        write_agent_result_summary(result)
+        return 0 if result.summary.get("validation_valid", False) else 1
 
     return 2
 
@@ -355,6 +398,44 @@ def find_example_fixture() -> Path:
         if fixture.is_dir():
             return fixture
     return Path.cwd() / "tests" / "fixtures" / "example_dataset"
+
+
+def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
+    return AgentRequest(
+        source_type=AgentSourceType(args.source_type.replace("-", "_")),
+        source_path=args.source,
+        workspace=args.workspace,
+        count=args.count,
+        seed=args.seed,
+        output_format=CoreOutputFormat(args.output_format),
+        mode=CoreGenerationMode(args.mode),
+        invalid_ratio=args.invalid_ratio,
+        table_name=args.table,
+        rule_sample_rows=args.rule_sample_rows,
+        use_cache=args.use_cache,
+    )
+
+
+def write_agent_result_summary(result: AgentResult) -> None:
+    if result.phase.value == "awaiting_approval":
+        print(
+            "Agent plan ready: "
+            f"{result.artifacts.workspace} | spec: {result.artifacts.dataset_spec_path} | "
+            "approve with: test-data-agent agent-approve "
+            f"{result.artifacts.workspace}",
+            file=sys.stderr,
+        )
+        return
+    row_counts = result.summary.get("row_counts", {})
+    rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"
+    validation = "passed" if result.summary.get("validation_valid") else "failed"
+    print(
+        "Agent generation completed: "
+        f"{result.artifacts.generated_folder} | rows: {rows_text} | "
+        f"seed: {result.summary.get('seed')} | validation: {validation} | "
+        "source rows copied: no",
+        file=sys.stderr,
+    )
 
 
 def apply_business_rules_from_args(

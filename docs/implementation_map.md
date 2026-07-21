@@ -89,6 +89,8 @@ New domain-agnostic commands:
 - `generate` with a YAML or JSON `DatasetSpec`
 - `validate` with a YAML or JSON `DatasetSpec` and output folder
 - `generate-from-example`
+- `agent-plan`
+- `agent-approve`
 
 Compatibility paths are still supported during migration:
 
@@ -120,6 +122,17 @@ workspace path escapes, and exact source CSV row reuse.
 Generation bundles include `generation_manifest.json` for reproducibility and
 provenance auditing.
 
+## Agent Orchestration
+
+`src/test_data_agent/agent.py`
+
+The agent layer is a review-first state machine over existing deterministic
+workflow helpers. `agent-plan` writes safe profile metadata, a reviewable
+`DatasetSpec`, and an agent plan. It intentionally stops before generation.
+`agent-approve` reloads the reviewed spec, generates synthetic data, validates
+it, runs source-row reuse checks for CSV sources, and writes the generated
+bundle.
+
 ## Tests
 
 `tests/test_domain_agnostic_pipeline.py` covers the main pipeline:
@@ -140,3 +153,6 @@ provenance auditing.
 `tests/test_ai_trino_workflow.py` cover MCP path isolation, inline Trino profile
 handoff, raw-profile rejection, non-copy checks, manifests, and the complete
 profile-to-CSV workflow.
+
+`tests/test_agent.py` covers the review-first agent workflow and confirms that
+planning does not write generated data.

@@ -207,6 +207,7 @@ pipeline:
 
 - [Domain-Agnostic Workflow](docs/domain_agnostic_workflow.md)
 - [Dataset Profile And Spec Reference](docs/dataset_profile_and_spec.md)
+- [Agent Design](docs/agent_design.md)
 - [AI Integration](docs/ai_integration.md)
 - [MCP Examples](docs/mcp_examples.md)
 - [Generator MCP Design Rationale](docs/mcp_generator_design.md)
@@ -503,6 +504,18 @@ Validate generated rows (the first form is the deprecated compatibility path):
 ```bash
 test-data-agent validate SPEC.json ROWS.json
 test-data-agent validate DATASET_SPEC.yaml OUTPUT_FOLDER
+```
+
+Plan and approve an AI-agent workflow:
+
+```bash
+test-data-agent agent-plan INPUT_FOLDER \
+  --source-type csv-folder \
+  --workspace out/agent \
+  --count 100 \
+  --seed 12345 \
+  --format csv
+test-data-agent agent-approve out/agent
 ```
 
 Useful options:
@@ -896,6 +909,8 @@ but new integrations should target the domain-agnostic modules.
 - `src/test_data_agent/mcp_trino_server.py` - safe read-only Trino MCP tools.
 - `src/test_data_agent/mcp_generator_server.py` - workspace-bounded MCP tools
   for profiling, spec inference, generation, validation, and export.
+- `src/test_data_agent/agent.py` - review-first agent orchestration over the
+  deterministic pipeline.
 - `src/test_data_agent/safety.py` - profile and source-row reuse safety checks.
 - `src/test_data_agent/profiling/` - domain-agnostic CSV-folder profiling,
   relationship inference, constraint mining, and safe profile caching.
