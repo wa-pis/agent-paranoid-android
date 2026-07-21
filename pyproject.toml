@@ -8,6 +8,28 @@ version = "0.3.0"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
+license = "MIT"
+keywords = [
+    "agent",
+    "csv",
+    "mcp",
+    "pii",
+    "synthetic-data",
+    "test-data",
+    "trino",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "Topic :: Security",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
 dependencies = [
     "faker>=25.0.0",
     "mcp>=1.0.0",

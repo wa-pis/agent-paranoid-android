@@ -8,6 +8,9 @@ All notable changes to this project are documented here.
 
 - Agent Paranoid Android project naming, package metadata, and public
   attribution note for the Radiohead inspiration.
+- Public release scaffolding: MIT license, security policy, contribution guide,
+  GitHub issue and pull-request templates, Dependabot configuration, and
+  publication checklist.
 - Review-first agent orchestration with `agent-plan`, `agent-approve`, Python
   API models, documentation, and OpenSpec requirements.
 - PlantUML architecture diagrams for the application overview, review-first

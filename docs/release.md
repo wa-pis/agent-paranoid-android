@@ -37,3 +37,22 @@ valid validation report, the expected seed, and expected row counts.
 
 Keep compatibility changes explicit: legacy `GenerationSpec` behavior should
 remain a migration path, while new work should target `DatasetSpec`.
+
+## Public Release Readiness
+
+Before making the repository public or announcing a public release, complete
+the [Public Release Checklist](public_release_checklist.md). In particular:
+
+1. Confirm `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md`, issue templates, pull
+   request template, and Dependabot configuration are present.
+2. Confirm author and committer emails are public-safe.
+3. Run a secret scan over the working tree and reachable Git history.
+4. Build the wheel to verify package metadata:
+
+```bash
+python3 -m pip wheel --no-deps . -w /tmp/agent-paranoid-android-wheel
+```
+
+5. Enable GitHub security settings after publication: secret scanning,
+   Dependabot alerts, Dependabot security updates, private vulnerability
+   reporting, required CI checks, and branch protection.

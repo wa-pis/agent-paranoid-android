@@ -1,0 +1,68 @@
+name: Bug report
+description: Report incorrect behavior using synthetic reproduction data.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Do not include secrets, raw PII, production rows, or internal hostnames.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Use minimal synthetic data and exact commands when possible.
+      placeholder: |
+        1. Create synthetic fixture ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: safety
+    attributes:
+      label: Safety Impact
+      options:
+        - No known safety impact
+        - Possible source-row copying
+        - Possible raw PII exposure
+        - Possible unsafe SQL acceptance
+        - Possible workspace/path escape
+        - Other safety concern
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version Or Commit
+      placeholder: "0.3.0 or commit SHA"
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Python version, OS, install method"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste sanitized logs only.
+      render: text

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/wa-pis/agent-paranoid-android/security/advisories/new
+    about: Please report vulnerabilities privately. Do not post secrets, raw PII, or exploit details in public issues.

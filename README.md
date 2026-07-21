@@ -1,5 +1,8 @@
 # Agent Paranoid Android
 
+[![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Safe, deterministic synthetic data generation for database and CSV-driven test
 datasets.
 
@@ -220,6 +223,10 @@ pipeline:
 - [Generator MCP Design Rationale](docs/mcp_generator_design.md)
 - [OpenSpec Baseline](openspec/project.md)
 - [Release Process](docs/release.md)
+- [Public Release Checklist](docs/public_release_checklist.md)
+- [Security Policy](SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+- [License](LICENSE)
 - [DatasetSpec JSON Schema](schemas/dataset_spec.schema.json)
 - [Roadmap](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
