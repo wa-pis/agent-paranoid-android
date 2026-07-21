@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.3.1] - 2026-07-21
+
 ### Added
 
 - Agent Paranoid Android project naming, package metadata, and public
@@ -74,5 +76,6 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/wa-pis/agent-paranoid-android/releases/tag/v0.2.0
