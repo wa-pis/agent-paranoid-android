@@ -36,8 +36,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="test-data-agent",
         description=(
-            "Safe deterministic synthetic test data generation from CSV files, "
-            "CSV folders, safe profiles, or dataset specs."
+            "Agent Paranoid Android: safe deterministic synthetic data generation "
+            "from CSV files, CSV folders, safe profiles, or dataset specs."
         ),
         epilog=(
             "Start here:\n"

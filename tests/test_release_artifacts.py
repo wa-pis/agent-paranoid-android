@@ -1,5 +1,6 @@
 import json
 import stat
+import tomllib
 from pathlib import Path
 
 from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetSpec
@@ -18,6 +19,14 @@ def test_dataset_spec_schema_matches_pydantic_contract() -> None:
     assert schema["x-schema-version"] == DATASET_SPEC_SCHEMA_VERSION
     assert schema["properties"] == expected["properties"]
     assert schema["$defs"] == expected["$defs"]
+
+
+def test_project_metadata_uses_public_name_and_stable_cli() -> None:
+    metadata = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+
+    assert metadata["name"] == "agent-paranoid-android"
+    assert metadata["description"] == "Safety-first synthetic data generation agent"
+    assert metadata["scripts"]["test-data-agent"] == "test_data_agent.cli:main"
 
 
 def test_release_script_is_executable_and_covers_release_gates() -> None:

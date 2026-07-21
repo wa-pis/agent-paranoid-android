@@ -1,4 +1,4 @@
-# Test Data Agent Project Instructions
+# Agent Paranoid Android Project Instructions
 
 You are working on a safe synthetic test data generation agent.
 

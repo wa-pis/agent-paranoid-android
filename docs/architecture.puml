@@ -1,5 +1,5 @@
 @startuml
-title Test Data Agent Architecture
+title Agent Paranoid Android Architecture
 
 skinparam shadowing false
 skinparam componentStyle rectangle

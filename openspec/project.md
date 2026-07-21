@@ -2,10 +2,10 @@
 
 ## Purpose
 
-Test Data Agent generates safe, deterministic synthetic test datasets from CSV
-files and safe database profile metadata. The project is safety-first: generated
-data must be synthetic, reproducible by seed, and reviewable through explicit
-artifacts.
+Agent Paranoid Android generates safe, deterministic synthetic test datasets
+from CSV files and safe database profile metadata. The project is safety-first:
+generated data must be synthetic, reproducible by seed, and reviewable through
+explicit artifacts.
 
 ## MVP Boundary
 

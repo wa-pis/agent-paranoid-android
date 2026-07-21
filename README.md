@@ -1,16 +1,23 @@
-# Test Data Agent
+# Agent Paranoid Android
 
-Safe, deterministic synthetic test data generation for database and CSV-driven
-test datasets.
+Safe, deterministic synthetic data generation for database and CSV-driven test
+datasets.
 
 The agent profiles schemas and safe aggregate metadata, detects likely
 sensitive fields, builds generation specs, generates synthetic rows from an
 explicit seed, validates the result, and exports data in common formats. It
 never copies source rows into generated output.
 
+The project name is a nod to [Radiohead](https://www.radiohead.com/deadairspace/)
+and ["Paranoid Android"](https://music.apple.com/us/song/1097861770). This
+project is unaffiliated with Radiohead, XL Recordings, Parlophone, or any
+related rights holders.
+
 ## Project Status
 
-Current package version: `0.3.0`.
+Current package version: `0.3.0`. The installable distribution is
+`agent-paranoid-android`; the CLI remains `test-data-agent` for compatibility
+and to keep the command focused on the generated-data use case.
 
 The domain-agnostic `DatasetSpec` pipeline is the primary path for new work. It
 supports safe CSV folder profiling, spec inference, deterministic multi-table

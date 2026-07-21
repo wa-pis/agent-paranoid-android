@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Agent Paranoid Android project naming, package metadata, and public
+  attribution note for the Radiohead inspiration.
 - Review-first agent orchestration with `agent-plan`, `agent-approve`, Python
   API models, documentation, and OpenSpec requirements.
 - PlantUML architecture diagrams for the application overview, review-first
