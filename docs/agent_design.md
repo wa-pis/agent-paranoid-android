@@ -7,6 +7,11 @@ calls deterministic generation and validation code.
 The agent does not generate rows with an LLM. It does not receive unrestricted
 SQL access, shell access, or raw production rows.
 
+PlantUML diagrams for this layer are available in:
+
+- [Agent Workflow](architecture_agent_workflow.puml)
+- [Safety Boundaries](architecture_safety_boundaries.puml)
+
 ## Flow
 
 ```text

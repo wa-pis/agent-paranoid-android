@@ -217,7 +217,9 @@ pipeline:
 - [Roadmap](docs/roadmap.md)
 - [Changelog](CHANGELOG.md)
 - [Implementation Map](docs/implementation_map.md)
-- [Architecture Diagram](docs/architecture.puml)
+- [Architecture Overview Diagram](docs/architecture.puml)
+- [Agent Workflow Diagram](docs/architecture_agent_workflow.puml)
+- [Safety Boundaries Diagram](docs/architecture_safety_boundaries.puml)
 
 ## How To Use It
 
@@ -547,10 +549,13 @@ Python-version checks.
 
 ## Architecture
 
-The high-level flow is documented as PlantUML in
-`docs/architecture.puml`. It shows the CLI, CSV and Trino profiling paths,
-safe profile metadata, generation spec inference, deterministic generation,
-business-rule validation, and exported artifacts.
+The architecture is documented as PlantUML diagrams:
+
+- `docs/architecture.puml` shows the high-level application components.
+- `docs/architecture_agent_workflow.puml` shows the review-first agent flow.
+- `docs/architecture_safety_boundaries.puml` shows the trust and safety
+  boundaries around AI planning, MCP tools, profiling, generation, and
+  validation.
 
 ## Legacy GenerationSpec Compatibility
 

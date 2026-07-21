@@ -1,0 +1,82 @@
+@startuml
+title Safety Boundaries
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam defaultTextAlignment center
+
+package "Untrusted Planning Zone" {
+  actor "User" as User
+  component "AI Client / LLM\nplanner and explainer only" as Llm
+}
+
+package "Controlled Tool Boundary" {
+  component "cli.py\nbounded commands" as Cli
+  component "agent.py\nreview-first state machine" as Agent
+  component "mcp_generator_server.py\nworkspace-bounded tools" as GeneratorMcp
+  component "mcp_trino_server.py\nread-only Trino tools" as TrinoMcp
+}
+
+package "Deterministic Safety Core" {
+  component "profiling/\nsafe metadata extraction" as Profiling
+  component "generation/\nseeded synthetic rows" as Generation
+  component "validation/\nexecutable checks" as Validation
+  component "safety.py\nPII and row-copy guards" as Safety
+  component "core/\nDatasetProfile + DatasetSpec" as CoreModels
+}
+
+package "External / Local Data" {
+  database "Trino\nallowlisted read-only" as Trino
+  folder "Source CSV\npotentially sensitive" as SourceCsv
+  folder "Workspace\nprofiles, specs,\nreports, manifests" as Workspace
+  folder "Generated Bundle\nsynthetic rows only" as Output
+}
+
+User --> Llm : intent
+Llm --> Cli : safe CLI calls
+Llm --> GeneratorMcp : MCP calls\nsummary responses
+Cli --> Agent : agent-plan /\nagent-approve
+Cli --> Profiling : direct profiling
+Cli --> Generation : direct generation
+Cli --> Validation : direct validation
+Agent --> Profiling : plan phase
+Agent --> Generation : approved phase
+Agent --> Validation : approved phase
+Agent --> Safety : source-row reuse check
+GeneratorMcp --> Profiling : profile_csv
+GeneratorMcp --> Generation : generate_dataset /\nexport_dataset
+GeneratorMcp --> Validation : validate_dataset
+TrinoMcp --> Trino : metadata, aggregates,\nmasked samples, bounded SELECT
+Profiling --> SourceCsv : read locally for\nmetadata and distributions
+Profiling --> CoreModels : DatasetProfile
+Generation --> CoreModels : DatasetSpec
+Validation --> CoreModels : DatasetSpec
+Safety --> SourceCsv : compare only for\ncopy detection
+Agent --> Workspace : request, plan,\nprofile, spec, result
+GeneratorMcp --> Workspace : profile, spec,\nmanifest, report
+Generation --> Output : write synthetic files
+Validation --> Output : read generated files
+Safety --> Output : compare generated files
+
+note right of TrinoMcp
+Rejects DDL/DML, unrestricted SELECT *,
+multiple statements, joins, CTEs,
+subqueries, ordering, and likely PII
+aliases in safe-select mode.
+end note
+
+note right of Safety
+Sensitive fields are treated as
+sensitive by default. Raw production
+rows must never become generated output.
+end note
+
+note bottom of Llm
+The LLM boundary is intentional:
+planning is advisory, while generation,
+validation, and safety checks are
+deterministic Python code.
+end note
+
+@enduml

@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Review-first agent orchestration with `agent-plan`, `agent-approve`, Python
   API models, documentation, and OpenSpec requirements.
+- PlantUML architecture diagrams for the application overview, review-first
+  agent workflow, and safety boundaries.
 - MVP and release checklists, OpenSpec change templates, and golden-path CLI
   regression coverage for the README quickstart flow.
 - Release smoke script, `test-data-agent doctor`, DatasetSpec JSON Schema, MCP

@@ -18,9 +18,16 @@ package "Inputs" {
 }
 
 package "Interfaces" {
-  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example, validate" as Cli
+  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example,\nvalidate, agent-plan,\nagent-approve" as Cli
   component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
   component "mcp_generator_server.py\nProfile, Infer, Generate,\nValidate, Export" as GeneratorMcp
+}
+
+package "Review-First Agent Layer" {
+  component "agent.py\nAgentRequest / AgentResult\nplan_agent_request\napprove_agent_workspace" as AgentLayer
+  component "Agent Approval Gate\nhuman reviews DatasetSpec\nbefore generation" as ApprovalGate
+  artifact "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as AgentWorkspace
+  artifact "Agent Result Bundle\nagent_result.json\ngenerated/*\nmanifest + validation report" as AgentBundle
 }
 
 package "Safety Controls" {
@@ -95,6 +102,19 @@ User --> GeneratorMcp : MCP synthetic workflow
 User --> LegacySpecFile : writes/reviews
 User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
+
+Cli --> AgentLayer : agent-plan /\nagent-approve
+AgentLayer --> CsvProfiler : single CSV planning
+AgentLayer --> SchemaProfiler : CSV-folder planning
+AgentLayer --> Planner : infer reviewable\nDatasetSpec
+AgentLayer --> AgentWorkspace : writes plan artifacts
+AgentWorkspace --> ApprovalGate : dataset_spec.yaml\nreview/edit
+User --> ApprovalGate : approves reviewed spec
+ApprovalGate --> AgentLayer : approve workspace
+AgentLayer --> EntityGenerator : approved deterministic\ngeneration
+AgentLayer --> Reconciliation : approved validation
+AgentLayer --> NoCopy : source-row reuse checks
+AgentLayer --> AgentBundle : writes final result
 
 Cli --> CsvProfiler : profile-csv /\ngenerate-from-csv
 SingleCsv --> CsvProfiler
@@ -180,6 +200,8 @@ LegacyValidator --> Artifacts
 DatasetReport --> Artifacts
 BusinessReport --> Artifacts
 EntityGenerator --> Manifest
+AgentWorkspace --> Artifacts
+AgentBundle --> Artifacts
 
 note right of DatasetProfile
   Dataset profiles are safe metadata:
@@ -207,6 +229,13 @@ note bottom of NoCopy
   Generated rows must be reproducible
   from seed and must not be shuffled,
   duplicated, or exported source rows.
+end note
+
+note right of ApprovalGate
+  The agent layer can prepare safe metadata
+  and specs, but generation waits until a
+  human or calling client explicitly approves
+  the reviewed workspace.
 end note
 
 @enduml

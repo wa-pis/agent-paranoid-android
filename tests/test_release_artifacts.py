@@ -53,3 +53,18 @@ def test_openspec_change_template_is_complete() -> None:
     assert (template / "design.md").is_file()
     assert (template / "tasks.md").is_file()
     assert (template / "specs" / "capability" / "spec.md").is_file()
+
+
+def test_plantuml_architecture_diagrams_are_present_and_well_formed() -> None:
+    required_diagrams = {
+        "architecture.puml",
+        "architecture_agent_workflow.puml",
+        "architecture_safety_boundaries.puml",
+    }
+    diagram_paths = {path.name: path for path in (ROOT / "docs").glob("*.puml")}
+
+    assert required_diagrams <= diagram_paths.keys()
+    for path in diagram_paths.values():
+        text = path.read_text()
+        assert text.startswith("@startuml")
+        assert text.rstrip().endswith("@enduml")

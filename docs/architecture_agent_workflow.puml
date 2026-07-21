@@ -1,0 +1,58 @@
+@startuml
+title Review-First Agent Workflow
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam defaultTextAlignment center
+
+actor "User" as User
+participant "AI Client\n(planning only)" as Ai
+participant "CLI\nagent-plan" as PlanCli
+participant "agent.py\nplan_agent_request" as PlanAgent
+participant "Safe Profiling\nCSV / folder / profile" as Profiling
+participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner
+database "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as Workspace
+participant "CLI\nagent-approve" as ApproveCli
+participant "agent.py\napprove_agent_workspace" as ApproveAgent
+participant "Synthetic Generator\nseeded deterministic" as Generator
+participant "Safety Checks\nPII + source-row reuse" as Safety
+participant "Validation Core\nschema / relationships /\nconstraints" as Validation
+database "Generated Bundle\ngenerated/*\ngeneration_manifest.json\nvalidation_report.json" as Bundle
+
+User -> Ai : asks for synthetic data
+Ai -> PlanCli : source, source type,\nworkspace, count, seed, format
+PlanCli -> PlanAgent : AgentRequest
+PlanAgent -> Profiling : build safe profile
+Profiling --> PlanAgent : DatasetProfile\nsafe metadata only
+PlanAgent -> SpecPlanner : infer reviewable spec
+SpecPlanner --> PlanAgent : DatasetSpec
+PlanAgent -> Workspace : write request, plan,\nprofile, spec
+PlanAgent --> Ai : awaiting_approval\nartifact paths
+Ai --> User : summarize spec\nask for approval
+
+User -> Workspace : review or edit\ndataset_spec.yaml
+User -> ApproveCli : approve workspace
+ApproveCli -> ApproveAgent : workspace path
+ApproveAgent -> Workspace : load reviewed request,\nprofile, DatasetSpec
+ApproveAgent -> Generator : generate rows\nfrom spec + seed
+Generator --> ApproveAgent : synthetic rows
+ApproveAgent -> Safety : verify no source rows copied\nwhen CSV source exists
+Safety --> ApproveAgent : safety ok
+ApproveAgent -> Validation : validate generated bundle
+Validation --> ApproveAgent : validation report
+ApproveAgent -> Bundle : write synthetic files,\nmanifest, reports
+ApproveAgent --> User : completed result\npaths, seed, row counts
+
+note right of Ai
+The AI client plans and explains.
+It does not generate rows, validate by
+free-form reasoning, or expose raw PII.
+end note
+
+note bottom of Workspace
+The workspace is the handoff contract:
+reviewable spec first, generation only
+after explicit approval.
+end note
+
+@enduml
