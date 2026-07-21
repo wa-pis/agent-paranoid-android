@@ -104,7 +104,7 @@ Example MCP client configuration:
     "test-data-agent-trino": {
       "command": "python3",
       "args": ["-m", "test_data_agent.mcp_trino_server"],
-      "cwd": "/Users/agrudin/dev/my/agent-paranoid-android",
+      "cwd": "/path/to/agent-paranoid-android",
       "env": {
         "TRINO_HOST": "trino.example.internal",
         "TRINO_PORT": "443",
@@ -117,9 +117,9 @@ Example MCP client configuration:
     "test-data-agent-generator": {
       "command": "python3",
       "args": ["-m", "test_data_agent.mcp_generator_server"],
-      "cwd": "/Users/agrudin/dev/my/agent-paranoid-android",
+      "cwd": "/path/to/agent-paranoid-android",
       "env": {
-        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/Users/agrudin/dev/my/agent-paranoid-android"
+        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/agent-paranoid-android"
       }
     }
   }
