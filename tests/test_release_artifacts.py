@@ -38,14 +38,26 @@ def test_public_release_artifacts_are_present() -> None:
         "CONTRIBUTING.md",
         "docs/public_release_checklist.md",
         ".github/dependabot.yml",
+        ".github/workflows/ci.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/ISSUE_TEMPLATE/config.yml",
         ".github/ISSUE_TEMPLATE/bug_report.yml",
         ".github/ISSUE_TEMPLATE/feature_request.yml",
+        "uv.lock",
     ]
 
     for relative_path in required_files:
         assert (ROOT / relative_path).is_file(), relative_path
+
+
+def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+
+    assert "uv sync --frozen --extra dev" in workflow
+    assert "python -m pip_audit --skip-editable" in workflow
+    assert "actions/checkout@v7" not in workflow
+    assert "actions/setup-python@v7" not in workflow
+    assert "astral-sh/setup-uv@v7" not in workflow
 
 
 def test_release_script_is_executable_and_covers_release_gates() -> None:

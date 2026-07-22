@@ -61,12 +61,34 @@ output paths must be distinct, and folder bundles are assembled atomically.
 Parquet keeps homogeneous numeric and boolean column types; intentionally mixed
 invalid columns are stored as strings so negative datasets remain exportable.
 
+Untrusted inputs are bounded before parsing. Defaults are 128 MiB per file,
+512 MiB total, 1,000,000 rows, 1,000 columns, 10,000,000 cells, 100 files,
+and 1,000,000 characters per CSV field. Parquet metadata is checked before
+reading and limits expanded data to 512 MiB. YAML is limited to 50 aliases and
+100 nesting levels.
+Override these with `TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES`,
+`TEST_DATA_AGENT_MAX_TOTAL_INPUT_BYTES`, `TEST_DATA_AGENT_MAX_INPUT_ROWS`,
+`TEST_DATA_AGENT_MAX_INPUT_COLUMNS`, `TEST_DATA_AGENT_MAX_INPUT_CELLS`,
+`TEST_DATA_AGENT_MAX_INPUT_FILES`,
+`TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS`,
+`TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES`, `TEST_DATA_AGENT_MAX_YAML_ALIASES`,
+and `TEST_DATA_AGENT_MAX_YAML_DEPTH`.
+
 ## Install
 
 Use Python 3.11 or newer.
 
 ```bash
 python3 -m pip install -e ".[dev]"
+```
+
+For a reproducible development or CI environment, install the pinned `uv`
+bootstrap version and sync from the committed lock file:
+
+```bash
+python3 -m pip install "uv==0.11.23"
+uv sync --frozen --extra dev
+uv run --frozen --extra dev python -m pip_audit --skip-editable
 ```
 
 ## Quickstart
@@ -682,10 +704,18 @@ python3 -m test_data_agent.mcp_trino_server
 `run_safe_select` rejects DDL, DML, executable statements, multiple statements,
 unbounded row-returning queries without a top-level `LIMIT`, unrestricted
 `SELECT *`, and projections of likely PII fields even when they are aliased.
-When catalog or schema allowlists are configured, arbitrary selects must use
-fully qualified `catalog.schema.table` references that match those allowlists.
+Both catalog and schema allowlists are required, and arbitrary selects must use
+fully qualified `catalog.schema.table` references that match them. The server
+also defaults to HTTPS and refuses plain HTTP.
 SQL validation uses `sqlglot` AST parsing for Trino syntax. Masked sampling uses
-conservative field-name detection for likely PII and secrets.
+conservative field-name and value-content detection for likely PII and secrets.
+
+For an intentionally unrestricted local environment, set
+`TRINO_ALLOW_UNRESTRICTED=true`. For a local Trino endpoint that cannot use TLS,
+also set `TRINO_ALLOW_INSECURE_HTTP=true`; neither override should be used for
+production access.
+Trino responses are also capped client-side at 10,000 rows; lower this with
+`TRINO_MAX_RESULT_ROWS` when metadata namespaces are small.
 
 For large Trino tables, use safe profiling instead of downloading rows. The
 safe profile path pushes aggregate work into Trino: row counts, null ratios,
