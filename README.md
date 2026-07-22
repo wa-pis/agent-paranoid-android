@@ -18,7 +18,7 @@ related rights holders.
 
 ## Project Status
 
-Current package version: `0.3.1`. The installable distribution is
+Current package version: `0.4.0`. The installable distribution is
 `agent-paranoid-android`; the CLI remains `test-data-agent` for compatibility
 and to keep the command focused on the generated-data use case.
 
