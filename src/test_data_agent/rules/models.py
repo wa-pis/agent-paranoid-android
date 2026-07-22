@@ -5,9 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import yaml
 from pydantic import BaseModel, Field
 
+from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.serialization import load_limited_yaml
 from test_data_agent.rules.conditions import Condition
 
 
@@ -81,7 +82,7 @@ class BusinessRules(BaseModel):
 
 
 def load_business_rules(path: Path) -> BusinessRules:
-    data = yaml.safe_load(path.read_text()) or {}
+    data = load_limited_yaml(read_limited_text(path)) or {}
     return business_rules_from_dict(data)
 
 

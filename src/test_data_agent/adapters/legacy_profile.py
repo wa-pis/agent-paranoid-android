@@ -10,7 +10,12 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
-from test_data_agent.core.privacy import is_sensitive_field, mask_pattern
+from test_data_agent.core.privacy import (
+    infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
+    is_sensitive_field,
+    mask_pattern,
+)
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.spec import DataType, GenerationSpec, coerce_profile_type
@@ -102,7 +107,17 @@ def _field_profile_from_column(
     unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
     is_identifier = _is_identifier(name, unique_ratio)
     semantic_type = _optional_string(column.get("semantic_type"))
-    sensitive = bool(column.get("sensitive", False)) or is_sensitive_field(name, semantic_type)
+    top_values = column.get("top_values") or []
+    content_sensitive_type = infer_sensitive_type_from_values(
+        item.get("value") for item in top_values if isinstance(item, Mapping)
+    )
+    if content_sensitive_type == "secret" or semantic_type is None:
+        semantic_type = content_sensitive_type or semantic_type
+    sensitive = (
+        bool(column.get("sensitive", False))
+        or is_sensitive_field(name, semantic_type)
+        or content_sensitive_type is not None
+    )
     return FieldProfile(
         name=name,
         data_type=_field_type_from_raw(column.get("data_type", "string")),
@@ -172,7 +187,10 @@ def _distribution_from_profile_column(
             "kind": "masked_patterns",
             "patterns": [
                 MaskedPattern(
-                    pattern=mask_pattern(str(item.get("value", "")), semantic_type),
+                    pattern=mask_pattern(
+                        str(item.get("value", "")),
+                        infer_sensitive_value_type(item.get("value")) or semantic_type,
+                    ),
                     count=int(item.get("count", 0) or 0),
                 ).model_dump(mode="json")
                 for item in top_values

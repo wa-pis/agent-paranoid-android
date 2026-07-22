@@ -150,6 +150,42 @@ def test_infer_dataset_spec_rejects_raw_sensitive_profile(
         )
 
 
+def test_infer_dataset_spec_rejects_secret_hidden_in_neutral_category(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    (tmp_path / "unsafe_profile.json").write_text(
+        json.dumps(
+            {
+                "source_type": "manual",
+                "entities": [
+                    {
+                        "name": "settings",
+                        "row_count": 1,
+                        "fields": [
+                            {
+                                "name": "value",
+                                "data_type": "string",
+                                "distribution": {
+                                    "kind": "categorical",
+                                    "categories": [{"value": "sk_live_51ABCDEF", "count": 1}],
+                                },
+                            }
+                        ],
+                    }
+                ],
+            }
+        )
+    )
+
+    with pytest.raises(ProfileSafetyError, match="raw-looking sensitive values"):
+        infer_dataset_spec(
+            output_path="dataset_spec.yaml",
+            profile_path="unsafe_profile.json",
+        )
+
+
 def test_infer_dataset_spec_accepts_inline_safe_trino_profile(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

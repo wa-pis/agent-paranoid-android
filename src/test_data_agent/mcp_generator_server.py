@@ -14,6 +14,7 @@ except ImportError:  # pragma: no cover
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io import (
     GenerationManifest,
@@ -116,7 +117,7 @@ def validate_dataset(
     if not manifest_path.is_file():
         raise WorkspacePathError("rows folder is not a synthetic generation bundle")
     try:
-        manifest = GenerationManifest.model_validate_json(manifest_path.read_text())
+        manifest = GenerationManifest.model_validate_json(read_limited_text(manifest_path))
     except ValueError as exc:
         raise WorkspacePathError("generation manifest is invalid") from exc
     loaded_spec = load_dataset_spec(spec)

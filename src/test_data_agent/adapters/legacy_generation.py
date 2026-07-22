@@ -24,6 +24,7 @@ from test_data_agent.core.distribution import (
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.limits import enforce_input_row_count, read_limited_text
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
@@ -141,7 +142,7 @@ def validate_legacy_rows_report(rows: list[dict[str, Any]], spec: GenerationSpec
 
 def load_legacy_generation_spec(path: Path) -> GenerationSpec:
     _warn_legacy_compatibility()
-    return GenerationSpec.model_validate_json(path.read_text())
+    return GenerationSpec.model_validate_json(read_limited_text(path))
 
 
 def prepare_legacy_generation_spec(
@@ -197,7 +198,9 @@ def validate_legacy_rows_file(
     rows_path: Path,
 ) -> ValidationReport:
     spec = prepare_legacy_generation_spec(spec_path)
-    rows = json.loads(rows_path.read_text())
+    rows = json.loads(read_limited_text(rows_path))
+    if isinstance(rows, list):
+        enforce_input_row_count(len(rows), label="legacy dataset")
     return validate_legacy_rows_report(rows, spec)
 
 

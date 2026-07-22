@@ -50,6 +50,9 @@ TRINO_ALLOWED_SCHEMAS=dev,test,staging \
 The Trino server must remain read-only and bounded. Unsafe SQL, DDL, DML,
 unrestricted `SELECT *`, joins, CTEs, subqueries, and likely PII aliases are
 rejected before execution.
+Both allowlists are mandatory unless `TRINO_ALLOW_UNRESTRICTED=true` is set
+explicitly. HTTPS is the default; plain HTTP additionally requires
+`TRINO_ALLOW_INSECURE_HTTP=true` and is intended only for isolated local use.
 
 ## Guardrails For AI Clients
 

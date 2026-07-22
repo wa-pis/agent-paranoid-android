@@ -13,11 +13,12 @@ from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_spec,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import read_limited_text
 from test_data_agent.generation.planner import infer_dataset_spec
 
 
 def load_json_payload(path: Path) -> dict[str, Any]:
-    payload = json.loads(path.read_text())
+    payload = json.loads(read_limited_text(path))
     if not isinstance(payload, dict):
         raise ValueError("JSON adapter expects an object payload")
     return payload

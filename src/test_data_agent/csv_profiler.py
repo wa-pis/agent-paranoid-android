@@ -15,7 +15,20 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from test_data_agent.core.privacy import infer_sensitive_from_name, mask_pattern, semantic_type_is_sensitive
+from test_data_agent.core.limits import (
+    configure_csv_field_limit,
+    enforce_input_cell_count,
+    enforce_input_column_count,
+    enforce_input_files,
+    enforce_input_row_count,
+)
+from test_data_agent.core.privacy import (
+    infer_sensitive_from_name,
+    infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
+    mask_pattern,
+    semantic_type_is_sensitive,
+)
 from test_data_agent.spec import DataType, infer_profile_data_type
 
 
@@ -57,17 +70,22 @@ class CSVProfile(BaseModel):
 
 
 def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
+    enforce_input_files([path])
+    configure_csv_field_limit(csv)
     encoding = detect_csv_encoding(path)
     sample = read_csv_sample(path, encoding)
     dialect = detect_csv_dialect(sample)
     with path.open(newline="", encoding=encoding) as handle:
         reader = csv.DictReader(handle, dialect=dialect)
         fieldnames = validate_csv_headers(reader.fieldnames)
+        enforce_input_column_count(len(fieldnames), label="CSV")
         reader.fieldnames = fieldnames
         accumulators = {name: CSVColumnAccumulator(name) for name in fieldnames}
         row_count = 0
         for row in reader:
             row_count += 1
+            enforce_input_row_count(row_count, label="CSV")
+            enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
             for name in fieldnames:
                 accumulators[name].add(row.get(name, ""))
     return CSVProfile(
@@ -116,6 +134,7 @@ class CSVColumnAccumulator:
         self.name = name
         self.non_null_count = 0
         self.semantic_sample: list[str] = []
+        self.content_sensitive_type: str | None = None
         self.counts: Counter[str] = Counter()
         self.distinct_overflow = False
         self.integer_values: list[int] = []
@@ -135,6 +154,9 @@ class CSVColumnAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < 100:
             self.semantic_sample.append(value)
+        detected_type = infer_sensitive_value_type(value)
+        if detected_type == "secret" or self.content_sensitive_type is None:
+            self.content_sensitive_type = detected_type
         self.add_count(value)
         self.add_typed_samples(value)
 
@@ -178,14 +200,21 @@ class CSVColumnAccumulator:
     def to_profile(self, row_count: int) -> CSVColumnProfile:
         null_count = row_count - self.non_null_count
         semantic_type = infer_semantic_type(self.name, self.semantic_sample)
+        if self.content_sensitive_type == "secret" or semantic_type is None:
+            semantic_type = self.content_sensitive_type or semantic_type
         base_type = self.infer_data_type(semantic_type)
-        sensitive = infer_sensitive_from_name(self.name) or semantic_type_is_sensitive(semantic_type)
+        sensitive = (
+            infer_sensitive_from_name(self.name)
+            or semantic_type_is_sensitive(semantic_type)
+            or self.content_sensitive_type is not None
+        )
         top_values: list[dict[str, Any]] = []
         masked_patterns: list[dict[str, Any]] = []
         if sensitive:
             pattern_counts: Counter[str] = Counter()
             for value, count in self.counts.items():
-                pattern_counts[mask_pattern(value, semantic_type)] += count
+                value_type = infer_sensitive_value_type(value) or semantic_type
+                pattern_counts[mask_pattern(value, value_type)] += count
             masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
         elif (
             base_type == DataType.STRING
@@ -250,8 +279,15 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
     non_null = [value.strip() for value in values if value is not None and value.strip() != ""]
     null_count = row_count - len(non_null)
     semantic_type = infer_semantic_type(name, non_null)
+    content_sensitive_type = infer_sensitive_type_from_values(non_null)
+    if content_sensitive_type == "secret" or semantic_type is None:
+        semantic_type = content_sensitive_type or semantic_type
     base_type = infer_data_type(name, non_null, semantic_type)
-    sensitive = infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
+    sensitive = (
+        infer_sensitive_from_name(name)
+        or semantic_type_is_sensitive(semantic_type)
+        or content_sensitive_type is not None
+    )
     counts = Counter(non_null)
 
     top_values: list[dict[str, Any]] = []
@@ -259,7 +295,10 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
     if sensitive:
         masked_patterns = [
             {"pattern": pattern, "count": count}
-            for pattern, count in Counter(mask_pattern(value, semantic_type) for value in non_null).most_common(10)
+            for pattern, count in Counter(
+                mask_pattern(value, infer_sensitive_value_type(value) or semantic_type)
+                for value in non_null
+            ).most_common(10)
         ]
     elif base_type == DataType.STRING and 0 < len(counts) <= MAX_ENUM_VALUES:
         top_values = [{"value": value, "count": count} for value, count in counts.most_common(MAX_ENUM_VALUES)]

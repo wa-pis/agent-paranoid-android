@@ -10,10 +10,23 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
+from test_data_agent.core.limits import (
+    configure_csv_field_limit,
+    enforce_input_cell_count,
+    enforce_input_column_count,
+    enforce_input_files,
+    enforce_input_row_count,
+)
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
-from test_data_agent.core.privacy import infer_sensitive_from_name, mask_pattern, semantic_type_is_sensitive
+from test_data_agent.core.privacy import (
+    infer_sensitive_from_name,
+    infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
+    mask_pattern,
+    semantic_type_is_sensitive,
+)
 from test_data_agent.csv_profiler import (
     detect_csv_dialect,
     detect_csv_encoding,
@@ -28,25 +41,34 @@ from test_data_agent.csv_profiler import (
     validate_csv_headers,
 )
 
-MAX_DISTINCT_TRACKED = 200_000
+MAX_DISTINCT_TRACKED = 10_000
 MAX_CATEGORY_TRACKED = 1_000
-MAX_RESERVOIR_VALUES = 10_000
+MAX_RESERVOIR_VALUES = 2_000
 MAX_SEMANTIC_SAMPLE = 100
 
 
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
-    for path in sorted(input_folder.glob("*.csv")):
+    csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
+    configure_csv_field_limit(csv)
+    total_rows = 0
+    total_cells = 0
+    for path in csv_paths:
         encoding = detect_csv_encoding(path)
         with path.open(newline="", encoding=encoding) as handle:
             sample = handle.read(8192)
             handle.seek(0)
             reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
+            enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
             rows: list[dict[str, str]] = []
             for row in reader:
                 rows.append(dict(row))
+                total_rows += 1
+                total_cells += len(fieldnames)
+                enforce_input_row_count(total_rows, label="CSV folder sample")
+                enforce_input_cell_count(total_cells, label="CSV folder sample")
                 if max_rows_per_entity is not None and len(rows) >= max_rows_per_entity:
                     break
             rows_by_entity[path.stem] = rows
@@ -57,9 +79,12 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
 
 def profile_schema(input_folder: Path) -> DatasetProfile:
     entities: list[EntityProfile] = []
-    csv_paths = sorted(input_folder.glob("*.csv"))
+    csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
+    configure_csv_field_limit(csv)
+    total_rows = 0
+    total_cells = 0
     for path in csv_paths:
         entity_name = path.stem
         encoding = detect_csv_encoding(path)
@@ -68,11 +93,16 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
             handle.seek(0)
             reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
+            enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
             accumulators = {name: FieldAccumulator(name=name) for name in fieldnames}
             row_count = 0
             for row in reader:
                 row_count += 1
+                total_rows += 1
+                total_cells += len(fieldnames)
+                enforce_input_row_count(total_rows, label="CSV folder")
+                enforce_input_cell_count(total_cells, label="CSV folder")
                 for name, accumulator in accumulators.items():
                     accumulator.add(row.get(name, ""))
         fields = [accumulator.to_profile(row_count) for accumulator in accumulators.values()]
@@ -96,6 +126,10 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
     unique_ratio = distinct_count / len(non_null) if non_null else 0.0
     is_identifier = is_identifier_name(name) or (unique_ratio >= 0.98 and "id" in name.lower())
     sensitive = infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
+    content_sensitive_type = infer_sensitive_type_from_values(non_null)
+    if content_sensitive_type == "secret" or semantic_type is None:
+        semantic_type = content_sensitive_type or semantic_type
+    sensitive = sensitive or content_sensitive_type is not None
     return FieldProfile(
         name=name,
         data_type=normalize_field_type(data_type.value),
@@ -126,6 +160,7 @@ class FieldAccumulator:
     null_count: int = 0
     non_null_count: int = 0
     semantic_sample: list[str] = field(default_factory=list)
+    content_sensitive_type: str | None = None
     distinct_values: set[str] = field(default_factory=set)
     distinct_overflow: bool = False
     duplicate_seen: bool = False
@@ -153,6 +188,9 @@ class FieldAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < MAX_SEMANTIC_SAMPLE:
             self.semantic_sample.append(value)
+        detected_type = infer_sensitive_value_type(value)
+        if detected_type == "secret" or self.content_sensitive_type is None:
+            self.content_sensitive_type = detected_type
         self.track_distinct(value)
         self.track_category(value)
         self.track_types(value)
@@ -212,10 +250,16 @@ class FieldAccumulator:
 
     def to_profile(self, table_row_count: int) -> FieldProfile:
         semantic_type = infer_semantic_type(self.name, self.semantic_sample)
+        if self.content_sensitive_type == "secret" or semantic_type is None:
+            semantic_type = self.content_sensitive_type or semantic_type
         data_type = self.infer_field_type(semantic_type)
         unique_ratio = self.estimate_unique_ratio()
         is_identifier = is_identifier_name(self.name) or (unique_ratio >= 0.98 and "id" in self.name.lower())
-        sensitive = infer_sensitive_from_name(self.name) or semantic_type_is_sensitive(semantic_type)
+        sensitive = (
+            infer_sensitive_from_name(self.name)
+            or semantic_type_is_sensitive(semantic_type)
+            or self.content_sensitive_type is not None
+        )
         profile = FieldProfile(
             name=self.name,
             data_type=data_type,
@@ -257,7 +301,10 @@ class FieldAccumulator:
         if profile.is_identifier:
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
-            patterns = Counter(mask_pattern(value, profile.semantic_type) for value in self.semantic_sample)
+            patterns = Counter(
+                mask_pattern(value, infer_sensitive_value_type(value) or profile.semantic_type)
+                for value in self.semantic_sample
+            )
             return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}
         if profile.data_type == FieldType.INTEGER:
             numbers = sorted(value for value in self.numeric_values if isinstance(value, int))

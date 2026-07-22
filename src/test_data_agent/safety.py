@@ -10,7 +10,18 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile
-from test_data_agent.core.privacy import SENSITIVE_SEMANTIC_TYPES, is_sensitive_field
+from test_data_agent.core.limits import (
+    configure_csv_field_limit,
+    enforce_input_cell_count,
+    enforce_input_column_count,
+    enforce_input_files,
+    enforce_input_row_count,
+)
+from test_data_agent.core.privacy import (
+    SENSITIVE_SEMANTIC_TYPES,
+    infer_sensitive_type_from_values,
+    is_sensitive_field,
+)
 from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
 
 
@@ -32,9 +43,20 @@ def assert_profile_safe(profile: DatasetProfile) -> None:
     for entity in profile.entities:
         for field in entity.fields:
             sensitive = field.sensitive or is_sensitive_field(field.name, field.semantic_type)
-            if not sensitive or not field.distribution:
+            if not field.distribution:
                 continue
             kind = str(field.distribution.get("kind", ""))
+            if kind == "categorical" and not sensitive:
+                categories = field.distribution.get("categories", [])
+                content_sensitive_type = infer_sensitive_type_from_values(
+                    item.get("value") for item in categories if isinstance(item, dict)
+                )
+                if content_sensitive_type is not None:
+                    raise ProfileSafetyError(
+                        f"profile field {entity.name!r}.{field.name!r} contains raw-looking sensitive values"
+                    )
+            if not sensitive:
+                continue
             if kind not in _SAFE_SENSITIVE_DISTRIBUTIONS:
                 raise ProfileSafetyError(
                     f"sensitive profile field {entity.name!r}.{field.name!r} uses unsafe distribution kind {kind!r}"
@@ -54,15 +76,20 @@ def assert_no_csv_source_rows(
     generated = list(generated_rows)
     if not generated:
         return
+    enforce_input_files([source_path])
+    configure_csv_field_limit(csv)
     encoding = detect_csv_encoding(source_path)
     with source_path.open(newline="", encoding=encoding) as handle:
         sample = handle.read(8192)
         handle.seek(0)
         reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
         fieldnames = validate_csv_headers(reader.fieldnames)
+        enforce_input_column_count(len(fieldnames), label="source CSV")
         reader.fieldnames = fieldnames
         signatures = {_row_signature(row, fieldnames) for row in generated}
-        for source_row in reader:
+        for row_count, source_row in enumerate(reader, start=1):
+            enforce_input_row_count(row_count, label="source CSV")
+            enforce_input_cell_count(row_count * len(fieldnames), label="source CSV")
             if _row_signature(source_row, fieldnames) in signatures:
                 label = entity_name or source_path.stem
                 raise SourceRowReuseError(

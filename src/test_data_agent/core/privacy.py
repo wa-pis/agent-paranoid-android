@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import math
+import re
+from collections import Counter
+from collections.abc import Iterable
 from enum import StrEnum
 from typing import Any
 
@@ -43,6 +47,28 @@ SENSITIVE_SEMANTIC_TYPES = {
     "ssn",
     "token",
 }
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+PHONE_RE = re.compile(r"^\+?[\d\s().-]{7,}$")
+SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
+PAYMENT_CARD_RE = re.compile(r"^(?:\d[ -]*?){13,19}$")
+JWT_RE = re.compile(r"^[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}$")
+KNOWN_SECRET_RE = re.compile(
+    r"^(?:"
+    r"(?:sk|pk)_(?:live|test)_[A-Za-z0-9_-]{8,}"
+    r"|(?:gh[opurs]|github_pat)_[A-Za-z0-9_]{20,}"
+    r"|(?:AKIA|ASIA)[A-Z0-9]{16}"
+    r"|xox[baprs]-[A-Za-z0-9-]{10,}"
+    r")$"
+)
+SECRET_ASSIGNMENT_RE = re.compile(
+    r"(?:api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|passwd|secret)"
+    r"\s*[:=]\s*\S+",
+    re.IGNORECASE,
+)
+PRIVATE_KEY_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----")
+BEARER_TOKEN_RE = re.compile(r"^Bearer\s+\S+$", re.IGNORECASE)
+TOKEN_ALPHABET_RE = re.compile(r"^[A-Za-z0-9_+/=-]+$")
 
 
 class PrivacyClassification(StrEnum):
@@ -94,6 +120,76 @@ def semantic_type_is_sensitive(semantic_type: str | None) -> bool:
 
 def is_sensitive_field(name: str, semantic_type: str | None = None) -> bool:
     return infer_sensitive_from_name(name) or semantic_type_is_sensitive(semantic_type)
+
+
+def infer_sensitive_value_type(value: Any) -> str | None:
+    """Classify recognizable PII and credentials without retaining the value."""
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if not text:
+        return None
+    if PRIVATE_KEY_RE.search(text) or BEARER_TOKEN_RE.fullmatch(text):
+        return "secret"
+    if KNOWN_SECRET_RE.fullmatch(text) or SECRET_ASSIGNMENT_RE.search(text):
+        return "secret"
+    if JWT_RE.fullmatch(text) or looks_high_entropy_token(text):
+        return "secret"
+    if EMAIL_RE.fullmatch(text):
+        return "email"
+    if SSN_RE.fullmatch(text):
+        return "ssn"
+    if PAYMENT_CARD_RE.fullmatch(text) and passes_luhn_check(text):
+        return "secret"
+    if PHONE_RE.fullmatch(text):
+        return "phone"
+    return None
+
+
+def infer_sensitive_type_from_values(values: Iterable[Any]) -> str | None:
+    detected: str | None = None
+    for value in values:
+        value_type = infer_sensitive_value_type(value)
+        if value_type == "secret":
+            return value_type
+        if detected is None and value_type is not None:
+            detected = value_type
+    return detected
+
+
+def looks_sensitive_value(value: Any) -> bool:
+    return infer_sensitive_value_type(value) is not None
+
+
+def looks_high_entropy_token(text: str) -> bool:
+    if not 24 <= len(text) <= 4096 or not TOKEN_ALPHABET_RE.fullmatch(text):
+        return False
+    character_classes = sum(
+        (
+            any(char.islower() for char in text),
+            any(char.isupper() for char in text),
+            any(char.isdigit() for char in text),
+            any(char in "_+/=-" for char in text),
+        )
+    )
+    if character_classes < 2:
+        return False
+    counts = Counter(text)
+    entropy = -sum((count / len(text)) * math.log2(count / len(text)) for count in counts.values())
+    return entropy >= 3.5
+
+
+def passes_luhn_check(text: str) -> bool:
+    digits = [int(char) for char in text if char.isdigit()]
+    checksum = 0
+    parity = len(digits) % 2
+    for index, digit in enumerate(digits):
+        if index % 2 == parity:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        checksum += digit
+    return bool(digits) and checksum % 10 == 0
 
 
 def mask_pattern(value: str, semantic_type: str | None) -> str:

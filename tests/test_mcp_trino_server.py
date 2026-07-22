@@ -4,11 +4,14 @@ from test_data_agent.mcp_trino_server import (
     AllowlistError,
     SqlSafetyError,
     TrinoConfig,
+    TrinoConfigurationError,
+    TrinoResultLimitError,
     check_allowlist,
     execute_query,
     has_top_level_limit,
     mask_row,
     profile_aggregate_mapping,
+    profile_column_safe,
     profile_conditional_allowed_values,
     profile_conditional_required,
     profile_foreign_key,
@@ -18,6 +21,11 @@ from test_data_agent.mcp_trino_server import (
     validate_table_references_allowed,
     validate_safe_select,
 )
+
+
+@pytest.fixture(autouse=True)
+def allow_unrestricted_unit_test_queries(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TRINO_ALLOW_UNRESTRICTED", "true")
 
 
 @pytest.mark.parametrize(
@@ -110,7 +118,7 @@ def test_safe_select_enforces_allowlist_for_table_references() -> None:
         host="localhost",
         port=8080,
         user="agent",
-        http_scheme="http",
+        http_scheme="https",
         allowed_catalogs=frozenset({"analytics"}),
         allowed_schemas=frozenset({"safe_schema"}),
     )
@@ -138,7 +146,7 @@ def test_allowlist_rejects_catalog_and_schema() -> None:
         host="localhost",
         port=8080,
         user="agent",
-        http_scheme="http",
+        http_scheme="https",
         allowed_catalogs=frozenset({"analytics"}),
         allowed_schemas=frozenset({"safe_schema"}),
     )
@@ -148,6 +156,31 @@ def test_allowlist_rejects_catalog_and_schema() -> None:
         check_allowlist(catalog="raw", schema="safe_schema", config=config)
     with pytest.raises(AllowlistError):
         check_allowlist(catalog="analytics", schema="pii", config=config)
+
+
+def test_trino_config_requires_catalog_and_schema_allowlists_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("TRINO_ALLOW_UNRESTRICTED")
+    monkeypatch.delenv("TRINO_ALLOWED_CATALOGS", raising=False)
+    monkeypatch.delenv("TRINO_ALLOWED_SCHEMAS", raising=False)
+
+    with pytest.raises(TrinoConfigurationError, match="are required"):
+        TrinoConfig.from_env()
+
+
+def test_trino_config_rejects_plain_http_without_explicit_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+    monkeypatch.setenv("TRINO_HTTP_SCHEME", "http")
+
+    with pytest.raises(TrinoConfigurationError, match="plain HTTP is disabled"):
+        TrinoConfig.from_env()
+
+    monkeypatch.setenv("TRINO_ALLOW_INSECURE_HTTP", "true")
+    assert TrinoConfig.from_env().http_scheme == "http"
 
 
 def test_likely_pii_fields_are_masked() -> None:
@@ -164,6 +197,45 @@ def test_likely_pii_fields_are_masked() -> None:
     }
 
 
+def test_sensitive_values_are_masked_even_with_neutral_column_names() -> None:
+    row = {
+        "value": "alice@example.com",
+        "note": "sk_live_51ABCDEF",
+        "status": "paid",
+    }
+
+    masked = mask_row(row)
+
+    assert masked["value"] != row["value"]
+    assert masked["note"] != row["note"]
+    assert masked["status"] == "paid"
+
+
+def test_profile_column_safe_suppresses_secret_top_values(monkeypatch: pytest.MonkeyPatch) -> None:
+    def fake_fetch_dicts(sql: str, parameters=None):
+        if "GROUP BY" in sql:
+            return [{"value": "sk_live_51ABCDEF", "count": 2}]
+        return [{"row_count": 2, "non_null_count": 2, "approx_distinct_count": 1}]
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+
+    profile = profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "settings",
+        "value",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert profile["sensitive"] is True
+    assert profile["semantic_type"] == "secret"
+    assert profile["masked_patterns"] == [{"pattern": "secret", "count": 2}]
+    assert "top_values" not in profile
+    assert "sk_live_51ABCDEF" not in str(profile)
+
+
 def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPatch) -> None:
     class FakeCursor:
         description = [("id",)]
@@ -175,7 +247,8 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
             assert sql == "SELECT id FROM users LIMIT 1"
             assert parameters == []
 
-        def fetchall(self):
+        def fetchmany(self, size):
+            assert size == 10_001
             return [(1,)]
 
         def close(self):
@@ -266,7 +339,8 @@ def test_execute_query_closes_connection_when_cursor_close_fails(monkeypatch: py
         def execute(self, sql, parameters):
             pass
 
-        def fetchall(self):
+        def fetchmany(self, size):
+            assert size == 10_001
             return [(1,)]
 
         def close(self):
@@ -299,6 +373,58 @@ def test_execute_query_closes_connection_when_cursor_close_fails(monkeypatch: py
     with pytest.raises(RuntimeError, match="cursor close failed"):
         execute_query("SELECT id FROM users LIMIT 1")
 
+    assert fake_trino.dbapi.connection.closed is True
+
+
+def test_execute_query_rejects_oversized_result_and_closes_resources(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class FakeCursor:
+        description = [("id",)]
+
+        def __init__(self) -> None:
+            self.closed = False
+
+        def execute(self, sql, parameters):
+            pass
+
+        def fetchmany(self, size):
+            assert size == 3
+            return [(1,), (2,), (3,)]
+
+        def close(self):
+            self.closed = True
+
+    class FakeConnection:
+        def __init__(self) -> None:
+            self.cursor_instance = FakeCursor()
+            self.closed = False
+
+        def cursor(self):
+            return self.cursor_instance
+
+        def close(self):
+            self.closed = True
+
+    class FakeDbapi:
+        def __init__(self) -> None:
+            self.connection = FakeConnection()
+
+        def connect(self, **kwargs):
+            return self.connection
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbapi()
+
+    fake_trino = FakeTrino()
+    monkeypatch.setenv("TRINO_MAX_RESULT_ROWS", "2")
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+
+    with pytest.raises(TrinoResultLimitError, match="limit of 2 rows"):
+        execute_query("SELECT id FROM users LIMIT 3")
+
+    assert fake_trino.dbapi.connection.cursor_instance.closed is True
     assert fake_trino.dbapi.connection.closed is True
 
 

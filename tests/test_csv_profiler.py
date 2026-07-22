@@ -3,8 +3,10 @@ import json
 from pathlib import Path
 
 import pyarrow.parquet as pq
+import pytest
 
 from test_data_agent.cli import main
+from test_data_agent.core.limits import InputLimitError
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generator import generate_rows
 from test_data_agent.io.writers import write_parquet
@@ -50,6 +52,20 @@ def test_csv_profile_detects_semicolon_delimiter_and_utf8_bom(tmp_path) -> None:
     assert email.sensitive is True
     assert status.top_values == [{"value": "active", "count": 1}, {"value": "paused", "count": 1}]
     assert "alice@example.com" not in profile.model_dump_json()
+
+
+def test_csv_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> None:
+    source = tmp_path / "secrets.csv"
+    source.write_text("value\nsk_live_51ABCDEF\nsk_live_51ABCDEF\n")
+
+    profile = profile_csv(source)
+    value = profile.columns[0]
+
+    assert value.sensitive is True
+    assert value.semantic_type == "secret"
+    assert value.top_values == []
+    assert value.masked_patterns == [{"pattern": "secret", "count": 2}]
+    assert "sk_live_51ABCDEF" not in profile.model_dump_json()
 
 
 def test_csv_profile_infers_generation_spec_without_copying_rows() -> None:
@@ -140,10 +156,66 @@ def test_profile_csv_rejects_duplicate_headers(tmp_path: Path) -> None:
     path = tmp_path / "duplicate.csv"
     path.write_text("id,status,status\n1,active,paid\n")
 
-    import pytest
-
     with pytest.raises(ValueError, match="unique"):
         profile_csv(path)
+
+
+def test_csv_profile_rejects_input_above_file_size_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "large.csv"
+    path.write_text("value\n" + "x" * 64 + "\n")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES", "32")
+
+    with pytest.raises(InputLimitError, match="must be <= 32 bytes"):
+        profile_csv(path)
+
+
+def test_csv_profile_rejects_input_above_row_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "rows.csv"
+    path.write_text("value\none\ntwo\n")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_ROWS", "1")
+
+    with pytest.raises(InputLimitError, match="<= 1 rows"):
+        profile_csv(path)
+
+
+def test_csv_profile_rejects_input_above_column_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "columns.csv"
+    path.write_text("one,two\n1,2\n")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_COLUMNS", "1")
+
+    with pytest.raises(InputLimitError, match="<= 1 columns"):
+        profile_csv(path)
+
+
+def test_csv_profile_rejects_input_above_cell_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "cells.csv"
+    path.write_text("one,two\n1,2\n3,4\n")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELLS", "3")
+
+    with pytest.raises(InputLimitError, match="<= 3 cells"):
+        profile_csv(path)
+
+
+def test_csv_profile_rejects_symbolic_link_input(tmp_path: Path) -> None:
+    target = tmp_path / "target.csv"
+    link = tmp_path / "source.csv"
+    target.write_text("value\nsafe\n")
+    link.symlink_to(target)
+
+    with pytest.raises(InputLimitError, match="symbolic link inputs are not allowed"):
+        profile_csv(link)
 
 
 FIXTURE_CSV = __import__("pathlib").Path(__file__).parent / "fixtures" / "customers.csv"

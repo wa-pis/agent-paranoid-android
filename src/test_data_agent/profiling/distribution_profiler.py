@@ -8,7 +8,11 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
-from test_data_agent.core.privacy import mask_pattern
+from test_data_agent.core.privacy import (
+    infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
+    mask_pattern,
+)
 from test_data_agent.csv_profiler import (
     numeric_stats,
     parse_bool,
@@ -32,10 +36,18 @@ def enrich_distributions(profile: DatasetProfile, rows_by_entity: dict[str, list
 
 def infer_distribution(field: FieldProfile, values: list[str]) -> dict[str, Any]:
     non_null = [value.strip() for value in values if value is not None and value.strip() != ""]
+    content_sensitive_type = infer_sensitive_type_from_values(non_null)
+    if content_sensitive_type is not None:
+        field.sensitive = True
+        if content_sensitive_type == "secret" or field.semantic_type is None:
+            field.semantic_type = content_sensitive_type
     if field.is_identifier:
         return {"kind": "synthetic_identifier"}
     if field.sensitive:
-        patterns = Counter(mask_pattern(value, field.semantic_type) for value in non_null)
+        patterns = Counter(
+            mask_pattern(value, infer_sensitive_value_type(value) or field.semantic_type)
+            for value in non_null
+        )
         return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}
     if field.data_type == FieldType.INTEGER:
         numbers = sorted(value for value in (parse_int(value) for value in non_null) if value is not None)

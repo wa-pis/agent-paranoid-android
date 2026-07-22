@@ -11,6 +11,7 @@ from pathlib import Path
 import tempfile
 
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.limits import read_limited_text
 
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
@@ -77,7 +78,7 @@ def write_cached_profile(
 
 
 def read_profile_cache_file(path: Path, expected_fingerprint: str | None = None) -> DatasetProfile:
-    payload = json.loads(path.read_text())
+    payload = json.loads(read_limited_text(path))
     cached_fingerprint = payload.get("fingerprint") if isinstance(payload, dict) else None
     if expected_fingerprint is not None and cached_fingerprint != expected_fingerprint:
         raise ValueError("profile cache fingerprint mismatch")

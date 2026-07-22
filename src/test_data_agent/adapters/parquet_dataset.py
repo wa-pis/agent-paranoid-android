@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import enforce_input_files, enforce_parquet_metadata_limits
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, csv_profile_to_dataset_spec
 
@@ -54,7 +55,9 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
     except ImportError as exc:  # pragma: no cover - optional dependency guard
         raise RuntimeError("Parquet adapters require pyarrow") from exc
 
+    enforce_input_files([path])
     parquet_file = pq.ParquetFile(path)
+    enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
     arrow_schema = parquet_file.schema_arrow
     row_count = parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0
     columns = [

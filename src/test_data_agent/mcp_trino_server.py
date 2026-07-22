@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import os
 import re
+from collections import Counter
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -16,7 +17,14 @@ from typing import Any
 import sqlglot
 from sqlglot import exp
 
-from test_data_agent.core.privacy import infer_sensitive_from_name, mask_value
+from test_data_agent.core.privacy import (
+    infer_sensitive_from_name,
+    infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
+    looks_sensitive_value,
+    mask_pattern,
+    mask_value,
+)
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
@@ -39,6 +47,8 @@ TABLE_STAR_RE = re.compile(r"\bselect\b(?:(?!\bfrom\b).)*\b[a-zA-Z_][\w$]*\s*\.\
 IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 DEFAULT_LIMIT = 100
 MAX_LIMIT = 1000
+DEFAULT_MAX_RESULT_ROWS = 10_000
+ABSOLUTE_MAX_RESULT_ROWS = 100_000
 MIN_RULE_CONFIDENCE = 0.9
 
 
@@ -50,6 +60,14 @@ class AllowlistError(ValueError):
     """Raised when a catalog or schema is outside configured allowlists."""
 
 
+class TrinoConfigurationError(ValueError):
+    """Raised when Trino safety boundaries are not explicitly configured."""
+
+
+class TrinoResultLimitError(ValueError):
+    """Raised when a Trino response exceeds the client-side safety limit."""
+
+
 @dataclass(frozen=True)
 class TrinoConfig:
     host: str
@@ -59,24 +77,73 @@ class TrinoConfig:
     allowed_catalogs: frozenset[str] | None
     allowed_schemas: frozenset[str] | None
     request_timeout: float = 30.0
+    max_result_rows: int = DEFAULT_MAX_RESULT_ROWS
+    allow_unrestricted: bool = False
+    allow_insecure_http: bool = False
 
     @classmethod
     def from_env(cls) -> TrinoConfig:
-        return cls(
+        config = cls(
             host=os.environ.get("TRINO_HOST", "localhost"),
             port=int(os.environ.get("TRINO_PORT", "8080")),
             user=os.environ.get("TRINO_USER", "test_data_agent"),
-            http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "http"),
+            http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "https"),
             allowed_catalogs=parse_allowlist(os.environ.get("TRINO_ALLOWED_CATALOGS")),
             allowed_schemas=parse_allowlist(os.environ.get("TRINO_ALLOWED_SCHEMAS")),
             request_timeout=float(os.environ.get("TRINO_REQUEST_TIMEOUT_SECONDS", "30")),
+            max_result_rows=parse_max_result_rows(),
+            allow_unrestricted=parse_env_bool("TRINO_ALLOW_UNRESTRICTED"),
+            allow_insecure_http=parse_env_bool("TRINO_ALLOW_INSECURE_HTTP"),
         )
+        config.validate_security()
+        return config
+
+    def validate_security(self) -> None:
+        scheme = self.http_scheme.lower()
+        if scheme not in {"http", "https"}:
+            raise TrinoConfigurationError("TRINO_HTTP_SCHEME must be http or https")
+        if scheme == "http" and not self.allow_insecure_http:
+            raise TrinoConfigurationError(
+                "plain HTTP is disabled; use https or explicitly set TRINO_ALLOW_INSECURE_HTTP=true"
+            )
+        if (
+            self.allowed_catalogs is None or self.allowed_schemas is None
+        ) and not self.allow_unrestricted:
+            raise TrinoConfigurationError(
+                "TRINO_ALLOWED_CATALOGS and TRINO_ALLOWED_SCHEMAS are required; "
+                "set TRINO_ALLOW_UNRESTRICTED=true only for an intentionally unrestricted environment"
+            )
 
 
 def parse_allowlist(value: str | None) -> frozenset[str] | None:
     if value is None or not value.strip():
         return None
     return frozenset(item.strip() for item in value.split(",") if item.strip())
+
+
+def parse_env_bool(name: str) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return False
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise TrinoConfigurationError(f"{name} must be a boolean")
+
+
+def parse_max_result_rows() -> int:
+    raw_value = os.environ.get("TRINO_MAX_RESULT_ROWS", str(DEFAULT_MAX_RESULT_ROWS))
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise TrinoConfigurationError("TRINO_MAX_RESULT_ROWS must be an integer") from exc
+    if not 1 <= value <= ABSOLUTE_MAX_RESULT_ROWS:
+        raise TrinoConfigurationError(
+            f"TRINO_MAX_RESULT_ROWS must be between 1 and {ABSOLUTE_MAX_RESULT_ROWS}"
+        )
+    return value
 
 
 def require_identifier(value: str, label: str) -> str:
@@ -91,6 +158,7 @@ def quote_identifier(value: str) -> str:
 
 def check_allowlist(catalog: str | None = None, schema: str | None = None, config: TrinoConfig | None = None) -> None:
     config = config or TrinoConfig.from_env()
+    config.validate_security()
     if catalog and config.allowed_catalogs is not None and catalog not in config.allowed_catalogs:
         raise AllowlistError(f"catalog is not allowed: {catalog}")
     if schema and config.allowed_schemas is not None and schema not in config.allowed_schemas:
@@ -197,6 +265,7 @@ def top_level_limit_value(sql_or_tree: str | exp.Expression) -> int | None:
 
 def validate_table_references_allowed(sql_or_tree: str | exp.Expression, config: TrinoConfig | None = None) -> None:
     config = config or TrinoConfig.from_env()
+    config.validate_security()
     tree = parse_select_ast(normalize_sql(sql_or_tree)) if isinstance(sql_or_tree, str) else sql_or_tree
     references = extract_table_references(tree)
     if not references:
@@ -249,7 +318,9 @@ def is_star_column(expression: exp.Expression) -> bool:
 
 def mask_row(row: dict[str, Any]) -> dict[str, Any]:
     return {
-        key: mask_value(value) if infer_sensitive_from_name(key) else value
+        key: mask_value(value)
+        if infer_sensitive_from_name(key) or looks_sensitive_value(value)
+        else value
         for key, value in row.items()
     }
 
@@ -274,7 +345,11 @@ def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[li
     cursor = connection.cursor()
     try:
         cursor.execute(sql, parameters or [])
-        rows = cursor.fetchall()
+        rows = cursor.fetchmany(config.max_result_rows + 1)
+        if len(rows) > config.max_result_rows:
+            raise TrinoResultLimitError(
+                f"Trino result exceeds the client limit of {config.max_result_rows} rows"
+            )
         return rows, cursor.description or []
     finally:
         try:
@@ -393,7 +468,7 @@ def profile_column_safe(
     profile.update({key: value for key, value in aggregates.items() if key not in profile and value is not None})
     approx_distinct = int(profile.get("approx_distinct_count") or 0)
     if is_string_trino_type(data_type) and not sensitive and 0 < approx_distinct <= max_top_values:
-        profile["top_values"] = fetch_dicts(
+        top_values = fetch_dicts(
             f"SELECT {safe_column} AS value, count(*) AS count "
             f"FROM {safe_table} "
             f"WHERE {safe_column} IS NOT NULL "
@@ -401,6 +476,21 @@ def profile_column_safe(
             f"ORDER BY count DESC "
             f"LIMIT {max_top_values}"
         )
+        content_sensitive_type = infer_sensitive_type_from_values(row.get("value") for row in top_values)
+        if content_sensitive_type is not None:
+            profile["sensitive"] = True
+            profile["semantic_type"] = content_sensitive_type
+            pattern_counts: Counter[str] = Counter()
+            for row in top_values:
+                value = row.get("value")
+                value_type = infer_sensitive_value_type(value) or content_sensitive_type
+                pattern_counts[mask_pattern(str(value), value_type)] += int(row.get("count") or 0)
+            profile["masked_patterns"] = [
+                {"pattern": pattern, "count": count}
+                for pattern, count in pattern_counts.most_common(10)
+            ]
+        else:
+            profile["top_values"] = top_values
     return profile
 
 
@@ -838,6 +928,7 @@ else:  # pragma: no cover
 def main() -> None:
     if mcp is None:
         raise RuntimeError("mcp package is not installed")
+    TrinoConfig.from_env()
     mcp.run()
 
 

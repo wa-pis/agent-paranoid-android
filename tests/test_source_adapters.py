@@ -27,6 +27,7 @@ from test_data_agent.adapters.legacy_generation import (
     validate_legacy_rows_report,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import InputLimitError
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, TableSpec
@@ -88,6 +89,18 @@ def test_csv_folder_adapter_builds_safe_multi_entity_profile() -> None:
     assert "alice@example.com" not in profile.model_dump_json()
 
 
+def test_csv_folder_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> None:
+    source = tmp_path / "settings.csv"
+    source.write_text("value\nsk_live_51ABCDEF\nsk_live_51ABCDEF\n")
+
+    profile = dataset_profile_from_csv_folder(tmp_path, use_cache=False)
+    value = profile.entity("settings").field("value")
+
+    assert value.sensitive is True
+    assert value.distribution["kind"] == "masked_patterns"
+    assert "sk_live_51ABCDEF" not in profile.model_dump_json()
+
+
 def test_csv_folder_adapter_builds_dataset_spec_with_seed_and_relationships() -> None:
     spec = dataset_spec_from_csv_folder(FIXTURE_FOLDER, count=7, seed=123, use_cache=False)
 
@@ -137,6 +150,32 @@ def test_trino_profile_adapter_uses_safe_metadata_only() -> None:
     assert status.distribution["kind"] == "categorical"
     assert email.sensitive is True
     assert "alice@example.com" not in spec.model_dump_json()
+
+
+def test_legacy_profile_adapter_masks_secret_in_neutral_top_values() -> None:
+    spec = dataset_spec_from_trino_profile(
+        {
+            "source_type": "trino",
+            "table": "settings",
+            "row_count": 2,
+            "columns": [
+                {
+                    "name": "value",
+                    "data_type": "varchar",
+                    "top_values": [{"value": "sk_live_51ABCDEF", "count": 2}],
+                    "approx_distinct_count": 1,
+                    "non_null_count": 2,
+                }
+            ],
+        },
+        count=2,
+    )
+
+    value = spec.entity("settings").field("value")
+
+    assert value.sensitive is True
+    assert value.distribution["kind"] == "masked_patterns"
+    assert "sk_live_51ABCDEF" not in spec.model_dump_json()
 
 
 def test_legacy_generation_spec_adapter_preserves_generation_settings() -> None:
@@ -414,6 +453,18 @@ def test_parquet_adapter_uses_schema_metadata(tmp_path) -> None:
     assert customers.field("customer_id").is_identifier is True
     assert customers.field("active").data_type == "boolean"
     assert customers.field("score").data_type == "float"
+
+
+def test_parquet_adapter_rejects_row_count_before_reading_data(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "customers.parquet"
+    pq.write_table(pa.table({"id": [1, 2]}), path)
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_ROWS", "1")
+
+    with pytest.raises(InputLimitError, match="<= 1 rows"):
+        dataset_profile_from_parquet(path)
 
 
 def test_adapters_package_keeps_legacy_workflow_helpers_out_of_dataset_oriented_exports() -> None:

@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.generation.entity_generator import generate_dataset
@@ -144,9 +145,9 @@ def approve_agent_workspace(workspace: Path) -> AgentResult:
     if not artifacts.dataset_spec_path.is_file():
         raise ValueError("agent workspace does not contain dataset_spec.yaml")
 
-    request = AgentRequest.model_validate_json(artifacts.request_path.read_text())
+    request = AgentRequest.model_validate_json(read_limited_text(artifacts.request_path))
     request = normalize_agent_request(request.model_copy(update={"workspace": resolved_workspace}))
-    profile = DatasetProfile.model_validate_json(artifacts.profile_path.read_text())
+    profile = DatasetProfile.model_validate_json(read_limited_text(artifacts.profile_path))
     assert_profile_safe(profile)
     spec = load_dataset_spec(artifacts.dataset_spec_path)
     prepare_spec_for_approval(spec, request)

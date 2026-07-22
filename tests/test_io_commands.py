@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from test_data_agent.cli import main
+from test_data_agent.core.limits import InputLimitError
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.commands import (
     generate_dataset_command,
@@ -20,6 +21,7 @@ from test_data_agent.io.commands import (
     profile_example_artifacts,
     validate_dataset_artifacts,
 )
+from test_data_agent.io.readers import load_dataset_spec
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "example_dataset"
 
@@ -166,6 +168,53 @@ entities:
 
     assert report.valid is False
     assert report.sections[0].errors == ["customers[0] row must be an object"]
+
+
+def test_validate_dataset_artifacts_rejects_json_above_row_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec_path = tmp_path / "spec.yaml"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text(
+        "entities:\n"
+        "  - name: orders\n"
+        "    row_count: 2\n"
+        "    fields:\n"
+        "      - name: id\n"
+        "        data_type: integer\n"
+    )
+    (rows_dir / "orders.json").write_text('[{"id": 1}, {"id": 2}]')
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_ROWS", "1")
+
+    with pytest.raises(InputLimitError, match="<= 1 rows"):
+        validate_dataset_artifacts(spec_path, rows_dir)
+
+
+def test_dataset_spec_loader_rejects_excessive_yaml_aliases(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec_path = tmp_path / "aliases.yaml"
+    spec_path.write_text("entities: &entities []\ncopy_one: *entities\ncopy_two: *entities\n")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_YAML_ALIASES", "1")
+
+    with pytest.raises(ValueError, match="more than 1 aliases"):
+        load_dataset_spec(spec_path)
+
+
+def test_validate_dataset_artifacts_rejects_symlinked_row_file(tmp_path: Path) -> None:
+    spec_path = tmp_path / "spec.yaml"
+    rows_dir = tmp_path / "rows"
+    outside = tmp_path / "outside.json"
+    rows_dir.mkdir()
+    spec_path.write_text("entities: []\n")
+    outside.write_text("[]")
+    (rows_dir / "orders.json").symlink_to(outside)
+
+    with pytest.raises(InputLimitError, match="symbolic link inputs are not allowed"):
+        validate_dataset_artifacts(spec_path, rows_dir)
 
 
 def test_generate_dataset_command_uses_dataset_spec_helper(tmp_path) -> None:
