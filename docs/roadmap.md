@@ -12,6 +12,8 @@ date.
 - Runtime raw-profile and source-row reuse protections.
 - End-to-end AI integration demo.
 - Review-first agent orchestration with `agent-plan` and `agent-approve`.
+- Configurable input, output-size, disk-reserve, execution-time, and Trino
+  server-side query budgets.
 
 ## MVP Freeze
 
@@ -39,8 +41,6 @@ Treat these as non-negotiable release gates rather than new feature work:
   server and include business validation in the generation manifest.
 - Extend agent orchestration to cover allowlisted Trino table planning through
   MCP without granting the agent raw SQL access.
-- Add configurable output quotas for row counts, total artifact size, and
-  execution time.
 - Add signed or externally persisted audit records for teams running the MCP
   servers in shared environments.
 - Publish a formal DatasetSpec JSON Schema and compatibility policy for future

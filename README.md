@@ -81,6 +81,14 @@ Override these with `TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES`,
 `TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES`, `TEST_DATA_AGENT_MAX_YAML_ALIASES`,
 and `TEST_DATA_AGENT_MAX_YAML_DEPTH`.
 
+Generated bundles are also bounded before publication. The defaults are
+512 MiB for all generated files, 128 MiB of free disk space left in reserve,
+and five minutes of wall-clock generation time. Override them with
+`TEST_DATA_AGENT_MAX_OUTPUT_BYTES`, `TEST_DATA_AGENT_MIN_FREE_DISK_BYTES`, and
+`TEST_DATA_AGENT_MAX_GENERATION_SECONDS`. DatasetSpec workflows estimate output
+size before allocating rows, check time throughout generation, and publish
+folder bundles only after exact size and validation checks pass.
+
 ## Install
 
 Use Python 3.11 or newer.

@@ -8,6 +8,7 @@ import pytest
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec
+from test_data_agent.core.limits import GenerationLimitError
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.workflows import (
     generate_dataset_bundle,
@@ -161,7 +162,7 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
     input_path.write_text("order_id,status\n1,new\n")
     monkeypatch.setattr(
         "test_data_agent.io.workflows.generate_dataset",
-        lambda spec, seed: {"orders": [{"order_id": "1", "status": "new"}]},
+        lambda spec, seed, budget: {"orders": [{"order_id": "1", "status": "new"}]},
     )
 
     with pytest.raises(SourceRowReuseError):
@@ -373,6 +374,59 @@ def test_generate_dataset_bundle_does_not_leave_partial_output_on_validation_err
             output_format=OutputFormat.JSON,
             seed=11,
         )
+
+    assert not (tmp_path / "generated").exists()
+    assert not list(tmp_path.glob(".generated.*"))
+
+
+def test_generate_dataset_bundle_rejects_estimated_oversized_output(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_OUTPUT_BYTES", "100")
+    monkeypatch.setenv("TEST_DATA_AGENT_MIN_FREE_DISK_BYTES", "1")
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[FieldSpec(name="status", data_type="string")],
+            )
+        ]
+    )
+
+    with pytest.raises(GenerationLimitError, match="estimated generated data"):
+        generate_dataset_bundle(spec, output_folder=tmp_path / "generated")
+
+    assert not (tmp_path / "generated").exists()
+    assert not list(tmp_path.glob(".generated.*"))
+
+
+def test_generate_dataset_bundle_removes_temp_output_when_time_budget_expires(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class ExportDeadline:
+        def check(self, stage: str) -> None:
+            if stage == "dataset export":
+                raise GenerationLimitError("generation deadline reached")
+
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.prepare_generation_budget",
+        lambda spec, output_path: ExportDeadline(),
+    )
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[FieldSpec(name="status", data_type="string")],
+            )
+        ]
+    )
+
+    with pytest.raises(GenerationLimitError, match="deadline"):
+        generate_dataset_bundle(spec, output_folder=tmp_path / "generated")
 
     assert not (tmp_path / "generated").exists()
     assert not list(tmp_path.glob(".generated.*"))

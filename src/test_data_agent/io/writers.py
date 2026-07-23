@@ -14,6 +14,10 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import (
+    enforce_output_folder_size,
+    enforce_output_payload_size,
+)
 from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
 
 
@@ -47,7 +51,12 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
         raise SystemExit("Parquet output requires pyarrow") from exc
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), output)
+    try:
+        pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), output)
+        enforce_output_payload_size(output.stat().st_size, label=f"output file {output.name!r}")
+    except Exception:
+        output.unlink(missing_ok=True)
+        raise
 
 
 def parquet_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -89,11 +98,18 @@ def write_dataset_rows(
     root = output_folder.resolve(strict=True)
     for entity_name, rows in rows_by_entity.items():
         if output_format == DatasetOutputFormat.CSV:
-            safe_entity_artifact_path(root, entity_name, ".csv").write_text(rows_to_csv(rows))
+            write_bounded_text(
+                rows_to_csv(rows),
+                safe_entity_artifact_path(root, entity_name, ".csv"),
+            )
         elif output_format == DatasetOutputFormat.JSON:
-            safe_entity_artifact_path(root, entity_name, ".json").write_text(json.dumps(rows, indent=2, sort_keys=True))
+            write_bounded_text(
+                json.dumps(rows, indent=2, sort_keys=True),
+                safe_entity_artifact_path(root, entity_name, ".json"),
+            )
         elif output_format == DatasetOutputFormat.PARQUET:
             write_parquet(rows, safe_entity_artifact_path(root, entity_name, ".parquet"))
+        enforce_output_folder_size(root)
 
 
 def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str) -> Path:
@@ -103,6 +119,13 @@ def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str
     if not path.is_relative_to(output_folder):
         raise ValueError("entity artifact path escapes output folder")
     return path
+
+
+def write_bounded_text(text: str, output: Path) -> None:
+    payload = text.encode("utf-8")
+    enforce_output_payload_size(len(payload), label=f"output file {output.name!r}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_bytes(payload)
 
 
 def write_single_entity_rows(
@@ -116,17 +139,17 @@ def write_single_entity_rows(
     if output_format == DatasetOutputFormat.CSV:
         text = rows_to_csv(rows)
         if output is None:
+            enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
             print(text)
             return
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(text)
+        write_bounded_text(text, output)
     elif output_format == DatasetOutputFormat.JSON:
         text = json.dumps(rows, indent=2, sort_keys=True)
         if output is None:
+            enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
             print(text)
             return
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(text)
+        write_bounded_text(text, output)
     elif output_format == DatasetOutputFormat.PARQUET:
         if output is None:
             raise SystemExit("Parquet output requires --output")

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import json
 import shutil
 import tempfile
 from pathlib import Path
@@ -15,6 +16,10 @@ from test_data_agent.adapters import (
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
+    GenerationBudget,
+    enforce_output_capacity,
+    enforce_output_folder_size,
+    enforce_output_payload_size,
     enforce_row_count_limit,
     max_generation_count as configured_max_generation_count,
 )
@@ -83,7 +88,9 @@ def generate_dataset_bundle(
     effective_spec.generation_settings.seed = effective_seed
     effective_spec.generation_settings.output_format = effective_output_format
 
-    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed)
+    budget = prepare_generation_budget(effective_spec, output_folder)
+    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget)
+    budget.check("dataset generation")
     business_report = (
         invoke_business_rules_applier(
             business_rules_applier,
@@ -94,10 +101,13 @@ def generate_dataset_bundle(
         if business_rules_applier is not None
         else None
     )
+    budget.check("business rule application")
     temp_folder = make_temp_output_folder(output_folder)
     try:
         write_dataset_rows(rows_by_entity, effective_output_format, temp_folder)
+        budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec)
+        budget.check("dataset validation")
         generation_valid = report.valid and business_report_is_valid(
             business_report,
             effective_spec.generation_settings.mode,
@@ -115,6 +125,8 @@ def generate_dataset_bundle(
             validation_valid=generation_valid,
             output_folder=temp_folder,
         )
+        enforce_output_folder_size(temp_folder)
+        budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except Exception:
         shutil.rmtree(temp_folder, ignore_errors=True)
@@ -206,9 +218,17 @@ def generate_single_entity_profile_artifacts(
     rows_by_entity: dict[str, list[dict[str, Any]]] | None = None,
     business_report: Any | None = None,
     profile_artifact_name: str = "profile.json",
+    budget: GenerationBudget | None = None,
 ) -> DatasetValidationReport:
-    rows_by_entity = rows_by_entity or generate_dataset(spec, seed=spec.generation_settings.seed or 0)
+    budget = budget or prepare_generation_budget(spec, output_path or Path.cwd())
+    rows_by_entity = rows_by_entity or generate_dataset(
+        spec,
+        seed=spec.generation_settings.seed or 0,
+        budget=budget,
+    )
+    budget.check("dataset generation")
     report = validate_dataset(rows_by_entity, spec)
+    budget.check("dataset validation")
     if output_path is None:
         write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path)
         write_dataset_generation_artifacts(
@@ -220,6 +240,7 @@ def generate_single_entity_profile_artifacts(
             profile_artifact_name=profile_artifact_name,
             row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
         )
+        budget.check("artifact publication")
         return report
 
     temp_folder = make_temp_output_folder(output_path.parent / output_path.stem)
@@ -235,6 +256,8 @@ def generate_single_entity_profile_artifacts(
             profile_artifact_name=profile_artifact_name,
             row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
         )
+        enforce_output_folder_size(temp_folder)
+        budget.check("artifact publication")
         commit_single_entity_bundle(temp_folder, output_path.parent)
     except Exception:
         shutil.rmtree(temp_folder, ignore_errors=True)
@@ -262,7 +285,13 @@ def generate_dataset_from_profile_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
-    rows_by_entity = generate_dataset(spec, seed=spec.generation_settings.seed or 0)
+    budget = prepare_generation_budget(spec, output_path)
+    rows_by_entity = generate_dataset(
+        spec,
+        seed=spec.generation_settings.seed or 0,
+        budget=budget,
+    )
+    budget.check("dataset generation")
     business_report = None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
@@ -271,6 +300,7 @@ def generate_dataset_from_profile_artifacts(
             spec.generation_settings.seed or 0,
             spec,
         )
+        budget.check("business rule application")
     report = generate_single_entity_profile_artifacts(
         profile,
         spec,
@@ -278,6 +308,7 @@ def generate_dataset_from_profile_artifacts(
         rows_by_entity=rows_by_entity,
         business_report=business_report,
         profile_artifact_name=profile_artifact_name,
+        budget=budget,
     )
     return report, business_report
 
@@ -304,7 +335,9 @@ def generate_dataset_from_csv_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
-    rows_by_entity = generate_dataset(spec, seed=seed)
+    budget = prepare_generation_budget(spec, output_path)
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
+    budget.check("dataset generation")
     business_report = None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
@@ -313,6 +346,7 @@ def generate_dataset_from_csv_artifacts(
             seed,
             spec,
         )
+        budget.check("business rule application")
     assert_no_csv_source_rows(input_path, rows_by_entity[spec.entities[0].name])
     report = generate_single_entity_profile_artifacts(
         profile,
@@ -321,6 +355,7 @@ def generate_dataset_from_csv_artifacts(
         rows_by_entity=rows_by_entity,
         business_report=business_report,
         profile_artifact_name="csv_profile.json",
+        budget=budget,
     )
     return report, business_report
 
@@ -342,21 +377,32 @@ def generate_dataset_review_artifacts(
     effective_spec.generation_settings.seed = seed
     effective_spec.generation_settings.output_format = output_format
     enforce_generation_row_count_limits(effective_spec)
-    rows_by_entity = generate_dataset(effective_spec, seed=seed)
-    if source_folder is not None:
-        assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
-    write_dataset_rows(rows_by_entity, output_format, output_folder)
-    report = validate_dataset(rows_by_entity, effective_spec)
-
-    write_dataset_review_bundle(profile, effective_spec, report, output_folder)
-    write_generation_manifest(
-        effective_spec,
-        seed=seed,
-        output_format=output_format,
-        row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
-        validation_valid=report.valid,
-        output_folder=output_folder,
-    )
+    budget = prepare_generation_budget(effective_spec, output_folder)
+    rows_by_entity = generate_dataset(effective_spec, seed=seed, budget=budget)
+    budget.check("dataset generation")
+    temp_folder = make_temp_output_folder(output_folder)
+    try:
+        if source_folder is not None:
+            assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
+        write_dataset_rows(rows_by_entity, output_format, temp_folder)
+        budget.check("dataset export")
+        report = validate_dataset(rows_by_entity, effective_spec)
+        budget.check("dataset validation")
+        write_dataset_review_bundle(profile, effective_spec, report, temp_folder)
+        write_generation_manifest(
+            effective_spec,
+            seed=seed,
+            output_format=output_format,
+            row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
+            validation_valid=report.valid,
+            output_folder=temp_folder,
+        )
+        enforce_output_folder_size(temp_folder)
+        budget.check("artifact publication")
+        commit_temp_output_folder(temp_folder, output_folder)
+    except Exception:
+        shutil.rmtree(temp_folder, ignore_errors=True)
+        raise
     return 0 if report.valid else 1
 
 
@@ -418,8 +464,50 @@ def enforce_generation_row_count_limits(spec: DatasetSpec, *, max_count: int | N
             raise ValueError(f"entity row_count must be <= {effective_max}: {entity.name}") from exc
 
 
+def prepare_generation_budget(spec: DatasetSpec, output_path: Path) -> GenerationBudget:
+    target_folder = output_path if not output_path.suffix else output_path.parent
+    enforce_output_capacity(target_folder)
+    enforce_output_payload_size(
+        estimate_dataset_output_bytes(spec),
+        label="estimated generated data",
+    )
+    return GenerationBudget()
+
+
+def estimate_dataset_output_bytes(spec: DatasetSpec) -> int:
+    total = len(spec.model_dump_json().encode("utf-8")) * 2 + 65_536
+    for entity in spec.entities:
+        row_bytes = 2
+        for field in entity.fields:
+            row_bytes += len(field.name.encode("utf-8")) + estimate_field_output_bytes(field) + 8
+        total += entity.row_count * row_bytes * 2
+    return total
+
+
+def estimate_field_output_bytes(field: Any) -> int:
+    if field.is_identifier:
+        return len(field.name.encode("utf-8")) + 64
+    if field.sensitive:
+        return 128
+    if field.data_type != "string":
+        return 64
+    distribution = field.distribution or {}
+    if distribution.get("kind") == "categorical":
+        categories = distribution.get("categories") or []
+        return max(
+            (
+                len(json.dumps(category.get("value"), default=str).encode("utf-8"))
+                for category in categories
+            ),
+            default=16,
+        )
+    maximum = int(distribution.get("max_length", 12))
+    return max(1, maximum) + 4
+
+
 def make_temp_output_folder(output_folder: Path) -> Path:
     output_folder.parent.mkdir(parents=True, exist_ok=True)
+    enforce_output_capacity(output_folder.parent)
     return Path(tempfile.mkdtemp(prefix=f".{output_folder.name}.", dir=output_folder.parent))
 
 

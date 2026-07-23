@@ -10,25 +10,32 @@ from uuid import UUID
 from faker import Faker
 
 from test_data_agent.spec import ColumnSpec, DataType, GenerationSpec, GenerationStrategy, MultiTableGenerationSpec
-from test_data_agent.core.limits import enforce_row_count_limit
+from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
 
 
-def generate_rows(spec: GenerationSpec) -> list[dict[str, Any]]:
+def generate_rows(
+    spec: GenerationSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[dict[str, Any]]:
+    budget = budget or GenerationBudget()
     enforce_row_count_limit(spec.table.row_count)
     rng = random.Random(spec.seed)
     faker = Faker()
     faker.seed_instance(spec.seed)
 
-    return [
-        {
+    rows: list[dict[str, Any]] = []
+    for row_index in range(spec.table.row_count):
+        budget.check(f"table {spec.table.name!r} row generation")
+        rows.append({
             column.name: generate_value(column, row_index, rng, faker)
             for column in spec.table.columns
-        }
-        for row_index in range(spec.table.row_count)
-    ]
+        })
+    return rows
 
 
 def generate_tables(spec: MultiTableGenerationSpec) -> dict[str, list[dict[str, Any]]]:
+    budget = GenerationBudget()
     rows_by_table: dict[str, list[dict[str, Any]]] = {}
     for table_index, table in enumerate(spec.tables):
         table_spec = GenerationSpec(
@@ -36,8 +43,10 @@ def generate_tables(spec: MultiTableGenerationSpec) -> dict[str, list[dict[str, 
             table=table,
             output_format=spec.output_format,
         )
-        rows_by_table[table.name] = generate_rows(table_spec)
+        rows_by_table[table.name] = generate_rows(table_spec, budget=budget)
+    budget.check("foreign-key application")
     apply_foreign_keys(rows_by_table, spec)
+    budget.check("foreign-key application")
     return rows_by_table
 
 

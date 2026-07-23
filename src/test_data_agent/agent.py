@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.limits import enforce_output_folder_size, read_limited_text
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.generation.entity_generator import generate_dataset
@@ -29,6 +29,7 @@ from test_data_agent.io.workflows import (
     enforce_generation_row_count_limits,
     ensure_empty_output_folder,
     make_temp_output_folder,
+    prepare_generation_budget,
 )
 from test_data_agent.io.writers import write_dataset_rows
 from test_data_agent.profiling import profile_example_folder
@@ -257,12 +258,16 @@ def generate_agent_dataset(
     *,
     output_folder: Path,
 ) -> tuple[dict[str, int], bool]:
+    budget = prepare_generation_budget(spec, output_folder)
     temp_folder = make_temp_output_folder(output_folder)
     try:
-        rows_by_entity = generate_dataset(spec, seed=request.seed)
+        rows_by_entity = generate_dataset(spec, seed=request.seed, budget=budget)
+        budget.check("dataset generation")
         assert_agent_source_not_copied(request, spec, rows_by_entity)
         write_dataset_rows(rows_by_entity, request.output_format, temp_folder)
+        budget.check("dataset export")
         report = validate_dataset(rows_by_entity, spec)
+        budget.check("dataset validation")
         write_dataset_review_artifacts(profile, spec, report, temp_folder)
         row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
         write_generation_manifest(
@@ -273,6 +278,8 @@ def generate_agent_dataset(
             validation_valid=report.valid,
             output_folder=temp_folder,
         )
+        enforce_output_folder_size(temp_folder)
+        budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except Exception:
         shutil.rmtree(temp_folder, ignore_errors=True)

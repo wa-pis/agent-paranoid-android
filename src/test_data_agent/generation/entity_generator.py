@@ -20,25 +20,45 @@ from test_data_agent.core.distribution import (
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
-from test_data_agent.core.limits import enforce_row_count_limit
+from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.generation.constraint_solver import solve_constraints
 
 
-def generate_dataset(spec: DatasetSpec, seed: int) -> dict[str, list[dict[str, Any]]]:
+def generate_dataset(
+    spec: DatasetSpec,
+    seed: int,
+    *,
+    budget: GenerationBudget | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    budget = budget or GenerationBudget()
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = Faker()
     faker.seed_instance(seed)
     mode = spec.generation_settings.mode
     invalid_ratio = spec.generation_settings.invalid_ratio
     for entity_index, entity in enumerate(spec.entities):
+        budget.check(f"entity {entity.name!r} setup")
         enforce_row_count_limit(entity.row_count)
         rng = random.Random(seed + entity_index)
-        rows_by_entity[entity.name] = [
-            generate_row(entity, row_index, rng, faker, seed, mode=mode, invalid_ratio=invalid_ratio)
-            for row_index in range(entity.row_count)
-        ]
+        rows: list[dict[str, Any]] = []
+        for row_index in range(entity.row_count):
+            budget.check(f"entity {entity.name!r} row generation")
+            rows.append(
+                generate_row(
+                    entity,
+                    row_index,
+                    rng,
+                    faker,
+                    seed,
+                    mode=mode,
+                    invalid_ratio=invalid_ratio,
+                )
+            )
+        rows_by_entity[entity.name] = rows
+    budget.check("constraint solving")
     solve_constraints(rows_by_entity, spec, seed=seed)
+    budget.check("constraint solving")
     return rows_by_entity
 
 

@@ -11,7 +11,11 @@ from pydantic import BaseModel
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
-from test_data_agent.io.writers import dataset_spec_to_json, dataset_spec_to_yaml
+from test_data_agent.io.writers import (
+    dataset_spec_to_json,
+    dataset_spec_to_yaml,
+    write_bounded_text,
+)
 from test_data_agent.version import __version__
 
 
@@ -31,9 +35,9 @@ class GenerationManifest(BaseModel):
 def write_json_artifact(payload: Any, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     if hasattr(payload, "model_dump_json"):
-        output.write_text(payload.model_dump_json(indent=2))
+        write_bounded_text(payload.model_dump_json(indent=2), output)
         return
-    output.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str))
+    write_bounded_text(json.dumps(payload, indent=2, sort_keys=True, default=str), output)
 
 
 def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
@@ -43,9 +47,9 @@ def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> Non
 def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.suffix.lower() == ".json":
-        output.write_text(dataset_spec_to_json(spec))
+        write_bounded_text(dataset_spec_to_json(spec), output)
     else:
-        output.write_text(dataset_spec_to_yaml(spec))
+        write_bounded_text(dataset_spec_to_yaml(spec), output)
 
 
 def write_dataset_generation_artifacts(
@@ -59,9 +63,9 @@ def write_dataset_generation_artifacts(
 ) -> None:
     artifact_dir = output.parent if output is not None else Path.cwd()
     artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / profile_artifact_name).write_text(profile.model_dump_json(indent=2))
-    (artifact_dir / "generation_spec.json").write_text(spec.model_dump_json(indent=2))
-    (artifact_dir / "validation_report.json").write_text(report.model_dump_json(indent=2))
+    write_bounded_text(profile.model_dump_json(indent=2), artifact_dir / profile_artifact_name)
+    write_bounded_text(spec.model_dump_json(indent=2), artifact_dir / "generation_spec.json")
+    write_bounded_text(report.model_dump_json(indent=2), artifact_dir / "validation_report.json")
     write_generation_manifest(
         spec,
         seed=spec.generation_settings.seed or 0,
@@ -78,7 +82,10 @@ def write_dataset_generation_artifacts(
         output_folder=artifact_dir,
     )
     if business_report is not None:
-        (artifact_dir / "business_validation_report.json").write_text(business_report.model_dump_json(indent=2))
+        write_bounded_text(
+            business_report.model_dump_json(indent=2),
+            artifact_dir / "business_validation_report.json",
+        )
 
 
 def write_dataset_validation_report(report: Any, output_folder: Path) -> None:
