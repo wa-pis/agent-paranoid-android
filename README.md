@@ -31,6 +31,13 @@ and export workflow to AI clients without returning dataset rows through MCP.
 Legacy `GenerationSpec` commands and imports remain available for compatibility,
 but they emit deprecation warnings and should be treated as migration paths.
 
+## AI-Assisted Development
+
+This project is developed with substantial assistance from AI coding tools.
+All changes remain subject to human review, automated testing, and the same
+security requirements as manually written code. AI assistance does not imply
+endorsement by any AI provider.
+
 ## Safety Model
 
 Generated data must be synthetic. Source data is used only for structure and

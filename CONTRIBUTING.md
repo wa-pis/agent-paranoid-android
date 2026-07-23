@@ -16,6 +16,18 @@ must preserve the safety contract before they optimize ergonomics or breadth.
 - Generated data must be deterministic when a seed is supplied.
 - Validation must be executable Python logic, not only free-form LLM reasoning.
 
+## AI-Assisted Contributions
+
+AI-generated and AI-assisted contributions are welcome. Contributors remain
+responsible for understanding and reviewing every submitted change, verifying
+licenses and provenance, adding appropriate tests, and ensuring that generated
+code does not introduce secrets or unsafe behavior.
+
+Do not send production data, raw PII, credentials, internal infrastructure
+details, or other sensitive project context to external AI services. Disclose
+material AI assistance in the pull request when it helps reviewers understand
+the provenance or review needs of a change.
+
 ## Development Setup
 
 Use Python 3.11 or newer.
@@ -64,6 +76,8 @@ openspec/changes/<change-id>/
 - Unsafe SQL paths are rejected by tests when Trino behavior changes.
 - Generated outputs remain reproducible by seed.
 - New files and examples contain synthetic data only.
+- AI-assisted changes have been reviewed by the contributor, and no sensitive
+  project data was shared with external AI services.
 - Relevant tests and `scripts/check_release.sh` pass, or the PR explains why a
   check could not be run.
 
