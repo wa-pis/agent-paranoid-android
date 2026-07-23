@@ -50,6 +50,11 @@ Security-sensitive behavior includes:
 - overwriting existing artifacts without explicit approval;
 - non-deterministic generation when a seed is supplied;
 - validation paths that depend only on free-form LLM reasoning.
+- missing or bypassable resource budgets for untrusted input, generated
+  artifacts, or Trino queries.
+
+Official GitHub Release assets include SHA-256 checksums, a CycloneDX SBOM, and
+GitHub attestations. Verify those records before distributing a release build.
 
 ## Disclosure Expectations
 

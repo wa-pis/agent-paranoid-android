@@ -3,6 +3,17 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Completed In 0.4.0
+
+- Content-aware PII and secret detection across CSV, Trino, and imported
+  profile trust boundaries.
+- Configurable input, output-size, disk-reserve, execution-time, and Trino
+  server-side query budgets.
+- Locked dependencies, vulnerability auditing, CodeQL, full-history secret
+  scanning, and live Trino integration coverage.
+- Reproducible release artifacts with CycloneDX SBOMs, checksums, provenance,
+  and SBOM attestations.
+
 ## Completed In 0.3.0
 
 - Full MCP workflow for safe CSV profiling, spec inference, deterministic
@@ -12,8 +23,6 @@ date.
 - Runtime raw-profile and source-row reuse protections.
 - End-to-end AI integration demo.
 - Review-first agent orchestration with `agent-plan` and `agent-approve`.
-- Configurable input, output-size, disk-reserve, execution-time, and Trino
-  server-side query budgets.
 
 ## MVP Freeze
 
@@ -43,7 +52,7 @@ Treat these as non-negotiable release gates rather than new feature work:
   MCP without granting the agent raw SQL access.
 - Add signed or externally persisted audit records for teams running the MCP
   servers in shared environments.
-- Publish a formal DatasetSpec JSON Schema and compatibility policy for future
+- Define a compatibility and deprecation policy for future DatasetSpec
   `schema_version` revisions.
 
 ## Later

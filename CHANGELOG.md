@@ -4,6 +4,48 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.4.0] - 2026-07-23
+
+### Added
+
+- Content-aware PII and credential detection for emails, phone numbers, SSNs,
+  payment cards, JWTs, private keys, bearer tokens, known provider tokens, and
+  high-entropy secrets, with a synthetic positive/negative regression corpus.
+- Configurable limits for input files, rows, columns, cells, expanded Parquet
+  data, YAML aliases/depth, generated artifact bytes, free-disk reserve, and
+  wall-clock generation time.
+- Live Trino integration tests against a digest-pinned official container.
+- CodeQL SAST and full-history Gitleaks scanning with immutable action pins.
+- Locked dependency resolution, hash-based vulnerability auditing, CycloneDX
+  release SBOMs, SHA-256 checksums, GitHub build provenance, and SBOM
+  attestations.
+- Public disclosure and contribution guidance for AI-assisted development.
+
+### Changed
+
+- **Breaking:** the Trino MCP server now defaults to HTTPS and requires both
+  catalog and schema allowlists. Intentionally unrestricted or plain-HTTP
+  local environments must set the explicit override variables documented in
+  README.
+- Every Trino connection now applies validated server-side execution,
+  run-time, and physical-scan budgets in addition to the client result-row cap.
+- Dataset generation estimates output size before allocating rows and
+  publishes review bundles only after validation and exact bundle-size checks.
+- The build backend and GitHub Actions are version/SHA pinned; CI builds the
+  project from the locked, non-editable environment.
+
+### Security
+
+- Sensitive values in neutral column names are masked or suppressed across CSV
+  profiles, folder profiles, Trino profiles, masked samples, and imported
+  profile JSON.
+- CSV, JSON, YAML, and Parquet readers fail closed on oversized or deeply
+  nested input; generated outputs reject symlinks and partial bundles are
+  removed on quota, validation, or artifact failures.
+- Trino SQL validation rejects work-expanding generic query shapes, likely PII
+  projections, missing allowlists, insecure transport by default, and
+  oversized client responses.
+
 ## [0.3.1] - 2026-07-21
 
 ### Added
@@ -76,6 +118,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/wa-pis/agent-paranoid-android/releases/tag/v0.2.0

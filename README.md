@@ -102,9 +102,17 @@ bootstrap version and sync from the committed lock file:
 
 ```bash
 python3 -m pip install "uv==0.11.23"
-uv sync --frozen --extra dev
-uv run --frozen --extra dev python -m pip_audit --skip-editable
+uv sync --frozen --extra dev --no-install-project
+uv sync --frozen --extra dev --no-editable --no-build-isolation
+uv export --quiet --frozen --extra dev --no-emit-project \
+  --output-file /tmp/agent-paranoid-android-audit.txt
+uv run --no-sync python -m pip_audit --require-hashes \
+  --requirement /tmp/agent-paranoid-android-audit.txt
 ```
+
+Version tags trigger a release gate that builds wheel and source archives,
+exports a CycloneDX SBOM, writes SHA-256 checksums, creates GitHub provenance
+and SBOM attestations, and publishes the verified files as a GitHub Release.
 
 ## Quickstart
 
