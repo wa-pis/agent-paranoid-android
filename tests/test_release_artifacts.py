@@ -108,6 +108,9 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert workflow.count("actions/attest@") == 2
     assert "sbom-path: dist/sbom.cdx.json" in workflow
     assert "softprops/action-gh-release@" in workflow
+    assert "files: dist/*" not in workflow
+    assert "          path: dist/\n" not in workflow
+    assert workflow.count("            dist/SHA256SUMS\n") == 2
 
 
 def test_release_tag_must_match_package_version() -> None:
