@@ -254,6 +254,18 @@ def test_field_models_reject_invalid_typed_distribution_shapes() -> None:
         raise AssertionError("expected invalid categorical distribution to fail validation")
 
 
+@pytest.mark.parametrize("value", [None, "numeric", 123, ["numeric"]])
+def test_field_models_reject_non_object_distribution(value: object) -> None:
+    with pytest.raises(ValidationError, match="distribution must be an object"):
+        FieldSpec.model_validate(
+            {
+                "name": "value",
+                "data_type": "string",
+                "distribution": value,
+            }
+        )
+
+
 @pytest.mark.parametrize(
     "distribution",
     [

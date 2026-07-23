@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- PEP 561 `py.typed` package metadata and strict mypy checks for the stable
+  core, generation, and validation modules.
+- Isolated installed-wheel smoke checks for package metadata, CLI entry
+  points, and the `test-data-agent doctor` command.
+- Pull-request dependency review that rejects newly introduced dependencies
+  with known Moderate-or-higher vulnerabilities.
+
+### Changed
+
+- CI and the release gate now type-check the stable package core, and release
+  publication verifies the built wheel before creating attestations.
+
 ## [0.4.0] - 2026-07-23
 
 ### Added

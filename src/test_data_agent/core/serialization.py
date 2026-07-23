@@ -17,7 +17,7 @@ class LimitedSafeLoader(yaml.SafeLoader):
         self.composition_depth = 0
 
     def compose_node(self, parent: Any, index: Any) -> Any:
-        event = self.peek_event()
+        event = self.peek_event()  # type: ignore[no-untyped-call]
         if isinstance(event, AliasEvent):
             self.alias_count += 1
             if self.alias_count > max_yaml_aliases():
@@ -36,4 +36,4 @@ def load_limited_yaml(text: str) -> Any:
     try:
         return loader.get_single_data()
     finally:
-        loader.dispose()
+        loader.dispose()  # type: ignore[no-untyped-call]

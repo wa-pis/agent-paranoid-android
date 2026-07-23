@@ -102,13 +102,16 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         if relationship is None:
             continue
         totals: dict[Any, float] = defaultdict(float)
+        target_field = constraint.target_field
         for child_row in rows_by_entity.get(relationship.child_entity, []):
             key = child_row.get(relationship.child_field)
             if constraint.aggregate == "count":
                 totals[key] += 1
                 continue
+            if target_field is None:
+                continue
             try:
-                totals[key] += float(child_row.get(constraint.target_field) or 0.0)
+                totals[key] += float(child_row.get(target_field) or 0.0)
             except (TypeError, ValueError):
                 continue
         parent_field = constraint.fields[0] if constraint.fields else None

@@ -49,6 +49,11 @@ jobs:
       - name: Build wheel and source distribution
         run: uv build --no-build-isolation
 
+      - name: Verify installed wheel
+        run: |
+          uv run --isolated --no-project --with ./dist/*.whl python scripts/check_installed_package.py
+          uv run --isolated --no-project --with ./dist/*.whl test-data-agent doctor --skip-smoke
+
       - name: Export CycloneDX SBOM from lockfile
         run: >-
           uv export

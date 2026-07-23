@@ -14,6 +14,9 @@ trap cleanup EXIT
 echo "==> Lint"
 python3 -m ruff check src tests scripts
 
+echo "==> Types"
+python3 -m mypy
+
 echo "==> Compile"
 python3 -m compileall -q src tests scripts
 

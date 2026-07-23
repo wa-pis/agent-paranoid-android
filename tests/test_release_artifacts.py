@@ -49,6 +49,8 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/ISSUE_TEMPLATE/config.yml",
         ".github/ISSUE_TEMPLATE/bug_report.yml",
         ".github/ISSUE_TEMPLATE/feature_request.yml",
+        "scripts/check_installed_package.py",
+        "src/test_data_agent/py.typed",
         "uv.lock",
     ]
 
@@ -71,6 +73,10 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "uv sync --frozen --extra dev" in workflow
     assert "--extra dev --no-emit-project" in workflow
     assert "python -m pip_audit --require-hashes" in workflow
+    assert "python -m mypy" in workflow
+    assert "name: Wheel smoke" in workflow
+    assert "scripts/check_installed_package.py" in workflow
+    assert "test-data-agent doctor --skip-smoke" in workflow
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
@@ -93,6 +99,8 @@ def test_security_workflow_runs_code_and_secret_scans() -> None:
     assert "github/codeql-action/init@" in workflow
     assert "queries: security-extended" in workflow
     assert "gitleaks/gitleaks-action@" in workflow
+    assert "actions/dependency-review-action@" in workflow
+    assert "fail-on-severity: moderate" in workflow
     assert "fetch-depth: 0" in workflow
     assert "security-events: write" in workflow
 
@@ -104,6 +112,8 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "scripts/check_release_tag.py" in workflow
     assert "scripts/check_release.sh" in workflow
     assert "uv build --no-build-isolation" in workflow
+    assert "scripts/check_installed_package.py" in workflow
+    assert "test-data-agent doctor --skip-smoke" in workflow
     assert "--format cyclonedx1.5" in workflow
     assert workflow.count("actions/attest@") == 2
     assert "sbom-path: dist/sbom.cdx.json" in workflow
@@ -128,6 +138,7 @@ def test_release_script_is_executable_and_covers_release_gates() -> None:
 
     assert script.stat().st_mode & stat.S_IXUSR
     assert "python3 -m ruff check src tests scripts" in text
+    assert "python3 -m mypy" in text
     assert "python3 -m compileall -q src tests scripts" in text
     assert "python3 -m pytest --cov=test_data_agent" in text
     assert "scripts/export_dataset_schema.py" in text

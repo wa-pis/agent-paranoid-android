@@ -40,6 +40,7 @@ Run the normal checks:
 
 ```bash
 python3 -m ruff check src tests scripts
+python3 -m mypy
 python3 -m compileall -q src tests scripts
 python3 -m pytest
 ```

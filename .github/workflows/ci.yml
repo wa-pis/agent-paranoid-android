@@ -48,6 +48,9 @@ jobs:
       - name: Run lint checks
         run: uv run --no-sync python -m ruff check src tests
 
+      - name: Run static type checks
+        run: uv run --no-sync python -m mypy
+
       - name: Compile source and tests
         run: uv run --no-sync python -m compileall -q src tests
 
@@ -57,6 +60,37 @@ jobs:
           --cov=test_data_agent
           --cov-report=term-missing
           --cov-fail-under=85
+
+  package:
+    name: Wheel smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          version: "0.11.23"
+          enable-cache: true
+
+      - name: Install locked build environment
+        run: |
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+
+      - name: Build wheel and source distribution
+        run: uv build --no-build-isolation
+
+      - name: Verify installed wheel
+        run: |
+          uv run --isolated --no-project --with ./dist/*.whl python scripts/check_installed_package.py
+          uv run --isolated --no-project --with ./dist/*.whl test-data-agent doctor --skip-smoke
 
   trino-integration:
     name: Trino integration

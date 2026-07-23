@@ -12,7 +12,7 @@ from test_data_agent.core.distribution import FieldDistribution, parse_distribut
 
 def _normalize_distribution(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
-        return value
+        raise ValueError("distribution must be an object")
     distribution = parse_distribution(value)
     if distribution is None:
         return value

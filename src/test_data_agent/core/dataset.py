@@ -13,7 +13,7 @@ from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, ValidationSettings
 
 
-DATASET_SPEC_SCHEMA_VERSION = "1.0"
+DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
 
 
 class DatasetProfile(BaseModel):

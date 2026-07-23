@@ -108,11 +108,14 @@ uv export --quiet --frozen --extra dev --no-emit-project \
   --output-file /tmp/agent-paranoid-android-audit.txt
 uv run --no-sync python -m pip_audit --require-hashes \
   --requirement /tmp/agent-paranoid-android-audit.txt
+uv run --no-sync python -m mypy
 ```
 
 Version tags trigger a release gate that builds wheel and source archives,
-exports a CycloneDX SBOM, writes SHA-256 checksums, creates GitHub provenance
-and SBOM attestations, and publishes the verified files as a GitHub Release.
+installs the wheel in an isolated environment, verifies package metadata,
+`py.typed`, CLI entry points, and `doctor --skip-smoke`, exports a CycloneDX
+SBOM, writes SHA-256 checksums, creates GitHub provenance and SBOM attestations,
+and publishes the verified files as a GitHub Release.
 
 ## Quickstart
 
@@ -205,13 +208,16 @@ Run the same quality checks used by CI:
 
 ```bash
 python3 -m ruff check src tests
+python3 -m mypy
 python3 -m compileall -q src tests
 python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
 ```
 
 CI runs these checks on Python 3.11 and 3.12. The security regression suite
 also uses Hypothesis to exercise variations of PII aliases, SQL statement
-tails, duplicate CSV headers, and sensitive-value masking.
+tails, duplicate CSV headers, and sensitive-value masking. Pull requests also
+run dependency review and fail when they introduce a dependency with a known
+Moderate-or-higher vulnerability.
 
 For a local environment and quickstart smoke check:
 

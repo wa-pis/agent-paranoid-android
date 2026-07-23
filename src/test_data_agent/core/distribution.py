@@ -148,7 +148,7 @@ FieldDistribution: TypeAlias = Annotated[
 ]
 
 
-_DISTRIBUTION_ADAPTER = TypeAdapter(FieldDistribution)
+_DISTRIBUTION_ADAPTER: TypeAdapter[FieldDistribution] = TypeAdapter(FieldDistribution)
 _TYPED_DISTRIBUTION_KINDS = frozenset(
     {
         "synthetic_identifier",
