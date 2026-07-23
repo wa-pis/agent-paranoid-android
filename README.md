@@ -700,6 +700,9 @@ TRINO_USER=your_user
 TRINO_HTTP_SCHEME=https
 TRINO_ALLOWED_CATALOGS=hive,iceberg
 TRINO_ALLOWED_SCHEMAS=dev,test,staging
+TRINO_QUERY_MAX_EXECUTION_TIME=30s
+TRINO_QUERY_MAX_RUN_TIME=45s
+TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES=1GB
 ```
 
 Start the server:
@@ -723,6 +726,11 @@ also set `TRINO_ALLOW_INSECURE_HTTP=true`; neither override should be used for
 production access.
 Trino responses are also capped client-side at 10,000 rows; lower this with
 `TRINO_MAX_RESULT_ROWS` when metadata namespaces are small.
+Every connection also applies server-side session budgets for execution time,
+total run time, and physical bytes scanned. The defaults are `30s`, `45s`, and
+`1GB`; lower the corresponding `TRINO_QUERY_MAX_*` variables for narrower
+environments. Values are validated locally and cannot exceed one hour of
+execution, two hours of total run time, or 100 GB scanned.
 
 For large Trino tables, use safe profiling instead of downloading rows. The
 safe profile path pushes aggregate work into Trino: row counts, null ratios,

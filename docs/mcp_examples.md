@@ -38,6 +38,9 @@ source rows copied: false
 ```bash
 TRINO_ALLOWED_CATALOGS=hive,iceberg \
 TRINO_ALLOWED_SCHEMAS=dev,test,staging \
+TRINO_QUERY_MAX_EXECUTION_TIME=30s \
+TRINO_QUERY_MAX_RUN_TIME=45s \
+TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES=1GB \
   python3 -m test_data_agent.mcp_trino_server
 ```
 
@@ -53,6 +56,8 @@ rejected before execution.
 Both allowlists are mandatory unless `TRINO_ALLOW_UNRESTRICTED=true` is set
 explicitly. HTTPS is the default; plain HTTP additionally requires
 `TRINO_ALLOW_INSECURE_HTTP=true` and is intended only for isolated local use.
+The `TRINO_QUERY_MAX_*` values are sent as Trino session properties so a query
+is terminated by the server when it exceeds its time or scan budget.
 
 ## Guardrails For AI Clients
 

@@ -49,6 +49,16 @@ DEFAULT_LIMIT = 100
 MAX_LIMIT = 1000
 DEFAULT_MAX_RESULT_ROWS = 10_000
 ABSOLUTE_MAX_RESULT_ROWS = 100_000
+DEFAULT_QUERY_MAX_EXECUTION_TIME = "30s"
+DEFAULT_QUERY_MAX_RUN_TIME = "45s"
+DEFAULT_QUERY_MAX_SCAN_PHYSICAL_BYTES = "1GB"
+DURATION_RE = re.compile(r"^([1-9][0-9]*)(ms|s|m|h)$")
+DATA_SIZE_RE = re.compile(r"^([1-9][0-9]*)(B|kB|MB|GB)$")
+DURATION_MULTIPLIERS_MS = {"ms": 1, "s": 1_000, "m": 60_000, "h": 3_600_000}
+DATA_SIZE_MULTIPLIERS = {"B": 1, "kB": 1_024, "MB": 1_024**2, "GB": 1_024**3}
+MAX_QUERY_EXECUTION_TIME_MS = 3_600_000
+MAX_QUERY_RUN_TIME_MS = 7_200_000
+MAX_QUERY_SCAN_BYTES = 100 * 1_024**3
 MIN_RULE_CONFIDENCE = 0.9
 
 
@@ -78,6 +88,9 @@ class TrinoConfig:
     allowed_schemas: frozenset[str] | None
     request_timeout: float = 30.0
     max_result_rows: int = DEFAULT_MAX_RESULT_ROWS
+    query_max_execution_time: str = DEFAULT_QUERY_MAX_EXECUTION_TIME
+    query_max_run_time: str = DEFAULT_QUERY_MAX_RUN_TIME
+    query_max_scan_physical_bytes: str = DEFAULT_QUERY_MAX_SCAN_PHYSICAL_BYTES
     allow_unrestricted: bool = False
     allow_insecure_http: bool = False
 
@@ -85,13 +98,28 @@ class TrinoConfig:
     def from_env(cls) -> TrinoConfig:
         config = cls(
             host=os.environ.get("TRINO_HOST", "localhost"),
-            port=int(os.environ.get("TRINO_PORT", "8080")),
+            port=parse_trino_port(),
             user=os.environ.get("TRINO_USER", "test_data_agent"),
             http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "https"),
             allowed_catalogs=parse_allowlist(os.environ.get("TRINO_ALLOWED_CATALOGS")),
             allowed_schemas=parse_allowlist(os.environ.get("TRINO_ALLOWED_SCHEMAS")),
-            request_timeout=float(os.environ.get("TRINO_REQUEST_TIMEOUT_SECONDS", "30")),
+            request_timeout=parse_request_timeout(),
             max_result_rows=parse_max_result_rows(),
+            query_max_execution_time=parse_duration_env(
+                "TRINO_QUERY_MAX_EXECUTION_TIME",
+                DEFAULT_QUERY_MAX_EXECUTION_TIME,
+                MAX_QUERY_EXECUTION_TIME_MS,
+            ),
+            query_max_run_time=parse_duration_env(
+                "TRINO_QUERY_MAX_RUN_TIME",
+                DEFAULT_QUERY_MAX_RUN_TIME,
+                MAX_QUERY_RUN_TIME_MS,
+            ),
+            query_max_scan_physical_bytes=parse_data_size_env(
+                "TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES",
+                DEFAULT_QUERY_MAX_SCAN_PHYSICAL_BYTES,
+                MAX_QUERY_SCAN_BYTES,
+            ),
             allow_unrestricted=parse_env_bool("TRINO_ALLOW_UNRESTRICTED"),
             allow_insecure_http=parse_env_bool("TRINO_ALLOW_INSECURE_HTTP"),
         )
@@ -100,6 +128,14 @@ class TrinoConfig:
 
     def validate_security(self) -> None:
         scheme = self.http_scheme.lower()
+        if not self.host.strip() or "\r" in self.host or "\n" in self.host:
+            raise TrinoConfigurationError("TRINO_HOST must be a non-empty host name")
+        if not self.user.strip() or "\r" in self.user or "\n" in self.user:
+            raise TrinoConfigurationError("TRINO_USER must be a non-empty header-safe value")
+        if not 1 <= self.port <= 65_535:
+            raise TrinoConfigurationError("TRINO_PORT must be between 1 and 65535")
+        if not 0.1 <= self.request_timeout <= 300:
+            raise TrinoConfigurationError("TRINO_REQUEST_TIMEOUT_SECONDS must be between 0.1 and 300")
         if scheme not in {"http", "https"}:
             raise TrinoConfigurationError("TRINO_HTTP_SCHEME must be http or https")
         if scheme == "http" and not self.allow_insecure_http:
@@ -112,6 +148,26 @@ class TrinoConfig:
             raise TrinoConfigurationError(
                 "TRINO_ALLOWED_CATALOGS and TRINO_ALLOWED_SCHEMAS are required; "
                 "set TRINO_ALLOW_UNRESTRICTED=true only for an intentionally unrestricted environment"
+            )
+        execution_ms = parse_duration_value(
+            self.query_max_execution_time,
+            "TRINO_QUERY_MAX_EXECUTION_TIME",
+            MAX_QUERY_EXECUTION_TIME_MS,
+        )
+        run_ms = parse_duration_value(
+            self.query_max_run_time,
+            "TRINO_QUERY_MAX_RUN_TIME",
+            MAX_QUERY_RUN_TIME_MS,
+        )
+        parse_data_size_value(
+            self.query_max_scan_physical_bytes,
+            "TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES",
+            MAX_QUERY_SCAN_BYTES,
+        )
+        if run_ms < execution_ms:
+            raise TrinoConfigurationError(
+                "TRINO_QUERY_MAX_RUN_TIME must be greater than or equal to "
+                "TRINO_QUERY_MAX_EXECUTION_TIME"
             )
 
 
@@ -133,6 +189,28 @@ def parse_env_bool(name: str) -> bool:
     raise TrinoConfigurationError(f"{name} must be a boolean")
 
 
+def parse_trino_port() -> int:
+    raw_value = os.environ.get("TRINO_PORT", "8080")
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise TrinoConfigurationError("TRINO_PORT must be an integer") from exc
+    if not 1 <= value <= 65_535:
+        raise TrinoConfigurationError("TRINO_PORT must be between 1 and 65535")
+    return value
+
+
+def parse_request_timeout() -> float:
+    raw_value = os.environ.get("TRINO_REQUEST_TIMEOUT_SECONDS", "30")
+    try:
+        value = float(raw_value)
+    except ValueError as exc:
+        raise TrinoConfigurationError("TRINO_REQUEST_TIMEOUT_SECONDS must be a number") from exc
+    if not 0.1 <= value <= 300:
+        raise TrinoConfigurationError("TRINO_REQUEST_TIMEOUT_SECONDS must be between 0.1 and 300")
+    return value
+
+
 def parse_max_result_rows() -> int:
     raw_value = os.environ.get("TRINO_MAX_RESULT_ROWS", str(DEFAULT_MAX_RESULT_ROWS))
     try:
@@ -144,6 +222,38 @@ def parse_max_result_rows() -> int:
             f"TRINO_MAX_RESULT_ROWS must be between 1 and {ABSOLUTE_MAX_RESULT_ROWS}"
         )
     return value
+
+
+def parse_duration_env(name: str, default: str, maximum_ms: int) -> str:
+    value = os.environ.get(name, default)
+    parse_duration_value(value, name, maximum_ms)
+    return value
+
+
+def parse_duration_value(value: str, name: str, maximum_ms: int) -> int:
+    match = DURATION_RE.fullmatch(value)
+    if match is None:
+        raise TrinoConfigurationError(f"{name} must use an integer followed by ms, s, m, or h")
+    duration_ms = int(match.group(1)) * DURATION_MULTIPLIERS_MS[match.group(2)]
+    if duration_ms > maximum_ms:
+        raise TrinoConfigurationError(f"{name} exceeds the maximum allowed query budget")
+    return duration_ms
+
+
+def parse_data_size_env(name: str, default: str, maximum_bytes: int) -> str:
+    value = os.environ.get(name, default)
+    parse_data_size_value(value, name, maximum_bytes)
+    return value
+
+
+def parse_data_size_value(value: str, name: str, maximum_bytes: int) -> int:
+    match = DATA_SIZE_RE.fullmatch(value)
+    if match is None:
+        raise TrinoConfigurationError(f"{name} must use an integer followed by B, kB, MB, or GB")
+    size_bytes = int(match.group(1)) * DATA_SIZE_MULTIPLIERS[match.group(2)]
+    if size_bytes > maximum_bytes:
+        raise TrinoConfigurationError(f"{name} exceeds the maximum allowed scan budget")
+    return size_bytes
 
 
 def require_identifier(value: str, label: str) -> str:
@@ -341,6 +451,11 @@ def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[li
         user=config.user,
         http_scheme=config.http_scheme,
         request_timeout=config.request_timeout,
+        session_properties={
+            "query_max_execution_time": config.query_max_execution_time,
+            "query_max_run_time": config.query_max_run_time,
+            "query_max_scan_physical_bytes": config.query_max_scan_physical_bytes,
+        },
     )
     cursor = connection.cursor()
     try:

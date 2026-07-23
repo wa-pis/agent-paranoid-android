@@ -183,6 +183,41 @@ def test_trino_config_rejects_plain_http_without_explicit_override(
     assert TrinoConfig.from_env().http_scheme == "http"
 
 
+@pytest.mark.parametrize(
+    ("name", "value"),
+    [
+        ("TRINO_QUERY_MAX_EXECUTION_TIME", "0s"),
+        ("TRINO_QUERY_MAX_EXECUTION_TIME", "30 seconds"),
+        ("TRINO_QUERY_MAX_EXECUTION_TIME", "2h"),
+        ("TRINO_QUERY_MAX_RUN_TIME", "3h"),
+        ("TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES", "101GB"),
+        ("TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES", "1TB"),
+        ("TRINO_REQUEST_TIMEOUT_SECONDS", "nan"),
+        ("TRINO_REQUEST_TIMEOUT_SECONDS", "301"),
+        ("TRINO_PORT", "0"),
+    ],
+)
+def test_trino_config_rejects_invalid_resource_budgets(
+    monkeypatch: pytest.MonkeyPatch,
+    name: str,
+    value: str,
+) -> None:
+    monkeypatch.setenv(name, value)
+
+    with pytest.raises(TrinoConfigurationError):
+        TrinoConfig.from_env()
+
+
+def test_trino_config_requires_run_budget_to_cover_execution_budget(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_QUERY_MAX_EXECUTION_TIME", "30s")
+    monkeypatch.setenv("TRINO_QUERY_MAX_RUN_TIME", "20s")
+
+    with pytest.raises(TrinoConfigurationError, match="greater than or equal"):
+        TrinoConfig.from_env()
+
+
 def test_likely_pii_fields_are_masked() -> None:
     row = {
         "customer_email": "person@example.com",
@@ -268,8 +303,10 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
     class FakeDbapi:
         def __init__(self) -> None:
             self.connection = FakeConnection()
+            self.connect_kwargs = None
 
         def connect(self, **kwargs):
+            self.connect_kwargs = kwargs
             return self.connection
 
     class FakeTrino:
@@ -285,6 +322,11 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
     assert description == [("id",)]
     assert fake_trino.dbapi.connection.cursor_instance.closed is True
     assert fake_trino.dbapi.connection.closed is True
+    assert fake_trino.dbapi.connect_kwargs["session_properties"] == {
+        "query_max_execution_time": "30s",
+        "query_max_run_time": "45s",
+        "query_max_scan_physical_bytes": "1GB",
+    }
 
 
 def test_execute_query_closes_resources_on_error(monkeypatch: pytest.MonkeyPatch) -> None:
