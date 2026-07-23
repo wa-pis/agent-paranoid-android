@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-paranoid-android"
-version = "0.4.0"
+version = "0.5.0"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -73,7 +73,9 @@ python_version = "3.11"
 files = [
     "src/test_data_agent/core",
     "src/test_data_agent/generation",
+    "src/test_data_agent/rules",
     "src/test_data_agent/validation",
+    "src/test_data_agent/mcp_generator_server.py",
 ]
 strict = true
 follow_imports = "silent"

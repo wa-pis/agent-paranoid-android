@@ -47,46 +47,55 @@ def apply_valid_defaults(
     *,
     field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> None:
-    for rule in rules.field_rules:
-        for row in rows_by_table.get(rule.table, []):
-            if rule.required and row.get(rule.field) in (None, ""):
-                row[rule.field] = default_value(
-                    rule,
-                    field_defaults.get(rule.table, {}).get(rule.field)
+    for field_rule in rules.field_rules:
+        for row in rows_by_table.get(field_rule.table, []):
+            if field_rule.required and row.get(field_rule.field) in (None, ""):
+                row[field_rule.field] = default_value(
+                    field_rule,
+                    field_defaults.get(field_rule.table, {}).get(field_rule.field)
                     if field_defaults is not None
                     else None,
                 )
-            if rule.allowed_values and row.get(rule.field) not in rule.allowed_values:
-                row[rule.field] = rule.allowed_values[0]
+            if (
+                field_rule.allowed_values
+                and row.get(field_rule.field) not in field_rule.allowed_values
+            ):
+                row[field_rule.field] = field_rule.allowed_values[0]
 
-    for rule in rules.row_rules:
-        if isinstance(rule, ConditionalRequiredRule):
-            for row in rows_by_table.get(rule.table, []):
-                if not condition_matches(row, rule.when):
+    for row_rule in rules.row_rules:
+        if isinstance(row_rule, ConditionalRequiredRule):
+            for row in rows_by_table.get(row_rule.table, []):
+                if not condition_matches(row, row_rule.when):
                     continue
-                for field in rule.required_fields:
+                for field in row_rule.required_fields:
                     if row.get(field) in (None, ""):
-                        if field_defaults is not None and field in field_defaults.get(rule.table, {}):
-                            row[field] = field_defaults[rule.table][field]
+                        if (
+                            field_defaults is not None
+                            and field in field_defaults.get(row_rule.table, {})
+                        ):
+                            row[field] = field_defaults[row_rule.table][field]
                         else:
                             row[field] = "required"
-        elif isinstance(rule, ConditionalAllowedValuesRule):
-            for row in rows_by_table.get(rule.table, []):
-                if condition_matches(row, rule.when) and row.get(rule.field) not in rule.allowed_values:
-                    row[rule.field] = rule.allowed_values[0]
-        elif isinstance(rule, TemporalOrderingRule):
-            for row in rows_by_table.get(rule.table, []):
-                start = parse_datetime(row.get(rule.start_field))
-                end = parse_datetime(row.get(rule.end_field))
+        elif isinstance(row_rule, ConditionalAllowedValuesRule):
+            for row in rows_by_table.get(row_rule.table, []):
+                if (
+                    condition_matches(row, row_rule.when)
+                    and row.get(row_rule.field) not in row_rule.allowed_values
+                ):
+                    row[row_rule.field] = row_rule.allowed_values[0]
+        elif isinstance(row_rule, TemporalOrderingRule):
+            for row in rows_by_table.get(row_rule.table, []):
+                start = parse_datetime(row.get(row_rule.start_field))
+                end = parse_datetime(row.get(row_rule.end_field))
                 if start is not None and (end is None or start > end):
-                    row[rule.end_field] = row.get(rule.start_field)
-        elif isinstance(rule, FormulaRule):
-            for row in rows_by_table.get(rule.table, []):
+                    row[row_rule.end_field] = row.get(row_rule.start_field)
+        elif isinstance(row_rule, FormulaRule):
+            for row in rows_by_table.get(row_rule.table, []):
                 try:
-                    row[rule.field] = safe_eval(rule.expression, row)
+                    row[row_rule.field] = safe_eval(row_rule.expression, row)
                 except Exception as exc:
                     raise ValueError(
-                        f"{rule.table}.{rule.field} formula failed: {exc}"
+                        f"{row_rule.table}.{row_rule.field} formula failed: {exc}"
                     ) from exc
 
 

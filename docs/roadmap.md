@@ -3,6 +3,14 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.5.0
+
+- Structured generator MCP business-rule inputs with strict contract checks,
+  sensitive-literal rejection, bounded formulas, manifest fingerprints, and
+  compact validation summaries.
+- Typed package metadata, strict core/rules/MCP type checks, installed-wheel
+  smoke coverage, and pull-request dependency review.
+
 ## Completed In 0.4.0
 
 - Content-aware PII and secret detection across CSV, Trino, and imported
@@ -46,8 +54,6 @@ Treat these as non-negotiable release gates rather than new feature work:
 
 ## Post-MVP Hardening
 
-- Expose structured business-rule configuration through the generator MCP
-  server and include business validation in the generation manifest.
 - Extend agent orchestration to cover allowlisted Trino table planning through
   MCP without granting the agent raw SQL access.
 - Add signed or externally persisted audit records for teams running the MCP

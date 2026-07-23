@@ -115,12 +115,15 @@ aggregate mappings. These tools return counts, residuals, `confidence`, and
 
 Workspace-bounded tools profile CSV metadata, infer a DatasetSpec from a safe
 file or inline MCP payload, generate/export fresh synthetic datasets, and
-validate generated bundles. Tool responses contain summaries and reports, not
-rows. `src/test_data_agent/safety.py` rejects unsafe sensitive distributions,
-workspace path escapes, and exact source CSV row reuse.
+validate generated bundles. Generation and export accept strict, bounded
+business-rule files or inline payloads. Tool responses contain summaries and
+artifact paths, not rows. `src/test_data_agent/safety.py` and
+`src/test_data_agent/rules/contract.py` reject unsafe sensitive distributions,
+rule literals, workspace path escapes, and exact source CSV row reuse.
 
 Generation bundles include `generation_manifest.json` for reproducibility and
-provenance auditing.
+provenance auditing. Rule-driven bundles also include a rule fingerprint and
+compact business-validation summary.
 
 ## Agent Orchestration
 

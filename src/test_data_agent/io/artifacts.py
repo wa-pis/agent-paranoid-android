@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
@@ -19,6 +19,15 @@ from test_data_agent.io.writers import (
 from test_data_agent.version import __version__
 
 
+class BusinessValidationManifest(BaseModel):
+    rules_sha256: str | None = None
+    rule_count: int = Field(default=0, ge=0)
+    rule_pass_count: int = Field(default=0, ge=0)
+    rule_fail_count: int = Field(default=0, ge=0)
+    valid: bool
+    errors_truncated: bool = False
+
+
 class GenerationManifest(BaseModel):
     artifact_type: Literal["synthetic_dataset"] = "synthetic_dataset"
     package_version: str = __version__
@@ -28,6 +37,7 @@ class GenerationManifest(BaseModel):
     output_format: OutputFormat
     row_counts: dict[str, int]
     validation_valid: bool
+    business_validation: BusinessValidationManifest | None = None
     synthetic: Literal[True] = True
     source_rows_copied: Literal[False] = False
 
@@ -79,6 +89,7 @@ def write_dataset_generation_artifacts(
                 or bool(business_report.valid)
             )
         ),
+        business_report=business_report,
         output_folder=artifact_dir,
     )
     if business_report is not None:
@@ -100,6 +111,7 @@ def write_generation_manifest(
     row_counts: dict[str, int],
     validation_valid: bool,
     output_folder: Path,
+    business_report: Any | None = None,
 ) -> GenerationManifest:
     manifest = GenerationManifest(
         dataset_spec_schema_version=spec.schema_version,
@@ -108,9 +120,28 @@ def write_generation_manifest(
         output_format=output_format,
         row_counts=row_counts,
         validation_valid=validation_valid,
+        business_validation=business_validation_manifest(business_report),
     )
     write_json_artifact(manifest, output_folder / "generation_manifest.json")
     return manifest
+
+
+def business_validation_manifest(
+    report: Any | None,
+) -> BusinessValidationManifest | None:
+    if report is None:
+        return None
+    return BusinessValidationManifest(
+        rules_sha256=getattr(report, "rules_sha256", None),
+        rule_count=int(getattr(report, "rule_count", 0)),
+        rule_pass_count=int(getattr(report, "rule_pass_count", 0)),
+        rule_fail_count=int(getattr(report, "rule_fail_count", 0)),
+        valid=bool(report.valid),
+        errors_truncated=any(
+            bool(getattr(result, "errors_truncated", False))
+            for result in getattr(report, "results", [])
+        ),
+    )
 
 
 def dataset_spec_fingerprint(spec: DatasetSpec) -> str:

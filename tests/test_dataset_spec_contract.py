@@ -311,7 +311,7 @@ def test_output_format_is_shared_with_legacy_spec_module() -> None:
 def test_package_root_exposes_domain_agnostic_api_without_dropping_legacy_symbols() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
     assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
-    assert test_data_agent.__version__ == "0.4.0"
+    assert test_data_agent.__version__ == "0.5.0"
     assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None
     assert test_data_agent.infer_dataset_spec is not None

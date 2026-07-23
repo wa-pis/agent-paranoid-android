@@ -460,6 +460,7 @@ def apply_business_rules_from_args(
         mode=args.mode,
         invalid_ratio=args.invalid_ratio,
         field_defaults=field_defaults,
+        spec=spec,
     )
 
 

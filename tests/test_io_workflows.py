@@ -249,6 +249,14 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
     manifest = json.loads((tmp_path / "generated" / "generation_manifest.json").read_text())
     assert result.business_validation is not None
     assert manifest["validation_valid"] is False
+    assert manifest["business_validation"] == {
+        "rules_sha256": None,
+        "rule_count": 0,
+        "rule_pass_count": 0,
+        "rule_fail_count": 0,
+        "valid": False,
+        "errors_truncated": False,
+    }
 
 
 def test_infer_dataset_spec_artifact_writes_dataset_spec_yaml(tmp_path) -> None:

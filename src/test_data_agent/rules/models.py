@@ -1,120 +1,193 @@
-"""Business rule models and YAML loading for the neutral rules package."""
+"""Business rule models and bounded YAML loading."""
 
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any, Literal, Self, TypeAlias
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
-from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.limits import max_business_rules_bytes, read_limited_text
 from test_data_agent.core.serialization import load_limited_yaml
 from test_data_agent.rules.conditions import Condition
 
 
-class FieldRule(BaseModel):
-    table: str
-    field: str
+MAX_BUSINESS_RULE_COUNT = 1_000
+MAX_RULE_VALUES = 1_000
+MAX_RULE_FIELDS = 1_000
+MAX_SCENARIO_TABLES = 100
+RuleIdentifier: TypeAlias = Annotated[str, Field(min_length=1, max_length=255)]
+RuleValues: TypeAlias = Annotated[list[Any], Field(min_length=1, max_length=MAX_RULE_VALUES)]
+
+
+class StrictRuleModel(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        allow_inf_nan=False,
+        str_strip_whitespace=True,
+    )
+
+
+class FieldRule(StrictRuleModel):
+    table: RuleIdentifier
+    field: RuleIdentifier
     required: bool = False
-    allowed_values: list[Any] | None = None
+    allowed_values: RuleValues | None = None
     min_value: float | None = None
     max_value: float | None = None
 
+    @model_validator(mode="after")
+    def validate_bounds(self) -> Self:
+        if (
+            self.min_value is not None
+            and self.max_value is not None
+            and self.min_value > self.max_value
+        ):
+            raise ValueError("field rule min_value must be <= max_value")
+        return self
 
-class ConditionalRequiredRule(BaseModel):
-    table: str
+
+class ConditionalRequiredRule(StrictRuleModel):
+    type: Literal["conditional_required"]
+    table: RuleIdentifier
     when: Condition
-    required_fields: list[str]
+    required_fields: Annotated[
+        list[RuleIdentifier],
+        Field(min_length=1, max_length=MAX_RULE_FIELDS),
+    ]
 
 
-class ConditionalAllowedValuesRule(BaseModel):
-    table: str
-    field: str
+class ConditionalAllowedValuesRule(StrictRuleModel):
+    type: Literal["conditional_allowed_values"]
+    table: RuleIdentifier
+    field: RuleIdentifier
     when: Condition
-    allowed_values: list[Any]
+    allowed_values: RuleValues
 
 
-class TemporalOrderingRule(BaseModel):
-    table: str
-    start_field: str
-    end_field: str
+class TemporalOrderingRule(StrictRuleModel):
+    type: Literal["temporal_ordering"]
+    table: RuleIdentifier
+    start_field: RuleIdentifier
+    end_field: RuleIdentifier
     allow_equal: bool = True
 
 
-class FormulaRule(BaseModel):
-    table: str
-    field: str
-    expression: str
-    tolerance: float = 0.000001
+class FormulaRule(StrictRuleModel):
+    type: Literal["formula"]
+    table: RuleIdentifier
+    field: RuleIdentifier
+    expression: Annotated[str, Field(min_length=1, max_length=1_024)]
+    tolerance: float = Field(default=0.000001, ge=0)
 
 
-class ForeignKeyRule(BaseModel):
-    child_table: str
-    child_field: str
-    parent_table: str
-    parent_field: str
+class ForeignKeyRule(StrictRuleModel):
+    type: Literal["foreign_key"]
+    child_table: RuleIdentifier
+    child_field: RuleIdentifier
+    parent_table: RuleIdentifier
+    parent_field: RuleIdentifier
 
 
-class AggregateFormulaRule(BaseModel):
-    table: str
-    field: str
-    expression: str
+class AggregateFormulaRule(StrictRuleModel):
+    type: Literal["aggregate_formula"]
+    table: RuleIdentifier
+    field: RuleIdentifier
+    expression: Annotated[str, Field(min_length=1, max_length=1_024)]
     expected: float | int | None = None
-    tolerance: float = 0.000001
+    tolerance: float = Field(default=0.000001, ge=0)
 
 
-class ScenarioRule(BaseModel):
-    name: str
+class ScenarioRule(StrictRuleModel):
+    name: RuleIdentifier
     weight: float = Field(gt=0)
-    field_values: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    field_values: dict[RuleIdentifier, dict[RuleIdentifier, Any]] = Field(
+        default_factory=dict,
+        max_length=MAX_SCENARIO_TABLES,
+    )
 
 
-class BusinessRules(BaseModel):
-    field_rules: list[FieldRule] = Field(default_factory=list)
-    row_rules: list[
-        ConditionalRequiredRule
-        | ConditionalAllowedValuesRule
-        | TemporalOrderingRule
-        | FormulaRule
-    ] = Field(default_factory=list)
-    cross_table_rules: list[ForeignKeyRule | AggregateFormulaRule] = Field(default_factory=list)
-    scenarios: list[ScenarioRule] = Field(default_factory=list)
+RowRule: TypeAlias = Annotated[
+    ConditionalRequiredRule
+    | ConditionalAllowedValuesRule
+    | TemporalOrderingRule
+    | FormulaRule,
+    Field(discriminator="type"),
+]
+CrossTableRule: TypeAlias = Annotated[
+    ForeignKeyRule | AggregateFormulaRule,
+    Field(discriminator="type"),
+]
+
+
+class BusinessRules(StrictRuleModel):
+    field_rules: list[FieldRule] = Field(
+        default_factory=list,
+        max_length=MAX_BUSINESS_RULE_COUNT,
+    )
+    row_rules: list[RowRule] = Field(
+        default_factory=list,
+        max_length=MAX_BUSINESS_RULE_COUNT,
+    )
+    cross_table_rules: list[CrossTableRule] = Field(
+        default_factory=list,
+        max_length=MAX_BUSINESS_RULE_COUNT,
+    )
+    scenarios: list[ScenarioRule] = Field(
+        default_factory=list,
+        max_length=MAX_BUSINESS_RULE_COUNT,
+    )
+
+    @property
+    def rule_count(self) -> int:
+        return (
+            len(self.field_rules)
+            + len(self.row_rules)
+            + len(self.cross_table_rules)
+            + len(self.scenarios)
+        )
+
+    @model_validator(mode="after")
+    def validate_total_rule_count(self) -> Self:
+        if self.rule_count > MAX_BUSINESS_RULE_COUNT:
+            raise ValueError(
+                f"business rules must contain <= {MAX_BUSINESS_RULE_COUNT} rules"
+            )
+        return self
+
+
+_ROW_RULE_ADAPTER: TypeAdapter[RowRule] = TypeAdapter(RowRule)
+_CROSS_TABLE_RULE_ADAPTER: TypeAdapter[CrossTableRule] = TypeAdapter(CrossTableRule)
 
 
 def load_business_rules(path: Path) -> BusinessRules:
-    data = load_limited_yaml(read_limited_text(path)) or {}
+    data = load_limited_yaml(
+        read_limited_text(path, max_bytes=max_business_rules_bytes())
+    ) or {}
     return business_rules_from_dict(data)
 
 
 def business_rules_from_dict(data: dict[str, Any]) -> BusinessRules:
-    return BusinessRules(
-        field_rules=[FieldRule.model_validate(item) for item in data.get("field_rules", [])],
-        row_rules=[parse_row_rule(item) for item in data.get("row_rules", [])],
-        cross_table_rules=[parse_cross_table_rule(item) for item in data.get("cross_table_rules", [])],
-        scenarios=[ScenarioRule.model_validate(item) for item in data.get("scenarios", [])],
-    )
+    return BusinessRules.model_validate(data)
 
 
-def parse_row_rule(item: dict[str, Any]) -> ConditionalRequiredRule | ConditionalAllowedValuesRule | TemporalOrderingRule | FormulaRule:
-    kind = item.get("type")
-    if kind == "conditional_required":
-        return ConditionalRequiredRule.model_validate(item)
-    if kind == "conditional_allowed_values":
-        return ConditionalAllowedValuesRule.model_validate(item)
-    if kind == "temporal_ordering":
-        return TemporalOrderingRule.model_validate(item)
-    if kind == "formula":
-        return FormulaRule.model_validate(item)
-    raise ValueError(f"unsupported row rule type: {kind}")
+def business_rules_fingerprint(rules: BusinessRules) -> str:
+    canonical = json.dumps(
+        rules.model_dump(mode="json", exclude_none=True),
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
-def parse_cross_table_rule(item: dict[str, Any]) -> ForeignKeyRule | AggregateFormulaRule:
-    kind = item.get("type")
-    if kind == "foreign_key":
-        return ForeignKeyRule.model_validate(item)
-    if kind == "aggregate_formula":
-        return AggregateFormulaRule.model_validate(item)
-    raise ValueError(f"unsupported cross-table rule type: {kind}")
+def parse_row_rule(item: dict[str, Any]) -> RowRule:
+    return _ROW_RULE_ADAPTER.validate_python(item)
+
+
+def parse_cross_table_rule(item: dict[str, Any]) -> CrossTableRule:
+    return _CROSS_TABLE_RULE_ADAPTER.validate_python(item)
 
 
 __all__ = [
@@ -122,11 +195,14 @@ __all__ = [
     "BusinessRules",
     "ConditionalAllowedValuesRule",
     "ConditionalRequiredRule",
+    "CrossTableRule",
     "FieldRule",
     "ForeignKeyRule",
     "FormulaRule",
+    "RowRule",
     "ScenarioRule",
     "TemporalOrderingRule",
+    "business_rules_fingerprint",
     "business_rules_from_dict",
     "load_business_rules",
     "parse_cross_table_rule",

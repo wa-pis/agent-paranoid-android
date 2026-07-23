@@ -123,6 +123,7 @@ def generate_dataset_bundle(
             output_format=effective_output_format,
             row_counts=row_counts,
             validation_valid=generation_valid,
+            business_report=business_report,
             output_folder=temp_folder,
         )
         enforce_output_folder_size(temp_folder)

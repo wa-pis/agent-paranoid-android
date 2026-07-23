@@ -15,9 +15,14 @@ from test_data_agent.rules.models import (
     ForeignKeyRule,
     FormulaRule,
     TemporalOrderingRule,
+    business_rules_fingerprint,
 )
 from test_data_agent.rules.conditions import condition_matches
 from test_data_agent.rules.expressions import aggregate, comparable_number, numbers_close, parse_datetime, safe_eval
+
+
+MAX_REPORTED_RULE_ERRORS = 100
+MAX_TOTAL_REPORTED_RULE_ERRORS = 1_000
 
 
 class RuleResult(BaseModel):
@@ -25,10 +30,13 @@ class RuleResult(BaseModel):
     passed: int = 0
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
+    errors_truncated: bool = False
 
 
 class BusinessValidationReport(BaseModel):
     valid: bool
+    rule_count: int
+    rules_sha256: str
     rule_pass_count: int
     rule_fail_count: int
     results: list[RuleResult]
@@ -36,27 +44,34 @@ class BusinessValidationReport(BaseModel):
 
 def validate_business_rules(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> BusinessValidationReport:
     results: list[RuleResult] = []
-    for rule in rules.field_rules:
-        results.append(validate_field_rule(rows_by_table, rule))
-    for rule in rules.row_rules:
-        if isinstance(rule, ConditionalRequiredRule):
-            results.append(validate_conditional_required(rows_by_table, rule))
-        elif isinstance(rule, ConditionalAllowedValuesRule):
-            results.append(validate_conditional_allowed_values(rows_by_table, rule))
-        elif isinstance(rule, TemporalOrderingRule):
-            results.append(validate_temporal_ordering(rows_by_table, rule))
-        elif isinstance(rule, FormulaRule):
-            results.append(validate_formula(rows_by_table, rule))
-    for rule in rules.cross_table_rules:
-        if isinstance(rule, ForeignKeyRule):
-            results.append(validate_foreign_key(rows_by_table, rule))
-        elif isinstance(rule, AggregateFormulaRule):
-            results.append(validate_aggregate_formula(rows_by_table, rule))
+    for field_rule in rules.field_rules:
+        results.append(validate_field_rule(rows_by_table, field_rule))
+    for row_rule in rules.row_rules:
+        if isinstance(row_rule, ConditionalRequiredRule):
+            results.append(validate_conditional_required(rows_by_table, row_rule))
+        elif isinstance(row_rule, ConditionalAllowedValuesRule):
+            results.append(
+                validate_conditional_allowed_values(rows_by_table, row_rule)
+            )
+        elif isinstance(row_rule, TemporalOrderingRule):
+            results.append(validate_temporal_ordering(rows_by_table, row_rule))
+        elif isinstance(row_rule, FormulaRule):
+            results.append(validate_formula(rows_by_table, row_rule))
+    for cross_table_rule in rules.cross_table_rules:
+        if isinstance(cross_table_rule, ForeignKeyRule):
+            results.append(validate_foreign_key(rows_by_table, cross_table_rule))
+        elif isinstance(cross_table_rule, AggregateFormulaRule):
+            results.append(
+                validate_aggregate_formula(rows_by_table, cross_table_rule)
+            )
 
+    truncate_report_errors(results)
     passed = sum(result.passed for result in results)
     failed = sum(result.failed for result in results)
     return BusinessValidationReport(
         valid=failed == 0,
+        rule_count=rules.rule_count,
+        rules_sha256=business_rules_fingerprint(rules),
         rule_pass_count=passed,
         rule_fail_count=failed,
         results=results,
@@ -72,9 +87,10 @@ def validate_field_rule(rows_by_table: dict[str, list[dict[str, Any]]], rule: Fi
             errors.append("required")
         if rule.allowed_values is not None and value not in (None, "") and value not in rule.allowed_values:
             errors.append("allowed_values")
-        if rule.min_value is not None and comparable_number(value) is not None and comparable_number(value) < rule.min_value:
+        number = comparable_number(value)
+        if rule.min_value is not None and number is not None and number < rule.min_value:
             errors.append("min_value")
-        if rule.max_value is not None and comparable_number(value) is not None and comparable_number(value) > rule.max_value:
+        if rule.max_value is not None and number is not None and number > rule.max_value:
             errors.append("max_value")
         record_result(result, not errors, f"{rule.table}[{index}].{rule.field}: {', '.join(errors)}")
     return result
@@ -151,4 +167,18 @@ def record_result(result: RuleResult, ok: bool, message: str) -> None:
         result.passed += 1
     else:
         result.failed += 1
-        result.errors.append(message)
+        if len(result.errors) < MAX_REPORTED_RULE_ERRORS:
+            result.errors.append(message)
+        else:
+            result.errors_truncated = True
+
+
+def truncate_report_errors(results: list[RuleResult]) -> None:
+    remaining = MAX_TOTAL_REPORTED_RULE_ERRORS
+    for result in results:
+        if len(result.errors) > remaining:
+            result.errors = result.errors[:remaining]
+            result.errors_truncated = True
+        remaining -= len(result.errors)
+        if remaining == 0 and result.failed > len(result.errors):
+            result.errors_truncated = True

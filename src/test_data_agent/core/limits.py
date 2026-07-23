@@ -22,6 +22,8 @@ MAX_INPUT_CELL_CHARS_ENV = "TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS"
 MAX_PARQUET_EXPANDED_BYTES_ENV = "TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES"
 MAX_YAML_ALIASES_ENV = "TEST_DATA_AGENT_MAX_YAML_ALIASES"
 MAX_YAML_DEPTH_ENV = "TEST_DATA_AGENT_MAX_YAML_DEPTH"
+MAX_BUSINESS_RULES_BYTES_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES"
+MAX_BUSINESS_RULE_EVALUATIONS_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS"
 MAX_OUTPUT_BYTES_ENV = "TEST_DATA_AGENT_MAX_OUTPUT_BYTES"
 MIN_FREE_DISK_BYTES_ENV = "TEST_DATA_AGENT_MIN_FREE_DISK_BYTES"
 MAX_GENERATION_SECONDS_ENV = "TEST_DATA_AGENT_MAX_GENERATION_SECONDS"
@@ -36,6 +38,8 @@ DEFAULT_MAX_INPUT_CELL_CHARS = 1_000_000
 DEFAULT_MAX_PARQUET_EXPANDED_BYTES = 512 * 1024 * 1024
 DEFAULT_MAX_YAML_ALIASES = 50
 DEFAULT_MAX_YAML_DEPTH = 100
+DEFAULT_MAX_BUSINESS_RULES_BYTES = 1024 * 1024
+DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS = 5_000_000
 DEFAULT_MAX_OUTPUT_BYTES = 512 * 1024 * 1024
 DEFAULT_MIN_FREE_DISK_BYTES = 128 * 1024 * 1024
 DEFAULT_MAX_GENERATION_SECONDS = 300.0
@@ -113,6 +117,20 @@ def max_yaml_aliases() -> int:
 
 def max_yaml_depth() -> int:
     return positive_int_env(MAX_YAML_DEPTH_ENV, DEFAULT_MAX_YAML_DEPTH)
+
+
+def max_business_rules_bytes() -> int:
+    return positive_int_env(
+        MAX_BUSINESS_RULES_BYTES_ENV,
+        DEFAULT_MAX_BUSINESS_RULES_BYTES,
+    )
+
+
+def max_business_rule_evaluations() -> int:
+    return positive_int_env(
+        MAX_BUSINESS_RULE_EVALUATIONS_ENV,
+        DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS,
+    )
 
 
 def max_output_bytes() -> int:
@@ -209,14 +227,33 @@ def configure_csv_field_limit(csv_module: Any) -> None:
     csv_module.field_size_limit(max_input_cell_chars())
 
 
-def read_limited_text(path: Path, *, encoding: str = "utf-8") -> str:
+def read_limited_text(
+    path: Path,
+    *,
+    encoding: str = "utf-8",
+    max_bytes: int | None = None,
+) -> str:
     enforce_input_files([path])
-    limit = max_input_file_bytes()
+    limit = max_input_file_bytes() if max_bytes is None else min(max_input_file_bytes(), max_bytes)
     with path.open("rb") as handle:
         payload = handle.read(limit + 1)
     if len(payload) > limit:
         raise InputLimitError(f"input file {path.name!r} must be <= {limit} bytes")
     return payload.decode(encoding)
+
+
+def enforce_business_rules_payload_size(size: int) -> None:
+    limit = max_business_rules_bytes()
+    if size > limit:
+        raise InputLimitError(f"business rules payload must be <= {limit} bytes")
+
+
+def enforce_business_rule_evaluations(count: int) -> None:
+    limit = max_business_rule_evaluations()
+    if count > limit:
+        raise InputLimitError(
+            f"business rules require more than {limit} estimated evaluations"
+        )
 
 
 def enforce_parquet_metadata_limits(metadata: Any, *, label: str) -> None:

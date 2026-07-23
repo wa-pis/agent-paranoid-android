@@ -74,3 +74,24 @@ effective spec.
 - **WHEN** validation is requested with a different spec
 - **THEN** validation rejects the mismatch instead of silently validating the
   wrong contract
+
+### Requirement: Structured Business Rules
+
+The generator MCP server SHALL accept bounded, structured business rules for
+generation and export without granting arbitrary code execution.
+
+#### Scenario: Valid business rules are supplied
+
+- **GIVEN** a reviewed DatasetSpec and exactly one rule file or inline payload
+- **WHEN** generation or export runs
+- **THEN** deterministic code applies and validates the rules
+- **AND** the manifest records their fingerprint and validation summary
+- **AND** detailed bounded errors are written to a workspace report
+
+#### Scenario: Unsafe business rules are supplied
+
+- **GIVEN** rules contain unknown keys, dangling references, unsupported
+  expressions, excessive input, or raw-looking sensitive literals
+- **WHEN** the generator MCP server validates the request
+- **THEN** it rejects the request before creating output artifacts
+- **AND** no source or generated rows are returned in the error

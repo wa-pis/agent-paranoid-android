@@ -60,9 +60,9 @@ patterns. Source rows and raw sensitive values do not cross it.
 | --- | --- | --- | --- | --- |
 | `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
 | `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
-| `generate_dataset` | Run deterministic generation and validation | DatasetSpec, seed, count, optional format | Synthetic bundle | Row counts and validation summary |
+| `generate_dataset` | Run deterministic generation and validation | DatasetSpec, seed, count, optional format and structured rules | Synthetic bundle | Row counts and compact validation summaries |
 | `validate_dataset` | Recheck a generated bundle without exposing its rows | Matching spec and generated folder | Optional report JSON | Validation report |
-| `export_dataset` | Produce another supported format safely | DatasetSpec, seed, count, required format | Fresh synthetic bundle | Row counts and validation summary |
+| `export_dataset` | Produce another supported format safely | DatasetSpec, seed, count, required format and optional structured rules | Fresh synthetic bundle | Row counts and compact validation summaries |
 
 `export_dataset` intentionally regenerates data from a `DatasetSpec`. It does
 not accept arbitrary row files, because a generic conversion tool could be used
@@ -133,6 +133,26 @@ counts, versions, and validation results. This keeps large payloads out of the
 model context and reduces the chance of accidental disclosure in prompts,
 logs, or chat history.
 
+Business-rule generation follows the same boundary. The response contains a
+rule fingerprint, rule/pass fail counts, validity, truncation status, and the
+path to `business_validation_report.json`. Row-level errors remain in the
+bounded workspace artifact.
+
+### Structured Business Rules
+
+`generate_dataset` and `export_dataset` accept at most one workspace
+`business_rules_path` or inline `business_rules_payload`. Rule models forbid
+unknown fields, cap list and expression sizes, and permit only constants,
+field names, basic arithmetic, and explicit `sum`/`count` aggregate helpers.
+The server also rejects requests whose DatasetSpec row counts and rule set
+would exceed the configured estimated evaluation budget.
+
+Before generation, `rules/contract.py` verifies every entity and field
+reference against the DatasetSpec. It rejects values assigned to sensitive
+fields and raw-looking emails, phones, SSNs, payment data, credentials, or
+tokens in otherwise neutral rule literals. No output folder is published when
+this boundary fails.
+
 ### Provenance Manifest
 
 Every generated bundle includes `generation_manifest.json` with:
@@ -143,6 +163,8 @@ Every generated bundle includes `generation_manifest.json` with:
 - seed and output format
 - row counts
 - validation status
+- optional business-rule fingerprint, rule count, pass/fail counts, validity,
+  and error-truncation status
 - `synthetic: true`
 - `source_rows_copied: false`
 
