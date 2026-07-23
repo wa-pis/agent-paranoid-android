@@ -543,18 +543,20 @@ def test_generate_dataset_rejects_excessively_nested_business_rules(
 ) -> None:
     configure_workspace(monkeypatch, tmp_path)
     write_customer_spec(tmp_path)
-    nested: list[object] = []
-    cursor = nested
-    for _ in range(1_100):
-        child: list[object] = []
-        cursor.append(child)
-        cursor = child
+
+    def fail_serialization(*args: object, **kwargs: object) -> str:
+        raise RecursionError
+
+    monkeypatch.setattr(
+        "test_data_agent.mcp_generator_server.json.dumps",
+        fail_serialization,
+    )
 
     with pytest.raises(ValueError, match="JSON-compatible"):
         generate_dataset(
             "spec.json",
             "deep-rules",
-            business_rules_payload={"field_rules": nested},
+            business_rules_payload={"field_rules": []},
         )
 
     assert not (tmp_path / "deep-rules").exists()
