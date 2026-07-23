@@ -6,6 +6,7 @@ import math
 import re
 from collections import Counter
 from collections.abc import Iterable
+from datetime import date
 from enum import StrEnum
 from typing import Any
 
@@ -69,6 +70,7 @@ SECRET_ASSIGNMENT_RE = re.compile(
 PRIVATE_KEY_RE = re.compile(r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----")
 BEARER_TOKEN_RE = re.compile(r"^Bearer\s+\S+$", re.IGNORECASE)
 TOKEN_ALPHABET_RE = re.compile(r"^[A-Za-z0-9_+/=-]+$")
+ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 class PrivacyClassification(StrEnum):
@@ -129,6 +131,8 @@ def infer_sensitive_value_type(value: Any) -> str | None:
     text = value.strip()
     if not text:
         return None
+    if is_iso_date(text):
+        return None
     if PRIVATE_KEY_RE.search(text) or BEARER_TOKEN_RE.fullmatch(text):
         return "secret"
     if KNOWN_SECRET_RE.fullmatch(text) or SECRET_ASSIGNMENT_RE.search(text):
@@ -141,7 +145,7 @@ def infer_sensitive_value_type(value: Any) -> str | None:
         return "ssn"
     if PAYMENT_CARD_RE.fullmatch(text) and passes_luhn_check(text):
         return "secret"
-    if PHONE_RE.fullmatch(text):
+    if PHONE_RE.fullmatch(text) and 7 <= sum(char.isdigit() for char in text) <= 15:
         return "phone"
     return None
 
@@ -190,6 +194,16 @@ def passes_luhn_check(text: str) -> bool:
                 digit -= 9
         checksum += digit
     return bool(digits) and checksum % 10 == 0
+
+
+def is_iso_date(text: str) -> bool:
+    if ISO_DATE_RE.fullmatch(text) is None:
+        return False
+    try:
+        date.fromisoformat(text)
+    except ValueError:
+        return False
+    return True
 
 
 def mask_pattern(value: str, semantic_type: str | None) -> str:

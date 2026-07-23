@@ -1,0 +1,109 @@
+{
+  "value_cases": [
+    {
+      "id": "email",
+      "parts": ["alice", "@", "example.test"],
+      "expected": "email"
+    },
+    {
+      "id": "phone",
+      "parts": ["+1-202-", "555-", "0100"],
+      "expected": "phone"
+    },
+    {
+      "id": "ssn",
+      "parts": ["000-", "00-", "0000"],
+      "expected": "ssn"
+    },
+    {
+      "id": "luhn_card",
+      "parts": ["4242 ", "4242 ", "4242 ", "4242"],
+      "expected": "secret"
+    },
+    {
+      "id": "stripe_key",
+      "parts": ["sk", "_test_", "A1b2C3d4E5f6"],
+      "expected": "secret"
+    },
+    {
+      "id": "github_token",
+      "parts": ["gh", "p_", "A1b2C3d4E5f6G7h8I9j0K1"],
+      "expected": "secret"
+    },
+    {
+      "id": "aws_access_key",
+      "parts": ["AK", "IA", "ABCDEFGHIJKLMNOP"],
+      "expected": "secret"
+    },
+    {
+      "id": "slack_token",
+      "parts": ["xo", "xb-", "1234567890-AbCd"],
+      "expected": "secret"
+    },
+    {
+      "id": "jwt",
+      "parts": ["eyJhbGci", ".", "OiJIUzI1", ".", "NiJ9TEST"],
+      "expected": "secret"
+    },
+    {
+      "id": "bearer",
+      "parts": ["Bear", "er ", "A1b2C3d4E5f6G7h8"],
+      "expected": "secret"
+    },
+    {
+      "id": "private_key_header",
+      "parts": ["-----BEGIN ", "PRIVATE ", "KEY-----"],
+      "expected": "secret"
+    },
+    {
+      "id": "secret_assignment",
+      "parts": ["client_", "secret=", "A1b2C3d4E5f6"],
+      "expected": "secret"
+    },
+    {
+      "id": "high_entropy_token",
+      "parts": ["aB3dE5fG7hJ9", "kL2mN4pQ6rS8", "tU0vW1xY"],
+      "expected": "secret"
+    },
+    {
+      "id": "status",
+      "parts": ["cancelled"],
+      "expected": null
+    },
+    {
+      "id": "date",
+      "parts": ["2026-07-23"],
+      "expected": null
+    },
+    {
+      "id": "uuid",
+      "parts": ["123e4567-e89b-12d3-a456-426614174000"],
+      "expected": "secret"
+    },
+    {
+      "id": "invalid_email",
+      "parts": ["alice", "@", "localhost"],
+      "expected": null
+    },
+    {
+      "id": "short_identifier",
+      "parts": ["ABC12345"],
+      "expected": null
+    },
+    {
+      "id": "non_luhn_16_digit_order",
+      "parts": ["42424242", "42424243"],
+      "expected": null
+    }
+  ],
+  "name_cases": [
+    {"name": "customer_email", "expected": true},
+    {"name": "api-token", "expected": true},
+    {"name": "first name", "expected": true},
+    {"name": "credential_hash", "expected": true},
+    {"name": "order_id", "expected": false},
+    {"name": "status", "expected": false},
+    {"name": "created_at", "expected": false},
+    {"name": "amount", "expected": false}
+  ]
+}
