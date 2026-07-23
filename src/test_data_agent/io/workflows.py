@@ -464,8 +464,10 @@ def enforce_generation_row_count_limits(spec: DatasetSpec, *, max_count: int | N
             raise ValueError(f"entity row_count must be <= {effective_max}: {entity.name}") from exc
 
 
-def prepare_generation_budget(spec: DatasetSpec, output_path: Path) -> GenerationBudget:
-    target_folder = output_path if not output_path.suffix else output_path.parent
+def prepare_generation_budget(spec: DatasetSpec, output_path: Path | None) -> GenerationBudget:
+    target_folder = Path.cwd() if output_path is None else output_path
+    if target_folder.suffix:
+        target_folder = target_folder.parent
     enforce_output_capacity(target_folder)
     enforce_output_payload_size(
         estimate_dataset_output_bytes(spec),
