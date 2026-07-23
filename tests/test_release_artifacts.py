@@ -1,4 +1,5 @@
 import json
+import re
 import stat
 import tomllib
 from pathlib import Path
@@ -39,6 +40,7 @@ def test_public_release_artifacts_are_present() -> None:
         "docs/public_release_checklist.md",
         ".github/dependabot.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/security.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/ISSUE_TEMPLATE/config.yml",
         ".github/ISSUE_TEMPLATE/bug_report.yml",
@@ -67,6 +69,27 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
+
+
+def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
+    action_reference = re.compile(r"^\s*uses:\s*[^@\s]+@([^\s#]+)", re.MULTILINE)
+    workflows = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
+
+    assert workflows
+    for workflow in workflows:
+        references = action_reference.findall(workflow.read_text())
+        assert references, workflow
+        assert all(re.fullmatch(r"[0-9a-f]{40}", reference) for reference in references), workflow
+
+
+def test_security_workflow_runs_code_and_secret_scans() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "security.yml").read_text()
+
+    assert "github/codeql-action/init@" in workflow
+    assert "queries: security-extended" in workflow
+    assert "gitleaks/gitleaks-action@" in workflow
+    assert "fetch-depth: 0" in workflow
+    assert "security-events: write" in workflow
 
 
 def test_release_script_is_executable_and_covers_release_gates() -> None:
