@@ -36,20 +36,24 @@ jobs:
           enable-cache: true
 
       - name: Install locked development environment
-        run: uv sync --frozen --extra dev --python python
+        run: |
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
 
       - name: Audit Python dependencies
-        run: uv run --frozen --extra dev python -m pip_audit --skip-editable
+        run: |
+          uv export --quiet --frozen --extra dev --no-emit-project --output-file /tmp/audit-requirements.txt
+          uv run --no-sync python -m pip_audit --require-hashes --requirement /tmp/audit-requirements.txt
 
       - name: Run lint checks
-        run: uv run --frozen --extra dev python -m ruff check src tests
+        run: uv run --no-sync python -m ruff check src tests
 
       - name: Compile source and tests
-        run: uv run --frozen --extra dev python -m compileall -q src tests
+        run: uv run --no-sync python -m compileall -q src tests
 
       - name: Run tests with coverage gate
         run: >-
-          uv run --frozen --extra dev python -m pytest
+          uv run --no-sync python -m pytest
           --cov=test_data_agent
           --cov-report=term-missing
           --cov-fail-under=85
@@ -97,10 +101,12 @@ jobs:
           enable-cache: true
 
       - name: Install locked development environment
-        run: uv sync --frozen --extra dev --python python
+        run: |
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
 
       - name: Run live Trino integration tests
         run: >-
-          uv run --frozen --extra dev python -m pytest
+          uv run --no-sync python -m pytest
           -m integration
           tests/integration/test_trino_integration.py

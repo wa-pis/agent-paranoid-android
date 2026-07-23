@@ -56,3 +56,7 @@ Before creating a tag:
 - Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
   change.
 - Avoid publishing exploit details before fixes are available.
+- Sign the version tag and verify it locally before pushing.
+- Confirm the tag-triggered release workflow publishes wheel, source
+  distribution, CycloneDX SBOM, SHA-256 checksums, provenance, and SBOM
+  attestations.

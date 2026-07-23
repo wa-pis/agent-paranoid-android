@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, attest, and release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          version: "0.11.23"
+          enable-cache: true
+
+      - name: Install locked release environment
+        run: |
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+
+      - name: Verify tag matches package version
+        run: uv run --no-sync python scripts/check_release_tag.py "${GITHUB_REF_NAME}"
+
+      - name: Run release gate
+        run: uv run --no-sync scripts/check_release.sh
+
+      - name: Build wheel and source distribution
+        run: uv build --no-build-isolation
+
+      - name: Export CycloneDX SBOM from lockfile
+        run: >-
+          uv export
+          --frozen
+          --no-dev
+          --format cyclonedx1.5
+          --preview-features sbom-export
+          --quiet
+          --output-file dist/sbom.cdx.json
+
+      - name: Write artifact checksums
+        run: sha256sum dist/*.whl dist/*.tar.gz dist/sbom.cdx.json > dist/SHA256SUMS
+
+      - name: Attest build provenance
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+
+      - name: Attest package SBOM
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+          sbom-path: dist/sbom.cdx.json
+
+      - name: Preserve release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-${{ github.ref_name }}
+          path: dist/
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
+        with:
+          files: dist/*
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          make_latest: true

@@ -4,6 +4,9 @@ import stat
 import tomllib
 from pathlib import Path
 
+import pytest
+
+from scripts.check_release_tag import check_release_tag
 from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetSpec
 
 
@@ -40,6 +43,7 @@ def test_public_release_artifacts_are_present() -> None:
         "docs/public_release_checklist.md",
         ".github/dependabot.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
         ".github/workflows/security.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/ISSUE_TEMPLATE/config.yml",
@@ -65,7 +69,8 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
 
     assert "uv sync --frozen --extra dev" in workflow
-    assert "python -m pip_audit --skip-editable" in workflow
+    assert "--extra dev --no-emit-project" in workflow
+    assert "python -m pip_audit --require-hashes" in workflow
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
@@ -90,6 +95,28 @@ def test_security_workflow_runs_code_and_secret_scans() -> None:
     assert "gitleaks/gitleaks-action@" in workflow
     assert "fetch-depth: 0" in workflow
     assert "security-events: write" in workflow
+
+
+def test_release_workflow_builds_sbom_and_attests_packages() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
+
+    assert 'tags:\n      - "v*.*.*"' in workflow
+    assert "scripts/check_release_tag.py" in workflow
+    assert "scripts/check_release.sh" in workflow
+    assert "uv build --no-build-isolation" in workflow
+    assert "--format cyclonedx1.5" in workflow
+    assert workflow.count("actions/attest@") == 2
+    assert "sbom-path: dist/sbom.cdx.json" in workflow
+    assert "softprops/action-gh-release@" in workflow
+
+
+def test_release_tag_must_match_package_version() -> None:
+    check_release_tag("v0.4.0")
+
+    with pytest.raises(ValueError, match="does not match"):
+        check_release_tag("v9.9.9")
+    with pytest.raises(ValueError, match="start with"):
+        check_release_tag("0.4.0")
 
 
 def test_release_script_is_executable_and_covers_release_gates() -> None:
