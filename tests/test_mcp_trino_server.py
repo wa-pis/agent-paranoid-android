@@ -7,6 +7,7 @@ from test_data_agent.mcp_trino_server import (
     TrinoConfigurationError,
     TrinoResultLimitError,
     check_allowlist,
+    describe_table,
     execute_query,
     has_top_level_limit,
     mask_row,
@@ -517,6 +518,23 @@ def test_profile_table_safe_uses_aggregates_without_sensitive_top_values(monkeyp
     assert status["top_values"] == [{"value": "paid", "count": 700}, {"value": "cancelled", "count": 290}]
     assert amount["p05"] == 10.0
     assert not any('GROUP BY "customer_email"' in sql for sql in executed_sql)
+
+
+def test_describe_table_qualifies_information_schema_catalog(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        captured["sql"] = sql
+        captured["parameters"] = parameters
+        return []
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+
+    assert describe_table("analytics", "safe_schema", "orders") == []
+    assert 'FROM "analytics".information_schema.columns' in str(captured["sql"])
+    assert captured["parameters"] == ["analytics", "safe_schema", "orders"]
 
 
 def test_profile_foreign_key_uses_join_counts_only(monkeypatch: pytest.MonkeyPatch) -> None:

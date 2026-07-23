@@ -501,7 +501,7 @@ def describe_table(catalog: str, schema: str, table: str) -> list[dict[str, Any]
     check_allowlist(catalog=catalog, schema=schema)
     sql = (
         "SELECT column_name, data_type, is_nullable "
-        "FROM information_schema.columns "
+        f"FROM {quote_identifier(catalog)}.information_schema.columns "
         "WHERE table_catalog = ? AND table_schema = ? AND table_name = ? "
         "ORDER BY ordinal_position"
     )
