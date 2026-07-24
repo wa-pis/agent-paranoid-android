@@ -4,6 +4,8 @@ import pytest
 import test_data_agent
 from test_data_agent.core import (
     CategoricalDistribution,
+    DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS,
+    SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS,
     DatasetSpec,
     FieldProfile,
     FieldSpec,
@@ -61,6 +63,31 @@ def test_dataset_spec_loads_minimal_shape_with_default_settings() -> None:
     assert spec.generation_settings.mode == GenerationMode.VALID
     assert spec.validation_settings == ValidationSettings()
     assert spec.schema_version == "1.0"
+
+
+def test_dataset_spec_compatibility_registry_matches_current_contract() -> None:
+    assert SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS == {"1.0"}
+    assert DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS == set()
+
+
+def test_json_spec_loader_fails_closed_on_unknown_schema_version(tmp_path) -> None:
+    path = tmp_path / "future_spec.json"
+    path.write_text(
+        json.dumps(
+            {
+                "schema_version": "2.0",
+                "entities": [],
+                "relationships": [],
+                "constraints": [],
+            }
+        )
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=r"unsupported DatasetSpec schema_version '2.0'.*supports: 1.0",
+    ):
+        load_json_dataset_spec(path)
 
 
 def test_entities_only_json_spec_preserves_primary_key(tmp_path) -> None:

@@ -44,6 +44,7 @@ nav:
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md
       - Profiles And Specs: concepts/profiles-and-specs.md
+      - DatasetSpec Compatibility: concepts/dataset-spec-compatibility.md
       - Dataset Workflow: domain_agnostic_workflow.md
   - Reference:
       - CLI: reference/cli.md
