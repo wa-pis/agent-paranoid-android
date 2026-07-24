@@ -6,5 +6,5 @@
 - [x] Add workflow and artifact-validator tests.
 - [x] Update installation, release, and public-readiness documentation.
 - [x] Run the complete release gate and security review.
-- [ ] Configure the GitHub environment and pending PyPI publisher.
-- [ ] Publish and verify `agent-paranoid-android==0.5.0`.
+- [x] Configure the GitHub environment and pending PyPI publisher.
+- [x] Publish and verify `agent-paranoid-android==0.5.0`.
