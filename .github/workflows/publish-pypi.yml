@@ -1,0 +1,114 @@
+name: Publish PyPI
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Published GitHub Release tag to upload
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published GitHub Release tag to upload
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: publish-pypi-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Verify published distributions
+    runs-on: ubuntu-latest
+    permissions:
+      attestations: read
+      contents: read
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+    steps:
+      - name: Check out trusted workflow helpers
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve published release tag
+        id: release
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="${REQUESTED_TAG:-}"
+          if [[ ! "${tag}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+[A-Za-z0-9.+-]*$ ]]; then
+            echo "release tag must use vX.Y.Z syntax" >&2
+            exit 1
+          fi
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Download published release distributions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          published_tag="$(
+            gh release view "${RELEASE_TAG}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --json isDraft,tagName \
+              --jq 'select(.isDraft == false) | .tagName'
+          )"
+          test "${published_tag}" = "${RELEASE_TAG}"
+          mkdir -p dist
+          gh release download "${RELEASE_TAG}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "*.whl" \
+            --pattern "*.tar.gz" \
+            --dir dist
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            gh attestation verify "${artifact}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
+              --source-ref "refs/tags/${RELEASE_TAG}" \
+              --deny-self-hosted-runners
+          done
+
+      - name: Verify distribution identity
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: python3 scripts/check_pypi_artifacts.py "${RELEASE_TAG}" dist
+
+      - name: Preserve verified PyPI distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pypi-${{ steps.release.outputs.tag }}
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Publish distributions
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/agent-paranoid-android
+    permissions:
+      actions: read
+      id-token: write
+    steps:
+      - name: Download verified PyPI distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: pypi-${{ needs.prepare.outputs.tag }}
+          path: dist
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@ba38be9e461d3875417946c167d0b5f3d385a247 # release/v1
+        with:
+          packages-dir: dist/
+          print-hash: true

@@ -97,6 +97,14 @@ folder bundles only after exact size and validation checks pass.
 
 Use Python 3.11 or newer.
 
+Install the latest published release from PyPI:
+
+```bash
+python3 -m pip install agent-paranoid-android
+```
+
+For local development, install the repository in editable mode:
+
 ```bash
 python3 -m pip install -e ".[dev]"
 ```
@@ -119,7 +127,13 @@ Version tags trigger a release gate that builds wheel and source archives,
 installs the wheel in an isolated environment, verifies package metadata,
 `py.typed`, CLI entry points, and `doctor --skip-smoke`, exports a CycloneDX
 SBOM, writes SHA-256 checksums, creates GitHub provenance and SBOM attestations,
-and publishes the verified files as a GitHub Release.
+and publishes the verified files as a GitHub Release. The release workflow then
+explicitly invokes a separate least-privilege PyPI workflow. It downloads the
+already published wheel and source distribution, verifies their embedded name
+and version plus their tag-bound GitHub build provenance, then uploads them
+through PyPI Trusted Publishing with short-lived GitHub OIDC credentials and no
+stored PyPI token. Validation runs in an unprivileged job; the OIDC-enabled job
+executes only immutable-pinned artifact-download and PyPA publish actions.
 
 ## Quickstart
 

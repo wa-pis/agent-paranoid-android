@@ -44,6 +44,28 @@ environment. That smoke check verifies package version metadata, the PEP 561
 Keep compatibility changes explicit: legacy `GenerationSpec` behavior should
 remain a migration path, while new work should target `DatasetSpec`.
 
+## PyPI Trusted Publishing
+
+After creating a GitHub Release, `.github/workflows/release.yml` explicitly
+invokes `.github/workflows/publish-pypi.yml`. The called workflow downloads the
+release wheel and sdist, validates their embedded distribution name and
+version, verifies that both were attested by `release.yml` for the selected tag,
+and publishes with short-lived GitHub OIDC credentials. It does not use a PyPI
+API token and does not build or execute repository code in the OIDC-enabled
+publish job.
+
+Configure the pending or project Trusted Publisher with these exact values:
+
+- PyPI project: `agent-paranoid-android`
+- GitHub owner: `wa-pis`
+- GitHub repository: `agent-paranoid-android`
+- Workflow filename: `publish-pypi.yml`
+- Environment: `pypi`
+
+The manual dispatch input exists only for recovering a published GitHub
+Release that predates the workflow. Duplicate PyPI versions fail loudly;
+`skip-existing` is intentionally disabled.
+
 ## Public Release Readiness
 
 Before making the repository public or announcing a public release, complete
@@ -67,3 +89,5 @@ uv run --isolated --no-project --with ./dist/*.whl \
    Dependabot alerts, Dependabot security updates, private vulnerability
    reporting, required CI and dependency-review checks, and active branch/tag
    rulesets.
+6. Confirm the `pypi` GitHub environment and matching PyPI Trusted Publisher
+   use the exact workflow identity documented above.

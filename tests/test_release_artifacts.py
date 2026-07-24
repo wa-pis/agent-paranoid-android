@@ -43,6 +43,7 @@ def test_public_release_artifacts_are_present() -> None:
         "docs/public_release_checklist.md",
         ".github/dependabot.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/publish-pypi.yml",
         ".github/workflows/release.yml",
         ".github/workflows/security.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
@@ -50,6 +51,7 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/ISSUE_TEMPLATE/bug_report.yml",
         ".github/ISSUE_TEMPLATE/feature_request.yml",
         "scripts/check_installed_package.py",
+        "scripts/check_pypi_artifacts.py",
         "src/test_data_agent/py.typed",
         "uv.lock",
     ]
@@ -118,9 +120,42 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert workflow.count("actions/attest@") == 2
     assert "sbom-path: dist/sbom.cdx.json" in workflow
     assert "softprops/action-gh-release@" in workflow
+    assert "needs: release" in workflow
+    assert "uses: ./.github/workflows/publish-pypi.yml" in workflow
+    assert "tag: ${{ github.ref_name }}" in workflow
     assert "files: dist/*" not in workflow
     assert "          path: dist/\n" not in workflow
     assert workflow.count("            dist/SHA256SUMS\n") == 2
+
+
+def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "publish-pypi.yml").read_text()
+
+    assert "workflow_call:" in workflow
+    assert "workflow_dispatch:" in workflow
+    assert "environment:\n      name: pypi" in workflow
+    assert "attestations: read" in workflow
+    assert "contents: read" in workflow
+    assert "actions: read" in workflow
+    assert "id-token: write" in workflow
+    assert "gh release view" in workflow
+    assert "gh release download" in workflow
+    assert "gh attestation verify" in workflow
+    assert '--signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml"' in workflow
+    assert '--source-ref "refs/tags/${RELEASE_TAG}"' in workflow
+    assert "--deny-self-hosted-runners" in workflow
+    assert 'test "${published_tag}" = "${RELEASE_TAG}"' in workflow
+    assert "scripts/check_pypi_artifacts.py" in workflow
+    assert "actions/upload-artifact@" in workflow
+    assert "actions/download-artifact@" in workflow
+    assert "pypa/gh-action-pypi-publish@" in workflow
+    assert "password:" not in workflow
+    assert "skip-existing:" not in workflow
+    assert "print-hash: true" in workflow
+    publish_job = workflow.split("\n  publish:\n", maxsplit=1)[1]
+    assert "needs: prepare" in publish_job
+    assert "actions/checkout@" not in publish_job
+    assert "\n        run:" not in publish_job
 
 
 def test_release_tag_must_match_package_version() -> None:

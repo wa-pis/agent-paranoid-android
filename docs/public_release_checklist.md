@@ -39,6 +39,10 @@ Enable or verify these repository settings after publishing:
 - Require linear history if the project will avoid merge commits.
 - Require signed commits if all maintainers have signing keys configured.
 - Disallow force-pushes to protected branches after the initial history cleanup.
+- Create a `pypi` environment for the tokenless publish job.
+- Configure a matching PyPI Trusted Publisher for
+  `wa-pis/agent-paranoid-android`, workflow `publish-pypi.yml`, environment
+  `pypi`.
 
 ## Maintainer Identity
 
@@ -60,3 +64,6 @@ Before creating a tag:
 - Confirm the tag-triggered release workflow publishes wheel, source
   distribution, CycloneDX SBOM, SHA-256 checksums, provenance, and SBOM
   attestations.
+- Confirm the release workflow invokes the PyPI workflow after creating the
+  GitHub Release and uploads the same wheel and source distribution with
+  verified tag-bound provenance, Trusted Publishing, and publish attestations.

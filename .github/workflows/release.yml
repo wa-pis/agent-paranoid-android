@@ -104,3 +104,15 @@ jobs:
           fail_on_unmatched_files: true
           generate_release_notes: true
           make_latest: true
+
+  publish-pypi:
+    name: Publish distributions to PyPI
+    needs: release
+    permissions:
+      actions: read
+      attestations: read
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/publish-pypi.yml
+    with:
+      tag: ${{ github.ref_name }}
