@@ -33,6 +33,18 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
     assert metadata["scripts"]["test-data-agent"] == "test_data_agent.cli:main"
+    assert set(metadata["dependencies"]) == {
+        "faker>=25.0.0",
+        "pydantic>=2.7.0",
+        "PyYAML>=6.0.0",
+    }
+    assert set(metadata["optional-dependencies"]) == {
+        "parquet",
+        "mcp",
+        "trino",
+        "all",
+        "dev",
+    }
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
         "Repository": "https://github.com/wa-pis/agent-paranoid-android",
@@ -91,8 +103,8 @@ def test_pypi_readme_starts_with_public_installation() -> None:
 def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
 
-    assert "uv sync --frozen --extra dev" in workflow
-    assert "--extra dev --no-emit-project" in workflow
+    assert "uv sync --frozen --all-extras" in workflow
+    assert "--all-extras --no-emit-project" in workflow
     assert "python -m pip_audit --require-hashes" in workflow
     assert "python -m mypy" in workflow
     assert "name: Wheel smoke" in workflow
@@ -235,7 +247,7 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.6.0")
+    check_release_tag("v0.7.0")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")

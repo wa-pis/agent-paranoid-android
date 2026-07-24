@@ -3,6 +3,17 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.7.0
+
+- Lightweight base installation with explicit `parquet`, `mcp`, `trino`, and
+  `all` extras.
+- Review-first allowlisted Trino planning through MCP without raw-SQL access
+  on the default tool surface.
+- HMAC-authenticated, metadata-only MCP audit records with integrity
+  verification and bounded fail-closed storage.
+- An explicit compatibility and deprecation policy for future DatasetSpec
+  `schema_version` revisions.
+
 ## Implemented For 0.6.0
 
 - One reviewed `DatasetSpec` contract across CLI and Python generation and
@@ -66,15 +77,6 @@ Treat these as non-negotiable release gates rather than new feature work:
 - Generated manifests report `synthetic: true` and
   `source_rows_copied: false`.
 - OpenSpec baseline stays aligned with implemented behavior.
-
-## Post-MVP Hardening
-
-- Extend agent orchestration to cover allowlisted Trino table planning through
-  MCP without granting the agent raw SQL access.
-- Add signed or externally persisted audit records for teams running the MCP
-  servers in shared environments.
-- Define a compatibility and deprecation policy for future DatasetSpec
-  `schema_version` revisions.
 
 ## Later
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from importlib.metadata import distribution
 from importlib.resources import files
 
@@ -20,6 +21,8 @@ EXPECTED_PROJECT_URLS = {
     "Changelog, https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
     "Release Notes, https://github.com/wa-pis/agent-paranoid-android/releases",
 }
+EXPECTED_BASE_DEPENDENCIES = {"faker", "pydantic", "pyyaml"}
+EXPECTED_EXTRAS = {"all", "dev", "mcp", "parquet", "trino"}
 
 
 def main() -> None:
@@ -34,6 +37,21 @@ def main() -> None:
     missing_urls = EXPECTED_PROJECT_URLS - project_urls
     if missing_urls:
         raise SystemExit(f"installed wheel is missing project URLs: {sorted(missing_urls)}")
+
+    requirements = installed.requires or []
+    base_dependencies = {
+        requirement_name(requirement)
+        for requirement in requirements
+        if ";" not in requirement
+    }
+    if base_dependencies != EXPECTED_BASE_DEPENDENCIES:
+        raise SystemExit(
+            "installed wheel has invalid base dependencies: "
+            f"{sorted(base_dependencies)}"
+        )
+    extras = set(installed.metadata.get_all("Provides-Extra") or [])
+    if extras != EXPECTED_EXTRAS:
+        raise SystemExit(f"installed wheel has invalid extras: {sorted(extras)}")
 
     marker = files("test_data_agent").joinpath("py.typed")
     if not marker.is_file():
@@ -53,6 +71,13 @@ def main() -> None:
         raise SystemExit(f"installed wheel has invalid console scripts: {missing_or_changed}")
 
     print(f"Installed wheel verified: {DISTRIBUTION_NAME} {installed.version}")
+
+
+def requirement_name(requirement: str) -> str:
+    match = re.match(r"[A-Za-z0-9_.-]+", requirement)
+    if match is None:
+        raise SystemExit(f"installed wheel has invalid requirement: {requirement!r}")
+    return match.group(0).lower().replace("_", "-")
 
 
 if __name__ == "__main__":

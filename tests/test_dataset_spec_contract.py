@@ -315,7 +315,7 @@ def test_privacy_policy_helpers_detect_and_mask_sensitive_values() -> None:
 def test_package_root_exposes_only_dataset_oriented_api() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
     assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
-    assert test_data_agent.__version__ == "0.6.0"
+    assert test_data_agent.__version__ == "0.7.0"
     assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None
     assert test_data_agent.infer_dataset_spec is not None
