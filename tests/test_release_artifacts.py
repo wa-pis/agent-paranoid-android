@@ -155,8 +155,12 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "sbom-path: dist/sbom.cdx.json" in workflow
     assert "softprops/action-gh-release@" in workflow
     assert "needs: release" in workflow
-    assert "uses: ./.github/workflows/publish-pypi.yml" in workflow
-    assert "tag: ${{ github.ref_name }}" in workflow
+    assert "name: Dispatch trusted PyPI workflow" in workflow
+    assert "actions: write" in workflow
+    assert "gh workflow run publish-pypi.yml" in workflow
+    assert '--ref "${RELEASE_TAG}"' in workflow
+    assert '--field "tag=${RELEASE_TAG}"' in workflow
+    assert "uses: ./.github/workflows/publish-pypi.yml" not in workflow
     assert "files: dist/*" not in workflow
     assert "          path: dist/\n" not in workflow
     assert workflow.count("            dist/SHA256SUMS\n") == 2
@@ -169,7 +173,7 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
 def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     workflow = (ROOT / ".github" / "workflows" / "publish-pypi.yml").read_text()
 
-    assert "workflow_call:" in workflow
+    assert "workflow_call:" not in workflow
     assert "workflow_dispatch:" in workflow
     assert "environment:\n      name: pypi" in workflow
     assert "attestations: read" in workflow
@@ -194,6 +198,8 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     assert "scripts.verify_pypi_release" in workflow
     assert "--index-url https://pypi.org/simple" in workflow
     assert '"agent-paranoid-android==${PYPI_VERSION}"' in workflow
+    assert "for attempt in {1..10}; do" in workflow
+    assert "PyPI simple index is not ready" in workflow
     assert "/test-data-agent doctor" in workflow
     publish_job = workflow.split("\n  publish:\n", maxsplit=1)[1]
     publish_job = publish_job.split("\n  verify:\n", maxsplit=1)[0]

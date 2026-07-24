@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Tag releases now dispatch the dedicated PyPI workflow instead of invoking it
+  as a reusable workflow, keeping GitHub's attestation Build Config URI aligned
+  with the PyPI Trusted Publisher configuration.
+- Post-publication installation now waits for the PyPI simple index to expose
+  the new version after its JSON metadata and files become available.
+
 ## [0.5.1] - 2026-07-24
 
 ### Added

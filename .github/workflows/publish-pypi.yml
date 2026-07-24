@@ -1,12 +1,6 @@
 name: Publish PyPI
 
 on:
-  workflow_call:
-    inputs:
-      tag:
-        description: Published GitHub Release tag to upload
-        required: true
-        type: string
   workflow_dispatch:
     inputs:
       tag:
@@ -159,12 +153,21 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m venv /tmp/agent-paranoid-android-pypi
-          /tmp/agent-paranoid-android-pypi/bin/python -m pip install \
-            --disable-pip-version-check \
-            --no-cache-dir \
-            --only-binary=:all: \
-            --index-url https://pypi.org/simple \
-            "agent-paranoid-android==${PYPI_VERSION}"
+          for attempt in {1..10}; do
+            if /tmp/agent-paranoid-android-pypi/bin/python -m pip install \
+              --disable-pip-version-check \
+              --no-cache-dir \
+              --only-binary=:all: \
+              --index-url https://pypi.org/simple \
+              "agent-paranoid-android==${PYPI_VERSION}"; then
+              exit 0
+            fi
+            if [[ "${attempt}" -eq 10 ]]; then
+              exit 1
+            fi
+            echo "PyPI simple index is not ready; retrying in 15 seconds"
+            sleep 15
+          done
 
       - name: Verify installed public package
         run: |
