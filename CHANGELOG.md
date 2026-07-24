@@ -21,6 +21,8 @@ All notable changes to this project are documented here.
   troubleshooting.
 - Added a searchable MkDocs site with strict link validation and a dedicated
   documentation CI build.
+- Added GitHub Pages deployment from `main` with least-privilege permissions
+  and a post-deployment public availability check.
 
 ## [0.5.1] - 2026-07-24
 

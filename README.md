@@ -2,6 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/agent-paranoid-android.svg)](https://pypi.org/project/agent-paranoid-android/)
 [![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://wa-pis.github.io/agent-paranoid-android/)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/wa-pis/agent-paranoid-android/badge)](https://scorecard.dev/viewer/?uri=github.com/wa-pis/agent-paranoid-android)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/wa-pis/agent-paranoid-android/blob/main/LICENSE)
 
@@ -85,14 +86,14 @@ True False True 12345
 
 | Goal | Guide |
 | --- | --- |
-| Install and verify the package | [Installation](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/getting-started/installation.md) |
-| Generate from one CSV | [First CSV Dataset](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/getting-started/first-csv.md) |
-| Generate related tables | [Related Tables](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/getting-started/related-tables.md) |
-| Understand the generated files | [Review The Output](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/getting-started/review-output.md) |
-| Enforce domain constraints | [Business Rules](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/how-to/business-rules.md) |
-| Connect an AI client | [MCP Setup](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/how-to/mcp.md) |
-| Configure limits and Trino | [Configuration](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/reference/configuration.md) |
-| Recover from an error | [Troubleshooting](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/operations/troubleshooting.md) |
+| Install and verify the package | [Installation](https://wa-pis.github.io/agent-paranoid-android/getting-started/installation/) |
+| Generate from one CSV | [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/) |
+| Generate related tables | [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/) |
+| Understand the generated files | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
+| Enforce domain constraints | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
+| Connect an AI client | [MCP Setup](https://wa-pis.github.io/agent-paranoid-android/how-to/mcp/) |
+| Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
+| Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
 
 The documentation source is under
 [`docs/`](https://github.com/wa-pis/agent-paranoid-android/tree/main/docs).
@@ -122,7 +123,7 @@ Human review is still required for ambiguous domain identifiers, rare free
 text, inferred relationships, and organization-specific privacy policy.
 
 Read the complete
-[Safety Model](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/concepts/safety-model.md)
+[Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/)
 before using production-adjacent metadata.
 
 ## Business Rules
@@ -181,7 +182,7 @@ uv run --no-sync scripts/check_release.sh
 See [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md),
 [Security Policy](https://github.com/wa-pis/agent-paranoid-android/security/policy),
 [Changelog](https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md),
-and [Roadmap](https://github.com/wa-pis/agent-paranoid-android/blob/main/docs/roadmap.md).
+and [Roadmap](https://wa-pis.github.io/agent-paranoid-android/roadmap/).
 
 Releases build wheel and source distributions, verify the installed wheel,
 publish SBOMs and checksums, create GitHub attestations, and use tokenless

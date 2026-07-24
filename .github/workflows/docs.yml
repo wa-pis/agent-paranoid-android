@@ -9,15 +9,14 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: docs-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
     name: Build documentation
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: docs-build-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -48,3 +47,64 @@ jobs:
           path: site/
           if-no-files-found: error
           retention-days: 7
+
+      - name: Upload GitHub Pages artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site/
+
+  deploy:
+    name: Deploy documentation
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+  verify:
+    name: Verify public documentation
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Wait for the public site
+        env:
+          DOCS_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          for attempt in {1..15}; do
+            page="$(
+              curl \
+                --fail \
+                --location \
+                --max-time 5 \
+                --silent \
+                --show-error \
+                "${DOCS_URL}" || true
+            )"
+            if grep -Fq "Agent Paranoid Android" <<< "${page}"; then
+              echo "Documentation is available at ${DOCS_URL}"
+              exit 0
+            fi
+            if [[ "${attempt}" -eq 15 ]]; then
+              echo "Documentation did not become available at ${DOCS_URL}" >&2
+              exit 1
+            fi
+            sleep 10
+          done
