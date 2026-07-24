@@ -1,0 +1,61 @@
+site_name: Agent Paranoid Android
+site_description: Safety-first synthetic test data generation
+site_url: https://wa-pis.github.io/agent-paranoid-android/
+repo_url: https://github.com/wa-pis/agent-paranoid-android
+repo_name: wa-pis/agent-paranoid-android
+edit_uri: edit/main/docs/
+
+theme:
+  name: readthedocs
+  highlightjs: true
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+
+validation:
+  nav:
+    omitted_files: ignore
+    not_found: warn
+  links:
+    absolute_links: relative_to_docs
+    anchors: warn
+    unrecognized_links: warn
+
+exclude_docs: |
+  domain_agnostic_refactoring_plan.md
+  implementation_map.md
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - First CSV Dataset: getting-started/first-csv.md
+      - Related Tables: getting-started/related-tables.md
+      - Review The Output: getting-started/review-output.md
+  - How-To Guides:
+      - Add Business Rules: how-to/business-rules.md
+      - Connect An MCP Client: how-to/mcp.md
+  - Safety And Concepts:
+      - Safety Model: concepts/safety-model.md
+      - Profiles And Specs: concepts/profiles-and-specs.md
+      - Dataset Workflow: domain_agnostic_workflow.md
+  - Reference:
+      - CLI: reference/cli.md
+      - Configuration: reference/configuration.md
+      - DatasetSpec: dataset_profile_and_spec.md
+      - MCP Tools: mcp_examples.md
+  - Operations:
+      - Troubleshooting: operations/troubleshooting.md
+      - Release Process: release.md
+  - Maintainers:
+      - Architecture: agent_design.md
+      - AI Integration: ai_integration.md
+      - Generator MCP Design: mcp_generator_design.md
+      - Roadmap: roadmap.md

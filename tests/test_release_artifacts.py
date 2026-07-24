@@ -51,6 +51,7 @@ def test_public_release_artifacts_are_present() -> None:
         "docs/public_release_checklist.md",
         ".github/dependabot.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/docs.yml",
         ".github/workflows/publish-pypi.yml",
         ".github/workflows/release.yml",
         ".github/workflows/scorecard.yml",
@@ -84,11 +85,7 @@ def test_pypi_readme_starts_with_public_installation() -> None:
 
     assert "python3 -m pip install agent-paranoid-android" in readme
     assert "PyPI Trusted Publishing" in readme
-    quickstart = readme.split("## Quickstart", maxsplit=1)[1].split(
-        "## MVP Readiness Checklist",
-        maxsplit=1,
-    )[0]
-    assert 'pip install -e ".[dev]"' not in quickstart
+    assert 'pip install -e ".[dev]"' not in readme
 
 
 def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
@@ -104,6 +101,16 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
+
+
+def test_documentation_workflow_builds_strict_site() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "docs.yml").read_text()
+
+    assert "uv sync --frozen --only-group docs" in workflow
+    assert "mkdocs build --strict" in workflow
+    assert "name: documentation-site" in workflow
+    assert "permissions:\n  contents: read" in workflow
+    assert "persist-credentials: false" in workflow
 
 
 def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
