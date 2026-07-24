@@ -36,7 +36,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
         "Repository": "https://github.com/wa-pis/agent-paranoid-android",
-        "Documentation": "https://github.com/wa-pis/agent-paranoid-android#readme",
+        "Documentation": "https://wa-pis.github.io/agent-paranoid-android/",
         "Issues": "https://github.com/wa-pis/agent-paranoid-android/issues",
         "Changelog": "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
         "Release Notes": "https://github.com/wa-pis/agent-paranoid-android/releases",

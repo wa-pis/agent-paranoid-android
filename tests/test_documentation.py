@@ -53,10 +53,43 @@ def test_readme_is_a_focused_entrypoint() -> None:
 def test_required_user_documentation_exists_and_is_navigable() -> None:
     config = (ROOT / "mkdocs.yml").read_text()
 
+    assert "site_url: https://wa-pis.github.io/agent-paranoid-android/" in config
     for relative_path in REQUIRED_DOCS:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
         assert relative_path in config, relative_path
     assert (ROOT / "examples" / "orders_rules.yaml").is_file()
+
+
+def test_documentation_workflow_deploys_only_from_main() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "docs.yml").read_text()
+
+    main_only = (
+        "if: github.ref == 'refs/heads/main' && "
+        "github.event_name != 'pull_request'"
+    )
+    assert workflow.count(main_only) == 2
+    assert "actions/upload-pages-artifact@" in workflow
+    assert "actions/deploy-pages@" in workflow
+    assert "name: github-pages" in workflow
+    assert "pages: write" in workflow
+    assert "id-token: write" in workflow
+    assert "permissions: {}" in workflow
+    assert "needs: deploy" in workflow
+    assert "Agent Paranoid Android" in workflow
+    assert "group: docs-build-${{ github.ref }}" in workflow
+    assert "group: github-pages" in workflow
+    assert "cancel-in-progress: false" in workflow
+    action_lines = [
+        line.strip()
+        for line in workflow.splitlines()
+        if line.strip().startswith("uses: actions/")
+    ]
+    assert action_lines
+    for line in action_lines:
+        assert re.fullmatch(
+            r"uses: actions/[a-z0-9-]+@[0-9a-f]{40} # v[0-9.]+",
+            line,
+        )
 
 
 def test_cli_reference_covers_every_public_command() -> None:

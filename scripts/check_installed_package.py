@@ -15,7 +15,7 @@ EXPECTED_SCRIPTS = {
     "test-data-agent-mcp-trino": "test_data_agent.mcp_trino_server:main",
 }
 EXPECTED_PROJECT_URLS = {
-    "Documentation, https://github.com/wa-pis/agent-paranoid-android#readme",
+    "Documentation, https://wa-pis.github.io/agent-paranoid-android/",
     "Issues, https://github.com/wa-pis/agent-paranoid-android/issues",
     "Changelog, https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
     "Release Notes, https://github.com/wa-pis/agent-paranoid-android/releases",
