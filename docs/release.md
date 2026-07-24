@@ -41,8 +41,8 @@ environment. That smoke check verifies package version metadata, the PEP 561
 3. Commit the release preparation.
 4. Tag the commit after `scripts/check_release.sh` passes.
 
-Keep compatibility changes explicit: legacy `GenerationSpec` behavior should
-remain a migration path, while new work should target `DatasetSpec`.
+Keep compatibility changes explicit. Breaking `DatasetSpec`, CLI, artifact, or
+Python API changes require a migration guide and a versioned changelog entry.
 
 ## PyPI Trusted Publishing
 

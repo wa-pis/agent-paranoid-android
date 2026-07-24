@@ -6,12 +6,13 @@ import pyarrow.parquet as pq
 import pytest
 
 from test_data_agent.cli import main
+from test_data_agent.adapters import csv_profile_to_dataset_spec
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.csv_profiler import profile_csv
-from test_data_agent.generator import generate_rows
+from test_data_agent.generation import generate_dataset
 from test_data_agent.io.writers import write_parquet
-from test_data_agent.spec import DataType, GenerationSpec
-from test_data_agent.validator import validate_rows_report
+from test_data_agent.validation import validate_dataset
 
 
 def test_csv_profile_uses_safe_metadata_and_masks_pii() -> None:
@@ -68,19 +69,23 @@ def test_csv_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> N
     assert "sk_live_51ABCDEF" not in profile.model_dump_json()
 
 
-def test_csv_profile_infers_generation_spec_without_copying_rows() -> None:
+def test_csv_profile_infers_dataset_spec_without_copying_rows() -> None:
     profile = profile_csv(FIXTURE_CSV)
-    spec = GenerationSpec.from_csv_profile(profile.model_dump(), seed=10, row_count=12)
-    rows = generate_rows(spec)
-    report = validate_rows_report(rows, spec)
+    spec = csv_profile_to_dataset_spec(profile, seed=10, count=12)
+    rows = generate_dataset(spec, seed=10)
+    report = validate_dataset(rows, spec)
 
-    email = next(column for column in spec.table.columns if column.name == "email")
-    created_at = next(column for column in spec.table.columns if column.name == "created_at")
+    email = spec.entity("customers").field("email")
+    created_at = spec.entity("customers").field("created_at")
 
-    assert email.data_type == DataType.EMAIL
-    assert created_at.data_type == DataType.DATETIME
+    assert email.data_type == FieldType.STRING
+    assert email.semantic_type == "email"
+    assert created_at.data_type == FieldType.DATETIME
     assert report.valid is True
-    assert all(row["email"] not in {"alice@example.com", "bob@example.com"} for row in rows)
+    assert all(
+        row["email"] not in {"alice@example.com", "bob@example.com"}
+        for row in rows["customers"]
+    )
 
 
 def test_profile_csv_cli_writes_safe_profile(tmp_path) -> None:
@@ -123,7 +128,7 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     json_rows = json.loads(json_output.read_text())
     parquet_rows = pq.read_table(parquet_output).to_pylist()
     report = json.loads((csv_output.parent / "validation_report.json").read_text())
-    spec = json.loads((csv_output.parent / "generation_spec.json").read_text())
+    spec = json.loads((csv_output.parent / "dataset_spec.json").read_text())
     profile = json.loads((csv_output.parent / "csv_profile.json").read_text())
 
     assert len(csv_rows) == 20

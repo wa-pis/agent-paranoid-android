@@ -13,7 +13,6 @@ from typing import Any
 from pydantic import ValidationError
 
 from test_data_agent.agent import AgentRequest, AgentResult, AgentSourceType, approve_agent_workspace, plan_agent_request
-from test_data_agent.compat.commands import generate_legacy_command, validate_legacy_command
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.constraint_solver import default_value_for_field
@@ -24,7 +23,6 @@ from test_data_agent.io import (
     generate_dataset_from_profile_command,
     generate_dataset_command,
     infer_dataset_spec_command,
-    is_dataset_spec_path,
     profile_csv_command,
     profile_example_command,
     validate_dataset_artifacts,
@@ -104,12 +102,12 @@ def main(argv: list[str] | None = None) -> int:
     generate_csv_parser = subparsers.add_parser(
         "generate-from-csv",
         help="Generate a synthetic single-table dataset directly from one CSV file.",
-        description="Profile one CSV file, infer a generation spec, generate synthetic rows, and validate the result.",
+        description="Profile one CSV file, infer a DatasetSpec, generate synthetic rows, and validate the result.",
         epilog=(
             "Example:\n"
             "  test-data-agent generate-from-csv tests/fixtures/customers.csv "
             "--count 25 --seed 12345 --format csv --output out/customers.csv\n\n"
-            "Writes csv_profile.json, generation_spec.json, validation_report.json, "
+            "Writes csv_profile.json, dataset_spec.json, validation_report.json, "
             "and generation_manifest.json next to the output file."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -131,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
         description="Validate generated files and optionally write a validation_report.json.",
     )
     validate_parser.add_argument("spec", type=Path, help="DatasetSpec YAML/JSON.")
-    validate_parser.add_argument("rows", type=Path, help="Generated output folder or legacy rows file.")
+    validate_parser.add_argument("rows", type=Path, help="Generated output folder.")
     validate_parser.add_argument("--output", "-o", type=Path, help="Validation report JSON to write.")
     validate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing validation report.")
 
@@ -225,22 +223,15 @@ def run_command(args: argparse.Namespace) -> int:
                     spec,
                 ),
             )
-        if args.spec is not None and is_dataset_spec_path(args.spec):
-            return generate_dataset_command(
-                args,
-                business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
-                    rows_by_entity,
-                    args,
-                    seed,
-                    spec,
-                ),
-            )
-        return generate_legacy_command(
+        if args.spec is None:
+            raise SystemExit("generate requires a DatasetSpec path or --profile")
+        return generate_dataset_command(
             args,
-            business_rules_applier=lambda rows_by_entity, seed: apply_business_rules_from_args(
+            business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
                 rows_by_entity,
                 args,
                 seed,
+                spec,
             ),
         )
 
@@ -265,19 +256,17 @@ def run_command(args: argparse.Namespace) -> int:
         )
 
     if args.command == "validate":
-        if is_dataset_spec_path(args.spec) or args.rows.is_dir():
-            report = validate_dataset_artifacts(
-                args.spec,
-                args.rows,
-                output_path=args.output,
-                overwrite=args.overwrite,
-            )
-            write_validation_summary(report, args.output)
-            text = report.model_dump_json(indent=2)
-            if args.output is None:
-                print(text)
-            return 0 if report.valid else 1
-        return validate_legacy_command(args)
+        report = validate_dataset_artifacts(
+            args.spec,
+            args.rows,
+            output_path=args.output,
+            overwrite=args.overwrite,
+        )
+        write_validation_summary(report, args.output)
+        text = report.model_dump_json(indent=2)
+        if args.output is None:
+            print(text)
+        return 0 if report.valid else 1
 
     if args.command in {"generate-from-example", "generate-from-csv-folder"}:
         return generate_dataset_from_example_command(args)

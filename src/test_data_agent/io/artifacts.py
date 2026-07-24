@@ -74,7 +74,7 @@ def write_dataset_generation_artifacts(
     artifact_dir = output.parent if output is not None else Path.cwd()
     artifact_dir.mkdir(parents=True, exist_ok=True)
     write_bounded_text(profile.model_dump_json(indent=2), artifact_dir / profile_artifact_name)
-    write_bounded_text(spec.model_dump_json(indent=2), artifact_dir / "generation_spec.json")
+    write_bounded_text(spec.model_dump_json(indent=2), artifact_dir / "dataset_spec.json")
     write_bounded_text(report.model_dump_json(indent=2), artifact_dir / "validation_report.json")
     write_generation_manifest(
         spec,

@@ -208,7 +208,7 @@ def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
         rows = list(csv.DictReader(handle))
 
     profile = json.loads((output_path.parent / "profile.json").read_text())
-    spec = json.loads((output_path.parent / "generation_spec.json").read_text())
+    spec = json.loads((output_path.parent / "dataset_spec.json").read_text())
     report = json.loads((output_path.parent / "validation_report.json").read_text())
 
     assert len(rows) == 10
@@ -222,7 +222,7 @@ def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
     assert sum(section["failed"] for section in report["sections"]) > 0
 
 
-def test_generate_from_profile_uses_dataset_pipeline_without_legacy_warning(tmp_path, capsys) -> None:
+def test_generate_from_profile_uses_dataset_pipeline(tmp_path) -> None:
     profile_path = tmp_path / "orders_profile.json"
     output_path = tmp_path / "out" / "orders.json"
     profile_path.write_text(
@@ -252,10 +252,7 @@ def test_generate_from_profile_uses_dataset_pipeline_without_legacy_warning(tmp_
         ]
     )
 
-    captured = capsys.readouterr()
-
     assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" not in captured.err
 
 
 def test_infer_spec_routes_through_dataset_command_helper(tmp_path) -> None:
@@ -396,7 +393,7 @@ generation_settings:
     assert not (output_path / "customers.csv").exists()
 
 
-def test_generate_dataset_spec_does_not_warn_about_legacy_path(tmp_path, capsys) -> None:
+def test_generate_dataset_spec_uses_dataset_pipeline(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     output_path = tmp_path / "generated"
     spec_path.write_text(
@@ -417,10 +414,8 @@ generation_settings:
 
     exit_code = main(["generate", str(spec_path), "--output", str(output_path)])
 
-    captured = capsys.readouterr()
-
     assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" not in captured.err
+    assert (output_path / "generation_manifest.json").is_file()
 
 
 def test_generate_accepts_dataset_spec_json(tmp_path) -> None:
@@ -491,21 +486,19 @@ def test_validate_accepts_dataset_spec_json(tmp_path) -> None:
     assert exit_code == 0
 
 
-def test_validate_legacy_spec_warns_about_deprecated_path(tmp_path, capsys) -> None:
-    spec_path = tmp_path / "legacy_spec.json"
-    rows_path = tmp_path / "rows.json"
+def test_validate_rejects_single_rows_file_with_folder_help(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    rows_path = tmp_path / "customers.json"
     spec_path.write_text(
         json.dumps(
             {
-                "seed": 11,
-                "output_format": "json",
-                "table": {
-                    "name": "customers",
-                    "row_count": 1,
-                    "columns": [
-                        {"name": "customer_id", "data_type": "integer", "strategy": "sequence"},
-                    ],
-                },
+                "entities": [
+                    {
+                        "name": "customers",
+                        "row_count": 1,
+                        "fields": [{"name": "customer_id", "data_type": "integer"}],
+                    }
+                ]
             }
         )
     )
@@ -515,14 +508,14 @@ def test_validate_legacy_spec_warns_about_deprecated_path(tmp_path, capsys) -> N
 
     captured = capsys.readouterr()
 
-    assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" in captured.err
+    assert exit_code == 2
+    assert "validate expects a dataset output folder" in captured.err
 
 
-def test_validate_legacy_spec_writes_report_to_output_file(tmp_path, capsys) -> None:
-    spec_path = tmp_path / "legacy_spec.json"
-    rows_path = tmp_path / "rows.json"
-    output_path = tmp_path / "validation_report.json"
+def test_validate_rejects_removed_spec_with_migration_help(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "removed_spec.json"
+    rows_path = tmp_path / "rows"
+    rows_path.mkdir()
     spec_path.write_text(
         json.dumps(
             {
@@ -538,22 +531,20 @@ def test_validate_legacy_spec_writes_report_to_output_file(tmp_path, capsys) -> 
             }
         )
     )
-    rows_path.write_text(json.dumps([{"customer_id": 1}]))
+    (rows_path / "customers.json").write_text(json.dumps([{"customer_id": 1}]))
 
-    exit_code = main(["validate", str(spec_path), str(rows_path), "--output", str(output_path)])
+    exit_code = main(["validate", str(spec_path), str(rows_path)])
 
     captured = capsys.readouterr()
-    report = json.loads(output_path.read_text())
 
-    assert exit_code == 0
-    assert captured.out == ""
-    assert "deprecated GenerationSpec compatibility" in captured.err
-    assert report["valid"] is True
+    assert exit_code == 2
+    assert "GenerationSpec was removed in 0.6.0" in captured.err
+    assert "operations/migrating-to-0.6/" in captured.err
 
 
-def test_generate_legacy_spec_uses_dataset_engine_with_warning(tmp_path, capsys) -> None:
-    spec_path = tmp_path / "legacy_spec.json"
-    output_path = tmp_path / "out" / "rows.json"
+def test_generate_rejects_removed_spec_before_writing_output(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "removed_spec.json"
+    output_path = tmp_path / "out"
     spec_path.write_text(
         json.dumps(
             {
@@ -574,12 +565,11 @@ def test_generate_legacy_spec_uses_dataset_engine_with_warning(tmp_path, capsys)
     exit_code = main(["generate", str(spec_path), "--output", str(output_path)])
 
     captured = capsys.readouterr()
-    rows = json.loads(output_path.read_text())
 
-    assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" in captured.err
-    assert rows[0]["customer_id"] == 11000001
-    assert {row["status"] for row in rows} <= {"new", "active"}
+    assert exit_code == 2
+    assert "GenerationSpec was removed in 0.6.0" in captured.err
+    assert "operations/migrating-to-0.6/" in captured.err
+    assert not output_path.exists()
 
 
 def test_generate_from_csv_applies_business_rules_via_neutral_rules_helper(tmp_path) -> None:
@@ -621,7 +611,7 @@ field_rules:
     assert report["rule_fail_count"] == 0
 
 
-def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path, capsys) -> None:
+def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path) -> None:
     output_path = tmp_path / "out" / "customers.json"
 
     exit_code = main(
@@ -643,12 +633,10 @@ def test_generate_from_csv_routes_through_dataset_command_helper(tmp_path, capsy
         ]
     )
 
-    captured = capsys.readouterr()
     rows = json.loads(output_path.read_text())
     profile = json.loads((output_path.parent / "csv_profile.json").read_text())
 
     assert exit_code == 0
-    assert "deprecated GenerationSpec compatibility" not in captured.err
     assert len(rows) == 3
     assert profile["entities"][0]["name"] == "customers_cli"
 

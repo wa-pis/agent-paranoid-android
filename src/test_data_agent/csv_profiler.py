@@ -29,7 +29,7 @@ from test_data_agent.core.privacy import (
     mask_pattern,
     semantic_type_is_sensitive,
 )
-from test_data_agent.spec import DataType, infer_profile_data_type
+from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
 
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -217,7 +217,7 @@ class CSVColumnAccumulator:
                 pattern_counts[mask_pattern(value, value_type)] += count
             masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
         elif (
-            base_type == DataType.STRING
+            base_type == ProfileDataType.STRING
             and not self.distinct_overflow
             and 0 < len(self.counts) <= MAX_ENUM_VALUES
         ):
@@ -239,37 +239,37 @@ class CSVColumnAccumulator:
             **self.range_stats(base_type),
         )
 
-    def infer_data_type(self, semantic_type: str | None) -> DataType:
+    def infer_data_type(self, semantic_type: str | None) -> ProfileDataType:
         if semantic_type == "email":
-            return DataType.EMAIL
+            return ProfileDataType.EMAIL
         if semantic_type == "phone":
-            return DataType.PHONE
+            return ProfileDataType.PHONE
         profile_hint = infer_profile_data_type({"name": self.name, "data_type": "string", "semantic_type": semantic_type})
-        if profile_hint != DataType.STRING:
+        if profile_hint != ProfileDataType.STRING:
             return profile_hint
         if self.non_null_count == 0:
-            return DataType.STRING
+            return ProfileDataType.STRING
         if self.all_int:
-            return DataType.INTEGER
+            return ProfileDataType.INTEGER
         if self.all_float:
-            return DataType.FLOAT
+            return ProfileDataType.FLOAT
         if self.all_bool:
-            return DataType.BOOLEAN
+            return ProfileDataType.BOOLEAN
         if self.all_datetime:
-            return DataType.DATETIME
+            return ProfileDataType.DATETIME
         if self.all_date:
-            return DataType.DATE
-        return DataType.STRING
+            return ProfileDataType.DATE
+        return ProfileDataType.STRING
 
-    def range_stats(self, data_type: DataType) -> dict[str, Any]:
-        if data_type == DataType.INTEGER:
+    def range_stats(self, data_type: ProfileDataType) -> dict[str, Any]:
+        if data_type == ProfileDataType.INTEGER:
             return numeric_stats(sorted(self.integer_values), integer=True)
-        if data_type == DataType.FLOAT:
+        if data_type == ProfileDataType.FLOAT:
             return numeric_stats(sorted(self.float_values), integer=False)
-        if data_type == DataType.DATE:
+        if data_type == ProfileDataType.DATE:
             parsed = sorted(self.date_values)
             return {"min_date": parsed[0].isoformat(), "max_date": parsed[-1].isoformat()} if parsed else {}
-        if data_type == DataType.DATETIME:
+        if data_type == ProfileDataType.DATETIME:
             parsed = sorted(self.datetime_values)
             return {"min_timestamp": parsed[0].isoformat(), "max_timestamp": parsed[-1].isoformat()} if parsed else {}
         return {}
@@ -300,7 +300,7 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
                 for value in non_null
             ).most_common(10)
         ]
-    elif base_type == DataType.STRING and 0 < len(counts) <= MAX_ENUM_VALUES:
+    elif base_type == ProfileDataType.STRING and 0 < len(counts) <= MAX_ENUM_VALUES:
         top_values = [{"value": value, "count": count} for value, count in counts.most_common(MAX_ENUM_VALUES)]
 
     stats = range_stats(non_null, base_type)
@@ -337,43 +337,43 @@ def infer_semantic_type(name: str, values: list[str]) -> str | None:
     return None
 
 
-def infer_data_type(name: str, values: list[str], semantic_type: str | None) -> DataType:
+def infer_data_type(name: str, values: list[str], semantic_type: str | None) -> ProfileDataType:
     if semantic_type == "email":
-        return DataType.EMAIL
+        return ProfileDataType.EMAIL
     if semantic_type == "phone":
-        return DataType.PHONE
+        return ProfileDataType.PHONE
     profile_hint = infer_profile_data_type({"name": name, "data_type": "string", "semantic_type": semantic_type})
-    if profile_hint != DataType.STRING:
+    if profile_hint != ProfileDataType.STRING:
         return profile_hint
     if not values:
-        return DataType.STRING
+        return ProfileDataType.STRING
     if all(parse_int(value) is not None for value in values):
-        return DataType.INTEGER
+        return ProfileDataType.INTEGER
     if all(parse_float(value) is not None for value in values):
-        return DataType.FLOAT
+        return ProfileDataType.FLOAT
     if all(parse_bool(value) is not None for value in values):
-        return DataType.BOOLEAN
+        return ProfileDataType.BOOLEAN
     if all(parse_datetime_value(value) is not None for value in values):
-        return DataType.DATETIME
+        return ProfileDataType.DATETIME
     if all(parse_date_value(value) is not None for value in values):
-        return DataType.DATE
-    return DataType.STRING
+        return ProfileDataType.DATE
+    return ProfileDataType.STRING
 
 
-def range_stats(values: list[str], data_type: DataType) -> dict[str, Any]:
+def range_stats(values: list[str], data_type: ProfileDataType) -> dict[str, Any]:
     if not values:
         return {}
-    if data_type == DataType.INTEGER:
+    if data_type == ProfileDataType.INTEGER:
         numbers = sorted(parse_int(value) for value in values)
         return numeric_stats([number for number in numbers if number is not None], integer=True)
-    if data_type == DataType.FLOAT:
+    if data_type == ProfileDataType.FLOAT:
         numbers = sorted(parse_float(value) for value in values)
         return numeric_stats([number for number in numbers if number is not None], integer=False)
-    if data_type == DataType.DATE:
+    if data_type == ProfileDataType.DATE:
         dates = sorted(parse_date_value(value) for value in values)
         parsed = [item for item in dates if item is not None]
         return {"min_date": parsed[0].isoformat(), "max_date": parsed[-1].isoformat()} if parsed else {}
-    if data_type == DataType.DATETIME:
+    if data_type == ProfileDataType.DATETIME:
         datetimes = sorted(parse_datetime_value(value) for value in values)
         parsed = [item for item in datetimes if item is not None]
         return {"min_timestamp": parsed[0].isoformat(), "max_timestamp": parsed[-1].isoformat()} if parsed else {}

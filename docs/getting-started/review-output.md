@@ -8,7 +8,7 @@ bundle to decide whether the synthetic dataset is safe and useful.
 1. Read `generation_manifest.json`.
 2. Read `validation_report.json`.
 3. Read `business_validation_report.json` when business rules were supplied.
-4. Review the effective `dataset_spec.yaml` or `generation_spec.json`.
+4. Review the effective `dataset_spec.yaml` or `dataset_spec.json`.
 5. Inspect a small sample of generated rows.
 
 ## Manifest Checks

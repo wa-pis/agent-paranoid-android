@@ -15,6 +15,7 @@ from test_data_agent.adapters.legacy_profile import (
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.generation.planner import infer_dataset_spec
+from test_data_agent.migration import reject_removed_spec_payload
 
 
 def load_json_payload(path: Path) -> dict[str, Any]:
@@ -39,6 +40,7 @@ def json_payload_to_dataset_spec(
     count: int | None = None,
     seed: int | None = None,
 ) -> DatasetSpec:
+    reject_removed_spec_payload(payload)
     if (
         "schema_version" in payload
         or "privacy_rules" in payload
@@ -86,6 +88,7 @@ def load_json_dataset_spec(
 
 def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
     payload = load_json_payload(path)
+    reject_removed_spec_payload(payload)
     if (
         "schema_version" in payload
         or "privacy_rules" in payload

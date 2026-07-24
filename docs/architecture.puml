@@ -12,8 +12,7 @@ package "Inputs" {
   file "Single CSV\n(potentially sensitive)" as SingleCsv
   folder "Example Dataset Folder\n*.csv per entity" as ExampleFolder
   database "Trino\n(read-only)" as Trino
-  artifact "GenerationSpec\nJSON" as LegacySpecFile
-  artifact "DatasetSpec\nYAML" as DatasetSpecFile
+  artifact "DatasetSpec\nYAML / JSON" as DatasetSpecFile
   artifact "Business Rules\nYAML / JSON" as RuleFile
 }
 
@@ -38,15 +37,6 @@ package "Safety Controls" {
   component "Safe Profile Validation\nno raw sensitive distributions" as ProfileSafety
 }
 
-package "Legacy Single-Table Flow" {
-  component "csv_profiler.py\nSingle CSV Profiler" as CsvProfiler
-  component "spec.py\nGenerationSpec / ColumnSpec" as LegacySpec
-  component "generator.py\nDeterministic Row Generator" as LegacyGenerator
-  component "validator.py\nSingle-table Schema Validation" as LegacyValidator
-  artifact "Safe Table Profile\nschema, nulls, ranges,\nmasked patterns" as TableProfile
-  artifact "Synthetic Table Rows" as TableRows
-}
-
 package "Domain-Agnostic Dataset Flow" {
   package "core/" {
     component "dataset.py\nDatasetProfile / DatasetSpec" as DatasetModels
@@ -57,6 +47,7 @@ package "Domain-Agnostic Dataset Flow" {
   }
 
   package "profiling/" {
+    component "csv_profiler.py\nSingle CSV profiling" as CsvProfiler
     component "schema_profiler.py\nCSV folder schema profiling" as SchemaProfiler
     component "distribution_profiler.py\nSafe distributions" as DistributionProfiler
     component "relationship_profiler.py\nFK inference" as RelationshipProfiler
@@ -93,13 +84,12 @@ package "Outputs" {
   file "CSV" as CsvOut
   file "JSON" as JsonOut
   file "Parquet" as ParquetOut
-  artifact "Artifacts\nprofile.json / csv_profile.json\ngeneration_spec.json / dataset_spec.yaml\nvalidation_report.json\nbusiness_validation_report.json" as Artifacts
+  artifact "Artifacts\nprofile.json / csv_profile.json\ndataset_spec.json / dataset_spec.yaml\nvalidation_report.json\nbusiness_validation_report.json" as Artifacts
   artifact "Generation Manifest\nversion, spec hash, seed, format,\nrow counts, validation, provenance" as Manifest
 }
 
 User --> Cli : runs commands
 User --> GeneratorMcp : MCP synthetic workflow
-User --> LegacySpecFile : writes/reviews
 User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
 
@@ -119,29 +109,20 @@ AgentLayer --> AgentBundle : writes final result
 Cli --> CsvProfiler : profile-csv /\ngenerate-from-csv
 SingleCsv --> CsvProfiler
 CsvProfiler --> PiiMasking
-CsvProfiler --> TableProfile : safe metadata only
-TableProfile --> LegacySpec : from_csv_profile
+CsvProfiler --> DatasetProfile : safe metadata only
 
 Cli --> TrinoMcp : MCP metadata/profiling calls
 TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
-TrinoMcp --> TableProfile : metadata, aggregates,\nmasked samples
+TrinoMcp --> DatasetProfile : metadata, aggregates,\nmasked samples
 TrinoMcp --> GeneratorMcp : inline safe profile payload
-TableProfile --> LegacySpec : from_trino_profile
 
 GeneratorMcp --> WorkspaceBoundary
 GeneratorMcp --> ProfileSafety
 GeneratorMcp --> Planner : infer_dataset_spec
 GeneratorMcp --> EntityGenerator : generate / export
 GeneratorMcp --> Reconciliation : validate_dataset
-
-LegacySpecFile --> LegacySpec
-LegacySpec --> LegacyGenerator
-LegacyGenerator --> NoCopy
-LegacyGenerator --> TableRows
-TableRows --> LegacyValidator
-LegacySpec --> LegacyValidator
 
 Cli --> SchemaProfiler : profile-example /\ngenerate-from-example
 ExampleFolder --> SchemaProfiler
@@ -179,24 +160,18 @@ Reconciliation --> DatasetReport
 
 RuleFile --> RuleModels
 RuleModels --> RulesEngine
-TableRows --> RulesEngine : optional CLI flow
+DatasetRows --> RulesEngine : optional CLI flow
 RulesEngine --> BusinessValidator
 BusinessValidator --> BusinessReport
 
 Cli --> CsvOut
 Cli --> JsonOut
 Cli --> ParquetOut
-TableRows --> CsvOut
-TableRows --> JsonOut
-TableRows --> ParquetOut
 DatasetRows --> CsvOut
 DatasetRows --> JsonOut
 DatasetRows --> ParquetOut
-TableProfile --> Artifacts
-LegacySpec --> Artifacts
 DatasetProfile --> Artifacts
 DatasetSpec --> Artifacts
-LegacyValidator --> Artifacts
 DatasetReport --> Artifacts
 BusinessReport --> Artifacts
 EntityGenerator --> Manifest

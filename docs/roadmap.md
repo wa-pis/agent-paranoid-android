@@ -3,6 +3,15 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.6.0
+
+- One reviewed `DatasetSpec` contract across CLI and Python generation and
+  validation workflows.
+- Removal of the deprecated parallel specification API and conversion layer.
+- Consistent `dataset_spec.json` and `dataset_spec.yaml` artifact names.
+- A smaller project README backed by the published task-oriented documentation
+  site.
+
 ## Implemented For 0.5.1
 
 - Tokenless PyPI publication with post-publish digest comparison and a clean

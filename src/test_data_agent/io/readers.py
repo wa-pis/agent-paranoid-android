@@ -19,10 +19,32 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.serialization import load_limited_yaml
 from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
+from test_data_agent.migration import reject_removed_spec_payload
 
 
 def load_dataset_spec(path: Path) -> DatasetSpec:
-    return DatasetSpec.model_validate(load_limited_yaml(read_limited_text(path)) or {})
+    payload = load_limited_yaml(read_limited_text(path)) or {}
+    reject_removed_spec_payload(payload)
+    if _is_dataset_profile_payload(payload):
+        raise ValueError(
+            "expected a DatasetSpec, received a DatasetProfile; "
+            "use 'generate --profile' or convert it with 'infer-spec'"
+        )
+    return DatasetSpec.model_validate(payload)
+
+
+def _is_dataset_profile_payload(payload: Any) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    if "source_type" in payload:
+        return True
+    entities = payload.get("entities")
+    if not isinstance(entities, list):
+        return False
+    return any(
+        isinstance(entity, dict) and "primary_key_candidates" in entity
+        for entity in entities
+    )
 
 
 def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:

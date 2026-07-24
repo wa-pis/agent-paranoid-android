@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from typing import Any
-import warnings
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
@@ -16,14 +15,8 @@ from test_data_agent.core.privacy import (
     is_sensitive_field,
     mask_pattern,
 )
-from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.spec import DataType, GenerationSpec, coerce_profile_type
-
-
-_LEGACY_COMPATIBILITY_WARNING = (
-    "GenerationSpec compatibility is deprecated; prefer DatasetSpec and DatasetProfile APIs"
-)
+from test_data_agent.profile_types import ProfileDataType, coerce_profile_type
 
 
 def legacy_profile_to_dataset_profile(
@@ -73,31 +66,6 @@ def legacy_profile_to_dataset_spec(
     return dataset_spec
 
 
-def legacy_profile_to_generation_spec(
-    profile: Mapping[str, Any],
-    *,
-    count: int,
-    seed: int,
-    output_format: OutputFormat = OutputFormat.JSON,
-    source_type: str = "legacy_profile",
-) -> GenerationSpec:
-    warnings.warn(_LEGACY_COMPATIBILITY_WARNING, DeprecationWarning, stacklevel=2)
-
-    from test_data_agent.adapters.legacy_generation import dataset_spec_to_generation_spec
-
-    dataset_spec = legacy_profile_to_dataset_spec(
-        profile,
-        count=count,
-        seed=seed,
-        source_type=source_type,
-    )
-    return dataset_spec_to_generation_spec(
-        dataset_spec,
-        seed=seed,
-        output_format=output_format,
-    )
-
-
 def _field_profile_from_column(
     table_name: str,
     row_count: int,
@@ -132,8 +100,8 @@ def _field_profile_from_column(
 
 
 def _field_type_from_raw(value: Any) -> FieldType:
-    if isinstance(value, DataType):
-        return _field_type_from_legacy_type(value)
+    if isinstance(value, ProfileDataType):
+        return _field_type_from_profile_type(value)
     normalized = str(value).lower()
     if normalized == FieldType.INTEGER.value:
         return FieldType.INTEGER
@@ -146,21 +114,26 @@ def _field_type_from_raw(value: Any) -> FieldType:
     if normalized == FieldType.DATETIME.value:
         return FieldType.DATETIME
     coerced = coerce_profile_type(normalized)
-    if coerced in {DataType.EMAIL, DataType.PHONE, DataType.NAME, DataType.ADDRESS}:
+    if coerced in {
+        ProfileDataType.EMAIL,
+        ProfileDataType.PHONE,
+        ProfileDataType.NAME,
+        ProfileDataType.ADDRESS,
+    }:
         return FieldType.STRING
-    return _field_type_from_legacy_type(coerced)
+    return _field_type_from_profile_type(coerced)
 
 
-def _field_type_from_legacy_type(data_type: DataType) -> FieldType:
-    if data_type == DataType.INTEGER:
+def _field_type_from_profile_type(data_type: ProfileDataType) -> FieldType:
+    if data_type == ProfileDataType.INTEGER:
         return FieldType.INTEGER
-    if data_type == DataType.FLOAT:
+    if data_type == ProfileDataType.FLOAT:
         return FieldType.FLOAT
-    if data_type == DataType.BOOLEAN:
+    if data_type == ProfileDataType.BOOLEAN:
         return FieldType.BOOLEAN
-    if data_type == DataType.DATE:
+    if data_type == ProfileDataType.DATE:
         return FieldType.DATE
-    if data_type == DataType.DATETIME:
+    if data_type == ProfileDataType.DATETIME:
         return FieldType.DATETIME
     return FieldType.STRING
 
@@ -253,5 +226,4 @@ def _safe_ratio(distinct_count: Any, row_count: int) -> float:
 __all__ = [
     "legacy_profile_to_dataset_profile",
     "legacy_profile_to_dataset_spec",
-    "legacy_profile_to_generation_spec",
 ]
