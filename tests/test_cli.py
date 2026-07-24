@@ -25,7 +25,11 @@ def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     assert "synthetic" in captured.out
 
 
-def test_doctor_runs_quickstart_smoke(capsys) -> None:
+def test_doctor_runs_quickstart_smoke_without_repository_fixture(
+    tmp_path, monkeypatch, capsys
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
     exit_code = main(["doctor"])
 
     captured = capsys.readouterr()

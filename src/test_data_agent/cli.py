@@ -353,16 +353,13 @@ def run_doctor(*, skip_smoke: bool = False) -> int:
         else:
             checks.append(f"dependency {module_name}: ok")
 
-    fixture = find_example_fixture()
-    if fixture.is_dir():
-        checks.append(f"fixture: ok ({fixture})")
-    else:
-        failures.append(f"fixture: missing {fixture}")
-
     if not skip_smoke and not failures:
         with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
-            output = Path(tmp) / "generated"
-            cache_dir = Path(tmp) / "cache"
+            root = Path(tmp)
+            fixture = root / "example_dataset"
+            output = root / "generated"
+            cache_dir = root / "cache"
+            write_doctor_fixture(fixture)
             generate_dataset_from_example_artifacts(
                 fixture,
                 output_folder=output,
@@ -392,12 +389,20 @@ def run_doctor(*, skip_smoke: bool = False) -> int:
     return 0
 
 
-def find_example_fixture() -> Path:
-    for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
-        fixture = root / "tests" / "fixtures" / "example_dataset"
-        if fixture.is_dir():
-            return fixture
-    return Path.cwd() / "tests" / "fixtures" / "example_dataset"
+def write_doctor_fixture(directory: Path) -> None:
+    directory.mkdir()
+    (directory / "customers.csv").write_text(
+        "customer_id,email,segment\n"
+        "C1,alice@example.test,retail\n"
+        "C2,bob@example.test,business\n",
+        encoding="utf-8",
+    )
+    (directory / "orders.csv").write_text(
+        "order_id,customer_id,status,amount\n"
+        "O1,C1,paid,20\n"
+        "O2,C2,cancelled,30\n",
+        encoding="utf-8",
+    )
 
 
 def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:

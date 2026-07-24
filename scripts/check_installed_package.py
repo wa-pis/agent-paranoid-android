@@ -14,6 +14,12 @@ EXPECTED_SCRIPTS = {
     "test-data-agent-mcp-generator": "test_data_agent.mcp_generator_server:main",
     "test-data-agent-mcp-trino": "test_data_agent.mcp_trino_server:main",
 }
+EXPECTED_PROJECT_URLS = {
+    "Documentation, https://github.com/wa-pis/agent-paranoid-android#readme",
+    "Issues, https://github.com/wa-pis/agent-paranoid-android/issues",
+    "Changelog, https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
+    "Release Notes, https://github.com/wa-pis/agent-paranoid-android/releases",
+}
 
 
 def main() -> None:
@@ -23,6 +29,11 @@ def main() -> None:
             f"installed metadata version {installed.version!r} does not match "
             f"package version {__version__!r}"
         )
+
+    project_urls = set(installed.metadata.get_all("Project-URL") or [])
+    missing_urls = EXPECTED_PROJECT_URLS - project_urls
+    if missing_urls:
+        raise SystemExit(f"installed wheel is missing project URLs: {sorted(missing_urls)}")
 
     marker = files("test_data_agent").joinpath("py.typed")
     if not marker.is_file():

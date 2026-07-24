@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-paranoid-android"
-version = "0.5.0"
+version = "0.5.1"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -90,6 +90,10 @@ test-data-agent-mcp-trino = "test_data_agent.mcp_trino_server:main"
 [project.urls]
 Homepage = "https://github.com/wa-pis/agent-paranoid-android"
 Repository = "https://github.com/wa-pis/agent-paranoid-android"
+Documentation = "https://github.com/wa-pis/agent-paranoid-android#readme"
+Issues = "https://github.com/wa-pis/agent-paranoid-android/issues"
+Changelog = "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md"
+"Release Notes" = "https://github.com/wa-pis/agent-paranoid-android/releases"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/test_data_agent"]

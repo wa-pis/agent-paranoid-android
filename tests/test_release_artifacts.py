@@ -33,6 +33,14 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
     assert metadata["scripts"]["test-data-agent"] == "test_data_agent.cli:main"
+    assert metadata["urls"] == {
+        "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
+        "Repository": "https://github.com/wa-pis/agent-paranoid-android",
+        "Documentation": "https://github.com/wa-pis/agent-paranoid-android#readme",
+        "Issues": "https://github.com/wa-pis/agent-paranoid-android/issues",
+        "Changelog": "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
+        "Release Notes": "https://github.com/wa-pis/agent-paranoid-android/releases",
+    }
 
 
 def test_public_release_artifacts_are_present() -> None:
@@ -45,6 +53,7 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/workflows/ci.yml",
         ".github/workflows/publish-pypi.yml",
         ".github/workflows/release.yml",
+        ".github/workflows/scorecard.yml",
         ".github/workflows/security.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/ISSUE_TEMPLATE/config.yml",
@@ -52,6 +61,7 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/ISSUE_TEMPLATE/feature_request.yml",
         "scripts/check_installed_package.py",
         "scripts/check_pypi_artifacts.py",
+        "scripts/verify_pypi_release.py",
         "src/test_data_agent/py.typed",
         "uv.lock",
     ]
@@ -67,6 +77,18 @@ def test_public_docs_disclose_ai_assisted_development() -> None:
     assert "## AI-Assisted Development" in readme
     assert "## AI-Assisted Contributions" in contributing
     assert "Do not send production data, raw PII, credentials" in contributing
+
+
+def test_pypi_readme_starts_with_public_installation() -> None:
+    readme = (ROOT / "README.md").read_text()
+
+    assert "python3 -m pip install agent-paranoid-android" in readme
+    assert "PyPI Trusted Publishing" in readme
+    quickstart = readme.split("## Quickstart", maxsplit=1)[1].split(
+        "## MVP Readiness Checklist",
+        maxsplit=1,
+    )[0]
+    assert 'pip install -e ".[dev]"' not in quickstart
 
 
 def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
@@ -107,6 +129,18 @@ def test_security_workflow_runs_code_and_secret_scans() -> None:
     assert "security-events: write" in workflow
 
 
+def test_scorecard_workflow_publishes_security_results() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "scorecard.yml").read_text()
+
+    assert "permissions: read-all" in workflow
+    assert "ossf/scorecard-action@" in workflow
+    assert "publish_results: true" in workflow
+    assert "security-events: write" in workflow
+    assert "id-token: write" in workflow
+    assert "github/codeql-action/upload-sarif@" in workflow
+    assert "persist-credentials: false" in workflow
+
+
 def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
 
@@ -126,6 +160,10 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "files: dist/*" not in workflow
     assert "          path: dist/\n" not in workflow
     assert workflow.count("            dist/SHA256SUMS\n") == 2
+
+    installed_check = (ROOT / "scripts" / "check_installed_package.py").read_text()
+    assert "EXPECTED_PROJECT_URLS" in installed_check
+    assert "installed wheel is missing project URLs" in installed_check
 
 
 def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
@@ -152,14 +190,20 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     assert "password:" not in workflow
     assert "skip-existing:" not in workflow
     assert "print-hash: true" in workflow
+    assert "name: Verify public PyPI release" in workflow
+    assert "scripts.verify_pypi_release" in workflow
+    assert "--index-url https://pypi.org/simple" in workflow
+    assert '"agent-paranoid-android==${PYPI_VERSION}"' in workflow
+    assert "/test-data-agent doctor" in workflow
     publish_job = workflow.split("\n  publish:\n", maxsplit=1)[1]
+    publish_job = publish_job.split("\n  verify:\n", maxsplit=1)[0]
     assert "needs: prepare" in publish_job
     assert "actions/checkout@" not in publish_job
     assert "\n        run:" not in publish_job
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.5.0")
+    check_release_tag("v0.5.1")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")
