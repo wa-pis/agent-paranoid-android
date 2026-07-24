@@ -159,9 +159,16 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser = subparsers.add_parser(
         "doctor",
         help="Run local environment and fixture smoke checks.",
-        description="Check Python version, runtime dependencies, fixture data, and a small synthetic generation smoke test.",
+        description="Check Python, installed features, and a small synthetic generation smoke test.",
     )
     doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
+    doctor_parser.add_argument(
+        "--require-extra",
+        action="append",
+        choices=["parquet", "mcp", "trino", "all"],
+        default=[],
+        help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
+    )
 
     agent_plan_parser = subparsers.add_parser(
         "agent-plan",
@@ -272,7 +279,10 @@ def run_command(args: argparse.Namespace) -> int:
         return generate_dataset_from_example_command(args)
 
     if args.command == "doctor":
-        return run_doctor(skip_smoke=args.skip_smoke)
+        return run_doctor(
+            skip_smoke=args.skip_smoke,
+            required_extras=set(args.require_extra),
+        )
 
     if args.command == "agent-plan":
         result = plan_agent_request(agent_request_from_args(args))
@@ -325,22 +335,51 @@ def write_validation_summary(report: Any, output: Path | None) -> None:
     print(f"Validation {status}: {passed} checks passed, {failed} failed.{destination}", file=sys.stderr)
 
 
-def run_doctor(*, skip_smoke: bool = False) -> int:
+def run_doctor(
+    *,
+    skip_smoke: bool = False,
+    required_extras: set[str] | None = None,
+) -> int:
     checks: list[str] = []
     failures: list[str] = []
+    required = set(required_extras or ())
+    if "all" in required:
+        required.update({"parquet", "mcp", "trino"})
 
     if sys.version_info >= (3, 11):
         checks.append(f"python: ok ({sys.version_info.major}.{sys.version_info.minor})")
     else:
         failures.append("python: Python 3.11 or newer is required")
 
-    for module_name in ("faker", "pydantic", "pyarrow", "sqlglot", "trino", "yaml"):
+    for module_name in ("faker", "pydantic", "yaml"):
         try:
             importlib.import_module(module_name)
         except ImportError as exc:
             failures.append(f"dependency {module_name}: missing ({exc})")
         else:
             checks.append(f"dependency {module_name}: ok")
+
+    optional_modules = {
+        "parquet": ("pyarrow",),
+        "mcp": ("mcp",),
+        "trino": ("sqlglot", "trino"),
+    }
+    for extra, module_names in optional_modules.items():
+        missing = []
+        for module_name in module_names:
+            try:
+                importlib.import_module(module_name)
+            except ImportError:
+                missing.append(module_name)
+        if missing and extra in required:
+            failures.append(
+                f"extra {extra}: missing {', '.join(missing)} "
+                f"(install agent-paranoid-android[{extra}])"
+            )
+        elif missing:
+            checks.append(f"extra {extra}: not installed (optional)")
+        else:
+            checks.append(f"extra {extra}: ok")
 
     if not skip_smoke and not failures:
         with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:

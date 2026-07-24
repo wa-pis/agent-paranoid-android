@@ -14,8 +14,12 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-import sqlglot
-from sqlglot import exp
+try:  # pragma: no cover - optional Trino support.
+    import sqlglot
+    from sqlglot import exp
+except ImportError:  # pragma: no cover
+    sqlglot = None  # type: ignore[assignment]
+    exp = None  # type: ignore[assignment]
 
 from test_data_agent.core.privacy import (
     infer_sensitive_from_name,
@@ -326,6 +330,11 @@ def validate_safe_select_shape(tree: exp.Expression) -> None:
 
 
 def parse_select_ast(sql: str) -> exp.Expression:
+    if sqlglot is None or exp is None:
+        raise RuntimeError(
+            "Trino support is not installed; "
+            "install agent-paranoid-android[trino]"
+        )
     try:
         statements = sqlglot.parse(sql, read="trino")
     except sqlglot.errors.ParseError as exc:
@@ -1041,8 +1050,19 @@ else:  # pragma: no cover
 
 
 def main() -> None:
+    missing = []
     if mcp is None:
-        raise RuntimeError("mcp package is not installed")
+        missing.append("mcp")
+    if sqlglot is None:
+        missing.append("sqlglot")
+    if trino is None:
+        missing.append("trino")
+    if missing:
+        raise RuntimeError(
+            "Trino MCP support is not installed "
+            f"(missing: {', '.join(missing)}); "
+            "install agent-paranoid-android[mcp,trino]"
+        )
     TrinoConfig.from_env()
     mcp.run()
 

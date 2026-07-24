@@ -16,15 +16,17 @@ version = "0.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "faker" },
-    { name = "mcp" },
-    { name = "pyarrow" },
     { name = "pydantic" },
     { name = "pyyaml" },
-    { name = "sqlglot" },
-    { name = "trino" },
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "mcp" },
+    { name = "pyarrow" },
+    { name = "sqlglot" },
+    { name = "trino" },
+]
 dev = [
     { name = "hatchling" },
     { name = "hypothesis" },
@@ -34,6 +36,16 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "types-pyyaml" },
+]
+mcp = [
+    { name = "mcp" },
+]
+parquet = [
+    { name = "pyarrow" },
+]
+trino = [
+    { name = "sqlglot" },
+    { name = "trino" },
 ]
 
 [package.dev-dependencies]
@@ -46,20 +58,24 @@ requires-dist = [
     { name = "faker", specifier = ">=25.0.0" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = "==1.31.0" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.100.0" },
-    { name = "mcp", specifier = ">=1.0.0" },
+    { name = "mcp", marker = "extra == 'all'", specifier = ">=1.0.0" },
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.0.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=2.3.0" },
     { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.7.0" },
-    { name = "pyarrow", specifier = ">=15.0.0" },
+    { name = "pyarrow", marker = "extra == 'all'", specifier = ">=15.0.0" },
+    { name = "pyarrow", marker = "extra == 'parquet'", specifier = ">=15.0.0" },
     { name = "pydantic", specifier = ">=2.7.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0.0" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.0" },
-    { name = "sqlglot", specifier = ">=30.0.0" },
-    { name = "trino", specifier = ">=0.330.0" },
+    { name = "sqlglot", marker = "extra == 'all'", specifier = ">=30.0.0" },
+    { name = "sqlglot", marker = "extra == 'trino'", specifier = ">=30.0.0" },
+    { name = "trino", marker = "extra == 'all'", specifier = ">=0.330.0" },
+    { name = "trino", marker = "extra == 'trino'", specifier = ">=0.330.0" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.12" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["parquet", "mcp", "trino", "all", "dev"]
 
 [package.metadata.requires-dev]
 docs = [{ name = "mkdocs", specifier = ">=1.6.1,<2.0.0" }]

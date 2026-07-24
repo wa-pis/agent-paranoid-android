@@ -395,7 +395,10 @@ else:  # pragma: no cover
 
 def main() -> None:
     if mcp is None:
-        raise RuntimeError("mcp package is not installed")
+        raise RuntimeError(
+            "Generator MCP support is not installed; "
+            "install agent-paranoid-android[mcp]"
+        )
     mcp.run()
 
 

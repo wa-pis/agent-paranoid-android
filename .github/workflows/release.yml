@@ -39,8 +39,8 @@ jobs:
 
       - name: Install locked release environment
         run: |
-          uv sync --frozen --extra dev --python python --no-install-project
-          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
       - name: Verify tag matches package version
         run: uv run --no-sync python scripts/check_release_tag.py "${GITHUB_REF_NAME}"

@@ -25,6 +25,14 @@ python3 -m pip install agent-paranoid-android
 test-data-agent doctor
 ```
 
+Install only features you use:
+
+```bash
+python3 -m pip install "agent-paranoid-android[parquet]"
+python3 -m pip install "agent-paranoid-android[mcp,trino]"
+python3 -m pip install "agent-paranoid-android[all]"
+```
+
 ## Quickstart
 
 Clone the repository to use its safe fictional fixture:
@@ -87,8 +95,8 @@ inferred relationships, and organization-specific privacy policy.
 
 ```bash
 python3 -m pip install "uv==0.11.23"
-uv sync --frozen --extra dev --no-install-project
-uv sync --frozen --extra dev --no-editable --no-build-isolation
+uv sync --frozen --all-extras --no-install-project
+uv sync --frozen --all-extras --no-editable --no-build-isolation
 uv run --no-sync scripts/check_release.sh
 ```
 
