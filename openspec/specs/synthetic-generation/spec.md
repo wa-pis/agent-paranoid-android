@@ -64,6 +64,26 @@ No parallel public generation specification is supported.
 - **WHEN** review artifacts are published
 - **THEN** the effective `DatasetSpec` is written as `dataset_spec.json`
 
+### Requirement: DatasetSpec Version Compatibility
+
+DatasetSpec readers SHALL accept only explicitly supported schema versions and
+SHALL fail closed on unknown versions.
+
+#### Scenario: Unknown schema version is supplied
+
+- **GIVEN** a DatasetSpec with a `schema_version` not listed as supported
+- **WHEN** a file or profile adapter attempts to load it
+- **THEN** loading fails before generation or validation
+- **AND** the error lists the schema versions supported by the package
+
+#### Scenario: Schema version is deprecated
+
+- **GIVEN** a supported DatasetSpec version is scheduled for removal
+- **WHEN** the deprecation is released
+- **THEN** the changelog and migration documentation identify the replacement
+- **AND** the old version remains readable for at least one feature release and
+  90 days unless an urgent security issue requires earlier removal
+
 ### Requirement: Bounded Generation
 
 Generation SHALL enforce configured row-count limits before writing output.

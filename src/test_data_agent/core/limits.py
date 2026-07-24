@@ -23,6 +23,7 @@ MAX_PARQUET_EXPANDED_BYTES_ENV = "TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES"
 MAX_YAML_ALIASES_ENV = "TEST_DATA_AGENT_MAX_YAML_ALIASES"
 MAX_YAML_DEPTH_ENV = "TEST_DATA_AGENT_MAX_YAML_DEPTH"
 MAX_BUSINESS_RULES_BYTES_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES"
+MAX_PROFILE_PAYLOAD_BYTES_ENV = "TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES"
 MAX_BUSINESS_RULE_EVALUATIONS_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS"
 MAX_OUTPUT_BYTES_ENV = "TEST_DATA_AGENT_MAX_OUTPUT_BYTES"
 MIN_FREE_DISK_BYTES_ENV = "TEST_DATA_AGENT_MIN_FREE_DISK_BYTES"
@@ -39,6 +40,7 @@ DEFAULT_MAX_PARQUET_EXPANDED_BYTES = 512 * 1024 * 1024
 DEFAULT_MAX_YAML_ALIASES = 50
 DEFAULT_MAX_YAML_DEPTH = 100
 DEFAULT_MAX_BUSINESS_RULES_BYTES = 1024 * 1024
+DEFAULT_MAX_PROFILE_PAYLOAD_BYTES = 4 * 1024 * 1024
 DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS = 5_000_000
 DEFAULT_MAX_OUTPUT_BYTES = 512 * 1024 * 1024
 DEFAULT_MIN_FREE_DISK_BYTES = 128 * 1024 * 1024
@@ -123,6 +125,13 @@ def max_business_rules_bytes() -> int:
     return positive_int_env(
         MAX_BUSINESS_RULES_BYTES_ENV,
         DEFAULT_MAX_BUSINESS_RULES_BYTES,
+    )
+
+
+def max_profile_payload_bytes() -> int:
+    return positive_int_env(
+        MAX_PROFILE_PAYLOAD_BYTES_ENV,
+        DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
     )
 
 
@@ -246,6 +255,12 @@ def enforce_business_rules_payload_size(size: int) -> None:
     limit = max_business_rules_bytes()
     if size > limit:
         raise InputLimitError(f"business rules payload must be <= {limit} bytes")
+
+
+def enforce_profile_payload_size(size: int) -> None:
+    limit = max_profile_payload_bytes()
+    if size > limit:
+        raise InputLimitError(f"profile payload must be <= {limit} bytes")
 
 
 def enforce_business_rule_evaluations(count: int) -> None:

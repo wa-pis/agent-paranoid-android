@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.dataset import DatasetSpec, parse_dataset_spec_payload
 from test_data_agent.core.limits import (
     configure_csv_field_limit,
     enforce_input_cell_count,
@@ -30,7 +30,7 @@ def load_dataset_spec(path: Path) -> DatasetSpec:
             "expected a DatasetSpec, received a DatasetProfile; "
             "use 'generate --profile' or convert it with 'infer-spec'"
         )
-    return DatasetSpec.model_validate(payload)
+    return parse_dataset_spec_payload(payload)
 
 
 def _is_dataset_profile_payload(payload: Any) -> bool:
@@ -82,7 +82,9 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
             try:
                 import pyarrow.parquet as pq
             except ImportError as exc:
-                raise SystemExit("Parquet input requires pyarrow") from exc
+                raise ValueError(
+                    "Parquet input requires agent-paranoid-android[parquet]"
+                ) from exc
             parquet_file = pq.ParquetFile(path)
             enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
             total_rows += int(parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0)

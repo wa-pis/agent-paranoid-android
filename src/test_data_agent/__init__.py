@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
-from test_data_agent.agent import AgentRequest, AgentResult, AgentSourceType, approve_agent_workspace, plan_agent_request
+from test_data_agent.agent import (
+    AgentRequest,
+    AgentResult,
+    AgentSourceType,
+    approve_agent_workspace,
+    plan_agent_profile,
+    plan_agent_request,
+)
 from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
 from test_data_agent.io.workflows import DatasetGenerationResult, generate_dataset_bundle
@@ -23,6 +30,7 @@ __all__ = [
     "generate_dataset_bundle",
     "infer_dataset_spec",
     "plan_agent_request",
+    "plan_agent_profile",
     "solve_constraints",
     "validate_dataset",
     "__version__",

@@ -19,6 +19,18 @@ python3 -m pip install --upgrade pip
 python3 -m pip install agent-paranoid-android
 ```
 
+The base package supports CSV and JSON workflows. Add only the integrations
+you need:
+
+```bash
+python3 -m pip install "agent-paranoid-android[parquet]"
+python3 -m pip install "agent-paranoid-android[mcp]"
+python3 -m pip install "agent-paranoid-android[mcp,trino]"
+python3 -m pip install "agent-paranoid-android[all]"
+```
+
+Use `test-data-agent doctor --require-extra all` to verify a full installation.
+
 ### Windows PowerShell
 
 ```powershell
@@ -53,8 +65,8 @@ Clone the repository and install the locked development environment:
 git clone https://github.com/wa-pis/agent-paranoid-android.git
 cd agent-paranoid-android
 python3 -m pip install "uv==0.11.23"
-uv sync --frozen --extra dev --no-install-project
-uv sync --frozen --extra dev --no-editable --no-build-isolation
+uv sync --frozen --all-extras --no-install-project
+uv sync --frozen --all-extras --no-editable --no-build-isolation
 ```
 
 Run the release-quality checks:

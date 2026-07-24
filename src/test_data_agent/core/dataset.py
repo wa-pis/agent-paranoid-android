@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from collections.abc import Mapping
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -14,6 +15,8 @@ from test_data_agent.core.settings import GenerationSettings, ValidationSettings
 
 
 DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
+SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS = frozenset({DATASET_SPEC_SCHEMA_VERSION})
+DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS: frozenset[str] = frozenset()
 
 
 class DatasetProfile(BaseModel):
@@ -70,6 +73,22 @@ class DatasetSpec(BaseModel):
             if entity.name == name:
                 return entity
         raise KeyError(name)
+
+
+def parse_dataset_spec_payload(payload: Any) -> DatasetSpec:
+    """Validate a DatasetSpec with an explicit fail-closed version check."""
+
+    if isinstance(payload, Mapping):
+        version = payload.get("schema_version", DATASET_SPEC_SCHEMA_VERSION)
+        if not isinstance(version, str):
+            raise ValueError("DatasetSpec schema_version must be a string")
+        if version not in SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS:
+            supported = ", ".join(sorted(SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS))
+            raise ValueError(
+                f"unsupported DatasetSpec schema_version {version!r}; "
+                f"this package supports: {supported}"
+            )
+    return DatasetSpec.model_validate(payload)
 
 
 def _validate_entity_names(entities: list[EntityProfile] | list[EntitySpec], context: str) -> None:

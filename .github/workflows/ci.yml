@@ -37,12 +37,12 @@ jobs:
 
       - name: Install locked development environment
         run: |
-          uv sync --frozen --extra dev --python python --no-install-project
-          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
       - name: Audit Python dependencies
         run: |
-          uv export --quiet --frozen --extra dev --no-emit-project --output-file /tmp/audit-requirements.txt
+          uv export --quiet --frozen --all-extras --no-emit-project --output-file /tmp/audit-requirements.txt
           uv run --no-sync python -m pip_audit --require-hashes --requirement /tmp/audit-requirements.txt
 
       - name: Run lint checks
@@ -81,8 +81,8 @@ jobs:
 
       - name: Install locked build environment
         run: |
-          uv sync --frozen --extra dev --python python --no-install-project
-          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
       - name: Build wheel and source distribution
         run: uv build --no-build-isolation
@@ -136,8 +136,8 @@ jobs:
 
       - name: Install locked development environment
         run: |
-          uv sync --frozen --extra dev --python python --no-install-project
-          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
       - name: Run live Trino integration tests
         run: >-

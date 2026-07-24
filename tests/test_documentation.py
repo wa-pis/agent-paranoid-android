@@ -19,14 +19,17 @@ REQUIRED_DOCS = {
     "how-to/business-rules.md",
     "how-to/mcp.md",
     "concepts/safety-model.md",
+    "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
     "reference/cli.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
+    "operations/audit-logging.md",
     "operations/migrating-to-0.6.md",
 }
 CLI_COMMANDS = {
     "doctor",
+    "audit-verify",
     "profile-csv",
     "profile-example",
     "infer-spec",

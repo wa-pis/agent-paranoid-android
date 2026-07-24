@@ -12,7 +12,11 @@ from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_profile,
     legacy_profile_to_dataset_spec,
 )
-from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.dataset import (
+    DatasetProfile,
+    DatasetSpec,
+    parse_dataset_spec_payload,
+)
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.migration import reject_removed_spec_payload
@@ -48,7 +52,7 @@ def json_payload_to_dataset_spec(
         or "generation_settings" in payload
         or "validation_settings" in payload
     ):
-        spec = DatasetSpec.model_validate(payload)
+        spec = parse_dataset_spec_payload(payload)
         if count is not None:
             for entity in spec.entities:
                 entity.row_count = count
@@ -60,7 +64,7 @@ def json_payload_to_dataset_spec(
         if isinstance(first_entity, dict) and "primary_key_candidates" in first_entity:
             spec = infer_dataset_spec(DatasetProfile.model_validate(payload), count=count)
         else:
-            spec = DatasetSpec.model_validate(payload)
+            spec = parse_dataset_spec_payload(payload)
             if count is not None:
                 for entity in spec.entities:
                     entity.row_count = count
@@ -96,7 +100,7 @@ def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
         or "generation_settings" in payload
         or "validation_settings" in payload
     ):
-        return DatasetSpec.model_validate(payload)
+        return parse_dataset_spec_payload(payload)
     if "columns" in payload:
         return json_payload_to_dataset_profile(payload)
     if "source_type" in payload:
@@ -110,5 +114,5 @@ def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
         first_entity = payload["entities"][0] if payload["entities"] else {}
         if isinstance(first_entity, dict) and "primary_key_candidates" in first_entity:
             return DatasetProfile.model_validate(payload)
-        return DatasetSpec.model_validate(payload)
+        return parse_dataset_spec_payload(payload)
     return json_payload_to_dataset_profile(payload)

@@ -24,7 +24,7 @@ deterministic generation, validates the output, and reports the result.
 Install the package locally first:
 
 ```bash
-python3 -m pip install -e ".[dev]"
+python3 -m pip install -e ".[all,dev]"
 ```
 
 ## Agent Mode

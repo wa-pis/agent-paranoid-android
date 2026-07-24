@@ -14,9 +14,17 @@ except ImportError:  # pragma: no cover
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
+from test_data_agent.agent import (
+    AgentRequest,
+    AgentSourceType,
+    approve_agent_workspace,
+    plan_agent_profile,
+)
+from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
+    enforce_profile_payload_size,
     read_limited_text,
 )
 from test_data_agent.core.settings import OutputFormat
@@ -87,7 +95,7 @@ def infer_dataset_spec(
         if isinstance(loaded, DatasetSpec):
             raise ValueError("infer_dataset_spec expects a dataset profile, not a dataset spec")
     else:
-        loaded = json_payload_to_dataset_profile(profile_payload or {})
+        loaded = load_inline_profile_payload(profile_payload or {})
     assert_profile_safe(loaded)
     spec = infer_dataset_spec_artifact(loaded, output_path=output, count=count)
     return {
@@ -175,6 +183,74 @@ def validate_dataset(
             if manifest.business_validation is not None
             else None
         ),
+    }
+
+
+def plan_trino_dataset(
+    profile_payload: dict[str, Any],
+    workspace_path: str,
+    count: int = 100,
+    seed: int = 12345,
+    output_format: str = "csv",
+) -> dict[str, Any]:
+    """Write a review-first agent plan from safe Trino profile metadata."""
+
+    profile = load_inline_profile_payload(profile_payload)
+    if profile.source_type != "trino":
+        raise ValueError(
+            "plan_trino_dataset accepts only a profile returned by Trino MCP"
+        )
+    workspace = resolve_workspace_path(workspace_path)
+    if workspace.exists() and not workspace.is_dir():
+        raise WorkspacePathError("agent workspace must be a folder")
+    if workspace.exists() and any(workspace.iterdir()):
+        raise WorkspacePathError("agent workspace must be empty for planning")
+    request = AgentRequest(
+        source_type=AgentSourceType.PROFILE,
+        source_path=workspace / "profile.json",
+        workspace=workspace,
+        count=count,
+        seed=seed,
+        output_format=OutputFormat(output_format),
+    )
+    result = plan_agent_profile(request, profile)
+    return {
+        "operation": "plan_trino_dataset",
+        "approval_required": result.approval_required,
+        "workspace": workspace_path_label(result.artifacts.workspace),
+        "profile_path": workspace_path_label(result.artifacts.profile_path),
+        "spec_path": workspace_path_label(result.artifacts.dataset_spec_path),
+        "plan_path": workspace_path_label(result.artifacts.plan_path),
+        **result.summary,
+    }
+
+
+def approve_dataset_plan(workspace_path: str) -> dict[str, Any]:
+    """Approve a reviewed agent plan and return artifact summaries, not rows."""
+
+    workspace = resolve_workspace_path(
+        workspace_path,
+        must_exist=True,
+        expect_directory=True,
+    )
+    result = approve_agent_workspace(workspace)
+    artifacts = result.artifacts
+    if (
+        artifacts.generated_folder is None
+        or artifacts.validation_report_path is None
+        or artifacts.manifest_path is None
+    ):
+        raise RuntimeError("approved agent plan did not produce expected artifacts")
+    return {
+        "operation": "approve_dataset_plan",
+        "approval_required": result.approval_required,
+        "workspace": workspace_path_label(artifacts.workspace),
+        "output_folder": workspace_path_label(artifacts.generated_folder),
+        "validation_report_path": workspace_path_label(
+            artifacts.validation_report_path
+        ),
+        "manifest_path": workspace_path_label(artifacts.manifest_path),
+        **result.summary,
     }
 
 
@@ -365,6 +441,21 @@ def load_mcp_business_rules(
     return rules
 
 
+def load_inline_profile_payload(payload: dict[str, Any]) -> DatasetProfile:
+    try:
+        serialized = json.dumps(
+            payload,
+            ensure_ascii=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    except (TypeError, ValueError, RecursionError) as exc:
+        raise ValueError("profile payload must be JSON-compatible") from exc
+    enforce_profile_payload_size(len(serialized))
+    profile = json_payload_to_dataset_profile(payload)
+    assert_profile_safe(profile)
+    return profile
+
+
 def _require_suffix(path: Path, allowed: set[str], label: str) -> None:
     if path.suffix.lower() not in allowed:
         expected = ", ".join(sorted(allowed))
@@ -384,18 +475,24 @@ def _require_new_output(path: Path) -> None:
 mcp: Any
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-generator")
-    mcp.tool()(profile_csv)
-    mcp.tool()(infer_dataset_spec)
-    mcp.tool()(generate_dataset)
-    mcp.tool()(validate_dataset)
-    mcp.tool()(export_dataset)
+    mcp.tool()(audited_mcp_tool("generator-mcp", profile_csv))
+    mcp.tool()(audited_mcp_tool("generator-mcp", infer_dataset_spec))
+    mcp.tool()(audited_mcp_tool("generator-mcp", plan_trino_dataset))
+    mcp.tool()(audited_mcp_tool("generator-mcp", approve_dataset_plan))
+    mcp.tool()(audited_mcp_tool("generator-mcp", generate_dataset))
+    mcp.tool()(audited_mcp_tool("generator-mcp", validate_dataset))
+    mcp.tool()(audited_mcp_tool("generator-mcp", export_dataset))
 else:  # pragma: no cover
     mcp = None
 
 
 def main() -> None:
     if mcp is None:
-        raise RuntimeError("mcp package is not installed")
+        raise RuntimeError(
+            "Generator MCP support is not installed; "
+            "install agent-paranoid-android[mcp]"
+        )
+    audit_logger_from_env("generator-mcp")
     mcp.run()
 
 

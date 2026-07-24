@@ -4,6 +4,36 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.7.0] - 2026-07-24
+
+### Added
+
+- Optional installation groups for Parquet, MCP, Trino, and the complete
+  integration set.
+- A documented, fail-closed DatasetSpec compatibility and deprecation policy
+  with an explicit supported-version registry.
+- Metadata-only MCP audit records authenticated with an HMAC-SHA256 hash
+  chain, plus `audit-verify` integrity checks and bounded secure file handling.
+- Review-first `plan_trino_dataset` and `approve_dataset_plan` MCP tools for
+  turning safe Trino profiles into approved synthetic generation.
+
+### Changed
+
+- The base installation now requires only Faker, Pydantic, and PyYAML.
+- `doctor` reports optional features without failing unless they are requested
+  through `--require-extra`.
+- Trino's generic `run_safe_select` MCP tool is disabled by default and
+  requires the explicit `TRINO_ENABLE_SAFE_SELECT=true` opt-in.
+- Inline MCP profile payloads are size-bounded before validation.
+
+### Security
+
+- Enabled audit deployments fail before MCP tool execution when the log path,
+  key, permissions, link state, or size limit is unsafe.
+- Audit events exclude tool arguments, SQL, profiles, rows, return values, and
+  exception messages.
+- Unknown DatasetSpec schema versions fail before generation or validation.
+
 ## [0.6.0] - 2026-07-24
 
 ### Breaking Changes
@@ -231,6 +261,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.7.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.4.0...v0.5.0

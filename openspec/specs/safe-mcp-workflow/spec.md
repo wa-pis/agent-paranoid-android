@@ -63,6 +63,28 @@ validation, and export as explicit operations.
 - **THEN** it generates fresh synthetic data from the spec
 - **AND** it does not convert arbitrary source rows into exported output
 
+### Requirement: Review-First Trino Planning
+
+The MCP workflow SHALL support planning from an allowlisted Trino table without
+granting the planning client raw-SQL access.
+
+#### Scenario: Trino profile is planned
+
+- **GIVEN** `profile_table_safe` returns bounded metadata for an allowlisted
+  catalog and schema
+- **WHEN** the client passes that payload to `plan_trino_dataset`
+- **THEN** the generator writes a safe profile, DatasetSpec, and approval plan
+  inside its workspace
+- **AND** no source or generated rows are returned
+- **AND** generation does not start until `approve_dataset_plan` is called
+
+#### Scenario: Default Trino MCP surface is inspected
+
+- **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false
+- **WHEN** the Trino MCP server registers its tools
+- **THEN** `run_safe_select` is not exposed
+- **AND** fixed metadata and aggregate profiling tools remain available
+
 ### Requirement: Manifest-Gated Validation
 
 MCP validation SHALL verify generated bundles against their manifest and
@@ -95,3 +117,23 @@ generation and export without granting arbitrary code execution.
 - **WHEN** the generator MCP server validates the request
 - **THEN** it rejects the request before creating output artifacts
 - **AND** no source or generated rows are returned in the error
+
+### Requirement: Authenticated MCP Audit Records
+
+Shared MCP deployments SHALL support opt-in, tamper-evident audit records
+without persisting tool inputs or outputs.
+
+#### Scenario: Signed audit logging is enabled
+
+- **GIVEN** an operator configures an audit path and HMAC key
+- **WHEN** an MCP tool is invoked
+- **THEN** a metadata-only `started` event is authenticated before execution
+- **AND** a linked `succeeded` or `failed` event is authenticated afterward
+- **AND** arguments, SQL, profiles, rows, return values, and exception messages
+  are not recorded
+
+#### Scenario: Audit configuration is invalid
+
+- **GIVEN** audit logging is partially configured, unsafe, or full
+- **WHEN** an MCP tool is invoked
+- **THEN** the operation fails closed instead of running without an audit event

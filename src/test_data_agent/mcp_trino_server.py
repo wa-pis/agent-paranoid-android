@@ -10,12 +10,16 @@ import ast
 import os
 import re
 from collections import Counter
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-import sqlglot
-from sqlglot import exp
+try:  # pragma: no cover - optional Trino support.
+    import sqlglot
+    from sqlglot import exp
+except ImportError:  # pragma: no cover
+    sqlglot = None  # type: ignore[assignment]
+    exp = None  # type: ignore[assignment]
 
 from test_data_agent.core.privacy import (
     infer_sensitive_from_name,
@@ -25,6 +29,7 @@ from test_data_agent.core.privacy import (
     mask_pattern,
     mask_value,
 )
+from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
@@ -60,6 +65,7 @@ MAX_QUERY_EXECUTION_TIME_MS = 3_600_000
 MAX_QUERY_RUN_TIME_MS = 7_200_000
 MAX_QUERY_SCAN_BYTES = 100 * 1_024**3
 MIN_RULE_CONFIDENCE = 0.9
+ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
 
 
 class SqlSafetyError(ValueError):
@@ -326,6 +332,11 @@ def validate_safe_select_shape(tree: exp.Expression) -> None:
 
 
 def parse_select_ast(sql: str) -> exp.Expression:
+    if sqlglot is None or exp is None:
+        raise RuntimeError(
+            "Trino support is not installed; "
+            "install agent-paranoid-android[trino]"
+        )
     try:
         statements = sqlglot.parse(sql, read="trino")
     except sqlglot.errors.ParseError as exc:
@@ -1019,31 +1030,52 @@ def bounded_limit(limit: int) -> int:
     return min(limit, MAX_LIMIT)
 
 
+def trino_mcp_tools() -> list[Callable[..., Any]]:
+    tools: list[Callable[..., Any]] = [
+        list_catalogs,
+        list_schemas,
+        list_tables,
+        describe_table,
+        profile_table,
+        profile_column,
+        profile_table_safe,
+        profile_foreign_key,
+        profile_temporal_ordering,
+        profile_formula_rule,
+        profile_conditional_required,
+        profile_conditional_allowed_values,
+        profile_aggregate_mapping,
+        sample_rows_masked,
+    ]
+    if parse_env_bool(ENABLE_SAFE_SELECT_ENV):
+        tools.append(run_safe_select)
+    return tools
+
+
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-trino")
-    mcp.tool()(list_catalogs)
-    mcp.tool()(list_schemas)
-    mcp.tool()(list_tables)
-    mcp.tool()(describe_table)
-    mcp.tool()(profile_table)
-    mcp.tool()(profile_column)
-    mcp.tool()(profile_table_safe)
-    mcp.tool()(profile_foreign_key)
-    mcp.tool()(profile_temporal_ordering)
-    mcp.tool()(profile_formula_rule)
-    mcp.tool()(profile_conditional_required)
-    mcp.tool()(profile_conditional_allowed_values)
-    mcp.tool()(profile_aggregate_mapping)
-    mcp.tool()(sample_rows_masked)
-    mcp.tool()(run_safe_select)
+    for tool in trino_mcp_tools():
+        mcp.tool()(audited_mcp_tool("trino-mcp", tool))
 else:  # pragma: no cover
     mcp = None
 
 
 def main() -> None:
+    missing = []
     if mcp is None:
-        raise RuntimeError("mcp package is not installed")
+        missing.append("mcp")
+    if sqlglot is None:
+        missing.append("sqlglot")
+    if trino is None:
+        missing.append("trino")
+    if missing:
+        raise RuntimeError(
+            "Trino MCP support is not installed "
+            f"(missing: {', '.join(missing)}); "
+            "install agent-paranoid-android[mcp,trino]"
+        )
     TrinoConfig.from_env()
+    audit_logger_from_env("trino-mcp")
     mcp.run()
 
 

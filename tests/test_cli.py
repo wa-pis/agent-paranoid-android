@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.cli as cli_module
 from test_data_agent.cli import main
 
 
@@ -50,6 +51,42 @@ def test_doctor_can_skip_smoke(capsys) -> None:
     assert "dependency pydantic: ok" in captured.err
     assert "quickstart smoke: ok" not in captured.err
     assert "doctor passed" in captured.err
+
+
+def test_doctor_allows_missing_optional_extra(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    real_import = cli_module.importlib.import_module
+
+    def import_without_pyarrow(name: str):
+        if name == "pyarrow":
+            raise ImportError("not installed")
+        return real_import(name)
+
+    monkeypatch.setattr(cli_module.importlib, "import_module", import_without_pyarrow)
+
+    assert main(["doctor", "--skip-smoke"]) == 0
+    assert "extra parquet: not installed (optional)" in capsys.readouterr().err
+
+
+def test_doctor_fails_when_required_extra_is_missing(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    real_import = cli_module.importlib.import_module
+
+    def import_without_pyarrow(name: str):
+        if name == "pyarrow":
+            raise ImportError("not installed")
+        return real_import(name)
+
+    monkeypatch.setattr(cli_module.importlib, "import_module", import_without_pyarrow)
+
+    assert main(["doctor", "--skip-smoke", "--require-extra", "parquet"]) == 1
+    captured = capsys.readouterr()
+    assert "extra parquet: missing pyarrow" in captured.err
+    assert "agent-paranoid-android[parquet]" in captured.err
 
 
 def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:

@@ -72,9 +72,11 @@ TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES=1GB \
 
 2. Use metadata and profiling tools such as `describe_table`,
    `profile_table_safe`, `profile_column`, and rule-profiling tools.
-3. Pass the safe profile payload to the generator MCP server's
-   `infer_dataset_spec` tool.
-4. Generate or export fresh synthetic data from the resulting `DatasetSpec`.
+3. Pass the `profile_table_safe` response to the generator MCP server's
+   `plan_trino_dataset` tool with a new workspace, count, seed, and output
+   format.
+4. Review `dataset_spec.yaml` in that workspace.
+5. Call `approve_dataset_plan` to generate and validate fresh synthetic data.
 
 The Trino server must remain read-only and bounded. Unsafe SQL, DDL, DML,
 unrestricted `SELECT *`, joins, CTEs, subqueries, and likely PII aliases are
@@ -84,6 +86,9 @@ explicitly. HTTPS is the default; plain HTTP additionally requires
 `TRINO_ALLOW_INSECURE_HTTP=true` and is intended only for isolated local use.
 The `TRINO_QUERY_MAX_*` values are sent as Trino session properties so a query
 is terminated by the server when it exceeds its time or scan budget.
+The generic `run_safe_select` tool is excluded from the default MCP surface.
+Set `TRINO_ENABLE_SAFE_SELECT=true` only for a trusted client that needs it;
+the planning workflow does not use raw SQL.
 
 ## Guardrails For AI Clients
 

@@ -35,6 +35,12 @@ Invalid environment values fail closed.
 | Variable | Required | Purpose |
 | --- | --- | --- |
 | `TEST_DATA_AGENT_WORKSPACE_ROOT` | Recommended | Bounds every MCP input and output path |
+| `TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES` | Optional | Maximum inline safe profile size; defaults to 4 MiB |
+| `TEST_DATA_AGENT_AUDIT_LOG` | Optional | Enables a shared HMAC-authenticated JSONL audit log |
+| `TEST_DATA_AGENT_AUDIT_HMAC_KEY` | Required with audit log | Base64 key containing at least 32 random bytes |
+| `TEST_DATA_AGENT_AUDIT_ACTOR` | Optional | Stable non-sensitive worker or deployment label |
+| `TEST_DATA_AGENT_AUDIT_MAX_BYTES` | Optional | Audit log size limit; defaults to 64 MiB |
+| `TRINO_ENABLE_SAFE_SELECT` | Optional | Exposes raw-SQL `run_safe_select`; disabled by default |
 
 When unset, the generator server uses the current working directory. For shared
 or production-like use, always set a dedicated narrow workspace.

@@ -19,6 +19,7 @@ from test_data_agent.mcp_trino_server import (
     profile_formula_rule,
     profile_table_safe,
     profile_temporal_ordering,
+    trino_mcp_tools,
     validate_table_references_allowed,
     validate_safe_select,
 )
@@ -68,6 +69,16 @@ def test_safe_select_with_limit_is_allowed() -> None:
     assert validate_safe_select("SELECT id, count(*) AS n FROM users GROUP BY id LIMIT 10") == (
         "SELECT id, count(*) AS n FROM users GROUP BY id LIMIT 10"
     )
+
+
+def test_raw_sql_tool_is_opt_in(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    assert "run_safe_select" not in {tool.__name__ for tool in trino_mcp_tools()}
+
+    monkeypatch.setenv("TRINO_ENABLE_SAFE_SELECT", "true")
+    assert "run_safe_select" in {tool.__name__ for tool in trino_mcp_tools()}
 
 
 def test_limit_must_be_top_level_not_inside_literal() -> None:

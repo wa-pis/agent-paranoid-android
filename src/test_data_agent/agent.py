@@ -106,6 +106,30 @@ def plan_agent_request(request: AgentRequest) -> AgentResult:
     ensure_agent_workspace_for_plan(normalized)
 
     profile = build_agent_profile(normalized)
+    return _persist_agent_plan(normalized, profile)
+
+
+def plan_agent_profile(request: AgentRequest, profile: DatasetProfile) -> AgentResult:
+    """Plan from safe in-memory metadata without granting source access."""
+
+    if request.source_type != AgentSourceType.PROFILE:
+        raise ValueError("in-memory agent planning requires profile source type")
+    workspace = request.workspace.expanduser().resolve(strict=False)
+    normalized = request.model_copy(
+        update={
+            "source_path": workspace / PROFILE_FILE,
+            "workspace": workspace,
+        }
+    )
+    ensure_agent_workspace_for_plan(normalized)
+    assert_profile_safe(profile)
+    return _persist_agent_plan(normalized, profile)
+
+
+def _persist_agent_plan(
+    normalized: AgentRequest,
+    profile: DatasetProfile,
+) -> AgentResult:
     spec = build_agent_spec(profile, normalized)
     artifacts = agent_artifacts(normalized.workspace)
 
@@ -124,7 +148,11 @@ def plan_agent_request(request: AgentRequest) -> AgentResult:
         ],
         artifacts=artifacts,
         summary={
-            "source_type": normalized.source_type.value,
+            "source_type": (
+                profile.source_type
+                if normalized.source_type == AgentSourceType.PROFILE
+                else normalized.source_type.value
+            ),
             "entities": entity_summary(spec),
             "relationship_count": len(spec.relationships),
             "constraint_count": len(spec.constraints),
@@ -175,7 +203,11 @@ def approve_agent_workspace(workspace: Path) -> AgentResult:
         ],
         artifacts=completed_artifacts,
         summary={
-            "source_type": request.source_type.value,
+            "source_type": (
+                profile.source_type
+                if request.source_type == AgentSourceType.PROFILE
+                else request.source_type.value
+            ),
             "row_counts": row_counts,
             "seed": request.seed,
             "output_format": request.output_format.value,
