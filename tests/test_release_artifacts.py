@@ -127,6 +127,7 @@ def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
 def test_security_workflow_runs_code_and_secret_scans() -> None:
     workflow = (ROOT / ".github" / "workflows" / "security.yml").read_text()
 
+    assert "permissions: {}" in workflow
     assert "github/codeql-action/init@" in workflow
     assert "queries: security-extended" in workflow
     assert "gitleaks/gitleaks-action@" in workflow
@@ -152,6 +153,7 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
 
     assert 'tags:\n      - "v*.*.*"' in workflow
+    assert "permissions: {}" in workflow
     assert "scripts/check_release_tag.py" in workflow
     assert "scripts/check_release.sh" in workflow
     assert "uv build --no-build-isolation" in workflow
@@ -161,6 +163,18 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert workflow.count("actions/attest@") == 2
     assert "sbom-path: dist/sbom.cdx.json" in workflow
     assert "softprops/action-gh-release@" in workflow
+    assert "name: Build and attest distributions" in workflow
+    assert "name: Create GitHub Release" in workflow
+    assert "needs: build" in workflow
+    assert "actions/download-artifact@" in workflow
+    build_job = workflow.split("\n  build:\n", maxsplit=1)[1]
+    build_job = build_job.split("\n  release:\n", maxsplit=1)[0]
+    assert "contents: read" in build_job
+    assert "contents: write" not in build_job
+    release_job = workflow.split("\n  release:\n", maxsplit=1)[1]
+    release_job = release_job.split("\n  publish-pypi:\n", maxsplit=1)[0]
+    assert "contents: write" in release_job
+    assert "actions/checkout@" not in release_job
     assert "needs: release" in workflow
     assert "name: Dispatch trusted PyPI workflow" in workflow
     assert "actions: write" in workflow
@@ -203,8 +217,13 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     assert "print-hash: true" in workflow
     assert "name: Verify public PyPI release" in workflow
     assert "scripts.verify_pypi_release" in workflow
+    assert "/tmp/public-package-requirement.txt" in workflow
+    assert "--no-emit-project" in workflow
+    assert "--requirement /tmp/runtime-requirements.txt" in workflow
+    assert "--requirement /tmp/public-package-requirement.txt" in workflow
+    assert workflow.count("--require-hashes") == 2
+    assert "--no-deps" in workflow
     assert "--index-url https://pypi.org/simple" in workflow
-    assert '"agent-paranoid-android==${PYPI_VERSION}"' in workflow
     assert "for attempt in {1..10}; do" in workflow
     assert "PyPI simple index is not ready" in workflow
     assert "/test-data-agent doctor" in workflow

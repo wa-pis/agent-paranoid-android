@@ -41,6 +41,17 @@ environment. That smoke check verifies package version metadata, the PEP 561
 3. Commit the release preparation.
 4. Tag the commit after `scripts/check_release.sh` passes.
 
+Merging a release pull request does not publish a package. Publication starts
+only after the matching annotated tag is pushed:
+
+```bash
+git tag -a vX.Y.Z -m "Release vX.Y.Z" <verified-main-commit>
+git push origin vX.Y.Z
+```
+
+The tag triggers `.github/workflows/release.yml`, which creates the GitHub
+Release and then dispatches the dedicated PyPI Trusted Publishing workflow.
+
 Keep compatibility changes explicit. Breaking `DatasetSpec`, CLI, artifact, or
 Python API changes require a migration guide and a versioned changelog entry.
 
@@ -50,9 +61,11 @@ After creating a GitHub Release, `.github/workflows/release.yml` explicitly
 invokes `.github/workflows/publish-pypi.yml`. The called workflow downloads the
 release wheel and sdist, validates their embedded distribution name and
 version, verifies that both were attested by `release.yml` for the selected tag,
-and publishes with short-lived GitHub OIDC credentials. It does not use a PyPI
-API token and does not build or execute repository code in the OIDC-enabled
-publish job.
+and publishes with short-lived GitHub OIDC credentials. The public-index smoke
+test installs runtime dependencies from the hash-locked `uv.lock` export and
+installs the exact PyPI wheel by its verified SHA-256 digest. The workflow does
+not use a PyPI API token and does not build or execute repository code in the
+OIDC-enabled publish job.
 
 Configure the pending or project Trusted Publisher with these exact values:
 

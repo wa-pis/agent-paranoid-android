@@ -17,6 +17,7 @@ from scripts.check_pypi_artifacts import (
 from scripts.verify_pypi_release import (
     PublishedReleaseValidationError,
     fetch_pypi_metadata,
+    hashed_wheel_requirement,
     verify_pypi_release,
 )
 
@@ -106,6 +107,30 @@ def test_verify_pypi_release_accepts_matching_public_digests(
     write_distributions(tmp_path)
 
     verify_pypi_release("0.5.0", tmp_path, published_metadata(tmp_path))
+
+
+def test_hashed_wheel_requirement_uses_verified_distribution(
+    tmp_path: Path,
+) -> None:
+    write_distributions(tmp_path)
+    wheel = next(tmp_path.glob("*.whl"))
+
+    requirement = hashed_wheel_requirement("0.5.0", tmp_path)
+
+    assert requirement == (
+        "agent-paranoid-android==0.5.0 "
+        f"--hash=sha256:{hashlib.sha256(wheel.read_bytes()).hexdigest()}\n"
+    )
+
+
+def test_hashed_wheel_requirement_rejects_ambiguous_wheels(
+    tmp_path: Path,
+) -> None:
+    write_distributions(tmp_path)
+    (tmp_path / "second.whl").write_bytes(b"synthetic wheel")
+
+    with pytest.raises(PublishedReleaseValidationError, match="exactly one wheel"):
+        hashed_wheel_requirement("0.5.0", tmp_path)
 
 
 def test_verify_pypi_release_rejects_digest_mismatch(

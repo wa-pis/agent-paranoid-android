@@ -39,6 +39,13 @@ All notable changes to this project are documented here.
 - Post-publication installation now waits for the PyPI simple index to expose
   the new version after its JSON metadata and files become available.
 
+### Security
+
+- Release workflows now deny token permissions by default and isolate
+  `contents: write` in the GitHub Release job, after build and attestation.
+- Public PyPI verification now installs locked runtime dependencies and the
+  exact published wheel with mandatory SHA-256 hashes.
+
 ### Documentation
 
 - Replaced the monolithic README with a focused installation and quickstart

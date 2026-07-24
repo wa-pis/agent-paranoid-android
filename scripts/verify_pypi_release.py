@@ -89,6 +89,21 @@ def verify_pypi_release(
             )
 
 
+def hashed_wheel_requirement(version: str, directory: Path) -> str:
+    if VERSION_PATTERN.fullmatch(version) is None:
+        raise PublishedReleaseValidationError("version must use X.Y.Z syntax")
+    wheels = [
+        path
+        for path in directory.iterdir()
+        if path.is_file() and not path.is_symlink() and path.suffix == ".whl"
+    ]
+    if len(wheels) != 1:
+        raise PublishedReleaseValidationError(
+            "distribution directory must contain exactly one wheel"
+        )
+    return f"{DISTRIBUTION_NAME}=={version} --hash=sha256:{_sha256(wheels[0])}\n"
+
+
 def fetch_pypi_metadata(
     version: str,
     *,
@@ -152,16 +167,22 @@ def _canonical_name(value: Any) -> str:
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 3:
+    if len(argv) not in {3, 4}:
         print(
-            "usage: verify_pypi_release.py X.Y.Z DIST_DIRECTORY",
+            "usage: verify_pypi_release.py X.Y.Z DIST_DIRECTORY [REQUIREMENT_FILE]",
             file=sys.stderr,
         )
         return 2
     try:
         metadata = fetch_pypi_metadata(argv[1])
-        verify_pypi_release(argv[1], Path(argv[2]), metadata)
-    except PublishedReleaseValidationError as exc:
+        directory = Path(argv[2])
+        verify_pypi_release(argv[1], directory, metadata)
+        if len(argv) == 4:
+            Path(argv[3]).write_text(
+                hashed_wheel_requirement(argv[1], directory),
+                encoding="utf-8",
+            )
+    except (OSError, PublishedReleaseValidationError) as exc:
         print(f"Published PyPI verification failed: {exc}", file=sys.stderr)
         return 1
     print(f"Published PyPI release verified: {DISTRIBUTION_NAME} {argv[1]}")
