@@ -3,6 +3,12 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.5.1
+
+- Tokenless PyPI publication with post-publish digest comparison and a clean
+  public-index installation smoke test.
+- OpenSSF Scorecard reporting and expanded standard project links on PyPI.
+
 ## Implemented For 0.5.0
 
 - Structured generator MCP business-rule inputs with strict contract checks,

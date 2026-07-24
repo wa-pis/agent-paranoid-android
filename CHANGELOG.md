@@ -4,10 +4,18 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.5.1] - 2026-07-24
+
 ### Added
 
 - Tokenless PyPI publication through a dedicated GitHub OIDC workflow that
   publishes wheel and source distributions from an existing GitHub Release.
+- Post-publication verification that compares PyPI SHA-256 digests with the
+  GitHub Release distributions, installs the exact public-index package in an
+  isolated environment, and runs its self-check.
+- OpenSSF Scorecard analysis with results published to GitHub code scanning.
+- Standard PyPI project links for documentation, issues, changelog, and release
+  notes.
 
 ### Security
 
@@ -16,6 +24,8 @@ All notable changes to this project are documented here.
   tag-bound build-provenance verification, and independent distribution
   name/version validation before upload. Repository code does not execute in
   the OIDC-enabled publish job.
+- Post-publication checks run without an OIDC token and fail if PyPI exposes
+  missing, additional, yanked, renamed, or digest-mismatched distributions.
 
 ## [0.5.0] - 2026-07-24
 
@@ -164,6 +174,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.5.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.0...v0.3.1

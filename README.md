@@ -18,7 +18,7 @@ related rights holders.
 
 ## Project Status
 
-Current package version: `0.5.0`. The installable distribution is
+Current package version: `0.5.1`. The installable distribution is
 `agent-paranoid-android`; the CLI remains `test-data-agent` for compatibility
 and to keep the command focused on the generated-data use case.
 
@@ -134,6 +134,9 @@ and version plus their tag-bound GitHub build provenance, then uploads them
 through PyPI Trusted Publishing with short-lived GitHub OIDC credentials and no
 stored PyPI token. Validation runs in an unprivileged job; the OIDC-enabled job
 executes only immutable-pinned artifact-download and PyPA publish actions.
+After publication, another unprivileged job compares the SHA-256 hashes reported
+by PyPI with the GitHub Release files, installs the exact version from the
+public PyPI index in a clean environment, and runs the package self-check.
 
 ## Quickstart
 
@@ -163,17 +166,25 @@ check. It also writes review artifacts such as `generation_manifest.json` and
 `validation_report.json`.
 
 The example path below uses the checked-in fixture data and writes only local
-artifacts under `out/`.
+artifacts under `out/`. Clone the repository first if you want to run these
+exact fixture-based commands.
 
-1. Install the package and run the test suite:
+1. Install the published package and run its self-check:
 
 ```bash
-python3 -m pip install -e ".[dev]"
-python3 -m pytest
+python3 -m pip install agent-paranoid-android
+test-data-agent doctor
 ```
 
-After installation, the `test-data-agent` CLI should be available. If your shell
-cannot find it, run the same commands as `python3 -m test_data_agent.cli ...`.
+For the remaining examples, clone the repository so the sample CSV files are
+available:
+
+```bash
+git clone https://github.com/wa-pis/agent-paranoid-android.git
+cd agent-paranoid-android
+```
+
+After installation, the `test-data-agent` CLI should be available.
 
 2. Generate a synthetic single-table CSV from an example source CSV:
 
