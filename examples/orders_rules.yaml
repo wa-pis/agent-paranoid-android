@@ -1,0 +1,21 @@
+field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, cancelled]
+  - table: orders
+    field: amount
+    required: true
+    min_value: 0
+
+row_rules:
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: fulfilled_at
+    allow_equal: true
+
+  - type: formula
+    table: orders
+    field: amount
+    expression: quantity * unit_price

@@ -12,6 +12,16 @@ All notable changes to this project are documented here.
 - Post-publication installation now waits for the PyPI simple index to expose
   the new version after its JSON metadata and files become available.
 
+### Documentation
+
+- Replaced the monolithic README with a focused installation and quickstart
+  entry point.
+- Added task-oriented guides for first generation, multi-table datasets,
+  artifact review, business rules, MCP setup, safety, configuration, and
+  troubleshooting.
+- Added a searchable MkDocs site with strict link validation and a dedicated
+  documentation CI build.
+
 ## [0.5.1] - 2026-07-24
 
 ### Added
