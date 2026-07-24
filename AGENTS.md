@@ -103,6 +103,16 @@ Git workflow:
 * Use clear conventional commit messages, for example `feat: add csv profiling` or `docs: explain usage`.
 * Before committing, run the relevant tests or document why they were not run.
 * Do not include unrelated worktree changes in a commit.
+* Treat a substantial PR as a release candidate when it introduces breaking
+  behavior, major user-facing functionality, or significant security or
+  supply-chain changes.
+* Before merging a release candidate, update the package version and
+  `CHANGELOG.md`, then run `scripts/check_release.sh`.
+* After the release candidate is merged and required checks pass, create and
+  push an annotated `vX.Y.Z` tag on the exact verified merge commit in `main`.
+  The tag is required to trigger GitHub Release and PyPI publication.
+* Never tag a PR branch, tag an unverified commit, create a release tag without
+  a matching package version, or move an already published release tag.
 
 ## CSV Input Support
 
