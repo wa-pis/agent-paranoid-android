@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Tokenless PyPI publication through a dedicated GitHub OIDC workflow that
+  publishes wheel and source distributions from an existing GitHub Release.
+
+### Security
+
+- PyPI publication uses a scoped `pypi` environment, job-level
+  `id-token: write`, immutable action pins, published-release checks,
+  tag-bound build-provenance verification, and independent distribution
+  name/version validation before upload. Repository code does not execute in
+  the OIDC-enabled publish job.
+
 ## [0.5.0] - 2026-07-24
 
 ### Added
