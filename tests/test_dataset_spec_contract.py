@@ -9,7 +9,6 @@ from test_data_agent.core import (
     FieldSpec,
     GenerationMode,
     NumericDistribution,
-    OutputFormat as CoreOutputFormat,
     PrivacyAction,
     PrivacyClassification,
     ValidationSettings,
@@ -27,27 +26,13 @@ from test_data_agent.adapters import (
     parquet_file_to_dataset_profile,
     trino_profile_to_dataset_profile,
 )
-from test_data_agent.adapters.legacy_generation import (
-    generation_spec_to_dataset_spec,
-    multi_table_generation_spec_to_dataset_spec,
-)
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldType
-from test_data_agent.spec import (
-    ColumnSpec,
-    DataType,
-    ForeignKeySpec,
-    GenerationSpec,
-    GenerationStrategy,
-    MultiTableGenerationSpec,
-    OutputFormat,
-    TableSpec,
-)
 
 
-def test_dataset_spec_loads_legacy_shape_with_default_settings() -> None:
+def test_dataset_spec_loads_minimal_shape_with_default_settings() -> None:
     spec = DatasetSpec.model_validate(
         {
             "entities": [
@@ -293,33 +278,23 @@ def test_field_models_preserve_untyped_distribution_metadata() -> None:
     assert field.typed_distribution is None
 
 
-def test_privacy_policy_is_shared_with_legacy_spec_module() -> None:
-    from test_data_agent.spec import infer_sensitive_from_name as legacy_infer_sensitive
-
-    assert legacy_infer_sensitive is infer_sensitive_from_name
+def test_privacy_policy_helpers_detect_and_mask_sensitive_values() -> None:
     assert infer_sensitive_from_name("api_token") is True
     assert infer_sensitive_from_name("favorite_color") is False
     assert mask_pattern("alice@example.com", "email") == "email"
     assert mask_pattern("plain text", None) == "text_len_10"
 
 
-def test_output_format_is_shared_with_legacy_spec_module() -> None:
-    assert OutputFormat is CoreOutputFormat
-    assert OutputFormat.CSV.value == "csv"
-
-
-def test_package_root_exposes_domain_agnostic_api_without_dropping_legacy_symbols() -> None:
+def test_package_root_exposes_only_dataset_oriented_api() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
     assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
-    assert test_data_agent.__version__ == "0.5.1"
+    assert test_data_agent.__version__ == "0.6.0"
     assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None
     assert test_data_agent.infer_dataset_spec is not None
     assert test_data_agent.validate_dataset is not None
-    with pytest.deprecated_call(match="test_data_agent.GenerationSpec is deprecated"):
-        assert test_data_agent.GenerationSpec is GenerationSpec
-    with pytest.deprecated_call(match="test_data_agent.generate_rows is deprecated"):
-        assert test_data_agent.generate_rows is __import__("test_data_agent.compat.legacy_spec", fromlist=["generate_rows"]).generate_rows
+    assert not hasattr(test_data_agent, "GenerationSpec")
+    assert not hasattr(test_data_agent, "generate_rows")
 
 
 def test_dataset_spec_rejects_duplicate_entities_and_dangling_relationships() -> None:
@@ -401,54 +376,6 @@ def test_csv_adapter_normalizes_legacy_profile_into_dataset_shapes() -> None:
     assert dataset_spec.generation_settings.seed == 9
 
 
-def test_legacy_generation_specs_normalize_into_dataset_spec() -> None:
-    spec = GenerationSpec(
-        seed=123,
-        output_format=OutputFormat.CSV,
-        table=TableSpec(
-            name="customers",
-            row_count=5,
-            columns=[
-                ColumnSpec(name="customer_id", data_type=DataType.STRING, strategy=GenerationStrategy.SEQUENCE),
-                ColumnSpec(name="status", data_type=DataType.STRING, strategy=GenerationStrategy.CHOICE, choices=["active", "paused"]),
-            ],
-        ),
-    )
-    multi_spec = MultiTableGenerationSpec(
-        seed=7,
-        output_format=OutputFormat.JSON,
-        tables=[
-            TableSpec(
-                name="customers",
-                row_count=2,
-                columns=[ColumnSpec(name="customer_id", data_type=DataType.STRING, strategy=GenerationStrategy.SEQUENCE)],
-            ),
-            TableSpec(
-                name="orders",
-                row_count=3,
-                columns=[ColumnSpec(name="customer_id", data_type=DataType.STRING)],
-            ),
-        ],
-        foreign_keys=[
-            ForeignKeySpec(
-                child_table="orders",
-                child_field="customer_id",
-                parent_table="customers",
-                parent_field="customer_id",
-            )
-        ],
-    )
-
-    dataset_spec = generation_spec_to_dataset_spec(spec)
-    multi_dataset_spec = multi_table_generation_spec_to_dataset_spec(multi_spec)
-
-    assert dataset_spec.entity("customers").primary_key == "customer_id"
-    assert dataset_spec.entity("customers").field("status").distribution["kind"] == "categorical"
-    assert dataset_spec.generation_settings.output_format.value == "csv"
-    assert multi_dataset_spec.relationships[0].parent_entity == "customers"
-    assert multi_dataset_spec.relationships[0].child_entity == "orders"
-
-
 def test_json_dataset_spec_loader_preserves_explicit_privacy_settings(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.json"
     spec_path.write_text(
@@ -497,7 +424,7 @@ def test_json_loader_treats_privacy_settings_only_payload_as_dataset_spec(tmp_pa
     assert loaded.privacy_settings.max_safe_categories == 3
 
 
-def test_json_loader_routes_legacy_trino_profile_with_source_type_and_columns(tmp_path) -> None:
+def test_json_loader_routes_older_trino_profile_with_source_type_and_columns(tmp_path) -> None:
     profile_path = tmp_path / "trino_profile.json"
     profile_path.write_text(
         json.dumps(
@@ -522,7 +449,7 @@ def test_json_loader_routes_legacy_trino_profile_with_source_type_and_columns(tm
     assert loaded.entity("orders").row_count == 10
 
 
-def test_json_and_trino_adapters_load_legacy_profile_shapes(tmp_path) -> None:
+def test_json_and_trino_adapters_load_older_profile_shapes(tmp_path) -> None:
     payload = {
         "source_type": "trino",
         "table": "accounts",

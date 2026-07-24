@@ -20,7 +20,7 @@ test-data-agent COMMAND --help
 | `generate-from-csv` | Run the complete single-table workflow | Data file and review artifacts |
 | `generate-from-example` | Run the complete related-table workflow | Dataset bundle |
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
-| `validate` | Validate generated data against a spec | Validation report |
+| `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
 

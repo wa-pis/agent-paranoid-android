@@ -75,9 +75,8 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current package version is `0.5.1`. `DatasetSpec` is the primary API.
-Legacy `GenerationSpec` commands remain available as a migration path and emit
-deprecation warnings.
+The current package version is `0.6.0`. `DatasetSpec` is the generation and
+validation contract for the CLI and Python API.
 
 Development is substantially AI-assisted. Human review, automated tests, and
 the documented security requirements still apply to every change.

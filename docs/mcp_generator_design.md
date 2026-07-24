@@ -123,8 +123,7 @@ Sensitive values are generated independently from the source. Emails use the
 reserved `example.test` domain, phones use a fictional 555 range, and SSN-like
 values use an invalid `000` prefix.
 
-Implementation: `src/test_data_agent/generation/entity_generator.py` and the
-legacy compatibility generator.
+Implementation: `src/test_data_agent/generation/entity_generator.py`.
 
 ### No Rows In MCP Responses
 
@@ -222,7 +221,7 @@ CSV, JSON, or Parquet format.
 ## Module Ownership
 
 - `core/`: versioned Pydantic domain contracts.
-- `adapters/`: conversion of safe CSV, Trino, JSON, and legacy metadata.
+- `adapters/`: conversion of safe CSV, Trino, JSON, and older profile metadata.
 - `profiling/`: schema, distribution, relationship, and constraint inference.
 - `generation/`: seeded row generation and deterministic constraint solving.
 - `validation/`: executable schema, relationship, and constraint checks.

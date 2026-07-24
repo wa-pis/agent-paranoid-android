@@ -38,7 +38,7 @@ The command writes:
 out/
   customers.csv
   csv_profile.json
-  generation_spec.json
+  dataset_spec.json
   generation_manifest.json
   validation_report.json
 ```

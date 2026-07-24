@@ -40,8 +40,8 @@ Synthetic generation SHALL NOT copy, shuffle, duplicate, or export source rows.
 
 ### Requirement: Reviewable DatasetSpec Contract
 
-Generation SHALL run from a reviewable `DatasetSpec` contract for the primary
-dataset-oriented workflow.
+Generation and validation SHALL run from a reviewable `DatasetSpec` contract.
+No parallel public generation specification is supported.
 
 #### Scenario: Spec is inferred from a profile
 
@@ -50,6 +50,19 @@ dataset-oriented workflow.
 - **THEN** it declares entities, fields, row counts, relationships,
   constraints, privacy rules, generation settings, and validation settings
 - **AND** users can inspect or edit it before generation
+
+#### Scenario: Removed specification shape is supplied
+
+- **GIVEN** a file with the removed top-level `table` or `tables` shape
+- **WHEN** generation or validation is requested
+- **THEN** the command fails before rows are processed
+- **AND** the error points to the version `0.6.0` migration guide
+
+#### Scenario: Single-CSV workflow writes its effective spec
+
+- **GIVEN** a CSV file is processed by the complete generation workflow
+- **WHEN** review artifacts are published
+- **THEN** the effective `DatasetSpec` is written as `dataset_spec.json`
 
 ### Requirement: Bounded Generation
 

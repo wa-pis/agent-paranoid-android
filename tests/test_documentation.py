@@ -23,6 +23,7 @@ REQUIRED_DOCS = {
     "reference/cli.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
+    "operations/migrating-to-0.6.md",
 }
 CLI_COMMANDS = {
     "doctor",
@@ -41,10 +42,11 @@ CLI_COMMANDS = {
 def test_readme_is_a_focused_entrypoint() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert len(readme.splitlines()) <= 250
+    assert len(readme.splitlines()) <= 130
     assert "python3 -m pip install agent-paranoid-android" in readme
     assert "test-data-agent doctor" in readme
     assert "source rows copied: no" in readme
+    assert "https://wa-pis.github.io/agent-paranoid-android/" in readme
     assert "## Choose A Guide" in readme
     assert "## Release Checklist" not in readme
     assert "## Legacy GenerationSpec Compatibility" not in readme

@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.6.0] - 2026-07-24
+
+### Breaking Changes
+
+- `DatasetSpec` is now the only supported generation and validation contract.
+  The deprecated `GenerationSpec` models, converters, generators,
+  validators, CLI fallback, and package-root exports have been removed.
+- `validate` now requires a generated dataset folder rather than a
+  single-table row file.
+- Single-CSV workflows now write the effective spec as `dataset_spec.json`
+  instead of `generation_spec.json`.
+
+### Changed
+
+- Safe profile payloads with top-level `columns` remain supported, but they are
+  normalized directly into `DatasetProfile` and then processed through the
+  `DatasetSpec` pipeline.
+- Removed specification files fail before generation or validation with a
+  link to the `0.6.0` migration guide.
+- The package version is now `0.6.0`.
+
+### Removed
+
+- Deleted the retired specification, row generator, row validator,
+  compatibility adapters, compatibility package, and completed refactoring
+  script.
+
 ### Fixed
 
 - Tag releases now dispatch the dedicated PyPI workflow instead of invoking it
@@ -23,6 +50,9 @@ All notable changes to this project are documented here.
   documentation CI build.
 - Added GitHub Pages deployment from `main` with least-privilege permissions
   and a post-deployment public availability check.
+- Added a `0.6.0` migration guide, updated architecture and OpenSpec contracts,
+  and reduced README to a concise project entry point with a prominent
+  documentation link.
 
 ## [0.5.1] - 2026-07-24
 
@@ -194,6 +224,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.6.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.3.1...v0.4.0

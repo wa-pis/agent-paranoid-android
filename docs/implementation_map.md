@@ -82,7 +82,7 @@ This is a map of the codebase for the domain-agnostic generator.
 
 `src/test_data_agent/cli.py`
 
-New domain-agnostic commands:
+Public dataset-oriented commands:
 
 - `profile-example`
 - `infer-spec`
@@ -92,12 +92,8 @@ New domain-agnostic commands:
 - `agent-plan`
 - `agent-approve`
 
-Compatibility paths are still supported during migration:
-
 - `profile-csv`
 - `generate-from-csv`
-- `generate` with legacy JSON `GenerationSpec`
-- `validate` with legacy JSON rows
 
 ## Trino MCP
 

@@ -15,7 +15,6 @@ from test_data_agent.io.commands import (
     generate_dataset_from_profile_command,
     generate_dataset_from_spec_path,
     infer_dataset_spec_command,
-    is_dataset_spec_path,
     profile_csv_command,
     profile_example_command,
     profile_example_artifacts,
@@ -26,27 +25,28 @@ from test_data_agent.io.readers import load_dataset_spec
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "example_dataset"
 
 
-def test_is_dataset_spec_path_accepts_yaml_and_dataset_spec_json(tmp_path) -> None:
-    yaml_path = tmp_path / "dataset_spec.yaml"
-    yaml_path.write_text("entities: []\n")
-    json_path = tmp_path / "dataset_spec.json"
-    json_path.write_text(
+def test_dataset_spec_loader_rejects_removed_shape_with_migration_help(tmp_path) -> None:
+    path = tmp_path / "removed_spec.json"
+    path.write_text(
         json.dumps(
             {
-                "entities": [
-                    {
-                        "name": "customers",
-                        "row_count": 1,
-                        "fields": [
-                            {"name": "customer_id", "data_type": "integer", "is_identifier": True},
-                        ],
-                    }
-                ]
+                "seed": 7,
+                "table": {
+                    "name": "customers",
+                    "row_count": 1,
+                    "columns": [{"name": "customer_id", "data_type": "integer"}],
+                },
             }
         )
     )
-    profile_path = tmp_path / "profile.json"
-    profile_path.write_text(
+
+    with pytest.raises(ValueError, match="GenerationSpec was removed in 0.6.0"):
+        load_dataset_spec(path)
+
+
+def test_dataset_spec_loader_rejects_profile_with_command_help(tmp_path) -> None:
+    path = tmp_path / "profile.json"
+    path.write_text(
         json.dumps(
             {
                 "source_type": "csv",
@@ -55,15 +55,15 @@ def test_is_dataset_spec_path_accepts_yaml_and_dataset_spec_json(tmp_path) -> No
                         "name": "customers",
                         "row_count": 1,
                         "fields": [{"name": "customer_id", "data_type": "integer"}],
+                        "primary_key_candidates": ["customer_id"],
                     }
                 ],
             }
         )
     )
 
-    assert is_dataset_spec_path(yaml_path) is True
-    assert is_dataset_spec_path(json_path) is True
-    assert is_dataset_spec_path(profile_path) is False
+    with pytest.raises(ValueError, match="use 'generate --profile'"):
+        load_dataset_spec(path)
 
 
 def test_dataset_command_helpers_generate_and_validate_dataset_artifacts(tmp_path) -> None:
@@ -287,7 +287,7 @@ def test_generate_dataset_from_profile_command_writes_generation_bundle(tmp_path
 
     assert exit_code == 0
     assert output_path.exists()
-    assert json.loads((output_path.parent / "generation_spec.json").read_text())["generation_settings"]["seed"] == 22
+    assert json.loads((output_path.parent / "dataset_spec.json").read_text())["generation_settings"]["seed"] == 22
 
 
 def test_profile_example_artifacts_writes_dataset_profile_json(tmp_path) -> None:
@@ -480,7 +480,7 @@ def test_generate_dataset_from_csv_command_writes_generation_bundle(tmp_path) ->
 
     rows = json.loads(output_path.read_text())
     profile = json.loads((output_path.parent / "csv_profile.json").read_text())
-    spec = json.loads((output_path.parent / "generation_spec.json").read_text())
+    spec = json.loads((output_path.parent / "dataset_spec.json").read_text())
     report = json.loads((output_path.parent / "validation_report.json").read_text())
 
     assert exit_code == 0

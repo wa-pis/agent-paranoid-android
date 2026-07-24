@@ -36,18 +36,6 @@ from test_data_agent.validation import DatasetValidationReport, validate_dataset
 BusinessRulesApplier = Callable[..., Any | None]
 
 
-def is_dataset_spec_path(path: Path) -> bool:
-    suffix = path.suffix.lower()
-    if suffix in {".yaml", ".yml"}:
-        return True
-    if suffix != ".json":
-        return False
-    try:
-        return isinstance(load_profile_or_spec(path), DatasetSpec)
-    except Exception:
-        return False
-
-
 def generate_dataset_from_spec_path(
     spec_path: Path,
     *,
@@ -151,6 +139,10 @@ def validate_dataset_artifacts(
     overwrite: bool = False,
 ) -> DatasetValidationReport:
     spec = load_dataset_spec(spec_path)
+    if not rows_path.is_dir():
+        raise ValueError(
+            "validate expects a dataset output folder; pass the folder containing generated entity files"
+        )
     rows_by_entity = load_dataset_rows(rows_path)
     report = validate_dataset(rows_by_entity, spec)
     if output_path is not None:

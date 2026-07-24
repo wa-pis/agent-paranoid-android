@@ -1,6 +1,5 @@
 import csv
 import json
-import test_data_agent.io as io_package
 from pathlib import Path
 
 import pytest
@@ -68,7 +67,7 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
 
     rows = json.loads(output_path.read_text())
     profile_artifact = json.loads((output_path.parent / "profile.json").read_text())
-    spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
+    spec_artifact = json.loads((output_path.parent / "dataset_spec.json").read_text())
     validation_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
     manifest = json.loads((output_path.parent / "generation_manifest.json").read_text())
 
@@ -108,7 +107,7 @@ def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_a
     with output_path.open() as handle:
         rows = list(csv.DictReader(handle))
     profile_artifact = json.loads((output_path.parent / "csv_profile.json").read_text())
-    spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
+    spec_artifact = json.loads((output_path.parent / "dataset_spec.json").read_text())
     validation_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
     manifest = json.loads((output_path.parent / "generation_manifest.json").read_text())
 
@@ -141,7 +140,7 @@ def test_generate_dataset_from_csv_artifacts_uses_shared_profile_builder_for_mod
         invalid_ratio=0.4,
     )
 
-    spec_artifact = json.loads((output_path.parent / "generation_spec.json").read_text())
+    spec_artifact = json.loads((output_path.parent / "dataset_spec.json").read_text())
     validation_artifact = json.loads((output_path.parent / "validation_report.json").read_text())
 
     assert report.valid is False
@@ -491,10 +490,3 @@ def test_generate_dataset_review_artifacts_enforces_configured_row_limit(
             output_format=OutputFormat.JSON,
             seed=19,
         )
-
-
-def test_io_package_keeps_legacy_workflows_out_of_dataset_oriented_exports() -> None:
-    assert not hasattr(io_package, "generate_legacy_spec_artifacts")
-    assert not hasattr(io_package, "validate_legacy_spec_artifacts")
-    assert not hasattr(io_package, "warn_deprecated_generation_spec_compatibility")
-    assert not hasattr(io_package, "write_tabular_rows")
