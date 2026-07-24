@@ -67,14 +67,21 @@ structured `business_rules_payload`.
 
 1. Call `list_catalogs`, `list_schemas`, and `list_tables`.
 2. Call `describe_table`.
-3. Use `profile_table_safe`, `profile_column`, and aggregate rule-profiling
-   tools.
-4. Pass the safe profile payload to generator `infer_dataset_spec`.
-5. Do not export or relay source rows.
+3. Call `profile_table_safe` for an allowlisted table.
+4. Pass that response to generator `plan_trino_dataset` with a new workspace,
+   explicit count, seed, and output format.
+5. Stop and review the written `dataset_spec.yaml`.
+6. Call `approve_dataset_plan` only after review.
+7. Do not export or relay source rows.
 
 Both catalog and schema allowlists are mandatory by default. HTTPS is the
 default. Plain HTTP requires an explicit override and is intended only for an
 isolated local Trino instance.
+
+The raw-SQL `run_safe_select` MCP tool is not exposed by default. Trusted
+clients that need the separately validated query tool must explicitly set
+`TRINO_ENABLE_SAFE_SELECT=true`. The review-first planning sequence above does
+not require it.
 
 ## Expected Result
 
@@ -99,6 +106,7 @@ The server rejects:
 - existing output files and non-empty output directories;
 - unrestricted SQL, DDL, DML, joins, CTEs, and subqueries;
 - likely PII projections and raw sensitive rule literals;
+- non-Trino or oversized inline planning profiles;
 - missing Trino allowlists;
 - requests exceeding configured input, output, query, or execution limits.
 

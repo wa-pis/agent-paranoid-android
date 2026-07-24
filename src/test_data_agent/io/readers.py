@@ -82,7 +82,9 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
             try:
                 import pyarrow.parquet as pq
             except ImportError as exc:
-                raise SystemExit("Parquet input requires pyarrow") from exc
+                raise ValueError(
+                    "Parquet input requires agent-paranoid-android[parquet]"
+                ) from exc
             parquet_file = pq.ParquetFile(path)
             enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
             total_rows += int(parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0)

@@ -60,6 +60,8 @@ patterns. Source rows and raw sensitive values do not cross it.
 | --- | --- | --- | --- | --- |
 | `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
 | `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
+| `plan_trino_dataset` | Build a review-first agent workspace from safe Trino metadata | `profile_table_safe` payload and generation settings | Profile, DatasetSpec, and plan | Plan summary and review paths |
+| `approve_dataset_plan` | Continue only after the written DatasetSpec is reviewed | Planned workspace | Synthetic bundle | Row counts, validation, and manifest paths |
 | `generate_dataset` | Run deterministic generation and validation | DatasetSpec, seed, count, optional format and structured rules | Synthetic bundle | Row counts and compact validation summaries |
 | `validate_dataset` | Recheck a generated bundle without exposing its rows | Matching spec and generated folder | Optional report JSON | Validation report |
 | `export_dataset` | Produce another supported format safely | DatasetSpec, seed, count, required format and optional structured rules | Fresh synthetic bundle | Row counts and compact validation summaries |
@@ -244,6 +246,8 @@ CSV, JSON, or Parquet format.
 - One MCP server with both database credentials and broad filesystem access.
 - Arbitrary unrestricted SQL tools.
 - Returning raw or generated datasets directly in MCP responses.
+- Giving the planning client `run_safe_select`; raw-SQL access is opt-in and
+  not needed by `profile_table_safe` -> `plan_trino_dataset`.
 - Exporting or converting arbitrary row files.
 - Building output by copying, shuffling, or duplicating source rows.
 - Treating free-form LLM reasoning as validation.

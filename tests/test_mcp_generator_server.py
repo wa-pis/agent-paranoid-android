@@ -7,9 +7,11 @@ import pytest
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.mcp_generator_server import (
     WorkspacePathError,
+    approve_dataset_plan,
     export_dataset,
     generate_dataset,
     infer_dataset_spec,
+    plan_trino_dataset,
     profile_csv,
     resolve_workspace_path,
     validate_dataset,
@@ -230,6 +232,110 @@ def test_infer_dataset_spec_accepts_inline_safe_trino_profile(
     assert result["operation"] == "infer_dataset_spec"
     assert result["entities"] == [{"name": "orders", "row_count": 5, "field_count": 2}]
     assert "@" not in (tmp_path / "dataset_spec.yaml").read_text()
+
+
+def test_plan_and_approve_safe_trino_dataset_through_mcp(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    profile_payload = {
+        "source_type": "trino",
+        "table": "orders",
+        "row_count": 100,
+        "columns": [
+            {
+                "name": "order_id",
+                "data_type": "bigint",
+                "approx_distinct_count": 100,
+            },
+            {
+                "name": "status",
+                "data_type": "varchar",
+                "approx_distinct_count": 2,
+                "top_values": [
+                    {"value": "paid", "count": 80},
+                    {"value": "cancelled", "count": 20},
+                ],
+            },
+            {
+                "name": "customer_email",
+                "data_type": "varchar",
+                "sensitive": True,
+                "semantic_type": "email",
+                "masked_patterns": [{"pattern": "email", "count": 100}],
+            },
+        ],
+    }
+
+    planned = plan_trino_dataset(
+        profile_payload,
+        "agent/orders",
+        count=4,
+        seed=73,
+        output_format="json",
+    )
+
+    assert planned["operation"] == "plan_trino_dataset"
+    assert planned["approval_required"] is True
+    assert planned["source_type"] == "trino"
+    assert planned["entities"] == [
+        {"name": "orders", "row_count": 4, "field_count": 3}
+    ]
+    assert (tmp_path / "agent" / "orders" / "dataset_spec.yaml").is_file()
+    assert not (tmp_path / "agent" / "orders" / "generated").exists()
+    assert "paid" not in json.dumps(planned)
+
+    approved = approve_dataset_plan("agent/orders")
+    generated_rows = json.loads(
+        (tmp_path / "agent" / "orders" / "generated" / "orders.json").read_text()
+    )
+
+    assert approved["operation"] == "approve_dataset_plan"
+    assert approved["approval_required"] is False
+    assert approved["source_type"] == "trino"
+    assert approved["row_counts"] == {"orders": 4}
+    assert approved["validation_valid"] is True
+    assert approved["source_rows_copied"] is False
+    assert len(generated_rows) == 4
+    assert "@" in generated_rows[0]["customer_email"]
+    assert "customer_email" not in json.dumps(approved)
+
+
+def test_plan_trino_dataset_rejects_non_trino_and_oversized_profiles(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+
+    with pytest.raises(ValueError, match="only a profile returned by Trino MCP"):
+        plan_trino_dataset(
+            {
+                "source_type": "manual",
+                "entities": [],
+            },
+            "agent/non-trino",
+        )
+
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES", "128")
+    with pytest.raises(InputLimitError, match="profile payload must be <= 128"):
+        plan_trino_dataset(
+            {
+                "source_type": "trino",
+                "table": "orders",
+                "row_count": 1,
+                "columns": [
+                    {
+                        "name": "status",
+                        "data_type": "varchar",
+                        "top_values": [{"value": "x" * 256, "count": 1}],
+                    }
+                ],
+            },
+            "agent/oversized",
+        )
+
+    assert not (tmp_path / "agent").exists()
 
 
 def test_profile_csv_does_not_overwrite_input(

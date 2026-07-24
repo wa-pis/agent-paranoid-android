@@ -48,7 +48,9 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
         import pyarrow as pa
         import pyarrow.parquet as pq
     except ImportError as exc:
-        raise SystemExit("Parquet output requires pyarrow") from exc
+        raise ValueError(
+            "Parquet output requires agent-paranoid-android[parquet]"
+        ) from exc
 
     output.parent.mkdir(parents=True, exist_ok=True)
     try:

@@ -10,7 +10,7 @@ import ast
 import os
 import re
 from collections import Counter
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -65,6 +65,7 @@ MAX_QUERY_EXECUTION_TIME_MS = 3_600_000
 MAX_QUERY_RUN_TIME_MS = 7_200_000
 MAX_QUERY_SCAN_BYTES = 100 * 1_024**3
 MIN_RULE_CONFIDENCE = 0.9
+ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
 
 
 class SqlSafetyError(ValueError):
@@ -1029,23 +1030,32 @@ def bounded_limit(limit: int) -> int:
     return min(limit, MAX_LIMIT)
 
 
+def trino_mcp_tools() -> list[Callable[..., Any]]:
+    tools: list[Callable[..., Any]] = [
+        list_catalogs,
+        list_schemas,
+        list_tables,
+        describe_table,
+        profile_table,
+        profile_column,
+        profile_table_safe,
+        profile_foreign_key,
+        profile_temporal_ordering,
+        profile_formula_rule,
+        profile_conditional_required,
+        profile_conditional_allowed_values,
+        profile_aggregate_mapping,
+        sample_rows_masked,
+    ]
+    if parse_env_bool(ENABLE_SAFE_SELECT_ENV):
+        tools.append(run_safe_select)
+    return tools
+
+
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-trino")
-    mcp.tool()(audited_mcp_tool("trino-mcp", list_catalogs))
-    mcp.tool()(audited_mcp_tool("trino-mcp", list_schemas))
-    mcp.tool()(audited_mcp_tool("trino-mcp", list_tables))
-    mcp.tool()(audited_mcp_tool("trino-mcp", describe_table))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_table))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_column))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_table_safe))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_foreign_key))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_temporal_ordering))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_formula_rule))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_conditional_required))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_conditional_allowed_values))
-    mcp.tool()(audited_mcp_tool("trino-mcp", profile_aggregate_mapping))
-    mcp.tool()(audited_mcp_tool("trino-mcp", sample_rows_masked))
-    mcp.tool()(audited_mcp_tool("trino-mcp", run_safe_select))
+    for tool in trino_mcp_tools():
+        mcp.tool()(audited_mcp_tool("trino-mcp", tool))
 else:  # pragma: no cover
     mcp = None
 
