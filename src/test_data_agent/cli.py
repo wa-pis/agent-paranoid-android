@@ -13,6 +13,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from test_data_agent.agent import AgentRequest, AgentResult, AgentSourceType, approve_agent_workspace, plan_agent_request
+from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.constraint_solver import default_value_for_field
@@ -170,6 +171,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
     )
 
+    audit_verify_parser = subparsers.add_parser(
+        "audit-verify",
+        help="Verify an HMAC-authenticated MCP audit log.",
+    )
+    audit_verify_parser.add_argument("log", type=Path, help="Audit JSONL file to verify.")
+
     agent_plan_parser = subparsers.add_parser(
         "agent-plan",
         help="Plan a safe agent workflow and stop before generation.",
@@ -283,6 +290,15 @@ def run_command(args: argparse.Namespace) -> int:
             skip_smoke=args.skip_smoke,
             required_extras=set(args.require_extra),
         )
+
+    if args.command == "audit-verify":
+        result = verify_audit_log_from_env(args.log)
+        print(
+            f"Audit log verified: {result.record_count} records, "
+            f"last MAC {result.last_mac}",
+            file=sys.stderr,
+        )
+        return 0
 
     if args.command == "agent-plan":
         result = plan_agent_request(agent_request_from_args(args))

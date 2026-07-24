@@ -14,6 +14,7 @@ except ImportError:  # pragma: no cover
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
+from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
@@ -384,11 +385,11 @@ def _require_new_output(path: Path) -> None:
 mcp: Any
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-generator")
-    mcp.tool()(profile_csv)
-    mcp.tool()(infer_dataset_spec)
-    mcp.tool()(generate_dataset)
-    mcp.tool()(validate_dataset)
-    mcp.tool()(export_dataset)
+    mcp.tool()(audited_mcp_tool("generator-mcp", profile_csv))
+    mcp.tool()(audited_mcp_tool("generator-mcp", infer_dataset_spec))
+    mcp.tool()(audited_mcp_tool("generator-mcp", generate_dataset))
+    mcp.tool()(audited_mcp_tool("generator-mcp", validate_dataset))
+    mcp.tool()(audited_mcp_tool("generator-mcp", export_dataset))
 else:  # pragma: no cover
     mcp = None
 
@@ -399,6 +400,7 @@ def main() -> None:
             "Generator MCP support is not installed; "
             "install agent-paranoid-android[mcp]"
         )
+    audit_logger_from_env("generator-mcp")
     mcp.run()
 
 

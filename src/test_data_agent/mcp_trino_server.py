@@ -29,6 +29,7 @@ from test_data_agent.core.privacy import (
     mask_pattern,
     mask_value,
 )
+from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
@@ -1030,21 +1031,21 @@ def bounded_limit(limit: int) -> int:
 
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-trino")
-    mcp.tool()(list_catalogs)
-    mcp.tool()(list_schemas)
-    mcp.tool()(list_tables)
-    mcp.tool()(describe_table)
-    mcp.tool()(profile_table)
-    mcp.tool()(profile_column)
-    mcp.tool()(profile_table_safe)
-    mcp.tool()(profile_foreign_key)
-    mcp.tool()(profile_temporal_ordering)
-    mcp.tool()(profile_formula_rule)
-    mcp.tool()(profile_conditional_required)
-    mcp.tool()(profile_conditional_allowed_values)
-    mcp.tool()(profile_aggregate_mapping)
-    mcp.tool()(sample_rows_masked)
-    mcp.tool()(run_safe_select)
+    mcp.tool()(audited_mcp_tool("trino-mcp", list_catalogs))
+    mcp.tool()(audited_mcp_tool("trino-mcp", list_schemas))
+    mcp.tool()(audited_mcp_tool("trino-mcp", list_tables))
+    mcp.tool()(audited_mcp_tool("trino-mcp", describe_table))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_table))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_column))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_table_safe))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_foreign_key))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_temporal_ordering))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_formula_rule))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_conditional_required))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_conditional_allowed_values))
+    mcp.tool()(audited_mcp_tool("trino-mcp", profile_aggregate_mapping))
+    mcp.tool()(audited_mcp_tool("trino-mcp", sample_rows_masked))
+    mcp.tool()(audited_mcp_tool("trino-mcp", run_safe_select))
 else:  # pragma: no cover
     mcp = None
 
@@ -1064,6 +1065,7 @@ def main() -> None:
             "install agent-paranoid-android[mcp,trino]"
         )
     TrinoConfig.from_env()
+    audit_logger_from_env("trino-mcp")
     mcp.run()
 
 

@@ -14,6 +14,7 @@ test-data-agent COMMAND --help
 | Command | Purpose | Primary output |
 | --- | --- | --- |
 | `doctor` | Check installation and run a temporary smoke generation | Terminal report |
+| `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |

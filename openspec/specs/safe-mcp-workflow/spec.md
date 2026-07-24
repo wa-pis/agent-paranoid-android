@@ -95,3 +95,23 @@ generation and export without granting arbitrary code execution.
 - **WHEN** the generator MCP server validates the request
 - **THEN** it rejects the request before creating output artifacts
 - **AND** no source or generated rows are returned in the error
+
+### Requirement: Authenticated MCP Audit Records
+
+Shared MCP deployments SHALL support opt-in, tamper-evident audit records
+without persisting tool inputs or outputs.
+
+#### Scenario: Signed audit logging is enabled
+
+- **GIVEN** an operator configures an audit path and HMAC key
+- **WHEN** an MCP tool is invoked
+- **THEN** a metadata-only `started` event is authenticated before execution
+- **AND** a linked `succeeded` or `failed` event is authenticated afterward
+- **AND** arguments, SQL, profiles, rows, return values, and exception messages
+  are not recorded
+
+#### Scenario: Audit configuration is invalid
+
+- **GIVEN** audit logging is partially configured, unsafe, or full
+- **WHEN** an MCP tool is invoked
+- **THEN** the operation fails closed instead of running without an audit event

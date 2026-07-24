@@ -108,6 +108,14 @@ stale files from an earlier run.
 
 Implementation: `src/test_data_agent/mcp_generator_server.py`.
 
+### Shared Deployment Audit
+
+Both MCP servers can write metadata-only, HMAC-authenticated audit events when
+the operator configures an audit path and key. Audit records never contain tool
+arguments, SQL, profiles, rows, return values, or exception messages. Invalid
+audit configuration prevents tool execution. See
+[MCP Audit Logging](operations/audit-logging.md).
+
 ### Safe Profiles
 
 Fields marked sensitive, or inferred as sensitive from their name or semantic
