@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from test_data_agent.core.limits import InputLimitError
 from test_data_agent.mcp_generator_server import (
     WorkspacePathError,
     export_dataset,
@@ -25,6 +26,16 @@ def write_source_csv(root: Path) -> None:
         "customer_id,email,status\n"
         "1,alice@example.com,active\n"
         "2,bob@example.com,paused\n"
+    )
+
+
+def write_customer_spec(root: Path, *, count: int = 3) -> None:
+    write_source_csv(root)
+    profile_csv("customers.csv", "profile.json")
+    infer_dataset_spec(
+        output_path="spec.json",
+        profile_path="profile.json",
+        count=count,
     )
 
 
@@ -311,3 +322,271 @@ def test_generate_dataset_rejects_spec_row_count_above_configured_limit(
 
     with pytest.raises(ValueError, match="entity row_count must be <= 3"):
         generate_dataset("spec.json", "generated", output_format="json")
+
+
+def test_generate_dataset_applies_inline_business_rules_and_records_manifest(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path)
+
+    result = generate_dataset(
+        "spec.json",
+        "generated",
+        output_format="json",
+        seed=17,
+        business_rules_payload={
+            "field_rules": [
+                {
+                    "table": "customers",
+                    "field": "status",
+                    "allowed_values": ["reviewed"],
+                }
+            ]
+        },
+    )
+
+    rows = json.loads((tmp_path / "generated" / "customers.json").read_text())
+    manifest = json.loads(
+        (tmp_path / "generated" / "generation_manifest.json").read_text()
+    )
+    report = json.loads(
+        (tmp_path / "generated" / "business_validation_report.json").read_text()
+    )
+    validated = validate_dataset("generated/dataset_spec.yaml", "generated")
+
+    assert {row["status"] for row in rows} == {"reviewed"}
+    assert result["business_validation"]["valid"] is True
+    assert result["business_validation"]["rule_count"] == 1
+    assert len(result["business_validation"]["rules_sha256"]) == 64
+    assert result["business_validation_report_path"] == (
+        "generated/business_validation_report.json"
+    )
+    assert "reviewed" not in json.dumps(result)
+    assert manifest["business_validation"] == result["business_validation"]
+    assert report["rules_sha256"] == manifest["business_validation"]["rules_sha256"]
+    assert validated["business_validation"] == result["business_validation"]
+    assert validated["business_validation_report_path"] == (
+        "generated/business_validation_report.json"
+    )
+
+
+def test_export_dataset_accepts_workspace_business_rule_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path, count=2)
+    (tmp_path / "rules.yaml").write_text(
+        """
+field_rules:
+  - table: customers
+    field: status
+    required: true
+"""
+    )
+
+    result = export_dataset(
+        "spec.json",
+        "exported",
+        output_format="json",
+        seed=23,
+        business_rules_path="rules.yaml",
+    )
+
+    assert result["business_validation"]["valid"] is True
+    assert result["manifest_path"] == "exported/generation_manifest.json"
+
+
+def test_generate_dataset_rejects_ambiguous_or_unsafe_business_rules(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path)
+    (tmp_path / "rules.yaml").write_text("field_rules: []\n")
+
+    with pytest.raises(ValueError, match="provide at most one"):
+        generate_dataset(
+            "spec.json",
+            "ambiguous",
+            business_rules_path="rules.yaml",
+            business_rules_payload={"field_rules": []},
+        )
+
+    with pytest.raises(ValueError, match="unknown field"):
+        generate_dataset(
+            "spec.json",
+            "unknown",
+            business_rules_payload={
+                "field_rules": [
+                    {
+                        "table": "customers",
+                        "field": "missing",
+                        "required": True,
+                    }
+                ]
+            },
+        )
+
+    with pytest.raises(ValueError, match="raw-looking sensitive value"):
+        generate_dataset(
+            "spec.json",
+            "raw-pii",
+            business_rules_payload={
+                "field_rules": [
+                    {
+                        "table": "customers",
+                        "field": "status",
+                        "allowed_values": ["victim@example.com"],
+                    }
+                ]
+            },
+        )
+
+    with pytest.raises(ValueError, match="sensitive field values"):
+        generate_dataset(
+            "spec.json",
+            "sensitive-target",
+            business_rules_payload={
+                "scenarios": [
+                    {
+                        "name": "fixed-email",
+                        "weight": 1,
+                        "field_values": {
+                            "customers": {"email": "synthetic@example.test"}
+                        },
+                    }
+                ]
+            },
+        )
+
+    assert not any(
+        (tmp_path / name).exists()
+        for name in ("ambiguous", "unknown", "raw-pii", "sensitive-target")
+    )
+
+
+def test_generate_dataset_rejects_unknown_keys_and_oversized_rule_payload(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path)
+
+    with pytest.raises(ValueError, match="extra_forbidden"):
+        generate_dataset(
+            "spec.json",
+            "unknown-key",
+            business_rules_payload={
+                "field_rules": [
+                    {
+                        "table": "customers",
+                        "field": "status",
+                        "required": True,
+                        "typo": True,
+                    }
+                ]
+            },
+        )
+
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES", "128")
+    with pytest.raises(InputLimitError, match="payload must be <= 128 bytes"):
+        generate_dataset(
+            "spec.json",
+            "oversized",
+            business_rules_payload={
+                "field_rules": [
+                    {
+                        "table": "customers",
+                        "field": "status",
+                        "allowed_values": ["x" * 256],
+                    }
+                ]
+            },
+        )
+
+    assert not (tmp_path / "unknown-key").exists()
+    assert not (tmp_path / "oversized").exists()
+
+
+def test_generate_dataset_rejects_excessive_business_rule_work(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path, count=3)
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS", "2")
+
+    with pytest.raises(InputLimitError, match="more than 2 estimated evaluations"):
+        generate_dataset(
+            "spec.json",
+            "excessive-work",
+            business_rules_payload={
+                "field_rules": [
+                    {
+                        "table": "customers",
+                        "field": "status",
+                        "required": True,
+                    }
+                ]
+            },
+        )
+
+    assert not (tmp_path / "excessive-work").exists()
+
+
+def test_generate_dataset_rejects_excessively_nested_business_rules(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path)
+
+    def fail_serialization(*args: object, **kwargs: object) -> str:
+        raise RecursionError
+
+    monkeypatch.setattr(
+        "test_data_agent.mcp_generator_server.json.dumps",
+        fail_serialization,
+    )
+
+    with pytest.raises(ValueError, match="JSON-compatible"):
+        generate_dataset(
+            "spec.json",
+            "deep-rules",
+            business_rules_payload={"field_rules": []},
+        )
+
+    assert not (tmp_path / "deep-rules").exists()
+
+
+def test_validate_dataset_rejects_tampered_business_validation_report(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_customer_spec(tmp_path)
+    generate_dataset(
+        "spec.json",
+        "generated",
+        output_format="json",
+        seed=29,
+        business_rules_payload={
+            "field_rules": [
+                {
+                    "table": "customers",
+                    "field": "status",
+                    "required": True,
+                }
+            ]
+        },
+    )
+    report_path = tmp_path / "generated" / "business_validation_report.json"
+    report = json.loads(report_path.read_text())
+    report["rule_pass_count"] += 1
+    report_path.write_text(json.dumps(report))
+
+    with pytest.raises(WorkspacePathError, match="does not match"):
+        validate_dataset("generated/dataset_spec.yaml", "generated")

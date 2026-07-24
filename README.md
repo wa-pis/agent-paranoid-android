@@ -18,7 +18,7 @@ related rights holders.
 
 ## Project Status
 
-Current package version: `0.4.0`. The installable distribution is
+Current package version: `0.5.0`. The installable distribution is
 `agent-paranoid-android`; the CLI remains `test-data-agent` for compatibility
 and to keep the command focused on the generated-data use case.
 
@@ -79,7 +79,11 @@ Override these with `TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES`,
 `TEST_DATA_AGENT_MAX_INPUT_FILES`,
 `TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS`,
 `TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES`, `TEST_DATA_AGENT_MAX_YAML_ALIASES`,
-and `TEST_DATA_AGENT_MAX_YAML_DEPTH`.
+and `TEST_DATA_AGENT_MAX_YAML_DEPTH`. Business-rule files and inline payloads
+have a separate 1 MiB default limit controlled by
+`TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES`. Estimated business-rule work is
+limited to 5,000,000 row/rule evaluations by default; override it with
+`TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`.
 
 Generated bundles are also bounded before publication. The defaults are
 512 MiB for all generated files, 128 MiB of free disk space left in reserve,
@@ -806,11 +810,36 @@ Generated bundles contain `dataset_spec.yaml`, `validation_report.json`, and
 `generation_manifest.json`. The manifest records the package and schema
 versions, spec fingerprint, seed, output format, row counts, validation status,
 and the explicit provenance flags `synthetic: true` and
-`source_rows_copied: false`.
+`source_rows_copied: false`. Runs with business rules also record a SHA-256
+fingerprint, rule count, pass/fail counts, truncation status, and overall
+business validity.
 
 `infer_dataset_spec` accepts exactly one of a workspace `profile_path` or an
 inline `profile_payload` from the Trino MCP server. MCP tools never overwrite
 existing output files, and generation requires a new or empty output folder.
+`generate_dataset` and `export_dataset` accept at most one of a workspace
+`business_rules_path` or structured `business_rules_payload`. Unknown keys,
+dangling references, unsupported expressions, oversized inputs, and
+raw-looking sensitive literals fail before output is created.
+
+Example MCP rule payload:
+
+```json
+{
+  "field_rules": [
+    {
+      "table": "orders",
+      "field": "status",
+      "required": true,
+      "allowed_values": ["new", "paid", "cancelled"]
+    }
+  ]
+}
+```
+
+The MCP response returns only the compact business-validation summary and
+`business_validation_report_path`; detailed bounded errors remain in the
+workspace artifact and generated rows are never returned inline.
 
 Run the local end-to-end example from safe Trino profile metadata:
 
@@ -922,8 +951,11 @@ scenarios:
 ```
 
 Business rules can be applied from the CLI with `--business-rules` on
-`generate`, `generate-from-csv`, and profile-based generation. They are also
-available from Python:
+`generate`, `generate-from-csv`, and profile-based generation. Generator MCP
+calls use `business_rules_path` or `business_rules_payload`. Rules are strict:
+unknown keys and fields fail closed, formulas use a bounded arithmetic AST,
+and concrete PII or secret values are rejected by both CLI and MCP workflows.
+They are also available from Python:
 
 ```python
 from pathlib import Path

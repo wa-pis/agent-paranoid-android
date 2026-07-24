@@ -12,11 +12,28 @@ All notable changes to this project are documented here.
   points, and the `test-data-agent doctor` command.
 - Pull-request dependency review that rejects newly introduced dependencies
   with known Moderate-or-higher vulnerabilities.
+- Structured business-rule inputs for generator MCP generation and export,
+  with workspace paths or bounded inline payloads.
+- Business-rule fingerprints and compact validation summaries in generation
+  manifests, with detailed bounded reports kept as workspace artifacts.
 
 ### Changed
 
 - CI and the release gate now type-check the stable package core, and release
   publication verifies the built wheel before creating attestations.
+- Business-rule models now reject unknown keys, dangling DatasetSpec
+  references, unsafe sensitive literals, excessive input, and unsupported or
+  overly complex formula syntax before generation.
+- The package version is now `0.5.0`.
+
+### Security
+
+- CLI and MCP rule paths reject attempts to inject PII, credentials, tokens,
+  or arbitrary string values through scenarios, enum rules, conditions, or
+  formulas.
+- Rule payload bytes, estimated row/rule evaluations, expression complexity,
+  and detailed validation errors are bounded to prevent memory, CPU, disk, and
+  model-context exhaustion.
 
 ## [0.4.0] - 2026-07-23
 

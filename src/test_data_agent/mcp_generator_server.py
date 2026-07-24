@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 from typing import Any
@@ -9,12 +10,15 @@ from typing import Any
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
 except ImportError:  # pragma: no cover
-    FastMCP = None  # type: ignore[assignment]
+    FastMCP = None  # type: ignore[misc, assignment]
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.limits import (
+    enforce_business_rules_payload_size,
+    read_limited_text,
+)
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io import (
     GenerationManifest,
@@ -25,6 +29,15 @@ from test_data_agent.io import (
     validate_dataset_artifacts,
     write_csv_profile_artifact,
 )
+from test_data_agent.io.artifacts import business_validation_manifest
+from test_data_agent.rules.business_config import make_business_rules_applier
+from test_data_agent.rules.contract import validate_business_rules_for_spec
+from test_data_agent.rules.models import (
+    BusinessRules,
+    business_rules_from_dict,
+    load_business_rules,
+)
+from test_data_agent.rules.validation import BusinessValidationReport
 from test_data_agent.safety import assert_profile_safe
 
 
@@ -90,6 +103,8 @@ def generate_dataset(
     output_format: str | None = None,
     seed: int | None = None,
     count: int | None = None,
+    business_rules_path: str | None = None,
+    business_rules_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Generate synthetic files and validation artifacts without returning rows."""
 
@@ -100,6 +115,8 @@ def generate_dataset(
         output_format=output_format,
         seed=seed,
         count=count,
+        business_rules_path=business_rules_path,
+        business_rules_payload=business_rules_payload,
     )
 
 
@@ -123,6 +140,20 @@ def validate_dataset(
     loaded_spec = load_dataset_spec(spec)
     if manifest.spec_sha256 != dataset_spec_fingerprint(loaded_spec):
         raise WorkspacePathError("generation manifest does not match the dataset spec")
+    business_report_path = rows / "business_validation_report.json"
+    if manifest.business_validation is not None:
+        if not business_report_path.is_file():
+            raise WorkspacePathError("business validation report is missing")
+        try:
+            business_report = BusinessValidationReport.model_validate_json(
+                read_limited_text(business_report_path)
+            )
+        except ValueError as exc:
+            raise WorkspacePathError("business validation report is invalid") from exc
+        if business_validation_manifest(business_report) != manifest.business_validation:
+            raise WorkspacePathError(
+                "business validation report does not match the generation manifest"
+            )
     report_path = None
     if output_path is not None:
         report_path = resolve_workspace_path(output_path)
@@ -134,6 +165,16 @@ def validate_dataset(
         "rows_folder": workspace_path_label(rows),
         "report_path": workspace_path_label(report_path) if report_path is not None else None,
         "validation": report.model_dump(mode="json"),
+        "business_validation": (
+            manifest.business_validation.model_dump(mode="json")
+            if manifest.business_validation is not None
+            else None
+        ),
+        "business_validation_report_path": (
+            workspace_path_label(business_report_path)
+            if manifest.business_validation is not None
+            else None
+        ),
     }
 
 
@@ -143,6 +184,8 @@ def export_dataset(
     output_format: str,
     seed: int | None = None,
     count: int | None = None,
+    business_rules_path: str | None = None,
+    business_rules_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Generate and export fresh synthetic data; source-row conversion is not supported."""
 
@@ -153,6 +196,8 @@ def export_dataset(
         output_format=output_format,
         seed=seed,
         count=count,
+        business_rules_path=business_rules_path,
+        business_rules_payload=business_rules_payload,
     )
 
 
@@ -234,6 +279,8 @@ def _generate_dataset(
     output_format: str | None,
     seed: int | None,
     count: int | None,
+    business_rules_path: str | None,
+    business_rules_payload: dict[str, Any] | None,
 ) -> dict[str, Any]:
     source = resolve_workspace_path(spec_path, must_exist=True, expect_file=True)
     output = resolve_workspace_path(output_folder)
@@ -243,6 +290,11 @@ def _generate_dataset(
     if output.exists() and any(output.iterdir()):
         raise WorkspacePathError("generation output folder must be empty")
     spec = load_dataset_spec(source)
+    business_rules = load_mcp_business_rules(
+        business_rules_path,
+        business_rules_payload,
+        spec,
+    )
     selected_format = None if output_format is None else OutputFormat(output_format)
     result = generate_dataset_bundle(
         spec,
@@ -250,12 +302,67 @@ def _generate_dataset(
         output_format=selected_format,
         seed=seed,
         count=count,
+        business_rules_applier=(
+            make_business_rules_applier(business_rules)
+            if business_rules is not None
+            else None
+        ),
     )
+    business_summary = business_validation_manifest(result.business_validation)
     return {
         "operation": operation,
         "output_folder": workspace_path_label(output),
-        **result.model_dump(mode="json"),
+        "manifest_path": workspace_path_label(output / "generation_manifest.json"),
+        "business_validation_report_path": (
+            workspace_path_label(output / "business_validation_report.json")
+            if business_summary is not None
+            else None
+        ),
+        **result.model_dump(mode="json", exclude={"business_validation"}),
+        "business_validation": (
+            business_summary.model_dump(mode="json")
+            if business_summary is not None
+            else None
+        ),
     }
+
+
+def load_mcp_business_rules(
+    rules_path: str | None,
+    rules_payload: dict[str, Any] | None,
+    spec: DatasetSpec,
+) -> BusinessRules | None:
+    if rules_path is not None and rules_payload is not None:
+        raise ValueError(
+            "provide at most one of business_rules_path or business_rules_payload"
+        )
+    if rules_path is None and rules_payload is None:
+        return None
+    if rules_path is not None:
+        source = resolve_workspace_path(
+            rules_path,
+            must_exist=True,
+            expect_file=True,
+        )
+        _require_suffix(
+            source,
+            {".json", ".yaml", ".yml"},
+            "business rules input",
+        )
+        rules = load_business_rules(source)
+    else:
+        try:
+            serialized = json.dumps(
+                rules_payload,
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        except (TypeError, ValueError, RecursionError) as exc:
+            raise ValueError("business rules payload must be JSON-compatible") from exc
+        enforce_business_rules_payload_size(len(serialized))
+        rules = business_rules_from_dict(rules_payload or {})
+    validate_business_rules_for_spec(rules, spec)
+    return rules
 
 
 def _require_suffix(path: Path, allowed: set[str], label: str) -> None:
@@ -274,6 +381,7 @@ def _require_new_output(path: Path) -> None:
         raise WorkspacePathError("MCP output path already exists")
 
 
+mcp: Any
 if FastMCP is not None:
     mcp = FastMCP("test-data-agent-generator")
     mcp.tool()(profile_csv)

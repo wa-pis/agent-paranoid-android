@@ -124,12 +124,12 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.4.0")
+    check_release_tag("v0.5.0")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")
     with pytest.raises(ValueError, match="start with"):
-        check_release_tag("0.4.0")
+        check_release_tag("0.5.0")
 
 
 def test_release_script_is_executable_and_covers_release_gates() -> None:

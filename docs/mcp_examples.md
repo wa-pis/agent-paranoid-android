@@ -18,8 +18,10 @@ TEST_DATA_AGENT_WORKSPACE_ROOT=/path/to/workspace \
 3. Call `infer_dataset_spec` with a safe `profile_path` or safe inline
    `profile_payload`.
 4. Review the written `DatasetSpec`.
-5. Call `generate_dataset` with an explicit seed and output folder.
-6. Call `validate_dataset` for the generated bundle.
+5. Optionally provide reviewed business rules through one
+   `business_rules_path` or structured `business_rules_payload`.
+6. Call `generate_dataset` with an explicit seed and output folder.
+7. Call `validate_dataset` for the generated bundle.
 
 Expected final report:
 
@@ -30,6 +32,30 @@ validation: passed
 synthetic: true
 source rows copied: false
 ```
+
+For a rule-driven run, the response also includes a compact
+`business_validation` object and `business_validation_report_path`. The
+manifest stores the same summary and the SHA-256 fingerprint of the normalized
+rule contract.
+
+Example inline payload:
+
+```json
+{
+  "field_rules": [
+    {
+      "table": "customers",
+      "field": "status",
+      "required": true,
+      "allowed_values": ["active", "paused"]
+    }
+  ]
+}
+```
+
+Inline and file inputs are size-bounded. Unknown keys, missing entities or
+fields, unsupported formula syntax, and concrete PII or secret values are
+rejected before an output folder is created.
 
 ## Trino Profile To Synthetic Output
 
@@ -65,5 +91,7 @@ is terminated by the server when it exceeds its time or scan budget.
 - Never ask MCP tools to return raw PII or generated datasets inline.
 - Always use explicit seeds.
 - Always review the `DatasetSpec` before generation for new data domains.
+- Always review structured business rules; do not place production values,
+  identifiers, PII, credentials, or tokens in rule literals.
 - Always inspect `generation_manifest.json` and `validation_report.json` before
   reporting success.

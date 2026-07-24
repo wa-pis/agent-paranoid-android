@@ -1,13 +1,23 @@
 import json
 
 import pytest
+from pydantic import ValidationError
 
+from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode
 from test_data_agent.business_rules import ScenarioRule, load_business_rules
 from test_data_agent.business_validator import validate_business_rules
+from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.rules.engine import apply_business_rules as apply_neutral_business_rules
-from test_data_agent.rules.models import ScenarioRule as NeutralScenarioRule
-from test_data_agent.rules.models import load_business_rules as load_neutral_business_rules
+from test_data_agent.rules.models import (
+    ScenarioRule as NeutralScenarioRule,
+    business_rules_from_dict,
+)
+from test_data_agent.rules.models import (
+    load_business_rules as load_neutral_business_rules,
+)
 from test_data_agent.rules.scenarios import apply_scenarios as apply_neutral_scenarios
 from test_data_agent.cli import main
 from test_data_agent.rules_engine import GenerationMode, apply_business_rules
@@ -345,7 +355,7 @@ field_rules:
     assert report["rule_fail_count"] == 0
 
 
-def test_cli_valid_mode_fails_when_business_rules_fail(tmp_path) -> None:
+def test_cli_rejects_business_rules_with_unknown_references(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     output = tmp_path / "out" / "customers.json"
     rules_path.write_text(
@@ -378,7 +388,175 @@ cross_table_rules:
         ]
     )
 
-    report = json.loads((output.parent / "business_validation_report.json").read_text())
+    assert exit_code == 2
+    assert not output.exists()
+    assert not (output.parent / "business_validation_report.json").exists()
 
-    assert exit_code == 1
-    assert report["rule_fail_count"] > 0
+
+def test_cli_rejects_sensitive_business_rule_literals(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    output = tmp_path / "out" / "customers.json"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: customers
+    field: email
+    allowed_values: [victim@example.com]
+"""
+    )
+
+    exit_code = main(
+        [
+            "generate-from-csv",
+            "tests/fixtures/customers.csv",
+            "--count",
+            "5",
+            "--mode",
+            "valid",
+            "--seed",
+            "9",
+            "--format",
+            "json",
+            "--output",
+            str(output),
+            "--business-rules",
+            str(rules_path),
+        ]
+    )
+
+    assert exit_code == 2
+    assert not output.exists()
+    assert not (output.parent / "business_validation_report.json").exists()
+
+
+def test_business_rule_models_reject_unknown_keys_and_unbounded_expressions() -> None:
+    with pytest.raises(ValidationError, match="extra_forbidden"):
+        business_rules_from_dict(
+            {
+                "field_rules": [
+                    {
+                        "table": "orders",
+                        "field": "status",
+                        "required": True,
+                        "typo": True,
+                    }
+                ]
+            }
+        )
+
+    with pytest.raises(ValidationError, match="at most 1024 characters"):
+        business_rules_from_dict(
+            {
+                "row_rules": [
+                    {
+                        "type": "formula",
+                        "table": "orders",
+                        "field": "total",
+                        "expression": "1" * 1_025,
+                    }
+                ]
+            }
+        )
+
+
+def test_business_rule_contract_rejects_unsupported_formula_syntax() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[
+                    FieldSpec(name="quantity", data_type="integer"),
+                    FieldSpec(name="total", data_type="integer"),
+                ],
+            )
+        ]
+    )
+    rules = business_rules_from_dict(
+        {
+            "row_rules": [
+                {
+                    "type": "formula",
+                    "table": "orders",
+                    "field": "total",
+                    "expression": "quantity ** 2",
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(ValueError, match="unsupported expression"):
+        validate_business_rules_for_spec(rules, spec)
+
+
+def test_business_rule_contract_rejects_formula_value_injection() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[FieldSpec(name="status", data_type="string")],
+            )
+        ]
+    )
+    rules = business_rules_from_dict(
+        {
+            "row_rules": [
+                {
+                    "type": "formula",
+                    "table": "orders",
+                    "field": "status",
+                    "expression": "'fixed'",
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(ValueError, match="numeric target field"):
+        validate_business_rules_for_spec(rules, spec)
+
+
+def test_business_validation_bounds_detailed_errors() -> None:
+    rules = business_rules_from_dict(
+        {
+            "field_rules": [
+                {
+                    "table": "orders",
+                    "field": "status",
+                    "required": True,
+                }
+            ]
+        }
+    )
+    rows = {"orders": [{"status": None} for _ in range(150)]}
+
+    report = validate_business_rules(rows, rules)
+
+    assert report.rule_fail_count == 150
+    assert len(report.results[0].errors) == 100
+    assert report.results[0].errors_truncated is True
+    assert report.rule_count == 1
+    assert len(report.rules_sha256) == 64
+
+
+def test_business_validation_bounds_total_report_errors() -> None:
+    rules = business_rules_from_dict(
+        {
+            "field_rules": [
+                {
+                    "table": "orders",
+                    "field": "status",
+                    "required": True,
+                }
+                for _ in range(11)
+            ]
+        }
+    )
+    rows = {"orders": [{"status": None} for _ in range(150)]}
+
+    report = validate_business_rules(rows, rules)
+
+    assert report.rule_fail_count == 1_650
+    assert sum(len(result.errors) for result in report.results) == 1_000
+    assert report.results[-1].errors == []
+    assert report.results[-1].errors_truncated is True
