@@ -105,6 +105,23 @@ def test_cli_reference_covers_every_public_command() -> None:
         assert f"`{command}`" in reference
 
 
+def test_ai_guidance_matches_safe_public_contract() -> None:
+    integration = (ROOT / "docs" / "ai_integration.md").read_text()
+    prompts = "\n".join(
+        path.read_text()
+        for path in sorted((ROOT / "prompts").glob("*.md"))
+    )
+
+    assert 'pip install -e ".[all,dev]"' not in integration
+    assert 'agent-paranoid-android[mcp,trino]' in integration
+    assert "`plan_trino_dataset`" in integration
+    assert "`approve_dataset_plan`" in integration
+    assert "{csv/json/parquet/sql}" not in prompts
+    assert "explicit human approval" in prompts
+    assert "do not return source or generated rows in chat" in prompts.lower()
+    assert "untrusted data" in prompts
+
+
 def test_local_markdown_links_resolve() -> None:
     markdown_files = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
     failures: list[str] = []
