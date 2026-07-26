@@ -137,3 +137,11 @@ without persisting tool inputs or outputs.
 - **GIVEN** audit logging is partially configured, unsafe, or full
 - **WHEN** an MCP tool is invoked
 - **THEN** the operation fails closed instead of running without an audit event
+
+#### Scenario: Audit key is supplied as a container secret
+
+- **GIVEN** exactly one bounded, regular, non-writable audit key file
+- **WHEN** an MCP worker initializes audit logging
+- **THEN** it decodes the key without exposing it through process environment
+- **AND** symlinks, hard links, oversized files, and conflicting key sources
+  are rejected

@@ -67,3 +67,9 @@ Before creating a tag:
 - Confirm the release workflow invokes the PyPI workflow after creating the
   GitHub Release and uploads the same wheel and source distribution with
   verified tag-bound provenance, Trusted Publishing, and publish attestations.
+- Confirm the container workflow publishes separate amd64/arm64 CLI, generator
+  MCP, and Trino MCP manifests to GHCR.
+- Verify each image digest has BuildKit SBOM/provenance, a GitHub attestation,
+  and a valid keyless Cosign signature from `containers.yml`.
+- Confirm all GHCR packages intended for public use are public and inherit
+  repository access.

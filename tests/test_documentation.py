@@ -25,6 +25,7 @@ REQUIRED_DOCS = {
     "reference/configuration.md",
     "operations/troubleshooting.md",
     "operations/audit-logging.md",
+    "operations/containers.md",
     "operations/migrating-to-0.6.md",
 }
 CLI_COMMANDS = {

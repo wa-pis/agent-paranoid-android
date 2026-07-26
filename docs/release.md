@@ -51,9 +51,23 @@ git push origin vX.Y.Z
 
 The tag triggers `.github/workflows/release.yml`, which creates the GitHub
 Release and then dispatches the dedicated PyPI Trusted Publishing workflow.
+It also triggers `.github/workflows/containers.yml`, which independently
+validates and publishes the three GHCR images.
 
 Keep compatibility changes explicit. Breaking `DatasetSpec`, CLI, artifact, or
 Python API changes require a migration guide and a versioned changelog entry.
+
+## Container Publication
+
+Container images are never pushed from pull requests or ordinary branch
+builds. A matching version tag publishes separate CLI, generator MCP, and Trino
+MCP images for `linux/amd64` and `linux/arm64`.
+
+The workflow attaches BuildKit SBOM and maximal provenance attestations,
+creates a GitHub provenance attestation for each manifest digest, and signs the
+same digest with keyless Cosign using GitHub OIDC. It does not use a registry
+password or signing key. After the first publication, confirm all three GHCR
+packages are public and linked to this repository.
 
 ## PyPI Trusted Publishing
 

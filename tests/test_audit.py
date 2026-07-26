@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from test_data_agent.audit import (
+    AUDIT_HMAC_KEY_FILE_ENV,
     AUDIT_HMAC_KEY_ENV,
     AUDIT_LOG_ENV,
     AuditConfigurationError,
@@ -122,6 +123,51 @@ def test_audit_log_rejects_symlink_target(
 def test_audit_key_requires_32_decoded_bytes() -> None:
     with pytest.raises(AuditConfigurationError, match="at least 32 bytes"):
         decode_audit_key(base64.b64encode(b"short").decode("ascii"))
+
+
+def test_audit_key_can_be_read_from_bounded_secret_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "audit.jsonl"
+    key_path = tmp_path / "audit_hmac_key"
+    key_path.write_text(f"{AUDIT_KEY}\n", encoding="ascii")
+    key_path.chmod(0o400)
+    monkeypatch.setenv(AUDIT_LOG_ENV, str(log_path))
+    monkeypatch.setenv(AUDIT_HMAC_KEY_FILE_ENV, str(key_path))
+
+    audited_mcp_tool("generator-mcp", lambda: None)()
+
+    assert verify_audit_log(log_path, AUDIT_KEY_BYTES).record_count == 2
+
+
+def test_audit_key_sources_are_mutually_exclusive(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    key_path = tmp_path / "audit_hmac_key"
+    key_path.write_text(AUDIT_KEY, encoding="ascii")
+    monkeypatch.setenv(AUDIT_LOG_ENV, str(tmp_path / "audit.jsonl"))
+    monkeypatch.setenv(AUDIT_HMAC_KEY_ENV, AUDIT_KEY)
+    monkeypatch.setenv(AUDIT_HMAC_KEY_FILE_ENV, str(key_path))
+
+    with pytest.raises(AuditConfigurationError, match="mutually exclusive"):
+        audited_mcp_tool("generator-mcp", lambda: None)()
+
+
+def test_audit_key_file_rejects_symlink(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    target = tmp_path / "key"
+    target.write_text(AUDIT_KEY, encoding="ascii")
+    link = tmp_path / "audit_hmac_key"
+    link.symlink_to(target)
+    monkeypatch.setenv(AUDIT_LOG_ENV, str(tmp_path / "audit.jsonl"))
+    monkeypatch.setenv(AUDIT_HMAC_KEY_FILE_ENV, str(link))
+
+    with pytest.raises(AuditConfigurationError, match="symbolic link"):
+        audited_mcp_tool("generator-mcp", lambda: None)()
 
 
 def test_cli_verifies_audit_log(

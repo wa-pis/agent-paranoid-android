@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-paranoid-android"
-version = "0.7.1"
+version = "0.8.0"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -92,6 +92,8 @@ files = [
     "src/test_data_agent/generation",
     "src/test_data_agent/rules",
     "src/test_data_agent/validation",
+    "src/test_data_agent/audit.py",
+    "src/test_data_agent/container_health.py",
     "src/test_data_agent/mcp_generator_server.py",
 ]
 strict = true
@@ -111,6 +113,7 @@ Documentation = "https://wa-pis.github.io/agent-paranoid-android/"
 Issues = "https://github.com/wa-pis/agent-paranoid-android/issues"
 Changelog = "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md"
 "Release Notes" = "https://github.com/wa-pis/agent-paranoid-android/releases"
+"Container Images" = "https://github.com/wa-pis/agent-paranoid-android/pkgs/container/agent-paranoid-android-cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/test_data_agent"]

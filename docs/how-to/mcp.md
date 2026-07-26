@@ -8,6 +8,10 @@ The project exposes two MCP servers with separate trust boundaries:
 Start with the generator server. Add Trino only when database profiling is
 required.
 
+For process and dependency isolation, use the separate hardened images in
+[Container Deployment](../operations/containers.md). The generator example has
+no network, while the Trino worker receives no generator workspace mount.
+
 ## Prepare A Workspace
 
 ```bash
