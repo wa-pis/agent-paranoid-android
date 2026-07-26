@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.7.1] - 2026-07-26
+
+### Changed
+
+- Running `test-data-agent` without a command now prints a guided start screen
+  instead of failing with a missing-command parser error.
+- `generate` reports the valid DatasetSpec and safe-profile forms when its
+  input is missing or ambiguous.
+- CLI argument and command errors now point to the exact contextual `--help`
+  command for recovery.
+
+### Added
+
+- Added `test-data-agent examples` with copy-ready CSV, folder, DatasetSpec,
+  safe-profile, agent-review, and validation workflows.
+- Added `test-data-agent --version` and examples to command-specific help.
+- Expanded the CLI reference and README discovery instructions.
+
 ## [0.7.0] - 2026-07-24
 
 ### Added
@@ -261,6 +279,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.7.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.0...v0.5.1

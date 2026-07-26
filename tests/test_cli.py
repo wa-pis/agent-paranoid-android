@@ -12,6 +12,20 @@ FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
 FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
 
 
+def test_cli_without_command_shows_starting_points(capsys) -> None:
+    exit_code = main([])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert captured.err == ""
+    assert "Quick start:" in captured.out
+    assert "test-data-agent doctor" in captured.out
+    assert "test-data-agent generate-from-csv" in captured.out
+    assert "test-data-agent examples" in captured.out
+    assert "the following arguments are required: command" not in captured.out
+
+
 def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     with pytest.raises(SystemExit) as exc_info:
         main(["--help"])
@@ -24,6 +38,73 @@ def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     assert "doctor" in captured.out
     assert "generation_manifest.json" in captured.out
     assert "synthetic" in captured.out
+
+
+def test_cli_examples_cover_supported_input_workflows(capsys) -> None:
+    exit_code = main(["examples"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert captured.err == ""
+    assert "One CSV file" in captured.out
+    assert "Related CSV files" in captured.out
+    assert "Reviewed DatasetSpec" in captured.out
+    assert "Safe profile metadata" in captured.out
+    assert "Review-first agent workflow" in captured.out
+
+
+def test_cli_version_is_available(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["--version"])
+
+    captured = capsys.readouterr()
+
+    assert exc_info.value.code == 0
+    assert captured.out == f"test-data-agent {cli_module.__version__}\n"
+
+
+def test_generate_without_input_shows_two_valid_forms(capsys) -> None:
+    exit_code = main(["generate"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Error: choose a DatasetSpec path or --profile." in captured.err
+    assert "test-data-agent generate dataset_spec.yaml" in captured.err
+    assert "test-data-agent generate --profile profile.json" in captured.err
+    assert "test-data-agent generate --help" in captured.err
+
+
+def test_generate_rejects_two_input_sources_with_help(capsys) -> None:
+    exit_code = main(["generate", "dataset_spec.yaml", "--profile", "profile.json"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "a DatasetSpec path and --profile cannot be used together" in captured.err
+    assert "test-data-agent generate --help" in captured.err
+
+
+def test_generate_missing_output_has_recovery_hint(capsys) -> None:
+    exit_code = main(["generate", "dataset_spec.yaml"])
+
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Error: dataset generation requires --output folder" in captured.err
+    assert "test-data-agent generate --help" in captured.err
+
+
+def test_argument_error_points_to_command_help(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["profile-csv", "data.csv"])
+
+    captured = capsys.readouterr()
+
+    assert exc_info.value.code == 2
+    assert "the following arguments are required: --output/-o" in captured.err
+    assert "Try 'test-data-agent profile-csv --help'" in captured.err
 
 
 def test_doctor_runs_quickstart_smoke_without_repository_fixture(
@@ -147,6 +228,19 @@ def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:
     assert "tests/fixtures/example_dataset" in folder_output
     assert "dataset_spec.yaml" in folder_output
     assert "generation_manifest.json" in folder_output
+
+
+def test_generate_help_explains_spec_and_profile_modes(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["generate", "--help"])
+
+    captured = capsys.readouterr()
+
+    assert exc_info.value.code == 0
+    assert "Choose exactly one input" in captured.out
+    assert "Reviewed DatasetSpec" in captured.out
+    assert "Safe profile" in captured.out
+    assert "one output file and requires --count and --seed" in captured.out
 
 
 def test_quickstart_folder_golden_path_writes_safe_artifacts(tmp_path, capsys) -> None:

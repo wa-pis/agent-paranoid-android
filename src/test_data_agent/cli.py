@@ -29,34 +29,145 @@ from test_data_agent.io import (
     validate_dataset_artifacts,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
+from test_data_agent.version import __version__
+
+ROOT_EPILOG = """\
+Quick start:
+  Check the installation:
+    test-data-agent doctor
+
+  Generate from one CSV file:
+    test-data-agent generate-from-csv data/customers.csv \\
+      --count 100 --seed 12345 --format csv \\
+      --output out/customers.csv
+
+  Generate related tables from a CSV folder:
+    test-data-agent generate-from-example data/example_dataset \\
+      --count 100 --seed 12345 --format csv \\
+      --output out/generated
+
+  Generate from a reviewed DatasetSpec:
+    test-data-agent generate dataset_spec.yaml \\
+      --seed 12345 --format csv --output out/generated
+
+Learn more:
+  test-data-agent examples
+  test-data-agent COMMAND --help
+  Documentation: https://wa-pis.github.io/agent-paranoid-android/
+
+Generated rows are synthetic. Review generation_manifest.json for the seed,
+row counts, validation result, and safety flags.
+"""
+
+EXAMPLES_TEXT = """\
+Common workflows
+================
+
+1. Check the installation
+
+   test-data-agent doctor
+
+2. One CSV file: profile, infer, generate, and validate in one command
+
+   test-data-agent generate-from-csv data/customers.csv \\
+     --count 100 \\
+     --seed 12345 \\
+     --format csv \\
+     --output out/customers.csv
+
+3. Related CSV files: one file per table
+
+   test-data-agent generate-from-example data/example_dataset \\
+     --count 100 \\
+     --seed 12345 \\
+     --format csv \\
+     --output out/generated
+
+4. Reviewed DatasetSpec
+
+   test-data-agent generate dataset_spec.yaml \\
+     --seed 12345 \\
+     --format csv \\
+     --output out/generated
+
+5. Safe profile metadata
+
+   test-data-agent generate --profile profile.json \\
+     --count 100 \\
+     --seed 12345 \\
+     --format csv \\
+     --output out/customers.csv
+
+6. Review-first agent workflow
+
+   test-data-agent agent-plan data/example_dataset \\
+     --source-type csv-folder \\
+     --workspace out/agent
+
+   # Review out/agent/dataset_spec.yaml before approval.
+   test-data-agent agent-approve out/agent
+
+7. Validate an existing generated dataset
+
+   test-data-agent validate dataset_spec.yaml out/generated \\
+     --output out/generated/validation_report.json
+
+Use "test-data-agent COMMAND --help" for every option.
+Documentation: https://wa-pis.github.io/agent-paranoid-android/
+"""
+
+GENERATE_EPILOG = """\
+Choose exactly one input:
+
+  Reviewed DatasetSpec:
+    test-data-agent generate dataset_spec.yaml \\
+      --seed 12345 --format csv --output out/generated
+
+  Safe profile:
+    test-data-agent generate --profile profile.json \\
+      --count 100 --seed 12345 --format csv \\
+      --output out/customers.csv
+
+A DatasetSpec produces a dataset folder. A safe single-table profile produces
+one output file and requires --count and --seed.
+"""
+
+
+class HelpfulArgumentParser(argparse.ArgumentParser):
+    """Add a concrete recovery hint to argparse failures."""
+
+    def error(self, message: str) -> None:
+        self.print_usage(sys.stderr)
+        print(f"{self.prog}: error: {message}", file=sys.stderr)
+        print(f"Try '{self.prog} --help' for examples and options.", file=sys.stderr)
+        raise SystemExit(2)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
+    parser = HelpfulArgumentParser(
         prog="test-data-agent",
         description=(
             "Agent Paranoid Android: safe deterministic synthetic data generation "
             "from CSV files, CSV folders, safe profiles, or dataset specs."
         ),
-        epilog=(
-            "Start here:\n"
-            "  CSV file:    test-data-agent generate-from-csv data/customers.csv --count 100 --seed 123 --format csv --output out/customers.csv\n"
-            "  CSV folder:  test-data-agent generate-from-example data/example_dataset --count 100 --seed 123 --format csv --output out/generated\n"
-            "  AI agent:    test-data-agent agent-plan data/example_dataset --source-type csv-folder --workspace out/agent\n"
-            "  Self-check:   test-data-agent doctor\n"
-            "  Validate:    test-data-agent validate out/generated/dataset_spec.yaml out/generated\n\n"
-            "The generated rows are synthetic. Review generation_manifest.json after generation for the seed, row counts, and safety flags."
-        ),
+        epilog=ROOT_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    subparsers = parser.add_subparsers(
+        dest="command",
+        title="commands",
+        metavar="COMMAND",
+    )
 
     generate_parser = subparsers.add_parser(
         "generate",
         help="Generate a dataset from a DatasetSpec, or from a safe profile with --profile.",
         description="Generate synthetic rows from a DatasetSpec file or safe profile metadata.",
+        epilog=GENERATE_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    generate_parser.add_argument("spec", nargs="?", type=Path)
+    generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
     generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
     generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
@@ -72,6 +183,14 @@ def main(argv: list[str] | None = None) -> int:
         aliases=["profile-csv-folder"],
         help="Create a safe profile from a folder of related CSV files.",
         description="Profile a CSV folder without writing source rows or raw PII to the profile.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-example data/example_dataset "
+            "--output out/profile.json\n\n"
+            "Then review the profile and run:\n"
+            "  test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     profile_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
     profile_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
@@ -84,6 +203,13 @@ def main(argv: list[str] | None = None) -> int:
         "infer-spec",
         help="Infer a reusable DatasetSpec YAML from a safe profile.",
         description="Turn a safe profile JSON into a DatasetSpec YAML recipe for generation.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent infer-spec out/profile.json "
+            "--count 100 --output out/dataset_spec.yaml\n\n"
+            "Review the spec before passing it to the generate command."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     infer_spec_parser.add_argument("profile", type=Path, help="Safe profile JSON.")
     infer_spec_parser.add_argument("--output", "-o", type=Path, required=True, help="DatasetSpec YAML/JSON to write.")
@@ -94,6 +220,13 @@ def main(argv: list[str] | None = None) -> int:
         "profile-csv",
         help="Create a safe profile from one CSV file.",
         description="Profile one CSV file into safe metadata: schema, distributions, ranges, and masked sensitive patterns.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-csv data/customers.csv "
+            "--output out/customers_profile.json\n\n"
+            "For the complete one-command workflow, use generate-from-csv."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     profile_csv_parser.add_argument("input", type=Path, help="Source CSV file. Source rows are not copied to the profile.")
     profile_csv_parser.add_argument("--table", type=str, help="Table/entity name to use in the profile.")
@@ -128,6 +261,13 @@ def main(argv: list[str] | None = None) -> int:
         "validate",
         help="Validate generated rows against a DatasetSpec.",
         description="Validate generated files and optionally write a validation_report.json.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent validate dataset_spec.yaml out/generated "
+            "--output out/generated/validation_report.json\n\n"
+            "The rows argument must be the generated dataset folder, not one data file."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     validate_parser.add_argument("spec", type=Path, help="DatasetSpec YAML/JSON.")
     validate_parser.add_argument("rows", type=Path, help="Generated output folder.")
@@ -161,6 +301,12 @@ def main(argv: list[str] | None = None) -> int:
         "doctor",
         help="Run local environment and fixture smoke checks.",
         description="Check Python, installed features, and a small synthetic generation smoke test.",
+        epilog=(
+            "Examples:\n"
+            "  test-data-agent doctor\n"
+            "  test-data-agent doctor --require-extra parquet --require-extra trino"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
     doctor_parser.add_argument(
@@ -174,6 +320,13 @@ def main(argv: list[str] | None = None) -> int:
     audit_verify_parser = subparsers.add_parser(
         "audit-verify",
         help="Verify an HMAC-authenticated MCP audit log.",
+        description="Verify the complete HMAC chain of a metadata-only MCP audit JSONL file.",
+        epilog=(
+            "Example:\n"
+            "  TEST_DATA_AGENT_AUDIT_KEY_FILE=/run/secrets/audit.key "
+            "test-data-agent audit-verify logs/mcp-audit.jsonl"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     audit_verify_parser.add_argument("log", type=Path, help="Audit JSONL file to verify.")
 
@@ -205,14 +358,49 @@ def main(argv: list[str] | None = None) -> int:
         "agent-approve",
         help="Approve a planned agent workflow and generate synthetic data.",
         description="Load a prepared agent workspace, use the reviewed DatasetSpec, generate data, and validate it.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent agent-approve out/agent\n\n"
+            "Run this only after reviewing out/agent/dataset_spec.yaml."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     agent_approve_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
 
+    subparsers.add_parser(
+        "examples",
+        help="Show copy-ready examples for common workflows.",
+        description=EXAMPLES_TEXT,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     args = parser.parse_args(argv)
+
+    if args.command is None:
+        parser.print_help()
+        return 0
+
+    if args.command == "generate" and args.spec is None and args.profile is None:
+        print("Error: choose a DatasetSpec path or --profile.\n", file=sys.stderr)
+        print(GENERATE_EPILOG, file=sys.stderr)
+        print("Run 'test-data-agent generate --help' for all options.", file=sys.stderr)
+        return 2
+
+    if args.command == "generate" and args.spec is not None and args.profile is not None:
+        print("Error: choose one input; a DatasetSpec path and --profile cannot be used together.", file=sys.stderr)
+        print("Run 'test-data-agent generate --help' for examples.", file=sys.stderr)
+        return 2
 
     try:
         return run_command(args)
-    except SystemExit:
+    except SystemExit as exc:
+        if isinstance(exc.code, str):
+            print(f"Error: {exc.code}", file=sys.stderr)
+            print(
+                f"Run 'test-data-agent {args.command} --help' for examples and options.",
+                file=sys.stderr,
+            )
+            return 2
         raise
     except FileNotFoundError as exc:
         print(f"Error: file not found: {exc.filename}", file=sys.stderr)
@@ -226,6 +414,10 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def run_command(args: argparse.Namespace) -> int:
+    if args.command == "examples":
+        print(EXAMPLES_TEXT)
+        return 0
+
     if args.command == "generate":
         if args.profile is not None:
             return generate_dataset_from_profile_command(
@@ -237,8 +429,6 @@ def run_command(args: argparse.Namespace) -> int:
                     spec,
                 ),
             )
-        if args.spec is None:
-            raise SystemExit("generate requires a DatasetSpec path or --profile")
         return generate_dataset_command(
             args,
             business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(

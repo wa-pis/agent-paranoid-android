@@ -13,7 +13,7 @@ Source rows are profiled, never shuffled or copied into generated output.
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)**
 for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
-Current package version: `0.7.0`. The package is
+Current package version: `0.7.1`. The package is
 `agent-paranoid-android`; the CLI is `test-data-agent`.
 
 ## Install
@@ -23,6 +23,14 @@ Python 3.11 or newer is required.
 ```bash
 python3 -m pip install agent-paranoid-android
 test-data-agent doctor
+```
+
+Explore the CLI without needing to remember a command:
+
+```bash
+test-data-agent
+test-data-agent examples
+test-data-agent generate --help
 ```
 
 Install only features you use:
