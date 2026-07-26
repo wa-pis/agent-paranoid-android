@@ -9,7 +9,7 @@ Source:
 Requirements:
 
 * row count: {count}
-* output format: {csv/json/parquet/sql}
+* output format: {csv/json/parquet}
 * mode: {valid/mixed/negative/edge/load_test}
 * invalid ratio: {invalid_ratio}
 * seed: {seed}
@@ -19,4 +19,8 @@ Requirements:
 * copy production rows: no
 * expose PII: no
 
-Use the database only for schema, metadata, aggregate profiling, safe distributions, and masked patterns. Generate fully synthetic data. Validate the output and return the generation specification plus validation report.
+Use the database only for schema, metadata, aggregate profiling, safe
+distributions, and masked patterns. First create a reviewable DatasetSpec and
+stop for my explicit approval. After approval, generate fully synthetic data
+and validate it. Return artifact paths, manifest facts, and validation status;
+do not return source or generated rows in chat.
