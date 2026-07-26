@@ -5,14 +5,22 @@ The executable is `test-data-agent`.
 Use built-in help as the authoritative option reference:
 
 ```bash
+test-data-agent
 test-data-agent --help
+test-data-agent examples
 test-data-agent COMMAND --help
+test-data-agent --version
 ```
+
+Running `test-data-agent` without a command is not an error. It prints the
+available commands, the safest starting points, and copy-ready quickstart
+commands.
 
 ## Commands
 
 | Command | Purpose | Primary output |
 | --- | --- | --- |
+| `examples` | Show complete examples for common workflows | Terminal guide |
 | `doctor` | Check installation and run a temporary smoke generation | Terminal report |
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
@@ -29,6 +37,51 @@ Aliases:
 
 - `profile-csv-folder` is an alias for `profile-example`;
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
+
+## Choose A Workflow
+
+For one CSV file, use the complete workflow:
+
+```bash
+test-data-agent generate-from-csv data/customers.csv \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+```
+
+For a folder containing one related table per CSV file:
+
+```bash
+test-data-agent generate-from-example data/example_dataset \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+```
+
+For a reviewed `DatasetSpec`, pass the spec as the positional input:
+
+```bash
+test-data-agent generate dataset_spec.yaml \
+  --seed 12345 \
+  --format csv \
+  --output out/generated
+```
+
+For previously reviewed safe profile metadata, use `--profile`:
+
+```bash
+test-data-agent generate --profile profile.json \
+  --count 100 \
+  --seed 12345 \
+  --format csv \
+  --output out/customers.csv
+```
+
+`generate` accepts exactly one of a `DatasetSpec` path or `--profile`. Spec
+generation writes a dataset folder. Single-table profile generation writes one
+data file and requires `--count` and `--seed`.
 
 ## Common Generation Options
 
@@ -77,9 +130,11 @@ context before running `agent-approve`.
 ## Exit Behavior
 
 - exit code `0` means the requested command completed;
-- invalid arguments are reported by `argparse`;
+- running without a command prints the starting guide and exits with `0`;
+- invalid arguments show the relevant command syntax and the exact
+  `COMMAND --help` recovery command;
 - safety, validation, resource, and configuration errors produce a concise
-  CLI error and a non-zero exit code;
+  CLI error, a help hint, and a non-zero exit code;
 - intentional negative datasets can produce validation failures by design.
 
 For recovery steps, see [Troubleshooting](../operations/troubleshooting.md).
