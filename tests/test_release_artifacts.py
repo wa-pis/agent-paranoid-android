@@ -142,6 +142,15 @@ def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
         assert all(re.fullmatch(r"[0-9a-f]{40}", reference) for reference in references), workflow
 
 
+def test_setup_uv_keeps_cache_pruning_enabled() -> None:
+    workflows = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
+    workflow_text = "\n".join(path.read_text() for path in workflows)
+
+    setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
+    assert setup_count == 7
+    assert workflow_text.count("prune-cache: true") == setup_count
+
+
 def test_security_workflow_runs_code_and_secret_scans() -> None:
     workflow = (ROOT / ".github" / "workflows" / "security.yml").read_text()
 
