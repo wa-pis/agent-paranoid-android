@@ -87,8 +87,86 @@ Treat these as non-negotiable release gates rather than new feature work:
   `source_rows_copied: false`.
 - OpenSpec baseline stays aligned with implemented behavior.
 
+## Planned For 0.8.1
+
+Treat `0.8.1` as a focused quality release rather than a feature release:
+
+- Align the AI prompts and integration documentation with the implemented
+  `DatasetSpec`, output-format, approval, and artifact-only MCP contracts.
+- Add installation smoke tests for the base package and the `parquet`, `mcp`,
+  and `trino` extras independently.
+- Add a dependency budget and wheel-size check so optional integrations cannot
+  silently become base dependencies.
+- Keep `all` as a development, demo, and container convenience rather than the
+  recommended user installation.
+- Extend strict type checking to the CLI and agent-facing interfaces, and
+  replace loosely typed command results where practical.
+
+## Planned For 0.9.0
+
+Make the review-first agent workflow the clearest product entry point:
+
+- Provide a small guided command set for planning, reviewing, approving, and
+  checking the status of a generation run.
+- Detect CSV files, CSV folders, safe profiles, and `DatasetSpec` inputs when
+  this can be done unambiguously, while retaining explicit overrides.
+- Present concise human-readable summaries of inferred fields, sensitive
+  fields, relationships, confidence, assumptions, and safety warnings.
+- Add stable JSON output for automation and AI clients, with documented exit
+  codes and structured errors.
+- Introduce typed plan, run, approval, and error models with a plan identifier,
+  profile/spec fingerprints, and an approval receipt tied to the reviewed
+  `DatasetSpec`.
+- Make interrupted or repeated operations observable and safely recoverable
+  through explicit status and idempotent state transitions.
+- Add high-level MCP workflow tools so an AI client does not need to choose
+  manually among every low-level profiling operation for the common path.
+  Keep advanced profiling tools available without weakening the current Trino
+  and generator-server trust boundary.
+
+## Reference AI Agent
+
+Provide a practical AI-agent integration without coupling the deterministic
+core to one model vendor:
+
+- Define a provider-neutral advisor interface that accepts safe profile
+  metadata and proposes structured `DatasetSpec` changes.
+- Validate every model-produced proposal with Pydantic and the existing
+  deterministic safety, generation, and validation layers.
+- Keep model SDKs out of the base package; ship provider integrations as
+  optional examples or separate extras only when they are useful.
+- Ensure the model never needs raw production rows, raw PII, database
+  credentials, unrestricted SQL, or generated dataset contents in chat.
+- Treat table names, column names, descriptions, and safe distribution values
+  as untrusted data and defend the agent flow against prompt injection.
+- Include a complete reference flow that profiles, proposes a spec, requests
+  human approval, generates, validates, and reports artifact paths and
+  manifest facts.
+
+## Dependency Policy
+
+- Keep the base runtime limited to dependencies required for deterministic
+  generation and strict contracts. `Faker`, `Pydantic`, and `PyYAML` are the
+  current direct baseline.
+- Keep Parquet, MCP, and Trino support in separate extras. Do not require
+  `PyArrow`, the MCP SDK, the Trino client, or SQL parsing for basic CSV/JSON
+  generation.
+- Do not replace maintained protocol or database libraries with custom
+  implementations solely to reduce package count.
+- Measure the base environment separately from development and `all` installs
+  in CI, and document the installation cost of each optional capability.
+
+## Toward 1.0
+
+- Stabilize the public Python, CLI, MCP, `DatasetSpec`, and artifact contracts.
+- Split the CLI and MCP server modules into parsing, application, and
+  presentation boundaries without changing their safety behavior.
+- Remove legacy compatibility wrappers and command aliases only after a
+  documented deprecation period.
+- Add a pluggable semantic-provider interface for organization-specific
+  synthetic values without allowing providers to bypass privacy validation.
+- Expand cross-table aggregate constraints and controlled negative scenarios.
+
 ## Later
 
-- Pluggable synthetic providers for organization-specific semantic types.
-- More cross-table aggregate constraints and controlled negative scenarios.
 - Deployment templates for orchestrators beyond Docker Compose.
