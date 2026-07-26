@@ -16,6 +16,7 @@ generated output.
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |
 | An MCP-compatible AI client | [Connect An MCP Client](how-to/mcp.md) |
+| An isolated container deployment | [Run In Containers](operations/containers.md) |
 | A failed command | [Troubleshooting](operations/troubleshooting.md) |
 
 ## The Safe Workflow
@@ -75,7 +76,7 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current package version is `0.7.1`. `DatasetSpec` is the generation and
+The current package version is `0.8.0`. `DatasetSpec` is the generation and
 validation contract for the CLI and Python API.
 
 Development is substantially AI-assisted. Human review, automated tests, and

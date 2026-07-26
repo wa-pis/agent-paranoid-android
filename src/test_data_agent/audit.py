@@ -25,6 +25,7 @@ except ImportError:  # pragma: no cover
 
 AUDIT_LOG_ENV = "TEST_DATA_AGENT_AUDIT_LOG"
 AUDIT_HMAC_KEY_ENV = "TEST_DATA_AGENT_AUDIT_HMAC_KEY"
+AUDIT_HMAC_KEY_FILE_ENV = "TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE"
 AUDIT_ACTOR_ENV = "TEST_DATA_AGENT_AUDIT_ACTOR"
 AUDIT_MAX_BYTES_ENV = "TEST_DATA_AGENT_AUDIT_MAX_BYTES"
 AUDIT_SCHEMA_VERSION = "1.0"
@@ -84,12 +85,12 @@ class AuditLogger:
 
 def audit_logger_from_env(service: str) -> AuditLogger | None:
     path_value = os.environ.get(AUDIT_LOG_ENV)
-    key_value = os.environ.get(AUDIT_HMAC_KEY_ENV)
+    key_value = _audit_key_value_from_env()
     if path_value is None and key_value is None:
         return None
     if not path_value or not key_value:
         raise AuditConfigurationError(
-            f"{AUDIT_LOG_ENV} and {AUDIT_HMAC_KEY_ENV} must be configured together"
+            f"{AUDIT_LOG_ENV} and an audit HMAC key must be configured together"
         )
     if fcntl is None or not hasattr(os, "O_NOFOLLOW"):
         raise AuditConfigurationError(
@@ -202,10 +203,11 @@ def verify_audit_log(path: Path, key: bytes) -> AuditVerificationResult:
 
 
 def verify_audit_log_from_env(path: Path) -> AuditVerificationResult:
-    key_value = os.environ.get(AUDIT_HMAC_KEY_ENV)
+    key_value = _audit_key_value_from_env()
     if not key_value:
         raise AuditConfigurationError(
-            f"{AUDIT_HMAC_KEY_ENV} is required to verify an audit log"
+            f"{AUDIT_HMAC_KEY_ENV} or {AUDIT_HMAC_KEY_FILE_ENV} is required "
+            "to verify an audit log"
         )
     return verify_audit_log(path, decode_audit_key(key_value))
 
@@ -222,6 +224,57 @@ def decode_audit_key(value: str) -> bytes:
             f"{AUDIT_HMAC_KEY_ENV} must decode to at least 32 bytes"
         )
     return key
+
+
+def _audit_key_value_from_env() -> str | None:
+    key_value = os.environ.get(AUDIT_HMAC_KEY_ENV)
+    key_file_value = os.environ.get(AUDIT_HMAC_KEY_FILE_ENV)
+    if key_value is not None and key_file_value is not None:
+        raise AuditConfigurationError(
+            f"{AUDIT_HMAC_KEY_ENV} and {AUDIT_HMAC_KEY_FILE_ENV} are mutually exclusive"
+        )
+    if key_file_value is None:
+        return key_value
+    if not key_file_value:
+        raise AuditConfigurationError(f"{AUDIT_HMAC_KEY_FILE_ENV} must not be empty")
+    return _read_audit_key_file(Path(key_file_value))
+
+
+def _read_audit_key_file(path: Path) -> str:
+    if not hasattr(os, "O_NOFOLLOW"):
+        raise AuditConfigurationError("audit key files require secure POSIX file access")
+    candidate = path.expanduser()
+    if candidate.is_symlink():
+        raise AuditConfigurationError("audit key file must not be a symbolic link")
+    flags = os.O_RDONLY | os.O_NOFOLLOW
+    if hasattr(os, "O_CLOEXEC"):
+        flags |= os.O_CLOEXEC
+    try:
+        descriptor = os.open(candidate, flags)
+    except OSError as exc:
+        raise AuditConfigurationError("audit key file cannot be opened safely") from exc
+    try:
+        file_stat = os.fstat(descriptor)
+        if not stat.S_ISREG(file_stat.st_mode):
+            raise AuditConfigurationError("audit key file must be a regular file")
+        if file_stat.st_nlink != 1:
+            raise AuditConfigurationError("audit key file must not have hard links")
+        if file_stat.st_mode & (stat.S_IWGRP | stat.S_IWOTH):
+            raise AuditConfigurationError(
+                "audit key file must not be group- or world-writable"
+            )
+        encoded = os.read(descriptor, 4097)
+        if len(encoded) > 4096:
+            raise AuditConfigurationError("audit key file is too large")
+    finally:
+        os.close(descriptor)
+    try:
+        value = encoded.decode("ascii").strip()
+    except UnicodeDecodeError as exc:
+        raise AuditConfigurationError("audit key file must contain base64 text") from exc
+    if not value:
+        raise AuditConfigurationError("audit key file must not be empty")
+    return value
 
 
 def parse_audit_max_bytes(value: str | None) -> int:

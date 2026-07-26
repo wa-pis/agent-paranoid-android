@@ -52,6 +52,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
         "Issues": "https://github.com/wa-pis/agent-paranoid-android/issues",
         "Changelog": "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
         "Release Notes": "https://github.com/wa-pis/agent-paranoid-android/releases",
+        "Container Images": "https://github.com/wa-pis/agent-paranoid-android/pkgs/container/agent-paranoid-android-cli",
     }
 
 
@@ -61,13 +62,16 @@ def test_public_release_artifacts_are_present() -> None:
         "SECURITY.md",
         "CONTRIBUTING.md",
         "docs/public_release_checklist.md",
+        "docs/operations/containers.md",
         ".github/dependabot.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/containers.yml",
         ".github/workflows/docs.yml",
         ".github/workflows/publish-pypi.yml",
         ".github/workflows/release.yml",
         ".github/workflows/scorecard.yml",
         ".github/workflows/security.yml",
+        ".dockerignore",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/ISSUE_TEMPLATE/config.yml",
         ".github/ISSUE_TEMPLATE/bug_report.yml",
@@ -75,6 +79,8 @@ def test_public_release_artifacts_are_present() -> None:
         "scripts/check_installed_package.py",
         "scripts/check_pypi_artifacts.py",
         "scripts/verify_pypi_release.py",
+        "Dockerfile",
+        "compose.yaml",
         "src/test_data_agent/py.typed",
         "uv.lock",
     ]
@@ -159,6 +165,22 @@ def test_scorecard_workflow_publishes_security_results() -> None:
     assert "id-token: write" in workflow
     assert "github/codeql-action/upload-sarif@" in workflow
     assert "persist-credentials: false" in workflow
+
+
+def test_container_release_uses_oidc_and_no_stored_signing_key() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "containers.yml").read_text()
+
+    assert "permissions:\n  contents: read" in workflow
+    assert "packages: write" in workflow
+    assert "id-token: write" in workflow
+    assert "artifact-metadata: write" in workflow
+    assert "actions/attest-build-provenance@" in workflow
+    assert "sigstore/cosign-installer@" in workflow
+    assert "cosign-release: v3.1.2" in workflow
+    assert "cosign sign --yes" in workflow
+    assert "cosign verify" in workflow
+    assert "private-key" not in workflow
+    assert "COSIGN_PASSWORD" not in workflow
 
 
 def test_release_workflow_builds_sbom_and_attests_packages() -> None:
@@ -247,7 +269,7 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.7.1")
+    check_release_tag("v0.8.0")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")

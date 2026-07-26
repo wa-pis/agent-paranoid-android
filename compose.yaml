@@ -1,0 +1,103 @@
+name: agent-paranoid-android
+
+x-runtime: &runtime
+  read_only: true
+  user: "${CONTAINER_UID:-65532}:${CONTAINER_GID:-65532}"
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  init: true
+  restart: "no"
+  pids_limit: 128
+  mem_limit: 512m
+  cpus: 1.0
+  tmpfs:
+    - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+  stdin_open: true
+  tty: false
+
+x-audit: &audit
+  TEST_DATA_AGENT_AUDIT_ACTOR: "${TEST_DATA_AGENT_AUDIT_ACTOR:-docker-compose}"
+  TEST_DATA_AGENT_AUDIT_MAX_BYTES: "${TEST_DATA_AGENT_AUDIT_MAX_BYTES:-67108864}"
+
+services:
+  cli:
+    <<: *runtime
+    image: "${CLI_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-cli:0.8.0}"
+    build:
+      context: .
+      target: cli
+      args:
+        APP_VERSION: "0.8.0"
+    network_mode: none
+    volumes:
+      - type: bind
+        source: "${TEST_DATA_AGENT_WORKSPACE:-./workspace}"
+        target: /workspace
+
+  generator-mcp:
+    <<: *runtime
+    image: "${GENERATOR_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-generator-mcp:0.8.0}"
+    build:
+      context: .
+      target: generator-mcp
+      args:
+        APP_VERSION: "0.8.0"
+    network_mode: none
+    environment:
+      <<: *audit
+      TEST_DATA_AGENT_AUDIT_LOG: /audit/generator.jsonl
+      TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE: /run/secrets/generator_audit_hmac_key
+      TEST_DATA_AGENT_WORKSPACE_ROOT: /workspace
+    secrets:
+      - generator_audit_hmac_key
+    volumes:
+      - type: bind
+        source: "${TEST_DATA_AGENT_WORKSPACE:-./workspace}"
+        target: /workspace
+      - type: bind
+        source: "${TEST_DATA_AGENT_GENERATOR_AUDIT_DIR:-./audit/generator}"
+        target: /audit
+
+  trino-mcp:
+    <<: *runtime
+    image: "${TRINO_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-trino-mcp:0.8.0}"
+    build:
+      context: .
+      target: trino-mcp
+      args:
+        APP_VERSION: "0.8.0"
+    environment:
+      <<: *audit
+      TEST_DATA_AGENT_AUDIT_LOG: /audit/trino.jsonl
+      TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE: /run/secrets/trino_audit_hmac_key
+      TRINO_HOST: "${TRINO_HOST:-}"
+      TRINO_PORT: "${TRINO_PORT:-443}"
+      TRINO_USER: "${TRINO_USER:-test_data_agent}"
+      TRINO_HTTP_SCHEME: "${TRINO_HTTP_SCHEME:-https}"
+      TRINO_ALLOWED_CATALOGS: "${TRINO_ALLOWED_CATALOGS:-}"
+      TRINO_ALLOWED_SCHEMAS: "${TRINO_ALLOWED_SCHEMAS:-}"
+      TRINO_REQUEST_TIMEOUT_SECONDS: "${TRINO_REQUEST_TIMEOUT_SECONDS:-30}"
+      TRINO_MAX_RESULT_ROWS: "${TRINO_MAX_RESULT_ROWS:-10000}"
+      TRINO_QUERY_MAX_EXECUTION_TIME: "${TRINO_QUERY_MAX_EXECUTION_TIME:-30s}"
+      TRINO_QUERY_MAX_RUN_TIME: "${TRINO_QUERY_MAX_RUN_TIME:-45s}"
+      TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES: "${TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES:-1GB}"
+    secrets:
+      - trino_audit_hmac_key
+    volumes:
+      - type: bind
+        source: "${TEST_DATA_AGENT_TRINO_AUDIT_DIR:-./audit/trino}"
+        target: /audit
+    networks:
+      - trino-egress
+
+networks:
+  trino-egress:
+    name: agent-paranoid-android-trino-egress
+
+secrets:
+  generator_audit_hmac_key:
+    file: "${TEST_DATA_AGENT_GENERATOR_AUDIT_HMAC_KEY_FILE:-./secrets/generator_audit_hmac_key}"
+  trino_audit_hmac_key:
+    file: "${TEST_DATA_AGENT_TRINO_AUDIT_HMAC_KEY_FILE:-./secrets/trino_audit_hmac_key}"

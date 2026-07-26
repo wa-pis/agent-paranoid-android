@@ -4,6 +4,28 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.8.0] - 2026-07-26
+
+### Added
+
+- Separate minimal OCI targets for the CLI, generator MCP server, and Trino MCP
+  server, with non-root users and target-specific health checks.
+- A hardened Compose deployment with read-only root filesystems, dropped
+  capabilities, bounded resources, generator network isolation, narrow mounts,
+  and Docker secret-backed audit logging.
+- Tag-only multi-platform GHCR publication with BuildKit SBOM and provenance,
+  GitHub artifact attestations, and keyless Cosign signatures.
+- `TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE` as a bounded, no-follow alternative to
+  placing an audit key directly in process environment.
+
+### Security
+
+- Container targets exclude dependencies and mounts outside their role: the
+  generator has no Trino stack or network, and the Trino worker has no
+  generator workspace.
+- Base images and GitHub Actions are pinned to immutable digests or commit
+  SHAs; pull-request jobs have no registry write permission.
+
 ## [0.7.1] - 2026-07-26
 
 ### Changed
@@ -279,6 +301,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.8.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.5.1...v0.6.0

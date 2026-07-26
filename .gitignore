@@ -152,6 +152,9 @@ activemq-data/
 .env
 .envrc
 .venv
+/audit/
+/secrets/
+/workspace/
 env/
 venv/
 ENV/

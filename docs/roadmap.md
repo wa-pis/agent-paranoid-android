@@ -3,6 +3,15 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.8.0
+
+- Separate minimal CLI, generator MCP, and Trino MCP OCI images.
+- A least-privilege Compose deployment with non-root workers, read-only root
+  filesystems, bounded resources, mounted audit secrets, and isolated
+  generator networking.
+- Multi-platform GHCR publication with BuildKit SBOM and provenance,
+  GitHub attestations, and keyless Cosign signatures.
+
 ## Implemented For 0.7.0
 
 - Lightweight base installation with explicit `parquet`, `mcp`, `trino`, and
@@ -82,4 +91,4 @@ Treat these as non-negotiable release gates rather than new feature work:
 
 - Pluggable synthetic providers for organization-specific semantic types.
 - More cross-table aggregate constraints and controlled negative scenarios.
-- Packaging and deployment examples for isolated MCP workers.
+- Deployment templates for orchestrators beyond Docker Compose.

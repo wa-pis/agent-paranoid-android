@@ -38,3 +38,16 @@ selected published GitHub Release.
   distribution files
 - **WHEN** pre-publication validation runs
 - **THEN** the workflow fails before requesting PyPI publication
+
+### Requirement: Signed OCI Publication
+
+The project SHALL publish container images only from matching version tags and
+SHALL authenticate image manifests without stored signing keys.
+
+#### Scenario: Release images are published
+
+- **GIVEN** a version tag that matches the package version
+- **WHEN** the container workflow pushes its three target images
+- **THEN** the manifest digests receive SBOM and provenance attestations
+- **AND** Cosign signs each digest with GitHub OIDC
+- **AND** pull-request builds never receive package write permission

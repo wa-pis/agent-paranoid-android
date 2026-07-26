@@ -20,6 +20,11 @@ EXPECTED_PROJECT_URLS = {
     "Issues, https://github.com/wa-pis/agent-paranoid-android/issues",
     "Changelog, https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELOG.md",
     "Release Notes, https://github.com/wa-pis/agent-paranoid-android/releases",
+    (
+        "Container Images, "
+        "https://github.com/wa-pis/agent-paranoid-android/pkgs/container/"
+        "agent-paranoid-android-cli"
+    ),
 }
 EXPECTED_BASE_DEPENDENCIES = {"faker", "pydantic", "pyyaml"}
 EXPECTED_EXTRAS = {"all", "dev", "mcp", "parquet", "trino"}

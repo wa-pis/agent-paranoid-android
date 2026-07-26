@@ -28,6 +28,19 @@ in MCP client configuration, or print it in CI logs. The log parent directory
 must already exist. Symbolic links, hard-linked files, and group- or
 world-writable log files are rejected.
 
+For Docker or another secret-file provider, configure the file instead of an
+environment value:
+
+```bash
+export TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE=/run/secrets/audit_hmac_key
+unset TEST_DATA_AGENT_AUDIT_HMAC_KEY
+```
+
+The file must contain only the base64 key, may end with one newline, and is
+read with no-follow semantics and a 4096-byte limit. Configuring both key
+sources is rejected. See [Container Deployment](containers.md) for the
+least-privilege Compose example.
+
 When audit configuration is present but invalid, MCP operations fail closed.
 The default maximum log size is 64 MiB. Override it with
 `TEST_DATA_AGENT_AUDIT_MAX_BYTES`, up to 1 GiB.
