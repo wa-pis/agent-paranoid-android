@@ -130,6 +130,10 @@ context before running `agent-approve`. Use `agent-status --json` for a
 versioned, row-free automation contract. Source type is detected for CSV
 files, CSV folders, and safe-profile JSON; use `--source-type` to override it.
 
+Planning and pending status show metadata-only entities, fields, sensitive
+classifications, relationships, confidence, assumptions, and warnings. Entity
+and field names are untrusted input and are escaped before terminal output.
+
 ## Exit Behavior
 
 - exit code `0` means the requested command completed;

@@ -15,6 +15,7 @@ except ImportError:  # pragma: no cover
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.agent import (
+    AgentPlanSummary,
     AgentRequest,
     AgentSourceType,
     approve_agent_workspace,
@@ -214,6 +215,8 @@ def plan_trino_dataset(
         output_format=OutputFormat(output_format),
     )
     result = plan_agent_profile(request, profile)
+    if not isinstance(result.summary, AgentPlanSummary):
+        raise RuntimeError("Trino planning did not produce an agent plan summary")
     return {
         "operation": "plan_trino_dataset",
         "approval_required": result.approval_required,
@@ -221,7 +224,7 @@ def plan_trino_dataset(
         "profile_path": workspace_path_label(result.artifacts.profile_path),
         "spec_path": workspace_path_label(result.artifacts.dataset_spec_path),
         "plan_path": workspace_path_label(result.artifacts.plan_path),
-        **result.summary.model_dump(mode="json"),
+        **compact_agent_plan_summary(result.summary),
     }
 
 
@@ -251,6 +254,26 @@ def approve_dataset_plan(workspace_path: str) -> dict[str, Any]:
         ),
         "manifest_path": workspace_path_label(artifacts.manifest_path),
         **result.summary.model_dump(mode="json"),
+    }
+
+
+def compact_agent_plan_summary(summary: AgentPlanSummary) -> dict[str, Any]:
+    """Preserve the existing metadata-minimal MCP response contract."""
+
+    return {
+        "source_type": summary.source_type,
+        "entities": [
+            {
+                "name": entity.name,
+                "row_count": entity.row_count,
+                "field_count": entity.field_count,
+            }
+            for entity in summary.entities
+        ],
+        "relationship_count": summary.relationship_count,
+        "constraint_count": summary.constraint_count,
+        "seed": summary.seed,
+        "output_format": summary.output_format.value,
     }
 
 

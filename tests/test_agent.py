@@ -4,10 +4,13 @@ from pathlib import Path
 
 import test_data_agent
 from test_data_agent.agent import (
+    AgentFieldReference,
+    AgentFieldSummary,
     AgentGenerationSummary,
     AgentNextAction,
     AgentPlanSummary,
     AgentRequest,
+    AgentRelationshipSummary,
     AgentSourceType,
     AgentWorkspaceStatus,
     approve_agent_workspace,
@@ -23,7 +26,10 @@ FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
 
 
 def test_package_root_exposes_agent_api() -> None:
+    assert test_data_agent.AgentFieldReference is AgentFieldReference
+    assert test_data_agent.AgentFieldSummary is AgentFieldSummary
     assert test_data_agent.AgentRequest is AgentRequest
+    assert test_data_agent.AgentRelationshipSummary is AgentRelationshipSummary
     assert test_data_agent.AgentPlanSummary is AgentPlanSummary
     assert test_data_agent.AgentGenerationSummary is AgentGenerationSummary
     assert test_data_agent.AgentNextAction is AgentNextAction
@@ -57,6 +63,15 @@ def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
     assert isinstance(result.summary, AgentPlanSummary)
     assert result.summary.seed == 12345
     assert result.summary.entities[0].field_count > 0
+    assert result.summary.entities[0].fields[0].name == "customer_id"
+    assert result.summary.metadata_trust == "untrusted"
+    assert [(field.entity, field.field) for field in result.summary.sensitive_fields] == [
+        ("customers", "email")
+    ]
+    assert result.summary.relationships[0].confidence == 1.0
+    assert result.summary.minimum_inference_confidence is not None
+    assert result.summary.assumptions
+    assert "untrusted metadata" in result.summary.warnings[0]
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
     assert "alice@example.com" not in profile_text
@@ -212,6 +227,30 @@ def test_detect_agent_source_type_routes_dataset_spec_to_generate(tmp_path) -> N
         assert "test-data-agent generate" in str(exc)
     else:
         raise AssertionError("DatasetSpec must not be treated as a safe profile")
+
+
+def test_agent_plan_summary_keeps_older_persisted_shape_readable() -> None:
+    summary = AgentPlanSummary.model_validate(
+        {
+            "source_type": "csv",
+            "entities": [
+                {
+                    "name": "customers",
+                    "row_count": 3,
+                    "field_count": 2,
+                }
+            ],
+            "relationship_count": 0,
+            "constraint_count": 0,
+            "seed": 7,
+            "output_format": "csv",
+        }
+    )
+
+    assert summary.entities[0].fields == []
+    assert summary.sensitive_fields == []
+    assert summary.relationships == []
+    assert summary.metadata_trust == "untrusted"
 
 
 def load_csv_folder(folder: Path) -> dict[str, list[dict[str, str]]]:

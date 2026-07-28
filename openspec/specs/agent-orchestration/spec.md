@@ -97,3 +97,17 @@ inputs when their shape is unambiguous.
 - **THEN** it selects the matching source adapter
 - **AND** explicit `--source-type` remains available as an override
 - **AND** DatasetSpec and unsupported inputs fail with actionable guidance
+
+### Requirement: Agent Plan Has A Safe Review Summary
+
+The agent workflow SHALL provide a concise metadata-only review summary after
+planning and while approval is pending.
+
+#### Scenario: Plan summary is rendered
+
+- **GIVEN** an inferred agent plan
+- **WHEN** the CLI or typed API returns its summary
+- **THEN** it reports fields, sensitive classifications, relationships,
+  confidence, assumptions, and safety warnings
+- **AND** untrusted names are escaped for terminal output
+- **AND** source values and dataset rows are excluded

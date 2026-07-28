@@ -10,6 +10,9 @@ All notable changes to this project are documented here.
   workspaces, with concise human output and a versioned `--json` contract.
 - Automatic `agent-plan` source detection for CSV files, CSV folders, and
   validated safe-profile JSON, while retaining `--source-type` as an override.
+- Metadata-only `agent-plan` review summaries covering inferred fields,
+  sensitive classifications, relationships, confidence, assumptions, and
+  safety warnings, with escaped untrusted names.
 
 ### Changed
 
