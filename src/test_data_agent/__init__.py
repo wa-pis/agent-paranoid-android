@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from test_data_agent.agent import (
+    AgentGenerationSummary,
+    AgentPlanSummary,
     AgentRequest,
     AgentResult,
     AgentSourceType,
@@ -19,6 +21,8 @@ from test_data_agent.version import __version__
 __all__ = [
     "AgentRequest",
     "AgentResult",
+    "AgentPlanSummary",
+    "AgentGenerationSummary",
     "AgentSourceType",
     "DatasetProfile",
     "DatasetSpec",

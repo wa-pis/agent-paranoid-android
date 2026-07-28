@@ -3,6 +3,18 @@
 The roadmap is ordered by safety and integration value, not by a fixed delivery
 date.
 
+## Implemented For 0.8.1
+
+- AI prompts and integration documentation aligned with the implemented
+  `DatasetSpec`, output-format, approval, and artifact-only MCP contracts.
+- Independent installation smoke tests for the base package and the `parquet`,
+  `mcp`, and `trino` extras.
+- Dependency-count and wheel-size budgets that keep optional integrations out
+  of the base installation.
+- `all` documented as a development, demo, and container convenience.
+- Strict type checking for the CLI and agent-facing interfaces, with typed
+  plan and generation summaries.
+
 ## Implemented For 0.8.0
 
 - Separate minimal CLI, generator MCP, and Trino MCP OCI images.
@@ -86,21 +98,6 @@ Treat these as non-negotiable release gates rather than new feature work:
 - Generated manifests report `synthetic: true` and
   `source_rows_copied: false`.
 - OpenSpec baseline stays aligned with implemented behavior.
-
-## Planned For 0.8.1
-
-Treat `0.8.1` as a focused quality release rather than a feature release:
-
-- Align the AI prompts and integration documentation with the implemented
-  `DatasetSpec`, output-format, approval, and artifact-only MCP contracts.
-- Add installation smoke tests for the base package and the `parquet`, `mcp`,
-  and `trino` extras independently.
-- Add a dependency budget and wheel-size check so optional integrations cannot
-  silently become base dependencies.
-- Keep `all` as a development, demo, and container convenience rather than the
-  recommended user installation.
-- Extend strict type checking to the CLI and agent-facing interfaces, and
-  replace loosely typed command results where practical.
 
 ## Planned For 0.9.0
 

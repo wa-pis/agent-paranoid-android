@@ -7,7 +7,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -93,12 +93,58 @@ class AgentArtifacts(BaseModel):
     manifest_path: Path | None = None
 
 
+class AgentEntitySummary(BaseModel):
+    name: str
+    row_count: int
+    field_count: int
+
+
+class AgentSummary(BaseModel):
+    """Typed summary with temporary dict-style access for compatibility."""
+
+    def __getitem__(self, key: str) -> Any:
+        try:
+            return getattr(self, key)
+        except AttributeError:
+            raise KeyError(key) from None
+
+    def get(self, key: str, default: Any = None) -> Any:
+        return getattr(self, key, default)
+
+
+class AgentPlanSummary(AgentSummary):
+    source_type: str
+    entities: list[AgentEntitySummary]
+    relationship_count: int
+    constraint_count: int
+    seed: int
+    output_format: OutputFormat
+
+
+class AgentGenerationSummary(AgentSummary):
+    source_type: str
+    row_counts: dict[str, int]
+    seed: int
+    output_format: OutputFormat
+    validation_valid: bool
+    synthetic: Literal[True] = True
+    source_rows_copied: Literal[False] = False
+
+
 class AgentResult(BaseModel):
     phase: AgentPhase
     approval_required: bool
     steps: list[AgentStep]
     artifacts: AgentArtifacts
-    summary: dict[str, Any] = Field(default_factory=dict)
+    summary: AgentPlanSummary | AgentGenerationSummary
+
+    @model_validator(mode="after")
+    def validate_phase_summary(self) -> AgentResult:
+        if self.phase == AgentPhase.AWAITING_APPROVAL and not isinstance(self.summary, AgentPlanSummary):
+            raise ValueError("awaiting-approval results require an agent plan summary")
+        if self.phase == AgentPhase.COMPLETED and not isinstance(self.summary, AgentGenerationSummary):
+            raise ValueError("completed results require an agent generation summary")
+        return self
 
 
 def plan_agent_request(request: AgentRequest) -> AgentResult:
@@ -147,18 +193,18 @@ def _persist_agent_plan(
             AgentStep(name="generate", status="skipped", summary="Generation waits for agent-approve."),
         ],
         artifacts=artifacts,
-        summary={
-            "source_type": (
+        summary=AgentPlanSummary(
+            source_type=(
                 profile.source_type
                 if normalized.source_type == AgentSourceType.PROFILE
                 else normalized.source_type.value
             ),
-            "entities": entity_summary(spec),
-            "relationship_count": len(spec.relationships),
-            "constraint_count": len(spec.constraints),
-            "seed": normalized.seed,
-            "output_format": normalized.output_format.value,
-        },
+            entities=entity_summary(spec),
+            relationship_count=len(spec.relationships),
+            constraint_count=len(spec.constraints),
+            seed=normalized.seed,
+            output_format=normalized.output_format,
+        ),
     )
     write_json_artifact(result, artifacts.plan_path)
     return result
@@ -202,19 +248,17 @@ def approve_agent_workspace(workspace: Path) -> AgentResult:
             AgentStep(name="validate", status="completed", summary="Validation report written."),
         ],
         artifacts=completed_artifacts,
-        summary={
-            "source_type": (
+        summary=AgentGenerationSummary(
+            source_type=(
                 profile.source_type
                 if request.source_type == AgentSourceType.PROFILE
                 else request.source_type.value
             ),
-            "row_counts": row_counts,
-            "seed": request.seed,
-            "output_format": request.output_format.value,
-            "validation_valid": validation_valid,
-            "synthetic": True,
-            "source_rows_copied": False,
-        },
+            row_counts=row_counts,
+            seed=request.seed,
+            output_format=request.output_format,
+            validation_valid=validation_valid,
+        ),
     )
     write_json_artifact(result, resolved_workspace / AGENT_RESULT_FILE)
     return result
@@ -346,12 +390,12 @@ def agent_artifacts(workspace: Path, *, generated_folder: Path | None = None) ->
     )
 
 
-def entity_summary(spec: DatasetSpec) -> list[dict[str, Any]]:
+def entity_summary(spec: DatasetSpec) -> list[AgentEntitySummary]:
     return [
-        {
-            "name": entity.name,
-            "row_count": entity.row_count,
-            "field_count": len(entity.fields),
-        }
+        AgentEntitySummary(
+            name=entity.name,
+            row_count=entity.row_count,
+            field_count=len(entity.fields),
+        )
         for entity in spec.entities
     ]

@@ -4,6 +4,24 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.8.1] - 2026-07-28
+
+### Added
+
+- Independent installation smoke tests for the base package and the Parquet,
+  MCP, and Trino extras.
+- Dependency-count and wheel-size budgets for release artifacts.
+- Typed `AgentPlanSummary` and `AgentGenerationSummary` result models while
+  retaining the existing serialized JSON and dict-style reads.
+
+### Changed
+
+- Aligned AI prompts and integration documentation with the review-first
+  `DatasetSpec`, approval, output-format, and artifact-only MCP contracts.
+- Extended strict type checking to the CLI and agent-facing interfaces.
+- Documented `all` as a development, demo, and container convenience rather
+  than the recommended installation.
+
 ## [0.8.0] - 2026-07-26
 
 ### Added

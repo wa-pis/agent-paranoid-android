@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM ${PYTHON_IMAGE} AS runtime-base
 
-ARG APP_VERSION=0.8.0
+ARG APP_VERSION=0.8.1
 ARG VCS_REF=unknown
 ARG SOURCE_URL=https://github.com/wa-pis/agent-paranoid-android
 

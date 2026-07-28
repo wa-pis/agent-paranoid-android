@@ -87,6 +87,21 @@ Approval writes:
 - `generated/validation_report.json`
 - `generated/generation_manifest.json`
 
+## Result Contract
+
+The Python API returns an `AgentResult`. Its `summary` is one of two typed
+models:
+
+- `AgentPlanSummary` reports entities, relationship and constraint counts,
+  seed, and output format while approval is pending.
+- `AgentGenerationSummary` reports row counts, seed, output format, validation
+  status, and the `synthetic` and `source_rows_copied` safety facts.
+
+The same fields are serialized under `summary` in `agent_plan.json` and
+`agent_result.json`. Existing dict-style reads such as
+`result.summary["row_counts"]` remain supported, but new Python integrations
+should use typed attributes such as `result.summary.row_counts`.
+
 ## LLM Responsibilities
 
 An LLM-based client may:
