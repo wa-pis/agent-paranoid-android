@@ -221,7 +221,7 @@ def plan_trino_dataset(
         "profile_path": workspace_path_label(result.artifacts.profile_path),
         "spec_path": workspace_path_label(result.artifacts.dataset_spec_path),
         "plan_path": workspace_path_label(result.artifacts.plan_path),
-        **result.summary,
+        **result.summary.model_dump(mode="json"),
     }
 
 
@@ -250,7 +250,7 @@ def approve_dataset_plan(workspace_path: str) -> dict[str, Any]:
             artifacts.validation_report_path
         ),
         "manifest_path": workspace_path_label(artifacts.manifest_path),
-        **result.summary,
+        **result.summary.model_dump(mode="json"),
     }
 
 

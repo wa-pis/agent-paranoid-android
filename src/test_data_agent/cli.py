@@ -12,7 +12,14 @@ from typing import Any, Never
 
 from pydantic import ValidationError
 
-from test_data_agent.agent import AgentRequest, AgentResult, AgentSourceType, approve_agent_workspace, plan_agent_request
+from test_data_agent.agent import (
+    AgentGenerationSummary,
+    AgentRequest,
+    AgentResult,
+    AgentSourceType,
+    approve_agent_workspace,
+    plan_agent_request,
+)
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -665,13 +672,15 @@ def write_agent_result_summary(result: AgentResult) -> None:
             file=sys.stderr,
         )
         return
-    row_counts = result.summary.get("row_counts", {})
+    if not isinstance(result.summary, AgentGenerationSummary):
+        raise ValueError("completed agent result is missing its generation summary")
+    row_counts = result.summary.row_counts
     rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"
-    validation = "passed" if result.summary.get("validation_valid") else "failed"
+    validation = "passed" if result.summary.validation_valid else "failed"
     print(
         "Agent generation completed: "
         f"{result.artifacts.generated_folder} | rows: {rows_text} | "
-        f"seed: {result.summary.get('seed')} | validation: {validation} | "
+        f"seed: {result.summary.seed} | validation: {validation} | "
         "source rows copied: no",
         file=sys.stderr,
     )

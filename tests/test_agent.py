@@ -3,7 +3,14 @@ import json
 from pathlib import Path
 
 import test_data_agent
-from test_data_agent.agent import AgentRequest, AgentSourceType, approve_agent_workspace, plan_agent_request
+from test_data_agent.agent import (
+    AgentGenerationSummary,
+    AgentPlanSummary,
+    AgentRequest,
+    AgentSourceType,
+    approve_agent_workspace,
+    plan_agent_request,
+)
 from test_data_agent.core.settings import OutputFormat
 
 
@@ -13,6 +20,8 @@ FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
 
 def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentRequest is AgentRequest
+    assert test_data_agent.AgentPlanSummary is AgentPlanSummary
+    assert test_data_agent.AgentGenerationSummary is AgentGenerationSummary
     assert test_data_agent.AgentSourceType is AgentSourceType
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
@@ -37,12 +46,17 @@ def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
     request = json.loads((workspace / "agent_request.json").read_text())
 
     assert result.phase == "awaiting_approval"
+    assert isinstance(result.summary, AgentPlanSummary)
+    assert result.summary.seed == 12345
+    assert result.summary.entities[0].field_count > 0
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
     assert "alice@example.com" not in profile_text
     assert plan["approval_required"] is True
     assert plan["steps"][2]["name"] == "approval"
     assert plan["steps"][2]["status"] == "pending"
+    assert plan["summary"]["seed"] == 12345
+    assert plan["summary"]["output_format"] == "csv"
     assert request["source_type"] == "csv_folder"
     assert request["seed"] == 12345
 
@@ -64,12 +78,18 @@ def test_agent_approve_generates_safe_csv_folder_bundle(tmp_path) -> None:
 
     manifest = json.loads((workspace / "generated" / "generation_manifest.json").read_text())
     report = json.loads((workspace / "generated" / "validation_report.json").read_text())
+    persisted_result = json.loads((workspace / "agent_result.json").read_text())
     generated_rows = load_csv_folder(workspace / "generated")
     source_rows = load_csv_folder(FIXTURE_EXAMPLE_DATASET)
 
     assert result.phase == "completed"
+    assert isinstance(result.summary, AgentGenerationSummary)
+    assert result.summary.row_counts == {"customers": 5, "orders": 5}
+    assert result.summary.validation_valid is True
     assert result.summary["row_counts"] == {"customers": 5, "orders": 5}
-    assert result.summary["validation_valid"] is True
+    assert persisted_result["summary"]["row_counts"] == {"customers": 5, "orders": 5}
+    assert persisted_result["summary"]["output_format"] == "csv"
+    assert persisted_result["summary"]["source_rows_copied"] is False
     assert manifest["synthetic"] is True
     assert manifest["source_rows_copied"] is False
     assert manifest["seed"] == 77
