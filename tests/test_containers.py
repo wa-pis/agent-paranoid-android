@@ -112,6 +112,25 @@ def test_container_workflow_builds_before_tag_only_publish() -> None:
     assert "--cap-drop ALL" in validate_job
 
 
+def test_container_workflow_uses_node24_docker_actions() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "containers.yml").read_text()
+
+    assert (
+        workflow.count(
+            "docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0"
+        )
+        == 2
+    )
+    assert (
+        "docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0"
+        in workflow
+    )
+    assert (
+        "docker/login-action@abd2ef45e78c5afb21d64d4ca52ee8550d9572c7 # v4.5.1"
+        in workflow
+    )
+
+
 def test_dependabot_tracks_docker_and_workflow_dependencies() -> None:
     config = yaml.safe_load((ROOT / ".github" / "dependabot.yml").read_text())
     ecosystems = {update["package-ecosystem"] for update in config["updates"]}

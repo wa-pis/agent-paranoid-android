@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Updated the Docker build, registry login, and QEMU GitHub Actions to
+  immutable Node.js 24-compatible releases.
+
 ## [0.8.1] - 2026-07-28
 
 ### Added
