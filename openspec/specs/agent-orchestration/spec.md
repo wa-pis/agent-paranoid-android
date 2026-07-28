@@ -71,3 +71,16 @@ or validator.
 - **THEN** it may call `agent-plan`, summarize the `DatasetSpec`, request
   approval, and call `agent-approve`
 - **AND** deterministic Python code performs generation and validation
+
+### Requirement: Agent Workspace Status Is Observable
+
+The agent workflow SHALL expose read-only status for planned and completed
+workspaces without returning dataset rows.
+
+#### Scenario: Workspace status is inspected
+
+- **GIVEN** a valid planned or completed agent workspace
+- **WHEN** `agent-status` runs
+- **THEN** it reports the phase, next action, artifact paths, and safe summary
+- **AND** `--json` returns a versioned typed contract
+- **AND** status inspection does not generate data or modify the workspace

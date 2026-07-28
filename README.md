@@ -13,8 +13,7 @@ Source rows are profiled, never shuffled or copied into generated output.
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)**
 for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
-Current package version: `0.8.1`. The package is
-`agent-paranoid-android`; the CLI is `test-data-agent`.
+Current version: `0.8.1`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## Install
 
@@ -79,6 +78,7 @@ Review the manifest and effective spec before accepting a new dataset.
 | Generate related tables | [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/) |
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
+| Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |
 | Connect an AI client | [MCP Setup](https://wa-pis.github.io/agent-paranoid-android/how-to/mcp/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |

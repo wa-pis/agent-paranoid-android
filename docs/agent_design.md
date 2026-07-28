@@ -21,6 +21,9 @@ User or AI client
     -> DatasetSpec inference
     -> profile.json / dataset_spec.yaml / agent_plan.json
     -> stop for review
+  -> agent-status
+    -> validate workspace state
+    -> report phase, next action, artifact paths, and safe summary
   -> agent-approve
     -> deterministic synthetic generation
     -> source-row reuse checks when source CSV is available
@@ -43,8 +46,18 @@ test-data-agent agent-plan tests/fixtures/example_dataset \
 Review `out/agent/dataset_spec.yaml`, then approve:
 
 ```bash
+test-data-agent agent-status out/agent
 test-data-agent agent-approve out/agent
 ```
+
+Inspect the same workspace as versioned JSON for automation or an AI client:
+
+```bash
+test-data-agent agent-status out/agent --json
+```
+
+Status inspection is read-only. It rejects incomplete or contradictory
+workspace state and never returns source or generated rows.
 
 Plan from one CSV file:
 
@@ -96,6 +109,8 @@ models:
   seed, and output format while approval is pending.
 - `AgentGenerationSummary` reports row counts, seed, output format, validation
   status, and the `synthetic` and `source_rows_copied` safety facts.
+- `AgentWorkspaceStatus` reports the current phase, next action, artifacts, and
+  the applicable typed summary. Its JSON contract has `schema_version: "1.0"`.
 
 The same fields are serialized under `summary` in `agent_plan.json` and
 `agent_result.json`. Existing dict-style reads such as

@@ -209,6 +209,49 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert manifest["row_counts"] == {"customers": 3, "orders": 3}
 
 
+def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> None:
+    workspace = tmp_path / "agent"
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--source-type",
+                "csv-folder",
+                "--workspace",
+                str(workspace),
+                "--count",
+                "3",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+
+    assert main(["agent-status", str(workspace)]) == 0
+    human = capsys.readouterr()
+    assert "Agent status: awaiting approval" in human.err
+    assert "dataset_spec.yaml" in human.err
+
+    assert main(["agent-status", str(workspace), "--json"]) == 0
+    machine = capsys.readouterr()
+    payload = json.loads(machine.out)
+    assert machine.err == ""
+    assert payload["schema_version"] == "1.0"
+    assert payload["phase"] == "awaiting_approval"
+    assert payload["next_action"] == "review_and_approve"
+    assert "rows" not in payload
+
+    assert main(["agent-approve", str(workspace)]) == 0
+    capsys.readouterr()
+    assert main(["agent-status", str(workspace), "--json"]) == 0
+    completed = json.loads(capsys.readouterr().out)
+    assert completed["phase"] == "completed"
+    assert completed["next_action"] == "none"
+    assert completed["summary"]["validation_valid"] is True
+    assert completed["summary"]["source_rows_copied"] is False
+
+
 def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:
     with pytest.raises(SystemExit) as csv_help:
         main(["generate-from-csv", "--help"])

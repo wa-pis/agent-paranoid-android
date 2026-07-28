@@ -31,6 +31,7 @@ commands.
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
+| `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
 
 Aliases:
@@ -121,11 +122,13 @@ test-data-agent agent-plan data/example_dataset \
   --seed 12345 \
   --format csv
 
+test-data-agent agent-status out/agent
 test-data-agent agent-approve out/agent
 ```
 
 `agent-plan` must stop before generation. Review the prepared spec and manifest
-context before running `agent-approve`.
+context before running `agent-approve`. Use `agent-status --json` for a
+versioned, row-free automation contract.
 
 ## Exit Behavior
 

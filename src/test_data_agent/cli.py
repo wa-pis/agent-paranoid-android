@@ -17,7 +17,9 @@ from test_data_agent.agent import (
     AgentRequest,
     AgentResult,
     AgentSourceType,
+    AgentWorkspaceStatus,
     approve_agent_workspace,
+    inspect_agent_workspace,
     plan_agent_request,
 )
 from test_data_agent.audit import verify_audit_log_from_env
@@ -112,6 +114,7 @@ Common workflows
      --workspace out/agent
 
    # Review out/agent/dataset_spec.yaml before approval.
+   test-data-agent agent-status out/agent
    test-data-agent agent-approve out/agent
 
 7. Validate an existing generated dataset
@@ -374,6 +377,26 @@ def main(argv: list[str] | None = None) -> int:
     )
     agent_approve_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
 
+    agent_status_parser = subparsers.add_parser(
+        "agent-status",
+        help="Inspect a planned or completed agent workspace.",
+        description="Read an agent workspace and report its phase, next action, and artifact summary.",
+        epilog=(
+            "Examples:\n"
+            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-status out/agent --json\n\n"
+            "Status inspection never generates data or changes the workspace."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_status_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
+    agent_status_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned status contract as JSON.",
+    )
+
     subparsers.add_parser(
         "examples",
         help="Show copy-ready examples for common workflows.",
@@ -506,6 +529,14 @@ def run_command(args: argparse.Namespace) -> int:
         agent_result = approve_agent_workspace(args.workspace)
         write_agent_result_summary(agent_result)
         return 0 if agent_result.summary.get("validation_valid", False) else 1
+
+    if args.command == "agent-status":
+        status = inspect_agent_workspace(args.workspace)
+        if args.json_output:
+            print(status.model_dump_json(indent=2))
+        else:
+            write_agent_status_summary(status)
+        return 0
 
     return 2
 
@@ -682,6 +713,26 @@ def write_agent_result_summary(result: AgentResult) -> None:
         f"{result.artifacts.generated_folder} | rows: {rows_text} | "
         f"seed: {result.summary.seed} | validation: {validation} | "
         "source rows copied: no",
+        file=sys.stderr,
+    )
+
+
+def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
+    if status.phase.value == "awaiting_approval":
+        print(
+            "Agent status: awaiting approval | "
+            f"review: {status.artifacts.dataset_spec_path} | "
+            f"approve with: test-data-agent agent-approve {status.artifacts.workspace}",
+            file=sys.stderr,
+        )
+        return
+    if not isinstance(status.summary, AgentGenerationSummary):
+        raise ValueError("completed agent status is missing its generation summary")
+    validation = "passed" if status.summary.validation_valid else "failed"
+    print(
+        "Agent status: completed | "
+        f"output: {status.artifacts.generated_folder} | "
+        f"validation: {validation} | source rows copied: no",
         file=sys.stderr,
     )
 

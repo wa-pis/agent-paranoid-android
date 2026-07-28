@@ -4,11 +4,14 @@ from __future__ import annotations
 
 from test_data_agent.agent import (
     AgentGenerationSummary,
+    AgentNextAction,
     AgentPlanSummary,
     AgentRequest,
     AgentResult,
     AgentSourceType,
+    AgentWorkspaceStatus,
     approve_agent_workspace,
+    inspect_agent_workspace,
     plan_agent_profile,
     plan_agent_request,
 )
@@ -23,7 +26,9 @@ __all__ = [
     "AgentResult",
     "AgentPlanSummary",
     "AgentGenerationSummary",
+    "AgentNextAction",
     "AgentSourceType",
+    "AgentWorkspaceStatus",
     "DatasetProfile",
     "DatasetSpec",
     "DatasetGenerationResult",
@@ -33,6 +38,7 @@ __all__ = [
     "generate_dataset",
     "generate_dataset_bundle",
     "infer_dataset_spec",
+    "inspect_agent_workspace",
     "plan_agent_request",
     "plan_agent_profile",
     "solve_constraints",
