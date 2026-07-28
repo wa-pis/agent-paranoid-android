@@ -116,7 +116,6 @@ limit bounds comparisons that require row-level relationships.
 
 ```bash
 test-data-agent agent-plan data/example_dataset \
-  --source-type csv-folder \
   --workspace out/agent \
   --count 25 \
   --seed 12345 \
@@ -128,7 +127,8 @@ test-data-agent agent-approve out/agent
 
 `agent-plan` must stop before generation. Review the prepared spec and manifest
 context before running `agent-approve`. Use `agent-status --json` for a
-versioned, row-free automation contract.
+versioned, row-free automation contract. Source type is detected for CSV
+files, CSV folders, and safe-profile JSON; use `--source-type` to override it.
 
 ## Exit Behavior
 

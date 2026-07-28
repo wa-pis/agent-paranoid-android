@@ -40,12 +40,14 @@ generation:
 
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
-  --source-type csv-folder \
   --workspace out/agent \
   --count 25 \
   --seed 12345 \
   --format csv
 ```
+
+The CLI detects this as a CSV-folder source. AI clients should provide
+`--source-type` only when an explicit override is required.
 
 The AI client can summarize `out/agent/dataset_spec.yaml` and ask for approval.
 After review, run:

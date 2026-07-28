@@ -36,7 +36,6 @@ Plan from a CSV folder and stop before generation:
 
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
-  --source-type csv-folder \
   --workspace out/agent \
   --count 25 \
   --seed 12345 \
@@ -63,7 +62,6 @@ Plan from one CSV file:
 
 ```bash
 test-data-agent agent-plan tests/fixtures/customers.csv \
-  --source-type csv \
   --workspace out/customer_agent \
   --table customers \
   --count 25 \
@@ -75,12 +73,15 @@ Plan from a safe profile JSON:
 
 ```bash
 test-data-agent agent-plan examples/orders_profile.json \
-  --source-type profile \
   --workspace out/profile_agent \
   --count 25 \
   --seed 12345 \
   --format json
 ```
+
+`agent-plan` detects CSV files, folders containing CSV files, and validated
+safe-profile JSON. Use `--source-type` only as an explicit override.
+DatasetSpec JSON or YAML belongs to the existing `generate` workflow.
 
 ## Artifacts
 

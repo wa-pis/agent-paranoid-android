@@ -84,3 +84,16 @@ workspaces without returning dataset rows.
 - **THEN** it reports the phase, next action, artifact paths, and safe summary
 - **AND** `--json` returns a versioned typed contract
 - **AND** status inspection does not generate data or modify the workspace
+
+### Requirement: Agent Input Detection Is Narrow And Validated
+
+The CLI SHALL infer CSV files, CSV folders, and validated safe-profile JSON
+inputs when their shape is unambiguous.
+
+#### Scenario: Agent source type is omitted
+
+- **GIVEN** an unambiguous supported source path
+- **WHEN** `agent-plan` runs without `--source-type`
+- **THEN** it selects the matching source adapter
+- **AND** explicit `--source-type` remains available as an override
+- **AND** DatasetSpec and unsupported inputs fail with actionable guidance

@@ -19,6 +19,8 @@ date.
 
 - Read-only workspace status for the review-first agent flow, including
   versioned JSON output for automation and AI clients.
+- Narrow validated `agent-plan` input detection for CSV files, CSV folders,
+  and safe profiles, with DatasetSpec inputs routed to `generate`.
 
 ## Implemented For 0.8.0
 
@@ -112,7 +114,9 @@ Make the review-first agent workflow the clearest product entry point:
   checking the status of a generation run. Initial workspace status inspection
   is implemented; guided planning and review remain.
 - Detect CSV files, CSV folders, safe profiles, and `DatasetSpec` inputs when
-  this can be done unambiguously, while retaining explicit overrides.
+  this can be done unambiguously, while retaining explicit overrides. CSV and
+  profile detection is implemented; DatasetSpec inputs are recognized and
+  routed to the existing reviewed-spec workflow.
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
 - Add stable JSON output for automation and AI clients, with documented exit

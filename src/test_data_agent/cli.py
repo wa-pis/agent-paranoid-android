@@ -19,6 +19,7 @@ from test_data_agent.agent import (
     AgentSourceType,
     AgentWorkspaceStatus,
     approve_agent_workspace,
+    detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
 )
@@ -110,7 +111,6 @@ Common workflows
 6. Review-first agent workflow
 
    test-data-agent agent-plan data/example_dataset \\
-     --source-type csv-folder \\
      --workspace out/agent
 
    # Review out/agent/dataset_spec.yaml before approval.
@@ -347,13 +347,17 @@ def main(argv: list[str] | None = None) -> int:
         epilog=(
             "Example:\n"
             "  test-data-agent agent-plan tests/fixtures/example_dataset "
-            "--source-type csv-folder --workspace out/agent --count 25 --seed 12345 --format csv\n"
+            "--workspace out/agent --count 25 --seed 12345 --format csv\n"
             "  test-data-agent agent-approve out/agent"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     agent_plan_parser.add_argument("source", type=Path, help="CSV file, CSV folder, or safe profile JSON.")
-    agent_plan_parser.add_argument("--source-type", choices=["csv", "csv-folder", "profile"], required=True)
+    agent_plan_parser.add_argument(
+        "--source-type",
+        choices=["csv", "csv-folder", "profile"],
+        help="Override automatic CSV, CSV-folder, or safe-profile detection.",
+    )
     agent_plan_parser.add_argument("--workspace", type=Path, required=True, help="Empty folder for agent artifacts.")
     agent_plan_parser.add_argument("--count", type=positive_int, default=100, help="Synthetic row count per entity.")
     agent_plan_parser.add_argument("--seed", type=non_negative_int, default=12345, help="Deterministic generation seed.")
@@ -678,8 +682,13 @@ def write_doctor_fixture(directory: Path) -> None:
 
 
 def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
+    source_type = (
+        AgentSourceType(args.source_type.replace("-", "_"))
+        if args.source_type is not None
+        else detect_agent_source_type(args.source)
+    )
     return AgentRequest(
-        source_type=AgentSourceType(args.source_type.replace("-", "_")),
+        source_type=source_type,
         source_path=args.source,
         workspace=args.workspace,
         count=args.count,
