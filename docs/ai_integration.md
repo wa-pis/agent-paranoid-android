@@ -43,7 +43,8 @@ test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent \
   --count 25 \
   --seed 12345 \
-  --format csv
+  --format csv \
+  --json
 ```
 
 The CLI detects this as a CSV-folder source. AI clients should provide
@@ -56,8 +57,13 @@ AI client can summarize `out/agent/dataset_spec.yaml` and ask for approval.
 After review, run:
 
 ```bash
-test-data-agent agent-approve out/agent
+test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent --json
 ```
+
+AI clients should use `--json`, inspect `schema_version`, and branch on stable
+structured error codes and process exit codes. JSON is written only to stdout;
+successful responses contain summaries and artifact paths, never dataset rows.
 
 This mode is documented in [Agent Design](agent_design.md). It is useful when
 an LLM should plan the workflow but deterministic Python code must retain

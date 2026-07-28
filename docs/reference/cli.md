@@ -126,22 +126,62 @@ test-data-agent agent-approve out/agent
 ```
 
 `agent-plan` must stop before generation. Review the prepared spec and manifest
-context before running `agent-approve`. Use `agent-status --json` for a
-versioned, row-free automation contract. Source type is detected for CSV
-files, CSV folders, and safe-profile JSON; use `--source-type` to override it.
+context before running `agent-approve`. Add `--json` to `agent-plan`,
+`agent-status`, or `agent-approve` for a versioned, row-free automation
+contract. Source type is detected for CSV files, CSV folders, and safe-profile
+JSON; use `--source-type` to override it.
 
 Planning and pending status show metadata-only entities, fields, sensitive
 classifications, relationships, confidence, assumptions, and warnings. Entity
 and field names are untrusted input and are escaped before terminal output.
 
+## Agent JSON Contract
+
+Use JSON output when invoking the review flow from automation or an AI client:
+
+```bash
+test-data-agent agent-plan data/example_dataset \
+  --workspace out/agent --json
+test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent --json
+```
+
+Successful commands write one JSON document to stdout and leave stderr empty.
+Planning and approval return an `AgentResult`; status returns an
+`AgentWorkspaceStatus`. Both contracts include `"schema_version": "1.0"` and
+artifact paths and summaries, never source or generated rows.
+
+Known argument, input, and path failures also write one versioned JSON document
+to stdout when `--json` is present:
+
+```json
+{
+  "schema_version": "1.0",
+  "ok": false,
+  "error": {
+    "code": "invalid_arguments",
+    "message": "the following arguments are required: --workspace",
+    "command": "test-data-agent agent-plan",
+    "exit_code": 2,
+    "retryable": false,
+    "help": "test-data-agent agent-plan --help"
+  }
+}
+```
+
+Stable error codes are `invalid_arguments`, `input_not_found`, `invalid_path`,
+and `invalid_input`. Messages may become clearer over time; clients should
+branch on `error.code`, not message text.
+
 ## Exit Behavior
 
-- exit code `0` means the requested command completed;
-- running without a command prints the starting guide and exits with `0`;
-- invalid arguments show the relevant command syntax and the exact
-  `COMMAND --help` recovery command;
-- safety, validation, resource, and configuration errors produce a concise
-  CLI error, a help hint, and a non-zero exit code;
-- intentional negative datasets can produce validation failures by design.
+| Code | Meaning |
+| --- | --- |
+| `0` | The command completed successfully. Running without a command also prints the starting guide and returns `0`. |
+| `1` | The command completed, but dataset validation failed. This can be intentional for negative datasets. |
+| `2` | Arguments, input, paths, safety checks, resources, or configuration prevented completion. |
+
+Without `--json`, errors use concise stderr text and an exact recovery command
+when contextual help is available.
 
 For recovery steps, see [Troubleshooting](../operations/troubleshooting.md).

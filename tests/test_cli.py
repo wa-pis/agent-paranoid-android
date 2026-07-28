@@ -215,6 +215,94 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert manifest["row_counts"] == {"customers": 3, "orders": 3}
 
 
+def test_agent_plan_and_approve_cli_json_contract(tmp_path, capsys) -> None:
+    workspace = tmp_path / "agent"
+
+    plan_exit = main(
+        [
+            "agent-plan",
+            str(FIXTURE_EXAMPLE_DATASET),
+            "--workspace",
+            str(workspace),
+            "--count",
+            "3",
+            "--json",
+        ]
+    )
+
+    planned_output = capsys.readouterr()
+    planned = json.loads(planned_output.out)
+    assert plan_exit == 0
+    assert planned_output.err == ""
+    assert planned["schema_version"] == "1.0"
+    assert planned["phase"] == "awaiting_approval"
+    assert planned["summary"]["metadata_trust"] == "untrusted"
+    assert planned["summary"]["sensitive_fields"] == [
+        {"entity": "customers", "field": "email"}
+    ]
+
+    approve_exit = main(["agent-approve", str(workspace), "--json"])
+
+    approved_output = capsys.readouterr()
+    approved = json.loads(approved_output.out)
+    assert approve_exit == 0
+    assert approved_output.err == ""
+    assert approved["schema_version"] == "1.0"
+    assert approved["phase"] == "completed"
+    assert approved["summary"]["validation_valid"] is True
+    assert approved["summary"]["source_rows_copied"] is False
+
+
+def test_agent_json_runtime_error_is_structured(tmp_path, capsys) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    spec_path.write_text('{"schema_version":"1.0","entities":[]}')
+
+    exit_code = main(
+        [
+            "agent-plan",
+            str(spec_path),
+            "--workspace",
+            str(tmp_path / "agent"),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exit_code == 2
+    assert captured.err == ""
+    assert payload == {
+        "schema_version": "1.0",
+        "ok": False,
+        "error": {
+            "code": "invalid_input",
+            "message": (
+                "agent-plan detected a DatasetSpec; use "
+                "'test-data-agent generate' for reviewed specs"
+            ),
+            "command": "test-data-agent agent-plan",
+            "exit_code": 2,
+            "retryable": False,
+            "help": None,
+        },
+    }
+
+
+def test_agent_json_argument_error_is_structured(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["agent-plan", str(FIXTURE_EXAMPLE_DATASET), "--json"])
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exc_info.value.code == 2
+    assert captured.err == ""
+    assert payload["schema_version"] == "1.0"
+    assert payload["ok"] is False
+    assert payload["error"]["code"] == "invalid_arguments"
+    assert payload["error"]["command"] == "test-data-agent agent-plan"
+    assert payload["error"]["help"] == "test-data-agent agent-plan --help"
+
+
 def test_untrusted_review_names_are_escaped_and_bounded() -> None:
     assert cli_module.display_untrusted_name("name\x1b[31m") == r"name\u001b[31m"
     assert cli_module.display_untrusted_name("x" * 81) == f"{'x' * 80}..."

@@ -24,6 +24,8 @@ date.
 - Concise metadata-only review summaries with fields, sensitive
   classifications, relationships, confidence, assumptions, and safety
   warnings.
+- Stable versioned JSON results for planning, status, and approval, with
+  typed errors and documented exit codes for automation and AI clients.
 
 ## Implemented For 0.8.0
 
@@ -123,8 +125,6 @@ Make the review-first agent workflow the clearest product entry point:
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
   Implemented for `agent-plan` and pending `agent-status`.
-- Add stable JSON output for automation and AI clients, with documented exit
-  codes and structured errors.
 - Introduce typed plan, run, approval, and error models with a plan identifier,
   profile/spec fingerprints, and an approval receipt tied to the reviewed
   `DatasetSpec`.

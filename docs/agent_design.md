@@ -52,11 +52,15 @@ test-data-agent agent-approve out/agent
 Inspect the same workspace as versioned JSON for automation or an AI client:
 
 ```bash
+test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --json
 test-data-agent agent-status out/agent --json
+test-data-agent agent-approve out/agent --json
 ```
 
-Status inspection is read-only. It rejects incomplete or contradictory
-workspace state and never returns source or generated rows.
+Each command writes one JSON document to stdout and leaves stderr empty. Status
+inspection is read-only. It rejects incomplete or contradictory workspace
+state, and none of the JSON contracts returns source or generated rows.
 
 Planning and pending status print a review summary containing:
 
@@ -124,10 +128,15 @@ models:
 - `AgentWorkspaceStatus` reports the current phase, next action, artifacts, and
   the applicable typed summary. Its JSON contract has `schema_version: "1.0"`.
 
-The same fields are serialized under `summary` in `agent_plan.json` and
-`agent_result.json`. Existing dict-style reads such as
+`AgentResult` and `AgentWorkspaceStatus` both have
+`schema_version: "1.0"`. The same result fields are serialized under `summary`
+in `agent_plan.json` and `agent_result.json`. Existing dict-style reads such as
 `result.summary["row_counts"]` remain supported, but new Python integrations
 should use typed attributes such as `result.summary.row_counts`.
+
+Agent CLI failures use `CliErrorResponse`. It has a stable error code, message,
+command, exit code, retryability flag, and optional help command. Consumers
+should branch on the error code rather than matching human-readable messages.
 
 New review fields have defaults, so status inspection can still read
 workspaces created before the richer summary was introduced.

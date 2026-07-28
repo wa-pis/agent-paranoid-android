@@ -20,6 +20,7 @@ from test_data_agent.agent import (
     plan_agent_request,
 )
 from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
+from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
 from test_data_agent.io.workflows import DatasetGenerationResult, generate_dataset_bundle
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
@@ -36,6 +37,9 @@ __all__ = [
     "AgentNextAction",
     "AgentSourceType",
     "AgentWorkspaceStatus",
+    "CliErrorCode",
+    "CliErrorDetail",
+    "CliErrorResponse",
     "DatasetProfile",
     "DatasetSpec",
     "DatasetGenerationResult",

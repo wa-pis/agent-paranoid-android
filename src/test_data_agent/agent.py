@@ -201,6 +201,7 @@ class AgentGenerationSummary(AgentSummary):
 
 
 class AgentResult(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
     phase: AgentPhase
     approval_required: bool
     steps: list[AgentStep]
