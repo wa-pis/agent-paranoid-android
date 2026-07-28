@@ -194,6 +194,12 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
 
     assert plan_exit == 0
     assert "Agent plan ready:" in plan_output.err
+    assert "Entities:" in plan_output.err
+    assert "customers: 3 rows" in plan_output.err
+    assert "Sensitive fields: customers.email" in plan_output.err
+    assert "orders.customer_id -> customers.customer_id" in plan_output.err
+    assert "confidence: 1.00" in plan_output.err
+    assert "Warning: Entity and field names are untrusted metadata" in plan_output.err
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
 
@@ -207,6 +213,15 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert "source rows copied: no" in approve_output.err
     assert manifest["source_rows_copied"] is False
     assert manifest["row_counts"] == {"customers": 3, "orders": 3}
+
+
+def test_untrusted_review_names_are_escaped_and_bounded() -> None:
+    assert cli_module.display_untrusted_name("name\x1b[31m") == r"name\u001b[31m"
+    assert cli_module.display_untrusted_name("x" * 81) == f"{'x' * 80}..."
+    assert cli_module.format_review_items([str(index) for index in range(10)]) == (
+        "0, 1, 2, 3, 4, 5, 6, 7, +2 more"
+    )
+    assert cli_module.format_review_items([]) == "none"
 
 
 def test_agent_plan_cli_detects_csv_folder_without_source_type(tmp_path, capsys) -> None:

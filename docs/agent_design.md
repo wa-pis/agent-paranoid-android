@@ -58,6 +58,16 @@ test-data-agent agent-status out/agent --json
 Status inspection is read-only. It rejects incomplete or contradictory
 workspace state and never returns source or generated rows.
 
+Planning and pending status print a review summary containing:
+
+- entities, inferred field names and types;
+- sensitive field classifications;
+- inferred relationships and confidence;
+- assumptions and safety warnings.
+
+Only metadata is shown. Names are treated as untrusted input, escaped for the
+terminal, and explicitly marked as non-instructional.
+
 Plan from one CSV file:
 
 ```bash
@@ -107,7 +117,8 @@ The Python API returns an `AgentResult`. Its `summary` is one of two typed
 models:
 
 - `AgentPlanSummary` reports entities, relationship and constraint counts,
-  seed, and output format while approval is pending.
+  seed, output format, fields, sensitive classifications, relationship
+  confidence, assumptions, and warnings while approval is pending.
 - `AgentGenerationSummary` reports row counts, seed, output format, validation
   status, and the `synthetic` and `source_rows_copied` safety facts.
 - `AgentWorkspaceStatus` reports the current phase, next action, artifacts, and
@@ -117,6 +128,9 @@ The same fields are serialized under `summary` in `agent_plan.json` and
 `agent_result.json`. Existing dict-style reads such as
 `result.summary["row_counts"]` remain supported, but new Python integrations
 should use typed attributes such as `result.summary.row_counts`.
+
+New review fields have defaults, so status inspection can still read
+workspaces created before the richer summary was introduced.
 
 ## LLM Responsibilities
 

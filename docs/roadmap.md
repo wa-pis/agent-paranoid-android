@@ -21,6 +21,9 @@ date.
   versioned JSON output for automation and AI clients.
 - Narrow validated `agent-plan` input detection for CSV files, CSV folders,
   and safe profiles, with DatasetSpec inputs routed to `generate`.
+- Concise metadata-only review summaries with fields, sensitive
+  classifications, relationships, confidence, assumptions, and safety
+  warnings.
 
 ## Implemented For 0.8.0
 
@@ -119,6 +122,7 @@ Make the review-first agent workflow the clearest product entry point:
   routed to the existing reviewed-spec workflow.
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
+  Implemented for `agent-plan` and pending `agent-status`.
 - Add stable JSON output for automation and AI clients, with documented exit
   codes and structured errors.
 - Introduce typed plan, run, approval, and error models with a plan identifier,

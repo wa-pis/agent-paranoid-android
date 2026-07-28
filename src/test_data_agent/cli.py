@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
+import shlex
 import sys
 import tempfile
 from pathlib import Path
@@ -14,6 +15,7 @@ from pydantic import ValidationError
 
 from test_data_agent.agent import (
     AgentGenerationSummary,
+    AgentPlanSummary,
     AgentRequest,
     AgentResult,
     AgentSourceType,
@@ -704,12 +706,13 @@ def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
 
 def write_agent_result_summary(result: AgentResult) -> None:
     if result.phase.value == "awaiting_approval":
-        print(
-            "Agent plan ready: "
-            f"{result.artifacts.workspace} | spec: {result.artifacts.dataset_spec_path} | "
-            "approve with: test-data-agent agent-approve "
-            f"{result.artifacts.workspace}",
-            file=sys.stderr,
+        if not isinstance(result.summary, AgentPlanSummary):
+            raise ValueError("awaiting-approval result is missing its plan summary")
+        write_agent_plan_review(
+            heading="Agent plan ready",
+            summary=result.summary,
+            workspace=result.artifacts.workspace,
+            spec_path=result.artifacts.dataset_spec_path,
         )
         return
     if not isinstance(result.summary, AgentGenerationSummary):
@@ -728,11 +731,13 @@ def write_agent_result_summary(result: AgentResult) -> None:
 
 def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
     if status.phase.value == "awaiting_approval":
-        print(
-            "Agent status: awaiting approval | "
-            f"review: {status.artifacts.dataset_spec_path} | "
-            f"approve with: test-data-agent agent-approve {status.artifacts.workspace}",
-            file=sys.stderr,
+        if not isinstance(status.summary, AgentPlanSummary):
+            raise ValueError("awaiting-approval status is missing its plan summary")
+        write_agent_plan_review(
+            heading="Agent status: awaiting approval",
+            summary=status.summary,
+            workspace=status.artifacts.workspace,
+            spec_path=status.artifacts.dataset_spec_path,
         )
         return
     if not isinstance(status.summary, AgentGenerationSummary):
@@ -744,6 +749,79 @@ def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
         f"validation: {validation} | source rows copied: no",
         file=sys.stderr,
     )
+
+
+def write_agent_plan_review(
+    *,
+    heading: str,
+    summary: AgentPlanSummary,
+    workspace: Path,
+    spec_path: Path,
+) -> None:
+    workspace_text = display_untrusted_name(str(workspace), limit=240)
+    workspace_command = display_untrusted_name(shlex.quote(str(workspace)), limit=260)
+    spec_path_text = display_untrusted_name(str(spec_path), limit=240)
+    print(f"{heading}: {workspace_text}", file=sys.stderr)
+    print(
+        f"Source: {display_untrusted_name(summary.source_type)} | seed: {summary.seed} | "
+        f"format: {summary.output_format.value}",
+        file=sys.stderr,
+    )
+    print("Entities:", file=sys.stderr)
+    for entity in summary.entities:
+        fields = [
+            f"{display_untrusted_name(field.name)}:{field.data_type.value}"
+            for field in entity.fields
+        ]
+        print(
+            f"  {display_untrusted_name(entity.name)}: {entity.row_count} rows | "
+            f"fields ({entity.field_count}): {format_review_items(fields)}",
+            file=sys.stderr,
+        )
+    sensitive = [
+        f"{display_untrusted_name(field.entity)}.{display_untrusted_name(field.field)}"
+        for field in summary.sensitive_fields
+    ]
+    print(
+        f"Sensitive fields: {format_review_items(sensitive) if sensitive else 'none detected'}",
+        file=sys.stderr,
+    )
+    if summary.relationships:
+        print("Relationships:", file=sys.stderr)
+        for relationship in summary.relationships:
+            child = (
+                f"{display_untrusted_name(relationship.child_entity)}."
+                f"{display_untrusted_name(relationship.child_field)}"
+            )
+            parent = (
+                f"{display_untrusted_name(relationship.parent_entity)}."
+                f"{display_untrusted_name(relationship.parent_field)}"
+            )
+            print(
+                f"  {child} -> {parent} | {relationship.relationship_type.value} | "
+                f"confidence: {relationship.confidence:.2f}",
+                file=sys.stderr,
+            )
+    for assumption in summary.assumptions:
+        print(f"Assumption: {assumption}", file=sys.stderr)
+    for warning in summary.warnings:
+        print(f"Warning: {warning}", file=sys.stderr)
+    print(f"Review: {spec_path_text}", file=sys.stderr)
+    print(f"Approve: test-data-agent agent-approve {workspace_command}", file=sys.stderr)
+
+
+def display_untrusted_name(value: str, *, limit: int = 80) -> str:
+    truncated = value[:limit]
+    escaped = json.dumps(truncated, ensure_ascii=False)[1:-1]
+    return f"{escaped}..." if len(value) > limit else escaped
+
+
+def format_review_items(items: list[str], *, limit: int = 8) -> str:
+    if not items:
+        return "none"
+    visible = items[:limit]
+    suffix = f", +{len(items) - limit} more" if len(items) > limit else ""
+    return ", ".join(visible) + suffix
 
 
 def apply_business_rules_from_args(
