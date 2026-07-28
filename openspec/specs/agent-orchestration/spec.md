@@ -125,3 +125,19 @@ versioned JSON output for automation and AI clients.
 - **AND** stderr is empty
 - **AND** errors include stable codes and documented exit status
 - **AND** results and errors exclude dataset rows, raw values, and tracebacks
+
+### Requirement: Approval Is Bound To The Reviewed DatasetSpec
+
+Every new agent plan SHALL identify and fingerprint its safe review artifacts,
+and approval SHALL require the exact fingerprint of the reviewed effective
+`DatasetSpec`.
+
+#### Scenario: Exact reviewed spec is approved
+
+- **GIVEN** a valid agent plan and the fingerprint reported after review
+- **WHEN** approval receives that fingerprint
+- **THEN** the stored profile and current effective spec are verified before
+  generation
+- **AND** a typed approval receipt binds the plan identifier, profile
+  fingerprint, and reviewed spec fingerprint
+- **AND** a mismatch or legacy plan fails before generated output is written

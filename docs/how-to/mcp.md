@@ -75,8 +75,10 @@ structured `business_rules_payload`.
 4. Pass that response to generator `plan_trino_dataset` with a new workspace,
    explicit count, seed, and output format.
 5. Stop and review the written `dataset_spec.yaml`.
-6. Call `approve_dataset_plan` only after review.
-7. Do not export or relay source rows.
+6. Call `inspect_dataset_plan` and record `review.current_spec_sha256`.
+7. Call `approve_dataset_plan` with that value as `reviewed_spec_sha256` only
+   after the human reviewed that exact spec fingerprint.
+8. Do not export or relay source rows.
 
 Both catalog and schema allowlists are mandatory by default. HTTPS is the
 default. Plain HTTP requires an explicit override and is intended only for an

@@ -2,6 +2,7 @@
 
 from test_data_agent.io.artifacts import (
     GenerationManifest,
+    dataset_profile_fingerprint,
     dataset_spec_fingerprint,
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
@@ -50,6 +51,7 @@ from test_data_agent.io.writers import (
 __all__ = [
     "dataset_spec_to_yaml",
     "dataset_spec_to_json",
+    "dataset_profile_fingerprint",
     "DatasetGenerationResult",
     "GenerationManifest",
     "apply_dataset_mode_options",

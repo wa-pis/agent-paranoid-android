@@ -46,7 +46,9 @@ Review `out/agent/dataset_spec.yaml`, then approve:
 
 ```bash
 test-data-agent agent-status out/agent
-test-data-agent agent-approve out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-status
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
 ```
 
 Inspect the same workspace as versioned JSON for automation or an AI client:
@@ -55,7 +57,8 @@ Inspect the same workspace as versioned JSON for automation or an AI client:
 test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --json
 test-data-agent agent-status out/agent --json
-test-data-agent agent-approve out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
 ```
 
 Each command writes one JSON document to stdout and leaves stderr empty. Status
@@ -108,6 +111,7 @@ Planning writes:
 
 Approval writes:
 
+- `approval_receipt.json`
 - `agent_result.json`
 - `generated/<entity>.csv|json|parquet`
 - `generated/profile.json`
@@ -127,6 +131,11 @@ models:
   status, and the `synthetic` and `source_rows_copied` safety facts.
 - `AgentWorkspaceStatus` reports the current phase, next action, artifacts, and
   the applicable typed summary. Its JSON contract has `schema_version: "1.0"`.
+- `AgentReviewState` reports the random plan identifier, safe-profile
+  fingerprint, planned/current spec fingerprints, and whether the spec changed
+  during review.
+- `AgentApprovalReceipt` binds successful approval to the plan identifier,
+  profile fingerprint, and exact reviewed effective-spec fingerprint.
 
 `AgentResult` and `AgentWorkspaceStatus` both have
 `schema_version: "1.0"`. The same result fields are serialized under `summary`
@@ -139,7 +148,8 @@ command, exit code, retryability flag, and optional help command. Consumers
 should branch on the error code rather than matching human-readable messages.
 
 New review fields have defaults, so status inspection can still read
-workspaces created before the richer summary was introduced.
+workspaces created before the richer summary was introduced. Legacy workspaces
+must be replanned before approval because they have no trusted review binding.
 
 ## LLM Responsibilities
 

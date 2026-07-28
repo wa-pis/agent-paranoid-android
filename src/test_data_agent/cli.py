@@ -18,6 +18,7 @@ from test_data_agent.agent import (
     AgentPlanSummary,
     AgentRequest,
     AgentResult,
+    AgentReviewState,
     AgentSourceType,
     AgentWorkspaceStatus,
     approve_agent_workspace,
@@ -118,7 +119,8 @@ Common workflows
 
    # Review out/agent/dataset_spec.yaml before approval.
    test-data-agent agent-status out/agent
-   test-data-agent agent-approve out/agent
+   test-data-agent agent-approve out/agent \\
+     --reviewed-spec-sha256 SHA256_FROM_STATUS
 
 7. Validate an existing generated dataset
 
@@ -379,7 +381,9 @@ def main(argv: list[str] | None = None) -> int:
             "Example:\n"
             "  test-data-agent agent-plan tests/fixtures/example_dataset "
             "--workspace out/agent --count 25 --seed 12345 --format csv\n"
-            "  test-data-agent agent-approve out/agent"
+            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-approve out/agent "
+            "--reviewed-spec-sha256 SHA256_FROM_STATUS"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -411,12 +415,20 @@ def main(argv: list[str] | None = None) -> int:
         description="Load a prepared agent workspace, use the reviewed DatasetSpec, generate data, and validate it.",
         epilog=(
             "Example:\n"
-            "  test-data-agent agent-approve out/agent\n\n"
-            "Run this only after reviewing out/agent/dataset_spec.yaml."
+            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-approve out/agent "
+            "--reviewed-spec-sha256 SHA256_FROM_STATUS\n\n"
+            "Run this only after reviewing out/agent/dataset_spec.yaml and "
+            "recording the fingerprint reported by agent-status."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     agent_approve_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
+    agent_approve_parser.add_argument(
+        "--reviewed-spec-sha256",
+        required=True,
+        help="SHA-256 reported by agent-status for the exact reviewed DatasetSpec.",
+    )
     agent_approve_parser.add_argument(
         "--json",
         action="store_true",
@@ -582,7 +594,10 @@ def run_command(args: argparse.Namespace) -> int:
         return 0
 
     if args.command == "agent-approve":
-        agent_result = approve_agent_workspace(args.workspace)
+        agent_result = approve_agent_workspace(
+            args.workspace,
+            reviewed_spec_sha256=args.reviewed_spec_sha256,
+        )
         write_agent_command_result(agent_result, json_output=args.json_output)
         return 0 if agent_result.summary.get("validation_valid", False) else 1
 
@@ -806,6 +821,7 @@ def write_agent_result_summary(result: AgentResult) -> None:
             summary=result.summary,
             workspace=result.artifacts.workspace,
             spec_path=result.artifacts.dataset_spec_path,
+            review=result.review,
         )
         return
     if not isinstance(result.summary, AgentGenerationSummary):
@@ -817,7 +833,8 @@ def write_agent_result_summary(result: AgentResult) -> None:
         "Agent generation completed: "
         f"{result.artifacts.generated_folder} | rows: {rows_text} | "
         f"seed: {result.summary.seed} | validation: {validation} | "
-        "source rows copied: no",
+        "source rows copied: no | "
+        f"approval receipt: {result.artifacts.approval_receipt_path}",
         file=sys.stderr,
     )
 
@@ -838,6 +855,7 @@ def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
             summary=status.summary,
             workspace=status.artifacts.workspace,
             spec_path=status.artifacts.dataset_spec_path,
+            review=status.review,
         )
         return
     if not isinstance(status.summary, AgentGenerationSummary):
@@ -857,6 +875,7 @@ def write_agent_plan_review(
     summary: AgentPlanSummary,
     workspace: Path,
     spec_path: Path,
+    review: AgentReviewState | None,
 ) -> None:
     workspace_text = display_untrusted_name(str(workspace), limit=240)
     workspace_command = display_untrusted_name(shlex.quote(str(workspace)), limit=260)
@@ -907,7 +926,24 @@ def write_agent_plan_review(
     for warning in summary.warnings:
         print(f"Warning: {warning}", file=sys.stderr)
     print(f"Review: {spec_path_text}", file=sys.stderr)
-    print(f"Approve: test-data-agent agent-approve {workspace_command}", file=sys.stderr)
+    if review is None:
+        print(
+            "Approve unavailable: create a new plan with fingerprint-bound approval.",
+            file=sys.stderr,
+        )
+        return
+    print(
+        f"Plan ID: {review.plan_id} | current spec SHA-256: "
+        f"{review.current_spec_sha256}",
+        file=sys.stderr,
+    )
+    if review.spec_changed_since_plan:
+        print("Notice: DatasetSpec changed since the initial plan.", file=sys.stderr)
+    print(
+        f"Approve: test-data-agent agent-approve {workspace_command} "
+        f"--reviewed-spec-sha256 {review.current_spec_sha256}",
+        file=sys.stderr,
+    )
 
 
 def display_untrusted_name(value: str, *, limit: int = 80) -> str:

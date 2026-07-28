@@ -78,6 +78,16 @@ granting the planning client raw-SQL access.
 - **AND** no source or generated rows are returned
 - **AND** generation does not start until `approve_dataset_plan` is called
 
+#### Scenario: Trino plan is inspected and approved
+
+- **GIVEN** a workspace created by `plan_trino_dataset`
+- **WHEN** the client calls `inspect_dataset_plan`
+- **THEN** it receives the current effective-spec fingerprint without changing
+  the workspace
+- **AND** `approve_dataset_plan` requires that exact fingerprint as
+  `reviewed_spec_sha256`
+- **AND** successful approval returns receipt and artifact metadata, not rows
+
 #### Scenario: Default Trino MCP surface is inspected
 
 - **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false

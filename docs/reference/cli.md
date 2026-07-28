@@ -122,7 +122,9 @@ test-data-agent agent-plan data/example_dataset \
   --format csv
 
 test-data-agent agent-status out/agent
-test-data-agent agent-approve out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-status
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
 ```
 
 `agent-plan` must stop before generation. Review the prepared spec and manifest
@@ -135,6 +137,13 @@ Planning and pending status show metadata-only entities, fields, sensitive
 classifications, relationships, confidence, assumptions, and warnings. Entity
 and field names are untrusted input and are escaped before terminal output.
 
+`agent-status` reports the SHA-256 fingerprint of the current effective spec
+and an exact approval command. Record that value only after reviewing
+`dataset_spec.yaml`. Approval recomputes the fingerprint immediately before
+generation and fails if the file changed. Intentional edits are supported:
+edit the spec, run status again, review the new hash, and approve that hash.
+Successful approval writes `approval_receipt.json`.
+
 ## Agent JSON Contract
 
 Use JSON output when invoking the review flow from automation or an AI client:
@@ -143,13 +152,20 @@ Use JSON output when invoking the review flow from automation or an AI client:
 test-data-agent agent-plan data/example_dataset \
   --workspace out/agent --json
 test-data-agent agent-status out/agent --json
-test-data-agent agent-approve out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
 ```
 
 Successful commands write one JSON document to stdout and leave stderr empty.
 Planning and approval return an `AgentResult`; status returns an
 `AgentWorkspaceStatus`. Both contracts include `"schema_version": "1.0"` and
 artifact paths and summaries, never source or generated rows.
+
+The `review` object contains `plan_id`, profile and planned/current spec
+fingerprints, and `spec_changed_since_plan`. Completed results add an
+`approval_receipt` tied to the exact `current_spec_sha256` supplied during
+approval. Workspaces created before this contract remain inspectable but must
+be replanned before approval.
 
 Known argument, input, and path failures also write one versioned JSON document
 to stdout when `--json` is present:

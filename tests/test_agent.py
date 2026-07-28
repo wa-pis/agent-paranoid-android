@@ -2,14 +2,17 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
 import test_data_agent
 from test_data_agent.agent import (
+    AgentApprovalReceipt,
     AgentFieldReference,
     AgentFieldSummary,
     AgentGenerationSummary,
     AgentNextAction,
     AgentPlanSummary,
     AgentRequest,
+    AgentReviewState,
     AgentRelationshipSummary,
     AgentSourceType,
     AgentWorkspaceStatus,
@@ -19,6 +22,8 @@ from test_data_agent.agent import (
     plan_agent_request,
 )
 from test_data_agent.core.settings import OutputFormat
+from test_data_agent.io.artifacts import write_dataset_spec_artifact
+from test_data_agent.io.readers import load_dataset_spec
 
 
 FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
@@ -26,9 +31,11 @@ FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
 
 
 def test_package_root_exposes_agent_api() -> None:
+    assert test_data_agent.AgentApprovalReceipt is AgentApprovalReceipt
     assert test_data_agent.AgentFieldReference is AgentFieldReference
     assert test_data_agent.AgentFieldSummary is AgentFieldSummary
     assert test_data_agent.AgentRequest is AgentRequest
+    assert test_data_agent.AgentReviewState is AgentReviewState
     assert test_data_agent.AgentRelationshipSummary is AgentRelationshipSummary
     assert test_data_agent.AgentPlanSummary is AgentPlanSummary
     assert test_data_agent.AgentGenerationSummary is AgentGenerationSummary
@@ -72,6 +79,11 @@ def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
     assert result.summary.minimum_inference_confidence is not None
     assert result.summary.assumptions
     assert "untrusted metadata" in result.summary.warnings[0]
+    assert result.review is not None
+    assert len(result.review.plan_id) == 32
+    assert len(result.review.profile_sha256) == 64
+    assert result.review.planned_spec_sha256 == result.review.current_spec_sha256
+    assert result.review.spec_changed_since_plan is False
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
     assert "alice@example.com" not in profile_text
@@ -82,11 +94,12 @@ def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
     assert plan["summary"]["output_format"] == "csv"
     assert request["source_type"] == "csv_folder"
     assert request["seed"] == 12345
+    assert plan["review"]["plan_id"] == result.review.plan_id
 
 
 def test_agent_approve_generates_safe_csv_folder_bundle(tmp_path) -> None:
     workspace = tmp_path / "agent"
-    plan_agent_request(
+    planned = plan_agent_request(
         AgentRequest(
             source_type=AgentSourceType.CSV_FOLDER,
             source_path=FIXTURE_EXAMPLE_DATASET,
@@ -97,11 +110,16 @@ def test_agent_approve_generates_safe_csv_folder_bundle(tmp_path) -> None:
         )
     )
 
-    result = approve_agent_workspace(workspace)
+    assert planned.review is not None
+    result = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
 
     manifest = json.loads((workspace / "generated" / "generation_manifest.json").read_text())
     report = json.loads((workspace / "generated" / "validation_report.json").read_text())
     persisted_result = json.loads((workspace / "agent_result.json").read_text())
+    receipt = json.loads((workspace / "approval_receipt.json").read_text())
     generated_rows = load_csv_folder(workspace / "generated")
     source_rows = load_csv_folder(FIXTURE_EXAMPLE_DATASET)
 
@@ -113,6 +131,11 @@ def test_agent_approve_generates_safe_csv_folder_bundle(tmp_path) -> None:
     assert persisted_result["summary"]["row_counts"] == {"customers": 5, "orders": 5}
     assert persisted_result["summary"]["output_format"] == "csv"
     assert persisted_result["summary"]["source_rows_copied"] is False
+    assert result.approval_receipt is not None
+    assert receipt == result.approval_receipt.model_dump(mode="json")
+    assert receipt["plan_id"] == planned.review.plan_id
+    assert receipt["profile_sha256"] == planned.review.profile_sha256
+    assert receipt["reviewed_spec_sha256"] == manifest["spec_sha256"]
     assert manifest["synthetic"] is True
     assert manifest["source_rows_copied"] is False
     assert manifest["seed"] == 77
@@ -123,7 +146,7 @@ def test_agent_approve_generates_safe_csv_folder_bundle(tmp_path) -> None:
 
 def test_agent_approve_generates_safe_single_csv_bundle(tmp_path) -> None:
     workspace = tmp_path / "agent_csv"
-    plan_agent_request(
+    planned = plan_agent_request(
         AgentRequest(
             source_type=AgentSourceType.CSV,
             source_path=FIXTURE_CUSTOMERS,
@@ -135,7 +158,11 @@ def test_agent_approve_generates_safe_single_csv_bundle(tmp_path) -> None:
         )
     )
 
-    result = approve_agent_workspace(workspace)
+    assert planned.review is not None
+    result = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
 
     rows = list(csv.DictReader((workspace / "generated" / "customers_agent.csv").open()))
     source_rows = list(csv.DictReader(FIXTURE_CUSTOMERS.open()))
@@ -168,8 +195,12 @@ def test_agent_workspace_status_tracks_plan_and_completion(tmp_path) -> None:
     assert planned.approval_required is True
     assert isinstance(planned.summary, AgentPlanSummary)
     assert planned.artifacts.generated_folder is None
+    assert planned.review is not None
 
-    approve_agent_workspace(workspace)
+    approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
     completed = inspect_agent_workspace(workspace)
 
     assert completed.phase == "completed"
@@ -178,6 +209,143 @@ def test_agent_workspace_status_tracks_plan_and_completion(tmp_path) -> None:
     assert isinstance(completed.summary, AgentGenerationSummary)
     assert completed.summary.validation_valid is True
     assert completed.artifacts.generated_folder == workspace.resolve() / "generated"
+    assert completed.approval_receipt is not None
+    assert completed.artifacts.approval_receipt_path == (
+        workspace.resolve() / "approval_receipt.json"
+    )
+
+
+def test_agent_status_tracks_reviewed_spec_edits(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert result.review is not None
+    initial_sha256 = result.review.current_spec_sha256
+    spec_path = workspace / "dataset_spec.yaml"
+    spec = load_dataset_spec(spec_path)
+    spec.entities[0].row_count = 4
+    write_dataset_spec_artifact(spec, spec_path)
+
+    status = inspect_agent_workspace(workspace)
+
+    assert status.review is not None
+    assert status.review.current_spec_sha256 != initial_sha256
+    assert status.review.spec_changed_since_plan is True
+    approved = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=status.review.current_spec_sha256,
+    )
+    assert approved.approval_receipt is not None
+    assert (
+        approved.approval_receipt.reviewed_spec_sha256
+        == status.review.current_spec_sha256
+    )
+
+
+def test_agent_approval_rejects_spec_changed_after_review(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert result.review is not None
+    reviewed_sha256 = result.review.current_spec_sha256
+    spec_path = workspace / "dataset_spec.yaml"
+    spec = load_dataset_spec(spec_path)
+    spec.entities[0].row_count = 4
+    write_dataset_spec_artifact(spec, spec_path)
+
+    with pytest.raises(ValueError, match="reviewed DatasetSpec fingerprint mismatch"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=reviewed_sha256,
+        )
+
+    assert not (workspace / "generated").exists()
+    assert not (workspace / "approval_receipt.json").exists()
+
+
+def test_agent_approval_rejects_profile_tampering(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert result.review is not None
+    profile_path = workspace / "profile.json"
+    profile = json.loads(profile_path.read_text())
+    profile["entities"][0]["row_count"] += 1
+    profile_path.write_text(json.dumps(profile))
+
+    with pytest.raises(ValueError, match="profile.json fingerprint"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=result.review.current_spec_sha256,
+        )
+
+    assert not (workspace / "generated").exists()
+
+
+def test_agent_approval_rejects_legacy_plan_without_review_state(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert result.review is not None
+    plan_path = workspace / "agent_plan.json"
+    plan = json.loads(plan_path.read_text())
+    plan.pop("review")
+    plan_path.write_text(json.dumps(plan))
+
+    with pytest.raises(ValueError, match="create a new plan"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=result.review.current_spec_sha256,
+        )
+
+
+def test_agent_approval_rejects_receipt_symlink(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert result.review is not None
+    target = tmp_path / "outside.json"
+    target.write_text("unchanged")
+    (workspace / "approval_receipt.json").symlink_to(target)
+
+    with pytest.raises(ValueError, match="approval output already exists"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=result.review.current_spec_sha256,
+        )
+
+    assert target.read_text() == "unchanged"
+    assert not (workspace / "generated").exists()
 
 
 def test_agent_workspace_status_rejects_incomplete_workspace(tmp_path) -> None:

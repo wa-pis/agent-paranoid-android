@@ -16,6 +16,9 @@ All notable changes to this project are documented here.
 - Versioned `--json` results for `agent-plan` and `agent-approve`, plus
   structured machine-readable argument, input, and path errors across all
   three agent commands.
+- Fingerprint-bound agent approval with random plan identifiers, profile and
+  effective-spec SHA-256 values, read-only MCP plan inspection, and persisted
+  `approval_receipt.json` records.
 
 ### Changed
 
