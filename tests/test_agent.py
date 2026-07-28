@@ -5,10 +5,13 @@ from pathlib import Path
 import test_data_agent
 from test_data_agent.agent import (
     AgentGenerationSummary,
+    AgentNextAction,
     AgentPlanSummary,
     AgentRequest,
     AgentSourceType,
+    AgentWorkspaceStatus,
     approve_agent_workspace,
+    inspect_agent_workspace,
     plan_agent_request,
 )
 from test_data_agent.core.settings import OutputFormat
@@ -22,9 +25,12 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentRequest is AgentRequest
     assert test_data_agent.AgentPlanSummary is AgentPlanSummary
     assert test_data_agent.AgentGenerationSummary is AgentGenerationSummary
+    assert test_data_agent.AgentNextAction is AgentNextAction
     assert test_data_agent.AgentSourceType is AgentSourceType
+    assert test_data_agent.AgentWorkspaceStatus is AgentWorkspaceStatus
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
+    assert test_data_agent.inspect_agent_workspace is inspect_agent_workspace
 
 
 def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
@@ -122,6 +128,53 @@ def test_agent_approve_generates_safe_single_csv_bundle(tmp_path) -> None:
     assert len(rows) == 4
     assert "alice@example.com" not in profile_text
     assert {tuple(row.items()) for row in rows}.isdisjoint({tuple(row.items()) for row in source_rows})
+
+
+def test_agent_workspace_status_tracks_plan_and_completion(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+            seed=21,
+            output_format=OutputFormat.CSV,
+        )
+    )
+
+    planned = inspect_agent_workspace(workspace)
+
+    assert planned.schema_version == "1.0"
+    assert planned.phase == "awaiting_approval"
+    assert planned.next_action == "review_and_approve"
+    assert planned.approval_required is True
+    assert isinstance(planned.summary, AgentPlanSummary)
+    assert planned.artifacts.generated_folder is None
+
+    approve_agent_workspace(workspace)
+    completed = inspect_agent_workspace(workspace)
+
+    assert completed.phase == "completed"
+    assert completed.next_action == "none"
+    assert completed.approval_required is False
+    assert isinstance(completed.summary, AgentGenerationSummary)
+    assert completed.summary.validation_valid is True
+    assert completed.artifacts.generated_folder == workspace.resolve() / "generated"
+
+
+def test_agent_workspace_status_rejects_incomplete_workspace(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    workspace.mkdir()
+    (workspace / "agent_request.json").write_text("{}")
+
+    try:
+        inspect_agent_workspace(workspace)
+    except ValueError as exc:
+        assert "agent workspace is incomplete" in str(exc)
+        assert "profile.json" in str(exc)
+    else:
+        raise AssertionError("incomplete workspace must be rejected")
 
 
 def load_csv_folder(folder: Path) -> dict[str, list[dict[str, str]]]:

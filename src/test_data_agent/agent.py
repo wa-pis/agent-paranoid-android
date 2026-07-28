@@ -60,6 +60,11 @@ class AgentPhase(StrEnum):
     COMPLETED = "completed"
 
 
+class AgentNextAction(StrEnum):
+    REVIEW_AND_APPROVE = "review_and_approve"
+    NONE = "none"
+
+
 class AgentRequest(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
@@ -144,6 +149,28 @@ class AgentResult(BaseModel):
             raise ValueError("awaiting-approval results require an agent plan summary")
         if self.phase == AgentPhase.COMPLETED and not isinstance(self.summary, AgentGenerationSummary):
             raise ValueError("completed results require an agent generation summary")
+        return self
+
+
+class AgentWorkspaceStatus(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    phase: AgentPhase
+    approval_required: bool
+    next_action: AgentNextAction
+    artifacts: AgentArtifacts
+    summary: AgentPlanSummary | AgentGenerationSummary
+
+    @model_validator(mode="after")
+    def validate_phase_summary(self) -> AgentWorkspaceStatus:
+        if self.phase == AgentPhase.AWAITING_APPROVAL:
+            if not isinstance(self.summary, AgentPlanSummary):
+                raise ValueError("awaiting-approval status requires an agent plan summary")
+            if not self.approval_required or self.next_action != AgentNextAction.REVIEW_AND_APPROVE:
+                raise ValueError("awaiting-approval status requires review and approval")
+        elif not isinstance(self.summary, AgentGenerationSummary):
+            raise ValueError("completed status requires an agent generation summary")
+        elif self.approval_required or self.next_action != AgentNextAction.NONE:
+            raise ValueError("completed status cannot require another approval")
         return self
 
 
@@ -262,6 +289,70 @@ def approve_agent_workspace(workspace: Path) -> AgentResult:
     )
     write_json_artifact(result, resolved_workspace / AGENT_RESULT_FILE)
     return result
+
+
+def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
+    resolved_workspace = workspace.expanduser().resolve(strict=True)
+    if not resolved_workspace.is_dir():
+        raise ValueError("agent workspace must be a folder")
+
+    artifacts = agent_artifacts(resolved_workspace)
+    required_plan_files = (
+        artifacts.request_path,
+        artifacts.profile_path,
+        artifacts.dataset_spec_path,
+        artifacts.plan_path,
+    )
+    missing = [path.name for path in required_plan_files if not path.is_file()]
+    if missing:
+        raise ValueError(f"agent workspace is incomplete; missing: {', '.join(missing)}")
+
+    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
+    if plan.phase != AgentPhase.AWAITING_APPROVAL:
+        raise ValueError("agent_plan.json must describe an awaiting-approval plan")
+
+    result_path = resolved_workspace / AGENT_RESULT_FILE
+    generated_folder = resolved_workspace / GENERATED_FOLDER
+    if not result_path.exists():
+        if generated_folder.exists():
+            raise ValueError("agent workspace has generated output without agent_result.json")
+        if not isinstance(plan.summary, AgentPlanSummary):
+            raise ValueError("agent plan is missing its plan summary")
+        return AgentWorkspaceStatus(
+            phase=AgentPhase.AWAITING_APPROVAL,
+            approval_required=True,
+            next_action=AgentNextAction.REVIEW_AND_APPROVE,
+            artifacts=artifacts,
+            summary=plan.summary,
+        )
+
+    if not result_path.is_file():
+        raise ValueError("agent_result.json must be a file")
+    result = AgentResult.model_validate_json(read_limited_text(result_path))
+    if result.phase != AgentPhase.COMPLETED:
+        raise ValueError("agent_result.json must describe a completed run")
+    if not generated_folder.is_dir():
+        raise ValueError("completed agent workspace is missing generated output")
+
+    completed_artifacts = agent_artifacts(
+        resolved_workspace,
+        generated_folder=generated_folder,
+    )
+    completed_files = (
+        completed_artifacts.validation_report_path,
+        completed_artifacts.manifest_path,
+    )
+    if any(path is None or not path.is_file() for path in completed_files):
+        raise ValueError("completed agent workspace is missing validation or manifest artifacts")
+    if not isinstance(result.summary, AgentGenerationSummary):
+        raise ValueError("completed agent result is missing its generation summary")
+    return AgentWorkspaceStatus(
+        phase=AgentPhase.COMPLETED,
+        approval_required=False,
+        next_action=AgentNextAction.NONE,
+        artifacts=completed_artifacts,
+        summary=result.summary,
+    )
 
 
 def normalize_agent_request(request: AgentRequest) -> AgentRequest:

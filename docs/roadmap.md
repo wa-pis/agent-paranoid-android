@@ -15,6 +15,11 @@ date.
 - Strict type checking for the CLI and agent-facing interfaces, with typed
   plan and generation summaries.
 
+## Implemented Toward 0.9.0
+
+- Read-only workspace status for the review-first agent flow, including
+  versioned JSON output for automation and AI clients.
+
 ## Implemented For 0.8.0
 
 - Separate minimal CLI, generator MCP, and Trino MCP OCI images.
@@ -104,7 +109,8 @@ Treat these as non-negotiable release gates rather than new feature work:
 Make the review-first agent workflow the clearest product entry point:
 
 - Provide a small guided command set for planning, reviewing, approving, and
-  checking the status of a generation run.
+  checking the status of a generation run. Initial workspace status inspection
+  is implemented; guided planning and review remain.
 - Detect CSV files, CSV folders, safe profiles, and `DatasetSpec` inputs when
   this can be done unambiguously, while retaining explicit overrides.
 - Present concise human-readable summaries of inferred fields, sensitive

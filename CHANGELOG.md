@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Read-only `agent-status` inspection for planned and completed agent
+  workspaces, with concise human output and a versioned `--json` contract.
+
 ### Changed
 
 - Updated the Docker build, registry login, and QEMU GitHub Actions to
