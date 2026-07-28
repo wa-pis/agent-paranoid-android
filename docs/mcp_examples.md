@@ -76,7 +76,9 @@ TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES=1GB \
    `plan_trino_dataset` tool with a new workspace, count, seed, and output
    format.
 4. Review `dataset_spec.yaml` in that workspace.
-5. Call `approve_dataset_plan` to generate and validate fresh synthetic data.
+5. Call `inspect_dataset_plan` and record `review.current_spec_sha256`.
+6. Call `approve_dataset_plan` with that exact value as
+   `reviewed_spec_sha256` to generate and validate fresh synthetic data.
 
 The Trino server must remain read-only and bounded. Unsafe SQL, DDL, DML,
 unrestricted `SELECT *`, joins, CTEs, subqueries, and likely PII aliases are

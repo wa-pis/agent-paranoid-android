@@ -58,12 +58,17 @@ After review, run:
 
 ```bash
 test-data-agent agent-status out/agent --json
-test-data-agent agent-approve out/agent --json
+test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
 ```
 
 AI clients should use `--json`, inspect `schema_version`, and branch on stable
 structured error codes and process exit codes. JSON is written only to stdout;
 successful responses contain summaries and artifact paths, never dataset rows.
+The client must show the current `review.current_spec_sha256` alongside the
+spec, obtain explicit human approval for that value, and pass it unchanged to
+`agent-approve`. It must not approve a newly computed hash without renewed
+human review.
 
 This mode is documented in [Agent Design](agent_design.md). It is useful when
 an LLM should plan the workflow but deterministic Python code must retain
@@ -107,6 +112,7 @@ Its tools are:
 - `profile_csv`
 - `infer_dataset_spec`
 - `plan_trino_dataset`
+- `inspect_dataset_plan`
 - `approve_dataset_plan`
 - `generate_dataset`
 - `validate_dataset`
@@ -159,10 +165,13 @@ An MCP-compatible AI client can run the complete workflow:
 3. Pass the safe profile result to `plan_trino_dataset`.
 4. Summarize the written versioned `DatasetSpec` and request explicit human
    approval.
-5. Call `approve_dataset_plan` only after that approval.
-6. Call `validate_dataset` on the generated bundle when an independent
+5. Call `inspect_dataset_plan` after any edits and show its current spec
+   fingerprint to the reviewer.
+6. Call `approve_dataset_plan` with that exact `reviewed_spec_sha256` only
+   after approval.
+7. Call `validate_dataset` on the generated bundle when an independent
    validation response is needed.
-7. Return artifact paths plus a concise report with row count, seed, format,
+8. Return artifact paths plus a concise report with row count, seed, format,
    validation status, and confirmation that no production rows were copied.
 
 The generator MCP responses return summaries and validation reports, not data

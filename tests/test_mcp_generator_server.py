@@ -11,6 +11,7 @@ from test_data_agent.mcp_generator_server import (
     export_dataset,
     generate_dataset,
     infer_dataset_spec,
+    inspect_dataset_plan,
     plan_trino_dataset,
     profile_csv,
     resolve_workspace_path,
@@ -279,6 +280,9 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     assert planned["operation"] == "plan_trino_dataset"
     assert planned["approval_required"] is True
     assert planned["source_type"] == "trino"
+    assert len(planned["plan_id"]) == 32
+    assert len(planned["profile_sha256"]) == 64
+    assert planned["planned_spec_sha256"] == planned["current_spec_sha256"]
     assert planned["entities"] == [
         {"name": "orders", "row_count": 4, "field_count": 3}
     ]
@@ -286,7 +290,18 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     assert not (tmp_path / "agent" / "orders" / "generated").exists()
     assert "paid" not in json.dumps(planned)
 
-    approved = approve_dataset_plan("agent/orders")
+    inspected = inspect_dataset_plan("agent/orders")
+    assert inspected["phase"] == "awaiting_approval"
+    assert inspected["next_action"] == "review_and_approve"
+    assert (
+        inspected["review"]["current_spec_sha256"]
+        == planned["current_spec_sha256"]
+    )
+
+    approved = approve_dataset_plan(
+        "agent/orders",
+        inspected["review"]["current_spec_sha256"],
+    )
     generated_rows = json.loads(
         (tmp_path / "agent" / "orders" / "generated" / "orders.json").read_text()
     )
@@ -297,9 +312,18 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     assert approved["row_counts"] == {"orders": 4}
     assert approved["validation_valid"] is True
     assert approved["source_rows_copied"] is False
+    assert (
+        approved["approval_receipt"]["reviewed_spec_sha256"]
+        == planned["current_spec_sha256"]
+    )
+    assert approved["approval_receipt_path"] == "agent/orders/approval_receipt.json"
     assert len(generated_rows) == 4
     assert "@" in generated_rows[0]["customer_email"]
     assert "customer_email" not in json.dumps(approved)
+
+    completed = inspect_dataset_plan("agent/orders")
+    assert completed["phase"] == "completed"
+    assert completed["approval_receipt"] == approved["approval_receipt"]
 
 
 def test_plan_trino_dataset_rejects_non_trino_and_oversized_profiles(

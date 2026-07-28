@@ -26,6 +26,8 @@ date.
   warnings.
 - Stable versioned JSON results for planning, status, and approval, with
   typed errors and documented exit codes for automation and AI clients.
+- Typed review and approval records with plan identifiers, profile/spec
+  fingerprints, exact-hash confirmation, and persisted approval receipts.
 
 ## Implemented For 0.8.0
 
@@ -125,9 +127,6 @@ Make the review-first agent workflow the clearest product entry point:
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
   Implemented for `agent-plan` and pending `agent-status`.
-- Introduce typed plan, run, approval, and error models with a plan identifier,
-  profile/spec fingerprints, and an approval receipt tied to the reviewed
-  `DatasetSpec`.
 - Make interrupted or repeated operations observable and safely recoverable
   through explicit status and idempotent state transitions.
 - Add high-level MCP workflow tools so an AI client does not need to choose

@@ -9,6 +9,7 @@ from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec
 from test_data_agent.core.limits import GenerationLimitError
 from test_data_agent.core.settings import OutputFormat
+from test_data_agent.io.artifacts import write_json_artifact_atomic
 from test_data_agent.io.workflows import (
     generate_dataset_bundle,
     generate_dataset_review_artifacts,
@@ -18,6 +19,19 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.safety import SourceRowReuseError
+
+
+def test_atomic_json_artifact_does_not_follow_target_symlink(tmp_path) -> None:
+    outside = tmp_path / "outside.json"
+    outside.write_text("unchanged")
+    output = tmp_path / "result.json"
+    output.symlink_to(outside)
+
+    write_json_artifact_atomic({"safe": True}, output)
+
+    assert outside.read_text() == "unchanged"
+    assert output.is_symlink() is False
+    assert json.loads(output.read_text()) == {"safe": True}
 
 
 def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tmp_path) -> None:

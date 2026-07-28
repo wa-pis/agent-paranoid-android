@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any, Literal
 
@@ -48,6 +50,21 @@ def write_json_artifact(payload: Any, output: Path) -> None:
         write_bounded_text(payload.model_dump_json(indent=2), output)
         return
     write_bounded_text(json.dumps(payload, indent=2, sort_keys=True, default=str), output)
+
+
+def write_json_artifact_atomic(payload: Any, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=output.parent,
+        prefix=f".{output.name}.",
+    )
+    temporary_path = Path(temporary_name)
+    os.close(descriptor)
+    try:
+        write_json_artifact(payload, temporary_path)
+        temporary_path.replace(output)
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
@@ -145,8 +162,16 @@ def business_validation_manifest(
 
 
 def dataset_spec_fingerprint(spec: DatasetSpec) -> str:
+    return model_fingerprint(spec)
+
+
+def dataset_profile_fingerprint(profile: DatasetProfile) -> str:
+    return model_fingerprint(profile)
+
+
+def model_fingerprint(model: BaseModel) -> str:
     canonical = json.dumps(
-        spec.model_dump(mode="json"),
+        model.model_dump(mode="json"),
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")

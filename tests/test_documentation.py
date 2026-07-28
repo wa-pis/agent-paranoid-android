@@ -127,6 +127,7 @@ def test_ai_guidance_matches_safe_public_contract() -> None:
     assert 'pip install -e ".[all,dev]"' not in integration
     assert 'agent-paranoid-android[mcp,trino]' in integration
     assert "`plan_trino_dataset`" in integration
+    assert "`inspect_dataset_plan`" in integration
     assert "`approve_dataset_plan`" in integration
     assert "{csv/json/parquet/sql}" not in prompts
     assert "explicit human approval" in prompts

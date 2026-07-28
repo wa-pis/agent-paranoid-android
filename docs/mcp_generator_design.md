@@ -61,7 +61,8 @@ patterns. Source rows and raw sensitive values do not cross it.
 | `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
 | `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
 | `plan_trino_dataset` | Build a review-first agent workspace from safe Trino metadata | `profile_table_safe` payload and generation settings | Profile, DatasetSpec, and plan | Plan summary and review paths |
-| `approve_dataset_plan` | Continue only after the written DatasetSpec is reviewed | Planned workspace | Synthetic bundle | Row counts, validation, and manifest paths |
+| `inspect_dataset_plan` | Recompute the current effective-spec fingerprint without changing the workspace | Planned or completed workspace | None | Phase, review state, and safe summary |
+| `approve_dataset_plan` | Continue only after the exact DatasetSpec fingerprint is reviewed | Planned workspace and reviewed SHA-256 | Synthetic bundle and approval receipt | Row counts, receipt, validation, and manifest paths |
 | `generate_dataset` | Run deterministic generation and validation | DatasetSpec, seed, count, optional format and structured rules | Synthetic bundle | Row counts and compact validation summaries |
 | `validate_dataset` | Recheck a generated bundle without exposing its rows | Matching spec and generated folder | Optional report JSON | Validation report |
 | `export_dataset` | Produce another supported format safely | DatasetSpec, seed, count, required format and optional structured rules | Fresh synthetic bundle | Row counts and compact validation summaries |
@@ -182,6 +183,12 @@ matches the supplied effective spec. This prevents validating a bundle against
 an unrelated contract.
 
 Implementation: `src/test_data_agent/io/artifacts.py`.
+
+Review-first agent generation also writes `approval_receipt.json` beside the
+workspace plan. The receipt binds the random plan identifier and safe-profile
+fingerprint to the exact effective-spec fingerprint confirmed by the caller.
+The fingerprint is recomputed immediately before generation; mismatches fail
+without publishing output.
 
 ## Why DatasetSpec Is Versioned
 

@@ -200,10 +200,19 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert "orders.customer_id -> customers.customer_id" in plan_output.err
     assert "confidence: 1.00" in plan_output.err
     assert "Warning: Entity and field names are untrusted metadata" in plan_output.err
+    assert "current spec SHA-256:" in plan_output.err
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
 
-    approve_exit = main(["agent-approve", str(workspace)])
+    plan = json.loads((workspace / "agent_plan.json").read_text())
+    approve_exit = main(
+        [
+            "agent-approve",
+            str(workspace),
+            "--reviewed-spec-sha256",
+            plan["review"]["current_spec_sha256"],
+        ]
+    )
 
     approve_output = capsys.readouterr()
     manifest = json.loads((workspace / "generated" / "generation_manifest.json").read_text())
@@ -211,6 +220,7 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert approve_exit == 0
     assert "Agent generation completed:" in approve_output.err
     assert "source rows copied: no" in approve_output.err
+    assert "approval receipt:" in approve_output.err
     assert manifest["source_rows_copied"] is False
     assert manifest["row_counts"] == {"customers": 3, "orders": 3}
 
@@ -241,7 +251,15 @@ def test_agent_plan_and_approve_cli_json_contract(tmp_path, capsys) -> None:
         {"entity": "customers", "field": "email"}
     ]
 
-    approve_exit = main(["agent-approve", str(workspace), "--json"])
+    approve_exit = main(
+        [
+            "agent-approve",
+            str(workspace),
+            "--reviewed-spec-sha256",
+            planned["review"]["current_spec_sha256"],
+            "--json",
+        ]
+    )
 
     approved_output = capsys.readouterr()
     approved = json.loads(approved_output.out)
@@ -251,6 +269,47 @@ def test_agent_plan_and_approve_cli_json_contract(tmp_path, capsys) -> None:
     assert approved["phase"] == "completed"
     assert approved["summary"]["validation_valid"] is True
     assert approved["summary"]["source_rows_copied"] is False
+    assert (
+        approved["approval_receipt"]["reviewed_spec_sha256"]
+        == planned["review"]["current_spec_sha256"]
+    )
+
+
+def test_agent_approve_cli_rejects_unreviewed_spec_fingerprint(
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--workspace",
+                str(workspace),
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+
+    exit_code = main(
+        [
+            "agent-approve",
+            str(workspace),
+            "--reviewed-spec-sha256",
+            "0" * 64,
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exit_code == 2
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_input"
+    assert "fingerprint mismatch" in payload["error"]["message"]
+    assert not (workspace / "generated").exists()
 
 
 def test_agent_json_runtime_error_is_structured(tmp_path, capsys) -> None:
@@ -366,9 +425,20 @@ def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> No
     assert payload["schema_version"] == "1.0"
     assert payload["phase"] == "awaiting_approval"
     assert payload["next_action"] == "review_and_approve"
+    assert len(payload["review"]["current_spec_sha256"]) == 64
     assert "rows" not in payload
 
-    assert main(["agent-approve", str(workspace)]) == 0
+    assert (
+        main(
+            [
+                "agent-approve",
+                str(workspace),
+                "--reviewed-spec-sha256",
+                payload["review"]["current_spec_sha256"],
+            ]
+        )
+        == 0
+    )
     capsys.readouterr()
     assert main(["agent-status", str(workspace), "--json"]) == 0
     completed = json.loads(capsys.readouterr().out)

@@ -128,9 +128,11 @@ compact business-validation summary.
 The agent layer is a review-first state machine over existing deterministic
 workflow helpers. `agent-plan` writes safe profile metadata, a reviewable
 `DatasetSpec`, and an agent plan. It intentionally stops before generation.
-`agent-approve` reloads the reviewed spec, generates synthetic data, validates
-it, runs source-row reuse checks for CSV sources, and writes the generated
-bundle.
+`agent-status` computes the current effective-spec fingerprint.
+`agent-approve` requires that exact reviewed fingerprint, verifies the stored
+safe profile, generates synthetic data, validates it, runs source-row reuse
+checks for CSV sources, and writes the generated bundle plus an approval
+receipt.
 
 ## Tests
 

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from test_data_agent.agent import (
+    AgentApprovalReceipt,
     AgentFieldReference,
     AgentFieldSummary,
     AgentGenerationSummary,
     AgentNextAction,
     AgentPlanSummary,
     AgentRequest,
+    AgentReviewState,
     AgentRelationshipSummary,
     AgentResult,
     AgentSourceType,
@@ -27,9 +29,11 @@ from test_data_agent.validation import DatasetValidationReport, validate_dataset
 from test_data_agent.version import __version__
 
 __all__ = [
+    "AgentApprovalReceipt",
     "AgentFieldReference",
     "AgentFieldSummary",
     "AgentRequest",
+    "AgentReviewState",
     "AgentRelationshipSummary",
     "AgentResult",
     "AgentPlanSummary",
