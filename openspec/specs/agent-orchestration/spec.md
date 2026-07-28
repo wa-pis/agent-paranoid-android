@@ -111,3 +111,17 @@ planning and while approval is pending.
   confidence, assumptions, and safety warnings
 - **AND** untrusted names are escaped for terminal output
 - **AND** source values and dataset rows are excluded
+
+### Requirement: Agent CLI Has A Versioned Machine Contract
+
+Agent planning, pending/completed status, and approval SHALL support stable
+versioned JSON output for automation and AI clients.
+
+#### Scenario: Agent command uses JSON mode
+
+- **GIVEN** an agent CLI invocation with `--json`
+- **WHEN** the command succeeds or encounters a known input error
+- **THEN** stdout contains one typed versioned result or error
+- **AND** stderr is empty
+- **AND** errors include stable codes and documented exit status
+- **AND** results and errors exclude dataset rows, raw values, and tracebacks

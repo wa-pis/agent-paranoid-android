@@ -13,6 +13,9 @@ All notable changes to this project are documented here.
 - Metadata-only `agent-plan` review summaries covering inferred fields,
   sensitive classifications, relationships, confidence, assumptions, and
   safety warnings, with escaped untrusted names.
+- Versioned `--json` results for `agent-plan` and `agent-approve`, plus
+  structured machine-readable argument, input, and path errors across all
+  three agent commands.
 
 ### Changed
 

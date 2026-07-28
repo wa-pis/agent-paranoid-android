@@ -26,6 +26,7 @@ from test_data_agent.agent import (
     plan_agent_request,
 )
 from test_data_agent.audit import verify_audit_log_from_env
+from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.constraint_solver import default_value_for_field
@@ -148,14 +149,40 @@ one output file and requires --count and --seed.
 class HelpfulArgumentParser(argparse.ArgumentParser):
     """Add a concrete recovery hint to argparse failures."""
 
+    def __init__(
+        self,
+        *args: Any,
+        json_errors: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.json_errors = json_errors
+
     def error(self, message: str) -> Never:
+        if self.json_errors:
+            write_cli_error_response(
+                code=CliErrorCode.INVALID_ARGUMENTS,
+                message=message,
+                command=self.prog,
+                help_command=f"{self.prog} --help",
+            )
+            raise SystemExit(2)
         self.print_usage(sys.stderr)
         print(f"{self.prog}: error: {message}", file=sys.stderr)
         print(f"Try '{self.prog} --help' for examples and options.", file=sys.stderr)
         raise SystemExit(2)
 
 
+class JsonHelpfulArgumentParser(HelpfulArgumentParser):
+    """Render parser failures as the public JSON error contract."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, json_errors=True, **kwargs)
+
+
 def main(argv: list[str] | None = None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    json_errors = "--json" in arguments
     parser = HelpfulArgumentParser(
         prog="test-data-agent",
         description=(
@@ -164,12 +191,14 @@ def main(argv: list[str] | None = None) -> int:
         ),
         epilog=ROOT_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
+        json_errors=json_errors,
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(
         dest="command",
         title="commands",
         metavar="COMMAND",
+        parser_class=JsonHelpfulArgumentParser if json_errors else HelpfulArgumentParser,
     )
 
     generate_parser = subparsers.add_parser(
@@ -369,6 +398,12 @@ def main(argv: list[str] | None = None) -> int:
     agent_plan_parser.add_argument("--table", type=str, help="Table/entity name for single CSV sources.")
     agent_plan_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000)
     agent_plan_parser.add_argument("--use-cache", action="store_true", help="Use a safe profile cache inside the agent workspace.")
+    agent_plan_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned agent result as JSON.",
+    )
 
     agent_approve_parser = subparsers.add_parser(
         "agent-approve",
@@ -382,6 +417,12 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     agent_approve_parser.add_argument("workspace", type=Path, help="Workspace created by agent-plan.")
+    agent_approve_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned agent result as JSON.",
+    )
 
     agent_status_parser = subparsers.add_parser(
         "agent-status",
@@ -410,7 +451,7 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    args = parser.parse_args(argv)
+    args = parser.parse_args(arguments)
 
     if args.command is None:
         parser.print_help()
@@ -431,22 +472,31 @@ def main(argv: list[str] | None = None) -> int:
         return run_command(args)
     except SystemExit as exc:
         if isinstance(exc.code, str):
-            print(f"Error: {exc.code}", file=sys.stderr)
-            print(
-                f"Run 'test-data-agent {args.command} --help' for examples and options.",
-                file=sys.stderr,
+            return report_cli_error(
+                args,
+                code=CliErrorCode.INVALID_INPUT,
+                message=exc.code,
+                help_command=f"test-data-agent {args.command} --help",
             )
-            return 2
         raise
     except FileNotFoundError as exc:
-        print(f"Error: file not found: {exc.filename}", file=sys.stderr)
-        return 2
+        return report_cli_error(
+            args,
+            code=CliErrorCode.INPUT_NOT_FOUND,
+            message=f"file not found: {exc.filename}",
+        )
     except (IsADirectoryError, NotADirectoryError, PermissionError) as exc:
-        print(f"Error: {exc.strerror}: {exc.filename}", file=sys.stderr)
-        return 2
+        return report_cli_error(
+            args,
+            code=CliErrorCode.INVALID_PATH,
+            message=f"{exc.strerror}: {exc.filename}",
+        )
     except (ValidationError, ValueError) as exc:
-        print(f"Error: {friendly_error(exc)}", file=sys.stderr)
-        return 2
+        return report_cli_error(
+            args,
+            code=CliErrorCode.INVALID_INPUT,
+            message=friendly_error(exc),
+        )
 
 
 def run_command(args: argparse.Namespace) -> int:
@@ -528,12 +578,12 @@ def run_command(args: argparse.Namespace) -> int:
 
     if args.command == "agent-plan":
         agent_result = plan_agent_request(agent_request_from_args(args))
-        write_agent_result_summary(agent_result)
+        write_agent_command_result(agent_result, json_output=args.json_output)
         return 0
 
     if args.command == "agent-approve":
         agent_result = approve_agent_workspace(args.workspace)
-        write_agent_result_summary(agent_result)
+        write_agent_command_result(agent_result, json_output=args.json_output)
         return 0 if agent_result.summary.get("validation_valid", False) else 1
 
     if args.command == "agent-status":
@@ -575,6 +625,49 @@ def friendly_error(exc: Exception) -> str:
         message = first.get("msg", str(exc))
         return f"{location}: {message}" if location else message
     return str(exc)
+
+
+def write_cli_error_response(
+    *,
+    code: CliErrorCode,
+    message: str,
+    command: str,
+    help_command: str | None = None,
+    exit_code: int = 2,
+) -> None:
+    response = CliErrorResponse(
+        error=CliErrorDetail(
+            code=code,
+            message=message,
+            command=command,
+            exit_code=exit_code,
+            help=help_command,
+        )
+    )
+    print(response.model_dump_json(indent=2))
+
+
+def report_cli_error(
+    args: argparse.Namespace,
+    *,
+    code: CliErrorCode,
+    message: str,
+    help_command: str | None = None,
+    exit_code: int = 2,
+) -> int:
+    if getattr(args, "json_output", False):
+        write_cli_error_response(
+            code=code,
+            message=message,
+            command=f"test-data-agent {args.command}",
+            help_command=help_command,
+            exit_code=exit_code,
+        )
+        return exit_code
+    print(f"Error: {message}", file=sys.stderr)
+    if help_command is not None:
+        print(f"Run '{help_command}' for examples and options.", file=sys.stderr)
+    return exit_code
 
 
 def write_validation_summary(report: Any, output: Path | None) -> None:
@@ -727,6 +820,13 @@ def write_agent_result_summary(result: AgentResult) -> None:
         "source rows copied: no",
         file=sys.stderr,
     )
+
+
+def write_agent_command_result(result: AgentResult, *, json_output: bool) -> None:
+    if json_output:
+        print(result.model_dump_json(indent=2))
+    else:
+        write_agent_result_summary(result)
 
 
 def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
