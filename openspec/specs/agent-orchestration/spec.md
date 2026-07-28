@@ -141,3 +141,20 @@ and approval SHALL require the exact fingerprint of the reviewed effective
 - **AND** a typed approval receipt binds the plan identifier, profile
   fingerprint, and reviewed spec fingerprint
 - **AND** a mismatch or legacy plan fails before generated output is written
+
+### Requirement: Agent Completion Is Recoverable And Idempotent
+
+The agent workflow SHALL expose interrupted completion as an explicit state and
+recover it without regenerating or trusting unverified rows.
+
+#### Scenario: Interrupted completion is inspected and recovered
+
+- **GIVEN** an atomically published generated bundle with its completion
+  checkpoint but incomplete root result metadata
+- **WHEN** status is inspected and recovery is requested with the reviewed
+  fingerprint
+- **THEN** status reports `recovery_required`
+- **AND** recovery revalidates fingerprints, artifacts, rows, validation, and
+  source-row non-reuse before publishing completion metadata
+- **AND** repeated approval of a completed matching plan returns its existing
+  result without rewriting generated rows

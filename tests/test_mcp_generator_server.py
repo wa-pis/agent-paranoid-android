@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.agent as agent_module
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.mcp_generator_server import (
     WorkspacePathError,
@@ -14,6 +15,7 @@ from test_data_agent.mcp_generator_server import (
     inspect_dataset_plan,
     plan_trino_dataset,
     profile_csv,
+    recover_dataset_plan,
     resolve_workspace_path,
     validate_dataset,
 )
@@ -324,6 +326,52 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     completed = inspect_dataset_plan("agent/orders")
     assert completed["phase"] == "completed"
     assert completed["approval_receipt"] == approved["approval_receipt"]
+
+
+def test_mcp_recovers_interrupted_plan_without_returning_rows(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    planned = plan_trino_dataset(
+        {
+            "source_type": "trino",
+            "table": "orders",
+            "row_count": 10,
+            "columns": [
+                {
+                    "name": "order_id",
+                    "data_type": "bigint",
+                    "approx_distinct_count": 10,
+                }
+            ],
+        },
+        "agent/orders",
+        count=3,
+    )
+    original_publish = agent_module.publish_agent_completion
+    monkeypatch.setattr(
+        agent_module,
+        "publish_agent_completion",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        approve_dataset_plan("agent/orders", planned["current_spec_sha256"])
+    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+
+    status = inspect_dataset_plan("agent/orders")
+    assert status["phase"] == "recovery_required"
+    assert status["next_action"] == "recover"
+    assert status["summary"]["reviewed_spec_sha256"] == planned["current_spec_sha256"]
+
+    recovered = recover_dataset_plan(
+        "agent/orders",
+        planned["current_spec_sha256"],
+    )
+    assert recovered["operation"] == "recover_dataset_plan"
+    assert recovered["row_counts"] == {"orders": 3}
+    assert "rows" not in recovered
+    assert inspect_dataset_plan("agent/orders")["phase"] == "completed"
 
 
 def test_plan_trino_dataset_rejects_non_trino_and_oversized_profiles(

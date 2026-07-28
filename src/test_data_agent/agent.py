@@ -20,6 +20,7 @@ from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.io.artifacts import (
+    GenerationManifest,
     dataset_profile_fingerprint,
     dataset_spec_fingerprint,
     write_dataset_profile_artifact,
@@ -29,7 +30,7 @@ from test_data_agent.io.artifacts import (
     write_json_artifact,
     write_json_artifact_atomic,
 )
-from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     apply_dataset_mode_options,
     commit_temp_output_folder,
@@ -45,13 +46,14 @@ from test_data_agent.safety import (
     assert_no_csv_source_rows,
     assert_profile_safe,
 )
-from test_data_agent.validation import validate_dataset
+from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 
 AGENT_REQUEST_FILE = "agent_request.json"
 AGENT_PLAN_FILE = "agent_plan.json"
 AGENT_RESULT_FILE = "agent_result.json"
 APPROVAL_RECEIPT_FILE = "approval_receipt.json"
+COMPLETION_CHECKPOINT_FILE = "agent_completion.json"
 PROFILE_FILE = "profile.json"
 DATASET_SPEC_FILE = "dataset_spec.yaml"
 GENERATED_FOLDER = "generated"
@@ -65,11 +67,13 @@ class AgentSourceType(StrEnum):
 
 class AgentPhase(StrEnum):
     AWAITING_APPROVAL = "awaiting_approval"
+    RECOVERY_REQUIRED = "recovery_required"
     COMPLETED = "completed"
 
 
 class AgentNextAction(StrEnum):
     REVIEW_AND_APPROVE = "review_and_approve"
+    RECOVER = "recover"
     NONE = "none"
 
 
@@ -137,6 +141,7 @@ class AgentArtifacts(BaseModel):
     validation_report_path: Path | None = None
     manifest_path: Path | None = None
     approval_receipt_path: Path | None = None
+    completion_checkpoint_path: Path | None = None
 
 
 class AgentFieldSummary(BaseModel):
@@ -223,6 +228,28 @@ class AgentApprovalReceipt(BaseModel):
     reviewed_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
+class AgentCompletionCheckpoint(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    plan_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    profile_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    reviewed_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_type: str
+    row_counts: dict[str, int]
+    seed: int = Field(ge=0)
+    output_format: OutputFormat
+    validation_valid: bool
+    synthetic: Literal[True] = True
+    source_rows_copied: Literal[False] = False
+
+
+class AgentRecoverySummary(AgentSummary):
+    reason: Literal["completion_metadata_missing", "approval_receipt_missing"]
+    plan_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    reviewed_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    checkpoint_present: Literal[True] = True
+    generated_artifacts_present: Literal[True] = True
+
+
 class AgentResult(BaseModel):
     schema_version: Literal["1.0"] = "1.0"
     phase: AgentPhase
@@ -235,6 +262,8 @@ class AgentResult(BaseModel):
 
     @model_validator(mode="after")
     def validate_phase_summary(self) -> AgentResult:
+        if self.phase == AgentPhase.RECOVERY_REQUIRED:
+            raise ValueError("recovery-required is a workspace status, not an agent result")
         if self.phase == AgentPhase.AWAITING_APPROVAL and not isinstance(self.summary, AgentPlanSummary):
             raise ValueError("awaiting-approval results require an agent plan summary")
         if self.phase == AgentPhase.COMPLETED and not isinstance(self.summary, AgentGenerationSummary):
@@ -260,7 +289,7 @@ class AgentWorkspaceStatus(BaseModel):
     approval_required: bool
     next_action: AgentNextAction
     artifacts: AgentArtifacts
-    summary: AgentPlanSummary | AgentGenerationSummary
+    summary: AgentPlanSummary | AgentGenerationSummary | AgentRecoverySummary
     review: AgentReviewState | None = None
     approval_receipt: AgentApprovalReceipt | None = None
 
@@ -271,6 +300,13 @@ class AgentWorkspaceStatus(BaseModel):
                 raise ValueError("awaiting-approval status requires an agent plan summary")
             if not self.approval_required or self.next_action != AgentNextAction.REVIEW_AND_APPROVE:
                 raise ValueError("awaiting-approval status requires review and approval")
+        elif self.phase == AgentPhase.RECOVERY_REQUIRED:
+            if not isinstance(self.summary, AgentRecoverySummary):
+                raise ValueError(
+                    "recovery-required status requires an agent recovery summary"
+                )
+            if self.approval_required or self.next_action != AgentNextAction.RECOVER:
+                raise ValueError("recovery-required status requires recovery")
         elif not isinstance(self.summary, AgentGenerationSummary):
             raise ValueError("completed status requires an agent generation summary")
         elif self.approval_required or self.next_action != AgentNextAction.NONE:
@@ -361,74 +397,121 @@ def approve_agent_workspace(
     *,
     reviewed_spec_sha256: str,
 ) -> AgentResult:
+    expected_spec_sha256 = normalize_sha256_digest(reviewed_spec_sha256)
     resolved_workspace = workspace.expanduser().resolve(strict=True)
     artifacts = agent_artifacts(resolved_workspace)
-    if not artifacts.request_path.is_file():
-        raise ValueError("agent workspace does not contain agent_request.json")
-    if not artifacts.profile_path.is_file():
-        raise ValueError("agent workspace does not contain profile.json")
-    if not artifacts.dataset_spec_path.is_file():
-        raise ValueError("agent workspace does not contain dataset_spec.yaml")
-    if not artifacts.plan_path.is_file():
-        raise ValueError("agent workspace does not contain agent_plan.json")
+    ensure_agent_plan_files(artifacts)
     result_path = resolved_workspace / AGENT_RESULT_FILE
     receipt_path = resolved_workspace / APPROVAL_RECEIPT_FILE
-    for output_path in (result_path, receipt_path):
-        if output_path.exists() or output_path.is_symlink():
-            raise ValueError(
-                f"agent approval output already exists: {output_path.name}"
-            )
 
-    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
-    if plan.phase != AgentPhase.AWAITING_APPROVAL:
-        raise ValueError("agent_plan.json must describe an awaiting-approval plan")
-    if plan.review is None:
+    if result_path.exists() or result_path.is_symlink():
+        status = inspect_agent_workspace(resolved_workspace)
+        if status.phase == AgentPhase.RECOVERY_REQUIRED:
+            raise ValueError(
+                "agent workspace requires agent-recover before approval can continue"
+            )
+        result = AgentResult.model_validate_json(read_limited_text(result_path))
+        receipt = result.approval_receipt
+        if receipt is None or not hmac.compare_digest(
+            receipt.reviewed_spec_sha256,
+            expected_spec_sha256,
+        ):
+            raise ValueError(
+                "completed agent result does not match reviewed DatasetSpec fingerprint"
+            )
+        return result
+
+    generated_folder = resolved_workspace / GENERATED_FOLDER
+    if generated_folder.exists() or generated_folder.is_symlink():
         raise ValueError(
-            "agent plan predates fingerprint-bound approval; create a new plan"
+            "agent workspace has generated output awaiting publication; "
+            "run agent-recover with the reviewed DatasetSpec fingerprint"
         )
-    request = AgentRequest.model_validate_json(read_limited_text(artifacts.request_path))
-    request = normalize_agent_request(request.model_copy(update={"workspace": resolved_workspace}))
-    profile = DatasetProfile.model_validate_json(read_limited_text(artifacts.profile_path))
-    assert_profile_safe(profile)
-    profile_sha256 = dataset_profile_fingerprint(profile)
-    if not hmac.compare_digest(profile_sha256, plan.review.profile_sha256):
-        raise ValueError("profile.json fingerprint does not match agent_plan.json")
-    spec = load_dataset_spec(artifacts.dataset_spec_path)
-    validate_spec_for_approval(spec, request)
-    current_spec_sha256 = dataset_spec_fingerprint(spec)
-    expected_spec_sha256 = normalize_sha256_digest(reviewed_spec_sha256)
+    if receipt_path.exists() or receipt_path.is_symlink():
+        raise ValueError(f"agent approval output already exists: {receipt_path.name}")
+
+    request, profile, spec, review = load_agent_approval_context(
+        resolved_workspace,
+        artifacts,
+    )
+    current_spec_sha256 = review.current_spec_sha256
     if not hmac.compare_digest(current_spec_sha256, expected_spec_sha256):
         raise ValueError(
             "reviewed DatasetSpec fingerprint mismatch; run agent-status and "
             "review dataset_spec.yaml again"
         )
-    review = plan.review.model_copy(
-        update={
-            "profile_sha256": profile_sha256,
-            "current_spec_sha256": current_spec_sha256,
-            "spec_changed_since_plan": (
-                current_spec_sha256 != plan.review.planned_spec_sha256
-            ),
-        }
-    )
-    receipt = AgentApprovalReceipt(
-        plan_id=review.plan_id,
-        profile_sha256=profile_sha256,
-        reviewed_spec_sha256=current_spec_sha256,
-    )
 
-    generated_folder = resolved_workspace / GENERATED_FOLDER
-    if generated_folder.is_symlink():
-        raise ValueError("agent generated output must not be a symbolic link")
     ensure_empty_output_folder(generated_folder)
-    row_counts, validation_valid = generate_agent_dataset(
+    checkpoint = generate_agent_dataset(
         request,
         profile,
         spec,
+        review=review,
         output_folder=generated_folder,
     )
 
     completed_artifacts = agent_artifacts(resolved_workspace, generated_folder=generated_folder)
+    receipt, result = build_completed_agent_result(
+        review,
+        checkpoint,
+        completed_artifacts,
+    )
+    publish_agent_completion(receipt, result, completed_artifacts)
+    return result
+
+
+def recover_agent_workspace(
+    workspace: Path,
+    *,
+    reviewed_spec_sha256: str,
+) -> AgentResult:
+    expected_spec_sha256 = normalize_sha256_digest(reviewed_spec_sha256)
+    resolved_workspace = workspace.expanduser().resolve(strict=True)
+    artifacts = agent_artifacts(resolved_workspace)
+    ensure_agent_plan_files(artifacts)
+    request, profile, spec, review = load_agent_approval_context(
+        resolved_workspace,
+        artifacts,
+    )
+    if not hmac.compare_digest(review.current_spec_sha256, expected_spec_sha256):
+        raise ValueError(
+            "reviewed DatasetSpec fingerprint mismatch; run agent-status and "
+            "review dataset_spec.yaml again"
+        )
+
+    generated_folder = resolved_workspace / GENERATED_FOLDER
+    if generated_folder.is_symlink() or not generated_folder.is_dir():
+        raise ValueError("agent recovery requires a regular generated output folder")
+    completed_artifacts = agent_artifacts(
+        resolved_workspace,
+        generated_folder=generated_folder,
+    )
+    checkpoint = validate_agent_completion_checkpoint(
+        request,
+        profile,
+        spec,
+        review,
+        completed_artifacts,
+    )
+    receipt, result = build_completed_agent_result(
+        review,
+        checkpoint,
+        completed_artifacts,
+    )
+    publish_agent_completion(receipt, result, completed_artifacts)
+    return result
+
+
+def build_completed_agent_result(
+    review: AgentReviewState,
+    checkpoint: AgentCompletionCheckpoint,
+    artifacts: AgentArtifacts,
+) -> tuple[AgentApprovalReceipt, AgentResult]:
+    receipt = AgentApprovalReceipt(
+        plan_id=review.plan_id,
+        profile_sha256=review.profile_sha256,
+        reviewed_spec_sha256=review.current_spec_sha256,
+    )
     result = AgentResult(
         phase=AgentPhase.COMPLETED,
         approval_required=False,
@@ -439,26 +522,57 @@ def approve_agent_workspace(
             AgentStep(name="generate", status="completed", summary="Synthetic dataset bundle written."),
             AgentStep(name="validate", status="completed", summary="Validation report written."),
         ],
-        artifacts=completed_artifacts,
+        artifacts=artifacts,
         review=review,
         approval_receipt=receipt,
         summary=AgentGenerationSummary(
-            source_type=(
-                profile.source_type
-                if request.source_type == AgentSourceType.PROFILE
-                else request.source_type.value
-            ),
-            row_counts=row_counts,
-            seed=request.seed,
-            output_format=request.output_format,
-            validation_valid=validation_valid,
+            source_type=checkpoint.source_type,
+            row_counts=checkpoint.row_counts,
+            seed=checkpoint.seed,
+            output_format=checkpoint.output_format,
+            validation_valid=checkpoint.validation_valid,
         ),
     )
-    if completed_artifacts.approval_receipt_path is None:
+    return receipt, result
+
+
+def publish_agent_completion(
+    receipt: AgentApprovalReceipt,
+    result: AgentResult,
+    artifacts: AgentArtifacts,
+) -> None:
+    if artifacts.approval_receipt_path is None:
         raise RuntimeError("completed agent artifacts require an approval receipt path")
-    write_json_artifact_atomic(receipt, completed_artifacts.approval_receipt_path)
-    write_json_artifact_atomic(result, result_path)
-    return result
+    result_path = artifacts.workspace / AGENT_RESULT_FILE
+    receipt_missing = validate_matching_json(
+        receipt,
+        artifacts.approval_receipt_path,
+        AgentApprovalReceipt,
+    )
+    result_missing = validate_matching_json(
+        result,
+        result_path,
+        AgentResult,
+    )
+    if receipt_missing:
+        write_json_artifact_atomic(receipt, artifacts.approval_receipt_path)
+    if result_missing:
+        write_json_artifact_atomic(result, result_path)
+
+
+def validate_matching_json(
+    payload: BaseModel,
+    path: Path,
+    model_type: type[BaseModel],
+) -> bool:
+    if path.exists() or path.is_symlink():
+        if path.is_symlink() or not path.is_file():
+            raise ValueError(f"agent completion output must be a regular file: {path.name}")
+        existing = model_type.model_validate_json(read_limited_text(path))
+        if existing != payload:
+            raise ValueError(f"existing {path.name} does not match recovered completion")
+        return False
+    return True
 
 
 def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
@@ -467,15 +581,7 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
         raise ValueError("agent workspace must be a folder")
 
     artifacts = agent_artifacts(resolved_workspace)
-    required_plan_files = (
-        artifacts.request_path,
-        artifacts.profile_path,
-        artifacts.dataset_spec_path,
-        artifacts.plan_path,
-    )
-    missing = [path.name for path in required_plan_files if not path.is_file()]
-    if missing:
-        raise ValueError(f"agent workspace is incomplete; missing: {', '.join(missing)}")
+    ensure_agent_plan_files(artifacts)
 
     plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
     if plan.phase != AgentPhase.AWAITING_APPROVAL:
@@ -483,12 +589,33 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
 
     result_path = resolved_workspace / AGENT_RESULT_FILE
     generated_folder = resolved_workspace / GENERATED_FOLDER
+    if result_path.is_symlink():
+        raise ValueError("agent_result.json must be a regular file")
     if not result_path.exists():
-        if generated_folder.exists():
-            raise ValueError("agent workspace has generated output without agent_result.json")
+        if generated_folder.exists() or generated_folder.is_symlink():
+            recovery_artifacts = agent_artifacts(
+                resolved_workspace,
+                generated_folder=generated_folder,
+            )
+            review, checkpoint = inspect_agent_recovery_state(
+                recovery_artifacts,
+                plan,
+            )
+            return AgentWorkspaceStatus(
+                phase=AgentPhase.RECOVERY_REQUIRED,
+                approval_required=False,
+                next_action=AgentNextAction.RECOVER,
+                artifacts=recovery_artifacts,
+                summary=AgentRecoverySummary(
+                    reason="completion_metadata_missing",
+                    plan_id=checkpoint.plan_id,
+                    reviewed_spec_sha256=checkpoint.reviewed_spec_sha256,
+                ),
+                review=review,
+            )
         if not isinstance(plan.summary, AgentPlanSummary):
             raise ValueError("agent plan is missing its plan summary")
-        review = (
+        planned_review = (
             inspect_agent_review_state(artifacts, plan.review)
             if plan.review is not None
             else None
@@ -499,7 +626,7 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
             next_action=AgentNextAction.REVIEW_AND_APPROVE,
             artifacts=artifacts,
             summary=plan.summary,
-            review=review,
+            review=planned_review,
         )
 
     if not result_path.is_file():
@@ -522,8 +649,30 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
         raise ValueError("completed agent workspace is missing validation or manifest artifacts")
     if result.approval_receipt is not None:
         receipt_path = completed_artifacts.approval_receipt_path
-        if receipt_path is None or not receipt_path.is_file():
-            raise ValueError("completed agent workspace is missing approval_receipt.json")
+        if receipt_path is None:
+            raise RuntimeError("completed agent artifacts require an approval receipt path")
+        if not receipt_path.exists():
+            review, checkpoint = inspect_agent_recovery_state(
+                completed_artifacts,
+                plan,
+            )
+            if result.approval_receipt.reviewed_spec_sha256 != checkpoint.reviewed_spec_sha256:
+                raise ValueError("agent_result.json does not match agent_completion.json")
+            return AgentWorkspaceStatus(
+                phase=AgentPhase.RECOVERY_REQUIRED,
+                approval_required=False,
+                next_action=AgentNextAction.RECOVER,
+                artifacts=completed_artifacts,
+                summary=AgentRecoverySummary(
+                    reason="approval_receipt_missing",
+                    plan_id=checkpoint.plan_id,
+                    reviewed_spec_sha256=checkpoint.reviewed_spec_sha256,
+                ),
+                review=review,
+                approval_receipt=result.approval_receipt,
+            )
+        if receipt_path.is_symlink() or not receipt_path.is_file():
+            raise ValueError("approval_receipt.json must be a regular file")
         persisted_receipt = AgentApprovalReceipt.model_validate_json(
             read_limited_text(receipt_path)
         )
@@ -540,6 +689,87 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
         review=result.review,
         approval_receipt=result.approval_receipt,
     )
+
+
+def ensure_agent_plan_files(artifacts: AgentArtifacts) -> None:
+    required_plan_files = (
+        artifacts.request_path,
+        artifacts.profile_path,
+        artifacts.dataset_spec_path,
+        artifacts.plan_path,
+    )
+    missing = [
+        path.name
+        for path in required_plan_files
+        if not path.is_file() or path.is_symlink()
+    ]
+    if missing:
+        raise ValueError(f"agent workspace is incomplete; missing: {', '.join(missing)}")
+
+
+def load_agent_approval_context(
+    workspace: Path,
+    artifacts: AgentArtifacts,
+) -> tuple[AgentRequest, DatasetProfile, DatasetSpec, AgentReviewState]:
+    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
+    if plan.phase != AgentPhase.AWAITING_APPROVAL:
+        raise ValueError("agent_plan.json must describe an awaiting-approval plan")
+    if plan.review is None:
+        raise ValueError(
+            "agent plan predates fingerprint-bound approval; create a new plan"
+        )
+    request = AgentRequest.model_validate_json(read_limited_text(artifacts.request_path))
+    request = normalize_agent_request(request.model_copy(update={"workspace": workspace}))
+    profile = DatasetProfile.model_validate_json(read_limited_text(artifacts.profile_path))
+    assert_profile_safe(profile)
+    profile_sha256 = dataset_profile_fingerprint(profile)
+    if not hmac.compare_digest(profile_sha256, plan.review.profile_sha256):
+        raise ValueError("profile.json fingerprint does not match agent_plan.json")
+    spec = load_dataset_spec(artifacts.dataset_spec_path)
+    validate_spec_for_approval(spec, request)
+    current_spec_sha256 = dataset_spec_fingerprint(spec)
+    review = plan.review.model_copy(
+        update={
+            "profile_sha256": profile_sha256,
+            "current_spec_sha256": current_spec_sha256,
+            "spec_changed_since_plan": (
+                current_spec_sha256 != plan.review.planned_spec_sha256
+            ),
+        }
+    )
+    return request, profile, spec, review
+
+
+def inspect_agent_recovery_state(
+    artifacts: AgentArtifacts,
+    plan: AgentResult,
+) -> tuple[AgentReviewState, AgentCompletionCheckpoint]:
+    if plan.review is None:
+        raise ValueError(
+            "agent plan predates fingerprint-bound approval; create a new plan"
+        )
+    if artifacts.generated_folder is None or artifacts.generated_folder.is_symlink():
+        raise ValueError("agent generated output must be a regular folder")
+    if not artifacts.generated_folder.is_dir():
+        raise ValueError("agent workspace is missing generated output")
+    enforce_output_folder_size(artifacts.generated_folder)
+    checkpoint_path = artifacts.completion_checkpoint_path
+    if checkpoint_path is None or not checkpoint_path.is_file() or checkpoint_path.is_symlink():
+        raise ValueError("agent recovery requires generated/agent_completion.json")
+    checkpoint = AgentCompletionCheckpoint.model_validate_json(
+        read_limited_text(checkpoint_path)
+    )
+    review = inspect_agent_review_state(artifacts, plan.review)
+    if (
+        checkpoint.plan_id != review.plan_id
+        or not hmac.compare_digest(checkpoint.profile_sha256, review.profile_sha256)
+        or not hmac.compare_digest(
+            checkpoint.reviewed_spec_sha256,
+            review.current_spec_sha256,
+        )
+    ):
+        raise ValueError("agent_completion.json does not match the current reviewed plan")
+    return review, checkpoint
 
 
 def normalize_agent_request(request: AgentRequest) -> AgentRequest:
@@ -665,8 +895,9 @@ def generate_agent_dataset(
     profile: DatasetProfile,
     spec: DatasetSpec,
     *,
+    review: AgentReviewState,
     output_folder: Path,
-) -> tuple[dict[str, int], bool]:
+) -> AgentCompletionCheckpoint:
     budget = prepare_generation_budget(spec, output_folder)
     temp_folder = make_temp_output_folder(output_folder)
     try:
@@ -687,13 +918,104 @@ def generate_agent_dataset(
             validation_valid=report.valid,
             output_folder=temp_folder,
         )
+        checkpoint = AgentCompletionCheckpoint(
+            plan_id=review.plan_id,
+            profile_sha256=review.profile_sha256,
+            reviewed_spec_sha256=review.current_spec_sha256,
+            source_type=agent_source_label(request, profile),
+            row_counts=row_counts,
+            seed=request.seed,
+            output_format=request.output_format,
+            validation_valid=report.valid,
+        )
+        write_json_artifact(checkpoint, temp_folder / COMPLETION_CHECKPOINT_FILE)
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except Exception:
         shutil.rmtree(temp_folder, ignore_errors=True)
         raise
-    return row_counts, report.valid
+    return checkpoint
+
+
+def validate_agent_completion_checkpoint(
+    request: AgentRequest,
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+    review: AgentReviewState,
+    artifacts: AgentArtifacts,
+) -> AgentCompletionCheckpoint:
+    generated_folder = artifacts.generated_folder
+    if generated_folder is None:
+        raise RuntimeError("agent recovery requires generated artifacts")
+    enforce_output_folder_size(generated_folder)
+    checkpoint_path = artifacts.completion_checkpoint_path
+    profile_path = generated_folder / PROFILE_FILE
+    spec_path = generated_folder / DATASET_SPEC_FILE
+    report_path = artifacts.validation_report_path
+    manifest_path = artifacts.manifest_path
+    required = (checkpoint_path, profile_path, spec_path, report_path, manifest_path)
+    if any(
+        path is None or not path.is_file() or path.is_symlink()
+        for path in required
+    ):
+        raise ValueError("generated output is missing a regular recovery artifact")
+
+    assert checkpoint_path is not None
+    assert report_path is not None
+    assert manifest_path is not None
+    checkpoint = AgentCompletionCheckpoint.model_validate_json(
+        read_limited_text(checkpoint_path)
+    )
+    expected_source_type = agent_source_label(request, profile)
+    if (
+        checkpoint.plan_id != review.plan_id
+        or not hmac.compare_digest(checkpoint.profile_sha256, review.profile_sha256)
+        or not hmac.compare_digest(
+            checkpoint.reviewed_spec_sha256,
+            review.current_spec_sha256,
+        )
+        or checkpoint.source_type != expected_source_type
+        or checkpoint.seed != request.seed
+        or checkpoint.output_format != request.output_format
+    ):
+        raise ValueError("agent_completion.json does not match the reviewed plan")
+
+    generated_profile = DatasetProfile.model_validate_json(read_limited_text(profile_path))
+    assert_profile_safe(generated_profile)
+    if not hmac.compare_digest(
+        dataset_profile_fingerprint(generated_profile),
+        review.profile_sha256,
+    ):
+        raise ValueError("generated profile.json does not match the reviewed profile")
+    generated_spec = load_dataset_spec(spec_path)
+    if not hmac.compare_digest(
+        dataset_spec_fingerprint(generated_spec),
+        review.current_spec_sha256,
+    ):
+        raise ValueError("generated dataset_spec.yaml does not match the reviewed DatasetSpec")
+
+    manifest = GenerationManifest.model_validate_json(read_limited_text(manifest_path))
+    report = DatasetValidationReport.model_validate_json(read_limited_text(report_path))
+    rows_by_entity = load_dataset_rows(generated_folder)
+    row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
+    if (
+        manifest.spec_sha256 != review.current_spec_sha256
+        or manifest.seed != request.seed
+        or manifest.output_format != request.output_format
+        or manifest.row_counts != row_counts
+        or checkpoint.row_counts != row_counts
+        or manifest.validation_valid != report.valid
+        or checkpoint.validation_valid != report.valid
+    ):
+        raise ValueError("generated manifest, checkpoint, or validation report is inconsistent")
+
+    assert_agent_source_not_copied(request, spec, rows_by_entity)
+    recovered_report = validate_dataset(rows_by_entity, spec)
+    if recovered_report != report:
+        raise ValueError("generated rows do not match the persisted validation report")
+    enforce_output_folder_size(generated_folder)
+    return checkpoint
 
 
 def assert_agent_source_not_copied(
@@ -723,6 +1045,19 @@ def agent_artifacts(workspace: Path, *, generated_folder: Path | None = None) ->
         approval_receipt_path=(
             workspace / APPROVAL_RECEIPT_FILE if generated_folder else None
         ),
+        completion_checkpoint_path=(
+            generated_folder / COMPLETION_CHECKPOINT_FILE
+            if generated_folder
+            else None
+        ),
+    )
+
+
+def agent_source_label(request: AgentRequest, profile: DatasetProfile) -> str:
+    return (
+        profile.source_type
+        if request.source_type == AgentSourceType.PROFILE
+        else request.source_type.value
     )
 
 

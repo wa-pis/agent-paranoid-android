@@ -4,13 +4,16 @@ from pathlib import Path
 
 import pytest
 import test_data_agent
+import test_data_agent.agent as agent_module
 from test_data_agent.agent import (
     AgentApprovalReceipt,
+    AgentCompletionCheckpoint,
     AgentFieldReference,
     AgentFieldSummary,
     AgentGenerationSummary,
     AgentNextAction,
     AgentPlanSummary,
+    AgentRecoverySummary,
     AgentRequest,
     AgentReviewState,
     AgentRelationshipSummary,
@@ -20,6 +23,7 @@ from test_data_agent.agent import (
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
+    recover_agent_workspace,
 )
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_dataset_spec_artifact
@@ -32,12 +36,14 @@ FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
 
 def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentApprovalReceipt is AgentApprovalReceipt
+    assert test_data_agent.AgentCompletionCheckpoint is AgentCompletionCheckpoint
     assert test_data_agent.AgentFieldReference is AgentFieldReference
     assert test_data_agent.AgentFieldSummary is AgentFieldSummary
     assert test_data_agent.AgentRequest is AgentRequest
     assert test_data_agent.AgentReviewState is AgentReviewState
     assert test_data_agent.AgentRelationshipSummary is AgentRelationshipSummary
     assert test_data_agent.AgentPlanSummary is AgentPlanSummary
+    assert test_data_agent.AgentRecoverySummary is AgentRecoverySummary
     assert test_data_agent.AgentGenerationSummary is AgentGenerationSummary
     assert test_data_agent.AgentNextAction is AgentNextAction
     assert test_data_agent.AgentSourceType is AgentSourceType
@@ -46,6 +52,7 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
     assert test_data_agent.detect_agent_source_type is detect_agent_source_type
     assert test_data_agent.inspect_agent_workspace is inspect_agent_workspace
+    assert test_data_agent.recover_agent_workspace is recover_agent_workspace
 
 
 def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
@@ -213,6 +220,191 @@ def test_agent_workspace_status_tracks_plan_and_completion(tmp_path) -> None:
     assert completed.artifacts.approval_receipt_path == (
         workspace.resolve() / "approval_receipt.json"
     )
+    assert completed.artifacts.completion_checkpoint_path == (
+        workspace.resolve() / "generated" / "agent_completion.json"
+    )
+
+
+def test_agent_recovery_finishes_publication_without_regenerating_rows(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+            seed=91,
+        )
+    )
+    assert planned.review is not None
+    original_publish = agent_module.publish_agent_completion
+
+    def interrupt_publication(*args, **kwargs) -> None:
+        raise RuntimeError("simulated publication interruption")
+
+    monkeypatch.setattr(agent_module, "publish_agent_completion", interrupt_publication)
+    with pytest.raises(RuntimeError, match="simulated publication interruption"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+
+    generated_before = generated_bundle_bytes(workspace / "generated")
+    status = inspect_agent_workspace(workspace)
+    assert status.phase == "recovery_required"
+    assert status.next_action == "recover"
+    assert isinstance(status.summary, AgentRecoverySummary)
+    assert status.summary.reason == "completion_metadata_missing"
+    assert status.summary.reviewed_spec_sha256 == planned.review.current_spec_sha256
+
+    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    recovered = recover_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+
+    assert recovered.phase == "completed"
+    assert generated_bundle_bytes(workspace / "generated") == generated_before
+    assert inspect_agent_workspace(workspace).phase == "completed"
+
+
+def test_agent_recovery_rejects_tampered_rows_before_publication(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    original_publish = agent_module.publish_agent_completion
+    monkeypatch.setattr(
+        agent_module,
+        "publish_agent_completion",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+
+    customers_path = workspace / "generated" / "customers.csv"
+    customers_path.write_text(customers_path.read_text() + "tampered,row\n")
+    with pytest.raises(ValueError, match="inconsistent|validation report"):
+        recover_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+
+    assert not (workspace / "agent_result.json").exists()
+    assert not (workspace / "approval_receipt.json").exists()
+
+
+def test_agent_approve_is_idempotent_for_matching_completed_plan(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    first = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+    before = generated_bundle_bytes(workspace / "generated")
+
+    repeated = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+
+    assert repeated == first
+    assert generated_bundle_bytes(workspace / "generated") == before
+    with pytest.raises(ValueError, match="does not match"):
+        approve_agent_workspace(workspace, reviewed_spec_sha256="0" * 64)
+
+
+def test_agent_recovery_restores_missing_approval_receipt(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+    (workspace / "approval_receipt.json").unlink()
+
+    status = inspect_agent_workspace(workspace)
+    assert status.phase == "recovery_required"
+    assert isinstance(status.summary, AgentRecoverySummary)
+    assert status.summary.reason == "approval_receipt_missing"
+
+    recover_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+    assert (workspace / "approval_receipt.json").is_file()
+    assert inspect_agent_workspace(workspace).phase == "completed"
+
+
+def test_agent_recovery_preflights_existing_result_before_writing_receipt(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    original_publish = agent_module.publish_agent_completion
+    monkeypatch.setattr(
+        agent_module,
+        "publish_agent_completion",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    (workspace / "agent_result.json").write_text(
+        (workspace / "agent_plan.json").read_text()
+    )
+
+    with pytest.raises(ValueError, match="agent_result.json"):
+        recover_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+
+    assert not (workspace / "approval_receipt.json").exists()
 
 
 def test_agent_status_tracks_reviewed_spec_edits(tmp_path) -> None:
@@ -436,3 +628,11 @@ def copied_rows(generated: dict[str, list[dict[str, str]]], source: dict[str, li
         if generated_normalized & source_normalized:
             return True
     return False
+
+
+def generated_bundle_bytes(folder: Path) -> dict[str, bytes]:
+    return {
+        path.relative_to(folder).as_posix(): path.read_bytes()
+        for path in sorted(folder.rglob("*"))
+        if path.is_file()
+    }

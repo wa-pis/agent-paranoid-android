@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from test_data_agent.agent import (
     AgentApprovalReceipt,
+    AgentCompletionCheckpoint,
     AgentFieldReference,
     AgentFieldSummary,
     AgentGenerationSummary,
     AgentNextAction,
     AgentPlanSummary,
+    AgentRecoverySummary,
     AgentRequest,
     AgentReviewState,
     AgentRelationshipSummary,
@@ -20,6 +22,7 @@ from test_data_agent.agent import (
     inspect_agent_workspace,
     plan_agent_profile,
     plan_agent_request,
+    recover_agent_workspace,
 )
 from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
@@ -30,6 +33,7 @@ from test_data_agent.version import __version__
 
 __all__ = [
     "AgentApprovalReceipt",
+    "AgentCompletionCheckpoint",
     "AgentFieldReference",
     "AgentFieldSummary",
     "AgentRequest",
@@ -37,6 +41,7 @@ __all__ = [
     "AgentRelationshipSummary",
     "AgentResult",
     "AgentPlanSummary",
+    "AgentRecoverySummary",
     "AgentGenerationSummary",
     "AgentNextAction",
     "AgentSourceType",
@@ -57,6 +62,7 @@ __all__ = [
     "inspect_agent_workspace",
     "plan_agent_request",
     "plan_agent_profile",
+    "recover_agent_workspace",
     "solve_constraints",
     "validate_dataset",
     "__version__",

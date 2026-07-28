@@ -45,6 +45,21 @@ test-data-agent generate-from-example data/example_dataset \
 Use `--overwrite` only for commands that explicitly support replacing a
 single-file output. Never point output at a source file or source folder.
 
+## Agent Approval Was Interrupted
+
+Inspect the workspace:
+
+```bash
+test-data-agent agent-status out/agent
+```
+
+When it reports `recovery_required`, run the exact `agent-recover` command it
+prints. Recovery requires the previously reviewed DatasetSpec SHA-256,
+revalidates the existing generated bundle, and does not generate new rows.
+
+Do not edit files under `generated/` before recovery. A changed checkpoint,
+manifest, report, spec, profile, or row file causes recovery to fail closed.
+
 ## Input Limit Exceeded
 
 The error names the failed limit. Prefer splitting an oversized source or

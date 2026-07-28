@@ -95,6 +95,18 @@ granting the planning client raw-SQL access.
 - **THEN** `run_safe_select` is not exposed
 - **AND** fixed metadata and aggregate profiling tools remain available
 
+### Requirement: MCP Agent Recovery Is Explicit
+
+The generator MCP SHALL report recovery-required plans and expose bounded
+recovery without regenerating or returning rows.
+
+#### Scenario: Interrupted MCP plan is recovered
+
+- **GIVEN** `inspect_dataset_plan` reports `recovery_required`
+- **WHEN** `recover_dataset_plan` receives the reviewed spec fingerprint
+- **THEN** it revalidates the existing bundle and publishes completion metadata
+- **AND** no generated rows are returned
+
 ### Requirement: Manifest-Gated Validation
 
 MCP validation SHALL verify generated bundles against their manifest and

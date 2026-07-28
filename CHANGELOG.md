@@ -19,6 +19,9 @@ All notable changes to this project are documented here.
 - Fingerprint-bound agent approval with random plan identifiers, profile and
   effective-spec SHA-256 values, read-only MCP plan inspection, and persisted
   `approval_receipt.json` records.
+- Recoverable agent approvals with an atomic completion checkpoint,
+  `recovery_required` status, CLI/Python/MCP recovery operations, full bounded
+  bundle revalidation, and idempotent repeated approval.
 
 ### Changed
 
