@@ -26,10 +26,25 @@ you need:
 python3 -m pip install "agent-paranoid-android[parquet]"
 python3 -m pip install "agent-paranoid-android[mcp]"
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
-python3 -m pip install "agent-paranoid-android[all]"
 ```
 
-Use `test-data-agent doctor --require-extra all` to verify a full installation.
+The CI dependency ceilings are intentionally small enough to catch accidental
+growth:
+
+| Profile | Capability | Maximum installed distributions |
+| --- | --- | ---: |
+| base | CSV and JSON | 10 |
+| `parquet` | Parquet files | 11 |
+| `mcp` | Generator MCP server | 35 |
+| `trino` | Trino client and safe SQL parser | 25 |
+
+These are regression budgets, not a guarantee that every platform installs the
+same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
+environments that do not produce Parquet files.
+
+The `all` extra remains available for development, demos, and container builds.
+It is not the recommended user installation. Use
+`test-data-agent doctor --require-extra all` to verify that full environment.
 
 ### Windows PowerShell
 

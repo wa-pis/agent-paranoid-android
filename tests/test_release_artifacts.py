@@ -116,6 +116,10 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "name: Wheel smoke" in workflow
     assert "scripts/check_installed_package.py" in workflow
     assert "test-data-agent doctor --skip-smoke" in workflow
+    assert "--profile base --wheel" in workflow
+    for extra in ("parquet", "mcp", "trino"):
+        assert f"--profile {extra}" in workflow
+        assert f"--require-extra {extra}" in workflow
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
