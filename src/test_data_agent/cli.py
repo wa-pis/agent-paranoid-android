@@ -8,7 +8,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Never
 
 from pydantic import ValidationError
 
@@ -136,7 +136,7 @@ one output file and requires --count and --seed.
 class HelpfulArgumentParser(argparse.ArgumentParser):
     """Add a concrete recovery hint to argparse failures."""
 
-    def error(self, message: str) -> None:
+    def error(self, message: str) -> Never:
         self.print_usage(sys.stderr)
         print(f"{self.prog}: error: {message}", file=sys.stderr)
         print(f"Try '{self.prog} --help' for examples and options.", file=sys.stderr)
@@ -482,23 +482,23 @@ def run_command(args: argparse.Namespace) -> int:
         )
 
     if args.command == "audit-verify":
-        result = verify_audit_log_from_env(args.log)
+        audit_result = verify_audit_log_from_env(args.log)
         print(
-            f"Audit log verified: {result.record_count} records, "
-            f"last MAC {result.last_mac}",
+            f"Audit log verified: {audit_result.record_count} records, "
+            f"last MAC {audit_result.last_mac}",
             file=sys.stderr,
         )
         return 0
 
     if args.command == "agent-plan":
-        result = plan_agent_request(agent_request_from_args(args))
-        write_agent_result_summary(result)
+        agent_result = plan_agent_request(agent_request_from_args(args))
+        write_agent_result_summary(agent_result)
         return 0
 
     if args.command == "agent-approve":
-        result = approve_agent_workspace(args.workspace)
-        write_agent_result_summary(result)
-        return 0 if result.summary.get("validation_valid", False) else 1
+        agent_result = approve_agent_workspace(args.workspace)
+        write_agent_result_summary(agent_result)
+        return 0 if agent_result.summary.get("validation_valid", False) else 1
 
     return 2
 
