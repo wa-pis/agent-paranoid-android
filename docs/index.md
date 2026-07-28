@@ -76,7 +76,7 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current package version is `0.8.0`. `DatasetSpec` is the generation and
+The current package version is `0.8.1`. `DatasetSpec` is the generation and
 validation contract for the CLI and Python API.
 
 Development is substantially AI-assisted. Human review, automated tests, and
