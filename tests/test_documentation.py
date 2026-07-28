@@ -66,6 +66,18 @@ def test_required_user_documentation_exists_and_is_navigable() -> None:
     assert (ROOT / "examples" / "orders_rules.yaml").is_file()
 
 
+def test_installation_documents_dependency_budgets() -> None:
+    installation = (
+        ROOT / "docs" / "getting-started" / "installation.md"
+    ).read_text()
+
+    assert "Maximum installed distributions" in installation
+    for maximum in (10, 11, 25, 35):
+        assert f"| {maximum} |" in installation
+    assert 'pip install "agent-paranoid-android[all]"' not in installation
+    assert "not the recommended user installation" in installation
+
+
 def test_documentation_workflow_deploys_only_from_main() -> None:
     workflow = (ROOT / ".github" / "workflows" / "docs.yml").read_text()
 

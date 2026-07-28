@@ -89,10 +89,38 @@ jobs:
       - name: Build wheel and source distribution
         run: uv build --no-build-isolation
 
-      - name: Verify installed wheel
+      - name: Verify isolated install profiles
         run: |
-          uv run --isolated --no-project --with ./dist/*.whl python scripts/check_installed_package.py
-          uv run --isolated --no-project --with ./dist/*.whl test-data-agent doctor --skip-smoke
+          set -euo pipefail
+          wheel_path="$(realpath "$(find dist -maxdepth 1 -name '*.whl' -print -quit)")"
+          wheel_uri="file://${wheel_path}"
+
+          uv run --isolated --no-project --with "${wheel_path}" \
+            python scripts/check_installed_package.py \
+            --profile base --wheel "${wheel_path}"
+          uv run --isolated --no-project --with "${wheel_path}" \
+            test-data-agent doctor --skip-smoke
+
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[parquet] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile parquet
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[parquet] @ ${wheel_uri}" \
+            test-data-agent doctor --skip-smoke --require-extra parquet
+
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[mcp] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile mcp
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[mcp] @ ${wheel_uri}" \
+            test-data-agent doctor --skip-smoke --require-extra mcp
+
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile trino
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
+            test-data-agent doctor --skip-smoke --require-extra trino
 
   trino-integration:
     name: Trino integration
