@@ -7,7 +7,7 @@ Source:
 Requirements:
 
 * row count: {count}
-* output format: {csv/json/parquet/sql}
+* output format: {csv/json/parquet}
 * mode: {valid/mixed/negative/edge/load_test}
 * invalid ratio: {invalid_ratio}
 * seed: {seed}
@@ -16,9 +16,14 @@ Requirements:
 * copy source rows: no
 * expose PII: no
 
-Use the CSV only for schema inference, aggregate profiling, safe distributions, and masked patterns. Generate fully synthetic data. Validate the output and return:
+Use the CSV only for schema inference, aggregate profiling, safe
+distributions, and masked patterns. First create a reviewable DatasetSpec and
+stop for my explicit approval. After approval, generate fully synthetic data
+and validate it. Return paths for:
 
 * CSV profile
 * generation specification
-* generated dataset
+* generated dataset folder
 * validation report
+
+Do not return source or generated rows in chat.
