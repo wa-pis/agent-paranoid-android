@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Read-only `agent-status` inspection for planned and completed agent
   workspaces, with concise human output and a versioned `--json` contract.
+- Automatic `agent-plan` source detection for CSV files, CSV folders, and
+  validated safe-profile JSON, while retaining `--source-type` as an override.
 
 ### Changed
 

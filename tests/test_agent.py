@@ -11,6 +11,7 @@ from test_data_agent.agent import (
     AgentSourceType,
     AgentWorkspaceStatus,
     approve_agent_workspace,
+    detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
 )
@@ -30,6 +31,7 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentWorkspaceStatus is AgentWorkspaceStatus
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
+    assert test_data_agent.detect_agent_source_type is detect_agent_source_type
     assert test_data_agent.inspect_agent_workspace is inspect_agent_workspace
 
 
@@ -175,6 +177,41 @@ def test_agent_workspace_status_rejects_incomplete_workspace(tmp_path) -> None:
         assert "profile.json" in str(exc)
     else:
         raise AssertionError("incomplete workspace must be rejected")
+
+
+def test_detect_agent_source_type_for_supported_inputs(tmp_path) -> None:
+    assert detect_agent_source_type(FIXTURE_CUSTOMERS) == AgentSourceType.CSV
+    assert detect_agent_source_type(FIXTURE_EXAMPLE_DATASET) == AgentSourceType.CSV_FOLDER
+    assert detect_agent_source_type(Path("examples/orders_profile.json")) == AgentSourceType.PROFILE
+
+    empty_folder = tmp_path / "empty"
+    empty_folder.mkdir()
+    try:
+        detect_agent_source_type(empty_folder)
+    except ValueError as exc:
+        assert "folder contains no CSV files" in str(exc)
+    else:
+        raise AssertionError("an empty folder must not be detected as a CSV source")
+
+
+def test_detect_agent_source_type_routes_dataset_spec_to_generate(tmp_path) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "entities": [],
+            }
+        )
+    )
+
+    try:
+        detect_agent_source_type(spec_path)
+    except ValueError as exc:
+        assert "detected a DatasetSpec" in str(exc)
+        assert "test-data-agent generate" in str(exc)
+    else:
+        raise AssertionError("DatasetSpec must not be treated as a safe profile")
 
 
 def load_csv_folder(folder: Path) -> dict[str, list[dict[str, str]]]:

@@ -209,6 +209,29 @@ def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     assert manifest["row_counts"] == {"customers": 3, "orders": 3}
 
 
+def test_agent_plan_cli_detects_csv_folder_without_source_type(tmp_path, capsys) -> None:
+    workspace = tmp_path / "agent"
+
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--workspace",
+                str(workspace),
+                "--count",
+                "3",
+            ]
+        )
+        == 0
+    )
+
+    captured = capsys.readouterr()
+    request = json.loads((workspace / "agent_request.json").read_text())
+    assert "Agent plan ready:" in captured.err
+    assert request["source_type"] == "csv_folder"
+
+
 def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
     assert (

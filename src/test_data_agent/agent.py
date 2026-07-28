@@ -65,6 +65,38 @@ class AgentNextAction(StrEnum):
     NONE = "none"
 
 
+def detect_agent_source_type(source: Path) -> AgentSourceType:
+    resolved = source.expanduser().resolve(strict=True)
+    if resolved.is_dir():
+        if any(path.is_file() and path.suffix == ".csv" for path in resolved.iterdir()):
+            return AgentSourceType.CSV_FOLDER
+        raise ValueError(
+            "cannot detect agent source type: folder contains no CSV files; "
+            "pass --source-type to override"
+        )
+    if not resolved.is_file():
+        raise ValueError("agent source must be a regular file or folder")
+    if resolved.suffix.lower() == ".csv":
+        return AgentSourceType.CSV
+    if resolved.suffix.lower() == ".json":
+        loaded = load_profile_or_spec(resolved)
+        if isinstance(loaded, DatasetSpec):
+            raise ValueError(
+                "agent-plan detected a DatasetSpec; use 'test-data-agent generate' "
+                "for reviewed specs"
+            )
+        return AgentSourceType.PROFILE
+    if resolved.suffix.lower() in {".yaml", ".yml"}:
+        raise ValueError(
+            "agent-plan does not accept DatasetSpec YAML; "
+            "use 'test-data-agent generate' for reviewed specs"
+        )
+    raise ValueError(
+        "cannot detect agent source type; use a CSV file, a folder containing "
+        "CSV files, a safe profile JSON, or pass --source-type"
+    )
+
+
 class AgentRequest(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
