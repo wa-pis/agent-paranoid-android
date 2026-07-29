@@ -129,7 +129,7 @@ Make the review-first agent workflow the clearest product entry point:
   routed to the existing reviewed-spec workflow.
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
-  Implemented for `agent-plan` and pending `agent-status`.
+  Implemented for `agent-plan` and pending `agent-status` output.
 - Continue exercising recovery and idempotency contracts across new workflow
   integrations. The local CLI, Python API, and generator MCP path are
   implemented.
@@ -144,7 +144,9 @@ Provide a practical AI-agent integration without coupling the deterministic
 core to one model vendor:
 
 - Define a provider-neutral advisor interface that accepts safe profile
-  metadata and proposes structured `DatasetSpec` changes.
+  metadata and proposes structured `DatasetSpec` changes. The typed,
+  fingerprint-bound core contract is implemented; persisted review integration
+  and provider examples remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as

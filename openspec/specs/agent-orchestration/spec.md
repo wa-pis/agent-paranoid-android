@@ -72,6 +72,35 @@ or validator.
   approval, and call `agent-approve`
 - **AND** deterministic Python code performs generation and validation
 
+### Requirement: Advisor Integration Is Provider Neutral
+
+The agent workflow SHALL expose a typed provider-neutral interface that accepts
+safe profile metadata and proposes a structured `DatasetSpec`.
+
+#### Scenario: A model adapter proposes a DatasetSpec
+
+- **GIVEN** a profile that passes the existing profile safety checks
+- **WHEN** a provider adapter receives an advisor request
+- **THEN** the request contains safe metadata, a deterministic baseline spec,
+  and their SHA-256 fingerprints
+- **AND** profile text is marked as untrusted data
+- **AND** the request contains no source rows, generated rows, credentials, or
+  provider SDK objects
+
+### Requirement: Advisor Output Is Untrusted And Review Only
+
+Model-produced proposals SHALL be validated before they can enter the reviewed
+generation workflow.
+
+#### Scenario: A structured proposal is returned
+
+- **GIVEN** a proposal bound to the request fingerprints
+- **WHEN** the core validates it
+- **THEN** Pydantic validates the full `DatasetSpec`
+- **AND** schema identity and core-owned safety settings remain unchanged
+- **AND** sensitive and identifier classifications cannot be weakened
+- **AND** the result requires human approval and performs no generation
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

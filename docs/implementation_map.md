@@ -142,6 +142,12 @@ receipt. The generated bundle includes `agent_completion.json`.
 manifest, rows, validation report, and source-row non-reuse before publishing
 missing result metadata. It never calls generation.
 
+`src/test_data_agent/advisor.py`
+
+The provider-neutral model boundary fingerprints safe metadata and the
+baseline `DatasetSpec`, validates structured proposals, preserves core-owned
+safety settings, and performs no generation.
+
 ## Tests
 
 `tests/test_domain_agnostic_pipeline.py` covers the main pipeline:

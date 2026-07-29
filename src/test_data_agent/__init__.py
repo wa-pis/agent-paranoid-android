@@ -24,6 +24,15 @@ from test_data_agent.agent import (
     plan_agent_request,
     recover_agent_workspace,
 )
+from test_data_agent.advisor import (
+    AdvisorContractError,
+    AdvisorProposal,
+    AdvisorRequest,
+    DatasetAdvisor,
+    advise_dataset_spec,
+    build_advisor_request,
+    validate_advisor_proposal,
+)
 from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
@@ -46,15 +55,21 @@ __all__ = [
     "AgentNextAction",
     "AgentSourceType",
     "AgentWorkspaceStatus",
+    "AdvisorContractError",
+    "AdvisorProposal",
+    "AdvisorRequest",
     "CliErrorCode",
     "CliErrorDetail",
     "CliErrorResponse",
     "DatasetProfile",
     "DatasetSpec",
     "DatasetGenerationResult",
+    "DatasetAdvisor",
     "DatasetValidationReport",
     "DATASET_SPEC_SCHEMA_VERSION",
     "approve_agent_workspace",
+    "advise_dataset_spec",
+    "build_advisor_request",
     "detect_agent_source_type",
     "generate_dataset",
     "generate_dataset_bundle",
@@ -65,5 +80,6 @@ __all__ = [
     "recover_agent_workspace",
     "solve_constraints",
     "validate_dataset",
+    "validate_advisor_proposal",
     "__version__",
 ]
