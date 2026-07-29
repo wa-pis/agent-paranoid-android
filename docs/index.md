@@ -15,6 +15,7 @@ generated output.
 | A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |
+| Any structured-output AI client | [AI Integration](ai_integration.md) |
 | An MCP-compatible AI client | [Connect An MCP Client](how-to/mcp.md) |
 | An isolated container deployment | [Run In Containers](operations/containers.md) |
 | A failed command | [Troubleshooting](operations/troubleshooting.md) |

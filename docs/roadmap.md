@@ -31,6 +31,9 @@ date.
 - Explicit recovery for interrupted approvals, including a completion
   checkpoint, bounded artifact revalidation, and idempotent repeated approval
   without regenerating rows.
+- Provider-neutral advisor JSON export and apply commands, with bounded input,
+  fingerprint validation, recoverable persistence, and no model SDK in the
+  base package.
 
 ## Implemented For 0.8.0
 
@@ -145,8 +148,8 @@ core to one model vendor:
 
 - Define a provider-neutral advisor interface that accepts safe profile
   metadata and proposes structured `DatasetSpec` changes. The typed,
-  fingerprint-bound core contract and recoverable agent-workspace review
-  handoff are implemented; provider examples remain.
+  fingerprint-bound core contract, recoverable workspace handoff, and external
+  JSON exchange are implemented; provider-specific examples remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as

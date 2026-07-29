@@ -118,6 +118,22 @@ generation.
 - **AND** interruption can resume without another provider call
 - **AND** conflicting human edits fail closed
 
+### Requirement: Advisor Exchange Has A Provider-Neutral JSON Boundary
+
+The agent workflow SHALL export a safe advisor request and apply an untrusted
+structured proposal without requiring a model-provider SDK.
+
+#### Scenario: An external AI client proposes a DatasetSpec
+
+- **GIVEN** an awaiting-approval workspace without an existing advisor review
+- **WHEN** the client exports a request and applies a fingerprint-bound
+  proposal JSON
+- **THEN** request output contains safe metadata and no rows or credentials
+- **AND** proposal input is bounded and validated by the existing advisor
+  contract
+- **AND** persistence is retryable and rejects stale or conflicting content
+- **AND** generation still requires explicit reviewed-spec approval
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

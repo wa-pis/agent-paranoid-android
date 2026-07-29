@@ -61,6 +61,51 @@ A successful proposal still has `approval_required: true` and
 `generation_performed: false`. Review the resulting spec through the normal
 agent approval flow before generation.
 
+## JSON Handoff
+
+Use the JSON handoff when the model runs outside this Python process. It needs
+no provider SDK:
+
+```bash
+test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --count 25
+
+test-data-agent agent-advisor-request out/agent > advisor_request.json
+```
+
+Send the complete `advisor_request.json` object to a model as structured data.
+Do not concatenate profile fields into privileged instructions. Require the
+model to return exactly this `AdvisorProposal` shape:
+
+```json
+{
+  "schema_version": "1.0",
+  "profile_sha256": "copy from the request",
+  "baseline_spec_sha256": "copy from the request",
+  "approval_required": true,
+  "generation_performed": false,
+  "dataset_spec": {
+    "schema_version": "1.0",
+    "entities": []
+  }
+}
+```
+
+`dataset_spec` must be the complete proposed spec, normally the request's
+`baseline_spec` with allowed generation hints changed. Save the structured
+model response and apply it:
+
+```bash
+test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json
+test-data-agent agent-status out/agent
+```
+
+Proposal input must be a bounded regular JSON file. Symbolic links, malformed
+or oversized input, stale fingerprints, schema changes, weakened safety
+settings, and conflicting edits are rejected. A successful apply writes no
+dataset rows and leaves the workspace awaiting approval.
+
 ## Agent Workspace Handoff
 
 Use `advise_agent_workspace` after `agent-plan` to persist one validated
@@ -91,3 +136,8 @@ Conflicting manual edits fail instead of being overwritten.
 
 The handoff never writes `generated/`. Inspect the changed spec and use its
 current fingerprint with the existing `agent-approve` command.
+
+For direct file/API integration, use `build_agent_advisor_request` and
+`apply_agent_advisor_proposal`. The latter accepts an `AdvisorProposal` or
+mapping and uses the same validation, retry, persistence, and approval
+behavior as `advise_agent_workspace`.

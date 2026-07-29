@@ -149,6 +149,9 @@ baseline `DatasetSpec`, validates structured proposals, preserves core-owned
 safety settings, and performs no generation. `advise_agent_workspace` persists
 the validated exchange as `advisor_review.json`, atomically updates the pending
 spec, and leaves generation behind the existing fingerprint approval gate.
+`build_agent_advisor_request` and `apply_agent_advisor_proposal` expose the
+same boundary to external model clients through structured JSON without a
+provider SDK.
 
 ## Tests
 

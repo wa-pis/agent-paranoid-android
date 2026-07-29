@@ -88,6 +88,41 @@ This mode is documented in [Agent Design](agent_design.md). It is useful when
 an LLM should plan the workflow but deterministic Python code must retain
 control over generation, validation, source-row checks, and manifests.
 
+## External Advisor JSON Handoff
+
+Any model service that can accept and return structured JSON can propose
+`DatasetSpec` changes without a package integration:
+
+```bash
+test-data-agent agent-plan tests/fixtures/example_dataset \
+  --workspace out/agent --count 25 --json
+test-data-agent agent-advisor-request out/agent > advisor_request.json
+```
+
+Pass the complete request as untrusted structured input. Ask the model for an
+`AdvisorProposal` JSON object, not prose or Markdown, and save that response as
+`advisor_proposal.json`. Then run:
+
+```bash
+test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json --json
+test-data-agent agent-status out/agent --json
+```
+
+The core verifies both request fingerprints, the full spec schema, schema
+identity, privacy settings, sensitive classifications, row limits, and the
+absence of raw sensitive values. It records the exchange in
+`advisor_review.json` and never generates data during apply.
+
+Show the updated `dataset_spec.yaml` and the new
+`review.current_spec_sha256` to the human reviewer. Only after explicit review
+may the client pass that exact hash to `agent-approve`. A retry with the same
+proposal can finish an interrupted spec write; stale, different, linked,
+oversized, or conflicting input fails closed.
+
+See [Advisor API](reference/advisor.md) for the exact request and proposal
+contracts.
+
 ## MCP Mode
 
 The Trino server is read-only and exposes safe metadata, aggregate profiling,

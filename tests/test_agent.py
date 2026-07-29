@@ -20,8 +20,10 @@ from test_data_agent.agent import (
     AgentRelationshipSummary,
     AgentSourceType,
     AgentWorkspaceStatus,
+    apply_agent_advisor_proposal,
     advise_agent_workspace,
     approve_agent_workspace,
+    build_agent_advisor_request,
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
@@ -70,7 +72,9 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentNextAction is AgentNextAction
     assert test_data_agent.AgentSourceType is AgentSourceType
     assert test_data_agent.AgentWorkspaceStatus is AgentWorkspaceStatus
+    assert test_data_agent.apply_agent_advisor_proposal is apply_agent_advisor_proposal
     assert test_data_agent.advise_agent_workspace is advise_agent_workspace
+    assert test_data_agent.build_agent_advisor_request is build_agent_advisor_request
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
     assert test_data_agent.detect_agent_source_type is detect_agent_source_type
@@ -499,6 +503,125 @@ def test_advisor_workspace_handoff_stops_for_review_then_approves(tmp_path) -> N
         completed.approval_receipt.reviewed_spec_sha256
         == status.review.current_spec_sha256
     )
+
+
+def test_external_advisor_request_is_safe_and_read_only(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    spec_before = (workspace / "dataset_spec.yaml").read_bytes()
+
+    request = build_agent_advisor_request(workspace)
+
+    assert request.approval_required is True
+    assert request.metadata_trust == "untrusted"
+    assert "alice@example.com" not in request.model_dump_json()
+    assert (workspace / "dataset_spec.yaml").read_bytes() == spec_before
+    assert not (workspace / "advisor_review.json").exists()
+    assert not (workspace / "generated").exists()
+
+
+def test_external_advisor_proposal_is_applied_once_and_stops_for_review(
+    tmp_path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    request = build_agent_advisor_request(workspace)
+    proposal = RowCountAdvisor(4).propose(request)
+
+    status = apply_agent_advisor_proposal(workspace, proposal)
+    repeated = apply_agent_advisor_proposal(workspace, proposal)
+
+    assert status.phase == "awaiting_approval"
+    assert repeated == status
+    assert status.review is not None
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 4
+    assert (workspace / "advisor_review.json").is_file()
+    assert not (workspace / "generated").exists()
+
+    different_proposal = RowCountAdvisor(5).propose(request)
+    with pytest.raises(ValueError, match="different advisor proposal"):
+        apply_agent_advisor_proposal(workspace, different_proposal)
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 4
+
+
+def test_external_advisor_proposal_rejects_stale_request(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    request = build_agent_advisor_request(workspace)
+    proposal = RowCountAdvisor(4).propose(request)
+    spec_path = workspace / "dataset_spec.yaml"
+    edited = load_dataset_spec(spec_path)
+    edited.entities[0].row_count = 5
+    write_dataset_spec_artifact(edited, spec_path)
+
+    with pytest.raises(AdvisorContractError, match="baseline spec fingerprint"):
+        apply_agent_advisor_proposal(workspace, proposal)
+
+    assert not (workspace / "advisor_review.json").exists()
+    assert load_dataset_spec(spec_path).entities[0].row_count == 5
+
+
+def test_external_advisor_proposal_resumes_after_interrupted_spec_write(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    request = build_agent_advisor_request(workspace)
+    proposal = RowCountAdvisor(4).propose(request)
+    original_write = agent_module.write_dataset_spec_artifact_atomic
+    monkeypatch.setattr(
+        agent_module,
+        "write_dataset_spec_artifact_atomic",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            RuntimeError("interrupted")
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="interrupted"):
+        apply_agent_advisor_proposal(workspace, proposal)
+
+    assert (workspace / "advisor_review.json").is_file()
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 3
+
+    monkeypatch.setattr(
+        agent_module,
+        "write_dataset_spec_artifact_atomic",
+        original_write,
+    )
+    status = apply_agent_advisor_proposal(workspace, proposal)
+
+    assert status.review is not None
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 4
+    assert not (workspace / "generated").exists()
 
 
 def test_advisor_workspace_handoff_recovers_without_recalling_provider(
