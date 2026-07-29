@@ -8,8 +8,10 @@ from pydantic import ValidationError
 from test_data_agent.advisor import (
     AdvisorContractError,
     AdvisorRequest,
+    AdvisorReviewArtifact,
     advise_dataset_spec,
     build_advisor_request,
+    build_advisor_review_artifact,
     validate_advisor_proposal,
 )
 from test_data_agent.core.dataset import DatasetProfile
@@ -179,6 +181,34 @@ def test_advisor_proposal_cannot_change_core_owned_settings() -> None:
 
     with pytest.raises(AdvisorContractError, match="privacy settings"):
         validate_advisor_proposal(request, payload)
+
+
+def test_advisor_request_rejects_weakened_baseline_privacy() -> None:
+    profile = safe_profile()
+    baseline = build_advisor_request(profile).baseline_spec
+    baseline.privacy_settings.allow_raw_sensitive_values = True
+
+    with pytest.raises(AdvisorContractError, match="cannot allow raw sensitive"):
+        build_advisor_request(profile, baseline_spec=baseline)
+
+
+def test_advisor_review_artifact_validates_full_exchange() -> None:
+    request = build_advisor_request(safe_profile())
+
+    artifact = build_advisor_review_artifact(
+        request,
+        proposal_payload(
+            request,
+            customers__segment__semantic_type="customer_segment",
+        ),
+    )
+    loaded = AdvisorReviewArtifact.model_validate_json(
+        artifact.model_dump_json()
+    )
+
+    assert loaded == artifact
+    assert len(artifact.proposed_spec_sha256) == 64
+    assert artifact.proposal.generation_performed is False
 
 
 def test_advisor_contract_rejects_unknown_top_level_fields() -> None:

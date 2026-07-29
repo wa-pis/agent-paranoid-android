@@ -1,8 +1,8 @@
 # Advisor API
 
 The advisor API is a small provider-neutral boundary for model-assisted
-`DatasetSpec` proposals. It does not call an LLM, persist a plan, approve a
-plan, or generate rows.
+`DatasetSpec` proposals. The direct API does not call an LLM, persist a plan,
+approve a plan, or generate rows.
 
 ## Contract
 
@@ -60,3 +60,34 @@ that:
 A successful proposal still has `approval_required: true` and
 `generation_performed: false`. Review the resulting spec through the normal
 agent approval flow before generation.
+
+## Agent Workspace Handoff
+
+Use `advise_agent_workspace` after `agent-plan` to persist one validated
+proposal inside the existing review workflow:
+
+```python
+from pathlib import Path
+
+from test_data_agent import advise_agent_workspace
+
+
+status = advise_agent_workspace(
+    Path("out/agent"),
+    ProviderAdapter(),
+)
+reviewed_spec_sha256 = status.review.current_spec_sha256
+```
+
+The handoff writes:
+
+- `advisor_review.json`: safe request, validated proposal, and proposed-spec
+  fingerprint;
+- `dataset_spec.yaml`: proposed effective spec.
+
+Both files are bounded and written atomically. The review artifact is written
+first, so an interrupted handoff can resume without another model call.
+Conflicting manual edits fail instead of being overwritten.
+
+The handoff never writes `generated/`. Inspect the changed spec and use its
+current fingerprint with the existing `agent-approve` command.

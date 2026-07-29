@@ -57,6 +57,7 @@ def write_json_artifact_atomic(payload: Any, output: Path) -> None:
     descriptor, temporary_name = tempfile.mkstemp(
         dir=output.parent,
         prefix=f".{output.name}.",
+        suffix=output.suffix,
     )
     temporary_path = Path(temporary_name)
     os.close(descriptor)
@@ -77,6 +78,22 @@ def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
         write_bounded_text(dataset_spec_to_json(spec), output)
     else:
         write_bounded_text(dataset_spec_to_yaml(spec), output)
+
+
+def write_dataset_spec_artifact_atomic(spec: DatasetSpec, output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=output.parent,
+        prefix=f".{output.name}.",
+        suffix=output.suffix,
+    )
+    temporary_path = Path(temporary_name)
+    os.close(descriptor)
+    try:
+        write_dataset_spec_artifact(spec, temporary_path)
+        temporary_path.replace(output)
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def write_dataset_generation_artifacts(

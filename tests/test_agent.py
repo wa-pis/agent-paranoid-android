@@ -1,6 +1,7 @@
 import csv
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 import test_data_agent
@@ -19,12 +20,14 @@ from test_data_agent.agent import (
     AgentRelationshipSummary,
     AgentSourceType,
     AgentWorkspaceStatus,
+    advise_agent_workspace,
     approve_agent_workspace,
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
     recover_agent_workspace,
 )
+from test_data_agent.advisor import AdvisorContractError, AdvisorRequest
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_dataset_spec_artifact
 from test_data_agent.io.readers import load_dataset_spec
@@ -32,6 +35,25 @@ from test_data_agent.io.readers import load_dataset_spec
 
 FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
 FIXTURE_EXAMPLE_DATASET = Path("tests/fixtures/example_dataset")
+
+
+class RowCountAdvisor:
+    def __init__(self, row_count: int) -> None:
+        self.row_count = row_count
+        self.calls = 0
+
+    def propose(self, request: AdvisorRequest) -> dict[str, Any]:
+        self.calls += 1
+        candidate = request.baseline_spec.model_copy(deep=True)
+        candidate.entities[0].row_count = self.row_count
+        return {
+            "schema_version": "1.0",
+            "profile_sha256": request.profile_sha256,
+            "baseline_spec_sha256": request.baseline_spec_sha256,
+            "approval_required": True,
+            "generation_performed": False,
+            "dataset_spec": candidate.model_dump(mode="json"),
+        }
 
 
 def test_package_root_exposes_agent_api() -> None:
@@ -48,6 +70,7 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentNextAction is AgentNextAction
     assert test_data_agent.AgentSourceType is AgentSourceType
     assert test_data_agent.AgentWorkspaceStatus is AgentWorkspaceStatus
+    assert test_data_agent.advise_agent_workspace is advise_agent_workspace
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace
     assert test_data_agent.detect_agent_source_type is detect_agent_source_type
@@ -429,6 +452,8 @@ def test_agent_status_tracks_reviewed_spec_edits(tmp_path) -> None:
     assert status.review is not None
     assert status.review.current_spec_sha256 != initial_sha256
     assert status.review.spec_changed_since_plan is True
+    assert isinstance(status.summary, AgentPlanSummary)
+    assert status.summary.entities[0].row_count == 4
     approved = approve_agent_workspace(
         workspace,
         reviewed_spec_sha256=status.review.current_spec_sha256,
@@ -438,6 +463,190 @@ def test_agent_status_tracks_reviewed_spec_edits(tmp_path) -> None:
         approved.approval_receipt.reviewed_spec_sha256
         == status.review.current_spec_sha256
     )
+
+
+def test_advisor_workspace_handoff_stops_for_review_then_approves(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    advisor = RowCountAdvisor(4)
+
+    status = advise_agent_workspace(workspace, advisor)
+
+    assert advisor.calls == 1
+    assert status.phase == "awaiting_approval"
+    assert status.review is not None
+    assert status.review.spec_changed_since_plan is True
+    assert isinstance(status.summary, AgentPlanSummary)
+    assert status.summary.entities[0].row_count == 4
+    assert (workspace / "advisor_review.json").is_file()
+    assert "alice@example.com" not in (workspace / "advisor_review.json").read_text()
+    assert not (workspace / "generated").exists()
+
+    completed = approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=status.review.current_spec_sha256,
+    )
+    assert completed.phase == "completed"
+    assert completed.approval_receipt is not None
+    assert (
+        completed.approval_receipt.reviewed_spec_sha256
+        == status.review.current_spec_sha256
+    )
+
+
+def test_advisor_workspace_handoff_recovers_without_recalling_provider(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    advisor = RowCountAdvisor(4)
+    original_write = agent_module.write_dataset_spec_artifact_atomic
+    monkeypatch.setattr(
+        agent_module,
+        "write_dataset_spec_artifact_atomic",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            RuntimeError("interrupted")
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="interrupted"):
+        advise_agent_workspace(workspace, advisor)
+
+    assert advisor.calls == 1
+    assert (workspace / "advisor_review.json").is_file()
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 3
+
+    class UnexpectedAdvisor:
+        def propose(self, request: AdvisorRequest) -> dict[str, Any]:
+            raise AssertionError("persisted advisor review must be reused")
+
+    monkeypatch.setattr(
+        agent_module,
+        "write_dataset_spec_artifact_atomic",
+        original_write,
+    )
+    status = advise_agent_workspace(workspace, UnexpectedAdvisor())
+
+    assert status.review is not None
+    assert status.review.spec_changed_since_plan is True
+    assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 4
+
+
+def test_advisor_workspace_rejects_unsafe_proposal_without_changes(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    spec_before = (workspace / "dataset_spec.yaml").read_bytes()
+
+    class UnsafeAdvisor:
+        def propose(self, request: AdvisorRequest) -> dict[str, Any]:
+            candidate = request.baseline_spec.model_copy(deep=True)
+            candidate.entity("customers").field("email").sensitive = False
+            return {
+                "schema_version": "1.0",
+                "profile_sha256": request.profile_sha256,
+                "baseline_spec_sha256": request.baseline_spec_sha256,
+                "approval_required": True,
+                "generation_performed": False,
+                "dataset_spec": candidate.model_dump(mode="json"),
+            }
+
+    with pytest.raises(AdvisorContractError, match="sensitive field"):
+        advise_agent_workspace(workspace, UnsafeAdvisor())
+
+    assert not (workspace / "advisor_review.json").exists()
+    assert (workspace / "dataset_spec.yaml").read_bytes() == spec_before
+
+
+def test_advisor_workspace_rejects_spec_changed_after_proposal(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    advise_agent_workspace(workspace, RowCountAdvisor(4))
+    spec_path = workspace / "dataset_spec.yaml"
+    spec = load_dataset_spec(spec_path)
+    spec.entities[0].row_count = 5
+    write_dataset_spec_artifact(spec, spec_path)
+
+    with pytest.raises(ValueError, match="changed after advisor review"):
+        advise_agent_workspace(workspace, RowCountAdvisor(6))
+
+    assert load_dataset_spec(spec_path).entities[0].row_count == 5
+
+
+def test_advisor_workspace_does_not_overwrite_edit_during_provider_call(
+    tmp_path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    spec_path = workspace / "dataset_spec.yaml"
+
+    class EditingAdvisor(RowCountAdvisor):
+        def propose(self, request: AdvisorRequest) -> dict[str, Any]:
+            payload = super().propose(request)
+            edited = load_dataset_spec(spec_path)
+            edited.entities[0].row_count = 5
+            write_dataset_spec_artifact(edited, spec_path)
+            return payload
+
+    with pytest.raises(ValueError, match="changed after advisor review"):
+        advise_agent_workspace(workspace, EditingAdvisor(4))
+
+    assert load_dataset_spec(spec_path).entities[0].row_count == 5
+
+
+def test_advisor_workspace_rejects_completed_run(tmp_path) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+
+    with pytest.raises(ValueError, match="awaiting-approval"):
+        advise_agent_workspace(workspace, RowCountAdvisor(4))
 
 
 def test_agent_approval_rejects_spec_changed_after_review(tmp_path) -> None:

@@ -28,6 +28,9 @@ All notable changes to this project are documented here.
 - Provider-neutral `DatasetAdvisor` request and proposal contracts with safe
   metadata-only input, fingerprint binding, strict proposal validation, and
   no provider SDK dependency or generation side effect.
+- Recoverable `advise_agent_workspace` handoff with atomic
+  `advisor_review.json` and `dataset_spec.yaml` persistence, conflict-safe
+  retries, current-spec status summaries, and the existing approval gate.
 
 ### Changed
 
