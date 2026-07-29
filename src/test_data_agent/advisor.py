@@ -127,6 +127,29 @@ class DatasetAdvisor(Protocol):
         """Return a structured proposal without generating dataset rows."""
 
 
+@runtime_checkable
+class AdvisorExchangeClient(Protocol):
+    """Provider client that maps a self-describing exchange to structured output."""
+
+    def complete(self, exchange: AdvisorExchange) -> AdvisorProposalPayload:
+        """Return one structured proposal without applying it."""
+
+
+class ExchangeDatasetAdvisor:
+    """Adapt a structured-output client to the DatasetAdvisor contract."""
+
+    def __init__(self, client: AdvisorExchangeClient) -> None:
+        self._client = client
+
+    def propose(self, request: AdvisorRequest) -> AdvisorProposal:
+        validated_request = AdvisorRequest.model_validate(
+            request.model_dump(mode="python")
+        )
+        exchange = build_advisor_exchange(validated_request)
+        payload = self._client.complete(exchange.model_copy(deep=True))
+        return validate_advisor_proposal(validated_request, payload)
+
+
 def build_advisor_request(
     profile: DatasetProfile,
     *,

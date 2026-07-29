@@ -153,6 +153,9 @@ spec, and leaves generation behind the existing fingerprint approval gate.
 same boundary to external model clients through structured JSON without a
 provider SDK. `AdvisorExchange` adds immutable trusted instructions and the
 generated proposal schema while keeping the request explicitly untrusted.
+`ExchangeDatasetAdvisor` adapts an application-owned structured-output client
+to `DatasetAdvisor`, passes a defensive exchange copy, and validates the
+untrusted response against the original fingerprint-bound request.
 
 ## Tests
 

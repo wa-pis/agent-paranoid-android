@@ -37,6 +37,9 @@ All notable changes to this project are documented here.
 - Self-describing `AdvisorExchange` export with immutable trusted instructions,
   explicitly untrusted request metadata, and generated `AdvisorProposal` JSON
   Schema.
+- Provider-neutral `ExchangeDatasetAdvisor` for application-owned
+  structured-output clients, with defensive exchange copying and validation
+  against the original fingerprint-bound request.
 
 ### Changed
 
