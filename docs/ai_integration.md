@@ -1,9 +1,11 @@
 # AI Integration
 
 Model-specific Python integrations should implement the provider-neutral
-[`DatasetAdvisor`](reference/advisor.md) contract. It accepts only safe profile
-metadata and a deterministic baseline `DatasetSpec`, validates structured
-provider output, and never generates data or bypasses approval.
+[`AdvisorExchangeClient`](reference/advisor.md) contract and use
+`ExchangeDatasetAdvisor`. The client receives static trusted instructions,
+safe profile metadata marked as untrusted, and the current structured-output
+schema. The adapter validates provider output against the original request and
+never generates data or bypasses approval.
 
 `advise_agent_workspace` can persist that validated proposal as
 `advisor_review.json` and update the pending `dataset_spec.yaml`. The existing
@@ -87,6 +89,39 @@ regenerates rows.
 This mode is documented in [Agent Design](agent_design.md). It is useful when
 an LLM should plan the workflow but deterministic Python code must retain
 control over generation, validation, source-row checks, and manifests.
+
+## In-Process Advisor Client
+
+Use `ExchangeDatasetAdvisor` when a provider SDK runs in the consuming
+application:
+
+```python
+from test_data_agent import (
+    AdvisorExchange,
+    ExchangeDatasetAdvisor,
+    advise_agent_workspace,
+)
+
+
+class ProviderClient:
+    def complete(self, exchange: AdvisorExchange) -> dict:
+        return call_model_with_structured_output(
+            trusted_instructions=exchange.trusted_instructions,
+            untrusted_input=exchange.request.model_dump(mode="json"),
+            response_schema=exchange.response_json_schema,
+        )
+
+
+status = advise_agent_workspace(
+    workspace,
+    ExchangeDatasetAdvisor(ProviderClient()),
+)
+```
+
+`call_model_with_structured_output` is provider-specific application code.
+Keep its SDK and credentials outside this package. The client must return a
+parsed object matching `AdvisorProposal`; prose, tool commands, and unknown
+fields fail validation.
 
 ## External Advisor JSON Handoff
 

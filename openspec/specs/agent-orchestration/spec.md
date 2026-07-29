@@ -151,6 +151,21 @@ response schema.
 - **AND** export has no provider, persistence, approval, or generation side
   effect
 
+### Requirement: Advisor Client Adapter Preserves Trust Boundaries
+
+The agent workflow SHALL adapt application-owned structured-output clients
+without giving them authority over validation, approval, or generation.
+
+#### Scenario: An in-process provider client returns a proposal
+
+- **GIVEN** a safe fingerprint-bound advisor request
+- **WHEN** `ExchangeDatasetAdvisor` invokes a structured-output client
+- **THEN** the client receives a defensive copy of the self-describing exchange
+- **AND** trusted instructions remain separate from untrusted request metadata
+- **AND** the response is validated against the original request
+- **AND** client mutation cannot weaken the validation source
+- **AND** no persistence, approval, or generation occurs
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

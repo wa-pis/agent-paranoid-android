@@ -4,30 +4,44 @@ The advisor API is a small provider-neutral boundary for model-assisted
 `DatasetSpec` proposals. The direct API does not call an LLM, persist a plan,
 approve a plan, or generate rows.
 
-## Contract
+## Structured Client Adapter
 
-Implement `DatasetAdvisor.propose` in a separate adapter:
+Implement `AdvisorExchangeClient.complete` around the structured-output API of
+the chosen provider, then wrap it with `ExchangeDatasetAdvisor`:
 
 ```python
 from typing import Any
 
-from test_data_agent import AdvisorRequest, advise_dataset_spec
+from test_data_agent import (
+    AdvisorExchange,
+    ExchangeDatasetAdvisor,
+    advise_dataset_spec,
+)
 
 
-class ProviderAdapter:
-    def propose(self, request: AdvisorRequest) -> dict[str, Any]:
-        provider_payload = call_model_with_structured_output(
-            request.model_dump(mode="json")
+class ProviderClient:
+    def complete(self, exchange: AdvisorExchange) -> dict[str, Any]:
+        return call_model_with_structured_output(
+            trusted_instructions=exchange.trusted_instructions,
+            untrusted_input=exchange.request.model_dump(mode="json"),
+            response_schema=exchange.response_json_schema,
         )
-        return provider_payload
 
 
-proposal = advise_dataset_spec(profile, ProviderAdapter(), count=100)
+advisor = ExchangeDatasetAdvisor(ProviderClient())
+proposal = advise_dataset_spec(profile, advisor, count=100)
 reviewed_spec = proposal.dataset_spec
 ```
 
 `call_model_with_structured_output` is application code, not part of this
-package. Provider SDKs therefore stay outside the base installation.
+package. Provider SDKs therefore stay outside the base installation. The
+adapter gives the client a deep copy of the exchange and validates its output
+against the original request. Client-side mutation cannot change the
+fingerprints or safety source used for validation.
+
+For lower-level integrations, an application may implement
+`DatasetAdvisor.propose` directly. It must preserve the same separation
+between trusted instructions and untrusted profile metadata.
 
 ## Request Boundary
 
@@ -131,7 +145,7 @@ from test_data_agent import advise_agent_workspace
 
 status = advise_agent_workspace(
     Path("out/agent"),
-    ProviderAdapter(),
+    ExchangeDatasetAdvisor(ProviderClient()),
 )
 reviewed_spec_sha256 = status.review.current_spec_sha256
 ```

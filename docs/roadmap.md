@@ -36,6 +36,9 @@ date.
   base package.
 - Self-describing advisor exchanges with immutable trusted instructions,
   explicitly untrusted request metadata, and generated proposal JSON Schema.
+- An in-process `ExchangeDatasetAdvisor` adapter for structured-output clients,
+  with defensive request copying and proposal validation at the provider
+  boundary.
 
 ## Implemented For 0.8.0
 
@@ -151,8 +154,8 @@ core to one model vendor:
 - Define a provider-neutral advisor interface that accepts safe profile
   metadata and proposes structured `DatasetSpec` changes. The typed,
   fingerprint-bound core contract, recoverable workspace handoff, and external
-  self-describing JSON exchange are implemented; provider-specific examples
-  remain.
+  self-describing JSON exchange are implemented. The in-process exchange
+  adapter is implemented; provider-specific examples remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as
