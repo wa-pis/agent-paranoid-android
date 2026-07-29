@@ -61,6 +61,22 @@ class AdvisorProposal(BaseModel):
     dataset_spec: DatasetSpec
 
 
+class AdvisorReviewArtifact(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"] = "1.0"
+    request: AdvisorRequest
+    proposal: AdvisorProposal
+    proposed_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def validate_exchange(self) -> AdvisorReviewArtifact:
+        validated = validate_advisor_proposal(self.request, self.proposal)
+        if dataset_spec_fingerprint(validated.dataset_spec) != self.proposed_spec_sha256:
+            raise ValueError("advisor proposed spec fingerprint mismatch")
+        return self
+
+
 AdvisorProposalPayload = AdvisorProposal | Mapping[str, Any]
 
 
@@ -134,6 +150,20 @@ def advise_dataset_spec(
     return validate_advisor_proposal(request, payload)
 
 
+def build_advisor_review_artifact(
+    request: AdvisorRequest,
+    payload: AdvisorProposalPayload,
+) -> AdvisorReviewArtifact:
+    """Build an auditable validated exchange for later human review."""
+
+    proposal = validate_advisor_proposal(request, payload)
+    return AdvisorReviewArtifact(
+        request=request,
+        proposal=proposal,
+        proposed_spec_sha256=dataset_spec_fingerprint(proposal.dataset_spec),
+    )
+
+
 def _validate_schema_identity(baseline: DatasetSpec, candidate: DatasetSpec) -> None:
     baseline_entities = [entity.name for entity in baseline.entities]
     candidate_entities = [entity.name for entity in candidate.entities]
@@ -170,6 +200,14 @@ def _validate_spec_against_profile(
     profile: DatasetProfile,
     candidate: DatasetSpec,
 ) -> None:
+    if candidate.privacy_settings.allow_raw_sensitive_values:
+        raise AdvisorContractError(
+            "advisor spec cannot allow raw sensitive values"
+        )
+    if not candidate.privacy_settings.treat_unknown_as_sensitive:
+        raise AdvisorContractError(
+            "advisor spec must treat unknown fields as sensitive"
+        )
     profile_entities = [entity.name for entity in profile.entities]
     candidate_entities = [entity.name for entity in candidate.entities]
     if candidate_entities != profile_entities:

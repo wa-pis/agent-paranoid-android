@@ -5,6 +5,10 @@ Model-specific Python integrations should implement the provider-neutral
 metadata and a deterministic baseline `DatasetSpec`, validates structured
 provider output, and never generates data or bypasses approval.
 
+`advise_agent_workspace` can persist that validated proposal as
+`advisor_review.json` and update the pending `dataset_spec.yaml`. The existing
+status fingerprint and explicit approval remain the only path to generation.
+
 This project can be used by an AI agent in three practical modes:
 
 1. As a local CLI tool.

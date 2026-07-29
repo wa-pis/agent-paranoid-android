@@ -101,6 +101,23 @@ generation workflow.
 - **AND** sensitive and identifier classifications cannot be weakened
 - **AND** the result requires human approval and performs no generation
 
+### Requirement: Advisor Proposals Enter The Existing Review Gate
+
+The agent workflow SHALL persist validated advisor proposals as review
+artifacts and SHALL require the normal reviewed-spec approval before
+generation.
+
+#### Scenario: A pending workspace receives a valid proposal
+
+- **GIVEN** an awaiting-approval agent workspace
+- **WHEN** advisor handoff succeeds
+- **THEN** `advisor_review.json` binds the safe request, proposal, and proposed
+  spec fingerprint
+- **AND** `dataset_spec.yaml` is updated atomically
+- **AND** pending status summarizes the current effective spec
+- **AND** interruption can resume without another provider call
+- **AND** conflicting human edits fail closed
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

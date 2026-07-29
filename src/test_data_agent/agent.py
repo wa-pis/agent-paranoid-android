@@ -12,6 +12,12 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
+from test_data_agent.advisor import (
+    AdvisorReviewArtifact,
+    DatasetAdvisor,
+    build_advisor_request,
+    build_advisor_review_artifact,
+)
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import enforce_output_folder_size, read_limited_text
@@ -26,6 +32,7 @@ from test_data_agent.io.artifacts import (
     write_dataset_profile_artifact,
     write_dataset_review_artifacts,
     write_dataset_spec_artifact,
+    write_dataset_spec_artifact_atomic,
     write_generation_manifest,
     write_json_artifact,
     write_json_artifact_atomic,
@@ -52,6 +59,7 @@ from test_data_agent.validation import DatasetValidationReport, validate_dataset
 AGENT_REQUEST_FILE = "agent_request.json"
 AGENT_PLAN_FILE = "agent_plan.json"
 AGENT_RESULT_FILE = "agent_result.json"
+ADVISOR_REVIEW_FILE = "advisor_review.json"
 APPROVAL_RECEIPT_FILE = "approval_receipt.json"
 COMPLETION_CHECKPOINT_FILE = "agent_completion.json"
 PROFILE_FILE = "profile.json"
@@ -339,6 +347,86 @@ def plan_agent_profile(request: AgentRequest, profile: DatasetProfile) -> AgentR
     return _persist_agent_plan(normalized, profile)
 
 
+def advise_agent_workspace(
+    workspace: Path,
+    advisor: DatasetAdvisor,
+) -> AgentWorkspaceStatus:
+    """Persist one validated advisor proposal without generating data."""
+
+    resolved_workspace = workspace.expanduser().resolve(strict=True)
+    status = inspect_agent_workspace(resolved_workspace)
+    if status.phase != AgentPhase.AWAITING_APPROVAL:
+        raise ValueError("advisor proposals require an awaiting-approval workspace")
+
+    artifacts = agent_artifacts(resolved_workspace)
+    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
+    if plan.review is None:
+        raise ValueError(
+            "agent plan predates fingerprint-bound advisor review; create a new plan"
+        )
+    _request, profile, spec, _review = inspect_agent_review_context(
+        artifacts,
+        plan.review,
+    )
+    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
+    if review_path.exists() or review_path.is_symlink():
+        if review_path.is_symlink() or not review_path.is_file():
+            raise ValueError("advisor_review.json must be a regular file")
+        review_artifact = AdvisorReviewArtifact.model_validate_json(
+            read_limited_text(review_path)
+        )
+    else:
+        advisor_request = build_advisor_request(
+            profile,
+            baseline_spec=spec,
+        )
+        payload = advisor.propose(advisor_request.model_copy(deep=True))
+        review_artifact = build_advisor_review_artifact(
+            advisor_request,
+            payload,
+        )
+        if review_path.exists() or review_path.is_symlink():
+            raise ValueError("advisor_review.json was created concurrently")
+        write_json_artifact_atomic(review_artifact, review_path)
+
+    current_plan = AgentResult.model_validate_json(
+        read_limited_text(artifacts.plan_path)
+    )
+    if current_plan.review is None:
+        raise ValueError(
+            "agent plan predates fingerprint-bound advisor review; create a new plan"
+        )
+    _request, current_profile, current_spec, _review = inspect_agent_review_context(
+        artifacts,
+        current_plan.review,
+    )
+    profile_sha256 = dataset_profile_fingerprint(current_profile)
+    if not hmac.compare_digest(
+        review_artifact.request.profile_sha256,
+        profile_sha256,
+    ):
+        raise ValueError("advisor review profile does not match workspace profile")
+    current_spec_sha256 = dataset_spec_fingerprint(current_spec)
+    if hmac.compare_digest(
+        current_spec_sha256,
+        review_artifact.proposed_spec_sha256,
+    ):
+        return inspect_agent_workspace(resolved_workspace)
+    if not hmac.compare_digest(
+        current_spec_sha256,
+        review_artifact.request.baseline_spec_sha256,
+    ):
+        raise ValueError(
+            "dataset_spec.yaml changed after advisor review; create a new plan"
+        )
+
+    write_dataset_spec_artifact_atomic(
+        review_artifact.proposal.dataset_spec,
+        artifacts.dataset_spec_path,
+    )
+    return inspect_agent_workspace(resolved_workspace)
+
+
 def _persist_agent_plan(
     normalized: AgentRequest,
     profile: DatasetProfile,
@@ -370,23 +458,7 @@ def _persist_agent_plan(
         ],
         artifacts=artifacts,
         review=review,
-        summary=AgentPlanSummary(
-            source_type=(
-                profile.source_type
-                if normalized.source_type == AgentSourceType.PROFILE
-                else normalized.source_type.value
-            ),
-            entities=entity_summary(spec),
-            relationship_count=len(spec.relationships),
-            constraint_count=len(spec.constraints),
-            seed=normalized.seed,
-            output_format=normalized.output_format,
-            sensitive_fields=sensitive_field_summary(spec),
-            relationships=relationship_summary(spec),
-            minimum_inference_confidence=minimum_inference_confidence(spec),
-            assumptions=plan_assumptions(spec),
-            warnings=plan_warnings(spec),
-        ),
+        summary=build_agent_plan_summary(profile, spec, normalized),
     )
     write_json_artifact(result, artifacts.plan_path)
     return result
@@ -615,17 +687,21 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
             )
         if not isinstance(plan.summary, AgentPlanSummary):
             raise ValueError("agent plan is missing its plan summary")
-        planned_review = (
-            inspect_agent_review_state(artifacts, plan.review)
-            if plan.review is not None
-            else None
-        )
+        if plan.review is None:
+            planned_review = None
+            summary = plan.summary
+        else:
+            request, profile, spec, planned_review = inspect_agent_review_context(
+                artifacts,
+                plan.review,
+            )
+            summary = build_agent_plan_summary(profile, spec, request)
         return AgentWorkspaceStatus(
             phase=AgentPhase.AWAITING_APPROVAL,
             approval_required=True,
             next_action=AgentNextAction.REVIEW_AND_APPROVE,
             artifacts=artifacts,
-            summary=plan.summary,
+            summary=summary,
             review=planned_review,
         )
 
@@ -718,24 +794,12 @@ def load_agent_approval_context(
         raise ValueError(
             "agent plan predates fingerprint-bound approval; create a new plan"
         )
-    request = AgentRequest.model_validate_json(read_limited_text(artifacts.request_path))
-    request = normalize_agent_request(request.model_copy(update={"workspace": workspace}))
-    profile = DatasetProfile.model_validate_json(read_limited_text(artifacts.profile_path))
-    assert_profile_safe(profile)
-    profile_sha256 = dataset_profile_fingerprint(profile)
-    if not hmac.compare_digest(profile_sha256, plan.review.profile_sha256):
-        raise ValueError("profile.json fingerprint does not match agent_plan.json")
-    spec = load_dataset_spec(artifacts.dataset_spec_path)
-    validate_spec_for_approval(spec, request)
-    current_spec_sha256 = dataset_spec_fingerprint(spec)
-    review = plan.review.model_copy(
-        update={
-            "profile_sha256": profile_sha256,
-            "current_spec_sha256": current_spec_sha256,
-            "spec_changed_since_plan": (
-                current_spec_sha256 != plan.review.planned_spec_sha256
-            ),
-        }
+    request, profile, spec, review = inspect_agent_review_context(
+        artifacts,
+        plan.review,
+    )
+    request = normalize_agent_request(
+        request.model_copy(update={"workspace": workspace})
     )
     return request, profile, spec, review
 
@@ -870,6 +934,13 @@ def inspect_agent_review_state(
     artifacts: AgentArtifacts,
     planned_review: AgentReviewState,
 ) -> AgentReviewState:
+    return inspect_agent_review_context(artifacts, planned_review)[3]
+
+
+def inspect_agent_review_context(
+    artifacts: AgentArtifacts,
+    planned_review: AgentReviewState,
+) -> tuple[AgentRequest, DatasetProfile, DatasetSpec, AgentReviewState]:
     request = AgentRequest.model_validate_json(read_limited_text(artifacts.request_path))
     profile = DatasetProfile.model_validate_json(read_limited_text(artifacts.profile_path))
     assert_profile_safe(profile)
@@ -879,7 +950,7 @@ def inspect_agent_review_state(
     spec = load_dataset_spec(artifacts.dataset_spec_path)
     validate_spec_for_approval(spec, request)
     current_spec_sha256 = dataset_spec_fingerprint(spec)
-    return planned_review.model_copy(
+    review = planned_review.model_copy(
         update={
             "profile_sha256": profile_sha256,
             "current_spec_sha256": current_spec_sha256,
@@ -888,6 +959,7 @@ def inspect_agent_review_state(
             ),
         }
     )
+    return request, profile, spec, review
 
 
 def generate_agent_dataset(
@@ -1058,6 +1130,26 @@ def agent_source_label(request: AgentRequest, profile: DatasetProfile) -> str:
         profile.source_type
         if request.source_type == AgentSourceType.PROFILE
         else request.source_type.value
+    )
+
+
+def build_agent_plan_summary(
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+    request: AgentRequest,
+) -> AgentPlanSummary:
+    return AgentPlanSummary(
+        source_type=agent_source_label(request, profile),
+        entities=entity_summary(spec),
+        relationship_count=len(spec.relationships),
+        constraint_count=len(spec.constraints),
+        seed=request.seed,
+        output_format=request.output_format,
+        sensitive_fields=sensitive_field_summary(spec),
+        relationships=relationship_summary(spec),
+        minimum_inference_confidence=minimum_inference_confidence(spec),
+        assumptions=plan_assumptions(spec),
+        warnings=plan_warnings(spec),
     )
 
 

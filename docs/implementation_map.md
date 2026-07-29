@@ -146,7 +146,9 @@ missing result metadata. It never calls generation.
 
 The provider-neutral model boundary fingerprints safe metadata and the
 baseline `DatasetSpec`, validates structured proposals, preserves core-owned
-safety settings, and performs no generation.
+safety settings, and performs no generation. `advise_agent_workspace` persists
+the validated exchange as `advisor_review.json`, atomically updates the pending
+spec, and leaves generation behind the existing fingerprint approval gate.
 
 ## Tests
 

@@ -145,8 +145,8 @@ core to one model vendor:
 
 - Define a provider-neutral advisor interface that accepts safe profile
   metadata and proposes structured `DatasetSpec` changes. The typed,
-  fingerprint-bound core contract is implemented; persisted review integration
-  and provider examples remain.
+  fingerprint-bound core contract and recoverable agent-workspace review
+  handoff are implemented; provider examples remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as
