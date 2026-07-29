@@ -25,6 +25,9 @@ All notable changes to this project are documented here.
 - High-level generator MCP `plan_dataset` orchestration for workspace CSV
   files, CSV folders, and safe profiles, with automatic source detection and
   the existing review, approval, status, and recovery gates.
+- Provider-neutral `DatasetAdvisor` request and proposal contracts with safe
+  metadata-only input, fingerprint binding, strict proposal validation, and
+  no provider SDK dependency or generation side effect.
 
 ### Changed
 

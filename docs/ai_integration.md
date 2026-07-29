@@ -1,5 +1,10 @@
 # AI Integration
 
+Model-specific Python integrations should implement the provider-neutral
+[`DatasetAdvisor`](reference/advisor.md) contract. It accepts only safe profile
+metadata and a deterministic baseline `DatasetSpec`, validates structured
+provider output, and never generates data or bypasses approval.
+
 This project can be used by an AI agent in three practical modes:
 
 1. As a local CLI tool.

@@ -50,6 +50,7 @@ nav:
       - CLI: reference/cli.md
       - Configuration: reference/configuration.md
       - DatasetSpec: dataset_profile_and_spec.md
+      - Advisor API: reference/advisor.md
       - MCP Tools: mcp_examples.md
   - Operations:
       - Troubleshooting: operations/troubleshooting.md
