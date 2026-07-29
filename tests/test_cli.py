@@ -7,7 +7,7 @@ import pytest
 import test_data_agent.agent as agent_module
 import test_data_agent.cli as cli_module
 from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
-from test_data_agent.advisor import AdvisorRequest
+from test_data_agent.advisor import AdvisorExchange, AdvisorRequest
 from test_data_agent.cli import main
 
 
@@ -503,6 +503,38 @@ def test_agent_advisor_cli_json_handoff_stops_before_generation(
     assert apply_output.err == ""
     assert status["phase"] == "awaiting_approval"
     assert status["summary"]["entities"][0]["row_count"] == 4
+    assert not (workspace / "generated").exists()
+
+
+def test_agent_advisor_cli_exports_self_describing_exchange(
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    spec_before = (workspace / "dataset_spec.yaml").read_bytes()
+
+    assert (
+        main(["agent-advisor-request", str(workspace), "--exchange"])
+        == 0
+    )
+
+    output = capsys.readouterr()
+    exchange = AdvisorExchange.model_validate_json(output.out)
+    assert output.err == ""
+    assert exchange.instructions_trust == "trusted_static"
+    assert exchange.request.metadata_trust == "untrusted"
+    assert exchange.response_json_schema["title"] == "AdvisorProposal"
+    assert "alice@example.com" not in output.out
+    assert (workspace / "dataset_spec.yaml").read_bytes() == spec_before
+    assert not (workspace / "advisor_review.json").exists()
     assert not (workspace / "generated").exists()
 
 

@@ -23,13 +23,14 @@ from test_data_agent.agent import (
     apply_agent_advisor_proposal,
     advise_agent_workspace,
     approve_agent_workspace,
+    build_agent_advisor_exchange,
     build_agent_advisor_request,
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
     recover_agent_workspace,
 )
-from test_data_agent.advisor import AdvisorContractError, AdvisorRequest
+from test_data_agent.advisor import AdvisorContractError, AdvisorExchange, AdvisorRequest
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_dataset_spec_artifact
 from test_data_agent.io.readers import load_dataset_spec
@@ -74,6 +75,8 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentWorkspaceStatus is AgentWorkspaceStatus
     assert test_data_agent.apply_agent_advisor_proposal is apply_agent_advisor_proposal
     assert test_data_agent.advise_agent_workspace is advise_agent_workspace
+    assert test_data_agent.AdvisorExchange is AdvisorExchange
+    assert test_data_agent.build_agent_advisor_exchange is build_agent_advisor_exchange
     assert test_data_agent.build_agent_advisor_request is build_agent_advisor_request
     assert test_data_agent.plan_agent_request is plan_agent_request
     assert test_data_agent.approve_agent_workspace is approve_agent_workspace

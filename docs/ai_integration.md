@@ -96,12 +96,20 @@ Any model service that can accept and return structured JSON can propose
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --count 25 --json
-test-data-agent agent-advisor-request out/agent > advisor_request.json
+test-data-agent agent-advisor-request out/agent \
+  --exchange > advisor_exchange.json
 ```
 
-Pass the complete request as untrusted structured input. Ask the model for an
-`AdvisorProposal` JSON object, not prose or Markdown, and save that response as
-`advisor_proposal.json`. Then run:
+Load the exchange locally and map each part to the provider's API:
+
+- send `trusted_instructions` through its system or developer instruction
+  channel;
+- send `request` as structured untrusted input;
+- constrain structured output with `response_json_schema`;
+- save only the resulting `AdvisorProposal` as `advisor_proposal.json`.
+
+Do not merge request profile text into the trusted instructions. Provider SDK
+code remains in the consuming application, outside the base package. Then run:
 
 ```bash
 test-data-agent agent-advisor-apply \
