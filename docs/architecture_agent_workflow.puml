@@ -7,7 +7,7 @@ skinparam defaultTextAlignment center
 
 actor "User" as User
 participant "AI Client\n(planning only)" as Ai
-participant "CLI\nagent-plan" as PlanCli
+participant "CLI agent-plan /\nMCP plan_dataset" as PlanCli
 participant "agent.py\nplan_agent_request" as PlanAgent
 participant "Safe Profiling\nCSV / folder / profile" as Profiling
 participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner

@@ -45,6 +45,7 @@ Agent --> Generation : approved phase
 Agent --> Validation : approved phase
 Agent --> Safety : source-row reuse check
 GeneratorMcp --> Profiling : profile_csv
+GeneratorMcp --> Agent : plan_dataset /\nplan_trino_dataset
 GeneratorMcp --> Generation : generate_dataset /\nexport_dataset
 GeneratorMcp --> Validation : validate_dataset
 TrinoMcp --> Trino : metadata, aggregates,\nmasked samples, bounded SELECT

@@ -22,6 +22,9 @@ All notable changes to this project are documented here.
 - Recoverable agent approvals with an atomic completion checkpoint,
   `recovery_required` status, CLI/Python/MCP recovery operations, full bounded
   bundle revalidation, and idempotent repeated approval.
+- High-level generator MCP `plan_dataset` orchestration for workspace CSV
+  files, CSV folders, and safe profiles, with automatic source detection and
+  the existing review, approval, status, and recovery gates.
 
 ### Changed
 

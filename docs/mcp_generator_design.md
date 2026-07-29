@@ -60,6 +60,7 @@ patterns. Source rows and raw sensitive values do not cross it.
 | --- | --- | --- | --- | --- |
 | `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
 | `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
+| `plan_dataset` | Build a review-first workspace from a local supported source | Workspace CSV, CSV folder, or safe profile path | Profile, DatasetSpec, and plan | Plan summary and review paths |
 | `plan_trino_dataset` | Build a review-first agent workspace from safe Trino metadata | `profile_table_safe` payload and generation settings | Profile, DatasetSpec, and plan | Plan summary and review paths |
 | `inspect_dataset_plan` | Recompute the current effective-spec fingerprint without changing the workspace | Planned or completed workspace | None | Phase, review state, and safe summary |
 | `approve_dataset_plan` | Continue only after the exact DatasetSpec fingerprint is reviewed | Planned workspace and reviewed SHA-256 | Synthetic bundle and approval receipt | Row counts, receipt, validation, and manifest paths |
@@ -88,10 +89,14 @@ No local copy of the source table is required.
 ### CSV Source
 
 1. The CSV must be inside `TEST_DATA_AGENT_WORKSPACE_ROOT`.
-2. `profile_csv` infers schema and safe distributions.
+2. `plan_dataset` detects a CSV file or folder and invokes safe profiling.
 3. Sensitive columns retain masked patterns, never raw top values.
-4. `infer_dataset_spec` creates the generation contract.
-5. Generation uses distributions and a seed, not source-row shuffling.
+4. The agent writes a reviewable generation contract and stops for approval.
+5. Approved generation uses distributions and a seed, not source-row
+   shuffling.
+
+The lower-level `profile_csv` and `infer_dataset_spec` tools remain available
+when a client needs explicit control over intermediate artifacts.
 
 Direct CSV and example-folder workflows compare complete generated rows against
 the source before writing output. An exact match stops generation without

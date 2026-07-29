@@ -57,12 +57,18 @@ Use the client's secret mechanism or an environment injected by the runtime.
 
 ## Safe Generator Sequence
 
-1. Call `profile_csv` with a CSV path and a new profile path.
-2. Call `infer_dataset_spec` with that safe profile.
-3. Stop and review the written `DatasetSpec`.
-4. Call `generate_dataset` with an explicit seed.
-5. Call `validate_dataset`.
+1. Put a CSV file, CSV folder, or safe profile below the workspace root.
+2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
+   and output format.
+3. Stop and review the written `dataset_spec.yaml`.
+4. Call `inspect_dataset_plan` and record
+   `review.current_spec_sha256`.
+5. Call `approve_dataset_plan` with that exact fingerprint only after review.
 6. Report summaries and artifact paths, not generated rows.
+
+Use `profile_csv`, `infer_dataset_spec`, `generate_dataset`, and
+`validate_dataset` separately when an advanced client needs control over each
+pipeline stage.
 
 For business rules, provide exactly one of `business_rules_path` or a bounded
 structured `business_rules_payload`.
@@ -113,6 +119,7 @@ The server rejects:
 - unrestricted SQL, DDL, DML, joins, CTEs, and subqueries;
 - likely PII projections and raw sensitive rule literals;
 - non-Trino or oversized inline planning profiles;
+- DatasetSpec input passed to `plan_dataset` instead of `generate_dataset`;
 - missing Trino allowlists;
 - requests exceeding configured input, output, query, or execution limits.
 

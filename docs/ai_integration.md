@@ -116,9 +116,11 @@ Its tools are:
 
 - `profile_csv`
 - `infer_dataset_spec`
+- `plan_dataset`
 - `plan_trino_dataset`
 - `inspect_dataset_plan`
 - `approve_dataset_plan`
+- `recover_dataset_plan`
 - `generate_dataset`
 - `validate_dataset`
 - `export_dataset`
@@ -163,21 +165,28 @@ new, and generation folders must be new or empty.
 
 ## Recommended AI Workflow
 
+For a CSV file, CSV folder, or safe profile already inside the generator
+workspace, call `plan_dataset` with a new agent workspace. It detects the
+source type, writes the review artifacts, and stops before generation.
+
 An MCP-compatible AI client can run the complete workflow:
 
-1. Inspect schemas through MCP.
-2. Profile tables safely through MCP.
-3. Pass the safe profile result to `plan_trino_dataset`.
-4. Summarize the written versioned `DatasetSpec` and request explicit human
+1. Call `plan_dataset` for a workspace source, or inspect and profile a Trino
+   table safely before passing its safe profile to `plan_trino_dataset`.
+2. Summarize the written versioned `DatasetSpec` and request explicit human
    approval.
-5. Call `inspect_dataset_plan` after any edits and show its current spec
+3. Call `inspect_dataset_plan` after any edits and show its current spec
    fingerprint to the reviewer.
-6. Call `approve_dataset_plan` with that exact `reviewed_spec_sha256` only
+4. Call `approve_dataset_plan` with that exact `reviewed_spec_sha256` only
    after approval.
-7. Call `validate_dataset` on the generated bundle when an independent
+5. Call `validate_dataset` on the generated bundle when an independent
    validation response is needed.
-8. Return artifact paths plus a concise report with row count, seed, format,
+6. Return artifact paths plus a concise report with row count, seed, format,
    validation status, and confirmation that no production rows were copied.
+
+If inspection reports `recovery_required`, call `recover_dataset_plan` with
+the same reviewed fingerprint. Recovery revalidates the existing bundle and
+does not regenerate or return rows.
 
 The generator MCP responses return summaries and validation reports, not data
 rows. Generated files stay in the configured workspace. Each bundle includes a

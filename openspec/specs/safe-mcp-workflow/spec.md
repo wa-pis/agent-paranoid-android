@@ -107,6 +107,18 @@ recovery without regenerating or returning rows.
 - **THEN** it revalidates the existing bundle and publishes completion metadata
 - **AND** no generated rows are returned
 
+### Requirement: Workspace Sources Have A High-Level Planning Tool
+
+The generator MCP SHALL expose one review-first planning tool for supported
+workspace sources without returning rows.
+
+#### Scenario: Workspace source is planned
+
+- **GIVEN** a CSV file, CSV folder, or safe profile below the workspace root
+- **WHEN** `plan_dataset` receives the source and a new workspace path
+- **THEN** it writes review artifacts and stops before generation
+- **AND** it returns only compact metadata, fingerprints, and artifact paths
+
 ### Requirement: Manifest-Gated Validation
 
 MCP validation SHALL verify generated bundles against their manifest and
