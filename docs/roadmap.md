@@ -47,6 +47,24 @@ date.
   and identifier flags, semantic and distribution kinds, privacy defaults,
   relationships, and exact approval fingerprints in human and JSON forms.
 
+## Planned For 0.10.0
+
+- Add the first provider-specific advisor example behind an optional extra,
+  without increasing the base installation or coupling the deterministic core
+  to one model vendor.
+- Keep the provider boundary metadata-only and structured: no source rows, raw
+  PII, credentials, generated dataset contents, automatic approval, or direct
+  generation access.
+- Present one guided agent workflow across the CLI and documentation:
+  `agent-plan` -> `agent-review` -> `agent-advise` -> `agent-approve`, with
+  clear next-action guidance and actionable recovery errors.
+- Add golden contract fixtures and compatibility tests for versioned CLI JSON,
+  MCP responses, `DatasetSpec` schemas, advisor exchanges, and generated
+  artifact metadata.
+- Ship a runnable end-to-end provider example that uses safe metadata,
+  validates structured model output, pauses for exact-fingerprint human
+  approval, and reports artifact paths rather than rows.
+
 ## Implemented For 0.8.0
 
 - Separate minimal CLI, generator MCP, and Trino MCP OCI images.
