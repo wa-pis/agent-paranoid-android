@@ -151,7 +151,8 @@ the validated exchange as `advisor_review.json`, atomically updates the pending
 spec, and leaves generation behind the existing fingerprint approval gate.
 `build_agent_advisor_request` and `apply_agent_advisor_proposal` expose the
 same boundary to external model clients through structured JSON without a
-provider SDK.
+provider SDK. `AdvisorExchange` adds immutable trusted instructions and the
+generated proposal schema while keeping the request explicitly untrusted.
 
 ## Tests
 

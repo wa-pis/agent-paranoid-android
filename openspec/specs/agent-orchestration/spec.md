@@ -134,6 +134,23 @@ structured proposal without requiring a model-provider SDK.
 - **AND** persistence is retryable and rejects stale or conflicting content
 - **AND** generation still requires explicit reviewed-spec approval
 
+### Requirement: Advisor Exchange Is Self Describing
+
+The agent workflow SHALL provide a versioned provider-neutral exchange that
+separates trusted instructions, untrusted request data, and the structured
+response schema.
+
+#### Scenario: An external AI client exports an exchange
+
+- **GIVEN** a valid awaiting-approval workspace
+- **WHEN** exchange-mode advisor export runs
+- **THEN** package-owned trusted instructions are separate from the request
+- **AND** the request remains fingerprint-bound and explicitly untrusted
+- **AND** the response JSON Schema is generated from `AdvisorProposal`
+- **AND** modified instructions or schema fail validation
+- **AND** export has no provider, persistence, approval, or generation side
+  effect
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

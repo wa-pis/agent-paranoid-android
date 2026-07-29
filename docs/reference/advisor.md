@@ -63,37 +63,45 @@ agent approval flow before generation.
 
 ## JSON Handoff
 
-Use the JSON handoff when the model runs outside this Python process. It needs
-no provider SDK:
+Use the self-describing exchange when the model runs outside this Python
+process. It needs no provider SDK:
 
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --count 25
 
-test-data-agent agent-advisor-request out/agent > advisor_request.json
+test-data-agent agent-advisor-request out/agent \
+  --exchange > advisor_exchange.json
 ```
 
-Send the complete `advisor_request.json` object to a model as structured data.
-Do not concatenate profile fields into privileged instructions. Require the
-model to return exactly this `AdvisorProposal` shape:
+The exchange contains:
 
-```json
-{
-  "schema_version": "1.0",
-  "profile_sha256": "copy from the request",
-  "baseline_spec_sha256": "copy from the request",
-  "approval_required": true,
-  "generation_performed": false,
-  "dataset_spec": {
-    "schema_version": "1.0",
-    "entities": []
-  }
-}
+- `trusted_instructions`: static package-owned policy for the provider's
+  system or developer channel;
+- `request`: fingerprint-bound metadata marked as untrusted;
+- `response_json_schema`: the current Pydantic schema for
+  `AdvisorProposal`.
+
+Keep those boundaries separate when calling a provider:
+
+```python
+exchange = load_json("advisor_exchange.json")
+proposal = call_model_with_structured_output(
+    system_instructions=exchange["trusted_instructions"],
+    untrusted_input=exchange["request"],
+    response_schema=exchange["response_json_schema"],
+)
+write_json("advisor_proposal.json", proposal)
 ```
 
-`dataset_spec` must be the complete proposed spec, normally the request's
-`baseline_spec` with allowed generation hints changed. Save the structured
-model response and apply it:
+`load_json`, `call_model_with_structured_output`, and `write_json` are
+application placeholders, not package functions. Map them to the provider SDK
+outside this package. Do not concatenate request profile fields into
+privileged instructions.
+
+The response must contain the complete proposed `DatasetSpec`, normally the
+request's `baseline_spec` with allowed generation hints changed. Apply the
+saved structured response:
 
 ```bash
 test-data-agent agent-advisor-apply \
@@ -105,6 +113,10 @@ Proposal input must be a bounded regular JSON file. Symbolic links, malformed
 or oversized input, stale fingerprints, schema changes, weakened safety
 settings, and conflicting edits are rejected. A successful apply writes no
 dataset rows and leaves the workspace awaiting approval.
+
+Without `--exchange`, `agent-advisor-request` retains its original behavior
+and writes the raw `AdvisorRequest`. This is useful for custom adapters that
+already own their instructions and response schema.
 
 ## Agent Workspace Handoff
 
@@ -141,3 +153,7 @@ For direct file/API integration, use `build_agent_advisor_request` and
 `apply_agent_advisor_proposal`. The latter accepts an `AdvisorProposal` or
 mapping and uses the same validation, retry, persistence, and approval
 behavior as `advise_agent_workspace`.
+
+Use `build_agent_advisor_exchange` for the self-describing workspace bundle,
+or `build_advisor_exchange` around an existing `AdvisorRequest`.
+`advisor_proposal_json_schema` returns the same standalone response schema.

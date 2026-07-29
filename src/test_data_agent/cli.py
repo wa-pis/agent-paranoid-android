@@ -24,6 +24,7 @@ from test_data_agent.agent import (
     AgentWorkspaceStatus,
     apply_agent_advisor_proposal,
     approve_agent_workspace,
+    build_agent_advisor_exchange,
     build_agent_advisor_request,
     detect_agent_source_type,
     inspect_agent_workspace,
@@ -125,8 +126,9 @@ Common workflows
 
    # Review out/agent/dataset_spec.yaml before approval.
    test-data-agent agent-status out/agent
-   test-data-agent agent-advisor-request out/agent > advisor_request.json
-   # Send advisor_request.json as structured data and save the model response.
+   test-data-agent agent-advisor-request out/agent \\
+     --exchange > advisor_exchange.json
+   # Use the trusted instructions, request, and response schema separately.
    test-data-agent agent-advisor-apply out/agent advisor_proposal.json
    # Review the changed spec and use its new fingerprint.
    test-data-agent agent-status out/agent
@@ -492,11 +494,14 @@ def main(argv: list[str] | None = None) -> int:
             "without changing the workspace."
         ),
         epilog=(
-            "Example:\n"
+            "Recommended external AI exchange:\n"
+            "  test-data-agent agent-advisor-request out/agent "
+            "--exchange > advisor_exchange.json\n\n"
+            "Raw request for custom adapters:\n"
             "  test-data-agent agent-advisor-request out/agent "
             "> advisor_request.json\n\n"
-            "Send the JSON as structured model input. It contains safe metadata "
-            "and a baseline DatasetSpec, never source rows or credentials."
+            "Exchange mode separates trusted instructions, untrusted request "
+            "metadata, and the AdvisorProposal JSON Schema."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -504,6 +509,14 @@ def main(argv: list[str] | None = None) -> int:
         "workspace",
         type=Path,
         help="Awaiting-approval workspace created by agent-plan.",
+    )
+    agent_advisor_request_parser.add_argument(
+        "--exchange",
+        action="store_true",
+        help=(
+            "Include trusted instructions and the AdvisorProposal JSON Schema "
+            "around the request."
+        ),
     )
     agent_advisor_request_parser.set_defaults(json_output=True)
 
@@ -714,8 +727,12 @@ def run_command(args: argparse.Namespace) -> int:
         return 0 if agent_result.summary.get("validation_valid", False) else 1
 
     if args.command == "agent-advisor-request":
-        request = build_agent_advisor_request(args.workspace)
-        print(request.model_dump_json(indent=2))
+        payload = (
+            build_agent_advisor_exchange(args.workspace)
+            if args.exchange
+            else build_agent_advisor_request(args.workspace)
+        )
+        print(payload.model_dump_json(indent=2))
         return 0
 
     if args.command == "agent-advisor-apply":

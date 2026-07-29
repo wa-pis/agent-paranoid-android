@@ -13,10 +13,12 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
 from test_data_agent.advisor import (
+    AdvisorExchange,
     AdvisorProposalPayload,
     AdvisorRequest,
     AdvisorReviewArtifact,
     DatasetAdvisor,
+    build_advisor_exchange,
     build_advisor_request,
     build_advisor_review_artifact,
 )
@@ -395,6 +397,12 @@ def build_agent_advisor_request(workspace: Path) -> AdvisorRequest:
             raise ValueError("advisor_review.json must be a regular file")
         raise ValueError("advisor review already exists for this workspace")
     return build_advisor_request(profile, baseline_spec=spec)
+
+
+def build_agent_advisor_exchange(workspace: Path) -> AdvisorExchange:
+    """Build a self-describing exchange for an external advisor client."""
+
+    return build_advisor_exchange(build_agent_advisor_request(workspace))
 
 
 def apply_agent_advisor_proposal(

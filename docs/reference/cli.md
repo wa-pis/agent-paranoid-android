@@ -31,7 +31,7 @@ commands.
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
-| `agent-advisor-request` | Export safe metadata for an external AI advisor | Advisor request JSON |
+| `agent-advisor-request` | Export safe metadata for an external AI advisor | Request or exchange JSON |
 | `agent-advisor-apply` | Validate and apply an external proposal | Pending workspace status |
 | `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
@@ -143,18 +143,21 @@ and field names are untrusted input and are escaped before terminal output.
 To let an external model propose bounded spec changes without adding its SDK:
 
 ```bash
-test-data-agent agent-advisor-request out/agent > advisor_request.json
-# Send the request as structured data and save the structured model response.
+test-data-agent agent-advisor-request out/agent \
+  --exchange > advisor_exchange.json
+# Use trusted_instructions, request, and response_json_schema separately.
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json
 test-data-agent agent-status out/agent
 ```
 
-The request command is read-only and always writes one `AdvisorRequest` JSON
-document to stdout. The apply command accepts a bounded regular JSON file,
-persists `advisor_review.json`, atomically updates `dataset_spec.yaml`, and
-still stops before generation. Review the changed spec and use the new hash
-reported by `agent-status`; never reuse the hash from before advisor apply.
+The request command is read-only. By default it writes one `AdvisorRequest`
+JSON document. `--exchange` wraps it with package-owned trusted instructions
+and the generated `AdvisorProposal` JSON Schema. The apply command accepts a
+bounded regular JSON file, persists `advisor_review.json`, atomically updates
+`dataset_spec.yaml`, and still stops before generation. Review the changed
+spec and use the new hash reported by `agent-status`; never reuse the hash from
+before advisor apply.
 
 `agent-status` reports the SHA-256 fingerprint of the current effective spec
 and an exact approval command. Record that value only after reviewing
@@ -184,7 +187,8 @@ Use JSON output when invoking the review flow from automation or an AI client:
 ```bash
 test-data-agent agent-plan data/example_dataset \
   --workspace out/agent --json
-test-data-agent agent-advisor-request out/agent > advisor_request.json
+test-data-agent agent-advisor-request out/agent \
+  --exchange > advisor_exchange.json
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json --json
 test-data-agent agent-status out/agent --json
@@ -196,8 +200,9 @@ test-data-agent agent-recover out/agent \
 
 Successful commands write one JSON document to stdout and leave stderr empty.
 Planning and approval return an `AgentResult`; advisor request returns an
-`AdvisorRequest`; advisor apply and status return an `AgentWorkspaceStatus`.
-The contracts are versioned and never include source or generated rows.
+`AdvisorRequest` or `AdvisorExchange`; advisor apply and status return an
+`AgentWorkspaceStatus`. The contracts are versioned and never include source
+or generated rows.
 
 The `review` object contains `plan_id`, profile and planned/current spec
 fingerprints, and `spec_changed_since_plan`. Completed results add an

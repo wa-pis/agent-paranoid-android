@@ -34,6 +34,9 @@ All notable changes to this project are documented here.
 - Provider-neutral `agent-advisor-request` and `agent-advisor-apply` JSON
   handoff for external model clients, with bounded proposal input, stale and
   conflicting content rejection, and no provider SDK dependency.
+- Self-describing `AdvisorExchange` export with immutable trusted instructions,
+  explicitly untrusted request metadata, and generated `AdvisorProposal` JSON
+  Schema.
 
 ### Changed
 

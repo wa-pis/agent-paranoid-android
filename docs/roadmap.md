@@ -34,6 +34,8 @@ date.
 - Provider-neutral advisor JSON export and apply commands, with bounded input,
   fingerprint validation, recoverable persistence, and no model SDK in the
   base package.
+- Self-describing advisor exchanges with immutable trusted instructions,
+  explicitly untrusted request metadata, and generated proposal JSON Schema.
 
 ## Implemented For 0.8.0
 
@@ -149,7 +151,8 @@ core to one model vendor:
 - Define a provider-neutral advisor interface that accepts safe profile
   metadata and proposes structured `DatasetSpec` changes. The typed,
   fingerprint-bound core contract, recoverable workspace handoff, and external
-  JSON exchange are implemented; provider-specific examples remain.
+  self-describing JSON exchange are implemented; provider-specific examples
+  remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as
