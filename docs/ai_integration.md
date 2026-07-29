@@ -123,6 +123,12 @@ Keep its SDK and credentials outside this package. The client must return a
 parsed object matching `AdvisorProposal`; prose, tool commands, and unknown
 fields fail validation.
 
+For an executable application-layer example, run
+[The Reference Agent](how-to/reference-agent.md). It uses a deterministic
+stand-in client, stops for explicit human review, requires the exact reviewed
+spec fingerprint, and then runs the normal deterministic generation and
+validation pipeline.
+
 ## External Advisor JSON Handoff
 
 Any model service that can accept and return structured JSON can propose

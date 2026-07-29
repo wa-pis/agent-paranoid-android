@@ -39,6 +39,10 @@ date.
 - An in-process `ExchangeDatasetAdvisor` adapter for structured-output clients,
   with defensive request copying and proposal validation at the provider
   boundary.
+- A runnable reference agent that plans from safe metadata, invokes the
+  provider-neutral advisor boundary, stops for human review, requires the
+  exact reviewed fingerprint, generates, validates, and reports artifact
+  metadata without dataset rows.
 
 ## Implemented For 0.8.0
 
@@ -166,7 +170,9 @@ core to one model vendor:
   as untrusted data and defend the agent flow against prompt injection.
 - Include a complete reference flow that profiles, proposes a spec, requests
   human approval, generates, validates, and reports artifact paths and
-  manifest facts.
+  manifest facts. The runnable provider-neutral flow is implemented; a
+  deterministic stand-in keeps provider credentials and SDKs out of the
+  repository.
 
 ## Dependency Policy
 

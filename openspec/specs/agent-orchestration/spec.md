@@ -166,6 +166,22 @@ without giving them authority over validation, approval, or generation.
 - **AND** client mutation cannot weaken the validation source
 - **AND** no persistence, approval, or generation occurs
 
+### Requirement: Reference Agent Flow Is Runnable And Review Gated
+
+The project SHALL provide an executable application-layer example covering the
+complete advisor-assisted workflow without requiring a provider SDK.
+
+#### Scenario: A user runs the reference flow
+
+- **GIVEN** a supported source and a new workspace
+- **WHEN** reference planning and advisor proposal complete
+- **THEN** safe review artifacts are written and generation does not start
+- **AND** status reports the exact current spec fingerprint
+- **AND** approval requires that human-reviewed fingerprint
+- **AND** a mismatch fails before generated output exists
+- **AND** successful approval generates, validates, and reports metadata
+  without returning rows
+
 ### Requirement: Agent Workspace Status Is Observable
 
 The agent workflow SHALL expose read-only status for planned and completed

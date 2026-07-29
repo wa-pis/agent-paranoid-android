@@ -18,6 +18,7 @@ REQUIRED_DOCS = {
     "getting-started/review-output.md",
     "how-to/business-rules.md",
     "how-to/mcp.md",
+    "how-to/reference-agent.md",
     "concepts/safety-model.md",
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
@@ -64,6 +65,7 @@ def test_required_user_documentation_exists_and_is_navigable() -> None:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
         assert relative_path in config, relative_path
     assert (ROOT / "examples" / "orders_rules.yaml").is_file()
+    assert (ROOT / "examples" / "reference_agent.py").is_file()
 
 
 def test_installation_documents_dependency_budgets() -> None:

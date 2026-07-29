@@ -40,6 +40,9 @@ All notable changes to this project are documented here.
 - Provider-neutral `ExchangeDatasetAdvisor` for application-owned
   structured-output clients, with defensive exchange copying and validation
   against the original fingerprint-bound request.
+- Runnable review-first reference agent covering safe planning, advisor
+  proposal persistence, read-only status, exact-fingerprint human approval,
+  deterministic generation, and validation without a provider SDK.
 
 ### Changed
 
