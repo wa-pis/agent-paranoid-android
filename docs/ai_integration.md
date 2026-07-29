@@ -68,6 +68,7 @@ AI client can summarize `out/agent/dataset_spec.yaml` and ask for approval.
 After review, run:
 
 ```bash
+test-data-agent agent-review out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
@@ -155,6 +156,7 @@ code remains in the consuming application, outside the base package. Then run:
 ```bash
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json --json
+test-data-agent agent-review out/agent --json
 test-data-agent agent-status out/agent --json
 ```
 

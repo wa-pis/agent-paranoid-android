@@ -18,6 +18,7 @@ from test_data_agent.agent import (
     AgentPlanSummary,
     AgentRecoverySummary,
     AgentRequest,
+    AgentReviewReport,
     AgentResult,
     AgentReviewState,
     AgentSourceType,
@@ -30,6 +31,7 @@ from test_data_agent.agent import (
     inspect_agent_workspace,
     plan_agent_request,
     recover_agent_workspace,
+    review_agent_workspace,
 )
 from test_data_agent.advisor import AdvisorProposal
 from test_data_agent.audit import verify_audit_log_from_env
@@ -124,14 +126,14 @@ Common workflows
    test-data-agent agent-plan data/example_dataset \\
      --workspace out/agent
 
-   # Review out/agent/dataset_spec.yaml before approval.
-   test-data-agent agent-status out/agent
+   # Review out/agent/dataset_spec.yaml and its metadata checklist.
+   test-data-agent agent-review out/agent
    test-data-agent agent-advisor-request out/agent \\
      --exchange > advisor_exchange.json
    # Use the trusted instructions, request, and response schema separately.
    test-data-agent agent-advisor-apply out/agent advisor_proposal.json
    # Review the changed spec and use its new fingerprint.
-   test-data-agent agent-status out/agent
+   test-data-agent agent-review out/agent
    test-data-agent agent-approve out/agent \\
      --reviewed-spec-sha256 SHA256_FROM_STATUS
 
@@ -398,7 +400,7 @@ def main(argv: list[str] | None = None) -> int:
             "Example:\n"
             "  test-data-agent agent-plan tests/fixtures/example_dataset "
             "--workspace out/agent --count 25 --seed 12345 --format csv\n"
-            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-review out/agent\n"
             "  test-data-agent agent-approve out/agent "
             "--reviewed-spec-sha256 SHA256_FROM_STATUS"
         ),
@@ -432,11 +434,11 @@ def main(argv: list[str] | None = None) -> int:
         description="Load a prepared agent workspace, use the reviewed DatasetSpec, generate data, and validate it.",
         epilog=(
             "Example:\n"
-            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-review out/agent\n"
             "  test-data-agent agent-approve out/agent "
             "--reviewed-spec-sha256 SHA256_FROM_STATUS\n\n"
             "Run this only after reviewing out/agent/dataset_spec.yaml and "
-            "recording the fingerprint reported by agent-status."
+            "recording the fingerprint reported by agent-review."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -444,7 +446,7 @@ def main(argv: list[str] | None = None) -> int:
     agent_approve_parser.add_argument(
         "--reviewed-spec-sha256",
         required=True,
-        help="SHA-256 reported by agent-status for the exact reviewed DatasetSpec.",
+        help="SHA-256 reported by agent-review for the exact reviewed DatasetSpec.",
     )
     agent_approve_parser.add_argument(
         "--json",
@@ -531,7 +533,7 @@ def main(argv: list[str] | None = None) -> int:
             "Example:\n"
             "  test-data-agent agent-advisor-apply "
             "out/agent advisor_proposal.json\n\n"
-            "Review dataset_spec.yaml after this command, then use agent-status "
+            "Review dataset_spec.yaml after this command, then use agent-review "
             "and agent-approve with the exact reviewed fingerprint."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -571,6 +573,34 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         dest="json_output",
         help="Write the versioned status contract as JSON.",
+    )
+
+    agent_review_parser = subparsers.add_parser(
+        "agent-review",
+        help="Review the current DatasetSpec before approval.",
+        description=(
+            "Show a metadata-only field, relationship, privacy, and fingerprint "
+            "checklist without changing the workspace."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  test-data-agent agent-review out/agent\n"
+            "  test-data-agent agent-review out/agent --json\n\n"
+            "Review dataset_spec.yaml, then pass the reported current SHA-256 "
+            "unchanged to agent-approve."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_review_parser.add_argument(
+        "workspace",
+        type=Path,
+        help="Awaiting-approval workspace created by agent-plan.",
+    )
+    agent_review_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned metadata-only review report as JSON.",
     )
 
     subparsers.add_parser(
@@ -752,6 +782,14 @@ def run_command(args: argparse.Namespace) -> int:
             print(status.model_dump_json(indent=2))
         else:
             write_agent_status_summary(status)
+        return 0
+
+    if args.command == "agent-review":
+        review_report = review_agent_workspace(args.workspace)
+        if args.json_output:
+            print(review_report.model_dump_json(indent=2))
+        else:
+            write_agent_review_report(review_report)
         return 0
 
     return 2
@@ -1027,6 +1065,123 @@ def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
         "Agent status: completed | "
         f"output: {status.artifacts.generated_folder} | "
         f"validation: {validation} | source rows copied: no",
+        file=sys.stderr,
+    )
+
+
+def write_agent_review_report(report: AgentReviewReport) -> None:
+    workspace_text = display_untrusted_name(str(report.workspace), limit=240)
+    workspace_command = display_untrusted_name(
+        shlex.quote(str(report.workspace)),
+        limit=260,
+    )
+    spec_path_text = display_untrusted_name(
+        str(report.dataset_spec_path),
+        limit=240,
+    )
+    print(f"DatasetSpec review: {workspace_text}", file=sys.stderr)
+    print(
+        f"Spec: {spec_path_text} | source: "
+        f"{display_untrusted_name(report.source_type)} | seed: {report.seed} | "
+        f"format: {report.output_format.value}",
+        file=sys.stderr,
+    )
+    changed = "yes" if report.spec_changed_since_plan else "no"
+    print(
+        f"Plan ID: {report.plan_id} | changed since plan: {changed}",
+        file=sys.stderr,
+    )
+    print(
+        f"Current spec SHA-256: {report.current_spec_sha256}",
+        file=sys.stderr,
+    )
+    raw_values = (
+        "blocked"
+        if report.safety.raw_sensitive_values_blocked
+        else "ALLOWED - do not approve"
+    )
+    unknown_fields = (
+        "sensitive"
+        if report.safety.unknown_fields_treated_as_sensitive
+        else "not sensitive - review required"
+    )
+    print(
+        f"Privacy: raw sensitive values {raw_values} | unknown fields "
+        f"{unknown_fields} | sensitive fields: "
+        f"{report.safety.sensitive_field_count} | privacy rules: "
+        f"{report.safety.privacy_rule_count}",
+        file=sys.stderr,
+    )
+    print("Entities:", file=sys.stderr)
+    for entity in report.entities:
+        primary_key = (
+            display_untrusted_name(entity.primary_key)
+            if entity.primary_key is not None
+            else "none"
+        )
+        print(
+            f"  {display_untrusted_name(entity.name)}: {entity.row_count} rows | "
+            f"primary key: {primary_key}",
+            file=sys.stderr,
+        )
+        for field in entity.fields[:20]:
+            flags = [
+                (
+                    f"nullable {field.null_ratio:.2f}"
+                    if field.nullable
+                    else "required"
+                )
+            ]
+            if field.sensitive:
+                flags.append("sensitive")
+            if field.is_identifier:
+                flags.append("identifier")
+            if field.semantic_type is not None:
+                flags.append(
+                    f"semantic={display_untrusted_name(field.semantic_type)}"
+                )
+            if field.distribution_kind is not None:
+                flags.append(
+                    "distribution="
+                    f"{display_untrusted_name(field.distribution_kind)}"
+                )
+            print(
+                f"    {display_untrusted_name(field.name)}: "
+                f"{field.data_type.value} | {' | '.join(flags)}",
+                file=sys.stderr,
+            )
+        omitted = len(entity.fields) - 20
+        if omitted > 0:
+            print(
+                f"    +{omitted} more fields; inspect dataset_spec.yaml",
+                file=sys.stderr,
+            )
+    if report.relationships:
+        print("Relationships:", file=sys.stderr)
+        for relationship in report.relationships:
+            child = (
+                f"{display_untrusted_name(relationship.child_entity)}."
+                f"{display_untrusted_name(relationship.child_field)}"
+            )
+            parent = (
+                f"{display_untrusted_name(relationship.parent_entity)}."
+                f"{display_untrusted_name(relationship.parent_field)}"
+            )
+            print(
+                f"  {child} -> {parent} | "
+                f"{relationship.relationship_type.value} | "
+                f"confidence: {relationship.confidence:.2f}",
+                file=sys.stderr,
+            )
+    print(f"Constraints: {report.constraint_count}", file=sys.stderr)
+    for assumption in report.assumptions:
+        print(f"Assumption: {assumption}", file=sys.stderr)
+    for warning in report.warnings:
+        print(f"Warning: {warning}", file=sys.stderr)
+    print("Approve only after reviewing the complete DatasetSpec:", file=sys.stderr)
+    print(
+        f"  test-data-agent agent-approve {workspace_command} "
+        f"--reviewed-spec-sha256 {report.current_spec_sha256}",
         file=sys.stderr,
     )
 

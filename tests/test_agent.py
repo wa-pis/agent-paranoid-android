@@ -16,6 +16,7 @@ from test_data_agent.agent import (
     AgentPlanSummary,
     AgentRecoverySummary,
     AgentRequest,
+    AgentReviewReport,
     AgentReviewState,
     AgentRelationshipSummary,
     AgentSourceType,
@@ -29,6 +30,7 @@ from test_data_agent.agent import (
     inspect_agent_workspace,
     plan_agent_request,
     recover_agent_workspace,
+    review_agent_workspace,
 )
 from test_data_agent.advisor import (
     AdvisorContractError,
@@ -71,6 +73,7 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentFieldReference is AgentFieldReference
     assert test_data_agent.AgentFieldSummary is AgentFieldSummary
     assert test_data_agent.AgentRequest is AgentRequest
+    assert test_data_agent.AgentReviewReport is AgentReviewReport
     assert test_data_agent.AgentReviewState is AgentReviewState
     assert test_data_agent.AgentRelationshipSummary is AgentRelationshipSummary
     assert test_data_agent.AgentPlanSummary is AgentPlanSummary
@@ -91,6 +94,7 @@ def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.detect_agent_source_type is detect_agent_source_type
     assert test_data_agent.inspect_agent_workspace is inspect_agent_workspace
     assert test_data_agent.recover_agent_workspace is recover_agent_workspace
+    assert test_data_agent.review_agent_workspace is review_agent_workspace
 
 
 def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
@@ -478,6 +482,89 @@ def test_agent_status_tracks_reviewed_spec_edits(tmp_path) -> None:
         approved.approval_receipt.reviewed_spec_sha256
         == status.review.current_spec_sha256
     )
+
+
+def test_agent_review_report_is_detailed_metadata_only_and_read_only(
+    tmp_path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+            seed=42,
+        )
+    )
+    before = {
+        path.name: path.read_bytes()
+        for path in workspace.iterdir()
+        if path.is_file()
+    }
+
+    report = review_agent_workspace(workspace)
+
+    after = {
+        path.name: path.read_bytes()
+        for path in workspace.iterdir()
+        if path.is_file()
+    }
+    customer_fields = {
+        field.name: field
+        for field in report.entities[0].fields
+    }
+    serialized = report.model_dump_json()
+
+    assert isinstance(report, AgentReviewReport)
+    assert report.phase == "awaiting_approval"
+    assert report.approval_required is True
+    assert report.generation_performed is False
+    assert report.seed == 42
+    assert report.safety.raw_sensitive_values_blocked is True
+    assert report.safety.unknown_fields_treated_as_sensitive is True
+    assert customer_fields["customer_id"].is_identifier is True
+    assert customer_fields["email"].sensitive is True
+    assert customer_fields["email"].semantic_type == "email"
+    assert customer_fields["email"].distribution_kind == "masked_patterns"
+    assert "alice@example.com" not in serialized
+    assert "categories" not in serialized
+    assert before == after
+    assert not (workspace / "generated").exists()
+
+
+def test_agent_review_rejects_spec_changed_during_report(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    original_load = agent_module.load_dataset_spec
+    load_count = 0
+
+    def load_and_edit(path: Path):
+        nonlocal load_count
+        spec = original_load(path)
+        load_count += 1
+        if load_count == 1:
+            changed = spec.model_copy(deep=True)
+            changed.entities[0].row_count = 4
+            write_dataset_spec_artifact(changed, path)
+        return spec
+
+    monkeypatch.setattr(agent_module, "load_dataset_spec", load_and_edit)
+
+    with pytest.raises(ValueError, match="changed during review"):
+        review_agent_workspace(workspace)
+
+    assert not (workspace / "generated").exists()
 
 
 def test_advisor_workspace_handoff_stops_for_review_then_approves(tmp_path) -> None:

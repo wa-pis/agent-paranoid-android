@@ -15,7 +15,7 @@ date.
 - Strict type checking for the CLI and agent-facing interfaces, with typed
   plan and generation summaries.
 
-## Implemented Toward 0.9.0
+## Implemented For 0.9.0
 
 - Read-only workspace status for the review-first agent flow, including
   versioned JSON output for automation and AI clients.
@@ -43,6 +43,9 @@ date.
   provider-neutral advisor boundary, stops for human review, requires the
   exact reviewed fingerprint, generates, validates, and reports artifact
   metadata without dataset rows.
+- Detailed read-only `agent-review` reports with field nullability, sensitive
+  and identifier flags, semantic and distribution kinds, privacy defaults,
+  relationships, and exact approval fingerprints in human and JSON forms.
 
 ## Implemented For 0.8.0
 
@@ -127,28 +130,6 @@ Treat these as non-negotiable release gates rather than new feature work:
 - Generated manifests report `synthetic: true` and
   `source_rows_copied: false`.
 - OpenSpec baseline stays aligned with implemented behavior.
-
-## Planned For 0.9.0
-
-Make the review-first agent workflow the clearest product entry point:
-
-- Provide a small guided command set for planning, reviewing, approving, and
-  checking the status of a generation run. Initial workspace status inspection
-  is implemented; guided planning and review remain.
-- Detect CSV files, CSV folders, safe profiles, and `DatasetSpec` inputs when
-  this can be done unambiguously, while retaining explicit overrides. CSV and
-  profile detection is implemented; DatasetSpec inputs are recognized and
-  routed to the existing reviewed-spec workflow.
-- Present concise human-readable summaries of inferred fields, sensitive
-  fields, relationships, confidence, assumptions, and safety warnings.
-  Implemented for `agent-plan` and pending `agent-status` output.
-- Continue exercising recovery and idempotency contracts across new workflow
-  integrations. The local CLI, Python API, and generator MCP path are
-  implemented.
-- High-level MCP planning for workspace CSV files, CSV folders, safe profiles,
-  and safe inline Trino profiles is implemented. AI clients can use the common
-  plan, inspect, approve, and recover path while advanced profiling tools
-  remain available behind the same trust boundaries.
 
 ## Reference AI Agent
 
