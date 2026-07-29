@@ -120,6 +120,7 @@ saved structured response:
 ```bash
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json
+test-data-agent agent-review out/agent
 test-data-agent agent-status out/agent
 ```
 

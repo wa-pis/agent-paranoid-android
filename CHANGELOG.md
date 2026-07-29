@@ -43,6 +43,9 @@ All notable changes to this project are documented here.
 - Runnable review-first reference agent covering safe planning, advisor
   proposal persistence, read-only status, exact-fingerprint human approval,
   deterministic generation, and validation without a provider SDK.
+- Read-only `agent-review` CLI and Python report with detailed field,
+  relationship, privacy, and fingerprint metadata, bounded human output, and a
+  versioned row-free JSON contract.
 
 ### Changed
 

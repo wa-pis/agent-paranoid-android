@@ -43,6 +43,9 @@ date.
   provider-neutral advisor boundary, stops for human review, requires the
   exact reviewed fingerprint, generates, validates, and reports artifact
   metadata without dataset rows.
+- Detailed read-only `agent-review` reports with field nullability, sensitive
+  and identifier flags, semantic and distribution kinds, privacy defaults,
+  relationships, and exact approval fingerprints in human and JSON forms.
 
 ## Implemented For 0.8.0
 
@@ -133,15 +136,16 @@ Treat these as non-negotiable release gates rather than new feature work:
 Make the review-first agent workflow the clearest product entry point:
 
 - Provide a small guided command set for planning, reviewing, approving, and
-  checking the status of a generation run. Initial workspace status inspection
-  is implemented; guided planning and review remain.
+  checking the status of a generation run. `agent-plan`, `agent-review`,
+  `agent-approve`, recovery, and workspace status are implemented.
 - Detect CSV files, CSV folders, safe profiles, and `DatasetSpec` inputs when
   this can be done unambiguously, while retaining explicit overrides. CSV and
   profile detection is implemented; DatasetSpec inputs are recognized and
   routed to the existing reviewed-spec workflow.
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
-  Implemented for `agent-plan` and pending `agent-status` output.
+  Implemented for concise plan/status output and detailed `agent-review`
+  checklists.
 - Continue exercising recovery and idempotency contracts across new workflow
   integrations. The local CLI, Python API, and generator MCP path are
   implemented.

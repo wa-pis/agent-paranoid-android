@@ -24,6 +24,9 @@ User or AI client
   -> agent-status
     -> validate workspace state
     -> report phase, next action, artifact paths, and safe summary
+  -> agent-review
+    -> report detailed metadata-only spec and privacy checklist
+    -> report exact current fingerprint without changing the workspace
   -> agent-approve
     -> deterministic synthetic generation
     -> source-row reuse checks when source CSV is available
@@ -49,8 +52,8 @@ test-data-agent agent-plan tests/fixtures/example_dataset \
 Review `out/agent/dataset_spec.yaml`, then approve:
 
 ```bash
-test-data-agent agent-status out/agent
-REVIEWED_SPEC_SHA256=replace-with-current-hash-from-status
+test-data-agent agent-review out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
 ```
@@ -60,6 +63,7 @@ Inspect the same workspace as versioned JSON for automation or an AI client:
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --json
+test-data-agent agent-review out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
@@ -76,11 +80,14 @@ Each command writes one JSON document to stdout and leaves stderr empty. Status
 inspection is read-only. It rejects incomplete or contradictory workspace
 state, and none of the JSON contracts returns source or generated rows.
 
-Planning and pending status print a review summary containing:
+Planning and pending status print a concise summary. `agent-review` adds the
+approval checklist containing:
 
-- entities, inferred field names and types;
-- sensitive field classifications;
+- entities, row counts, primary keys, field types, and nullability;
+- sensitive and identifier classifications;
+- semantic types and distribution kinds, without distribution values;
 - inferred relationships and confidence;
+- privacy defaults and current/planned spec fingerprints;
 - assumptions and safety warnings.
 
 Only metadata is shown. Names are treated as untrusted input, escaped for the

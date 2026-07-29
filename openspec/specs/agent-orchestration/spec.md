@@ -222,6 +222,26 @@ planning and while approval is pending.
 - **AND** untrusted names are escaped for terminal output
 - **AND** source values and dataset rows are excluded
 
+### Requirement: Agent Review Has A Detailed Metadata Checklist
+
+The agent workflow SHALL expose a read-only detailed review report for the
+current effective `DatasetSpec` before approval.
+
+#### Scenario: A pending workspace is reviewed
+
+- **GIVEN** a valid awaiting-approval workspace
+- **WHEN** `agent-review` runs
+- **THEN** it reports entity row counts, primary keys, field types,
+  nullability, sensitive and identifier flags, semantic types, and
+  distribution kinds
+- **AND** it reports relationships, privacy defaults, assumptions, warnings,
+  planned/current fingerprints, and whether the spec changed
+- **AND** distribution values, source values, and dataset rows are excluded
+- **AND** human output is bounded and escapes untrusted names
+- **AND** JSON output is versioned and reports that generation was not
+  performed
+- **AND** the workspace is not modified
+
 ### Requirement: Agent CLI Has A Versioned Machine Contract
 
 Agent planning, pending/completed status, and approval SHALL support stable

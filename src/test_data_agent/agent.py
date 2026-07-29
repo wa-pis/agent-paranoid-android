@@ -214,6 +214,54 @@ class AgentPlanSummary(AgentSummary):
     warnings: list[str] = Field(default_factory=list)
 
 
+class AgentReviewFieldSummary(BaseModel):
+    name: str
+    data_type: FieldType
+    nullable: bool
+    null_ratio: float = Field(ge=0.0, le=1.0)
+    sensitive: bool
+    semantic_type: str | None = None
+    is_identifier: bool
+    distribution_kind: str | None = None
+
+
+class AgentReviewEntitySummary(BaseModel):
+    name: str
+    row_count: int = Field(ge=1)
+    primary_key: str | None = None
+    fields: list[AgentReviewFieldSummary]
+
+
+class AgentReviewSafetySummary(BaseModel):
+    raw_sensitive_values_blocked: bool
+    unknown_fields_treated_as_sensitive: bool
+    sensitive_field_count: int = Field(ge=0)
+    privacy_rule_count: int = Field(ge=0)
+
+
+class AgentReviewReport(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    phase: Literal["awaiting_approval"] = "awaiting_approval"
+    approval_required: Literal[True] = True
+    generation_performed: Literal[False] = False
+    workspace: Path
+    dataset_spec_path: Path
+    plan_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    profile_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    planned_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    current_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    spec_changed_since_plan: bool
+    source_type: str
+    seed: int = Field(ge=0)
+    output_format: OutputFormat
+    entities: list[AgentReviewEntitySummary]
+    relationships: list[AgentRelationshipSummary]
+    constraint_count: int = Field(ge=0)
+    safety: AgentReviewSafetySummary
+    assumptions: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class AgentGenerationSummary(AgentSummary):
     source_type: str
     row_counts: dict[str, int]
@@ -846,6 +894,87 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
         summary=result.summary,
         review=result.review,
         approval_receipt=result.approval_receipt,
+    )
+
+
+def review_agent_workspace(workspace: Path) -> AgentReviewReport:
+    """Build a detailed metadata-only report for human DatasetSpec review."""
+
+    status = inspect_agent_workspace(workspace)
+    if status.phase != AgentPhase.AWAITING_APPROVAL:
+        raise ValueError(
+            "agent-review requires an awaiting-approval workspace; "
+            "run agent-status for the current phase"
+        )
+    if not isinstance(status.summary, AgentPlanSummary) or status.review is None:
+        raise ValueError(
+            "agent plan predates fingerprint-bound review; create a new plan"
+        )
+
+    spec = load_dataset_spec(status.artifacts.dataset_spec_path)
+    current_spec_sha256 = dataset_spec_fingerprint(spec)
+    if not hmac.compare_digest(
+        current_spec_sha256,
+        status.review.current_spec_sha256,
+    ):
+        raise ValueError("dataset_spec.yaml changed during review; run agent-review again")
+
+    entities = [
+        AgentReviewEntitySummary(
+            name=entity.name,
+            row_count=entity.row_count,
+            primary_key=entity.primary_key,
+            fields=[
+                AgentReviewFieldSummary(
+                    name=field.name,
+                    data_type=field.data_type,
+                    nullable=field.nullable,
+                    null_ratio=field.null_ratio,
+                    sensitive=field.sensitive,
+                    semantic_type=field.semantic_type,
+                    is_identifier=field.is_identifier,
+                    distribution_kind=(
+                        field.typed_distribution.kind
+                        if field.typed_distribution is not None
+                        else None
+                    ),
+                )
+                for field in entity.fields
+            ],
+        )
+        for entity in spec.entities
+    ]
+    sensitive_field_count = sum(
+        field.sensitive
+        for entity in spec.entities
+        for field in entity.fields
+    )
+    return AgentReviewReport(
+        workspace=status.artifacts.workspace,
+        dataset_spec_path=status.artifacts.dataset_spec_path,
+        plan_id=status.review.plan_id,
+        profile_sha256=status.review.profile_sha256,
+        planned_spec_sha256=status.review.planned_spec_sha256,
+        current_spec_sha256=current_spec_sha256,
+        spec_changed_since_plan=status.review.spec_changed_since_plan,
+        source_type=status.summary.source_type,
+        seed=status.summary.seed,
+        output_format=status.summary.output_format,
+        entities=entities,
+        relationships=status.summary.relationships,
+        constraint_count=len(spec.constraints),
+        safety=AgentReviewSafetySummary(
+            raw_sensitive_values_blocked=(
+                not spec.privacy_settings.allow_raw_sensitive_values
+            ),
+            unknown_fields_treated_as_sensitive=(
+                spec.privacy_settings.treat_unknown_as_sensitive
+            ),
+            sensitive_field_count=sensitive_field_count,
+            privacy_rule_count=len(spec.privacy_rules),
+        ),
+        assumptions=status.summary.assumptions,
+        warnings=status.summary.warnings,
     )
 
 

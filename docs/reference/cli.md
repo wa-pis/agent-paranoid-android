@@ -34,6 +34,7 @@ commands.
 | `agent-advisor-request` | Export safe metadata for an external AI advisor | Request or exchange JSON |
 | `agent-advisor-apply` | Validate and apply an external proposal | Pending workspace status |
 | `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
+| `agent-review` | Inspect the current spec as a metadata-only approval checklist | Terminal or JSON report |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
 | `agent-recover` | Revalidate and finish an interrupted approval | Missing completion metadata |
 
@@ -124,21 +125,24 @@ test-data-agent agent-plan data/example_dataset \
   --seed 12345 \
   --format csv
 
-test-data-agent agent-status out/agent
-REVIEWED_SPEC_SHA256=replace-with-current-hash-from-status
+test-data-agent agent-review out/agent
+REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
 ```
 
 `agent-plan` must stop before generation. Review the prepared spec and manifest
 context before running `agent-approve`. Add `--json` to `agent-plan`,
-`agent-status`, or `agent-approve` for a versioned, row-free automation
-contract. Source type is detected for CSV files, CSV folders, and safe-profile
-JSON; use `--source-type` to override it.
+`agent-review`, `agent-status`, or `agent-approve` for a versioned, row-free
+automation contract. Source type is detected for CSV files, CSV folders, and
+safe-profile JSON; use `--source-type` to override it.
 
-Planning and pending status show metadata-only entities, fields, sensitive
-classifications, relationships, confidence, assumptions, and warnings. Entity
-and field names are untrusted input and are escaped before terminal output.
+`agent-review` shows every field's type, nullability, sensitive and identifier
+flags, semantic type, distribution kind, entity row count, primary key,
+relationships, privacy defaults, assumptions, warnings, and the current
+fingerprint. Distribution values and dataset rows are excluded. Human output
+bounds long field lists and points to the complete spec. Entity and field names
+are untrusted input and are escaped before terminal output.
 
 To let an external model propose bounded spec changes without adding its SDK:
 
@@ -148,7 +152,7 @@ test-data-agent agent-advisor-request out/agent \
 # Use trusted_instructions, request, and response_json_schema separately.
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json
-test-data-agent agent-status out/agent
+test-data-agent agent-review out/agent
 ```
 
 The request command is read-only. By default it writes one `AdvisorRequest`
@@ -156,15 +160,18 @@ JSON document. `--exchange` wraps it with package-owned trusted instructions
 and the generated `AdvisorProposal` JSON Schema. The apply command accepts a
 bounded regular JSON file, persists `advisor_review.json`, atomically updates
 `dataset_spec.yaml`, and still stops before generation. Review the changed
-spec and use the new hash reported by `agent-status`; never reuse the hash from
+spec and use the new hash reported by `agent-review`; never reuse the hash from
 before advisor apply.
 
-`agent-status` reports the SHA-256 fingerprint of the current effective spec
+`agent-review` reports the SHA-256 fingerprint of the current effective spec
 and an exact approval command. Record that value only after reviewing
 `dataset_spec.yaml`. Approval recomputes the fingerprint immediately before
 generation and fails if the file changed. Intentional edits are supported:
-edit the spec, run status again, review the new hash, and approve that hash.
+edit the spec, run review again, review the new hash, and approve that hash.
 Successful approval writes `approval_receipt.json`.
+
+Use `agent-status` for a short phase/next-action view and for recovery
+instructions after an interrupted approval.
 
 If approval is interrupted after the generated bundle is committed,
 `agent-status` reports `recovery_required` and prints the exact recovery
@@ -191,6 +198,7 @@ test-data-agent agent-advisor-request out/agent \
   --exchange > advisor_exchange.json
 test-data-agent agent-advisor-apply \
   out/agent advisor_proposal.json --json
+test-data-agent agent-review out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
@@ -201,8 +209,12 @@ test-data-agent agent-recover out/agent \
 Successful commands write one JSON document to stdout and leave stderr empty.
 Planning and approval return an `AgentResult`; advisor request returns an
 `AdvisorRequest` or `AdvisorExchange`; advisor apply and status return an
-`AgentWorkspaceStatus`. The contracts are versioned and never include source
-or generated rows.
+`AgentWorkspaceStatus`; review returns an `AgentReviewReport`. The contracts
+are versioned and never include source or generated rows.
+
+`AgentReviewReport` contains field metadata, relationships, privacy safety
+flags, plan/current fingerprints, and `generation_performed: false`. It omits
+distribution values and is valid only while the workspace awaits approval.
 
 The `review` object contains `plan_id`, profile and planned/current spec
 fingerprints, and `spec_changed_since_plan`. Completed results add an

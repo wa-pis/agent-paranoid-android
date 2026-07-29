@@ -40,6 +40,7 @@ CLI_COMMANDS = {
     "generate",
     "validate",
     "agent-plan",
+    "agent-review",
     "agent-approve",
 }
 

@@ -451,6 +451,79 @@ def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> No
     assert completed["summary"]["source_rows_copied"] is False
 
 
+def test_agent_review_cli_provides_human_checklist_and_json_contract(
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--workspace",
+                str(workspace),
+                "--count",
+                "3",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+
+    assert main(["agent-review", str(workspace)]) == 0
+    human = capsys.readouterr()
+    assert human.out == ""
+    assert "DatasetSpec review:" in human.err
+    assert "Current spec SHA-256:" in human.err
+    assert "raw sensitive values blocked" in human.err
+    assert "unknown fields sensitive" in human.err
+    assert "email: string | required | sensitive | semantic=email" in human.err
+    assert "Approve only after reviewing the complete DatasetSpec:" in human.err
+    assert "alice@example.com" not in human.err
+    assert not (workspace / "generated").exists()
+
+    assert main(["agent-review", str(workspace), "--json"]) == 0
+    machine = capsys.readouterr()
+    payload = json.loads(machine.out)
+    assert machine.err == ""
+    assert payload["schema_version"] == "1.0"
+    assert payload["phase"] == "awaiting_approval"
+    assert payload["approval_required"] is True
+    assert payload["generation_performed"] is False
+    assert payload["safety"]["raw_sensitive_values_blocked"] is True
+    assert payload["entities"][0]["fields"][1]["distribution_kind"] == (
+        "masked_patterns"
+    )
+    assert "alice@example.com" not in machine.out
+    assert "categories" not in machine.out
+
+
+def test_agent_review_cli_rejects_completed_workspace(tmp_path, capsys) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    agent_module.approve_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=planned.review.current_spec_sha256,
+    )
+
+    assert main(["agent-review", str(workspace), "--json"]) == 2
+    output = capsys.readouterr()
+    error = json.loads(output.out)
+    assert output.err == ""
+    assert error["error"]["code"] == "invalid_input"
+    assert "awaiting-approval workspace" in error["error"]["message"]
+    assert "traceback" not in output.out.lower()
+
+
 def test_agent_advisor_cli_json_handoff_stops_before_generation(
     tmp_path,
     capsys,

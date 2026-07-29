@@ -90,6 +90,7 @@ Public dataset-oriented commands:
 - `validate` with a YAML or JSON `DatasetSpec` and output folder
 - `generate-from-example`
 - `agent-plan`
+- `agent-review`
 - `agent-approve`
 
 - `profile-csv`
@@ -134,6 +135,9 @@ The agent layer is a review-first state machine over existing deterministic
 workflow helpers. `agent-plan` writes safe profile metadata, a reviewable
 `DatasetSpec`, and an agent plan. It intentionally stops before generation.
 `agent-status` computes the current effective-spec fingerprint.
+`agent-review` builds a typed metadata-only checklist from the current spec,
+including privacy flags and field generation metadata but no distribution
+values or rows.
 `agent-approve` requires that exact reviewed fingerprint, verifies the stored
 safe profile, generates synthetic data, validates it, runs source-row reuse
 checks for CSV sources, and writes the generated bundle plus an approval
