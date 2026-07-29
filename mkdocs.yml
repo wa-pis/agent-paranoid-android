@@ -41,6 +41,7 @@ nav:
   - How-To Guides:
       - Add Business Rules: how-to/business-rules.md
       - Connect An AI Client: ai_integration.md
+      - Run The Reference Agent: how-to/reference-agent.md
       - Connect An MCP Client: how-to/mcp.md
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md

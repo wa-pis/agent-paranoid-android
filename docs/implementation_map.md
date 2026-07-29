@@ -157,6 +157,13 @@ generated proposal schema while keeping the request explicitly untrusted.
 to `DatasetAdvisor`, passes a defensive exchange copy, and validates the
 untrusted response against the original fingerprint-bound request.
 
+`examples/reference_agent.py`
+
+The runnable application-layer example composes planning, the exchange
+adapter, status inspection, exact-fingerprint approval, deterministic
+generation, and validation. Its baseline stand-in performs no network call,
+and the command never auto-approves or returns rows.
+
 ## Tests
 
 `tests/test_domain_agnostic_pipeline.py` covers the main pipeline:
