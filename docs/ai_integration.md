@@ -70,6 +70,11 @@ spec, obtain explicit human approval for that value, and pass it unchanged to
 `agent-approve`. It must not approve a newly computed hash without renewed
 human review.
 
+If status reports `recovery_required`, the client may call `agent-recover`
+with that same human-reviewed hash. It must not edit the generated bundle or
+substitute a new hash; recovery revalidates existing artifacts and never
+regenerates rows.
+
 This mode is documented in [Agent Design](agent_design.md). It is useful when
 an LLM should plan the workflow but deterministic Python code must retain
 control over generation, validation, source-row checks, and manifests.

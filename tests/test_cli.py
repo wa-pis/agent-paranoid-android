@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.agent as agent_module
 import test_data_agent.cli as cli_module
+from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
 from test_data_agent.cli import main
 
 
@@ -446,6 +448,57 @@ def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> No
     assert completed["next_action"] == "none"
     assert completed["summary"]["validation_valid"] is True
     assert completed["summary"]["source_rows_copied"] is False
+
+
+def test_agent_recover_cli_explains_and_completes_interrupted_approval(
+    monkeypatch,
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    assert planned.review is not None
+    original_publish = agent_module.publish_agent_completion
+    monkeypatch.setattr(
+        agent_module,
+        "publish_agent_completion",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
+    )
+    with pytest.raises(RuntimeError, match="interrupted"):
+        agent_module.approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+
+    assert main(["agent-status", str(workspace)]) == 0
+    status_output = capsys.readouterr()
+    assert "Agent status: recovery required" in status_output.err
+    assert "agent-recover" in status_output.err
+    assert planned.review.current_spec_sha256 in status_output.err
+
+    assert (
+        main(
+            [
+                "agent-recover",
+                str(workspace),
+                "--reviewed-spec-sha256",
+                planned.review.current_spec_sha256,
+                "--json",
+            ]
+        )
+        == 0
+    )
+    recovered = json.loads(capsys.readouterr().out)
+    assert recovered["phase"] == "completed"
+    assert recovered["summary"]["validation_valid"] is True
 
 
 def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:

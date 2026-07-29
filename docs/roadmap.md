@@ -28,6 +28,9 @@ date.
   typed errors and documented exit codes for automation and AI clients.
 - Typed review and approval records with plan identifiers, profile/spec
   fingerprints, exact-hash confirmation, and persisted approval receipts.
+- Explicit recovery for interrupted approvals, including a completion
+  checkpoint, bounded artifact revalidation, and idempotent repeated approval
+  without regenerating rows.
 
 ## Implemented For 0.8.0
 
@@ -127,8 +130,9 @@ Make the review-first agent workflow the clearest product entry point:
 - Present concise human-readable summaries of inferred fields, sensitive
   fields, relationships, confidence, assumptions, and safety warnings.
   Implemented for `agent-plan` and pending `agent-status`.
-- Make interrupted or repeated operations observable and safely recoverable
-  through explicit status and idempotent state transitions.
+- Continue exercising recovery and idempotency contracts across new workflow
+  integrations. The local CLI, Python API, and generator MCP path are
+  implemented.
 - Add high-level MCP workflow tools so an AI client does not need to choose
   manually among every low-level profiling operation for the common path.
   Keep advanced profiling tools available without weakening the current Trino

@@ -17,11 +17,13 @@ from test_data_agent.adapters.json_profile import json_payload_to_dataset_profil
 from test_data_agent.agent import (
     AgentGenerationSummary,
     AgentPlanSummary,
+    AgentRecoverySummary,
     AgentRequest,
     AgentSourceType,
     approve_agent_workspace,
     inspect_agent_workspace,
     plan_agent_profile,
+    recover_agent_workspace,
 )
 from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -274,6 +276,47 @@ def approve_dataset_plan(
     }
 
 
+def recover_dataset_plan(
+    workspace_path: str,
+    reviewed_spec_sha256: str,
+) -> dict[str, Any]:
+    """Recover an interrupted approval without regenerating synthetic rows."""
+
+    workspace = resolve_workspace_path(
+        workspace_path,
+        must_exist=True,
+        expect_directory=True,
+    )
+    result = recover_agent_workspace(
+        workspace,
+        reviewed_spec_sha256=reviewed_spec_sha256,
+    )
+    artifacts = result.artifacts
+    if (
+        artifacts.generated_folder is None
+        or artifacts.validation_report_path is None
+        or artifacts.manifest_path is None
+        or artifacts.approval_receipt_path is None
+        or result.approval_receipt is None
+    ):
+        raise RuntimeError("recovered agent plan did not produce expected artifacts")
+    return {
+        "operation": "recover_dataset_plan",
+        "approval_required": result.approval_required,
+        "workspace": workspace_path_label(artifacts.workspace),
+        "output_folder": workspace_path_label(artifacts.generated_folder),
+        "validation_report_path": workspace_path_label(
+            artifacts.validation_report_path
+        ),
+        "manifest_path": workspace_path_label(artifacts.manifest_path),
+        "approval_receipt_path": workspace_path_label(
+            artifacts.approval_receipt_path
+        ),
+        "approval_receipt": result.approval_receipt.model_dump(mode="json"),
+        **result.summary.model_dump(mode="json"),
+    }
+
+
 def inspect_dataset_plan(workspace_path: str) -> dict[str, Any]:
     """Inspect a planned or completed agent workspace without changing it."""
 
@@ -304,6 +347,8 @@ def inspect_dataset_plan(workspace_path: str) -> dict[str, Any]:
     if isinstance(status.summary, AgentPlanSummary):
         response["summary"] = compact_agent_plan_summary(status.summary)
     elif isinstance(status.summary, AgentGenerationSummary):
+        response["summary"] = status.summary.model_dump(mode="json")
+    elif isinstance(status.summary, AgentRecoverySummary):
         response["summary"] = status.summary.model_dump(mode="json")
     return response
 
@@ -554,6 +599,7 @@ if FastMCP is not None:
     mcp.tool()(audited_mcp_tool("generator-mcp", plan_trino_dataset))
     mcp.tool()(audited_mcp_tool("generator-mcp", inspect_dataset_plan))
     mcp.tool()(audited_mcp_tool("generator-mcp", approve_dataset_plan))
+    mcp.tool()(audited_mcp_tool("generator-mcp", recover_dataset_plan))
     mcp.tool()(audited_mcp_tool("generator-mcp", generate_dataset))
     mcp.tool()(audited_mcp_tool("generator-mcp", validate_dataset))
     mcp.tool()(audited_mcp_tool("generator-mcp", export_dataset))

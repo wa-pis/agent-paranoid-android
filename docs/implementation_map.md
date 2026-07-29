@@ -132,7 +132,10 @@ workflow helpers. `agent-plan` writes safe profile metadata, a reviewable
 `agent-approve` requires that exact reviewed fingerprint, verifies the stored
 safe profile, generates synthetic data, validates it, runs source-row reuse
 checks for CSV sources, and writes the generated bundle plus an approval
-receipt.
+receipt. The generated bundle includes `agent_completion.json`.
+`agent-recover` revalidates that checkpoint, profile/spec fingerprints,
+manifest, rows, validation report, and source-row non-reuse before publishing
+missing result metadata. It never calls generation.
 
 ## Tests
 

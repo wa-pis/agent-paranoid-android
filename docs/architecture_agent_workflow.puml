@@ -12,12 +12,12 @@ participant "agent.py\nplan_agent_request" as PlanAgent
 participant "Safe Profiling\nCSV / folder / profile" as Profiling
 participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner
 database "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as Workspace
-participant "CLI\nagent-approve" as ApproveCli
-participant "agent.py\napprove_agent_workspace" as ApproveAgent
+participant "CLI\nagent-approve / agent-recover" as ApproveCli
+participant "agent.py\napprove / recover" as ApproveAgent
 participant "Synthetic Generator\nseeded deterministic" as Generator
 participant "Safety Checks\nPII + source-row reuse" as Safety
 participant "Validation Core\nschema / relationships /\nconstraints" as Validation
-database "Generated Bundle\ngenerated/*\ngeneration_manifest.json\nvalidation_report.json" as Bundle
+database "Generated Bundle\ngenerated/*\ngeneration_manifest.json\nvalidation_report.json\nagent_completion.json" as Bundle
 
 User -> Ai : asks for synthetic data
 Ai -> PlanCli : source, source type,\nworkspace, count, seed, format
@@ -42,6 +42,13 @@ ApproveAgent -> Validation : validate generated bundle
 Validation --> ApproveAgent : validation report
 ApproveAgent -> Bundle : write synthetic files,\nmanifest, reports
 ApproveAgent --> User : completed result\npaths, seed, row counts
+
+alt completion metadata publication was interrupted
+  User -> ApproveCli : recover workspace\nwith reviewed fingerprint
+  ApproveCli -> ApproveAgent : recovery request
+  ApproveAgent -> Bundle : revalidate unchanged\ncheckpoint and rows
+  ApproveAgent --> User : publish missing result\nwithout regeneration
+end
 
 note right of Ai
 The AI client plans and explains.

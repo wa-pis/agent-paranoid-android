@@ -33,6 +33,7 @@ commands.
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
 | `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
+| `agent-recover` | Revalidate and finish an interrupted approval | Missing completion metadata |
 
 Aliases:
 
@@ -144,6 +145,20 @@ generation and fails if the file changed. Intentional edits are supported:
 edit the spec, run status again, review the new hash, and approve that hash.
 Successful approval writes `approval_receipt.json`.
 
+If approval is interrupted after the generated bundle is committed,
+`agent-status` reports `recovery_required` and prints the exact recovery
+command:
+
+```bash
+test-data-agent agent-recover out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
+```
+
+Recovery revalidates the checkpoint, fingerprints, manifest, generated rows,
+validation report, and source-row non-reuse before publishing missing
+completion metadata. It never regenerates rows. Repeating `agent-approve` for
+an already completed matching plan returns the persisted result.
+
 ## Agent JSON Contract
 
 Use JSON output when invoking the review flow from automation or an AI client:
@@ -153,6 +168,8 @@ test-data-agent agent-plan data/example_dataset \
   --workspace out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
+test-data-agent agent-recover out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
 ```
 
@@ -164,8 +181,9 @@ artifact paths and summaries, never source or generated rows.
 The `review` object contains `plan_id`, profile and planned/current spec
 fingerprints, and `spec_changed_since_plan`. Completed results add an
 `approval_receipt` tied to the exact `current_spec_sha256` supplied during
-approval. Workspaces created before this contract remain inspectable but must
-be replanned before approval.
+approval. Recovery status uses `next_action: "recover"` and includes the same
+reviewed fingerprint without returning rows. Workspaces created before this
+contract remain inspectable but must be replanned before approval.
 
 Known argument, input, and path failures also write one versioned JSON document
 to stdout when `--json` is present:

@@ -28,6 +28,10 @@ User or AI client
     -> deterministic synthetic generation
     -> source-row reuse checks when source CSV is available
     -> validation_report.json / generation_manifest.json
+    -> agent_completion.json checkpoint
+  -> agent-recover (only after interrupted completion publication)
+    -> revalidate the existing bundle
+    -> publish missing receipt/result without regenerating rows
 ```
 
 ## CLI Usage
@@ -58,6 +62,13 @@ test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
+  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
+```
+
+If status reports `recovery_required`, keep the reviewed fingerprint and run:
+
+```bash
+test-data-agent agent-recover out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
 ```
 
@@ -118,6 +129,7 @@ Approval writes:
 - `generated/dataset_spec.yaml`
 - `generated/validation_report.json`
 - `generated/generation_manifest.json`
+- `generated/agent_completion.json`
 
 ## Result Contract
 
@@ -136,6 +148,10 @@ models:
   during review.
 - `AgentApprovalReceipt` binds successful approval to the plan identifier,
   profile fingerprint, and exact reviewed effective-spec fingerprint.
+- `AgentCompletionCheckpoint` records the reviewed identity and completed
+  generation facts inside the atomically published bundle.
+- `AgentRecoverySummary` reports why completion metadata must be recovered and
+  the exact reviewed fingerprint required for that operation.
 
 `AgentResult` and `AgentWorkspaceStatus` both have
 `schema_version: "1.0"`. The same result fields are serialized under `summary`
@@ -180,3 +196,5 @@ The Python workflow still enforces the important invariants:
 - generation folders are assembled through temporary folders;
 - validation reports and generation manifests are written for every approved
   generation.
+- interrupted publication is recoverable only after bounded revalidation of
+  the unchanged generated bundle.

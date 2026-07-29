@@ -16,6 +16,7 @@ from pydantic import ValidationError
 from test_data_agent.agent import (
     AgentGenerationSummary,
     AgentPlanSummary,
+    AgentRecoverySummary,
     AgentRequest,
     AgentResult,
     AgentReviewState,
@@ -25,6 +26,7 @@ from test_data_agent.agent import (
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
+    recover_agent_workspace,
 )
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
@@ -120,6 +122,10 @@ Common workflows
    # Review out/agent/dataset_spec.yaml before approval.
    test-data-agent agent-status out/agent
    test-data-agent agent-approve out/agent \\
+     --reviewed-spec-sha256 SHA256_FROM_STATUS
+
+   # If status reports recovery_required after an interrupted approval:
+   test-data-agent agent-recover out/agent \\
      --reviewed-spec-sha256 SHA256_FROM_STATUS
 
 7. Validate an existing generated dataset
@@ -436,6 +442,39 @@ def main(argv: list[str] | None = None) -> int:
         help="Write the versioned agent result as JSON.",
     )
 
+    agent_recover_parser = subparsers.add_parser(
+        "agent-recover",
+        help="Finish publishing an interrupted approved agent run.",
+        description=(
+            "Revalidate an existing generated bundle and publish missing completion "
+            "metadata without regenerating rows."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent agent-status out/agent\n"
+            "  test-data-agent agent-recover out/agent "
+            "--reviewed-spec-sha256 SHA256_FROM_STATUS\n\n"
+            "Use this only when agent-status reports recovery_required."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_recover_parser.add_argument(
+        "workspace",
+        type=Path,
+        help="Workspace whose approval was interrupted.",
+    )
+    agent_recover_parser.add_argument(
+        "--reviewed-spec-sha256",
+        required=True,
+        help="SHA-256 reported by agent-status for the reviewed DatasetSpec.",
+    )
+    agent_recover_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned agent result as JSON.",
+    )
+
     agent_status_parser = subparsers.add_parser(
         "agent-status",
         help="Inspect a planned or completed agent workspace.",
@@ -595,6 +634,14 @@ def run_command(args: argparse.Namespace) -> int:
 
     if args.command == "agent-approve":
         agent_result = approve_agent_workspace(
+            args.workspace,
+            reviewed_spec_sha256=args.reviewed_spec_sha256,
+        )
+        write_agent_command_result(agent_result, json_output=args.json_output)
+        return 0 if agent_result.summary.get("validation_valid", False) else 1
+
+    if args.command == "agent-recover":
+        agent_result = recover_agent_workspace(
             args.workspace,
             reviewed_spec_sha256=args.reviewed_spec_sha256,
         )
@@ -856,6 +903,23 @@ def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
             workspace=status.artifacts.workspace,
             spec_path=status.artifacts.dataset_spec_path,
             review=status.review,
+        )
+        return
+    if status.phase.value == "recovery_required":
+        if not isinstance(status.summary, AgentRecoverySummary):
+            raise ValueError("recovery-required status is missing its recovery summary")
+        workspace_command = display_untrusted_name(
+            shlex.quote(str(status.artifacts.workspace)),
+            limit=260,
+        )
+        print(
+            "Agent status: recovery required | generated rows will not be regenerated",
+            file=sys.stderr,
+        )
+        print(
+            f"Recover: test-data-agent agent-recover {workspace_command} "
+            f"--reviewed-spec-sha256 {status.summary.reviewed_spec_sha256}",
+            file=sys.stderr,
         )
         return
     if not isinstance(status.summary, AgentGenerationSummary):
