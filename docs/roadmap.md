@@ -133,10 +133,10 @@ Make the review-first agent workflow the clearest product entry point:
 - Continue exercising recovery and idempotency contracts across new workflow
   integrations. The local CLI, Python API, and generator MCP path are
   implemented.
-- Add high-level MCP workflow tools so an AI client does not need to choose
-  manually among every low-level profiling operation for the common path.
-  Keep advanced profiling tools available without weakening the current Trino
-  and generator-server trust boundary.
+- High-level MCP planning for workspace CSV files, CSV folders, safe profiles,
+  and safe inline Trino profiles is implemented. AI clients can use the common
+  plan, inspect, approve, and recover path while advanced profiling tools
+  remain available behind the same trust boundaries.
 
 ## Reference AI Agent
 

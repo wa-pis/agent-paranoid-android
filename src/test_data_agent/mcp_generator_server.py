@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
@@ -19,10 +19,13 @@ from test_data_agent.agent import (
     AgentPlanSummary,
     AgentRecoverySummary,
     AgentRequest,
+    AgentResult,
     AgentSourceType,
     approve_agent_workspace,
+    detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_profile,
+    plan_agent_request,
     recover_agent_workspace,
 )
 from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
@@ -32,7 +35,7 @@ from test_data_agent.core.limits import (
     enforce_profile_payload_size,
     read_limited_text,
 )
-from test_data_agent.core.settings import OutputFormat
+from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
     GenerationManifest,
     dataset_spec_fingerprint,
@@ -221,10 +224,57 @@ def plan_trino_dataset(
     result = plan_agent_profile(request, profile)
     if not isinstance(result.summary, AgentPlanSummary):
         raise RuntimeError("Trino planning did not produce an agent plan summary")
+    return agent_plan_response("plan_trino_dataset", result)
+
+
+def plan_dataset(
+    source_path: str,
+    workspace_path: str,
+    source_type: Literal["csv", "csv-folder", "profile"] | None = None,
+    count: int = 100,
+    seed: int = 12345,
+    output_format: Literal["csv", "json", "parquet"] = "csv",
+    mode: Literal["valid", "negative", "mixed"] = "valid",
+    invalid_ratio: float = 0.0,
+    table_name: str | None = None,
+    rule_sample_rows: int = 50_000,
+    use_cache: bool = False,
+) -> dict[str, Any]:
+    """Plan a review-first workflow from one bounded workspace source."""
+
+    source = resolve_workspace_path(source_path, must_exist=True)
+    workspace = resolve_workspace_path(workspace_path)
+    ensure_new_agent_workspace(workspace)
+    selected_source_type = (
+        detect_agent_source_type(source)
+        if source_type is None
+        else parse_agent_source_type(source_type)
+    )
+    result = plan_agent_request(
+        AgentRequest(
+            source_type=selected_source_type,
+            source_path=source,
+            workspace=workspace,
+            count=count,
+            seed=seed,
+            output_format=OutputFormat(output_format),
+            mode=GenerationMode(mode),
+            invalid_ratio=invalid_ratio,
+            table_name=table_name,
+            rule_sample_rows=rule_sample_rows,
+            use_cache=use_cache,
+        )
+    )
+    return agent_plan_response("plan_dataset", result)
+
+
+def agent_plan_response(operation: str, result: AgentResult) -> dict[str, Any]:
+    if not isinstance(result.summary, AgentPlanSummary):
+        raise RuntimeError("agent planning did not produce an agent plan summary")
     if result.review is None:
-        raise RuntimeError("Trino planning did not produce fingerprint review state")
+        raise RuntimeError("agent planning did not produce fingerprint review state")
     return {
-        "operation": "plan_trino_dataset",
+        "operation": operation,
         "approval_required": result.approval_required,
         "workspace": workspace_path_label(result.artifacts.workspace),
         "profile_path": workspace_path_label(result.artifacts.profile_path),
@@ -233,6 +283,27 @@ def plan_trino_dataset(
         **result.review.model_dump(mode="json"),
         **compact_agent_plan_summary(result.summary),
     }
+
+
+def ensure_new_agent_workspace(workspace: Path) -> None:
+    if workspace.exists() and not workspace.is_dir():
+        raise WorkspacePathError("agent workspace must be a folder")
+    if workspace.exists() and any(workspace.iterdir()):
+        raise WorkspacePathError("agent workspace must be empty for planning")
+
+
+def parse_agent_source_type(value: str) -> AgentSourceType:
+    source_types = {
+        "csv": AgentSourceType.CSV,
+        "csv-folder": AgentSourceType.CSV_FOLDER,
+        "profile": AgentSourceType.PROFILE,
+    }
+    try:
+        return source_types[value]
+    except KeyError as exc:
+        raise ValueError(
+            "source_type must be one of: csv, csv-folder, profile"
+        ) from exc
 
 
 def approve_dataset_plan(
@@ -596,6 +667,7 @@ if FastMCP is not None:
     mcp = FastMCP("test-data-agent-generator")
     mcp.tool()(audited_mcp_tool("generator-mcp", profile_csv))
     mcp.tool()(audited_mcp_tool("generator-mcp", infer_dataset_spec))
+    mcp.tool()(audited_mcp_tool("generator-mcp", plan_dataset))
     mcp.tool()(audited_mcp_tool("generator-mcp", plan_trino_dataset))
     mcp.tool()(audited_mcp_tool("generator-mcp", inspect_dataset_plan))
     mcp.tool()(audited_mcp_tool("generator-mcp", approve_dataset_plan))

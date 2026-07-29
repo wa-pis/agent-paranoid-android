@@ -117,6 +117,11 @@ artifact paths, not rows. `src/test_data_agent/safety.py` and
 `src/test_data_agent/rules/contract.py` reject unsafe sensitive distributions,
 rule literals, workspace path escapes, and exact source CSV row reuse.
 
+`plan_dataset` gives AI clients one review-first entry point for a workspace
+CSV file, CSV folder, or safe profile. It delegates to the same agent state
+machine used by the CLI; `plan_trino_dataset` provides the parallel handoff for
+safe inline Trino profiles.
+
 Generation bundles include `generation_manifest.json` for reproducibility and
 provenance auditing. Rule-driven bundles also include a rule fingerprint and
 compact business-validation summary.

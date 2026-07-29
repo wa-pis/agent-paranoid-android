@@ -13,15 +13,17 @@ TEST_DATA_AGENT_WORKSPACE_ROOT=/path/to/workspace \
   python3 -m test_data_agent.mcp_generator_server
 ```
 
-2. Ask the MCP client to call `profile_csv` for individual CSV files, or use
-   local CLI folder profiling when starting from a folder.
-3. Call `infer_dataset_spec` with a safe `profile_path` or safe inline
-   `profile_payload`.
-4. Review the written `DatasetSpec`.
-5. Optionally provide reviewed business rules through one
-   `business_rules_path` or structured `business_rules_payload`.
-6. Call `generate_dataset` with an explicit seed and output folder.
-7. Call `validate_dataset` for the generated bundle.
+2. Call `plan_dataset` with the workspace CSV file or folder, a new agent
+   workspace, count, seed, and output format.
+3. Review the written `dataset_spec.yaml`.
+4. Call `inspect_dataset_plan` and record the current spec fingerprint.
+5. Call `approve_dataset_plan` with that exact reviewed fingerprint.
+6. If status reports `recovery_required`, call `recover_dataset_plan` with the
+   same fingerprint.
+
+Advanced clients may still call `profile_csv`, `infer_dataset_spec`,
+`generate_dataset`, and `validate_dataset` separately. Structured business
+rules currently use that lower-level generation path.
 
 Expected final report:
 

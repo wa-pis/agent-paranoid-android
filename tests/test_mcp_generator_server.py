@@ -1,5 +1,6 @@
 import csv
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -13,6 +14,7 @@ from test_data_agent.mcp_generator_server import (
     generate_dataset,
     infer_dataset_spec,
     inspect_dataset_plan,
+    plan_dataset,
     plan_trino_dataset,
     profile_csv,
     recover_dataset_plan,
@@ -326,6 +328,96 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     completed = inspect_dataset_plan("agent/orders")
     assert completed["phase"] == "completed"
     assert completed["approval_receipt"] == approved["approval_receipt"]
+
+
+def test_plan_dataset_runs_review_first_csv_flow(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_source_csv(tmp_path)
+
+    planned = plan_dataset(
+        "customers.csv",
+        "agent/customers",
+        count=4,
+        seed=81,
+        output_format="csv",
+        table_name="customers",
+    )
+
+    assert planned["operation"] == "plan_dataset"
+    assert planned["approval_required"] is True
+    assert planned["source_type"] == "csv"
+    assert planned["entities"] == [
+        {"name": "customers", "row_count": 4, "field_count": 3}
+    ]
+    assert "alice@example.com" not in json.dumps(planned)
+    assert not (tmp_path / "agent" / "customers" / "generated").exists()
+
+    inspected = inspect_dataset_plan("agent/customers")
+    approved = approve_dataset_plan(
+        "agent/customers",
+        inspected["review"]["current_spec_sha256"],
+    )
+    with (tmp_path / "customers.csv").open(newline="") as handle:
+        source_rows = list(csv.DictReader(handle))
+    with (
+        tmp_path / "agent" / "customers" / "generated" / "customers.csv"
+    ).open(newline="") as handle:
+        generated_rows = list(csv.DictReader(handle))
+
+    assert approved["row_counts"] == {"customers": 4}
+    assert approved["validation_valid"] is True
+    assert {tuple(row.items()) for row in source_rows}.isdisjoint(
+        {tuple(row.items()) for row in generated_rows}
+    )
+    assert inspect_dataset_plan("agent/customers")["phase"] == "completed"
+
+
+def test_plan_dataset_detects_supported_sources_and_rejects_unsafe_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    write_source_csv(tmp_path)
+    profile_csv("customers.csv", "customers_profile.json")
+    inferred = plan_dataset(
+        "customers_profile.json",
+        "agent/profile",
+        count=2,
+    )
+    request = json.loads((tmp_path / "agent" / "profile" / "agent_request.json").read_text())
+    assert inferred["operation"] == "plan_dataset"
+    assert request["source_type"] == "profile"
+
+    source_folder = tmp_path / "example"
+    shutil.copytree(Path("tests/fixtures/example_dataset"), source_folder)
+    folder_plan = plan_dataset("example", "agent/folder", count=2)
+    folder_request = json.loads(
+        (tmp_path / "agent" / "folder" / "agent_request.json").read_text()
+    )
+    assert folder_plan["relationship_count"] == 1
+    assert folder_request["source_type"] == "csv_folder"
+
+    infer_dataset_spec(
+        output_path="dataset_spec.json",
+        profile_path="customers_profile.json",
+        count=2,
+    )
+    with pytest.raises(ValueError, match="detected a DatasetSpec"):
+        plan_dataset("dataset_spec.json", "agent/spec")
+    with pytest.raises(WorkspacePathError, match="escapes"):
+        plan_dataset("../outside.csv", "agent/escape")
+    with pytest.raises(ValueError, match="source_type must be one of"):
+        plan_dataset("customers.csv", "agent/invalid-type", source_type="spreadsheet")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="must not be inside the source CSV folder"):
+        plan_dataset("example", "example/agent")
+
+    assert not (tmp_path / "agent" / "spec").exists()
+    assert not (tmp_path / "agent" / "escape").exists()
+    assert not (tmp_path / "agent" / "invalid-type").exists()
+    assert not (tmp_path / "example" / "agent").exists()
 
 
 def test_mcp_recovers_interrupted_plan_without_returning_rows(
