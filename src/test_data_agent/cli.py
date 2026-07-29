@@ -22,15 +22,19 @@ from test_data_agent.agent import (
     AgentReviewState,
     AgentSourceType,
     AgentWorkspaceStatus,
+    apply_agent_advisor_proposal,
     approve_agent_workspace,
+    build_agent_advisor_request,
     detect_agent_source_type,
     inspect_agent_workspace,
     plan_agent_request,
     recover_agent_workspace,
 )
+from test_data_agent.advisor import AdvisorProposal
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
@@ -121,6 +125,11 @@ Common workflows
 
    # Review out/agent/dataset_spec.yaml before approval.
    test-data-agent agent-status out/agent
+   test-data-agent agent-advisor-request out/agent > advisor_request.json
+   # Send advisor_request.json as structured data and save the model response.
+   test-data-agent agent-advisor-apply out/agent advisor_proposal.json
+   # Review the changed spec and use its new fingerprint.
+   test-data-agent agent-status out/agent
    test-data-agent agent-approve out/agent \\
      --reviewed-spec-sha256 SHA256_FROM_STATUS
 
@@ -190,7 +199,7 @@ class JsonHelpfulArgumentParser(HelpfulArgumentParser):
 
 def main(argv: list[str] | None = None) -> int:
     arguments = list(sys.argv[1:] if argv is None else argv)
-    json_errors = "--json" in arguments
+    json_errors = "--json" in arguments or arguments[:1] == ["agent-advisor-request"]
     parser = HelpfulArgumentParser(
         prog="test-data-agent",
         description=(
@@ -475,6 +484,62 @@ def main(argv: list[str] | None = None) -> int:
         help="Write the versioned agent result as JSON.",
     )
 
+    agent_advisor_request_parser = subparsers.add_parser(
+        "agent-advisor-request",
+        help="Export safe metadata for an external AI advisor.",
+        description=(
+            "Write one fingerprint-bound advisor request JSON document to stdout "
+            "without changing the workspace."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent agent-advisor-request out/agent "
+            "> advisor_request.json\n\n"
+            "Send the JSON as structured model input. It contains safe metadata "
+            "and a baseline DatasetSpec, never source rows or credentials."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_advisor_request_parser.add_argument(
+        "workspace",
+        type=Path,
+        help="Awaiting-approval workspace created by agent-plan.",
+    )
+    agent_advisor_request_parser.set_defaults(json_output=True)
+
+    agent_advisor_apply_parser = subparsers.add_parser(
+        "agent-advisor-apply",
+        help="Validate and apply an external AI proposal for review.",
+        description=(
+            "Read a bounded proposal JSON file, validate it against the workspace "
+            "request, and update the pending DatasetSpec without generating data."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent agent-advisor-apply "
+            "out/agent advisor_proposal.json\n\n"
+            "Review dataset_spec.yaml after this command, then use agent-status "
+            "and agent-approve with the exact reviewed fingerprint."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_advisor_apply_parser.add_argument(
+        "workspace",
+        type=Path,
+        help="Awaiting-approval workspace used to create the advisor request.",
+    )
+    agent_advisor_apply_parser.add_argument(
+        "proposal",
+        type=Path,
+        help="Bounded regular JSON file containing an AdvisorProposal.",
+    )
+    agent_advisor_apply_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned pending workspace status as JSON.",
+    )
+
     agent_status_parser = subparsers.add_parser(
         "agent-status",
         help="Inspect a planned or completed agent workspace.",
@@ -647,6 +712,22 @@ def run_command(args: argparse.Namespace) -> int:
         )
         write_agent_command_result(agent_result, json_output=args.json_output)
         return 0 if agent_result.summary.get("validation_valid", False) else 1
+
+    if args.command == "agent-advisor-request":
+        request = build_agent_advisor_request(args.workspace)
+        print(request.model_dump_json(indent=2))
+        return 0
+
+    if args.command == "agent-advisor-apply":
+        proposal = AdvisorProposal.model_validate_json(
+            read_limited_text(args.proposal)
+        )
+        status = apply_agent_advisor_proposal(args.workspace, proposal)
+        if args.json_output:
+            print(status.model_dump_json(indent=2))
+        else:
+            write_agent_status_summary(status)
+        return 0
 
     if args.command == "agent-status":
         status = inspect_agent_workspace(args.workspace)

@@ -7,6 +7,7 @@ import pytest
 import test_data_agent.agent as agent_module
 import test_data_agent.cli as cli_module
 from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
+from test_data_agent.advisor import AdvisorRequest
 from test_data_agent.cli import main
 
 
@@ -448,6 +449,97 @@ def test_agent_status_cli_supports_human_and_json_output(tmp_path, capsys) -> No
     assert completed["next_action"] == "none"
     assert completed["summary"]["validation_valid"] is True
     assert completed["summary"]["source_rows_copied"] is False
+
+
+def test_agent_advisor_cli_json_handoff_stops_before_generation(
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+
+    assert main(["agent-advisor-request", str(workspace)]) == 0
+    request_output = capsys.readouterr()
+    request = AdvisorRequest.model_validate_json(request_output.out)
+    assert request_output.err == ""
+    assert "alice@example.com" not in request_output.out
+
+    candidate = request.baseline_spec.model_copy(deep=True)
+    candidate.entities[0].row_count = 4
+    proposal_path = tmp_path / "advisor_proposal.json"
+    proposal_path.write_text(
+        json.dumps(
+            {
+                "schema_version": "1.0",
+                "profile_sha256": request.profile_sha256,
+                "baseline_spec_sha256": request.baseline_spec_sha256,
+                "approval_required": True,
+                "generation_performed": False,
+                "dataset_spec": candidate.model_dump(mode="json"),
+            }
+        )
+    )
+
+    assert (
+        main(
+            [
+                "agent-advisor-apply",
+                str(workspace),
+                str(proposal_path),
+                "--json",
+            ]
+        )
+        == 0
+    )
+    apply_output = capsys.readouterr()
+    status = json.loads(apply_output.out)
+    assert apply_output.err == ""
+    assert status["phase"] == "awaiting_approval"
+    assert status["summary"]["entities"][0]["row_count"] == 4
+    assert not (workspace / "generated").exists()
+
+
+def test_agent_advisor_apply_rejects_linked_proposal_with_json_error(
+    tmp_path,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    proposal = tmp_path / "proposal.json"
+    proposal.write_text("{}")
+    linked_proposal = tmp_path / "linked-proposal.json"
+    linked_proposal.symlink_to(proposal)
+
+    exit_code = main(
+        [
+            "agent-advisor-apply",
+            str(workspace),
+            str(linked_proposal),
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exit_code == 2
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_input"
+    assert "symbolic link inputs are not allowed" in payload["error"]["message"]
+    assert not (workspace / "advisor_review.json").exists()
 
 
 def test_agent_recover_cli_explains_and_completes_interrupted_approval(

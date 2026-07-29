@@ -31,6 +31,8 @@ commands.
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
+| `agent-advisor-request` | Export safe metadata for an external AI advisor | Advisor request JSON |
+| `agent-advisor-apply` | Validate and apply an external proposal | Pending workspace status |
 | `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
 | `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
 | `agent-recover` | Revalidate and finish an interrupted approval | Missing completion metadata |
@@ -138,6 +140,22 @@ Planning and pending status show metadata-only entities, fields, sensitive
 classifications, relationships, confidence, assumptions, and warnings. Entity
 and field names are untrusted input and are escaped before terminal output.
 
+To let an external model propose bounded spec changes without adding its SDK:
+
+```bash
+test-data-agent agent-advisor-request out/agent > advisor_request.json
+# Send the request as structured data and save the structured model response.
+test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json
+test-data-agent agent-status out/agent
+```
+
+The request command is read-only and always writes one `AdvisorRequest` JSON
+document to stdout. The apply command accepts a bounded regular JSON file,
+persists `advisor_review.json`, atomically updates `dataset_spec.yaml`, and
+still stops before generation. Review the changed spec and use the new hash
+reported by `agent-status`; never reuse the hash from before advisor apply.
+
 `agent-status` reports the SHA-256 fingerprint of the current effective spec
 and an exact approval command. Record that value only after reviewing
 `dataset_spec.yaml`. Approval recomputes the fingerprint immediately before
@@ -166,6 +184,9 @@ Use JSON output when invoking the review flow from automation or an AI client:
 ```bash
 test-data-agent agent-plan data/example_dataset \
   --workspace out/agent --json
+test-data-agent agent-advisor-request out/agent > advisor_request.json
+test-data-agent agent-advisor-apply \
+  out/agent advisor_proposal.json --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
@@ -174,9 +195,9 @@ test-data-agent agent-recover out/agent \
 ```
 
 Successful commands write one JSON document to stdout and leave stderr empty.
-Planning and approval return an `AgentResult`; status returns an
-`AgentWorkspaceStatus`. Both contracts include `"schema_version": "1.0"` and
-artifact paths and summaries, never source or generated rows.
+Planning and approval return an `AgentResult`; advisor request returns an
+`AdvisorRequest`; advisor apply and status return an `AgentWorkspaceStatus`.
+The contracts are versioned and never include source or generated rows.
 
 The `review` object contains `plan_id`, profile and planned/current spec
 fingerprints, and `spec_changed_since_plan`. Completed results add an

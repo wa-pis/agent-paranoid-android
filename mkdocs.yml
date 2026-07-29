@@ -40,6 +40,7 @@ nav:
       - Review The Output: getting-started/review-output.md
   - How-To Guides:
       - Add Business Rules: how-to/business-rules.md
+      - Connect An AI Client: ai_integration.md
       - Connect An MCP Client: how-to/mcp.md
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md
@@ -60,6 +61,5 @@ nav:
       - Release Process: release.md
   - Maintainers:
       - Architecture: agent_design.md
-      - AI Integration: ai_integration.md
       - Generator MCP Design: mcp_generator_design.md
       - Roadmap: roadmap.md

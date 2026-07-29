@@ -13,6 +13,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.adapters import csv_file_to_dataset_profile, load_profile_or_spec
 from test_data_agent.advisor import (
+    AdvisorProposalPayload,
+    AdvisorRequest,
     AdvisorReviewArtifact,
     DatasetAdvisor,
     build_advisor_request,
@@ -353,6 +355,85 @@ def advise_agent_workspace(
 ) -> AgentWorkspaceStatus:
     """Persist one validated advisor proposal without generating data."""
 
+    resolved_workspace, artifacts, profile, spec = _load_pending_advisor_context(
+        workspace
+    )
+    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
+    if review_path.exists() or review_path.is_symlink():
+        review_artifact = _load_advisor_review(review_path)
+        return _apply_persisted_advisor_review(
+            resolved_workspace,
+            artifacts,
+            review_artifact,
+        )
+
+    advisor_request = build_advisor_request(
+        profile,
+        baseline_spec=spec,
+    )
+    payload = advisor.propose(advisor_request.model_copy(deep=True))
+    review_artifact = build_advisor_review_artifact(advisor_request, payload)
+    if review_path.exists() or review_path.is_symlink():
+        raise ValueError("advisor_review.json was created concurrently")
+    write_json_artifact_atomic(review_artifact, review_path)
+    return _apply_persisted_advisor_review(
+        resolved_workspace,
+        artifacts,
+        review_artifact,
+    )
+
+
+def build_agent_advisor_request(workspace: Path) -> AdvisorRequest:
+    """Build a read-only advisor request for an awaiting-approval workspace."""
+
+    resolved_workspace, _artifacts, profile, spec = _load_pending_advisor_context(
+        workspace
+    )
+    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
+    if review_path.exists() or review_path.is_symlink():
+        if review_path.is_symlink() or not review_path.is_file():
+            raise ValueError("advisor_review.json must be a regular file")
+        raise ValueError("advisor review already exists for this workspace")
+    return build_advisor_request(profile, baseline_spec=spec)
+
+
+def apply_agent_advisor_proposal(
+    workspace: Path,
+    payload: AdvisorProposalPayload,
+) -> AgentWorkspaceStatus:
+    """Validate and persist an external proposal without generating data."""
+
+    resolved_workspace, artifacts, profile, spec = _load_pending_advisor_context(
+        workspace
+    )
+    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
+    if review_path.exists() or review_path.is_symlink():
+        review_artifact = _load_advisor_review(review_path)
+        submitted_artifact = build_advisor_review_artifact(
+            review_artifact.request,
+            payload,
+        )
+        if submitted_artifact != review_artifact:
+            raise ValueError(
+                "advisor_review.json contains a different advisor proposal"
+            )
+    else:
+        advisor_request = build_advisor_request(profile, baseline_spec=spec)
+        review_artifact = build_advisor_review_artifact(advisor_request, payload)
+        if review_path.exists() or review_path.is_symlink():
+            raise ValueError("advisor_review.json was created concurrently")
+        write_json_artifact_atomic(review_artifact, review_path)
+
+    return _apply_persisted_advisor_review(
+        resolved_workspace,
+        artifacts,
+        review_artifact,
+    )
+
+
+def _load_pending_advisor_context(
+    workspace: Path,
+) -> tuple[Path, AgentArtifacts, DatasetProfile, DatasetSpec]:
     resolved_workspace = workspace.expanduser().resolve(strict=True)
     status = inspect_agent_workspace(resolved_workspace)
     if status.phase != AgentPhase.AWAITING_APPROVAL:
@@ -368,27 +449,20 @@ def advise_agent_workspace(
         artifacts,
         plan.review,
     )
-    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
-    if review_path.exists() or review_path.is_symlink():
-        if review_path.is_symlink() or not review_path.is_file():
-            raise ValueError("advisor_review.json must be a regular file")
-        review_artifact = AdvisorReviewArtifact.model_validate_json(
-            read_limited_text(review_path)
-        )
-    else:
-        advisor_request = build_advisor_request(
-            profile,
-            baseline_spec=spec,
-        )
-        payload = advisor.propose(advisor_request.model_copy(deep=True))
-        review_artifact = build_advisor_review_artifact(
-            advisor_request,
-            payload,
-        )
-        if review_path.exists() or review_path.is_symlink():
-            raise ValueError("advisor_review.json was created concurrently")
-        write_json_artifact_atomic(review_artifact, review_path)
+    return resolved_workspace, artifacts, profile, spec
 
+
+def _load_advisor_review(review_path: Path) -> AdvisorReviewArtifact:
+    if review_path.is_symlink() or not review_path.is_file():
+        raise ValueError("advisor_review.json must be a regular file")
+    return AdvisorReviewArtifact.model_validate_json(read_limited_text(review_path))
+
+
+def _apply_persisted_advisor_review(
+    resolved_workspace: Path,
+    artifacts: AgentArtifacts,
+    review_artifact: AdvisorReviewArtifact,
+) -> AgentWorkspaceStatus:
     current_plan = AgentResult.model_validate_json(
         read_limited_text(artifacts.plan_path)
     )

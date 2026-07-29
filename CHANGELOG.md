@@ -31,6 +31,9 @@ All notable changes to this project are documented here.
 - Recoverable `advise_agent_workspace` handoff with atomic
   `advisor_review.json` and `dataset_spec.yaml` persistence, conflict-safe
   retries, current-spec status summaries, and the existing approval gate.
+- Provider-neutral `agent-advisor-request` and `agent-advisor-apply` JSON
+  handoff for external model clients, with bounded proposal input, stale and
+  conflicting content rejection, and no provider SDK dependency.
 
 ### Changed
 
