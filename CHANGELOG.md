@@ -9,6 +9,11 @@ All notable changes to this project are documented here.
 - Generated CLI parser-surface contract coverage for public commands, aliases,
   and agent workflow defaults ahead of the 0.12 interface refactor.
 
+### Changed
+
+- Moved reusable argparse behavior, argument validators, recovery hints, and
+  structured parser errors behind a dedicated CLI parsing boundary.
+
 ## [0.11.0] - 2026-07-31
 
 ### Added
