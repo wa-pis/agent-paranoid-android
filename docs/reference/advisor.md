@@ -4,6 +4,10 @@ The advisor API is a small provider-neutral boundary for model-assisted
 `DatasetSpec` proposals. The direct API does not call an LLM, persist a plan,
 approve a plan, or generate rows.
 
+For a provider implementation tutorial, exact wire-field tables, and a
+contract-test checklist, see
+[Build A Provider Adapter](../how-to/custom-advisor-provider.md).
+
 ## Structured Client Adapter
 
 Implement `AdvisorExchangeClient.complete` around the structured-output API of

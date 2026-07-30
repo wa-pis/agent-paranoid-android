@@ -10,6 +10,9 @@ All notable changes to this project are documented here.
   output, separate trusted and untrusted roles, bounded non-streaming requests,
   disabled response storage, provider-error redaction, reference-agent
   selection, and isolated dependency-budget coverage.
+- Provider adapter guide covering the Python protocol, versioned JSON wire
+  format, trust-channel mapping, implementation template, safety requirements,
+  compatibility rules, and contract-test checklist.
 
 ## [0.9.0] - 2026-07-29
 

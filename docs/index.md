@@ -16,6 +16,7 @@ generated output.
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |
 | Any structured-output AI client | [AI Integration](ai_integration.md) |
+| A custom model provider | [Build A Provider Adapter](how-to/custom-advisor-provider.md) |
 | An MCP-compatible AI client | [Connect An MCP Client](how-to/mcp.md) |
 | An isolated container deployment | [Run In Containers](operations/containers.md) |
 | A failed command | [Troubleshooting](operations/troubleshooting.md) |

@@ -186,7 +186,9 @@ proposal can finish an interrupted spec write; stale, different, linked,
 oversized, or conflicting input fails closed.
 
 See [Advisor API](reference/advisor.md) for the exact request and proposal
-contracts.
+contracts. See
+[Build A Provider Adapter](how-to/custom-advisor-provider.md) for the Python
+protocol, wire-field tables, adapter template, and required contract tests.
 
 ## MCP Mode
 

@@ -80,6 +80,7 @@ Review the manifest and effective spec before accepting a new dataset.
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
 | Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |
 | Connect an AI client | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) |
+| Add any model provider | [Provider Adapter Guide](https://wa-pis.github.io/agent-paranoid-android/how-to/custom-advisor-provider/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |
 | Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
