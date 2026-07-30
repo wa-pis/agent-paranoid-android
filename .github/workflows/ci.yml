@@ -116,6 +116,13 @@ jobs:
             test-data-agent doctor --skip-smoke --require-extra mcp
 
           uv run --isolated --no-project \
+            --with "agent-paranoid-android[openai] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile openai
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[openai] @ ${wheel_uri}" \
+            test-data-agent doctor --skip-smoke --require-extra openai
+
+          uv run --isolated --no-project \
             --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
             python scripts/check_installed_package.py --profile trino
           uv run --isolated --no-project \

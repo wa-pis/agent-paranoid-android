@@ -366,7 +366,7 @@ def main(argv: list[str] | None = None) -> int:
         epilog=(
             "Examples:\n"
             "  test-data-agent doctor\n"
-            "  test-data-agent doctor --require-extra parquet --require-extra trino"
+            "  test-data-agent doctor --require-extra openai"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -374,7 +374,7 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser.add_argument(
         "--require-extra",
         action="append",
-        choices=["parquet", "mcp", "trino", "all"],
+        choices=["parquet", "mcp", "trino", "openai", "all"],
         default=[],
         help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
     )
@@ -885,7 +885,7 @@ def run_doctor(
     failures: list[str] = []
     required = set(required_extras or ())
     if "all" in required:
-        required.update({"parquet", "mcp", "trino"})
+        required.update({"parquet", "mcp", "trino", "openai"})
 
     if sys.version_info >= (3, 11):
         checks.append(f"python: ok ({sys.version_info.major}.{sys.version_info.minor})")
@@ -904,6 +904,7 @@ def run_doctor(
         "parquet": ("pyarrow",),
         "mcp": ("mcp",),
         "trino": ("sqlglot", "trino"),
+        "openai": ("openai",),
     }
     for extra, module_names in optional_modules.items():
         missing = []

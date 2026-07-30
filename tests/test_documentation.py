@@ -75,7 +75,7 @@ def test_installation_documents_dependency_budgets() -> None:
     ).read_text()
 
     assert "Maximum installed distributions" in installation
-    for maximum in (10, 11, 25, 35):
+    for maximum in (10, 11, 20, 25, 35):
         assert f"| {maximum} |" in installation
     assert 'pip install "agent-paranoid-android[all]"' not in installation
     assert "not the recommended user installation" in installation

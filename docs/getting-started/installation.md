@@ -26,6 +26,7 @@ you need:
 python3 -m pip install "agent-paranoid-android[parquet]"
 python3 -m pip install "agent-paranoid-android[mcp]"
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
+python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -36,6 +37,7 @@ growth:
 | base | CSV and JSON | 10 |
 | `parquet` | Parquet files | 11 |
 | `mcp` | Generator MCP server | 35 |
+| `openai` | Optional structured-output advisor | 20 |
 | `trino` | Trino client and safe SQL parser | 25 |
 
 These are regression budgets, not a guarantee that every platform installs the

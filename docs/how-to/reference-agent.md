@@ -10,6 +10,16 @@ returns the baseline `DatasetSpec` unchanged. Replace only its `complete`
 method with a provider-specific structured-output call described in the
 [Advisor API](../reference/advisor.md).
 
+To use the included OpenAI adapter instead, install only its optional extra:
+
+```bash
+python3 -m pip install "agent-paranoid-android[openai]"
+export OPENAI_API_KEY="<read from your secret manager>"
+```
+
+Do not put the key in source files, command arguments, fixtures, logs, or
+workspace artifacts.
+
 ## 1. Plan And Propose
 
 From a repository checkout:
@@ -20,6 +30,18 @@ python3 examples/reference_agent.py plan \
   --workspace out/reference-agent \
   --count 25 \
   --seed 12345
+```
+
+For a real OpenAI proposal, add `--advisor openai`. The default model is
+`gpt-5.6`; use `--model` to select another model available to your project:
+
+```bash
+python3 examples/reference_agent.py plan \
+  tests/fixtures/example_dataset \
+  --workspace out/openai-agent \
+  --count 25 \
+  --seed 12345 \
+  --advisor openai
 ```
 
 This profiles the source, builds a safe advisor exchange, persists the
@@ -77,3 +99,8 @@ manifest reports:
 
 The example never auto-approves, sends source rows to a model, or returns
 dataset rows in its JSON status output.
+
+The OpenAI request uses separate developer and user roles for trusted policy
+and untrusted metadata, requests a structured `AdvisorProposal`, sets
+`store=False`, and rejects incomplete responses. The package validates the
+proposal again before writing it to the workspace.

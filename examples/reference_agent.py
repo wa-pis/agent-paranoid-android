@@ -10,6 +10,7 @@ from typing import Any
 from test_data_agent import (
     AgentRequest,
     AdvisorExchange,
+    AdvisorExchangeClient,
     AdvisorProposal,
     ExchangeDatasetAdvisor,
     advise_agent_workspace,
@@ -33,11 +34,32 @@ class BaselineAdvisorClient:
         ).model_dump(mode="json")
 
 
+def build_advisor_client(
+    provider: str,
+    *,
+    model: str | None = None,
+) -> AdvisorExchangeClient:
+    if provider == "baseline":
+        return BaselineAdvisorClient()
+    if provider != "openai":
+        raise ValueError(f"unsupported advisor provider: {provider}")
+    try:
+        from test_data_agent.providers.openai import (
+            DEFAULT_OPENAI_MODEL,
+            OpenAIAdvisorClient,
+        )
+    except ImportError as exc:
+        raise ValueError(
+            "OpenAI advice requires agent-paranoid-android[openai]"
+        ) from exc
+    return OpenAIAdvisorClient(model=model or DEFAULT_OPENAI_MODEL)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Run the review-first agent flow without a provider SDK. "
-            "Replace BaselineAdvisorClient with an application-owned client."
+            "Run the review-first agent flow with the local baseline or an "
+            "optional structured-output provider."
         )
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -50,6 +72,16 @@ def build_parser() -> argparse.ArgumentParser:
     plan_parser.add_argument("--workspace", type=Path, required=True)
     plan_parser.add_argument("--count", type=int, default=100)
     plan_parser.add_argument("--seed", type=int, default=12345)
+    plan_parser.add_argument(
+        "--advisor",
+        choices=["baseline", "openai"],
+        default="baseline",
+        help="Advisor implementation. OpenAI requires the optional openai extra.",
+    )
+    plan_parser.add_argument(
+        "--model",
+        help="OpenAI model override. Ignored by the baseline advisor.",
+    )
     plan_parser.add_argument(
         "--format",
         choices=[output_format.value for output_format in OutputFormat],
@@ -89,7 +121,9 @@ def run(args: argparse.Namespace) -> str:
         )
         result = advise_agent_workspace(
             args.workspace,
-            ExchangeDatasetAdvisor(BaselineAdvisorClient()),
+            ExchangeDatasetAdvisor(
+                build_advisor_client(args.advisor, model=args.model)
+            ),
         )
     elif args.command == "status":
         result = inspect_agent_workspace(args.workspace)

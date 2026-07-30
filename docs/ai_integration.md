@@ -42,6 +42,7 @@ Add only the integrations the AI client needs:
 
 ```bash
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
+python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
 ## Agent Mode
@@ -97,6 +98,19 @@ Use `ExchangeDatasetAdvisor` when a provider SDK runs in the consuming
 application:
 
 ```python
+from test_data_agent import ExchangeDatasetAdvisor
+from test_data_agent.providers.openai import OpenAIAdvisorClient
+
+advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(model="gpt-5.6"))
+```
+
+The OpenAI adapter is optional, uses structured Responses API output, disables
+response storage, and accepts only completed parsed responses. The package
+root and base installation do not import its SDK.
+
+For another provider, implement the same application-owned contract:
+
+```python
 from test_data_agent import (
     AdvisorExchange,
     ExchangeDatasetAdvisor,
@@ -120,15 +134,15 @@ status = advise_agent_workspace(
 ```
 
 `call_model_with_structured_output` is provider-specific application code.
-Keep its SDK and credentials outside this package. The client must return a
-parsed object matching `AdvisorProposal`; prose, tool commands, and unknown
-fields fail validation.
+Keep additional SDKs and all credentials outside the deterministic core and
+base installation. The client must return a parsed object matching
+`AdvisorProposal`; prose, tool commands, and unknown fields fail validation.
 
 For an executable application-layer example, run
 [The Reference Agent](how-to/reference-agent.md). It uses a deterministic
-stand-in client, stops for explicit human review, requires the exact reviewed
-spec fingerprint, and then runs the normal deterministic generation and
-validation pipeline.
+stand-in by default and can select the optional OpenAI adapter. Both paths
+stop for explicit human review, require the exact reviewed spec fingerprint,
+and then run the normal deterministic generation and validation pipeline.
 
 ## External Advisor JSON Handoff
 
@@ -172,7 +186,9 @@ proposal can finish an interrupted spec write; stale, different, linked,
 oversized, or conflicting input fails closed.
 
 See [Advisor API](reference/advisor.md) for the exact request and proposal
-contracts.
+contracts. See
+[Build A Provider Adapter](how-to/custom-advisor-provider.md) for the Python
+protocol, wire-field tables, adapter template, and required contract tests.
 
 ## MCP Mode
 

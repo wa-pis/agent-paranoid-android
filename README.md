@@ -37,7 +37,7 @@ Install only features you use:
 ```bash
 python3 -m pip install "agent-paranoid-android[parquet]"
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
-python3 -m pip install "agent-paranoid-android[all]"
+python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
 ## Quickstart
@@ -79,7 +79,7 @@ Review the manifest and effective spec before accepting a new dataset.
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
 | Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |
-| Connect an AI client | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) |
+| Connect an AI client or provider | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) · [Provider Adapter](https://wa-pis.github.io/agent-paranoid-android/how-to/custom-advisor-provider/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |
 | Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
