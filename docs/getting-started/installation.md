@@ -6,6 +6,10 @@
 - enough local disk space for the requested output
 - a dedicated working directory for inputs and generated artifacts
 
+The supported CI matrix covers CPython 3.11, 3.12, 3.13, and 3.14. Python 3.11
+remains the minimum so users can adopt newer interpreters without forcing
+existing environments to upgrade.
+
 ## Install From PyPI
 
 Create an isolated environment:

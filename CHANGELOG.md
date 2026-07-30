@@ -11,6 +11,8 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Expanded the supported CPython CI matrix from 3.11-3.12 to 3.11-3.14 and
+  moved isolated wheel smoke tests to Python 3.14.
 - Moved reusable argparse behavior, argument validators, recovery hints, and
   structured parser errors behind a dedicated CLI parsing boundary.
 
