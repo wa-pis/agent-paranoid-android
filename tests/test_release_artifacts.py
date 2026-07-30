@@ -283,7 +283,7 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.9.0")
+    check_release_tag("v0.10.0")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")
