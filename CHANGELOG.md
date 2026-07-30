@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.10.0] - 2026-07-30
+
 ### Added
 
 - Optional OpenAI Responses API advisor with structured `AdvisorProposal`
@@ -13,6 +15,11 @@ All notable changes to this project are documented here.
 - Provider adapter guide covering the Python protocol, versioned JSON wire
   format, trust-channel mapping, implementation template, safety requirements,
   compatibility rules, and contract-test checklist.
+
+### Changed
+
+- Updated `docker/login-action` from 4.5.1 to 4.6.0 while retaining an
+  immutable full-commit pin and matching workflow contract test.
 
 ## [0.9.0] - 2026-07-29
 
@@ -379,6 +386,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.10.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.7.1...v0.8.0
