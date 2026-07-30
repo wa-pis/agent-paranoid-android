@@ -2,7 +2,9 @@
 
 - [x] Add contract coverage for parser defaults, aliases, help, and registered
   MCP tool schemas where current golden fixtures are incomplete.
-- [ ] Extract CLI parser construction behind the existing entry point.
+- [x] Extract review-gated agent command registration behind the existing
+  entry point.
+- [ ] Extract remaining dataset and utility command registration.
 - [ ] Extract CLI human and JSON presentation from application dispatch.
 - [ ] Separate generator MCP registration from application services.
 - [ ] Separate Trino MCP registration from allowlisted application services.
