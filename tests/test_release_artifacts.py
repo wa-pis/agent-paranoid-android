@@ -5,6 +5,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
+import yaml
 
 from scripts.check_release_tag import check_release_tag
 from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetSpec
@@ -32,6 +33,11 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["description"] == "Safety-first synthetic data generation agent"
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
+    for version in ("3.11", "3.12", "3.13", "3.14"):
+        assert (
+            f"Programming Language :: Python :: {version}"
+            in metadata["classifiers"]
+        )
     assert metadata["scripts"]["test-data-agent"] == "test_data_agent.cli:main"
     assert set(metadata["dependencies"]) == {
         "faker>=25.0.0",
@@ -124,6 +130,26 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
+
+
+def test_ci_covers_supported_python_versions() -> None:
+    workflow = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    )
+    jobs = workflow["jobs"]
+
+    assert jobs["quality"]["strategy"]["matrix"]["python-version"] == [
+        "3.11",
+        "3.12",
+        "3.13",
+        "3.14",
+    ]
+    package_python = next(
+        step
+        for step in jobs["package"]["steps"]
+        if step["name"] == "Set up Python"
+    )
+    assert package_python["with"]["python-version"] == "3.14"
 
 
 def test_documentation_workflow_builds_strict_site() -> None:

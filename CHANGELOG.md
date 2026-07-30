@@ -9,6 +9,11 @@ All notable changes to this project are documented here.
 - Generated CLI parser-surface contract coverage for public commands, aliases,
   and agent workflow defaults ahead of the 0.12 interface refactor.
 
+### Changed
+
+- Expanded the supported CPython CI matrix from 3.11-3.12 to 3.11-3.14 and
+  moved isolated wheel smoke tests to Python 3.14.
+
 ## [0.11.0] - 2026-07-31
 
 ### Added

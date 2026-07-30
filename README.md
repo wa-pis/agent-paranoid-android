@@ -17,7 +17,7 @@ Current version: `0.11.0`. Package: `agent-paranoid-android`; CLI: `test-data-ag
 
 ## Install
 
-Python 3.11 or newer is required.
+Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14.
 
 ```bash
 python3 -m pip install agent-paranoid-android
