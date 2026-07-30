@@ -4,7 +4,7 @@
   MCP tool schemas where current golden fixtures are incomplete.
 - [x] Extract review-gated agent command registration behind the existing
   entry point.
-- [ ] Extract remaining dataset and utility command registration.
+- [x] Extract remaining dataset and utility command registration.
 - [ ] Extract CLI human and JSON presentation from application dispatch.
 - [ ] Separate generator MCP registration from application services.
 - [ ] Separate Trino MCP registration from allowlisted application services.
