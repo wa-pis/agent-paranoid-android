@@ -71,6 +71,17 @@ date.
   MCP responses, `DatasetSpec` schemas, advisor exchanges, and generated
   artifact metadata.
 
+## Planned For 0.12.0
+
+- Separate CLI argument parsing, application dispatch, and human/JSON
+  presentation behind the existing `test-data-agent` entry point.
+- Separate generator and Trino MCP transport registration from application
+  services and safety policy.
+- Preserve command names, help, exit codes, JSON and MCP schemas, artifact
+  formats, and safety behavior through golden contract tests.
+- Deliver the refactor as small independently reviewable changes; do not add a
+  CLI framework, provider SDK, or base runtime dependency.
+
 ## Implemented For 0.8.0
 
 - Separate minimal CLI, generator MCP, and Trino MCP OCI images.
