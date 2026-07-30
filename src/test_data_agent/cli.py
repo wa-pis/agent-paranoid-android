@@ -9,7 +9,7 @@ import shlex
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Never
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -36,7 +36,15 @@ from test_data_agent.agent import (
 )
 from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
-from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
+from test_data_agent.cli_contract import CliErrorCode
+from test_data_agent.cli_parser import (
+    HelpfulArgumentParser,
+    JsonHelpfulArgumentParser,
+    non_negative_int,
+    positive_int,
+    ratio,
+    write_cli_error_response,
+)
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
@@ -164,40 +172,6 @@ Choose exactly one input:
 A DatasetSpec produces a dataset folder. A safe single-table profile produces
 one output file and requires --count and --seed.
 """
-
-
-class HelpfulArgumentParser(argparse.ArgumentParser):
-    """Add a concrete recovery hint to argparse failures."""
-
-    def __init__(
-        self,
-        *args: Any,
-        json_errors: bool = False,
-        **kwargs: Any,
-    ) -> None:
-        super().__init__(*args, **kwargs)
-        self.json_errors = json_errors
-
-    def error(self, message: str) -> Never:
-        if self.json_errors:
-            write_cli_error_response(
-                code=CliErrorCode.INVALID_ARGUMENTS,
-                message=message,
-                command=self.prog,
-                help_command=f"{self.prog} --help",
-            )
-            raise SystemExit(2)
-        self.print_usage(sys.stderr)
-        print(f"{self.prog}: error: {message}", file=sys.stderr)
-        print(f"Try '{self.prog} --help' for examples and options.", file=sys.stderr)
-        raise SystemExit(2)
-
-
-class JsonHelpfulArgumentParser(HelpfulArgumentParser):
-    """Render parser failures as the public JSON error contract."""
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, json_errors=True, **kwargs)
 
 
 def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
@@ -855,27 +829,6 @@ def run_command(args: argparse.Namespace) -> int:
     return 2
 
 
-def positive_int(value: str) -> int:
-    parsed = int(value)
-    if parsed < 1:
-        raise argparse.ArgumentTypeError("must be greater than 0")
-    return parsed
-
-
-def non_negative_int(value: str) -> int:
-    parsed = int(value)
-    if parsed < 0:
-        raise argparse.ArgumentTypeError("must be greater than or equal to 0")
-    return parsed
-
-
-def ratio(value: str) -> float:
-    parsed = float(value)
-    if not 0.0 <= parsed <= 1.0:
-        raise argparse.ArgumentTypeError("must be between 0 and 1")
-    return parsed
-
-
 def friendly_error(exc: Exception) -> str:
     if isinstance(exc, ValidationError):
         first = exc.errors()[0]
@@ -883,26 +836,6 @@ def friendly_error(exc: Exception) -> str:
         message = first.get("msg", str(exc))
         return f"{location}: {message}" if location else message
     return str(exc)
-
-
-def write_cli_error_response(
-    *,
-    code: CliErrorCode,
-    message: str,
-    command: str,
-    help_command: str | None = None,
-    exit_code: int = 2,
-) -> None:
-    response = CliErrorResponse(
-        error=CliErrorDetail(
-            code=code,
-            message=message,
-            command=command,
-            exit_code=exit_code,
-            help=help_command,
-        )
-    )
-    print(response.model_dump_json(indent=2))
 
 
 def report_cli_error(

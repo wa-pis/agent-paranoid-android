@@ -1,6 +1,6 @@
 # Tasks: cli-mcp-boundaries
 
-- [ ] Add contract coverage for parser defaults, aliases, help, and registered
+- [x] Add contract coverage for parser defaults, aliases, help, and registered
   MCP tool schemas where current golden fixtures are incomplete.
 - [ ] Extract CLI parser construction behind the existing entry point.
 - [ ] Extract CLI human and JSON presentation from application dispatch.
