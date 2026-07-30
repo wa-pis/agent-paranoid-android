@@ -1,0 +1,39 @@
+{
+  "agent_plan_defaults": {
+    "count": 100,
+    "invalid_ratio": 0.0,
+    "json_output": false,
+    "mode": "valid",
+    "output_format": "csv",
+    "rule_sample_rows": 50000,
+    "seed": 12345,
+    "source_type": null,
+    "table": null,
+    "use_cache": false
+  },
+  "aliases": {
+    "generate-from-csv-folder": "generate-from-example",
+    "profile-csv-folder": "profile-example"
+  },
+  "commands": [
+    "generate",
+    "profile-example",
+    "infer-spec",
+    "profile-csv",
+    "generate-from-csv",
+    "validate",
+    "generate-from-example",
+    "doctor",
+    "audit-verify",
+    "agent-plan",
+    "agent-approve",
+    "agent-recover",
+    "agent-advise",
+    "agent-advisor-request",
+    "agent-advisor-apply",
+    "agent-status",
+    "agent-review",
+    "examples"
+  ],
+  "schema_version": "1.0"
+}

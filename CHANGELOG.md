@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Generated CLI parser-surface contract coverage for public commands, aliases,
+  and agent workflow defaults ahead of the 0.12 interface refactor.
+
 ## [0.11.0] - 2026-07-31
 
 ### Added
