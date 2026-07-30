@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [0.11.0] - 2026-07-31
+
 ### Added
 
 - Guided provider-backed CLI flow with `agent-advise`, lazy optional OpenAI
@@ -395,6 +397,7 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[0.11.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.8.0...v0.8.1
