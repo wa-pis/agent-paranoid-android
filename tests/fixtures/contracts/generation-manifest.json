@@ -1,0 +1,15 @@
+{
+  "artifact_type": "synthetic_dataset",
+  "business_validation": null,
+  "dataset_spec_schema_version": "1.0",
+  "output_format": "json",
+  "package_version": "<package-version>",
+  "row_counts": {
+    "orders": 3
+  },
+  "seed": 73,
+  "source_rows_copied": false,
+  "spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+  "synthetic": true,
+  "validation_valid": true
+}

@@ -1,0 +1,140 @@
+"""Build deterministic, row-free public contract fixtures."""
+
+from __future__ import annotations
+
+import json
+import os
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any
+from unittest.mock import patch
+
+from test_data_agent.agent import build_agent_advisor_exchange
+from test_data_agent.io import load_dataset_spec
+from test_data_agent.mcp_generator_server import generate_dataset, plan_trino_dataset
+
+
+CONTRACT_FIXTURE_NAMES = (
+    "advisor-exchange.json",
+    "cli-agent-plan.json",
+    "dataset-spec.json",
+    "generation-manifest.json",
+    "mcp-generate.json",
+    "mcp-plan.json",
+)
+FIXED_PLAN_ID = "0" * 32
+
+
+def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
+    workspace_root.mkdir(parents=True, exist_ok=True)
+    workspace_root = workspace_root.resolve()
+    previous_workspace = os.environ.get("TEST_DATA_AGENT_WORKSPACE_ROOT")
+    os.environ["TEST_DATA_AGENT_WORKSPACE_ROOT"] = str(workspace_root)
+    try:
+        with patch(
+            "test_data_agent.agent.secrets.token_hex",
+            return_value=FIXED_PLAN_ID,
+        ):
+            mcp_plan = plan_trino_dataset(
+                _safe_trino_profile(),
+                "agent/orders",
+                count=3,
+                seed=73,
+                output_format="json",
+            )
+            agent_workspace = workspace_root / "agent" / "orders"
+            cli_plan = json.loads(
+                (agent_workspace / "agent_plan.json").read_text(encoding="utf-8")
+            )
+            spec = load_dataset_spec(agent_workspace / "dataset_spec.yaml")
+            advisor_exchange = build_agent_advisor_exchange(agent_workspace)
+            mcp_generate = generate_dataset(
+                "agent/orders/dataset_spec.yaml",
+                "generated",
+                output_format="json",
+                seed=73,
+            )
+            manifest = json.loads(
+                (workspace_root / "generated" / "generation_manifest.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+    finally:
+        if previous_workspace is None:
+            os.environ.pop("TEST_DATA_AGENT_WORKSPACE_ROOT", None)
+        else:
+            os.environ["TEST_DATA_AGENT_WORKSPACE_ROOT"] = previous_workspace
+
+    fixtures = {
+        "advisor-exchange.json": advisor_exchange.model_dump(mode="json"),
+        "cli-agent-plan.json": cli_plan,
+        "dataset-spec.json": spec.model_dump(mode="json"),
+        "generation-manifest.json": manifest,
+        "mcp-generate.json": mcp_generate,
+        "mcp-plan.json": mcp_plan,
+    }
+    return {
+        name: _normalize_contract(payload, workspace_root)
+        for name, payload in fixtures.items()
+    }
+
+
+def write_contract_fixtures(
+    fixtures: Mapping[str, Any],
+    output_dir: Path,
+) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for name in CONTRACT_FIXTURE_NAMES:
+        payload = fixtures[name]
+        output_dir.joinpath(name).write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+
+def _normalize_contract(payload: Any, workspace_root: Path) -> Any:
+    if isinstance(payload, dict):
+        return {
+            key: (
+                "<package-version>"
+                if key == "package_version"
+                else _normalize_contract(value, workspace_root)
+            )
+            for key, value in payload.items()
+        }
+    if isinstance(payload, list):
+        return [_normalize_contract(value, workspace_root) for value in payload]
+    if isinstance(payload, str):
+        return payload.replace(str(workspace_root), "<workspace>")
+    return payload
+
+
+def _safe_trino_profile() -> dict[str, Any]:
+    return {
+        "source_type": "trino",
+        "table": "orders",
+        "row_count": 12,
+        "columns": [
+            {
+                "name": "order_id",
+                "data_type": "bigint",
+                "approx_distinct_count": 12,
+            },
+            {
+                "name": "status",
+                "data_type": "varchar",
+                "approx_distinct_count": 2,
+                "top_values": [
+                    {"value": "paid", "count": 9},
+                    {"value": "cancelled", "count": 3},
+                ],
+            },
+            {
+                "name": "customer_email",
+                "data_type": "varchar",
+                "sensitive": True,
+                "semantic_type": "email",
+                "masked_patterns": [{"pattern": "email", "count": 12}],
+            },
+        ],
+    }

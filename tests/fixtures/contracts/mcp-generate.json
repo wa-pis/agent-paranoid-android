@@ -1,0 +1,38 @@
+{
+  "business_validation": null,
+  "business_validation_report_path": null,
+  "manifest_path": "generated/generation_manifest.json",
+  "mode": "valid",
+  "operation": "generate_dataset",
+  "output_folder": "generated",
+  "output_format": "json",
+  "row_counts": {
+    "orders": 3
+  },
+  "seed": 73,
+  "source_rows_copied": false,
+  "synthetic": true,
+  "validation": {
+    "sections": [
+      {
+        "errors": [],
+        "failed": 0,
+        "name": "schema",
+        "passed": 1
+      },
+      {
+        "errors": [],
+        "failed": 0,
+        "name": "relationships",
+        "passed": 1
+      },
+      {
+        "errors": [],
+        "failed": 0,
+        "name": "constraints",
+        "passed": 1
+      }
+    ],
+    "valid": true
+  }
+}

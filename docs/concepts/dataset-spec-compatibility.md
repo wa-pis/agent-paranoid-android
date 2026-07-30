@@ -47,3 +47,21 @@ the issue, affected versions, and safe migration path.
 Generation manifests retain the exact DatasetSpec fingerprint. Migration must
 produce a new reviewed DatasetSpec and must never rewrite an existing generated
 bundle in place.
+
+## Golden Contract Gate
+
+Representative public JSON contracts are checked into
+`tests/fixtures/contracts/`. Tests rebuild the same CLI, MCP, advisor,
+`DatasetSpec`, and manifest payloads from safe metadata and compare them with
+the reviewed fixtures. Generated dataset rows are never stored in this fixture
+set.
+
+After an intentional contract change, inspect the compatibility impact and run:
+
+```bash
+python3 scripts/update_contract_fixtures.py
+```
+
+Do not update fixtures only to make a failing test pass. A changed field,
+default, enum value, nesting shape, or JSON Schema may require a documented
+deprecation or a new contract version.

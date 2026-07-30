@@ -67,9 +67,6 @@ date.
 - Present one guided agent workflow across the CLI and documentation:
   `agent-plan` -> `agent-review` -> `agent-advise` -> `agent-approve`, with
   clear next-action guidance and actionable recovery errors.
-
-## Planned For 0.11.0
-
 - Add golden contract fixtures and compatibility tests for versioned CLI JSON,
   MCP responses, `DatasetSpec` schemas, advisor exchanges, and generated
   artifact metadata.
