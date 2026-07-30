@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 from collections.abc import Mapping
@@ -10,6 +11,7 @@ from typing import Any
 from unittest.mock import patch
 
 from test_data_agent.agent import build_agent_advisor_exchange
+from test_data_agent.cli import build_parser
 from test_data_agent.io import load_dataset_spec
 from test_data_agent.mcp_generator_server import generate_dataset, plan_trino_dataset
 
@@ -17,6 +19,7 @@ from test_data_agent.mcp_generator_server import generate_dataset, plan_trino_da
 CONTRACT_FIXTURE_NAMES = (
     "advisor-exchange.json",
     "cli-agent-plan.json",
+    "cli-parser-surface.json",
     "dataset-spec.json",
     "generation-manifest.json",
     "mcp-generate.json",
@@ -68,6 +71,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
     fixtures = {
         "advisor-exchange.json": advisor_exchange.model_dump(mode="json"),
         "cli-agent-plan.json": cli_plan,
+        "cli-parser-surface.json": _cli_parser_surface(),
         "dataset-spec.json": spec.model_dump(mode="json"),
         "generation-manifest.json": manifest,
         "mcp-generate.json": mcp_generate,
@@ -137,4 +141,56 @@ def _safe_trino_profile() -> dict[str, Any]:
                 "masked_patterns": [{"pattern": "email", "count": 12}],
             },
         ],
+    }
+
+
+def _cli_parser_surface() -> dict[str, Any]:
+    parser = build_parser([])
+    subparsers = next(
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+    commands: list[str] = []
+    aliases: dict[str, str] = {}
+    canonical_by_parser: dict[int, str] = {}
+    for name, command_parser in subparsers.choices.items():
+        parser_id = id(command_parser)
+        canonical = canonical_by_parser.get(parser_id)
+        if canonical is None:
+            canonical_by_parser[parser_id] = name
+            commands.append(name)
+        else:
+            aliases[name] = canonical
+
+    agent_plan = vars(
+        parser.parse_args(
+            [
+                "agent-plan",
+                "source.csv",
+                "--workspace",
+                "workspace",
+            ]
+        )
+    )
+    default_names = (
+        "source_type",
+        "count",
+        "seed",
+        "output_format",
+        "mode",
+        "invalid_ratio",
+        "table",
+        "rule_sample_rows",
+        "use_cache",
+        "json_output",
+    )
+    return {
+        "schema_version": "1.0",
+        "commands": commands,
+        "aliases": aliases,
+        "agent_plan_defaults": {
+            name: agent_plan[name]
+            for name in default_names
+        },
     }

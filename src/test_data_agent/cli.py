@@ -200,7 +200,8 @@ class JsonHelpfulArgumentParser(HelpfulArgumentParser):
         super().__init__(*args, json_errors=True, **kwargs)
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
+    """Build the public CLI parser for the requested output mode."""
     arguments = list(sys.argv[1:] if argv is None else argv)
     json_errors = "--json" in arguments or arguments[:1] == ["agent-advisor-request"]
     parser = HelpfulArgumentParser(
@@ -648,6 +649,12 @@ def main(argv: list[str] | None = None) -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    parser = build_parser(arguments)
     args = parser.parse_args(arguments)
 
     if args.command is None:
