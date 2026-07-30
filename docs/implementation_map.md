@@ -91,6 +91,7 @@ Public dataset-oriented commands:
 - `generate-from-example`
 - `agent-plan`
 - `agent-review`
+- `agent-advise`
 - `agent-approve`
 
 - `profile-csv`
@@ -138,6 +139,9 @@ workflow helpers. `agent-plan` writes safe profile metadata, a reviewable
 `agent-review` builds a typed metadata-only checklist from the current spec,
 including privacy flags and field generation metadata but no distribution
 values or rows.
+`agent-advise` lazily loads an optional provider adapter, validates its
+structured proposal through the provider-neutral contract, updates the pending
+spec, and requires another review.
 `agent-approve` requires that exact reviewed fingerprint, verifies the stored
 safe profile, generates synthetic data, validates it, runs source-row reuse
 checks for CSV sources, and writes the generated bundle plus an approval

@@ -6,12 +6,13 @@ skinparam sequenceMessageAlign center
 skinparam defaultTextAlignment center
 
 actor "User" as User
-participant "AI Client\n(planning only)" as Ai
+participant "AI Client\n(advice only)" as Ai
 participant "CLI agent-plan /\nMCP plan_dataset" as PlanCli
 participant "agent.py\nplan_agent_request" as PlanAgent
 participant "Safe Profiling\nCSV / folder / profile" as Profiling
 participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner
 database "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as Workspace
+participant "CLI\nagent-review / agent-advise" as ReviewCli
 participant "CLI\nagent-approve / agent-recover" as ApproveCli
 participant "agent.py\napprove / recover" as ApproveAgent
 participant "Synthetic Generator\nseeded deterministic" as Generator
@@ -31,6 +32,14 @@ PlanAgent --> Ai : awaiting_approval\nartifact paths
 Ai --> User : summarize spec\nask for approval
 
 User -> Workspace : review or edit\ndataset_spec.yaml
+opt provider advice requested
+  User -> ReviewCli : request structured advice
+  ReviewCli -> Workspace : load safe profile +\nreviewed baseline spec
+  ReviewCli -> Ai : trusted policy +\nuntrusted safe metadata
+  Ai --> ReviewCli : structured DatasetSpec proposal
+  ReviewCli -> Workspace : validate + persist proposal
+  ReviewCli --> User : review required again\nnew fingerprint
+end
 User -> ApproveCli : approve workspace
 ApproveCli -> ApproveAgent : workspace path
 ApproveAgent -> Workspace : load reviewed request,\nprofile, DatasetSpec
@@ -51,7 +60,7 @@ alt completion metadata publication was interrupted
 end
 
 note right of Ai
-The AI client plans and explains.
+The AI client proposes and explains.
 It does not generate rows, validate by
 free-form reasoning, or expose raw PII.
 end note
