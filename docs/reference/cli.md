@@ -31,6 +31,7 @@ commands.
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
 | `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
+| `agent-advise` | Ask an installed provider for validated spec changes | Pending workspace status |
 | `agent-advisor-request` | Export safe metadata for an external AI advisor | Request or exchange JSON |
 | `agent-advisor-apply` | Validate and apply an external proposal | Pending workspace status |
 | `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
@@ -126,6 +127,10 @@ test-data-agent agent-plan data/example_dataset \
   --format csv
 
 test-data-agent agent-review out/agent
+# Optional; requires agent-paranoid-android[openai].
+test-data-agent agent-advise out/agent --provider openai
+# Advice changes the spec, so review it again.
+test-data-agent agent-review out/agent
 REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
 test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
@@ -137,6 +142,13 @@ context before running `agent-approve`. Add `--json` to `agent-plan`,
 automation contract. Source type is detected for CSV files, CSV folders, and
 safe-profile JSON; use `--source-type` to override it.
 
+`agent-advise` is the shortest provider-backed path. It loads the optional
+OpenAI adapter only when invoked, sends safe metadata through the structured
+advisor contract, validates the proposal, updates the pending spec, and never
+approves or generates data. Install `agent-paranoid-android[openai]`, configure
+`OPENAI_API_KEY` through a secret manager, and use `--model` only when the
+adapter default is unsuitable. Always run `agent-review` again after advice.
+
 `agent-review` shows every field's type, nullability, sensitive and identifier
 flags, semantic type, distribution kind, entity row count, primary key,
 relationships, privacy defaults, assumptions, warnings, and the current
@@ -144,7 +156,7 @@ fingerprint. Distribution values and dataset rows are excluded. Human output
 bounds long field lists and points to the complete spec. Entity and field names
 are untrusted input and are escaped before terminal output.
 
-To let an external model propose bounded spec changes without adding its SDK:
+For another provider, use the provider-neutral exchange commands:
 
 ```bash
 test-data-agent agent-advisor-request out/agent \
@@ -194,6 +206,7 @@ Use JSON output when invoking the review flow from automation or an AI client:
 ```bash
 test-data-agent agent-plan data/example_dataset \
   --workspace out/agent --json
+test-data-agent agent-advise out/agent --provider openai --json
 test-data-agent agent-advisor-request out/agent \
   --exchange > advisor_exchange.json
 test-data-agent agent-advisor-apply \

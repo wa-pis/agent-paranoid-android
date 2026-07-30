@@ -4,6 +4,15 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Guided provider-backed CLI flow with `agent-advise`, lazy optional OpenAI
+  loading, structured proposal validation, and explicit review guidance before
+  and after advice.
+- Deterministic row-free golden fixtures for CLI JSON, MCP responses,
+  `DatasetSpec`, advisor exchanges, and generation manifests, with an explicit
+  review-first update command.
+
 ## [0.10.0] - 2026-07-30
 
 ### Added

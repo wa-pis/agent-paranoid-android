@@ -104,6 +104,8 @@ files = [
     "src/test_data_agent/container_health.py",
     "src/test_data_agent/mcp_generator_server.py",
     "src/test_data_agent/providers/openai.py",
+    "scripts/contract_fixtures.py",
+    "scripts/update_contract_fixtures.py",
 ]
 strict = true
 follow_imports = "silent"
@@ -128,7 +130,7 @@ Changelog = "https://github.com/wa-pis/agent-paranoid-android/blob/main/CHANGELO
 packages = ["src/test_data_agent"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 markers = [
     "integration: tests that require a live local service",

@@ -8,7 +8,7 @@ skinparam defaultTextAlignment center
 
 package "Untrusted Planning Zone" {
   actor "User" as User
-  component "AI Client / LLM\nplanner and explainer only" as Llm
+  component "AI Client / LLM\nadvisor and explainer only" as Llm
 }
 
 package "Controlled Tool Boundary" {
@@ -36,7 +36,7 @@ package "External / Local Data" {
 User --> Llm : intent
 Llm --> Cli : safe CLI calls
 Llm --> GeneratorMcp : MCP calls\nsummary responses
-Cli --> Agent : agent-plan /\nagent-approve /\nagent-recover
+Cli --> Agent : agent-plan / agent-review /\nagent-advise / agent-approve /\nagent-recover
 Cli --> Profiling : direct profiling
 Cli --> Generation : direct generation
 Cli --> Validation : direct validation

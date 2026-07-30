@@ -27,6 +27,10 @@ User or AI client
   -> agent-review
     -> report detailed metadata-only spec and privacy checklist
     -> report exact current fingerprint without changing the workspace
+  -> agent-advise (optional provider-backed proposal)
+    -> send safe metadata through the structured advisor boundary
+    -> validate and persist the proposed DatasetSpec
+    -> stop for another agent-review
   -> agent-approve
     -> deterministic synthetic generation
     -> source-row reuse checks when source CSV is available
@@ -49,9 +53,12 @@ test-data-agent agent-plan tests/fixtures/example_dataset \
   --format csv
 ```
 
-Review `out/agent/dataset_spec.yaml`, then approve:
+Review `out/agent/dataset_spec.yaml`, optionally request advice, review any
+changed spec again, then approve:
 
 ```bash
+test-data-agent agent-review out/agent
+test-data-agent agent-advise out/agent --provider openai
 test-data-agent agent-review out/agent
 REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
 test-data-agent agent-approve out/agent \
@@ -63,6 +70,8 @@ Inspect the same workspace as versioned JSON for automation or an AI client:
 ```bash
 test-data-agent agent-plan tests/fixtures/example_dataset \
   --workspace out/agent --json
+test-data-agent agent-review out/agent --json
+test-data-agent agent-advise out/agent --provider openai --json
 test-data-agent agent-review out/agent --json
 test-data-agent agent-status out/agent --json
 test-data-agent agent-approve out/agent \

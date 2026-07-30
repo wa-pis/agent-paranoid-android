@@ -1,0 +1,25 @@
+{
+  "approval_required": true,
+  "constraint_count": 0,
+  "current_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+  "entities": [
+    {
+      "field_count": 3,
+      "name": "orders",
+      "row_count": 3
+    }
+  ],
+  "operation": "plan_trino_dataset",
+  "output_format": "json",
+  "plan_id": "00000000000000000000000000000000",
+  "plan_path": "agent/orders/agent_plan.json",
+  "planned_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+  "profile_path": "agent/orders/profile.json",
+  "profile_sha256": "95a9184c9aa26b780ecea78705461a5c5bf88642af5af4ffe14a45a6c8da0057",
+  "relationship_count": 0,
+  "seed": 73,
+  "source_type": "trino",
+  "spec_changed_since_plan": false,
+  "spec_path": "agent/orders/dataset_spec.yaml",
+  "workspace": "agent/orders"
+}

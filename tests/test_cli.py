@@ -7,7 +7,7 @@ import pytest
 import test_data_agent.agent as agent_module
 import test_data_agent.cli as cli_module
 from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
-from test_data_agent.advisor import AdvisorExchange, AdvisorRequest
+from test_data_agent.advisor import AdvisorExchange, AdvisorProposal, AdvisorRequest
 from test_data_agent.cli import main
 
 
@@ -522,6 +522,86 @@ def test_agent_review_cli_rejects_completed_workspace(tmp_path, capsys) -> None:
     assert error["error"]["code"] == "invalid_input"
     assert "awaiting-approval workspace" in error["error"]["message"]
     assert "traceback" not in output.out.lower()
+
+
+def test_agent_advise_cli_guides_review_without_generating(
+    tmp_path,
+    monkeypatch,
+    capsys,
+) -> None:
+    from test_data_agent.providers import openai as openai_provider
+
+    workspace = tmp_path / "agent"
+    models: list[str] = []
+
+    class FakeOpenAIAdvisorClient:
+        def __init__(self, *, model: str) -> None:
+            models.append(model)
+
+        def complete(self, exchange):
+            request = exchange.request
+            return AdvisorProposal(
+                profile_sha256=request.profile_sha256,
+                baseline_spec_sha256=request.baseline_spec_sha256,
+                dataset_spec=request.baseline_spec.model_copy(deep=True),
+            ).model_dump(mode="json")
+
+    monkeypatch.setattr(
+        openai_provider,
+        "OpenAIAdvisorClient",
+        FakeOpenAIAdvisorClient,
+    )
+
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--workspace",
+                str(workspace),
+                "--count",
+                "3",
+            ]
+        )
+        == 0
+    )
+    plan_output = capsys.readouterr()
+    assert "Next: test-data-agent agent-review" in plan_output.err
+
+    assert main(["agent-review", str(workspace)]) == 0
+    review_output = capsys.readouterr()
+    assert "Optional AI advice" in review_output.err
+    assert "test-data-agent agent-advise" in review_output.err
+
+    assert (
+        main(
+            [
+                "agent-advise",
+                str(workspace),
+                "--provider",
+                "openai",
+                "--model",
+                "test-model",
+            ]
+        )
+        == 0
+    )
+    advice_output = capsys.readouterr()
+    assert advice_output.out == ""
+    assert "AI proposal ready; review required" in advice_output.err
+    assert "Next: test-data-agent agent-review" in advice_output.err
+    assert models == ["test-model"]
+    assert (workspace / "advisor_review.json").is_file()
+    assert not (workspace / "generated").exists()
+
+    assert main(["agent-advise", str(workspace), "--json"]) == 0
+    repeated = capsys.readouterr()
+    payload = json.loads(repeated.out)
+    assert repeated.err == ""
+    assert payload["phase"] == "awaiting_approval"
+    assert payload["approval_required"] is True
+    assert payload["next_action"] == "review_and_approve"
+    assert not (workspace / "generated").exists()
 
 
 def test_agent_advisor_cli_json_handoff_stops_before_generation(

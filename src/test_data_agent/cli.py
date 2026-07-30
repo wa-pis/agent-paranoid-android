@@ -24,6 +24,7 @@ from test_data_agent.agent import (
     AgentSourceType,
     AgentWorkspaceStatus,
     apply_agent_advisor_proposal,
+    advise_agent_workspace,
     approve_agent_workspace,
     build_agent_advisor_exchange,
     build_agent_advisor_request,
@@ -33,7 +34,7 @@ from test_data_agent.agent import (
     recover_agent_workspace,
     review_agent_workspace,
 )
-from test_data_agent.advisor import AdvisorProposal
+from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.core.dataset import DatasetSpec
@@ -128,11 +129,9 @@ Common workflows
 
    # Review out/agent/dataset_spec.yaml and its metadata checklist.
    test-data-agent agent-review out/agent
-   test-data-agent agent-advisor-request out/agent \\
-     --exchange > advisor_exchange.json
-   # Use the trusted instructions, request, and response schema separately.
-   test-data-agent agent-advisor-apply out/agent advisor_proposal.json
-   # Review the changed spec and use its new fingerprint.
+   # Optional: ask the installed OpenAI adapter for a structured proposal.
+   test-data-agent agent-advise out/agent --provider openai
+   # Advice changes the spec, so review it again and use the new fingerprint.
    test-data-agent agent-review out/agent
    test-data-agent agent-approve out/agent \\
      --reviewed-spec-sha256 SHA256_FROM_STATUS
@@ -488,6 +487,45 @@ def main(argv: list[str] | None = None) -> int:
         help="Write the versioned agent result as JSON.",
     )
 
+    agent_advise_parser = subparsers.add_parser(
+        "agent-advise",
+        help="Ask an optional AI provider to propose safe DatasetSpec changes.",
+        description=(
+            "Send safe profile metadata to a configured provider, validate its "
+            "structured proposal, and stop for another human review."
+        ),
+        epilog=(
+            "Example:\n"
+            "  python3 -m pip install \"agent-paranoid-android[openai]\"\n"
+            "  test-data-agent agent-advise out/agent --provider openai\n"
+            "  test-data-agent agent-review out/agent\n\n"
+            "The provider receives metadata, not source rows. This command never "
+            "approves a spec or generates data."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    agent_advise_parser.add_argument(
+        "workspace",
+        type=Path,
+        help="Awaiting-approval workspace created by agent-plan.",
+    )
+    agent_advise_parser.add_argument(
+        "--provider",
+        choices=["openai"],
+        default="openai",
+        help="Structured-output provider. Currently supported: openai.",
+    )
+    agent_advise_parser.add_argument(
+        "--model",
+        help="Provider model override. Uses the adapter default when omitted.",
+    )
+    agent_advise_parser.add_argument(
+        "--json",
+        action="store_true",
+        dest="json_output",
+        help="Write the versioned pending workspace status as JSON.",
+    )
+
     agent_advisor_request_parser = subparsers.add_parser(
         "agent-advisor-request",
         help="Export safe metadata for an external AI advisor.",
@@ -755,6 +793,21 @@ def run_command(args: argparse.Namespace) -> int:
         )
         write_agent_command_result(agent_result, json_output=args.json_output)
         return 0 if agent_result.summary.get("validation_valid", False) else 1
+
+    if args.command == "agent-advise":
+        status = advise_agent_workspace_with_provider(
+            args.workspace,
+            provider=args.provider,
+            model=args.model,
+        )
+        if args.json_output:
+            print(status.model_dump_json(indent=2))
+        else:
+            write_agent_status_summary(
+                status,
+                pending_heading="AI proposal ready; review required",
+            )
+        return 0
 
     if args.command == "agent-advisor-request":
         payload = (
@@ -1030,12 +1083,16 @@ def write_agent_command_result(result: AgentResult, *, json_output: bool) -> Non
         write_agent_result_summary(result)
 
 
-def write_agent_status_summary(status: AgentWorkspaceStatus) -> None:
+def write_agent_status_summary(
+    status: AgentWorkspaceStatus,
+    *,
+    pending_heading: str = "Agent status: awaiting approval",
+) -> None:
     if status.phase.value == "awaiting_approval":
         if not isinstance(status.summary, AgentPlanSummary):
             raise ValueError("awaiting-approval status is missing its plan summary")
         write_agent_plan_review(
-            heading="Agent status: awaiting approval",
+            heading=pending_heading,
             summary=status.summary,
             workspace=status.artifacts.workspace,
             spec_path=status.artifacts.dataset_spec_path,
@@ -1185,6 +1242,14 @@ def write_agent_review_report(report: AgentReviewReport) -> None:
         f"--reviewed-spec-sha256 {report.current_spec_sha256}",
         file=sys.stderr,
     )
+    print(
+        "Optional AI advice (review the changed spec again before approval):",
+        file=sys.stderr,
+    )
+    print(
+        f"  test-data-agent agent-advise {workspace_command} --provider openai",
+        file=sys.stderr,
+    )
 
 
 def write_agent_plan_review(
@@ -1258,9 +1323,32 @@ def write_agent_plan_review(
     if review.spec_changed_since_plan:
         print("Notice: DatasetSpec changed since the initial plan.", file=sys.stderr)
     print(
-        f"Approve: test-data-agent agent-approve {workspace_command} "
-        f"--reviewed-spec-sha256 {review.current_spec_sha256}",
+        f"Next: test-data-agent agent-review {workspace_command}",
         file=sys.stderr,
+    )
+
+
+def advise_agent_workspace_with_provider(
+    workspace: Path,
+    *,
+    provider: str,
+    model: str | None,
+) -> AgentWorkspaceStatus:
+    if provider != "openai":
+        raise ValueError(f"unsupported advisor provider: {provider}")
+    try:
+        from test_data_agent.providers.openai import (
+            DEFAULT_OPENAI_MODEL,
+            OpenAIAdvisorClient,
+        )
+    except ImportError as exc:
+        raise ValueError(
+            "OpenAI advice requires agent-paranoid-android[openai]"
+        ) from exc
+    client = OpenAIAdvisorClient(model=model or DEFAULT_OPENAI_MODEL)
+    return advise_agent_workspace(
+        workspace,
+        ExchangeDatasetAdvisor(client),
     )
 
 

@@ -17,7 +17,7 @@ package "Inputs" {
 }
 
 package "Interfaces" {
-  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example,\nvalidate, agent-plan,\nagent-approve, agent-recover" as Cli
+  component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example,\nvalidate, agent-plan,\nagent-review, agent-advise,\nagent-approve, agent-recover" as Cli
   component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
   component "mcp_generator_server.py\nProfile, Infer, Generate,\nValidate, Export" as GeneratorMcp
 }
@@ -93,7 +93,7 @@ User --> GeneratorMcp : MCP synthetic workflow
 User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
 
-Cli --> AgentLayer : agent-plan /\nagent-approve /\nagent-recover
+Cli --> AgentLayer : agent-plan / agent-review /\nagent-advise / agent-approve /\nagent-recover
 AgentLayer --> CsvProfiler : single CSV planning
 AgentLayer --> SchemaProfiler : CSV-folder planning
 AgentLayer --> Planner : infer reviewable\nDatasetSpec
