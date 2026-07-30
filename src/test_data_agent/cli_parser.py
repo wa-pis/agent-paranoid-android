@@ -93,6 +93,202 @@ def write_cli_error_response(
     print(response.model_dump_json(indent=2))
 
 
+def register_dataset_commands(
+    subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
+    *,
+    generate_epilog: str,
+) -> None:
+    """Register dataset profiling, generation, and validation commands."""
+    generate_parser = subparsers.add_parser(
+        "generate",
+        help="Generate a dataset from a DatasetSpec, or from a safe profile with --profile.",
+        description="Generate synthetic rows from a DatasetSpec file or safe profile metadata.",
+        epilog=generate_epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
+    generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
+    generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
+    generate_parser.add_argument("--invalid-ratio", type=ratio, default=0.0, help="Share of invalid values for mixed/negative modes, between 0 and 1.")
+    generate_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed. Reuse it to reproduce the same output.")
+    generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
+    generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
+    generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
+    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-file output.")
+
+    profile_example_parser = subparsers.add_parser(
+        "profile-example",
+        aliases=["profile-csv-folder"],
+        help="Create a safe profile from a folder of related CSV files.",
+        description="Profile a CSV folder without writing source rows or raw PII to the profile.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-example data/example_dataset "
+            "--output out/profile.json\n\n"
+            "Then review the profile and run:\n"
+            "  test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    profile_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
+    profile_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
+    profile_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"), help="Safe profile cache directory.")
+    profile_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
+    profile_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
+    profile_example_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
+
+    infer_spec_parser = subparsers.add_parser(
+        "infer-spec",
+        help="Infer a reusable DatasetSpec YAML from a safe profile.",
+        description="Turn a safe profile JSON into a DatasetSpec YAML recipe for generation.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent infer-spec out/profile.json "
+            "--count 100 --output out/dataset_spec.yaml\n\n"
+            "Review the spec before passing it to the generate command."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    infer_spec_parser.add_argument("profile", type=Path, help="Safe profile JSON.")
+    infer_spec_parser.add_argument("--output", "-o", type=Path, required=True, help="DatasetSpec YAML/JSON to write.")
+    infer_spec_parser.add_argument("--count", type=positive_int, help="Override row count per entity in the inferred spec.")
+    infer_spec_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing spec file.")
+
+    profile_csv_parser = subparsers.add_parser(
+        "profile-csv",
+        help="Create a safe profile from one CSV file.",
+        description="Profile one CSV file into safe metadata: schema, distributions, ranges, and masked sensitive patterns.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-csv data/customers.csv "
+            "--output out/customers_profile.json\n\n"
+            "For the complete one-command workflow, use generate-from-csv."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    profile_csv_parser.add_argument("input", type=Path, help="Source CSV file. Source rows are not copied to the profile.")
+    profile_csv_parser.add_argument("--table", type=str, help="Table/entity name to use in the profile.")
+    profile_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
+    profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
+
+    generate_csv_parser = subparsers.add_parser(
+        "generate-from-csv",
+        help="Generate a synthetic single-table dataset directly from one CSV file.",
+        description="Profile one CSV file, infer a DatasetSpec, generate synthetic rows, and validate the result.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent generate-from-csv tests/fixtures/customers.csv "
+            "--count 25 --seed 12345 --format csv --output out/customers.csv\n\n"
+            "Writes csv_profile.json, dataset_spec.json, validation_report.json, "
+            "and generation_manifest.json next to the output file."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    generate_csv_parser.add_argument("input", type=Path, help="Source CSV file used only for safe metadata.")
+    generate_csv_parser.add_argument("--count", type=positive_int, required=True, help="Number of synthetic rows to generate.")
+    generate_csv_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
+    generate_csv_parser.add_argument("--invalid-ratio", type=ratio, default=0.0, help="Share of invalid values for mixed/negative modes, between 0 and 1.")
+    generate_csv_parser.add_argument("--seed", type=non_negative_int, required=True, help="Deterministic seed. Reuse it to reproduce the same output.")
+    generate_csv_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format", help="Output format for generated rows.")
+    generate_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Generated output file.")
+    generate_csv_parser.add_argument("--table", type=str, help="Table/entity name to use for the generated dataset.")
+    generate_csv_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
+    generate_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing generated file.")
+
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="Validate generated rows against a DatasetSpec.",
+        description="Validate generated files and optionally write a validation_report.json.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent validate dataset_spec.yaml out/generated "
+            "--output out/generated/validation_report.json\n\n"
+            "The rows argument must be the generated dataset folder, not one data file."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    validate_parser.add_argument("spec", type=Path, help="DatasetSpec YAML/JSON.")
+    validate_parser.add_argument("rows", type=Path, help="Generated output folder.")
+    validate_parser.add_argument("--output", "-o", type=Path, help="Validation report JSON to write.")
+    validate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing validation report.")
+
+    generate_example_parser = subparsers.add_parser(
+        "generate-from-example",
+        aliases=["generate-from-csv-folder"],
+        help="Generate a related multi-table dataset from a folder of CSV examples.",
+        description="Profile a CSV folder, infer a DatasetSpec, generate synthetic related tables, and validate them.",
+        epilog=(
+            "Example:\n"
+            "  test-data-agent generate-from-example tests/fixtures/example_dataset "
+            "--count 25 --seed 12345 --format csv --output out/example_dataset\n\n"
+            "Writes profile.json, dataset_spec.yaml, validation_report.json, "
+            "generation_manifest.json, and one synthetic data file per entity."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    generate_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
+    generate_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Output folder for generated tables and review artifacts.")
+    generate_example_parser.add_argument("--seed", type=non_negative_int, required=True, help="Deterministic seed. Reuse it to reproduce the same output.")
+    generate_example_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
+    generate_example_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format", help="Output format for generated rows.")
+    generate_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"), help="Safe profile cache directory.")
+    generate_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
+    generate_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
+
+
+def register_utility_commands(
+    subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
+) -> None:
+    """Register environment and audit utility commands."""
+    doctor_parser = subparsers.add_parser(
+        "doctor",
+        help="Run local environment and fixture smoke checks.",
+        description="Check Python, installed features, and a small synthetic generation smoke test.",
+        epilog=(
+            "Examples:\n"
+            "  test-data-agent doctor\n"
+            "  test-data-agent doctor --require-extra openai"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
+    doctor_parser.add_argument(
+        "--require-extra",
+        action="append",
+        choices=["parquet", "mcp", "trino", "openai", "all"],
+        default=[],
+        help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
+    )
+
+    audit_verify_parser = subparsers.add_parser(
+        "audit-verify",
+        help="Verify an HMAC-authenticated MCP audit log.",
+        description="Verify the complete HMAC chain of a metadata-only MCP audit JSONL file.",
+        epilog=(
+            "Example:\n"
+            "  TEST_DATA_AGENT_AUDIT_KEY_FILE=/run/secrets/audit.key "
+            "test-data-agent audit-verify logs/mcp-audit.jsonl"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    audit_verify_parser.add_argument("log", type=Path, help="Audit JSONL file to verify.")
+
+
+def register_examples_command(
+    subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
+    *,
+    examples_text: str,
+) -> None:
+    """Register the copy-ready workflow examples command."""
+    subparsers.add_parser(
+        "examples",
+        help="Show copy-ready examples for common workflows.",
+        description=examples_text,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+
 def register_agent_commands(
     subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
 ) -> None:

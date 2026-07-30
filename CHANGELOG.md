@@ -17,6 +17,9 @@ All notable changes to this project are documented here.
   structured parser errors behind a dedicated CLI parsing boundary.
 - Moved review-gated agent command registration behind the same parsing
   boundary without changing command names, options, defaults, or help.
+- Moved dataset, validation, environment, audit, and examples command
+  registration behind the CLI parsing boundary while preserving the public
+  parser contract.
 
 ## [0.11.0] - 2026-07-31
 
