@@ -30,21 +30,24 @@ EXPECTED_PROJECT_URLS = {
     ),
 }
 EXPECTED_BASE_DEPENDENCIES = {"faker", "pydantic", "pyyaml"}
-EXPECTED_EXTRAS = {"all", "dev", "mcp", "parquet", "trino"}
+EXPECTED_EXTRAS = {"all", "dev", "mcp", "openai", "parquet", "trino"}
 EXPECTED_RUNTIME_EXTRA_DEPENDENCIES = {
-    "all": {"mcp", "pyarrow", "sqlglot", "trino"},
+    "all": {"mcp", "openai", "pyarrow", "sqlglot", "trino"},
     "mcp": {"mcp"},
+    "openai": {"openai"},
     "parquet": {"pyarrow"},
     "trino": {"sqlglot", "trino"},
 }
 OPTIONAL_MODULES = {
     "mcp": {"mcp"},
+    "openai": {"openai"},
     "parquet": {"pyarrow"},
     "trino": {"sqlglot", "trino"},
 }
 MAX_DISTRIBUTIONS = {
     "base": 10,
     "mcp": 35,
+    "openai": 20,
     "parquet": 11,
     "trino": 25,
 }

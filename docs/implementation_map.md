@@ -166,7 +166,10 @@ untrusted response against the original fingerprint-bound request.
 The runnable application-layer example composes planning, the exchange
 adapter, status inspection, exact-fingerprint approval, deterministic
 generation, and validation. Its baseline stand-in performs no network call,
-and the command never auto-approves or returns rows.
+and the command never auto-approves or returns rows. With the optional
+`openai` extra, `test_data_agent.providers.openai.OpenAIAdvisorClient` maps
+the same exchange to the OpenAI Responses API with bounded non-streaming
+structured output and response storage disabled.
 
 ## Tests
 

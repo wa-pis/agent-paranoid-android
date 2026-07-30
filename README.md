@@ -37,7 +37,7 @@ Install only features you use:
 ```bash
 python3 -m pip install "agent-paranoid-android[parquet]"
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
-python3 -m pip install "agent-paranoid-android[all]"
+python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
 ## Quickstart

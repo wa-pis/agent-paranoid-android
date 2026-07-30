@@ -41,6 +41,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert set(metadata["optional-dependencies"]) == {
         "parquet",
         "mcp",
+        "openai",
         "trino",
         "all",
         "dev",
@@ -117,7 +118,7 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "scripts/check_installed_package.py" in workflow
     assert "test-data-agent doctor --skip-smoke" in workflow
     assert "--profile base --wheel" in workflow
-    for extra in ("parquet", "mcp", "trino"):
+    for extra in ("parquet", "mcp", "openai", "trino"):
         assert f"--profile {extra}" in workflow
         assert f"--require-extra {extra}" in workflow
     assert "actions/checkout@v7" not in workflow

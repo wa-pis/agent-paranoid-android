@@ -158,7 +158,8 @@ core to one model vendor:
   metadata and proposes structured `DatasetSpec` changes. The typed,
   fingerprint-bound core contract, recoverable workspace handoff, and external
   self-describing JSON exchange are implemented. The in-process exchange
-  adapter is implemented; provider-specific examples remain.
+  adapter and first optional OpenAI provider are implemented; additional
+  provider examples remain.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as
@@ -181,6 +182,8 @@ core to one model vendor:
 - Keep Parquet, MCP, and Trino support in separate extras. Do not require
   `PyArrow`, the MCP SDK, the Trino client, or SQL parsing for basic CSV/JSON
   generation.
+- Keep model-provider SDKs in provider-specific extras. Installing or importing
+  the base package must not require provider credentials or SDK modules.
 - Do not replace maintained protocol or database libraries with custom
   implementations solely to reduce package count.
 - Measure the base environment separately from development and `all` installs

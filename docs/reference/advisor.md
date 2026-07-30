@@ -43,6 +43,31 @@ For lower-level integrations, an application may implement
 `DatasetAdvisor.propose` directly. It must preserve the same separation
 between trusted instructions and untrusted profile metadata.
 
+## OpenAI Adapter
+
+Install the optional provider integration:
+
+```bash
+python3 -m pip install "agent-paranoid-android[openai]"
+```
+
+`test_data_agent.providers.openai.OpenAIAdvisorClient` uses the Responses API
+with Pydantic structured output. It sends static package policy in the
+developer role and the serialized `AdvisorRequest` in the user role. It
+disables response storage, does not stream partial JSON, and rejects
+incomplete or unparsed responses.
+
+```python
+from test_data_agent import ExchangeDatasetAdvisor
+from test_data_agent.providers.openai import OpenAIAdvisorClient
+
+advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(model="gpt-5.6"))
+```
+
+The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
+a secret manager or private environment configuration; never write it into an
+agent workspace or dataset artifact.
+
 ## Request Boundary
 
 `AdvisorRequest` contains:
