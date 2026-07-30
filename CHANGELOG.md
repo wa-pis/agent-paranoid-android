@@ -20,6 +20,9 @@ All notable changes to this project are documented here.
 - Moved dataset, validation, environment, audit, and examples command
   registration behind the CLI parsing boundary while preserving the public
   parser contract.
+- Moved CLI error and validation-result rendering behind a dedicated
+  presentation boundary without changing stdout, stderr, JSON, or exit-code
+  behavior.
 
 ## [0.11.0] - 2026-07-31
 

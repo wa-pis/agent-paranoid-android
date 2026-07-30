@@ -6,6 +6,9 @@
   entry point.
 - [x] Extract remaining dataset and utility command registration.
 - [ ] Extract CLI human and JSON presentation from application dispatch.
+  - [x] Move shared CLI error and validation-result rendering behind a
+    presentation module.
+  - [ ] Move remaining agent human and JSON rendering behind the same boundary.
 - [ ] Separate generator MCP registration from application services.
 - [ ] Separate Trino MCP registration from allowlisted application services.
 - [ ] Keep safety checks in core/application layers and test direct services.
