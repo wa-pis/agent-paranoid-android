@@ -82,6 +82,14 @@ This is a map of the codebase for the domain-agnostic generator.
 
 `src/test_data_agent/cli.py`
 
+Owns the stable `main` entry point, command registration, application
+dispatch, and current human presentation.
+
+`src/test_data_agent/cli_parser.py`
+
+Owns reusable argparse behavior, numeric argument validation, recovery hints,
+and structured parser-error rendering.
+
 Public dataset-oriented commands:
 
 - `profile-example`
