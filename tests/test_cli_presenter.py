@@ -3,7 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from test_data_agent.cli_presenter import write_validation_result
+from test_data_agent.cli_presenter import (
+    display_untrusted_name,
+    format_review_items,
+    write_validation_result,
+)
 from test_data_agent.validation import DatasetValidationReport
 
 
@@ -44,3 +48,12 @@ def test_validation_result_with_output_path_suppresses_stdout(capsys) -> None:
     assert exit_code == 0
     assert captured.out == ""
     assert captured.err.endswith(" Report: validation_report.json\n")
+
+
+def test_untrusted_review_names_are_escaped_and_bounded() -> None:
+    assert display_untrusted_name("name\x1b[31m") == r"name\u001b[31m"
+    assert display_untrusted_name("x" * 81) == f"{'x' * 80}..."
+    assert format_review_items([str(index) for index in range(10)]) == (
+        "0, 1, 2, 3, 4, 5, 6, 7, +2 more"
+    )
+    assert format_review_items([]) == "none"

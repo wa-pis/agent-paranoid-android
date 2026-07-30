@@ -82,8 +82,8 @@ This is a map of the codebase for the domain-agnostic generator.
 
 `src/test_data_agent/cli.py`
 
-Owns the stable `main` entry point, application dispatch, and current human
-agent presentation.
+Owns the stable `main` entry point, application dispatch, provider loading,
+and doctor execution.
 
 `src/test_data_agent/cli_parser.py`
 
@@ -93,8 +93,8 @@ command.
 
 `src/test_data_agent/cli_presenter.py`
 
-Owns shared human and JSON error rendering plus validation-result output and
-exit-code selection.
+Owns shared human and JSON error rendering, validation-result output and exit
+codes, and bounded review-first agent presentation.
 
 Public dataset-oriented commands:
 
