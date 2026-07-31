@@ -29,6 +29,7 @@ from test_data_agent.generation.semantic_provider import (
     SemanticValueRequest,
     request_semantic_value,
 )
+from test_data_agent.safety import assert_spec_safe
 
 
 def generate_dataset(
@@ -38,6 +39,7 @@ def generate_dataset(
     budget: GenerationBudget | None = None,
     semantic_provider: SemanticValueProvider | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
+    assert_spec_safe(spec)
     budget = budget or GenerationBudget()
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = Faker()

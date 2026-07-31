@@ -9,7 +9,7 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     configure_csv_field_limit,
     enforce_input_cell_count,
@@ -18,6 +18,7 @@ from test_data_agent.core.limits import (
     enforce_input_row_count,
 )
 from test_data_agent.core.privacy import (
+    PrivacyClassification,
     SENSITIVE_SEMANTIC_TYPES,
     infer_sensitive_type_from_values,
     is_sensitive_field,
@@ -29,12 +30,80 @@ class ProfileSafetyError(ValueError):
     """Raised when a profile contains raw-looking sensitive metadata."""
 
 
+class SpecSafetyError(ValueError):
+    """Raised when a generation spec could publish unsafe source-derived values."""
+
+
 class SourceRowReuseError(ValueError):
     """Raised when generated output exactly repeats a source CSV row."""
 
 
 _SAFE_SENSITIVE_DISTRIBUTIONS = frozenset({"masked_patterns", "synthetic_identifier"})
 _TEXT_LENGTH_PATTERN = re.compile(r"text_len_\d+")
+
+
+def assert_spec_safe(spec: DatasetSpec) -> None:
+    """Reject unsafe distributions before generation or artifact publication."""
+
+    if spec.privacy_settings.allow_raw_sensitive_values:
+        raise SpecSafetyError("dataset spec cannot allow raw sensitive values")
+
+    for entity in spec.entities:
+        for field in entity.fields:
+            sensitive = _spec_field_is_sensitive(spec, entity.name, field.name)
+            if sensitive and not field.sensitive:
+                raise SpecSafetyError(
+                    f"dataset spec field {entity.name!r}.{field.name!r} must be marked sensitive"
+                )
+            if not field.distribution:
+                continue
+
+            kind = str(field.distribution.get("kind", ""))
+            if sensitive and kind not in _SAFE_SENSITIVE_DISTRIBUTIONS:
+                raise SpecSafetyError(
+                    f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
+                    f"uses unsafe distribution kind {kind!r}"
+                )
+            if sensitive and kind == "masked_patterns":
+                _validate_masked_patterns(
+                    entity.name,
+                    field.name,
+                    field.distribution.get("patterns", []),
+                    error_type=SpecSafetyError,
+                    context="dataset spec",
+                )
+            if kind != "categorical":
+                continue
+
+            categories = field.distribution.get("categories", [])
+            if len(categories) > spec.privacy_settings.max_safe_categories:
+                raise SpecSafetyError(
+                    f"dataset spec field {entity.name!r}.{field.name!r} exceeds the safe category limit"
+                )
+            detected = infer_sensitive_type_from_values(
+                item.get("value") for item in categories if isinstance(item, dict)
+            )
+            if detected is not None:
+                raise SpecSafetyError(
+                    f"dataset spec field {entity.name!r}.{field.name!r} "
+                    "contains raw-looking sensitive values"
+                )
+
+
+def _spec_field_is_sensitive(spec: DatasetSpec, entity_name: str, field_name: str) -> bool:
+    field = spec.entity(entity_name).field(field_name)
+    if field.sensitive or is_sensitive_field(field.name, field.semantic_type):
+        return True
+    sensitive_classes = {
+        PrivacyClassification.SENSITIVE,
+        PrivacyClassification.SECRET,
+    }
+    return any(
+        rule.classification in sensitive_classes
+        and (rule.entity is None or rule.entity == entity_name)
+        and (rule.field is None or rule.field == field_name)
+        for rule in spec.privacy_rules
+    )
 
 
 def assert_profile_safe(profile: DatasetProfile) -> None:
@@ -107,10 +176,17 @@ def assert_no_csv_folder_source_rows(
             assert_no_csv_source_rows(source_path, rows, entity_name=entity_name)
 
 
-def _validate_masked_patterns(entity_name: str, field_name: str, patterns: Any) -> None:
+def _validate_masked_patterns(
+    entity_name: str,
+    field_name: str,
+    patterns: Any,
+    *,
+    error_type: type[ValueError] = ProfileSafetyError,
+    context: str = "profile",
+) -> None:
     if not isinstance(patterns, list):
-        raise ProfileSafetyError(
-            f"sensitive profile field {entity_name!r}.{field_name!r} has invalid masked patterns"
+        raise error_type(
+            f"sensitive {context} field {entity_name!r}.{field_name!r} has invalid masked patterns"
         )
     for item in patterns:
         pattern = item.get("pattern") if isinstance(item, dict) else None
@@ -118,8 +194,8 @@ def _validate_masked_patterns(entity_name: str, field_name: str, patterns: Any) 
             continue
         if isinstance(pattern, str) and _TEXT_LENGTH_PATTERN.fullmatch(pattern):
             continue
-        raise ProfileSafetyError(
-            f"sensitive profile field {entity_name!r}.{field_name!r} has a raw-looking masked pattern"
+        raise error_type(
+            f"sensitive {context} field {entity_name!r}.{field_name!r} has a raw-looking masked pattern"
         )
 
 

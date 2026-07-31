@@ -2,10 +2,10 @@
 
 ## P0 — release blockers before `1.0.0rc1`
 
-- [ ] Define and implement `assert_spec_safe()` for every `DatasetSpec`.
+- [x] Define and implement `assert_spec_safe()` for every `DatasetSpec`.
 - [ ] Enforce the spec safety gate in direct Python generation, bundle
   workflows, CLI, agent, and generator MCP paths.
-- [ ] Reject raw sensitive/unknown categorical values and unsafe sensitive
+- [x] Reject raw sensitive/unknown categorical values and unsafe sensitive
   distributions before row generation or artifact publication.
 - [ ] Add regression tests for manually constructed and malicious on-disk
   specs through Python, CLI, and MCP.
