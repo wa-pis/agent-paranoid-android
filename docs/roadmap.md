@@ -281,7 +281,7 @@ Scope:
   - [x] Exercise mid-write disk exhaustion after a partial staged file exists.
   - [x] Exercise staged timeout cleanup across every generation output shape.
   - [x] Roll back folder and single-entity publication interrupted mid-commit.
-- [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
+- [x] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
   and provider extras with actionable, secret-free recovery guidance.
   - [x] Run base generation and Parquet write/read smoke checks locally.
   - [x] Verify local generator MCP construction and tool registration.
@@ -289,6 +289,9 @@ Scope:
   - [x] Add a local provider SDK and advisor-construction capability check.
 - [ ] Run isolated wheel and container workflows across supported Python
   versions and architectures.
+  - [x] Build and install the base wheel on Python 3.11 through 3.14 while
+    retaining the full optional-profile smoke on Python 3.14.
+  - [ ] Validate container targets on supported CPU architectures.
 - [ ] Complete a dependency, license, security, and container-image review with
   no unresolved release-blocking findings.
 

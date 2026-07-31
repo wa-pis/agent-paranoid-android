@@ -8,8 +8,9 @@ modules public.
 ## Python Versions
 
 The package supports CPython 3.11, 3.12, 3.13, and 3.14. Each supported
-version is included in CI before release. Alternative Python implementations
-may work, but are not release-gated.
+version runs the test suite and builds, installs, and checks an isolated base
+wheel before release. Alternative Python implementations may work, but are not
+release-gated.
 
 - Python 3.11 is the current minimum and remains supported through the 1.x
   series unless a security or dependency constraint makes that impossible.
