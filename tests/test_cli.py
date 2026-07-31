@@ -1242,6 +1242,45 @@ def test_generate_accepts_dataset_spec_json(tmp_path) -> None:
     assert report["valid"] is True
 
 
+def test_generate_rejects_raw_sensitive_category_before_writing_output(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    raw_email = "private-person@example.com"
+    spec_path = tmp_path / "unsafe_spec.json"
+    output_path = tmp_path / "generated"
+    spec_path.write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "records",
+                        "row_count": 1,
+                        "fields": [
+                            {
+                                "name": "segment",
+                                "data_type": "string",
+                                "distribution": {
+                                    "kind": "categorical",
+                                    "categories": [{"value": raw_email, "count": 1}],
+                                },
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    exit_code = main(["generate", str(spec_path), "--output", str(output_path)])
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "raw-looking sensitive values" in captured.err
+    assert raw_email not in captured.err
+    assert not output_path.exists()
+
+
 def test_validate_accepts_dataset_spec_json(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.json"
     rows_dir = tmp_path / "rows"

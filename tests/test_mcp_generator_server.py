@@ -21,7 +21,7 @@ from test_data_agent.mcp_generator_server import (
     resolve_workspace_path,
     validate_dataset,
 )
-from test_data_agent.safety import ProfileSafetyError
+from test_data_agent.safety import ProfileSafetyError, SpecSafetyError
 
 
 def configure_workspace(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
@@ -582,6 +582,42 @@ def test_generate_dataset_rejects_entity_name_path_traversal(
         generate_dataset("spec.json", "generated", output_format="json", seed=7)
 
     assert not (tmp_path / "escaped.json").exists()
+
+
+def test_generate_dataset_rejects_raw_sensitive_category_before_output(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+    raw_email = "private-person@example.com"
+    (tmp_path / "unsafe_spec.json").write_text(
+        json.dumps(
+            {
+                "entities": [
+                    {
+                        "name": "records",
+                        "row_count": 1,
+                        "fields": [
+                            {
+                                "name": "segment",
+                                "data_type": "string",
+                                "distribution": {
+                                    "kind": "categorical",
+                                    "categories": [{"value": raw_email, "count": 1}],
+                                },
+                            }
+                        ],
+                    }
+                ]
+            }
+        )
+    )
+
+    with pytest.raises(SpecSafetyError) as error:
+        generate_dataset("unsafe_spec.json", "generated", seed=7)
+
+    assert raw_email not in str(error.value)
+    assert not (tmp_path / "generated").exists()
 
 
 def test_generate_dataset_rejects_count_above_configured_limit(
