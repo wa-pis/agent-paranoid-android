@@ -92,7 +92,10 @@ def test_container_workflow_builds_before_tag_only_publish() -> None:
     assert "push: false" in validate_job
     assert "scripts/check_release_tag.py" in release_gate
     assert "scripts/check_release.sh" in release_gate
-    assert "needs:\n      - validate\n      - release-gate" in publish_job
+    assert (
+        "needs:\n      - validate\n      - validate-arm64\n      - release-gate"
+        in publish_job
+    )
     assert "startsWith(github.ref, 'refs/tags/')" in publish_job
     assert "platforms: linux/amd64,linux/arm64" in publish_job
     assert "provenance: mode=max" in publish_job
@@ -119,7 +122,7 @@ def test_container_workflow_uses_node24_docker_actions() -> None:
         workflow.count(
             "docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0"
         )
-        == 2
+        == 3
     )
     assert (
         "docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0"
@@ -129,6 +132,29 @@ def test_container_workflow_uses_node24_docker_actions() -> None:
         "docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0"
         in workflow
     )
+
+
+def test_container_workflow_validates_arm64_runtime() -> None:
+    workflow = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "containers.yml").read_text()
+    )
+    job = workflow["jobs"]["validate-arm64"]
+
+    assert job["strategy"]["matrix"]["target"] == [
+        "cli",
+        "generator-mcp",
+        "trino-mcp",
+    ]
+    build = next(step for step in job["steps"] if step["name"] == "Build ARM64 target")
+    assert build["with"]["platforms"] == "linux/arm64"
+    assert build["with"]["load"] is True
+    verify = next(
+        step
+        for step in job["steps"]
+        if step["name"] == "Verify ARM64 runtime and health check"
+    )
+    assert "--platform linux/arm64" in verify["run"]
+    assert "{{.Architecture}}" in verify["run"]
 
 
 def test_dependabot_tracks_docker_and_workflow_dependencies() -> None:
