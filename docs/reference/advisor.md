@@ -174,6 +174,15 @@ Without `--exchange`, `agent-advisor-request` retains its original behavior
 and writes the raw `AdvisorRequest`. This is useful for custom adapters that
 already own their instructions and response schema.
 
+## Relationship Discovery
+
+`mine_relationship_candidates(profile)` builds deterministic foreign-key
+candidates without sending profile distributions or source values to a provider.
+`rank_relationship_candidates(candidates, advisor)` validates provider rankings
+against those candidates, and `review_relationship_proposal(...)` records the
+separate human decision. Even an accepted review does not authorize generation
+or modify a `DatasetSpec`.
+
 ## Agent Workspace Handoff
 
 Use `advise_agent_workspace` after `agent-plan` to persist one validated
