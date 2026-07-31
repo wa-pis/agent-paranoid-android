@@ -308,6 +308,10 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
     assert "Same package version" in compatibility
     assert "Cross-version" in compatibility
     assert "byte_identical_across_versions: false" in compatibility
+    assert "Retain `<2.0.0`" in compatibility
+    assert "Retain `<3.0.0`" in compatibility
+    assert "Add no upper bound" in compatibility
+    assert "user-facing changelog entry" in compatibility
 
     minimum_constraints = (
         ROOT / ".github" / "constraints" / "dependency-minimum.txt"

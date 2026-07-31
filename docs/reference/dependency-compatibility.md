@@ -93,3 +93,15 @@ lowercase distribution names and includes installed optional integrations;
 
 The lockfile is evidence for the latest profile, not a promise that unrelated
 future dependency versions are compatible.
+
+## Upper-Bound Decisions
+
+| Dependency | Decision | Evidence |
+| --- | --- | --- |
+| MCP | Retain `<2.0.0` | The transport contract is tested only on MCP 1.x. |
+| OpenAI | Retain `<3.0.0` | The structured provider adapter is tested only on OpenAI 2.x. |
+| Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
+
+A newly discovered incompatibility must first be reproduced by a focused
+contract test. Narrowing a range then requires a user-facing changelog entry
+and a package release; an unreviewed speculative bound is not accepted.
