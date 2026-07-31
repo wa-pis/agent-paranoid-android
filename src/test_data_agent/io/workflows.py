@@ -129,7 +129,7 @@ def generate_dataset_bundle(
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
-    except Exception:
+    except BaseException:
         shutil.rmtree(temp_folder, ignore_errors=True)
         raise
     row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
@@ -260,7 +260,7 @@ def generate_single_entity_profile_artifacts(
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
         commit_single_entity_bundle(temp_folder, output_path.parent)
-    except Exception:
+    except BaseException:
         shutil.rmtree(temp_folder, ignore_errors=True)
         raise
     return report
@@ -401,7 +401,7 @@ def generate_dataset_review_artifacts(
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
-    except Exception:
+    except BaseException:
         shutil.rmtree(temp_folder, ignore_errors=True)
         raise
     return 0 if report.valid else 1
