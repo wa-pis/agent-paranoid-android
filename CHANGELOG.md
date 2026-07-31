@@ -101,6 +101,8 @@ All notable changes to this project are documented here.
   its detailed review contract is canonical.
 - The completed container vulnerability gate is merged into canonical
   operational readiness OpenSpec and archived with its implementation evidence.
+- The supported Python 3.11-3.14 wheel matrix is merged into canonical
+  operational readiness OpenSpec and archived with its implementation evidence.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
