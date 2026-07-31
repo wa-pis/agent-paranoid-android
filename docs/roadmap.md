@@ -366,6 +366,14 @@ Scope:
 - [ ] Validate the core product workflow: bounded profiling → deterministic
   relationship candidates → AI-assisted proposals → human review →
   deterministic validation → synthetic generation.
+- [ ] Define and implement the Evidence-Bounded Synthesis Contract: separate
+  `SourceBundle`, `EvidenceProfile`, `SemanticHypothesis`, and
+  `ReviewedDatasetSpec`; preserve provenance, sampling coverage, confidence,
+  assumptions, and unknowns instead of presenting inferred domain rules as
+  facts.
+- [ ] Ensure AI can rank and explain evidence-backed hypotheses but cannot
+  upgrade confidence, approve a rule, or authorize generation; deterministic
+  validation and human review remain the authority boundary.
 - [ ] Preserve approved FK graphs, distribution/order-of-magnitude shape,
   temporal dependencies, and executable business invariants independently of
   domain or table names.

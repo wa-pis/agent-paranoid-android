@@ -7,7 +7,43 @@ This document describes the two main artifacts in the domain-agnostic pipeline:
 
 ## DatasetProfile JSON
 
-A profile is safe metadata inferred from an example dataset.
+A profile is safe metadata and bounded evidence inferred from a source. It is
+not a complete description of the domain and must not imply that unobserved
+rules are known.
+
+## Evidence Envelope
+
+The evidence-bounded contract records how each important observation was
+obtained. Relationships and constraints already expose confidence and status;
+the release contract extends that record with provenance and coverage rather
+than treating inference as fact.
+
+Target shape for an observed rule or relationship:
+
+```yaml
+origin: observed
+status: candidate
+confidence: medium
+evidence:
+  sample_size: 200
+  sampling: bounded
+  time_window:
+    from: '2026-01-01'
+    to: '2026-03-31'
+  rows_checked: 200
+  violations: 0
+source_fingerprint: sha256:...
+assumptions: []
+```
+
+`high` confidence means strong support from the recorded evidence, not a
+universal truth claim. DDL or ORM declarations are `declared`; facts measured
+from a sample or live profile are `observed`; deterministic or AI proposals
+are `inferred` until a human accepts them. AI receives this context as
+untrusted metadata and cannot promote a hypothesis into a generation rule.
+
+If sample size, sampling method, coverage, or time window is unknown, that
+uncertainty must remain visible in the profile and review record.
 
 Top-level shape:
 
