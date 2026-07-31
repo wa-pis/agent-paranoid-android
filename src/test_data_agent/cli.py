@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import importlib
 import json
 import sys
@@ -482,6 +483,16 @@ def inspect_doctor(
                     )
                 else:
                     checks.append("capability parquet: ok")
+            if "mcp" in required:
+                try:
+                    run_mcp_doctor_smoke()
+                except Exception:
+                    failures.append(
+                        "capability mcp: failed "
+                        "(reinstall agent-paranoid-android[mcp] and retry)"
+                    )
+                else:
+                    checks.append("capability mcp: ok")
 
     return DoctorReport(checks=tuple(checks), failures=tuple(failures))
 
@@ -510,6 +521,20 @@ def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:
         and manifest.get("output_format") == "parquet"
     ):
         raise RuntimeError("parquet smoke manifest is invalid")
+
+
+def run_mcp_doctor_smoke() -> None:
+    from test_data_agent.mcp_generator_transport import create_generator_mcp
+
+    def doctor_probe() -> dict[str, bool]:
+        return {"ok": True}
+
+    server = create_generator_mcp((doctor_probe,))
+    if server is None or server.name != "test-data-agent-generator":
+        raise RuntimeError("generator MCP transport is unavailable")
+    tools = asyncio.run(server.list_tools())
+    if [tool.name for tool in tools] != ["doctor_probe"]:
+        raise RuntimeError("generator MCP tool registration is invalid")
 
 
 def write_doctor_fixture(directory: Path) -> None:

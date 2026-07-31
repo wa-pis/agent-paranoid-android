@@ -19,6 +19,11 @@ row counts and manifest safety flags, and contacts no external service. A
 failure recommends the exact extra to reinstall without exposing the original
 exception text or temporary paths.
 
+`doctor --require-extra mcp` constructs the real generator `FastMCP`
+transport, registers one local audited probe tool, and verifies its public tool
+listing. It does not start a server, listen on a port, invoke the tool, or
+contact an MCP client.
+
 ## Command Not Found
 
 Symptom:

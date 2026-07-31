@@ -52,6 +52,8 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
         "all",
         "dev",
     }
+    assert metadata["optional-dependencies"]["mcp"] == ["mcp>=1.0.0,<2.0.0"]
+    assert "mcp>=1.0.0,<2.0.0" in metadata["optional-dependencies"]["all"]
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
         "Repository": "https://github.com/wa-pis/agent-paranoid-android",
@@ -125,6 +127,7 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "test-data-agent doctor --skip-smoke" in workflow
     assert "--profile base --wheel" in workflow
     assert "test-data-agent doctor --require-extra parquet" in workflow
+    assert "test-data-agent doctor --require-extra mcp" in workflow
     for extra in ("parquet", "mcp", "openai", "trino"):
         assert f"--profile {extra}" in workflow
         assert f"--require-extra {extra}" in workflow

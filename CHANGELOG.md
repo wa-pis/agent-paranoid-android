@@ -32,9 +32,13 @@ All notable changes to this project are documented here.
   generation outputs.
 - A real Parquet `doctor` capability smoke that generates and reads a temporary
   bundle with secret-free reinstall guidance on failure.
+- A local MCP `doctor` capability smoke that constructs the generator
+  transport and verifies audited tool registration without starting a server.
 
 ### Fixed
 
+- MCP extras exclude the incompatible 2.x SDK until the transport migrates to
+  its replacement API.
 - Incomplete staged generation and review bundles are removed when interactive
   cancellation interrupts writing or validation.
 - Mid-write disk exhaustion removes partial staged folder, review, and

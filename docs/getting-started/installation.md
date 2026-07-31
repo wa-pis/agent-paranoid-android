@@ -80,7 +80,8 @@ doctor passed
 does not need a repository checkout and does not contact Trino or another
 external system. `doctor --require-extra parquet` also writes and reads a
 temporary Parquet bundle to verify that capability rather than only importing
-PyArrow.
+PyArrow. `doctor --require-extra mcp` verifies local generator tool
+registration without starting a server or opening a network connection.
 
 ## Install For Development
 
