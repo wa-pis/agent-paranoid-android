@@ -429,34 +429,81 @@ def test_generate_dataset_bundle_rejects_estimated_oversized_output(
     assert not list(tmp_path.glob(".generated.*"))
 
 
-def test_generate_dataset_bundle_removes_temp_output_when_time_budget_expires(
+@pytest.mark.parametrize("workflow", ["folder", "review", "single"])
+def test_staged_workflows_remove_temp_output_when_time_budget_expires(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
+    workflow: str,
 ) -> None:
     class ExportDeadline:
         def check(self, stage: str) -> None:
-            if stage == "dataset export":
+            deadline_stage = (
+                "artifact publication" if workflow == "single" else "dataset export"
+            )
+            if stage == deadline_stage:
                 raise GenerationLimitError("generation deadline reached")
 
     monkeypatch.setattr(
         "test_data_agent.io.workflows.prepare_generation_budget",
         lambda spec, output_path: ExportDeadline(),
     )
-    spec = DatasetSpec(
+    profile = DatasetProfile(
+        source_type="json_profile",
         entities=[
-            EntitySpec(
+            EntityProfile(
                 name="orders",
                 row_count=1,
-                fields=[FieldSpec(name="status", data_type="string")],
+                fields=[FieldProfile(name="status", data_type="string")],
             )
-        ]
+        ],
+    )
+    spec = infer_dataset_spec_artifact(
+        profile,
+        output_path=tmp_path / "dataset_spec.yaml",
+        count=1,
     )
 
-    with pytest.raises(GenerationLimitError, match="deadline"):
-        generate_dataset_bundle(spec, output_folder=tmp_path / "generated")
+    if workflow == "folder":
+        output = tmp_path / "generated"
+        temporary_parent = tmp_path
+        temporary_pattern = ".generated.*"
 
-    assert not (tmp_path / "generated").exists()
-    assert not list(tmp_path.glob(".generated.*"))
+        def operation():
+            return generate_dataset_bundle(spec, output_folder=output)
+
+    elif workflow == "review":
+        output = tmp_path / "review"
+        temporary_parent = tmp_path
+        temporary_pattern = ".review.*"
+
+        def operation():
+            return generate_dataset_review_artifacts(
+                profile,
+                spec,
+                output_folder=output,
+                output_format=OutputFormat.JSON,
+                seed=19,
+            )
+
+    else:
+        output = tmp_path / "single" / "orders.json"
+        temporary_parent = output.parent
+        temporary_pattern = ".orders.*"
+
+        def operation():
+            return generate_dataset_from_profile_artifacts(
+                profile,
+                count=1,
+                seed=19,
+                output_path=output,
+                output_format=OutputFormat.JSON,
+            )
+
+    with pytest.raises(GenerationLimitError, match="deadline"):
+        operation()
+
+    assert not output.exists()
+    assert not list(temporary_parent.glob(temporary_pattern))
 
 
 def test_generate_dataset_bundle_removes_staging_on_cancellation(

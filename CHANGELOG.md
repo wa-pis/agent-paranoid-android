@@ -28,6 +28,8 @@ All notable changes to this project are documented here.
   adapter maturity, compatibility notices, and release gates.
 - Bounded release regressions for profiling, multi-entity generation, and
   validation wall time and peak traced allocations.
+- Staged timeout cleanup coverage for folder, review, and single-entity
+  generation outputs.
 
 ### Fixed
 
