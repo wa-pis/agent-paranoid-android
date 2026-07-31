@@ -31,6 +31,7 @@ REQUIRED_DOCS = {
     "reference/cli.md",
     "reference/compatibility.md",
     "reference/stability.md",
+    "reference/support-policy.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
     "operations/audit-logging.md",
@@ -194,6 +195,19 @@ def test_public_stability_table_covers_contract_surfaces() -> None:
         assert fixture in stability
     assert "additive change" in stability
     assert "breaking change" in stability
+
+
+def test_runtime_support_policy_covers_release_boundaries() -> None:
+    support = (ROOT / "docs" / "reference" / "support-policy.md").read_text()
+
+    for version in ("3.11", "3.12", "3.13", "3.14"):
+        assert version in support
+    for extra in ("parquet", "mcp", "trino", "openai", "all"):
+        assert f"`{extra}`" in support
+    assert "breaking packaging change" in support
+    assert "provider-neutral" in support
+    assert "safe metadata only" in support
+    assert "local fakes" in support
 
 
 def test_compatibility_inventory_covers_retained_surfaces() -> None:

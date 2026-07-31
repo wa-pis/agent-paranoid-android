@@ -253,7 +253,7 @@ Scope:
   anything before its documented compatibility window expires.
 - [x] Test that the current package reads reviewed specs and generated metadata
   fixtures from the previous feature release.
-- [ ] Document the support policy for Python versions, optional extras, and
+- [x] Document the support policy for Python versions, optional extras, and
   provider adapters.
 
 Exit criteria:
