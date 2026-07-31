@@ -28,6 +28,8 @@ All notable changes to this project are documented here.
 - Moved examples, audit verification, and doctor output behind the
   presentation boundary, with typed doctor results separating checks from
   rendering.
+- Separated generator MCP transport registration and audit wrapping from
+  application services while preserving tool order and public contracts.
 
 ## [0.11.0] - 2026-07-31
 

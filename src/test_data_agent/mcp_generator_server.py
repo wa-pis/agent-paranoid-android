@@ -7,11 +7,6 @@ import os
 from pathlib import Path
 from typing import Any, Literal
 
-try:  # pragma: no cover - exercised when the MCP dependency is installed.
-    from mcp.server.fastmcp import FastMCP
-except ImportError:  # pragma: no cover
-    FastMCP = None  # type: ignore[misc, assignment]
-
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
 from test_data_agent.agent import (
@@ -28,7 +23,7 @@ from test_data_agent.agent import (
     plan_agent_request,
     recover_agent_workspace,
 )
-from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
+from test_data_agent.audit import audit_logger_from_env
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
@@ -45,6 +40,7 @@ from test_data_agent.io import (
     validate_dataset_artifacts,
     write_csv_profile_artifact,
 )
+from test_data_agent.mcp_generator_transport import create_generator_mcp
 from test_data_agent.io.artifacts import business_validation_manifest
 from test_data_agent.rules.business_config import make_business_rules_applier
 from test_data_agent.rules.contract import validate_business_rules_for_spec
@@ -662,21 +658,20 @@ def _require_new_output(path: Path) -> None:
         raise WorkspacePathError("MCP output path already exists")
 
 
-mcp: Any
-if FastMCP is not None:
-    mcp = FastMCP("test-data-agent-generator")
-    mcp.tool()(audited_mcp_tool("generator-mcp", profile_csv))
-    mcp.tool()(audited_mcp_tool("generator-mcp", infer_dataset_spec))
-    mcp.tool()(audited_mcp_tool("generator-mcp", plan_dataset))
-    mcp.tool()(audited_mcp_tool("generator-mcp", plan_trino_dataset))
-    mcp.tool()(audited_mcp_tool("generator-mcp", inspect_dataset_plan))
-    mcp.tool()(audited_mcp_tool("generator-mcp", approve_dataset_plan))
-    mcp.tool()(audited_mcp_tool("generator-mcp", recover_dataset_plan))
-    mcp.tool()(audited_mcp_tool("generator-mcp", generate_dataset))
-    mcp.tool()(audited_mcp_tool("generator-mcp", validate_dataset))
-    mcp.tool()(audited_mcp_tool("generator-mcp", export_dataset))
-else:  # pragma: no cover
-    mcp = None
+_GENERATOR_MCP_TOOLS = (
+    profile_csv,
+    infer_dataset_spec,
+    plan_dataset,
+    plan_trino_dataset,
+    inspect_dataset_plan,
+    approve_dataset_plan,
+    recover_dataset_plan,
+    generate_dataset,
+    validate_dataset,
+    export_dataset,
+)
+
+mcp: Any = create_generator_mcp(_GENERATOR_MCP_TOOLS)
 
 
 def main() -> None:
