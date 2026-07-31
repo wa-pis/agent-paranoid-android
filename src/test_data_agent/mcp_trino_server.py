@@ -451,7 +451,7 @@ def rows_to_dicts(description: Sequence[Any], rows: Iterable[Sequence[Any]]) -> 
     return [dict(zip(names, row, strict=True)) for row in rows]
 
 
-def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[list[tuple[Any, ...]], list[Any]]:
+def _execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[list[tuple[Any, ...]], list[Any]]:
     if trino is None:
         raise RuntimeError("trino package is not installed")
 
@@ -484,27 +484,27 @@ def execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[li
             connection.close()
 
 
-def fetch_dicts(sql: str, parameters: Sequence[Any] | None = None) -> list[dict[str, Any]]:
-    rows, description = execute_query(sql, parameters)
+def _fetch_dicts(sql: str, parameters: Sequence[Any] | None = None) -> list[dict[str, Any]]:
+    rows, description = _execute_query(sql, parameters)
     return rows_to_dicts(description, rows)
 
 
 def list_catalogs() -> list[str]:
-    rows = fetch_dicts("SHOW CATALOGS")
+    rows = _fetch_dicts("SHOW CATALOGS")
     allowed = TrinoConfig.from_env().allowed_catalogs
     return [row["Catalog"] for row in rows if allowed is None or row["Catalog"] in allowed]
 
 
 def list_schemas(catalog: str) -> list[str]:
     check_allowlist(catalog=catalog)
-    rows = fetch_dicts(f"SHOW SCHEMAS FROM {quote_identifier(catalog)}")
+    rows = _fetch_dicts(f"SHOW SCHEMAS FROM {quote_identifier(catalog)}")
     allowed = TrinoConfig.from_env().allowed_schemas
     return [row["Schema"] for row in rows if allowed is None or row["Schema"] in allowed]
 
 
 def list_tables(catalog: str, schema: str) -> list[str]:
     check_allowlist(catalog=catalog, schema=schema)
-    rows = fetch_dicts(f"SHOW TABLES FROM {quote_identifier(catalog)}.{quote_identifier(schema)}")
+    rows = _fetch_dicts(f"SHOW TABLES FROM {quote_identifier(catalog)}.{quote_identifier(schema)}")
     return [next(iter(row.values())) for row in rows]
 
 
@@ -516,13 +516,13 @@ def describe_table(catalog: str, schema: str, table: str) -> list[dict[str, Any]
         "WHERE table_catalog = ? AND table_schema = ? AND table_name = ? "
         "ORDER BY ordinal_position"
     )
-    return fetch_dicts(sql, [catalog, schema, table])
+    return _fetch_dicts(sql, [catalog, schema, table])
 
 
 def profile_table(catalog: str, schema: str, table: str) -> dict[str, Any]:
     check_allowlist(catalog=catalog, schema=schema)
     safe_table = qualified_table(catalog, schema, table)
-    rows = fetch_dicts(f"SELECT count(*) AS row_count FROM {safe_table}")
+    rows = _fetch_dicts(f"SELECT count(*) AS row_count FROM {safe_table}")
     return {"table": table, "row_count": rows[0]["row_count"] if rows else 0}
 
 
@@ -535,7 +535,7 @@ def profile_column(catalog: str, schema: str, table: str, column: str) -> dict[s
         f"approx_distinct({safe_column}) AS approx_distinct_count "
         f"FROM {safe_table}"
     )
-    rows = fetch_dicts(sql)
+    rows = _fetch_dicts(sql)
     return rows[0] if rows else {"row_count": 0, "non_null_count": 0, "approx_distinct_count": 0}
 
 
@@ -577,7 +577,7 @@ def profile_column_safe(
     safe_table = qualified_table(catalog, schema, table)
     safe_column = quote_identifier(column)
     sensitive = infer_sensitive_from_name(column)
-    aggregate_rows = fetch_dicts(profile_column_sql(safe_table, safe_column, data_type))
+    aggregate_rows = _fetch_dicts(profile_column_sql(safe_table, safe_column, data_type))
     aggregates = aggregate_rows[0] if aggregate_rows else {}
     row_count = int(aggregates.get("row_count") or 0)
     non_null_count = int(aggregates.get("non_null_count") or 0)
@@ -594,7 +594,7 @@ def profile_column_safe(
     profile.update({key: value for key, value in aggregates.items() if key not in profile and value is not None})
     approx_distinct = int(profile.get("approx_distinct_count") or 0)
     if is_string_trino_type(data_type) and not sensitive and 0 < approx_distinct <= max_top_values:
-        top_values = fetch_dicts(
+        top_values = _fetch_dicts(
             f"SELECT {safe_column} AS value, count(*) AS count "
             f"FROM {safe_table} "
             f"WHERE {safe_column} IS NOT NULL "
@@ -685,7 +685,7 @@ def profile_foreign_key(
         f"LEFT JOIN (SELECT DISTINCT {parent_key} AS parent_key FROM {parent} WHERE {parent_key} IS NOT NULL) p "
         f"ON c.{child_key} = p.parent_key"
     )
-    row = first_row(fetch_dicts(sql))
+    row = first_row(_fetch_dicts(sql))
     checked = int(row.get("checked_count") or 0)
     passed = int(row.get("matched_count") or 0)
     return rule_profile(
@@ -727,7 +727,7 @@ def profile_temporal_ordering(
         f"count_if({checked_condition} AND {start} {fail_operator} {end}) AS failed_count "
         f"FROM {safe_table}"
     )
-    row = first_row(fetch_dicts(sql))
+    row = first_row(_fetch_dicts(sql))
     return rule_profile(
         "temporal",
         row,
@@ -767,7 +767,7 @@ def profile_formula_rule(
         f"max(CASE WHEN {checked_condition} THEN {residual} END) AS max_abs_error "
         f"FROM {safe_table}"
     )
-    row = first_row(fetch_dicts(sql))
+    row = first_row(_fetch_dicts(sql))
     return rule_profile(
         "formula",
         row,
@@ -800,7 +800,7 @@ def profile_conditional_required(
         f"count_if({condition_column} = ? AND NOT ({present})) AS failed_count "
         f"FROM {safe_table}"
     )
-    row = first_row(fetch_dicts(sql, [condition_equals, condition_equals, condition_equals]))
+    row = first_row(_fetch_dicts(sql, [condition_equals, condition_equals, condition_equals]))
     return rule_profile(
         "conditional_required",
         row,
@@ -839,7 +839,7 @@ def profile_conditional_allowed_values(
         f"FROM {safe_table}"
     )
     parameters = [condition_equals, condition_equals, *allowed_values, condition_equals, *allowed_values]
-    row = first_row(fetch_dicts(sql, parameters))
+    row = first_row(_fetch_dicts(sql, parameters))
     return rule_profile(
         "conditional_allowed_values",
         row,
@@ -901,7 +901,7 @@ def profile_aggregate_mapping(
         f"FROM {parent} p "
         f"LEFT JOIN child_agg a ON p.{parent_key_sql} = a.parent_key"
     )
-    row = first_row(fetch_dicts(sql))
+    row = first_row(_fetch_dicts(sql))
     return rule_profile(
         "aggregate_mapping",
         row,
@@ -1009,13 +1009,13 @@ def sample_rows_masked(catalog: str, schema: str, table: str, columns: list[str]
         raise ValueError("at least one column is required")
     safe_limit = bounded_limit(limit)
     select_list = ", ".join(quote_identifier(column) for column in columns)
-    rows = fetch_dicts(f"SELECT {select_list} FROM {qualified_table(catalog, schema, table)} LIMIT {safe_limit}")
+    rows = _fetch_dicts(f"SELECT {select_list} FROM {qualified_table(catalog, schema, table)} LIMIT {safe_limit}")
     return [mask_row(row) for row in rows]
 
 
 def run_safe_select(sql: str) -> list[dict[str, Any]]:
     safe_sql = validate_safe_select(sql, require_limit=True)
-    rows = fetch_dicts(safe_sql)
+    rows = _fetch_dicts(safe_sql)
     return [mask_row(row) for row in rows]
 
 
