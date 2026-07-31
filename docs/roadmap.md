@@ -286,7 +286,7 @@ Scope:
   - [x] Run base generation and Parquet write/read smoke checks locally.
   - [x] Verify local generator MCP construction and tool registration.
   - [x] Add a local Trino parser and client-construction capability check.
-  - [ ] Add local provider capability checks.
+  - [x] Add a local provider SDK and advisor-construction capability check.
 - [ ] Run isolated wheel and container workflows across supported Python
   versions and architectures.
 - [ ] Complete a dependency, license, security, and container-image review with

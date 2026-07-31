@@ -9,7 +9,7 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from pydantic import ValidationError
 
@@ -503,6 +503,16 @@ def inspect_doctor(
                     )
                 else:
                     checks.append("capability trino: ok")
+            if "openai" in required:
+                try:
+                    run_openai_doctor_smoke()
+                except Exception:
+                    failures.append(
+                        "capability openai: failed "
+                        "(reinstall agent-paranoid-android[openai] and retry)"
+                    )
+                else:
+                    checks.append("capability openai: ok")
 
     return DoctorReport(checks=tuple(checks), failures=tuple(failures))
 
@@ -571,6 +581,24 @@ def run_trino_doctor_smoke() -> None:
         request_timeout=config.request_timeout,
     )
     connection.close()
+
+
+def run_openai_doctor_smoke() -> None:
+    from openai import OpenAI
+
+    from test_data_agent.providers.openai import OpenAIAdvisorClient
+
+    sdk = OpenAI(
+        api_key="doctor-local-placeholder",
+        max_retries=0,
+        timeout=0.1,
+    )
+    try:
+        if not callable(getattr(sdk.responses, "parse", None)):
+            raise RuntimeError("OpenAI structured responses API is unavailable")
+        OpenAIAdvisorClient(client=cast(Any, sdk), model="doctor-local")
+    finally:
+        sdk.close()
 
 
 def write_doctor_fixture(directory: Path) -> None:

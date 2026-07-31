@@ -248,6 +248,31 @@ def test_doctor_redacts_trino_capability_failure(
     assert "secret-trino-password" not in captured.err
 
 
+def test_doctor_runs_required_openai_capability_smoke(capsys) -> None:
+    assert main(["doctor", "--require-extra", "openai"]) == 0
+
+    captured = capsys.readouterr()
+    assert "capability openai: ok" in captured.err
+    assert "doctor passed" in captured.err
+
+
+def test_doctor_redacts_openai_capability_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_openai_doctor_smoke",
+        lambda: (_ for _ in ()).throw(RuntimeError("secret-provider-token")),
+    )
+
+    assert main(["doctor", "--require-extra", "openai"]) == 1
+    captured = capsys.readouterr()
+    assert "capability openai: failed" in captured.err
+    assert "reinstall agent-paranoid-android[openai]" in captured.err
+    assert "secret-provider-token" not in captured.err
+
+
 def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
 

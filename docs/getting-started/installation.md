@@ -85,6 +85,9 @@ registration without starting a server or opening a network connection.
 `doctor --require-extra trino` parses an allowlisted read-only query and
 constructs then closes a local client object without executing SQL or
 contacting a Trino coordinator.
+`doctor --require-extra openai` constructs and closes a local SDK client with
+a non-secret placeholder, then verifies the structured Responses API and
+advisor adapter without contacting the provider.
 
 ## Install For Development
 

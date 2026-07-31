@@ -31,6 +31,12 @@ It does not read Trino credentials or contact a coordinator. On failure,
 reinstall `agent-paranoid-android[trino]` before checking deployment-specific
 allowlists and credentials.
 
+`doctor --require-extra openai` constructs and closes the installed SDK client
+with a local non-secret placeholder and verifies the structured Responses API
+used by the advisor adapter. It does not read `OPENAI_API_KEY`, send a request,
+or contact the provider. On failure, reinstall
+`agent-paranoid-android[openai]` before checking deployment credentials.
+
 ## Command Not Found
 
 Symptom:
