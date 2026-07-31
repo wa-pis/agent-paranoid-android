@@ -128,6 +128,8 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "--profile base --wheel" in workflow
     assert "test-data-agent doctor --require-extra parquet" in workflow
     assert "test-data-agent doctor --require-extra mcp" in workflow
+    assert "test-data-agent doctor --require-extra trino" in workflow
+    assert "doctor --skip-smoke --require-extra trino" not in workflow
     for extra in ("parquet", "mcp", "openai", "trino"):
         assert f"--profile {extra}" in workflow
         assert f"--require-extra {extra}" in workflow

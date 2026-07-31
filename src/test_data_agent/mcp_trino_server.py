@@ -297,7 +297,11 @@ def normalize_sql(sql: str) -> str:
     return cleaned
 
 
-def validate_safe_select(sql: str, require_limit: bool = True) -> str:
+def validate_safe_select(
+    sql: str,
+    require_limit: bool = True,
+    config: TrinoConfig | None = None,
+) -> str:
     cleaned = normalize_sql(sql)
     if FORBIDDEN_SQL_RE.search(cleaned):
         raise SqlSafetyError("DDL, DML, and executable statements are not allowed")
@@ -313,7 +317,7 @@ def validate_safe_select(sql: str, require_limit: bool = True) -> str:
             raise SqlSafetyError("row-returning SELECT queries must include LIMIT")
         if limit < 1 or limit > MAX_LIMIT:
             raise SqlSafetyError(f"row-returning SELECT queries must use LIMIT between 1 and {MAX_LIMIT}")
-    validate_table_references_allowed(tree)
+    validate_table_references_allowed(tree, config=config)
     return cleaned
 
 

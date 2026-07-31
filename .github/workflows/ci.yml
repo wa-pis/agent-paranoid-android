@@ -127,7 +127,7 @@ jobs:
             python scripts/check_installed_package.py --profile trino
           uv run --isolated --no-project \
             --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
-            test-data-agent doctor --skip-smoke --require-extra trino
+            test-data-agent doctor --require-extra trino
 
   trino-integration:
     name: Trino integration

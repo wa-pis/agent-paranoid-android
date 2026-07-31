@@ -72,6 +72,22 @@ def test_safe_select_with_limit_is_allowed() -> None:
     )
 
 
+def test_safe_select_accepts_explicit_doctor_config() -> None:
+    config = TrinoConfig(
+        host="doctor.invalid",
+        port=443,
+        user="doctor",
+        http_scheme="https",
+        allowed_catalogs=frozenset({"doctor"}),
+        allowed_schemas=frozenset({"safe"}),
+    )
+
+    assert validate_safe_select(
+        "SELECT synthetic_id FROM doctor.safe.synthetic_table LIMIT 1",
+        config=config,
+    ) == "SELECT synthetic_id FROM doctor.safe.synthetic_table LIMIT 1"
+
+
 def test_raw_sql_tool_is_opt_in(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

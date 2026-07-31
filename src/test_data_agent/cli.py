@@ -493,6 +493,16 @@ def inspect_doctor(
                     )
                 else:
                     checks.append("capability mcp: ok")
+            if "trino" in required:
+                try:
+                    run_trino_doctor_smoke()
+                except Exception:
+                    failures.append(
+                        "capability trino: failed "
+                        "(reinstall agent-paranoid-android[trino] and retry)"
+                    )
+                else:
+                    checks.append("capability trino: ok")
 
     return DoctorReport(checks=tuple(checks), failures=tuple(failures))
 
@@ -535,6 +545,32 @@ def run_mcp_doctor_smoke() -> None:
     tools = asyncio.run(server.list_tools())
     if [tool.name for tool in tools] != ["doctor_probe"]:
         raise RuntimeError("generator MCP tool registration is invalid")
+
+
+def run_trino_doctor_smoke() -> None:
+    from test_data_agent import mcp_trino_server as trino_server
+
+    config = trino_server.TrinoConfig(
+        host="doctor.invalid",
+        port=443,
+        user="doctor",
+        http_scheme="https",
+        allowed_catalogs=frozenset({"doctor"}),
+        allowed_schemas=frozenset({"safe"}),
+        request_timeout=0.1,
+    )
+    sql = "SELECT synthetic_id FROM doctor.safe.synthetic_table LIMIT 1"
+    if trino_server.validate_safe_select(sql, config=config) != sql:
+        raise RuntimeError("Trino safe SQL validation is unavailable")
+    trino_dbapi = importlib.import_module("trino.dbapi")
+    connection = trino_dbapi.connect(
+        host=config.host,
+        port=config.port,
+        user=config.user,
+        http_scheme=config.http_scheme,
+        request_timeout=config.request_timeout,
+    )
+    connection.close()
 
 
 def write_doctor_fixture(directory: Path) -> None:
