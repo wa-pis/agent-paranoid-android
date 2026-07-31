@@ -308,6 +308,34 @@ Exit criteria:
 - Resource limits fail closed and leave no successful-looking partial output.
 - Documentation covers the normal workflow and the most likely recovery paths.
 
+### Remaining Execution Plan To 1.0
+
+The implementation scopes for `0.13.0`, `0.14.0`, and `0.15.0` are complete,
+while the package version remains `0.12.0`. Finish the work in this order:
+
+1. [ ] Merge each completed active OpenSpec delta into its canonical capability
+   and archive its proposal and task evidence in small capability-focused PRs.
+2. [ ] Explicitly defer any active OpenSpec change that is not part of the 1.0
+   baseline, with an owner and a documented reason.
+3. [ ] Confirm that no active OpenSpec change remains except the repository
+   template and that canonical specs match the implemented contracts.
+4. [ ] Run a fresh full security audit, resolve every Critical and High finding,
+   and record owners and dispositions for accepted Medium or lower risks.
+5. [ ] Review README, documentation, migration guidance, examples, package
+   metadata, support policy, SBOM, provenance, signatures, and release notes as
+   one public-readiness gate.
+6. [ ] Prepare and publish `1.0.0rc1`, then run installation, `doctor`,
+   quickstart, agent approval, generation, validation, audit verification, and
+   container-signature checks only against its public artifacts.
+7. [ ] Apply only release-blocking RC fixes, repeat the exact release gates, and
+   publish `1.0.0` from the verified release commit.
+
+The preferred release path is to consolidate the already completed `0.13.0`
+through `0.15.0` scopes into `1.0.0rc1` after the OpenSpec and security gates.
+Do not create retroactive intermediate tags unless maintainers explicitly need
+those public milestones. Version changes, release commits, tags, and publication
+remain separate release-stage work.
+
 ### 1.0.0rc1: Release Candidate
 
 **Goal:** rehearse the final release from frozen contracts without adding

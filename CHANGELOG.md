@@ -75,6 +75,8 @@ All notable changes to this project are documented here.
   partial new output.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
+- An ordered remaining-work checklist from completed feature scopes through
+  OpenSpec closure, RC security review, public artifact verification, and 1.0.
 
 ## [0.12.0] - 2026-07-31
 
