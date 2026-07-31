@@ -221,6 +221,9 @@ core to one model vendor:
   fail-closed type, size, PII, and secret validation.
 - Expand cross-table aggregate constraints and controlled negative scenarios.
   Cross-table mappings now support sum, count, and average reconciliation.
+  Controlled negative generation now distributes deterministic violations
+  across supported field and row rules; coordinated cross-table violations
+  remain.
 
 ## Later
 

@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Cross-table average aggregate mappings across deterministic generation,
   validation, safe profile inference, and read-only Trino profiling.
+- Deterministic controlled negative generation across required, allowed-value,
+  numeric-bound, conditional, temporal, and formula business rules.
 
 ## [0.12.0] - 2026-07-31
 

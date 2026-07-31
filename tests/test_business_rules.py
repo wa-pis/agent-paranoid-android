@@ -278,6 +278,90 @@ scenarios:
     assert report.rule_fail_count == 6
 
 
+def test_negative_generation_distributes_failures_across_field_and_row_rules(
+    tmp_path,
+) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, refunded]
+  - table: orders
+    field: amount
+    min_value: 0
+    max_value: 100
+row_rules:
+  - type: conditional_required
+    table: orders
+    when: {field: status, equals: refunded}
+    required_fields: [refund_reason]
+  - type: conditional_allowed_values
+    table: orders
+    field: shipping_method
+    when: {field: status, equals: paid}
+    allowed_values: [ground, air]
+  - type: temporal_ordering
+    table: orders
+    start_field: created_at
+    end_field: shipped_at
+  - type: formula
+    table: orders
+    field: total
+    expression: quantity * unit_price
+"""
+    )
+    rules = load_business_rules(rules_path)
+    valid_row = {
+        "status": "paid",
+        "amount": 50,
+        "refund_reason": "synthetic reason",
+        "shipping_method": "ground",
+        "created_at": "2026-01-01T00:00:00",
+        "shipped_at": "2026-01-02T00:00:00",
+        "quantity": 2,
+        "unit_price": 5,
+        "total": 10,
+    }
+    rows_a = {"orders": [dict(valid_row) for _ in range(8)]}
+    rows_b = {"orders": [dict(valid_row) for _ in range(8)]}
+
+    apply_business_rules(rows_a, rules, seed=42, mode="negative")
+    apply_business_rules(rows_b, rules, seed=42, mode="negative")
+    report = validate_business_rules(rows_a, rules)
+
+    assert rows_a == rows_b
+    assert report.valid is False
+    assert len(report.results) == 6
+    assert all(result.failed >= 1 for result in report.results)
+
+
+def test_numeric_bound_validation_rejects_non_numeric_values(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: orders
+    field: amount
+    min_value: 0
+    max_value: 100
+"""
+    )
+    rules = load_business_rules(rules_path)
+
+    report = validate_business_rules(
+        {"orders": [{"amount": "__invalid__"}, {"amount": None}]},
+        rules,
+    )
+
+    assert report.valid is False
+    assert report.rule_fail_count == 1
+    assert report.rule_pass_count == 1
+    assert "min_value, max_value" in report.results[0].errors[0]
+
+
 def test_conditional_required_defaults_only_apply_when_condition_matches(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     rules_path.write_text(

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import math
 import random
 from collections.abc import Mapping
-from typing import Any
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Literal
 
 from test_data_agent.core.settings import GenerationMode
-from test_data_agent.rules.conditions import condition_matches
-from test_data_agent.rules.expressions import parse_datetime, safe_eval
+from test_data_agent.rules.conditions import Condition, condition_matches
+from test_data_agent.rules.expressions import numbers_close, parse_datetime, safe_eval
 from test_data_agent.rules.models import (
     BusinessRules,
     ConditionalAllowedValuesRule,
@@ -18,6 +21,28 @@ from test_data_agent.rules.models import (
     TemporalOrderingRule,
 )
 from test_data_agent.rules.scenarios import apply_scenarios
+
+
+@dataclass(frozen=True)
+class InvalidCase:
+    kind: Literal[
+        "required",
+        "allowed_values",
+        "min_value",
+        "max_value",
+        "conditional_required",
+        "conditional_allowed_values",
+        "temporal_ordering",
+        "formula",
+    ]
+    rule: (
+        FieldRule
+        | ConditionalRequiredRule
+        | ConditionalAllowedValuesRule
+        | TemporalOrderingRule
+        | FormulaRule
+    )
+    field: str | None = None
 
 
 def apply_business_rules(
@@ -117,34 +142,129 @@ def inject_invalid_cases(
     invalid_ratio: float,
 ) -> None:
     for table, rows in rows_by_table.items():
+        cases = invalid_cases_for_table(table, rules)
+        if not cases:
+            continue
+        case_index = rng.randrange(len(cases))
         for row in rows:
             if rng.random() > invalid_ratio:
                 continue
-            if break_field_rule(row, table, rules):
-                continue
-            if break_temporal_rule(row, table, rules):
-                continue
+            apply_invalid_case(row, cases[case_index])
+            case_index = (case_index + 1) % len(cases)
 
 
-def break_field_rule(row: dict[str, Any], table: str, rules: BusinessRules) -> bool:
-    for rule in rules.field_rules:
-        if rule.table != table:
+def invalid_cases_for_table(table: str, rules: BusinessRules) -> list[InvalidCase]:
+    cases: list[InvalidCase] = []
+    for field_rule in rules.field_rules:
+        if field_rule.table != table:
             continue
-        if rule.required:
+        if field_rule.required:
+            cases.append(InvalidCase("required", field_rule))
+        if field_rule.allowed_values:
+            cases.append(InvalidCase("allowed_values", field_rule))
+        if field_rule.min_value is not None:
+            cases.append(InvalidCase("min_value", field_rule))
+        if field_rule.max_value is not None:
+            cases.append(InvalidCase("max_value", field_rule))
+    for row_rule in rules.row_rules:
+        if row_rule.table != table:
+            continue
+        if isinstance(row_rule, ConditionalRequiredRule):
+            cases.extend(
+                InvalidCase("conditional_required", row_rule, field)
+                for field in row_rule.required_fields
+            )
+        elif isinstance(row_rule, ConditionalAllowedValuesRule):
+            cases.append(InvalidCase("conditional_allowed_values", row_rule))
+        elif isinstance(row_rule, TemporalOrderingRule):
+            cases.append(InvalidCase("temporal_ordering", row_rule))
+        elif isinstance(row_rule, FormulaRule):
+            cases.append(InvalidCase("formula", row_rule))
+    return cases
+
+
+def apply_invalid_case(row: dict[str, Any], case: InvalidCase) -> None:
+    rule = case.rule
+    if isinstance(rule, FieldRule):
+        if case.kind == "required":
             row[rule.field] = None
-            return True
-        if rule.allowed_values:
-            row[rule.field] = "__invalid__"
-            return True
-    return False
+        elif case.kind == "allowed_values":
+            row[rule.field] = value_outside(rule.allowed_values or [])
+        elif case.kind == "min_value":
+            row[rule.field] = value_below(rule.min_value)
+        elif case.kind == "max_value":
+            row[rule.field] = value_above(rule.max_value)
+        return
+    if isinstance(rule, ConditionalRequiredRule):
+        force_condition_match(row, rule.when)
+        if case.field is not None:
+            row[case.field] = None
+        return
+    if isinstance(rule, ConditionalAllowedValuesRule):
+        force_condition_match(row, rule.when)
+        row[rule.field] = value_outside(rule.allowed_values)
+        return
+    if isinstance(rule, TemporalOrderingRule):
+        start = parse_datetime(row.get(rule.start_field)) or datetime(2000, 1, 2)
+        row[rule.start_field] = start.isoformat()
+        row[rule.end_field] = (start - timedelta(microseconds=1)).isoformat()
+        return
+    if isinstance(rule, FormulaRule):
+        row[rule.field] = perturbed_formula_value(
+            row.get(rule.field),
+            rule.tolerance,
+        )
 
 
-def break_temporal_rule(row: dict[str, Any], table: str, rules: BusinessRules) -> bool:
-    for rule in rules.row_rules:
-        if isinstance(rule, TemporalOrderingRule) and rule.table == table:
-            row[rule.end_field] = "1900-01-01T00:00:00"
-            return True
-    return False
+def force_condition_match(row: dict[str, Any], condition: Condition) -> None:
+    candidates = []
+    if condition.equals is not None:
+        candidates.append(condition.equals)
+    if condition.in_values:
+        candidates.extend(condition.in_values)
+    candidates.extend([row.get(condition.field), "__condition_match__"])
+    for candidate in candidates:
+        candidate_row = dict(row)
+        candidate_row[condition.field] = candidate
+        if condition_matches(candidate_row, condition):
+            row[condition.field] = candidate
+            return
+    raise ValueError(f"condition for {condition.field!r} cannot be satisfied")
+
+
+def value_outside(allowed_values: list[Any]) -> str:
+    value = "__invalid__"
+    while value in allowed_values:
+        value += "_"
+    return value
+
+
+def value_below(bound: float | None) -> float | str:
+    if bound is None:
+        raise ValueError("minimum bound is required")
+    value = math.nextafter(bound, -math.inf)
+    return value if math.isfinite(value) else "__invalid__"
+
+
+def value_above(bound: float | None) -> float | str:
+    if bound is None:
+        raise ValueError("maximum bound is required")
+    value = math.nextafter(bound, math.inf)
+    return value if math.isfinite(value) else "__invalid__"
+
+
+def perturbed_formula_value(value: Any, tolerance: float) -> float | str:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return "__invalid__"
+    delta = max(1.0, tolerance * 2)
+    for candidate in (value + delta, value - delta):
+        if math.isfinite(candidate) and not numbers_close(
+            candidate,
+            value,
+            tolerance,
+        ):
+            return candidate
+    return "__invalid__"
 
 
 def default_value(rule: FieldRule, typed_default: Any = None) -> Any:

@@ -101,6 +101,12 @@ test-data-agent generate out/rules/dataset_spec.yaml \
 clearly separated from valid fixtures and review the validation report rather
 than expecting it to pass.
 
+For tables with several field and row rules, selected rows are distributed
+deterministically across required, allowed-value, numeric-bound, conditional,
+temporal, and formula violations. Reusing the same seed, mode, ratio, and rule
+file reproduces the same negative cases. Foreign-key and aggregate-formula
+negative cases are not generated automatically yet.
+
 ## Safety Restrictions
 
 Do not put real identifiers, emails, phone numbers, addresses, credentials,
