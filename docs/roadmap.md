@@ -294,6 +294,8 @@ Scope:
   - [x] Validate hardened runtime health for every target on AMD64 and ARM64.
 - [ ] Complete a dependency, license, security, and container-image review with
   no unresolved release-blocking findings.
+  - [x] Block container publication on fixable High or Critical vulnerabilities
+    found in each native CLI and MCP target.
 
 Exit criteria:
 
