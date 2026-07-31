@@ -9,6 +9,7 @@ from test_data_agent.advisor import AdvisorExchange
 from test_data_agent.agent import AgentResult
 from test_data_agent.core import DatasetSpec
 from test_data_agent.io import GenerationManifest
+from test_data_agent.validation import DatasetValidationReport
 
 from scripts.contract_fixtures import (
     CONTRACT_FIXTURE_NAMES,
@@ -45,11 +46,14 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     mcp_plan = _load_fixture("mcp-plan.json")
     mcp_generate = _load_fixture("mcp-generate.json")
     public_python_api = _load_fixture("public-python-api.json")
+    artifact_layout = _load_fixture("artifact-layout.json")
+    validation_report = _load_fixture("validation-report.json")
 
     AgentResult.model_validate(cli_plan)
     AdvisorExchange.model_validate(advisor_exchange)
     DatasetSpec.model_validate(dataset_spec)
     GenerationManifest.model_validate(generation_manifest)
+    DatasetValidationReport.model_validate(validation_report)
 
     assert mcp_plan["approval_required"] is True
     assert mcp_generate["source_rows_copied"] is False
@@ -68,6 +72,12 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     assert "sk-" not in serialized
     assert public_python_api["exports"] == sorted(test_data_agent.__all__)
     assert all(hasattr(test_data_agent, name) for name in public_python_api["exports"])
+    assert artifact_layout["files"] == [
+        "dataset_spec.yaml",
+        "generation_manifest.json",
+        "orders.json",
+        "validation_report.json",
+    ]
 
 
 def _load_fixture(name: str) -> dict[str, Any]:

@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 - Generated CLI parser-surface contract coverage for public commands, aliases,
   and agent workflow defaults ahead of the 0.12 interface refactor.
 - A golden contract for the supported top-level Python export surface.
+- Golden contracts for generation bundle filenames and validation reports.
 
 ### Changed
 

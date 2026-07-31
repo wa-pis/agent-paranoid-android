@@ -19,6 +19,7 @@ from test_data_agent.mcp_generator_server import generate_dataset, plan_trino_da
 
 CONTRACT_FIXTURE_NAMES = (
     "advisor-exchange.json",
+    "artifact-layout.json",
     "cli-agent-plan.json",
     "cli-parser-surface.json",
     "dataset-spec.json",
@@ -26,6 +27,7 @@ CONTRACT_FIXTURE_NAMES = (
     "mcp-generate.json",
     "mcp-plan.json",
     "public-python-api.json",
+    "validation-report.json",
 )
 FIXED_PLAN_ID = "0" * 32
 
@@ -59,11 +61,20 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
                 output_format="json",
                 seed=73,
             )
+            generated_folder = workspace_root / "generated"
             manifest = json.loads(
-                (workspace_root / "generated" / "generation_manifest.json").read_text(
-                    encoding="utf-8"
-                )
+                (generated_folder / "generation_manifest.json").read_text(encoding="utf-8")
             )
+            validation_report = json.loads(
+                (generated_folder / "validation_report.json").read_text(encoding="utf-8")
+            )
+            artifact_layout = {
+                "files": sorted(
+                    path.relative_to(generated_folder).as_posix()
+                    for path in generated_folder.rglob("*")
+                    if path.is_file()
+                )
+            }
     finally:
         if previous_workspace is None:
             os.environ.pop("TEST_DATA_AGENT_WORKSPACE_ROOT", None)
@@ -72,6 +83,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
 
     fixtures = {
         "advisor-exchange.json": advisor_exchange.model_dump(mode="json"),
+        "artifact-layout.json": artifact_layout,
         "cli-agent-plan.json": cli_plan,
         "cli-parser-surface.json": _cli_parser_surface(),
         "dataset-spec.json": spec.model_dump(mode="json"),
@@ -81,6 +93,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
         "public-python-api.json": {
             "exports": sorted(test_data_agent.__all__),
         },
+        "validation-report.json": validation_report,
     }
     return {
         name: _normalize_contract(payload, workspace_root)
