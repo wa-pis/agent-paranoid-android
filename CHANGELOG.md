@@ -5,7 +5,8 @@ All notable changes to this project are documented here.
 ## Unreleased
 
 - Added domain-agnostic business-invariant coverage for component formulas,
-  partitions, temporal windows, and paired values across multiple domains.
+  partitions, temporal windows, paired values, grouped totals, relationship
+  coverage, and cross-table reconciliation across multiple domains.
 - Added metadata-only temporal relationship candidates with normalized range
   overlap evidence and no provider-visible source date bounds.
 - Added relationship-discovery coverage for compatible key types, normalized

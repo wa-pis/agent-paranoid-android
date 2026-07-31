@@ -30,13 +30,13 @@
   - [x] Cover key compatibility, cardinality/null/distinctness evidence, and
     unresolved ambiguous low-confidence candidates.
   - [x] Cover bounded temporal-range evidence and overlap.
-- [ ] Add domain-agnostic aggregate and business-rule tests for grouped totals,
+- [x] Add domain-agnostic aggregate and business-rule tests for grouped totals,
   component formulas, partitions, coverage, temporal windows, paired values,
   and cross-table reconciliation. Include financial/accounting as one fixture,
   not as the product's assumed domain.
   - [x] Cover component formulas, partitions, temporal windows, and paired
     values across logistics, scientific, service, and inventory fixtures.
-  - [ ] Cover grouped totals, coverage, and cross-table reconciliation,
+  - [x] Cover grouped totals, coverage, and cross-table reconciliation,
     including one financial/accounting fixture.
 - [ ] Preserve relative distributions and order of magnitude while allowing
   synthetic scaling of sensitive totals; record the effective rule set.

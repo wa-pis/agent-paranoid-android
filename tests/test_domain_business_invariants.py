@@ -1,7 +1,67 @@
 import pytest
 
 from test_data_agent.business_validator import validate_business_rules
+from test_data_agent.core.constraint import Constraint, ConstraintType
+from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.relationship import Relationship
 from test_data_agent.rules.models import business_rules_from_dict
+from test_data_agent.validation import validate_dataset
+
+
+def grouped_total_spec(
+    *,
+    summary_entity: str,
+    detail_entity: str,
+    key_field: str,
+    total_field: str,
+    value_field: str,
+) -> DatasetSpec:
+    return DatasetSpec(
+        entities=[
+            EntitySpec(
+                name=summary_entity,
+                row_count=2,
+                fields=[
+                    FieldSpec(
+                        name=key_field,
+                        data_type=FieldType.INTEGER,
+                        is_identifier=True,
+                    ),
+                    FieldSpec(name=total_field, data_type=FieldType.FLOAT),
+                ],
+            ),
+            EntitySpec(
+                name=detail_entity,
+                row_count=3,
+                fields=[
+                    FieldSpec(name=key_field, data_type=FieldType.INTEGER),
+                    FieldSpec(name=value_field, data_type=FieldType.FLOAT),
+                ],
+            ),
+        ],
+        relationships=[
+            Relationship(
+                parent_entity=summary_entity,
+                parent_field=key_field,
+                child_entity=detail_entity,
+                child_field=key_field,
+                confidence=1.0,
+            )
+        ],
+        constraints=[
+            Constraint(
+                type=ConstraintType.AGGREGATE_MAPPING,
+                entity=summary_entity,
+                fields=[total_field],
+                target_entity=detail_entity,
+                target_field=value_field,
+                aggregate="sum",
+                confidence=1.0,
+            )
+        ],
+    )
 
 
 @pytest.mark.parametrize(
@@ -69,3 +129,78 @@ def test_business_invariants_are_domain_agnostic(
     assert valid_report.rule_fail_count == 0
     assert invalid_report.valid is False
     assert invalid_report.rule_fail_count == 1
+
+
+def test_grouped_totals_and_parent_coverage_are_validated() -> None:
+    spec = grouped_total_spec(
+        summary_entity="depots",
+        detail_entity="parcels",
+        key_field="depot_id",
+        total_field="total_weight",
+        value_field="weight",
+    )
+    valid_rows = {
+        "depots": [
+            {"depot_id": 1, "total_weight": 12},
+            {"depot_id": 2, "total_weight": 4},
+        ],
+        "parcels": [
+            {"depot_id": 1, "weight": 5},
+            {"depot_id": 1, "weight": 7},
+            {"depot_id": 2, "weight": 4},
+        ],
+    }
+
+    assert validate_dataset(valid_rows, spec).valid is True
+
+    mismatched_rows = {
+        table: [dict(row) for row in rows]
+        for table, rows in valid_rows.items()
+    }
+    mismatched_rows["depots"][0]["total_weight"] = 11
+    mismatch_report = validate_dataset(mismatched_rows, spec)
+    assert mismatch_report.valid is False
+    assert "aggregate mismatch" in next(
+        section for section in mismatch_report.sections if section.name == "constraints"
+    ).errors[0]
+
+    uncovered_rows = {
+        table: [dict(row) for row in rows]
+        for table, rows in valid_rows.items()
+    }
+    uncovered_rows["parcels"][2]["depot_id"] = 99
+    coverage_report = validate_dataset(uncovered_rows, spec)
+    assert coverage_report.valid is False
+    assert "has no parent" in next(
+        section for section in coverage_report.sections if section.name == "relationships"
+    ).errors[0]
+
+
+def test_financial_fixture_uses_generic_cross_table_reconciliation() -> None:
+    spec = grouped_total_spec(
+        summary_entity="ledger_balances",
+        detail_entity="postings",
+        key_field="ledger_id",
+        total_field="balance",
+        value_field="amount",
+    )
+    rows = {
+        "ledger_balances": [
+            {"ledger_id": 1, "balance": 60},
+            {"ledger_id": 2, "balance": 25},
+        ],
+        "postings": [
+            {"ledger_id": 1, "amount": 100},
+            {"ledger_id": 1, "amount": -40},
+            {"ledger_id": 2, "amount": 25},
+        ],
+    }
+
+    assert validate_dataset(rows, spec).valid is True
+
+    rows["ledger_balances"][0]["balance"] = 61
+    report = validate_dataset(rows, spec)
+    assert report.valid is False
+    assert "aggregate mismatch" in next(
+        section for section in report.sections if section.name == "constraints"
+    ).errors[0]
