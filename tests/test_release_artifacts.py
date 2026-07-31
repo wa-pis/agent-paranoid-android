@@ -237,6 +237,18 @@ def test_container_release_uses_oidc_and_no_stored_signing_key() -> None:
     assert "COSIGN_PASSWORD" not in workflow
 
 
+def test_container_validation_blocks_fixable_high_severity_vulnerabilities() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "containers.yml").read_text()
+
+    assert "name: Scan image for release-blocking vulnerabilities" in workflow
+    assert "aquasecurity/trivy-action@" in workflow
+    assert "image-ref: agent-paranoid-android:${{ matrix.target }}-test" in workflow
+    assert "scanners: vuln" in workflow
+    assert "severity: HIGH,CRITICAL" in workflow
+    assert "ignore-unfixed: true" in workflow
+    assert 'exit-code: "1"' in workflow
+
+
 def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text()
 

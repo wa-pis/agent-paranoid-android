@@ -149,6 +149,12 @@ The release workflow signs the multi-platform manifest digest with a
 short-lived GitHub OIDC identity and publishes BuildKit SBOM and provenance
 attestations. No Cosign private key is stored in the repository.
 
+Pull-request CI also scans every native container target for fixable High and
+Critical operating-system and Python-package vulnerabilities. A finding at
+either severity blocks publication through the container validation gate.
+Unfixed upstream findings remain visible in the scan output and must be
+reviewed separately during release-candidate security review.
+
 ## Health Semantics
 
 The image health command performs only local checks: non-root execution,

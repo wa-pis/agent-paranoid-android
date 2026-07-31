@@ -42,6 +42,8 @@ All notable changes to this project are documented here.
   coverage on every supported Python version from 3.11 through 3.14.
 - ARM64 pull-request build and hardened runtime health checks for every CLI,
   generator MCP, and Trino MCP container target.
+- Blocking container scans for fixable High and Critical vulnerabilities in
+  every native CLI and MCP target before publication.
 
 ### Fixed
 
