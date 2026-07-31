@@ -11,6 +11,7 @@ its generator transport and register tools through the current SDK API.
 - Register one audited probe tool and verify the public tool listing.
 - Redact failures and provide exact MCP-extra reinstall guidance.
 - Run the smoke from the isolated MCP wheel profile in CI.
+- Keep the optional dependency on the compatible MCP 1.x transport API.
 
 ## Impact
 

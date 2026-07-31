@@ -5,4 +5,5 @@
 - [x] Avoid server startup, tool invocation, and network access.
 - [x] Redact failures and provide reinstall guidance.
 - [x] Run the capability smoke in isolated wheel CI.
+- [x] Bound the MCP extra to the compatible 1.x transport API.
 - [x] Run release and documentation gates.

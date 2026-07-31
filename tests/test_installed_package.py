@@ -15,8 +15,8 @@ from scripts.check_installed_package import (
 def test_requirements_are_grouped_by_runtime_extra() -> None:
     requirements = [
         "faker>=25.0.0",
-        'mcp>=1.0.0; extra == "mcp"',
-        'mcp>=1.0.0; extra == "all"',
+        'mcp<2.0.0,>=1.0.0; extra == "mcp"',
+        'mcp<2.0.0,>=1.0.0; extra == "all"',
         'pyarrow>=15.0.0; extra == "parquet"',
         'pyarrow>=15.0.0; extra == "all"',
     ]
@@ -30,7 +30,7 @@ def test_requirements_are_grouped_by_runtime_extra() -> None:
 
 
 def test_requirement_extras_accepts_combined_markers() -> None:
-    requirement = 'mcp>=1.0.0; extra == "all" or extra == "mcp"'
+    requirement = 'mcp<2.0.0,>=1.0.0; extra == "all" or extra == "mcp"'
 
     assert requirement_extras(requirement) == {"all", "mcp"}
 

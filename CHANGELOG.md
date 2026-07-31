@@ -37,6 +37,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- MCP extras exclude the incompatible 2.x SDK until the transport migrates to
+  its replacement API.
 - Incomplete staged generation and review bundles are removed when interactive
   cancellation interrupts writing or validation.
 - Mid-write disk exhaustion removes partial staged folder, review, and
