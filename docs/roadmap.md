@@ -317,9 +317,9 @@ while the package version remains `0.12.0`. Finish the work in this order:
    and archive its proposal and task evidence.
 2. [x] Confirm that no active OpenSpec change outside the 1.0 baseline requires
    deferral.
-3. [x] Confirm that no active OpenSpec change remains except the RC hardening
-   change and repository template, and that canonical specs contain every
-   completed requirement.
+3. [ ] Reconfirm the active OpenSpec set after the planned public-readiness
+   changes below; every remaining change must be implemented, assigned, or
+   explicitly deferred before the RC is published.
 4. [ ] Run a fresh full security audit, resolve every Critical and High finding,
    and record owners and dispositions for accepted Medium or lower risks.
 5. [ ] Review README, documentation, migration guidance, examples, package
@@ -362,7 +362,15 @@ Scope:
   in the manifest.
 - [ ] Define the dependency support contract with tested minimum and latest
   compatible versions, reasonable upper bounds, and explicit behavior changes
-  that require a package release.
+  that require a package release. Use the [dependency compatibility
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/dependency-compatibility-contract/proposal.md)
+  as the implementation contract.
+  - [ ] Test minimum-supported and latest-compatible dependency profiles for
+    Faker, Pydantic, PyYAML, PyArrow, sqlglot, and the Trino client where used.
+  - [ ] Record dependency identities, generator version, locale, seed, spec
+    digest, and rules digest in reproducibility evidence.
+  - [ ] Add upper major bounds only after compatibility evidence justifies
+    them; do not promise cross-version byte identity without tests.
 - [ ] Validate the core product workflow: bounded profiling → deterministic
   relationship candidates → AI-assisted proposals → human review →
   deterministic validation → synthetic generation.
@@ -394,6 +402,17 @@ Scope:
   About/topics, an input → command → output README example, preserved versus
   not-preserved properties, an alternatives comparison, and a clear statement
   that CLI/library is primary while MCP and providers are integrations.
+  - [ ] Add an installed-wheel `test-data-agent demo --output PATH` workflow
+    using only a bundled synthetic fixture; it must be deterministic, offline,
+    optional-integration-free, and safe on existing or unwritable paths.
+  - [ ] Make the demo the first README workflow and show representative
+    synthetic output plus preserved schema, nullability, shape, relationships,
+    temporal, and executable business-rule properties.
+  - [ ] State explicit non-guarantees for raw-value copying, real PII,
+    statistical anonymity, re-identification, and cross-version byte identity.
+  - [ ] Use the [installed demo and product clarity
+    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/installed-demo-and-product-clarity/proposal.md)
+    as the implementation contract.
 - [ ] Publish runnable, CI-verified usage journeys built only from synthetic
   fixtures. Each journey must show its input, command or API call, generated
   artifacts, validation result, and the privacy boundary being exercised:
@@ -412,6 +431,10 @@ Scope:
     an installed wheel or release-style container, not the source checkout.
 - [ ] Verify README, documentation site, migration guidance, examples, package
   metadata, SBOM, provenance, signatures, and public support policy.
+  - [ ] Keep `CHANGELOG.md` user-facing; move detailed OpenSpec, audit, and
+    release-engineering evidence to canonical linked documents without deleting
+    security history. Track this in the [release documentation hygiene
+    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/release-documentation-hygiene/proposal.md).
 - [ ] Publish and install the release candidate through the real GitHub,
   PyPI, documentation, and GHCR paths.
 - [ ] Run end-to-end smoke tests only against the published candidate
@@ -449,7 +472,14 @@ The RC should remain focused on release safety and product clarity. Use the
 next cycle to reduce maintenance cost and make external contribution easier:
 
 - [ ] Decompose large orchestration modules into application use cases, ports,
-  and thin CLI/MCP transport adapters.
+  and thin CLI/MCP transport adapters, following the [application boundaries
+  refactor OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md).
+  - [ ] Split `agent.py` into typed planning, review, approval, recovery,
+    advising, status, and workspace-persistence responsibilities.
+  - [ ] Split `cli.py` composition, dispatch, doctor, command handlers, and
+    optional dependency resolution while preserving parser/presenter contracts.
+  - [ ] Split `mcp_trino_server.py` into config, pure SQL policy, query
+    builders, client, profiling, and masking boundaries.
 - [ ] Add an architectural dependency test that prevents transport code from
   becoming the only enforcement boundary or leaking into core policy.
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
