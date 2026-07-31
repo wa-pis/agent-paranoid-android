@@ -1,0 +1,53 @@
+{
+  "contracts": {
+    "advisor-exchange.json": {
+      "change_rule": "schema_versioned",
+      "version": "1.0"
+    },
+    "artifact-layout.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "cli-agent-plan.json": {
+      "change_rule": "schema_versioned",
+      "version": "1.0"
+    },
+    "cli-parser-surface.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "dataset-spec.json": {
+      "change_rule": "schema_versioned",
+      "version": "1.0"
+    },
+    "generation-manifest.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "mcp-generate.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "mcp-generator-tools.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "mcp-plan.json": {
+      "change_rule": "schema_versioned",
+      "version": "1.0"
+    },
+    "mcp-trino-tools.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "public-python-api.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    },
+    "validation-report.json": {
+      "change_rule": "additive_only",
+      "version": "1.0"
+    }
+  },
+  "schema_version": "1.0"
+}

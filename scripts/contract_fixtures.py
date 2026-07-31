@@ -29,6 +29,7 @@ CONTRACT_FIXTURE_NAMES = (
     "artifact-layout.json",
     "cli-agent-plan.json",
     "cli-parser-surface.json",
+    "contract-catalog.json",
     "dataset-spec.json",
     "generation-manifest.json",
     "mcp-generate.json",
@@ -99,6 +100,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
         "artifact-layout.json": artifact_layout,
         "cli-agent-plan.json": cli_plan,
         "cli-parser-surface.json": _cli_parser_surface(),
+        "contract-catalog.json": _contract_catalog(),
         "dataset-spec.json": spec.model_dump(mode="json"),
         "generation-manifest.json": manifest,
         "mcp-generate.json": mcp_generate,
@@ -113,6 +115,62 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
     return {
         name: _normalize_contract(payload, workspace_root)
         for name, payload in fixtures.items()
+    }
+
+
+def _contract_catalog() -> dict[str, Any]:
+    return {
+        "schema_version": "1.0",
+        "contracts": {
+            "advisor-exchange.json": {
+                "version": "1.0",
+                "change_rule": "schema_versioned",
+            },
+            "artifact-layout.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "cli-agent-plan.json": {
+                "version": "1.0",
+                "change_rule": "schema_versioned",
+            },
+            "cli-parser-surface.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "dataset-spec.json": {
+                "version": "1.0",
+                "change_rule": "schema_versioned",
+            },
+            "generation-manifest.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "mcp-generate.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "mcp-generator-tools.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "mcp-plan.json": {
+                "version": "1.0",
+                "change_rule": "schema_versioned",
+            },
+            "mcp-trino-tools.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "public-python-api.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+            "validation-report.json": {
+                "version": "1.0",
+                "change_rule": "additive_only",
+            },
+        },
     }
 
 

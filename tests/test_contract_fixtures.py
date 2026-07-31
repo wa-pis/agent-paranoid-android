@@ -50,6 +50,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     trino_tools = _load_fixture_list("mcp-trino-tools.json")
     artifact_layout = _load_fixture("artifact-layout.json")
     validation_report = _load_fixture("validation-report.json")
+    contract_catalog = _load_fixture("contract-catalog.json")
 
     AgentResult.model_validate(cli_plan)
     AdvisorExchange.model_validate(advisor_exchange)
@@ -96,6 +97,21 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     for tool in [*generator_tools, *trino_tools]:
         assert tool["input_schema"]["type"] == "object"
         assert tool["output_schema"] is not None
+    assert contract_catalog["schema_version"] == "1.0"
+
+
+def test_contract_catalog_versions_every_public_fixture() -> None:
+    catalog = _load_fixture("contract-catalog.json")
+    registered = catalog["contracts"]
+    expected = set(CONTRACT_FIXTURE_NAMES) - {"contract-catalog.json"}
+
+    assert set(registered) == expected
+    for contract in registered.values():
+        assert contract["version"] == "1.0"
+        assert contract["change_rule"] in {
+            "additive_only",
+            "schema_versioned",
+        }
 
 
 def _load_fixture(name: str) -> dict[str, Any]:
