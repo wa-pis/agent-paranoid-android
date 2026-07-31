@@ -246,7 +246,7 @@ Scope:
 
 - [x] Publish a stability table for the supported Python imports, CLI commands,
   MCP tools, `DatasetSpec`, advisor exchange, and generated artifact files.
-- [ ] Freeze versioned JSON and MCP schemas with golden compatibility tests and
+- [x] Freeze versioned JSON and MCP schemas with golden compatibility tests and
   explicit additive-versus-breaking change rules.
 - [ ] Inventory compatibility wrappers and command aliases. Mark retained
   surfaces as supported or deprecated with migration guidance; do not remove

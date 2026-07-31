@@ -59,5 +59,11 @@ Run `python3 scripts/update_contract_fixtures.py` only for an intentional,
 reviewed contract change. A fixture update is evidence of a changed contract,
 not approval to change it.
 
+`tests/fixtures/contracts/contract-catalog.json` versions every golden JSON and
+MCP fixture. `additive_only` entries cannot remove, rename, narrow, or require
+existing fields without a breaking release. `schema_versioned` entries must
+advance their serialized schema version and provide migration guidance for a
+breaking change. Contract tests reject fixtures missing from this catalog.
+
 See [DatasetSpec Compatibility](../concepts/dataset-spec-compatibility.md) for
 schema-version and deprecation rules.
