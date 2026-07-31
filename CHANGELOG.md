@@ -21,6 +21,8 @@ All notable changes to this project are documented here.
   and string value length before validation.
 - A runnable single-table CSV example now exercises explicit profiling, spec
   inference, deterministic generation, and independent validation.
+- A runnable relational CSV example now verifies generated foreign keys,
+  deterministic business rules, and multi-table validation.
 
 ### Added
 

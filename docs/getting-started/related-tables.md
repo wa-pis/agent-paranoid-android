@@ -13,6 +13,9 @@ example_dataset/
 
 The checked-in fixture already has this shape.
 
+For an executable version with synthetic inputs and business rules, run
+[`examples/relational_csv/run.sh`](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/relational_csv).
+
 ## Generate The Dataset
 
 ```bash
