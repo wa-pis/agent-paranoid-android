@@ -50,10 +50,10 @@ class Constraint(BaseModel):
                 raise ValueError(
                     "aggregate_mapping constraint requires fields and target_entity"
                 )
-            if self.aggregate not in {None, "sum", "count"}:
-                raise ValueError("aggregate_mapping supports only sum and count")
+            if self.aggregate not in {None, "sum", "count", "avg"}:
+                raise ValueError("aggregate_mapping supports only sum, count, and avg")
             if self.aggregate != "count" and not self.target_field:
-                raise ValueError("sum aggregate_mapping requires target_field")
+                raise ValueError("numeric aggregate_mapping requires target_field")
 
         if self.condition is not None:
             if not self.condition.get("field"):

@@ -860,10 +860,10 @@ def profile_aggregate_mapping(
 ) -> dict[str, Any]:
     """Profile whether parent aggregate fields match child aggregates."""
     check_allowlist(catalog=catalog, schema=schema)
-    if aggregate not in {"sum", "count"}:
-        raise ValueError("aggregate must be 'sum' or 'count'")
-    if aggregate == "sum" and not child_value_field:
-        raise ValueError("child_value_field is required for sum aggregate")
+    if aggregate not in {"sum", "count", "avg"}:
+        raise ValueError("aggregate must be 'sum', 'count', or 'avg'")
+    if aggregate != "count" and not child_value_field:
+        raise ValueError("child_value_field is required for numeric aggregates")
     safe_tolerance = require_non_negative_float(tolerance, "tolerance")
     parent = qualified_table(catalog, schema, parent_table)
     child = qualified_table(catalog, schema, child_table)
@@ -871,7 +871,12 @@ def profile_aggregate_mapping(
     parent_value_sql = quote_identifier(parent_value_field)
     child_key_sql = quote_identifier(child_key)
     child_value_sql = quote_identifier(child_value_field) if child_value_field else None
-    child_aggregate_sql = "count(*)" if aggregate == "count" else f"sum(CAST({child_value_sql} AS double))"
+    if aggregate == "count":
+        child_aggregate_sql = "count(*)"
+    else:
+        child_aggregate_sql = (
+            f"{aggregate}(CAST({child_value_sql} AS double))"
+        )
     expected = "COALESCE(a.aggregate_value, 0.0)"
     residual = f"abs(CAST(p.{parent_value_sql} AS double) - {expected})"
     checked_condition = f"p.{parent_key_sql} IS NOT NULL AND p.{parent_value_sql} IS NOT NULL"

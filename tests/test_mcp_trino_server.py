@@ -727,3 +727,35 @@ def test_profile_aggregate_mapping_uses_child_aggregate_cte(monkeypatch: pytest.
     assert profile["status"] == "inferred"
     assert "WITH child_agg AS" in executed_sql[0]
     assert 'sum(CAST("amount" AS double))' in executed_sql[0]
+
+
+def test_profile_aggregate_mapping_supports_average(monkeypatch: pytest.MonkeyPatch) -> None:
+    executed_sql: list[str] = []
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        executed_sql.append(sql)
+        return [
+            {
+                "parent_row_count": 1,
+                "checked_count": 1,
+                "passed_count": 1,
+                "failed_count": 0,
+            }
+        ]
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+
+    profile = profile_aggregate_mapping(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "customer_id",
+        "orders_amount_average",
+        "orders",
+        "customer_id",
+        "amount",
+        aggregate="avg",
+    )
+
+    assert profile["aggregate"] == "avg"
+    assert 'avg(CAST("amount" AS double))' in executed_sql[0]

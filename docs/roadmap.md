@@ -220,6 +220,7 @@ core to one model vendor:
   The Python generation API now has a row-free provider contract with
   fail-closed type, size, PII, and secret validation.
 - Expand cross-table aggregate constraints and controlled negative scenarios.
+  Cross-table mappings now support sum, count, and average reconciliation.
 
 ## Later
 

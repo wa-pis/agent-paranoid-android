@@ -82,22 +82,30 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
     if constraint.aggregate != "count" and not constraint.target_field:
         return []
     totals: dict[Any, float] = defaultdict(float)
+    counts: dict[Any, int] = defaultdict(int)
     errors: list[str] = []
     for index, child_row in enumerate(rows_by_entity.get(relationship.child_entity, [])):
         if constraint.aggregate == "count":
             totals[child_row.get(relationship.child_field)] += 1
             continue
         value = child_row.get(constraint.target_field)
+        if value is None:
+            continue
         try:
-            numeric_value = float(value or 0.0)
+            numeric_value = float(value)
         except (TypeError, ValueError):
             errors.append(f"{relationship.child_entity}[{index}].{constraint.target_field} aggregate value is not numeric")
             continue
-        totals[child_row.get(relationship.child_field)] += numeric_value
+        key = child_row.get(relationship.child_field)
+        totals[key] += numeric_value
+        counts[key] += 1
     parent_field = constraint.fields[0]
     for index, parent_row in enumerate(rows_by_entity.get(relationship.parent_entity, [])):
         key = parent_row.get(relationship.parent_field)
-        if not numbers_close(parent_row.get(parent_field), totals.get(key, 0.0)):
+        expected = totals.get(key, 0.0)
+        if constraint.aggregate == "avg" and counts.get(key, 0):
+            expected /= counts[key]
+        if not numbers_close(parent_row.get(parent_field), expected):
             errors.append(f"{relationship.parent_entity}[{index}].{parent_field} aggregate mismatch")
     return errors
 

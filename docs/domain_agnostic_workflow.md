@@ -200,7 +200,8 @@ The constraint miner currently infers:
 - temporal constraints, such as `created_at <= fulfilled_at`
 - conditional required constraints, such as `cancellation_reason` required when
   `status == cancelled`
-- aggregate mappings, such as a parent total matching the sum of child amounts
+- aggregate mappings, such as a parent total or average matching the `sum`,
+  `count`, or `avg` of child rows
 
 Every inferred constraint has:
 

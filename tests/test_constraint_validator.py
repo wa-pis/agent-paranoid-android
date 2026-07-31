@@ -3,6 +3,7 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.relationship import Relationship
+from test_data_agent.generation.constraint_solver import solve_constraints
 from test_data_agent.validation import validate_dataset
 
 
@@ -86,3 +87,62 @@ def test_aggregate_mapping_reports_non_numeric_child_values_without_crashing() -
 
     assert report.valid is False
     assert "aggregate value is not numeric" in report.sections[2].errors[0]
+
+
+def test_average_mapping_validation_detects_parent_mismatch() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="customers",
+                row_count=1,
+                fields=[
+                    FieldSpec(name="id", data_type=FieldType.INTEGER, is_identifier=True),
+                    FieldSpec(name="average_amount", data_type=FieldType.FLOAT),
+                ],
+            ),
+            EntitySpec(
+                name="orders",
+                row_count=2,
+                fields=[
+                    FieldSpec(name="customer_id", data_type=FieldType.INTEGER),
+                    FieldSpec(name="amount", data_type=FieldType.FLOAT),
+                ],
+            ),
+        ],
+        relationships=[
+            Relationship(
+                parent_entity="customers",
+                parent_field="id",
+                child_entity="orders",
+                child_field="customer_id",
+                confidence=1.0,
+            )
+        ],
+        constraints=[
+            Constraint(
+                type=ConstraintType.AGGREGATE_MAPPING,
+                entity="customers",
+                fields=["average_amount"],
+                target_entity="orders",
+                target_field="amount",
+                aggregate="avg",
+                confidence=1.0,
+            )
+        ],
+    )
+    rows = {
+        "customers": [{"id": 1, "average_amount": 0.0}],
+        "orders": [
+            {"customer_id": 1, "amount": 10.0},
+            {"customer_id": 1, "amount": 20.0},
+        ],
+    }
+    solve_constraints(rows, spec, seed=1)
+
+    assert validate_dataset(rows, spec).valid is True
+
+    rows["customers"][0]["average_amount"] = 16.0
+    report = validate_dataset(rows, spec)
+
+    assert report.valid is False
+    assert "aggregate mismatch" in report.sections[2].errors[0]
