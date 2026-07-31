@@ -61,6 +61,8 @@ All notable changes to this project are documented here.
   OpenSpec and archived with its immutable provenance evidence.
 - Runtime, optional-extra, and provider-adapter support policy merged into
   canonical OpenSpec and archived with its release-gate evidence.
+- A canonical public Python API capability covering reviewed top-level exports,
+  with the completed golden-contract change archived.
 
 ### Fixed
 
