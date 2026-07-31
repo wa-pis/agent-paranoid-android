@@ -9,6 +9,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Provider-neutral relationship discovery candidate and proposal contracts
+  restricted to bounded safe metadata and mandatory human review.
 - Public relational-synthesis contract defining preserved graph, distribution,
   temporal, and business-rule semantics and explicit non-guarantees.
 - Explicit direct-API privacy and SQL-boundary checks in the release gate.

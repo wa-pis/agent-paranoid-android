@@ -11,13 +11,18 @@ from test_data_agent.advisor import (
     AdvisorExchangeClient,
     AdvisorRequest,
     AdvisorReviewArtifact,
+    DiscoveryFieldReference,
     ExchangeDatasetAdvisor,
+    RelationshipDiscoveryCandidate,
+    RelationshipDiscoveryEvidence,
+    RelationshipDiscoveryProposal,
     advisor_proposal_json_schema,
     advise_dataset_spec,
     build_advisor_exchange,
     build_advisor_request,
     build_advisor_review_artifact,
     validate_advisor_proposal,
+    validate_relationship_discovery_proposals,
 )
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
@@ -343,3 +348,88 @@ def test_advisor_contract_rejects_unknown_top_level_fields() -> None:
 
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
         validate_advisor_proposal(request, payload)
+
+
+def relationship_candidate() -> RelationshipDiscoveryCandidate:
+    return RelationshipDiscoveryCandidate(
+        candidate_id="a" * 64,
+        kind="foreign_key",
+        fields=[
+            DiscoveryFieldReference(entity="customers", field="customer_id"),
+            DiscoveryFieldReference(entity="orders", field="customer_id"),
+        ],
+        confidence=0.91,
+        evidence=[
+            RelationshipDiscoveryEvidence(metric="type_compatibility", value=1.0),
+            RelationshipDiscoveryEvidence(metric="cardinality_ratio", value=0.87),
+        ],
+    )
+
+
+def test_relationship_discovery_contract_contains_safe_metadata_only() -> None:
+    candidate = relationship_candidate()
+    payload = candidate.model_dump(mode="json")
+
+    assert payload["metadata_trust"] == "untrusted"
+    assert payload["raw_values_included"] is False
+    assert "rows" not in candidate.model_dump_json()
+    assert "categories" not in candidate.model_dump_json()
+    assert set(payload["evidence"][0]) == {"metric", "value"}
+
+
+def test_relationship_proposal_requires_review_and_candidate_identity() -> None:
+    candidate = relationship_candidate()
+    proposal = RelationshipDiscoveryProposal(
+        candidate_id=candidate.candidate_id,
+        kind=candidate.kind,
+        fields=candidate.fields,
+        confidence=0.84,
+        evidence=["Compatible identifier types and bounded cardinality."],
+    )
+
+    assert validate_relationship_discovery_proposals([candidate], [proposal]) == [proposal]
+    assert proposal.review_status == "requires_human_review"
+    assert proposal.approved is False
+    assert proposal.generation_performed is False
+
+
+def test_relationship_proposal_cannot_invent_or_change_candidate() -> None:
+    candidate = relationship_candidate()
+    proposal = RelationshipDiscoveryProposal(
+        candidate_id="b" * 64,
+        kind=candidate.kind,
+        fields=candidate.fields,
+        confidence=0.84,
+    )
+
+    with pytest.raises(AdvisorContractError, match="unknown candidate"):
+        validate_relationship_discovery_proposals([candidate], [proposal])
+
+    changed_fields = [field.model_copy() for field in candidate.fields]
+    changed_fields[0] = DiscoveryFieldReference(entity="customers", field="other_id")
+    proposal = RelationshipDiscoveryProposal(
+        candidate_id=candidate.candidate_id,
+        kind=candidate.kind,
+        fields=changed_fields,
+        confidence=0.84,
+    )
+    with pytest.raises(AdvisorContractError, match="candidate identity"):
+        validate_relationship_discovery_proposals([candidate], [proposal])
+
+
+def test_relationship_discovery_contract_rejects_raw_or_unbounded_fields() -> None:
+    payload = relationship_candidate().model_dump(mode="json")
+    payload["raw_values"] = ["source-value"]
+
+    with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+        RelationshipDiscoveryCandidate.model_validate(payload)
+
+    proposal = {
+        "candidate_id": "a" * 64,
+        "kind": "foreign_key",
+        "fields": payload["fields"],
+        "confidence": 0.5,
+        "assumptions": ["x" * 501],
+    }
+    with pytest.raises(ValidationError, match="at most 500 characters"):
+        RelationshipDiscoveryProposal.model_validate(proposal)

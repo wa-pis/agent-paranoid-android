@@ -1,5 +1,17 @@
 # Advisor API
 
+## Relationship Discovery Contracts
+
+`RelationshipDiscoveryCandidate` carries only ordered entity/field references,
+normalized zero-to-one evidence metrics, confidence, bounded assumptions, and
+an opaque SHA-256 candidate identifier. It cannot contain rows, categories, raw
+values, SQL, credentials, or generation authority.
+
+`RelationshipDiscoveryProposal` lets any provider rank an existing candidate
+and add bounded evidence or assumptions. It cannot invent a candidate, change
+its kind or fields, approve it, or run generation. Every proposal remains
+`requires_human_review` until a later deterministic validation and review step.
+
 The advisor API is a small provider-neutral boundary for model-assisted
 `DatasetSpec` proposals. The direct API does not call an LLM, persist a plan,
 approve a plan, or generate rows.
