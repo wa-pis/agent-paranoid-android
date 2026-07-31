@@ -217,6 +217,8 @@ core to one model vendor:
   documented deprecation period.
 - Add a pluggable semantic-provider interface for organization-specific
   synthetic values without allowing providers to bypass privacy validation.
+  The Python generation API now has a row-free provider contract with
+  fail-closed type, size, PII, and secret validation.
 - Expand cross-table aggregate constraints and controlled negative scenarios.
 
 ## Later
