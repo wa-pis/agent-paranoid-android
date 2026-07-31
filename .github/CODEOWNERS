@@ -1,0 +1,9 @@
+# The current single maintainer reviews all project changes.
+* @wa-pis
+
+# Keep explicit ownership visible for security and release boundaries.
+/SECURITY.md @wa-pis
+/.github/workflows/ @wa-pis
+/scripts/check_release.sh @wa-pis
+/src/test_data_agent/mcp_trino_server.py @wa-pis
+/src/test_data_agent/core/ @wa-pis

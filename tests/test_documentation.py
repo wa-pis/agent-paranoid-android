@@ -68,6 +68,24 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "## Legacy GenerationSpec Compatibility" not in readme
 
 
+def test_public_governance_files_define_owners_and_safe_support() -> None:
+    required_files = {
+        "CODE_OF_CONDUCT.md": "onepis2word@gmail.com",
+        "SUPPORT.md": "SECURITY.md",
+        "GOVERNANCE.md": "single-maintainer",
+        ".github/CODEOWNERS": "* @wa-pis",
+    }
+
+    for relative_path, required_text in required_files.items():
+        content = (ROOT / relative_path).read_text()
+        assert required_text in content, relative_path
+
+    readme = (ROOT / "README.md").read_text()
+    for relative_path in required_files:
+        if not relative_path.startswith(".github/"):
+            assert f"]({relative_path})" in readme
+
+
 def test_required_user_documentation_exists_and_is_navigable() -> None:
     config = (ROOT / "mkdocs.yml").read_text()
 
