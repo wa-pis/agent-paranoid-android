@@ -35,6 +35,7 @@ class NumericDistribution(BaseModel):
     max_value: int | float | None = None
     p05: int | float | None = None
     p95: int | float | None = None
+    scale_factor: float = Field(default=1.0, ge=0.1, le=10.0)
 
     @model_validator(mode="after")
     def validate_ordered_bounds(self) -> NumericDistribution:

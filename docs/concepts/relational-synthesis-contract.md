@@ -26,6 +26,11 @@ shape and order of magnitude. Scaling must use synthetic values and explicit
 rules; it must not copy source totals or preserve sensitive outliers. Exact-row
 reuse checks are a safety backstop, not proof of anonymity.
 
+Numeric distributions accept a bounded `scale_factor` from `0.1` through
+`10.0`. Sensitive numeric distributions require an explicit non-identity
+factor; generation scales the approved bounds before drawing values and records
+the effective distribution in `dataset_spec.yaml`.
+
 ## Publication Rule
 
 A dataset may claim an invariant only when deterministic validation executes

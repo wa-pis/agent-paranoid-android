@@ -124,7 +124,7 @@ def generate_field_value(
         return invalid_value_for_type(field.data_type)
     if field.is_identifier:
         return synthetic_identifier(entity_name, field, row_index, seed)
-    if field.sensitive:
+    if field.sensitive and field.data_type == FieldType.STRING:
         return synthetic_sensitive_value(field, faker)
     if (
         semantic_provider is not None
@@ -213,14 +213,18 @@ def ranged_number(
     if typed_distribution is not None:
         low = typed_distribution.p05 if typed_distribution.p05 is not None else typed_distribution.min_value
         high = typed_distribution.p95 if typed_distribution.p95 is not None else typed_distribution.max_value
+        scale_factor = typed_distribution.scale_factor
     else:
         low = distribution.get("p05", distribution.get("min_value", default_min))
         high = distribution.get("p95", distribution.get("max_value", default_max))
+        scale_factor = 1.0
     low = default_min if low is None else low
     high = default_max if high is None else high
+    low = float(low) * scale_factor
+    high = float(high) * scale_factor
     if low == high:
-        return float(low)
-    return rng.uniform(float(low), float(high))
+        return low
+    return rng.uniform(low, high)
 
 
 def boolean_value(

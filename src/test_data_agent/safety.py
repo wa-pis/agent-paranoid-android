@@ -38,7 +38,9 @@ class SourceRowReuseError(ValueError):
     """Raised when generated output exactly repeats a source CSV row."""
 
 
-_SAFE_SENSITIVE_DISTRIBUTIONS = frozenset({"masked_patterns", "synthetic_identifier"})
+_SAFE_SENSITIVE_DISTRIBUTIONS = frozenset(
+    {"masked_patterns", "numeric", "synthetic_identifier"}
+)
 _TEXT_LENGTH_PATTERN = re.compile(r"text_len_\d+")
 
 
@@ -72,6 +74,17 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
                     error_type=SpecSafetyError,
                     context="dataset spec",
                 )
+            if sensitive and kind == "numeric":
+                if field.data_type.value not in {"integer", "float"}:
+                    raise SpecSafetyError(
+                        f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
+                        "uses a numeric distribution for a non-numeric field"
+                    )
+                if float(field.distribution.get("scale_factor", 1.0)) == 1.0:
+                    raise SpecSafetyError(
+                        f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
+                        "requires a non-identity numeric scale_factor"
+                    )
             if kind != "categorical":
                 continue
 
@@ -152,7 +165,9 @@ def assert_no_csv_source_rows(
         sample = handle.read(8192)
         handle.seek(0)
         reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
-        fieldnames = validate_csv_headers(reader.fieldnames)
+        fieldnames = validate_csv_headers(
+            list(reader.fieldnames) if reader.fieldnames is not None else None
+        )
         enforce_input_column_count(len(fieldnames), label="source CSV")
         reader.fieldnames = fieldnames
         signatures = {_row_signature(row, fieldnames) for row in generated}
