@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import test_data_agent
 from test_data_agent.advisor import AdvisorExchange
 from test_data_agent.agent import AgentResult
 from test_data_agent.core import DatasetSpec
@@ -43,6 +44,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     generation_manifest = _load_fixture("generation-manifest.json")
     mcp_plan = _load_fixture("mcp-plan.json")
     mcp_generate = _load_fixture("mcp-generate.json")
+    public_python_api = _load_fixture("public-python-api.json")
 
     AgentResult.model_validate(cli_plan)
     AdvisorExchange.model_validate(advisor_exchange)
@@ -64,6 +66,8 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     )
     assert "@" not in serialized
     assert "sk-" not in serialized
+    assert public_python_api["exports"] == sorted(test_data_agent.__all__)
+    assert all(hasattr(test_data_agent, name) for name in public_python_api["exports"])
 
 
 def _load_fixture(name: str) -> dict[str, Any]:
