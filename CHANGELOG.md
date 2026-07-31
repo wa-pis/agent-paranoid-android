@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added bounded numeric distribution scaling with fail-closed non-identity
+  scaling for sensitive synthetic totals.
 - Added domain-agnostic business-invariant coverage for component formulas,
   partitions, temporal windows, paired values, grouped totals, relationship
   coverage, and cross-table reconciliation across multiple domains.

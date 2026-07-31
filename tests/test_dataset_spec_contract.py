@@ -282,7 +282,14 @@ def test_field_models_normalize_recognized_distribution_shapes() -> None:
 
     assert profile.distribution["kind"] == "categorical"
     assert profile.distribution["categories"][0] == {"value": "active", "count": 2.0}
-    assert spec.distribution == {"kind": "numeric", "min_value": None, "max_value": None, "p05": 1, "p95": 10}
+    assert spec.distribution == {
+        "kind": "numeric",
+        "min_value": None,
+        "max_value": None,
+        "p05": 1,
+        "p95": 10,
+        "scale_factor": 1.0,
+    }
     assert isinstance(profile.typed_distribution, CategoricalDistribution)
     assert profile.typed_distribution.categories[0].value == "active"
     assert isinstance(spec.typed_distribution, NumericDistribution)
