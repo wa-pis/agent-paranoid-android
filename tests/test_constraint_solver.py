@@ -6,6 +6,7 @@ from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.relationship import Relationship, RelationshipType
 from test_data_agent.core.settings import GenerationMode
+from test_data_agent.generation.constraint_solver import solve_constraints
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.validation import validate_dataset
 
@@ -223,3 +224,63 @@ def test_aggregate_count_mapping_counts_child_rows() -> None:
 
     rows = generate_dataset(spec, seed=1)
     assert rows["customers"][0]["order_count"] == 2
+
+
+def test_aggregate_average_mapping_ignores_null_child_values() -> None:
+    spec = _average_mapping_spec()
+    rows = {
+        "customers": [{"id": 1, "orders_amount_average": 0.0}],
+        "orders": [
+            {"customer_id": 1, "amount": 10.0},
+            {"customer_id": 1, "amount": None},
+            {"customer_id": 1, "amount": 20.0},
+        ],
+    }
+
+    solve_constraints(rows, spec, seed=1)
+
+    assert rows["customers"][0]["orders_amount_average"] == 15
+
+
+def _average_mapping_spec() -> DatasetSpec:
+    return DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="customers",
+                row_count=1,
+                primary_key="id",
+                fields=[
+                    FieldSpec(name="id", data_type=FieldType.INTEGER, is_identifier=True),
+                    FieldSpec(name="orders_amount_average", data_type=FieldType.FLOAT),
+                ],
+            ),
+            EntitySpec(
+                name="orders",
+                row_count=3,
+                fields=[
+                    FieldSpec(name="customer_id", data_type=FieldType.INTEGER),
+                    FieldSpec(name="amount", data_type=FieldType.FLOAT, nullable=True),
+                ],
+            ),
+        ],
+        relationships=[
+            Relationship(
+                parent_entity="customers",
+                parent_field="id",
+                child_entity="orders",
+                child_field="customer_id",
+                confidence=1.0,
+            )
+        ],
+        constraints=[
+            Constraint(
+                type=ConstraintType.AGGREGATE_MAPPING,
+                entity="customers",
+                fields=["orders_amount_average"],
+                target_entity="orders",
+                target_field="amount",
+                aggregate="avg",
+                confidence=1.0,
+            )
+        ],
+    )

@@ -149,17 +149,22 @@ def infer_aggregate_mapping_constraints(profile: DatasetProfile) -> list[Constra
         parent_names = {field.name.lower(): field.name for field in parent.fields}
         child_numeric = [field for field in child.fields if field.data_type in {FieldType.INTEGER, FieldType.FLOAT} and not field.is_identifier]
         for child_field in child_numeric:
-            total_name = f"{relationship.child_entity}_{child_field.name}_total"
-            if total_name.lower() in parent_names:
-                constraints.append(
-                    Constraint(
-                        type=ConstraintType.AGGREGATE_MAPPING,
-                        entity=relationship.parent_entity,
-                        fields=[parent_names[total_name.lower()]],
-                        target_entity=relationship.child_entity,
-                        target_field=child_field.name,
-                        aggregate="sum",
-                        confidence=0.8,
+            candidates = (
+                ("sum", f"{relationship.child_entity}_{child_field.name}_total"),
+                ("avg", f"{relationship.child_entity}_{child_field.name}_average"),
+                ("avg", f"{relationship.child_entity}_{child_field.name}_avg"),
+            )
+            for aggregate, parent_name in candidates:
+                if parent_name.lower() in parent_names:
+                    constraints.append(
+                        Constraint(
+                            type=ConstraintType.AGGREGATE_MAPPING,
+                            entity=relationship.parent_entity,
+                            fields=[parent_names[parent_name.lower()]],
+                            target_entity=relationship.child_entity,
+                            target_field=child_field.name,
+                            aggregate=aggregate,
+                            confidence=0.8,
+                        )
                     )
-                )
     return constraints

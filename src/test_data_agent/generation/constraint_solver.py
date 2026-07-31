@@ -102,6 +102,7 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         if relationship is None:
             continue
         totals: dict[Any, float] = defaultdict(float)
+        counts: dict[Any, int] = defaultdict(int)
         target_field = constraint.target_field
         for child_row in rows_by_entity.get(relationship.child_entity, []):
             key = child_row.get(relationship.child_field)
@@ -110,16 +111,23 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
                 continue
             if target_field is None:
                 continue
+            value = child_row.get(target_field)
+            if value is None:
+                continue
             try:
-                totals[key] += float(child_row.get(target_field) or 0.0)
+                totals[key] += float(value)
             except (TypeError, ValueError):
                 continue
+            counts[key] += 1
         parent_field = constraint.fields[0] if constraint.fields else None
         if parent_field is None:
             continue
         for parent_row in rows_by_entity.get(relationship.parent_entity, []):
             key = parent_row.get(relationship.parent_field)
-            parent_row[parent_field] = normalize_number(totals.get(key, 0.0))
+            aggregate_value = totals.get(key, 0.0)
+            if constraint.aggregate == "avg" and counts.get(key, 0):
+                aggregate_value /= counts[key]
+            parent_row[parent_field] = normalize_number(aggregate_value)
 
 def normalize_number(value: float) -> int | float:
     rounded = round(value, 6)

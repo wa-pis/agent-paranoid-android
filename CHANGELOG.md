@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Cross-table average aggregate mappings across deterministic generation,
+  validation, safe profile inference, and read-only Trino profiling.
+
 ## [0.12.0] - 2026-07-31
 
 ### Added
