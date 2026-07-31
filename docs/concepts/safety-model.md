@@ -59,9 +59,16 @@ For supported workflows and accepted inputs, the project is designed to:
 - avoid copying complete source rows;
 - avoid writing raw detected PII into safe profiles;
 - regenerate identifiers and sensitive semantic values;
-- produce deterministic output for the same spec, rules, seed, and version;
+- produce logically deterministic output for the same spec, rules, seed,
+  locale, runtime, dependencies, serializer, and generator version;
 - validate schema, relationships, constraints, and business rules;
 - record provenance and safety flags in a generation manifest.
+
+The manifest records those effective inputs plus SHA-256 evidence for generated
+artifacts. Byte-for-byte identity is expected only when the complete recorded
+environment is unchanged. It is not guaranteed across Python, dependency,
+serializer, operating-system, or package versions, even when logical values and
+validation results remain equivalent.
 
 ## What It Does Not Guarantee
 

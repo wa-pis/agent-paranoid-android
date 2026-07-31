@@ -1,5 +1,6 @@
 import csv
 import errno
+import hashlib
 import json
 from pathlib import Path
 
@@ -96,6 +97,16 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
     assert validation_artifact["valid"] is True
     assert manifest["source_rows_copied"] is False
     assert manifest["seed"] == 41
+    evidence = manifest["reproducibility"]
+    assert evidence["guarantee"] == "same_environment_logical"
+    assert evidence["byte_identical_across_versions"] is False
+    assert evidence["locale"] == "en_US"
+    assert evidence["serializer"] == "python-stdlib-json"
+    assert evidence["generator_algorithm_version"] == manifest["package_version"]
+    assert evidence["output_sha256"]["orders.json"] == hashlib.sha256(
+        output_path.read_bytes()
+    ).hexdigest()
+    assert "generation_manifest.json" not in evidence["output_sha256"]
     assert applied and applied[0][1] == 41
     assert applied[0][0] == rows
 
