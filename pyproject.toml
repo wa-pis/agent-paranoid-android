@@ -94,22 +94,7 @@ exclude_lines = [
 [tool.mypy]
 python_version = "3.11"
 files = [
-    "src/test_data_agent/core",
-    "src/test_data_agent/generation",
-    "src/test_data_agent/rules",
-    "src/test_data_agent/validation",
-    "src/test_data_agent/audit.py",
-    "src/test_data_agent/agent.py",
-    "src/test_data_agent/advisor.py",
-    "src/test_data_agent/cli.py",
-    "src/test_data_agent/cli_contract.py",
-    "src/test_data_agent/cli_parser.py",
-    "src/test_data_agent/container_health.py",
-    "src/test_data_agent/csv_profiler.py",
-    "src/test_data_agent/io",
-    "src/test_data_agent/mcp_generator_server.py",
-    "src/test_data_agent/providers/openai.py",
-    "src/test_data_agent/adapters/parquet_dataset.py",
+    "src/test_data_agent",
     "scripts/contract_fixtures.py",
     "scripts/update_contract_fixtures.py",
 ]

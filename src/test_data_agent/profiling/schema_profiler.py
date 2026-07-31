@@ -307,11 +307,11 @@ class FieldAccumulator:
             )
             return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}
         if profile.data_type == FieldType.INTEGER:
-            numbers = sorted(value for value in self.numeric_values if isinstance(value, int))
-            return {"kind": "numeric", **numeric_stats(numbers, integer=True)}
+            integers = sorted(value for value in self.numeric_values if isinstance(value, int))
+            return {"kind": "numeric", **numeric_stats(integers, integer=True)}
         if profile.data_type == FieldType.FLOAT:
-            numbers = sorted(float(value) for value in self.numeric_values)
-            return {"kind": "numeric", **numeric_stats(numbers, integer=False)}
+            floats = sorted(float(value) for value in self.numeric_values)
+            return {"kind": "numeric", **numeric_stats(floats, integer=False)}
         if profile.data_type == FieldType.BOOLEAN:
             return {"kind": "boolean", "true_ratio": self.bool_counts[True] / self.non_null_count if self.non_null_count else 0.0}
         if profile.data_type == FieldType.DATE:

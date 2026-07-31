@@ -56,11 +56,11 @@
   - [x] Replace endpoint-preserving masks and add rare-text/quasi-ID tests.
 - [x] Document the exact-row limitation and the absence of statistical privacy
   guarantees.
-- [ ] Expand mypy coverage to the full production package and resolve optional
+- [x] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.
   - [x] Add the CSV profiler to strict mypy coverage.
   - [x] Add I/O and Parquet adapters with an explicit untyped `pyarrow` override.
-  - [ ] Cover the remaining production modules and duplicate script modules.
+  - [x] Cover the remaining production modules and duplicate script modules.
 - [x] Remove `0.8.1` container defaults or derive them from package metadata;
   add a release drift check.
 - [ ] Verify release tags point to the verified merge commit and publish
