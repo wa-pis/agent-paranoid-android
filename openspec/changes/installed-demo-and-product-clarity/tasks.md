@@ -6,11 +6,11 @@
   explicit deterministic seed.
 - [x] Stage and publish demo artifacts atomically; reject existing destinations
   and clean up all failure paths.
-- [ ] Add tests for successful execution, repeatability, offline operation,
+- [x] Add tests for successful execution, repeatability, offline operation,
   missing/unwritable output, existing output, and partial-failure cleanup.
 - [x] Add an isolated-wheel test that runs the installed console entrypoint and
   proves the bundled resource is present without the source checkout.
-- [ ] Verify the manifest and validation artifacts independently in tests.
+- [x] Verify the manifest and validation artifacts independently in tests.
 - [ ] Make the demo the first README scenario with a short sample result.
 - [ ] Document preserved properties: schema/types, nullability, bounded shape,
   relationships, temporal dependencies, and executable business rules where
