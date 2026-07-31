@@ -25,11 +25,11 @@
   discovery.
 - [x] Combine deterministic candidate mining with AI ranking/proposals and a
   human review step; AI output must never directly approve generation.
-- [ ] Add relationship tests for compatible key types, cardinality, nulls,
+- [x] Add relationship tests for compatible key types, cardinality, nulls,
   distinctness, temporal ranges, and ambiguous/low-confidence candidates.
   - [x] Cover key compatibility, cardinality/null/distinctness evidence, and
     unresolved ambiguous low-confidence candidates.
-  - [ ] Cover bounded temporal-range evidence and overlap.
+  - [x] Cover bounded temporal-range evidence and overlap.
 - [ ] Add domain-agnostic aggregate and business-rule tests for grouped totals,
   component formulas, partitions, coverage, temporal windows, paired values,
   and cross-table reconciliation. Include financial/accounting as one fixture,

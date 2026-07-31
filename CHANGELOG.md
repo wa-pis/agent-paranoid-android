@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added metadata-only temporal relationship candidates with normalized range
+  overlap evidence and no provider-visible source date bounds.
 - Added relationship-discovery coverage for compatible key types, normalized
   cardinality/null/distinctness evidence, and ambiguous low-confidence cases.
 - Added metadata-only relationship candidate mining, provider ranking validation,
