@@ -51,6 +51,8 @@ All notable changes to this project are documented here.
 - Canonical OpenSpec requirements for behavior-preserving CLI boundaries and
   safety-equivalent direct/MCP application services, with the completed change
   archived for the 1.0 contract freeze.
+- A canonical public-contracts OpenSpec capability covering retained aliases,
+  wrappers, migration targets, and minimum deprecation windows.
 
 ### Fixed
 
