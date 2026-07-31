@@ -178,6 +178,8 @@ already own their instructions and response schema.
 
 `mine_relationship_candidates(profile)` builds deterministic foreign-key
 candidates without sending profile distributions or source values to a provider.
+Candidates expose normalized type, cardinality, null, and distinctness evidence;
+incompatible key types are excluded and ambiguous candidates remain unresolved.
 `rank_relationship_candidates(candidates, advisor)` validates provider rankings
 against those candidates, and `review_relationship_proposal(...)` records the
 separate human decision. Even an accepted review does not authorize generation

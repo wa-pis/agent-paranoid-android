@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added relationship-discovery coverage for compatible key types, normalized
+  cardinality/null/distinctness evidence, and ambiguous low-confidence cases.
 - Added metadata-only relationship candidate mining, provider ranking validation,
   and explicit human review records that cannot authorize generation.
 - Bound JSON dataset inputs by row count, nested value count, nesting depth,

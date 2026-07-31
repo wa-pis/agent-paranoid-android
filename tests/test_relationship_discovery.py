@@ -98,3 +98,54 @@ def test_human_review_never_authorizes_generation() -> None:
 
     assert review.decision == "accepted"
     assert review.generation_authorized is False
+
+
+def test_candidate_reports_cardinality_null_and_distinctness() -> None:
+    candidate = mine_relationship_candidates(_profile())[0]
+    evidence = {item.metric: item.value for item in candidate.evidence}
+
+    assert evidence["type_compatibility"] == 1.0
+    assert evidence["cardinality_ratio"] == 0.5
+    assert evidence["child_null_ratio"] == 0.1
+    assert evidence["child_distinct_ratio"] == 0.4
+
+
+def test_incompatible_key_types_are_not_candidates() -> None:
+    profile = _profile()
+    profile.entity("payment").field("account_id").data_type = FieldType.DATE
+
+    assert mine_relationship_candidates(profile) == []
+
+
+def test_ambiguous_low_confidence_candidates_remain_unresolved() -> None:
+    profile = _profile()
+    profile.entity("account").field("account_id").unique_ratio = 0.2
+    profile.entity("payment").field("account_id").null_ratio = 0.9
+    profile.entities.append(
+        EntityProfile(
+            name="legacy_account",
+            row_count=8,
+            primary_key_candidates=["account_id"],
+            fields=[
+                FieldProfile(
+                    name="account_id",
+                    data_type=FieldType.INTEGER,
+                    unique_ratio=0.2,
+                    is_identifier=True,
+                )
+            ],
+        )
+    )
+
+    candidates = [
+        candidate
+        for candidate in mine_relationship_candidates(profile)
+        if candidate.fields[1].entity == "payment"
+    ]
+
+    assert len(candidates) == 2
+    assert all(candidate.confidence < 0.5 for candidate in candidates)
+    assert {candidate.fields[0].entity for candidate in candidates} == {
+        "account",
+        "legacy_account",
+    }

@@ -72,6 +72,12 @@ def mine_relationship_candidates(
                             metric="child_distinct_ratio",
                             value=child_field.unique_ratio,
                         ),
+                        RelationshipDiscoveryEvidence(
+                            metric="cardinality_ratio",
+                            value=_cardinality_ratio(
+                                parent.row_count, child.row_count
+                            ),
+                        ),
                     ]
                     fields = [
                         DiscoveryFieldReference(
@@ -146,3 +152,10 @@ def _key_types_compatible(parent: FieldProfile, child: FieldProfile) -> bool:
         FieldType.INTEGER,
         FieldType.FLOAT,
     }
+
+
+def _cardinality_ratio(parent_rows: int, child_rows: int) -> float:
+    largest = max(parent_rows, child_rows)
+    if largest == 0:
+        return 1.0
+    return round(min(parent_rows, child_rows) / largest, 6)
