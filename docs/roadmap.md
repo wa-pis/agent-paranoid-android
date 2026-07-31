@@ -205,26 +205,156 @@ core to one model vendor:
 - Measure the base environment separately from development and `all` installs
   in CI, and document the installation cost of each optional capability.
 
-## Toward 1.0
+## Version Plan To 1.0
 
-- Stabilize the public Python, CLI, MCP, `DatasetSpec`, and artifact contracts.
-  The top-level Python export surface, generation bundle layout, manifest, and
-  validation report now have checked-in golden contracts. Generator and Trino
-  MCP tool names plus input/output schemas are also golden.
-- Split the CLI and MCP server modules into parsing, application, and
-  presentation boundaries without changing their safety behavior.
-- Remove legacy compatibility wrappers and command aliases only after a
-  documented deprecation period.
-- Add a pluggable semantic-provider interface for organization-specific
-  synthetic values without allowing providers to bypass privacy validation.
-  The Python generation API now has a row-free provider contract with
-  fail-closed type, size, PII, and secret validation.
-- Expand cross-table aggregate constraints and controlled negative scenarios.
-  Cross-table mappings now support sum, count, and average reconciliation.
-  Controlled negative generation now distributes deterministic violations
-  across supported field and row rules; coordinated cross-table violations
-  remain.
+The package is currently at `0.12.0`. Assign work to the release where it forms
+a complete user workflow; do not bump the package version on every feature PR.
+Version bumps, release changelog sections, and tags belong to separate release
+pull requests.
+
+### 0.13.0: Complete Negative Dataset Workflows
+
+**Goal:** make controlled invalid datasets as deterministic and reviewable as
+valid datasets.
+
+Scope:
+
+- [x] Support sum, count, and average cross-table reconciliation.
+- [x] Distribute negative rows across supported field and row rules instead of
+  repeatedly breaking only the first rule.
+- [ ] Generate coordinated foreign-key and aggregate-formula violations
+  without corrupting unrelated rows.
+- [ ] Record expected and observed violations in bounded business-validation
+  artifacts so users can distinguish intentional failures from generator bugs.
+- [ ] Add CLI and MCP examples that reproduce the same negative cases from the
+  same spec, rule file, seed, mode, and invalid ratio.
+
+Exit criteria:
+
+- Every supported negative case is detected by deterministic validation.
+- Negative artifacts remain explicitly separated and labelled as invalid test
+  data.
+- Existing valid, edge, and load-test behavior remains unchanged.
+- Golden artifact contracts cover any report or manifest additions.
+
+### 0.14.0: Freeze Public Contracts
+
+**Goal:** define exactly what is stable for external users before the 1.0
+compatibility promise starts.
+
+Scope:
+
+- [ ] Publish a stability table for the supported Python imports, CLI commands,
+  MCP tools, `DatasetSpec`, advisor exchange, and generated artifact files.
+- [ ] Freeze versioned JSON and MCP schemas with golden compatibility tests and
+  explicit additive-versus-breaking change rules.
+- [ ] Inventory compatibility wrappers and command aliases. Mark retained
+  surfaces as supported or deprecated with migration guidance; do not remove
+  anything before its documented compatibility window expires.
+- [ ] Test that the current package reads reviewed specs and generated metadata
+  fixtures from the previous feature release.
+- [ ] Document the support policy for Python versions, optional extras, and
+  provider adapters.
+
+Exit criteria:
+
+- Every documented public surface has an owner, compatibility rule, and
+  contract test.
+- No unannounced schema, CLI help, exit-code, artifact-layout, or MCP tool
+  changes remain.
+- Experimental examples and provider integrations are clearly distinguished
+  from the stable deterministic core.
+
+### 0.15.0: Operational Readiness
+
+**Goal:** prove the frozen product works reliably when installed and operated
+outside the repository checkout.
+
+Scope:
+
+- [ ] Add bounded performance and resource regression checks for representative
+  multi-entity generation, validation, and profiling workloads.
+- [ ] Exercise cancellation, timeout, disk exhaustion, and interrupted-write
+  paths and verify that partial bundles are never reported as successful.
+- [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
+  and provider extras with actionable, secret-free recovery guidance.
+- [ ] Run isolated wheel and container workflows across supported Python
+  versions and architectures.
+- [ ] Complete a dependency, license, security, and container-image review with
+  no unresolved release-blocking findings.
+
+Exit criteria:
+
+- Installation, quickstart, agent approval, generation, validation, and audit
+  verification pass from published-style wheel and container artifacts.
+- Resource limits fail closed and leave no successful-looking partial output.
+- Documentation covers the normal workflow and the most likely recovery paths.
+
+### 1.0.0rc1: Release Candidate
+
+**Goal:** rehearse the final release from frozen contracts without adding
+features.
+
+Scope:
+
+- [ ] Close or explicitly defer every active OpenSpec change.
+- [ ] Run the full security audit and resolve all Critical and High findings.
+- [ ] Verify README, documentation site, migration guidance, examples, package
+  metadata, SBOM, provenance, signatures, and public support policy.
+- [ ] Publish and install the release candidate through the real GitHub,
+  PyPI, documentation, and GHCR paths.
+- [ ] Run end-to-end smoke tests only against the published candidate
+  artifacts.
+
+Exit criteria:
+
+- Required CI, release, publication, installation, and smoke checks pass.
+- Any remaining Medium or lower security risk is documented with an owner and
+  disposition.
+- Only release-blocking fixes may enter after the candidate.
+
+### 1.0.0: Stable Release
+
+**Goal:** publish the reviewed candidate as the first stable compatibility
+baseline.
+
+Scope:
+
+- [ ] Apply only fixes proven necessary by release-candidate testing.
+- [ ] Re-run every release candidate gate on the exact release commit.
+- [ ] Publish signed and attested wheel, source distribution, documentation,
+  and separate CLI, generator MCP, and Trino MCP container images.
+- [ ] Verify PyPI and GitHub Release digests, public installation, `doctor`,
+  quickstart, and container signatures after publication.
+- [ ] Start the post-1.0 compatibility and deprecation policy from the published
+  contracts.
+
+### Required For Every Remaining Release
+
+- `scripts/check_release.sh` and `mkdocs build --strict` pass.
+- Supported Python versions, minimal installation, extras, wheel, and
+  container checks pass where applicable.
+- Fixtures and examples remain synthetic; generated manifests report
+  `synthetic: true` and `source_rows_copied: false`.
+- Trino operations remain read-only, allowlisted, bounded, and free of raw
+  production rows.
+- OpenSpec baseline, changelog, user documentation, and golden contracts match
+  implemented behavior.
+- The version tag is created only from the verified merge commit of the release
+  pull request.
+
+### Not Required For 1.0
+
+- A hosted service, web UI, or desktop UI.
+- Arbitrary SQL or unrestricted database access.
+- Additional model-provider SDKs in the base package.
+- Orchestrator templates beyond the existing Docker Compose deployment.
+- Statistical aggregates whose semantics are not portable across supported
+  engines, such as median and percentile reconciliation.
 
 ## Later
 
+- Additional provider examples.
+- Median and percentile cross-table reconciliation with explicit cross-engine
+  semantics.
 - Deployment templates for orchestrators beyond Docker Compose.
