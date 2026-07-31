@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
+import test_data_agent
 from test_data_agent.agent import build_agent_advisor_exchange
 from test_data_agent.cli import build_parser
 from test_data_agent.io import load_dataset_spec
@@ -24,6 +25,7 @@ CONTRACT_FIXTURE_NAMES = (
     "generation-manifest.json",
     "mcp-generate.json",
     "mcp-plan.json",
+    "public-python-api.json",
 )
 FIXED_PLAN_ID = "0" * 32
 
@@ -76,6 +78,9 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
         "generation-manifest.json": manifest,
         "mcp-generate.json": mcp_generate,
         "mcp-plan.json": mcp_plan,
+        "public-python-api.json": {
+            "exports": sorted(test_data_agent.__all__),
+        },
     }
     return {
         name: _normalize_contract(payload, workspace_root)
