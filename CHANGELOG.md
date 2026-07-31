@@ -59,6 +59,8 @@ All notable changes to this project are documented here.
   OpenSpec and archived with its compatibility evidence.
 - Previous feature-release fixture compatibility merged into canonical
   OpenSpec and archived with its immutable provenance evidence.
+- Runtime, optional-extra, and provider-adapter support policy merged into
+  canonical OpenSpec and archived with its release-gate evidence.
 
 ### Fixed
 
