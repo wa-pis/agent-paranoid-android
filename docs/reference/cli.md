@@ -21,6 +21,7 @@ commands.
 | Command | Purpose | Primary output |
 | --- | --- | --- |
 | `examples` | Show complete examples for common workflows | Terminal guide |
+| `demo` | Run the installed package offline with a bundled fictional fixture | Synthetic CSV bundle |
 | `doctor` | Check installation and run a temporary smoke generation | Terminal report |
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
@@ -45,6 +46,17 @@ Aliases:
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
 
 ## Choose A Workflow
+
+For a first offline run after installation:
+
+```bash
+test-data-agent demo --output out/demo
+```
+
+The destination must not exist. The command uses a bundled fictional fixture,
+seed `20260801`, and no network or optional integration. The output contains
+synthetic CSV rows, a safe profile, the effective spec, a validation report,
+and a generation manifest.
 
 For one CSV file, use the complete workflow:
 

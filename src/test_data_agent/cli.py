@@ -54,6 +54,7 @@ from test_data_agent.cli_presenter import (
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
+from test_data_agent.demo import run_demo
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
     generate_dataset_from_csv_command,
@@ -65,6 +66,7 @@ from test_data_agent.io import (
     profile_csv_command,
     profile_example_command,
     validate_dataset_artifacts,
+    write_generation_summary,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 from test_data_agent.version import __version__
@@ -271,6 +273,11 @@ def main(argv: list[str] | None = None) -> int:
 def run_command(args: argparse.Namespace) -> int:
     if args.command == "examples":
         return write_examples(EXAMPLES_TEXT)
+
+    if args.command == "demo":
+        exit_code = run_demo(args.output)
+        write_generation_summary(args.output)
+        return exit_code
 
     if args.command == "generate":
         if args.profile is not None:
