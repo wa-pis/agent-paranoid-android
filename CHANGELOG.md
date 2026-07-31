@@ -20,6 +20,8 @@ All notable changes to this project are documented here.
   and artifact contracts to owners, compatibility rules, and test gates.
 - A versioned catalog covering every golden JSON and MCP fixture with enforced
   additive-only or schema-versioned change rules.
+- A compatibility inventory for retained CLI aliases, legacy Python wrappers,
+  transitional model access, migration targets, and minimum support windows.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

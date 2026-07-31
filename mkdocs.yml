@@ -53,6 +53,7 @@ nav:
   - Reference:
       - CLI: reference/cli.md
       - Public Stability: reference/stability.md
+      - Compatibility Surfaces: reference/compatibility.md
       - Configuration: reference/configuration.md
       - DatasetSpec: dataset_profile_and_spec.md
       - Advisor API: reference/advisor.md

@@ -29,6 +29,7 @@ REQUIRED_DOCS = {
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
     "reference/cli.md",
+    "reference/compatibility.md",
     "reference/stability.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
@@ -193,6 +194,29 @@ def test_public_stability_table_covers_contract_surfaces() -> None:
         assert fixture in stability
     assert "additive change" in stability
     assert "breaking change" in stability
+
+
+def test_compatibility_inventory_covers_retained_surfaces() -> None:
+    compatibility = (
+        ROOT / "docs" / "reference" / "compatibility.md"
+    ).read_text()
+
+    for alias in (
+        "profile-csv-folder",
+        "generate-from-csv-folder",
+    ):
+        assert alias in compatibility
+    for wrapper in (
+        "test_data_agent.business_rules",
+        "test_data_agent.business_validator",
+        "test_data_agent.rules_engine",
+        "test_data_agent.scenario",
+    ):
+        assert wrapper in compatibility
+    assert 'summary["field"]' in compatibility
+    assert "GenerationSpec" in compatibility
+    assert "one feature release and 90 days" in compatibility
+    assert "before `2.0`" in compatibility
 
 
 def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:

@@ -248,7 +248,7 @@ Scope:
   MCP tools, `DatasetSpec`, advisor exchange, and generated artifact files.
 - [x] Freeze versioned JSON and MCP schemas with golden compatibility tests and
   explicit additive-versus-breaking change rules.
-- [ ] Inventory compatibility wrappers and command aliases. Mark retained
+- [x] Inventory compatibility wrappers and command aliases. Mark retained
   surfaces as supported or deprecated with migration guidance; do not remove
   anything before its documented compatibility window expires.
 - [ ] Test that the current package reads reviewed specs and generated metadata
