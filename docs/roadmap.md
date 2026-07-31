@@ -279,7 +279,8 @@ Scope:
   - [x] Remove staged folder and single-entity outputs on interactive process
     cancellation without publishing success metadata.
   - [x] Exercise mid-write disk exhaustion after a partial staged file exists.
-  - [ ] Complete timeout and interrupted-commit coverage.
+  - [x] Exercise staged timeout cleanup across every generation output shape.
+  - [ ] Complete interrupted-commit coverage.
 - [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
   and provider extras with actionable, secret-free recovery guidance.
 - [ ] Run isolated wheel and container workflows across supported Python

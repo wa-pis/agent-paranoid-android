@@ -53,3 +53,15 @@ and publish neither the destination nor success metadata.
 Free space on the target filesystem and retry with the same reviewed spec and
 seed. Do not treat files from an abandoned or failed staging directory as a
 successful synthetic bundle.
+
+## Generation Timeout
+
+The generation deadline is checked between deterministic workflow stages. If
+the deadline expires after rows or metadata have been staged, folder, review,
+and single-entity workflows remove the entire staging directory before
+returning the timeout error. They publish neither a final destination nor
+success metadata.
+
+Increase `TEST_DATA_AGENT_MAX_GENERATION_SECONDS` only after confirming that
+the requested row count and rule complexity are expected. Retrying with the
+same spec and seed remains deterministic.
