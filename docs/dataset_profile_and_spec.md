@@ -56,7 +56,9 @@ Field profiles contain schema and safe distribution metadata:
 }
 ```
 
-Sensitive fields use masked patterns, not raw top values.
+Sensitive fields use masked patterns, not raw top values. Low-cardinality
+non-sensitive fields preserve category frequency ranks with synthetic labels
+such as `category_1`; source category values are not included in profiles.
 
 Common distribution kinds:
 

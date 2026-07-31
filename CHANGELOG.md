@@ -147,6 +147,8 @@ All notable changes to this project are documented here.
   artifact creation and never echo rejected sensitive values.
 - Lightweight no-op Python matrix checks for docs-only changes so existing
   branch-protection requirements are reported instead of remaining pending.
+- CSV and Trino profiles preserve low-cardinality frequency ranks with
+  synthetic labels instead of exposing source category values.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.
