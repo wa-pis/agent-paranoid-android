@@ -46,6 +46,9 @@ jobs:
           uv export --quiet --frozen --all-extras --no-emit-project --output-file /tmp/audit-requirements.txt
           uv run --no-sync python -m pip_audit --require-hashes --requirement /tmp/audit-requirements.txt
 
+      - name: Verify dependency licenses
+        run: uv run --no-sync python scripts/check_dependency_licenses.py
+
       - name: Run lint checks
         run: uv run --no-sync python -m ruff check src tests
 

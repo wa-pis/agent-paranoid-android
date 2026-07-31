@@ -71,5 +71,8 @@ Before creating a tag:
   MCP, and Trino MCP manifests to GHCR.
 - Verify each image digest has BuildKit SBOM/provenance, a GitHub attestation,
   and a valid keyless Cosign signature from `containers.yml`.
+- Run `python scripts/check_dependency_licenses.py` in the locked all-extras and
+  documentation environments. Investigate every unknown or unapproved license;
+  do not bypass the allowlist for a release.
 - Confirm all GHCR packages intended for public use are public and inherit
   repository access.
