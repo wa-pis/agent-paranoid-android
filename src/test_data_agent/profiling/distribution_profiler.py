@@ -50,23 +50,31 @@ def infer_distribution(field: FieldProfile, values: list[str]) -> dict[str, Any]
         )
         return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}
     if field.data_type == FieldType.INTEGER:
-        numbers = sorted(value for value in (parse_int(value) for value in non_null) if value is not None)
-        return {"kind": "numeric", **numeric_stats(numbers, integer=True)}
+        integers = sorted(value for value in (parse_int(value) for value in non_null) if value is not None)
+        return {"kind": "numeric", **numeric_stats(integers, integer=True)}
     if field.data_type == FieldType.FLOAT:
-        numbers = sorted(value for value in (parse_float(value) for value in non_null) if value is not None)
-        return {"kind": "numeric", **numeric_stats(numbers, integer=False)}
+        floats = sorted(value for value in (parse_float(value) for value in non_null) if value is not None)
+        return {"kind": "numeric", **numeric_stats(floats, integer=False)}
     if field.data_type == FieldType.BOOLEAN:
-        counts = Counter(parse_bool(value) for value in non_null)
-        return {"kind": "boolean", "true_ratio": counts[True] / len(non_null) if non_null else 0.0}
+        bool_counts = Counter(parse_bool(value) for value in non_null)
+        return {"kind": "boolean", "true_ratio": bool_counts[True] / len(non_null) if non_null else 0.0}
     if field.data_type == FieldType.DATE:
-        parsed = sorted(value for value in (parse_date_value(value) for value in non_null) if value is not None)
-        return date_distribution(parsed)
+        dates = sorted(value for value in (parse_date_value(value) for value in non_null) if value is not None)
+        return date_distribution(dates)
     if field.data_type == FieldType.DATETIME:
-        parsed = sorted(value for value in (parse_datetime_value(value) for value in non_null) if value is not None)
-        return datetime_distribution(parsed)
-    counts = Counter(non_null)
-    if 0 < len(counts) <= MAX_CATEGORIES:
-        return {"kind": "categorical", "categories": [{"value": value, "count": count} for value, count in counts.most_common(MAX_CATEGORIES)]}
+        datetimes = sorted(
+            value for value in (parse_datetime_value(value) for value in non_null) if value is not None
+        )
+        return datetime_distribution(datetimes)
+    category_counts = Counter(non_null)
+    if 0 < len(category_counts) <= MAX_CATEGORIES:
+        return {
+            "kind": "categorical",
+            "categories": [
+                {"value": value, "count": count}
+                for value, count in category_counts.most_common(MAX_CATEGORIES)
+            ],
+        }
     lengths = [len(value) for value in non_null]
     return {"kind": "string_pattern", "min_length": min(lengths, default=1), "max_length": max(lengths, default=12)}
 

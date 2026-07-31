@@ -457,7 +457,7 @@ def _execute_query(sql: str, parameters: Sequence[Any] | None = None) -> tuple[l
         raise RuntimeError("trino package is not installed")
 
     config = TrinoConfig.from_env()
-    connection = trino.dbapi.connect(
+    connection = trino.dbapi.connect(  # type: ignore[no-untyped-call]
         host=config.host,
         port=config.port,
         user=config.user,
