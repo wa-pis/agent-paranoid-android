@@ -77,7 +77,8 @@
   formats; include one rejected unsafe request and release-style smoke runs.
   - [x] Add the single-table CSV profile/spec/generate/validate journey.
   - [x] Add the relational CSV relationship/rules journey.
-  - [ ] Add Trino, MCP, Python API, and export journeys.
+  - [x] Add the public Python API generation/validation journey.
+  - [ ] Add Trino, MCP, and export journeys.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
   maintainability without expanding the product surface.
 - [ ] Create public good-first-issue/help-wanted backlog items.

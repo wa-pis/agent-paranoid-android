@@ -423,7 +423,7 @@ Scope:
     metadata/profiling tools, then generate without exporting source rows.
   - [ ] MCP: configure and call generator and Trino servers against the same
     synthetic fixtures, including one rejected unsafe request.
-  - [ ] Python library: reproduce the CLI golden path with the public API and
+  - [x] Python library: reproduce the CLI golden path with the public API and
     an explicit seed.
   - [ ] Output formats: inspect CSV, JSON, SQL, and optional Parquet artifacts
     plus their manifest and validation report.
