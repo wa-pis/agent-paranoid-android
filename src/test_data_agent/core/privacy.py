@@ -223,7 +223,4 @@ def synthetic_category_distribution(counts: Iterable[int]) -> list[dict[str, str
 def mask_value(value: Any) -> Any:
     if value is None:
         return None
-    text = str(value)
-    if len(text) <= 2:
-        return "*" * len(text)
-    return f"{text[0]}***{text[-1]}"
+    return "[MASKED]"
