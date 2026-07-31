@@ -79,8 +79,14 @@ All notable changes to this project are documented here.
   synthetic-generation OpenSpec and archived with executable example evidence.
 - A canonical operational-readiness capability covering bounded synthetic
   profiling, generation, and validation resource regression gates.
+- Fail-closed path-aware CI classification that keeps strict documentation
+  checks while skipping heavy Python, container, and security jobs for docs-only
+  pull requests and main pushes.
 
 ### Fixed
+
+- Lightweight no-op Python matrix checks for docs-only changes so existing
+  branch-protection requirements are reported instead of remaining pending.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.

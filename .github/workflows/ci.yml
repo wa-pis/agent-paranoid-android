@@ -13,23 +13,56 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.scope.outputs.code }}
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Classify changed paths
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: >-
+          python3 scripts/classify_ci_changes.py
+          --event "${GITHUB_EVENT_NAME}"
+          --ref "${GITHUB_REF}"
+          --base "${BASE_SHA}"
+          --head "${HEAD_SHA}"
+          >> "${GITHUB_OUTPUT}"
+
   quality:
     name: Python ${{ matrix.python-version }}
+    needs: changes
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
     steps:
+      - name: Skip heavy checks for documentation-only changes
+        if: needs.changes.outputs.code != 'true'
+        run: echo "Documentation-only change; Python checks are not required."
+
       - name: Check out repository
+        if: needs.changes.outputs.code == 'true'
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Python
+        if: needs.changes.outputs.code == 'true'
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Set up uv
+        if: needs.changes.outputs.code == 'true'
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           version: "0.11.23"
@@ -37,28 +70,35 @@ jobs:
           prune-cache: true
 
       - name: Install locked development environment
+        if: needs.changes.outputs.code == 'true'
         run: |
           uv sync --frozen --all-extras --python python --no-install-project
           uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
       - name: Audit Python dependencies
+        if: needs.changes.outputs.code == 'true'
         run: |
           uv export --quiet --frozen --all-extras --no-emit-project --output-file /tmp/audit-requirements.txt
           uv run --no-sync python -m pip_audit --require-hashes --requirement /tmp/audit-requirements.txt
 
       - name: Verify dependency licenses
+        if: needs.changes.outputs.code == 'true'
         run: uv run --no-sync python scripts/check_dependency_licenses.py
 
       - name: Run lint checks
+        if: needs.changes.outputs.code == 'true'
         run: uv run --no-sync python -m ruff check src tests
 
       - name: Run static type checks
+        if: needs.changes.outputs.code == 'true'
         run: uv run --no-sync python -m mypy
 
       - name: Compile source and tests
+        if: needs.changes.outputs.code == 'true'
         run: uv run --no-sync python -m compileall -q src tests
 
       - name: Run tests with coverage gate
+        if: needs.changes.outputs.code == 'true'
         run: >-
           uv run --no-sync python -m pytest
           --cov=test_data_agent
@@ -67,6 +107,8 @@ jobs:
 
   package:
     name: Wheel smoke
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -134,6 +176,8 @@ jobs:
 
   package-compatibility:
     name: Wheel compatibility (Python ${{ matrix.python-version }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -172,6 +216,8 @@ jobs:
 
   trino-integration:
     name: Trino integration
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     services:
       trino:

@@ -15,9 +15,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      code: ${{ steps.scope.outputs.code }}
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Classify changed paths
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: >-
+          python3 scripts/classify_ci_changes.py
+          --event "${GITHUB_EVENT_NAME}"
+          --ref "${GITHUB_REF}"
+          --base "${BASE_SHA}"
+          --head "${HEAD_SHA}"
+          >> "${GITHUB_OUTPUT}"
+
   dependency-review:
     name: Dependency review
-    if: github.event_name == 'pull_request'
+    needs: changes
+    if: >-
+      github.event_name == 'pull_request' &&
+      needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -32,6 +62,8 @@ jobs:
 
   codeql:
     name: CodeQL
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -51,6 +83,8 @@ jobs:
 
   secrets:
     name: Secret history scan
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

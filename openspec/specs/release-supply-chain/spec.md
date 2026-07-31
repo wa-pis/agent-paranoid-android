@@ -51,3 +51,24 @@ SHALL authenticate image manifests without stored signing keys.
 - **THEN** the manifest digests receive SBOM and provenance attestations
 - **AND** Cosign signs each digest with GitHub OIDC
 - **AND** pull-request builds never receive package write permission
+
+### Requirement: Path-Aware Heavy Verification
+
+Heavy Python, container, and security verification SHALL run for code,
+dependency, workflow, configuration, example, release, and unknown changes,
+while documentation-only changes retain a strict documentation gate.
+
+#### Scenario: A documentation-only change is proposed
+
+- **GIVEN** every changed path is Markdown, `docs/**`, `openspec/**`, or
+  `mkdocs.yml`
+- **WHEN** pull-request or main-push workflows classify the change
+- **THEN** the strict documentation workflow runs
+- **AND** heavy Python, container, and security jobs are skipped successfully
+
+#### Scenario: Classification is uncertain
+
+- **GIVEN** an empty change set, invalid commit identity, release tag, scheduled
+  run, workflow dispatch, or unrecognized path
+- **WHEN** workflow scope is classified
+- **THEN** heavy verification runs fail closed
