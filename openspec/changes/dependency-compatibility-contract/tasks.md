@@ -8,7 +8,7 @@
   dependency sets.
 - [x] Add contract tests for deterministic generation, validation, YAML/JSON
   parsing, Parquet, SQL policy, and Trino client construction where applicable.
-- [ ] Add normalized dependency evidence to the generation manifest without
+- [x] Add normalized dependency evidence to the generation manifest without
   exposing rows, PII, secrets, or provider payloads.
 - [x] Document same-environment, same-version, and cross-version guarantees.
 - [ ] Add upper major bounds only where the compatibility evidence justifies

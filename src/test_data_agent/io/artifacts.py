@@ -7,6 +7,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import re
 import tempfile
 from pathlib import Path
 from typing import Any, Literal
@@ -45,6 +46,8 @@ class ReproducibilityEvidence(BaseModel):
     python_version: str
     dependencies: dict[str, str]
     dependencies_sha256: str
+    normalized_dependencies: dict[str, str] = Field(default_factory=dict)
+    normalized_dependencies_sha256: str | None = None
     locale: str
     serializer: str
     generator_algorithm_version: str
@@ -248,6 +251,12 @@ def reproducibility_evidence(
         sort_keys=True,
         separators=(",", ":"),
     ).encode("utf-8")
+    normalized_dependencies = normalized_dependency_versions()
+    normalized_dependency_payload = json.dumps(
+        normalized_dependencies,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
     serializer = (
         f"pyarrow-{dependencies['pyarrow']}"
         if output_format == OutputFormat.PARQUET
@@ -258,11 +267,31 @@ def reproducibility_evidence(
         python_version=platform.python_version(),
         dependencies=dependencies,
         dependencies_sha256=hashlib.sha256(dependency_payload).hexdigest(),
+        normalized_dependencies=normalized_dependencies,
+        normalized_dependencies_sha256=hashlib.sha256(
+            normalized_dependency_payload
+        ).hexdigest(),
         locale=spec.generation_settings.locale or DEFAULT_LOCALE,
         serializer=serializer,
         generator_algorithm_version=__version__,
         output_sha256=artifact_hashes(output_folder),
     )
+
+
+def normalized_dependency_versions() -> dict[str, str]:
+    required = ("Faker", "pydantic", "PyYAML")
+    optional = ("pyarrow", "mcp", "sqlglot", "trino", "openai")
+    versions: dict[str, str] = {}
+    for distribution in (*required, *optional):
+        try:
+            version = importlib.metadata.version(distribution)
+        except importlib.metadata.PackageNotFoundError:
+            if distribution in required:
+                raise
+            continue
+        canonical_name = re.sub(r"[-_.]+", "-", distribution).lower()
+        versions[canonical_name] = version
+    return dict(sorted(versions.items()))
 
 
 def artifact_hashes(output_folder: Path) -> dict[str, str]:

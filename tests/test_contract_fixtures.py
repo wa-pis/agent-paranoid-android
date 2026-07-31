@@ -73,6 +73,10 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     )
     assert "@" not in serialized
     assert "sk-" not in serialized
+    normalized_dependencies = generation_manifest["reproducibility"][
+        "normalized_dependencies"
+    ]
+    assert {"faker", "pydantic", "pyyaml"} <= set(normalized_dependencies)
     assert public_python_api["exports"] == sorted(test_data_agent.__all__)
     assert all(hasattr(test_data_agent, name) for name in public_python_api["exports"])
     assert artifact_layout["files"] == [
