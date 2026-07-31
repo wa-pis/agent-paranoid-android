@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added metadata-only effective generation and business-rule evidence to
+  generation manifests, bound to exact spec and rule fingerprints.
 - Added bounded numeric distribution scaling with fail-closed non-identity
   scaling for sensitive synthetic totals.
 - Added domain-agnostic business-invariant coverage for component formulas,

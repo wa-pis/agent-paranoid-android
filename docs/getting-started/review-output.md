@@ -32,6 +32,9 @@ Also confirm:
 - `spec_sha256` is present;
 - `business_validation.rules_sha256` and its summary are present when rules
   were used.
+- `effective_rules` binds generation mode, validation settings, relationship,
+  constraint, and distribution counts to the exact spec and business-rule
+  fingerprints without repeating rule values.
 
 ## Validation Report
 
