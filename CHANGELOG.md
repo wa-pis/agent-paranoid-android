@@ -65,6 +65,8 @@ All notable changes to this project are documented here.
   with the completed golden-contract change archived.
 - A canonical artifact-contract capability covering stable generation bundle
   filenames and metadata-only validation report fixtures.
+- A canonical MCP interface capability covering stable discovery schemas and
+  the default exclusion of unrestricted raw SQL.
 
 ### Fixed
 
