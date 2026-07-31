@@ -67,6 +67,8 @@ All notable changes to this project are documented here.
   filenames and metadata-only validation report fixtures.
 - A canonical MCP interface capability covering stable discovery schemas and
   the default exclusion of unrestricted raw SQL.
+- Cross-table average reconciliation merged into canonical synthetic-generation
+  OpenSpec and archived with its deterministic and aggregate-only evidence.
 
 ### Fixed
 
