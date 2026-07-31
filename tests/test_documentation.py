@@ -29,6 +29,7 @@ REQUIRED_DOCS = {
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
     "reference/cli.md",
+    "reference/stability.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
     "operations/audit-logging.md",
@@ -164,6 +165,34 @@ def test_local_markdown_links_resolve() -> None:
                 )
 
     assert not failures, "\n".join(failures)
+
+
+def test_public_stability_table_covers_contract_surfaces() -> None:
+    stability = (ROOT / "docs" / "reference" / "stability.md").read_text()
+
+    for surface in (
+        "test_data_agent.__all__",
+        "test-data-agent",
+        "Generator MCP",
+        "Trino MCP",
+        "DatasetSpec",
+        "Advisor",
+        "Generated bundle",
+        "Provider adapters",
+    ):
+        assert surface in stability
+    for fixture in (
+        "public-python-api.json",
+        "cli-parser-surface.json",
+        "mcp-generator-tools.json",
+        "mcp-trino-tools.json",
+        "dataset-spec.json",
+        "advisor-exchange.json",
+        "artifact-layout.json",
+    ):
+        assert fixture in stability
+    assert "additive change" in stability
+    assert "breaking change" in stability
 
 
 def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:
