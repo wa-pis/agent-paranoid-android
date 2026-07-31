@@ -55,6 +55,7 @@ class InvalidCase:
         | AggregateFormulaRule
     )
     field: str | None = None
+    rule_index: int = 0
 
 
 def apply_business_rules(
@@ -64,6 +65,7 @@ def apply_business_rules(
     mode: str = GenerationMode.VALID,
     invalid_ratio: float = 0.0,
     field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
+    expected_rule_failures: dict[int, int] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     rng = random.Random(seed)
     apply_scenarios(rows_by_table, rules.scenarios, seed)
@@ -74,7 +76,13 @@ def apply_business_rules(
         apply_edge_cases(rows_by_table, rules)
     if selected_mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}:
         ratio = 1.0 if selected_mode == GenerationMode.NEGATIVE else invalid_ratio
-        inject_invalid_cases(rows_by_table, rules, rng, ratio)
+        inject_invalid_cases(
+            rows_by_table,
+            rules,
+            rng,
+            ratio,
+            expected_rule_failures=expected_rule_failures,
+        )
     return rows_by_table
 
 
@@ -152,6 +160,8 @@ def inject_invalid_cases(
     rules: BusinessRules,
     rng: random.Random,
     invalid_ratio: float,
+    *,
+    expected_rule_failures: dict[int, int] | None = None,
 ) -> None:
     for table, rows in rows_by_table.items():
         cases = invalid_cases_for_table(table, rules)
@@ -161,49 +171,88 @@ def inject_invalid_cases(
         for row in rows:
             if rng.random() > invalid_ratio:
                 continue
-            apply_invalid_case(row, cases[case_index], rows_by_table)
+            case = cases[case_index]
+            apply_invalid_case(row, case, rows_by_table)
+            if expected_rule_failures is not None:
+                if case.kind == "aggregate_formula":
+                    expected_rule_failures[case.rule_index] = 1
+                else:
+                    expected_rule_failures[case.rule_index] = (
+                        expected_rule_failures.get(case.rule_index, 0) + 1
+                    )
             case_index = (case_index + 1) % len(cases)
 
 
 def invalid_cases_for_table(table: str, rules: BusinessRules) -> list[InvalidCase]:
     cases: list[InvalidCase] = []
-    for field_rule in rules.field_rules:
+    for rule_index, field_rule in enumerate(rules.field_rules):
         if field_rule.table != table:
             continue
         if field_rule.required:
-            cases.append(InvalidCase("required", field_rule))
+            cases.append(InvalidCase("required", field_rule, rule_index=rule_index))
         if field_rule.allowed_values:
-            cases.append(InvalidCase("allowed_values", field_rule))
+            cases.append(
+                InvalidCase("allowed_values", field_rule, rule_index=rule_index)
+            )
         if field_rule.min_value is not None:
-            cases.append(InvalidCase("min_value", field_rule))
+            cases.append(InvalidCase("min_value", field_rule, rule_index=rule_index))
         if field_rule.max_value is not None:
-            cases.append(InvalidCase("max_value", field_rule))
-    for row_rule in rules.row_rules:
+            cases.append(InvalidCase("max_value", field_rule, rule_index=rule_index))
+    row_offset = len(rules.field_rules)
+    for row_index, row_rule in enumerate(rules.row_rules):
         if row_rule.table != table:
             continue
+        rule_index = row_offset + row_index
         if isinstance(row_rule, ConditionalRequiredRule):
             cases.extend(
-                InvalidCase("conditional_required", row_rule, field)
+                InvalidCase(
+                    "conditional_required",
+                    row_rule,
+                    field,
+                    rule_index,
+                )
                 for field in row_rule.required_fields
             )
         elif isinstance(row_rule, ConditionalAllowedValuesRule):
-            cases.append(InvalidCase("conditional_allowed_values", row_rule))
+            cases.append(
+                InvalidCase(
+                    "conditional_allowed_values",
+                    row_rule,
+                    rule_index=rule_index,
+                )
+            )
         elif isinstance(row_rule, TemporalOrderingRule):
-            cases.append(InvalidCase("temporal_ordering", row_rule))
+            cases.append(
+                InvalidCase("temporal_ordering", row_rule, rule_index=rule_index)
+            )
         elif isinstance(row_rule, FormulaRule):
-            cases.append(InvalidCase("formula", row_rule))
-    for cross_table_rule in rules.cross_table_rules:
+            cases.append(InvalidCase("formula", row_rule, rule_index=rule_index))
+    cross_table_offset = row_offset + len(rules.row_rules)
+    for cross_table_index, cross_table_rule in enumerate(rules.cross_table_rules):
+        rule_index = cross_table_offset + cross_table_index
         if (
             isinstance(cross_table_rule, ForeignKeyRule)
             and cross_table_rule.child_table == table
         ):
-            cases.append(InvalidCase("foreign_key", cross_table_rule))
+            cases.append(
+                InvalidCase(
+                    "foreign_key",
+                    cross_table_rule,
+                    rule_index=rule_index,
+                )
+            )
         elif (
             isinstance(cross_table_rule, AggregateFormulaRule)
             and cross_table_rule.table == table
             and cross_table_rule.field != "*"
         ):
-            cases.append(InvalidCase("aggregate_formula", cross_table_rule))
+            cases.append(
+                InvalidCase(
+                    "aggregate_formula",
+                    cross_table_rule,
+                    rule_index=rule_index,
+                )
+            )
     return cases
 
 

@@ -12,6 +12,8 @@ All notable changes to this project are documented here.
   numeric-bound, conditional, temporal, and formula business rules.
 - Coordinated negative foreign-key and concrete-field aggregate-formula cases
   that preserve unrelated rows and parent tables.
+- Bounded expected-versus-observed violation counts in business-validation
+  reports and generation manifests for controlled invalid datasets.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

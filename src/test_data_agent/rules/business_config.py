@@ -43,6 +43,7 @@ def apply_and_validate_business_rules(
     invalid_ratio: float,
     field_defaults: dict[str, dict[str, Any]] | None = None,
 ) -> BusinessValidationReport:
+    expected_rule_failures: dict[int, int] = {}
     apply_business_rules(
         rows_by_table,
         rules,
@@ -50,8 +51,13 @@ def apply_and_validate_business_rules(
         mode=mode,
         invalid_ratio=invalid_ratio,
         field_defaults=field_defaults,
+        expected_rule_failures=expected_rule_failures,
     )
-    return validate_business_rules(rows_by_table, rules)
+    return validate_business_rules(
+        rows_by_table,
+        rules,
+        expected_rule_failures=expected_rule_failures,
+    )
 
 
 def apply_and_validate_business_rules_from_path(

@@ -224,7 +224,7 @@ Scope:
   repeatedly breaking only the first rule.
 - [x] Generate coordinated foreign-key and aggregate-formula violations
   without corrupting unrelated rows.
-- [ ] Record expected and observed violations in bounded business-validation
+- [x] Record expected and observed violations in bounded business-validation
   artifacts so users can distinguish intentional failures from generator bugs.
 - [ ] Add CLI and MCP examples that reproduce the same negative cases from the
   same spec, rule file, seed, mode, and invalid ratio.
