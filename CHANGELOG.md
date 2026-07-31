@@ -77,6 +77,8 @@ All notable changes to this project are documented here.
   canonical synthetic-generation OpenSpec and archived with privacy evidence.
 - CLI and generator MCP negative-case reproducibility merged into canonical
   synthetic-generation OpenSpec and archived with executable example evidence.
+- A canonical operational-readiness capability covering bounded synthetic
+  profiling, generation, and validation resource regression gates.
 
 ### Fixed
 
