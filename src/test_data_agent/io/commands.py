@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from test_data_agent.adapters import load_profile_or_spec
-from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import write_json_artifact
@@ -204,7 +204,7 @@ def profile_example_artifacts(
     cache_dir: Path,
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
-):
+) -> DatasetProfile:
     require_output_suffix(output_path, {".json"}, "profile output")
     input_folder_resolved = input_folder.resolve(strict=True)
     output_resolved = output_path.resolve(strict=False)
