@@ -71,6 +71,8 @@ All notable changes to this project are documented here.
   OpenSpec and archived with its deterministic and aggregate-only evidence.
 - Controlled negative field and row-rule coverage merged into canonical
   synthetic-generation OpenSpec and archived with deterministic evidence.
+- Controlled foreign-key and aggregate-formula negative cases merged into
+  canonical synthetic-generation OpenSpec and archived with isolation evidence.
 
 ### Fixed
 
