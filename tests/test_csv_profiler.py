@@ -72,6 +72,21 @@ def test_csv_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> N
     assert "sk_live_51ABCDEF" not in profile.model_dump_json()
 
 
+def test_csv_profile_suppresses_rare_free_text(tmp_path: Path) -> None:
+    source = tmp_path / "rare_notes.csv"
+    source_values = ["late handoff near loading bay", "special access via side entrance"]
+    source.write_text("note\n" + "\n".join(source_values) + "\n")
+
+    profile = profile_csv(source)
+    note = profile.columns[0]
+
+    assert note.top_values == [
+        {"value": "category_1", "count": 1},
+        {"value": "category_2", "count": 1},
+    ]
+    assert all(value not in profile.model_dump_json() for value in source_values)
+
+
 def test_csv_profile_infers_dataset_spec_without_copying_rows() -> None:
     profile = profile_csv(FIXTURE_CSV)
     spec = csv_profile_to_dataset_spec(profile, seed=10, count=12)

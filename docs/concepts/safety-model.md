@@ -24,8 +24,10 @@ Treat all of these as untrusted:
 
 Likely PII and secrets are detected from both field names and values. Sensitive
 columns suppress raw top values and expose masked patterns or aggregate metadata
-instead. Non-sensitive category profiles also replace source values with ranked
-synthetic labels while preserving counts.
+instead. Masked samples use an opaque placeholder and never preserve source
+endpoints. Non-sensitive category profiles also replace source values,
+including rare free text and quasi-identifiers, with ranked synthetic labels
+while preserving counts.
 
 ### Source-row reuse
 

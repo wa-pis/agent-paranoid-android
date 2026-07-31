@@ -50,10 +50,10 @@
 - [x] Define logical versus byte-for-byte reproducibility and record the
   required runtime, dependency, serializer, locale, and output evidence in the
   manifest.
-- [ ] Harden profile and Trino category handling: suppress raw categories by
+- [x] Harden profile and Trino category handling: suppress raw categories by
   default, replace endpoint-preserving masks, and add rare-text/quasi-ID tests.
   - [x] Replace raw CSV and Trino category values with ranked synthetic labels.
-  - [ ] Replace endpoint-preserving masks and add rare-text/quasi-ID tests.
+  - [x] Replace endpoint-preserving masks and add rare-text/quasi-ID tests.
 - [x] Document the exact-row limitation and the absence of statistical privacy
   guarantees.
 - [ ] Expand mypy coverage to the full production package and resolve optional

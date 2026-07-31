@@ -318,8 +318,8 @@ def test_likely_pii_fields_are_masked() -> None:
     }
 
     assert mask_row(row) == {
-        "customer_email": "p***m",
-        "api_token": "s***n",
+        "customer_email": "[MASKED]",
+        "api_token": "[MASKED]",
         "order_id": 123,
     }
 
@@ -333,8 +333,8 @@ def test_sensitive_values_are_masked_even_with_neutral_column_names() -> None:
 
     masked = mask_row(row)
 
-    assert masked["value"] != row["value"]
-    assert masked["note"] != row["note"]
+    assert masked["value"] == "[MASKED]"
+    assert masked["note"] == "[MASKED]"
     assert masked["status"] == "paid"
 
 
@@ -361,6 +361,38 @@ def test_profile_column_safe_suppresses_secret_top_values(monkeypatch: pytest.Mo
     assert profile["masked_patterns"] == [{"pattern": "secret", "count": 2}]
     assert "top_values" not in profile
     assert "sk_live_51ABCDEF" not in str(profile)
+
+
+def test_profile_column_safe_suppresses_quasi_identifier_categories(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_values = ["district-7-house-41", "district-7-house-99"]
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        if "GROUP BY" in sql:
+            return [
+                {"value": source_values[0], "count": 2},
+                {"value": source_values[1], "count": 1},
+            ]
+        return [{"row_count": 3, "non_null_count": 3, "approx_distinct_count": 2}]
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
+
+    profile = profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "location_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert profile["top_values"] == [
+        {"value": "category_1", "count": 2},
+        {"value": "category_2", "count": 1},
+    ]
+    assert all(value not in str(profile) for value in source_values)
 
 
 def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPatch) -> None:
