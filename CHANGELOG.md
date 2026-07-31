@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added metadata-only relationship candidate mining, provider ranking validation,
+  and explicit human review records that cannot authorize generation.
 - Bound JSON dataset inputs by row count, nested value count, nesting depth,
   and string value length before validation.
 

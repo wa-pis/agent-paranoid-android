@@ -23,7 +23,7 @@
 - [x] Define safe relationship-discovery input metadata and provider-neutral
   proposal contracts for AI-assisted FK, temporal, formula, and aggregate-rule
   discovery.
-- [ ] Combine deterministic candidate mining with AI ranking/proposals and a
+- [x] Combine deterministic candidate mining with AI ranking/proposals and a
   human review step; AI output must never directly approve generation.
 - [ ] Add relationship tests for compatible key types, cardinality, nulls,
   distinctness, temporal ranges, and ambiguous/low-confidence candidates.
