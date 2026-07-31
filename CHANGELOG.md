@@ -38,6 +38,8 @@ All notable changes to this project are documented here.
   constructs a client without executing a query or contacting a coordinator.
 - A local OpenAI `doctor` capability smoke that verifies the structured SDK
   surface and advisor construction without credentials or provider requests.
+- Isolated base-wheel build, installation, metadata, size, and `doctor` smoke
+  coverage on every supported Python version from 3.11 through 3.14.
 
 ### Fixed
 

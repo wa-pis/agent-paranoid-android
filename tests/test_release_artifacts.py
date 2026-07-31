@@ -152,6 +152,12 @@ def test_ci_covers_supported_python_versions() -> None:
         "3.13",
         "3.14",
     ]
+    assert jobs["package-compatibility"]["strategy"]["matrix"][
+        "python-version"
+    ] == ["3.11", "3.12", "3.13", "3.14"]
+    assert jobs["package-compatibility"]["name"] == (
+        "Wheel compatibility (Python ${{ matrix.python-version }})"
+    )
     package_python = next(
         step
         for step in jobs["package"]["steps"]
@@ -186,7 +192,7 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflow_text = "\n".join(path.read_text() for path in workflows)
 
     setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 7
+    assert setup_count == 8
     assert workflow_text.count("prune-cache: true") == setup_count
 
 
