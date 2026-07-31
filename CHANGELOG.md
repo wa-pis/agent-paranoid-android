@@ -25,6 +25,9 @@ All notable changes to this project are documented here.
   behavior.
 - Moved review-first agent human summaries and JSON document rendering behind
   the same presentation boundary while preserving output contracts.
+- Moved examples, audit verification, and doctor output behind the
+  presentation boundary, with typed doctor results separating checks from
+  rendering.
 
 ## [0.11.0] - 2026-07-31
 

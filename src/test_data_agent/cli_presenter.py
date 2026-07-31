@@ -19,7 +19,8 @@ from test_data_agent.agent import (
     AgentReviewState,
     AgentWorkspaceStatus,
 )
-from test_data_agent.cli_contract import CliErrorCode
+from test_data_agent.audit import AuditVerificationResult
+from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_parser import write_cli_error_response
 from test_data_agent.validation import DatasetValidationReport
 
@@ -80,6 +81,34 @@ def write_validation_result(
 def write_json_document(document: BaseModel) -> None:
     """Write one public Pydantic document as formatted JSON."""
     print(document.model_dump_json(indent=2))
+
+
+def write_examples(examples_text: str) -> int:
+    """Write copy-ready workflow examples."""
+    print(examples_text)
+    return 0
+
+
+def write_audit_verification_result(result: AuditVerificationResult) -> int:
+    """Write a successful audit verification summary."""
+    print(
+        f"Audit log verified: {result.record_count} records, "
+        f"last MAC {result.last_mac}",
+        file=sys.stderr,
+    )
+    return 0
+
+
+def write_doctor_report(report: DoctorReport) -> int:
+    """Write installation checks and return their public exit code."""
+    for check in report.checks:
+        print(check, file=sys.stderr)
+    for failure in report.failures:
+        print(f"doctor failed: {failure}", file=sys.stderr)
+    if report.failures:
+        return 1
+    print("doctor passed", file=sys.stderr)
+    return 0
 
 
 def write_agent_command_result(result: AgentResult, *, json_output: bool) -> None:

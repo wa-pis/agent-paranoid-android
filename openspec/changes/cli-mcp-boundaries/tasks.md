@@ -5,11 +5,11 @@
 - [x] Extract review-gated agent command registration behind the existing
   entry point.
 - [x] Extract remaining dataset and utility command registration.
-- [ ] Extract CLI human and JSON presentation from application dispatch.
+- [x] Extract CLI human and JSON presentation from application dispatch.
   - [x] Move shared CLI error and validation-result rendering behind a
     presentation module.
   - [x] Move remaining agent human and JSON rendering behind the same boundary.
-  - [ ] Move examples, audit verification, and doctor rendering behind the
+  - [x] Move examples, audit verification, and doctor rendering behind the
     presentation boundary.
 - [ ] Separate generator MCP registration from application services.
 - [ ] Separate Trino MCP registration from allowlisted application services.
