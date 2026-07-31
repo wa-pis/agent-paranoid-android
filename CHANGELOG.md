@@ -63,6 +63,8 @@ All notable changes to this project are documented here.
   canonical OpenSpec and archived with its release-gate evidence.
 - A canonical public Python API capability covering reviewed top-level exports,
   with the completed golden-contract change archived.
+- A canonical artifact-contract capability covering stable generation bundle
+  filenames and metadata-only validation report fixtures.
 
 ### Fixed
 
