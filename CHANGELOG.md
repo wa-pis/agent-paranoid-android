@@ -75,6 +75,8 @@ All notable changes to this project are documented here.
   canonical synthetic-generation OpenSpec and archived with isolation evidence.
 - Bounded expected-versus-observed negative validation artifacts merged into
   canonical synthetic-generation OpenSpec and archived with privacy evidence.
+- CLI and generator MCP negative-case reproducibility merged into canonical
+  synthetic-generation OpenSpec and archived with executable example evidence.
 
 ### Fixed
 
