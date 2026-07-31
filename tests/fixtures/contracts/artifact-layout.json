@@ -1,0 +1,8 @@
+{
+  "files": [
+    "dataset_spec.yaml",
+    "generation_manifest.json",
+    "orders.json",
+    "validation_report.json"
+  ]
+}

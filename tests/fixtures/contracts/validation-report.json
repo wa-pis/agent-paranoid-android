@@ -1,0 +1,23 @@
+{
+  "sections": [
+    {
+      "errors": [],
+      "failed": 0,
+      "name": "schema",
+      "passed": 1
+    },
+    {
+      "errors": [],
+      "failed": 0,
+      "name": "relationships",
+      "passed": 1
+    },
+    {
+      "errors": [],
+      "failed": 0,
+      "name": "constraints",
+      "passed": 1
+    }
+  ],
+  "valid": true
+}
