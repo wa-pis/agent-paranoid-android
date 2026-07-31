@@ -31,9 +31,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM ${PYTHON_IMAGE} AS runtime-base
 
-ARG APP_VERSION=0.8.1
+ARG APP_VERSION
 ARG VCS_REF=unknown
 ARG SOURCE_URL=https://github.com/wa-pis/agent-paranoid-android
+
+RUN test -n "${APP_VERSION}"
 
 LABEL org.opencontainers.image.title="Agent Paranoid Android" \
       org.opencontainers.image.description="Safety-first synthetic test data generation agent" \

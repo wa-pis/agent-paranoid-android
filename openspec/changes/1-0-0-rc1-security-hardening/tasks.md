@@ -46,7 +46,7 @@
   guarantees.
 - [ ] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.
-- [ ] Remove `0.8.1` container defaults or derive them from package metadata;
+- [x] Remove `0.8.1` container defaults or derive them from package metadata;
   add a release drift check.
 - [ ] Verify release tags point to the verified merge commit and publish
   reproducible security evidence with run IDs and artifact digests.

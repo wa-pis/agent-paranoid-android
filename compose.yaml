@@ -24,12 +24,12 @@ x-audit: &audit
 services:
   cli:
     <<: *runtime
-    image: "${CLI_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-cli:0.8.1}"
+    image: "${CLI_IMAGE:-agent-paranoid-android-cli:local}"
     build:
       context: .
       target: cli
       args:
-        APP_VERSION: "0.8.1"
+        APP_VERSION: "${APP_VERSION:?Set APP_VERSION to the package version}"
     network_mode: none
     volumes:
       - type: bind
@@ -38,12 +38,12 @@ services:
 
   generator-mcp:
     <<: *runtime
-    image: "${GENERATOR_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-generator-mcp:0.8.1}"
+    image: "${GENERATOR_IMAGE:-agent-paranoid-android-generator-mcp:local}"
     build:
       context: .
       target: generator-mcp
       args:
-        APP_VERSION: "0.8.1"
+        APP_VERSION: "${APP_VERSION:?Set APP_VERSION to the package version}"
     network_mode: none
     environment:
       <<: *audit
@@ -62,12 +62,12 @@ services:
 
   trino-mcp:
     <<: *runtime
-    image: "${TRINO_IMAGE:-ghcr.io/wa-pis/agent-paranoid-android-trino-mcp:0.8.1}"
+    image: "${TRINO_IMAGE:-agent-paranoid-android-trino-mcp:local}"
     build:
       context: .
       target: trino-mcp
       args:
-        APP_VERSION: "0.8.1"
+        APP_VERSION: "${APP_VERSION:?Set APP_VERSION to the package version}"
     environment:
       <<: *audit
       TEST_DATA_AGENT_AUDIT_LOG: /audit/trino.jsonl

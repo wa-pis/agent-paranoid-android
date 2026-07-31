@@ -6,6 +6,10 @@ from pathlib import Path
 import pytest
 import yaml
 
+from scripts.check_container_version import (
+    main as check_container_version,
+    package_version,
+)
 from test_data_agent import container_health
 from test_data_agent.container_health import ContainerHealthError
 
@@ -35,6 +39,18 @@ def test_dockerfile_uses_digest_pinned_minimal_targets() -> None:
     assert "PATH=/app/.venv/bin" in dockerfile
     assert dockerfile.count("/app/.venv /app/.venv") == 3
     assert "/app/.venv /opt/venv" not in dockerfile
+    assert "ARG APP_VERSION\n" in dockerfile
+    assert "ARG APP_VERSION=" not in dockerfile
+
+
+def test_container_versions_have_no_release_default() -> None:
+    compose = (ROOT / "compose.yaml").read_text()
+
+    assert "0.8.1" not in compose
+    assert compose.count("APP_VERSION: \"${APP_VERSION:?") == 3
+    assert check_container_version([package_version()]) == 0
+    with pytest.raises(SystemExit, match="does not match package version"):
+        check_container_version(["0.8.1"])
 
 
 def test_compose_keeps_generator_and_trino_boundaries_separate() -> None:
