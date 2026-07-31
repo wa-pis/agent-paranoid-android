@@ -36,6 +36,8 @@ All notable changes to this project are documented here.
   transport and verifies audited tool registration without starting a server.
 - A local Trino `doctor` capability smoke that validates allowlisted SQL and
   constructs a client without executing a query or contacting a coordinator.
+- A local OpenAI `doctor` capability smoke that verifies the structured SDK
+  surface and advisor construction without credentials or provider requests.
 
 ### Fixed
 

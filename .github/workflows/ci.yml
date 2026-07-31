@@ -120,7 +120,7 @@ jobs:
             python scripts/check_installed_package.py --profile openai
           uv run --isolated --no-project \
             --with "agent-paranoid-android[openai] @ ${wheel_uri}" \
-            test-data-agent doctor --skip-smoke --require-extra openai
+            test-data-agent doctor --require-extra openai
 
           uv run --isolated --no-project \
             --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
