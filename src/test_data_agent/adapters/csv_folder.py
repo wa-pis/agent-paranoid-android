@@ -16,13 +16,14 @@ def csv_folder_to_dataset_profile(
     use_cache: bool = True,
     rule_sample_rows: int | None = None,
 ) -> DatasetProfile:
-    profile_kwargs: dict[str, object] = {
-        "cache_dir": cache_dir,
-        "use_cache": use_cache,
-    }
-    if rule_sample_rows is not None:
-        profile_kwargs["rule_sample_rows"] = rule_sample_rows
-    return profile_example_folder(path, **profile_kwargs)
+    if rule_sample_rows is None:
+        return profile_example_folder(path, cache_dir=cache_dir, use_cache=use_cache)
+    return profile_example_folder(
+        path,
+        cache_dir=cache_dir,
+        use_cache=use_cache,
+        rule_sample_rows=rule_sample_rows,
+    )
 
 
 def csv_folder_to_dataset_spec(
