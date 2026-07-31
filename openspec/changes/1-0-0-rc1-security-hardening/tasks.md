@@ -17,7 +17,7 @@
 
 ## P1 — product semantics required before final `1.0.0` or explicitly accepted by an independent reviewer
 
-- [ ] Define the relational-synthesis contract: preserve FK graph shape,
+- [x] Define the relational-synthesis contract: preserve FK graph shape,
   distribution/order-of-magnitude shape, temporal dependencies, and executable
   business invariants without copying source rows.
 - [ ] Define safe relationship-discovery input metadata and provider-neutral

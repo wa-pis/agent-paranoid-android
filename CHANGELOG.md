@@ -9,6 +9,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Public relational-synthesis contract defining preserved graph, distribution,
+  temporal, and business-rule semantics and explicit non-guarantees.
 - Explicit direct-API privacy and SQL-boundary checks in the release gate.
 - Public conduct, support, governance, and code-ownership policies for the
   current single-maintainer project model.

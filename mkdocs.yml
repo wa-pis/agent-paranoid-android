@@ -48,6 +48,7 @@ nav:
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md
       - Profiles And Specs: concepts/profiles-and-specs.md
+      - Relational Synthesis Contract: concepts/relational-synthesis-contract.md
       - DatasetSpec Compatibility: concepts/dataset-spec-compatibility.md
       - Dataset Workflow: domain_agnostic_workflow.md
   - Reference:
