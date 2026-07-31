@@ -45,6 +45,22 @@ every supported Python version. The CI matrix installs these profiles without
 silently upgrading minimum candidates and runs the contract tests relevant to
 each surface.
 
+## Contract Coverage
+
+The minimum profiles run focused contracts instead of the full locked suite:
+
+| Profile | Required behavior | CI contract |
+| --- | --- | --- |
+| `base-minimum` | Deterministic generation and validation; Pydantic JSON and PyYAML parsing | `tests/test_io_workflows.py`, `tests/test_business_rules.py` |
+| `parquet-minimum` | Parquet serialization and loading | `tests/test_io_commands.py` |
+| `mcp-minimum` | Generator and Trino MCP transport schemas | `tests/test_mcp_generator_transport.py`, `tests/test_mcp_trino_transport.py` |
+| `trino-minimum` | SQL policy and Trino client construction | `tests/test_mcp_trino_server.py` |
+| `openai-minimum` | Provider request, response, and error contracts | `tests/test_openai_provider.py` |
+
+The `latest-all` quality matrix runs the complete test suite on every
+supported Python version. A minimum profile must not be replaced by a resolver
+check alone: its behavior contract must also pass in the isolated environment.
+
 ## Support Rules
 
 - Same package, Python, dependency, locale, serializer, spec, rules, and seed
