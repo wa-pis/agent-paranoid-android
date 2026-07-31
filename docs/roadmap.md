@@ -411,7 +411,7 @@ Scope:
   - [ ] State explicit non-guarantees for raw-value copying, real PII,
     statistical anonymity, re-identification, and cross-version byte identity.
   - [ ] Use the [installed demo and product clarity
-    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/installed-demo-and-product-clarity/proposal.md)
+    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-installed-demo-and-product-clarity/proposal.md)
     as the implementation contract.
 - [ ] Publish runnable, CI-verified usage journeys built only from synthetic
   fixtures. Each journey must show its input, command or API call, generated
