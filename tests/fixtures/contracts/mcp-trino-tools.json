@@ -1,0 +1,618 @@
+[
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table"
+      ],
+      "title": "describe_tableArguments",
+      "type": "object"
+    },
+    "name": "describe_table",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Result",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "describe_tableOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {},
+      "title": "list_catalogsArguments",
+      "type": "object"
+    },
+    "name": "list_catalogs",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "list_catalogsOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog"
+      ],
+      "title": "list_schemasArguments",
+      "type": "object"
+    },
+    "name": "list_schemas",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "list_schemasOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema"
+      ],
+      "title": "list_tablesArguments",
+      "type": "object"
+    },
+    "name": "list_tables",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Result",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "list_tablesOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile whether parent aggregate fields match child aggregates.",
+    "input_schema": {
+      "properties": {
+        "aggregate": {
+          "default": "sum",
+          "title": "Aggregate",
+          "type": "string"
+        },
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "child_key": {
+          "title": "Child Key",
+          "type": "string"
+        },
+        "child_table": {
+          "title": "Child Table",
+          "type": "string"
+        },
+        "child_value_field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Child Value Field"
+        },
+        "parent_key": {
+          "title": "Parent Key",
+          "type": "string"
+        },
+        "parent_table": {
+          "title": "Parent Table",
+          "type": "string"
+        },
+        "parent_value_field": {
+          "title": "Parent Value Field",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "tolerance": {
+          "default": 1e-06,
+          "title": "Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "parent_table",
+        "parent_key",
+        "parent_value_field",
+        "child_table",
+        "child_key"
+      ],
+      "title": "profile_aggregate_mappingArguments",
+      "type": "object"
+    },
+    "name": "profile_aggregate_mapping",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_aggregate_mappingDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "column": {
+          "title": "Column",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "column"
+      ],
+      "title": "profile_columnArguments",
+      "type": "object"
+    },
+    "name": "profile_column",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_columnDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile conditional allowed-values consistency with counts only.",
+    "input_schema": {
+      "properties": {
+        "allowed_values": {
+          "items": {},
+          "title": "Allowed Values",
+          "type": "array"
+        },
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "condition_equals": {
+          "title": "Condition Equals"
+        },
+        "condition_field": {
+          "title": "Condition Field",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        },
+        "value_field": {
+          "title": "Value Field",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "condition_field",
+        "condition_equals",
+        "value_field",
+        "allowed_values"
+      ],
+      "title": "profile_conditional_allowed_valuesArguments",
+      "type": "object"
+    },
+    "name": "profile_conditional_allowed_values",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_conditional_allowed_valuesDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile conditional requiredness without exposing condition values.",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "condition_equals": {
+          "title": "Condition Equals"
+        },
+        "condition_field": {
+          "title": "Condition Field",
+          "type": "string"
+        },
+        "required_field": {
+          "title": "Required Field",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "condition_field",
+        "condition_equals",
+        "required_field"
+      ],
+      "title": "profile_conditional_requiredArguments",
+      "type": "object"
+    },
+    "name": "profile_conditional_required",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_conditional_requiredDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile foreign-key coverage using counts only.",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "child_field": {
+          "title": "Child Field",
+          "type": "string"
+        },
+        "child_table": {
+          "title": "Child Table",
+          "type": "string"
+        },
+        "parent_field": {
+          "title": "Parent Field",
+          "type": "string"
+        },
+        "parent_table": {
+          "title": "Parent Table",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "parent_table",
+        "parent_field",
+        "child_table",
+        "child_field"
+      ],
+      "title": "profile_foreign_keyArguments",
+      "type": "object"
+    },
+    "name": "profile_foreign_key",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_foreign_keyDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile a numeric row formula without returning source values.",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "expression": {
+          "title": "Expression",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        },
+        "target_field": {
+          "title": "Target Field",
+          "type": "string"
+        },
+        "tolerance": {
+          "default": 1e-06,
+          "title": "Tolerance",
+          "type": "number"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "target_field",
+        "expression"
+      ],
+      "title": "profile_formula_ruleArguments",
+      "type": "object"
+    },
+    "name": "profile_formula_rule",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_formula_ruleDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table"
+      ],
+      "title": "profile_tableArguments",
+      "type": "object"
+    },
+    "name": "profile_table",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_tableDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Build a safe Trino-derived profile using pushdown aggregates only.",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "max_top_values": {
+          "default": 20,
+          "title": "Max Top Values",
+          "type": "integer"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table"
+      ],
+      "title": "profile_table_safeArguments",
+      "type": "object"
+    },
+    "name": "profile_table_safe",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_table_safeDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Profile temporal ordering with pass/fail counts only.",
+    "input_schema": {
+      "properties": {
+        "allow_equal": {
+          "default": true,
+          "title": "Allow Equal",
+          "type": "boolean"
+        },
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "end_field": {
+          "title": "End Field",
+          "type": "string"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "start_field": {
+          "title": "Start Field",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "start_field",
+        "end_field"
+      ],
+      "title": "profile_temporal_orderingArguments",
+      "type": "object"
+    },
+    "name": "profile_temporal_ordering",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_temporal_orderingDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "catalog": {
+          "title": "Catalog",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "limit": {
+          "default": 100,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "schema": {
+          "title": "Schema",
+          "type": "string"
+        },
+        "table": {
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog",
+        "schema",
+        "table",
+        "columns"
+      ],
+      "title": "sample_rows_maskedArguments",
+      "type": "object"
+    },
+    "name": "sample_rows_masked",
+    "output_schema": {
+      "properties": {
+        "result": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Result",
+          "type": "array"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "title": "sample_rows_maskedOutput",
+      "type": "object"
+    }
+  }
+]

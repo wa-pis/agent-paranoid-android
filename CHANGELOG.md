@@ -10,6 +10,7 @@ All notable changes to this project are documented here.
   and agent workflow defaults ahead of the 0.12 interface refactor.
 - A golden contract for the supported top-level Python export surface.
 - Golden contracts for generation bundle filenames and validation reports.
+- Golden contracts for generator and Trino MCP tool names and JSON schemas.
 
 ### Changed
 

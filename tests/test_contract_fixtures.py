@@ -45,7 +45,9 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     generation_manifest = _load_fixture("generation-manifest.json")
     mcp_plan = _load_fixture("mcp-plan.json")
     mcp_generate = _load_fixture("mcp-generate.json")
+    generator_tools = _load_fixture_list("mcp-generator-tools.json")
     public_python_api = _load_fixture("public-python-api.json")
+    trino_tools = _load_fixture_list("mcp-trino-tools.json")
     artifact_layout = _load_fixture("artifact-layout.json")
     validation_report = _load_fixture("validation-report.json")
 
@@ -78,7 +80,27 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         "orders.json",
         "validation_report.json",
     ]
+    assert {tool["name"] for tool in generator_tools} == {
+        "approve_dataset_plan",
+        "export_dataset",
+        "generate_dataset",
+        "infer_dataset_spec",
+        "inspect_dataset_plan",
+        "plan_dataset",
+        "plan_trino_dataset",
+        "profile_csv",
+        "recover_dataset_plan",
+        "validate_dataset",
+    }
+    assert "run_safe_select" not in {tool["name"] for tool in trino_tools}
+    for tool in [*generator_tools, *trino_tools]:
+        assert tool["input_schema"]["type"] == "object"
+        assert tool["output_schema"] is not None
 
 
 def _load_fixture(name: str) -> dict[str, Any]:
+    return json.loads(CONTRACT_FIXTURE_DIR.joinpath(name).read_text(encoding="utf-8"))
+
+
+def _load_fixture_list(name: str) -> list[dict[str, Any]]:
     return json.loads(CONTRACT_FIXTURE_DIR.joinpath(name).read_text(encoding="utf-8"))

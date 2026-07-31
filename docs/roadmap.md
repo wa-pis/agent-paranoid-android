@@ -209,7 +209,8 @@ core to one model vendor:
 
 - Stabilize the public Python, CLI, MCP, `DatasetSpec`, and artifact contracts.
   The top-level Python export surface, generation bundle layout, manifest, and
-  validation report now have checked-in golden contracts.
+  validation report now have checked-in golden contracts. Generator and Trino
+  MCP tool names plus input/output schemas are also golden.
 - Split the CLI and MCP server modules into parsing, application, and
   presentation boundaries without changing their safety behavior.
 - Remove legacy compatibility wrappers and command aliases only after a

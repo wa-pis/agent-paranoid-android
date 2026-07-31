@@ -1,0 +1,528 @@
+[
+  {
+    "description": "Approve a reviewed agent plan and return artifact summaries, not rows.",
+    "input_schema": {
+      "properties": {
+        "reviewed_spec_sha256": {
+          "title": "Reviewed Spec Sha256",
+          "type": "string"
+        },
+        "workspace_path": {
+          "title": "Workspace Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_path",
+        "reviewed_spec_sha256"
+      ],
+      "title": "approve_dataset_planArguments",
+      "type": "object"
+    },
+    "name": "approve_dataset_plan",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "approve_dataset_planDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Generate and export fresh synthetic data; source-row conversion is not supported.",
+    "input_schema": {
+      "properties": {
+        "business_rules_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Rules Path"
+        },
+        "business_rules_payload": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Rules Payload"
+        },
+        "count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Count"
+        },
+        "output_folder": {
+          "title": "Output Folder",
+          "type": "string"
+        },
+        "output_format": {
+          "title": "Output Format",
+          "type": "string"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "spec_path": {
+          "title": "Spec Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spec_path",
+        "output_folder",
+        "output_format"
+      ],
+      "title": "export_datasetArguments",
+      "type": "object"
+    },
+    "name": "export_dataset",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "export_datasetDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Generate synthetic files and validation artifacts without returning rows.",
+    "input_schema": {
+      "properties": {
+        "business_rules_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Rules Path"
+        },
+        "business_rules_payload": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Business Rules Payload"
+        },
+        "count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Count"
+        },
+        "output_folder": {
+          "title": "Output Folder",
+          "type": "string"
+        },
+        "output_format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Format"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "spec_path": {
+          "title": "Spec Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spec_path",
+        "output_folder"
+      ],
+      "title": "generate_datasetArguments",
+      "type": "object"
+    },
+    "name": "generate_dataset",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "generate_datasetDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Infer and persist a versioned DatasetSpec from safe profile metadata.",
+    "input_schema": {
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Count"
+        },
+        "output_path": {
+          "title": "Output Path",
+          "type": "string"
+        },
+        "profile_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Path"
+        },
+        "profile_payload": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile Payload"
+        }
+      },
+      "required": [
+        "output_path"
+      ],
+      "title": "infer_dataset_specArguments",
+      "type": "object"
+    },
+    "name": "infer_dataset_spec",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "infer_dataset_specDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Inspect a planned or completed agent workspace without changing it.",
+    "input_schema": {
+      "properties": {
+        "workspace_path": {
+          "title": "Workspace Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_path"
+      ],
+      "title": "inspect_dataset_planArguments",
+      "type": "object"
+    },
+    "name": "inspect_dataset_plan",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "inspect_dataset_planDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Plan a review-first workflow from one bounded workspace source.",
+    "input_schema": {
+      "properties": {
+        "count": {
+          "default": 100,
+          "title": "Count",
+          "type": "integer"
+        },
+        "invalid_ratio": {
+          "default": 0.0,
+          "title": "Invalid Ratio",
+          "type": "number"
+        },
+        "mode": {
+          "default": "valid",
+          "enum": [
+            "valid",
+            "negative",
+            "mixed"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "output_format": {
+          "default": "csv",
+          "enum": [
+            "csv",
+            "json",
+            "parquet"
+          ],
+          "title": "Output Format",
+          "type": "string"
+        },
+        "rule_sample_rows": {
+          "default": 50000,
+          "title": "Rule Sample Rows",
+          "type": "integer"
+        },
+        "seed": {
+          "default": 12345,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "source_path": {
+          "title": "Source Path",
+          "type": "string"
+        },
+        "source_type": {
+          "anyOf": [
+            {
+              "enum": [
+                "csv",
+                "csv-folder",
+                "profile"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Type"
+        },
+        "table_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Name"
+        },
+        "use_cache": {
+          "default": false,
+          "title": "Use Cache",
+          "type": "boolean"
+        },
+        "workspace_path": {
+          "title": "Workspace Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_path",
+        "workspace_path"
+      ],
+      "title": "plan_datasetArguments",
+      "type": "object"
+    },
+    "name": "plan_dataset",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "plan_datasetDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Write a review-first agent plan from safe Trino profile metadata.",
+    "input_schema": {
+      "properties": {
+        "count": {
+          "default": 100,
+          "title": "Count",
+          "type": "integer"
+        },
+        "output_format": {
+          "default": "csv",
+          "title": "Output Format",
+          "type": "string"
+        },
+        "profile_payload": {
+          "additionalProperties": true,
+          "title": "Profile Payload",
+          "type": "object"
+        },
+        "seed": {
+          "default": 12345,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "workspace_path": {
+          "title": "Workspace Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile_payload",
+        "workspace_path"
+      ],
+      "title": "plan_trino_datasetArguments",
+      "type": "object"
+    },
+    "name": "plan_trino_dataset",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "plan_trino_datasetDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Create a safe aggregate profile for one workspace CSV file.",
+    "input_schema": {
+      "properties": {
+        "input_path": {
+          "title": "Input Path",
+          "type": "string"
+        },
+        "output_path": {
+          "title": "Output Path",
+          "type": "string"
+        },
+        "table_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Name"
+        }
+      },
+      "required": [
+        "input_path",
+        "output_path"
+      ],
+      "title": "profile_csvArguments",
+      "type": "object"
+    },
+    "name": "profile_csv",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "profile_csvDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Recover an interrupted approval without regenerating synthetic rows.",
+    "input_schema": {
+      "properties": {
+        "reviewed_spec_sha256": {
+          "title": "Reviewed Spec Sha256",
+          "type": "string"
+        },
+        "workspace_path": {
+          "title": "Workspace Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_path",
+        "reviewed_spec_sha256"
+      ],
+      "title": "recover_dataset_planArguments",
+      "type": "object"
+    },
+    "name": "recover_dataset_plan",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "recover_dataset_planDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "Validate generated workspace artifacts against a DatasetSpec.",
+    "input_schema": {
+      "properties": {
+        "output_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Output Path"
+        },
+        "rows_folder": {
+          "title": "Rows Folder",
+          "type": "string"
+        },
+        "spec_path": {
+          "title": "Spec Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "spec_path",
+        "rows_folder"
+      ],
+      "title": "validate_datasetArguments",
+      "type": "object"
+    },
+    "name": "validate_dataset",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "validate_datasetDictOutput",
+      "type": "object"
+    }
+  }
+]
