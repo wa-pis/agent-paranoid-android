@@ -55,6 +55,8 @@ All notable changes to this project are documented here.
   wrappers, migration targets, and minimum deprecation windows.
 - The completed public stability map merged into the canonical public-contracts
   OpenSpec capability and archived with its implementation evidence.
+- The completed versioned golden-contract catalog merged into canonical
+  OpenSpec and archived with its compatibility evidence.
 
 ### Fixed
 
