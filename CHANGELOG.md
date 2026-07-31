@@ -156,6 +156,8 @@ All notable changes to this project are documented here.
   explicit boundary for the optional untyped `pyarrow` dependency.
 - Strict mypy now covers the complete production package and both contract
   fixture scripts.
+- Pre-RC release documentation records the passing 87.94% unit, property, and
+  contract coverage gate against an exact `main` commit.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.
