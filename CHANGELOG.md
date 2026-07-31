@@ -16,6 +16,8 @@ All notable changes to this project are documented here.
   reports and generation manifests for controlled invalid datasets.
 - A checked-in controlled-invalid example with tested CLI/MCP reproducibility
   from one spec, rule file, seed, mode, and invalid ratio.
+- A public stability table mapping Python, CLI, MCP, `DatasetSpec`, advisor,
+  and artifact contracts to owners, compatibility rules, and test gates.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

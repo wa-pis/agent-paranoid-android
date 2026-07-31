@@ -244,7 +244,7 @@ compatibility promise starts.
 
 Scope:
 
-- [ ] Publish a stability table for the supported Python imports, CLI commands,
+- [x] Publish a stability table for the supported Python imports, CLI commands,
   MCP tools, `DatasetSpec`, advisor exchange, and generated artifact files.
 - [ ] Freeze versioned JSON and MCP schemas with golden compatibility tests and
   explicit additive-versus-breaking change rules.

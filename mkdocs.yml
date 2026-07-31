@@ -52,6 +52,7 @@ nav:
       - Dataset Workflow: domain_agnostic_workflow.md
   - Reference:
       - CLI: reference/cli.md
+      - Public Stability: reference/stability.md
       - Configuration: reference/configuration.md
       - DatasetSpec: dataset_profile_and_spec.md
       - Advisor API: reference/advisor.md
