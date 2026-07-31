@@ -73,6 +73,8 @@ All notable changes to this project are documented here.
   synthetic-generation OpenSpec and archived with deterministic evidence.
 - Controlled foreign-key and aggregate-formula negative cases merged into
   canonical synthetic-generation OpenSpec and archived with isolation evidence.
+- Bounded expected-versus-observed negative validation artifacts merged into
+  canonical synthetic-generation OpenSpec and archived with privacy evidence.
 
 ### Fixed
 
