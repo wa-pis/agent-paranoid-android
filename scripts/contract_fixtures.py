@@ -207,7 +207,16 @@ def _normalize_contract(payload: Any, workspace_root: Path) -> Any:
         return {
             key: (
                 "<package-version>"
-                if key == "package_version"
+                if key in {"package_version", "generator_algorithm_version"}
+                else "<python-version>"
+                if key == "python_version"
+                else "<dependency-fingerprint>"
+                if key == "dependencies_sha256"
+                else {
+                    name: "<dependency-version>"
+                    for name in sorted(value)
+                }
+                if key == "dependencies" and isinstance(value, dict)
                 else _normalize_contract(value, workspace_root)
             )
             for key, value in payload.items()

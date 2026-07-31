@@ -4,6 +4,26 @@
   "dataset_spec_schema_version": "1.0",
   "output_format": "json",
   "package_version": "<package-version>",
+  "reproducibility": {
+    "byte_identical_across_versions": false,
+    "dependencies": {
+      "Faker": "<dependency-version>",
+      "PyYAML": "<dependency-version>",
+      "pydantic": "<dependency-version>"
+    },
+    "dependencies_sha256": "<dependency-fingerprint>",
+    "generator_algorithm_version": "<package-version>",
+    "guarantee": "same_environment_logical",
+    "locale": "en_US",
+    "output_sha256": {
+      "dataset_spec.yaml": "e2dbd3adb615e18ce3c9b67768f23438673eeea1fb119439b27fd77b92527df8",
+      "orders.json": "963837c7b1d6a23155028d8028b364a47bb1361b0e07ca83803654843ab1f2dc",
+      "validation_report.json": "d89f7e7f21f0ac9cbd3504ed104a1c19d8484ef6c620f6729bb5cf0a694f7d8a"
+    },
+    "python_implementation": "CPython",
+    "python_version": "<python-version>",
+    "serializer": "python-stdlib-json"
+  },
   "row_counts": {
     "orders": 3
   },

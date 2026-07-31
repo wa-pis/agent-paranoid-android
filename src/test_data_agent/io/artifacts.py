@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import os
+import platform
 import tempfile
 from pathlib import Path
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
+from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode, OutputFormat
@@ -35,6 +38,19 @@ class BusinessValidationManifest(BaseModel):
     expectations_met: bool = True
 
 
+class ReproducibilityEvidence(BaseModel):
+    guarantee: Literal["same_environment_logical"] = "same_environment_logical"
+    byte_identical_across_versions: Literal[False] = False
+    python_implementation: str
+    python_version: str
+    dependencies: dict[str, str]
+    dependencies_sha256: str
+    locale: str
+    serializer: str
+    generator_algorithm_version: str
+    output_sha256: dict[str, str]
+
+
 class GenerationManifest(BaseModel):
     artifact_type: Literal["synthetic_dataset"] = "synthetic_dataset"
     package_version: str = __version__
@@ -45,6 +61,7 @@ class GenerationManifest(BaseModel):
     row_counts: dict[str, int]
     validation_valid: bool
     business_validation: BusinessValidationManifest | None = None
+    reproducibility: ReproducibilityEvidence | None = None
     synthetic: Literal[True] = True
     source_rows_copied: Literal[False] = False
 
@@ -115,6 +132,11 @@ def write_dataset_generation_artifacts(
     write_bounded_text(profile.model_dump_json(indent=2), artifact_dir / profile_artifact_name)
     write_bounded_text(spec.model_dump_json(indent=2), artifact_dir / "dataset_spec.json")
     write_bounded_text(report.model_dump_json(indent=2), artifact_dir / "validation_report.json")
+    if business_report is not None:
+        write_bounded_text(
+            business_report.model_dump_json(indent=2),
+            artifact_dir / "business_validation_report.json",
+        )
     write_generation_manifest(
         spec,
         seed=spec.generation_settings.seed or 0,
@@ -131,11 +153,6 @@ def write_dataset_generation_artifacts(
         business_report=business_report,
         output_folder=artifact_dir,
     )
-    if business_report is not None:
-        write_bounded_text(
-            business_report.model_dump_json(indent=2),
-            artifact_dir / "business_validation_report.json",
-        )
 
 
 def write_dataset_validation_report(report: Any, output_folder: Path) -> None:
@@ -160,9 +177,56 @@ def write_generation_manifest(
         row_counts=row_counts,
         validation_valid=validation_valid,
         business_validation=business_validation_manifest(business_report),
+        reproducibility=reproducibility_evidence(spec, output_format, output_folder),
     )
     write_json_artifact(manifest, output_folder / "generation_manifest.json")
     return manifest
+
+
+def reproducibility_evidence(
+    spec: DatasetSpec,
+    output_format: OutputFormat,
+    output_folder: Path,
+) -> ReproducibilityEvidence:
+    dependencies = {
+        name: importlib.metadata.version(name)
+        for name in ["Faker", "pydantic", "PyYAML"]
+    }
+    if output_format == OutputFormat.PARQUET:
+        dependencies["pyarrow"] = importlib.metadata.version("pyarrow")
+    dependency_payload = json.dumps(
+        dependencies,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    serializer = (
+        f"pyarrow-{dependencies['pyarrow']}"
+        if output_format == OutputFormat.PARQUET
+        else f"python-stdlib-{output_format.value}"
+    )
+    return ReproducibilityEvidence(
+        python_implementation=platform.python_implementation(),
+        python_version=platform.python_version(),
+        dependencies=dependencies,
+        dependencies_sha256=hashlib.sha256(dependency_payload).hexdigest(),
+        locale=spec.generation_settings.locale or DEFAULT_LOCALE,
+        serializer=serializer,
+        generator_algorithm_version=__version__,
+        output_sha256=artifact_hashes(output_folder),
+    )
+
+
+def artifact_hashes(output_folder: Path) -> dict[str, str]:
+    hashes: dict[str, str] = {}
+    for path in sorted(output_folder.rglob("*")):
+        if not path.is_file() or path.name == "generation_manifest.json":
+            continue
+        digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        hashes[path.relative_to(output_folder).as_posix()] = digest.hexdigest()
+    return hashes
 
 
 def business_validation_manifest(

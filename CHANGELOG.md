@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Generation manifests now record bounded reproducibility inputs and output
+  SHA-256 evidence while distinguishing logical from cross-version byte-level
+  reproducibility.
 - Explicit documentation of exact-row reuse detection limits and the absence
   of statistical privacy guarantees.
 - Cross-table average aggregate mappings across deterministic generation,
