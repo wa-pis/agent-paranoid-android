@@ -170,6 +170,42 @@ def test_partial_timezone_datetime_bound_is_generation_safe() -> None:
     assert generate_dataset(spec, seed=1)["events"][0]["created_at"].endswith("+00:00")
 
 
+def test_generation_locale_controls_seeded_faker_values() -> None:
+    def localized_spec(locale: str) -> DatasetSpec:
+        return DatasetSpec(
+            entities=[
+                EntitySpec(
+                    name="customers",
+                    row_count=5,
+                    fields=[
+                        FieldSpec(
+                            name="email",
+                            data_type=FieldType.STRING,
+                            sensitive=True,
+                            semantic_type="email",
+                        )
+                    ],
+                )
+            ],
+            generation_settings={"locale": locale},
+        )
+
+    german_rows = generate_dataset(localized_spec("de_DE"), seed=37)
+
+    assert german_rows == generate_dataset(localized_spec("de_DE"), seed=37)
+    assert german_rows != generate_dataset(localized_spec("ja_JP"), seed=37)
+
+
+def test_generation_rejects_unsupported_locale_clearly() -> None:
+    spec = DatasetSpec(
+        entities=[],
+        generation_settings={"locale": "not-a-locale"},
+    )
+
+    with pytest.raises(ValueError, match="unsupported generation locale: 'not-a-locale'"):
+        generate_dataset(spec, seed=1)
+
+
 def test_dataset_spec_accepts_explicit_privacy_and_runtime_settings() -> None:
     spec = DatasetSpec.model_validate(
         {

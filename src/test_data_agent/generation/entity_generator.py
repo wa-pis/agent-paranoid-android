@@ -42,7 +42,7 @@ def generate_dataset(
     assert_spec_safe(spec)
     budget = budget or GenerationBudget()
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
-    faker = Faker()
+    faker = create_faker(spec.generation_settings.locale)
     faker.seed_instance(seed)
     mode = spec.generation_settings.mode
     invalid_ratio = spec.generation_settings.invalid_ratio
@@ -70,6 +70,13 @@ def generate_dataset(
     solve_constraints(rows_by_entity, spec, seed=seed)
     budget.check("constraint solving")
     return rows_by_entity
+
+
+def create_faker(locale: str | None) -> Faker:
+    try:
+        return Faker(locale) if locale is not None else Faker()
+    except AttributeError as exc:
+        raise ValueError(f"unsupported generation locale: {locale!r}") from exc
 
 
 def generate_row(

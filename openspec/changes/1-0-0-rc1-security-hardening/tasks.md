@@ -36,7 +36,7 @@
 
 - [ ] Implement `ValidationSettings` semantics, including `fail_fast`, or
   remove unsupported settings from the public contract.
-- [ ] Wire `GenerationSettings.locale` into Faker and add locale contract tests.
+- [x] Wire `GenerationSettings.locale` into Faker and add locale contract tests.
 - [ ] Define logical versus byte-for-byte reproducibility and record the
   required runtime, dependency, serializer, locale, and output evidence in the
   manifest.

@@ -85,6 +85,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- `GenerationSettings.locale` now controls seeded Faker values, with clear
+  rejection of unsupported locales.
 - Low-level Trino execution helpers are private; public SQL access remains
   limited to validated safe-select and dedicated bounded profiling methods.
 - Mocked-cursor regressions prove forbidden and non-allowlisted SQL is rejected
