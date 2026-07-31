@@ -272,7 +272,7 @@ outside the repository checkout.
 
 Scope:
 
-- [ ] Add bounded performance and resource regression checks for representative
+- [x] Add bounded performance and resource regression checks for representative
   multi-entity generation, validation, and profiling workloads.
 - [ ] Exercise cancellation, timeout, disk exhaustion, and interrupted-write
   paths and verify that partial bundles are never reported as successful.

@@ -26,6 +26,8 @@ All notable changes to this project are documented here.
   deterministic generation remain compatible with the previous feature release.
 - A public support policy for CPython versions, optional extras, provider
   adapter maturity, compatibility notices, and release gates.
+- Bounded release regressions for profiling, multi-entity generation, and
+  validation wall time and peak traced allocations.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

@@ -23,6 +23,9 @@ python3 -m compileall -q src tests scripts
 echo "==> Tests with coverage"
 python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
 
+echo "==> Operational resource budgets"
+python3 scripts/check_operational_budgets.py
+
 echo "==> DatasetSpec schema freshness"
 python3 scripts/export_dataset_schema.py "$TMP_DIR/dataset_spec.schema.json"
 python3 - "$TMP_DIR/dataset_spec.schema.json" schemas/dataset_spec.schema.json <<'PY'
