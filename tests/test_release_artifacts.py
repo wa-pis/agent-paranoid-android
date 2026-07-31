@@ -194,7 +194,7 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflow_text = "\n".join(path.read_text() for path in workflows)
 
     setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 8
+    assert setup_count == 9
     assert workflow_text.count("prune-cache: true") == setup_count
 
 

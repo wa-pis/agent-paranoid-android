@@ -75,7 +75,12 @@ def test_unknown_or_release_events_fail_closed() -> None:
 
 def test_heavy_workflow_jobs_use_change_scope() -> None:
     expected = {
-        "ci.yml": {"package", "package-compatibility", "trino-integration"},
+        "ci.yml": {
+            "dependency-minimum",
+            "package",
+            "package-compatibility",
+            "trino-integration",
+        },
         "containers.yml": {"validate", "validate-arm64"},
         "security.yml": {"dependency-review", "codeql", "secrets"},
     }
@@ -103,6 +108,23 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         step["if"] == "needs.changes.outputs.code == 'true'"
         for step in quality["steps"][1:]
     )
+
+    minimum = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    )["jobs"]["dependency-minimum"]
+    profiles = minimum["strategy"]["matrix"]["include"]
+    assert {profile["profile"] for profile in profiles} == {
+        "base",
+        "parquet",
+        "mcp",
+        "trino",
+        "openai",
+    }
+    assert minimum["steps"][1]["with"]["python-version"] == "3.11"
+    assert "matrix.constraint-file" in minimum["steps"][3]["run"]
+    mcp_profile = next(profile for profile in profiles if profile["profile"] == "mcp")
+    assert mcp_profile["constraint-file"] == "dependency-minimum-mcp.txt"
+    assert "--all-extras" in quality["steps"][4]["run"]
 
     documentation = (
         ROOT / ".github" / "workflows" / "docs.yml"
