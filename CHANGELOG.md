@@ -87,6 +87,8 @@ All notable changes to this project are documented here.
 
 - Low-level Trino execution helpers are private; public SQL access remains
   limited to validated safe-select and dedicated bounded profiling methods.
+- Mocked-cursor regressions prove forbidden and non-allowlisted SQL is rejected
+  before a Trino connection or cursor execution can occur.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
