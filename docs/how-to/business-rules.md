@@ -104,8 +104,11 @@ than expecting it to pass.
 For tables with several field and row rules, selected rows are distributed
 deterministically across required, allowed-value, numeric-bound, conditional,
 temporal, and formula violations. Reusing the same seed, mode, ratio, and rule
-file reproduces the same negative cases. Foreign-key and aggregate-formula
-negative cases are not generated automatically yet.
+file reproduces the same negative cases. Foreign-key violations use synthetic
+missing parent keys without changing the parent table. Aggregate-formula
+violations change only the configured concrete numeric field. Count-style
+aggregate rules with `field: "*"` are validation-only because changing row
+counts would also break the dataset shape.
 
 ## Safety Restrictions
 
