@@ -10,6 +10,9 @@ from test_data_agent.mcp_trino_server import (
     check_allowlist,
     describe_table,
     has_top_level_limit,
+    list_catalogs,
+    list_schemas,
+    list_tables,
     mask_row,
     profile_aggregate_mapping,
     profile_column_safe,
@@ -17,6 +20,8 @@ from test_data_agent.mcp_trino_server import (
     profile_conditional_required,
     profile_foreign_key,
     profile_formula_rule,
+    profile_column,
+    profile_table,
     profile_table_safe,
     profile_temporal_ordering,
     run_safe_select,
@@ -621,6 +626,42 @@ def test_describe_table_qualifies_information_schema_catalog(
     assert describe_table("analytics", "safe_schema", "orders") == []
     assert 'FROM "analytics".information_schema.columns' in str(captured["sql"])
     assert captured["parameters"] == ["analytics", "safe_schema", "orders"]
+
+
+def test_metadata_and_basic_profilers_use_bounded_query_builders(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+    calls: list[tuple[str, list[object]]] = []
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        calls.append((sql, list(parameters or [])))
+        if sql == "SHOW CATALOGS":
+            return [{"Catalog": "analytics"}, {"Catalog": "raw"}]
+        if sql == 'SHOW SCHEMAS FROM "analytics"':
+            return [{"Schema": "safe_schema"}, {"Schema": "private"}]
+        if sql == 'SHOW TABLES FROM "analytics"."safe_schema"':
+            return [{"Table": "orders"}]
+        if "information_schema.columns" in sql:
+            return [{"column_name": "amount", "data_type": "double", "is_nullable": "NO"}]
+        if sql == 'SELECT count(*) AS row_count FROM "analytics"."safe_schema"."orders"':
+            return [{"row_count": 12}]
+        if 'approx_distinct("amount")' in sql:
+            return [{"row_count": 12, "non_null_count": 11, "approx_distinct_count": 9}]
+        raise AssertionError(sql)
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
+
+    assert list_catalogs() == ["analytics"]
+    assert list_schemas("analytics") == ["safe_schema"]
+    assert list_tables("analytics", "safe_schema") == ["orders"]
+    assert describe_table("analytics", "safe_schema", "orders")[0]["column_name"] == "amount"
+    assert profile_table("analytics", "safe_schema", "orders")["row_count"] == 12
+    assert profile_column("analytics", "safe_schema", "orders", "amount")["approx_distinct_count"] == 9
+
+    assert all("SELECT *" not in sql.upper() for sql, _ in calls)
+    assert calls[3][1] == ["analytics", "safe_schema", "orders"]
 
 
 def test_profile_foreign_key_uses_join_counts_only(monkeypatch: pytest.MonkeyPatch) -> None:
