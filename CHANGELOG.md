@@ -79,6 +79,9 @@ All notable changes to this project are documented here.
   synthetic-generation OpenSpec and archived with executable example evidence.
 - A canonical operational-readiness capability covering bounded synthetic
   profiling, generation, and validation resource regression gates.
+- Fail-closed path-aware CI classification that keeps strict documentation
+  checks while skipping heavy Python, container, and security jobs for docs-only
+  pull requests and main pushes.
 
 ### Fixed
 
