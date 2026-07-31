@@ -87,6 +87,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Container builds no longer default to version `0.8.1`, and publication now
+  rejects image metadata that differs from the package version.
 - `GenerationSettings.locale` now controls seeded Faker values, with clear
   rejection of unsupported locales.
 - Low-level Trino execution helpers are private; public SQL access remains
