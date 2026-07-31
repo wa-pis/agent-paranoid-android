@@ -46,6 +46,8 @@ All notable changes to this project are documented here.
   every native CLI and MCP target before publication.
 - A fail-closed dependency-license gate for application, optional, development,
   and documentation environments without adding a scanner dependency.
+- A dated security review with scanner evidence and explicit dispositions for
+  all remaining OpenSSF Scorecard governance and maturity findings.
 
 ### Fixed
 
