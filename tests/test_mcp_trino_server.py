@@ -1,5 +1,6 @@
 import pytest
 
+from test_data_agent import mcp_trino_server
 from test_data_agent.mcp_trino_server import (
     AllowlistError,
     SqlSafetyError,
@@ -8,7 +9,6 @@ from test_data_agent.mcp_trino_server import (
     TrinoResultLimitError,
     check_allowlist,
     describe_table,
-    execute_query,
     has_top_level_limit,
     mask_row,
     profile_aggregate_mapping,
@@ -96,6 +96,11 @@ def test_raw_sql_tool_is_opt_in(
 
     monkeypatch.setenv("TRINO_ENABLE_SAFE_SELECT", "true")
     assert "run_safe_select" in {tool.__name__ for tool in trino_mcp_tools()}
+
+
+def test_unrestricted_execution_helpers_are_private() -> None:
+    assert not hasattr(mcp_trino_server, "execute_query")
+    assert not hasattr(mcp_trino_server, "fetch_dicts")
 
 
 def test_limit_must_be_top_level_not_inside_literal() -> None:
@@ -192,7 +197,7 @@ def test_safe_select_service_rejects_before_database_io(
         raise AssertionError("unsafe SQL reached Trino")
 
     monkeypatch.setattr(
-        "test_data_agent.mcp_trino_server.fetch_dicts",
+        "test_data_agent.mcp_trino_server._fetch_dicts",
         unexpected_query,
     )
 
@@ -311,7 +316,7 @@ def test_profile_column_safe_suppresses_secret_top_values(monkeypatch: pytest.Mo
             return [{"value": "sk_live_51ABCDEF", "count": 2}]
         return [{"row_count": 2, "non_null_count": 2, "approx_distinct_count": 1}]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_column_safe(
         "analytics",
@@ -375,7 +380,7 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
     fake_trino = FakeTrino()
     monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
 
-    rows, description = execute_query("SELECT id FROM users LIMIT 1")
+    rows, description = mcp_trino_server._execute_query("SELECT id FROM users LIMIT 1")
 
     assert rows == [(1,)]
     assert description == [("id",)]
@@ -427,7 +432,7 @@ def test_execute_query_closes_resources_on_error(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
 
     with pytest.raises(RuntimeError, match="boom"):
-        execute_query("SELECT id FROM users LIMIT 1")
+        mcp_trino_server._execute_query("SELECT id FROM users LIMIT 1")
 
     assert fake_trino.dbapi.connection.cursor_instance.closed is True
     assert fake_trino.dbapi.connection.closed is True
@@ -472,7 +477,7 @@ def test_execute_query_closes_connection_when_cursor_close_fails(monkeypatch: py
     monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
 
     with pytest.raises(RuntimeError, match="cursor close failed"):
-        execute_query("SELECT id FROM users LIMIT 1")
+        mcp_trino_server._execute_query("SELECT id FROM users LIMIT 1")
 
     assert fake_trino.dbapi.connection.closed is True
 
@@ -523,7 +528,7 @@ def test_execute_query_rejects_oversized_result_and_closes_resources(
     monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
 
     with pytest.raises(TrinoResultLimitError, match="limit of 2 rows"):
-        execute_query("SELECT id FROM users LIMIT 3")
+        mcp_trino_server._execute_query("SELECT id FROM users LIMIT 3")
 
     assert fake_trino.dbapi.connection.cursor_instance.closed is True
     assert fake_trino.dbapi.connection.closed is True
@@ -562,7 +567,7 @@ def test_profile_table_safe_uses_aggregates_without_sensitive_top_values(monkeyp
             ]
         raise AssertionError(sql)
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_table_safe("analytics", "safe_schema", "orders")
 
@@ -588,7 +593,7 @@ def test_describe_table_qualifies_information_schema_catalog(
         captured["parameters"] = parameters
         return []
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     assert describe_table("analytics", "safe_schema", "orders") == []
     assert 'FROM "analytics".information_schema.columns' in str(captured["sql"])
@@ -602,7 +607,7 @@ def test_profile_foreign_key_uses_join_counts_only(monkeypatch: pytest.MonkeyPat
         executed_sql.append(sql)
         return [{"child_row_count": 100, "checked_count": 98, "matched_count": 97, "orphan_count": 1}]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_foreign_key("analytics", "safe_schema", "customers", "customer_id", "orders", "customer_id")
 
@@ -622,7 +627,7 @@ def test_profile_temporal_ordering_uses_count_if(monkeypatch: pytest.MonkeyPatch
         executed_sql.append(sql)
         return [{"row_count": 10, "checked_count": 10, "passed_count": 9, "failed_count": 1}]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_temporal_ordering("analytics", "safe_schema", "orders", "created_at", "paid_at")
 
@@ -648,7 +653,7 @@ def test_profile_formula_rule_uses_safe_arithmetic_residual(monkeypatch: pytest.
             }
         ]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_formula_rule("analytics", "safe_schema", "orders", "amount", "quantity * unit_price")
 
@@ -679,7 +684,7 @@ def test_profile_conditional_rules_use_parameters_without_echoing_values(monkeyp
         calls.append((sql, list(parameters or [])))
         return [{"row_count": 20, "checked_count": 5, "passed_count": 4, "failed_count": 1}]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     required = profile_conditional_required(
         "analytics",
@@ -725,7 +730,7 @@ def test_profile_aggregate_mapping_uses_child_aggregate_cte(monkeypatch: pytest.
             }
         ]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_aggregate_mapping(
         "analytics",
@@ -759,7 +764,7 @@ def test_profile_aggregate_mapping_supports_average(monkeypatch: pytest.MonkeyPa
             }
         ]
 
-    monkeypatch.setattr("test_data_agent.mcp_trino_server.fetch_dicts", fake_fetch_dicts)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
 
     profile = profile_aggregate_mapping(
         "analytics",

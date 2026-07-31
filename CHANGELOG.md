@@ -85,6 +85,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Low-level Trino execution helpers are private; public SQL access remains
+  limited to validated safe-select and dedicated bounded profiling methods.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before

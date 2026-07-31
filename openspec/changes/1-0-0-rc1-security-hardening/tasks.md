@@ -9,7 +9,7 @@
   distributions before row generation or artifact publication.
 - [x] Add regression tests for manually constructed and malicious on-disk
   specs through Python, CLI, and MCP.
-- [ ] Make unrestricted Trino execution private and route all external calls
+- [x] Make unrestricted Trino execution private and route all external calls
   through safe query validation or dedicated bounded methods.
 - [ ] Add mocked-cursor tests proving unsafe SQL is rejected before execution.
 - [ ] Verify that safe metadata and aggregate profilers still work through
