@@ -37,6 +37,9 @@ All notable changes to this project are documented here.
   cancellation interrupts writing or validation.
 - Mid-write disk exhaustion removes partial staged folder, review, and
   single-entity output without publishing success metadata.
+- Interrupted folder publication removes the renamed destination, while
+  interrupted single-entity publication restores replaced files and removes
+  partial new output.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

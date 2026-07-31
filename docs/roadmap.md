@@ -274,13 +274,13 @@ Scope:
 
 - [x] Add bounded performance and resource regression checks for representative
   multi-entity generation, validation, and profiling workloads.
-- [ ] Exercise cancellation, timeout, disk exhaustion, and interrupted-write
+- [x] Exercise cancellation, timeout, disk exhaustion, and interrupted-write
   paths and verify that partial bundles are never reported as successful.
   - [x] Remove staged folder and single-entity outputs on interactive process
     cancellation without publishing success metadata.
   - [x] Exercise mid-write disk exhaustion after a partial staged file exists.
   - [x] Exercise staged timeout cleanup across every generation output shape.
-  - [ ] Complete interrupted-commit coverage.
+  - [x] Roll back folder and single-entity publication interrupted mid-commit.
 - [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
   and provider extras with actionable, secret-free recovery guidance.
 - [ ] Run isolated wheel and container workflows across supported Python
