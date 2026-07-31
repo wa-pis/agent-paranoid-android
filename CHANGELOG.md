@@ -85,6 +85,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Direct Python generation now rejects specs containing raw-looking sensitive
+  categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - Lightweight no-op Python matrix checks for docs-only changes so existing
   branch-protection requirements are reported instead of remaining pending.
 
