@@ -48,6 +48,9 @@ All notable changes to this project are documented here.
   and documentation environments without adding a scanner dependency.
 - A dated security review with scanner evidence and explicit dispositions for
   all remaining OpenSSF Scorecard governance and maturity findings.
+- Canonical OpenSpec requirements for behavior-preserving CLI boundaries and
+  safety-equivalent direct/MCP application services, with the completed change
+  archived for the 1.0 contract freeze.
 
 ### Fixed
 
