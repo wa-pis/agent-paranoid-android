@@ -21,8 +21,10 @@ The goal is not to copy production rows or generate unrelated Faker records.
 The tool builds a synthetic analogue of relational and business semantics:
 foreign-key graphs, reference-table shape, distributions, order of magnitude,
 temporal dependencies, formulas, and aggregate reconciliation. Salary and
-accounting data can therefore support development and testing of analytics,
-forecasting, budgeting, and reporting systems without exposing source rows.
+accounting are example domains; the same engine applies to operational,
+customer, scientific, logistics, and other relational systems. The resulting
+datasets support development and testing of analytics, forecasting, budgeting,
+reporting, and domain-specific workflows without exposing source rows.
 
 AI may help discover likely relationships and business rules from safe schema
 profiles, aggregates, masked patterns, and bounded evidence. Its output is an

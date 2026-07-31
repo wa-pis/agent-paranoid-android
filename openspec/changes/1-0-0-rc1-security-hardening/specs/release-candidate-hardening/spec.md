@@ -77,7 +77,7 @@ The system SHALL support AI-assisted discovery of candidate relationships and
 business rules from bounded safe metadata, but SHALL require deterministic
 validation and review before a proposal affects generation.
 
-#### Scenario: The profiler finds a likely employee-to-payroll relationship
+#### Scenario: The profiler finds a likely parent-child relationship
 
 - **GIVEN** bounded profiles show compatible identifier types, cardinality,
   null/distinct ratios, temporal compatibility, and safe relationship evidence
@@ -100,23 +100,27 @@ For an approved relationship and rule set, generation SHALL preserve the
 requested relational graph, distribution/order-of-magnitude shape, temporal
 constraints, and executable business invariants without copying source rows.
 
-#### Scenario: Synthetic payroll data is generated from employee metadata
+#### Scenario: Related domain entities are generated from approved metadata
 
-- **GIVEN** approved employee, payroll, department, position, and period
-  relationships
+- **GIVEN** approved parent-child, reference, temporal, and domain-specific
+  relationships between entities
 - **WHEN** a dataset is generated with a fixed seed
 - **THEN** all requested FKs and temporal rules SHALL validate
-- **AND** salary values SHALL be synthetic while retaining configured ranges,
-  ratios, distributions, and order-of-magnitude characteristics
+- **AND** measures and categorical values SHALL be synthetic while retaining
+  configured ranges, ratios, distributions, and order-of-magnitude
+  characteristics
 
-#### Scenario: A financial summary requires reconciliation
+#### Scenario: A domain summary requires reconciliation
 
-- **GIVEN** approved salary-component, article, period, debit/credit, or
+- **GIVEN** approved component, category, period, partition, balancing, or
   cross-table aggregate formulas
 - **WHEN** synthetic data is generated
 - **THEN** deterministic validation SHALL verify every requested formula
 - **AND** generation SHALL fail or report the violation rather than publish a
   dataset marked valid
+
+Financial debit/credit reconciliation is one possible fixture for this
+requirement, not a special-case generation path.
 
 ### Requirement: AI providers receive metadata only
 

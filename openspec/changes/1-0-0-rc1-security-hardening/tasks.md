@@ -27,9 +27,10 @@
   human review step; AI output must never directly approve generation.
 - [ ] Add relationship tests for compatible key types, cardinality, nulls,
   distinctness, temporal ranges, and ambiguous/low-confidence candidates.
-- [ ] Add financial/aggregate reconciliation tests for synthetic salary and
-  accounting-style data: article/period totals, salary components, debit/credit
-  balance, and cross-table formulas.
+- [ ] Add domain-agnostic aggregate and business-rule tests for grouped totals,
+  component formulas, partitions, coverage, temporal windows, paired values,
+  and cross-table reconciliation. Include financial/accounting as one fixture,
+  not as the product's assumed domain.
 - [ ] Preserve relative distributions and order of magnitude while allowing
   synthetic scaling of sensitive totals; record the effective rule set.
 

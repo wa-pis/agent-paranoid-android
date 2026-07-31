@@ -53,8 +53,9 @@ In scope:
   deterministic validation, and synthetic generation.
 - Preserve relational graph shape, distribution/order-of-magnitude shape,
   temporal rules, and aggregate/business invariants without copying source
-  values. Financial summaries must support synthetic debit/credit, article,
-  period, and cross-table reconciliation rules.
+  values. Summary tables must support synthetic grouped totals, component
+  formulas, partition/coverage checks, and cross-table reconciliation rules;
+  financial debit/credit balancing is one example, not a domain restriction.
 - Keep AI providers restricted to safe metadata, bounded distributions,
   masked patterns, aggregate statistics, and candidate evidence—never raw
   source rows, generated rows, secrets, or credentials.
