@@ -34,6 +34,7 @@ REQUIRED_DOCS = {
     "reference/support-policy.md",
     "reference/configuration.md",
     "operations/troubleshooting.md",
+    "operations/resource-budgets.md",
     "operations/audit-logging.md",
     "operations/containers.md",
     "operations/migrating-to-0.6.md",
