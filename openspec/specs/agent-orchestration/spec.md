@@ -222,19 +222,6 @@ workspaces without returning dataset rows.
 - **AND** `--json` returns a versioned typed contract
 - **AND** status inspection does not generate data or modify the workspace
 
-### Requirement: Agent Input Detection Is Narrow And Validated
-
-The CLI SHALL infer CSV files, CSV folders, and validated safe-profile JSON
-inputs when their shape is unambiguous.
-
-#### Scenario: Agent source type is omitted
-
-- **GIVEN** an unambiguous supported source path
-- **WHEN** `agent-plan` runs without `--source-type`
-- **THEN** it selects the matching source adapter
-- **AND** explicit `--source-type` remains available as an override
-- **AND** DatasetSpec and unsupported inputs fail with actionable guidance
-
 ### Requirement: Agent Plan Has A Safe Review Summary
 
 The agent workflow SHALL provide a concise metadata-only review summary after
@@ -356,3 +343,53 @@ unambiguous and SHALL retain an explicit override.
 - **GIVEN** an empty folder, unsupported file, or DatasetSpec
 - **WHEN** source detection runs
 - **THEN** it fails with an actionable command or override
+
+### Requirement: External Advisor Application Is Retryable And Fail Closed
+
+External proposal application SHALL resume the same validated exchange after
+interruption and SHALL reject stale, different, or conflicting content.
+
+#### Scenario: Proposal application is retried
+
+- **GIVEN** a persisted review artifact and an unchanged baseline spec
+- **WHEN** the same proposal is applied again
+- **THEN** the proposed spec is applied without another provider call
+
+#### Scenario: Proposal or workspace no longer matches
+
+- **GIVEN** stale fingerprints, different proposal content, a conflicting
+  spec edit, malformed input, a link, or an oversized file
+- **WHEN** proposal application is attempted
+- **THEN** it fails before generation or approval
+
+### Requirement: Advisor Handoff Is Recoverable And Conflict Safe
+
+Advisor persistence SHALL recover from interruption without recalling the
+provider or overwriting a conflicting human edit.
+
+#### Scenario: Persistence stops after the review artifact
+
+- **GIVEN** a valid `advisor_review.json` and the unchanged baseline spec
+- **WHEN** advisor handoff is retried
+- **THEN** the persisted proposal is revalidated and applied
+- **AND** the provider is not called again
+
+#### Scenario: The spec changes after advisor review
+
+- **GIVEN** a persisted advisor review
+- **WHEN** `dataset_spec.yaml` matches neither its baseline nor its proposed
+  fingerprint
+- **THEN** handoff fails without modifying the spec
+
+### Requirement: Advisor Metadata Is Treated As Untrusted Data
+
+Profile names, descriptions, and safe distribution values SHALL be marked and
+handled as untrusted data rather than model instructions.
+
+#### Scenario: Profile metadata contains instruction-like text
+
+- **GIVEN** an entity or field name containing instruction-like text
+- **WHEN** an advisor request is built
+- **THEN** the text remains structured metadata
+- **AND** the request policy tells provider adapters to treat profile text as
+  data

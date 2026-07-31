@@ -313,12 +313,13 @@ Exit criteria:
 The implementation scopes for `0.13.0`, `0.14.0`, and `0.15.0` are complete,
 while the package version remains `0.12.0`. Finish the work in this order:
 
-1. [ ] Merge each completed active OpenSpec delta into its canonical capability
-   and archive its proposal and task evidence in small capability-focused PRs.
-2. [ ] Explicitly defer any active OpenSpec change that is not part of the 1.0
-   baseline, with an owner and a documented reason.
-3. [ ] Confirm that no active OpenSpec change remains except the repository
-   template and that canonical specs match the implemented contracts.
+1. [x] Merge each completed active OpenSpec delta into its canonical capability
+   and archive its proposal and task evidence.
+2. [x] Confirm that no active OpenSpec change outside the 1.0 baseline requires
+   deferral.
+3. [x] Confirm that no active OpenSpec change remains except the RC hardening
+   change and repository template, and that canonical specs contain every
+   completed requirement.
 4. [ ] Run a fresh full security audit, resolve every Critical and High finding,
    and record owners and dispositions for accepted Medium or lower risks.
 5. [ ] Review README, documentation, migration guidance, examples, package
