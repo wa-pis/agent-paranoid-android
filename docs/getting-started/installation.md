@@ -82,6 +82,9 @@ external system. `doctor --require-extra parquet` also writes and reads a
 temporary Parquet bundle to verify that capability rather than only importing
 PyArrow. `doctor --require-extra mcp` verifies local generator tool
 registration without starting a server or opening a network connection.
+`doctor --require-extra trino` parses an allowlisted read-only query and
+constructs then closes a local client object without executing SQL or
+contacting a Trino coordinator.
 
 ## Install For Development
 

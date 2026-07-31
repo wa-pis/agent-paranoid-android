@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
   bundle with secret-free reinstall guidance on failure.
 - A local MCP `doctor` capability smoke that constructs the generator
   transport and verifies audited tool registration without starting a server.
+- A local Trino `doctor` capability smoke that validates allowlisted SQL and
+  constructs a client without executing a query or contacting a coordinator.
 
 ### Fixed
 

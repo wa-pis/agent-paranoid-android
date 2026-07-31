@@ -24,6 +24,13 @@ transport, registers one local audited probe tool, and verifies its public tool
 listing. It does not start a server, listen on a port, invoke the tool, or
 contact an MCP client.
 
+`doctor --require-extra trino` validates a bounded allowlisted query with the
+installed Trino SQL parser, constructs a client for the reserved
+`doctor.invalid` host, and closes it without opening a cursor or executing SQL.
+It does not read Trino credentials or contact a coordinator. On failure,
+reinstall `agent-paranoid-android[trino]` before checking deployment-specific
+allowlists and credentials.
+
 ## Command Not Found
 
 Symptom:

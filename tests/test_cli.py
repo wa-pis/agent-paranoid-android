@@ -223,6 +223,31 @@ def test_doctor_redacts_mcp_capability_failure(
     assert "secret-audit-key" not in captured.err
 
 
+def test_doctor_runs_required_trino_capability_smoke(capsys) -> None:
+    assert main(["doctor", "--require-extra", "trino"]) == 0
+
+    captured = capsys.readouterr()
+    assert "capability trino: ok" in captured.err
+    assert "doctor passed" in captured.err
+
+
+def test_doctor_redacts_trino_capability_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_trino_doctor_smoke",
+        lambda: (_ for _ in ()).throw(RuntimeError("secret-trino-password")),
+    )
+
+    assert main(["doctor", "--require-extra", "trino"]) == 1
+    captured = capsys.readouterr()
+    assert "capability trino: failed" in captured.err
+    assert "reinstall agent-paranoid-android[trino]" in captured.err
+    assert "secret-trino-password" not in captured.err
+
+
 def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
 
