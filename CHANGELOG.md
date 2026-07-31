@@ -69,6 +69,8 @@ All notable changes to this project are documented here.
   the default exclusion of unrestricted raw SQL.
 - Cross-table average reconciliation merged into canonical synthetic-generation
   OpenSpec and archived with its deterministic and aggregate-only evidence.
+- Controlled negative field and row-rule coverage merged into canonical
+  synthetic-generation OpenSpec and archived with deterministic evidence.
 
 ### Fixed
 
