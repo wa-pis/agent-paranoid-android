@@ -58,6 +58,13 @@ SHALL be removed from the supported `DatasetSpec` contract before the RC.
 - **THEN** that section SHALL be omitted according to the documented behavior
 - **AND** the manifest/report SHALL identify the effective validation settings
 
+#### Scenario: Validation stops after the first failed section
+
+- **GIVEN** `fail_fast` is enabled in `ValidationSettings`
+- **WHEN** an enabled validation section fails
+- **THEN** later sections SHALL not run or appear in the report
+- **AND** the report SHALL retain the effective settings
+
 ### Requirement: Reproducibility claims are bounded and evidenced
 
 The project SHALL distinguish logical reproducibility from byte-for-byte

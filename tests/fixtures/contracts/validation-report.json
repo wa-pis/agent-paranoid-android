@@ -17,7 +17,20 @@
       "failed": 0,
       "name": "constraints",
       "passed": 1
+    },
+    {
+      "errors": [],
+      "failed": 0,
+      "name": "privacy",
+      "passed": 1
     }
   ],
+  "settings": {
+    "fail_fast": false,
+    "validate_constraints": true,
+    "validate_privacy": true,
+    "validate_relationships": true,
+    "validate_schema": true
+  },
   "valid": true
 }

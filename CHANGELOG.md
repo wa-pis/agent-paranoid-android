@@ -87,6 +87,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Validation reports now honor all `ValidationSettings` section toggles and
+  `fail_fast`, and record the effective settings used.
 - Container builds no longer default to version `0.8.1`, and publication now
   rejects image metadata that differs from the package version.
 - `GenerationSettings.locale` now controls seeded Faker values, with clear
