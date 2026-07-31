@@ -55,6 +55,7 @@ nav:
       - CLI: reference/cli.md
       - Public Stability: reference/stability.md
       - Runtime And Integration Support: reference/support-policy.md
+      - Dependency Compatibility: reference/dependency-compatibility.md
       - Compatibility Surfaces: reference/compatibility.md
       - Configuration: reference/configuration.md
       - DatasetSpec: dataset_profile_and_spec.md
