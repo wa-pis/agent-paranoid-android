@@ -22,6 +22,7 @@ MAX_INPUT_CELL_CHARS_ENV = "TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS"
 MAX_PARQUET_EXPANDED_BYTES_ENV = "TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES"
 MAX_YAML_ALIASES_ENV = "TEST_DATA_AGENT_MAX_YAML_ALIASES"
 MAX_YAML_DEPTH_ENV = "TEST_DATA_AGENT_MAX_YAML_DEPTH"
+MAX_JSON_DEPTH_ENV = "TEST_DATA_AGENT_MAX_JSON_DEPTH"
 MAX_BUSINESS_RULES_BYTES_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES"
 MAX_PROFILE_PAYLOAD_BYTES_ENV = "TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES"
 MAX_BUSINESS_RULE_EVALUATIONS_ENV = "TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS"
@@ -39,6 +40,7 @@ DEFAULT_MAX_INPUT_CELL_CHARS = 1_000_000
 DEFAULT_MAX_PARQUET_EXPANDED_BYTES = 512 * 1024 * 1024
 DEFAULT_MAX_YAML_ALIASES = 50
 DEFAULT_MAX_YAML_DEPTH = 100
+DEFAULT_MAX_JSON_DEPTH = 100
 DEFAULT_MAX_BUSINESS_RULES_BYTES = 1024 * 1024
 DEFAULT_MAX_PROFILE_PAYLOAD_BYTES = 4 * 1024 * 1024
 DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS = 5_000_000
@@ -119,6 +121,10 @@ def max_yaml_aliases() -> int:
 
 def max_yaml_depth() -> int:
     return positive_int_env(MAX_YAML_DEPTH_ENV, DEFAULT_MAX_YAML_DEPTH)
+
+
+def max_json_depth() -> int:
+    return positive_int_env(MAX_JSON_DEPTH_ENV, DEFAULT_MAX_JSON_DEPTH)
 
 
 def max_business_rules_bytes() -> int:
@@ -230,6 +236,41 @@ def enforce_input_cell_count(cell_count: int, *, label: str = "input") -> None:
     limit = max_input_cells()
     if cell_count > limit:
         raise InputLimitError(f"{label} must contain <= {limit} cells")
+
+
+def inspect_json_rows(payload: Any, *, label: str) -> tuple[int, int]:
+    """Count JSON rows and nested values without recursive traversal."""
+    if not isinstance(payload, list):
+        return 0, 0
+
+    row_count = len(payload)
+    enforce_input_row_count(row_count, label=label)
+    depth_limit = max_json_depth()
+    value_char_limit = max_input_cell_chars()
+    cell_count = 0
+    stack = [(value, 1) for row in payload for value in _json_row_values(row)]
+    while stack:
+        value, depth = stack.pop()
+        if depth > depth_limit:
+            raise InputLimitError(f"{label} values must have depth <= {depth_limit}")
+        if isinstance(value, dict):
+            stack.extend((nested, depth + 1) for nested in value.values())
+        elif isinstance(value, list):
+            stack.extend((nested, depth + 1) for nested in value)
+        else:
+            cell_count += 1
+            enforce_input_cell_count(cell_count, label=label)
+            if isinstance(value, str) and len(value) > value_char_limit:
+                raise InputLimitError(
+                    f"{label} values must contain <= {value_char_limit} characters"
+                )
+    return row_count, cell_count
+
+
+def _json_row_values(row: Any) -> list[Any]:
+    if isinstance(row, dict):
+        return list(row.values())
+    return [row]
 
 
 def configure_csv_field_limit(csv_module: Any) -> None:

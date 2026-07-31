@@ -15,6 +15,7 @@ from test_data_agent.core.limits import (
     enforce_input_files,
     enforce_input_row_count,
     enforce_parquet_metadata_limits,
+    inspect_json_rows,
     read_limited_text,
 )
 from test_data_agent.core.serialization import load_limited_yaml
@@ -75,8 +76,14 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
         elif path.suffix == ".json":
             payload = json.loads(read_limited_text(path))
             if isinstance(payload, list):
-                total_rows += len(payload)
+                row_count, cell_count = inspect_json_rows(
+                    payload,
+                    label=f"JSON {path.name!r}",
+                )
+                total_rows += row_count
+                total_cells += cell_count
                 enforce_input_row_count(total_rows, label="dataset")
+                enforce_input_cell_count(total_cells, label="dataset")
                 rows_by_entity[path.stem] = payload
         elif path.suffix == ".parquet":
             try:

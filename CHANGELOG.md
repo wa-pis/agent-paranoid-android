@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Bound JSON dataset inputs by row count, nested value count, nesting depth,
+  and string value length before validation.
+
 ### Added
 
 - Generation manifests now record bounded reproducibility inputs and output

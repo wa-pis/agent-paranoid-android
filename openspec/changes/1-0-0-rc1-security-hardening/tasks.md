@@ -53,7 +53,7 @@
 
 ## P2 — RC disposition required; implementation may follow the RC
 
-- [ ] Add bounded JSON row/cell/nested-value validation.
+- [x] Add bounded JSON row/cell/nested-value validation.
 - [ ] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
 - [ ] Improve GitHub About metadata, README positioning, comparison guidance,
   and the one-command golden-path example.

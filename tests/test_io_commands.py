@@ -192,6 +192,51 @@ def test_validate_dataset_artifacts_rejects_json_above_row_limit(
         validate_dataset_artifacts(spec_path, rows_dir)
 
 
+def test_validate_dataset_artifacts_rejects_json_above_nested_cell_limit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec_path = tmp_path / "spec.yaml"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text("entities: []\n")
+    (rows_dir / "orders.json").write_text('[{"items": [1, 2]}]')
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELLS", "1")
+
+    with pytest.raises(InputLimitError, match="<= 1 cells"):
+        validate_dataset_artifacts(spec_path, rows_dir)
+
+
+def test_validate_dataset_artifacts_rejects_deep_json_values(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec_path = tmp_path / "spec.yaml"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text("entities: []\n")
+    (rows_dir / "orders.json").write_text('[{"items": [[1]]}]')
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_JSON_DEPTH", "2")
+
+    with pytest.raises(InputLimitError, match="depth <= 2"):
+        validate_dataset_artifacts(spec_path, rows_dir)
+
+
+def test_validate_dataset_artifacts_rejects_long_nested_json_value(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec_path = tmp_path / "spec.yaml"
+    rows_dir = tmp_path / "rows"
+    rows_dir.mkdir()
+    spec_path.write_text("entities: []\n")
+    (rows_dir / "orders.json").write_text('[{"items": ["long"]}]')
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "3")
+
+    with pytest.raises(InputLimitError, match="<= 3 characters"):
+        validate_dataset_artifacts(spec_path, rows_dir)
+
+
 def test_dataset_spec_loader_rejects_excessive_yaml_aliases(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
