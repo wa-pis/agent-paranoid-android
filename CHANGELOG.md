@@ -53,6 +53,8 @@ All notable changes to this project are documented here.
   archived for the 1.0 contract freeze.
 - A canonical public-contracts OpenSpec capability covering retained aliases,
   wrappers, migration targets, and minimum deprecation windows.
+- The completed public stability map merged into the canonical public-contracts
+  OpenSpec capability and archived with its implementation evidence.
 
 ### Fixed
 
