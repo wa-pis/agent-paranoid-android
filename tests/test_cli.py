@@ -198,6 +198,31 @@ def test_doctor_redacts_parquet_capability_failure(
     assert "secret-provider-token" not in captured.err
 
 
+def test_doctor_runs_required_mcp_capability_smoke(capsys) -> None:
+    assert main(["doctor", "--require-extra", "mcp"]) == 0
+
+    captured = capsys.readouterr()
+    assert "capability mcp: ok" in captured.err
+    assert "doctor passed" in captured.err
+
+
+def test_doctor_redacts_mcp_capability_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_mcp_doctor_smoke",
+        lambda: (_ for _ in ()).throw(RuntimeError("secret-audit-key")),
+    )
+
+    assert main(["doctor", "--require-extra", "mcp"]) == 1
+    captured = capsys.readouterr()
+    assert "capability mcp: failed" in captured.err
+    assert "reinstall agent-paranoid-android[mcp]" in captured.err
+    assert "secret-audit-key" not in captured.err
+
+
 def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
 
