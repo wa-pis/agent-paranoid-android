@@ -355,6 +355,13 @@ Scope:
   CLI/MCP workflow tests alone is not sufficient evidence for the RC.
 - [ ] Record reproducibility inputs, container/package version consistency, and
   security scanner evidence against the exact RC commit and published artifacts.
+- [ ] Formalize the reproducibility contract: distinguish same-environment,
+  same-version, and cross-version guarantees; record package/Python,
+  dependency-lock, locale, spec, rules, provider, and generator fingerprints
+  in the manifest.
+- [ ] Define the dependency support contract with tested minimum and latest
+  compatible versions, reasonable upper bounds, and explicit behavior changes
+  that require a package release.
 - [ ] Validate the core product workflow: bounded profiling → deterministic
   relationship candidates → AI-assisted proposals → human review →
   deterministic validation → synthetic generation.
@@ -367,6 +374,17 @@ Scope:
   may be one fixture, not the product boundary.
 - [ ] Close or explicitly defer every active OpenSpec change.
 - [ ] Run the full security audit and resolve all Critical and High findings.
+- [ ] Separate structural validation from privacy assurance in user-facing
+  output; document heuristic false negatives, quasi-identifiers, rare/free
+  text, and explicit assurance levels without implying re-identification
+  certification.
+- [ ] Publish a concise threat model covering source rows, raw PII, secrets,
+  prompt injection, provider boundaries, generated artifacts, and resource
+  exhaustion.
+- [ ] Complete the public product-clarity gate: functional subtitle and GitHub
+  About/topics, an input → command → output README example, preserved versus
+  not-preserved properties, an alternatives comparison, and a clear statement
+  that CLI/library is primary while MCP and providers are integrations.
 - [ ] Verify README, documentation site, migration guidance, examples, package
   metadata, SBOM, provenance, signatures, and public support policy.
 - [ ] Publish and install the release candidate through the real GitHub,
@@ -399,6 +417,23 @@ Scope:
   quickstart, and container signatures after publication.
 - [ ] Start the post-1.0 compatibility and deprecation policy from the published
   contracts.
+
+### Post-1.0: Architecture And Community
+
+The RC should remain focused on release safety and product clarity. Use the
+next cycle to reduce maintenance cost and make external contribution easier:
+
+- [ ] Decompose large orchestration modules into application use cases, ports,
+  and thin CLI/MCP transport adapters.
+- [ ] Add an architectural dependency test that prevents transport code from
+  becoming the only enforcement boundary or leaking into core policy.
+- [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
+  production package, using narrow overrides only for external integrations.
+- [ ] Add a public maintainership/governance model, support expectations,
+  release cadence, design-decision log, issue labels, and `good first issue`
+  guidance.
+- [ ] Publish a small benchmark dataset, demo recording, and a technical note
+  explaining how source-row copying is prevented and tested.
 
 ### Required For Every Remaining Release
 
