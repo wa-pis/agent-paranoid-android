@@ -1,0 +1,23 @@
+schema_version: "1.0"
+entities:
+  - name: orders
+    row_count: 8
+    fields:
+      - name: status
+        data_type: string
+        nullable: true
+        distribution:
+          kind: categorical
+          categories:
+            - value: paid
+              count: 3
+            - value: cancelled
+              count: 1
+relationships: []
+constraints: []
+generation_settings:
+  seed: 1300
+  mode: mixed
+  invalid_ratio: 0.5
+  output_format: json
+privacy_rules: []

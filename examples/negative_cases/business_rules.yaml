@@ -1,0 +1,5 @@
+field_rules:
+  - table: orders
+    field: status
+    required: true
+    allowed_values: [paid, cancelled]

@@ -226,7 +226,7 @@ Scope:
   without corrupting unrelated rows.
 - [x] Record expected and observed violations in bounded business-validation
   artifacts so users can distinguish intentional failures from generator bugs.
-- [ ] Add CLI and MCP examples that reproduce the same negative cases from the
+- [x] Add CLI and MCP examples that reproduce the same negative cases from the
   same spec, rule file, seed, mode, and invalid ratio.
 
 Exit criteria:

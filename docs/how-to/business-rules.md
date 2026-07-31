@@ -118,6 +118,42 @@ selected cases that validation did not observe. `expectations_met` is true only
 when both counts are zero. These fields contain counts only, never generated
 row values.
 
+### Reproduce The Same Cases Through CLI And MCP
+
+The checked-in `examples/negative_cases/` bundle fixes the spec, rule file,
+seed (`1300`), mode (`mixed`), and invalid ratio (`0.5`). Run it through CLI:
+
+```bash
+test-data-agent generate examples/negative_cases/dataset_spec.yaml \
+  --seed 1300 \
+  --mode mixed \
+  --invalid-ratio 0.5 \
+  --format json \
+  --business-rules examples/negative_cases/business_rules.yaml \
+  --output out/negative-cli
+```
+
+The MCP equivalent uses the same files after copying the example bundle below
+the configured generator workspace. The mode and invalid ratio are already
+recorded in `dataset_spec.yaml`:
+
+```json
+{
+  "name": "generate_dataset",
+  "arguments": {
+    "spec_path": "negative_cases/dataset_spec.yaml",
+    "output_folder": "negative-mcp",
+    "output_format": "json",
+    "seed": 1300,
+    "business_rules_path": "negative_cases/business_rules.yaml"
+  }
+}
+```
+
+Both paths produce identical synthetic row files and matching expected versus
+observed violation counts. Use separate empty output folders when repeating the
+example.
+
 ## Safety Restrictions
 
 Do not put real identifiers, emails, phone numbers, addresses, credentials,
