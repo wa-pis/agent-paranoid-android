@@ -12,6 +12,9 @@ generates new values, and validates the result.
 
 The fixture contains fictional values and reserved example email domains.
 
+For the same workflow as an executable script with its own synthetic fixture,
+run [`examples/csv_quickstart/run.sh`](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/csv_quickstart).
+
 ## Generate 25 Rows
 
 ```bash

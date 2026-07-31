@@ -1,0 +1,6 @@
+customer_id,signup_date,plan,monthly_spend,active
+CUST-1001,2025-01-10,basic,29.00,true
+CUST-1002,2025-01-18,plus,59.00,true
+CUST-1003,2025-02-03,basic,35.50,false
+CUST-1004,2025-02-21,premium,119.00,true
+CUST-1005,2025-03-08,plus,64.25,true
