@@ -262,6 +262,8 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
 
     class InvalidBusinessReport:
         valid = False
+        rules_sha256 = "a" * 64
+        rule_count = 2
 
         def model_dump_json(self, indent: int) -> str:
             return '{"valid": false}'
@@ -276,8 +278,8 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
     assert result.business_validation is not None
     assert manifest["validation_valid"] is False
     assert manifest["business_validation"] == {
-        "rules_sha256": None,
-        "rule_count": 0,
+        "rules_sha256": "a" * 64,
+        "rule_count": 2,
         "rule_pass_count": 0,
         "rule_fail_count": 0,
         "valid": False,
@@ -287,6 +289,24 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
         "unexpected_violation_count": 0,
         "missing_expected_violation_count": 0,
         "expectations_met": True,
+    }
+    assert manifest["effective_rules"] == {
+        "spec_sha256": manifest["spec_sha256"],
+        "generation_mode": "valid",
+        "invalid_ratio": 0.0,
+        "locale": "en_US",
+        "validation_settings": {
+            "validate_schema": True,
+            "validate_relationships": True,
+            "validate_constraints": True,
+            "validate_privacy": True,
+            "fail_fast": False,
+        },
+        "relationship_count": 0,
+        "constraint_count": 0,
+        "distributed_field_count": 0,
+        "business_rules_sha256": "a" * 64,
+        "business_rule_count": 2,
     }
 
 

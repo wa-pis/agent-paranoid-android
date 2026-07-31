@@ -38,11 +38,11 @@
     values across logistics, scientific, service, and inventory fixtures.
   - [x] Cover grouped totals, coverage, and cross-table reconciliation,
     including one financial/accounting fixture.
-- [ ] Preserve relative distributions and order of magnitude while allowing
+- [x] Preserve relative distributions and order of magnitude while allowing
   synthetic scaling of sensitive totals; record the effective rule set.
   - [x] Add bounded numeric scaling that preserves relative shape and numeric
     types, and reject identity scaling for sensitive numeric distributions.
-  - [ ] Record the effective generation and business-rule set in the manifest.
+  - [x] Record the effective generation and business-rule set in the manifest.
 
 - [x] Implement `ValidationSettings` semantics, including `fail_fast`, or
   remove unsupported settings from the public contract.

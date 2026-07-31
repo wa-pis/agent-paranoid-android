@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.settings import GenerationMode, OutputFormat
+from test_data_agent.core.settings import GenerationMode, OutputFormat, ValidationSettings
 from test_data_agent.io.writers import (
     dataset_spec_to_json,
     dataset_spec_to_yaml,
@@ -51,6 +51,19 @@ class ReproducibilityEvidence(BaseModel):
     output_sha256: dict[str, str]
 
 
+class EffectiveRuleSetManifest(BaseModel):
+    spec_sha256: str
+    generation_mode: GenerationMode
+    invalid_ratio: float = Field(ge=0.0, le=1.0)
+    locale: str
+    validation_settings: ValidationSettings
+    relationship_count: int = Field(ge=0)
+    constraint_count: int = Field(ge=0)
+    distributed_field_count: int = Field(ge=0)
+    business_rules_sha256: str | None = None
+    business_rule_count: int = Field(default=0, ge=0)
+
+
 class GenerationManifest(BaseModel):
     artifact_type: Literal["synthetic_dataset"] = "synthetic_dataset"
     package_version: str = __version__
@@ -61,6 +74,7 @@ class GenerationManifest(BaseModel):
     row_counts: dict[str, int]
     validation_valid: bool
     business_validation: BusinessValidationManifest | None = None
+    effective_rules: EffectiveRuleSetManifest | None = None
     reproducibility: ReproducibilityEvidence | None = None
     synthetic: Literal[True] = True
     source_rows_copied: Literal[False] = False
@@ -169,18 +183,53 @@ def write_generation_manifest(
     output_folder: Path,
     business_report: Any | None = None,
 ) -> GenerationManifest:
+    spec_sha256 = dataset_spec_fingerprint(spec)
+    business_validation = business_validation_manifest(business_report)
     manifest = GenerationManifest(
         dataset_spec_schema_version=spec.schema_version,
-        spec_sha256=dataset_spec_fingerprint(spec),
+        spec_sha256=spec_sha256,
         seed=seed,
         output_format=output_format,
         row_counts=row_counts,
         validation_valid=validation_valid,
-        business_validation=business_validation_manifest(business_report),
+        business_validation=business_validation,
+        effective_rules=effective_rule_set_manifest(
+            spec,
+            spec_sha256=spec_sha256,
+            business_validation=business_validation,
+        ),
         reproducibility=reproducibility_evidence(spec, output_format, output_folder),
     )
     write_json_artifact(manifest, output_folder / "generation_manifest.json")
     return manifest
+
+
+def effective_rule_set_manifest(
+    spec: DatasetSpec,
+    *,
+    spec_sha256: str,
+    business_validation: BusinessValidationManifest | None,
+) -> EffectiveRuleSetManifest:
+    return EffectiveRuleSetManifest(
+        spec_sha256=spec_sha256,
+        generation_mode=spec.generation_settings.mode,
+        invalid_ratio=spec.generation_settings.invalid_ratio,
+        locale=spec.generation_settings.locale or DEFAULT_LOCALE,
+        validation_settings=spec.validation_settings.model_copy(deep=True),
+        relationship_count=len(spec.relationships),
+        constraint_count=len(spec.constraints),
+        distributed_field_count=sum(
+            bool(field.distribution)
+            for entity in spec.entities
+            for field in entity.fields
+        ),
+        business_rules_sha256=(
+            business_validation.rules_sha256 if business_validation is not None else None
+        ),
+        business_rule_count=(
+            business_validation.rule_count if business_validation is not None else 0
+        ),
+    )
 
 
 def reproducibility_evidence(
