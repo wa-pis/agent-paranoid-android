@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime
 from typing import Literal, Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -16,6 +17,10 @@ from test_data_agent.advisor import (
     validate_relationship_discovery_proposals,
 )
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.distribution import (
+    DateRangeDistribution,
+    DateTimeRangeDistribution,
+)
 from test_data_agent.core.field import FieldProfile, FieldType
 
 
@@ -114,6 +119,7 @@ def mine_relationship_candidates(
                             ],
                         )
                     )
+    candidates.extend(_mine_temporal_candidates(profile))
     return sorted(candidates, key=lambda candidate: candidate.candidate_id)
 
 
@@ -159,3 +165,104 @@ def _cardinality_ratio(parent_rows: int, child_rows: int) -> float:
     if largest == 0:
         return 1.0
     return round(min(parent_rows, child_rows) / largest, 6)
+
+
+def _mine_temporal_candidates(
+    profile: DatasetProfile,
+) -> list[RelationshipDiscoveryCandidate]:
+    candidates: list[RelationshipDiscoveryCandidate] = []
+    for entity in profile.entities:
+        starts = [field for field in entity.fields if _temporal_role(field) == "start"]
+        ends = [field for field in entity.fields if _temporal_role(field) == "end"]
+        for start in starts:
+            for end in ends:
+                if start.data_type != end.data_type:
+                    continue
+                overlap = _temporal_range_overlap(start, end)
+                if overlap is None:
+                    continue
+                fields = [
+                    DiscoveryFieldReference(entity=entity.name, field=start.name),
+                    DiscoveryFieldReference(entity=entity.name, field=end.name),
+                ]
+                evidence = [
+                    RelationshipDiscoveryEvidence(
+                        metric="type_compatibility", value=1.0
+                    ),
+                    RelationshipDiscoveryEvidence(
+                        metric="range_overlap", value=overlap
+                    ),
+                ]
+                identity = {
+                    "kind": "temporal",
+                    "fields": [item.model_dump(mode="json") for item in fields],
+                    "evidence": [item.model_dump(mode="json") for item in evidence],
+                }
+                candidate_id = hashlib.sha256(
+                    json.dumps(
+                        identity, sort_keys=True, separators=(",", ":")
+                    ).encode("utf-8")
+                ).hexdigest()
+                candidates.append(
+                    RelationshipDiscoveryCandidate(
+                        candidate_id=candidate_id,
+                        kind="temporal",
+                        fields=fields,
+                        confidence=round((1.0 + overlap) / 2.0, 6),
+                        evidence=evidence,
+                        assumptions=[
+                            "Field names may describe temporal start/end ordering."
+                        ],
+                    )
+                )
+    return candidates
+
+
+def _temporal_role(field: FieldProfile) -> Literal["start", "end"] | None:
+    if field.data_type not in {FieldType.DATE, FieldType.DATETIME}:
+        return None
+    tokens = field.name.lower().replace("-", "_").split("_")
+    if any(
+        token in {"start", "started", "from", "begin", "created"}
+        for token in tokens
+    ):
+        return "start"
+    if any(
+        token in {"end", "ended", "to", "finish", "closed", "updated"}
+        for token in tokens
+    ):
+        return "end"
+    return None
+
+
+def _temporal_range_overlap(start: FieldProfile, end: FieldProfile) -> float | None:
+    start_bounds = _temporal_bounds(start)
+    end_bounds = _temporal_bounds(end)
+    if start_bounds is None or end_bounds is None:
+        return None
+    start_min, start_max = start_bounds
+    end_min, end_max = end_bounds
+    try:
+        if start_max <= end_min:
+            return 1.0
+        if start_min > end_max:
+            return 0.0
+    except TypeError:
+        return None
+    return 0.5
+
+
+def _temporal_bounds(field: FieldProfile) -> tuple[datetime, datetime] | None:
+    distribution = field.typed_distribution
+    if not isinstance(distribution, (DateRangeDistribution, DateTimeRangeDistribution)):
+        return None
+    if distribution.min is None or distribution.max is None:
+        return None
+    return (_parse_temporal_bound(distribution.min), _parse_temporal_bound(distribution.max))
+
+
+def _parse_temporal_bound(value: str) -> datetime:
+    normalized = value.replace("Z", "+00:00")
+    if "T" not in normalized and " " not in normalized:
+        normalized = f"{normalized}T00:00:00"
+    return datetime.fromisoformat(normalized)

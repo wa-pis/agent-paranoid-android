@@ -149,3 +149,87 @@ def test_ambiguous_low_confidence_candidates_remain_unresolved() -> None:
         "account",
         "legacy_account",
     }
+
+
+def test_temporal_candidate_exposes_only_normalized_range_overlap() -> None:
+    profile = DatasetProfile(
+        entities=[
+            EntityProfile(
+                name="session",
+                row_count=10,
+                fields=[
+                    FieldProfile(
+                        name="started_at",
+                        data_type=FieldType.DATETIME,
+                        distribution={
+                            "kind": "datetime_range",
+                            "min": "2026-01-01T10:00:00",
+                            "max": "2026-01-01T11:00:00",
+                        },
+                    ),
+                    FieldProfile(
+                        name="ended_at",
+                        data_type=FieldType.DATETIME,
+                        distribution={
+                            "kind": "datetime_range",
+                            "min": "2026-01-01T11:30:00",
+                            "max": "2026-01-01T12:00:00",
+                        },
+                    ),
+                ],
+            )
+        ]
+    )
+
+    candidate = mine_relationship_candidates(profile)[0]
+    evidence = {item.metric: item.value for item in candidate.evidence}
+
+    assert candidate.kind == "temporal"
+    assert evidence["range_overlap"] == 1.0
+    assert "2026-01-01" not in candidate.model_dump_json()
+
+
+def test_temporal_overlap_and_inverted_ranges_remain_reviewable() -> None:
+    profile = DatasetProfile(
+        entities=[
+            EntityProfile(
+                name="window",
+                row_count=1,
+                fields=[
+                    FieldProfile(
+                        name="start_date",
+                        data_type=FieldType.DATE,
+                        distribution={
+                            "kind": "date_range",
+                            "min": "2026-01-10",
+                            "max": "2026-01-20",
+                        },
+                    ),
+                    FieldProfile(
+                        name="end_date",
+                        data_type=FieldType.DATE,
+                        distribution={
+                            "kind": "date_range",
+                            "min": "2026-01-15",
+                            "max": "2026-01-25",
+                        },
+                    ),
+                ],
+            )
+        ]
+    )
+    overlapping = mine_relationship_candidates(profile)[0]
+    profile.entity("window").field("end_date").distribution = {
+        "kind": "date_range",
+        "min": "2026-01-01",
+        "max": "2026-01-05",
+    }
+    inverted = mine_relationship_candidates(profile)[0]
+
+    assert {item.metric: item.value for item in overlapping.evidence}[
+        "range_overlap"
+    ] == 0.5
+    assert {item.metric: item.value for item in inverted.evidence}[
+        "range_overlap"
+    ] == 0.0
+    assert inverted.confidence < overlapping.confidence
