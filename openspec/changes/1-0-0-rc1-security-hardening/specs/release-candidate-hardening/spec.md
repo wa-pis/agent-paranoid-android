@@ -71,6 +71,68 @@ reproducibility and record the identity of components that affect output.
 - **THEN** the manifest SHALL record the effective reproducibility inputs
 - **AND** the release tests SHALL verify the documented reproducibility level
 
+### Requirement: Relationship discovery is safe, reviewable, and deterministic
+
+The system SHALL support AI-assisted discovery of candidate relationships and
+business rules from bounded safe metadata, but SHALL require deterministic
+validation and review before a proposal affects generation.
+
+#### Scenario: The profiler finds a likely employee-to-payroll relationship
+
+- **GIVEN** bounded profiles show compatible identifier types, cardinality,
+  null/distinct ratios, temporal compatibility, and safe relationship evidence
+- **WHEN** the deterministic miner and AI advisor produce a candidate
+- **THEN** the proposal SHALL include parent/child fields, relationship type,
+  confidence, evidence, assumptions, and a review status
+- **AND** it SHALL not include raw source rows or sensitive raw values
+
+#### Scenario: An AI provider proposes an unsupported or contradictory link
+
+- **GIVEN** the provider proposal has low confidence, incompatible types, or
+  conflicts with deterministic evidence
+- **WHEN** the proposal is normalized
+- **THEN** it SHALL remain rejected or require explicit human review
+- **AND** it SHALL not silently become an FK or generation constraint
+
+### Requirement: Synthetic output preserves relational and business semantics
+
+For an approved relationship and rule set, generation SHALL preserve the
+requested relational graph, distribution/order-of-magnitude shape, temporal
+constraints, and executable business invariants without copying source rows.
+
+#### Scenario: Synthetic payroll data is generated from employee metadata
+
+- **GIVEN** approved employee, payroll, department, position, and period
+  relationships
+- **WHEN** a dataset is generated with a fixed seed
+- **THEN** all requested FKs and temporal rules SHALL validate
+- **AND** salary values SHALL be synthetic while retaining configured ranges,
+  ratios, distributions, and order-of-magnitude characteristics
+
+#### Scenario: A financial summary requires reconciliation
+
+- **GIVEN** approved salary-component, article, period, debit/credit, or
+  cross-table aggregate formulas
+- **WHEN** synthetic data is generated
+- **THEN** deterministic validation SHALL verify every requested formula
+- **AND** generation SHALL fail or report the violation rather than publish a
+  dataset marked valid
+
+### Requirement: AI providers receive metadata only
+
+AI-assisted discovery SHALL use a bounded provider-neutral contract and SHALL
+never send raw source rows, generated rows, secrets, credentials, or sensitive
+raw category values.
+
+#### Scenario: An advisor request is built for relationship discovery
+
+- **GIVEN** profiles, candidate links, aggregates, masked patterns, and
+  fingerprints are available
+- **WHEN** an advisor request is serialized
+- **THEN** the payload SHALL contain safe metadata only
+- **AND** the response SHALL be schema-validated, bounded, fingerprint-bound,
+  and treated as untrusted until reviewed
+
 ### Requirement: The release candidate has auditable hardening evidence
 
 `1.0.0rc1` SHALL be blocked by unresolved P0 findings and SHALL record an

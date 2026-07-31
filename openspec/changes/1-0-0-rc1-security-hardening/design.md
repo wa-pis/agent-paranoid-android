@@ -1,5 +1,32 @@
 # Design: 1-0-0-rc1-security-hardening
 
+## Product Workflow
+
+The RC must validate this end-to-end workflow:
+
+```text
+source tables / files
+        ↓
+bounded schema + aggregate profiling
+        ↓
+deterministic relationship and rule candidates
+        ↓
+AI advisor receives safe metadata and proposes links/rules
+        ↓
+human reviews confidence, evidence, and assumptions
+        ↓
+deterministic validators confirm approved proposals
+        ↓
+reviewed DatasetSpec
+        ↓
+seeded synthetic generation
+        ↓
+FK, distribution, temporal, formula, and aggregate validation
+```
+
+The AI advisor helps discover semantics; it is not the source of truth and
+does not directly generate or approve data.
+
 ## Approach
 
 Implement the smallest boundary-first hardening sequence:
@@ -25,6 +52,29 @@ Implement the smallest boundary-first hardening sequence:
    manifest with enough runtime information to explain reproducibility.
 7. Run the RC audit and publish evidence against the exact candidate artifacts.
 
+Relationship discovery should combine deterministic and AI-assisted evidence:
+
+- deterministic candidate mining uses compatible types, identifier hints,
+  null/distinct ratios, bounded cardinality, temporal ranges, safe value
+  fingerprints, and table naming metadata;
+- the AI advisor ranks candidates and proposes relationship type, cardinality,
+  confidence, evidence, assumptions, and possible validation rules;
+- human review accepts, rejects, or edits the proposal;
+- deterministic validators test the approved relationship against bounded
+  metadata and generated rows before publication.
+
+For business and financial data, the generator preserves semantics rather than
+source totals by default. It may scale synthetic amounts while retaining
+distribution shape and order of magnitude, then enforce rules such as:
+
+- employee-to-payroll and dimension-to-fact foreign keys;
+- period ordering and effective-date constraints;
+- salary component totals and department/position relationships;
+- debit equals credit and balance-sheet reconciliation;
+- article, period, department, and cross-table aggregate formulas;
+- configurable scenario distributions for normal, budget, growth, and invalid
+  cases.
+
 ## Data And Contracts
 
 Affected areas:
@@ -47,9 +97,26 @@ Affected areas:
 - `compose.yaml`, `Dockerfile`, and release checks: version consistency.
 - `src/test_data_agent/io/readers.py`: bounded JSON row, cell, and nested-value
   handling.
+- relationship discovery and business-rule contracts: safe candidate metadata,
+  AI proposal schema, review receipts, deterministic validators, and aggregate
+  reconciliation reports.
 - `tests/`: direct API, adversarial privacy, SQL, contract, and RC smoke tests.
 - `docs/roadmap.md`, README, SECURITY, support/governance docs, and the dated
   security review: public release evidence and accepted-risk disposition.
+
+### Safe AI Discovery Contract
+
+The provider request may contain entity and field names, data types, null and
+distinct ratios, range/percentile summaries, masked patterns, bounded category
+metadata where policy permits, temporal ranges, relationship candidates, and
+aggregate confidence evidence. It must not contain raw rows, raw category
+values classified as sensitive, generated rows, credentials, or unrestricted
+query text.
+
+The provider response is treated as untrusted JSON. Every relationship or rule
+proposal must be bounded, schema-validated, tied to an input fingerprint, and
+labelled with confidence, evidence, assumptions, and review status. No provider
+response may itself authorize generation or database access.
 
 ## Failure Modes
 
@@ -63,6 +130,10 @@ Affected areas:
   metadata blocks the RC.
 - Failed checks leave no successful-looking partial output and do not expose
   source values in errors or logs.
+- A low-confidence or contradictory relationship remains a review warning and
+  cannot silently become a generation constraint.
+- A financial or aggregate rule that cannot be validated deterministically
+  blocks publication of a dataset claiming that invariant.
 
 ## Alternatives
 
