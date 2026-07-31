@@ -38,6 +38,7 @@ jobs:
           --ref "${GITHUB_REF}"
           --base "${BASE_SHA}"
           --head "${HEAD_SHA}"
+          >> "${GITHUB_OUTPUT}"
 
   validate:
     name: Validate ${{ matrix.target }}

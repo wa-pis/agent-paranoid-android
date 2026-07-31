@@ -85,6 +85,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Lightweight no-op Python matrix checks for docs-only changes so existing
+  branch-protection requirements are reported instead of remaining pending.
+
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.
 - Incomplete staged generation and review bundles are removed when interactive

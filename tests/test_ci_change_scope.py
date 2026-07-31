@@ -75,7 +75,7 @@ def test_unknown_or_release_events_fail_closed() -> None:
 
 def test_heavy_workflow_jobs_use_change_scope() -> None:
     expected = {
-        "ci.yml": {"quality", "package", "package-compatibility", "trino-integration"},
+        "ci.yml": {"package", "package-compatibility", "trino-integration"},
         "containers.yml": {"validate", "validate-arm64"},
         "security.yml": {"dependency-review", "codeql", "secrets"},
     }
@@ -86,10 +86,23 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         )
         jobs = workflow["jobs"]
         assert jobs["changes"]["outputs"]["code"] == "${{ steps.scope.outputs.code }}"
+        classifier = jobs["changes"]["steps"][1]
+        assert '>> "${GITHUB_OUTPUT}"' in classifier["run"]
         for job_name in job_names:
             job = jobs[job_name]
             assert job["needs"] == "changes"
             assert "needs.changes.outputs.code == 'true'" in job["if"]
+
+    quality = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    )["jobs"]["quality"]
+    assert quality["needs"] == "changes"
+    assert "if" not in quality
+    assert quality["steps"][0]["if"] == "needs.changes.outputs.code != 'true'"
+    assert all(
+        step["if"] == "needs.changes.outputs.code == 'true'"
+        for step in quality["steps"][1:]
+    )
 
     documentation = (
         ROOT / ".github" / "workflows" / "docs.yml"
