@@ -122,6 +122,17 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
     }
     assert minimum["steps"][1]["with"]["python-version"] == "3.11"
     assert "matrix.constraint-file" in minimum["steps"][3]["run"]
+    contracts = {
+        profile["profile"]: profile["test-paths"]
+        for profile in profiles
+    }
+    assert "test_io_workflows.py" in contracts["base"]
+    assert "test_business_rules.py" in contracts["base"]
+    assert "test_io_commands.py" in contracts["parquet"]
+    assert "test_mcp_generator_transport.py" in contracts["mcp"]
+    assert "test_mcp_trino_transport.py" in contracts["mcp"]
+    assert "test_mcp_trino_server.py" in contracts["trino"]
+    assert "test_openai_provider.py" in contracts["openai"]
     mcp_profile = next(profile for profile in profiles if profile["profile"] == "mcp")
     assert mcp_profile["constraint-file"] == "dependency-minimum-mcp.txt"
     assert "--all-extras" in quality["steps"][4]["run"]

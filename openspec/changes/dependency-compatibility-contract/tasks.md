@@ -6,7 +6,7 @@
   Python/extra combination.
 - [x] Add CI jobs or matrix profiles for the minimum and latest compatible
   dependency sets.
-- [ ] Add contract tests for deterministic generation, validation, YAML/JSON
+- [x] Add contract tests for deterministic generation, validation, YAML/JSON
   parsing, Parquet, SQL policy, and Trino client construction where applicable.
 - [ ] Add normalized dependency evidence to the generation manifest without
   exposing rows, PII, secrets, or provider payloads.
