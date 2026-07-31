@@ -57,6 +57,8 @@ All notable changes to this project are documented here.
   OpenSpec capability and archived with its implementation evidence.
 - The completed versioned golden-contract catalog merged into canonical
   OpenSpec and archived with its compatibility evidence.
+- Previous feature-release fixture compatibility merged into canonical
+  OpenSpec and archived with its immutable provenance evidence.
 
 ### Fixed
 
