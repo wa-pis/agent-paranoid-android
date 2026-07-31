@@ -276,6 +276,9 @@ Scope:
   multi-entity generation, validation, and profiling workloads.
 - [ ] Exercise cancellation, timeout, disk exhaustion, and interrupted-write
   paths and verify that partial bundles are never reported as successful.
+  - [x] Remove staged folder and single-entity outputs on interactive process
+    cancellation without publishing success metadata.
+  - [ ] Complete timeout, disk-exhaustion, and interrupted-commit coverage.
 - [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
   and provider extras with actionable, secret-free recovery guidance.
 - [ ] Run isolated wheel and container workflows across supported Python

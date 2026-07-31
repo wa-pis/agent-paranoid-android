@@ -29,3 +29,15 @@ A failure identifies the phase and exceeded ceiling. Investigate the measured
 operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure
 cleanup are covered by separate operational-readiness gates.
+
+## Cancellation Cleanup
+
+Folder and single-entity generation stage artifacts beside the destination.
+If the process receives an interactive cancellation while writing or
+validating that staging area, the incomplete staging directory is removed and
+the cancellation is re-raised. The final destination and success metadata are
+not published.
+
+Hard termination such as `SIGKILL`, power loss, or host failure cannot run
+in-process cleanup. A later operational gate covers discovery and recovery for
+those abandoned staging directories.

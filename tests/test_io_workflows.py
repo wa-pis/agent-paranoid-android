@@ -458,6 +458,101 @@ def test_generate_dataset_bundle_removes_temp_output_when_time_budget_expires(
     assert not list(tmp_path.glob(".generated.*"))
 
 
+def test_generate_dataset_bundle_removes_staging_on_cancellation(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[FieldSpec(name="status", data_type="string")],
+            )
+        ]
+    )
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.write_dataset_rows",
+        lambda *args, **kwargs: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        generate_dataset_bundle(spec, output_folder=tmp_path / "generated")
+
+    assert not (tmp_path / "generated").exists()
+    assert not list(tmp_path.glob(".generated.*"))
+
+
+def test_review_bundle_removes_staging_on_cancellation(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(
+        profile,
+        output_path=tmp_path / "dataset_spec.yaml",
+        count=1,
+    )
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.write_dataset_rows",
+        lambda *args, **kwargs: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        generate_dataset_review_artifacts(
+            profile,
+            spec,
+            output_folder=tmp_path / "review",
+            output_format=OutputFormat.JSON,
+            seed=19,
+        )
+
+    assert not (tmp_path / "review").exists()
+    assert not list(tmp_path.glob(".review.*"))
+
+
+def test_single_entity_bundle_removes_staging_on_cancellation(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    output_path = tmp_path / "generated" / "orders.json"
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.write_single_entity_rows",
+        lambda *args, **kwargs: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        generate_dataset_from_profile_artifacts(
+            profile,
+            count=1,
+            seed=19,
+            output_path=output_path,
+            output_format=OutputFormat.JSON,
+        )
+
+    assert not output_path.exists()
+    assert not list(output_path.parent.glob(".orders.*"))
+
+
 def test_generate_dataset_from_profile_artifacts_enforces_configured_row_limit(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
