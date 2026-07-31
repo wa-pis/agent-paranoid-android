@@ -3,6 +3,61 @@
 Relational synthesis preserves reviewed, executable structure. It does not
 reconstruct source rows, identifiers, totals, or rare values.
 
+## Evidence-Bounded Synthesis
+
+The system does not magically discover the complete domain model from a schema
+or a sample. It records bounded observations, keeps their provenance, and
+turns unverified conclusions into hypotheses that require review.
+
+The conceptual pipeline is:
+
+```text
+SourceBundle
+  schema + constraints + examples
+        ↓
+EvidenceProfile
+  safe observations + provenance
+        ↓
+SemanticHypotheses
+  candidate relationships and rules
+        ↓
+human review
+        ↓
+ReviewedDatasetSpec
+  executable generation contract
+```
+
+These artifacts have deliberately different authority:
+
+| Artifact | Meaning | Generation authority |
+| --- | --- | --- |
+| `SourceBundle` | Input schema, constraints, examples, and sampling metadata | None |
+| `EvidenceProfile` | Safe observations supported by bounded evidence | None |
+| `SemanticHypothesis` | Deterministic or AI-proposed relationship/rule | None until reviewed |
+| `ReviewedDatasetSpec` | Explicitly accepted and executable contract | Yes |
+
+### Provenance And Confidence
+
+Every non-declared relationship, distribution, or business rule should retain
+an evidence envelope containing, where applicable:
+
+- `origin`: `declared`, `observed`, or `inferred`;
+- `status`: `candidate`, `reviewed`, `accepted`, or `rejected`;
+- `confidence`: `low`, `medium`, or `high`;
+- sample size, sampling method, and time window;
+- rows checked and observed violations;
+- source/profile fingerprint and explicit assumptions.
+
+Confidence describes how strongly the conclusion is supported by the available
+evidence. It is not a claim that the rule is universally true. For example,
+observing `invoice.total == sum(lines.amount)` in 200 rows with no violations
+supports a medium-confidence hypothesis; it does not prove the domain rule.
+
+AI may rank or explain hypotheses, but it cannot increase their confidence,
+change their review status, or authorize generation. Missing evidence remains
+unknown and must either be reviewed as an explicit assumption or remain outside
+the executable contract.
+
 ## Preservation Matrix
 
 | Property | Preserved contract | Not preserved | Evidence |
