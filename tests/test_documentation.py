@@ -2,10 +2,16 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 from pathlib import Path
 from urllib.parse import unquote
 
+import pytest
+
 from test_data_agent.cli import main
+from test_data_agent.mcp_generator_server import (
+    generate_dataset as generate_dataset_mcp,
+)
 
 
 ROOT = Path(__file__).parent.parent
@@ -209,3 +215,57 @@ def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:
     assert manifest["validation_valid"] is True
     assert manifest["business_validation"]["valid"] is True
     assert business_report["valid"] is True
+
+
+def test_documented_negative_cli_and_mcp_examples_match(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "workspace"
+    example = workspace / "negative_cases"
+    shutil.copytree(ROOT / "examples" / "negative_cases", example)
+    cli_output = workspace / "negative-cli"
+
+    assert main(
+        [
+            "generate",
+            str(example / "dataset_spec.yaml"),
+            "--seed",
+            "1300",
+            "--mode",
+            "mixed",
+            "--invalid-ratio",
+            "0.5",
+            "--format",
+            "json",
+            "--business-rules",
+            str(example / "business_rules.yaml"),
+            "--output",
+            str(cli_output),
+        ]
+    ) == 0
+
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(workspace))
+    mcp_result = generate_dataset_mcp(
+        "negative_cases/dataset_spec.yaml",
+        "negative-mcp",
+        output_format="json",
+        seed=1300,
+        business_rules_path="negative_cases/business_rules.yaml",
+    )
+    mcp_output = workspace / "negative-mcp"
+
+    assert (cli_output / "orders.json").read_bytes() == (
+        mcp_output / "orders.json"
+    ).read_bytes()
+    cli_report = json.loads(
+        (cli_output / "business_validation_report.json").read_text()
+    )
+    mcp_report = json.loads(
+        (mcp_output / "business_validation_report.json").read_text()
+    )
+    assert cli_report == mcp_report
+    assert cli_report["expectations_met"] is True
+    assert cli_report["expected_violation_count"] == 4
+    assert cli_report["observed_violation_count"] == 4
+    assert mcp_result["business_validation"]["unexpected_violation_count"] == 0

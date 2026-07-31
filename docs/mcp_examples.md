@@ -40,6 +40,25 @@ For a rule-driven run, the response also includes a compact
 manifest stores the same summary and the SHA-256 fingerprint of the normalized
 rule contract.
 
+For a reproducible controlled-invalid example, copy
+`examples/negative_cases/` into the generator workspace and call:
+
+```json
+{
+  "name": "generate_dataset",
+  "arguments": {
+    "spec_path": "negative_cases/dataset_spec.yaml",
+    "output_folder": "negative-mcp",
+    "output_format": "json",
+    "seed": 1300,
+    "business_rules_path": "negative_cases/business_rules.yaml"
+  }
+}
+```
+
+That spec fixes `mode: mixed` and `invalid_ratio: 0.5`. The equivalent CLI
+command is documented in [Add Business Rules](how-to/business-rules.md).
+
 Example inline payload:
 
 ```json
