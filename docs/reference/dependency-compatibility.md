@@ -33,15 +33,17 @@ are the versions in the reviewed `uv.lock` used by the release gate on
 | --- | --- | --- |
 | `base-minimum` | 3.11 | Faker 25.0.0; Pydantic 2.7.0; PyYAML 6.0.0 |
 | `parquet-minimum` | 3.11 | Base minimum; PyArrow 15.0.0 |
-| `mcp-minimum` | 3.11 | Base minimum; MCP 1.0.0 |
+| `mcp-minimum` | 3.11 | Faker 25.0.0; Pydantic 2.8.0; PyYAML 6.0.0; MCP 1.0.0 |
 | `trino-minimum` | 3.11 | Base minimum; sqlglot 30.0.0; Trino 0.330.0 |
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 2.50.0 |
 
-The minimum profiles isolate one optional extra at a time. `latest-all` tests
-the locked dependency set across every supported Python version. A future CI
-matrix must install these profiles without silently upgrading minimum
-candidates and must run the contract tests relevant to each surface.
+MCP 1.0.0 requires Pydantic 2.8.0, so its minimum profile cannot reuse the
+base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
+optional extra at a time. `latest-all` tests the locked dependency set across
+every supported Python version. The CI matrix installs these profiles without
+silently upgrading minimum candidates and runs the contract tests relevant to
+each surface.
 
 ## Support Rules
 

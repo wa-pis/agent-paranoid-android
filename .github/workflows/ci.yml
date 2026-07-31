@@ -214,6 +214,65 @@ jobs:
           uv run --isolated --no-project --with "${wheel_path}" \
             test-data-agent doctor
 
+  dependency-minimum:
+    name: Minimum dependencies / ${{ matrix.profile }}
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - profile: base
+            project-spec: ".[dev]"
+            constraint-file: dependency-minimum.txt
+            test-paths: >-
+              tests/test_io_workflows.py
+              tests/test_business_rules.py
+          - profile: parquet
+            project-spec: ".[dev,parquet]"
+            constraint-file: dependency-minimum.txt
+            test-paths: tests/test_io_commands.py
+          - profile: mcp
+            project-spec: ".[dev,mcp]"
+            constraint-file: dependency-minimum-mcp.txt
+            test-paths: >-
+              tests/test_mcp_generator_transport.py
+              tests/test_mcp_trino_transport.py
+          - profile: trino
+            project-spec: ".[dev,trino]"
+            constraint-file: dependency-minimum.txt
+            test-paths: tests/test_mcp_trino_server.py
+          - profile: openai
+            project-spec: ".[dev,openai]"
+            constraint-file: dependency-minimum.txt
+            test-paths: tests/test_openai_provider.py
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.11"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.23"
+          enable-cache: true
+          prune-cache: true
+
+      - name: Install exact minimum profile
+        run: |
+          uv venv --python python
+          uv pip install --python .venv/bin/python \
+            --constraint '.github/constraints/${{ matrix.constraint-file }}' \
+            --editable '${{ matrix.project-spec }}'
+
+      - name: Run dependency contract tests
+        run: .venv/bin/python -m pytest ${{ matrix.test-paths }}
+
   trino-integration:
     name: Trino integration
     needs: changes

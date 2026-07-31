@@ -305,6 +305,27 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
     assert "Byte identity" in compatibility
     assert "No new upper major bound" in compatibility
 
+    minimum_constraints = (
+        ROOT / ".github" / "constraints" / "dependency-minimum.txt"
+    ).read_text()
+    for requirement in (
+        "faker==25.0.0",
+        "pydantic==2.7.0",
+        "PyYAML==6.0.0",
+        "pyarrow==15.0.0",
+        "mcp==1.0.0",
+        "sqlglot==30.0.0",
+        "trino==0.330.0",
+        "openai==2.46.0",
+    ):
+        assert requirement in minimum_constraints
+
+    mcp_constraints = (
+        ROOT / ".github" / "constraints" / "dependency-minimum-mcp.txt"
+    ).read_text()
+    assert "mcp==1.0.0" in mcp_constraints
+    assert "pydantic==2.8.0" in mcp_constraints
+
 
 def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:
     profile = tmp_path / "profile.json"
