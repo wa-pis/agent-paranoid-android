@@ -124,6 +124,7 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "scripts/check_installed_package.py" in workflow
     assert "test-data-agent doctor --skip-smoke" in workflow
     assert "--profile base --wheel" in workflow
+    assert "test-data-agent doctor --require-extra parquet" in workflow
     for extra in ("parquet", "mcp", "openai", "trino"):
         assert f"--profile {extra}" in workflow
         assert f"--require-extra {extra}" in workflow

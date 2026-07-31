@@ -8,6 +8,17 @@ test-data-agent doctor
 
 The final line should be `doctor passed`.
 
+Require the optional capability you intend to operate:
+
+```bash
+test-data-agent doctor --require-extra parquet
+```
+
+For Parquet this performs a local temporary generation and read-back, checks
+row counts and manifest safety flags, and contacts no external service. A
+failure recommends the exact extra to reinstall without exposing the original
+exception text or temporary paths.
+
 ## Command Not Found
 
 Symptom:

@@ -472,8 +472,44 @@ def inspect_doctor(
                 checks.append("quickstart smoke: ok")
             else:
                 failures.append("quickstart smoke: manifest safety flags are not valid")
+            if "parquet" in required:
+                try:
+                    run_parquet_doctor_smoke(fixture, root / "generated-parquet")
+                except Exception:
+                    failures.append(
+                        "capability parquet: failed "
+                        "(reinstall agent-paranoid-android[parquet] and retry)"
+                    )
+                else:
+                    checks.append("capability parquet: ok")
 
     return DoctorReport(checks=tuple(checks), failures=tuple(failures))
+
+
+def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:
+    generate_dataset_from_example_artifacts(
+        fixture,
+        output_folder=output,
+        seed=12345,
+        count=3,
+        output_format=CoreOutputFormat.PARQUET,
+        cache_dir=output.parent / "parquet-cache",
+        use_cache=False,
+    )
+    parquet = importlib.import_module("pyarrow.parquet")
+    parquet_files = sorted(output.glob("*.parquet"))
+    if len(parquet_files) != 2:
+        raise RuntimeError("parquet smoke output is incomplete")
+    if any(parquet.read_table(path).num_rows != 3 for path in parquet_files):
+        raise RuntimeError("parquet smoke row count is invalid")
+    manifest = json.loads((output / "generation_manifest.json").read_text())
+    if not (
+        manifest.get("synthetic") is True
+        and manifest.get("source_rows_copied") is False
+        and manifest.get("validation_valid") is True
+        and manifest.get("output_format") == "parquet"
+    ):
+        raise RuntimeError("parquet smoke manifest is invalid")
 
 
 def write_doctor_fixture(directory: Path) -> None:
