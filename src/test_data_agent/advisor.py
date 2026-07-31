@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Literal, Protocol, runtime_checkable
+from typing import Annotated, Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntityProfile
@@ -38,6 +38,89 @@ ADVISOR_TRUSTED_INSTRUCTIONS = (
 
 class AdvisorContractError(ValueError):
     """Raised when an advisor request or proposal violates the safe contract."""
+
+
+BoundedDiscoveryText = Annotated[str, StringConstraints(min_length=1, max_length=500)]
+DiscoveryKind = Literal["foreign_key", "temporal", "formula", "aggregate"]
+
+
+class DiscoveryFieldReference(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    entity: str = Field(min_length=1, max_length=256)
+    field: str = Field(min_length=1, max_length=256)
+
+
+class RelationshipDiscoveryEvidence(BaseModel):
+    """Normalized evidence that cannot carry source values."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    metric: Literal[
+        "type_compatibility",
+        "parent_unique_ratio",
+        "child_null_ratio",
+        "child_distinct_ratio",
+        "cardinality_ratio",
+        "range_overlap",
+        "value_fingerprint_match",
+    ]
+    value: float = Field(ge=0.0, le=1.0)
+
+
+class RelationshipDiscoveryCandidate(BaseModel):
+    """Safe deterministic input for provider-assisted candidate ranking."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"] = "1.0"
+    candidate_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    kind: DiscoveryKind
+    fields: list[DiscoveryFieldReference] = Field(min_length=2, max_length=16)
+    confidence: float = Field(ge=0.0, le=1.0)
+    evidence: list[RelationshipDiscoveryEvidence] = Field(min_length=1, max_length=16)
+    assumptions: list[BoundedDiscoveryText] = Field(default_factory=list, max_length=8)
+    metadata_trust: Literal["untrusted"] = "untrusted"
+    raw_values_included: Literal[False] = False
+
+
+class RelationshipDiscoveryProposal(BaseModel):
+    """Untrusted provider ranking that cannot approve or run generation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"] = "1.0"
+    candidate_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    kind: DiscoveryKind
+    fields: list[DiscoveryFieldReference] = Field(min_length=2, max_length=16)
+    confidence: float = Field(ge=0.0, le=1.0)
+    evidence: list[BoundedDiscoveryText] = Field(default_factory=list, max_length=16)
+    assumptions: list[BoundedDiscoveryText] = Field(default_factory=list, max_length=8)
+    review_status: Literal["requires_human_review"] = "requires_human_review"
+    approved: Literal[False] = False
+    generation_performed: Literal[False] = False
+
+
+def validate_relationship_discovery_proposals(
+    candidates: list[RelationshipDiscoveryCandidate],
+    proposals: list[RelationshipDiscoveryProposal],
+) -> list[RelationshipDiscoveryProposal]:
+    """Bind provider proposals to deterministic candidates without approving them."""
+
+    candidates_by_id = {candidate.candidate_id: candidate for candidate in candidates}
+    if len(candidates_by_id) != len(candidates):
+        raise AdvisorContractError("relationship candidate ids must be unique")
+    seen_proposals: set[str] = set()
+    for proposal in proposals:
+        if proposal.candidate_id in seen_proposals:
+            raise AdvisorContractError("relationship proposal ids must be unique")
+        seen_proposals.add(proposal.candidate_id)
+        candidate = candidates_by_id.get(proposal.candidate_id)
+        if candidate is None:
+            raise AdvisorContractError("relationship proposal references unknown candidate")
+        if proposal.kind != candidate.kind or proposal.fields != candidate.fields:
+            raise AdvisorContractError("relationship proposal cannot change candidate identity")
+    return proposals
 
 
 class AdvisorRequest(BaseModel):

@@ -20,7 +20,7 @@
 - [x] Define the relational-synthesis contract: preserve FK graph shape,
   distribution/order-of-magnitude shape, temporal dependencies, and executable
   business invariants without copying source rows.
-- [ ] Define safe relationship-discovery input metadata and provider-neutral
+- [x] Define safe relationship-discovery input metadata and provider-neutral
   proposal contracts for AI-assisted FK, temporal, formula, and aggregate-rule
   discovery.
 - [ ] Combine deterministic candidate mining with AI ranking/proposals and a
