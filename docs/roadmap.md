@@ -343,6 +343,18 @@ features.
 
 Scope:
 
+- [ ] Complete the [1.0.0rc1 security-boundary hardening
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc1-security-hardening/proposal.md).
+  P0 findings are release blockers; P1 findings require closure or explicit
+  independent-reviewer acceptance before the stable release; P2 findings need
+  a documented disposition.
+- [ ] Enforce the spec-level privacy gate across Python, CLI, agent, and MCP
+  generation paths, and enforce validated read-only SQL across direct Trino
+  access paths.
+- [ ] Add direct API adversarial tests to the release gate; passing the current
+  CLI/MCP workflow tests alone is not sufficient evidence for the RC.
+- [ ] Record reproducibility inputs, container/package version consistency, and
+  security scanner evidence against the exact RC commit and published artifacts.
 - [ ] Close or explicitly defer every active OpenSpec change.
 - [ ] Run the full security audit and resolve all Critical and High findings.
 - [ ] Verify README, documentation site, migration guidance, examples, package
@@ -355,6 +367,9 @@ Scope:
 Exit criteria:
 
 - Required CI, release, publication, installation, and smoke checks pass.
+- The RC security-boundary hardening OpenSpec has no unresolved P0 task, and
+  every remaining P1 or lower item has an owner, disposition, and revisit
+  trigger.
 - Any remaining Medium or lower security risk is documented with an owner and
   disposition.
 - Only release-blocking fixes may enter after the candidate.
