@@ -88,10 +88,12 @@ def validate_field_rule(rows_by_table: dict[str, list[dict[str, Any]]], rule: Fi
         if rule.allowed_values is not None and value not in (None, "") and value not in rule.allowed_values:
             errors.append("allowed_values")
         number = comparable_number(value)
-        if rule.min_value is not None and number is not None and number < rule.min_value:
-            errors.append("min_value")
-        if rule.max_value is not None and number is not None and number > rule.max_value:
-            errors.append("max_value")
+        if value not in (None, "") and rule.min_value is not None:
+            if number is None or number < rule.min_value:
+                errors.append("min_value")
+        if value not in (None, "") and rule.max_value is not None:
+            if number is None or number > rule.max_value:
+                errors.append("max_value")
         record_result(result, not errors, f"{rule.table}[{index}].{rule.field}: {', '.join(errors)}")
     return result
 
