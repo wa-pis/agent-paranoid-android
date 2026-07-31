@@ -25,6 +25,7 @@ from test_data_agent.io.commands import (
     profile_example_artifacts,
     should_fail_generation,
     validate_dataset_artifacts,
+    write_generation_summary,
     write_generation_errors,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
@@ -77,6 +78,7 @@ __all__ = [
     "profile_example_artifacts",
     "should_fail_generation",
     "validate_dataset_artifacts",
+    "write_generation_summary",
     "write_generation_errors",
     "write_generation_manifest",
     "write_dataset_generation_artifacts",

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added an offline `test-data-agent demo --output PATH` workflow using a
+  bundled fictional fixture, deterministic seed, and atomic artifact publish.
 - Added metadata-only effective generation and business-rule evidence to
   generation manifests, bound to exact spec and rule fingerprints.
 - Added bounded numeric distribution scaling with fail-closed non-identity

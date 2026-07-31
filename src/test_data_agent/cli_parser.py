@@ -241,6 +241,22 @@ def register_utility_commands(
     subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
 ) -> None:
     """Register environment and audit utility commands."""
+    demo_parser = subparsers.add_parser(
+        "demo",
+        help="Generate a deterministic offline demo dataset.",
+        description=(
+            "Run the installed package against a bundled fictional fixture "
+            "without network access or optional integrations."
+        ),
+    )
+    demo_parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        required=True,
+        help="New folder for generated demo data and review artifacts.",
+    )
+
     doctor_parser = subparsers.add_parser(
         "doctor",
         help="Run local environment and fixture smoke checks.",

@@ -41,6 +41,7 @@ REQUIRED_DOCS = {
     "operations/migrating-to-0.6.md",
 }
 CLI_COMMANDS = {
+    "demo",
     "doctor",
     "audit-verify",
     "profile-csv",

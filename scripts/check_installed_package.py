@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import json
 import re
+import subprocess
+import sys
+import tempfile
 from importlib.metadata import distribution, distributions
 from importlib.resources import files
 from pathlib import Path
@@ -91,6 +95,11 @@ def main(argv: list[str] | None = None) -> None:
     marker = files("test_data_agent").joinpath("py.typed")
     if not marker.is_file():
         raise SystemExit("installed wheel is missing test_data_agent/py.typed")
+    demo_fixture = files("test_data_agent.resources").joinpath(
+        "demo_customers.csv"
+    )
+    if not demo_fixture.is_file():
+        raise SystemExit("installed wheel is missing the bundled demo fixture")
 
     scripts = {
         entry.name: entry.value
@@ -106,6 +115,7 @@ def main(argv: list[str] | None = None) -> None:
         raise SystemExit(f"installed wheel has invalid console scripts: {missing_or_changed}")
 
     verify_install_profile(args.profile)
+    verify_installed_demo()
     if args.wheel is not None:
         verify_wheel_size(args.wheel)
 
@@ -186,6 +196,31 @@ def verify_wheel_size(path: Path) -> None:
             f"wheel exceeds size budget: {size} bytes, "
             f"maximum {MAX_WHEEL_SIZE_BYTES}"
         )
+
+
+def verify_installed_demo() -> None:
+    with tempfile.TemporaryDirectory(prefix="test-data-agent-demo-") as temp:
+        output = Path(temp) / "generated"
+        entrypoint = Path(sys.executable).with_name("test-data-agent")
+        completed = subprocess.run(
+            [entrypoint, "demo", "--output", str(output)],
+            cwd=temp,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            raise SystemExit(
+                "installed demo failed: "
+                f"{completed.stderr.strip() or completed.stdout.strip()}"
+            )
+        manifest = json.loads((output / "generation_manifest.json").read_text())
+        if not (
+            manifest.get("synthetic") is True
+            and manifest.get("source_rows_copied") is False
+            and manifest.get("validation_valid") is True
+        ):
+            raise SystemExit("installed demo manifest failed safety validation")
 
 
 def requirement_name(requirement: str) -> str:

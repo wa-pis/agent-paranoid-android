@@ -23,6 +23,7 @@
     "generate-from-csv",
     "validate",
     "generate-from-example",
+    "demo",
     "doctor",
     "audit-verify",
     "agent-plan",
