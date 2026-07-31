@@ -195,3 +195,22 @@ enforce the same validation and safety policy when called directly.
 - **AND** workspace limits, row-free responses, audit behavior, and Trino
   allowlists remain enforced
 - **AND** direct service calls cannot bypass the safety checks
+
+### Requirement: Bounded Business Validation Response
+
+MCP business-rule responses SHALL remain metadata-only and bounded.
+
+#### Scenario: Business validation contains row-level failures
+
+- **GIVEN** generated synthetic rows violate one or more configured rules
+- **WHEN** generation completes
+- **THEN** the MCP response contains only aggregate pass/fail counts, validity,
+  the rule fingerprint, and artifact paths
+- **AND** detailed bounded errors are written to the workspace report
+- **AND** generated rows are not returned inline
+
+### Requirement: Safe Trino Surface
+
+The default MCP surface SHALL expose fixed allowlisted metadata and aggregate
+profiling tools. The generic `run_safe_select` tool SHALL require explicit
+operator opt-in.

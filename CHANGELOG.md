@@ -105,6 +105,8 @@ All notable changes to this project are documented here.
   operational readiness OpenSpec and archived with its implementation evidence.
 - The completed metadata-only agent review summary is archived after confirming
   its bounded review contract is canonical.
+- All remaining completed pre-RC OpenSpec changes are consolidated into their
+  canonical capabilities and archived as one reviewed documentation baseline.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
