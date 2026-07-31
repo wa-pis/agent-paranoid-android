@@ -32,6 +32,8 @@ All notable changes to this project are documented here.
   application services while preserving tool order and public contracts.
 - Separated Trino MCP transport registration and audit wrapping from the
   allowlisted application services and opt-in safe SELECT policy.
+- Added direct-service boundary tests proving unsafe workspace paths and Trino
+  SQL are rejected before filesystem or database I/O.
 
 ## [0.11.0] - 2026-07-31
 

@@ -19,6 +19,7 @@ from test_data_agent.mcp_trino_server import (
     profile_formula_rule,
     profile_table_safe,
     profile_temporal_ordering,
+    run_safe_select,
     trino_mcp_tools,
     validate_table_references_allowed,
     validate_safe_select,
@@ -151,6 +152,36 @@ def test_safe_select_uses_env_allowlists(monkeypatch: pytest.MonkeyPatch) -> Non
         validate_safe_select("SELECT id FROM raw.safe_schema.users LIMIT 10")
     with pytest.raises(AllowlistError):
         validate_safe_select("SELECT id FROM users LIMIT 10")
+
+
+@pytest.mark.parametrize(
+    ("sql", "error_type"),
+    [
+        ("DELETE FROM analytics.safe_schema.users", SqlSafetyError),
+        (
+            "SELECT id FROM raw.safe_schema.users LIMIT 10",
+            AllowlistError,
+        ),
+    ],
+)
+def test_safe_select_service_rejects_before_database_io(
+    monkeypatch: pytest.MonkeyPatch,
+    sql: str,
+    error_type: type[Exception],
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+
+    def unexpected_query(_: str) -> list[dict[str, object]]:
+        raise AssertionError("unsafe SQL reached Trino")
+
+    monkeypatch.setattr(
+        "test_data_agent.mcp_trino_server.fetch_dicts",
+        unexpected_query,
+    )
+
+    with pytest.raises(error_type):
+        run_safe_select(sql)
 
 
 def test_allowlist_rejects_catalog_and_schema() -> None:

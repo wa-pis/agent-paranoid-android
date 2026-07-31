@@ -53,6 +53,24 @@ def test_workspace_paths_reject_escape(monkeypatch: pytest.MonkeyPatch, tmp_path
         resolve_workspace_path("../outside.csv")
 
 
+def test_profile_service_rejects_escape_before_file_io(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    configure_workspace(monkeypatch, tmp_path)
+
+    def unexpected_profile(*args: object, **kwargs: object) -> None:
+        raise AssertionError("unsafe path reached CSV profiling")
+
+    monkeypatch.setattr(
+        "test_data_agent.mcp_generator_server.write_csv_profile_artifact",
+        unexpected_profile,
+    )
+
+    with pytest.raises(WorkspacePathError, match="escapes"):
+        profile_csv("../outside.csv", "profile.json")
+
+
 def test_workspace_paths_reject_symlink_escape(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
