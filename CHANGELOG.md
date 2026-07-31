@@ -9,6 +9,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Explicit direct-API privacy and SQL-boundary checks in the release gate.
 - Public conduct, support, governance, and code-ownership policies for the
   current single-maintainer project model.
 - Generation manifests now record bounded reproducibility inputs and output
