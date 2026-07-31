@@ -12,6 +12,7 @@ from test_data_agent.core.limits import GenerationLimitError
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_json_artifact_atomic
 from test_data_agent.io.workflows import (
+    commit_temp_output_folder,
     generate_dataset_bundle,
     generate_dataset_review_artifacts,
     infer_dataset_spec_artifact,
@@ -680,6 +681,103 @@ def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
     assert raised.value.errno == errno.ENOSPC
     assert not output.exists()
     assert not list(temporary_parent.glob(temporary_pattern))
+
+
+@pytest.mark.parametrize("workflow", ["folder", "review"])
+def test_folder_publication_rolls_back_interruption_after_atomic_rename(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    workflow: str,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(
+        profile,
+        output_path=tmp_path / "dataset_spec.yaml",
+        count=1,
+    )
+    def interrupt_after_rename(temp_folder: Path, output_folder: Path) -> None:
+        commit_temp_output_folder(temp_folder, output_folder)
+        raise RuntimeError("publication interrupted")
+
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.commit_temp_output_folder",
+        interrupt_after_rename,
+    )
+    output = tmp_path / workflow
+
+    with pytest.raises(RuntimeError, match="publication interrupted"):
+        if workflow == "folder":
+            generate_dataset_bundle(spec, output_folder=output)
+        else:
+            generate_dataset_review_artifacts(
+                profile,
+                spec,
+                output_folder=output,
+                output_format=OutputFormat.JSON,
+                seed=19,
+            )
+
+    assert not output.exists()
+    assert not list(tmp_path.glob(f".{workflow}.*"))
+
+
+def test_single_entity_commit_restores_existing_files_when_interrupted(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    output_folder = tmp_path / "single"
+    output_folder.mkdir()
+    existing_profile = output_folder / "profile.json"
+    existing_profile.write_text("previous profile")
+    unrelated = output_folder / "keep.txt"
+    unrelated.write_text("keep")
+    output_path = output_folder / "orders.json"
+    original_replace = Path.replace
+
+    def interrupt_profile_move(path: Path, target: Path) -> Path:
+        result = original_replace(path, target)
+        if (
+            path.parent.name.startswith(".orders.")
+            and path.name == "profile.json"
+            and Path(target).parent == output_folder
+        ):
+            raise RuntimeError("single publication interrupted")
+        return result
+
+    monkeypatch.setattr(Path, "replace", interrupt_profile_move)
+
+    with pytest.raises(RuntimeError, match="single publication interrupted"):
+        generate_dataset_from_profile_artifacts(
+            profile,
+            count=1,
+            seed=19,
+            output_path=output_path,
+            output_format=OutputFormat.JSON,
+        )
+
+    assert not output_path.exists()
+    assert existing_profile.read_text() == "previous profile"
+    assert unrelated.read_text() == "keep"
+    assert not list(output_folder.glob(".orders.*"))
 
 
 def test_generate_dataset_from_profile_artifacts_enforces_configured_row_limit(

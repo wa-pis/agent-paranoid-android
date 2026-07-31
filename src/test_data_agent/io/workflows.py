@@ -130,7 +130,7 @@ def generate_dataset_bundle(
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        cleanup_failed_folder_publication(temp_folder, output_folder)
         raise
     row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
     return DatasetGenerationResult(
@@ -402,7 +402,7 @@ def generate_dataset_review_artifacts(
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        cleanup_failed_folder_publication(temp_folder, output_folder)
         raise
     return 0 if report.valid else 1
 
@@ -525,10 +525,41 @@ def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> None:
 
 
 def commit_single_entity_bundle(temp_folder: Path, output_folder: Path) -> None:
+    output_folder_existed = output_folder.exists()
     output_folder.mkdir(parents=True, exist_ok=True)
-    for path in sorted(temp_folder.iterdir()):
-        path.replace(output_folder / path.name)
+    staged_paths = sorted(temp_folder.iterdir())
+    rollback_folder = temp_folder / ".rollback"
+    rollback_folder.mkdir()
+    try:
+        for path in staged_paths:
+            destination = output_folder / path.name
+            if destination.exists() or destination.is_symlink():
+                destination.replace(rollback_folder / path.name)
+            path.replace(destination)
+    except BaseException:
+        for path in reversed(staged_paths):
+            destination = output_folder / path.name
+            backup = rollback_folder / path.name
+            if not path.exists() and (destination.exists() or destination.is_symlink()):
+                destination.replace(path)
+            if backup.exists() or backup.is_symlink():
+                backup.replace(destination)
+        rollback_folder.rmdir()
+        if not output_folder_existed and not any(output_folder.iterdir()):
+            output_folder.rmdir()
+        raise
+    shutil.rmtree(rollback_folder)
     temp_folder.rmdir()
+
+
+def cleanup_failed_folder_publication(temp_folder: Path, output_folder: Path) -> None:
+    if temp_folder.exists():
+        shutil.rmtree(temp_folder, ignore_errors=True)
+        return
+    if output_folder.is_symlink() or not output_folder.is_dir():
+        output_folder.unlink(missing_ok=True)
+    else:
+        shutil.rmtree(output_folder, ignore_errors=True)
 
 
 def ensure_paths_distinct(first: Path, second: Path) -> None:

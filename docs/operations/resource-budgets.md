@@ -65,3 +65,15 @@ success metadata.
 Increase `TEST_DATA_AGENT_MAX_GENERATION_SECONDS` only after confirming that
 the requested row count and rule complexity are expected. Retrying with the
 same spec and seed remains deterministic.
+
+## Interrupted Publication
+
+Folder and review bundles use an atomic directory rename. If publication is
+interrupted after that rename but before the caller receives success, the new
+destination is removed. Single-entity publication may update several files in
+an existing directory; it keeps temporary backups and rolls every moved file
+back, restoring replaced files while leaving unrelated files untouched.
+
+The caller receives the original interruption error. A failed publication does
+not leave a generation manifest or output file that can be mistaken for a
+successful run.
