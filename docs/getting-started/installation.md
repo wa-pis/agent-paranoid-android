@@ -8,7 +8,9 @@
 
 The supported CI matrix covers CPython 3.11, 3.12, 3.13, and 3.14. Python 3.11
 remains the minimum so users can adopt newer interpreters without forcing
-existing environments to upgrade.
+existing environments to upgrade. The notice and release-gate rules for
+changing this matrix are defined in
+[Runtime And Integration Support](../reference/support-policy.md).
 
 ## Install From PyPI
 
