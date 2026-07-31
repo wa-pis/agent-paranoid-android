@@ -23,6 +23,8 @@ All notable changes to this project are documented here.
   inference, deterministic generation, and independent validation.
 - A runnable relational CSV example now verifies generated foreign keys,
   deterministic business rules, and multi-table validation.
+- A runnable public Python API example now demonstrates metadata-only spec
+  inference, seeded bundle generation, and independent validation.
 
 ### Added
 

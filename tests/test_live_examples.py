@@ -100,3 +100,45 @@ def test_relational_csv_example_preserves_generated_relationships_and_rules(tmp_
     assert report["valid"] is True
     assert report["rule_fail_count"] == 0
     assert revalidation["valid"] is True
+
+
+def test_python_api_example_is_installed_deterministic_and_valid(tmp_path: Path) -> None:
+    first_output = tmp_path / "python-api-first"
+    second_output = tmp_path / "python-api-second"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    script = REPOSITORY_ROOT / "examples/python_api/run.py"
+
+    for output in (first_output, second_output):
+        subprocess.run(
+            [sys.executable, script, output],
+            cwd=tmp_path,
+            env=environment,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    first_rows = json.loads(
+        (first_output / "generated/support_tickets.json").read_text()
+    )
+    second_rows = json.loads(
+        (second_output / "generated/support_tickets.json").read_text()
+    )
+    manifest = json.loads(
+        (first_output / "generated/generation_manifest.json").read_text()
+    )
+    generated_validation = json.loads(
+        (first_output / "generated/validation_report.json").read_text()
+    )
+    independent_validation = json.loads(
+        (first_output / "independent_validation_report.json").read_text()
+    )
+
+    assert len(first_rows) == 16
+    assert first_rows == second_rows
+    assert manifest["seed"] == 314159
+    assert manifest["source_rows_copied"] is False
+    assert manifest["validation_valid"] is True
+    assert generated_validation["valid"] is True
+    assert independent_validation["valid"] is True
