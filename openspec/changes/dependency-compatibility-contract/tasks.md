@@ -1,8 +1,8 @@
 # Tasks: dependency-compatibility-contract
 
-- [ ] Inventory runtime and optional dependencies that affect parsing,
+- [x] Inventory runtime and optional dependencies that affect parsing,
   generation, serialization, SQL policy, or validation.
-- [ ] Define minimum supported and latest tested profiles for each supported
+- [x] Define minimum supported and latest tested profiles for each supported
   Python/extra combination.
 - [ ] Add CI jobs or matrix profiles for the minimum and latest compatible
   dependency sets.

@@ -31,6 +31,7 @@ REQUIRED_DOCS = {
     "concepts/relational-synthesis-contract.md",
     "reference/cli.md",
     "reference/compatibility.md",
+    "reference/dependency-compatibility.md",
     "reference/stability.md",
     "reference/support-policy.md",
     "reference/configuration.md",
@@ -274,6 +275,35 @@ def test_compatibility_inventory_covers_retained_surfaces() -> None:
     assert "GenerationSpec" in compatibility
     assert "one feature release and 90 days" in compatibility
     assert "before `2.0`" in compatibility
+
+
+def test_dependency_compatibility_defines_semantic_profiles() -> None:
+    compatibility = (
+        ROOT / "docs" / "reference" / "dependency-compatibility.md"
+    ).read_text()
+
+    for dependency in (
+        "Faker",
+        "Pydantic",
+        "PyYAML",
+        "PyArrow",
+        "MCP",
+        "sqlglot",
+        "Trino client",
+        "OpenAI",
+    ):
+        assert dependency in compatibility
+    for profile in (
+        "base-minimum",
+        "parquet-minimum",
+        "mcp-minimum",
+        "trino-minimum",
+        "openai-minimum",
+        "latest-all",
+    ):
+        assert f"`{profile}`" in compatibility
+    assert "Byte identity" in compatibility
+    assert "No new upper major bound" in compatibility
 
 
 def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:
