@@ -58,6 +58,8 @@
   guarantees.
 - [ ] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.
+  - [x] Add the CSV profiler to strict mypy coverage.
+  - [ ] Cover the remaining production modules and resolve optional imports.
 - [x] Remove `0.8.1` container defaults or derive them from package metadata;
   add a release drift check.
 - [ ] Verify release tags point to the verified merge commit and publish

@@ -105,6 +105,7 @@ files = [
     "src/test_data_agent/cli_contract.py",
     "src/test_data_agent/cli_parser.py",
     "src/test_data_agent/container_health.py",
+    "src/test_data_agent/csv_profiler.py",
     "src/test_data_agent/mcp_generator_server.py",
     "src/test_data_agent/providers/openai.py",
     "scripts/contract_fixtures.py",

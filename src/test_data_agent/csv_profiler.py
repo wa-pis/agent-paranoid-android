@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 import re
 from collections import Counter
+from collections.abc import Sequence
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -111,7 +112,7 @@ def read_csv_sample(path: Path, encoding: str) -> str:
         return handle.read(CSV_SAMPLE_BYTES).decode(encoding, errors="replace")
 
 
-def detect_csv_dialect(text: str) -> csv.Dialect:
+def detect_csv_dialect(text: str) -> type[csv.Dialect]:
     sample = text[:8192]
     try:
         return csv.Sniffer().sniff(sample, delimiters=",;\t|")
@@ -119,7 +120,7 @@ def detect_csv_dialect(text: str) -> csv.Dialect:
         return csv.excel
 
 
-def validate_csv_headers(fieldnames: list[str] | None) -> list[str]:
+def validate_csv_headers(fieldnames: Sequence[str] | None) -> list[str]:
     if not fieldnames:
         raise ValueError("CSV must include a header row")
     normalized = [str(name).strip() for name in fieldnames]
@@ -366,23 +367,25 @@ def range_stats(values: list[str], data_type: ProfileDataType) -> dict[str, Any]
     if not values:
         return {}
     if data_type == ProfileDataType.INTEGER:
-        numbers = sorted(parse_int(value) for value in values)
-        return numeric_stats([number for number in numbers if number is not None], integer=True)
+        integers = sorted(int_value for value in values if (int_value := parse_int(value)) is not None)
+        return numeric_stats(integers, integer=True)
     if data_type == ProfileDataType.FLOAT:
-        numbers = sorted(parse_float(value) for value in values)
-        return numeric_stats([number for number in numbers if number is not None], integer=False)
+        floats = sorted(float_value for value in values if (float_value := parse_float(value)) is not None)
+        return numeric_stats(floats, integer=False)
     if data_type == ProfileDataType.DATE:
-        dates = sorted(parse_date_value(value) for value in values)
-        parsed = [item for item in dates if item is not None]
-        return {"min_date": parsed[0].isoformat(), "max_date": parsed[-1].isoformat()} if parsed else {}
+        dates = sorted(item for value in values if (item := parse_date_value(value)) is not None)
+        return {"min_date": dates[0].isoformat(), "max_date": dates[-1].isoformat()} if dates else {}
     if data_type == ProfileDataType.DATETIME:
-        datetimes = sorted(parse_datetime_value(value) for value in values)
-        parsed = [item for item in datetimes if item is not None]
-        return {"min_timestamp": parsed[0].isoformat(), "max_timestamp": parsed[-1].isoformat()} if parsed else {}
+        datetimes = sorted(item for value in values if (item := parse_datetime_value(value)) is not None)
+        return (
+            {"min_timestamp": datetimes[0].isoformat(), "max_timestamp": datetimes[-1].isoformat()}
+            if datetimes
+            else {}
+        )
     return {}
 
 
-def numeric_stats(numbers: list[int | float], integer: bool) -> dict[str, Any]:
+def numeric_stats(numbers: Sequence[int | float], integer: bool) -> dict[str, Any]:
     if not numbers:
         return {}
     stats: dict[str, Any] = {
@@ -396,7 +399,7 @@ def numeric_stats(numbers: list[int | float], integer: bool) -> dict[str, Any]:
     return stats
 
 
-def percentile(numbers: list[int | float], ratio: float) -> float:
+def percentile(numbers: Sequence[int | float], ratio: float) -> float:
     if len(numbers) == 1:
         return float(numbers[0])
     index = ratio * (len(numbers) - 1)

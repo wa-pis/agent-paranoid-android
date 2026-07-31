@@ -151,6 +151,7 @@ All notable changes to this project are documented here.
   synthetic labels instead of exposing source category values.
 - Masked Trino samples use opaque placeholders, with regressions covering rare
   free text and quasi-identifiers.
+- The CSV profiler now runs under the project's strict type-checking gate.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.
