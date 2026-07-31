@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 import os
 from collections.abc import Mapping
@@ -14,7 +15,13 @@ import test_data_agent
 from test_data_agent.agent import build_agent_advisor_exchange
 from test_data_agent.cli import build_parser
 from test_data_agent.io import load_dataset_spec
-from test_data_agent.mcp_generator_server import generate_dataset, plan_trino_dataset
+from test_data_agent.mcp_generator_server import (
+    generate_dataset,
+    mcp as generator_mcp,
+    plan_trino_dataset,
+)
+from test_data_agent.mcp_trino_server import trino_mcp_tools
+from test_data_agent.mcp_trino_transport import create_trino_mcp
 
 
 CONTRACT_FIXTURE_NAMES = (
@@ -25,7 +32,9 @@ CONTRACT_FIXTURE_NAMES = (
     "dataset-spec.json",
     "generation-manifest.json",
     "mcp-generate.json",
+    "mcp-generator-tools.json",
     "mcp-plan.json",
+    "mcp-trino-tools.json",
     "public-python-api.json",
     "validation-report.json",
 )
@@ -75,6 +84,10 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
                     if path.is_file()
                 )
             }
+            with patch.dict(os.environ, {"TRINO_ENABLE_SAFE_SELECT": "false"}):
+                trino_mcp = create_trino_mcp(trino_mcp_tools())
+            generator_tools = _mcp_tool_contract(generator_mcp)
+            trino_tools = _mcp_tool_contract(trino_mcp)
     finally:
         if previous_workspace is None:
             os.environ.pop("TEST_DATA_AGENT_WORKSPACE_ROOT", None)
@@ -89,7 +102,9 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
         "dataset-spec.json": spec.model_dump(mode="json"),
         "generation-manifest.json": manifest,
         "mcp-generate.json": mcp_generate,
+        "mcp-generator-tools.json": generator_tools,
         "mcp-plan.json": mcp_plan,
+        "mcp-trino-tools.json": trino_tools,
         "public-python-api.json": {
             "exports": sorted(test_data_agent.__all__),
         },
@@ -99,6 +114,21 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
         name: _normalize_contract(payload, workspace_root)
         for name, payload in fixtures.items()
     }
+
+
+def _mcp_tool_contract(server: Any | None) -> list[dict[str, Any]]:
+    if server is None:
+        raise RuntimeError("MCP contract generation requires the mcp extra")
+    tools = asyncio.run(server.list_tools())
+    return [
+        {
+            "description": tool.description,
+            "input_schema": tool.inputSchema,
+            "name": tool.name,
+            "output_schema": tool.outputSchema,
+        }
+        for tool in sorted(tools, key=lambda item: item.name)
+    ]
 
 
 def write_contract_fixtures(
