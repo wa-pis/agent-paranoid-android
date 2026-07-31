@@ -33,6 +33,8 @@ All notable changes to this project are documented here.
 
 - Incomplete staged generation and review bundles are removed when interactive
   cancellation interrupts writing or validation.
+- Mid-write disk exhaustion removes partial staged folder, review, and
+  single-entity output without publishing success metadata.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

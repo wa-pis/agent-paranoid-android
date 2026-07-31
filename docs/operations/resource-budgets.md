@@ -41,3 +41,15 @@ not published.
 Hard termination such as `SIGKILL`, power loss, or host failure cannot run
 in-process cleanup. A later operational gate covers discovery and recovery for
 those abandoned staging directories.
+
+## Disk Exhaustion
+
+Generation checks estimated bundle size and available capacity before work
+starts. Free space can still disappear concurrently. If a write receives
+`ENOSPC` after creating a partial staged file, folder, review, and single-entity
+workflows remove the staging directory, propagate the operating-system error,
+and publish neither the destination nor success metadata.
+
+Free space on the target filesystem and retry with the same reviewed spec and
+seed. Do not treat files from an abandoned or failed staging directory as a
+successful synthetic bundle.

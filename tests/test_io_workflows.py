@@ -1,4 +1,5 @@
 import csv
+import errno
 import json
 from pathlib import Path
 
@@ -551,6 +552,87 @@ def test_single_entity_bundle_removes_staging_on_cancellation(
 
     assert not output_path.exists()
     assert not list(output_path.parent.glob(".orders.*"))
+
+
+@pytest.mark.parametrize("workflow", ["folder", "review", "single"])
+def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    workflow: str,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    spec = infer_dataset_spec_artifact(
+        profile,
+        output_path=tmp_path / "dataset_spec.yaml",
+        count=1,
+    )
+
+    def exhaust_folder(rows, output_format, output_folder: Path) -> None:
+        (output_folder / "partial.tmp").write_text("incomplete")
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+    def exhaust_single(rows, output_format, output_path: Path) -> None:
+        output_path.write_text("incomplete")
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+    if workflow == "folder":
+        output = tmp_path / "generated"
+        temporary_parent = tmp_path
+        temporary_pattern = ".generated.*"
+        monkeypatch.setattr(
+            "test_data_agent.io.workflows.write_dataset_rows",
+            exhaust_folder,
+        )
+        def operation():
+            return generate_dataset_bundle(spec, output_folder=output)
+    elif workflow == "review":
+        output = tmp_path / "review"
+        temporary_parent = tmp_path
+        temporary_pattern = ".review.*"
+        monkeypatch.setattr(
+            "test_data_agent.io.workflows.write_dataset_rows",
+            exhaust_folder,
+        )
+        def operation():
+            return generate_dataset_review_artifacts(
+                profile,
+                spec,
+                output_folder=output,
+                output_format=OutputFormat.JSON,
+                seed=19,
+            )
+    else:
+        output = tmp_path / "single" / "orders.json"
+        temporary_parent = output.parent
+        temporary_pattern = ".orders.*"
+        monkeypatch.setattr(
+            "test_data_agent.io.workflows.write_single_entity_rows",
+            exhaust_single,
+        )
+        def operation():
+            return generate_dataset_from_profile_artifacts(
+                profile,
+                count=1,
+                seed=19,
+                output_path=output,
+                output_format=OutputFormat.JSON,
+            )
+
+    with pytest.raises(OSError, match="No space left on device") as raised:
+        operation()
+
+    assert raised.value.errno == errno.ENOSPC
+    assert not output.exists()
+    assert not list(temporary_parent.glob(temporary_pattern))
 
 
 def test_generate_dataset_from_profile_artifacts_enforces_configured_row_limit(
