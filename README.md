@@ -15,6 +15,20 @@ for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
 Current version: `0.12.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
+## What It Preserves
+
+The goal is not to copy production rows or generate unrelated Faker records.
+The tool builds a synthetic analogue of relational and business semantics:
+foreign-key graphs, reference-table shape, distributions, order of magnitude,
+temporal dependencies, formulas, and aggregate reconciliation. Salary and
+accounting data can therefore support development and testing of analytics,
+forecasting, budgeting, and reporting systems without exposing source rows.
+
+AI may help discover likely relationships and business rules from safe schema
+profiles, aggregates, masked patterns, and bounded evidence. Its output is an
+untrusted proposal: a human reviews it, deterministic validators confirm it,
+and only then does it become part of a `DatasetSpec` used for generation.
+
 ## Install
 
 Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14.
