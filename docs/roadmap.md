@@ -76,8 +76,7 @@ date.
 - Separate CLI argument parsing, application dispatch, and human/JSON
   presentation behind the existing `test-data-agent` entry point.
 - Separate generator and Trino MCP transport registration from application
-  services and safety policy. Generator MCP registration is complete; Trino
-  MCP remains.
+  services and safety policy. Both transport registrations are complete.
 - Preserve command names, help, exit codes, JSON and MCP schemas, artifact
   formats, and safety behavior through golden contract tests.
 - Deliver the refactor as small independently reviewable changes; do not add a

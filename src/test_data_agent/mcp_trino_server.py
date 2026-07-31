@@ -29,12 +29,8 @@ from test_data_agent.core.privacy import (
     mask_pattern,
     mask_value,
 )
-from test_data_agent.audit import audit_logger_from_env, audited_mcp_tool
-
-try:  # pragma: no cover - exercised when the MCP dependency is installed.
-    from mcp.server.fastmcp import FastMCP
-except ImportError:  # pragma: no cover
-    FastMCP = None  # type: ignore[assignment]
+from test_data_agent.audit import audit_logger_from_env
+from test_data_agent.mcp_trino_transport import create_trino_mcp
 
 try:  # pragma: no cover - live Trino is not used in unit tests.
     import trino
@@ -1052,12 +1048,7 @@ def trino_mcp_tools() -> list[Callable[..., Any]]:
     return tools
 
 
-if FastMCP is not None:
-    mcp = FastMCP("test-data-agent-trino")
-    for tool in trino_mcp_tools():
-        mcp.tool()(audited_mcp_tool("trino-mcp", tool))
-else:  # pragma: no cover
-    mcp = None
+mcp: Any = create_trino_mcp(trino_mcp_tools())
 
 
 def main() -> None:

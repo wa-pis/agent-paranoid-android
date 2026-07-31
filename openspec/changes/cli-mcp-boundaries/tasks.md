@@ -12,7 +12,7 @@
   - [x] Move examples, audit verification, and doctor rendering behind the
     presentation boundary.
 - [x] Separate generator MCP registration from application services.
-- [ ] Separate Trino MCP registration from allowlisted application services.
+- [x] Separate Trino MCP registration from allowlisted application services.
 - [ ] Keep safety checks in core/application layers and test direct services.
 - [ ] Update the implementation map, changelog, and relevant contributor docs.
 - [ ] Run `scripts/check_release.sh`.
