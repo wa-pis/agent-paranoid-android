@@ -11,12 +11,20 @@ from typing import Any, Literal
 
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
-from test_data_agent.rules.expressions import numbers_close, parse_datetime, safe_eval
+from test_data_agent.rules.expressions import (
+    aggregate,
+    comparable_number,
+    numbers_close,
+    parse_datetime,
+    safe_eval,
+)
 from test_data_agent.rules.models import (
+    AggregateFormulaRule,
     BusinessRules,
     ConditionalAllowedValuesRule,
     ConditionalRequiredRule,
     FieldRule,
+    ForeignKeyRule,
     FormulaRule,
     TemporalOrderingRule,
 )
@@ -34,6 +42,8 @@ class InvalidCase:
         "conditional_allowed_values",
         "temporal_ordering",
         "formula",
+        "foreign_key",
+        "aggregate_formula",
     ]
     rule: (
         FieldRule
@@ -41,6 +51,8 @@ class InvalidCase:
         | ConditionalAllowedValuesRule
         | TemporalOrderingRule
         | FormulaRule
+        | ForeignKeyRule
+        | AggregateFormulaRule
     )
     field: str | None = None
 
@@ -149,7 +161,7 @@ def inject_invalid_cases(
         for row in rows:
             if rng.random() > invalid_ratio:
                 continue
-            apply_invalid_case(row, cases[case_index])
+            apply_invalid_case(row, cases[case_index], rows_by_table)
             case_index = (case_index + 1) % len(cases)
 
 
@@ -180,10 +192,26 @@ def invalid_cases_for_table(table: str, rules: BusinessRules) -> list[InvalidCas
             cases.append(InvalidCase("temporal_ordering", row_rule))
         elif isinstance(row_rule, FormulaRule):
             cases.append(InvalidCase("formula", row_rule))
+    for cross_table_rule in rules.cross_table_rules:
+        if (
+            isinstance(cross_table_rule, ForeignKeyRule)
+            and cross_table_rule.child_table == table
+        ):
+            cases.append(InvalidCase("foreign_key", cross_table_rule))
+        elif (
+            isinstance(cross_table_rule, AggregateFormulaRule)
+            and cross_table_rule.table == table
+            and cross_table_rule.field != "*"
+        ):
+            cases.append(InvalidCase("aggregate_formula", cross_table_rule))
     return cases
 
 
-def apply_invalid_case(row: dict[str, Any], case: InvalidCase) -> None:
+def apply_invalid_case(
+    row: dict[str, Any],
+    case: InvalidCase,
+    rows_by_table: Mapping[str, list[dict[str, Any]]],
+) -> None:
     rule = case.rule
     if isinstance(rule, FieldRule):
         if case.kind == "required":
@@ -213,6 +241,23 @@ def apply_invalid_case(row: dict[str, Any], case: InvalidCase) -> None:
         row[rule.field] = perturbed_formula_value(
             row.get(rule.field),
             rule.tolerance,
+        )
+        return
+    if isinstance(rule, ForeignKeyRule):
+        parent_values = [
+            parent.get(rule.parent_field)
+            for parent in rows_by_table.get(rule.parent_table, [])
+        ]
+        row[rule.child_field] = missing_parent_value(
+            parent_values,
+            row.get(rule.child_field),
+        )
+        return
+    if isinstance(rule, AggregateFormulaRule):
+        break_aggregate_formula(
+            row,
+            rows_by_table.get(rule.table, []),
+            rule,
         )
 
 
@@ -265,6 +310,68 @@ def perturbed_formula_value(value: Any, tolerance: float) -> float | str:
         ):
             return candidate
     return "__invalid__"
+
+
+def missing_parent_value(parent_values: list[Any], child_value: Any) -> Any:
+    used = set(parent_values)
+    typed_values = [value for value in parent_values if value is not None]
+    sample = typed_values[0] if typed_values else child_value
+    if isinstance(sample, int) and not isinstance(sample, bool):
+        integer_candidate = max(
+            (
+                value
+                for value in typed_values
+                if isinstance(value, int) and not isinstance(value, bool)
+            ),
+            default=sample,
+        ) + 1
+        while integer_candidate in used:
+            integer_candidate += 1
+        return integer_candidate
+    if isinstance(sample, float):
+        float_candidate = math.nextafter(
+            max(
+                (
+                    value
+                    for value in typed_values
+                    if isinstance(value, (int, float))
+                    and not isinstance(value, bool)
+                ),
+                default=sample,
+            ),
+            math.inf,
+        )
+        if math.isfinite(float_candidate) and float_candidate not in used:
+            return float_candidate
+    return value_outside(parent_values)
+
+
+def break_aggregate_formula(
+    row: dict[str, Any],
+    rows: list[dict[str, Any]],
+    rule: AggregateFormulaRule,
+) -> None:
+    actual = aggregate(rule.field, rows)
+    try:
+        expected = (
+            rule.expected
+            if rule.expected is not None
+            else safe_eval(rule.expression, {"rows": rows})
+        )
+    except Exception:
+        return
+    current = comparable_number(row.get(rule.field)) or 0.0
+    delta = max(1.0, rule.tolerance * 2)
+    for candidate in (current + delta, current - delta):
+        changed_actual = actual - current + candidate
+        if math.isfinite(candidate) and not numbers_close(
+            changed_actual,
+            expected,
+            rule.tolerance,
+        ):
+            row[rule.field] = candidate
+            return
+    row[rule.field] = "__invalid__"
 
 
 def default_value(rule: FieldRule, typed_default: Any = None) -> Any:

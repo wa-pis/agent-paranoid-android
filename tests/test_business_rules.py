@@ -362,6 +362,86 @@ field_rules:
     assert "min_value, max_value" in report.results[0].errors[0]
 
 
+def test_negative_generation_coordinates_cross_table_rule_violations(
+    tmp_path,
+) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+cross_table_rules:
+  - type: foreign_key
+    child_table: orders
+    child_field: customer_id
+    parent_table: customers
+    parent_field: customer_id
+  - type: aggregate_formula
+    table: orders
+    field: total
+    expression: sum("total")
+    expected: 40
+"""
+    )
+    rules = load_business_rules(rules_path)
+    valid_rows = {
+        "customers": [{"customer_id": 1, "label": "synthetic"}],
+        "orders": [
+            {"customer_id": 1, "total": 10, "label": f"order-{index}"}
+            for index in range(4)
+        ],
+    }
+    rows_a = {
+        table: [dict(row) for row in rows]
+        for table, rows in valid_rows.items()
+    }
+    rows_b = {
+        table: [dict(row) for row in rows]
+        for table, rows in valid_rows.items()
+    }
+
+    apply_business_rules(rows_a, rules, seed=21, mode="negative")
+    apply_business_rules(rows_b, rules, seed=21, mode="negative")
+    report = validate_business_rules(rows_a, rules)
+
+    assert rows_a == rows_b
+    assert report.valid is False
+    assert {result.rule_type: result.failed for result in report.results} == {
+        "foreign_key": 2,
+        "aggregate_formula": 1,
+    }
+    assert rows_a["customers"] == valid_rows["customers"]
+    assert [row["label"] for row in rows_a["orders"]] == [
+        row["label"] for row in valid_rows["orders"]
+    ]
+    assert all(
+        isinstance(row["customer_id"], int)
+        for row in rows_a["orders"]
+    )
+
+
+def test_negative_generation_does_not_mutate_count_aggregate_rows(
+    tmp_path,
+) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+cross_table_rules:
+  - type: aggregate_formula
+    table: orders
+    field: "*"
+    expression: count()
+    expected: 2
+"""
+    )
+    rules = load_business_rules(rules_path)
+    rows = {"orders": [{"id": 1}, {"id": 2}]}
+
+    apply_business_rules(rows, rules, seed=21, mode="negative")
+    report = validate_business_rules(rows, rules)
+
+    assert rows == {"orders": [{"id": 1}, {"id": 2}]}
+    assert report.valid is True
+
+
 def test_conditional_required_defaults_only_apply_when_condition_matches(tmp_path) -> None:
     rules_path = tmp_path / "rules.yaml"
     rules_path.write_text(

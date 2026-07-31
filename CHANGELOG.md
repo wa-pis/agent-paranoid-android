@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
   validation, safe profile inference, and read-only Trino profiling.
 - Deterministic controlled negative generation across required, allowed-value,
   numeric-bound, conditional, temporal, and formula business rules.
+- Coordinated negative foreign-key and concrete-field aggregate-formula cases
+  that preserve unrelated rows and parent tables.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 

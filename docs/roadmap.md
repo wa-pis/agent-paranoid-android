@@ -222,7 +222,7 @@ Scope:
 - [x] Support sum, count, and average cross-table reconciliation.
 - [x] Distribute negative rows across supported field and row rules instead of
   repeatedly breaking only the first rule.
-- [ ] Generate coordinated foreign-key and aggregate-formula violations
+- [x] Generate coordinated foreign-key and aggregate-formula violations
   without corrupting unrelated rows.
 - [ ] Record expected and observed violations in bounded business-validation
   artifacts so users can distinguish intentional failures from generator bugs.

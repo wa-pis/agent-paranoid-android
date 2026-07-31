@@ -21,4 +21,5 @@ stable contract; the documented guarantee is deterministic rule violation.
 ## Deferred
 
 Foreign-key and aggregate-formula negative cases require coordinated
-cross-table mutation and will be added separately.
+cross-table mutation and are implemented by the separate
+`cross-table-negative-cases` change.
