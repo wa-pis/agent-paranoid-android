@@ -30,6 +30,8 @@ All notable changes to this project are documented here.
   validation wall time and peak traced allocations.
 - Staged timeout cleanup coverage for folder, review, and single-entity
   generation outputs.
+- A real Parquet `doctor` capability smoke that generates and reads a temporary
+  bundle with secret-free reinstall guidance on failure.
 
 ### Fixed
 

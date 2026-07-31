@@ -173,6 +173,31 @@ def test_doctor_fails_when_required_extra_is_missing(
     assert "agent-paranoid-android[parquet]" in captured.err
 
 
+def test_doctor_runs_required_parquet_capability_smoke(capsys) -> None:
+    assert main(["doctor", "--require-extra", "parquet"]) == 0
+
+    captured = capsys.readouterr()
+    assert "capability parquet: ok" in captured.err
+    assert "doctor passed" in captured.err
+
+
+def test_doctor_redacts_parquet_capability_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_parquet_doctor_smoke",
+        lambda *args: (_ for _ in ()).throw(RuntimeError("secret-provider-token")),
+    )
+
+    assert main(["doctor", "--require-extra", "parquet"]) == 1
+    captured = capsys.readouterr()
+    assert "capability parquet: failed" in captured.err
+    assert "reinstall agent-paranoid-android[parquet]" in captured.err
+    assert "secret-provider-token" not in captured.err
+
+
 def test_agent_plan_and_approve_cli_flow(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
 

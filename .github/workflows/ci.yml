@@ -106,7 +106,7 @@ jobs:
             python scripts/check_installed_package.py --profile parquet
           uv run --isolated --no-project \
             --with "agent-paranoid-android[parquet] @ ${wheel_uri}" \
-            test-data-agent doctor --skip-smoke --require-extra parquet
+            test-data-agent doctor --require-extra parquet
 
           uv run --isolated --no-project \
             --with "agent-paranoid-android[mcp] @ ${wheel_uri}" \

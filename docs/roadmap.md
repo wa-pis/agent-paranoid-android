@@ -283,6 +283,8 @@ Scope:
   - [x] Roll back folder and single-entity publication interrupted mid-commit.
 - [ ] Complete the `doctor` capability matrix for base, Parquet, MCP, Trino,
   and provider extras with actionable, secret-free recovery guidance.
+  - [x] Run base generation and Parquet write/read smoke checks locally.
+  - [ ] Add local MCP, Trino, and provider capability checks.
 - [ ] Run isolated wheel and container workflows across supported Python
   versions and architectures.
 - [ ] Complete a dependency, license, security, and container-image review with

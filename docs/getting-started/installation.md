@@ -78,7 +78,9 @@ doctor passed
 
 `doctor` creates its sample input and output under a temporary directory. It
 does not need a repository checkout and does not contact Trino or another
-external system.
+external system. `doctor --require-extra parquet` also writes and reads a
+temporary Parquet bundle to verify that capability rather than only importing
+PyArrow.
 
 ## Install For Development
 
