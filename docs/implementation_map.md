@@ -94,7 +94,12 @@ command.
 `src/test_data_agent/cli_presenter.py`
 
 Owns shared human and JSON error rendering, validation-result output and exit
-codes, and bounded review-first agent presentation.
+codes, bounded review-first agent presentation, and utility command output.
+
+`src/test_data_agent/cli_contract.py`
+
+Owns versioned machine-readable CLI errors and the typed doctor result passed
+between diagnostics and presentation.
 
 Public dataset-oriented commands:
 

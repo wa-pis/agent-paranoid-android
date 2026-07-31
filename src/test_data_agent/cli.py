@@ -29,7 +29,7 @@ from test_data_agent.agent import (
 )
 from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
-from test_data_agent.cli_contract import CliErrorCode
+from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_parser import (
     HelpfulArgumentParser,
     JsonHelpfulArgumentParser,
@@ -41,9 +41,12 @@ from test_data_agent.cli_parser import (
 from test_data_agent.cli_presenter import (
     friendly_error,
     report_cli_error,
+    write_audit_verification_result,
     write_agent_command_result,
     write_agent_review_result,
     write_agent_status_result,
+    write_doctor_report,
+    write_examples,
     write_json_document,
     write_validation_result,
 )
@@ -266,8 +269,7 @@ def main(argv: list[str] | None = None) -> int:
 
 def run_command(args: argparse.Namespace) -> int:
     if args.command == "examples":
-        print(EXAMPLES_TEXT)
-        return 0
+        return write_examples(EXAMPLES_TEXT)
 
     if args.command == "generate":
         if args.profile is not None:
@@ -323,19 +325,16 @@ def run_command(args: argparse.Namespace) -> int:
         return generate_dataset_from_example_command(args)
 
     if args.command == "doctor":
-        return run_doctor(
-            skip_smoke=args.skip_smoke,
-            required_extras=set(args.require_extra),
+        return write_doctor_report(
+            inspect_doctor(
+                skip_smoke=args.skip_smoke,
+                required_extras=set(args.require_extra),
+            )
         )
 
     if args.command == "audit-verify":
         audit_result = verify_audit_log_from_env(args.log)
-        print(
-            f"Audit log verified: {audit_result.record_count} records, "
-            f"last MAC {audit_result.last_mac}",
-            file=sys.stderr,
-        )
-        return 0
+        return write_audit_verification_result(audit_result)
 
     if args.command == "agent-plan":
         agent_result = plan_agent_request(agent_request_from_args(args))
@@ -401,11 +400,11 @@ def run_command(args: argparse.Namespace) -> int:
     return 2
 
 
-def run_doctor(
+def inspect_doctor(
     *,
     skip_smoke: bool = False,
     required_extras: set[str] | None = None,
-) -> int:
+) -> DoctorReport:
     checks: list[str] = []
     failures: list[str] = []
     required = set(required_extras or ())
@@ -474,14 +473,7 @@ def run_doctor(
             else:
                 failures.append("quickstart smoke: manifest safety flags are not valid")
 
-    for check in checks:
-        print(check, file=sys.stderr)
-    for failure in failures:
-        print(f"doctor failed: {failure}", file=sys.stderr)
-    if failures:
-        return 1
-    print("doctor passed", file=sys.stderr)
-    return 0
+    return DoctorReport(checks=tuple(checks), failures=tuple(failures))
 
 
 def write_doctor_fixture(directory: Path) -> None:

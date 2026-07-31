@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import StrEnum
 from typing import Literal
 
@@ -28,3 +29,11 @@ class CliErrorResponse(BaseModel):
     schema_version: Literal["1.0"] = "1.0"
     ok: Literal[False] = False
     error: CliErrorDetail
+
+
+@dataclass(frozen=True)
+class DoctorReport:
+    """Typed result passed from installation checks to CLI presentation."""
+
+    checks: tuple[str, ...]
+    failures: tuple[str, ...]
