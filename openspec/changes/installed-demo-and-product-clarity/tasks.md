@@ -11,10 +11,10 @@
 - [x] Add an isolated-wheel test that runs the installed console entrypoint and
   proves the bundled resource is present without the source checkout.
 - [x] Verify the manifest and validation artifacts independently in tests.
-- [ ] Make the demo the first README scenario with a short sample result.
-- [ ] Document preserved properties: schema/types, nullability, bounded shape,
+- [x] Make the demo the first README scenario with a short sample result.
+- [x] Document preserved properties: schema/types, nullability, bounded shape,
   relationships, temporal dependencies, and executable business rules where
   the selected input provides evidence.
-- [ ] Document non-guarantees: source-value copying, real PII, statistical
+- [x] Document non-guarantees: source-value copying, real PII, statistical
   anonymity, all re-identification attacks, and cross-environment byte identity.
-- [ ] Run the package, documentation, lint, typing, and full test gates.
+- [x] Run the package, documentation, lint, typing, and full test gates.

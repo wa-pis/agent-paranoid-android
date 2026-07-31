@@ -63,7 +63,11 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert len(readme.splitlines()) <= 130
     assert "python3 -m pip install agent-paranoid-android" in readme
     assert "test-data-agent doctor" in readme
+    assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
+    assert "statistical anonymity" in readme
+    assert "cross-environment byte identity" in readme
+    assert "relationship or business-rule evidence" in readme
     assert "https://wa-pis.github.io/agent-paranoid-android/" in readme
     assert "## Choose A Guide" in readme
     assert "## Release Checklist" not in readme
