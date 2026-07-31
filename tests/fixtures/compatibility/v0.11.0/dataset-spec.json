@@ -1,0 +1,90 @@
+{
+  "constraints": [],
+  "entities": [
+    {
+      "fields": [
+        {
+          "data_type": "integer",
+          "distribution": {
+            "kind": "synthetic_identifier",
+            "prefix": "ORDER-"
+          },
+          "is_identifier": true,
+          "name": "order_id",
+          "null_ratio": 0.0,
+          "nullable": false,
+          "semantic_type": null,
+          "sensitive": false
+        },
+        {
+          "data_type": "string",
+          "distribution": {
+            "categories": [
+              {
+                "count": 9.0,
+                "value": "paid"
+              },
+              {
+                "count": 3.0,
+                "value": "cancelled"
+              }
+            ],
+            "kind": "categorical"
+          },
+          "is_identifier": false,
+          "name": "status",
+          "null_ratio": 0.0,
+          "nullable": false,
+          "semantic_type": null,
+          "sensitive": false
+        },
+        {
+          "data_type": "string",
+          "distribution": {
+            "kind": "masked_patterns",
+            "patterns": [
+              {
+                "count": 12,
+                "pattern": "email"
+              }
+            ]
+          },
+          "is_identifier": false,
+          "name": "customer_email",
+          "null_ratio": 0.0,
+          "nullable": false,
+          "semantic_type": "email",
+          "sensitive": true
+        }
+      ],
+      "name": "orders",
+      "primary_key": "order_id",
+      "row_count": 3
+    }
+  ],
+  "generation_settings": {
+    "invalid_ratio": 0.0,
+    "locale": null,
+    "mode": "valid",
+    "output_format": "json",
+    "seed": 73
+  },
+  "privacy_rules": [],
+  "privacy_settings": {
+    "allow_raw_sensitive_values": false,
+    "default_classification": "internal",
+    "max_safe_categories": 20,
+    "pii_classification": "sensitive",
+    "secret_classification": "secret",
+    "treat_unknown_as_sensitive": true
+  },
+  "relationships": [],
+  "schema_version": "1.0",
+  "validation_settings": {
+    "fail_fast": false,
+    "validate_constraints": true,
+    "validate_privacy": true,
+    "validate_relationships": true,
+    "validate_schema": true
+  }
+}

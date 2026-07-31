@@ -22,6 +22,8 @@ All notable changes to this project are documented here.
   additive-only or schema-versioned change rules.
 - A compatibility inventory for retained CLI aliases, legacy Python wrappers,
   transitional model access, migration targets, and minimum support windows.
+- Immutable `v0.11.0` spec and manifest fixtures proving current readers and
+  deterministic generation remain compatible with the previous feature release.
 - A versioned delivery plan from `0.13.0` through `1.0.0`, with explicit scope,
   exit criteria, release gates, and deferred work.
 
