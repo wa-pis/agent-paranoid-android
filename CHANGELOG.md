@@ -160,6 +160,8 @@ All notable changes to this project are documented here.
   contract coverage gate against an exact `main` commit.
 - The RC roadmap now requires runnable, CI-verified examples for CSV,
   relational rules, local Trino, MCP, Python API, and supported exports.
+- A runnable single-table CSV example now exercises explicit profiling, spec
+  inference, deterministic generation, and independent validation.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.

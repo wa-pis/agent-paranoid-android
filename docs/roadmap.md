@@ -397,7 +397,7 @@ Scope:
 - [ ] Publish runnable, CI-verified usage journeys built only from synthetic
   fixtures. Each journey must show its input, command or API call, generated
   artifacts, validation result, and the privacy boundary being exercised:
-  - [ ] Single-table CSV: profile → infer spec → generate → validate → export.
+  - [x] Single-table CSV: profile → infer spec → generate → validate → export.
   - [ ] Relational CSV folder: discover candidate relationships, review rules,
     generate multiple tables, and verify FK/business-rule reconciliation.
   - [ ] Local Trino: start a disposable synthetic catalog, exercise bounded
