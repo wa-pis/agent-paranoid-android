@@ -72,6 +72,9 @@
 - [x] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
 - [ ] Improve GitHub About metadata, README positioning, comparison guidance,
   and the one-command golden-path example.
+- [ ] Add runnable, CI-verified synthetic examples for single-table CSV,
+  relational CSV, local Trino, MCP, Python API, and all supported output
+  formats; include one rejected unsafe request and release-style smoke runs.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
   maintainability without expanding the product surface.
 - [ ] Create public good-first-issue/help-wanted backlog items.
