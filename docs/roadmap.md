@@ -359,10 +359,12 @@ Scope:
   relationship candidates → AI-assisted proposals → human review →
   deterministic validation → synthetic generation.
 - [ ] Preserve approved FK graphs, distribution/order-of-magnitude shape,
-  temporal dependencies, and executable business invariants in generated data.
-- [ ] Demonstrate a financial/summary-table scenario where synthetic salary or
-  accounting data reconciles by article, period, component, debit/credit, and
-  cross-table formulas without copying source totals or rows.
+  temporal dependencies, and executable business invariants independently of
+  domain or table names.
+- [ ] Demonstrate at least one domain-agnostic summary-table scenario where
+  synthetic grouped totals, components, partitions, and cross-table formulas
+  reconcile without copying source totals or rows. Financial/accounting data
+  may be one fixture, not the product boundary.
 - [ ] Close or explicitly defer every active OpenSpec change.
 - [ ] Run the full security audit and resolve all Critical and High findings.
 - [ ] Verify README, documentation site, migration guidance, examples, package

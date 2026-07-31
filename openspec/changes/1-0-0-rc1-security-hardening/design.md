@@ -63,17 +63,21 @@ Relationship discovery should combine deterministic and AI-assisted evidence:
 - deterministic validators test the approved relationship against bounded
   metadata and generated rows before publication.
 
-For business and financial data, the generator preserves semantics rather than
-source totals by default. It may scale synthetic amounts while retaining
-distribution shape and order of magnitude, then enforce rules such as:
+For any domain, the generator preserves semantics rather than source totals by
+default. It may scale synthetic measures while retaining distribution shape and
+order of magnitude, then enforce rules such as:
 
-- employee-to-payroll and dimension-to-fact foreign keys;
-- period ordering and effective-date constraints;
-- salary component totals and department/position relationships;
-- debit equals credit and balance-sheet reconciliation;
-- article, period, department, and cross-table aggregate formulas;
-- configurable scenario distributions for normal, budget, growth, and invalid
-  cases.
+- parent-child, dimension-to-fact, and reference-table foreign keys;
+- period ordering, effective dating, and lifecycle constraints;
+- component-to-total, partition, coverage, and uniqueness relationships;
+- paired-value or balancing identities when the domain defines them;
+- grouped, cross-table, window, and aggregate formulas;
+- configurable scenario distributions for normal, boundary, growth, drift,
+  load, and invalid cases.
+
+Financial reconciliation such as debit equals credit is one useful fixture for
+this generic rule engine, alongside examples from operational, customer,
+scientific, logistics, or other domains.
 
 ## Data And Contracts
 
@@ -132,7 +136,7 @@ response may itself authorize generation or database access.
   source values in errors or logs.
 - A low-confidence or contradictory relationship remains a review warning and
   cannot silently become a generation constraint.
-- A financial or aggregate rule that cannot be validated deterministically
+- A domain aggregate or business rule that cannot be validated deterministically
   blocks publication of a dataset claiming that invariant.
 
 ## Alternatives
