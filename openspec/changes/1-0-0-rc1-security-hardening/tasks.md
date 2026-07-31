@@ -63,7 +63,7 @@
 
 ## RC evidence and release gate
 
-- [ ] Update `scripts/check_release.sh` with direct API privacy and SQL-boundary
+- [x] Update `scripts/check_release.sh` with direct API privacy and SQL-boundary
   tests.
 - [ ] Run the complete unit/property/contract suite with coverage at or above
   the configured threshold.

@@ -23,6 +23,12 @@ python3 -m compileall -q src tests scripts
 echo "==> Dependency licenses"
 python3 scripts/check_dependency_licenses.py
 
+echo "==> Direct API privacy and SQL boundaries"
+python3 -m pytest -q \
+  tests/test_safety.py \
+  tests/test_mcp_trino_server.py::test_safe_select_service_rejects_before_cursor_execution \
+  tests/test_mcp_trino_server.py::test_metadata_and_basic_profilers_use_bounded_query_builders
+
 echo "==> Tests with coverage"
 python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
 

@@ -353,6 +353,10 @@ def test_release_script_is_executable_and_covers_release_gates() -> None:
     assert "python3 -m ruff check src tests scripts" in text
     assert "python3 -m mypy" in text
     assert "python3 -m compileall -q src tests scripts" in text
+    assert "==> Direct API privacy and SQL boundaries" in text
+    assert "tests/test_safety.py" in text
+    assert "test_safe_select_service_rejects_before_cursor_execution" in text
+    assert "test_metadata_and_basic_profilers_use_bounded_query_builders" in text
     assert "python3 -m pytest --cov=test_data_agent" in text
     assert "scripts/export_dataset_schema.py" in text
     assert "generate-from-example tests/fixtures/example_dataset" in text

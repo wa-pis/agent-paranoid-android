@@ -23,6 +23,10 @@ Run the executable release gate:
 scripts/check_release.sh
 ```
 
+The gate runs direct Python privacy checks and direct Trino service-boundary
+tests before the full coverage suite, so transport-level tests cannot mask a
+bypass in the underlying application API.
+
 The script runs linting, strict type checks for the stable package core,
 compilation, coverage tests, DatasetSpec schema freshness, and the README
 quickstart smoke flow. The smoke flow verifies the generated manifest reports
