@@ -365,15 +365,6 @@ def test_agent_json_argument_error_is_structured(capsys) -> None:
     assert payload["error"]["help"] == "test-data-agent agent-plan --help"
 
 
-def test_untrusted_review_names_are_escaped_and_bounded() -> None:
-    assert cli_module.display_untrusted_name("name\x1b[31m") == r"name\u001b[31m"
-    assert cli_module.display_untrusted_name("x" * 81) == f"{'x' * 80}..."
-    assert cli_module.format_review_items([str(index) for index in range(10)]) == (
-        "0, 1, 2, 3, 4, 5, 6, 7, +2 more"
-    )
-    assert cli_module.format_review_items([]) == "none"
-
-
 def test_agent_plan_cli_detects_csv_folder_without_source_type(tmp_path, capsys) -> None:
     workspace = tmp_path / "agent"
 

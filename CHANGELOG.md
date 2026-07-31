@@ -23,6 +23,8 @@ All notable changes to this project are documented here.
 - Moved CLI error and validation-result rendering behind a dedicated
   presentation boundary without changing stdout, stderr, JSON, or exit-code
   behavior.
+- Moved review-first agent human summaries and JSON document rendering behind
+  the same presentation boundary while preserving output contracts.
 
 ## [0.11.0] - 2026-07-31
 
