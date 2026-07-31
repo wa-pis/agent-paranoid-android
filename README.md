@@ -116,8 +116,8 @@ uv sync --frozen --all-extras --no-editable --no-build-isolation
 uv run --no-sync scripts/check_release.sh
 ```
 
-See [Contributing](CONTRIBUTING.md), [Security Policy](SECURITY.md), and
-[Changelog](CHANGELOG.md).
+See [Contributing](CONTRIBUTING.md), [Support](SUPPORT.md), [Governance](GOVERNANCE.md),
+[Code Of Conduct](CODE_OF_CONDUCT.md), [Security Policy](SECURITY.md), and [Changelog](CHANGELOG.md).
 
 Releases use tokenless PyPI Trusted Publishing with verified wheels/source distributions, checksums, SBOMs, and GitHub attestations.
 

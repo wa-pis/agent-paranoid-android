@@ -9,6 +9,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Public conduct, support, governance, and code-ownership policies for the
+  current single-maintainer project model.
 - Generation manifests now record bounded reproducibility inputs and output
   SHA-256 evidence while distinguishing logical from cross-version byte-level
   reproducibility.

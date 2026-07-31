@@ -54,7 +54,7 @@
 ## P2 — RC disposition required; implementation may follow the RC
 
 - [x] Add bounded JSON row/cell/nested-value validation.
-- [ ] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
+- [x] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
 - [ ] Improve GitHub About metadata, README positioning, comparison guidance,
   and the one-command golden-path example.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
