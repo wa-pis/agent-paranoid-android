@@ -87,6 +87,8 @@ All notable changes to this project are documented here.
 
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
+- CLI and generator MCP regressions verify malicious on-disk specs fail before
+  artifact creation and never echo rejected sensitive values.
 - Lightweight no-op Python matrix checks for docs-only changes so existing
   branch-protection requirements are reported instead of remaining pending.
 
