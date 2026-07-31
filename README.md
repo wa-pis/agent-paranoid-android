@@ -17,19 +17,10 @@ Current version: `0.12.0`. Package: `agent-paranoid-android`; CLI: `test-data-ag
 
 ## What It Preserves
 
-The goal is not to copy production rows or generate unrelated Faker records.
-The tool builds a synthetic analogue of relational and business semantics:
-foreign-key graphs, reference-table shape, distributions, order of magnitude,
-temporal dependencies, formulas, and aggregate reconciliation. Salary and
-accounting are example domains; the same engine applies to operational,
-customer, scientific, logistics, and other relational systems. The resulting
-datasets support development and testing of analytics, forecasting, budgeting,
-reporting, and domain-specific workflows without exposing source rows.
-
-AI may help discover likely relationships and business rules from safe schema
-profiles, aggregates, masked patterns, and bounded evidence. Its output is an
-untrusted proposal: a human reviews it, deterministic validators confirm it,
-and only then does it become part of a `DatasetSpec` used for generation.
+Synthetic data preserves relational and business semantics—FK graphs,
+distributions, scale, temporal dependencies, formulas, and aggregate rules—
+without copied rows, across domains. AI may propose relationships and rules
+from safe profiles; human review and deterministic validation gate `DatasetSpec`.
 
 ## Install
 
@@ -128,18 +119,11 @@ uv run --no-sync scripts/check_release.sh
 See [Contributing](CONTRIBUTING.md), [Security Policy](SECURITY.md), and
 [Changelog](CHANGELOG.md).
 
-Releases use tokenless PyPI Trusted Publishing and include verified wheel and
-source distributions, checksums, SBOMs, and GitHub attestations.
+Releases use tokenless PyPI Trusted Publishing with verified wheels/source distributions, checksums, SBOMs, and GitHub attestations.
 
 ## AI-Assisted Development
 
-This project is developed with substantial assistance from AI coding tools.
-All changes remain subject to human review, automated testing, and the same
-security requirements as manually written code. Do not send production data,
-raw PII, credentials, or tokens to an AI system while working with the project.
-
-The name is a nod to Radiohead's "Paranoid Android". This project is
-unaffiliated with Radiohead or related rights holders.
+AI-assisted changes require human review and tests; never send production data, raw PII, credentials, or tokens to AI. The name nods to Radiohead's "Paranoid Android"; this project is unaffiliated.
 
 ## License
 
