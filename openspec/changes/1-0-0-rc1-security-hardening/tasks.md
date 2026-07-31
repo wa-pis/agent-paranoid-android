@@ -12,7 +12,7 @@
 - [x] Make unrestricted Trino execution private and route all external calls
   through safe query validation or dedicated bounded methods.
 - [x] Add mocked-cursor tests proving unsafe SQL is rejected before execution.
-- [ ] Verify that safe metadata and aggregate profilers still work through
+- [x] Verify that safe metadata and aggregate profilers still work through
   dedicated internal query builders.
 
 ## P1 — product semantics required before final `1.0.0` or explicitly accepted by an independent reviewer

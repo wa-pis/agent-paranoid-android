@@ -89,6 +89,8 @@ All notable changes to this project are documented here.
   limited to validated safe-select and dedicated bounded profiling methods.
 - Mocked-cursor regressions prove forbidden and non-allowlisted SQL is rejected
   before a Trino connection or cursor execution can occur.
+- Contract tests preserve allowlisted metadata discovery and aggregate-only
+  Trino profiling through dedicated internal query builders.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
