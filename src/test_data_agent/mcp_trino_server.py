@@ -28,6 +28,7 @@ from test_data_agent.core.privacy import (
     looks_sensitive_value,
     mask_pattern,
     mask_value,
+    synthetic_category_distribution,
 )
 from test_data_agent.audit import audit_logger_from_env
 from test_data_agent.mcp_trino_transport import create_trino_mcp
@@ -616,7 +617,9 @@ def profile_column_safe(
                 for pattern, count in pattern_counts.most_common(10)
             ]
         else:
-            profile["top_values"] = top_values
+            profile["top_values"] = synthetic_category_distribution(
+                int(row.get("count") or 0) for row in top_values
+            )
     return profile
 
 

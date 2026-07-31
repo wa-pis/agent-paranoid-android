@@ -51,8 +51,11 @@ def test_csv_profile_detects_semicolon_delimiter_and_utf8_bom(tmp_path) -> None:
     email = next(column for column in profile.columns if column.name == "email")
     status = next(column for column in profile.columns if column.name == "status")
     assert email.sensitive is True
-    assert status.top_values == [{"value": "active", "count": 1}, {"value": "paused", "count": 1}]
-    assert "alice@example.com" not in profile.model_dump_json()
+    assert status.top_values == [{"value": "category_1", "count": 1}, {"value": "category_2", "count": 1}]
+    profile_json = profile.model_dump_json()
+    assert "active" not in profile_json
+    assert "paused" not in profile_json
+    assert "alice@example.com" not in profile_json
 
 
 def test_csv_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> None:

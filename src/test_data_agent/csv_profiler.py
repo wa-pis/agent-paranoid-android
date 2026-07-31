@@ -28,6 +28,7 @@ from test_data_agent.core.privacy import (
     infer_sensitive_value_type,
     mask_pattern,
     semantic_type_is_sensitive,
+    synthetic_category_distribution,
 )
 from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
 
@@ -221,10 +222,9 @@ class CSVColumnAccumulator:
             and not self.distinct_overflow
             and 0 < len(self.counts) <= MAX_ENUM_VALUES
         ):
-            top_values = [
-                {"value": value, "count": count}
-                for value, count in self.counts.most_common(MAX_ENUM_VALUES)
-            ]
+            top_values = synthetic_category_distribution(
+                count for _, count in self.counts.most_common(MAX_ENUM_VALUES)
+            )
         return CSVColumnProfile(
             name=self.name,
             data_type=base_type.value,
@@ -301,7 +301,9 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
             ).most_common(10)
         ]
     elif base_type == ProfileDataType.STRING and 0 < len(counts) <= MAX_ENUM_VALUES:
-        top_values = [{"value": value, "count": count} for value, count in counts.most_common(MAX_ENUM_VALUES)]
+        top_values = synthetic_category_distribution(
+            count for _, count in counts.most_common(MAX_ENUM_VALUES)
+        )
 
     stats = range_stats(non_null, base_type)
     return CSVColumnProfile(

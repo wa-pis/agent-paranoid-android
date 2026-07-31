@@ -606,7 +606,12 @@ def test_profile_table_safe_uses_aggregates_without_sensitive_top_values(monkeyp
     assert profile["row_count"] == 1000
     assert email["sensitive"] is True
     assert "top_values" not in email
-    assert status["top_values"] == [{"value": "paid", "count": 700}, {"value": "cancelled", "count": 290}]
+    assert status["top_values"] == [
+        {"value": "category_1", "count": 700},
+        {"value": "category_2", "count": 290},
+    ]
+    assert "paid" not in str(status)
+    assert "cancelled" not in str(status)
     assert amount["p05"] == 10.0
     assert not any('GROUP BY "customer_email"' in sql for sql in executed_sql)
 
