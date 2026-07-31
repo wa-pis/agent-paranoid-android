@@ -15,7 +15,23 @@
 - [ ] Verify that safe metadata and aggregate profilers still work through
   dedicated internal query builders.
 
-## P1 — required before final `1.0.0` or explicitly accepted by an independent reviewer
+## P1 — product semantics required before final `1.0.0` or explicitly accepted by an independent reviewer
+
+- [ ] Define the relational-synthesis contract: preserve FK graph shape,
+  distribution/order-of-magnitude shape, temporal dependencies, and executable
+  business invariants without copying source rows.
+- [ ] Define safe relationship-discovery input metadata and provider-neutral
+  proposal contracts for AI-assisted FK, temporal, formula, and aggregate-rule
+  discovery.
+- [ ] Combine deterministic candidate mining with AI ranking/proposals and a
+  human review step; AI output must never directly approve generation.
+- [ ] Add relationship tests for compatible key types, cardinality, nulls,
+  distinctness, temporal ranges, and ambiguous/low-confidence candidates.
+- [ ] Add financial/aggregate reconciliation tests for synthetic salary and
+  accounting-style data: article/period totals, salary components, debit/credit
+  balance, and cross-table formulas.
+- [ ] Preserve relative distributions and order of magnitude while allowing
+  synthetic scaling of sensitive totals; record the effective rule set.
 
 - [ ] Implement `ValidationSettings` semantics, including `fail_fast`, or
   remove unsupported settings from the public contract.
@@ -56,4 +72,6 @@
   documentation, and GHCR artifacts.
 - [ ] Re-run the full security review against the exact RC commit and record
   every remaining P2 or lower finding with owner, rationale, and revisit date.
+- [ ] Verify at least one end-to-end AI-assisted discovery flow with a local
+  fake provider and prove that no raw source rows enter the provider request.
 - [ ] Allow only release-blocking fixes after `1.0.0rc1`; no new features.

@@ -11,6 +11,12 @@ This change is the release-candidate hardening plan for the findings recorded
 in `docs/security-review-2026-07-31.md`. It is a prerequisite for the RC, not
 a new feature release.
 
+The product goal being protected is broader than row generation: produce a
+synthetic relational and business-semantic analogue of sensitive corporate
+data. The output must preserve useful structure—foreign-key graphs,
+distribution shape, order of magnitude, temporal dependencies, and executable
+business invariants—without copying source rows or raw sensitive values.
+
 ## Motivation
 
 The current project has strong safety-oriented infrastructure, but two
@@ -26,6 +32,13 @@ exposes raw PII and Trino access remains read-only, allowlisted, and bounded.
 They must be fixed and covered by direct API tests before publishing the
 release candidate.
 
+Real source systems also contain undocumented relationships and rules. An AI
+advisor is needed to help discover candidate foreign keys, table relationships,
+temporal dependencies, formulas, and reconciliation rules from safe profile
+metadata. AI output must remain an untrusted proposal: deterministic code and
+human review decide what enters the `DatasetSpec` and what the generator
+enforces.
+
 ## Scope
 
 In scope:
@@ -35,6 +48,16 @@ In scope:
 - Remove or privatize unrestricted Trino execution and expose only validated,
   bounded read-only operations to callers.
 - Add adversarial tests for direct Python, CLI, and MCP entry points.
+- Define the core relational-synthesis workflow: bounded profiling,
+  deterministic relationship candidates, AI-assisted proposals, human review,
+  deterministic validation, and synthetic generation.
+- Preserve relational graph shape, distribution/order-of-magnitude shape,
+  temporal rules, and aggregate/business invariants without copying source
+  values. Financial summaries must support synthetic debit/credit, article,
+  period, and cross-table reconciliation rules.
+- Keep AI providers restricted to safe metadata, bounded distributions,
+  masked patterns, aggregate statistics, and candidate evidence—never raw
+  source rows, generated rows, secrets, or credentials.
 - Make declared validation settings and generation locale either executable or
   explicitly remove them from the supported contract.
 - Define the reproducibility and manifest evidence required for the RC.
@@ -48,6 +71,9 @@ Out of scope:
 - New generation modes, providers, output formats, or MCP tools.
 - Differential privacy, anonymization certification, or a claim of statistical
   protection against re-identification.
+- Fully automatic acceptance of AI-discovered relationships or business rules.
+- Sending raw source values, source rows, or generated datasets to an AI
+  provider.
 - A broad rewrite of the agent or Trino modules beyond the decomposition needed
   to make safety enforcement central and testable.
 - Creating an intermediate `0.13.x` release solely for this hardening work.
@@ -60,6 +86,11 @@ Out of scope:
   publication.
 - Every external Trino query is parsed, allowlisted, bounded, and read-only;
   internal aggregate profilers may retain dedicated trusted query builders.
+- AI-assisted discovery receives only bounded safe metadata and produces
+  reviewable proposals; it never receives generation, filesystem, or database
+  authority.
+- Relationship, formula, temporal, and aggregate invariants are validated by
+  executable deterministic code after review.
 - Existing path, resource, audit, and source-row protections remain in force.
 - Privacy detection remains heuristic and must be documented as such; this
   change does not create a privacy certification.
@@ -74,5 +105,8 @@ Out of scope:
 - `DatasetSpec` and generation manifests may gain optional fields for safety
   evidence and reproducibility. Breaking schema changes require the existing
   versioning and compatibility fixtures.
+- Relationship-discovery proposals and business-rule proposals are untrusted,
+  versioned metadata contracts. Existing provider-neutral advisor boundaries
+  should be reused where possible.
 - Existing valid synthetic workflows, output formats, and deterministic seeds
   must remain compatible.

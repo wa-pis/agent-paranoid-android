@@ -15,6 +15,13 @@ for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
 Current version: `0.12.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
+## What It Preserves
+
+Synthetic data preserves relational and business semantics—FK graphs,
+distributions, scale, temporal dependencies, formulas, and aggregate rules—
+without copied rows, across domains. AI may propose relationships and rules
+from safe profiles; human review and deterministic validation gate `DatasetSpec`.
+
 ## Install
 
 Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14.
@@ -112,18 +119,11 @@ uv run --no-sync scripts/check_release.sh
 See [Contributing](CONTRIBUTING.md), [Security Policy](SECURITY.md), and
 [Changelog](CHANGELOG.md).
 
-Releases use tokenless PyPI Trusted Publishing and include verified wheel and
-source distributions, checksums, SBOMs, and GitHub attestations.
+Releases use tokenless PyPI Trusted Publishing with verified wheels/source distributions, checksums, SBOMs, and GitHub attestations.
 
 ## AI-Assisted Development
 
-This project is developed with substantial assistance from AI coding tools.
-All changes remain subject to human review, automated testing, and the same
-security requirements as manually written code. Do not send production data,
-raw PII, credentials, or tokens to an AI system while working with the project.
-
-The name is a nod to Radiohead's "Paranoid Android". This project is
-unaffiliated with Radiohead or related rights holders.
+AI-assisted changes require human review and tests; never send production data, raw PII, credentials, or tokens to AI. The name nods to Radiohead's "Paranoid Android"; this project is unaffiliated.
 
 ## License
 

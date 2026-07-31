@@ -355,6 +355,14 @@ Scope:
   CLI/MCP workflow tests alone is not sufficient evidence for the RC.
 - [ ] Record reproducibility inputs, container/package version consistency, and
   security scanner evidence against the exact RC commit and published artifacts.
+- [ ] Validate the core product workflow: bounded profiling → deterministic
+  relationship candidates → AI-assisted proposals → human review →
+  deterministic validation → synthetic generation.
+- [ ] Preserve approved FK graphs, distribution/order-of-magnitude shape,
+  temporal dependencies, and executable business invariants in generated data.
+- [ ] Demonstrate a financial/summary-table scenario where synthetic salary or
+  accounting data reconciles by article, period, component, debit/credit, and
+  cross-table formulas without copying source totals or rows.
 - [ ] Close or explicitly defer every active OpenSpec change.
 - [ ] Run the full security audit and resolve all Critical and High findings.
 - [ ] Verify README, documentation site, migration guidance, examples, package
