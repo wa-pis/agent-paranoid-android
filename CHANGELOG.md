@@ -152,6 +152,8 @@ All notable changes to this project are documented here.
 - Masked Trino samples use opaque placeholders, with regressions covering rare
   free text and quasi-identifiers.
 - The CSV profiler now runs under the project's strict type-checking gate.
+- Strict type checking now covers the I/O package and Parquet adapter, with an
+  explicit boundary for the optional untyped `pyarrow` dependency.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.

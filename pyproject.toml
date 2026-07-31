@@ -106,8 +106,10 @@ files = [
     "src/test_data_agent/cli_parser.py",
     "src/test_data_agent/container_health.py",
     "src/test_data_agent/csv_profiler.py",
+    "src/test_data_agent/io",
     "src/test_data_agent/mcp_generator_server.py",
     "src/test_data_agent/providers/openai.py",
+    "src/test_data_agent/adapters/parquet_dataset.py",
     "scripts/contract_fixtures.py",
     "scripts/update_contract_fixtures.py",
 ]
@@ -115,6 +117,10 @@ strict = true
 follow_imports = "silent"
 show_error_codes = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["pyarrow", "pyarrow.*"]
+ignore_missing_imports = true
 
 [project.scripts]
 test-data-agent = "test_data_agent.cli:main"
