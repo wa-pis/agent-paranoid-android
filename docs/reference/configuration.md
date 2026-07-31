@@ -16,10 +16,11 @@ All byte values are integer bytes unless stated otherwise.
 | `TEST_DATA_AGENT_MAX_INPUT_COLUMNS` | `1000` | Maximum columns |
 | `TEST_DATA_AGENT_MAX_INPUT_CELLS` | `10000000` | Maximum row/column cells |
 | `TEST_DATA_AGENT_MAX_INPUT_FILES` | `100` | Maximum files in a source folder |
-| `TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS` | `1000000` | Maximum characters in one CSV cell |
+| `TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS` | `1000000` | Maximum characters in one CSV cell or JSON string value |
 | `TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES` | `536870912` | Maximum estimated expanded Parquet bytes |
 | `TEST_DATA_AGENT_MAX_YAML_ALIASES` | `50` | Maximum YAML aliases |
 | `TEST_DATA_AGENT_MAX_YAML_DEPTH` | `100` | Maximum YAML nesting depth |
+| `TEST_DATA_AGENT_MAX_JSON_DEPTH` | `100` | Maximum nesting depth for JSON dataset values |
 | `TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES` | `1048576` | Maximum rule payload bytes |
 | `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS` | `5000000` | Estimated row/rule work limit |
 | `TEST_DATA_AGENT_MAX_OUTPUT_BYTES` | `536870912` | Maximum complete generated bundle size |
