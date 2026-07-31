@@ -93,6 +93,8 @@ All notable changes to this project are documented here.
   Trino profiling through dedicated internal query builders.
 - Agent input detection requirements are merged into canonical orchestration
   OpenSpec and the completed change is archived with its implementation evidence.
+- The completed provider-neutral advisor client adapter change is archived
+  after confirming its trust-boundary contract is canonical.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
