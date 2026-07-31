@@ -69,4 +69,5 @@ nav:
   - Maintainers:
       - Architecture: agent_design.md
       - Generator MCP Design: mcp_generator_design.md
+      - Security Review: security-review-2026-07-31.md
       - Roadmap: roadmap.md

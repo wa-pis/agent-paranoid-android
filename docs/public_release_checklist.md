@@ -26,6 +26,9 @@ python3 -m pip wheel --no-deps . -w /tmp/agent-paranoid-android-wheel
 The release gate must pass before publishing. The wheel build confirms package
 metadata and entry points are valid.
 
+Review the latest [security review](security-review-2026-07-31.md) and repeat
+its automated evidence collection against the release-candidate commit.
+
 ## GitHub Settings
 
 Enable or verify these repository settings after publishing:
