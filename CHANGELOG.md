@@ -158,6 +158,8 @@ All notable changes to this project are documented here.
   fixture scripts.
 - Pre-RC release documentation records the passing 87.94% unit, property, and
   contract coverage gate against an exact `main` commit.
+- The RC roadmap now requires runnable, CI-verified examples for CSV,
+  relational rules, local Trino, MCP, Python API, and supported exports.
 
 - MCP extras exclude the incompatible 2.x SDK until the transport migrates to
   its replacement API.

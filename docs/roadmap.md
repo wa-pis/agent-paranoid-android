@@ -394,6 +394,22 @@ Scope:
   About/topics, an input → command → output README example, preserved versus
   not-preserved properties, an alternatives comparison, and a clear statement
   that CLI/library is primary while MCP and providers are integrations.
+- [ ] Publish runnable, CI-verified usage journeys built only from synthetic
+  fixtures. Each journey must show its input, command or API call, generated
+  artifacts, validation result, and the privacy boundary being exercised:
+  - [ ] Single-table CSV: profile → infer spec → generate → validate → export.
+  - [ ] Relational CSV folder: discover candidate relationships, review rules,
+    generate multiple tables, and verify FK/business-rule reconciliation.
+  - [ ] Local Trino: start a disposable synthetic catalog, exercise bounded
+    metadata/profiling tools, then generate without exporting source rows.
+  - [ ] MCP: configure and call generator and Trino servers against the same
+    synthetic fixtures, including one rejected unsafe request.
+  - [ ] Python library: reproduce the CLI golden path with the public API and
+    an explicit seed.
+  - [ ] Output formats: inspect CSV, JSON, SQL, and optional Parquet artifacts
+    plus their manifest and validation report.
+  - [ ] Add one-command launchers and CI smoke tests that run the examples from
+    an installed wheel or release-style container, not the source checkout.
 - [ ] Verify README, documentation site, migration guidance, examples, package
   metadata, SBOM, provenance, signatures, and public support policy.
 - [ ] Publish and install the release candidate through the real GitHub,
