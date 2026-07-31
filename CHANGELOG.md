@@ -103,6 +103,8 @@ All notable changes to this project are documented here.
   operational readiness OpenSpec and archived with its implementation evidence.
 - The supported Python 3.11-3.14 wheel matrix is merged into canonical
   operational readiness OpenSpec and archived with its implementation evidence.
+- The completed metadata-only agent review summary is archived after confirming
+  its bounded review contract is canonical.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
