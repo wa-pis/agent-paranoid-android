@@ -71,7 +71,10 @@ check alone: its behavior contract must also pass in the isolated environment.
 
 The manifest records the environment evidence needed to compare runs. Its
 `byte_identical_across_versions: false` field is normative: a seed is not a
-cross-version snapshot promise.
+cross-version snapshot promise. `normalized_dependencies` uses canonical
+lowercase distribution names and includes installed optional integrations;
+`normalized_dependencies_sha256` fingerprints that map. The legacy
+`dependencies` fields remain for additive manifest compatibility.
 
 ## Support Rules
 

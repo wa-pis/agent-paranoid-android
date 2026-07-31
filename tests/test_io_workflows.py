@@ -103,6 +103,16 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
     assert evidence["locale"] == "en_US"
     assert evidence["serializer"] == "python-stdlib-json"
     assert evidence["generator_algorithm_version"] == manifest["package_version"]
+    normalized_dependencies = evidence["normalized_dependencies"]
+    assert {"faker", "pydantic", "pyyaml"} <= set(normalized_dependencies)
+    normalized_payload = json.dumps(
+        normalized_dependencies,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    assert evidence["normalized_dependencies_sha256"] == hashlib.sha256(
+        normalized_payload
+    ).hexdigest()
     assert evidence["output_sha256"]["orders.json"] == hashlib.sha256(
         output_path.read_bytes()
     ).hexdigest()
