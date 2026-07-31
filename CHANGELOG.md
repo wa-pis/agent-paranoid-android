@@ -91,6 +91,8 @@ All notable changes to this project are documented here.
   before a Trino connection or cursor execution can occur.
 - Contract tests preserve allowlisted metadata discovery and aggregate-only
   Trino profiling through dedicated internal query builders.
+- Agent input detection requirements are merged into canonical orchestration
+  OpenSpec and the completed change is archived with its implementation evidence.
 - Direct Python generation now rejects specs containing raw-looking sensitive
   categories, unsafe sensitive distributions, or privacy-policy opt-outs.
 - CLI and generator MCP regressions verify malicious on-disk specs fail before
