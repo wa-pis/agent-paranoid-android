@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Explicit documentation of exact-row reuse detection limits and the absence
+  of statistical privacy guarantees.
 - Cross-table average aggregate mappings across deterministic generation,
   validation, safe profile inference, and read-only Trino profiling.
 - Deterministic controlled negative generation across required, allowed-value,

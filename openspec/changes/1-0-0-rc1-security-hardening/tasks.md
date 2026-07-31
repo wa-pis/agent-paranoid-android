@@ -42,7 +42,7 @@
   manifest.
 - [ ] Harden profile and Trino category handling: suppress raw categories by
   default, replace endpoint-preserving masks, and add rare-text/quasi-ID tests.
-- [ ] Document the exact-row limitation and the absence of statistical privacy
+- [x] Document the exact-row limitation and the absence of statistical privacy
   guarantees.
 - [ ] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.

@@ -30,6 +30,9 @@ instead.
 
 Generation uses a reviewed specification and a local seeded random generator.
 Runtime checks reject exact source-row reuse in supported CSV workflows.
+The comparison covers complete rows only and runs only when the source CSV is
+available to that workflow. It does not detect every partial-value,
+quasi-identifier, or statistical similarity between source and output.
 
 ### Filesystem
 
@@ -64,7 +67,10 @@ For supported workflows and accepted inputs, the project is designed to:
 
 The project cannot decide whether every ambiguous business field is sensitive.
 It also cannot prove that an inferred distribution is legally or statistically
-safe for every use case.
+safe for every use case. The project does not currently implement differential
+privacy, k-anonymity, l-diversity, or a privacy budget, and makes no statistical
+privacy guarantee. Treat generated data as requiring a domain-specific privacy
+review before distribution.
 
 Human review is still required for:
 

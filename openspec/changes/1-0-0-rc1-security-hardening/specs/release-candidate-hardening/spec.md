@@ -129,6 +129,20 @@ constraints, and executable business invariants without copying source rows.
 Financial debit/credit reconciliation is one possible fixture for this
 requirement, not a special-case generation path.
 
+### Requirement: Privacy claims are explicitly bounded
+
+The project SHALL document that source-row comparison detects exact complete
+row reuse only when source data is available and SHALL NOT present that check as
+a statistical privacy guarantee.
+
+#### Scenario: An operator reviews privacy guarantees
+
+- **GIVEN** generated output passed source-row reuse checks
+- **WHEN** the operator reviews the safety model and security policy
+- **THEN** the documentation SHALL explain the exact-row and workflow limits
+- **AND** it SHALL state that differential privacy, anonymity models, and
+  privacy budgets are not currently provided
+
 ### Requirement: AI providers receive metadata only
 
 AI-assisted discovery SHALL use a bounded provider-neutral contract and SHALL

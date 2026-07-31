@@ -56,6 +56,18 @@ Security-sensitive behavior includes:
 Official GitHub Release assets include SHA-256 checksums, a CycloneDX SBOM, and
 GitHub attestations. Verify those records before distributing a release build.
 
+## Privacy Limitations
+
+Supported CSV workflows reject generated rows that exactly match complete
+source rows when the source files are available for comparison. This check does
+not prove that individual values, partial rows, rare combinations, or aggregate
+distributions cannot resemble the source.
+
+The project does not currently provide differential privacy, k-anonymity,
+l-diversity, a privacy budget, or any other statistical privacy guarantee.
+Operators remain responsible for domain-specific review, access controls, and
+legal or regulatory requirements before generated data is shared.
+
 ## Disclosure Expectations
 
 The maintainer will acknowledge credible private reports as soon as practical,
