@@ -61,6 +61,18 @@ The `latest-all` quality matrix runs the complete test suite on every
 supported Python version. A minimum profile must not be replaced by a resolver
 check alone: its behavior contract must also pass in the isolated environment.
 
+## Reproducibility Guarantees
+
+| Scope | Guarantee |
+| --- | --- |
+| Same environment | Reusing the recorded package, Python, dependencies, locale, serializer, spec, rules, and seed provides the logical reproducibility baseline. Recorded artifact digests can verify an exact repeat. |
+| Same package version | Logical behavior is supported only on dependency profiles that pass CI. Different Python, dependency, locale, or serializer versions may change generated values, ordering, and bytes. |
+| Cross-version | DatasetSpec compatibility follows its schema-version policy, but generated values, ordering, and byte identity are not guaranteed. Package release notes describe intentional semantic changes. |
+
+The manifest records the environment evidence needed to compare runs. Its
+`byte_identical_across_versions: false` field is normative: a seed is not a
+cross-version snapshot promise.
+
 ## Support Rules
 
 - Same package, Python, dependency, locale, serializer, spec, rules, and seed
