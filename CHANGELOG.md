@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
   allowlisted application services and opt-in safe SELECT policy.
 - Added direct-service boundary tests proving unsafe workspace paths and Trino
   SQL are rejected before filesystem or database I/O.
+- Documented the stable CLI, MCP transport, and application-safety boundaries
+  in the implementation map and contributor workflow.
 
 ## [0.11.0] - 2026-07-31
 
