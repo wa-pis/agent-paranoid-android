@@ -66,7 +66,8 @@ out/rules/generated/
 ```
 
 The generation manifest records a normalized rule fingerprint, rule counts,
-pass/fail counts, truncation status, and overall business validity.
+pass/fail counts, truncation status, overall business validity, and bounded
+expected-versus-observed violation counts.
 
 ## Supported Rule Categories
 
@@ -109,6 +110,13 @@ missing parent keys without changing the parent table. Aggregate-formula
 violations change only the configured concrete numeric field. Count-style
 aggregate rules with `field: "*"` are validation-only because changing row
 counts would also break the dataset shape.
+
+The business validation report compares expected and observed violations per
+rule. `unexpected_violation_count` identifies failures that were not selected
+by controlled invalid generation; `missing_expected_violation_count` identifies
+selected cases that validation did not observe. `expectations_met` is true only
+when both counts are zero. These fields contain counts only, never generated
+row values.
 
 ## Safety Restrictions
 

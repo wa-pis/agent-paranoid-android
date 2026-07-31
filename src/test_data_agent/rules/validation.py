@@ -31,6 +31,9 @@ class RuleResult(BaseModel):
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
     errors_truncated: bool = False
+    expected_violation_count: int = Field(default=0, ge=0)
+    unexpected_violation_count: int = Field(default=0, ge=0)
+    missing_expected_violation_count: int = Field(default=0, ge=0)
 
 
 class BusinessValidationReport(BaseModel):
@@ -39,10 +42,20 @@ class BusinessValidationReport(BaseModel):
     rules_sha256: str
     rule_pass_count: int
     rule_fail_count: int
+    expected_violation_count: int = Field(default=0, ge=0)
+    observed_violation_count: int = Field(default=0, ge=0)
+    unexpected_violation_count: int = Field(default=0, ge=0)
+    missing_expected_violation_count: int = Field(default=0, ge=0)
+    expectations_met: bool = True
     results: list[RuleResult]
 
 
-def validate_business_rules(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> BusinessValidationReport:
+def validate_business_rules(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rules: BusinessRules,
+    *,
+    expected_rule_failures: dict[int, int] | None = None,
+) -> BusinessValidationReport:
     results: list[RuleResult] = []
     for field_rule in rules.field_rules:
         results.append(validate_field_rule(rows_by_table, field_rule))
@@ -66,16 +79,36 @@ def validate_business_rules(rows_by_table: dict[str, list[dict[str, Any]]], rule
             )
 
     truncate_report_errors(results)
+    apply_violation_expectations(results, expected_rule_failures or {})
     passed = sum(result.passed for result in results)
     failed = sum(result.failed for result in results)
+    expected = sum(result.expected_violation_count for result in results)
+    unexpected = sum(result.unexpected_violation_count for result in results)
+    missing = sum(result.missing_expected_violation_count for result in results)
     return BusinessValidationReport(
         valid=failed == 0,
         rule_count=rules.rule_count,
         rules_sha256=business_rules_fingerprint(rules),
         rule_pass_count=passed,
         rule_fail_count=failed,
+        expected_violation_count=expected,
+        observed_violation_count=failed,
+        unexpected_violation_count=unexpected,
+        missing_expected_violation_count=missing,
+        expectations_met=unexpected == 0 and missing == 0,
         results=results,
     )
+
+
+def apply_violation_expectations(
+    results: list[RuleResult],
+    expected_rule_failures: dict[int, int],
+) -> None:
+    for rule_index, result in enumerate(results):
+        expected = max(0, expected_rule_failures.get(rule_index, 0))
+        result.expected_violation_count = expected
+        result.unexpected_violation_count = max(0, result.failed - expected)
+        result.missing_expected_violation_count = max(0, expected - result.failed)
 
 
 def validate_field_rule(rows_by_table: dict[str, list[dict[str, Any]]], rule: FieldRule) -> RuleResult:

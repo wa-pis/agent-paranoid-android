@@ -269,6 +269,11 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
         "rule_fail_count": 0,
         "valid": False,
         "errors_truncated": False,
+        "expected_violation_count": 0,
+        "observed_violation_count": 0,
+        "unexpected_violation_count": 0,
+        "missing_expected_violation_count": 0,
+        "expectations_met": True,
     }
 
 

@@ -28,6 +28,11 @@ class BusinessValidationManifest(BaseModel):
     rule_fail_count: int = Field(default=0, ge=0)
     valid: bool
     errors_truncated: bool = False
+    expected_violation_count: int = Field(default=0, ge=0)
+    observed_violation_count: int = Field(default=0, ge=0)
+    unexpected_violation_count: int = Field(default=0, ge=0)
+    missing_expected_violation_count: int = Field(default=0, ge=0)
+    expectations_met: bool = True
 
 
 class GenerationManifest(BaseModel):
@@ -175,6 +180,19 @@ def business_validation_manifest(
             bool(getattr(result, "errors_truncated", False))
             for result in getattr(report, "results", [])
         ),
+        expected_violation_count=int(
+            getattr(report, "expected_violation_count", 0)
+        ),
+        observed_violation_count=int(
+            getattr(report, "observed_violation_count", 0)
+        ),
+        unexpected_violation_count=int(
+            getattr(report, "unexpected_violation_count", 0)
+        ),
+        missing_expected_violation_count=int(
+            getattr(report, "missing_expected_violation_count", 0)
+        ),
+        expectations_met=bool(getattr(report, "expectations_met", True)),
     )
 
 

@@ -10,6 +10,7 @@ from test_data_agent.core.settings import GenerationMode as CoreGenerationMode
 from test_data_agent.business_rules import ScenarioRule, load_business_rules
 from test_data_agent.business_validator import validate_business_rules
 from test_data_agent.rules.contract import validate_business_rules_for_spec
+from test_data_agent.rules.business_config import apply_and_validate_business_rules
 from test_data_agent.rules.engine import apply_business_rules as apply_neutral_business_rules
 from test_data_agent.rules.models import (
     ScenarioRule as NeutralScenarioRule,
@@ -398,9 +399,14 @@ cross_table_rules:
         for table, rows in valid_rows.items()
     }
 
-    apply_business_rules(rows_a, rules, seed=21, mode="negative")
+    report = apply_and_validate_business_rules(
+        rows_a,
+        rules,
+        seed=21,
+        mode="negative",
+        invalid_ratio=0,
+    )
     apply_business_rules(rows_b, rules, seed=21, mode="negative")
-    report = validate_business_rules(rows_a, rules)
 
     assert rows_a == rows_b
     assert report.valid is False
@@ -408,6 +414,9 @@ cross_table_rules:
         "foreign_key": 2,
         "aggregate_formula": 1,
     }
+    assert report.expected_violation_count == 3
+    assert report.observed_violation_count == 3
+    assert report.expectations_met is True
     assert rows_a["customers"] == valid_rows["customers"]
     assert [row["label"] for row in rows_a["orders"]] == [
         row["label"] for row in valid_rows["orders"]
@@ -440,6 +449,61 @@ cross_table_rules:
 
     assert rows == {"orders": [{"id": 1}, {"id": 2}]}
     assert report.valid is True
+
+
+def test_negative_validation_report_matches_expected_violations(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+field_rules:
+  - table: orders
+    field: status
+    required: true
+"""
+    )
+    rules = load_business_rules(rules_path)
+    rows = {"orders": [{"status": "paid"} for _ in range(3)]}
+
+    report = apply_and_validate_business_rules(
+        rows,
+        rules,
+        seed=21,
+        mode="negative",
+        invalid_ratio=0,
+    )
+
+    assert report.expected_violation_count == 3
+    assert report.observed_violation_count == 3
+    assert report.unexpected_violation_count == 0
+    assert report.missing_expected_violation_count == 0
+    assert report.expectations_met is True
+    assert report.results[0].expected_violation_count == 3
+
+
+def test_validation_report_marks_unplanned_failures_as_unexpected() -> None:
+    rules = business_rules_from_dict(
+        {
+            "field_rules": [
+                {
+                    "table": "orders",
+                    "field": "status",
+                    "required": True,
+                }
+            ]
+        }
+    )
+
+    report = validate_business_rules(
+        {"orders": [{"status": None}, {"status": None}]},
+        rules,
+        expected_rule_failures={0: 1},
+    )
+
+    assert report.expected_violation_count == 1
+    assert report.observed_violation_count == 2
+    assert report.unexpected_violation_count == 1
+    assert report.missing_expected_violation_count == 0
+    assert report.expectations_met is False
 
 
 def test_conditional_required_defaults_only_apply_when_condition_matches(tmp_path) -> None:
