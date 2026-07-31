@@ -27,3 +27,22 @@ non-synthetic input.
 - **WHEN** the budget is enforced
 - **THEN** the check fails with the phase and exceeded ceiling
 - **AND** no external service or production data is involved
+
+### Requirement: Container Vulnerability Gate
+
+CI SHALL scan every native published container target for known fixable High
+and Critical vulnerabilities before publication.
+
+#### Scenario: Image has no release-blocking finding
+
+- **GIVEN** a locally built CLI, generator MCP, or Trino MCP image
+- **WHEN** its hardened runtime check succeeds
+- **THEN** the pinned scanner checks operating-system and language packages
+- **AND** validation succeeds when no fixable High or Critical finding exists
+
+#### Scenario: Image contains a release-blocking finding
+
+- **GIVEN** a fixable High or Critical vulnerability in a built target
+- **WHEN** container validation scans the image
+- **THEN** the target-specific job fails before merge
+- **AND** tagged publication remains blocked by the failed validation
