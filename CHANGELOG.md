@@ -40,6 +40,8 @@ All notable changes to this project are documented here.
   surface and advisor construction without credentials or provider requests.
 - Isolated base-wheel build, installation, metadata, size, and `doctor` smoke
   coverage on every supported Python version from 3.11 through 3.14.
+- ARM64 pull-request build and hardened runtime health checks for every CLI,
+  generator MCP, and Trino MCP container target.
 
 ### Fixed
 

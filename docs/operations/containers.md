@@ -15,6 +15,11 @@ Release tags publish `linux/amd64` and `linux/arm64` manifests. PyArrow is not
 installed in these images. Use the PyPI `parquet` extra when Parquet output is
 required.
 
+Pull requests build and run every target on both architectures. ARM64 checks
+use QEMU only as CI execution support; the resulting image still reports
+`arm64` and must pass the same non-root, read-only, network-isolated health
+contract as the native AMD64 validation.
+
 ## Build Locally
 
 Build only the target you need:
