@@ -11,6 +11,8 @@ All notable changes to this project are documented here.
 - A golden contract for the supported top-level Python export surface.
 - Golden contracts for generation bundle filenames and validation reports.
 - Golden contracts for generator and Trino MCP tool names and JSON schemas.
+- A row-free semantic value provider contract with fail-closed validation for
+  organization-specific synthetic values.
 
 ### Changed
 

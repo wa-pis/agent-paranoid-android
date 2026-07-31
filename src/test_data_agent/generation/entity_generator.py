@@ -21,8 +21,14 @@ from test_data_agent.core.distribution import (
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
+from test_data_agent.core.privacy import is_sensitive_field
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.generation.constraint_solver import solve_constraints
+from test_data_agent.generation.semantic_provider import (
+    SemanticValueProvider,
+    SemanticValueRequest,
+    request_semantic_value,
+)
 
 
 def generate_dataset(
@@ -30,6 +36,7 @@ def generate_dataset(
     seed: int,
     *,
     budget: GenerationBudget | None = None,
+    semantic_provider: SemanticValueProvider | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     budget = budget or GenerationBudget()
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
@@ -53,6 +60,7 @@ def generate_dataset(
                     seed,
                     mode=mode,
                     invalid_ratio=invalid_ratio,
+                    semantic_provider=semantic_provider,
                 )
             )
         rows_by_entity[entity.name] = rows
@@ -71,6 +79,7 @@ def generate_row(
     *,
     mode: GenerationMode,
     invalid_ratio: float,
+    semantic_provider: SemanticValueProvider | None = None,
 ) -> dict[str, Any]:
     return {
         field.name: generate_field_value(
@@ -82,6 +91,7 @@ def generate_row(
             seed,
             mode=mode,
             invalid_ratio=invalid_ratio,
+            semantic_provider=semantic_provider,
         )
         for field in entity.fields
     }
@@ -97,6 +107,7 @@ def generate_field_value(
     *,
     mode: GenerationMode,
     invalid_ratio: float,
+    semantic_provider: SemanticValueProvider | None = None,
 ) -> Any:
     if field.nullable and not field.is_identifier and rng.random() < field.null_ratio:
         return None
@@ -106,6 +117,24 @@ def generate_field_value(
         return synthetic_identifier(entity_name, field, row_index, seed)
     if field.sensitive:
         return synthetic_sensitive_value(field, faker)
+    if (
+        semantic_provider is not None
+        and field.semantic_type is not None
+        and not is_sensitive_field(field.name, field.semantic_type)
+    ):
+        provider_value = request_semantic_value(
+            semantic_provider,
+            SemanticValueRequest(
+                entity_name=entity_name,
+                field_name=field.name,
+                semantic_type=field.semantic_type,
+                data_type=field.data_type,
+                row_index=row_index,
+                seed=seed,
+            ),
+        )
+        if provider_value is not None:
+            return provider_value
     distribution = field.distribution or {}
     typed_distribution = field.typed_distribution
     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
