@@ -185,7 +185,7 @@ def test_safe_select_uses_env_allowlists(monkeypatch: pytest.MonkeyPatch) -> Non
         ),
     ],
 )
-def test_safe_select_service_rejects_before_database_io(
+def test_safe_select_service_rejects_before_cursor_execution(
     monkeypatch: pytest.MonkeyPatch,
     sql: str,
     error_type: type[Exception],
@@ -193,16 +193,39 @@ def test_safe_select_service_rejects_before_database_io(
     monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
     monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
 
-    def unexpected_query(_: str) -> list[dict[str, object]]:
-        raise AssertionError("unsafe SQL reached Trino")
+    class FakeCursor:
+        def __init__(self) -> None:
+            self.executed: list[tuple[str, list[object]]] = []
 
-    monkeypatch.setattr(
-        "test_data_agent.mcp_trino_server._fetch_dicts",
-        unexpected_query,
-    )
+        def execute(self, query: str, parameters: list[object]) -> None:
+            self.executed.append((query, parameters))
+
+    cursor = FakeCursor()
+
+    class FakeConnection:
+        def cursor(self) -> FakeCursor:
+            return cursor
+
+    class FakeDbApi:
+        def __init__(self) -> None:
+            self.connect_calls = 0
+
+        def connect(self, **_: object) -> FakeConnection:
+            self.connect_calls += 1
+            return FakeConnection()
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbApi()
+
+    fake_trino = FakeTrino()
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
 
     with pytest.raises(error_type):
         run_safe_select(sql)
+
+    assert fake_trino.dbapi.connect_calls == 0
+    assert cursor.executed == []
 
 
 def test_allowlist_rejects_catalog_and_schema() -> None:

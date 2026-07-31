@@ -11,7 +11,7 @@
   specs through Python, CLI, and MCP.
 - [x] Make unrestricted Trino execution private and route all external calls
   through safe query validation or dedicated bounded methods.
-- [ ] Add mocked-cursor tests proving unsafe SQL is rejected before execution.
+- [x] Add mocked-cursor tests proving unsafe SQL is rejected before execution.
 - [ ] Verify that safe metadata and aggregate profilers still work through
   dedicated internal query builders.
 
