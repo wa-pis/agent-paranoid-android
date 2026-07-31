@@ -20,6 +20,9 @@ python3 -m mypy
 echo "==> Compile"
 python3 -m compileall -q src tests scripts
 
+echo "==> Dependency licenses"
+python3 scripts/check_dependency_licenses.py
+
 echo "==> Tests with coverage"
 python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85
 

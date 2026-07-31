@@ -44,6 +44,8 @@ All notable changes to this project are documented here.
   generator MCP, and Trino MCP container target.
 - Blocking container scans for fixable High and Critical vulnerabilities in
   every native CLI and MCP target before publication.
+- A fail-closed dependency-license gate for application, optional, development,
+  and documentation environments without adding a scanner dependency.
 
 ### Fixed
 

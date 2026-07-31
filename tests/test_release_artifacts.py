@@ -121,6 +121,7 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "uv sync --frozen --all-extras" in workflow
     assert "--all-extras --no-emit-project" in workflow
     assert "python -m pip_audit --require-hashes" in workflow
+    assert "scripts/check_dependency_licenses.py" in workflow
     assert "python -m mypy" in workflow
     assert "name: Wheel smoke" in workflow
     assert "scripts/check_installed_package.py" in workflow
@@ -170,6 +171,7 @@ def test_documentation_workflow_builds_strict_site() -> None:
     workflow = (ROOT / ".github" / "workflows" / "docs.yml").read_text()
 
     assert "uv sync --frozen --only-group docs" in workflow
+    assert "scripts/check_dependency_licenses.py" in workflow
     assert "mkdocs build --strict" in workflow
     assert "name: documentation-site" in workflow
     assert "permissions:\n  contents: read" in workflow

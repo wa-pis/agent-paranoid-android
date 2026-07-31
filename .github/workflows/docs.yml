@@ -38,6 +38,9 @@ jobs:
       - name: Install locked documentation environment
         run: uv sync --frozen --only-group docs --python python --no-install-project
 
+      - name: Verify documentation dependency licenses
+        run: uv run --no-sync python scripts/check_dependency_licenses.py
+
       - name: Build documentation with strict validation
         run: uv run --no-sync mkdocs build --strict
 

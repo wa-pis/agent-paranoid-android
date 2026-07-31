@@ -296,6 +296,8 @@ Scope:
   no unresolved release-blocking findings.
   - [x] Block container publication on fixable High or Critical vulnerabilities
     found in each native CLI and MCP target.
+  - [x] Fail closed on unknown or unapproved licenses across locked application,
+    optional, development, and documentation dependencies.
 
 Exit criteria:
 
