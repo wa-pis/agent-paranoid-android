@@ -118,6 +118,12 @@ Public dataset-oriented commands:
 
 ## Trino MCP
 
+`src/test_data_agent/mcp_trino_transport.py`
+
+Owns optional FastMCP loading, server construction, ordered tool registration,
+and audit wrapping. It receives an allowlisted collection of application
+services and does not own SQL validation or database policy.
+
 `src/test_data_agent/mcp_trino_server.py`
 
 Safe Trino tools are read-only and return compact metadata. In addition to
@@ -127,6 +133,12 @@ aggregate mappings. These tools return counts, residuals, `confidence`, and
 `status`; they do not return source rows.
 
 ## Generator MCP
+
+`src/test_data_agent/mcp_generator_transport.py`
+
+Owns optional FastMCP loading, server construction, ordered tool registration,
+and audit wrapping. It receives workspace-bounded application services and
+does not own path, payload, profile, or generation safety policy.
 
 `src/test_data_agent/mcp_generator_server.py`
 
@@ -210,10 +222,14 @@ structured output and response storage disabled.
 - CLI profile/infer/generate/validate flow
 - safe profile cache reuse
 
-`tests/test_mcp_generator_server.py`, `tests/test_safety.py`, and
-`tests/test_ai_trino_workflow.py` cover MCP path isolation, inline Trino profile
-handoff, raw-profile rejection, non-copy checks, manifests, and the complete
-profile-to-CSV workflow.
+`tests/test_mcp_generator_transport.py` and
+`tests/test_mcp_trino_transport.py` cover ordered audited transport
+registration. `tests/test_mcp_generator_server.py`,
+`tests/test_mcp_trino_server.py`, `tests/test_safety.py`, and
+`tests/test_ai_trino_workflow.py` call application services directly to cover
+path isolation, SQL allowlists, inline Trino profile handoff, raw-profile
+rejection, non-copy checks, manifests, and the complete profile-to-CSV
+workflow.
 
 `tests/test_agent.py` covers the review-first agent workflow and confirms that
 planning does not write generated data.

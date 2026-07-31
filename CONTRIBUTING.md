@@ -69,6 +69,18 @@ Use OpenSpec for larger behavior changes:
 openspec/changes/<change-id>/
 ```
 
+## Boundary Changes
+
+- Keep CLI parsing and presentation separate from application dispatch.
+- Keep MCP SDK loading, tool registration, and audit wrapping in transport
+  modules.
+- Enforce workspace, payload, privacy, SQL, and allowlist safety in core or
+  application services so direct calls cannot bypass it.
+- Do not rely on argparse validation, an MCP decorator, or a transport wrapper
+  as the only enforcement point.
+- Preserve public CLI and MCP contracts with golden fixtures, and test safety
+  through direct service calls.
+
 ## Pull Request Checklist
 
 - The change does not copy source rows into generated output.
@@ -81,6 +93,7 @@ openspec/changes/<change-id>/
   project data was shared with external AI services.
 - Relevant tests and `scripts/check_release.sh` pass, or the PR explains why a
   check could not be run.
+- Boundary refactors preserve direct-service safety and public contracts.
 
 ## Commit Signing
 
