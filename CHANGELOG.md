@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Fixed ISO date columns being misclassified as phone numbers during CSV
+  profiling.
 - Added an offline `test-data-agent demo --output PATH` workflow using a
   bundled fictional fixture, deterministic seed, and atomic artifact publish.
 - Added metadata-only effective generation and business-rule evidence to

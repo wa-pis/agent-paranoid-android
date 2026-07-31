@@ -335,7 +335,9 @@ def infer_semantic_type(name: str, values: list[str]) -> str | None:
         return "email"
     if sample and sum(bool(SSN_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
         return "ssn"
-    if sample and sum(bool(PHONE_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
+    if sample and sum(
+        infer_sensitive_value_type(value) == "phone" for value in sample
+    ) / len(sample) >= 0.8:
         return "phone"
     return None
 

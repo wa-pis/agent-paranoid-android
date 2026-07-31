@@ -4,6 +4,7 @@ import csv
 import hashlib
 import json
 import socket
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -54,6 +55,10 @@ def test_demo_cli_generates_repeatable_valid_offline_bundle(
     assert typed_manifest.reproducibility is not None
     assert typed_manifest.reproducibility.output_sha256["customers.csv"] == (
         hashlib.sha256((first / "customers.csv").read_bytes()).hexdigest()
+    )
+    assert all(
+        date.fromisoformat(row["signup_date"])
+        for row in rows
     )
     assert "ava.lee@example.test" not in first_rows
     assert "source rows copied: no" in capsys.readouterr().err

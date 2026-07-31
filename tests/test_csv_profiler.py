@@ -58,6 +58,27 @@ def test_csv_profile_detects_semicolon_delimiter_and_utf8_bom(tmp_path) -> None:
     assert "alice@example.com" not in profile_json
 
 
+def test_csv_profile_classifies_iso_dates_before_phone_patterns(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "dates.csv"
+    source.write_text(
+        "signup_date\n"
+        "2024-01-15\n"
+        "2024-02-02\n"
+        "2024-03-18\n"
+    )
+
+    profile = profile_csv(source)
+    signup_date = profile.columns[0]
+
+    assert signup_date.data_type == "date"
+    assert signup_date.semantic_type is None
+    assert signup_date.sensitive is False
+    assert signup_date.min_date == "2024-01-15"
+    assert signup_date.max_date == "2024-03-18"
+
+
 def test_csv_profile_masks_secret_in_neutrally_named_column(tmp_path: Path) -> None:
     source = tmp_path / "secrets.csv"
     source.write_text("value\nsk_live_51ABCDEF\nsk_live_51ABCDEF\n")
