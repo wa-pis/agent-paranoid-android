@@ -107,6 +107,65 @@ def test_dataset_validation_rejects_wrong_entity_row_count() -> None:
     assert report.sections[0].errors == ["events row count mismatch: expected 2, got 1"]
 
 
+def test_validation_settings_control_sections_and_fail_fast() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="events",
+                row_count=1,
+                fields=[FieldSpec(name="event_id", data_type=FieldType.INTEGER)],
+            )
+        ],
+        validation_settings={
+            "validate_relationships": False,
+            "validate_constraints": False,
+            "validate_privacy": False,
+            "fail_fast": True,
+        },
+    )
+
+    report = validate_dataset({"events": [{"event_id": "wrong"}]}, spec)
+
+    assert report.valid is False
+    assert [item.name for item in report.sections] == ["schema"]
+    assert report.settings == spec.validation_settings
+
+
+def test_validation_can_disable_schema_section() -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="events",
+                row_count=1,
+                fields=[FieldSpec(name="event_id", data_type=FieldType.INTEGER)],
+            )
+        ],
+        validation_settings={"validate_schema": False},
+    )
+
+    report = validate_dataset({"events": [{"event_id": "wrong"}]}, spec)
+
+    assert report.valid is True
+    assert [item.name for item in report.sections] == [
+        "relationships",
+        "constraints",
+        "privacy",
+    ]
+
+
+def test_privacy_validation_reports_unsafe_spec_policy() -> None:
+    spec = DatasetSpec(entities=[])
+    spec.privacy_settings.allow_raw_sensitive_values = True
+
+    report = validate_dataset({}, spec)
+
+    assert report.valid is False
+    assert report.sections[-1].name == "privacy"
+    assert report.sections[-1].errors == [
+        "dataset spec cannot allow raw sensitive values"
+    ]
+
+
 def test_generation_uses_typed_distribution_models() -> None:
     spec = DatasetSpec(
         entities=[

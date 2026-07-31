@@ -34,7 +34,7 @@
 - [ ] Preserve relative distributions and order of magnitude while allowing
   synthetic scaling of sensitive totals; record the effective rule set.
 
-- [ ] Implement `ValidationSettings` semantics, including `fail_fast`, or
+- [x] Implement `ValidationSettings` semantics, including `fail_fast`, or
   remove unsupported settings from the public contract.
 - [x] Wire `GenerationSettings.locale` into Faker and add locale contract tests.
 - [ ] Define logical versus byte-for-byte reproducibility and record the
