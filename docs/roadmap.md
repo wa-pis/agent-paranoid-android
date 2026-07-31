@@ -71,7 +71,7 @@ date.
   MCP responses, `DatasetSpec` schemas, advisor exchanges, and generated
   artifact metadata.
 
-## Planned For 0.12.0
+## Implemented For 0.12.0
 
 - Separate CLI argument parsing, application dispatch, and human/JSON
   presentation behind the existing `test-data-agent` entry point.
