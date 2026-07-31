@@ -27,11 +27,28 @@ The gate runs direct Python privacy checks and direct Trino service-boundary
 tests before the full coverage suite, so transport-level tests cannot mask a
 bypass in the underlying application API.
 
-The script runs linting, strict type checks for the stable package core,
+The script runs linting, strict type checks for the full production package,
 compilation, coverage tests, DatasetSpec schema freshness, and the README
 quickstart smoke flow. The smoke flow verifies the generated manifest reports
 `synthetic: true`, `source_rows_copied: false`, a valid validation report, the
 expected seed, and expected row counts.
+
+### Pre-RC Coverage Evidence
+
+The unit, property, and contract suite passed locally on 2026-08-01 against
+`origin/main` commit `3862753` with:
+
+```bash
+uv run --no-sync pytest \
+  --cov=test_data_agent \
+  --cov-report=term-missing \
+  --cov-fail-under=85
+```
+
+Result: 518 passed, 2 live-Trino integration tests skipped, and 87.94% total
+coverage. This establishes the configured pre-RC coverage gate; it does not
+replace the required rerun against the exact release-candidate commit or the
+published artifact checks.
 
 CI and tagged releases also build the wheel and install it in an isolated
 environment. That smoke check verifies package version metadata, the PEP 561

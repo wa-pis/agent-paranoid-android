@@ -80,7 +80,7 @@
 
 - [x] Update `scripts/check_release.sh` with direct API privacy and SQL-boundary
   tests.
-- [ ] Run the complete unit/property/contract suite with coverage at or above
+- [x] Run the complete unit/property/contract suite with coverage at or above
   the configured threshold.
 - [ ] Run lint, full-package typing, compile, dependency/license/security,
   documentation, wheel, and container gates.
