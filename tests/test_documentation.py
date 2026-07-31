@@ -28,6 +28,7 @@ REQUIRED_DOCS = {
     "concepts/safety-model.md",
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
+    "concepts/relational-synthesis-contract.md",
     "reference/cli.md",
     "reference/compatibility.md",
     "reference/stability.md",
@@ -84,6 +85,24 @@ def test_public_governance_files_define_owners_and_safe_support() -> None:
     for relative_path in required_files:
         if not relative_path.startswith(".github/"):
             assert f"]({relative_path})" in readme
+
+
+def test_relational_synthesis_contract_bounds_preservation_claims() -> None:
+    contract = (
+        ROOT / "docs" / "concepts" / "relational-synthesis-contract.md"
+    ).read_text()
+
+    for term in (
+        "Foreign-key graph",
+        "Distribution shape",
+        "Temporal dependencies",
+        "Business invariants",
+        "Source key values",
+        "statistical privacy guarantee",
+        "proposal has no generation authority",
+        "deterministic validation",
+    ):
+        assert term in contract
 
 
 def test_required_user_documentation_exists_and_is_navigable() -> None:
