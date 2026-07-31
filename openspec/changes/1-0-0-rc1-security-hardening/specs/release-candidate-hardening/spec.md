@@ -71,6 +71,13 @@ reproducibility and record the identity of components that affect output.
 - **THEN** the manifest SHALL record the effective reproducibility inputs
 - **AND** the release tests SHALL verify the documented reproducibility level
 
+#### Scenario: Generation declares a Faker locale
+
+- **GIVEN** a supported locale and fixed seed in `GenerationSettings`
+- **WHEN** locale-backed synthetic values are generated
+- **THEN** Faker SHALL use that locale deterministically
+- **AND** an unsupported locale SHALL fail with a clear generation error
+
 ### Requirement: Relationship discovery is safe, reviewable, and deterministic
 
 The system SHALL support AI-assisted discovery of candidate relationships and
