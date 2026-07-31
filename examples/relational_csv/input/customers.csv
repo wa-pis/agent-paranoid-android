@@ -1,0 +1,4 @@
+customer_id,email,segment,orders_amount_total
+C1,alex@example.com,retail,50
+C2,blair@example.com,business,60
+C3,casey@example.com,retail,30

@@ -62,3 +62,41 @@ def test_csv_quickstart_runs_complete_safe_workflow(tmp_path: Path) -> None:
     assert manifest["validation_valid"] is True
     assert generated_validation["valid"] is True
     assert revalidation["valid"] is True
+
+
+def test_relational_csv_example_preserves_generated_relationships_and_rules(tmp_path: Path) -> None:
+    output = tmp_path / "relational-csv"
+    environment = os.environ.copy()
+    installed_cli = Path(sys.executable).with_name("test-data-agent")
+    assert installed_cli.is_file()
+    environment.pop("TDA_PYTHON", None)
+    environment["PATH"] = os.pathsep.join(
+        [str(installed_cli.parent), environment.get("PATH", "")]
+    )
+
+    subprocess.run(
+        [REPOSITORY_ROOT / "examples/relational_csv/run.sh", output],
+        cwd=REPOSITORY_ROOT,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    manifest = json.loads((output / "generated/generation_manifest.json").read_text())
+    report = json.loads((output / "generated/business_validation_report.json").read_text())
+    revalidation = json.loads((output / "revalidation_report.json").read_text())
+    with (output / "generated/customers.csv").open(newline="") as handle:
+        customers = list(csv.DictReader(handle))
+    with (output / "generated/orders.csv").open(newline="") as handle:
+        orders = list(csv.DictReader(handle))
+
+    customer_ids = {row["customer_id"] for row in customers}
+    assert len(customers) == 12
+    assert len(orders) == 12
+    assert {row["customer_id"] for row in orders} <= customer_ids
+    assert manifest["source_rows_copied"] is False
+    assert manifest["validation_valid"] is True
+    assert report["valid"] is True
+    assert report["rule_fail_count"] == 0
+    assert revalidation["valid"] is True
