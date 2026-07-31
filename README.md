@@ -17,10 +17,15 @@ Current version: `0.12.0`. Package: `agent-paranoid-android`; CLI: `test-data-ag
 
 ## What It Preserves
 
-Synthetic data preserves relational and business semantics—FK graphs,
-distributions, scale, temporal dependencies, formulas, and aggregate rules—
-without copied rows, across domains. AI may propose relationships and rules
-from safe profiles; human review and deterministic validation gate `DatasetSpec`.
+From bounded evidence and a reviewed `DatasetSpec`, generation can preserve schema
+and types, nullability, ranked distribution and scale shape, approved FK graphs,
+temporal dependencies, and executable business rules. AI may propose relationships
+and rules; human review and deterministic validation remain the authority boundary.
+
+It intentionally does not preserve or copy source values or real PII. It does not
+certify statistical anonymity, protection from every re-identification attack, or
+cross-environment byte identity. A seed provides logical reproducibility under the
+recorded package, dependency, locale, and serializer environment.
 
 ## Install
 
@@ -31,14 +36,6 @@ python3 -m pip install agent-paranoid-android
 test-data-agent doctor
 ```
 
-Explore the CLI without needing to remember a command:
-
-```bash
-test-data-agent
-test-data-agent examples
-test-data-agent generate --help
-```
-
 Install only features you use:
 
 ```bash
@@ -47,35 +44,41 @@ python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
-## Quickstart
+## First Offline Run
 
-Clone the repository to use its safe fictional fixture:
+Run the installed package with its bundled fictional customer fixture. No checkout,
+network, Trino, MCP, or provider is required:
 
 ```bash
-git clone https://github.com/wa-pis/agent-paranoid-android.git
-cd agent-paranoid-android
-
-test-data-agent generate-from-csv tests/fixtures/customers.csv \
-  --count 25 \
-  --seed 12345 \
-  --format csv \
-  --output out/customers.csv
+test-data-agent demo --output out/demo
 ```
 
 A successful run reports:
 
 ```text
-Generated synthetic dataset: out | rows: customers=25 | seed: 12345 | validation: passed | source rows copied: no
+Generated synthetic dataset: out/demo | rows: customers=12 | seed: 20260801 | validation: passed | source rows copied: no
 ```
 
-The output folder contains the generated data plus:
+Representative deterministic output:
 
+```csv
+customer_id,email,segment,signup_date
+syn_customers_00000001,amber21@example.test,category_1,2024-02-10
+```
+
+The demo preserves evidenced column names and types, non-null shape, category rank,
+and date range. Its fixture has no relationship or business-rule evidence, so the
+demo makes no claim about those properties. The output folder contains:
+
+- `customers.csv`;
 - `csv_profile.json`;
 - `dataset_spec.json`;
 - `validation_report.json`;
 - `generation_manifest.json`.
 
-Review the manifest and effective spec before accepting a new dataset.
+The destination must not already exist. Review the manifest and effective spec before
+accepting any dataset. Then follow [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/)
+to profile your own input.
 
 ## Choose A Guide
 
@@ -117,14 +120,10 @@ uv run --no-sync scripts/check_release.sh
 ```
 
 See [Contributing](CONTRIBUTING.md), [Support](SUPPORT.md), [Governance](GOVERNANCE.md),
-[Code Of Conduct](CODE_OF_CONDUCT.md), [Security Policy](SECURITY.md), and [Changelog](CHANGELOG.md).
+[Code Of Conduct](CODE_OF_CONDUCT.md), [Security Policy](SECURITY.md), [Changelog](CHANGELOG.md), and [License](LICENSE).
 
 Releases use tokenless PyPI Trusted Publishing with verified wheels/source distributions, checksums, SBOMs, and GitHub attestations.
 
 ## AI-Assisted Development
 
 AI-assisted changes require human review and tests; never send production data, raw PII, credentials, or tokens to AI. The name nods to Radiohead's "Paranoid Android"; this project is unaffiliated.
-
-## License
-
-[MIT](LICENSE)
