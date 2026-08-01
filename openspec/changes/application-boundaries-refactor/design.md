@@ -60,6 +60,8 @@ not be the only place where safety checks happen.
   fail-closed query resource budgets without importing Trino or MCP transports.
 - `trino_sql_policy.py` owns identifier validation, allowlist enforcement, and
   bounded read-only SQL validation without importing client or MCP transports.
+- `trino_query_builders.py` owns parameterized metadata and aggregate profiling
+  query construction without importing the Trino client or MCP transports.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final

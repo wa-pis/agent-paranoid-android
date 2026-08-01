@@ -25,7 +25,7 @@ contract-preserving increments.
   masking; keep policy pure and builders non-executing.
   - [x] Extract validated connection and resource-budget configuration.
   - [x] Extract pure SQL and allowlist policy.
-  - [ ] Extract non-executing metadata and profiling query builders.
+  - [x] Extract non-executing metadata and profiling query builders.
   - [ ] Extract the bounded Trino client boundary.
   - [ ] Extract profiling orchestration.
   - [ ] Extract masking and safe category summaries.
