@@ -373,6 +373,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
        entry points.
    - [ ] Run the full typing, lint, compile, test, package, documentation, and
      security gates, then archive the completed OpenSpec change.
+     - [x] Record full local and exact-commit GitHub gate evidence.
+     - [ ] Merge canonical OpenSpec deltas and archive the completed change.
 8. [ ] Publish a new release candidate from the verified refactor commit and
    repeat public-artifact acceptance against that candidate.
 9. [ ] Apply only release-blocking candidate fixes, repeat the exact release
