@@ -49,6 +49,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     public_python_api = _load_fixture("public-python-api.json")
     trino_tools = _load_fixture_list("mcp-trino-tools.json")
     artifact_layout = _load_fixture("artifact-layout.json")
+    boundary_compatibility = _load_fixture("boundary-compatibility.json")
     validation_report = _load_fixture("validation-report.json")
     contract_catalog = _load_fixture("contract-catalog.json")
 
@@ -67,6 +68,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         {
             "cli": cli_plan,
             "advisor": advisor_exchange,
+            "boundary": boundary_compatibility,
             "mcp_plan": mcp_plan,
             "mcp_generate": mcp_generate,
         }
@@ -102,6 +104,38 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         assert tool["input_schema"]["type"] == "object"
         assert tool["output_schema"] is not None
     assert contract_catalog["schema_version"] == "1.0"
+    assert boundary_compatibility["cli_error"] == {
+        "exit_code": 2,
+        "payload": {
+            "error": {
+                "code": "invalid_input",
+                "command": "test-data-agent agent-plan",
+                "exit_code": 2,
+                "help": None,
+                "message": (
+                    "agent-plan detected a DatasetSpec; use "
+                    "'test-data-agent generate' for reviewed specs"
+                ),
+                "retryable": False,
+            },
+            "ok": False,
+            "schema_version": "1.0",
+        },
+    }
+    assert boundary_compatibility["safety"] == {
+        "generated_output": {
+            "source_rows_copied": False,
+            "synthetic": True,
+        },
+        "unsafe_sql": {
+            "exception": "SqlSafetyError",
+            "message": "DDL, DML, and executable statements are not allowed",
+        },
+    }
+    assert boundary_compatibility["wrappers"]["cli_entry_points"] == [
+        "build_parser",
+        "main",
+    ]
 
 
 def test_contract_catalog_versions_every_public_fixture() -> None:

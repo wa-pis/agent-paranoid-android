@@ -4,6 +4,8 @@ These fixtures freeze representative, row-free public JSON contracts:
 
 - CLI agent planning;
 - MCP planning and generation responses;
+- retained application-boundary wrappers plus structured error and safety
+  behavior;
 - `DatasetSpec`;
 - advisor exchange;
 - generation manifest metadata.

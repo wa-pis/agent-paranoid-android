@@ -361,7 +361,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Extract review-first `agent-*` CLI command handlers.
      - [x] Extract dataset and utility CLI command handlers.
      - [x] Extract CLI application composition and command dispatch.
-   - [ ] Add architecture and direct-service adversarial tests while preserving
+   - [x] Add architecture and direct-service adversarial tests while preserving
      every public Python, CLI, MCP, artifact, error, and safety contract.
      - [x] Add static dependency, policy-owner, transport, and cycle gates.
      - [x] Complete cross-boundary direct-service adversarial coverage.
