@@ -97,16 +97,19 @@ jobs:
           RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
         run: |
           set -euo pipefail
-          mkdir -p /tmp/release-assets /tmp/release-dist
+          mkdir -p /tmp/release-assets/dist /tmp/release-dist
           gh release download "${RELEASE_TAG}" \
             --repo "${GITHUB_REPOSITORY}" \
             --dir /tmp/release-assets
+          cp /tmp/release-assets/*.whl /tmp/release-assets/dist/
+          cp /tmp/release-assets/*.tar.gz /tmp/release-assets/dist/
+          cp /tmp/release-assets/sbom.cdx.json /tmp/release-assets/dist/
           (
             cd /tmp/release-assets
             sha256sum --check SHA256SUMS
           )
-          cp /tmp/release-assets/*.whl /tmp/release-dist/
-          cp /tmp/release-assets/*.tar.gz /tmp/release-dist/
+          cp /tmp/release-assets/dist/*.whl /tmp/release-dist/
+          cp /tmp/release-assets/dist/*.tar.gz /tmp/release-dist/
           for artifact in /tmp/release-dist/*.whl /tmp/release-dist/*.tar.gz; do
             gh attestation verify "${artifact}" \
               --repo "${GITHUB_REPOSITORY}" \

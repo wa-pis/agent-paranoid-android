@@ -348,6 +348,10 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "permissions: {}" in workflow
     assert "scripts/check_release_tag.py" in workflow
     assert "gh release download" in workflow
+    assert "mkdir -p /tmp/release-assets/dist" in workflow
+    assert (
+        "cp /tmp/release-assets/sbom.cdx.json /tmp/release-assets/dist/" in workflow
+    )
     assert "sha256sum --check SHA256SUMS" in workflow
     assert "gh attestation verify" in workflow
     assert "GITHUB_STEP_SUMMARY" in workflow
