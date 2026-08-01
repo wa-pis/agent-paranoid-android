@@ -28,6 +28,7 @@ from test_data_agent.agent import (
 from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
+from test_data_agent.cli_dependencies import CliDependencyResolver
 from test_data_agent.cli_doctor import (
     CliDoctorService,
     run_mcp_doctor_smoke as _run_mcp_doctor_smoke,
@@ -488,16 +489,23 @@ def advise_agent_workspace_with_provider(
 ) -> AgentWorkspaceStatus:
     if provider != "openai":
         raise ValueError(f"unsupported advisor provider: {provider}")
-    try:
+
+    def load_openai_provider() -> tuple[str, Any]:
         from test_data_agent.providers.openai import (
             DEFAULT_OPENAI_MODEL,
             OpenAIAdvisorClient,
         )
-    except ImportError as exc:
-        raise ValueError(
-            "OpenAI advice requires agent-paranoid-android[openai]"
-        ) from exc
-    client = OpenAIAdvisorClient(model=model or DEFAULT_OPENAI_MODEL)
+
+        return DEFAULT_OPENAI_MODEL, OpenAIAdvisorClient
+
+    default_model, advisor_client = CliDependencyResolver(
+        importlib.import_module
+    ).load(
+        extra="openai",
+        purpose="OpenAI advice",
+        loader=load_openai_provider,
+    )
+    client = advisor_client(model=model or default_model)
     return advise_agent_workspace(
         workspace,
         ExchangeDatasetAdvisor(client),
