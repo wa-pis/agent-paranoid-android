@@ -34,6 +34,9 @@ not be the only place where safety checks happen.
 - `agent_approval.py` owns fingerprint-gated approval and completion
   publication. It receives workspace inspection and deterministic generation as
   typed callables so direct service use preserves the same safety gate.
+- `agent_recovery.py` owns interrupted-publication recovery and recovery-state
+  inspection. It receives completion-bundle validation as a typed callable and
+  reuses the same approval publication boundary.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
 - Trino package: config, pure SQL policy, non-executing query builders, client,

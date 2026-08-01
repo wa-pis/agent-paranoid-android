@@ -66,6 +66,10 @@ from test_data_agent.agent_planning import (
     sensitive_field_summary as sensitive_field_summary,
     validate_spec_for_approval as validate_spec_for_approval,
 )
+from test_data_agent.agent_recovery import (
+    AgentRecoveryService,
+    inspect_agent_recovery_state as inspect_agent_recovery_state,
+)
 from test_data_agent.agent_review import (
     AgentReviewService,
     inspect_agent_review_context as inspect_agent_review_context,
@@ -290,48 +294,6 @@ def _apply_persisted_advisor_review(
     return inspect_agent_workspace(resolved_workspace)
 
 
-def recover_agent_workspace(
-    workspace: Path,
-    *,
-    reviewed_spec_sha256: str,
-) -> AgentResult:
-    expected_spec_sha256 = normalize_sha256_digest(reviewed_spec_sha256)
-    resolved_workspace = workspace.expanduser().resolve(strict=True)
-    artifacts = agent_artifacts(resolved_workspace)
-    ensure_agent_plan_files(artifacts)
-    request, profile, spec, review = load_agent_approval_context(
-        resolved_workspace,
-        artifacts,
-    )
-    if not hmac.compare_digest(review.current_spec_sha256, expected_spec_sha256):
-        raise ValueError(
-            "reviewed DatasetSpec fingerprint mismatch; run agent-status and "
-            "review dataset_spec.yaml again"
-        )
-
-    generated_folder = resolved_workspace / GENERATED_FOLDER
-    if generated_folder.is_symlink() or not generated_folder.is_dir():
-        raise ValueError("agent recovery requires a regular generated output folder")
-    completed_artifacts = agent_artifacts(
-        resolved_workspace,
-        generated_folder=generated_folder,
-    )
-    checkpoint = validate_agent_completion_checkpoint(
-        request,
-        profile,
-        spec,
-        review,
-        completed_artifacts,
-    )
-    receipt, result = build_completed_agent_result(
-        review,
-        checkpoint,
-        completed_artifacts,
-    )
-    publish_agent_completion(receipt, result, completed_artifacts)
-    return result
-
-
 def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
     resolved_workspace = workspace.expanduser().resolve(strict=True)
     if not resolved_workspace.is_dir():
@@ -459,38 +421,6 @@ def review_agent_workspace(workspace: Path) -> AgentReviewReport:
     """Compatibility wrapper for the extracted review service."""
 
     return DEFAULT_AGENT_REVIEW_SERVICE.review_workspace(workspace)
-
-
-def inspect_agent_recovery_state(
-    artifacts: AgentArtifacts,
-    plan: AgentResult,
-) -> tuple[AgentReviewState, AgentCompletionCheckpoint]:
-    if plan.review is None:
-        raise ValueError(
-            "agent plan predates fingerprint-bound approval; create a new plan"
-        )
-    if artifacts.generated_folder is None or artifacts.generated_folder.is_symlink():
-        raise ValueError("agent generated output must be a regular folder")
-    if not artifacts.generated_folder.is_dir():
-        raise ValueError("agent workspace is missing generated output")
-    enforce_output_folder_size(artifacts.generated_folder)
-    checkpoint_path = artifacts.completion_checkpoint_path
-    if checkpoint_path is None or not checkpoint_path.is_file() or checkpoint_path.is_symlink():
-        raise ValueError("agent recovery requires generated/agent_completion.json")
-    checkpoint = AgentCompletionCheckpoint.model_validate_json(
-        read_limited_text(checkpoint_path)
-    )
-    review = inspect_agent_review_state(artifacts, plan.review)
-    if (
-        checkpoint.plan_id != review.plan_id
-        or not hmac.compare_digest(checkpoint.profile_sha256, review.profile_sha256)
-        or not hmac.compare_digest(
-            checkpoint.reviewed_spec_sha256,
-            review.current_spec_sha256,
-        )
-    ):
-        raise ValueError("agent_completion.json does not match the current reviewed plan")
-    return review, checkpoint
 
 
 def ensure_agent_workspace_for_plan(request: AgentRequest) -> None:
@@ -644,6 +574,24 @@ def validate_agent_completion_checkpoint(
         raise ValueError("generated rows do not match the persisted validation report")
     enforce_output_folder_size(generated_folder)
     return checkpoint
+
+
+DEFAULT_AGENT_RECOVERY_SERVICE = AgentRecoveryService(
+    validate_agent_completion_checkpoint,
+)
+
+
+def recover_agent_workspace(
+    workspace: Path,
+    *,
+    reviewed_spec_sha256: str,
+) -> AgentResult:
+    """Compatibility wrapper for the extracted recovery service."""
+
+    return DEFAULT_AGENT_RECOVERY_SERVICE.recover_workspace(
+        workspace,
+        reviewed_spec_sha256=reviewed_spec_sha256,
+    )
 
 
 def assert_agent_source_not_copied(
