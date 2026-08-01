@@ -11,12 +11,9 @@ from test_data_agent.advisor import (
     AdvisorExchange,
     AdvisorProposalPayload,
     AdvisorRequest,
-    AdvisorReviewArtifact,
     DatasetAdvisor,
-    build_advisor_exchange,
-    build_advisor_request,
-    build_advisor_review_artifact,
 )
+from test_data_agent.agent_advising import AgentAdvisingService
 from test_data_agent.agent_approval import (
     AgentApprovalService,
     build_completed_agent_result as build_completed_agent_result,
@@ -83,10 +80,8 @@ from test_data_agent.io.artifacts import (
     dataset_profile_fingerprint,
     dataset_spec_fingerprint,
     write_dataset_review_artifacts,
-    write_dataset_spec_artifact_atomic,
     write_generation_manifest,
     write_json_artifact,
-    write_json_artifact_atomic,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
@@ -102,7 +97,6 @@ from test_data_agent.safety import (
 )
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 from test_data_agent.workspace_store import (
-    ADVISOR_REVIEW_FILE,
     AGENT_PLAN_FILE as AGENT_PLAN_FILE,
     AGENT_REQUEST_FILE as AGENT_REQUEST_FILE,
     AGENT_RESULT_FILE,
@@ -130,168 +124,6 @@ def plan_agent_profile(request: AgentRequest, profile: DatasetProfile) -> AgentR
     """Compatibility wrapper for metadata-only planning."""
 
     return DEFAULT_AGENT_PLANNING_SERVICE.plan_profile(request, profile)
-
-
-def advise_agent_workspace(
-    workspace: Path,
-    advisor: DatasetAdvisor,
-) -> AgentWorkspaceStatus:
-    """Persist one validated advisor proposal without generating data."""
-
-    resolved_workspace, artifacts, profile, spec = _load_pending_advisor_context(
-        workspace
-    )
-    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
-    if review_path.exists() or review_path.is_symlink():
-        review_artifact = _load_advisor_review(review_path)
-        return _apply_persisted_advisor_review(
-            resolved_workspace,
-            artifacts,
-            review_artifact,
-        )
-
-    advisor_request = build_advisor_request(
-        profile,
-        baseline_spec=spec,
-    )
-    payload = advisor.propose(advisor_request.model_copy(deep=True))
-    review_artifact = build_advisor_review_artifact(advisor_request, payload)
-    if review_path.exists() or review_path.is_symlink():
-        raise ValueError("advisor_review.json was created concurrently")
-    write_json_artifact_atomic(review_artifact, review_path)
-    return _apply_persisted_advisor_review(
-        resolved_workspace,
-        artifacts,
-        review_artifact,
-    )
-
-
-def build_agent_advisor_request(workspace: Path) -> AdvisorRequest:
-    """Build a read-only advisor request for an awaiting-approval workspace."""
-
-    resolved_workspace, _artifacts, profile, spec = _load_pending_advisor_context(
-        workspace
-    )
-    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
-    if review_path.exists() or review_path.is_symlink():
-        if review_path.is_symlink() or not review_path.is_file():
-            raise ValueError("advisor_review.json must be a regular file")
-        raise ValueError("advisor review already exists for this workspace")
-    return build_advisor_request(profile, baseline_spec=spec)
-
-
-def build_agent_advisor_exchange(workspace: Path) -> AdvisorExchange:
-    """Build a self-describing exchange for an external advisor client."""
-
-    return build_advisor_exchange(build_agent_advisor_request(workspace))
-
-
-def apply_agent_advisor_proposal(
-    workspace: Path,
-    payload: AdvisorProposalPayload,
-) -> AgentWorkspaceStatus:
-    """Validate and persist an external proposal without generating data."""
-
-    resolved_workspace, artifacts, profile, spec = _load_pending_advisor_context(
-        workspace
-    )
-    review_path = resolved_workspace / ADVISOR_REVIEW_FILE
-    if review_path.exists() or review_path.is_symlink():
-        review_artifact = _load_advisor_review(review_path)
-        submitted_artifact = build_advisor_review_artifact(
-            review_artifact.request,
-            payload,
-        )
-        if submitted_artifact != review_artifact:
-            raise ValueError(
-                "advisor_review.json contains a different advisor proposal"
-            )
-    else:
-        advisor_request = build_advisor_request(profile, baseline_spec=spec)
-        review_artifact = build_advisor_review_artifact(advisor_request, payload)
-        if review_path.exists() or review_path.is_symlink():
-            raise ValueError("advisor_review.json was created concurrently")
-        write_json_artifact_atomic(review_artifact, review_path)
-
-    return _apply_persisted_advisor_review(
-        resolved_workspace,
-        artifacts,
-        review_artifact,
-    )
-
-
-def _load_pending_advisor_context(
-    workspace: Path,
-) -> tuple[Path, AgentArtifacts, DatasetProfile, DatasetSpec]:
-    resolved_workspace = workspace.expanduser().resolve(strict=True)
-    status = inspect_agent_workspace(resolved_workspace)
-    if status.phase != AgentPhase.AWAITING_APPROVAL:
-        raise ValueError("advisor proposals require an awaiting-approval workspace")
-
-    artifacts = agent_artifacts(resolved_workspace)
-    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
-    if plan.review is None:
-        raise ValueError(
-            "agent plan predates fingerprint-bound advisor review; create a new plan"
-        )
-    _request, profile, spec, _review = inspect_agent_review_context(
-        artifacts,
-        plan.review,
-    )
-    return resolved_workspace, artifacts, profile, spec
-
-
-def _load_advisor_review(review_path: Path) -> AdvisorReviewArtifact:
-    if review_path.is_symlink() or not review_path.is_file():
-        raise ValueError("advisor_review.json must be a regular file")
-    return AdvisorReviewArtifact.model_validate_json(read_limited_text(review_path))
-
-
-def _apply_persisted_advisor_review(
-    resolved_workspace: Path,
-    artifacts: AgentArtifacts,
-    review_artifact: AdvisorReviewArtifact,
-) -> AgentWorkspaceStatus:
-    current_plan = AgentResult.model_validate_json(
-        read_limited_text(artifacts.plan_path)
-    )
-    if current_plan.review is None:
-        raise ValueError(
-            "agent plan predates fingerprint-bound advisor review; create a new plan"
-        )
-    _request, current_profile, current_spec, _review = inspect_agent_review_context(
-        artifacts,
-        current_plan.review,
-    )
-    current_advisor_request = build_advisor_request(
-        current_profile,
-        baseline_spec=current_spec,
-    )
-    profile_sha256 = current_advisor_request.profile_sha256
-    if not hmac.compare_digest(
-        review_artifact.request.profile_sha256,
-        profile_sha256,
-    ):
-        raise ValueError("advisor review profile does not match workspace profile")
-    current_spec_sha256 = dataset_spec_fingerprint(current_spec)
-    if hmac.compare_digest(
-        current_spec_sha256,
-        review_artifact.proposed_spec_sha256,
-    ):
-        return inspect_agent_workspace(resolved_workspace)
-    if not hmac.compare_digest(
-        current_advisor_request.baseline_spec_sha256,
-        review_artifact.request.baseline_spec_sha256,
-    ):
-        raise ValueError(
-            "dataset_spec.yaml changed after advisor review; create a new plan"
-        )
-
-    write_dataset_spec_artifact_atomic(
-        review_artifact.proposal.dataset_spec,
-        artifacts.dataset_spec_path,
-    )
-    return inspect_agent_workspace(resolved_workspace)
 
 
 def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
@@ -412,6 +244,39 @@ def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
         review=result.review,
         approval_receipt=result.approval_receipt,
     )
+
+
+DEFAULT_AGENT_ADVISING_SERVICE = AgentAdvisingService(inspect_agent_workspace)
+
+
+def advise_agent_workspace(
+    workspace: Path,
+    advisor: DatasetAdvisor,
+) -> AgentWorkspaceStatus:
+    """Compatibility wrapper for the extracted advising service."""
+
+    return DEFAULT_AGENT_ADVISING_SERVICE.advise_workspace(workspace, advisor)
+
+
+def build_agent_advisor_request(workspace: Path) -> AdvisorRequest:
+    """Compatibility wrapper for a safe advisor request."""
+
+    return DEFAULT_AGENT_ADVISING_SERVICE.build_request(workspace)
+
+
+def build_agent_advisor_exchange(workspace: Path) -> AdvisorExchange:
+    """Compatibility wrapper for a self-describing advisor exchange."""
+
+    return DEFAULT_AGENT_ADVISING_SERVICE.build_exchange(workspace)
+
+
+def apply_agent_advisor_proposal(
+    workspace: Path,
+    payload: AdvisorProposalPayload,
+) -> AgentWorkspaceStatus:
+    """Compatibility wrapper for applying one advisor proposal."""
+
+    return DEFAULT_AGENT_ADVISING_SERVICE.apply_proposal(workspace, payload)
 
 
 DEFAULT_AGENT_REVIEW_SERVICE = AgentReviewService(inspect_agent_workspace)

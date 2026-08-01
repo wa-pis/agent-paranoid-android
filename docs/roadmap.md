@@ -345,8 +345,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Extract the metadata-only review lifecycle service.
      - [x] Extract the approval lifecycle service.
      - [x] Extract the recovery lifecycle service.
-     - [ ] Extract advising and status services one lifecycle boundary at a
-       time.
+     - [x] Extract the metadata-only advising lifecycle service.
+     - [ ] Extract the status lifecycle service.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
    - [ ] Add architecture and direct-service adversarial tests while preserving
