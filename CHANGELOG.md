@@ -28,6 +28,8 @@ All notable changes to this project are documented here.
   builders without adding client or MCP transport dependencies.
 - Extract the bounded Trino client with explicit resource budgets, result
   limits, row conversion, and deterministic cursor/connection cleanup.
+- Extract allowlisted, aggregate-only Trino profiling orchestration behind an
+  injected typed query-fetch boundary while retaining MCP tool wrappers.
 
 ### Security
 

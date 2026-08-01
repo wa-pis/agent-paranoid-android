@@ -64,6 +64,10 @@ not be the only place where safety checks happen.
   query construction without importing the Trino client or MCP transports.
 - `trino_client.py` owns driver access, resource-budget session properties,
   result limits, row conversion, and deterministic cursor/connection cleanup.
+- `trino_profiling.py` owns allowlisted metadata and aggregate-only profiling
+  orchestration behind an injected typed query-fetch boundary. The MCP server
+  retains compatibility wrappers and injects the existing safe column
+  summarizer until masking is extracted separately.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final

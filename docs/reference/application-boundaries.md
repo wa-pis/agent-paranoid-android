@@ -165,7 +165,8 @@ The current dependencies after completed extraction increments are:
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
-| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders/client, profiling, masking, Trino transport factory |
+| `trino_profiling.py` | allowlisted metadata and aggregate-only profiling orchestration with injected query fetching |
+| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders/client/profiling, masking, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
@@ -281,6 +282,16 @@ resource budgets, client-side result limits, row conversion, and nested
 cursor/connection cleanup. `mcp_trino_server.py` retains its existing
 `_execute_query`, `_fetch_dicts`, `trino`, and error imports as compatibility
 wrappers while delegating execution to the injected `TrinoClient` boundary.
+
+### Trino Profiling Migration
+
+`trino_profiling.py` now owns allowlisted metadata inspection, aggregate-only
+table and column profiling, and count-only rule profiling behind an injected
+`TrinoQuery` fetcher. Direct service calls enforce the explicit configuration
+allowlist before I/O, and condition values remain bound parameters rather than
+SQL or result metadata. `mcp_trino_server.py` keeps the existing public tool
+functions as wrappers and injects its safe column summarizer until masking is
+extracted in the next increment.
 
 ## Per-Increment Review
 

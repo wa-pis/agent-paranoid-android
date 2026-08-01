@@ -27,7 +27,7 @@ contract-preserving increments.
   - [x] Extract pure SQL and allowlist policy.
   - [x] Extract non-executing metadata and profiling query builders.
   - [x] Extract the bounded Trino client boundary.
-  - [ ] Extract profiling orchestration.
+  - [x] Extract profiling orchestration.
   - [ ] Extract masking and safe category summaries.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for
   public Python, CLI, MCP, errors, artifacts, and safety behavior.
