@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 import test_data_agent
 import test_data_agent.agent as agent_module
+import test_data_agent.agent_review as agent_review_module
 from test_data_agent.agent import (
     AgentApprovalReceipt,
     AgentCompletionCheckpoint,
@@ -566,7 +567,7 @@ def test_agent_review_rejects_spec_changed_during_report(
             count=3,
         )
     )
-    original_load = agent_module.load_dataset_spec
+    original_load = agent_review_module.load_dataset_spec
     load_count = 0
 
     def load_and_edit(path: Path):
@@ -579,7 +580,7 @@ def test_agent_review_rejects_spec_changed_during_report(
             write_dataset_spec_artifact(changed, path)
         return spec
 
-    monkeypatch.setattr(agent_module, "load_dataset_spec", load_and_edit)
+    monkeypatch.setattr(agent_review_module, "load_dataset_spec", load_and_edit)
 
     with pytest.raises(ValueError, match="changed during review"):
         review_agent_workspace(workspace)

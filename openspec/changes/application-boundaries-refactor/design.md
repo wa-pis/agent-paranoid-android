@@ -28,6 +28,9 @@ not be the only place where safety checks happen.
   `agent_planning.py` owns safe profile-to-plan orchestration. Existing imports
   continue through thin `agent.py` and `workspace_store.py` compatibility
   exports while later lifecycle services are extracted.
+- `agent_review.py` owns metadata-only review reports and fingerprint refresh
+  checks. It receives the workspace-status inspector as a typed callable so it
+  does not import the compatibility composition module.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
 - Trino package: config, pure SQL policy, non-executing query builders, client,
