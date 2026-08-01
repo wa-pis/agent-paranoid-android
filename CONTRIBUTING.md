@@ -55,7 +55,10 @@ scripts/check_release.sh
 
 1. Keep changes focused and small enough to review.
 2. Update README and docs for user-visible behavior changes.
-3. Update `CHANGELOG.md` under `Unreleased`.
+3. For user-visible changes, update `CHANGELOG.md` under `Unreleased` using the
+   categories and evidence rules in the
+   [changelog policy](docs/changelog-policy.md). Keep internal-only refactors,
+   CI detail, and OpenSpec bookkeeping in their canonical documents.
 4. Add or update tests for safety, validation, generation, or CLI behavior.
 5. Regenerate `schemas/dataset_spec.schema.json` when `DatasetSpec` changes:
 
