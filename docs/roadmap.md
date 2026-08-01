@@ -342,7 +342,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Publish plans and completion markers through a typed, atomic
        filesystem workspace store.
      - [x] Extract neutral agent contracts and the planning lifecycle service.
-     - [ ] Extract review, approval, recovery, advising, and status services one
+     - [x] Extract the metadata-only review lifecycle service.
+     - [ ] Extract approval, recovery, advising, and status services one
        lifecycle boundary at a time.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.

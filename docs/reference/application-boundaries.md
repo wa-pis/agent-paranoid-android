@@ -149,6 +149,7 @@ The current dependencies after completed extraction increments are:
 | `agent.py` | compatibility exports plus review, approval, recovery, advising, and status orchestration |
 | `agent_contracts.py` | core field, relationship, and settings models only |
 | `agent_planning.py` | adapters, contracts, core, generation planning, profiling, safety, and workspace-store port |
+| `agent_review.py` | contracts, planning settings validation, bounded artifact readers, profile safety, and injected workspace status |
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | Trino MCP server | audit, core privacy, SQL parsing, Trino client, Trino transport factory |
@@ -192,6 +193,11 @@ the existing checkpoint-based recovery behavior.
 profile-to-plan orchestration. Public package and `agent.py` imports remain
 compatible, and `workspace_store.py` re-exports `AgentArtifacts`. Direct service
 calls enforce source-path and profile-safety checks before publishing artifacts.
+
+`agent_review.py` now owns metadata-only review report construction and review
+fingerprint refresh. The compatibility wrapper injects `inspect_agent_workspace`;
+the extracted service has no reverse dependency on `agent.py`, CLI, or MCP
+transports and rejects a replaced spec symlink before reading it.
 
 ## Per-Increment Review
 
