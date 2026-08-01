@@ -86,9 +86,10 @@
     - [x] Add the CSV, JSON, SQL, and optional Parquet export journey.
     - [x] Add the MCP stdio journey with a rejected pre-network Trino request.
     - [x] Add the local Trino journey with the synthetic TPC-H catalog.
-- [ ] Split oversized agent and Trino orchestration modules where needed for
-  maintainability without expanding the product surface.
-- [ ] Create public good-first-issue/help-wanted backlog items.
+- [x] Defer the oversized agent and Trino orchestration split to the post-1.0
+  application-boundaries change; no concrete RC security blocker requires it.
+- [x] Defer public good-first-issue/help-wanted backlog creation to post-1.0
+  community work after the stable contract baseline is published.
 
 ## RC evidence and release gate
 

@@ -21,6 +21,18 @@ before merge. Evidence is retained in the [CI and wheel run](https://github.com/
 and [security run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989499).
 This snapshot does not replace the final rerun against the exact release commit.
 
+## Post-1.0 Dispositions
+
+**Application boundaries.** Deferred to the first post-1.0 architecture cycle.
+Existing direct-service safety tests and release gates cover the RC; no
+concrete RC blocker requires a broad agent, CLI, or Trino decomposition.
+Revisit immediately if a release-blocking fix cannot remain narrowly scoped.
+
+**Contributor backlog.** Defer public `good first issue` and `help wanted`
+items until the stable contract baseline is published. This avoids inviting
+contributions against moving pre-1.0 contracts. Revisit in the first post-1.0
+community cycle.
+
 ## Added-Scope Evidence
 
 - Explicit direct-API privacy and SQL-boundary checks in the release gate.
