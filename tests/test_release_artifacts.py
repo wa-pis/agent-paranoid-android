@@ -268,6 +268,8 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "softprops/action-gh-release@" in workflow
     assert "name: Build and attest distributions" in workflow
     assert "name: Create GitHub Release" in workflow
+    assert "prerelease: ${{ contains(github.ref_name, 'rc') }}" in workflow
+    assert "make_latest: ${{ contains(github.ref_name, 'rc') && 'false' || 'true' }}" in workflow
     assert "needs: build" in workflow
     assert "actions/download-artifact@" in workflow
     build_job = workflow.split("\n  build:\n", maxsplit=1)[1]
@@ -338,7 +340,7 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v0.12.0")
+    check_release_tag("v1.0.0rc1")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")

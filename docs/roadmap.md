@@ -207,7 +207,7 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The package is currently at `0.12.0`. Assign work to the release where it forms
+The package release candidate is `1.0.0rc1`. Assign work to the release where it forms
 a complete user workflow; do not bump the package version on every feature PR.
 Version bumps, release changelog sections, and tags belong to separate release
 pull requests.
@@ -310,14 +310,14 @@ Exit criteria:
 
 ### Remaining Execution Plan To 1.0
 
-The implementation scopes for `0.13.0`, `0.14.0`, and `0.15.0` are complete,
-while the package version remains `0.12.0`. Finish the work in this order:
+The implementation scopes for `0.13.0`, `0.14.0`, and `0.15.0` are consolidated
+into `1.0.0rc1`. Finish the release stage in this order:
 
 1. [x] Merge each completed active OpenSpec delta into its canonical capability
    and archive its proposal and task evidence.
 2. [x] Confirm that no active OpenSpec change outside the 1.0 baseline requires
    deferral.
-3. [ ] Reconfirm the active OpenSpec set after the planned public-readiness
+3. [x] Reconfirm the active OpenSpec set after the planned public-readiness
    changes below; every remaining change must be implemented, assigned, or
    explicitly deferred before the RC is published.
 4. [ ] Run a fresh full security audit, resolve every Critical and High finding,

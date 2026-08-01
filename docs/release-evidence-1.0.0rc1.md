@@ -7,8 +7,8 @@ These facts are evidence for maintainers, not additional product guarantees.
 
 ## RC Gate Snapshot
 
-The full local release gate passed on `main` commit
-`c9a26b75b22296eea5448d62b6952cc773f88b94` on 2026-08-01. It covered Ruff,
+The full local release gate passed on pre-release `main` commit
+`9356926e2fb3a349f4da6ea4df9fab858e4bbe80` on 2026-08-01. It covered Ruff,
 strict mypy across 78 source files, compilation, 97 approved dependency
 licenses, dependency compatibility, direct privacy and SQL boundaries,
 operational budgets, schema freshness, and the synthetic quickstart. The test
@@ -20,6 +20,11 @@ before merge. Evidence is retained in the [CI and wheel run](https://github.com/
 [documentation run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989523),
 and [security run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989499).
 This snapshot does not replace the final rerun against the exact release commit.
+The prepared `1.0.0rc1` release tree repeated the complete local gate with 537
+passed tests, 3 expected live-Trino skips, and 88.01% coverage. Its wheel and
+source distribution built successfully; an isolated base-wheel installation
+reported version `1.0.0rc1` and passed `doctor --skip-smoke` without optional
+extras.
 
 ## Documentation Readiness
 
