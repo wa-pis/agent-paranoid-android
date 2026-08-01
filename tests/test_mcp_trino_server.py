@@ -1,6 +1,6 @@
 import pytest
 
-from test_data_agent import mcp_trino_server
+from test_data_agent import mcp_trino_server, trino_masking, trino_query_builders
 from test_data_agent.mcp_trino_server import (
     AllowlistError,
     SqlSafetyError,
@@ -103,10 +103,13 @@ def test_raw_sql_tool_is_opt_in(
     assert "run_safe_select" in {tool.__name__ for tool in trino_mcp_tools()}
 
 
-def test_row_sampling_is_not_registered_by_default() -> None:
+def test_row_sampling_surface_is_removed() -> None:
     assert "sample_rows_masked" not in {
         tool.__name__ for tool in trino_mcp_tools()
     }
+    assert not hasattr(mcp_trino_server, "sample_rows_masked")
+    assert not hasattr(trino_masking.TrinoMasker, "sample_rows_masked")
+    assert not hasattr(trino_query_builders, "build_masked_sample_query")
 
 
 def test_unrestricted_execution_helpers_are_private() -> None:

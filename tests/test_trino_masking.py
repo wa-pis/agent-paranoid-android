@@ -118,43 +118,6 @@ def test_masker_skips_category_query_for_sensitive_column_name() -> None:
     assert "GROUP BY" not in queries[0].sql
 
 
-def test_masker_masks_samples_before_returning_them() -> None:
-    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
-        assert "LIMIT 1" in query.sql
-        return [{"value": "person@example.com", "status": "paid"}]
-
-    rows = TrinoMasker(
-        config=masker_config(),
-        fetch_query=fetch_query,
-        fetch_sql=reject_sql,
-    ).sample_rows_masked(
-        "analytics",
-        "safe_schema",
-        "customers",
-        ["value", "status"],
-        1,
-    )
-
-    assert rows == [{"value": "[MASKED]", "status": "paid"}]
-
-
-def test_masker_rejects_unsafe_source_before_fetch() -> None:
-    masker = TrinoMasker(
-        config=masker_config(),
-        fetch_query=reject_query,
-        fetch_sql=reject_sql,
-    )
-
-    with pytest.raises(AllowlistError, match="catalog is not allowed"):
-        masker.sample_rows_masked(
-            "production",
-            "safe_schema",
-            "customers",
-            ["status"],
-            1,
-        )
-
-
 @pytest.mark.parametrize(
     "sql",
     [
