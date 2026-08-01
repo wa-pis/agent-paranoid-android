@@ -58,6 +58,8 @@
   guarantees.
 - [x] Publish a threat model for source data, PII, secrets, prompt injection,
   provider and artifact boundaries, and resource exhaustion.
+- [x] Distinguish deterministic validation, heuristic safety checks, complete-row
+  reuse checks, and operator privacy review without implying certification.
 - [x] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.
   - [x] Add the CSV profiler to strict mypy coverage.
