@@ -15,5 +15,10 @@
   them, with release notes for any narrowed range.
 - [x] Add release checks for manifest completeness and unreviewed dependency
   drift.
-- [ ] Run the full supported-version, package, security, and documentation
+- [x] Run the full supported-version, package, security, and documentation
   gates.
+
+Completion evidence: PR #167 passed all 29 required CI, package, minimum
+dependency, security, and documentation checks before merge on 2026-08-01;
+the local release gate passed with 530 tests, 2 integration skips, and 88.04%
+coverage.
