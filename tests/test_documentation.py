@@ -115,6 +115,25 @@ def test_rc_changelog_inventory_classifies_every_unreleased_entry() -> None:
     assert "**43**" in inventory
 
 
+def test_unreleased_changelog_headings_follow_policy_order() -> None:
+    changelog = (ROOT / "CHANGELOG.md").read_text()
+    unreleased = changelog.split("## Unreleased", 1)[1].split("\n## [", 1)[0]
+    headings = re.findall(r"^### (.+)$", unreleased, flags=re.MULTILINE)
+    allowed = [
+        "Added",
+        "Changed",
+        "Fixed",
+        "Security",
+        "Deprecated",
+        "Removed",
+        "Migration",
+    ]
+
+    assert len(headings) == len(set(headings))
+    assert all(heading in allowed for heading in headings)
+    assert headings == sorted(headings, key=allowed.index)
+
+
 def test_public_governance_files_define_owners_and_safe_support() -> None:
     required_files = {
         "CODE_OF_CONDUCT.md": "onepis2word@gmail.com",
