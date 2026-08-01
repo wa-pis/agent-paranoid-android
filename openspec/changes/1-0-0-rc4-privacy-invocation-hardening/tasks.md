@@ -8,7 +8,7 @@
   query builder, and public compatibility exports. Do not retain a row
   diagnostic in RC4; any future row-returning capability requires a separate
   OpenSpec change.
-- [ ] Update MCP golden contracts, docs, migration notes, and release notes.
+- [x] Update MCP golden contracts, docs, migration notes, and release notes.
 - [ ] Enumerate the production-registered default tool list from
   `trino_mcp_tools()` and test every Trino-accessing tool through both direct
   service and transport boundaries. Check success responses, validation and

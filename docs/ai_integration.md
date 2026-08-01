@@ -192,8 +192,8 @@ protocol, wire-field tables, adapter template, and required contract tests.
 
 ## MCP Mode
 
-The Trino server is read-only and exposes safe metadata, aggregate profiling,
-masked sampling, and bounded query tools:
+The default Trino server is read-only and exposes source-literal-free metadata
+and aggregate profiling tools:
 
 ```bash
 python3 -m test_data_agent.mcp_trino_server
@@ -214,8 +214,11 @@ Its tools are:
 - `profile_conditional_required`
 - `profile_conditional_allowed_values`
 - `profile_aggregate_mapping`
-- `sample_rows_masked`
-- `run_safe_select`
+
+`sample_rows_masked` was removed for RC4. The separately configured
+`run_safe_select` tool is available only when
+`TRINO_ENABLE_SAFE_SELECT=true`; it can return masked row-shaped results and
+is not part of the source-literal-free default surface.
 
 The generator server exposes the local synthetic pipeline:
 

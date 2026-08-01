@@ -384,7 +384,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md),
    publish `1.0.0rc4` from the verified merge commit, and repeat
    public-artifact acceptance against that candidate.
-   - [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+   - [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
      query builder, and public compatibility exports. Do not retain a row
      diagnostic in RC4; require a separate OpenSpec for any future
      row-returning capability.
@@ -542,7 +542,7 @@ Scope:
 
 - [ ] Complete and review the [RC4 privacy and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md).
-- [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+- [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
   query builder, and public compatibility exports. Do not retain a row
   diagnostic in RC4; require a separate OpenSpec for any future
   row-returning capability.
