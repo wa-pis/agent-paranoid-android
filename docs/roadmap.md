@@ -207,11 +207,13 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The package release candidate is `1.0.0rc3`. `1.0.0rc2` completed public
+The merged release baseline is `1.0.0rc3`. `1.0.0rc2` completed public
 acceptance; `1.0.0rc3` includes the contract-preserving application-boundary
-refactor. `1.0.0rc1` completed package and GitHub publication but was
-superseded after GHCR rejected its PEP 440 version as a SemVer tag. Assign work
-to the release where it forms
+refactor. The next candidate is explicitly `1.0.0rc4`, which closes the
+remaining privacy and invocation-budget findings before stable publication.
+`1.0.0rc1` completed package and GitHub publication but was superseded after
+GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
+where it forms
 a complete user workflow; do not bump the package version on every feature PR.
 Version bumps, release changelog sections, and tags belong to separate release
 pull requests.
@@ -378,10 +380,23 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Record full local and exact-commit GitHub gate evidence.
      - [x] Confirm no canonical deltas are required and archive the completed
        change.
-8. [ ] Publish a new release candidate from the verified refactor commit and
-   repeat public-artifact acceptance against that candidate.
-9. [ ] Apply only release-blocking candidate fixes, repeat the exact release
-   gates, and publish `1.0.0` from the verified release commit.
+8. [ ] Complete the [1.0.0rc4 privacy and invocation hardening
+   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md),
+   publish `1.0.0rc4` from the verified merge commit, and repeat
+   public-artifact acceptance against that candidate.
+   - [ ] Close the P0 default-MCP source-literal exposure and add regression
+     coverage for every returned column.
+   - [ ] Add and enforce a shared invocation-level Trino work budget across
+     nested profiling and query operations.
+   - [ ] Correct prerelease installation instructions and execute the README
+     quickstart from a clean environment using the public RC4 artifact.
+   - [ ] Clarify aggregate-only versus explicitly opt-in row-returning MCP
+     capabilities and their privacy guarantees.
+   - [ ] Record the disposition of crash-durability/fsync work; it is not an
+     ordinary stable-release blocker unless the product contract promises it.
+9. [ ] Apply only release-blocking fixes found during RC4 acceptance, repeat
+   the exact release gates, and publish `1.0.0` from the verified release
+   commit.
 
 The preferred release path is to consolidate the already completed `0.13.0`
 through `0.15.0` scopes into the 1.0 release candidate after the OpenSpec and
@@ -507,10 +522,60 @@ Exit criteria:
   disposition.
 - Only release-blocking fixes may enter after the candidate.
 
+### 1.0.0rc4: Privacy And Invocation Hardening
+
+**Goal:** close the post-RC3 security and release-engineering findings before
+the first stable compatibility baseline. RC4 is a required gate, not an
+optional milestone after `1.0.0`.
+
+Scope:
+
+- [ ] Complete and review the [RC4 privacy and invocation hardening
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md).
+- [ ] Remove `sample_rows_masked` from the default Trino MCP surface. If a
+  row-returning diagnostic capability is retained, make it an explicit,
+  separately named, operator-enabled, reviewed, and audited capability; the
+  default response contract must not return literal source-cell values.
+- [ ] Add adversarial regression tests that populate every source column with
+  distinct literals and prove that no default MCP response returns any of
+  those literals, including values that heuristic PII masking would not flag.
+- [ ] Introduce a common `QueryWorkBudget` for one MCP invocation, covering
+  request size, SQL/formula size, AST complexity, nesting depth, projected
+  columns, statement count, and response bytes. Share it across nested
+  profiling calls and fail before connection, cursor, execution, deep parsing,
+  or unbounded response accumulation as applicable.
+- [ ] Change prerelease installation guidance to select RC4 intentionally
+  (`==1.0.0rc4` or `--pre`), keep extras consistent, and run the literal
+  README quickstart in a clean environment against the public wheel.
+- [ ] Update MCP documentation and compatibility fixtures to distinguish
+  aggregate-only tools from row-returning opt-in tools. Do not describe
+  row-returning output as PII-free, anonymous, or privacy-safe merely because
+  heuristic masking was applied.
+- [ ] Document the durability boundary between atomic visibility, process
+  interruption recovery, and crash/power-loss durability. Decide explicitly
+  whether fsync is a post-1.0 improvement or a release requirement.
+- [ ] Run the direct API adversarial suite, Trino integration checks, typing,
+  lint, compile, full tests, wheel/container checks, documentation build,
+  security scans, and public package acceptance against the exact RC4 commit.
+
+Exit criteria:
+
+- No unresolved P0 or release-blocking P1 findings remain. Every lower-priority
+  finding has an owner, disposition, and revisit trigger.
+- Public `1.0.0rc4` artifacts install in a clean environment, the README
+  quickstart succeeds, optional extras are verified, and the exact artifact
+  version is reported.
+- MCP golden contracts, OpenSpec requirements, documentation, changelog,
+  package metadata, attestations, and container tags describe the same RC4
+  behavior.
+- Stable publication is allowed only from the exact verified RC4 release
+  commit; no unrelated feature work is added between RC4 acceptance and
+  `1.0.0`.
+
 ### 1.0.0: Stable Release
 
-**Goal:** complete the contract-preserving application-boundary refactor, prove
-it through a new candidate, and publish the first stable compatibility baseline.
+**Goal:** promote the verified RC4 baseline to the first stable compatibility
+baseline.
 
 Scope:
 
@@ -518,10 +583,9 @@ Scope:
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
   without changing public Python, CLI, MCP, artifact, error, or safety
   contracts.
-- [ ] Publish and smoke-test a release candidate containing the completed
-  refactor before promoting the exact verified code to stable.
-- [ ] Apply only fixes proven necessary by release-candidate testing outside
-  the bounded refactor scope.
+- [ ] Promote the accepted `1.0.0rc4` commit without unrelated feature work.
+- [ ] Apply only fixes proven necessary by RC4 acceptance and repeat the
+  affected release gates.
 - [ ] Re-run every release candidate gate on the exact release commit.
 - [ ] Publish signed and attested wheel, source distribution, documentation,
   and separate CLI, generator MCP, and Trino MCP container images.
