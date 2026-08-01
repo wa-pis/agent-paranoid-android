@@ -336,7 +336,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
 7. [ ] Complete the [application boundaries refactor
    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
    as a contract-preserving stable-1.0 gate.
-   - [ ] Inventory and freeze the existing public and safety boundaries.
+   - [x] Inventory and freeze the existing public and safety boundaries.
    - [ ] Extract typed workspace persistence and staged agent lifecycle
      services.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and

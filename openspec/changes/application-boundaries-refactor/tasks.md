@@ -3,7 +3,7 @@
 Target: required before the stable 1.0 release and delivered as small,
 contract-preserving increments.
 
-- [ ] Inventory public imports, CLI commands, MCP tools, artifact contracts,
+- [x] Inventory public imports, CLI commands, MCP tools, artifact contracts,
   and current dependency direction before moving code.
 - [ ] Extract typed workspace persistence and atomic transition interfaces.
 - [ ] Split agent lifecycle services into planning, review, approval, recovery,
