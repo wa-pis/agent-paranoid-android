@@ -79,6 +79,10 @@ not be the only place where safety checks happen.
   `agent_result.json` as the last atomic state marker so interrupted runs stay
   recoverable from generated checkpoints.
 - Architecture test rules for forbidden imports and direct unsafe boundaries.
+- Static architecture gates keep lower-layer agent and Trino services free of
+  CLI/MCP imports, keep MCP transports registration-only, require policy imports
+  below transports, enforce one owner per safety symbol, and reject cycles
+  across the extracted application boundary graph.
 
 ## Failure Modes
 

@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Add static application-boundary tests for dependency direction, direct
+  policy ownership, registration-only MCP transports, and import cycles.
 - Add a manual post-publish gate that verifies immutable GitHub Release, PyPI,
   documentation, and signed multi-platform GHCR artifacts, then exercises
   agent approval and audit verification from the public wheel.
