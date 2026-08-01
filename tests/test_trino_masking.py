@@ -138,7 +138,7 @@ def test_masker_masks_samples_before_returning_them() -> None:
     assert rows == [{"value": "[MASKED]", "status": "paid"}]
 
 
-def test_masker_rejects_unsafe_source_and_sql_before_fetch() -> None:
+def test_masker_rejects_unsafe_source_before_fetch() -> None:
     masker = TrinoMasker(
         config=masker_config(),
         fetch_query=reject_query,
@@ -153,8 +153,47 @@ def test_masker_rejects_unsafe_source_and_sql_before_fetch() -> None:
             ["status"],
             1,
         )
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "DELETE FROM analytics.safe_schema.customers",
+        "SELECT * FROM analytics.safe_schema.customers LIMIT 1",
+        ("SELECT customer_email AS value FROM analytics.safe_schema.customers LIMIT 1"),
+        "SELECT synthetic_id FROM analytics.safe_schema.customers",
+        (
+            "SELECT synthetic_id FROM analytics.safe_schema.customers "
+            "ORDER BY rand() LIMIT 1"
+        ),
+        (
+            "SELECT synthetic_id FROM analytics.safe_schema.customers LIMIT 1; "
+            "DROP TABLE customers"
+        ),
+    ],
+)
+def test_masker_rejects_unsafe_sql_before_fetch(sql: str) -> None:
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=reject_sql,
+    )
+
     with pytest.raises(SqlSafetyError):
-        masker.run_safe_select("DELETE FROM analytics.safe_schema.customers")
+        masker.run_safe_select(sql)
+
+
+def test_masker_rejects_disallowed_sql_source_before_fetch() -> None:
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=reject_sql,
+    )
+
+    with pytest.raises(AllowlistError, match="catalog is not allowed"):
+        masker.run_safe_select(
+            "SELECT synthetic_id FROM production.safe_schema.customers LIMIT 1"
+        )
 
 
 def test_server_keeps_masking_compatibility_exports() -> None:
