@@ -142,3 +142,47 @@ def test_python_api_example_is_installed_deterministic_and_valid(tmp_path: Path)
     assert manifest["validation_valid"] is True
     assert generated_validation["valid"] is True
     assert independent_validation["valid"] is True
+
+
+def test_output_format_example_exports_valid_synthetic_bundles(tmp_path: Path) -> None:
+    output = tmp_path / "output-formats"
+    environment = os.environ.copy()
+    installed_cli = Path(sys.executable).with_name("test-data-agent")
+    assert installed_cli.is_file()
+    environment.pop("TDA_PYTHON", None)
+    environment["PATH"] = os.pathsep.join(
+        [str(installed_cli.parent), environment.get("PATH", "")]
+    )
+
+    subprocess.run(
+        [REPOSITORY_ROOT / "examples/output_formats/run.sh", output],
+        cwd=REPOSITORY_ROOT,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    expected_files = {
+        "csv": "support_tickets.csv",
+        "json": "support_tickets.json",
+        "sql": "support_tickets.sql",
+        "parquet": "support_tickets.parquet",
+    }
+    for output_format, row_file in expected_files.items():
+        manifest = json.loads(
+            (output / output_format / "generation_manifest.json").read_text()
+        )
+        report = json.loads(
+            (output / output_format / "validation_report.json").read_text()
+        )
+        assert (output / output_format / row_file).is_file()
+        assert manifest["output_format"] == output_format
+        assert manifest["row_counts"] == {"support_tickets": 4}
+        assert manifest["source_rows_copied"] is False
+        assert manifest["validation_valid"] is True
+        assert report["valid"] is True
+
+    sql = (output / "sql" / "support_tickets.sql").read_text()
+    assert sql.count('INSERT INTO "support_tickets"') == 4
+    assert "DROP " not in sql

@@ -517,6 +517,7 @@
         "enum": [
           "csv",
           "json",
+          "sql",
           "parquet"
         ],
         "title": "OutputFormat",

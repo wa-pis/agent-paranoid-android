@@ -1,0 +1,25 @@
+schema_version: "1.0"
+entities:
+  - name: support_tickets
+    row_count: 4
+    primary_key: ticket_id
+    fields:
+      - name: ticket_id
+        data_type: integer
+        is_identifier: true
+      - name: requester_email
+        data_type: string
+        sensitive: true
+        semantic_type: email
+      - name: summary
+        data_type: string
+        distribution:
+          type: categorical
+          values:
+            - synthetic_login_issue
+            - synthetic_billing_question
+      - name: resolved
+        data_type: boolean
+generation_settings:
+  seed: 271828
+  output_format: json

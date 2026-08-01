@@ -184,3 +184,17 @@ owner, rationale, and revisit date for every accepted P1 or lower risk.
 - **THEN** accepted remaining findings SHALL include evidence, owner,
   disposition, and revisit trigger
 - **AND** the RC may proceed without adding new product features
+
+### Requirement: SQL export contains synthetic inserts only
+
+SQL export SHALL serialize freshly generated synthetic rows as deterministic
+`INSERT` statements with quoted identifiers and escaped literals.
+
+#### Scenario: A reviewed spec is exported as SQL
+
+- **GIVEN** a safe reviewed `DatasetSpec`, explicit seed, and SQL output format
+- **WHEN** generation succeeds
+- **THEN** each entity SHALL be written to a bounded `.sql` artifact
+- **AND** the artifact SHALL contain only generated rows, never source rows
+- **AND** identifiers and string literals SHALL be escaped without accepting
+  caller-provided SQL expressions

@@ -18,6 +18,7 @@ class GenerationMode(StrEnum):
 class OutputFormat(StrEnum):
     CSV = "csv"
     JSON = "json"
+    SQL = "sql"
     PARQUET = "parquet"
 
 
