@@ -50,6 +50,8 @@ not be the only place where safety checks happen.
   inspection, and normalized installation errors for CLI services.
 - `cli_agent.py` owns `agent-*` request translation and command handling while
   the compatibility composition root retains top-level dispatch.
+- `cli_commands.py` owns dataset and utility command handling, including the
+  direct business-rule bridge, while `cli.py` retains composition and wrappers.
 - Trino package: config, pure SQL policy, non-executing query builders, client,
   profiling, and masking.
 - Typed workspace transition and persistence interfaces with atomic commit and
