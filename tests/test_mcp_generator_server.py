@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-import test_data_agent.agent as agent_module
+import test_data_agent.agent_approval as agent_approval_module
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.mcp_generator_server import (
     WorkspacePathError,
@@ -459,15 +459,19 @@ def test_mcp_recovers_interrupted_plan_without_returning_rows(
         "agent/orders",
         count=3,
     )
-    original_publish = agent_module.publish_agent_completion
+    original_publish = agent_approval_module.publish_agent_completion
     monkeypatch.setattr(
-        agent_module,
+        agent_approval_module,
         "publish_agent_completion",
         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
     )
     with pytest.raises(RuntimeError, match="interrupted"):
         approve_dataset_plan("agent/orders", planned["current_spec_sha256"])
-    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        original_publish,
+    )
 
     status = inspect_dataset_plan("agent/orders")
     assert status["phase"] == "recovery_required"

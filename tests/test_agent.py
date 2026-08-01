@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 import test_data_agent
 import test_data_agent.agent as agent_module
+import test_data_agent.agent_approval as agent_approval_module
 import test_data_agent.agent_review as agent_review_module
 from test_data_agent.agent import (
     AgentApprovalReceipt,
@@ -303,12 +304,16 @@ def test_agent_recovery_finishes_publication_without_regenerating_rows(
         )
     )
     assert planned.review is not None
-    original_publish = agent_module.publish_agent_completion
+    original_publish = agent_approval_module.publish_agent_completion
 
     def interrupt_publication(*args, **kwargs) -> None:
         raise RuntimeError("simulated publication interruption")
 
-    monkeypatch.setattr(agent_module, "publish_agent_completion", interrupt_publication)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        interrupt_publication,
+    )
     with pytest.raises(RuntimeError, match="simulated publication interruption"):
         approve_agent_workspace(
             workspace,
@@ -323,7 +328,11 @@ def test_agent_recovery_finishes_publication_without_regenerating_rows(
     assert status.summary.reason == "completion_metadata_missing"
     assert status.summary.reviewed_spec_sha256 == planned.review.current_spec_sha256
 
-    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        original_publish,
+    )
     recovered = recover_agent_workspace(
         workspace,
         reviewed_spec_sha256=planned.review.current_spec_sha256,
@@ -348,9 +357,9 @@ def test_agent_recovery_rejects_tampered_rows_before_publication(
         )
     )
     assert planned.review is not None
-    original_publish = agent_module.publish_agent_completion
+    original_publish = agent_approval_module.publish_agent_completion
     monkeypatch.setattr(
-        agent_module,
+        agent_approval_module,
         "publish_agent_completion",
         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
     )
@@ -359,7 +368,11 @@ def test_agent_recovery_rejects_tampered_rows_before_publication(
             workspace,
             reviewed_spec_sha256=planned.review.current_spec_sha256,
         )
-    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        original_publish,
+    )
 
     customers_path = workspace / "generated" / "customers.csv"
     customers_path.write_text(customers_path.read_text() + "tampered,row\n")
@@ -445,9 +458,9 @@ def test_agent_recovery_preflights_existing_result_before_writing_receipt(
         )
     )
     assert planned.review is not None
-    original_publish = agent_module.publish_agent_completion
+    original_publish = agent_approval_module.publish_agent_completion
     monkeypatch.setattr(
-        agent_module,
+        agent_approval_module,
         "publish_agent_completion",
         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
     )
@@ -456,7 +469,11 @@ def test_agent_recovery_preflights_existing_result_before_writing_receipt(
             workspace,
             reviewed_spec_sha256=planned.review.current_spec_sha256,
         )
-    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        original_publish,
+    )
     (workspace / "agent_result.json").write_text(
         (workspace / "agent_plan.json").read_text()
     )

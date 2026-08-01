@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 import test_data_agent.agent as agent_module
+import test_data_agent.agent_approval as agent_approval_module
 import test_data_agent.cli as cli_module
 from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
 from test_data_agent.advisor import AdvisorExchange, AdvisorProposal, AdvisorRequest
@@ -833,9 +834,9 @@ def test_agent_recover_cli_explains_and_completes_interrupted_approval(
         )
     )
     assert planned.review is not None
-    original_publish = agent_module.publish_agent_completion
+    original_publish = agent_approval_module.publish_agent_completion
     monkeypatch.setattr(
-        agent_module,
+        agent_approval_module,
         "publish_agent_completion",
         lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("interrupted")),
     )
@@ -844,7 +845,11 @@ def test_agent_recover_cli_explains_and_completes_interrupted_approval(
             workspace,
             reviewed_spec_sha256=planned.review.current_spec_sha256,
         )
-    monkeypatch.setattr(agent_module, "publish_agent_completion", original_publish)
+    monkeypatch.setattr(
+        agent_approval_module,
+        "publish_agent_completion",
+        original_publish,
+    )
 
     assert main(["agent-status", str(workspace)]) == 0
     status_output = capsys.readouterr()

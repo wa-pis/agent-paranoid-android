@@ -17,6 +17,14 @@ from test_data_agent.advisor import (
     build_advisor_request,
     build_advisor_review_artifact,
 )
+from test_data_agent.agent_approval import (
+    AgentApprovalService,
+    build_completed_agent_result as build_completed_agent_result,
+    ensure_agent_plan_files as ensure_agent_plan_files,
+    load_agent_approval_context as load_agent_approval_context,
+    normalize_sha256_digest as normalize_sha256_digest,
+    publish_agent_completion as publish_agent_completion,
+)
 from test_data_agent.agent_contracts import (
     AgentApprovalReceipt as AgentApprovalReceipt,
     AgentCompletionCheckpoint as AgentCompletionCheckpoint,
@@ -79,7 +87,6 @@ from test_data_agent.io.artifacts import (
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     commit_temp_output_folder,
-    ensure_empty_output_folder,
     make_temp_output_folder,
     prepare_generation_budget,
 )
@@ -95,7 +102,6 @@ from test_data_agent.workspace_store import (
     AGENT_PLAN_FILE as AGENT_PLAN_FILE,
     AGENT_REQUEST_FILE as AGENT_REQUEST_FILE,
     AGENT_RESULT_FILE,
-    APPROVAL_RECEIPT_FILE,
     COMPLETION_CHECKPOINT_FILE,
     DATASET_SPEC_FILE,
     DEFAULT_AGENT_WORKSPACE_STORE,
@@ -284,74 +290,6 @@ def _apply_persisted_advisor_review(
     return inspect_agent_workspace(resolved_workspace)
 
 
-def approve_agent_workspace(
-    workspace: Path,
-    *,
-    reviewed_spec_sha256: str,
-) -> AgentResult:
-    expected_spec_sha256 = normalize_sha256_digest(reviewed_spec_sha256)
-    resolved_workspace = workspace.expanduser().resolve(strict=True)
-    artifacts = agent_artifacts(resolved_workspace)
-    ensure_agent_plan_files(artifacts)
-    result_path = resolved_workspace / AGENT_RESULT_FILE
-    receipt_path = resolved_workspace / APPROVAL_RECEIPT_FILE
-
-    if result_path.exists() or result_path.is_symlink():
-        status = inspect_agent_workspace(resolved_workspace)
-        if status.phase == AgentPhase.RECOVERY_REQUIRED:
-            raise ValueError(
-                "agent workspace requires agent-recover before approval can continue"
-            )
-        result = AgentResult.model_validate_json(read_limited_text(result_path))
-        receipt = result.approval_receipt
-        if receipt is None or not hmac.compare_digest(
-            receipt.reviewed_spec_sha256,
-            expected_spec_sha256,
-        ):
-            raise ValueError(
-                "completed agent result does not match reviewed DatasetSpec fingerprint"
-            )
-        return result
-
-    generated_folder = resolved_workspace / GENERATED_FOLDER
-    if generated_folder.exists() or generated_folder.is_symlink():
-        raise ValueError(
-            "agent workspace has generated output awaiting publication; "
-            "run agent-recover with the reviewed DatasetSpec fingerprint"
-        )
-    if receipt_path.exists() or receipt_path.is_symlink():
-        raise ValueError(f"agent approval output already exists: {receipt_path.name}")
-
-    request, profile, spec, review = load_agent_approval_context(
-        resolved_workspace,
-        artifacts,
-    )
-    current_spec_sha256 = review.current_spec_sha256
-    if not hmac.compare_digest(current_spec_sha256, expected_spec_sha256):
-        raise ValueError(
-            "reviewed DatasetSpec fingerprint mismatch; run agent-status and "
-            "review dataset_spec.yaml again"
-        )
-
-    ensure_empty_output_folder(generated_folder)
-    checkpoint = generate_agent_dataset(
-        request,
-        profile,
-        spec,
-        review=review,
-        output_folder=generated_folder,
-    )
-
-    completed_artifacts = agent_artifacts(resolved_workspace, generated_folder=generated_folder)
-    receipt, result = build_completed_agent_result(
-        review,
-        checkpoint,
-        completed_artifacts,
-    )
-    publish_agent_completion(receipt, result, completed_artifacts)
-    return result
-
-
 def recover_agent_workspace(
     workspace: Path,
     *,
@@ -392,48 +330,6 @@ def recover_agent_workspace(
     )
     publish_agent_completion(receipt, result, completed_artifacts)
     return result
-
-
-def build_completed_agent_result(
-    review: AgentReviewState,
-    checkpoint: AgentCompletionCheckpoint,
-    artifacts: AgentArtifacts,
-) -> tuple[AgentApprovalReceipt, AgentResult]:
-    receipt = AgentApprovalReceipt(
-        plan_id=review.plan_id,
-        profile_sha256=review.profile_sha256,
-        reviewed_spec_sha256=review.current_spec_sha256,
-    )
-    result = AgentResult(
-        phase=AgentPhase.COMPLETED,
-        approval_required=False,
-        steps=[
-            AgentStep(name="profile", status="completed", summary="Safe profile metadata loaded."),
-            AgentStep(name="infer_spec", status="completed", summary="Reviewed DatasetSpec loaded."),
-            AgentStep(name="approval", status="completed", summary="Approval gate passed."),
-            AgentStep(name="generate", status="completed", summary="Synthetic dataset bundle written."),
-            AgentStep(name="validate", status="completed", summary="Validation report written."),
-        ],
-        artifacts=artifacts,
-        review=review,
-        approval_receipt=receipt,
-        summary=AgentGenerationSummary(
-            source_type=checkpoint.source_type,
-            row_counts=checkpoint.row_counts,
-            seed=checkpoint.seed,
-            output_format=checkpoint.output_format,
-            validation_valid=checkpoint.validation_valid,
-        ),
-    )
-    return receipt, result
-
-
-def publish_agent_completion(
-    receipt: AgentApprovalReceipt,
-    result: AgentResult,
-    artifacts: AgentArtifacts,
-) -> None:
-    DEFAULT_AGENT_WORKSPACE_STORE.publish_completion(receipt, result, artifacts)
 
 
 def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
@@ -565,43 +461,6 @@ def review_agent_workspace(workspace: Path) -> AgentReviewReport:
     return DEFAULT_AGENT_REVIEW_SERVICE.review_workspace(workspace)
 
 
-def ensure_agent_plan_files(artifacts: AgentArtifacts) -> None:
-    required_plan_files = (
-        artifacts.request_path,
-        artifacts.profile_path,
-        artifacts.dataset_spec_path,
-        artifacts.plan_path,
-    )
-    missing = [
-        path.name
-        for path in required_plan_files
-        if not path.is_file() or path.is_symlink()
-    ]
-    if missing:
-        raise ValueError(f"agent workspace is incomplete; missing: {', '.join(missing)}")
-
-
-def load_agent_approval_context(
-    workspace: Path,
-    artifacts: AgentArtifacts,
-) -> tuple[AgentRequest, DatasetProfile, DatasetSpec, AgentReviewState]:
-    plan = AgentResult.model_validate_json(read_limited_text(artifacts.plan_path))
-    if plan.phase != AgentPhase.AWAITING_APPROVAL:
-        raise ValueError("agent_plan.json must describe an awaiting-approval plan")
-    if plan.review is None:
-        raise ValueError(
-            "agent plan predates fingerprint-bound approval; create a new plan"
-        )
-    request, profile, spec, review = inspect_agent_review_context(
-        artifacts,
-        plan.review,
-    )
-    request = normalize_agent_request(
-        request.model_copy(update={"workspace": workspace})
-    )
-    return request, profile, spec, review
-
-
 def inspect_agent_recovery_state(
     artifacts: AgentArtifacts,
     plan: AgentResult,
@@ -638,15 +497,6 @@ def ensure_agent_workspace_for_plan(request: AgentRequest) -> None:
     """Compatibility helper retained while planning moves behind its service."""
 
     DEFAULT_AGENT_WORKSPACE_STORE.ensure_new(request.workspace, create=True)
-
-
-def normalize_sha256_digest(value: str) -> str:
-    normalized = value.strip().lower()
-    if len(normalized) != 64 or any(
-        character not in "0123456789abcdef" for character in normalized
-    ):
-        raise ValueError("reviewed spec fingerprint must be a 64-character SHA-256 hex digest")
-    return normalized
 
 
 def generate_agent_dataset(
@@ -695,6 +545,25 @@ def generate_agent_dataset(
         shutil.rmtree(temp_folder, ignore_errors=True)
         raise
     return checkpoint
+
+
+DEFAULT_AGENT_APPROVAL_SERVICE = AgentApprovalService(
+    inspect_agent_workspace,
+    generate_agent_dataset,
+)
+
+
+def approve_agent_workspace(
+    workspace: Path,
+    *,
+    reviewed_spec_sha256: str,
+) -> AgentResult:
+    """Compatibility wrapper for the extracted approval service."""
+
+    return DEFAULT_AGENT_APPROVAL_SERVICE.approve_workspace(
+        workspace,
+        reviewed_spec_sha256=reviewed_spec_sha256,
+    )
 
 
 def validate_agent_completion_checkpoint(

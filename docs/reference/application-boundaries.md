@@ -146,10 +146,11 @@ The current dependencies after completed extraction increments are:
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
 | `cli.py` | parser/presenter/contracts, agent, advisor, audit, demo, core, I/O commands, rules |
-| `agent.py` | compatibility exports plus review, approval, recovery, advising, and status orchestration |
+| `agent.py` | compatibility exports plus recovery, advising, status, and deterministic generation orchestration |
 | `agent_contracts.py` | core field, relationship, and settings models only |
 | `agent_planning.py` | adapters, contracts, core, generation planning, profiling, safety, and workspace-store port |
 | `agent_review.py` | contracts, planning settings validation, bounded artifact readers, profile safety, and injected workspace status |
+| `agent_approval.py` | contracts, review context, bounded artifact readers, workspace-store publication, and injected status/generation ports |
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | Trino MCP server | audit, core privacy, SQL parsing, Trino client, Trino transport factory |
@@ -198,6 +199,11 @@ calls enforce source-path and profile-safety checks before publishing artifacts.
 fingerprint refresh. The compatibility wrapper injects `inspect_agent_workspace`;
 the extracted service has no reverse dependency on `agent.py`, CLI, or MCP
 transports and rejects a replaced spec symlink before reading it.
+
+`agent_approval.py` now owns the reviewed-fingerprint gate, idempotent completed
+result handling, and atomic receipt/result publication. Its typed ports inject
+workspace inspection and deterministic generation without a reverse dependency
+on `agent.py`, CLI, or MCP transports.
 
 ## Per-Increment Review
 
