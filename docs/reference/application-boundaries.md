@@ -108,7 +108,7 @@ those contracts.
   `profile_conditional_required`
 - `profile_foreign_key`, `profile_formula_rule`
 - `profile_table`, `profile_table_safe`
-- `profile_temporal_ordering`, `sample_rows_masked`
+- `profile_temporal_ordering`
 
 Tool names, descriptions, input/output schemas, ordering, audit wrapping, and
 safety behavior remain compatibility-gated. Transport extraction must not move
@@ -287,8 +287,8 @@ before any client execution.
 
 ### Trino Query Builder Migration
 
-`trino_query_builders.py` now owns metadata, aggregate profiling, rule
-profiling, and masked-sample query construction as typed `TrinoQuery` values.
+`trino_query_builders.py` now owns metadata, aggregate profiling, and rule
+profiling query construction as typed `TrinoQuery` values.
 The builders validate identifiers, keep source values in bound parameters, and
 perform no I/O. `mcp_trino_server.py` retains orchestration and compatibility
 exports while passing built queries to the existing bounded client path.
@@ -315,11 +315,19 @@ functions as wrappers and injects the safe column summarizer from
 
 `trino_masking.py` now owns content-aware row masking, masked sensitive
 patterns, synthetic category-rank summaries, safe column-profile completion,
-masked samples, and generic safe-select result masking. It validates explicit
+and generic safe-select result masking. It validates explicit
 allowlists and SQL policy before injected query ports run, and it returns no
 raw detected PII, secrets, or source category values. `mcp_trino_server.py`
-retains the existing tool functions and privacy helper imports as compatibility
+retains the remaining tool functions and privacy helper imports as compatibility
 exports while delegating masking below the transport boundary.
+
+### RC4 Trino MCP Privacy Migration
+
+`sample_rows_masked` is no longer registered or retained as a public Python
+compatibility wrapper, masking-service method, or query builder. MCP clients
+must migrate to metadata and aggregate profiling tools. `run_safe_select`
+remains a separately configured opt-in and is not a source-literal-free
+replacement for the removed diagnostic.
 
 ### Architecture Gate
 

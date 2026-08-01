@@ -48,7 +48,7 @@ GeneratorMcp --> Profiling : profile_csv
 GeneratorMcp --> Agent : plan_dataset /\nplan_trino_dataset
 GeneratorMcp --> Generation : generate_dataset /\nexport_dataset
 GeneratorMcp --> Validation : validate_dataset
-TrinoMcp --> Trino : metadata, aggregates,\nmasked samples, bounded SELECT
+TrinoMcp --> Trino : metadata and aggregates\nopt-in bounded SELECT
 Profiling --> SourceCsv : read locally for\nmetadata and distributions
 Profiling --> CoreModels : DatasetProfile
 Generation --> CoreModels : DatasetSpec

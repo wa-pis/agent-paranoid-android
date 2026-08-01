@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Remove the `sample_rows_masked` Trino MCP tool, masking-service method, and
+  query builder from the RC4 compatibility surface.
+
+### Security
+
+- Remove the row-returning diagnostic path instead of relying on heuristic
+  masking to prevent unknown source literals from reaching MCP clients.
+
+### Migration
+
+- MCP clients that called `sample_rows_masked` must use metadata and aggregate
+  profiling tools such as `describe_table`, `profile_table_safe`, and
+  `profile_column`. The separate `run_safe_select` tool remains explicit
+  operator opt-in and is not a source-literal-free replacement.
+
 ## [1.0.0rc3] - 2026-08-02
 
 ### Added

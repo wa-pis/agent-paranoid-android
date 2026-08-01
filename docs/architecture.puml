@@ -115,7 +115,7 @@ Cli --> TrinoMcp : MCP metadata/profiling calls
 TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
-TrinoMcp --> DatasetProfile : metadata, aggregates,\nmasked samples
+TrinoMcp --> DatasetProfile : source-literal-free\nmetadata and aggregates
 TrinoMcp --> GeneratorMcp : inline safe profile payload
 
 GeneratorMcp --> WorkspaceBoundary
