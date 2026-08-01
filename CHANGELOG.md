@@ -20,6 +20,8 @@ All notable changes to this project are documented here.
 - Extract CLI application composition, dispatch, review-first agent, dataset,
   utility, diagnostics, and optional-extra services while retaining the public
   parser, presenter, and entry-point contracts.
+- Extract validated Trino connection and resource-budget configuration while
+  retaining the existing server import paths.
 
 ### Security
 

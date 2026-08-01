@@ -23,6 +23,12 @@ contract-preserving increments.
   - [x] Centralize optional dependency resolution.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
   masking; keep policy pure and builders non-executing.
+  - [x] Extract validated connection and resource-budget configuration.
+  - [ ] Extract pure SQL and allowlist policy.
+  - [ ] Extract non-executing metadata and profiling query builders.
+  - [ ] Extract the bounded Trino client boundary.
+  - [ ] Extract profiling orchestration.
+  - [ ] Extract masking and safe category summaries.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for
   public Python, CLI, MCP, errors, artifacts, and safety behavior.
 - [ ] Add architecture tests preventing transport-only enforcement, policy

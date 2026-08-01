@@ -56,6 +56,8 @@ not be the only place where safety checks happen.
   direct business-rule bridge, while `cli.py` retains composition and wrappers.
 - Trino package: config, pure SQL policy, non-executing query builders, client,
   profiling, and masking.
+- `trino_config.py` owns validated connection settings, allowlist inputs, and
+  fail-closed query resource budgets without importing Trino or MCP transports.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final

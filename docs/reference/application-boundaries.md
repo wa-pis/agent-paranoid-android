@@ -161,7 +161,8 @@ The current dependencies after completed extraction increments are:
 | `agent_status.py` | contracts, bounded artifact readers, review/recovery inspection, and read-only lifecycle reconstruction |
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
-| Trino MCP server | audit, core privacy, SQL parsing, Trino client, Trino transport factory |
+| `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
+| Trino MCP server | audit, core privacy, extracted Trino config, SQL parsing, Trino client, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
@@ -246,6 +247,14 @@ compatibility helper while injecting doctor and rule dependencies.
 dispatches to the first handler that owns a command. `cli.py` retains the public
 entry point and a thin `run_command` compatibility wrapper with its existing
 test override points.
+
+### Trino Configuration Migration
+
+`trino_config.py` now owns validated connection settings, allowlist inputs, and
+query resource budgets. `mcp_trino_server.py` re-exports the existing config
+types, constants, and parsing helpers for compatibility while consuming the
+extracted configuration without adding a Trino-client or MCP dependency to that
+boundary.
 
 ## Per-Increment Review
 

@@ -349,6 +349,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Extract the status lifecycle service.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
+     - [x] Extract validated Trino connection and resource-budget configuration.
      - [x] Extract CLI installation diagnostics and capability smoke
        orchestration.
      - [x] Centralize CLI optional-extra discovery and installation errors.
