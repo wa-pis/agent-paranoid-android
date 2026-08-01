@@ -9,6 +9,8 @@ All notable changes to this project are documented here.
 - Add a manual post-publish gate that verifies immutable GitHub Release, PyPI,
   documentation, and signed multi-platform GHCR artifacts before a release is
   accepted.
+- Record the exact `v1.0.0rc2` commit, publication run IDs, package hashes, and
+  three verified multi-platform container digests.
 
 ## [1.0.0rc2] - 2026-08-01
 
