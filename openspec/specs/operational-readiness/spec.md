@@ -289,3 +289,25 @@ generation deadline expires before publication.
 - **WHEN** the user retries with an appropriate deadline
 - **THEN** the same reviewed spec and seed produce deterministic output
 - **AND** the abandoned attempt is not treated as successful
+
+### Requirement: Published Candidate Acceptance Uses Public Artifacts
+
+Post-publication acceptance SHALL exercise the immutable public package,
+documentation, and container artifacts instead of repository fixtures or a
+locally built distribution.
+
+#### Scenario: The published Python package is accepted
+
+- **GIVEN** a published tag whose GitHub Release and PyPI hashes match
+- **WHEN** the post-publication gate installs the exact public wheel
+- **THEN** `doctor`, deterministic demo generation, agent planning, review,
+  exact-fingerprint approval, validation, and audit verification succeed
+- **AND** agent input comes from the synthetic fixture bundled in that wheel
+
+#### Scenario: Published containers and documentation are accepted
+
+- **GIVEN** the same public release tag
+- **WHEN** the gate verifies documentation and the three GHCR images
+- **THEN** the documented version matches the package
+- **AND** each multi-platform image passes digest, SBOM, attestation, signature,
+  and hardened runtime checks

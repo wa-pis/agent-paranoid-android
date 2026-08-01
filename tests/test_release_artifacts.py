@@ -359,6 +359,13 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "--require-hashes" in workflow
     assert "/test-data-agent doctor" in workflow
     assert "/test-data-agent demo" in workflow
+    assert "/test-data-agent agent-plan" in workflow
+    assert "/test-data-agent agent-review" in workflow
+    assert "/test-data-agent agent-approve" in workflow
+    assert "/test-data-agent audit-verify" in workflow
+    assert 'files("test_data_agent.resources")' in workflow
+    assert "audited_mcp_tool" in workflow
+    assert "tests/fixtures" not in workflow
     assert "source_rows_copied" in workflow
     assert "wa-pis.github.io/agent-paranoid-android" in workflow
     assert "docker buildx imagetools inspect" in workflow
