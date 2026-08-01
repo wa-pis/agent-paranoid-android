@@ -24,6 +24,8 @@ All notable changes to this project are documented here.
   retaining the existing server import paths.
 - Extract pure Trino identifier, allowlist, and bounded read-only SQL policy
   without moving enforcement into the MCP transport.
+- Extract typed, parameterized Trino metadata and aggregate profiling query
+  builders without adding client or MCP transport dependencies.
 
 ### Security
 

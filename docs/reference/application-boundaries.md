@@ -163,7 +163,8 @@ The current dependencies after completed extraction increments are:
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
-| Trino MCP server | audit, core privacy, extracted Trino config/policy, Trino client, Trino transport factory |
+| `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
+| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders, Trino client, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
@@ -263,6 +264,14 @@ boundary.
 and bounded read-only SQL validation. `mcp_trino_server.py` re-exports the
 existing policy errors, constants, and helpers while using the extracted policy
 before any client execution.
+
+### Trino Query Builder Migration
+
+`trino_query_builders.py` now owns metadata, aggregate profiling, rule
+profiling, and masked-sample query construction as typed `TrinoQuery` values.
+The builders validate identifiers, keep source values in bound parameters, and
+perform no I/O. `mcp_trino_server.py` retains orchestration and compatibility
+exports while passing built queries to the existing bounded client path.
 
 ## Per-Increment Review
 
