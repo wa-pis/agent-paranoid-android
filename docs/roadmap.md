@@ -207,9 +207,11 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The package release candidate is `1.0.0rc2`. `1.0.0rc1` completed package and
-GitHub publication but was superseded after GHCR rejected its PEP 440 version
-as a SemVer tag. Assign work to the release where it forms
+The package release candidate is `1.0.0rc3`. `1.0.0rc2` completed public
+acceptance; `1.0.0rc3` includes the contract-preserving application-boundary
+refactor. `1.0.0rc1` completed package and GitHub publication but was
+superseded after GHCR rejected its PEP 440 version as a SemVer tag. Assign work
+to the release where it forms
 a complete user workflow; do not bump the package version on every feature PR.
 Version bumps, release changelog sections, and tags belong to separate release
 pull requests.
