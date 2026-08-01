@@ -4,36 +4,19 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc3] - 2026-08-02
+
 ### Added
 
-- Add static application-boundary tests for dependency direction, direct
-  policy ownership, registration-only MCP transports, and import cycles.
 - Add a manual post-publish gate that verifies immutable GitHub Release, PyPI,
   documentation, and signed multi-platform GHCR artifacts, then exercises
   agent approval and audit verification from the public wheel.
-- Record the exact `v1.0.0rc2` commit, publication run IDs, package hashes, and
-  three verified multi-platform container digests.
 
 ### Changed
 
-- Route agent workspace plans and completion markers through a typed
-  filesystem store with atomic plan publication and rollback, while retaining
-  existing artifact names and compatibility imports.
-- Extract CLI application composition, dispatch, review-first agent, dataset,
-  utility, diagnostics, and optional-extra services while retaining the public
-  parser, presenter, and entry-point contracts.
-- Extract validated Trino connection and resource-budget configuration while
-  retaining the existing server import paths.
-- Extract pure Trino identifier, allowlist, and bounded read-only SQL policy
-  without moving enforcement into the MCP transport.
-- Extract typed, parameterized Trino metadata and aggregate profiling query
-  builders without adding client or MCP transport dependencies.
-- Extract the bounded Trino client with explicit resource budgets, result
-  limits, row conversion, and deterministic cursor/connection cleanup.
-- Extract allowlisted, aggregate-only Trino profiling orchestration behind an
-  injected typed query-fetch boundary while retaining MCP tool wrappers.
-- Extract Trino row masking, source-free category summaries, safe column
-  completion, and masked query results below the MCP transport boundary.
+- Preserve public Python, CLI, MCP, artifact, error, and safety contracts while
+  moving workspace, agent lifecycle, CLI, and Trino ownership behind typed
+  application boundaries. No user migration is required.
 
 ### Security
 
@@ -41,11 +24,6 @@ All notable changes to this project are documented here.
   injected generation port.
 - Reject symlinked agent workspace targets at the persistence boundary before
   creating plan staging artifacts.
-- Run CodeQL on every default-branch commit while keeping documentation-only
-  pull requests free of heavy security jobs, restoring continuous SAST
-  coverage for OpenSSF Scorecard.
-- Record the exact-commit RC2 security review with no unresolved Critical or
-  High finding and one accepted Medium SAST-coverage maturity risk.
 
 ## [1.0.0rc2] - 2026-08-01
 
@@ -596,7 +574,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc3...HEAD
+[1.0.0rc3]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...v1.0.0rc3
 [1.0.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...v1.0.0rc2
 [1.0.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.12.0...v1.0.0rc1
 [0.12.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.11.0...v0.12.0
