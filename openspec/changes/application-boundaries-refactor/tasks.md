@@ -29,7 +29,7 @@ contract-preserving increments.
   - [x] Extract the bounded Trino client boundary.
   - [x] Extract profiling orchestration.
   - [x] Extract masking and safe category summaries.
-- [ ] Preserve compatibility wrappers and add golden contract coverage for
+- [x] Preserve compatibility wrappers and add golden contract coverage for
   public Python, CLI, MCP, errors, artifacts, and safety behavior.
 - [x] Add architecture tests preventing transport-only enforcement, policy
   duplication, CLI/MCP imports from core services, and cyclic dependencies.

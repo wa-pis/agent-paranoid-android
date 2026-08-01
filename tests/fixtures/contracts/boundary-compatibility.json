@@ -1,0 +1,58 @@
+{
+  "cli_error": {
+    "exit_code": 2,
+    "payload": {
+      "error": {
+        "code": "invalid_input",
+        "command": "test-data-agent agent-plan",
+        "exit_code": 2,
+        "help": null,
+        "message": "agent-plan detected a DatasetSpec; use 'test-data-agent generate' for reviewed specs",
+        "retryable": false
+      },
+      "ok": false,
+      "schema_version": "1.0"
+    }
+  },
+  "safety": {
+    "generated_output": {
+      "source_rows_copied": false,
+      "synthetic": true
+    },
+    "unsafe_sql": {
+      "exception": "SqlSafetyError",
+      "message": "DDL, DML, and executable statements are not allowed"
+    }
+  },
+  "schema_version": "1.0",
+  "wrappers": {
+    "agent": [
+      "advise_agent_workspace",
+      "apply_agent_advisor_proposal",
+      "approve_agent_workspace",
+      "build_agent_advisor_exchange",
+      "build_agent_advisor_request",
+      "ensure_agent_workspace_for_plan",
+      "inspect_agent_workspace",
+      "plan_agent_profile",
+      "plan_agent_request",
+      "recover_agent_workspace",
+      "review_agent_workspace"
+    ],
+    "cli": [
+      "advise_agent_workspace_with_provider",
+      "agent_request_from_args",
+      "apply_business_rules_from_args",
+      "run_command",
+      "run_mcp_doctor_smoke",
+      "run_openai_doctor_smoke",
+      "run_parquet_doctor_smoke",
+      "run_trino_doctor_smoke",
+      "write_doctor_fixture"
+    ],
+    "cli_entry_points": [
+      "build_parser",
+      "main"
+    ]
+  }
+}

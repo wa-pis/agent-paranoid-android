@@ -118,7 +118,7 @@ SQL, path, profile, or generation policy into FastMCP registration.
 
 The versioned contract catalog contains:
 
-- `advisor-exchange.json`, `artifact-layout.json`
+- `advisor-exchange.json`, `artifact-layout.json`, `boundary-compatibility.json`
 - `cli-agent-plan.json`, `cli-parser-surface.json`
 - `dataset-spec.json`, `generation-manifest.json`
 - `mcp-generate.json`, `mcp-generator-tools.json`

@@ -7,13 +7,17 @@ import asyncio
 import json
 import os
 from collections.abc import Mapping
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import test_data_agent
+import test_data_agent.agent as agent_module
+import test_data_agent.cli as cli_module
+import test_data_agent.mcp_trino_server as trino_module
 from test_data_agent.agent import build_agent_advisor_exchange
-from test_data_agent.cli import build_parser
 from test_data_agent.io import load_dataset_spec
 from test_data_agent.mcp_generator_server import (
     generate_dataset,
@@ -27,6 +31,7 @@ from test_data_agent.mcp_trino_transport import create_trino_mcp
 CONTRACT_FIXTURE_NAMES = (
     "advisor-exchange.json",
     "artifact-layout.json",
+    "boundary-compatibility.json",
     "cli-agent-plan.json",
     "cli-parser-surface.json",
     "contract-catalog.json",
@@ -40,6 +45,30 @@ CONTRACT_FIXTURE_NAMES = (
     "validation-report.json",
 )
 FIXED_PLAN_ID = "0" * 32
+AGENT_COMPATIBILITY_WRAPPERS = (
+    "advise_agent_workspace",
+    "apply_agent_advisor_proposal",
+    "approve_agent_workspace",
+    "build_agent_advisor_exchange",
+    "build_agent_advisor_request",
+    "ensure_agent_workspace_for_plan",
+    "inspect_agent_workspace",
+    "plan_agent_profile",
+    "plan_agent_request",
+    "recover_agent_workspace",
+    "review_agent_workspace",
+)
+CLI_COMPATIBILITY_WRAPPERS = (
+    "advise_agent_workspace_with_provider",
+    "agent_request_from_args",
+    "apply_business_rules_from_args",
+    "run_command",
+    "run_mcp_doctor_smoke",
+    "run_openai_doctor_smoke",
+    "run_parquet_doctor_smoke",
+    "run_trino_doctor_smoke",
+    "write_doctor_fixture",
+)
 
 
 def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
@@ -89,6 +118,10 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
                 trino_mcp = create_trino_mcp(trino_mcp_tools())
             generator_tools = _mcp_tool_contract(generator_mcp)
             trino_tools = _mcp_tool_contract(trino_mcp)
+            boundary_compatibility = _boundary_compatibility_contract(
+                workspace_root,
+                mcp_generate,
+            )
     finally:
         if previous_workspace is None:
             os.environ.pop("TEST_DATA_AGENT_WORKSPACE_ROOT", None)
@@ -98,6 +131,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
     fixtures = {
         "advisor-exchange.json": advisor_exchange.model_dump(mode="json"),
         "artifact-layout.json": artifact_layout,
+        "boundary-compatibility.json": boundary_compatibility,
         "cli-agent-plan.json": cli_plan,
         "cli-parser-surface.json": _cli_parser_surface(),
         "contract-catalog.json": _contract_catalog(),
@@ -129,6 +163,10 @@ def _contract_catalog() -> dict[str, Any]:
             "artifact-layout.json": {
                 "version": "1.0",
                 "change_rule": "additive_only",
+            },
+            "boundary-compatibility.json": {
+                "version": "1.0",
+                "change_rule": "schema_versioned",
             },
             "cli-agent-plan.json": {
                 "version": "1.0",
@@ -172,6 +210,81 @@ def _contract_catalog() -> dict[str, Any]:
             },
         },
     }
+
+
+def _boundary_compatibility_contract(
+    workspace_root: Path,
+    mcp_generate: Mapping[str, Any],
+) -> dict[str, Any]:
+    invalid_spec = workspace_root / "invalid-agent-input.json"
+    invalid_spec.write_text(
+        '{"schema_version":"1.0","entities":[]}',
+        encoding="utf-8",
+    )
+    stdout = StringIO()
+    stderr = StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        exit_code = cli_module.main(
+            [
+                "agent-plan",
+                str(invalid_spec),
+                "--workspace",
+                str(workspace_root / "invalid-agent"),
+                "--json",
+            ]
+        )
+    if stderr.getvalue():
+        raise RuntimeError("structured CLI errors must not write to stderr")
+
+    try:
+        trino_module.validate_safe_select(
+            "DELETE FROM analytics.safe_schema.orders"
+        )
+    except trino_module.SqlSafetyError as exc:
+        unsafe_sql = {
+            "exception": type(exc).__name__,
+            "message": str(exc),
+        }
+    else:
+        raise RuntimeError("unsafe SQL unexpectedly passed the compatibility gate")
+
+    return {
+        "schema_version": "1.0",
+        "wrappers": {
+            "agent": _available_callables(
+                agent_module,
+                AGENT_COMPATIBILITY_WRAPPERS,
+            ),
+            "cli": _available_callables(
+                cli_module,
+                CLI_COMPATIBILITY_WRAPPERS,
+            ),
+            "cli_entry_points": _available_callables(
+                cli_module,
+                ("build_parser", "main"),
+            ),
+        },
+        "cli_error": {
+            "exit_code": exit_code,
+            "payload": json.loads(stdout.getvalue()),
+        },
+        "safety": {
+            "generated_output": {
+                "source_rows_copied": mcp_generate["source_rows_copied"],
+                "synthetic": mcp_generate["synthetic"],
+            },
+            "unsafe_sql": unsafe_sql,
+        },
+    }
+
+
+def _available_callables(module: Any, names: tuple[str, ...]) -> list[str]:
+    available = []
+    for name in names:
+        if not callable(getattr(module, name, None)):
+            raise RuntimeError(f"compatibility callable is missing: {name}")
+        available.append(name)
+    return sorted(available)
 
 
 def _mcp_tool_contract(server: Any | None) -> list[dict[str, Any]]:
@@ -261,7 +374,7 @@ def _safe_trino_profile() -> dict[str, Any]:
 
 
 def _cli_parser_surface() -> dict[str, Any]:
-    parser = build_parser([])
+    parser = cli_module.build_parser([])
     subparsers = next(
         action
         for action in parser._actions

@@ -8,6 +8,10 @@
       "change_rule": "additive_only",
       "version": "1.0"
     },
+    "boundary-compatibility.json": {
+      "change_rule": "schema_versioned",
+      "version": "1.0"
+    },
     "cli-agent-plan.json": {
       "change_rule": "schema_versioned",
       "version": "1.0"
