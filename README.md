@@ -8,7 +8,9 @@
 
 Safety-first, deterministic synthetic test data generation from CSV structure,
 safe profiles, reviewed `DatasetSpec` files, and allowlisted Trino metadata. The
-CLI and Python library are primary; MCP, Trino, and AI providers are integrations.
+CLI and Python library are primary; MCP, Trino, and AI providers are optional
+integrations. The base package supports CSV/JSON workflows without installing
+the Trino client, SQL parser, or MCP SDK.
 Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
@@ -40,9 +42,14 @@ Install only features you use:
 
 ```bash
 python3 -m pip install "agent-paranoid-android[parquet]"
-python3 -m pip install "agent-paranoid-android[mcp,trino]"
+python3 -m pip install "agent-paranoid-android[mcp]"
+python3 -m pip install "agent-paranoid-android[trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
 ```
+
+The `trino` extra is required only for Trino profiling and contains the Trino
+client and safe SQL parser. The `mcp` extra is separate; install both extras
+when using the Trino MCP server.
 
 ## First Offline Run
 
