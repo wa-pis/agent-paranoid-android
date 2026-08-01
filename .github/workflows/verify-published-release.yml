@@ -180,6 +180,108 @@ jobs:
           assert manifest["validation_valid"] is True
           PY
 
+      - name: Run public agent approval and audit verification
+        run: |
+          set -euo pipefail
+          cd /tmp
+          demo_source="$(
+            /tmp/published-release/bin/python - <<'PY'
+          from importlib.resources import files
+
+          print(files("test_data_agent.resources").joinpath("demo_customers.csv"))
+          PY
+          )"
+          test -f "${demo_source}"
+          test ! -e /tmp/published-release-agent
+
+          /tmp/published-release/bin/test-data-agent agent-plan \
+            "${demo_source}" \
+            --source-type csv \
+            --table customers \
+            --workspace /tmp/published-release-agent \
+            --count 8 \
+            --seed 12345 \
+            --format csv \
+            --json \
+            > /tmp/published-agent-plan.json
+          test ! -e /tmp/published-release-agent/generated
+          /tmp/published-release/bin/test-data-agent agent-review \
+            /tmp/published-release-agent \
+            --json \
+            > /tmp/published-agent-review.json
+          reviewed_spec_sha256="$(
+            /tmp/published-release/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+
+          review = json.loads(Path("/tmp/published-agent-review.json").read_text())
+          print(review["current_spec_sha256"])
+          PY
+          )"
+          /tmp/published-release/bin/test-data-agent agent-approve \
+            /tmp/published-release-agent \
+            --reviewed-spec-sha256 "${reviewed_spec_sha256}" \
+            --json \
+            > /tmp/published-agent-approved.json
+
+          export TEST_DATA_AGENT_AUDIT_LOG=/tmp/published-release-audit.jsonl
+          export TEST_DATA_AGENT_AUDIT_HMAC_KEY="$(
+            /tmp/published-release/bin/python - <<'PY'
+          import base64
+          import secrets
+
+          print(base64.b64encode(secrets.token_bytes(32)).decode("ascii"))
+          PY
+          )"
+          /tmp/published-release/bin/python - <<'PY'
+          from test_data_agent.audit import audited_mcp_tool
+
+
+          def published_smoke() -> None:
+              return None
+
+
+          audited_mcp_tool("generator-mcp", published_smoke)()
+          PY
+          /tmp/published-release/bin/test-data-agent audit-verify \
+            "${TEST_DATA_AGENT_AUDIT_LOG}" \
+            2> /tmp/published-audit-verification.txt
+          grep -F "Audit log verified: 2 records" \
+            /tmp/published-audit-verification.txt
+
+          /tmp/published-release/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+
+          planned = json.loads(Path("/tmp/published-agent-plan.json").read_text())
+          review = json.loads(Path("/tmp/published-agent-review.json").read_text())
+          approved = json.loads(
+              Path("/tmp/published-agent-approved.json").read_text()
+          )
+          manifest = json.loads(
+              Path(
+                  "/tmp/published-release-agent/generated/generation_manifest.json"
+              ).read_text()
+          )
+          reviewed_hash = review["current_spec_sha256"]
+          assert planned["phase"] == "awaiting_approval"
+          assert planned["review"]["current_spec_sha256"] == reviewed_hash
+          assert review["approval_required"] is True
+          assert review["generation_performed"] is False
+          assert approved["phase"] == "completed"
+          assert approved["summary"]["validation_valid"] is True
+          assert approved["summary"]["source_rows_copied"] is False
+          assert (
+              approved["approval_receipt"]["reviewed_spec_sha256"]
+              == reviewed_hash
+          )
+          assert manifest["synthetic"] is True
+          assert manifest["source_rows_copied"] is False
+          assert manifest["validation_valid"] is True
+          PY
+          echo "Public agent approval and audit verification passed." \
+            >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Verify published documentation
         env:
           PYPI_VERSION: ${{ needs.prepare.outputs.version }}

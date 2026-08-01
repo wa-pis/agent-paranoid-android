@@ -104,6 +104,9 @@ its commit, then:
 - compares the public PyPI hashes with the GitHub Release distributions;
 - installs the hash-pinned wheel from public PyPI and runs `doctor` plus the
   bundled synthetic demo;
+- uses only that installed wheel's synthetic fixture to run agent planning,
+  metadata-only review, exact-fingerprint approval, validation, and signed
+  audit-log verification;
 - confirms the public documentation names the same package version; and
 - resolves each GHCR tag to an immutable multi-platform digest, verifies its
   SBOM, GitHub provenance attestation, and keyless Cosign signature, then pulls

@@ -81,4 +81,5 @@ Before creating a tag:
   repository access.
 - Dispatch `Verify Published Release` for the immutable release tag and retain
   the successful run URL, exact commit, package hashes, and three image digests
-  in the release evidence.
+  in the release evidence. Confirm its public-wheel agent approval and audit
+  verification steps also pass without repository fixtures.
