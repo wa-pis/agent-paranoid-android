@@ -92,7 +92,7 @@ to profile your own input.
 | Connect an AI client or provider | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) · [Provider Adapter](https://wa-pis.github.io/agent-paranoid-android/how-to/custom-advisor-provider/) · [Runnable MCP example](examples/mcp_stdio/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |
-| Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
+| Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) · [Runnable local Trino example](examples/local_trino/) |
 | Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/) |
 | Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
 | Upgrade from 0.5.x | [Migrating To 0.6](https://wa-pis.github.io/agent-paranoid-android/operations/migrating-to-0.6/) |

@@ -413,13 +413,13 @@ Scope:
   - [ ] Use the [installed demo and product clarity
     OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-installed-demo-and-product-clarity/proposal.md)
     as the implementation contract.
-- [ ] Publish runnable, CI-verified usage journeys built only from synthetic
+- [x] Publish runnable, CI-verified usage journeys built only from synthetic
   fixtures. Each journey must show its input, command or API call, generated
   artifacts, validation result, and the privacy boundary being exercised:
   - [x] Single-table CSV: profile → infer spec → generate → validate → export.
   - [x] Relational CSV folder: discover candidate relationships, review rules,
     generate multiple tables, and verify FK/business-rule reconciliation.
-  - [ ] Local Trino: start a disposable synthetic catalog, exercise bounded
+  - [x] Local Trino: start a disposable synthetic catalog, exercise bounded
     metadata/profiling tools, then generate without exporting source rows.
   - [x] MCP: configure and call generator and Trino servers against the same
     synthetic fixtures, including one rejected unsafe request.
@@ -427,7 +427,7 @@ Scope:
     an explicit seed.
   - [x] Output formats: inspect CSV, JSON, SQL, and optional Parquet artifacts
     plus their manifest and validation report.
-  - [ ] Add one-command launchers and CI smoke tests that run the examples from
+  - [x] Add one-command launchers and CI smoke tests that run the examples from
     an installed wheel or release-style container, not the source checkout.
 - [ ] Verify README, documentation site, migration guidance, examples, package
   metadata, SBOM, provenance, signatures, and public support policy.

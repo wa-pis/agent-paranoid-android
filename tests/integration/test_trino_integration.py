@@ -1,4 +1,8 @@
 import os
+import json
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -19,6 +23,8 @@ pytestmark = [
         reason="set TEST_TRINO_INTEGRATION=1 with a local Trino service",
     ),
 ]
+
+ROOT = Path(__file__).parents[2]
 
 
 def test_trino_metadata_and_safe_profile_round_trip() -> None:
@@ -47,3 +53,39 @@ def test_trino_safe_select_returns_only_bounded_requested_columns() -> None:
 
     assert len(rows) == 3
     assert all(set(row) == {"nationkey", "regionkey"} for row in rows)
+
+
+def test_local_trino_example_profiles_then_generates_from_installed_package(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "local-trino"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    environment["PATH"] = os.pathsep.join(
+        [str(Path(sys.executable).parent), environment.get("PATH", "")]
+    )
+
+    subprocess.run(
+        [sys.executable, ROOT / "examples/local_trino/run.py", output],
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    result = json.loads((output / "example_result.json").read_text())
+    profile_text = (output / "profile.json").read_text()
+    manifest = json.loads(
+        (output / "generated/generation_manifest.json").read_text()
+    )
+    assert result["catalog_available"] is True
+    assert result["schema_available"] is True
+    assert result["table_available"] is True
+    assert result["profile_row_count"] == 25
+    assert result["generated_row_counts"] == {"nation": 12}
+    assert result["source_rows_copied"] is False
+    assert result["validation_valid"] is True
+    assert "ALGERIA" not in profile_text
+    assert manifest["synthetic"] is True
+    assert manifest["seed"] == 141421

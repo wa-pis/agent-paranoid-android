@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added a disposable local Trino journey that profiles the built-in synthetic
+  TPC-H catalog through bounded operations before generating fresh rows.
 - Added a runnable stdio MCP journey using both installed servers, review-bound
   generation, and a disallowed Trino request rejected before network access.
 - Added deterministic SQL `INSERT` export with quoted identifiers, escaped
