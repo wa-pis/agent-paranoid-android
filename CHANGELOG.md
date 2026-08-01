@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
 - Added a disposable local Trino journey that profiles the built-in synthetic
   TPC-H catalog through bounded operations before generating fresh rows.
 - Added a runnable stdio MCP journey using both installed servers, review-bound
@@ -12,8 +14,6 @@ All notable changes to this project are documented here.
   literals, manifest evidence, and a runnable all-format example.
 - Added canonical dependency identities and a stable dependency fingerprint to
   generation-manifest reproducibility evidence.
-- Fixed ISO date columns being misclassified as phone numbers during CSV
-  profiling.
 - Added an offline `test-data-agent demo --output PATH` workflow using a
   bundled fictional fixture, deterministic seed, and atomic artifact publish.
 - Added metadata-only effective generation and business-rule evidence to
@@ -29,16 +29,12 @@ All notable changes to this project are documented here.
   cardinality/null/distinctness evidence, and ambiguous low-confidence cases.
 - Added metadata-only relationship candidate mining, provider ranking validation,
   and explicit human review records that cannot authorize generation.
-- Bound JSON dataset inputs by row count, nested value count, nesting depth,
-  and string value length before validation.
 - A runnable single-table CSV example now exercises explicit profiling, spec
   inference, deterministic generation, and independent validation.
 - A runnable relational CSV example now verifies generated foreign keys,
   deterministic business rules, and multi-table validation.
 - A runnable public Python API example now demonstrates metadata-only spec
   inference, seeded bundle generation, and independent validation.
-
-### Added
 
 - Provider-neutral relationship discovery candidate and proposal contracts
   restricted to bounded safe metadata and mandatory human review.
@@ -131,6 +127,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Fixed ISO date columns being misclassified as phone numbers during CSV
+  profiling.
 - Validation reports now honor all `ValidationSettings` section toggles and
   `fail_fast`, and record the effective settings used.
 - Container builds no longer default to version `0.8.1`, and publication now
@@ -192,6 +190,11 @@ All notable changes to this project are documented here.
   exit criteria, release gates, and deferred work.
 - An ordered remaining-work checklist from completed feature scopes through
   OpenSpec closure, RC security review, public artifact verification, and 1.0.
+
+### Security
+
+- Bound JSON dataset inputs by row count, nested value count, nesting depth,
+  and string value length before validation.
 
 ## [0.12.0] - 2026-07-31
 
