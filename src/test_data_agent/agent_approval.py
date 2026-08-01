@@ -22,6 +22,7 @@ from test_data_agent.agent_review import inspect_agent_review_context
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.io.workflows import ensure_empty_output_folder
+from test_data_agent.safety import assert_spec_safe
 from test_data_agent.workspace_store import (
     AGENT_RESULT_FILE,
     APPROVAL_RECEIPT_FILE,
@@ -111,6 +112,7 @@ class AgentApprovalService:
                 "review dataset_spec.yaml again"
             )
 
+        assert_spec_safe(spec)
         ensure_empty_output_folder(generated_folder)
         checkpoint = self._generate_dataset(
             request,

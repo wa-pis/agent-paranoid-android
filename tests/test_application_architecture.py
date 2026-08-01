@@ -44,6 +44,7 @@ BOUNDARY_MODULES = LOWER_LAYER_MODULES | {
 }
 
 REQUIRED_POLICY_IMPORTS = {
+    "test_data_agent.agent_approval": {"test_data_agent.safety"},
     "test_data_agent.agent_planning": {"test_data_agent.safety"},
     "test_data_agent.agent_review": {"test_data_agent.safety"},
     "test_data_agent.generation.entity_generator": {"test_data_agent.safety"},

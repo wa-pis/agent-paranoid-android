@@ -18,8 +18,12 @@ from test_data_agent.agent_contracts import (
     AgentSourceType,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.io.artifacts import write_dataset_spec_artifact
+from test_data_agent.io.artifacts import (
+    dataset_spec_fingerprint,
+    write_dataset_spec_artifact,
+)
 from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent.safety import SpecSafetyError
 
 
 FIXTURE_DATASET = Path("tests/fixtures/example_dataset")
@@ -84,6 +88,40 @@ def test_approval_service_rejects_changed_spec_before_generation(
             reviewed_spec_sha256=planned.review.current_spec_sha256,
         )
 
+    assert not (workspace / "generated").exists()
+    assert not (workspace / "approval_receipt.json").exists()
+
+
+def test_approval_service_rejects_unsafe_spec_before_injected_generation(
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "agent"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    raw_email = "private-person@example.com"
+    spec_path = workspace / "dataset_spec.yaml"
+    spec = load_dataset_spec(spec_path)
+    field = spec.entity("customers").field("segment")
+    field.distribution = {
+        "kind": "categorical",
+        "categories": [{"value": raw_email, "count": 1}],
+    }
+    write_dataset_spec_artifact(spec, spec_path)
+
+    service = AgentApprovalService(inspect_agent_workspace, _forbidden_generation)
+    with pytest.raises(SpecSafetyError) as exc_info:
+        service.approve_workspace(
+            workspace,
+            reviewed_spec_sha256=dataset_spec_fingerprint(spec),
+        )
+
+    assert raw_email not in str(exc_info.value)
     assert not (workspace / "generated").exists()
     assert not (workspace / "approval_receipt.json").exists()
 
