@@ -369,6 +369,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
        - [x] Reject unsafe specs before injected approval generation.
        - [x] Reject unsafe SQL before injected Trino access.
        - [x] Reject unsafe provider payloads before review persistence.
+     - [x] Document internal ownership migrations and retained compatibility
+       entry points.
    - [ ] Run the full typing, lint, compile, test, package, documentation, and
      security gates, then archive the completed OpenSpec change.
 8. [ ] Publish a new release candidate from the verified refactor commit and

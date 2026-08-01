@@ -40,7 +40,7 @@ contract-preserving increments.
   - [x] Reject unsafe specs at the approval service before injected generation.
   - [x] Reject unsafe SQL at the masking service before injected Trino access.
   - [x] Reject unsafe provider payloads before advisor review persistence.
-- [ ] Document migration notes for any intentionally moved internal boundary.
+- [x] Document migration notes for any intentionally moved internal boundary.
 - [ ] Run the full typing, lint, compile, test, package, documentation, and
   security gates.
 - [ ] Merge applicable OpenSpec deltas into the canonical baseline and archive
