@@ -19,7 +19,7 @@ contract-preserving increments.
   - [x] Extract installation diagnostics and capability smoke orchestration.
   - [ ] Extract composition and command dispatch.
   - [x] Extract agent command handlers.
-  - [ ] Extract dataset and utility command handlers.
+  - [x] Extract dataset and utility command handlers.
   - [x] Centralize optional dependency resolution.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
   masking; keep policy pure and builders non-executing.

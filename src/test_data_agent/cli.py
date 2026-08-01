@@ -16,7 +16,11 @@ from test_data_agent.cli_agent import (
     agent_request_from_args as _agent_request_from_args,
     run_agent_command as _run_agent_command,
 )
-from test_data_agent.audit import verify_audit_log_from_env
+from test_data_agent.cli_commands import (
+    apply_business_rules_from_args as _apply_business_rules_from_args,
+    run_dataset_command as _run_dataset_command,
+    run_utility_command as _run_utility_command,
+)
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_dependencies import CliDependencyResolver
 from test_data_agent.cli_doctor import (
@@ -35,29 +39,8 @@ from test_data_agent.cli_parser import (
     register_examples_command,
     register_utility_commands,
 )
-from test_data_agent.cli_presenter import (
-    friendly_error,
-    report_cli_error,
-    write_audit_verification_result,
-    write_doctor_report,
-    write_examples,
-    write_validation_result,
-)
+from test_data_agent.cli_presenter import friendly_error, report_cli_error
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.demo import run_demo
-from test_data_agent.generation.constraint_solver import default_value_for_field
-from test_data_agent.io import (
-    generate_dataset_from_csv_command,
-    generate_dataset_from_example_command,
-    generate_dataset_from_profile_command,
-    generate_dataset_command,
-    infer_dataset_spec_command,
-    profile_csv_command,
-    profile_example_command,
-    validate_dataset_artifacts,
-    write_generation_summary,
-)
-from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
 from test_data_agent.version import __version__
 
 ROOT_EPILOG = """\
@@ -260,78 +243,20 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def run_command(args: argparse.Namespace) -> int:
-    if args.command == "examples":
-        return write_examples(EXAMPLES_TEXT)
+    utility_exit_code = _run_utility_command(
+        args,
+        examples_text=EXAMPLES_TEXT,
+        doctor_inspector=inspect_doctor,
+    )
+    if utility_exit_code is not None:
+        return utility_exit_code
 
-    if args.command == "demo":
-        exit_code = run_demo(args.output)
-        write_generation_summary(args.output)
-        return exit_code
-
-    if args.command == "generate":
-        if args.profile is not None:
-            return generate_dataset_from_profile_command(
-                args,
-                business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
-                    rows_by_entity,
-                    args,
-                    seed,
-                    spec,
-                ),
-            )
-        return generate_dataset_command(
-            args,
-            business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
-                rows_by_entity,
-                args,
-                seed,
-                spec,
-            ),
-        )
-
-    if args.command in {"profile-example", "profile-csv-folder"}:
-        return profile_example_command(args)
-
-    if args.command == "infer-spec":
-        return infer_dataset_spec_command(args)
-
-    if args.command == "profile-csv":
-        return profile_csv_command(args)
-
-    if args.command == "generate-from-csv":
-        return generate_dataset_from_csv_command(
-            args,
-            business_rules_applier=lambda rows_by_entity, seed, spec: apply_business_rules_from_args(
-                rows_by_entity,
-                args,
-                seed,
-                spec,
-            ),
-        )
-
-    if args.command == "validate":
-        report = validate_dataset_artifacts(
-            args.spec,
-            args.rows,
-            output_path=args.output,
-            overwrite=args.overwrite,
-        )
-        return write_validation_result(report, args.output)
-
-    if args.command in {"generate-from-example", "generate-from-csv-folder"}:
-        return generate_dataset_from_example_command(args)
-
-    if args.command == "doctor":
-        return write_doctor_report(
-            inspect_doctor(
-                skip_smoke=args.skip_smoke,
-                required_extras=set(args.require_extra),
-            )
-        )
-
-    if args.command == "audit-verify":
-        audit_result = verify_audit_log_from_env(args.log)
-        return write_audit_verification_result(audit_result)
+    dataset_exit_code = _run_dataset_command(
+        args,
+        business_rules_applier=apply_business_rules_from_args,
+    )
+    if dataset_exit_code is not None:
+        return dataset_exit_code
 
     agent_exit_code = _run_agent_command(
         args,
@@ -419,23 +344,13 @@ def apply_business_rules_from_args(
     seed: int,
     spec: DatasetSpec | None = None,
 ) -> Any | None:
-    field_defaults = None
-    if spec is not None:
-        field_defaults = {
-            entity.name: {
-                field.name: default_value_for_field(field)
-                for field in entity.fields
-            }
-            for entity in spec.entities
-        }
-    return apply_and_validate_business_rules_from_path(
+    """Compatibility wrapper for extracted dataset command rule handling."""
+
+    return _apply_business_rules_from_args(
         rows_by_table,
-        getattr(args, "business_rules", None),
-        seed=seed,
-        mode=args.mode,
-        invalid_ratio=args.invalid_ratio,
-        field_defaults=field_defaults,
-        spec=spec,
+        args,
+        seed,
+        spec,
     )
 
 

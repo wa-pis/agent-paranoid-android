@@ -17,6 +17,9 @@ All notable changes to this project are documented here.
 - Route agent workspace plans and completion markers through a typed
   filesystem store with atomic plan publication and rollback, while retaining
   existing artifact names and compatibility imports.
+- Extract review-first agent, dataset, utility, diagnostics, and optional-extra
+  CLI services while retaining the public parser, presenter, and entry-point
+  contracts.
 
 ### Security
 

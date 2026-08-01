@@ -145,8 +145,9 @@ The current dependencies after completed extraction increments are:
 | Owner | Current dependencies |
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
-| `cli.py` | composition/dispatch, parser/presenter contracts, compatibility wrappers, audit, demo, I/O commands, and rules |
+| `cli.py` | composition/dispatch, parser/presenter contracts, and compatibility wrappers |
 | `cli_agent.py` | `agent-*` request translation, handler dispatch, lifecycle services, provider adapter, and presenters |
+| `cli_commands.py` | dataset and utility handlers, I/O workflows, audit, demo, rules, and presenters |
 | `cli_dependencies.py` | optional-extra module catalog, injected availability inspection, and normalized installation errors |
 | `cli_doctor.py` | installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration |
 | `agent.py` | compatibility exports plus deterministic generation and completion validation |
@@ -234,6 +235,11 @@ remain injectable so direct service calls preserve fail-closed behavior.
 handling. `cli.py` keeps the public entry point and compatibility helpers, then
 injects those helpers into the extracted handler without changing parser or
 presenter contracts.
+
+`cli_commands.py` now owns dataset and utility command handling, including the
+direct business-rule bridge. `cli.py` keeps top-level composition, dispatch,
+and the existing business-rule compatibility helper while injecting doctor and
+rule dependencies into the extracted handlers.
 
 ## Per-Increment Review
 
