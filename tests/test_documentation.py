@@ -42,6 +42,7 @@ REQUIRED_DOCS = {
     "operations/migrating-to-0.6.md",
     "changelog-policy.md",
     "release-evidence-1.0.0rc1.md",
+    "release-evidence-1.0.0rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
 }
 CLI_COMMANDS = {
@@ -118,6 +119,20 @@ def test_rc_changelog_cleanup_preserves_inventory_evidence() -> None:
     assert "**9**" in inventory
     assert "**0**" in inventory
     assert "**43**" in inventory
+
+
+def test_rc2_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.0.0rc2.md").read_text()
+
+    for expected in (
+        "e5030b6ae3a06885296d530a4a99f86b760118dd",
+        "actions/runs/30689390871",
+        "8982b0fe05dc380ac948c1b3d37eda1bd5f2211a0299549be0b77952847c9297",
+        "sha256:7f2b93ce9570e2dc702d34bc098b0756ee64b13588f4eb73ede950694d5de73b",
+        "sha256:5fa30138b86fc4d9ce9eb80742ca4e9652da6507ea523508ac5fe7f0a9fa3d02",
+        "sha256:d53df07ea4bab935ec95592f9aa0e1f64e0a84825cf3241a62ef1d393060574c",
+    ):
+        assert expected in evidence
 
 
 def test_unreleased_changelog_headings_follow_policy_order() -> None:

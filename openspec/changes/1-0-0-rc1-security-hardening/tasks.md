@@ -67,7 +67,7 @@
   - [x] Cover the remaining production modules and duplicate script modules.
 - [x] Remove `0.8.1` container defaults or derive them from package metadata;
   add a release drift check.
-- [ ] Verify release tags point to the verified merge commit and publish
+- [x] Verify release tags point to the verified merge commit and publish
   reproducible security evidence with run IDs and artifact digests.
 
 ## P2 — RC disposition required; implementation may follow the RC
@@ -99,14 +99,14 @@
   the configured threshold.
 - [x] Run lint, full-package typing, compile, dependency/license/security,
   documentation, wheel, and container gates.
-- [ ] Run the workflow from published-style wheel, PyPI, GitHub Release,
+- [x] Run the workflow from published-style wheel, PyPI, GitHub Release,
   documentation, and GHCR artifacts.
   - [x] Add a manual post-publish workflow that verifies immutable package,
     documentation, attestation, signature, and container-runtime evidence.
-  - [ ] Run the workflow for `v1.0.0rc2` and record its run URL, exact commit,
+  - [x] Run the workflow for `v1.0.0rc2` and record its run URL, exact commit,
     package hashes, and three image digests.
 - [ ] Re-run the full security review against the exact RC commit and record
   every remaining P2 or lower finding with owner, rationale, and revisit date.
 - [x] Verify at least one end-to-end AI-assisted discovery flow with a local
   fake provider and prove that no raw source rows enter the provider request.
-- [ ] Allow only release-blocking fixes after `1.0.0rc1`; no new features.
+- [x] Allow only release-blocking fixes after `1.0.0rc1`; no new features.

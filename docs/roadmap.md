@@ -324,7 +324,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
    explicitly deferred before the RC is published.
 4. [ ] Run a fresh full security audit, resolve every Critical and High finding,
    and record owners and dispositions for accepted Medium or lower risks.
-5. [ ] Review README, documentation, migration guidance, examples, package
+5. [x] Review README, documentation, migration guidance, examples, package
    metadata, support policy, SBOM, provenance, signatures, and release notes as
    one public-readiness gate.
 6. [ ] Prepare and publish `1.0.0rc2`, then run installation, `doctor`,
@@ -357,7 +357,7 @@ Scope:
   access paths.
 - [x] Add direct API adversarial tests to the release gate; passing the current
   CLI/MCP workflow tests alone is not sufficient evidence for the RC.
-- [ ] Record reproducibility inputs, container/package version consistency, and
+- [x] Record reproducibility inputs, container/package version consistency, and
   security scanner evidence against the exact RC commit and published artifacts.
 - [x] Formalize the reproducibility contract: distinguish same-environment,
   same-version, and cross-version guarantees; record package/Python,
@@ -438,7 +438,7 @@ Scope:
     release-engineering evidence to canonical linked documents without deleting
     security history. Track this in the [release documentation hygiene
     OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/release-documentation-hygiene/proposal.md).
-- [ ] Publish and install the release candidate through the real GitHub,
+- [x] Publish and install the release candidate through the real GitHub,
   PyPI, documentation, and GHCR paths.
 - [ ] Run end-to-end smoke tests only against the published candidate
   artifacts.

@@ -75,6 +75,7 @@ nav:
       - Generator MCP Design: mcp_generator_design.md
       - Changelog Policy: changelog-policy.md
       - RC Changelog Inventory: unreleased-inventory-1.0.0rc1.md
-      - RC Internal Evidence: release-evidence-1.0.0rc1.md
+      - RC1 Internal Evidence: release-evidence-1.0.0rc1.md
+      - RC2 Published Evidence: release-evidence-1.0.0rc2.md
       - Security Review: security-review-2026-07-31.md
       - Roadmap: roadmap.md
