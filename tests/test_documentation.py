@@ -110,7 +110,7 @@ def test_rc_changelog_cleanup_preserves_inventory_evidence() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text().split("## [0.12.0]", 1)[0]
 
     assert "89 top-level bullets" in inventory
-    assert sum(line.startswith("- ") for line in changelog.splitlines()) == 46
+    assert sum(line.startswith("- ") for line in changelog.splitlines()) == 43
     assert sum(line.startswith("- ") for line in evidence.splitlines()) == 43
     assert "**37**" in inventory
     assert "**9**" in inventory
