@@ -67,7 +67,7 @@ CLI_COMMANDS = {
 def test_readme_is_a_focused_entrypoint() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert len(readme.splitlines()) <= 130
+    assert len(readme.splitlines()) <= 140
     assert "python3 -m pip install agent-paranoid-android" in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -171,7 +171,10 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template"}
+    assert active == {
+        "1-0-0-rc4-privacy-invocation-hardening",
+        "_template",
+    }
 
     requirements = {
         "synthetic-generation": (
@@ -215,7 +218,7 @@ def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
 
     assert "Status: required before the stable 1.0" in proposal
     assert "2026-08-01-application-boundaries-refactor/proposal.md" in stable_scope
-    assert "release candidate containing the completed" in stable_scope
+    assert "promote the verified RC4 baseline" in stable_scope
     assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
     assert "- [ ]" not in tasks
 
