@@ -35,6 +35,9 @@ contract-preserving increments.
   duplication, CLI/MCP imports from core services, and cyclic dependencies.
 - [ ] Add direct-service adversarial tests for unsafe specs, paths, SQL, and
   provider payloads after each extraction.
+  - [x] Reject symlinked workspace targets at the persistence boundary before
+    plan staging.
+  - [ ] Complete unsafe spec, SQL, and provider-payload coverage.
 - [ ] Document migration notes for any intentionally moved internal boundary.
 - [ ] Run the full typing, lint, compile, test, package, documentation, and
   security gates.

@@ -365,6 +365,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
      every public Python, CLI, MCP, artifact, error, and safety contract.
      - [x] Add static dependency, policy-owner, transport, and cycle gates.
      - [ ] Complete cross-boundary direct-service adversarial coverage.
+       - [x] Reject symlinked workspace targets before plan staging.
+       - [ ] Complete unsafe spec, SQL, and provider-payload coverage.
    - [ ] Run the full typing, lint, compile, test, package, documentation, and
      security gates, then archive the completed OpenSpec change.
 8. [ ] Publish a new release candidate from the verified refactor commit and

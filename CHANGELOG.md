@@ -37,6 +37,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Reject symlinked agent workspace targets at the persistence boundary before
+  creating plan staging artifacts.
 - Run CodeQL on every default-branch commit while keeping documentation-only
   pull requests free of heavy security jobs, restoring continuous SAST
   coverage for OpenSSF Scorecard.
