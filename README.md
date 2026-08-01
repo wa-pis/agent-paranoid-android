@@ -7,11 +7,11 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Safety-first, deterministic synthetic test data generation from CSV structure,
-safe profiles, reviewed `DatasetSpec` files, and allowlisted Trino metadata.
+safe profiles, reviewed `DatasetSpec` files, and allowlisted Trino metadata. The
+CLI and Python library are primary; MCP, Trino, and AI providers are integrations.
 Source rows are profiled, never shuffled or copied into generated output.
 
-**[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)**
-for tutorials, concepts, configuration, MCP setup, and troubleshooting.
+**[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
 Current version: `0.12.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
@@ -95,7 +95,7 @@ to profile your own input.
 | Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) · [Runnable local Trino example](examples/local_trino/) |
 | Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/) |
 | Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
-| Upgrade from 0.5.x | [Migrating To 0.6](https://wa-pis.github.io/agent-paranoid-android/operations/migrating-to-0.6/) |
+| Decide whether this tool fits | [Choose An Approach](https://wa-pis.github.io/agent-paranoid-android/concepts/choosing-an-approach/) |
 
 ## Safety
 
