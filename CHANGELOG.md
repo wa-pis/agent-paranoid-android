@@ -6,14 +6,18 @@ All notable changes to this project are documented here.
 
 ### Added
 
-- Added a disposable local Trino journey that profiles the built-in synthetic
-  TPC-H catalog through bounded operations before generating fresh rows.
-- Added a runnable stdio MCP journey using both installed servers, review-bound
-  generation, and a disallowed Trino request rejected before network access.
+- Added a [disposable local Trino journey](examples/local_trino/README.md) that
+  profiles the built-in synthetic TPC-H catalog through bounded operations
+  before generating fresh rows.
+- Added a [runnable stdio MCP journey](examples/mcp_stdio/README.md) using both
+  installed servers, review-bound generation, and a disallowed Trino request
+  rejected before network access.
 - Added deterministic SQL `INSERT` export with quoted identifiers, escaped
-  literals, manifest evidence, and a runnable all-format example.
-- Added canonical dependency identities and a stable dependency fingerprint to
-  generation-manifest reproducibility evidence.
+  literals, manifest evidence, and a
+  [runnable all-format example](examples/output_formats/README.md).
+- Added [canonical dependency identities](docs/reference/dependency-compatibility.md)
+  and a stable dependency fingerprint to generation-manifest reproducibility
+  evidence.
 - Added an offline `test-data-agent demo --output PATH` workflow using a
   bundled fictional fixture, deterministic seed, and atomic artifact publish.
 - Added metadata-only effective generation and business-rule evidence to
