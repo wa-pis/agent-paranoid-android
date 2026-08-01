@@ -100,6 +100,8 @@ not be the only place where safety checks happen.
   output folder or calling an injected generation port.
 - The masking service applies the complete bounded read-only SQL policy before
   calling an injected Trino fetch port, including for direct service callers.
+- The advising service validates untrusted payloads against its original
+  metadata request before persisting a review or changing the reviewed spec.
 
 ## Alternatives
 

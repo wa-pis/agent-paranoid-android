@@ -33,13 +33,13 @@ contract-preserving increments.
   public Python, CLI, MCP, errors, artifacts, and safety behavior.
 - [x] Add architecture tests preventing transport-only enforcement, policy
   duplication, CLI/MCP imports from core services, and cyclic dependencies.
-- [ ] Add direct-service adversarial tests for unsafe specs, paths, SQL, and
+- [x] Add direct-service adversarial tests for unsafe specs, paths, SQL, and
   provider payloads after each extraction.
   - [x] Reject symlinked workspace targets at the persistence boundary before
     plan staging.
   - [x] Reject unsafe specs at the approval service before injected generation.
   - [x] Reject unsafe SQL at the masking service before injected Trino access.
-  - [ ] Complete provider-payload coverage.
+  - [x] Reject unsafe provider payloads before advisor review persistence.
 - [ ] Document migration notes for any intentionally moved internal boundary.
 - [ ] Run the full typing, lint, compile, test, package, documentation, and
   security gates.
