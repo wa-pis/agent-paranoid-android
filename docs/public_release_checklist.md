@@ -79,3 +79,6 @@ Before creating a tag:
   do not bypass the allowlist for a release.
 - Confirm all GHCR packages intended for public use are public and inherit
   repository access.
+- Dispatch `Verify Published Release` for the immutable release tag and retain
+  the successful run URL, exact commit, package hashes, and three image digests
+  in the release evidence.

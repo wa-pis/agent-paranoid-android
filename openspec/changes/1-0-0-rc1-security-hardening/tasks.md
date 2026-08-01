@@ -101,6 +101,10 @@
   documentation, wheel, and container gates.
 - [ ] Run the workflow from published-style wheel, PyPI, GitHub Release,
   documentation, and GHCR artifacts.
+  - [x] Add a manual post-publish workflow that verifies immutable package,
+    documentation, attestation, signature, and container-runtime evidence.
+  - [ ] Run the workflow for `v1.0.0rc2` and record its run URL, exact commit,
+    package hashes, and three image digests.
 - [ ] Re-run the full security review against the exact RC commit and record
   every remaining P2 or lower finding with owner, rationale, and revisit date.
 - [x] Verify at least one end-to-end AI-assisted discovery flow with a local
