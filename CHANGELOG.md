@@ -14,6 +14,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Run CodeQL on every default-branch commit while keeping documentation-only
+  pull requests free of heavy security jobs, restoring continuous SAST
+  coverage for OpenSSF Scorecard.
 - Record the exact-commit RC2 security review with no unresolved Critical or
   High finding and one accepted Medium SAST-coverage maturity risk.
 

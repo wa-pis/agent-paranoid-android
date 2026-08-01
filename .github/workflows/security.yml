@@ -63,7 +63,9 @@ jobs:
   codeql:
     name: CodeQL
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: >-
+      github.event_name != 'pull_request' ||
+      needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

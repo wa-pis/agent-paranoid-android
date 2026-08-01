@@ -55,16 +55,24 @@ SHALL authenticate image manifests without stored signing keys.
 ### Requirement: Path-Aware Heavy Verification
 
 Heavy Python, container, and security verification SHALL run for code,
-dependency, workflow, configuration, example, release, and unknown changes,
-while documentation-only changes retain a strict documentation gate.
+dependency, workflow, configuration, example, release, and unknown changes.
+Documentation-only pull requests SHALL retain a strict documentation gate,
+while CodeQL SHALL analyze every commit that reaches the default branch.
 
 #### Scenario: A documentation-only change is proposed
 
 - **GIVEN** every changed path is Markdown, `docs/**`, `openspec/**`, or
   `mkdocs.yml`
-- **WHEN** pull-request or main-push workflows classify the change
+- **WHEN** pull-request workflows classify the change
 - **THEN** the strict documentation workflow runs
 - **AND** heavy Python, container, and security jobs are skipped successfully
+
+#### Scenario: A documentation-only change reaches the default branch
+
+- **GIVEN** a documentation-only pull request was accepted
+- **WHEN** its commit reaches the default branch
+- **THEN** CodeQL analyzes that default-branch commit
+- **AND** other heavy Python, container, and security jobs remain skipped
 
 #### Scenario: Classification is uncertain
 

@@ -82,7 +82,7 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
             "trino-integration",
         },
         "containers.yml": {"validate", "validate-arm64"},
-        "security.yml": {"dependency-review", "codeql", "secrets"},
+        "security.yml": {"dependency-review", "secrets"},
     }
 
     for workflow_name, job_names in expected.items():
@@ -97,6 +97,14 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
             job = jobs[job_name]
             assert job["needs"] == "changes"
             assert "needs.changes.outputs.code == 'true'" in job["if"]
+
+    security = yaml.safe_load(
+        (ROOT / ".github" / "workflows" / "security.yml").read_text()
+    )["jobs"]
+    codeql = security["codeql"]
+    assert codeql["needs"] == "changes"
+    assert "github.event_name != 'pull_request'" in codeql["if"]
+    assert "needs.changes.outputs.code == 'true'" in codeql["if"]
 
     quality = yaml.safe_load(
         (ROOT / ".github" / "workflows" / "ci.yml").read_text()
