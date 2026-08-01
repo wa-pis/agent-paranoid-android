@@ -398,19 +398,19 @@ Scope:
 - [ ] Publish a concise threat model covering source rows, raw PII, secrets,
   prompt injection, provider boundaries, generated artifacts, and resource
   exhaustion.
-- [ ] Complete the public product-clarity gate: functional subtitle and GitHub
+- [x] Complete the public product-clarity gate: functional subtitle and GitHub
   About/topics, an input → command → output README example, preserved versus
   not-preserved properties, an alternatives comparison, and a clear statement
   that CLI/library is primary while MCP and providers are integrations.
-  - [ ] Add an installed-wheel `test-data-agent demo --output PATH` workflow
+  - [x] Add an installed-wheel `test-data-agent demo --output PATH` workflow
     using only a bundled synthetic fixture; it must be deterministic, offline,
     optional-integration-free, and safe on existing or unwritable paths.
-  - [ ] Make the demo the first README workflow and show representative
+  - [x] Make the demo the first README workflow and show representative
     synthetic output plus preserved schema, nullability, shape, relationships,
     temporal, and executable business-rule properties.
-  - [ ] State explicit non-guarantees for raw-value copying, real PII,
+  - [x] State explicit non-guarantees for raw-value copying, real PII,
     statistical anonymity, re-identification, and cross-version byte identity.
-  - [ ] Use the [installed demo and product clarity
+  - [x] Use the [installed demo and product clarity
     OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-installed-demo-and-product-clarity/proposal.md)
     as the implementation contract.
 - [x] Publish runnable, CI-verified usage journeys built only from synthetic

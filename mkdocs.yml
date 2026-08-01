@@ -47,6 +47,7 @@ nav:
       - Connect An MCP Client: how-to/mcp.md
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md
+      - Choose An Approach: concepts/choosing-an-approach.md
       - Profiles And Specs: concepts/profiles-and-specs.md
       - Relational Synthesis Contract: concepts/relational-synthesis-contract.md
       - DatasetSpec Compatibility: concepts/dataset-spec-compatibility.md

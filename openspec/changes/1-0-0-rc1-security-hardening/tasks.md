@@ -70,7 +70,7 @@
 
 - [x] Add bounded JSON row/cell/nested-value validation.
 - [x] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
-- [ ] Improve GitHub About metadata, README positioning, comparison guidance,
+- [x] Improve GitHub About metadata, README positioning, comparison guidance,
   and the one-command golden-path example.
 - [x] Add runnable, CI-verified synthetic examples for single-table CSV,
   relational CSV, local Trino, MCP, Python API, and all supported output
