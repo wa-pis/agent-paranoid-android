@@ -107,7 +107,9 @@ def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
 def test_rc_changelog_cleanup_preserves_inventory_evidence() -> None:
     inventory = (ROOT / "docs" / "unreleased-inventory-1.0.0rc1.md").read_text()
     evidence = (ROOT / "docs" / "release-evidence-1.0.0rc1.md").read_text()
-    changelog = (ROOT / "CHANGELOG.md").read_text().split("## [0.12.0]", 1)[0]
+    changelog = (ROOT / "CHANGELOG.md").read_text()
+    changelog = changelog.split("## [1.0.0rc1]", 1)[1]
+    changelog = changelog.split("## [0.12.0]", 1)[0]
 
     assert "89 top-level bullets" in inventory
     assert sum(line.startswith("- ") for line in changelog.splitlines()) == 44

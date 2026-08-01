@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc2] - 2026-08-01
+
+### Fixed
+
+- Publish release-candidate container images with their PEP 440 package version
+  while reserving floating major, minor, and `latest` tags for stable releases.
+
 ## [1.0.0rc1] - 2026-08-01
 
 ### Added
@@ -546,7 +553,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...HEAD
+[1.0.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...v1.0.0rc2
 [1.0.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.12.0...v1.0.0rc1
 [0.12.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.10.0...v0.11.0

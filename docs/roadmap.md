@@ -207,7 +207,9 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The package release candidate is `1.0.0rc1`. Assign work to the release where it forms
+The package release candidate is `1.0.0rc2`. `1.0.0rc1` completed package and
+GitHub publication but was superseded after GHCR rejected its PEP 440 version
+as a SemVer tag. Assign work to the release where it forms
 a complete user workflow; do not bump the package version on every feature PR.
 Version bumps, release changelog sections, and tags belong to separate release
 pull requests.
@@ -325,14 +327,15 @@ into `1.0.0rc1`. Finish the release stage in this order:
 5. [ ] Review README, documentation, migration guidance, examples, package
    metadata, support policy, SBOM, provenance, signatures, and release notes as
    one public-readiness gate.
-6. [ ] Prepare and publish `1.0.0rc1`, then run installation, `doctor`,
+6. [ ] Prepare and publish `1.0.0rc2`, then run installation, `doctor`,
    quickstart, agent approval, generation, validation, audit verification, and
    container-signature checks only against its public artifacts.
 7. [ ] Apply only release-blocking RC fixes, repeat the exact release gates, and
    publish `1.0.0` from the verified release commit.
 
 The preferred release path is to consolidate the already completed `0.13.0`
-through `0.15.0` scopes into `1.0.0rc1` after the OpenSpec and security gates.
+through `0.15.0` scopes into the 1.0 release candidate after the OpenSpec and
+security gates.
 Do not create retroactive intermediate tags unless maintainers explicitly need
 those public milestones. Version changes, release commits, tags, and publication
 remain separate release-stage work.
