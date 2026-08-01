@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import inspect
+import json
 from collections.abc import Callable
 from typing import Any
 
@@ -24,6 +26,58 @@ DEFAULT_TRINO_TOOL_NAMES = (
     "profile_conditional_allowed_values",
     "profile_aggregate_mapping",
 )
+
+DEFAULT_ARGUMENT_VALUES: dict[str, Any] = {
+    "catalog": "analytics",
+    "schema": "safe_schema",
+    "table": "synthetic_orders",
+    "column": "amount",
+    "parent_table": "synthetic_customers",
+    "parent_field": "customer_id",
+    "child_table": "synthetic_orders",
+    "child_field": "customer_id",
+    "start_field": "created_at",
+    "end_field": "fulfilled_at",
+    "target_field": "total",
+    "expression": "subtotal + tax",
+    "condition_field": "status",
+    "condition_equals": "transport-source-literal-condition",
+    "required_field": "fulfilled_at",
+    "value_field": "status",
+    "allowed_values": ["transport-source-literal-allowed"],
+    "parent_key": "customer_id",
+    "parent_value_field": "lifetime_value",
+    "child_key": "customer_id",
+    "child_value_field": "amount",
+}
+
+
+class RecordingProfiler:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def __getattr__(self, name: str) -> Any:
+        def invoke(*args: Any, **kwargs: Any) -> Any:
+            self.calls.append(name)
+            if name == "list_catalogs":
+                return ["analytics"]
+            if name == "list_schemas":
+                return ["safe_schema"]
+            if name == "list_tables":
+                return ["synthetic_orders"]
+            if name == "describe_table":
+                return [{"name": "amount", "data_type": "double"}]
+            return {"tool": name, "counts": {"checked": 1, "failed": 0}}
+
+        return invoke
+
+
+def required_tool_arguments(tool: Callable[..., Any]) -> dict[str, Any]:
+    return {
+        parameter.name: DEFAULT_ARGUMENT_VALUES[parameter.name]
+        for parameter in inspect.signature(tool).parameters.values()
+        if parameter.default is inspect.Parameter.empty
+    }
 
 
 class FakeMCP:
@@ -101,6 +155,31 @@ def test_transport_registers_complete_default_tool_inventory(
     assert audited == [
         ("trino-mcp", name) for name in DEFAULT_TRINO_TOOL_NAMES
     ]
+
+
+def test_transport_completes_default_tool_success_paths(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profiler = RecordingProfiler()
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_LOG", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_HMAC_KEY", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE", raising=False)
+    monkeypatch.setattr(server, "_trino_profiler", lambda: profiler)
+    monkeypatch.setattr(transport, "FastMCP", FakeMCP)
+    mcp = transport.create_trino_mcp(tuple(server.trino_mcp_tools()))
+
+    assert isinstance(mcp, FakeMCP)
+    outputs = {
+        tool.__name__: tool(**required_tool_arguments(tool))
+        for tool in mcp.tools
+    }
+
+    assert tuple(outputs) == DEFAULT_TRINO_TOOL_NAMES
+    assert profiler.calls == list(DEFAULT_TRINO_TOOL_NAMES)
+    serialized = json.dumps(outputs, sort_keys=True)
+    assert "transport-source-literal-condition" not in serialized
+    assert "transport-source-literal-allowed" not in serialized
 
 
 def test_trino_transport_is_optional(
