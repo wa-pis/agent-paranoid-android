@@ -360,16 +360,16 @@ Scope:
   same-version, and cross-version guarantees; record package/Python,
   dependency-lock, locale, spec, rules, provider, and generator fingerprints
   in the manifest.
-- [ ] Define the dependency support contract with tested minimum and latest
+- [x] Define the dependency support contract with tested minimum and latest
   compatible versions, reasonable upper bounds, and explicit behavior changes
   that require a package release. Use the [dependency compatibility
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/dependency-compatibility-contract/proposal.md)
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-dependency-compatibility-contract/proposal.md)
   as the implementation contract.
-  - [ ] Test minimum-supported and latest-compatible dependency profiles for
+  - [x] Test minimum-supported and latest-compatible dependency profiles for
     Faker, Pydantic, PyYAML, PyArrow, sqlglot, and the Trino client where used.
-  - [ ] Record dependency identities, generator version, locale, seed, spec
+  - [x] Record dependency identities, generator version, locale, seed, spec
     digest, and rules digest in reproducibility evidence.
-  - [ ] Add upper major bounds only after compatibility evidence justifies
+  - [x] Add upper major bounds only after compatibility evidence justifies
     them; do not promise cross-version byte identity without tests.
 - [ ] Validate the core product workflow: bounded profiling → deterministic
   relationship candidates → AI-assisted proposals → human review →
