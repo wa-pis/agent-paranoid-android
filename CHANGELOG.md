@@ -93,6 +93,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Advisor requests replace singleton categorical values with synthetic labels
+  before a provider can receive the profile or baseline specification.
 - Documented exact-row reuse detection limits and the absence of statistical
   privacy guarantees.
 - Trino SQL access is limited to validated read-only operations and dedicated

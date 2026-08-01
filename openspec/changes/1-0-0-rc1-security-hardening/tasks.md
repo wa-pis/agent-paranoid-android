@@ -98,6 +98,6 @@
   documentation, and GHCR artifacts.
 - [ ] Re-run the full security review against the exact RC commit and record
   every remaining P2 or lower finding with owner, rationale, and revisit date.
-- [ ] Verify at least one end-to-end AI-assisted discovery flow with a local
+- [x] Verify at least one end-to-end AI-assisted discovery flow with a local
   fake provider and prove that no raw source rows enter the provider request.
 - [ ] Allow only release-blocking fixes after `1.0.0rc1`; no new features.

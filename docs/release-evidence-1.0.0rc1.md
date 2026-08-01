@@ -65,6 +65,9 @@ These facts are evidence for maintainers, not additional product guarantees.
 
 ## Fixed-Scope Evidence
 
+- An end-to-end workspace flow uses a local fake advisor provider, stops for
+  explicit approval, and verifies raw emails, rare text, and source identifiers
+  never enter the provider exchange.
 - Agent input detection requirements are merged into canonical orchestration
   OpenSpec and the completed change is archived with its implementation evidence.
 - The completed provider-neutral advisor client adapter change is archived

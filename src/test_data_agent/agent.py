@@ -530,7 +530,11 @@ def _apply_persisted_advisor_review(
         artifacts,
         current_plan.review,
     )
-    profile_sha256 = dataset_profile_fingerprint(current_profile)
+    current_advisor_request = build_advisor_request(
+        current_profile,
+        baseline_spec=current_spec,
+    )
+    profile_sha256 = current_advisor_request.profile_sha256
     if not hmac.compare_digest(
         review_artifact.request.profile_sha256,
         profile_sha256,
@@ -543,7 +547,7 @@ def _apply_persisted_advisor_review(
     ):
         return inspect_agent_workspace(resolved_workspace)
     if not hmac.compare_digest(
-        current_spec_sha256,
+        current_advisor_request.baseline_spec_sha256,
         review_artifact.request.baseline_spec_sha256,
     ):
         raise ValueError(
