@@ -96,6 +96,8 @@ not be the only place where safety checks happen.
 - The workspace persistence service rejects symlinked plan targets before it
   creates a staging directory, including for callers that bypass the agent or
   CLI composition roots.
+- The approval service validates the reviewed spec itself before preparing an
+  output folder or calling an injected generation port.
 
 ## Alternatives
 

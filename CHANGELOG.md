@@ -37,6 +37,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Enforce spec safety inside the agent approval service before calling an
+  injected generation port.
 - Reject symlinked agent workspace targets at the persistence boundary before
   creating plan staging artifacts.
 - Run CodeQL on every default-branch commit while keeping documentation-only

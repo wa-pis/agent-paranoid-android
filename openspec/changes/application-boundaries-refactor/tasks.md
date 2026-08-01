@@ -37,7 +37,8 @@ contract-preserving increments.
   provider payloads after each extraction.
   - [x] Reject symlinked workspace targets at the persistence boundary before
     plan staging.
-  - [ ] Complete unsafe spec, SQL, and provider-payload coverage.
+  - [x] Reject unsafe specs at the approval service before injected generation.
+  - [ ] Complete unsafe SQL and provider-payload coverage.
 - [ ] Document migration notes for any intentionally moved internal boundary.
 - [ ] Run the full typing, lint, compile, test, package, documentation, and
   security gates.
