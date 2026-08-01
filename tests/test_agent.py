@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 import test_data_agent
-import test_data_agent.agent as agent_module
+import test_data_agent.agent_advising as agent_advising_module
 import test_data_agent.agent_approval as agent_approval_module
 import test_data_agent.agent_review as agent_review_module
 from test_data_agent.agent import (
@@ -747,9 +747,9 @@ def test_external_advisor_proposal_resumes_after_interrupted_spec_write(
     )
     request = build_agent_advisor_request(workspace)
     proposal = RowCountAdvisor(4).propose(request)
-    original_write = agent_module.write_dataset_spec_artifact_atomic
+    original_write = agent_advising_module.write_dataset_spec_artifact_atomic
     monkeypatch.setattr(
-        agent_module,
+        agent_advising_module,
         "write_dataset_spec_artifact_atomic",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(
             RuntimeError("interrupted")
@@ -763,7 +763,7 @@ def test_external_advisor_proposal_resumes_after_interrupted_spec_write(
     assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 3
 
     monkeypatch.setattr(
-        agent_module,
+        agent_advising_module,
         "write_dataset_spec_artifact_atomic",
         original_write,
     )
@@ -788,9 +788,9 @@ def test_advisor_workspace_handoff_recovers_without_recalling_provider(
         )
     )
     advisor = RowCountAdvisor(4)
-    original_write = agent_module.write_dataset_spec_artifact_atomic
+    original_write = agent_advising_module.write_dataset_spec_artifact_atomic
     monkeypatch.setattr(
-        agent_module,
+        agent_advising_module,
         "write_dataset_spec_artifact_atomic",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(
             RuntimeError("interrupted")
@@ -809,7 +809,7 @@ def test_advisor_workspace_handoff_recovers_without_recalling_provider(
             raise AssertionError("persisted advisor review must be reused")
 
     monkeypatch.setattr(
-        agent_module,
+        agent_advising_module,
         "write_dataset_spec_artifact_atomic",
         original_write,
     )

@@ -37,6 +37,9 @@ not be the only place where safety checks happen.
 - `agent_recovery.py` owns interrupted-publication recovery and recovery-state
   inspection. It receives completion-bundle validation as a typed callable and
   reuses the same approval publication boundary.
+- `agent_advising.py` owns safe request/exchange creation and fingerprint-bound
+  proposal persistence. It receives workspace inspection as a typed callable
+  and remains metadata-only.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
 - Trino package: config, pure SQL policy, non-executing query builders, client,

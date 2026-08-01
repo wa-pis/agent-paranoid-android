@@ -12,7 +12,8 @@ contract-preserving increments.
   - [x] Extract the metadata-only review lifecycle service.
   - [x] Extract the approval lifecycle service.
   - [x] Extract the recovery lifecycle service.
-  - [ ] Extract advising and status services one lifecycle boundary at a time.
+  - [x] Extract the metadata-only advising lifecycle service.
+  - [ ] Extract the status lifecycle service.
 - [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized
   optional dependency resolution without changing parser/presenter contracts.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
