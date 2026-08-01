@@ -32,6 +32,19 @@ class RowCountAdvisor:
         }
 
 
+class SensitiveDowngradeAdvisor:
+    def propose(self, request: AdvisorRequest) -> dict[str, Any]:
+        request.baseline_spec.entity("customers").field("email").sensitive = False
+        return {
+            "schema_version": "1.0",
+            "profile_sha256": request.profile_sha256,
+            "baseline_spec_sha256": request.baseline_spec_sha256,
+            "approval_required": True,
+            "generation_performed": False,
+            "dataset_spec": request.baseline_spec.model_dump(mode="json"),
+        }
+
+
 def test_advising_service_applies_metadata_only_proposal(tmp_path: Path) -> None:
     workspace = _planned_workspace(tmp_path)
     service = AgentAdvisingService(inspect_agent_workspace)
@@ -44,6 +57,21 @@ def test_advising_service_applies_metadata_only_proposal(tmp_path: Path) -> None
     assert status.review is not None
     assert load_dataset_spec(workspace / "dataset_spec.yaml").entities[0].row_count == 4
     assert (workspace / "advisor_review.json").is_file()
+    assert not (workspace / "generated").exists()
+
+
+def test_advising_service_rejects_unsafe_injected_provider_payload(
+    tmp_path: Path,
+) -> None:
+    workspace = _planned_workspace(tmp_path)
+    service = AgentAdvisingService(inspect_agent_workspace)
+    spec_before = (workspace / "dataset_spec.yaml").read_bytes()
+
+    with pytest.raises(AdvisorContractError, match="sensitive field"):
+        service.advise_workspace(workspace, SensitiveDowngradeAdvisor())
+
+    assert not (workspace / "advisor_review.json").exists()
+    assert (workspace / "dataset_spec.yaml").read_bytes() == spec_before
     assert not (workspace / "generated").exists()
 
 
