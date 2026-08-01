@@ -80,7 +80,8 @@
   - [x] Add the public Python API generation/validation journey.
   - [ ] Add Trino, MCP, and export journeys.
     - [x] Add the CSV, JSON, SQL, and optional Parquet export journey.
-    - [ ] Add the local Trino and MCP journeys.
+    - [x] Add the MCP stdio journey with a rejected pre-network Trino request.
+    - [ ] Add the local Trino journey.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
   maintainability without expanding the product surface.
 - [ ] Create public good-first-issue/help-wanted backlog items.

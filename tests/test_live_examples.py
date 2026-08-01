@@ -186,3 +186,42 @@ def test_output_format_example_exports_valid_synthetic_bundles(tmp_path: Path) -
     sql = (output / "sql" / "support_tickets.sql").read_text()
     assert sql.count('INSERT INTO "support_tickets"') == 4
     assert "DROP " not in sql
+
+
+def test_mcp_stdio_example_uses_installed_servers_and_rejects_unsafe_request(
+    tmp_path: Path,
+) -> None:
+    workspace = tmp_path / "mcp-example"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    installed_bin = Path(sys.executable).parent
+    environment["PATH"] = os.pathsep.join(
+        [str(installed_bin), environment.get("PATH", "")]
+    )
+
+    subprocess.run(
+        [sys.executable, REPOSITORY_ROOT / "examples/mcp_stdio/run.py", workspace],
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    result = json.loads((workspace / "example_result.json").read_text())
+    manifest = json.loads(
+        (
+            workspace
+            / "agent/orders/generated/generation_manifest.json"
+        ).read_text()
+    )
+    assert result["raw_sql_exposed"] is False
+    assert result["unsafe_request_rejected"] is True
+    assert result["approval_required_before_review"] is True
+    assert result["row_counts"] == {"orders": 8}
+    assert result["validation_valid"] is True
+    assert result["synthetic"] is True
+    assert result["source_rows_copied"] is False
+    assert len(result["reviewed_spec_sha256"]) == 64
+    assert manifest["seed"] == 161803
+    assert manifest["source_rows_copied"] is False
