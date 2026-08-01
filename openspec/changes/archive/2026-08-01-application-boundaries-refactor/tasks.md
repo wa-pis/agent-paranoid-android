@@ -45,5 +45,5 @@ contract-preserving increments.
   security gates.
   - Evidence: `gate-evidence.md` records the exact verified source commit,
     local results, package hashes, and GitHub run IDs.
-- [ ] Merge applicable OpenSpec deltas into the canonical baseline and archive
+- [x] Merge applicable OpenSpec deltas into the canonical baseline and archive
   this change after every task is complete.
