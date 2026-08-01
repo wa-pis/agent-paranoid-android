@@ -4,25 +4,36 @@
 
 - [x] Update the safe-MCP capability requirements for source-literal-free
   default responses.
-- [x] Remove `sample_rows_masked` from the default Trino MCP registration, or
-  implement the explicit opt-in/review/audit boundary for any retained row
-  diagnostic.
+- [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+  query builder, and public compatibility exports. Do not retain a row
+  diagnostic in RC4; any future row-returning capability requires a separate
+  OpenSpec change.
 - [ ] Update MCP golden contracts, docs, migration notes, and release notes.
-- [ ] Add direct-service and transport tests with distinct literals in every
-  source column; assert none appear in default responses, errors, or audit
-  records.
+- [ ] Enumerate the production-registered default tool list from
+  `trino_mcp_tools()` and test every Trino-accessing tool through both direct
+  service and transport boundaries. Check success responses, validation and
+  database errors, nested structures after JSON serialization, and metadata-
+  only audit records for source literals.
+- [ ] Add source fixtures covering strings, integers, decimals, floats,
+  booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
+  like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
+  cannot be confused with aggregate counts.
 
 ## P1 — Invocation and release hardening
 
-- [ ] Add a typed shared `QueryWorkBudget` and enforce request, SQL/formula,
+- [ ] Add a typed shared `QueryWorkBudget` with separate raw transport payload
+  and canonical application-argument limits. Create it fresh per invocation,
+  keep it concurrency-isolated and non-resettable, and enforce SQL/formula,
   AST, depth, columns, statements, and response limits before their respective
   resource-consuming operations.
 - [ ] Thread one budget through nested table/column profiling and safe-query
-  execution; add tests proving exhaustion is shared across the invocation and
-  no connection/cursor is opened for preflight failures.
-- [ ] Change prerelease installation examples to select RC4 intentionally,
-  update extras, and add a clean-environment README smoke check against the
-  public wheel.
+  execution; consume response bytes incrementally, stop after exhaustion, and
+  prove no connection/cursor or later statement is opened after preflight or
+  nested-budget failure.
+- [ ] Change prerelease installation examples to the exact
+  `agent-paranoid-android==1.0.0rc4` command, update extras, and add a
+  clean-environment README smoke check against that public wheel. Do not use
+  floating `--pre` in the RC-specific instructions.
 - [ ] Verify the base wheel and CSV/JSON quickstart without `trino`, `sqlglot`,
   or the MCP SDK; verify Trino separately through the `trino` extra and keep
   failures isolated to that optional capability.
@@ -32,11 +43,16 @@
 
 ## P2/P3 — Contract clarity and durability decision
 
-- [ ] Document aggregate-only tools versus explicitly opt-in row-returning
-  tools and remove ambiguous privacy claims.
+- [ ] Document the aggregate-only default toolset and the separate
+  `run_safe_select` opt-in. Remove stale `sample_rows_masked` references and
+  claims that row-returning output is source-free, PII-free, anonymous, or
+  privacy-safe.
 - [ ] Document atomic visibility, process-interruption recovery, and
   crash/power-loss durability separately; record whether fsync is deferred or
   release-blocking.
+- [ ] Define stable promotion as the accepted RC4 production source tree plus
+  a reviewed version/changelog/release-metadata-only diff, followed by all
+  final release gates.
 
 ## Release gates
 
