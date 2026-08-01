@@ -269,6 +269,38 @@ def test_application_boundary_inventory_matches_frozen_contracts() -> None:
     assert "- [x] Inventory public imports" in tasks
 
 
+def test_application_boundary_migration_notes_cover_extracted_owners() -> None:
+    inventory = (
+        ROOT / "docs" / "reference" / "application-boundaries.md"
+    ).read_text()
+
+    assert "No user migration is required" in inventory
+    for owner in (
+        "agent_contracts.py",
+        "agent_planning.py",
+        "agent_review.py",
+        "agent_approval.py",
+        "agent_recovery.py",
+        "agent_advising.py",
+        "agent_status.py",
+        "workspace_store.py",
+        "cli_application.py",
+        "cli_agent.py",
+        "cli_commands.py",
+        "cli_dependencies.py",
+        "cli_doctor.py",
+        "trino_config.py",
+        "trino_sql_policy.py",
+        "trino_query_builders.py",
+        "trino_client.py",
+        "trino_profiling.py",
+        "trino_masking.py",
+    ):
+        assert f"`{owner}`" in inventory
+
+    assert "normal compatibility window" in inventory
+
+
 def test_unreleased_changelog_headings_follow_policy_order() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text()
     unreleased = changelog.split("## Unreleased", 1)[1].split("\n## [", 1)[0]

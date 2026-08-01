@@ -189,6 +189,23 @@ must not import CLI presentation or FastMCP registration. Compatibility modules
 may import extracted implementations temporarily, but extracted services must
 not import those wrappers back.
 
+## Migration Notes
+
+No user migration is required for these internal ownership changes. Public
+package imports, CLI commands, MCP tools, error behavior, and artifact formats
+remain available through their existing entry points.
+
+| Previous owner | Canonical internal owners | Retained compatibility entry point |
+|---|---|---|
+| `agent.py` lifecycle and workspace persistence | `agent_contracts.py`, `agent_planning.py`, `agent_review.py`, `agent_approval.py`, `agent_recovery.py`, `agent_advising.py`, `agent_status.py`, and `workspace_store.py` | `agent.py` and package-root exports |
+| `cli.py` composition and command handlers | `cli_application.py`, `cli_agent.py`, `cli_commands.py`, `cli_dependencies.py`, and `cli_doctor.py` | `cli.py` and the installed CLI |
+| `mcp_trino_server.py` configuration, SQL policy, query construction, client access, profiling, and masking | `trino_config.py`, `trino_sql_policy.py`, `trino_query_builders.py`, `trino_client.py`, `trino_profiling.py`, and `trino_masking.py` | `mcp_trino_server.py` and its MCP tool surface |
+
+External callers should continue using the documented package, CLI, and MCP
+entry points. Internal contributors may import the canonical owners directly.
+Compatibility wrappers remain in place for the normal compatibility window;
+their eventual removal would require a separately documented public migration.
+
 ### Workspace Store Migration
 
 `workspace_store.py` now owns workspace artifact paths, typed persistence ports,
