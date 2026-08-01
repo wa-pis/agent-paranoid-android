@@ -333,8 +333,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
      checks only against its public artifacts.
    - [x] Run agent approval and audit verification from the exact public
      package or container artifacts.
-7. [ ] Complete the [application boundaries refactor
-   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+7. [x] Complete the [application boundaries refactor
+   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
    as a contract-preserving stable-1.0 gate.
    - [x] Inventory and freeze the existing public and safety boundaries.
    - [x] Extract typed workspace persistence and staged agent lifecycle
@@ -371,10 +371,11 @@ into `1.0.0rc1`. Finish the release stage in this order:
        - [x] Reject unsafe provider payloads before review persistence.
      - [x] Document internal ownership migrations and retained compatibility
        entry points.
-   - [ ] Run the full typing, lint, compile, test, package, documentation, and
+   - [x] Run the full typing, lint, compile, test, package, documentation, and
      security gates, then archive the completed OpenSpec change.
      - [x] Record full local and exact-commit GitHub gate evidence.
-     - [ ] Merge canonical OpenSpec deltas and archive the completed change.
+     - [x] Confirm no canonical deltas are required and archive the completed
+       change.
 8. [ ] Publish a new release candidate from the verified refactor commit and
    repeat public-artifact acceptance against that candidate.
 9. [ ] Apply only release-blocking candidate fixes, repeat the exact release
@@ -511,8 +512,8 @@ it through a new candidate, and publish the first stable compatibility baseline.
 
 Scope:
 
-- [ ] Complete and archive the [application boundaries refactor
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+- [x] Complete and archive the [application boundaries refactor
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
   without changing public Python, CLI, MCP, artifact, error, or safety
   contracts.
 - [ ] Publish and smoke-test a release candidate containing the completed

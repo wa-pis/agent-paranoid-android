@@ -215,6 +215,13 @@ The default MCP surface SHALL expose fixed allowlisted metadata and aggregate
 profiling tools. The generic `run_safe_select` tool SHALL require explicit
 operator opt-in.
 
+#### Scenario: Default safe Trino surface is registered
+
+- **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false
+- **WHEN** the Trino MCP server registers its tools
+- **THEN** fixed allowlisted metadata and aggregate profiling tools are exposed
+- **AND** the generic `run_safe_select` tool is not exposed
+
 ### Requirement: External Trino Execution Is Read-Only And Validated
 
 Every public Trino operation SHALL use a dedicated bounded query builder or
