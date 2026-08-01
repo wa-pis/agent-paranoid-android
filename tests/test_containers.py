@@ -123,6 +123,10 @@ def test_container_workflow_builds_before_tag_only_publish() -> None:
     assert "packages: write" in publish_job
     assert "password: ${{ secrets.GITHUB_TOKEN }}" in publish_job
     assert "COSIGN_PASSWORD" not in publish_job
+    assert "type=raw,value=${{ steps.package.outputs.version }}" in publish_job
+    assert "type=semver" not in publish_job
+    assert publish_job.count("enable=${{ steps.package.outputs.stable }}") == 3
+    assert '[[ "${version}" =~ ^[0-9]+\\.[0-9]+\\.[0-9]+$ ]]' in publish_job
     assert "cache-from:" not in publish_job
     assert "cache-to:" not in publish_job
     assert "docker run --rm" in validate_job

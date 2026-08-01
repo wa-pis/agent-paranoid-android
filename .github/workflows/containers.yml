@@ -288,16 +288,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Read package version
+        id: package
+        shell: bash
+        run: |
+          version="$(python3 -c 'import pathlib,tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "major=${version%%.*}" >> "${GITHUB_OUTPUT}"
+          remainder="${version#*.}"
+          echo "major_minor=${version%%.*}.${remainder%%.*}" >> "${GITHUB_OUTPUT}"
+          if [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "stable=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "stable=false" >> "${GITHUB_OUTPUT}"
+          fi
+
       - name: Generate immutable image metadata
         id: metadata
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=raw,value=latest
+            type=raw,value=${{ steps.package.outputs.version }}
+            type=raw,value=${{ steps.package.outputs.major_minor }},enable=${{ steps.package.outputs.stable }}
+            type=raw,value=${{ steps.package.outputs.major }},enable=${{ steps.package.outputs.stable }}
+            type=raw,value=latest,enable=${{ steps.package.outputs.stable }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
