@@ -19,6 +19,9 @@ not be the only place where safety checks happen.
 
 ## Data And Contracts
 
+- The pre-refactor inventory is maintained in
+  `docs/reference/application-boundaries.md` and checked against the golden
+  Python, CLI, MCP, and artifact fixtures before code moves.
 - Agent application services: planning, review, approval, recovery, advising,
   status, and workspace store.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset

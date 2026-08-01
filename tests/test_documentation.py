@@ -29,6 +29,7 @@ REQUIRED_DOCS = {
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
     "concepts/relational-synthesis-contract.md",
+    "reference/application-boundaries.md",
     "reference/cli.md",
     "reference/compatibility.md",
     "reference/dependency-compatibility.md",
@@ -214,6 +215,58 @@ def test_application_boundaries_refactor_is_required_for_stable_1_0() -> None:
     assert "application-boundaries-refactor/proposal.md" in stable_scope
     assert "release candidate containing the completed" in stable_scope
     assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
+
+
+def test_application_boundary_inventory_matches_frozen_contracts() -> None:
+    inventory = (
+        ROOT / "docs" / "reference" / "application-boundaries.md"
+    ).read_text()
+    contracts = ROOT / "tests" / "fixtures" / "contracts"
+    python_api = json.loads((contracts / "public-python-api.json").read_text())
+    cli = json.loads((contracts / "cli-parser-surface.json").read_text())
+    generator_tools = json.loads(
+        (contracts / "mcp-generator-tools.json").read_text()
+    )
+    trino_tools = json.loads((contracts / "mcp-trino-tools.json").read_text())
+    catalog = json.loads((contracts / "contract-catalog.json").read_text())
+
+    names = {
+        *python_api["exports"],
+        *cli["commands"],
+        *cli["aliases"],
+        *(tool["name"] for tool in generator_tools),
+        *(tool["name"] for tool in trino_tools),
+        *catalog["contracts"],
+    }
+    for name in names:
+        assert f"`{name}`" in inventory
+
+    for artifact in (
+        "agent_request.json",
+        "agent_plan.json",
+        "profile.json",
+        "dataset_spec.yaml",
+        "advisor_review.json",
+        "approval_receipt.json",
+        "agent_result.json",
+        "agent_completion.json",
+        "generation_manifest.json",
+        "validation_report.json",
+        "business_validation_report.json",
+    ):
+        assert f"`{artifact}`" in inventory
+
+    assert "application services -> policy/core -> typed ports" in inventory
+    assert "transport factory" in inventory
+
+    tasks = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "application-boundaries-refactor"
+        / "tasks.md"
+    ).read_text()
+    assert "- [x] Inventory public imports" in tasks
 
 
 def test_unreleased_changelog_headings_follow_policy_order() -> None:

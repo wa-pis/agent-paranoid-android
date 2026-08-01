@@ -72,6 +72,7 @@ nav:
       - Release Process: release.md
   - Maintainers:
       - Architecture: agent_design.md
+      - Application Boundary Baseline: reference/application-boundaries.md
       - Generator MCP Design: mcp_generator_design.md
       - Changelog Policy: changelog-policy.md
       - RC Changelog Inventory: unreleased-inventory-1.0.0rc1.md
