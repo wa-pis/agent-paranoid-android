@@ -21,6 +21,16 @@ before merge. Evidence is retained in the [CI and wheel run](https://github.com/
 and [security run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989499).
 This snapshot does not replace the final rerun against the exact release commit.
 
+## Documentation Readiness
+
+The strict documentation and release-artifact checks cover the concise README,
+documentation navigation and links, migration guidance, runnable examples,
+package metadata, public support policy, and workflow definitions for
+checksums, SBOMs, provenance, attestations, and signatures. Detailed OpenSpec,
+audit, and engineering history remains in this evidence record instead of the
+user-facing changelog. Verification of the artifacts actually published for
+`1.0.0rc1` remains a separate release-stage gate.
+
 ## Post-1.0 Dispositions
 
 **Application boundaries.** Deferred to the first post-1.0 architecture cycle.

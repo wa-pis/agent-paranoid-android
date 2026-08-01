@@ -429,9 +429,9 @@ Scope:
     plus their manifest and validation report.
   - [x] Add one-command launchers and CI smoke tests that run the examples from
     an installed wheel or release-style container, not the source checkout.
-- [ ] Verify README, documentation site, migration guidance, examples, package
+- [x] Verify README, documentation site, migration guidance, examples, package
   metadata, SBOM, provenance, signatures, and public support policy.
-  - [ ] Keep `CHANGELOG.md` user-facing; move detailed OpenSpec, audit, and
+  - [x] Keep `CHANGELOG.md` user-facing; move detailed OpenSpec, audit, and
     release-engineering evidence to canonical linked documents without deleting
     security history. Track this in the [release documentation hygiene
     OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/release-documentation-hygiene/proposal.md).
