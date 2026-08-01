@@ -35,6 +35,9 @@ Implement the hardening in four bounded stages:
   aggregate-only/default versus opt-in/row-returning semantics.
 - `README.md`, `docs/getting-started/installation.md`, and release checks:
   exact prerelease installation and clean public-artifact quickstart.
+- `pyproject.toml` and installation smoke profiles: preserve the base runtime
+  without `trino`, `sqlglot`, or the MCP SDK; keep Trino checks behind the
+  separate `trino` extra.
 - Release metadata, changelog, attestations, container tags, and public
   acceptance evidence: all identify the exact `1.0.0rc4` commit/artifact.
 

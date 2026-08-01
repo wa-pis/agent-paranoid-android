@@ -23,6 +23,9 @@
 - [ ] Change prerelease installation examples to select RC4 intentionally,
   update extras, and add a clean-environment README smoke check against the
   public wheel.
+- [ ] Verify the base wheel and CSV/JSON quickstart without `trino`, `sqlglot`,
+  or the MCP SDK; verify Trino separately through the `trino` extra and keep
+  failures isolated to that optional capability.
 - [ ] Publish `1.0.0rc4` from the exact verified merge commit and run public
   package, wheel, container, documentation, attestation, signature, and
   integration acceptance.

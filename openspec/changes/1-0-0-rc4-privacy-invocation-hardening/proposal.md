@@ -36,6 +36,9 @@ In scope:
   limits.
 - Correct prerelease installation and extras documentation and validate the
   literal README workflow from a clean environment using public RC4 artifacts.
+- Reconfirm that Trino is an optional integration: the base wheel and CSV/JSON
+  workflow do not require the Trino client, SQL parser, or MCP SDK, while the
+  separate `trino` extra owns Trino capability checks.
 - Clarify aggregate-only versus row-returning MCP contracts and document the
   atomic-write versus crash-durability boundary.
 - Run the full release and public-artifact acceptance gates for `1.0.0rc4`.

@@ -547,6 +547,10 @@ Scope:
 - [ ] Change prerelease installation guidance to select RC4 intentionally
   (`==1.0.0rc4` or `--pre`), keep extras consistent, and run the literal
   README quickstart in a clean environment against the public wheel.
+- [ ] Reconfirm the dependency boundary: Trino is an optional integration.
+  The base wheel and CSV/JSON workflow must install and run without `trino`,
+  `sqlglot`, or the MCP SDK; Trino capability checks belong to the separate
+  `trino` extra and must not become a base-install release gate.
 - [ ] Update MCP documentation and compatibility fixtures to distinguish
   aggregate-only tools from row-returning opt-in tools. Do not describe
   row-returning output as PII-free, anonymous, or privacy-safe merely because
@@ -565,6 +569,8 @@ Exit criteria:
 - Public `1.0.0rc4` artifacts install in a clean environment, the README
   quickstart succeeds, optional extras are verified, and the exact artifact
   version is reported.
+- The base installation remains usable without Trino, SQL parsing, or MCP;
+  the separate `trino` extra is installed and checked only for Trino workflows.
 - MCP golden contracts, OpenSpec requirements, documentation, changelog,
   package metadata, attestations, and container tags describe the same RC4
   behavior.
