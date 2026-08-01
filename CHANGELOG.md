@@ -48,8 +48,6 @@ All notable changes to this project are documented here.
 - Generation manifests now record bounded reproducibility inputs and output
   SHA-256 evidence while distinguishing logical from cross-version byte-level
   reproducibility.
-- Explicit documentation of exact-row reuse detection limits and the absence
-  of statistical privacy guarantees.
 - Cross-table average aggregate mappings across deterministic generation,
   validation, safe profile inference, and read-only Trino profiling.
 - Deterministic controlled negative generation across required, allowed-value,
@@ -83,22 +81,8 @@ All notable changes to this project are documented here.
   rejects image metadata that differs from the package version.
 - `GenerationSettings.locale` now controls seeded Faker values, with clear
   rejection of unsupported locales.
-- Low-level Trino execution helpers are private; public SQL access remains
-  limited to validated safe-select and dedicated bounded profiling methods.
-- Mocked-cursor regressions prove forbidden and non-allowlisted SQL is rejected
-  before a Trino connection or cursor execution can occur.
-- Contract tests preserve allowlisted metadata discovery and aggregate-only
-  Trino profiling through dedicated internal query builders.
-- Direct Python generation now rejects specs containing raw-looking sensitive
-  categories, unsafe sensitive distributions, or privacy-policy opt-outs.
-- CLI and generator MCP regressions verify malicious on-disk specs fail before
-  artifact creation and never echo rejected sensitive values.
 - CSV and Trino profiles preserve low-cardinality frequency ranks with
   synthetic labels instead of exposing source category values.
-- Masked Trino samples use opaque placeholders, with regressions covering rare
-  free text and quasi-identifiers.
-- MCP extras exclude the incompatible 2.x SDK until the transport migrates to
-  its replacement API.
 - Incomplete staged generation and review bundles are removed when interactive
   cancellation interrupts writing or validation.
 - Mid-write disk exhaustion removes partial staged folder, review, and
@@ -109,8 +93,20 @@ All notable changes to this project are documented here.
 
 ### Security
 
-- Bound JSON dataset inputs by row count, nested value count, nesting depth,
-  and string value length before validation.
+- Documented exact-row reuse detection limits and the absence of statistical
+  privacy guarantees.
+- Trino SQL access is limited to validated read-only operations and dedicated
+  bounded profiling; forbidden and non-allowlisted queries fail before a
+  connection while allowlisted metadata and aggregate discovery remain available.
+- Python, CLI, and generator MCP generation reject raw-looking sensitive
+  categories, unsafe sensitive distributions, and privacy-policy opt-outs before
+  creating artifacts or echoing rejected values.
+- Masked Trino samples use opaque placeholders for rare free text and
+  quasi-identifiers.
+- MCP installations exclude the incompatible 2.x SDK until the transport
+  migrates to its replacement API.
+- JSON dataset inputs are bounded by row count, nested value count, nesting
+  depth, and string value length before validation.
 
 ## [0.12.0] - 2026-07-31
 
