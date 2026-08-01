@@ -6,14 +6,14 @@ contract-preserving increments.
 - [x] Inventory public imports, CLI commands, MCP tools, artifact contracts,
   and current dependency direction before moving code.
 - [x] Extract typed workspace persistence and atomic transition interfaces.
-- [ ] Split agent lifecycle services into planning, review, approval, recovery,
+- [x] Split agent lifecycle services into planning, review, approval, recovery,
   advising, status, and workspace-store modules.
   - [x] Extract neutral agent contracts and the planning lifecycle service.
   - [x] Extract the metadata-only review lifecycle service.
   - [x] Extract the approval lifecycle service.
   - [x] Extract the recovery lifecycle service.
   - [x] Extract the metadata-only advising lifecycle service.
-  - [ ] Extract the status lifecycle service.
+  - [x] Extract the status lifecycle service.
 - [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized
   optional dependency resolution without changing parser/presenter contracts.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
