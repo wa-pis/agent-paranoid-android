@@ -3,21 +3,25 @@
 from __future__ import annotations
 
 import asyncio
-import importlib
 import json
 import sys
 import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from types import ModuleType
 from typing import Any, cast
 
 from test_data_agent.cli_contract import DoctorReport
+from test_data_agent.cli_dependencies import (
+    CORE_DEPENDENCY_MODULES,
+    DEFAULT_CLI_DEPENDENCY_RESOLVER,
+    OPTIONAL_EXTRA_MODULES,
+    CliDependencyResolver,
+    ModuleImporter as ModuleImporter,
+)
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io import generate_dataset_from_example_artifacts
 
-ModuleImporter = Callable[[str], ModuleType]
 DoctorSmoke = Callable[[], None]
 ParquetDoctorSmoke = Callable[[Path, Path], None]
 
@@ -51,7 +55,7 @@ class CliDoctorService:
         else:
             failures.append("python: Python 3.11 or newer is required")
 
-        for module_name in ("faker", "pydantic", "yaml"):
+        for module_name in CORE_DEPENDENCY_MODULES:
             try:
                 self.import_module(module_name)
             except ImportError as exc:
@@ -59,19 +63,9 @@ class CliDoctorService:
             else:
                 checks.append(f"dependency {module_name}: ok")
 
-        optional_modules = {
-            "parquet": ("pyarrow",),
-            "mcp": ("mcp",),
-            "trino": ("sqlglot", "trino"),
-            "openai": ("openai",),
-        }
-        for extra, module_names in optional_modules.items():
-            missing = []
-            for module_name in module_names:
-                try:
-                    self.import_module(module_name)
-                except ImportError:
-                    missing.append(module_name)
+        dependencies = CliDependencyResolver(self.import_module)
+        for extra in OPTIONAL_EXTRA_MODULES:
+            missing = dependencies.missing_modules(extra)
             if missing and extra in required:
                 failures.append(
                     f"extra {extra}: missing {', '.join(missing)} "
@@ -154,7 +148,11 @@ def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:
         cache_dir=output.parent / "parquet-cache",
         use_cache=False,
     )
-    parquet = importlib.import_module("pyarrow.parquet")
+    parquet = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+        "pyarrow.parquet",
+        extra="parquet",
+        purpose="Parquet capability",
+    )
     parquet_files = sorted(output.glob("*.parquet"))
     if len(parquet_files) != 2:
         raise RuntimeError("parquet smoke output is incomplete")
@@ -171,7 +169,16 @@ def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:
 
 
 def run_mcp_doctor_smoke() -> None:
-    from test_data_agent.mcp_generator_transport import create_generator_mcp
+    def load_mcp_factory() -> Any:
+        from test_data_agent.mcp_generator_transport import create_generator_mcp
+
+        return create_generator_mcp
+
+    create_generator_mcp = DEFAULT_CLI_DEPENDENCY_RESOLVER.load(
+        extra="mcp",
+        purpose="MCP capability",
+        loader=load_mcp_factory,
+    )
 
     def doctor_probe() -> dict[str, bool]:
         return {"ok": True}
@@ -185,7 +192,16 @@ def run_mcp_doctor_smoke() -> None:
 
 
 def run_trino_doctor_smoke() -> None:
-    from test_data_agent import mcp_trino_server as trino_server
+    def load_trino_server() -> Any:
+        from test_data_agent import mcp_trino_server
+
+        return mcp_trino_server
+
+    trino_server = DEFAULT_CLI_DEPENDENCY_RESOLVER.load(
+        extra="trino",
+        purpose="Trino capability",
+        loader=load_trino_server,
+    )
 
     config = trino_server.TrinoConfig(
         host="doctor.invalid",
@@ -199,7 +215,11 @@ def run_trino_doctor_smoke() -> None:
     sql = "SELECT synthetic_id FROM doctor.safe.synthetic_table LIMIT 1"
     if trino_server.validate_safe_select(sql, config=config) != sql:
         raise RuntimeError("Trino safe SQL validation is unavailable")
-    trino_dbapi = importlib.import_module("trino.dbapi")
+    trino_dbapi = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+        "trino.dbapi",
+        extra="trino",
+        purpose="Trino capability",
+    )
     connection = trino_dbapi.connect(
         host=config.host,
         port=config.port,
@@ -211,9 +231,18 @@ def run_trino_doctor_smoke() -> None:
 
 
 def run_openai_doctor_smoke() -> None:
-    from openai import OpenAI
+    def load_openai_dependencies() -> tuple[type[Any], type[Any]]:
+        from openai import OpenAI
 
-    from test_data_agent.providers.openai import OpenAIAdvisorClient
+        from test_data_agent.providers.openai import OpenAIAdvisorClient
+
+        return OpenAI, OpenAIAdvisorClient
+
+    OpenAI, OpenAIAdvisorClient = DEFAULT_CLI_DEPENDENCY_RESOLVER.load(
+        extra="openai",
+        purpose="OpenAI capability",
+        loader=load_openai_dependencies,
+    )
 
     sdk = OpenAI(
         api_key="doctor-local-placeholder",

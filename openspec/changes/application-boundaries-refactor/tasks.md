@@ -20,7 +20,7 @@ contract-preserving increments.
   - [ ] Extract composition and command dispatch.
   - [ ] Extract agent command handlers.
   - [ ] Extract dataset and utility command handlers.
-  - [ ] Centralize optional dependency resolution.
+  - [x] Centralize optional dependency resolution.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
   masking; keep policy pure and builders non-executing.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for

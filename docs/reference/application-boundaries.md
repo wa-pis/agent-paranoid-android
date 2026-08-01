@@ -146,6 +146,7 @@ The current dependencies after completed extraction increments are:
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
 | `cli.py` | composition/dispatch, parser/presenter contracts, agent/provider adapters, audit, demo, I/O commands, and rules |
+| `cli_dependencies.py` | optional-extra module catalog, injected availability inspection, and normalized installation errors |
 | `cli_doctor.py` | installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration |
 | `agent.py` | compatibility exports plus deterministic generation and completion validation |
 | `agent_contracts.py` | core field, relationship, and settings models only |
@@ -223,6 +224,10 @@ transports.
 orchestration. `cli.py` retains compatibility wrappers and injects its current
 module importer and smoke callables, preserving existing output, redaction, and
 test override points while command dispatch remains unchanged.
+
+`cli_dependencies.py` centralizes optional-extra discovery and installation
+errors for doctor capability checks and OpenAI advice. Importers and loaders
+remain injectable so direct service calls preserve fail-closed behavior.
 
 ## Per-Increment Review
 
