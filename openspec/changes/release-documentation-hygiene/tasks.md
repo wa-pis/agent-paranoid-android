@@ -3,7 +3,7 @@
 - [x] Define and document the user-facing changelog policy and categories.
 - [x] Inventory the current `Unreleased` entries and classify user impact,
   security impact, migration impact, and internal evidence.
-- [ ] Move internal OpenSpec/audit/release-engineering detail to canonical
+- [x] Move internal OpenSpec/audit/release-engineering detail to canonical
   documents without deleting or changing historical evidence.
 - [x] Add links from concise changelog entries to detailed requirements or
   release evidence where maintainers need the context.
