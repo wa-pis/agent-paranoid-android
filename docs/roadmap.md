@@ -333,8 +333,22 @@ into `1.0.0rc1`. Finish the release stage in this order:
      checks only against its public artifacts.
    - [x] Run agent approval and audit verification from the exact public
      package or container artifacts.
-7. [ ] Apply only release-blocking RC fixes, repeat the exact release gates, and
-   publish `1.0.0` from the verified release commit.
+7. [ ] Complete the [application boundaries refactor
+   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+   as a contract-preserving stable-1.0 gate.
+   - [ ] Inventory and freeze the existing public and safety boundaries.
+   - [ ] Extract typed workspace persistence and staged agent lifecycle
+     services.
+   - [ ] Split CLI composition and Trino policy, query, client, profiling, and
+     masking responsibilities.
+   - [ ] Add architecture and direct-service adversarial tests while preserving
+     every public Python, CLI, MCP, artifact, error, and safety contract.
+   - [ ] Run the full typing, lint, compile, test, package, documentation, and
+     security gates, then archive the completed OpenSpec change.
+8. [ ] Publish a new release candidate from the verified refactor commit and
+   repeat public-artifact acceptance against that candidate.
+9. [ ] Apply only release-blocking candidate fixes, repeat the exact release
+   gates, and publish `1.0.0` from the verified release commit.
 
 The preferred release path is to consolidate the already completed `0.13.0`
 through `0.15.0` scopes into the 1.0 release candidate after the OpenSpec and
@@ -462,12 +476,19 @@ Exit criteria:
 
 ### 1.0.0: Stable Release
 
-**Goal:** publish the reviewed candidate as the first stable compatibility
-baseline.
+**Goal:** complete the contract-preserving application-boundary refactor, prove
+it through a new candidate, and publish the first stable compatibility baseline.
 
 Scope:
 
-- [ ] Apply only fixes proven necessary by release-candidate testing.
+- [ ] Complete and archive the [application boundaries refactor
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+  without changing public Python, CLI, MCP, artifact, error, or safety
+  contracts.
+- [ ] Publish and smoke-test a release candidate containing the completed
+  refactor before promoting the exact verified code to stable.
+- [ ] Apply only fixes proven necessary by release-candidate testing outside
+  the bounded refactor scope.
 - [ ] Re-run every release candidate gate on the exact release commit.
 - [ ] Publish signed and attested wheel, source distribution, documentation,
   and separate CLI, generator MCP, and Trino MCP container images.
@@ -476,22 +497,11 @@ Scope:
 - [ ] Start the post-1.0 compatibility and deprecation policy from the published
   contracts.
 
-### Post-1.0: Architecture And Community
+### Post-1.0: Follow-up Architecture And Community
 
-The RC should remain focused on release safety and product clarity. Use the
-next cycle to reduce maintenance cost and make external contribution easier:
+After the stable baseline, continue the remaining maintenance and community
+work without reopening the completed 1.0 application-boundary gate:
 
-- [ ] Decompose large orchestration modules into application use cases, ports,
-  and thin CLI/MCP transport adapters, following the [application boundaries
-  refactor OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md).
-  - [ ] Split `agent.py` into typed planning, review, approval, recovery,
-    advising, status, and workspace-persistence responsibilities.
-  - [ ] Split `cli.py` composition, dispatch, doctor, command handlers, and
-    optional dependency resolution while preserving parser/presenter contracts.
-  - [ ] Split `mcp_trino_server.py` into config, pure SQL policy, query
-    builders, client, profiling, and masking boundaries.
-- [ ] Add an architectural dependency test that prevents transport code from
-  becoming the only enforcement boundary or leaking into core policy.
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
   production package, using narrow overrides only for external integrations.
 - [ ] Add a public maintainership/governance model, support expectations,

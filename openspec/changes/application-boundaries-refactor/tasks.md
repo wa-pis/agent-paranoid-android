@@ -1,5 +1,8 @@
 # Tasks: application-boundaries-refactor
 
+Target: required before the stable 1.0 release and delivered as small,
+contract-preserving increments.
+
 - [ ] Inventory public imports, CLI commands, MCP tools, artifact contracts,
   and current dependency direction before moving code.
 - [ ] Extract typed workspace persistence and atomic transition interfaces.
@@ -16,4 +19,7 @@
 - [ ] Add direct-service adversarial tests for unsafe specs, paths, SQL, and
   provider payloads after each extraction.
 - [ ] Document migration notes for any intentionally moved internal boundary.
-- [ ] Run the full typing, lint, compile, test, package, and security gates.
+- [ ] Run the full typing, lint, compile, test, package, documentation, and
+  security gates.
+- [ ] Merge applicable OpenSpec deltas into the canonical baseline and archive
+  this change after every task is complete.

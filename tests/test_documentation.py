@@ -196,6 +196,26 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
             assert f"### Requirement: {heading}" in spec
 
 
+def test_application_boundaries_refactor_is_required_for_stable_1_0() -> None:
+    roadmap = (ROOT / "docs" / "roadmap.md").read_text()
+    proposal = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "application-boundaries-refactor"
+        / "proposal.md"
+    ).read_text()
+    stable_scope = roadmap.split("### 1.0.0: Stable Release", 1)[1].split(
+        "### Post-1.0", 1
+    )[0]
+    post_1_0_scope = roadmap.split("### Post-1.0", 1)[1]
+
+    assert "Status: required before the stable 1.0" in proposal
+    assert "application-boundaries-refactor/proposal.md" in stable_scope
+    assert "release candidate containing the completed" in stable_scope
+    assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
+
+
 def test_unreleased_changelog_headings_follow_policy_order() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text()
     unreleased = changelog.split("## Unreleased", 1)[1].split("\n## [", 1)[0]

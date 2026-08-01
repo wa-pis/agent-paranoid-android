@@ -6,15 +6,16 @@ Decompose the large agent, CLI, and Trino orchestration modules into typed
 application services, policy modules, ports, and thin transport adapters while
 preserving public behavior and safety boundaries.
 
-The target is a staged maintainability refactor after the release candidate,
-not a broad rewrite or a reason to delay the RC security fixes.
+The target is a staged maintainability refactor after public RC2 acceptance
+and before the stable 1.0 release. It is not a broad rewrite or permission to
+change the frozen public contracts.
 
 ## Scheduling
 
-Status: explicitly deferred until after the stable 1.0 contract baseline is
-published. The RC review found no concrete security blocker that requires this
-decomposition. Resume the change in the first post-1.0 architecture cycle and
-reassess immediately if an RC security fix cannot be isolated safely.
+Status: required before the stable 1.0 contract baseline is published. Deliver
+the change through small, contract-preserving pull requests after RC2 public
+acceptance. Complete every task and the full release gates before publishing a
+new candidate that contains the refactor.
 
 ## Motivation
 
@@ -44,8 +45,8 @@ Out of scope:
 - Moving security enforcement exclusively into a transport layer.
 - A framework migration or broad dependency increase.
 - Removing compatibility wrappers before their migration window is complete.
-- Performing the refactor as part of the RC unless a narrowly scoped security
-  fix requires it.
+- Bundling the extraction into one pull request or relaxing the stable-release
+  gates because the intended behavior is unchanged.
 
 ## Safety Impact
 
