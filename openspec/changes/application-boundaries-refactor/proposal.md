@@ -9,6 +9,13 @@ preserving public behavior and safety boundaries.
 The target is a staged maintainability refactor after the release candidate,
 not a broad rewrite or a reason to delay the RC security fixes.
 
+## Scheduling
+
+Status: explicitly deferred until after the stable 1.0 contract baseline is
+published. The RC review found no concrete security blocker that requires this
+decomposition. Resume the change in the first post-1.0 architecture cycle and
+reassess immediately if an RC security fix cannot be isolated safely.
+
 ## Motivation
 
 `agent.py`, `cli.py`, and `mcp_trino_server.py` currently combine composition,
