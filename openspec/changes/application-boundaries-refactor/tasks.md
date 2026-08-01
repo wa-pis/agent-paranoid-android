@@ -14,10 +14,10 @@ contract-preserving increments.
   - [x] Extract the recovery lifecycle service.
   - [x] Extract the metadata-only advising lifecycle service.
   - [x] Extract the status lifecycle service.
-- [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized
+- [x] Split CLI composition/dispatch, doctor, command handlers, and centralized
   optional dependency resolution without changing parser/presenter contracts.
   - [x] Extract installation diagnostics and capability smoke orchestration.
-  - [ ] Extract composition and command dispatch.
+  - [x] Extract composition and command dispatch.
   - [x] Extract agent command handlers.
   - [x] Extract dataset and utility command handlers.
   - [x] Centralize optional dependency resolution.

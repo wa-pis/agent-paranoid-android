@@ -145,7 +145,8 @@ The current dependencies after completed extraction increments are:
 | Owner | Current dependencies |
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
-| `cli.py` | composition/dispatch, parser/presenter contracts, and compatibility wrappers |
+| `cli.py` | public entry point, parser/presenter contracts, and compatibility wrappers |
+| `cli_application.py` | handler composition and first-owner command dispatch |
 | `cli_agent.py` | `agent-*` request translation, handler dispatch, lifecycle services, provider adapter, and presenters |
 | `cli_commands.py` | dataset and utility handlers, I/O workflows, audit, demo, rules, and presenters |
 | `cli_dependencies.py` | optional-extra module catalog, injected availability inspection, and normalized installation errors |
@@ -165,9 +166,10 @@ The current dependencies after completed extraction increments are:
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
 The two server modules currently import their transport factory to assemble the
-executable server. `agent.py`, `cli.py`, and `mcp_trino_server.py` retain
-responsibilities named in the active OpenSpec. These are the known pressure
-points, not permission to reverse safety dependencies during extraction.
+executable server. `agent.py` and `cli.py` remain compatibility owners around
+their extracted services; `mcp_trino_server.py` retains responsibilities named
+in the active OpenSpec. These boundaries are not permission to reverse safety
+dependencies during extraction.
 
 The target direction remains:
 
@@ -237,9 +239,13 @@ injects those helpers into the extracted handler without changing parser or
 presenter contracts.
 
 `cli_commands.py` now owns dataset and utility command handling, including the
-direct business-rule bridge. `cli.py` keeps top-level composition, dispatch,
-and the existing business-rule compatibility helper while injecting doctor and
-rule dependencies into the extracted handlers.
+direct business-rule bridge. `cli.py` keeps the existing business-rule
+compatibility helper while injecting doctor and rule dependencies.
+
+`cli_application.py` now composes the utility, dataset, and agent handlers and
+dispatches to the first handler that owns a command. `cli.py` retains the public
+entry point and a thin `run_command` compatibility wrapper with its existing
+test override points.
 
 ## Per-Increment Review
 

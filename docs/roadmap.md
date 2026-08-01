@@ -354,6 +354,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Centralize CLI optional-extra discovery and installation errors.
      - [x] Extract review-first `agent-*` CLI command handlers.
      - [x] Extract dataset and utility CLI command handlers.
+     - [x] Extract CLI application composition and command dispatch.
    - [ ] Add architecture and direct-service adversarial tests while preserving
      every public Python, CLI, MCP, artifact, error, and safety contract.
    - [ ] Run the full typing, lint, compile, test, package, documentation, and

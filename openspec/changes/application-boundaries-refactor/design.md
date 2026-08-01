@@ -42,8 +42,10 @@ not be the only place where safety checks happen.
   and remains metadata-only.
 - `agent_status.py` owns read-only reconstruction of planned, recoverable, and
   completed lifecycle state from bounded workspace artifacts.
-- CLI package: main composition root, dispatch, doctor, agent commands, dataset
-  commands, and centralized optional dependency resolution.
+- CLI package: public entry point, application composition/dispatch, doctor,
+  agent commands, dataset commands, and optional dependency resolution.
+- `cli_application.py` owns handler composition and first-owner command
+  dispatch; `cli.py` retains the public entry point and compatibility wrapper.
 - `cli_doctor.py` owns installation diagnostics and redacted capability smoke
   orchestration behind injected import and smoke callables.
 - `cli_dependencies.py` owns the optional-extra module catalog, availability
