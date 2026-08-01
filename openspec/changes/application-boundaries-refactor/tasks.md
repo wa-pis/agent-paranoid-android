@@ -38,7 +38,8 @@ contract-preserving increments.
   - [x] Reject symlinked workspace targets at the persistence boundary before
     plan staging.
   - [x] Reject unsafe specs at the approval service before injected generation.
-  - [ ] Complete unsafe SQL and provider-payload coverage.
+  - [x] Reject unsafe SQL at the masking service before injected Trino access.
+  - [ ] Complete provider-payload coverage.
 - [ ] Document migration notes for any intentionally moved internal boundary.
 - [ ] Run the full typing, lint, compile, test, package, documentation, and
   security gates.

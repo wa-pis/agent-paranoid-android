@@ -98,6 +98,8 @@ not be the only place where safety checks happen.
   CLI composition roots.
 - The approval service validates the reviewed spec itself before preparing an
   output folder or calling an injected generation port.
+- The masking service applies the complete bounded read-only SQL policy before
+  calling an injected Trino fetch port, including for direct service callers.
 
 ## Alternatives
 
