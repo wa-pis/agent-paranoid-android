@@ -9,5 +9,5 @@
   release evidence where maintainers need the context.
 - [ ] Review `Added`, `Changed`, `Fixed`, `Security`, `Deprecated`, `Removed`,
   and migration-note placement for the next release candidate.
-- [ ] Add documentation checks for broken links and heading/category drift.
+- [x] Add documentation checks for broken links and heading/category drift.
 - [x] Update contributor/release guidance so future entries follow the policy.
