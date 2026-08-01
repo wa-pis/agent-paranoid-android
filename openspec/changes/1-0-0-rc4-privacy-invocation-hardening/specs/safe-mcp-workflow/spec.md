@@ -1,11 +1,12 @@
 # Safe MCP Workflow Delta
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Default Trino MCP Responses Are Source-Literal-Free
 
 The default Trino MCP surface SHALL expose only metadata and bounded aggregate
-profiling responses that do not return literal values copied from source cells.
+profiling responses. Successful responses, typed errors, and metadata-only
+audit records SHALL NOT contain literal values copied from source cells.
 
 #### Scenario: A profile contains distinct values in every source column
 

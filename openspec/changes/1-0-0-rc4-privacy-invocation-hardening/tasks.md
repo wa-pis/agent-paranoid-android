@@ -2,7 +2,7 @@
 
 ## P0 — Default MCP privacy boundary
 
-- [ ] Update the safe-MCP capability requirements for source-literal-free
+- [x] Update the safe-MCP capability requirements for source-literal-free
   default responses.
 - [x] Remove `sample_rows_masked` from the default Trino MCP registration, or
   implement the explicit opt-in/review/audit boundary for any retained row
