@@ -31,6 +31,9 @@ not be the only place where safety checks happen.
 - `agent_review.py` owns metadata-only review reports and fingerprint refresh
   checks. It receives the workspace-status inspector as a typed callable so it
   does not import the compatibility composition module.
+- `agent_approval.py` owns fingerprint-gated approval and completion
+  publication. It receives workspace inspection and deterministic generation as
+  typed callables so direct service use preserves the same safety gate.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
 - Trino package: config, pure SQL policy, non-executing query builders, client,

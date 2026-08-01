@@ -10,8 +10,9 @@ contract-preserving increments.
   advising, status, and workspace-store modules.
   - [x] Extract neutral agent contracts and the planning lifecycle service.
   - [x] Extract the metadata-only review lifecycle service.
-  - [ ] Extract approval, recovery, advising, and status services one lifecycle
-    boundary at a time.
+  - [x] Extract the approval lifecycle service.
+  - [ ] Extract recovery, advising, and status services one lifecycle boundary
+    at a time.
 - [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized
   optional dependency resolution without changing parser/presenter contracts.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and

@@ -343,8 +343,9 @@ into `1.0.0rc1`. Finish the release stage in this order:
        filesystem workspace store.
      - [x] Extract neutral agent contracts and the planning lifecycle service.
      - [x] Extract the metadata-only review lifecycle service.
-     - [ ] Extract approval, recovery, advising, and status services one
-       lifecycle boundary at a time.
+     - [x] Extract the approval lifecycle service.
+     - [ ] Extract recovery, advising, and status services one lifecycle
+       boundary at a time.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
    - [ ] Add architecture and direct-service adversarial tests while preserving
