@@ -250,11 +250,47 @@ def build_advisor_request(
         else infer_dataset_spec(profile, count=count)
     )
     _validate_spec_against_profile(profile, effective_spec)
+    safe_profile, safe_spec = _sanitize_rare_profile_values(profile, effective_spec)
     return AdvisorRequest(
-        profile_sha256=dataset_profile_fingerprint(profile),
-        baseline_spec_sha256=dataset_spec_fingerprint(effective_spec),
-        profile=profile.model_copy(deep=True),
-        baseline_spec=effective_spec,
+        profile_sha256=dataset_profile_fingerprint(safe_profile),
+        baseline_spec_sha256=dataset_spec_fingerprint(safe_spec),
+        profile=safe_profile,
+        baseline_spec=safe_spec,
+    )
+
+
+def _sanitize_rare_profile_values(
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+) -> tuple[DatasetProfile, DatasetSpec]:
+    replacements: dict[str, str] = {}
+    for entity in profile.entities:
+        for field in entity.fields:
+            if field.distribution.get("kind") != "categorical":
+                continue
+            for category in field.distribution.get("categories", []):
+                value = category.get("value") if isinstance(category, dict) else None
+                count = category.get("count", 0) if isinstance(category, dict) else 0
+                if isinstance(value, str) and float(count) <= 1:
+                    replacements.setdefault(
+                        value,
+                        f"synthetic_category_{len(replacements) + 1}",
+                    )
+
+    def replace(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {key: replace(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [replace(item) for item in value]
+        if isinstance(value, tuple):
+            return tuple(replace(item) for item in value)
+        if isinstance(value, str):
+            return replacements.get(value, value)
+        return value
+
+    return (
+        DatasetProfile.model_validate(replace(profile.model_dump(mode="python"))),
+        DatasetSpec.model_validate(replace(spec.model_dump(mode="python"))),
     )
 
 

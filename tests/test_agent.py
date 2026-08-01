@@ -67,6 +67,26 @@ class RowCountAdvisor:
         }
 
 
+class RecordingRowCountClient:
+    def __init__(self, row_count: int) -> None:
+        self.row_count = row_count
+        self.exchanges: list[AdvisorExchange] = []
+
+    def complete(self, exchange: AdvisorExchange) -> dict[str, Any]:
+        self.exchanges.append(exchange)
+        request = exchange.request
+        candidate = request.baseline_spec.model_copy(deep=True)
+        candidate.entities[0].row_count = self.row_count
+        return {
+            "schema_version": "1.0",
+            "profile_sha256": request.profile_sha256,
+            "baseline_spec_sha256": request.baseline_spec_sha256,
+            "approval_required": True,
+            "generation_performed": False,
+            "dataset_spec": candidate.model_dump(mode="json"),
+        }
+
+
 def test_package_root_exposes_agent_api() -> None:
     assert test_data_agent.AgentApprovalReceipt is AgentApprovalReceipt
     assert test_data_agent.AgentCompletionCheckpoint is AgentCompletionCheckpoint
@@ -567,7 +587,9 @@ def test_agent_review_rejects_spec_changed_during_report(
     assert not (workspace / "generated").exists()
 
 
-def test_advisor_workspace_handoff_stops_for_review_then_approves(tmp_path) -> None:
+def test_fake_provider_flow_excludes_source_values_and_requires_approval(
+    tmp_path,
+) -> None:
     workspace = tmp_path / "agent"
     plan_agent_request(
         AgentRequest(
@@ -577,11 +599,23 @@ def test_advisor_workspace_handoff_stops_for_review_then_approves(tmp_path) -> N
             count=3,
         )
     )
-    advisor = RowCountAdvisor(4)
+    client = RecordingRowCountClient(4)
+    advisor = ExchangeDatasetAdvisor(client)
 
     status = advise_agent_workspace(workspace, advisor)
 
-    assert advisor.calls == 1
+    assert len(client.exchanges) == 1
+    provider_request = client.exchanges[0].model_dump_json()
+    for source_value in (
+        "alice@example.com",
+        "bob@example.com",
+        "carol@example.com",
+        "customer request",
+        "fraud",
+        '"C1"',
+        '"O1"',
+    ):
+        assert source_value not in provider_request
     assert status.phase == "awaiting_approval"
     assert status.review is not None
     assert status.review.spec_changed_since_plan is True
