@@ -103,6 +103,12 @@ def test_raw_sql_tool_is_opt_in(
     assert "run_safe_select" in {tool.__name__ for tool in trino_mcp_tools()}
 
 
+def test_row_sampling_is_not_registered_by_default() -> None:
+    assert "sample_rows_masked" not in {
+        tool.__name__ for tool in trino_mcp_tools()
+    }
+
+
 def test_unrestricted_execution_helpers_are_private() -> None:
     assert not hasattr(mcp_trino_server, "execute_query")
     assert not hasattr(mcp_trino_server, "fetch_dicts")

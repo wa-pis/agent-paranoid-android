@@ -4,7 +4,7 @@
 
 - [ ] Update the safe-MCP capability requirements for source-literal-free
   default responses.
-- [ ] Remove `sample_rows_masked` from the default Trino MCP registration, or
+- [x] Remove `sample_rows_masked` from the default Trino MCP registration, or
   implement the explicit opt-in/review/audit boundary for any retained row
   diagnostic.
 - [ ] Update MCP golden contracts, docs, migration notes, and release notes.
