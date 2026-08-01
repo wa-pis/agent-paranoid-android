@@ -128,6 +128,9 @@ def test_rc2_public_evidence_records_immutable_release() -> None:
     for expected in (
         "e5030b6ae3a06885296d530a4a99f86b760118dd",
         "actions/runs/30689390871",
+        "actions/runs/30690800129",
+        "63e7e3fe9abeb82b968314068c6180e5a3a64a6f",
+        "Public agent approval and audit verification",
         "8982b0fe05dc380ac948c1b3d37eda1bd5f2211a0299549be0b77952847c9297",
         "sha256:7f2b93ce9570e2dc702d34bc098b0756ee64b13588f4eb73ede950694d5de73b",
         "sha256:5fa30138b86fc4d9ce9eb80742ca4e9652da6507ea523508ac5fe7f0a9fa3d02",

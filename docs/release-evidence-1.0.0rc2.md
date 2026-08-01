@@ -8,10 +8,12 @@ additional product or privacy guarantee.
 
 The annotated tag `v1.0.0rc2` resolves to release commit
 `e5030b6ae3a06885296d530a4a99f86b760118dd`. The successful post-publish
-verification checked out that tag and independently resolved the same commit.
-The verification workflow itself ran from `main` commit
-`ac413e3e51dc6ee52a7e9230ac2f53f01ced7576`, after its checksum-path fix, and
-did not create or mutate release artifacts.
+verifications checked out that tag and independently resolved the same commit.
+The baseline workflow ran from `main` commit
+`ac413e3e51dc6ee52a7e9230ac2f53f01ced7576`, after its checksum-path fix. The
+final agent-approval and audit run used workflow commit
+`63e7e3fe9abeb82b968314068c6180e5a3a64a6f`. Neither run created or mutated
+release artifacts.
 
 | Gate | Run | Result |
 | --- | --- | --- |
@@ -19,6 +21,7 @@ did not create or mutate release artifacts.
 | Multi-platform GHCR images | [Containers #379](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30684853166) | Passed |
 | PyPI trusted publication and public-index smoke | [Publish PyPI](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30684911066) | Passed |
 | Independent public-artifact verification | [Verify Published Release #2](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30689390871) | Passed |
+| Public agent approval and audit verification | [Verify Published Release #3](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30690800129) | Passed |
 
 ## Package Digests
 
@@ -54,6 +57,13 @@ the bundled deterministic demo, and confirmed that its manifest reports
 synthetic output, no copied source rows, and successful validation. It also
 confirmed that the public documentation serves both the quickstart success
 marker and version `1.0.0rc2`.
+
+The final acceptance run used only the installed public PyPI wheel and its
+bundled synthetic fixture. It completed `agent-plan`, `agent-review`, and
+`agent-approve` against the exact reviewed fingerprint, then confirmed valid
+synthetic output with no source rows copied. The same clean installation wrote
+a two-record HMAC-authenticated MCP audit chain and verified it with the
+installed `audit-verify` command.
 
 The changes after `v1.0.0rc1` were limited to the RC2 container-tag correction,
 the post-publish verification gate, and the checksum-layout correction required

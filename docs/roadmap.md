@@ -327,11 +327,11 @@ into `1.0.0rc1`. Finish the release stage in this order:
 5. [x] Review README, documentation, migration guidance, examples, package
    metadata, support policy, SBOM, provenance, signatures, and release notes as
    one public-readiness gate.
-6. [ ] Complete public `1.0.0rc2` acceptance.
+6. [x] Complete public `1.0.0rc2` acceptance.
    - [x] Publish the candidate and run installation, `doctor`, demo generation,
      validation, documentation, package-attestation, and container-signature
      checks only against its public artifacts.
-   - [ ] Run agent approval and audit verification from the exact public
+   - [x] Run agent approval and audit verification from the exact public
      package or container artifacts.
 7. [ ] Apply only release-blocking RC fixes, repeat the exact release gates, and
    publish `1.0.0` from the verified release commit.
@@ -443,11 +443,11 @@ Scope:
     OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-release-documentation-hygiene/proposal.md).
 - [x] Publish and install the release candidate through the real GitHub,
   PyPI, documentation, and GHCR paths.
-- [ ] Finish end-to-end smoke tests only against the published candidate
+- [x] Finish end-to-end smoke tests only against the published candidate
   artifacts.
   - [x] Verify public installation, `doctor`, demo generation and validation,
     documentation, package attestations, and container signatures.
-  - [ ] Exercise agent approval and audit verification from the exact public
+  - [x] Exercise agent approval and audit verification from the exact public
     package or container artifacts.
 
 Exit criteria:
