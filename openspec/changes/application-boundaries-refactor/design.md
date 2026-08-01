@@ -66,8 +66,12 @@ not be the only place where safety checks happen.
   result limits, row conversion, and deterministic cursor/connection cleanup.
 - `trino_profiling.py` owns allowlisted metadata and aggregate-only profiling
   orchestration behind an injected typed query-fetch boundary. The MCP server
-  retains compatibility wrappers and injects the existing safe column
-  summarizer until masking is extracted separately.
+  retains compatibility wrappers and injects the masking service as its safe
+  column summarizer.
+- `trino_masking.py` owns row masking, source-free category summaries, safe
+  column-profile completion, masked samples, and generic safe-select result
+  masking behind injected query ports without importing the MCP transport or
+  Trino client.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final
