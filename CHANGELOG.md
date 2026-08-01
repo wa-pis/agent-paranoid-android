@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added a runnable stdio MCP journey using both installed servers, review-bound
+  generation, and a disallowed Trino request rejected before network access.
 - Added deterministic SQL `INSERT` export with quoted identifiers, escaped
   literals, manifest evidence, and a runnable all-format example.
 - Added canonical dependency identities and a stable dependency fingerprint to

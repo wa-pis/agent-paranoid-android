@@ -421,7 +421,7 @@ Scope:
     generate multiple tables, and verify FK/business-rule reconciliation.
   - [ ] Local Trino: start a disposable synthetic catalog, exercise bounded
     metadata/profiling tools, then generate without exporting source rows.
-  - [ ] MCP: configure and call generator and Trino servers against the same
+  - [x] MCP: configure and call generator and Trino servers against the same
     synthetic fixtures, including one rejected unsafe request.
   - [x] Python library: reproduce the CLI golden path with the public API and
     an explicit seed.
