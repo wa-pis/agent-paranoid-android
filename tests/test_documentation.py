@@ -40,6 +40,7 @@ REQUIRED_DOCS = {
     "operations/audit-logging.md",
     "operations/containers.md",
     "operations/migrating-to-0.6.md",
+    "changelog-policy.md",
 }
 CLI_COMMANDS = {
     "demo",
@@ -73,6 +74,32 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "## Choose A Guide" in readme
     assert "## Release Checklist" not in readme
     assert "## Legacy GenerationSpec Compatibility" not in readme
+
+
+def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
+    policy = (ROOT / "docs" / "changelog-policy.md").read_text()
+    contributing = (ROOT / "CONTRIBUTING.md").read_text()
+    release = (ROOT / "docs" / "release.md").read_text()
+
+    for category in (
+        "`Added`",
+        "`Changed`",
+        "`Fixed`",
+        "`Security`",
+        "`Deprecated`",
+        "`Removed`",
+        "`Migration`",
+    ):
+        assert category in policy
+    for classification in (
+        "user impact",
+        "security impact",
+        "migration impact",
+        "internal evidence",
+    ):
+        assert classification in policy
+    assert "docs/changelog-policy.md" in contributing
+    assert "changelog-policy.md" in release
 
 
 def test_public_governance_files_define_owners_and_safe_support() -> None:

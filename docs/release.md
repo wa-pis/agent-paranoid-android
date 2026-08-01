@@ -7,8 +7,9 @@ Use this process before merging release candidates or creating tags.
 1. Review `openspec/project.md` and the affected capability specs.
 2. Confirm the change belongs in the MVP or has an OpenSpec proposal under
    `openspec/changes/`.
-3. Update README examples, `CHANGELOG.md`, and user-facing docs for visible
-   behavior changes.
+3. Update README examples, user-facing docs, and `CHANGELOG.md` for visible
+   behavior changes. Follow the [changelog policy](changelog-policy.md); do not
+   turn release notes into an internal engineering log.
 4. Regenerate `schemas/dataset_spec.schema.json` when `DatasetSpec` changes:
 
 ```bash
@@ -58,7 +59,9 @@ environment. That smoke check verifies package version metadata, the PEP 561
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.
-2. Move relevant `CHANGELOG.md` entries from `Unreleased` to the new version.
+2. Review every `Unreleased` entry using the
+   [changelog policy](changelog-policy.md), then move the classified categories
+   to the new version.
 3. Commit the release preparation.
 4. Tag the commit after `scripts/check_release.sh` passes.
 
