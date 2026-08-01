@@ -10,22 +10,12 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from test_data_agent.agent import (
-    AgentRequest,
-    AgentSourceType,
-    AgentWorkspaceStatus,
-    apply_agent_advisor_proposal,
-    advise_agent_workspace,
-    approve_agent_workspace,
-    build_agent_advisor_exchange,
-    build_agent_advisor_request,
-    detect_agent_source_type,
-    inspect_agent_workspace,
-    plan_agent_request,
-    recover_agent_workspace,
-    review_agent_workspace,
+from test_data_agent.agent import AgentRequest, AgentWorkspaceStatus
+from test_data_agent.cli_agent import (
+    advise_agent_workspace_with_provider as _advise_agent_workspace_with_provider,
+    agent_request_from_args as _agent_request_from_args,
+    run_agent_command as _run_agent_command,
 )
-from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_dependencies import CliDependencyResolver
@@ -49,17 +39,11 @@ from test_data_agent.cli_presenter import (
     friendly_error,
     report_cli_error,
     write_audit_verification_result,
-    write_agent_command_result,
-    write_agent_review_result,
-    write_agent_status_result,
     write_doctor_report,
     write_examples,
-    write_json_document,
     write_validation_result,
 )
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.limits import read_limited_text
-from test_data_agent.core.settings import GenerationMode as CoreGenerationMode, OutputFormat as CoreOutputFormat
 from test_data_agent.demo import run_demo
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
@@ -349,66 +333,13 @@ def run_command(args: argparse.Namespace) -> int:
         audit_result = verify_audit_log_from_env(args.log)
         return write_audit_verification_result(audit_result)
 
-    if args.command == "agent-plan":
-        agent_result = plan_agent_request(agent_request_from_args(args))
-        write_agent_command_result(agent_result, json_output=args.json_output)
-        return 0
-
-    if args.command == "agent-approve":
-        agent_result = approve_agent_workspace(
-            args.workspace,
-            reviewed_spec_sha256=args.reviewed_spec_sha256,
-        )
-        write_agent_command_result(agent_result, json_output=args.json_output)
-        return 0 if agent_result.summary.get("validation_valid", False) else 1
-
-    if args.command == "agent-recover":
-        agent_result = recover_agent_workspace(
-            args.workspace,
-            reviewed_spec_sha256=args.reviewed_spec_sha256,
-        )
-        write_agent_command_result(agent_result, json_output=args.json_output)
-        return 0 if agent_result.summary.get("validation_valid", False) else 1
-
-    if args.command == "agent-advise":
-        status = advise_agent_workspace_with_provider(
-            args.workspace,
-            provider=args.provider,
-            model=args.model,
-        )
-        write_agent_status_result(
-            status,
-            json_output=args.json_output,
-            pending_heading="AI proposal ready; review required",
-        )
-        return 0
-
-    if args.command == "agent-advisor-request":
-        payload = (
-            build_agent_advisor_exchange(args.workspace)
-            if args.exchange
-            else build_agent_advisor_request(args.workspace)
-        )
-        write_json_document(payload)
-        return 0
-
-    if args.command == "agent-advisor-apply":
-        proposal = AdvisorProposal.model_validate_json(
-            read_limited_text(args.proposal)
-        )
-        status = apply_agent_advisor_proposal(args.workspace, proposal)
-        write_agent_status_result(status, json_output=args.json_output)
-        return 0
-
-    if args.command == "agent-status":
-        status = inspect_agent_workspace(args.workspace)
-        write_agent_status_result(status, json_output=args.json_output)
-        return 0
-
-    if args.command == "agent-review":
-        review_report = review_agent_workspace(args.workspace)
-        write_agent_review_result(review_report, json_output=args.json_output)
-        return 0
+    agent_exit_code = _run_agent_command(
+        args,
+        request_builder=agent_request_from_args,
+        advisor_runner=advise_agent_workspace_with_provider,
+    )
+    if agent_exit_code is not None:
+        return agent_exit_code
 
     return 2
 
@@ -461,24 +392,9 @@ def write_doctor_fixture(directory: Path) -> None:
 
 
 def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
-    source_type = (
-        AgentSourceType(args.source_type.replace("-", "_"))
-        if args.source_type is not None
-        else detect_agent_source_type(args.source)
-    )
-    return AgentRequest(
-        source_type=source_type,
-        source_path=args.source,
-        workspace=args.workspace,
-        count=args.count,
-        seed=args.seed,
-        output_format=CoreOutputFormat(args.output_format),
-        mode=CoreGenerationMode(args.mode),
-        invalid_ratio=args.invalid_ratio,
-        table_name=args.table,
-        rule_sample_rows=args.rule_sample_rows,
-        use_cache=args.use_cache,
-    )
+    """Compatibility wrapper for agent request translation."""
+
+    return _agent_request_from_args(args)
 
 
 def advise_agent_workspace_with_provider(
@@ -487,28 +403,13 @@ def advise_agent_workspace_with_provider(
     provider: str,
     model: str | None,
 ) -> AgentWorkspaceStatus:
-    if provider != "openai":
-        raise ValueError(f"unsupported advisor provider: {provider}")
+    """Compatibility wrapper for optional provider-backed advice."""
 
-    def load_openai_provider() -> tuple[str, Any]:
-        from test_data_agent.providers.openai import (
-            DEFAULT_OPENAI_MODEL,
-            OpenAIAdvisorClient,
-        )
-
-        return DEFAULT_OPENAI_MODEL, OpenAIAdvisorClient
-
-    default_model, advisor_client = CliDependencyResolver(
-        importlib.import_module
-    ).load(
-        extra="openai",
-        purpose="OpenAI advice",
-        loader=load_openai_provider,
-    )
-    client = advisor_client(model=model or default_model)
-    return advise_agent_workspace(
+    return _advise_agent_workspace_with_provider(
         workspace,
-        ExchangeDatasetAdvisor(client),
+        provider=provider,
+        model=model,
+        dependencies=CliDependencyResolver(importlib.import_module),
     )
 
 

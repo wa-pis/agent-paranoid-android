@@ -145,7 +145,8 @@ The current dependencies after completed extraction increments are:
 | Owner | Current dependencies |
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
-| `cli.py` | composition/dispatch, parser/presenter contracts, agent/provider adapters, audit, demo, I/O commands, and rules |
+| `cli.py` | composition/dispatch, parser/presenter contracts, compatibility wrappers, audit, demo, I/O commands, and rules |
+| `cli_agent.py` | `agent-*` request translation, handler dispatch, lifecycle services, provider adapter, and presenters |
 | `cli_dependencies.py` | optional-extra module catalog, injected availability inspection, and normalized installation errors |
 | `cli_doctor.py` | installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration |
 | `agent.py` | compatibility exports plus deterministic generation and completion validation |
@@ -228,6 +229,11 @@ test override points while command dispatch remains unchanged.
 `cli_dependencies.py` centralizes optional-extra discovery and installation
 errors for doctor capability checks and OpenAI advice. Importers and loaders
 remain injectable so direct service calls preserve fail-closed behavior.
+
+`cli_agent.py` now owns review-first `agent-*` request translation and command
+handling. `cli.py` keeps the public entry point and compatibility helpers, then
+injects those helpers into the extracted handler without changing parser or
+presenter contracts.
 
 ## Per-Increment Review
 

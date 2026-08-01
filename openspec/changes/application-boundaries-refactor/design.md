@@ -48,6 +48,8 @@ not be the only place where safety checks happen.
   orchestration behind injected import and smoke callables.
 - `cli_dependencies.py` owns the optional-extra module catalog, availability
   inspection, and normalized installation errors for CLI services.
+- `cli_agent.py` owns `agent-*` request translation and command handling while
+  the compatibility composition root retains top-level dispatch.
 - Trino package: config, pure SQL policy, non-executing query builders, client,
   profiling, and masking.
 - Typed workspace transition and persistence interfaces with atomic commit and
