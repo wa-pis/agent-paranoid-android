@@ -18,7 +18,7 @@ contract-preserving increments.
   optional dependency resolution without changing parser/presenter contracts.
   - [x] Extract installation diagnostics and capability smoke orchestration.
   - [ ] Extract composition and command dispatch.
-  - [ ] Extract agent command handlers.
+  - [x] Extract agent command handlers.
   - [ ] Extract dataset and utility command handlers.
   - [x] Centralize optional dependency resolution.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
