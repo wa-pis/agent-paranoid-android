@@ -38,6 +38,20 @@ def test_workspace_store_rejects_nonempty_workspace_without_changes(
     assert list(tmp_path.iterdir()) == [workspace]
 
 
+def test_workspace_store_rejects_symlink_before_staging(tmp_path: Path) -> None:
+    target = tmp_path / "outside"
+    target.mkdir()
+    workspace = tmp_path / "agent"
+    workspace.symlink_to(target, target_is_directory=True)
+
+    with pytest.raises(ValueError, match="must not be a symbolic link"):
+        FilesystemAgentWorkspaceStore().begin_plan(workspace)
+
+    assert workspace.is_symlink()
+    assert not list(tmp_path.glob(".agent.plan.*"))
+    assert not any(target.iterdir())
+
+
 def test_agent_plan_failure_rolls_back_staged_workspace(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

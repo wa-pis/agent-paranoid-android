@@ -181,6 +181,8 @@ class FilesystemAgentWorkspaceStore:
 
 
 def _validate_new_workspace(workspace: Path) -> None:
+    if workspace.is_symlink():
+        raise ValueError("agent workspace must not be a symbolic link")
     if workspace.exists() and not workspace.is_dir():
         raise ValueError("agent workspace must be a folder")
     if workspace.exists() and any(workspace.iterdir()):

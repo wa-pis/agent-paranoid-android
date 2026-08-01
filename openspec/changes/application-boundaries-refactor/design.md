@@ -93,6 +93,9 @@ not be the only place where safety checks happen.
   audit behavior.
 - Direct application calls that bypass CLI/MCP must still reject unsafe specs,
   SQL, paths, and provider payloads.
+- The workspace persistence service rejects symlinked plan targets before it
+  creates a staging directory, including for callers that bypass the agent or
+  CLI composition roots.
 
 ## Alternatives
 
