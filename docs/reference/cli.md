@@ -107,7 +107,7 @@ data file and requires `--count` and `--seed`.
 | --- | --- |
 | `--count N` | Number of generated rows per entity or an override |
 | `--seed N` | Non-negative deterministic seed |
-| `--format csv|json|parquet` | Output format |
+| `--format csv|json|sql|parquet` | Output format |
 | `--mode valid|mixed|negative|edge|load_test` | Generation mode |
 | `--invalid-ratio R` | Invalid share from `0` to `1` for applicable modes |
 | `--business-rules PATH` | Reviewed YAML or JSON rule file |

@@ -79,6 +79,8 @@
   - [x] Add the relational CSV relationship/rules journey.
   - [x] Add the public Python API generation/validation journey.
   - [ ] Add Trino, MCP, and export journeys.
+    - [x] Add the CSV, JSON, SQL, and optional Parquet export journey.
+    - [ ] Add the local Trino and MCP journeys.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
   maintainability without expanding the product surface.
 - [ ] Create public good-first-issue/help-wanted backlog items.

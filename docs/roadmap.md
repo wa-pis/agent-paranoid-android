@@ -425,7 +425,7 @@ Scope:
     synthetic fixtures, including one rejected unsafe request.
   - [x] Python library: reproduce the CLI golden path with the public API and
     an explicit seed.
-  - [ ] Output formats: inspect CSV, JSON, SQL, and optional Parquet artifacts
+  - [x] Output formats: inspect CSV, JSON, SQL, and optional Parquet artifacts
     plus their manifest and validation report.
   - [ ] Add one-command launchers and CI smoke tests that run the examples from
     an installed wheel or release-style container, not the source checkout.

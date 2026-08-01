@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Added deterministic SQL `INSERT` export with quoted identifiers, escaped
+  literals, manifest evidence, and a runnable all-format example.
 - Added canonical dependency identities and a stable dependency fingerprint to
   generation-manifest reproducibility evidence.
 - Fixed ISO date columns being misclassified as phone numbers during CSV
