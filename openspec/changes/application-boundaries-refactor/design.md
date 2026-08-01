@@ -58,6 +58,8 @@ not be the only place where safety checks happen.
   profiling, and masking.
 - `trino_config.py` owns validated connection settings, allowlist inputs, and
   fail-closed query resource budgets without importing Trino or MCP transports.
+- `trino_sql_policy.py` owns identifier validation, allowlist enforcement, and
+  bounded read-only SQL validation without importing client or MCP transports.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final

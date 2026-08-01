@@ -350,6 +350,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
      - [x] Extract validated Trino connection and resource-budget configuration.
+     - [x] Extract pure read-only SQL and allowlist policy.
      - [x] Extract CLI installation diagnostics and capability smoke
        orchestration.
      - [x] Centralize CLI optional-extra discovery and installation errors.
