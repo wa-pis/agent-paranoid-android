@@ -11,7 +11,7 @@
 - [x] Add normalized dependency evidence to the generation manifest without
   exposing rows, PII, secrets, or provider payloads.
 - [x] Document same-environment, same-version, and cross-version guarantees.
-- [ ] Add upper major bounds only where the compatibility evidence justifies
+- [x] Add upper major bounds only where the compatibility evidence justifies
   them, with release notes for any narrowed range.
 - [ ] Add release checks for manifest completeness and unreviewed dependency
   drift.
