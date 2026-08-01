@@ -30,6 +30,10 @@ not be the only place where safety checks happen.
   profiling, and masking.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
+- The filesystem workspace adapter stages a complete plan beside its final
+  path and publishes it with one directory rename. Completion keeps
+  `agent_result.json` as the last atomic state marker so interrupted runs stay
+  recoverable from generated checkpoints.
 - Architecture test rules for forbidden imports and direct unsafe boundaries.
 
 ## Failure Modes

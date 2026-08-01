@@ -339,6 +339,10 @@ into `1.0.0rc1`. Finish the release stage in this order:
    - [x] Inventory and freeze the existing public and safety boundaries.
    - [ ] Extract typed workspace persistence and staged agent lifecycle
      services.
+     - [x] Publish plans and completion markers through a typed, atomic
+       filesystem workspace store.
+     - [ ] Extract planning, review, approval, recovery, advising, and status
+       services one lifecycle boundary at a time.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
    - [ ] Add architecture and direct-service adversarial tests while preserving
