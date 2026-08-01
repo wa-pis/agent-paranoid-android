@@ -71,3 +71,37 @@ Validation SHALL produce reviewable artifacts.
 - **WHEN** validation runs
 - **THEN** the workflow writes or returns a report with validity, checked
   sections, failures, and relevant row-count context
+
+### Requirement: Validation Settings Have Executable Semantics
+
+Every supported validation setting SHALL affect deterministic validation
+behavior and SHALL be recorded in the resulting report or manifest.
+
+#### Scenario: A validation section is disabled
+
+- **GIVEN** a valid `DatasetSpec` disables a supported validation section
+- **WHEN** validation runs
+- **THEN** that section is omitted according to the documented behavior
+- **AND** the report identifies the effective validation settings
+
+#### Scenario: Fail-fast validation finds a failure
+
+- **GIVEN** `fail_fast` is enabled
+- **WHEN** an enabled validation section fails
+- **THEN** later sections do not run or appear in the report
+- **AND** the completed report retains the effective settings
+
+### Requirement: Privacy Assurance Claims Are Bounded
+
+Privacy validation SHALL distinguish deterministic safety checks from
+statistical privacy guarantees that the project does not provide.
+
+#### Scenario: Source-row comparison passes
+
+- **GIVEN** source data is available and no complete generated row exactly
+  matches a source row
+- **WHEN** an operator reviews the result
+- **THEN** documentation explains that only exact complete-row reuse was
+  checked
+- **AND** the result is not presented as differential privacy, anonymity, or
+  protection against re-identification

@@ -246,3 +246,80 @@ through a row-free, deterministic contract.
   type, or an oversized value
 - **WHEN** core generation validates the candidate
 - **THEN** generation fails before the value is returned
+
+### Requirement: Generation Entry Points Enforce Spec Safety
+
+Every supported Python, CLI, agent, and generator MCP entry point SHALL
+validate the complete `DatasetSpec` before generating rows or publishing
+artifacts.
+
+#### Scenario: A manually constructed spec contains unsafe sensitive values
+
+- **GIVEN** a `DatasetSpec` contains a categorical value or distribution that
+  violates the effective privacy policy
+- **WHEN** any supported generation entry point receives the spec
+- **THEN** generation fails before rows or artifacts are written
+- **AND** the error identifies the entity and field without exposing the value
+
+#### Scenario: Equivalent adapters receive a safe reviewed spec
+
+- **GIVEN** the same reviewed spec, seed, and supported runtime
+- **WHEN** generation runs through Python, CLI, agent, or MCP
+- **THEN** every adapter applies the same core safety policy
+- **AND** valid output retains the public artifact contract
+
+### Requirement: Reproducibility Claims Are Bounded And Evidenced
+
+Generation SHALL distinguish logical reproducibility from byte-for-byte
+identity and SHALL record the effective components that can affect output.
+
+#### Scenario: A bundle records reproducibility inputs
+
+- **GIVEN** a fixed spec, seed, locale, runtime, dependency set, serializer,
+  and generator algorithm version
+- **WHEN** generation completes
+- **THEN** the manifest records those effective identities and fingerprints
+- **AND** documentation states the reproducibility level they support
+
+#### Scenario: A supported Faker locale is requested
+
+- **GIVEN** a supported locale and fixed seed
+- **WHEN** locale-backed values are generated
+- **THEN** Faker uses that locale deterministically
+- **AND** an unsupported locale fails with a generation error
+
+### Requirement: Approved Relational Semantics Are Preserved
+
+Generation SHALL preserve approved foreign-key, distribution-shape, temporal,
+formula, and aggregate business semantics without copying source rows or raw
+sensitive values.
+
+#### Scenario: Related entities are generated from approved metadata
+
+- **GIVEN** reviewed relationship and rule metadata for multiple entities
+- **WHEN** a dataset is generated with a fixed seed
+- **THEN** requested foreign keys, temporal rules, and business invariants
+  validate
+- **AND** values remain synthetic while retaining configured ranges, ratios,
+  distributions, and order-of-magnitude characteristics
+
+#### Scenario: A summary requires reconciliation
+
+- **GIVEN** reviewed grouped-total, component, partition, coverage, balancing,
+  or cross-table aggregate formulas
+- **WHEN** generation completes
+- **THEN** deterministic validation verifies every requested formula
+- **AND** a violation prevents the dataset from being reported as valid
+
+### Requirement: SQL Export Contains Synthetic Inserts Only
+
+SQL export SHALL serialize freshly generated synthetic rows as deterministic
+`INSERT` statements with quoted identifiers and escaped literals.
+
+#### Scenario: A reviewed spec is exported as SQL
+
+- **GIVEN** a safe reviewed `DatasetSpec`, explicit seed, and SQL output format
+- **WHEN** generation succeeds
+- **THEN** each entity is written to a bounded `.sql` artifact
+- **AND** the artifact contains generated rows only, never source rows
+- **AND** caller-provided SQL expressions are not accepted as values

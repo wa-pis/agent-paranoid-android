@@ -267,7 +267,7 @@ supply-chain checks against an identified commit.
 - **GIVEN** a scanner finding does not identify an exploitable product defect
 - **WHEN** maintainers determine it is not release-blocking
 - **THEN** the review records its rationale, mitigation, owner, and revisit
-  trigger
+  date and trigger
 - **AND** the automated scanner remains enabled to detect changed conditions
 
 ### Requirement: Staged Timeout Cleanup

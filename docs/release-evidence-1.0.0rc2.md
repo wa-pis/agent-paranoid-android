@@ -58,4 +58,6 @@ marker and version `1.0.0rc2`.
 The changes after `v1.0.0rc1` were limited to the RC2 container-tag correction,
 the post-publish verification gate, and the checksum-layout correction required
 by its first run. No feature work entered the candidate. The exact-commit full
-security review and dispositions remain a separate open gate.
+security review found no unresolved Critical or High finding and dispositioned
+the single current Medium maturity risk in the
+[RC2 security review](security-review-2026-08-01-rc2.md).

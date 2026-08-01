@@ -322,14 +322,17 @@ into `1.0.0rc1`. Finish the release stage in this order:
 3. [x] Reconfirm the active OpenSpec set after the planned public-readiness
    changes below; every remaining change must be implemented, assigned, or
    explicitly deferred before the RC is published.
-4. [ ] Run a fresh full security audit, resolve every Critical and High finding,
+4. [x] Run a fresh full security audit, resolve every Critical and High finding,
    and record owners and dispositions for accepted Medium or lower risks.
 5. [x] Review README, documentation, migration guidance, examples, package
    metadata, support policy, SBOM, provenance, signatures, and release notes as
    one public-readiness gate.
-6. [ ] Prepare and publish `1.0.0rc2`, then run installation, `doctor`,
-   quickstart, agent approval, generation, validation, audit verification, and
-   container-signature checks only against its public artifacts.
+6. [ ] Complete public `1.0.0rc2` acceptance.
+   - [x] Publish the candidate and run installation, `doctor`, demo generation,
+     validation, documentation, package-attestation, and container-signature
+     checks only against its public artifacts.
+   - [ ] Run agent approval and audit verification from the exact public
+     package or container artifacts.
 7. [ ] Apply only release-blocking RC fixes, repeat the exact release gates, and
    publish `1.0.0` from the verified release commit.
 
@@ -347,8 +350,8 @@ features.
 
 Scope:
 
-- [ ] Complete the [1.0.0rc1 security-boundary hardening
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc1-security-hardening/proposal.md).
+- [x] Complete the [1.0.0rc1 security-boundary hardening
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-1-0-0-rc1-security-hardening/proposal.md).
   P0 findings are release blockers; P1 findings require closure or explicit
   independent-reviewer acceptance before the stable release; P2 findings need
   a documented disposition.
@@ -392,8 +395,8 @@ Scope:
   synthetic grouped totals, components, partitions, and cross-table formulas
   reconcile without copying source totals or rows. Financial/accounting data
   may be one fixture, not the product boundary.
-- [ ] Close or explicitly defer every active OpenSpec change.
-- [ ] Run the full security audit and resolve all Critical and High findings.
+- [x] Close or explicitly defer every active OpenSpec change.
+- [x] Run the full security audit and resolve all Critical and High findings.
 - [x] Separate structural validation from privacy assurance in user-facing
   output; document heuristic false negatives, quasi-identifiers, rare/free
   text, and explicit assurance levels without implying re-identification
@@ -437,18 +440,22 @@ Scope:
   - [x] Keep `CHANGELOG.md` user-facing; move detailed OpenSpec, audit, and
     release-engineering evidence to canonical linked documents without deleting
     security history. Track this in the [release documentation hygiene
-    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/release-documentation-hygiene/proposal.md).
+    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-release-documentation-hygiene/proposal.md).
 - [x] Publish and install the release candidate through the real GitHub,
   PyPI, documentation, and GHCR paths.
-- [ ] Run end-to-end smoke tests only against the published candidate
+- [ ] Finish end-to-end smoke tests only against the published candidate
   artifacts.
+  - [x] Verify public installation, `doctor`, demo generation and validation,
+    documentation, package attestations, and container signatures.
+  - [ ] Exercise agent approval and audit verification from the exact public
+    package or container artifacts.
 
 Exit criteria:
 
 - Required CI, release, publication, installation, and smoke checks pass.
 - The RC security-boundary hardening OpenSpec has no unresolved P0 task, and
-  every remaining P1 or lower item has an owner, disposition, and revisit
-  trigger.
+  every remaining P1 or lower item has an owner, disposition, revisit date,
+  and trigger.
 - Any remaining Medium or lower security risk is documented with an owner and
   disposition.
 - Only release-blocking fixes may enter after the candidate.
