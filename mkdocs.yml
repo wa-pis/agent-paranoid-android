@@ -72,5 +72,6 @@ nav:
       - Architecture: agent_design.md
       - Generator MCP Design: mcp_generator_design.md
       - Changelog Policy: changelog-policy.md
+      - RC Changelog Inventory: unreleased-inventory-1.0.0rc1.md
       - Security Review: security-review-2026-07-31.md
       - Roadmap: roadmap.md

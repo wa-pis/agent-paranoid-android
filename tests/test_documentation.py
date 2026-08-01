@@ -41,6 +41,7 @@ REQUIRED_DOCS = {
     "operations/containers.md",
     "operations/migrating-to-0.6.md",
     "changelog-policy.md",
+    "unreleased-inventory-1.0.0rc1.md",
 }
 CLI_COMMANDS = {
     "demo",
@@ -100,6 +101,18 @@ def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
         assert classification in policy
     assert "docs/changelog-policy.md" in contributing
     assert "changelog-policy.md" in release
+
+
+def test_rc_changelog_inventory_classifies_every_unreleased_entry() -> None:
+    inventory = (ROOT / "docs" / "unreleased-inventory-1.0.0rc1.md").read_text()
+    changelog = (ROOT / "CHANGELOG.md").read_text().split("## [0.12.0]", 1)[0]
+
+    assert "89 top-level bullets" in inventory
+    assert sum(line.startswith("- ") for line in changelog.splitlines()) == 89
+    assert "**37**" in inventory
+    assert "**9**" in inventory
+    assert "**0**" in inventory
+    assert "**43**" in inventory
 
 
 def test_public_governance_files_define_owners_and_safe_support() -> None:

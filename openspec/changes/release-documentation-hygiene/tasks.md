@@ -1,7 +1,7 @@
 # Tasks: release-documentation-hygiene
 
 - [x] Define and document the user-facing changelog policy and categories.
-- [ ] Inventory the current `Unreleased` entries and classify user impact,
+- [x] Inventory the current `Unreleased` entries and classify user impact,
   security impact, migration impact, and internal evidence.
 - [ ] Move internal OpenSpec/audit/release-engineering detail to canonical
   documents without deleting or changing historical evidence.
