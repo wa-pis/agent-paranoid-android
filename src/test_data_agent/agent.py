@@ -33,9 +33,7 @@ from test_data_agent.io.artifacts import (
     GenerationManifest,
     dataset_profile_fingerprint,
     dataset_spec_fingerprint,
-    write_dataset_profile_artifact,
     write_dataset_review_artifacts,
-    write_dataset_spec_artifact,
     write_dataset_spec_artifact_atomic,
     write_generation_manifest,
     write_json_artifact,
@@ -58,17 +56,21 @@ from test_data_agent.safety import (
     assert_profile_safe,
 )
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
-
-
-AGENT_REQUEST_FILE = "agent_request.json"
-AGENT_PLAN_FILE = "agent_plan.json"
-AGENT_RESULT_FILE = "agent_result.json"
-ADVISOR_REVIEW_FILE = "advisor_review.json"
-APPROVAL_RECEIPT_FILE = "approval_receipt.json"
-COMPLETION_CHECKPOINT_FILE = "agent_completion.json"
-PROFILE_FILE = "profile.json"
-DATASET_SPEC_FILE = "dataset_spec.yaml"
-GENERATED_FOLDER = "generated"
+from test_data_agent.workspace_store import (
+    ADVISOR_REVIEW_FILE,
+    AGENT_PLAN_FILE as AGENT_PLAN_FILE,
+    AGENT_REQUEST_FILE as AGENT_REQUEST_FILE,
+    AGENT_RESULT_FILE,
+    APPROVAL_RECEIPT_FILE,
+    COMPLETION_CHECKPOINT_FILE,
+    DATASET_SPEC_FILE,
+    DEFAULT_AGENT_WORKSPACE_STORE,
+    GENERATED_FOLDER,
+    PROFILE_FILE,
+    AgentArtifacts,
+    WorkspacePlanTransition,
+    agent_artifacts,
+)
 
 
 class AgentSourceType(StrEnum):
@@ -141,19 +143,6 @@ class AgentStep(BaseModel):
     name: str
     status: Literal["completed", "pending", "skipped"]
     summary: str
-
-
-class AgentArtifacts(BaseModel):
-    workspace: Path
-    request_path: Path
-    profile_path: Path
-    dataset_spec_path: Path
-    plan_path: Path
-    generated_folder: Path | None = None
-    validation_report_path: Path | None = None
-    manifest_path: Path | None = None
-    approval_receipt_path: Path | None = None
-    completion_checkpoint_path: Path | None = None
 
 
 class AgentFieldSummary(BaseModel):
@@ -376,10 +365,12 @@ class AgentWorkspaceStatus(BaseModel):
 
 def plan_agent_request(request: AgentRequest) -> AgentResult:
     normalized = normalize_agent_request(request)
-    ensure_agent_workspace_for_plan(normalized)
-
-    profile = build_agent_profile(normalized)
-    return _persist_agent_plan(normalized, profile)
+    with DEFAULT_AGENT_WORKSPACE_STORE.begin_plan(normalized.workspace) as transition:
+        profile = build_agent_profile(
+            normalized,
+            cache_workspace=transition.staging_workspace,
+        )
+        return _persist_agent_plan(normalized, profile, transition)
 
 
 def plan_agent_profile(request: AgentRequest, profile: DatasetProfile) -> AgentResult:
@@ -394,9 +385,9 @@ def plan_agent_profile(request: AgentRequest, profile: DatasetProfile) -> AgentR
             "workspace": workspace,
         }
     )
-    ensure_agent_workspace_for_plan(normalized)
-    assert_profile_safe(profile)
-    return _persist_agent_plan(normalized, profile)
+    with DEFAULT_AGENT_WORKSPACE_STORE.begin_plan(normalized.workspace) as transition:
+        assert_profile_safe(profile)
+        return _persist_agent_plan(normalized, profile, transition)
 
 
 def advise_agent_workspace(
@@ -564,13 +555,10 @@ def _apply_persisted_advisor_review(
 def _persist_agent_plan(
     normalized: AgentRequest,
     profile: DatasetProfile,
+    transition: WorkspacePlanTransition,
 ) -> AgentResult:
     spec = build_agent_spec(profile, normalized)
     artifacts = agent_artifacts(normalized.workspace)
-
-    write_json_artifact(normalized, artifacts.request_path)
-    write_dataset_profile_artifact(profile, artifacts.profile_path)
-    write_dataset_spec_artifact(spec, artifacts.dataset_spec_path)
 
     profile_sha256 = dataset_profile_fingerprint(profile)
     spec_sha256 = dataset_spec_fingerprint(spec)
@@ -594,7 +582,13 @@ def _persist_agent_plan(
         review=review,
         summary=build_agent_plan_summary(profile, spec, normalized),
     )
-    write_json_artifact(result, artifacts.plan_path)
+    DEFAULT_AGENT_WORKSPACE_STORE.persist_plan(
+        transition,
+        request=normalized,
+        profile=profile,
+        spec=spec,
+        plan=result,
+    )
     return result
 
 
@@ -747,38 +741,7 @@ def publish_agent_completion(
     result: AgentResult,
     artifacts: AgentArtifacts,
 ) -> None:
-    if artifacts.approval_receipt_path is None:
-        raise RuntimeError("completed agent artifacts require an approval receipt path")
-    result_path = artifacts.workspace / AGENT_RESULT_FILE
-    receipt_missing = validate_matching_json(
-        receipt,
-        artifacts.approval_receipt_path,
-        AgentApprovalReceipt,
-    )
-    result_missing = validate_matching_json(
-        result,
-        result_path,
-        AgentResult,
-    )
-    if receipt_missing:
-        write_json_artifact_atomic(receipt, artifacts.approval_receipt_path)
-    if result_missing:
-        write_json_artifact_atomic(result, result_path)
-
-
-def validate_matching_json(
-    payload: BaseModel,
-    path: Path,
-    model_type: type[BaseModel],
-) -> bool:
-    if path.exists() or path.is_symlink():
-        if path.is_symlink() or not path.is_file():
-            raise ValueError(f"agent completion output must be a regular file: {path.name}")
-        existing = model_type.model_validate_json(read_limited_text(path))
-        if existing != payload:
-            raise ValueError(f"existing {path.name} does not match recovered completion")
-        return False
-    return True
+    DEFAULT_AGENT_WORKSPACE_STORE.publish_completion(receipt, result, artifacts)
 
 
 def inspect_agent_workspace(workspace: Path) -> AgentWorkspaceStatus:
@@ -1070,21 +1033,24 @@ def normalize_agent_request(request: AgentRequest) -> AgentRequest:
 
 
 def ensure_agent_workspace_for_plan(request: AgentRequest) -> None:
-    workspace = request.workspace
-    if workspace.exists() and not workspace.is_dir():
-        raise ValueError("agent workspace must be a folder")
-    if workspace.exists() and any(workspace.iterdir()):
-        raise ValueError("agent workspace must be empty for planning")
-    workspace.mkdir(parents=True, exist_ok=True)
+    """Compatibility helper retained while planning moves behind its service."""
+
+    DEFAULT_AGENT_WORKSPACE_STORE.ensure_new(request.workspace, create=True)
 
 
-def build_agent_profile(request: AgentRequest) -> DatasetProfile:
+def build_agent_profile(
+    request: AgentRequest,
+    *,
+    cache_workspace: Path | None = None,
+) -> DatasetProfile:
     if request.source_type == AgentSourceType.CSV:
         profile = csv_file_to_dataset_profile(request.source_path, table_name=request.table_name)
     elif request.source_type == AgentSourceType.CSV_FOLDER:
         profile = profile_example_folder(
             request.source_path,
-            cache_dir=request.workspace / "profile_cache" if request.use_cache else None,
+            cache_dir=(cache_workspace or request.workspace) / "profile_cache"
+            if request.use_cache
+            else None,
             use_cache=request.use_cache,
             rule_sample_rows=request.rule_sample_rows,
         )
@@ -1317,27 +1283,6 @@ def assert_agent_source_not_copied(
         assert_no_csv_source_rows(request.source_path, rows_by_entity[entity_name])
     elif request.source_type == AgentSourceType.CSV_FOLDER:
         assert_no_csv_folder_source_rows(request.source_path, rows_by_entity)
-
-
-def agent_artifacts(workspace: Path, *, generated_folder: Path | None = None) -> AgentArtifacts:
-    return AgentArtifacts(
-        workspace=workspace,
-        request_path=workspace / AGENT_REQUEST_FILE,
-        profile_path=workspace / PROFILE_FILE,
-        dataset_spec_path=workspace / DATASET_SPEC_FILE,
-        plan_path=workspace / AGENT_PLAN_FILE,
-        generated_folder=generated_folder,
-        validation_report_path=generated_folder / "validation_report.json" if generated_folder else None,
-        manifest_path=generated_folder / "generation_manifest.json" if generated_folder else None,
-        approval_receipt_path=(
-            workspace / APPROVAL_RECEIPT_FILE if generated_folder else None
-        ),
-        completion_checkpoint_path=(
-            generated_folder / COMPLETION_CHECKPOINT_FILE
-            if generated_folder
-            else None
-        ),
-    )
 
 
 def agent_source_label(request: AgentRequest, profile: DatasetProfile) -> str:

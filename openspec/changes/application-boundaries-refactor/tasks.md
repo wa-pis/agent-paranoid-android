@@ -5,7 +5,7 @@ contract-preserving increments.
 
 - [x] Inventory public imports, CLI commands, MCP tools, artifact contracts,
   and current dependency direction before moving code.
-- [ ] Extract typed workspace persistence and atomic transition interfaces.
+- [x] Extract typed workspace persistence and atomic transition interfaces.
 - [ ] Split agent lifecycle services into planning, review, approval, recovery,
   advising, status, and workspace-store modules.
 - [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized

@@ -12,6 +12,12 @@ All notable changes to this project are documented here.
 - Record the exact `v1.0.0rc2` commit, publication run IDs, package hashes, and
   three verified multi-platform container digests.
 
+### Changed
+
+- Route agent workspace plans and completion markers through a typed
+  filesystem store with atomic plan publication and rollback, while retaining
+  existing artifact names and compatibility imports.
+
 ### Security
 
 - Run CodeQL on every default-branch commit while keeping documentation-only

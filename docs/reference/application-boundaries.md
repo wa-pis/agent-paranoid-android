@@ -147,6 +147,7 @@ The observed dependencies before extraction are:
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
 | `cli.py` | parser/presenter/contracts, agent, advisor, audit, demo, core, I/O commands, rules |
 | `agent.py` | adapters, advisor, core, generation, I/O persistence, profiling, safety, validation |
+| `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | Trino MCP server | audit, core privacy, SQL parsing, Trino client, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
@@ -169,6 +170,19 @@ Safety policy must be callable below transports. Core and application services
 must not import CLI presentation or FastMCP registration. Compatibility modules
 may import extracted implementations temporarily, but extracted services must
 not import those wrappers back.
+
+### Workspace Store Migration
+
+`workspace_store.py` now owns workspace artifact paths, typed persistence ports,
+atomic plan publication, and completion-marker publication. `agent.py` remains
+the compatibility owner for its existing constants, `AgentArtifacts`, and
+`agent_artifacts` import paths while lifecycle services are extracted.
+
+Planning writes into a sibling staging directory and renames the complete
+workspace into place only after every artifact is ready. A failed plan restores
+an existing empty workspace and removes staging data. Completion publishes the
+approval receipt before the atomic `agent_result.json` state marker, preserving
+the existing checkpoint-based recovery behavior.
 
 ## Per-Increment Review
 
