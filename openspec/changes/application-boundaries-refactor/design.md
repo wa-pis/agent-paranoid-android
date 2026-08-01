@@ -44,6 +44,8 @@ not be the only place where safety checks happen.
   completed lifecycle state from bounded workspace artifacts.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
+- `cli_doctor.py` owns installation diagnostics and redacted capability smoke
+  orchestration behind injected import and smoke callables.
 - Trino package: config, pure SQL policy, non-executing query builders, client,
   profiling, and masking.
 - Typed workspace transition and persistence interfaces with atomic commit and

@@ -16,6 +16,11 @@ contract-preserving increments.
   - [x] Extract the status lifecycle service.
 - [ ] Split CLI composition/dispatch, doctor, command handlers, and centralized
   optional dependency resolution without changing parser/presenter contracts.
+  - [x] Extract installation diagnostics and capability smoke orchestration.
+  - [ ] Extract composition and command dispatch.
+  - [ ] Extract agent command handlers.
+  - [ ] Extract dataset and utility command handlers.
+  - [ ] Centralize optional dependency resolution.
 - [ ] Split Trino config, SQL policy, query builders, client, profiling, and
   masking; keep policy pure and builders non-executing.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for

@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import asyncio
 import importlib
-import json
 import sys
-import tempfile
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -31,6 +28,14 @@ from test_data_agent.agent import (
 from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
+from test_data_agent.cli_doctor import (
+    CliDoctorService,
+    run_mcp_doctor_smoke as _run_mcp_doctor_smoke,
+    run_openai_doctor_smoke as _run_openai_doctor_smoke,
+    run_parquet_doctor_smoke as _run_parquet_doctor_smoke,
+    run_trino_doctor_smoke as _run_trino_doctor_smoke,
+    write_doctor_fixture as _write_doctor_fixture,
+)
 from test_data_agent.cli_parser import (
     HelpfulArgumentParser,
     JsonHelpfulArgumentParser,
@@ -58,7 +63,6 @@ from test_data_agent.demo import run_demo
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
     generate_dataset_from_csv_command,
-    generate_dataset_from_example_artifacts,
     generate_dataset_from_example_command,
     generate_dataset_from_profile_command,
     generate_dataset_command,
@@ -413,215 +417,46 @@ def inspect_doctor(
     skip_smoke: bool = False,
     required_extras: set[str] | None = None,
 ) -> DoctorReport:
-    checks: list[str] = []
-    failures: list[str] = []
-    required = set(required_extras or ())
-    if "all" in required:
-        required.update({"parquet", "mcp", "trino", "openai"})
-
-    if sys.version_info >= (3, 11):
-        checks.append(f"python: ok ({sys.version_info.major}.{sys.version_info.minor})")
-    else:
-        failures.append("python: Python 3.11 or newer is required")
-
-    for module_name in ("faker", "pydantic", "yaml"):
-        try:
-            importlib.import_module(module_name)
-        except ImportError as exc:
-            failures.append(f"dependency {module_name}: missing ({exc})")
-        else:
-            checks.append(f"dependency {module_name}: ok")
-
-    optional_modules = {
-        "parquet": ("pyarrow",),
-        "mcp": ("mcp",),
-        "trino": ("sqlglot", "trino"),
-        "openai": ("openai",),
-    }
-    for extra, module_names in optional_modules.items():
-        missing = []
-        for module_name in module_names:
-            try:
-                importlib.import_module(module_name)
-            except ImportError:
-                missing.append(module_name)
-        if missing and extra in required:
-            failures.append(
-                f"extra {extra}: missing {', '.join(missing)} "
-                f"(install agent-paranoid-android[{extra}])"
-            )
-        elif missing:
-            checks.append(f"extra {extra}: not installed (optional)")
-        else:
-            checks.append(f"extra {extra}: ok")
-
-    if not skip_smoke and not failures:
-        with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
-            root = Path(tmp)
-            fixture = root / "example_dataset"
-            output = root / "generated"
-            cache_dir = root / "cache"
-            write_doctor_fixture(fixture)
-            generate_dataset_from_example_artifacts(
-                fixture,
-                output_folder=output,
-                seed=12345,
-                count=3,
-                output_format=CoreOutputFormat.CSV,
-                cache_dir=cache_dir,
-                use_cache=False,
-            )
-            manifest = json.loads((output / "generation_manifest.json").read_text())
-            if (
-                manifest.get("synthetic") is True
-                and manifest.get("source_rows_copied") is False
-                and manifest.get("validation_valid") is True
-            ):
-                checks.append("quickstart smoke: ok")
-            else:
-                failures.append("quickstart smoke: manifest safety flags are not valid")
-            if "parquet" in required:
-                try:
-                    run_parquet_doctor_smoke(fixture, root / "generated-parquet")
-                except Exception:
-                    failures.append(
-                        "capability parquet: failed "
-                        "(reinstall agent-paranoid-android[parquet] and retry)"
-                    )
-                else:
-                    checks.append("capability parquet: ok")
-            if "mcp" in required:
-                try:
-                    run_mcp_doctor_smoke()
-                except Exception:
-                    failures.append(
-                        "capability mcp: failed "
-                        "(reinstall agent-paranoid-android[mcp] and retry)"
-                    )
-                else:
-                    checks.append("capability mcp: ok")
-            if "trino" in required:
-                try:
-                    run_trino_doctor_smoke()
-                except Exception:
-                    failures.append(
-                        "capability trino: failed "
-                        "(reinstall agent-paranoid-android[trino] and retry)"
-                    )
-                else:
-                    checks.append("capability trino: ok")
-            if "openai" in required:
-                try:
-                    run_openai_doctor_smoke()
-                except Exception:
-                    failures.append(
-                        "capability openai: failed "
-                        "(reinstall agent-paranoid-android[openai] and retry)"
-                    )
-                else:
-                    checks.append("capability openai: ok")
-
-    return DoctorReport(checks=tuple(checks), failures=tuple(failures))
+    return CliDoctorService(
+        import_module=importlib.import_module,
+        parquet_smoke=run_parquet_doctor_smoke,
+        mcp_smoke=run_mcp_doctor_smoke,
+        trino_smoke=run_trino_doctor_smoke,
+        openai_smoke=run_openai_doctor_smoke,
+    ).inspect(
+        skip_smoke=skip_smoke,
+        required_extras=required_extras,
+    )
 
 
 def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:
-    generate_dataset_from_example_artifacts(
-        fixture,
-        output_folder=output,
-        seed=12345,
-        count=3,
-        output_format=CoreOutputFormat.PARQUET,
-        cache_dir=output.parent / "parquet-cache",
-        use_cache=False,
-    )
-    parquet = importlib.import_module("pyarrow.parquet")
-    parquet_files = sorted(output.glob("*.parquet"))
-    if len(parquet_files) != 2:
-        raise RuntimeError("parquet smoke output is incomplete")
-    if any(parquet.read_table(path).num_rows != 3 for path in parquet_files):
-        raise RuntimeError("parquet smoke row count is invalid")
-    manifest = json.loads((output / "generation_manifest.json").read_text())
-    if not (
-        manifest.get("synthetic") is True
-        and manifest.get("source_rows_copied") is False
-        and manifest.get("validation_valid") is True
-        and manifest.get("output_format") == "parquet"
-    ):
-        raise RuntimeError("parquet smoke manifest is invalid")
+    """Compatibility wrapper for the extracted doctor capability smoke."""
+
+    _run_parquet_doctor_smoke(fixture, output)
 
 
 def run_mcp_doctor_smoke() -> None:
-    from test_data_agent.mcp_generator_transport import create_generator_mcp
+    """Compatibility wrapper for the extracted MCP capability smoke."""
 
-    def doctor_probe() -> dict[str, bool]:
-        return {"ok": True}
-
-    server = create_generator_mcp((doctor_probe,))
-    if server is None or server.name != "test-data-agent-generator":
-        raise RuntimeError("generator MCP transport is unavailable")
-    tools = asyncio.run(server.list_tools())
-    if [tool.name for tool in tools] != ["doctor_probe"]:
-        raise RuntimeError("generator MCP tool registration is invalid")
+    _run_mcp_doctor_smoke()
 
 
 def run_trino_doctor_smoke() -> None:
-    from test_data_agent import mcp_trino_server as trino_server
+    """Compatibility wrapper for the extracted Trino capability smoke."""
 
-    config = trino_server.TrinoConfig(
-        host="doctor.invalid",
-        port=443,
-        user="doctor",
-        http_scheme="https",
-        allowed_catalogs=frozenset({"doctor"}),
-        allowed_schemas=frozenset({"safe"}),
-        request_timeout=0.1,
-    )
-    sql = "SELECT synthetic_id FROM doctor.safe.synthetic_table LIMIT 1"
-    if trino_server.validate_safe_select(sql, config=config) != sql:
-        raise RuntimeError("Trino safe SQL validation is unavailable")
-    trino_dbapi = importlib.import_module("trino.dbapi")
-    connection = trino_dbapi.connect(
-        host=config.host,
-        port=config.port,
-        user=config.user,
-        http_scheme=config.http_scheme,
-        request_timeout=config.request_timeout,
-    )
-    connection.close()
+    _run_trino_doctor_smoke()
 
 
 def run_openai_doctor_smoke() -> None:
-    from openai import OpenAI
+    """Compatibility wrapper for the extracted OpenAI capability smoke."""
 
-    from test_data_agent.providers.openai import OpenAIAdvisorClient
-
-    sdk = OpenAI(
-        api_key="doctor-local-placeholder",
-        max_retries=0,
-        timeout=0.1,
-    )
-    try:
-        if not callable(getattr(sdk.responses, "parse", None)):
-            raise RuntimeError("OpenAI structured responses API is unavailable")
-        OpenAIAdvisorClient(client=cast(Any, sdk), model="doctor-local")
-    finally:
-        sdk.close()
+    _run_openai_doctor_smoke()
 
 
 def write_doctor_fixture(directory: Path) -> None:
-    directory.mkdir()
-    (directory / "customers.csv").write_text(
-        "customer_id,email,segment\n"
-        "C1,alice@example.test,retail\n"
-        "C2,bob@example.test,business\n",
-        encoding="utf-8",
-    )
-    (directory / "orders.csv").write_text(
-        "order_id,customer_id,status,amount\n"
-        "O1,C1,paid,20\n"
-        "O2,C2,cancelled,30\n",
-        encoding="utf-8",
-    )
+    """Compatibility wrapper for the synthetic doctor fixture."""
+
+    _write_doctor_fixture(directory)
 
 
 def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
