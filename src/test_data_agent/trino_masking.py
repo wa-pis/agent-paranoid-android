@@ -20,7 +20,6 @@ from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
     build_column_profile_query,
-    build_masked_sample_query,
     build_top_values_query,
     is_string_trino_type,
 )
@@ -131,20 +130,6 @@ class TrinoMasker:
             )
             profile.update(summarize_top_values(top_values))
         return profile
-
-    def sample_rows_masked(
-        self,
-        catalog: str,
-        schema: str,
-        table: str,
-        columns: list[str],
-        limit: int,
-    ) -> list[dict[str, Any]]:
-        check_allowlist(catalog=catalog, schema=schema, config=self.config)
-        rows = self.fetch_query(
-            build_masked_sample_query(catalog, schema, table, columns, limit)
-        )
-        return [mask_row(row) for row in rows]
 
     def run_safe_select(self, sql: str) -> list[dict[str, Any]]:
         safe_sql = validate_safe_select(sql, require_limit=True, config=self.config)

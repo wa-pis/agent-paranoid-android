@@ -16,7 +16,6 @@ from test_data_agent.trino_query_builders import (
     build_list_catalogs_query,
     build_list_schemas_query,
     build_list_tables_query,
-    build_masked_sample_query,
     build_table_profile_query,
     build_temporal_ordering_profile_query,
     build_top_values_query,
@@ -90,15 +89,11 @@ def test_profile_builders_are_bounded_aggregate_queries() -> None:
             "sum",
             0.01,
         ),
-        build_masked_sample_query(
-            "analytics", "safe_schema", "synthetic_orders", ["status", "amount"], 5
-        ),
     ]
 
     assert all(isinstance(query, TrinoQuery) for query in queries)
     assert all("SELECT *" not in query.sql.upper() for query in queries)
     assert queries[3].sql.endswith("LIMIT 20")
-    assert queries[-1].sql.endswith("LIMIT 5")
 
 
 def test_conditional_builders_keep_values_out_of_sql() -> None:

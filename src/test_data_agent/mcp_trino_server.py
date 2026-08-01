@@ -76,7 +76,6 @@ from test_data_agent.trino_query_builders import (
     build_list_catalogs_query as build_list_catalogs_query,
     build_list_schemas_query as build_list_schemas_query,
     build_list_tables_query as build_list_tables_query,
-    build_masked_sample_query as build_masked_sample_query,
     build_table_profile_query as build_table_profile_query,
     build_temporal_ordering_profile_query as build_temporal_ordering_profile_query,
     build_top_values_query as build_top_values_query,
@@ -337,22 +336,6 @@ def profile_aggregate_mapping(
         child_value_field,
         aggregate,
         tolerance,
-    )
-
-
-def sample_rows_masked(
-    catalog: str,
-    schema: str,
-    table: str,
-    columns: list[str],
-    limit: int = DEFAULT_LIMIT,
-) -> list[dict[str, Any]]:
-    return _trino_masker().sample_rows_masked(
-        catalog,
-        schema,
-        table,
-        columns,
-        limit,
     )
 
 

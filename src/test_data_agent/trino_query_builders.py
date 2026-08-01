@@ -299,23 +299,6 @@ def build_aggregate_mapping_profile_query(
     )
 
 
-def build_masked_sample_query(
-    catalog: str,
-    schema: str,
-    table: str,
-    columns: list[str],
-    limit: int,
-) -> TrinoQuery:
-    if not columns:
-        raise ValueError("at least one column is required")
-    safe_limit = bounded_limit(limit)
-    select_list = ", ".join(quote_identifier(column) for column in columns)
-    return TrinoQuery(
-        f"SELECT {select_list} FROM {qualified_table(catalog, schema, table)} "
-        f"LIMIT {safe_limit}"
-    )
-
-
 def profile_column_sql(safe_table: str, safe_column: str, data_type: str) -> str:
     metrics = [
         "count(*) AS row_count",

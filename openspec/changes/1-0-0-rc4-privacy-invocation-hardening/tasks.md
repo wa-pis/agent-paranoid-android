@@ -4,7 +4,7 @@
 
 - [x] Update the safe-MCP capability requirements for source-literal-free
   default responses.
-- [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+- [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
   query builder, and public compatibility exports. Do not retain a row
   diagnostic in RC4; any future row-returning capability requires a separate
   OpenSpec change.
