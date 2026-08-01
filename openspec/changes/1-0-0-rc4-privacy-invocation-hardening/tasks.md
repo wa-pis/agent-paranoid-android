@@ -22,8 +22,10 @@
       success path and assert request sentinels are not echoed.
     - [x] Invoke every production default wrapper through a transport success
       path and assert request sentinels are not echoed.
-    - [ ] Cover direct and transport validation, database-error, nested
-      serialization, and audit paths.
+    - [x] Cover validation failures through direct and transport paths without
+      echoing request sentinels.
+    - [ ] Cover direct and transport database-error, nested serialization, and
+      audit paths.
 - [ ] Add source fixtures covering strings, integers, decimals, floats,
   booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
   like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
