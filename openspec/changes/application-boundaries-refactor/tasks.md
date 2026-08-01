@@ -31,7 +31,7 @@ contract-preserving increments.
   - [x] Extract masking and safe category summaries.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for
   public Python, CLI, MCP, errors, artifacts, and safety behavior.
-- [ ] Add architecture tests preventing transport-only enforcement, policy
+- [x] Add architecture tests preventing transport-only enforcement, policy
   duplication, CLI/MCP imports from core services, and cyclic dependencies.
 - [ ] Add direct-service adversarial tests for unsafe specs, paths, SQL, and
   provider payloads after each extraction.

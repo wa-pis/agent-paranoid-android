@@ -304,6 +304,14 @@ raw detected PII, secrets, or source category values. `mcp_trino_server.py`
 retains the existing tool functions and privacy helper imports as compatibility
 exports while delegating masking below the transport boundary.
 
+### Architecture Gate
+
+`tests/test_application_architecture.py` parses package imports and definitions
+without importing optional transports. It rejects CLI/MCP dependencies from
+lower-layer agent and Trino services, domain ownership inside MCP registration,
+missing direct policy dependencies, duplicate safety-policy definitions, and
+cycles across the extracted boundary modules.
+
 ## Per-Increment Review
 
 Each refactor pull request must:
