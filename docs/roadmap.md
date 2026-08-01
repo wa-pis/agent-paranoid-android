@@ -349,6 +349,8 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Extract the status lifecycle service.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
+     - [x] Extract CLI installation diagnostics and capability smoke
+       orchestration.
    - [ ] Add architecture and direct-service adversarial tests while preserving
      every public Python, CLI, MCP, artifact, error, and safety contract.
    - [ ] Run the full typing, lint, compile, test, package, documentation, and

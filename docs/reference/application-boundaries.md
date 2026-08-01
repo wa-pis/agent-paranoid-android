@@ -145,7 +145,8 @@ The current dependencies after completed extraction increments are:
 | Owner | Current dependencies |
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
-| `cli.py` | parser/presenter/contracts, agent, advisor, audit, demo, core, I/O commands, rules |
+| `cli.py` | composition/dispatch, parser/presenter contracts, agent/provider adapters, audit, demo, I/O commands, and rules |
+| `cli_doctor.py` | installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration |
 | `agent.py` | compatibility exports plus deterministic generation and completion validation |
 | `agent_contracts.py` | core field, relationship, and settings models only |
 | `agent_planning.py` | adapters, contracts, core, generation planning, profiling, safety, and workspace-store port |
@@ -215,6 +216,13 @@ tamper detection without importing `agent.py`, CLI, or MCP transports.
 resume, and fingerprint-bound spec application. It remains metadata-only and
 injects workspace inspection without importing `agent.py`, CLI, or MCP
 transports.
+
+### CLI Doctor Service Migration
+
+`cli_doctor.py` now owns installation diagnostics and capability smoke
+orchestration. `cli.py` retains compatibility wrappers and injects its current
+module importer and smoke callables, preserving existing output, redaction, and
+test override points while command dispatch remains unchanged.
 
 ## Per-Increment Review
 
