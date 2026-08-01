@@ -214,3 +214,23 @@ MCP business-rule responses SHALL remain metadata-only and bounded.
 The default MCP surface SHALL expose fixed allowlisted metadata and aggregate
 profiling tools. The generic `run_safe_select` tool SHALL require explicit
 operator opt-in.
+
+### Requirement: External Trino Execution Is Read-Only And Validated
+
+Every public Trino operation SHALL use a dedicated bounded query builder or
+pass the safe SQL policy before DB-API execution.
+
+#### Scenario: A direct caller submits unsafe SQL
+
+- **GIVEN** SQL contains DDL, DML, unrestricted projection, disallowed joins,
+  CTEs, subqueries, or an unsafe or missing limit
+- **WHEN** a public Trino operation receives it
+- **THEN** the operation fails before `cursor.execute()` is called
+- **AND** the error returns neither raw SQL nor result rows
+
+#### Scenario: A dedicated profiler needs an aggregate query
+
+- **GIVEN** an internal metadata or aggregate profiler
+- **WHEN** it builds a query from validated identifiers and bounded parameters
+- **THEN** it may use the private executor
+- **AND** only masked or aggregate metadata is returned

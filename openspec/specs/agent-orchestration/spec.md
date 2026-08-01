@@ -393,3 +393,26 @@ handled as untrusted data rather than model instructions.
 - **THEN** the text remains structured metadata
 - **AND** the request policy tells provider adapters to treat profile text as
   data
+
+### Requirement: Relationship Discovery Is Reviewable And Deterministic
+
+AI-assisted relationship and business-rule discovery SHALL use bounded safe
+metadata and SHALL require deterministic validation and human review before a
+proposal affects generation.
+
+#### Scenario: A likely relationship is discovered
+
+- **GIVEN** bounded profiles contain compatible types, cardinality, null and
+  distinct ratios, temporal compatibility, and safe relationship evidence
+- **WHEN** deterministic mining and an advisor produce a candidate
+- **THEN** the proposal records fields, relationship type, confidence,
+  evidence, assumptions, and review status
+- **AND** it contains no raw source rows or sensitive raw values
+
+#### Scenario: An advisor proposes an unsupported relationship
+
+- **GIVEN** a proposal has low confidence, incompatible types, or contradicts
+  deterministic evidence
+- **WHEN** the proposal is normalized
+- **THEN** it remains rejected or requires explicit human review
+- **AND** it cannot silently become a generation constraint

@@ -105,8 +105,14 @@
     documentation, attestation, signature, and container-runtime evidence.
   - [x] Run the workflow for `v1.0.0rc2` and record its run URL, exact commit,
     package hashes, and three image digests.
-- [ ] Re-run the full security review against the exact RC commit and record
+- [x] Re-run the full security review against the exact RC commit and record
   every remaining P2 or lower finding with owner, rationale, and revisit date.
 - [x] Verify at least one end-to-end AI-assisted discovery flow with a local
   fake provider and prove that no raw source rows enter the provider request.
 - [x] Allow only release-blocking fixes after `1.0.0rc1`; no new features.
+
+Completion evidence: `v1.0.0rc2` resolves to
+`e5030b6ae3a06885296d530a4a99f86b760118dd`; its exact-commit CI, security,
+Scorecard, release, publication, and public-artifact runs are recorded in
+`docs/release-evidence-1.0.0rc2.md` and
+`docs/security-review-2026-08-01-rc2.md`.

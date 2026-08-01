@@ -12,6 +12,11 @@ All notable changes to this project are documented here.
 - Record the exact `v1.0.0rc2` commit, publication run IDs, package hashes, and
   three verified multi-platform container digests.
 
+### Security
+
+- Record the exact-commit RC2 security review with no unresolved Critical or
+  High finding and one accepted Medium SAST-coverage maturity risk.
+
 ## [1.0.0rc2] - 2026-08-01
 
 ### Fixed

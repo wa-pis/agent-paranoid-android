@@ -43,6 +43,7 @@ REQUIRED_DOCS = {
     "changelog-policy.md",
     "release-evidence-1.0.0rc1.md",
     "release-evidence-1.0.0rc2.md",
+    "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
 }
 CLI_COMMANDS = {
@@ -133,6 +134,63 @@ def test_rc2_public_evidence_records_immutable_release() -> None:
         "sha256:d53df07ea4bab935ec95592f9aa0e1f64e0a84825cf3241a62ef1d393060574c",
     ):
         assert expected in evidence
+
+
+def test_rc2_security_review_records_exact_disposition() -> None:
+    review = (ROOT / "docs" / "security-review-2026-08-01-rc2.md").read_text()
+
+    for expected in (
+        "e5030b6ae3a06885296d530a4a99f86b760118dd",
+        "actions/runs/30684756448",
+        "actions/runs/30684756459",
+        "actions/runs/30684853166",
+        "actions/runs/30689390871",
+        "Critical | 0",
+        "High | 0",
+        "Medium | 1",
+        "repository maintainer (`@wa-pis`)",
+        "2026-11-01",
+    ):
+        assert expected in review
+
+
+def test_rc2_security_hardening_is_archived_and_baselined() -> None:
+    changes = ROOT / "openspec" / "changes"
+    archive = (
+        changes / "archive" / "2026-08-01-1-0-0-rc1-security-hardening"
+    )
+    tasks = (archive / "tasks.md").read_text()
+
+    assert "- [ ]" not in tasks
+    active = {
+        path.name
+        for path in changes.iterdir()
+        if path.is_dir() and path.name != "archive"
+    }
+    assert active == {"_template", "application-boundaries-refactor"}
+
+    requirements = {
+        "synthetic-generation": (
+            "Generation Entry Points Enforce Spec Safety",
+            "Reproducibility Claims Are Bounded And Evidenced",
+            "Approved Relational Semantics Are Preserved",
+            "SQL Export Contains Synthetic Inserts Only",
+        ),
+        "dataset-validation": (
+            "Validation Settings Have Executable Semantics",
+            "Privacy Assurance Claims Are Bounded",
+        ),
+        "safe-mcp-workflow": (
+            "External Trino Execution Is Read-Only And Validated",
+        ),
+        "agent-orchestration": (
+            "Relationship Discovery Is Reviewable And Deterministic",
+        ),
+    }
+    for capability, headings in requirements.items():
+        spec = (ROOT / "openspec" / "specs" / capability / "spec.md").read_text()
+        for heading in headings:
+            assert f"### Requirement: {heading}" in spec
 
 
 def test_unreleased_changelog_headings_follow_policy_order() -> None:
