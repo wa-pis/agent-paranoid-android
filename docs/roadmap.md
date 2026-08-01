@@ -349,14 +349,14 @@ Scope:
   P0 findings are release blockers; P1 findings require closure or explicit
   independent-reviewer acceptance before the stable release; P2 findings need
   a documented disposition.
-- [ ] Enforce the spec-level privacy gate across Python, CLI, agent, and MCP
+- [x] Enforce the spec-level privacy gate across Python, CLI, agent, and MCP
   generation paths, and enforce validated read-only SQL across direct Trino
   access paths.
-- [ ] Add direct API adversarial tests to the release gate; passing the current
+- [x] Add direct API adversarial tests to the release gate; passing the current
   CLI/MCP workflow tests alone is not sufficient evidence for the RC.
 - [ ] Record reproducibility inputs, container/package version consistency, and
   security scanner evidence against the exact RC commit and published artifacts.
-- [ ] Formalize the reproducibility contract: distinguish same-environment,
+- [x] Formalize the reproducibility contract: distinguish same-environment,
   same-version, and cross-version guarantees; record package/Python,
   dependency-lock, locale, spec, rules, provider, and generator fingerprints
   in the manifest.
@@ -371,21 +371,21 @@ Scope:
     digest, and rules digest in reproducibility evidence.
   - [x] Add upper major bounds only after compatibility evidence justifies
     them; do not promise cross-version byte identity without tests.
-- [ ] Validate the core product workflow: bounded profiling → deterministic
+- [x] Validate the core product workflow: bounded profiling → deterministic
   relationship candidates → AI-assisted proposals → human review →
   deterministic validation → synthetic generation.
-- [ ] Define and implement the Evidence-Bounded Synthesis Contract: separate
+- [x] Define and implement the Evidence-Bounded Synthesis Contract: separate
   `SourceBundle`, `EvidenceProfile`, `SemanticHypothesis`, and
   `ReviewedDatasetSpec`; preserve provenance, sampling coverage, confidence,
   assumptions, and unknowns instead of presenting inferred domain rules as
   facts.
-- [ ] Ensure AI can rank and explain evidence-backed hypotheses but cannot
+- [x] Ensure AI can rank and explain evidence-backed hypotheses but cannot
   upgrade confidence, approve a rule, or authorize generation; deterministic
   validation and human review remain the authority boundary.
-- [ ] Preserve approved FK graphs, distribution/order-of-magnitude shape,
+- [x] Preserve approved FK graphs, distribution/order-of-magnitude shape,
   temporal dependencies, and executable business invariants independently of
   domain or table names.
-- [ ] Demonstrate at least one domain-agnostic summary-table scenario where
+- [x] Demonstrate at least one domain-agnostic summary-table scenario where
   synthetic grouped totals, components, partitions, and cross-table formulas
   reconcile without copying source totals or rows. Financial/accounting data
   may be one fixture, not the product boundary.
