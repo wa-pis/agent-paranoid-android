@@ -27,5 +27,7 @@ impact; no current entry requires a migration step.
 - Do not add an empty `Migration` section. Add one only if the final RC review
   identifies a concrete action required from an operator or API consumer.
 
-This snapshot is an audit aid, not a permanent changelog category. Update it if
-`Unreleased` changes before the classification cleanup is completed.
+This snapshot is an audit aid, not a permanent changelog category. The 43
+internal-evidence entries are preserved in the
+[RC evidence record](release-evidence-1.0.0rc1.md) after their removal from the
+user-facing changelog.
