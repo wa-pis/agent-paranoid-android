@@ -14,13 +14,9 @@ from test_data_agent.agent import AgentRequest, AgentWorkspaceStatus
 from test_data_agent.cli_agent import (
     advise_agent_workspace_with_provider as _advise_agent_workspace_with_provider,
     agent_request_from_args as _agent_request_from_args,
-    run_agent_command as _run_agent_command,
 )
-from test_data_agent.cli_commands import (
-    apply_business_rules_from_args as _apply_business_rules_from_args,
-    run_dataset_command as _run_dataset_command,
-    run_utility_command as _run_utility_command,
-)
+from test_data_agent.cli_application import run_cli_command as _run_cli_command
+from test_data_agent.cli_commands import apply_business_rules_from_args as _apply_business_rules_from_args
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_dependencies import CliDependencyResolver
 from test_data_agent.cli_doctor import (
@@ -243,30 +239,16 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def run_command(args: argparse.Namespace) -> int:
-    utility_exit_code = _run_utility_command(
+    """Compatibility wrapper for extracted CLI composition and dispatch."""
+
+    return _run_cli_command(
         args,
         examples_text=EXAMPLES_TEXT,
         doctor_inspector=inspect_doctor,
-    )
-    if utility_exit_code is not None:
-        return utility_exit_code
-
-    dataset_exit_code = _run_dataset_command(
-        args,
         business_rules_applier=apply_business_rules_from_args,
-    )
-    if dataset_exit_code is not None:
-        return dataset_exit_code
-
-    agent_exit_code = _run_agent_command(
-        args,
         request_builder=agent_request_from_args,
         advisor_runner=advise_agent_workspace_with_provider,
     )
-    if agent_exit_code is not None:
-        return agent_exit_code
-
-    return 2
 
 
 def inspect_doctor(
