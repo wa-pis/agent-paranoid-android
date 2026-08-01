@@ -23,6 +23,9 @@ python3 -m compileall -q src tests scripts
 echo "==> Dependency licenses"
 python3 scripts/check_dependency_licenses.py
 
+echo "==> Dependency compatibility"
+python3 scripts/check_dependency_compatibility.py
+
 echo "==> Direct API privacy and SQL boundaries"
 python3 -m pytest -q \
   tests/test_safety.py \
@@ -74,5 +77,8 @@ failed = [name for name, ok in checks.items() if not ok]
 if failed:
     raise SystemExit(f"quickstart smoke failed: {', '.join(failed)}")
 PY
+
+python3 scripts/check_dependency_compatibility.py \
+  --manifest "$TMP_DIR/generated/generation_manifest.json"
 
 echo "Release checks passed."

@@ -1,0 +1,65 @@
+[dependencies.faker]
+requirement = "faker"
+extra = "base"
+minimum = "25.0.0"
+latest = "40.35.0"
+
+[dependencies.pydantic]
+requirement = "pydantic"
+extra = "base"
+minimum = "2.7.0"
+latest = "2.13.4"
+
+[dependencies.pyyaml]
+requirement = "PyYAML"
+extra = "base"
+minimum = "6.0.0"
+latest = "6.0.3"
+
+[dependencies.pyarrow]
+requirement = "pyarrow"
+extra = "parquet"
+minimum = "15.0.0"
+latest = "25.0.0"
+
+[dependencies.mcp]
+requirement = "mcp"
+extra = "mcp"
+minimum = "1.0.0"
+latest = "1.28.1"
+upper_major = 2
+
+[dependencies.sqlglot]
+requirement = "sqlglot"
+extra = "trino"
+minimum = "30.0.0"
+latest = "30.13.0"
+
+[dependencies.trino]
+requirement = "trino"
+extra = "trino"
+minimum = "0.330.0"
+latest = "0.338.0"
+
+[dependencies.openai]
+requirement = "openai"
+extra = "openai"
+minimum = "2.46.0"
+latest = "2.50.0"
+upper_major = 3
+
+[minimum_profiles.base]
+constraint = ".github/constraints/dependency-minimum.txt"
+
+[minimum_profiles.parquet]
+constraint = ".github/constraints/dependency-minimum.txt"
+
+[minimum_profiles.mcp]
+constraint = ".github/constraints/dependency-minimum-mcp.txt"
+pydantic = "2.8.0"
+
+[minimum_profiles.trino]
+constraint = ".github/constraints/dependency-minimum.txt"
+
+[minimum_profiles.openai]
+constraint = ".github/constraints/dependency-minimum.txt"

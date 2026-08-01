@@ -94,6 +94,12 @@ lowercase distribution names and includes installed optional integrations;
 The lockfile is evidence for the latest profile, not a promise that unrelated
 future dependency versions are compatible.
 
+The release gate treats `.github/dependency-compatibility.toml` as the reviewed
+machine-readable record. It rejects runtime dependencies missing from that
+inventory, lower-bound or lockfile drift, CI profiles that lose their minimum
+constraints, undocumented reviewed versions, and incomplete or incorrectly
+hashed dependency evidence in a generated manifest.
+
 ## Upper-Bound Decisions
 
 | Dependency | Decision | Evidence |

@@ -86,6 +86,7 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/ISSUE_TEMPLATE/bug_report.yml",
         ".github/ISSUE_TEMPLATE/feature_request.yml",
         "scripts/check_installed_package.py",
+        "scripts/check_dependency_compatibility.py",
         "scripts/check_pypi_artifacts.py",
         "scripts/verify_pypi_release.py",
         "Dockerfile",
