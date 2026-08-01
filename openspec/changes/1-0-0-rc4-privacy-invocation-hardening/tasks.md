@@ -14,6 +14,10 @@
   service and transport boundaries. Check success responses, validation and
   database errors, nested structures after JSON serialization, and metadata-
   only audit records for source literals.
+  - [x] Freeze the exact default list and verify transport registration order
+    plus audit wrapping for every production-registered tool.
+  - [ ] Exercise every tool through direct and transport success, validation,
+    database-error, serialized nested-response, and audit paths.
 - [ ] Add source fixtures covering strings, integers, decimals, floats,
   booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
   like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
