@@ -22,6 +22,8 @@ All notable changes to this project are documented here.
   parser, presenter, and entry-point contracts.
 - Extract validated Trino connection and resource-budget configuration while
   retaining the existing server import paths.
+- Extract pure Trino identifier, allowlist, and bounded read-only SQL policy
+  without moving enforcement into the MCP transport.
 
 ### Security
 
