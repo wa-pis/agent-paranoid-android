@@ -13,7 +13,7 @@
 - [x] Document same-environment, same-version, and cross-version guarantees.
 - [x] Add upper major bounds only where the compatibility evidence justifies
   them, with release notes for any narrowed range.
-- [ ] Add release checks for manifest completeness and unreviewed dependency
+- [x] Add release checks for manifest completeness and unreviewed dependency
   drift.
 - [ ] Run the full supported-version, package, security, and documentation
   gates.
