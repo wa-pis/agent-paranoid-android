@@ -72,16 +72,16 @@
 - [x] Add `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `GOVERNANCE.md`, and `CODEOWNERS`.
 - [ ] Improve GitHub About metadata, README positioning, comparison guidance,
   and the one-command golden-path example.
-- [ ] Add runnable, CI-verified synthetic examples for single-table CSV,
+- [x] Add runnable, CI-verified synthetic examples for single-table CSV,
   relational CSV, local Trino, MCP, Python API, and all supported output
   formats; include one rejected unsafe request and release-style smoke runs.
   - [x] Add the single-table CSV profile/spec/generate/validate journey.
   - [x] Add the relational CSV relationship/rules journey.
   - [x] Add the public Python API generation/validation journey.
-  - [ ] Add Trino, MCP, and export journeys.
+  - [x] Add Trino, MCP, and export journeys.
     - [x] Add the CSV, JSON, SQL, and optional Parquet export journey.
     - [x] Add the MCP stdio journey with a rejected pre-network Trino request.
-    - [ ] Add the local Trino journey.
+    - [x] Add the local Trino journey with the synthetic TPC-H catalog.
 - [ ] Split oversized agent and Trino orchestration modules where needed for
   maintainability without expanding the product surface.
 - [ ] Create public good-first-issue/help-wanted backlog items.
