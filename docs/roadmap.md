@@ -384,14 +384,24 @@ into `1.0.0rc1`. Finish the release stage in this order:
    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md),
    publish `1.0.0rc4` from the verified merge commit, and repeat
    public-artifact acceptance against that candidate.
-   - [ ] Close the P0 default-MCP source-literal exposure and add regression
-     coverage for every returned column.
+   - [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+     query builder, and public compatibility exports. Do not retain a row
+     diagnostic in RC4; require a separate OpenSpec for any future
+     row-returning capability.
+   - [ ] Test the complete production-registered default Trino toolset through
+     direct-service and transport boundaries, including serialized success,
+     error, and audit payloads with typed source-literal sentinels.
    - [ ] Add and enforce a shared invocation-level Trino work budget across
-     nested profiling and query operations.
-   - [ ] Correct prerelease installation instructions and execute the README
-     quickstart from a clean environment using the public RC4 artifact.
-   - [ ] Clarify aggregate-only versus explicitly opt-in row-returning MCP
-     capabilities and their privacy guarantees.
+     nested profiling and query operations. Define separate raw transport and
+     canonical application-input limits, fresh per-invocation lifecycle,
+     concurrency isolation, non-resettable counters, and incremental response
+     accumulation limits.
+   - [ ] Correct prerelease installation instructions to use the exact
+     `agent-paranoid-android==1.0.0rc4` command and execute the README
+     quickstart from a clean environment using that public artifact.
+   - [ ] Clarify that default aggregate-only MCP is source-literal-free while
+     `run_safe_select` is a separate explicit opt-in and is not source-free.
+     Remove stale `sample_rows_masked` documentation.
    - [ ] Record the disposition of crash-durability/fsync work; it is not an
      ordinary stable-release blocker unless the product contract promises it.
 9. [ ] Apply only release-blocking fixes found during RC4 acceptance, repeat
@@ -532,29 +542,31 @@ Scope:
 
 - [ ] Complete and review the [RC4 privacy and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md).
-- [ ] Remove `sample_rows_masked` from the default Trino MCP surface. If a
-  row-returning diagnostic capability is retained, make it an explicit,
-  separately named, operator-enabled, reviewed, and audited capability; the
-  default response contract must not return literal source-cell values.
-- [ ] Add adversarial regression tests that populate every source column with
-  distinct literals and prove that no default MCP response returns any of
-  those literals, including values that heuristic PII masking would not flag.
-- [ ] Introduce a common `QueryWorkBudget` for one MCP invocation, covering
-  request size, SQL/formula size, AST complexity, nesting depth, projected
-  columns, statement count, and response bytes. Share it across nested
-  profiling calls and fail before connection, cursor, execution, deep parsing,
-  or unbounded response accumulation as applicable.
-- [ ] Change prerelease installation guidance to select RC4 intentionally
-  (`==1.0.0rc4` or `--pre`), keep extras consistent, and run the literal
-  README quickstart in a clean environment against the public wheel.
+- [ ] Remove `sample_rows_masked` from the Trino MCP server, masking service,
+  query builder, and public compatibility exports. Do not retain a row
+  diagnostic in RC4; require a separate OpenSpec for any future
+  row-returning capability.
+- [ ] Add adversarial regression tests over the complete production-registered
+  default toolset through direct-service and transport boundaries. Check
+  serialized success, error, and audit payloads with typed source-literal
+  sentinels, including values that heuristic PII masking would not flag.
+- [ ] Introduce a common `QueryWorkBudget` for one MCP invocation with
+  separate raw transport and canonical application-input limits, fresh
+  per-invocation lifecycle, concurrency isolation, non-resettable counters,
+  shared nested consumption, and incremental response-byte accounting.
+- [ ] Change prerelease installation guidance to the exact
+  `agent-paranoid-android==1.0.0rc4` command, keep extras consistent, and run
+  the literal README quickstart in a clean environment against that public
+  wheel.
 - [ ] Reconfirm the dependency boundary: Trino is an optional integration.
   The base wheel and CSV/JSON workflow must install and run without `trino`,
   `sqlglot`, or the MCP SDK; Trino capability checks belong to the separate
   `trino` extra and must not become a base-install release gate.
-- [ ] Update MCP documentation and compatibility fixtures to distinguish
-  aggregate-only tools from row-returning opt-in tools. Do not describe
-  row-returning output as PII-free, anonymous, or privacy-safe merely because
-  heuristic masking was applied.
+- [ ] Update MCP documentation and compatibility fixtures to distinguish the
+  source-literal-free aggregate-only default from the separate opt-in
+  `run_safe_select` capability. Remove stale `sample_rows_masked` references
+  and do not describe row-returning output as source-free, PII-free,
+  anonymous, or privacy-safe merely because heuristic masking was applied.
 - [ ] Document the durability boundary between atomic visibility, process
   interruption recovery, and crash/power-loss durability. Decide explicitly
   whether fsync is a post-1.0 improvement or a release requirement.
@@ -574,9 +586,10 @@ Exit criteria:
 - MCP golden contracts, OpenSpec requirements, documentation, changelog,
   package metadata, attestations, and container tags describe the same RC4
   behavior.
-- Stable publication is allowed only from the exact verified RC4 release
-  commit; no unrelated feature work is added between RC4 acceptance and
-  `1.0.0`.
+- Stable publication is allowed only from the accepted RC4 production source
+  tree plus a reviewed version/changelog/release-metadata-only diff. No
+  executable production or dependency changes may be added between RC4
+  acceptance and `1.0.0`; all final release gates must run again.
 
 ### 1.0.0: Stable Release
 
