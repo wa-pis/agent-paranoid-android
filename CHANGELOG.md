@@ -30,6 +30,8 @@ All notable changes to this project are documented here.
   limits, row conversion, and deterministic cursor/connection cleanup.
 - Extract allowlisted, aggregate-only Trino profiling orchestration behind an
   injected typed query-fetch boundary while retaining MCP tool wrappers.
+- Extract Trino row masking, source-free category summaries, safe column
+  completion, and masked query results below the MCP transport boundary.
 
 ### Security
 

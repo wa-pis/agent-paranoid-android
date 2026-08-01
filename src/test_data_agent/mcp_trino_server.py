@@ -6,19 +6,9 @@ they can be tested without a live Trino cluster.
 
 from __future__ import annotations
 
-from collections import Counter
 from collections.abc import Callable, Sequence
 from typing import Any
 
-from test_data_agent.core.privacy import (
-    infer_sensitive_from_name,
-    infer_sensitive_type_from_values,
-    infer_sensitive_value_type,
-    looks_sensitive_value,
-    mask_pattern,
-    mask_value,
-    synthetic_category_distribution,
-)
 from test_data_agent.audit import audit_logger_from_env
 from test_data_agent.mcp_trino_transport import create_trino_mcp
 from test_data_agent.trino_config import (
@@ -51,6 +41,18 @@ from test_data_agent.trino_client import (
     TrinoResultLimitError as TrinoResultLimitError,
     rows_to_dicts as rows_to_dicts,
     trino as trino,
+)
+from test_data_agent.trino_masking import (
+    TrinoMasker as TrinoMasker,
+    infer_sensitive_from_name as infer_sensitive_from_name,
+    infer_sensitive_type_from_values as infer_sensitive_type_from_values,
+    infer_sensitive_value_type as infer_sensitive_value_type,
+    looks_sensitive_value as looks_sensitive_value,
+    mask_pattern as mask_pattern,
+    mask_row as mask_row,
+    mask_value as mask_value,
+    summarize_top_values as summarize_top_values,
+    synthetic_category_distribution as synthetic_category_distribution,
 )
 from test_data_agent.trino_profiling import (
     MIN_RULE_CONFIDENCE as MIN_RULE_CONFIDENCE,
@@ -121,15 +123,6 @@ DEFAULT_LIMIT = 100
 ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
 
 
-def mask_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        key: mask_value(value)
-        if infer_sensitive_from_name(key) or looks_sensitive_value(value)
-        else value
-        for key, value in row.items()
-    }
-
-
 def _execute_query(
     sql: str, parameters: Sequence[Any] | None = None
 ) -> tuple[list[tuple[Any, ...]], list[Any]]:
@@ -153,6 +146,14 @@ def _trino_profiler() -> TrinoProfiler:
     return TrinoProfiler(
         config=TrinoConfig.from_env(),
         fetch_query=_fetch_built_query,
+    )
+
+
+def _trino_masker() -> TrinoMasker:
+    return TrinoMasker(
+        config=TrinoConfig.from_env(),
+        fetch_query=_fetch_built_query,
+        fetch_sql=_fetch_dicts,
     )
 
 
@@ -204,64 +205,15 @@ def profile_column_safe(
     nullable: bool,
     max_top_values: int,
 ) -> dict[str, Any]:
-    check_allowlist(catalog=catalog, schema=schema)
-    sensitive = infer_sensitive_from_name(column)
-    aggregate_rows = _fetch_built_query(
-        build_column_profile_query(catalog, schema, table, column, data_type)
+    return _trino_masker().profile_column_safe(
+        catalog,
+        schema,
+        table,
+        column,
+        data_type,
+        nullable,
+        max_top_values,
     )
-    aggregates = aggregate_rows[0] if aggregate_rows else {}
-    row_count = int(aggregates.get("row_count") or 0)
-    non_null_count = int(aggregates.get("non_null_count") or 0)
-    profile: dict[str, Any] = {
-        "name": column,
-        "data_type": data_type,
-        "nullable": nullable,
-        "row_count": row_count,
-        "null_count": max(0, row_count - non_null_count),
-        "null_ratio": round((row_count - non_null_count) / row_count, 6)
-        if row_count
-        else 0.0,
-        "approx_distinct_count": aggregates.get("approx_distinct_count", 0),
-        "sensitive": sensitive,
-    }
-    profile.update(
-        {
-            key: value
-            for key, value in aggregates.items()
-            if key not in profile and value is not None
-        }
-    )
-    approx_distinct = int(profile.get("approx_distinct_count") or 0)
-    if (
-        is_string_trino_type(data_type)
-        and not sensitive
-        and 0 < approx_distinct <= max_top_values
-    ):
-        top_values = _fetch_built_query(
-            build_top_values_query(catalog, schema, table, column, max_top_values)
-        )
-        content_sensitive_type = infer_sensitive_type_from_values(
-            row.get("value") for row in top_values
-        )
-        if content_sensitive_type is not None:
-            profile["sensitive"] = True
-            profile["semantic_type"] = content_sensitive_type
-            pattern_counts: Counter[str] = Counter()
-            for row in top_values:
-                value = row.get("value")
-                value_type = infer_sensitive_value_type(value) or content_sensitive_type
-                pattern_counts[mask_pattern(str(value), value_type)] += int(
-                    row.get("count") or 0
-                )
-            profile["masked_patterns"] = [
-                {"pattern": pattern, "count": count}
-                for pattern, count in pattern_counts.most_common(10)
-            ]
-        else:
-            profile["top_values"] = synthetic_category_distribution(
-                int(row.get("count") or 0) for row in top_values
-            )
-    return profile
 
 
 def profile_foreign_key(
@@ -395,17 +347,17 @@ def sample_rows_masked(
     columns: list[str],
     limit: int = DEFAULT_LIMIT,
 ) -> list[dict[str, Any]]:
-    check_allowlist(catalog=catalog, schema=schema)
-    rows = _fetch_built_query(
-        build_masked_sample_query(catalog, schema, table, columns, limit)
+    return _trino_masker().sample_rows_masked(
+        catalog,
+        schema,
+        table,
+        columns,
+        limit,
     )
-    return [mask_row(row) for row in rows]
 
 
 def run_safe_select(sql: str) -> list[dict[str, Any]]:
-    safe_sql = validate_safe_select(sql, require_limit=True)
-    rows = _fetch_dicts(safe_sql)
-    return [mask_row(row) for row in rows]
+    return _trino_masker().run_safe_select(sql)
 
 
 def trino_mcp_tools() -> list[Callable[..., Any]]:

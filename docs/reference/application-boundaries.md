@@ -166,7 +166,8 @@ The current dependencies after completed extraction increments are:
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
 | `trino_profiling.py` | allowlisted metadata and aggregate-only profiling orchestration with injected query fetching |
-| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders/client/profiling, masking, Trino transport factory |
+| `trino_masking.py` | row masking, source-free category summaries, safe column completion, and masked query results |
+| Trino MCP server | audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
@@ -290,8 +291,18 @@ table and column profiling, and count-only rule profiling behind an injected
 `TrinoQuery` fetcher. Direct service calls enforce the explicit configuration
 allowlist before I/O, and condition values remain bound parameters rather than
 SQL or result metadata. `mcp_trino_server.py` keeps the existing public tool
-functions as wrappers and injects its safe column summarizer until masking is
-extracted in the next increment.
+functions as wrappers and injects the safe column summarizer from
+`trino_masking.py`.
+
+### Trino Masking Migration
+
+`trino_masking.py` now owns content-aware row masking, masked sensitive
+patterns, synthetic category-rank summaries, safe column-profile completion,
+masked samples, and generic safe-select result masking. It validates explicit
+allowlists and SQL policy before injected query ports run, and it returns no
+raw detected PII, secrets, or source category values. `mcp_trino_server.py`
+retains the existing tool functions and privacy helper imports as compatibility
+exports while delegating masking below the transport boundary.
 
 ## Per-Increment Review
 
