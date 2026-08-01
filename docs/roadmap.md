@@ -395,7 +395,7 @@ Scope:
   output; document heuristic false negatives, quasi-identifiers, rare/free
   text, and explicit assurance levels without implying re-identification
   certification.
-- [ ] Publish a concise threat model covering source rows, raw PII, secrets,
+- [x] Publish a concise threat model covering source rows, raw PII, secrets,
   prompt injection, provider boundaries, generated artifacts, and resource
   exhaustion.
 - [x] Complete the public product-clarity gate: functional subtitle and GitHub

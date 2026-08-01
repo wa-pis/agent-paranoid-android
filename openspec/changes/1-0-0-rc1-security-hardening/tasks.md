@@ -56,6 +56,8 @@
   - [x] Replace endpoint-preserving masks and add rare-text/quasi-ID tests.
 - [x] Document the exact-row limitation and the absence of statistical privacy
   guarantees.
+- [x] Publish a threat model for source data, PII, secrets, prompt injection,
+  provider and artifact boundaries, and resource exhaustion.
 - [x] Expand mypy coverage to the full production package and resolve optional
   `pyarrow` typing and duplicate script-module configuration.
   - [x] Add the CSV profiler to strict mypy coverage.
