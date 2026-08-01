@@ -164,7 +164,8 @@ The current dependencies after completed extraction increments are:
 | `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
-| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders, Trino client, Trino transport factory |
+| `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
+| Trino MCP server | audit, core privacy, extracted Trino config/policy/query builders/client, profiling, masking, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
@@ -272,6 +273,14 @@ profiling, and masked-sample query construction as typed `TrinoQuery` values.
 The builders validate identifiers, keep source values in bound parameters, and
 perform no I/O. `mcp_trino_server.py` retains orchestration and compatibility
 exports while passing built queries to the existing bounded client path.
+
+### Trino Client Migration
+
+`trino_client.py` now owns configured driver connections, fail-closed session
+resource budgets, client-side result limits, row conversion, and nested
+cursor/connection cleanup. `mcp_trino_server.py` retains its existing
+`_execute_query`, `_fetch_dicts`, `trino`, and error imports as compatibility
+wrappers while delegating execution to the injected `TrinoClient` boundary.
 
 ## Per-Increment Review
 

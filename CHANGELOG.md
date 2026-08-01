@@ -26,6 +26,8 @@ All notable changes to this project are documented here.
   without moving enforcement into the MCP transport.
 - Extract typed, parameterized Trino metadata and aggregate profiling query
   builders without adding client or MCP transport dependencies.
+- Extract the bounded Trino client with explicit resource budgets, result
+  limits, row conversion, and deterministic cursor/connection cleanup.
 
 ### Security
 
