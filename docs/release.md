@@ -93,6 +93,25 @@ same digest with keyless Cosign using GitHub OIDC. It does not use a registry
 password or signing key. After the first publication, confirm all three GHCR
 packages are public and linked to this repository.
 
+## Post-Publish Verification
+
+After a GitHub Release, PyPI version, documentation site, and all three GHCR
+images are public, run the `Verify Published Release` workflow with the exact
+release tag. The workflow checks out the immutable annotated tag and records
+its commit, then:
+
+- verifies GitHub Release checksums and tag-bound attestations;
+- compares the public PyPI hashes with the GitHub Release distributions;
+- installs the hash-pinned wheel from public PyPI and runs `doctor` plus the
+  bundled synthetic demo;
+- confirms the public documentation names the same package version; and
+- resolves each GHCR tag to an immutable multi-platform digest, verifies its
+  SBOM, GitHub provenance attestation, and keyless Cosign signature, then pulls
+  and runs the published image under the hardened health-check settings.
+
+Keep the successful workflow run URL and emitted image digests in the release
+evidence. This is a post-publish gate and never creates or mutates a release.
+
 ## PyPI Trusted Publishing
 
 After creating a GitHub Release, `.github/workflows/release.yml` explicitly

@@ -195,7 +195,7 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflow_text = "\n".join(path.read_text() for path in workflows)
 
     setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 9
+    assert setup_count == 10
     assert workflow_text.count("prune-cache: true") == setup_count
 
 
@@ -337,6 +337,33 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     assert "needs: prepare" in publish_job
     assert "actions/checkout@" not in publish_job
     assert "\n        run:" not in publish_job
+
+
+def test_published_release_workflow_verifies_public_artifacts() -> None:
+    workflow = (
+        ROOT / ".github" / "workflows" / "verify-published-release.yml"
+    ).read_text()
+
+    assert "workflow_dispatch:" in workflow
+    assert "permissions: {}" in workflow
+    assert "scripts/check_release_tag.py" in workflow
+    assert "gh release download" in workflow
+    assert "sha256sum --check SHA256SUMS" in workflow
+    assert "gh attestation verify" in workflow
+    assert "GITHUB_STEP_SUMMARY" in workflow
+    assert "scripts.verify_pypi_release" in workflow
+    assert "--require-hashes" in workflow
+    assert "/test-data-agent doctor" in workflow
+    assert "/test-data-agent demo" in workflow
+    assert "source_rows_copied" in workflow
+    assert "wa-pis.github.io/agent-paranoid-android" in workflow
+    assert "docker buildx imagetools inspect" in workflow
+    assert "linux/amd64" in workflow
+    assert "linux/arm64" in workflow
+    assert "cosign verify" in workflow
+    assert "docker pull --platform linux/amd64" in workflow
+    assert "-m test_data_agent.container_health" in workflow
+    assert workflow.count("image: agent-paranoid-android-") == 3
 
 
 def test_release_tag_must_match_package_version() -> None:
