@@ -62,6 +62,8 @@ not be the only place where safety checks happen.
   bounded read-only SQL validation without importing client or MCP transports.
 - `trino_query_builders.py` owns parameterized metadata and aggregate profiling
   query construction without importing the Trino client or MCP transports.
+- `trino_client.py` owns driver access, resource-budget session properties,
+  result limits, row conversion, and deterministic cursor/connection cleanup.
 - Typed workspace transition and persistence interfaces with atomic commit and
   cleanup semantics.
 - The filesystem workspace adapter stages a complete plan beside its final

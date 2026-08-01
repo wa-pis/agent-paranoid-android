@@ -352,6 +352,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Extract validated Trino connection and resource-budget configuration.
      - [x] Extract pure read-only SQL and allowlist policy.
      - [x] Extract non-executing Trino metadata and profiling query builders.
+     - [x] Extract the bounded Trino client and resource-cleanup boundary.
      - [x] Extract CLI installation diagnostics and capability smoke
        orchestration.
      - [x] Centralize CLI optional-extra discovery and installation errors.

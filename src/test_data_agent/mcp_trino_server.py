@@ -7,7 +7,7 @@ they can be tested without a live Trino cluster.
 from __future__ import annotations
 
 from collections import Counter
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from test_data_agent.core.privacy import (
@@ -45,6 +45,12 @@ from test_data_agent.trino_config import (
     parse_max_result_rows as parse_max_result_rows,
     parse_request_timeout as parse_request_timeout,
     parse_trino_port as parse_trino_port,
+)
+from test_data_agent.trino_client import (
+    TrinoClient as TrinoClient,
+    TrinoResultLimitError as TrinoResultLimitError,
+    rows_to_dicts as rows_to_dicts,
+    trino as trino,
 )
 from test_data_agent.trino_query_builders import (
     FormulaSql as FormulaSql,
@@ -105,19 +111,9 @@ from test_data_agent.trino_sql_policy import (
     validate_table_references_allowed as validate_table_references_allowed,
 )
 
-try:  # pragma: no cover - live Trino is not used in unit tests.
-    import trino
-except ImportError:  # pragma: no cover
-    trino = None  # type: ignore[assignment]
-
-
 DEFAULT_LIMIT = 100
 MIN_RULE_CONFIDENCE = 0.9
 ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
-
-
-class TrinoResultLimitError(ValueError):
-    """Raised when a Trino response exceeds the client-side safety limit."""
 
 
 def mask_row(row: dict[str, Any]) -> dict[str, Any]:
@@ -129,46 +125,11 @@ def mask_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def rows_to_dicts(
-    description: Sequence[Any], rows: Iterable[Sequence[Any]]
-) -> list[dict[str, Any]]:
-    names = [column[0] for column in description]
-    return [dict(zip(names, row, strict=True)) for row in rows]
-
-
 def _execute_query(
     sql: str, parameters: Sequence[Any] | None = None
 ) -> tuple[list[tuple[Any, ...]], list[Any]]:
-    if trino is None:
-        raise RuntimeError("trino package is not installed")
-
-    config = TrinoConfig.from_env()
-    connection = trino.dbapi.connect(  # type: ignore[no-untyped-call]
-        host=config.host,
-        port=config.port,
-        user=config.user,
-        http_scheme=config.http_scheme,
-        request_timeout=config.request_timeout,
-        session_properties={
-            "query_max_execution_time": config.query_max_execution_time,
-            "query_max_run_time": config.query_max_run_time,
-            "query_max_scan_physical_bytes": config.query_max_scan_physical_bytes,
-        },
-    )
-    cursor = connection.cursor()
-    try:
-        cursor.execute(sql, parameters or [])
-        rows = cursor.fetchmany(config.max_result_rows + 1)
-        if len(rows) > config.max_result_rows:
-            raise TrinoResultLimitError(
-                f"Trino result exceeds the client limit of {config.max_result_rows} rows"
-            )
-        return rows, cursor.description or []
-    finally:
-        try:
-            cursor.close()
-        finally:
-            connection.close()
+    client = TrinoClient(config=TrinoConfig.from_env(), driver=trino)
+    return client.execute_query(sql, parameters)
 
 
 def _fetch_dicts(

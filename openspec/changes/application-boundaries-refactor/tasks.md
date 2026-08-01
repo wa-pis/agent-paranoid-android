@@ -26,7 +26,7 @@ contract-preserving increments.
   - [x] Extract validated connection and resource-budget configuration.
   - [x] Extract pure SQL and allowlist policy.
   - [x] Extract non-executing metadata and profiling query builders.
-  - [ ] Extract the bounded Trino client boundary.
+  - [x] Extract the bounded Trino client boundary.
   - [ ] Extract profiling orchestration.
   - [ ] Extract masking and safe category summaries.
 - [ ] Preserve compatibility wrappers and add golden contract coverage for
