@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc1] - 2026-08-01
+
 ### Added
 
 - Added a [disposable local Trino journey](examples/local_trino/README.md) that
@@ -544,6 +546,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...HEAD
+[1.0.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.12.0...v1.0.0rc1
 [0.12.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.9.0...v0.10.0
