@@ -5,6 +5,22 @@ facts removed from the user-facing `Unreleased` changelog during RC hygiene.
 The source classification is recorded in the [inventory](unreleased-inventory-1.0.0rc1.md).
 These facts are evidence for maintainers, not additional product guarantees.
 
+## RC Gate Snapshot
+
+The full local release gate passed on `main` commit
+`c9a26b75b22296eea5448d62b6952cc773f88b94` on 2026-08-01. It covered Ruff,
+strict mypy across 78 source files, compilation, 97 approved dependency
+licenses, dependency compatibility, direct privacy and SQL boundaries,
+operational budgets, schema freshness, and the synthetic quickstart. The test
+run reported 537 passed, 3 skipped, and 88.01% coverage.
+
+The equivalent reviewed tree passed 29 CI checks with four intentional skips
+before merge. Evidence is retained in the [CI and wheel run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989489),
+[container run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989496),
+[documentation run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989523),
+and [security run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30678989499).
+This snapshot does not replace the final rerun against the exact release commit.
+
 ## Added-Scope Evidence
 
 - Explicit direct-API privacy and SQL-boundary checks in the release gate.

@@ -92,7 +92,7 @@
   tests.
 - [x] Run the complete unit/property/contract suite with coverage at or above
   the configured threshold.
-- [ ] Run lint, full-package typing, compile, dependency/license/security,
+- [x] Run lint, full-package typing, compile, dependency/license/security,
   documentation, wheel, and container gates.
 - [ ] Run the workflow from published-style wheel, PyPI, GitHub Release,
   documentation, and GHCR artifacts.
