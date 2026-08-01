@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+import json
+from typing import Any
+
 import pytest
 
 from test_data_agent import mcp_trino_server, trino_masking, trino_query_builders
@@ -29,6 +34,103 @@ from test_data_agent.mcp_trino_server import (
     validate_table_references_allowed,
     validate_safe_select,
 )
+
+
+DEFAULT_TOOL_ARGUMENTS: dict[str, dict[str, Any]] = {
+    "list_catalogs": {},
+    "list_schemas": {"catalog": "analytics"},
+    "list_tables": {"catalog": "analytics", "schema": "safe_schema"},
+    "describe_table": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+    },
+    "profile_table": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+    },
+    "profile_column": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+        "column": "amount",
+    },
+    "profile_table_safe": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+    },
+    "profile_foreign_key": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "parent_table": "synthetic_customers",
+        "parent_field": "customer_id",
+        "child_table": "synthetic_orders",
+        "child_field": "customer_id",
+    },
+    "profile_temporal_ordering": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+        "start_field": "created_at",
+        "end_field": "fulfilled_at",
+    },
+    "profile_formula_rule": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+        "target_field": "total",
+        "expression": "subtotal + tax",
+    },
+    "profile_conditional_required": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+        "condition_field": "status",
+        "condition_equals": "source-literal-condition",
+        "required_field": "fulfilled_at",
+    },
+    "profile_conditional_allowed_values": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "table": "synthetic_orders",
+        "condition_field": "kind",
+        "condition_equals": "source-literal-kind",
+        "value_field": "status",
+        "allowed_values": ["source-literal-allowed"],
+    },
+    "profile_aggregate_mapping": {
+        "catalog": "analytics",
+        "schema": "safe_schema",
+        "parent_table": "synthetic_customers",
+        "parent_key": "customer_id",
+        "parent_value_field": "lifetime_value",
+        "child_table": "synthetic_orders",
+        "child_key": "customer_id",
+        "child_value_field": "amount",
+    },
+}
+
+
+class RecordingProfiler:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def __getattr__(self, name: str) -> Any:
+        def invoke(*args: Any, **kwargs: Any) -> Any:
+            self.calls.append(name)
+            if name == "list_catalogs":
+                return ["analytics"]
+            if name == "list_schemas":
+                return ["safe_schema"]
+            if name == "list_tables":
+                return ["synthetic_orders"]
+            if name == "describe_table":
+                return [{"name": "amount", "data_type": "double"}]
+            return {"tool": name, "counts": {"checked": 1, "failed": 0}}
+
+        return invoke
 
 
 @pytest.fixture(autouse=True)
@@ -110,6 +212,30 @@ def test_row_sampling_surface_is_removed() -> None:
     assert not hasattr(mcp_trino_server, "sample_rows_masked")
     assert not hasattr(trino_masking.TrinoMasker, "sample_rows_masked")
     assert not hasattr(trino_query_builders, "build_masked_sample_query")
+
+
+def test_default_tools_complete_direct_service_success_paths(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profiler = RecordingProfiler()
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.setattr(mcp_trino_server, "_trino_profiler", lambda: profiler)
+    tools = trino_mcp_tools()
+
+    outputs = {
+        tool.__name__: tool(**DEFAULT_TOOL_ARGUMENTS[tool.__name__])
+        for tool in tools
+    }
+
+    assert tuple(outputs) == tuple(DEFAULT_TOOL_ARGUMENTS)
+    assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
+    serialized = json.dumps(outputs, sort_keys=True)
+    for source_literal in (
+        "source-literal-condition",
+        "source-literal-kind",
+        "source-literal-allowed",
+    ):
+        assert source_literal not in serialized
 
 
 def test_unrestricted_execution_helpers_are_private() -> None:

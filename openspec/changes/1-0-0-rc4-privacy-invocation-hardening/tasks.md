@@ -18,6 +18,10 @@
     plus audit wrapping for every production-registered tool.
   - [ ] Exercise every tool through direct and transport success, validation,
     database-error, serialized nested-response, and audit paths.
+    - [x] Invoke every production default wrapper through a direct-service
+      success path and assert request sentinels are not echoed.
+    - [ ] Cover transport success plus direct and transport validation,
+      database-error, nested serialization, and audit paths.
 - [ ] Add source fixtures covering strings, integers, decimals, floats,
   booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
   like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
