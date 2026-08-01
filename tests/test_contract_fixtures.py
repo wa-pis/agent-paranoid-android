@@ -99,7 +99,9 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         "recover_dataset_plan",
         "validate_dataset",
     }
-    assert "run_safe_select" not in {tool["name"] for tool in trino_tools}
+    trino_tool_names = {tool["name"] for tool in trino_tools}
+    assert "run_safe_select" not in trino_tool_names
+    assert "sample_rows_masked" not in trino_tool_names
     for tool in [*generator_tools, *trino_tools]:
         assert tool["input_schema"]["type"] == "object"
         assert tool["output_schema"] is not None

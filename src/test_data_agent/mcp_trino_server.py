@@ -375,7 +375,6 @@ def trino_mcp_tools() -> list[Callable[..., Any]]:
         profile_conditional_required,
         profile_conditional_allowed_values,
         profile_aggregate_mapping,
-        sample_rows_masked,
     ]
     if parse_env_bool(ENABLE_SAFE_SELECT_ENV):
         tools.append(run_safe_select)
