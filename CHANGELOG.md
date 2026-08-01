@@ -96,8 +96,8 @@ All notable changes to this project are documented here.
 
 - Advisor requests replace singleton categorical values with synthetic labels
   before a provider can receive the profile or baseline specification.
-- Documented the public threat model, exact-row reuse detection limits, and the
-  absence of statistical privacy guarantees.
+- Documented the public threat model, validation assurance levels, exact-row
+  reuse detection limits, and the absence of statistical privacy guarantees.
 - Trino SQL access is limited to validated read-only operations and dedicated
   bounded profiling; forbidden and non-allowlisted queries fail before a
   connection while allowlisted metadata and aggregate discovery remain available.

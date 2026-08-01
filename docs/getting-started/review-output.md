@@ -50,6 +50,23 @@ Also confirm:
 Do not treat a missing report as success. A failed report should block
 publication of the generated dataset.
 
+## Assurance Levels
+
+Interpret each result at its actual level:
+
+| Level | Evidence | What it does not prove |
+| --- | --- | --- |
+| Structural validation | Schema, keys, relationships, constraints, formulas, and business rules passed deterministic checks. | Values are private or safe to distribute. |
+| Built-in safety policy | The reviewed spec rejected known raw sensitive values, unsafe categories, and disabled safety settings. The report's `privacy` section records this policy check. | Detectors found every PII, secret, quasi-identifier, or rare free-text value. |
+| Complete-row reuse check | A supported CSV workflow compared generated and available source rows and found no complete-row match. | No individual value, partial row, rare combination, or statistical pattern resembles the source. |
+| Domain privacy review | An accountable reviewer assessed the generated artifacts under the organization's policy and intended use. | A formal statistical privacy guarantee unless a separate qualified evaluation provides one. |
+
+`validation_valid: true` means the enabled deterministic checks passed. It is
+not a privacy certificate. Name- and value-based detection is heuristic and
+can produce false negatives, especially for domain identifiers,
+quasi-identifiers, rare categories, and free text. This project does not assign
+an anonymity, differential-privacy, or re-identification-resistance level.
+
 ## Profile Review
 
 Profiles should contain metadata such as types, null ratios, ranges,

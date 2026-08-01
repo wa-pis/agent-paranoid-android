@@ -391,7 +391,7 @@ Scope:
   may be one fixture, not the product boundary.
 - [ ] Close or explicitly defer every active OpenSpec change.
 - [ ] Run the full security audit and resolve all Critical and High findings.
-- [ ] Separate structural validation from privacy assurance in user-facing
+- [x] Separate structural validation from privacy assurance in user-facing
   output; document heuristic false negatives, quasi-identifiers, rare/free
   text, and explicit assurance levels without implying re-identification
   certification.
