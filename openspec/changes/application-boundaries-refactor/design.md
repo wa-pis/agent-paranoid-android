@@ -24,6 +24,10 @@ not be the only place where safety checks happen.
   Python, CLI, MCP, and artifact fixtures before code moves.
 - Agent application services: planning, review, approval, recovery, advising,
   status, and workspace store.
+- `agent_contracts.py` owns transport-neutral lifecycle models;
+  `agent_planning.py` owns safe profile-to-plan orchestration. Existing imports
+  continue through thin `agent.py` and `workspace_store.py` compatibility
+  exports while later lifecycle services are extracted.
 - CLI package: main composition root, dispatch, doctor, agent commands, dataset
   commands, and centralized optional dependency resolution.
 - Trino package: config, pure SQL policy, non-executing query builders, client,

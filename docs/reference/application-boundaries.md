@@ -140,13 +140,15 @@ the existing contract review; rename or removal is breaking.
 
 ## Current Dependency Direction
 
-The observed dependencies before extraction are:
+The current dependencies after completed extraction increments are:
 
 | Owner | Current dependencies |
 | --- | --- |
 | `__init__.py` | agent, advisor, core, CLI contracts, generation, I/O workflows, validation, version |
 | `cli.py` | parser/presenter/contracts, agent, advisor, audit, demo, core, I/O commands, rules |
-| `agent.py` | adapters, advisor, core, generation, I/O persistence, profiling, safety, validation |
+| `agent.py` | compatibility exports plus review, approval, recovery, advising, and status orchestration |
+| `agent_contracts.py` | core field, relationship, and settings models only |
+| `agent_planning.py` | adapters, contracts, core, generation planning, profiling, safety, and workspace-store port |
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | Trino MCP server | audit, core privacy, SQL parsing, Trino client, Trino transport factory |
@@ -183,6 +185,13 @@ workspace into place only after every artifact is ready. A failed plan restores
 an existing empty workspace and removes staging data. Completion publishes the
 approval receipt before the atomic `agent_result.json` state marker, preserving
 the existing checkpoint-based recovery behavior.
+
+### Planning Service Migration
+
+`agent_contracts.py` now owns lifecycle models and `agent_planning.py` owns safe
+profile-to-plan orchestration. Public package and `agent.py` imports remain
+compatible, and `workspace_store.py` re-exports `AgentArtifacts`. Direct service
+calls enforce source-path and profile-safety checks before publishing artifacts.
 
 ## Per-Increment Review
 
