@@ -49,7 +49,7 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
     os.environ["TEST_DATA_AGENT_WORKSPACE_ROOT"] = str(workspace_root)
     try:
         with patch(
-            "test_data_agent.agent.secrets.token_hex",
+            "test_data_agent.agent_planning.secrets.token_hex",
             return_value=FIXED_PLAN_ID,
         ):
             mcp_plan = plan_trino_dataset(

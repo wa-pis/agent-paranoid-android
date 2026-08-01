@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Protocol, Self
 
 from pydantic import BaseModel
 
+from test_data_agent.agent_contracts import AgentArtifacts as AgentArtifacts
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.io.artifacts import (
@@ -21,7 +22,7 @@ from test_data_agent.io.artifacts import (
 )
 
 if TYPE_CHECKING:
-    from test_data_agent.agent import AgentApprovalReceipt, AgentRequest, AgentResult
+    from test_data_agent.agent_contracts import AgentApprovalReceipt, AgentRequest, AgentResult
 
 
 AGENT_REQUEST_FILE = "agent_request.json"
@@ -33,19 +34,6 @@ COMPLETION_CHECKPOINT_FILE = "agent_completion.json"
 PROFILE_FILE = "profile.json"
 DATASET_SPEC_FILE = "dataset_spec.yaml"
 GENERATED_FOLDER = "generated"
-
-
-class AgentArtifacts(BaseModel):
-    workspace: Path
-    request_path: Path
-    profile_path: Path
-    dataset_spec_path: Path
-    plan_path: Path
-    generated_folder: Path | None = None
-    validation_report_path: Path | None = None
-    manifest_path: Path | None = None
-    approval_receipt_path: Path | None = None
-    completion_checkpoint_path: Path | None = None
 
 
 class WorkspacePlanTransition(Protocol):

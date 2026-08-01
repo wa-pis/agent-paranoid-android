@@ -341,8 +341,9 @@ into `1.0.0rc1`. Finish the release stage in this order:
      services.
      - [x] Publish plans and completion markers through a typed, atomic
        filesystem workspace store.
-     - [ ] Extract planning, review, approval, recovery, advising, and status
-       services one lifecycle boundary at a time.
+     - [x] Extract neutral agent contracts and the planning lifecycle service.
+     - [ ] Extract review, approval, recovery, advising, and status services one
+       lifecycle boundary at a time.
    - [ ] Split CLI composition and Trino policy, query, client, profiling, and
      masking responsibilities.
    - [ ] Add architecture and direct-service adversarial tests while preserving
