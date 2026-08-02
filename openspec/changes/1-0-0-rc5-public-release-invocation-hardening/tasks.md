@@ -68,7 +68,7 @@
   consumed work.
 - [x] Propagate remaining invocation time into query timeouts and cancel or
   close an active cursor/connection when the deadline expires.
-- [ ] Document environment names, defaults, units, per-query versus
+- [x] Document environment names, defaults, units, per-query versus
   per-invocation scope, and failure behavior in configuration reference.
 - [ ] Add wide-table, statement-fan-out, timeout, concurrency-isolation, and
   preflight/no-connection tests.

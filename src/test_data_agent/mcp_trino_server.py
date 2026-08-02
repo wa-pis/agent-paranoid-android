@@ -7,6 +7,7 @@ they can be tested without a live Trino cluster.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
+from functools import partial
 from typing import Any
 
 from test_data_agent.audit import audit_logger_from_env
@@ -124,6 +125,7 @@ from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
     QueryWorkLimits,
+    query_work_limits_from_env,
     with_query_work_budget,
 )
 
@@ -388,8 +390,12 @@ def trino_mcp_services(
     ]
 
 
-def _new_transport_query_work_budget(raw_payload_bytes: int) -> QueryWorkBudget:
-    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+def _new_transport_query_work_budget(
+    raw_payload_bytes: int,
+    *,
+    work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+) -> QueryWorkBudget:
+    budget = QueryWorkBudget(work_limits)
     budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
     return budget
 
@@ -410,6 +416,8 @@ mcp: Any = create_trino_mcp(
 
 
 def main() -> None:
+    global mcp
+
     missing = []
     if mcp is None:
         missing.append("mcp")
@@ -423,12 +431,22 @@ def main() -> None:
             f"(missing: {', '.join(missing)}); "
             "install agent-paranoid-android[mcp,trino]"
         )
+    work_limits = query_work_limits_from_env()
     TrinoConfig.from_env()
     audit_logger_from_env("trino-mcp")
+    mcp = create_trino_mcp(
+        trino_mcp_services(
+            work_limits=work_limits,
+            budget_provider=_current_transport_query_work_budget,
+        )
+    )
     run_bounded_trino_mcp(
         mcp,
-        max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes,
-        request_context_factory=_new_transport_query_work_budget,
+        max_payload_bytes=work_limits.raw_transport_payload_bytes,
+        request_context_factory=partial(
+            _new_transport_query_work_budget,
+            work_limits=work_limits,
+        ),
     )
 
 

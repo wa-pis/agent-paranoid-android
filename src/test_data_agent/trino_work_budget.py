@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import inspect
 import json
+import os
 from collections.abc import Callable, Iterable
 from contextvars import ContextVar
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from functools import wraps
 from time import monotonic
@@ -16,6 +17,12 @@ from typing import Any, ParamSpec, TypeVar
 P = ParamSpec("P")
 R = TypeVar("R")
 MIN_TRANSPORT_RESPONSE_BYTES = 350
+MAX_INVOCATION_PROFILED_COLUMNS_ENV = "TRINO_MAX_INVOCATION_PROFILED_COLUMNS"
+MAX_INVOCATION_STATEMENTS_ENV = "TRINO_MAX_INVOCATION_STATEMENTS"
+MAX_INVOCATION_SECONDS_ENV = "TRINO_MAX_INVOCATION_SECONDS"
+MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV = (
+    "TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES"
+)
 
 
 class QueryWorkDimension(StrEnum):
@@ -111,6 +118,60 @@ DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
     database_result_bytes=4 * 1024 * 1024,
     transport_response_bytes=4 * 1024 * 1024,
 )
+
+
+def query_work_limits_from_env() -> QueryWorkLimits:
+    """Load cumulative Trino invocation limits without changing other defaults."""
+    return replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        max_profiled_columns=_positive_int_env(
+            MAX_INVOCATION_PROFILED_COLUMNS_ENV,
+            DEFAULT_QUERY_WORK_LIMITS.max_profiled_columns,
+        ),
+        statements=_positive_int_env(
+            MAX_INVOCATION_STATEMENTS_ENV,
+            DEFAULT_QUERY_WORK_LIMITS.statements,
+        ),
+        max_invocation_seconds=_positive_float_env(
+            MAX_INVOCATION_SECONDS_ENV,
+            DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds,
+        ),
+        max_cumulative_estimated_scan_bytes=_optional_positive_int_env(
+            MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV
+        ),
+    )
+
+
+def _positive_int_env(name: str, default: int) -> int:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if value <= 0:
+        raise ValueError(f"{name} must be positive")
+    return value
+
+
+def _optional_positive_int_env(name: str) -> int | None:
+    if name not in os.environ:
+        return None
+    return _positive_int_env(name, 1)
+
+
+def _positive_float_env(name: str, default: float) -> float:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+    try:
+        value = float(raw_value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a number") from exc
+    if not value > 0 or value == float("inf"):
+        raise ValueError(f"{name} must be a finite positive number")
+    return value
 
 
 @dataclass(frozen=True, slots=True)

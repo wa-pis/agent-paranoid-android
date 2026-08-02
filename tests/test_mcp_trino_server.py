@@ -38,6 +38,7 @@ from test_data_agent.mcp_trino_server import (
 )
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
     QueryWorkBudgetExceeded,
 )
 from tests.trino_source_literals import (
@@ -121,6 +122,77 @@ DEFAULT_TOOL_ARGUMENTS: dict[str, dict[str, Any]] = {
         "child_value_field": "amount",
     },
 }
+
+
+def test_main_applies_invocation_limits_to_tools_and_transport(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    configured_limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        statements=7,
+        max_profiled_columns=5,
+        max_invocation_seconds=3.0,
+    )
+    runtime_mcp = object()
+    service_arguments: dict[str, Any] = {}
+    transport_arguments: dict[str, Any] = {}
+
+    def fake_services(**kwargs: Any) -> list[Any]:
+        service_arguments.update(kwargs)
+        return [object()]
+
+    def fake_run_bounded_trino_mcp(
+        mcp: Any,
+        *,
+        max_payload_bytes: int,
+        request_context_factory: Any,
+    ) -> None:
+        transport_arguments.update(
+            mcp=mcp,
+            max_payload_bytes=max_payload_bytes,
+            request_context_factory=request_context_factory,
+        )
+
+    monkeypatch.setattr(mcp_trino_server, "mcp", object())
+    monkeypatch.setattr(mcp_trino_server, "sqlglot", object())
+    monkeypatch.setattr(mcp_trino_server, "trino", object())
+    monkeypatch.setattr(
+        mcp_trino_server,
+        "query_work_limits_from_env",
+        lambda: configured_limits,
+    )
+    monkeypatch.setattr(
+        mcp_trino_server.TrinoConfig,
+        "from_env",
+        classmethod(lambda cls: object()),
+    )
+    monkeypatch.setattr(mcp_trino_server, "audit_logger_from_env", lambda service: None)
+    monkeypatch.setattr(mcp_trino_server, "trino_mcp_services", fake_services)
+    monkeypatch.setattr(
+        mcp_trino_server,
+        "create_trino_mcp",
+        lambda tools: runtime_mcp,
+    )
+    monkeypatch.setattr(
+        mcp_trino_server,
+        "run_bounded_trino_mcp",
+        fake_run_bounded_trino_mcp,
+    )
+
+    mcp_trino_server.main()
+
+    assert service_arguments == {
+        "work_limits": configured_limits,
+        "budget_provider": mcp_trino_server._current_transport_query_work_budget,
+    }
+    assert transport_arguments["mcp"] is runtime_mcp
+    assert (
+        transport_arguments["max_payload_bytes"]
+        == configured_limits.raw_transport_payload_bytes
+    )
+    budget = transport_arguments["request_context_factory"](0)
+    assert isinstance(budget, QueryWorkBudget)
+    assert budget.limits == configured_limits
 
 
 class RecordingProfiler:

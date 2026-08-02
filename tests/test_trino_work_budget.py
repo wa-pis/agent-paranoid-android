@@ -8,7 +8,12 @@ from typing import Any
 import pytest
 
 from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
     MIN_TRANSPORT_RESPONSE_BYTES,
+    MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV,
+    MAX_INVOCATION_PROFILED_COLUMNS_ENV,
+    MAX_INVOCATION_SECONDS_ENV,
+    MAX_INVOCATION_STATEMENTS_ENV,
     QueryWorkBudget,
     QueryWorkBudgetExceeded,
     QueryWorkDimension,
@@ -16,6 +21,7 @@ from test_data_agent.trino_work_budget import (
     QueryWorkSnapshot,
     canonical_argument_size,
     current_query_work_budget,
+    query_work_limits_from_env,
     with_query_work_budget,
 )
 
@@ -213,6 +219,44 @@ def test_cumulative_fields_preserve_existing_typed_constructors() -> None:
     assert limits.max_cumulative_estimated_scan_bytes is None
     assert snapshot.profiled_columns == 0
     assert snapshot.cumulative_estimated_scan_bytes == 0
+
+
+def test_cumulative_invocation_limits_load_from_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(MAX_INVOCATION_PROFILED_COLUMNS_ENV, "12")
+    monkeypatch.setenv(MAX_INVOCATION_STATEMENTS_ENV, "34")
+    monkeypatch.setenv(MAX_INVOCATION_SECONDS_ENV, "5.5")
+    monkeypatch.setenv(MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV, "678")
+
+    limits = query_work_limits_from_env()
+
+    assert limits.max_profiled_columns == 12
+    assert limits.statements == 34
+    assert limits.max_invocation_seconds == 5.5
+    assert limits.max_cumulative_estimated_scan_bytes == 678
+    assert limits.database_result_bytes == DEFAULT_QUERY_WORK_LIMITS.database_result_bytes
+
+
+@pytest.mark.parametrize(
+    ("name", "value", "error_match"),
+    [
+        (MAX_INVOCATION_PROFILED_COLUMNS_ENV, "0", "must be positive"),
+        (MAX_INVOCATION_STATEMENTS_ENV, "many", "must be an integer"),
+        (MAX_INVOCATION_SECONDS_ENV, "inf", "finite positive"),
+        (MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV, "-1", "must be positive"),
+    ],
+)
+def test_cumulative_invocation_environment_rejects_invalid_values(
+    monkeypatch: pytest.MonkeyPatch,
+    name: str,
+    value: str,
+    error_match: str,
+) -> None:
+    monkeypatch.setenv(name, value)
+
+    with pytest.raises(ValueError, match=error_match):
+        query_work_limits_from_env()
 
 
 def test_limits_and_snapshots_are_immutable() -> None:
