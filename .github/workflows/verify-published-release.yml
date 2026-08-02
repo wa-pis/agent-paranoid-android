@@ -306,6 +306,46 @@ jobs:
           grep -F "quickstart smoke: ok" /tmp/published-docs.html
           grep -F "${PYPI_VERSION}" /tmp/published-docs.html
 
+  public-install-profiles:
+    name: Verify public install / ${{ matrix.profile }}
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - profile: base
+            requirement: "agent-paranoid-android"
+          - profile: trino
+            requirement: "agent-paranoid-android[trino]"
+          - profile: mcp
+            requirement: "agent-paranoid-android[mcp]"
+          - profile: mcp-trino
+            requirement: "agent-paranoid-android[mcp,trino]"
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Install exact public profile
+        env:
+          PACKAGE_REQUIREMENT: ${{ matrix.requirement }}
+          PROFILE: ${{ matrix.profile }}
+          PYPI_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          environment="/tmp/published-${PROFILE}"
+          python3 -m venv "${environment}"
+          "${environment}/bin/python" -m pip install \
+            --disable-pip-version-check \
+            --no-cache-dir \
+            --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            "${PACKAGE_REQUIREMENT}==${PYPI_VERSION}"
+          "${environment}/bin/python" -m pip check
+
   containers:
     name: Verify ${{ matrix.target }} container
     needs: prepare
