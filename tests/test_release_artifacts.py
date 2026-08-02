@@ -125,18 +125,21 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert "scripts/check_dependency_licenses.py" in workflow
     assert "python -m mypy" in workflow
     assert "name: Wheel smoke" in workflow
+    assert "name: Optional wheel / ${{ matrix.profile }}" in workflow
     assert "scripts/check_installed_package.py" in workflow
-    assert "test-data-agent doctor --skip-smoke" in workflow
+    assert "Verify isolated base install and CSV/JSON quickstart" in workflow
     assert "--profile base --wheel" in workflow
-    assert "test-data-agent doctor --require-extra parquet" in workflow
-    assert "test-data-agent doctor --require-extra mcp" in workflow
-    assert "test-data-agent doctor --require-extra trino" in workflow
-    assert "test-data-agent doctor --require-extra openai" in workflow
+    assert "test-data-agent doctor --require-extra \"${{ matrix.profile }}\"" in workflow
     assert "doctor --skip-smoke --require-extra trino" not in workflow
     assert "doctor --skip-smoke --require-extra openai" not in workflow
-    for extra in ("parquet", "mcp", "openai", "trino"):
-        assert f"--profile {extra}" in workflow
-        assert f"--require-extra {extra}" in workflow
+    jobs = yaml.safe_load(workflow)["jobs"]
+    assert jobs["package-optional"]["strategy"]["matrix"]["profile"] == [
+        "parquet",
+        "mcp",
+        "openai",
+        "trino",
+    ]
+    assert jobs["package-optional"]["strategy"]["fail-fast"] is False
     assert "actions/checkout@v7" not in workflow
     assert "actions/setup-python@v7" not in workflow
     assert "astral-sh/setup-uv@v7" not in workflow
@@ -166,6 +169,12 @@ def test_ci_covers_supported_python_versions() -> None:
         if step["name"] == "Set up Python"
     )
     assert package_python["with"]["python-version"] == "3.14"
+    optional_python = next(
+        step
+        for step in jobs["package-optional"]["steps"]
+        if step["name"] == "Set up Python"
+    )
+    assert optional_python["with"]["python-version"] == "3.14"
 
 
 def test_documentation_workflow_builds_strict_site() -> None:
@@ -195,7 +204,7 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflow_text = "\n".join(path.read_text() for path in workflows)
 
     setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 10
+    assert setup_count == 11
     assert workflow_text.count("prune-cache: true") == setup_count
 
 
