@@ -93,7 +93,7 @@
 ## Release gates
 
 - [x] Run `python3 -m ruff check src tests`.
-- [ ] Run `python3 -m compileall -q src tests`.
+- [x] Run `python3 -m compileall -q src tests`.
 - [ ] Run `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
 - [ ] Run `scripts/check_release.sh` and `mkdocs build --strict`.
 - [ ] Confirm every remaining finding has an owner, disposition, and revisit
