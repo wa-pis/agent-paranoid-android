@@ -18,6 +18,7 @@ verification checked out that tag and resolved the same commit.
 | Independent public-artifact, agent, and audit verification | [Verify Published Release #5](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985) | Passed |
 | Clean public-index profile installs and literal README smoke | [Verify Published Release #7](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757) | Passed |
 | Seven-profile CLI and install-metadata verification | [Verify Published Release #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272) | Passed |
+| Public documentation, signatures, attestations, and `0.12.0` upgrade | [Verify Published Release #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369) | Passed |
 
 ## Package Digests
 
@@ -77,3 +78,11 @@ recorded version `1.0.0rc4`, the profile name, and wheel SHA-256
 The package job also reverified the wheel, source-distribution, and SBOM
 digests listed above. Its separate container matrix passed the published CLI,
 generator-MCP, and Trino-MCP image jobs.
+
+Verification run #9 executed from workflow commit `92a4e1a` against the same
+immutable tag and release commit. It reverified the published documentation,
+GitHub Release checksums and package attestations, and all three published
+container signatures and attestations. In a fresh environment, it installed
+public version `0.12.0`, upgraded through public PyPI to exact version
+`1.0.0rc4`, passed `pip check`, and reran `--version`, `doctor`, `demo`, and
+the synthetic-output safety manifest assertions.

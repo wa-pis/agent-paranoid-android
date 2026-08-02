@@ -613,14 +613,16 @@ Scope:
   README `doctor` and `demo` commands for base, `[trino]`, `[mcp]`, and
   `[mcp,trino]`. Evidence: the [public profile smoke
   run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757).
-- [ ] Verify `--version`, `demo`, and `doctor` for every published wheel
+- [x] Verify `--version`, `demo`, and `doctor` for every published wheel
   profile, recording package version, artifact hash, Python version, and
-  extra profile in the release evidence.
-- [ ] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
+  extra profile in the [release evidence](release-evidence-1.0.0rc4.md).
+- [x] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
   verify the CLI, generator-MCP, and Trino-MCP container targets in their
-  separate container matrix.
-- [ ] Re-run public documentation, package attestation, and upgrade-from
-  `0.12.0` checks from published artifacts only.
+  separate container matrix. Evidence: [public verification run
+  #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272).
+- [x] Re-run public documentation, package attestation, and upgrade-from
+  `0.12.0` checks from published artifacts only. Evidence: [public
+  verification run #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369).
 - [ ] Split database-result and transport-response budgets. Enforce
   `database_result_bytes` incrementally while reading the cursor and
   `transport_response_bytes` after final MCP JSON serialization, including
