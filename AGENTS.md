@@ -1,192 +1,73 @@
-# Agent Paranoid Android Project Instructions
+# Agent Paranoid Android project instructions
 
-You are working on a safe synthetic test data generation agent.
+This repository builds a safe, deterministic synthetic test-data agent. It can
+profile schemas and source metadata, infer generation specifications, generate
+synthetic datasets, validate them, and export them.
 
-The project goal is to build an agent that can:
+These rules are always active. Task-specific detail lives in the guides below;
+read only the guide that matches the files or behavior being changed.
 
-* inspect Trino-accessible database schemas through MCP
-* profile source tables safely
-* detect sensitive fields
-* build generation specifications
-* generate synthetic test data
-* validate generated datasets
-* export data as CSV, JSON, SQL, or Parquet
+## Non-negotiable safety
 
-Core safety rules:
+- Never copy source rows into generated output or fixtures.
+- Never expose raw PII, credentials, tokens, secrets, or production data in
+  artifacts, logs, exceptions, tests, or MCP responses.
+- All external database access is read-only, allowlisted, and resource-bounded;
+  never add arbitrary unrestricted SQL.
+- Treat possible PII as sensitive by default. Prefer metadata, aggregates,
+  distributions, and masked values over source rows.
+- Generated data is synthetic and reproducible when an explicit seed is used.
+- Default profiling and generation tools return metadata and summaries. Any
+  explicit row-returning capability is a separate opt-in surface and must never
+  feed generated output.
 
-* Never copy production rows into generated output.
-* Never expose raw PII.
-* Never create tools that allow arbitrary unrestricted SQL.
-* Trino access must be read-only.
-* Prefer schema metadata, aggregates, distributions, and masked samples over raw rows.
-* Treat possible PII as sensitive by default.
-* Generated data must be synthetic and reproducible via seed.
+Do not weaken these guarantees without executable tests and, for a public
+behavior change, a matching OpenSpec/roadmap update.
 
-Allowed database operations:
+## Engineering contract
 
-* list catalogs
-* list schemas
-* list tables
-* describe table
-* profile table
-* profile column
-* run safe read-only SELECT queries with LIMIT
-* return masked samples only when needed
+- Target Python 3.11+ and use typed Pydantic or dataclass models at module
+  boundaries.
+- Keep deterministic generation and validation separate from I/O, MCP,
+  provider, filesystem, and CLI adapters.
+- The LLM/agent may propose plans, specifications, or hypotheses; deterministic
+  code must enforce safety, constraints, relationships, and validation.
+- Pass seeds, limits, configurations, and dependencies explicitly. Avoid
+  global mutable state and wildcard imports.
+- Raise specific exceptions and convert them to user-facing errors only at the
+  CLI or transport boundary.
+- Prefer the smallest clear change and avoid dependencies that do not simplify
+  safe, testable behavior.
 
-Forbidden database operations:
+## Task-specific guides
 
-* INSERT
-* UPDATE
-* DELETE
-* MERGE
-* DROP
-* TRUNCATE
-* ALTER
-* CREATE
-* GRANT
-* REVOKE
-* unrestricted SELECT *
-* exporting real production rows
-* reading secrets, credentials, tokens, or raw PII
+- Trino, MCP, SQL policy, masking, or database budgets: read
+  `docs/agent-guides/trino-security.md`.
+- CSV, Parquet, file profiling, samples, or profile caching: read
+  `docs/agent-guides/profiling.md`.
+- Generation, validation, foreign keys, formulas, scenarios, or business
+  rules: read `docs/agent-guides/generation-and-rules.md`.
+- Agent planning, advisors, OpenAI providers, confidence, or relationship
+  discovery: read `docs/agent-guides/advisors.md`.
+- Architecture or module ownership: use `docs/implementation_map.md` and
+  `docs/reference/application-boundaries.md`; do not infer module names from
+  this file.
+- Release candidates, versioning, tags, PyPI, or release checks: read
+  `CONTRIBUTING.md` and `docs/release.md`.
 
-Implementation preference:
+Do not load all guides for an unrelated task. When a public CLI, MCP, artifact,
+or Python API contract changes, update the relevant documentation, OpenSpec,
+and focused tests.
 
-* Use Python.
-* Use Pydantic for generation specs and validation models.
-* Use Faker for synthetic values.
-* Use deterministic random generation with an explicit seed.
-* Keep the LLM/agent layer responsible for planning and spec creation.
-* Keep actual data generation deterministic and testable.
-* Keep Trino MCP tools small, explicit, and safe.
+## Change and test workflow
 
-Python implementation guidelines:
-
-* Target Python 3.11+ and use modern type hints.
-* Prefer dataclasses or Pydantic models for structured data instead of untyped dictionaries at module boundaries.
-* Keep pure deterministic logic separate from I/O, MCP, filesystem, and CLI wrappers.
-* Use `pathlib.Path` for filesystem paths.
-* Avoid global mutable state; pass seeds, configs, and dependencies explicitly.
-* Keep random generation local to a seeded `random.Random` instance.
-* Raise specific exceptions for safety violations and validation failures.
-* Do not swallow exceptions silently; convert them to clear CLI errors only at the CLI boundary.
-* Keep imports explicit and avoid wildcard imports.
-* Add dependencies only when they materially simplify safe, testable behavior.
-
-Expected modules:
-
-* mcp_trino_server.py: MCP tools for safe Trino metadata/profiling
-* spec.py: Pydantic models for generation specifications
-* generator.py: deterministic synthetic data generation
-* validator.py: dataset validation
-* cli.py: local command-line interface
-
-Testing expectations:
-
-* Add unit tests for generator behavior.
-* Add tests for PII masking decisions.
-* Add tests that unsafe SQL is rejected.
-* Add tests that generated datasets match requested schema.
-* Do not require real Trino access for normal unit tests; mock Trino responses.
-
-When implementing:
-
-* Make the smallest working version first.
-* Prefer clear code over clever abstractions.
-* Add comments only where they clarify safety decisions.
-* Do not add heavy dependencies unless necessary.
-* Update README with usage examples after adding functionality.
-
-Git workflow:
-
-* Make regular commits at coherent checkpoints instead of one large end-of-session commit.
-* Keep each commit focused on a single logical change.
-* Use clear conventional commit messages, for example `feat: add csv profiling` or `docs: explain usage`.
-* Before committing, run the relevant tests or document why they were not run.
-* Do not include unrelated worktree changes in a commit.
-* Treat a substantial PR as a release candidate when it introduces breaking
-  behavior, major user-facing functionality, or significant security or
-  supply-chain changes.
-* Before merging a release candidate, update the package version and
-  `CHANGELOG.md`, then run `scripts/check_release.sh`.
-* After the release candidate is merged and required checks pass, create and
-  push an annotated `vX.Y.Z` tag on the exact verified merge commit in `main`.
-  The tag is required to trigger GitHub Release and PyPI publication.
-* Never tag a PR branch, tag an unverified commit, create a release tag without
-  a matching package version, or move an already published release tag.
-
-## CSV Input Support
-
-The agent may use CSV files as a source of schema and profiling information.
-
-CSV files must be treated as potentially sensitive. The agent must not copy source rows directly into generated output.
-
-Allowed CSV-derived information:
-
-* column names
-* inferred data types
-* null ratios
-* approximate distinct counts
-* enum-like value distributions for non-sensitive fields
-* numeric min/max/percentiles
-* date/time ranges
-* string length distributions
-* masked patterns
-* safe synthetic examples
-
-Forbidden CSV-derived behavior:
-
-* copying source rows
-* exposing raw PII
-* using real emails, names, phones, addresses, IDs, tokens, or secrets
-* generating output by shuffling or duplicating input rows
-* preserving unique sensitive identifiers
-* leaking rare free-text values
-
-CSV profiling requirements:
-
-* detect delimiter
-* detect encoding where practical
-* detect header
-* infer column types
-* detect likely PII
-* mask sensitive examples
-* create a reusable profile JSON
-* build generation specifications from the profile
-
-For CSV input, the preferred flow is:
-
-1. profile-csv
-2. infer generation spec
-3. generate synthetic data
-4. validate generated data
-5. export output
-
-
-## Business Logic Support
-
-The agent must support scenario-based synthetic data generation with explicit business rules.
-
-Business logic must be represented as structured configuration, preferably YAML or JSON. The LLM may help infer or draft rules, but deterministic code must enforce and validate them.
-
-Supported rule categories:
-
-* field rules
-* row rules
-* cross-table rules
-* conditional rules
-* temporal ordering rules
-* formula rules
-* foreign-key rules
-* aggregate formula rules
-* scenario distribution rules
-
-The generator must:
-
-* generate valid records that satisfy business rules
-* generate controlled invalid records only when requested
-* label or report invalid cases clearly
-* preserve referential integrity where requested
-* validate every rule after generation
-* produce a business validation report
-
-The agent must not rely on free-form LLM reasoning as the only validation mechanism. All important rules must be executable and testable.
+- Keep commits focused and do not include unrelated worktree changes.
+- Use conventional commit messages and run the smallest relevant checks before
+  committing; document checks that could not run.
+- Add or update tests for safety, generation, validation, CLI, or provider
+  behavior. Normal unit tests must not require live Trino access.
+- Use synthetic fixtures only. Never send production data or secrets to an
+  external AI provider.
+- Larger behavior, security, compatibility, or supply-chain changes require
+  an OpenSpec change and should be treated as a release candidate when
+  appropriate.
