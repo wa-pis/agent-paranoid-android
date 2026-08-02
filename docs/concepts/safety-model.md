@@ -24,10 +24,10 @@ Treat all of these as untrusted:
 
 Likely PII and secrets are detected from both field names and values. Sensitive
 columns suppress raw top values and expose masked patterns or aggregate metadata
-instead. Masked samples use an opaque placeholder and never preserve source
-endpoints. Non-sensitive category profiles also replace source values,
-including rare free text and quasi-identifiers, with ranked synthetic labels
-while preserving counts.
+instead. Sensitive examples use an opaque placeholder rather than intentionally
+preserving source values. Non-sensitive category profiles also replace source
+values, including rare free text and quasi-identifiers, with ranked synthetic
+labels while preserving counts.
 
 ### Source-row reuse
 
@@ -47,7 +47,11 @@ checks. Workspace-bound MCP paths reject traversal and symlink escapes.
 
 Trino access is read-only, allowlisted, bounded by client row limits and
 server-side time and scan budgets. Unsafe query shapes and likely sensitive
-projections are rejected before execution.
+projections are rejected before execution. The default MCP tools return only
+source-literal-free metadata and aggregates. Separately enabling
+`run_safe_select` permits bounded row-shaped results that may contain allowed
+source values or values missed by heuristic masking; those rows are not
+source-free, PII-free, anonymous, or privacy-safe.
 
 ### Resource limits
 

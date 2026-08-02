@@ -449,6 +449,38 @@ def test_ai_guidance_matches_safe_public_contract() -> None:
     assert "untrusted data" in prompts
 
 
+def test_trino_mcp_docs_define_default_privacy_boundary() -> None:
+    guide = (ROOT / "docs" / "how-to" / "mcp.md").read_text()
+    integration = (ROOT / "docs" / "ai_integration.md").read_text()
+    boundaries = (
+        ROOT / "docs" / "reference" / "application-boundaries.md"
+    ).read_text()
+    default_tools = json.loads(
+        (
+            ROOT
+            / "tests"
+            / "fixtures"
+            / "contracts"
+            / "mcp-trino-tools.json"
+        ).read_text()
+    )
+
+    for tool in default_tools:
+        assert f"`{tool['name']}`" in guide
+    assert "`run_safe_select`" not in {
+        f"`{tool['name']}`" for tool in default_tools
+    }
+    assert "source-literal-free" in guide
+    assert "TRINO_ENABLE_SAFE_SELECT=true" in guide
+    assert "may contain allowed source" in guide
+    for public_doc in (guide, integration, boundaries):
+        assert "sample_rows_masked" not in public_doc
+    assert (
+        "does not make returned rows source-free, PII-free, anonymous, or\n"
+        "privacy-safe"
+    ) in guide
+
+
 def test_local_markdown_links_resolve() -> None:
     markdown_files = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
     failures: list[str] = []

@@ -166,7 +166,7 @@ The current dependencies after completed extraction increments are:
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
 | `trino_profiling.py` | allowlisted metadata and aggregate-only profiling orchestration with injected query fetching |
-| `trino_masking.py` | row masking, source-free category summaries, safe column completion, and masked query results |
+| `trino_masking.py` | sensitive-value masking, synthetic category summaries, safe column completion, and opt-in safe-select masking |
 | Trino MCP server | audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
@@ -313,21 +313,23 @@ functions as wrappers and injects the safe column summarizer from
 
 ### Trino Masking Migration
 
-`trino_masking.py` now owns content-aware row masking, masked sensitive
+`trino_masking.py` now owns content-aware value masking, masked sensitive
 patterns, synthetic category-rank summaries, safe column-profile completion,
-and generic safe-select result masking. It validates explicit
-allowlists and SQL policy before injected query ports run, and it returns no
-raw detected PII, secrets, or source category values. `mcp_trino_server.py`
-retains the remaining tool functions and privacy helper imports as compatibility
-exports while delegating masking below the transport boundary.
+and opt-in safe-select result masking. Aggregate profiles replace source
+categories with synthetic labels or masked patterns. Safe-select masking is
+heuristic: returned rows may retain allowed source values that are not
+classified as sensitive, so they are outside the source-literal-free default
+contract. `mcp_trino_server.py` retains the remaining tool functions and
+privacy helper imports as compatibility exports while delegating masking below
+the transport boundary.
 
 ### RC4 Trino MCP Privacy Migration
 
-`sample_rows_masked` is no longer registered or retained as a public Python
-compatibility wrapper, masking-service method, or query builder. MCP clients
-must migrate to metadata and aggregate profiling tools. `run_safe_select`
+The former row-sampling diagnostic is no longer registered or retained as a
+public Python compatibility wrapper, masking-service method, or query builder.
+MCP clients must use metadata and aggregate profiling tools. `run_safe_select`
 remains a separately configured opt-in and is not a source-literal-free
-replacement for the removed diagnostic.
+replacement for that diagnostic.
 
 ### Architecture Gate
 

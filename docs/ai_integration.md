@@ -215,10 +215,12 @@ Its tools are:
 - `profile_conditional_allowed_values`
 - `profile_aggregate_mapping`
 
-`sample_rows_masked` was removed for RC4. The separately configured
+No row-sampling diagnostic is registered in RC4. The separately configured
 `run_safe_select` tool is available only when
-`TRINO_ENABLE_SAFE_SELECT=true`; it can return masked row-shaped results and
-is not part of the source-literal-free default surface.
+`TRINO_ENABLE_SAFE_SELECT=true`; its bounded row-shaped result may contain
+allowed source values, including values not recognized as sensitive by
+heuristic masking. It is not part of the source-literal-free default surface
+and must not be treated as PII-free, anonymous, or privacy-safe.
 
 The generator server exposes the local synthetic pipeline:
 

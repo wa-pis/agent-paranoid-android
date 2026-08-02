@@ -42,7 +42,7 @@ Invalid environment values fail closed.
 | `TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE` | Alternative to key value | Path to a bounded base64 secret file |
 | `TEST_DATA_AGENT_AUDIT_ACTOR` | Optional | Stable non-sensitive worker or deployment label |
 | `TEST_DATA_AGENT_AUDIT_MAX_BYTES` | Optional | Audit log size limit; defaults to 64 MiB |
-| `TRINO_ENABLE_SAFE_SELECT` | Optional | Exposes raw-SQL `run_safe_select`; disabled by default |
+| `TRINO_ENABLE_SAFE_SELECT` | Optional | Exposes separately trusted, row-returning `run_safe_select`; disabled by default and not covered by the source-literal-free guarantee |
 
 When unset, the generator server uses the current working directory. For shared
 or production-like use, always set a dedicated narrow workspace.
