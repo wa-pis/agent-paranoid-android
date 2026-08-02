@@ -66,7 +66,7 @@
 - [x] Enforce column, statement, deadline, and scan limits across nested table
   profiling with one shared monotonic budget; no helper may reset or restore
   consumed work.
-- [ ] Propagate remaining invocation time into query timeouts and cancel or
+- [x] Propagate remaining invocation time into query timeouts and cancel or
   close an active cursor/connection when the deadline expires.
 - [ ] Document environment names, defaults, units, per-query versus
   per-invocation scope, and failure behavior in configuration reference.
