@@ -47,7 +47,7 @@
   at the production writer boundary before stdout/transport framing is
   emitted, including the complete UTF-8 JSON-RPC envelope, request ID,
   framing, escaping, dictionaries, nested metadata, and error objects.
-- [ ] Bound JSON-RPC request IDs, including long, Unicode, and escaped IDs, so
+- [x] Bound JSON-RPC request IDs, including long, Unicode, and escaped IDs, so
   success and overflow responses cannot expand beyond the configured budget.
 - [ ] Reserve and test a fixed small error response that always fits the
   transport budget; reject configurations whose limit is below that minimum.

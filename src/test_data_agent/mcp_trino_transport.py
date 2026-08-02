@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from collections.abc import AsyncIterator, Callable, Sequence
 from contextlib import asynccontextmanager
@@ -19,6 +20,7 @@ from test_data_agent.trino_work_budget import QueryWorkBudget
 
 
 RawRequestContextFactory = Callable[[int], QueryWorkBudget]
+_MAX_JSONRPC_REQUEST_ID_BYTES = 256
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,6 +42,7 @@ class _RequestBudgetRegistry:
         root = session_message.message.root
         if not isinstance(root, types.JSONRPCRequest):
             return
+        _validate_jsonrpc_request_id(root.id)
         budget = getattr(session_message.metadata, "request_context", None)
         if not isinstance(budget, QueryWorkBudget):
             raise TypeError("MCP request context must be a QueryWorkBudget")
@@ -72,6 +75,18 @@ class _RequestBudgetRegistry:
         root = session_message.message.root
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
             self._budgets.pop(root.id, None)
+
+
+def _validate_jsonrpc_request_id(request_id: Any) -> None:
+    serialized = json.dumps(
+        request_id,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    if len(serialized) > _MAX_JSONRPC_REQUEST_ID_BYTES:
+        raise ValueError(
+            "JSON-RPC request ID exceeds the 256-byte serialized limit"
+        )
 
 
 async def _write_bounded_session_message(
