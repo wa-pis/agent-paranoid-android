@@ -13,6 +13,8 @@ All notable changes to this project are documented here.
 
 - Remove the row-returning diagnostic path instead of relying on heuristic
   masking to prevent unknown source literals from reaching MCP clients.
+- Create a concurrency-isolated work budget for every Trino MCP invocation and
+  reject canonical application arguments over 256 KiB before tool execution.
 
 ### Migration
 

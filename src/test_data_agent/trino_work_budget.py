@@ -2,8 +2,18 @@
 
 from __future__ import annotations
 
+import inspect
+import json
+from collections.abc import Callable
+from contextvars import ContextVar
 from dataclasses import dataclass
 from enum import StrEnum
+from functools import wraps
+from typing import Any, ParamSpec, TypeVar
+
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 class QueryWorkDimension(StrEnum):
@@ -60,6 +70,18 @@ class QueryWorkLimits:
         ):
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
+
+
+DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
+    raw_transport_payload_bytes=1024 * 1024,
+    canonical_argument_bytes=256 * 1024,
+    sql_formula_chars=100_000,
+    ast_nodes=10_000,
+    ast_depth=100,
+    projected_columns=1_000,
+    statements=2_048,
+    response_bytes=4 * 1024 * 1024,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -208,3 +230,52 @@ class QueryWorkBudget:
     ) -> None:
         if amount < 0:
             raise ValueError(f"{dimension.value} must be non-negative")
+
+
+_CURRENT_QUERY_WORK_BUDGET: ContextVar[QueryWorkBudget | None] = ContextVar(
+    "current_query_work_budget",
+    default=None,
+)
+
+
+def current_query_work_budget() -> QueryWorkBudget | None:
+    """Return the budget shared by the current invocation, when present."""
+    return _CURRENT_QUERY_WORK_BUDGET.get()
+
+
+def canonical_argument_size(
+    function: Callable[..., Any],
+    *args: Any,
+    **kwargs: Any,
+) -> int:
+    """Return the stable UTF-8 JSON size of validated application arguments."""
+    bound = inspect.signature(function).bind(*args, **kwargs)
+    bound.apply_defaults()
+    payload = json.dumps(
+        dict(bound.arguments),
+        ensure_ascii=False,
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return len(payload)
+
+
+def with_query_work_budget(
+    function: Callable[P, R],
+    limits: QueryWorkLimits,
+) -> Callable[P, R]:
+    """Create and isolate one work budget around an application invocation."""
+
+    @wraps(function)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        budget = QueryWorkBudget(limits)
+        token = _CURRENT_QUERY_WORK_BUDGET.set(budget)
+        try:
+            budget.consume_canonical_argument_bytes(
+                canonical_argument_size(function, *args, **kwargs)
+            )
+            return function(*args, **kwargs)
+        finally:
+            _CURRENT_QUERY_WORK_BUDGET.reset(token)
+
+    return wrapper
