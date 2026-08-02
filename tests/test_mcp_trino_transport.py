@@ -16,6 +16,10 @@ from test_data_agent.audit import (
     AUDIT_LOG_ENV,
     verify_audit_log,
 )
+from tests.trino_source_literals import (
+    SOURCE_ROWS,
+    assert_source_literals_absent,
+)
 
 
 DEFAULT_TRINO_TOOL_NAMES = (
@@ -65,11 +69,13 @@ class RecordingProfiler:
         failure_message: str | None = None,
         failure_type: type[Exception] = ValueError,
         nested: bool = False,
+        source_rows: tuple[dict[str, object], ...] = SOURCE_ROWS,
     ) -> None:
         self.calls: list[str] = []
         self.failure_message = failure_message
         self.failure_type = failure_type
         self.nested = nested
+        self.source_count = len(source_rows)
 
     def __getattr__(self, name: str) -> Any:
         def invoke(*args: Any, **kwargs: Any) -> Any:
@@ -96,7 +102,10 @@ class RecordingProfiler:
                 return {
                     "tool": name,
                     "summary": {
-                        "counts": {"checked": 1, "failed": 0},
+                        "counts": {
+                            "checked": self.source_count,
+                            "failed": 0,
+                        },
                         "columns": [
                             {
                                 "name": "synthetic_metric",
@@ -105,7 +114,10 @@ class RecordingProfiler:
                         ],
                     },
                 }
-            return {"tool": name, "counts": {"checked": 1, "failed": 0}}
+            return {
+                "tool": name,
+                "counts": {"checked": self.source_count, "failed": 0},
+            }
 
         return invoke
 
@@ -216,6 +228,7 @@ def test_transport_completes_default_tool_success_paths(
     assert tuple(outputs) == DEFAULT_TRINO_TOOL_NAMES
     assert profiler.calls == list(DEFAULT_TRINO_TOOL_NAMES)
     serialized = json.dumps(outputs, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     assert "transport-source-literal-condition" not in serialized
     assert "transport-source-literal-allowed" not in serialized
 
@@ -245,6 +258,7 @@ def test_transport_validation_errors_are_source_free(
     assert tuple(errors) == DEFAULT_TRINO_TOOL_NAMES
     assert profiler.calls == list(DEFAULT_TRINO_TOOL_NAMES)
     serialized = json.dumps(errors, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     assert "transport-source-literal-condition" not in serialized
     assert "transport-source-literal-allowed" not in serialized
 
@@ -277,6 +291,7 @@ def test_transport_database_errors_are_source_free(
     assert tuple(errors) == DEFAULT_TRINO_TOOL_NAMES
     assert profiler.calls == list(DEFAULT_TRINO_TOOL_NAMES)
     serialized = json.dumps(errors, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     assert "transport-source-literal-condition" not in serialized
     assert "transport-source-literal-allowed" not in serialized
 
@@ -301,6 +316,7 @@ def test_transport_nested_responses_round_trip_source_free(
     serialized = json.dumps(outputs, sort_keys=True)
 
     assert json.loads(serialized) == outputs
+    assert_source_literals_absent(json.loads(serialized))
     assert outputs["describe_table"][0]["metadata"] == {"nullable": True}
     for name, output in outputs.items():
         if name.startswith("profile_"):
@@ -347,6 +363,7 @@ def test_default_tool_audit_records_are_metadata_only(
         json.loads(line)
         for line in log_path.read_text(encoding="utf-8").splitlines()
     ]
+    assert_source_literals_absent(records)
     expected_events = [
         (name, status)
         for name in DEFAULT_TRINO_TOOL_NAMES

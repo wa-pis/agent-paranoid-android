@@ -34,6 +34,10 @@ from test_data_agent.mcp_trino_server import (
     validate_table_references_allowed,
     validate_safe_select,
 )
+from tests.trino_source_literals import (
+    SOURCE_ROWS,
+    assert_source_literals_absent,
+)
 
 
 DEFAULT_TOOL_ARGUMENTS: dict[str, dict[str, Any]] = {
@@ -119,11 +123,13 @@ class RecordingProfiler:
         failure_message: str | None = None,
         failure_type: type[Exception] = ValueError,
         nested: bool = False,
+        source_rows: tuple[dict[str, object], ...] = SOURCE_ROWS,
     ) -> None:
         self.calls: list[str] = []
         self.failure_message = failure_message
         self.failure_type = failure_type
         self.nested = nested
+        self.source_count = len(source_rows)
 
     def __getattr__(self, name: str) -> Any:
         def invoke(*args: Any, **kwargs: Any) -> Any:
@@ -150,7 +156,10 @@ class RecordingProfiler:
                 return {
                     "tool": name,
                     "summary": {
-                        "counts": {"checked": 1, "failed": 0},
+                        "counts": {
+                            "checked": self.source_count,
+                            "failed": 0,
+                        },
                         "columns": [
                             {
                                 "name": "synthetic_metric",
@@ -159,7 +168,10 @@ class RecordingProfiler:
                         ],
                     },
                 }
-            return {"tool": name, "counts": {"checked": 1, "failed": 0}}
+            return {
+                "tool": name,
+                "counts": {"checked": self.source_count, "failed": 0},
+            }
 
         return invoke
 
@@ -261,6 +273,7 @@ def test_default_tools_complete_direct_service_success_paths(
     assert tuple(outputs) == tuple(DEFAULT_TOOL_ARGUMENTS)
     assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
     serialized = json.dumps(outputs, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     for source_literal in (
         "source-literal-condition",
         "source-literal-kind",
@@ -288,6 +301,7 @@ def test_default_tools_direct_validation_errors_are_source_free(
     assert tuple(errors) == tuple(DEFAULT_TOOL_ARGUMENTS)
     assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
     serialized = json.dumps(errors, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     for source_literal in (
         "source-literal-condition",
         "source-literal-kind",
@@ -318,6 +332,7 @@ def test_default_tools_direct_database_errors_are_source_free(
     assert tuple(errors) == tuple(DEFAULT_TOOL_ARGUMENTS)
     assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
     serialized = json.dumps(errors, sort_keys=True)
+    assert_source_literals_absent(json.loads(serialized))
     for source_literal in (
         "source-literal-condition",
         "source-literal-kind",
@@ -340,6 +355,7 @@ def test_default_tools_direct_nested_responses_round_trip_source_free(
     serialized = json.dumps(outputs, sort_keys=True)
 
     assert json.loads(serialized) == outputs
+    assert_source_literals_absent(json.loads(serialized))
     assert outputs["describe_table"][0]["metadata"] == {"nullable": True}
     for name, output in outputs.items():
         if name.startswith("profile_"):

@@ -29,7 +29,7 @@
     - [x] Cover direct and transport nested serialization paths.
     - [x] Cover every default transport audit path with metadata-only success
       and failure records that omit arguments, results, and source literals.
-- [ ] Add source fixtures covering strings, integers, decimals, floats,
+- [x] Add source fixtures covering strings, integers, decimals, floats,
   booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
   like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
   cannot be confused with aggregate counts.
