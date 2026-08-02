@@ -82,6 +82,21 @@ later statement runs after exhaustion.
   recovery. Crash/power-loss durability remains an explicit documented
   decision, not an accidental guarantee.
 
+## Durability Disposition
+
+Artifact publication guarantees same-filesystem atomic visibility where a
+single file or new directory is replaced, plus in-process cleanup, rollback,
+and agent recovery for failures the process can handle. Multi-file updates are
+not one filesystem transaction. Artifact writers do not fsync file contents or
+parent-directory metadata, so crash, storage, and power-loss durability is not
+promised.
+
+Artifact fsync is deferred until after 1.0 and is not release-blocking for RC4
+or stable 1.0. The repository maintainer owns reconsideration before any public
+crash-durability promise, when deployment requirements demand it, after an
+artifact-loss incident, or when platform-specific implementation and
+crash-consistency tests are ready.
+
 ## Alternatives
 
 - Retain heuristic `sample_rows_masked` behind a new opt-in in RC4: rejected;

@@ -14,6 +14,8 @@ All notable changes to this project are documented here.
   dependencies, and isolate Trino-extra failures in a separate CI check.
 - Document the exact aggregate-only default Trino MCP surface and classify the
   separately enabled safe-select rows as potentially containing source values.
+- Define atomic visibility and process-interruption recovery separately from
+  crash durability, with artifact fsync explicitly deferred until after 1.0.
 
 ### Security
 

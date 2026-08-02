@@ -402,7 +402,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
    - [x] Clarify that default aggregate-only MCP is source-literal-free while
      `run_safe_select` is a separate explicit opt-in and is not source-free.
      Remove stale `sample_rows_masked` documentation.
-   - [ ] Record the disposition of crash-durability/fsync work; it is not an
+   - [x] Record the disposition of crash-durability/fsync work; it is not an
      ordinary stable-release blocker unless the product contract promises it.
 9. [ ] Apply only release-blocking fixes found during RC4 acceptance, repeat
    the exact release gates, and publish `1.0.0` from the verified release
@@ -567,7 +567,7 @@ Scope:
   `run_safe_select` capability. Remove stale `sample_rows_masked` references
   and do not describe row-returning output as source-free, PII-free,
   anonymous, or privacy-safe merely because heuristic masking was applied.
-- [ ] Document the durability boundary between atomic visibility, process
+- [x] Document the durability boundary between atomic visibility, process
   interruption recovery, and crash/power-loss durability. Decide explicitly
   whether fsync is a post-1.0 improvement or a release requirement.
 - [ ] Run the direct API adversarial suite, Trino integration checks, typing,
