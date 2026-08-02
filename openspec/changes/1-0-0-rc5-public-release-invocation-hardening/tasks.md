@@ -25,9 +25,12 @@
   passed all seven public install profiles and recorded the exact version,
   wheel hash, Python version, and profile in each job summary; its package job
   reverified the wheel, source-distribution, and SBOM hashes.
-- [ ] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
+- [x] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
   verify the CLI, generator-MCP, and Trino-MCP images in the separate
   container matrix.
+  Evidence: [Verify Published Release #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272)
+  passed all three added public wheel profiles and the three separate
+  published-image container jobs.
 - [ ] Re-run public documentation, container signature, package attestation,
   and upgrade-from-`0.12.0` checks from published artifacts only.
 

@@ -75,4 +75,5 @@ Every profile passed the exact `test-data-agent --version` assertion,
 recorded version `1.0.0rc4`, the profile name, and wheel SHA-256
 `f38ac6cadacec56229ffe25ae12170aaf388fad842ae8ed14d0675b24bd8fde4`.
 The package job also reverified the wheel, source-distribution, and SBOM
-digests listed above.
+digests listed above. Its separate container matrix passed the published CLI,
+generator-MCP, and Trino-MCP image jobs.
