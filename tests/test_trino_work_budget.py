@@ -7,6 +7,7 @@ from threading import Barrier
 import pytest
 
 from test_data_agent.trino_work_budget import (
+    MIN_TRANSPORT_RESPONSE_BYTES,
     QueryWorkBudget,
     QueryWorkBudgetExceeded,
     QueryWorkDimension,
@@ -28,7 +29,7 @@ def work_limits(**overrides: int) -> QueryWorkLimits:
         "projected_columns": 5,
         "statements": 4,
         "database_result_bytes": 60,
-        "transport_response_bytes": 50,
+        "transport_response_bytes": MIN_TRANSPORT_RESPONSE_BYTES,
     }
     values.update(overrides)
     return QueryWorkLimits(**values)
@@ -77,18 +78,26 @@ def test_database_result_budget_rejects_overspend_without_restoring_work() -> No
 
 
 def test_transport_response_budget_is_independent_from_database_result() -> None:
-    budget = QueryWorkBudget(work_limits(transport_response_bytes=10))
+    budget = QueryWorkBudget(work_limits())
     budget.consume_database_result_bytes(8)
-    budget.consume_transport_response_bytes(6)
+    budget.consume_transport_response_bytes(MIN_TRANSPORT_RESPONSE_BYTES - 4)
 
     with pytest.raises(QueryWorkBudgetExceeded) as error:
         budget.consume_transport_response_bytes(5)
 
     assert error.value.dimension is QueryWorkDimension.TRANSPORT_RESPONSE_BYTES
-    assert error.value.attempted == 11
-    assert error.value.limit == 10
+    assert error.value.attempted == MIN_TRANSPORT_RESPONSE_BYTES + 1
+    assert error.value.limit == MIN_TRANSPORT_RESPONSE_BYTES
     assert budget.snapshot().database_result_bytes == 8
-    assert budget.snapshot().transport_response_bytes == 6
+    assert (
+        budget.snapshot().transport_response_bytes
+        == MIN_TRANSPORT_RESPONSE_BYTES - 4
+    )
+
+
+def test_limits_reserve_transport_overflow_error() -> None:
+    with pytest.raises(ValueError, match="transport_response_bytes must be at least"):
+        work_limits(transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES - 1)
 
 
 def test_budget_rejects_excessive_depth_without_lowering_high_water_mark() -> None:

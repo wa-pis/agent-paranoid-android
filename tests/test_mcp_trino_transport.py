@@ -21,6 +21,7 @@ from test_data_agent.audit import (
 )
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
+    MIN_TRANSPORT_RESPONSE_BYTES,
     QueryWorkBudget,
     QueryWorkBudgetExceeded,
     canonical_argument_size,
@@ -264,13 +265,20 @@ def test_transport_response_budget_counts_final_jsonrpc_and_framing(
     assert budget.snapshot().transport_response_bytes == len(expected)
 
 
-def test_transport_response_overflow_fails_before_writer() -> None:
+def test_transport_response_overflow_writes_reserved_error() -> None:
     import anyio
     import mcp.types as types
 
     response = SimpleNamespace(
         message=types.JSONRPCMessage.model_validate_json(
-            '{"jsonrpc":"2.0","id":7,"result":{"value":"too-wide"}}'
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 7,
+                    "result": {"value": "source-value" * 100},
+                },
+                separators=(",", ":"),
+            )
         ),
         metadata=None,
     )
@@ -282,7 +290,7 @@ def test_transport_response_overflow_fails_before_writer() -> None:
     ) + 1
     limits = replace(
         DEFAULT_QUERY_WORK_LIMITS,
-        transport_response_bytes=response_size - 1,
+        transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES,
     )
     budget = QueryWorkBudget(limits)
     request = SimpleNamespace(
@@ -295,19 +303,82 @@ def test_transport_response_overflow_fails_before_writer() -> None:
     registry.register_incoming_request(request)
     stdout = RecordingStdout()
 
-    with pytest.raises(QueryWorkBudgetExceeded) as error:
-        anyio.run(
-            transport._write_bounded_session_message,
-            stdout,
-            response,
-            registry,
-        )
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
 
-    assert error.value.attempted == response_size
-    assert error.value.limit == response_size - 1
-    assert stdout.payloads == []
-    assert stdout.flush_count == 0
-    assert budget.snapshot().transport_response_bytes == 0
+    assert response_size > limits.transport_response_bytes
+    assert len(stdout.payloads) == 1
+    assert b"source-value" not in stdout.payloads[0]
+    error_message = types.JSONRPCMessage.model_validate_json(stdout.payloads[0])
+    assert isinstance(error_message.root, types.JSONRPCError)
+    assert error_message.root.id == 7
+    assert error_message.root.error.code == -32001
+    assert error_message.root.error.message == "response exceeds transport budget"
+    assert stdout.flush_count == 1
+    assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
+
+
+@pytest.mark.parametrize(
+    "request_id",
+    [
+        "a" * 254,
+        "é" * 127,
+        "\\" * 127,
+    ],
+    ids=("ascii", "unicode", "escaped"),
+)
+def test_reserved_transport_error_fits_maximum_request_id(request_id: str) -> None:
+    import anyio
+    import mcp.types as types
+
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES,
+    )
+    budget = QueryWorkBudget(limits)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {"jsonrpc": "2.0", "id": request_id, "method": "ping"},
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": request_id,
+                    "result": {"value": "x" * MIN_TRANSPORT_RESPONSE_BYTES},
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    assert len(stdout.payloads[0]) == MIN_TRANSPORT_RESPONSE_BYTES
+    error_message = types.JSONRPCMessage.model_validate_json(stdout.payloads[0])
+    assert isinstance(error_message.root, types.JSONRPCError)
+    assert error_message.root.id == request_id
 
 
 @pytest.mark.parametrize(
