@@ -12,7 +12,10 @@ from test_data_agent.trino_sql_policy import (
     quote_identifier,
     require_identifier,
 )
-from test_data_agent.trino_work_budget import consume_sql_formula_chars
+from test_data_agent.trino_work_budget import (
+    consume_ast_work,
+    consume_sql_formula_chars,
+)
 
 
 @dataclass(frozen=True)
@@ -367,6 +370,7 @@ def build_formula_sql(expression: str) -> FormulaSql:
         node = ast.parse(expression, mode="eval")
     except SyntaxError as exc:
         raise SqlSafetyError("formula expression is not valid arithmetic") from exc
+    consume_ast_work(node, child_nodes=ast.iter_child_nodes)
     columns: set[str] = set()
     extra_conditions: list[str] = []
     sql = formula_node_to_sql(node.body, columns, extra_conditions)

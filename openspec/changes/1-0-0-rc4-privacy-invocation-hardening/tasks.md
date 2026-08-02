@@ -52,7 +52,7 @@
     at their resource-consuming boundaries.
     - [x] Enforce cumulative SQL/formula character work before Python/sqlglot
       parsing and before opening a Trino connection.
-    - [ ] Enforce AST node and depth work before query execution.
+    - [x] Enforce AST node and depth work before query execution.
     - [ ] Enforce projected-column work before query execution.
     - [ ] Enforce statement work before opening a connection or cursor.
     - [ ] Consume response bytes incrementally before retaining complete

@@ -78,6 +78,35 @@ def test_sql_budget_fails_before_sqlglot_parsing(
     assert parsed == []
 
 
+@pytest.mark.parametrize(
+    ("limit_name", "error_match"),
+    [
+        ("ast_nodes", "AST nodes"),
+        ("ast_depth", "AST depth"),
+    ],
+)
+def test_sql_ast_budget_fails_before_policy_walks(
+    monkeypatch: pytest.MonkeyPatch,
+    limit_name: str,
+    error_match: str,
+) -> None:
+    validated: list[object] = []
+    monkeypatch.setattr(
+        "test_data_agent.trino_sql_policy.validate_safe_select_shape",
+        validated.append,
+    )
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, **{limit_name: 1})
+    wrapped = with_query_work_budget(
+        lambda sql: validate_safe_select(sql, config=policy_config()),
+        limits,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match=error_match):
+        wrapped("SELECT synthetic_id FROM analytics.safe.records LIMIT 1")
+
+    assert validated == []
+
+
 def test_direct_allowlist_policy_fails_closed() -> None:
     config = policy_config()
 

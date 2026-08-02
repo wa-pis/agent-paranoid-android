@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from contextvars import ContextVar
 from dataclasses import dataclass
 from enum import StrEnum
@@ -248,6 +248,24 @@ def consume_sql_formula_chars(value: str) -> None:
     budget = current_query_work_budget()
     if budget is not None:
         budget.consume_sql_formula_chars(len(value))
+
+
+def consume_ast_work(
+    root: Any,
+    *,
+    child_nodes: Callable[[Any], Iterable[Any]],
+) -> None:
+    """Charge one parsed tree iteratively before downstream work can use it."""
+    budget = current_query_work_budget()
+    if budget is None:
+        return
+
+    pending = [(root, 1)]
+    while pending:
+        node, depth = pending.pop()
+        budget.consume_ast_nodes(1)
+        budget.observe_ast_depth(depth)
+        pending.extend((child, depth + 1) for child in child_nodes(node))
 
 
 def canonical_argument_size(

@@ -19,6 +19,8 @@ All notable changes to this project are documented here.
   parsing, without retaining the complete oversized frame in memory.
 - Bound cumulative SQL and formula character work before Python/sqlglot
   parsing and before opening a Trino connection.
+- Bound cumulative Python and sqlglot AST nodes and maximum depth before
+  formula rendering, policy traversal, or Trino query execution.
 
 ### Migration
 
