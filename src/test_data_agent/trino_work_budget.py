@@ -9,6 +9,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass
 from enum import StrEnum
 from functools import wraps
+from time import monotonic
 from typing import Any, ParamSpec, TypeVar
 
 
@@ -25,6 +26,9 @@ class QueryWorkDimension(StrEnum):
     AST_DEPTH = "AST depth"
     PROJECTED_COLUMNS = "projected columns"
     STATEMENTS = "statements"
+    PROFILED_COLUMNS = "profiled columns"
+    INVOCATION_SECONDS = "invocation seconds"
+    CUMULATIVE_ESTIMATED_SCAN_BYTES = "cumulative estimated scan bytes"
     DATABASE_RESULT_BYTES = "database result bytes"
     TRANSPORT_RESPONSE_BYTES = "transport response bytes"
 
@@ -36,8 +40,8 @@ class QueryWorkBudgetExceeded(ValueError):
         self,
         *,
         dimension: QueryWorkDimension,
-        attempted: int,
-        limit: int,
+        attempted: int | float,
+        limit: int | float,
     ) -> None:
         self.dimension = dimension
         self.attempted = attempted
@@ -59,6 +63,9 @@ class QueryWorkLimits:
     statements: int
     database_result_bytes: int
     transport_response_bytes: int
+    max_profiled_columns: int = 100
+    max_invocation_seconds: float = 120.0
+    max_cumulative_estimated_scan_bytes: int | None = None
 
     def __post_init__(self) -> None:
         for name, value in (
@@ -69,11 +76,20 @@ class QueryWorkLimits:
             ("ast_depth", self.ast_depth),
             ("projected_columns", self.projected_columns),
             ("statements", self.statements),
+            ("max_profiled_columns", self.max_profiled_columns),
+            ("max_invocation_seconds", self.max_invocation_seconds),
             ("database_result_bytes", self.database_result_bytes),
             ("transport_response_bytes", self.transport_response_bytes),
         ):
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
+        if (
+            self.max_cumulative_estimated_scan_bytes is not None
+            and self.max_cumulative_estimated_scan_bytes <= 0
+        ):
+            raise ValueError(
+                "max_cumulative_estimated_scan_bytes must be positive when set"
+            )
         if self.transport_response_bytes < MIN_TRANSPORT_RESPONSE_BYTES:
             raise ValueError(
                 "transport_response_bytes must be at least "
@@ -89,6 +105,9 @@ DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
     ast_depth=100,
     projected_columns=1_000,
     statements=2_048,
+    max_profiled_columns=100,
+    max_invocation_seconds=120.0,
+    max_cumulative_estimated_scan_bytes=None,
     database_result_bytes=4 * 1024 * 1024,
     transport_response_bytes=4 * 1024 * 1024,
 )
@@ -105,6 +124,8 @@ class QueryWorkSnapshot:
     statements: int
     database_result_bytes: int
     transport_response_bytes: int
+    profiled_columns: int = 0
+    cumulative_estimated_scan_bytes: int = 0
 
 
 class QueryWorkBudget:
@@ -114,17 +135,28 @@ class QueryWorkBudget:
         "_ast_depth",
         "_ast_nodes",
         "_canonical_argument_bytes",
+        "_cumulative_estimated_scan_bytes",
         "_database_result_bytes",
         "_limits",
+        "_monotonic_clock",
+        "_profiled_columns",
         "_projected_columns",
         "_raw_transport_payload_bytes",
         "_sql_formula_chars",
+        "_started_at",
         "_statements",
         "_transport_response_bytes",
     )
 
-    def __init__(self, limits: QueryWorkLimits) -> None:
+    def __init__(
+        self,
+        limits: QueryWorkLimits,
+        *,
+        monotonic_clock: Callable[[], float] = monotonic,
+    ) -> None:
         self._limits = limits
+        self._monotonic_clock = monotonic_clock
+        self._started_at = monotonic_clock()
         self._raw_transport_payload_bytes = 0
         self._canonical_argument_bytes = 0
         self._sql_formula_chars = 0
@@ -132,6 +164,8 @@ class QueryWorkBudget:
         self._ast_depth = 0
         self._projected_columns = 0
         self._statements = 0
+        self._profiled_columns = 0
+        self._cumulative_estimated_scan_bytes = 0
         self._database_result_bytes = 0
         self._transport_response_bytes = 0
 
@@ -148,6 +182,8 @@ class QueryWorkBudget:
             ast_depth=self._ast_depth,
             projected_columns=self._projected_columns,
             statements=self._statements,
+            profiled_columns=self._profiled_columns,
+            cumulative_estimated_scan_bytes=self._cumulative_estimated_scan_bytes,
             database_result_bytes=self._database_result_bytes,
             transport_response_bytes=self._transport_response_bytes,
         )
@@ -210,6 +246,39 @@ class QueryWorkBudget:
             limit=self._limits.statements,
         )
 
+    def consume_profiled_columns(self, amount: int = 1) -> None:
+        self._profiled_columns = self._consume(
+            QueryWorkDimension.PROFILED_COLUMNS,
+            current=self._profiled_columns,
+            amount=amount,
+            limit=self._limits.max_profiled_columns,
+        )
+
+    def consume_cumulative_estimated_scan_bytes(self, amount: int) -> None:
+        self._cumulative_estimated_scan_bytes = self._consume_optional(
+            QueryWorkDimension.CUMULATIVE_ESTIMATED_SCAN_BYTES,
+            current=self._cumulative_estimated_scan_bytes,
+            amount=amount,
+            limit=self._limits.max_cumulative_estimated_scan_bytes,
+        )
+
+    def elapsed_invocation_seconds(self) -> float:
+        return max(0.0, self._monotonic_clock() - self._started_at)
+
+    def remaining_invocation_seconds(self) -> float:
+        elapsed = self.elapsed_invocation_seconds()
+        remaining = self._limits.max_invocation_seconds - elapsed
+        if remaining <= 0:
+            raise QueryWorkBudgetExceeded(
+                dimension=QueryWorkDimension.INVOCATION_SECONDS,
+                attempted=elapsed,
+                limit=self._limits.max_invocation_seconds,
+            )
+        return remaining
+
+    def check_invocation_deadline(self) -> None:
+        self.remaining_invocation_seconds()
+
     def consume_database_result_bytes(self, amount: int) -> None:
         self._database_result_bytes = self._consume(
             QueryWorkDimension.DATABASE_RESULT_BYTES,
@@ -238,6 +307,25 @@ class QueryWorkBudget:
         cls._validate_non_negative(dimension, amount)
         attempted = current + amount
         if attempted > limit:
+            raise QueryWorkBudgetExceeded(
+                dimension=dimension,
+                attempted=attempted,
+                limit=limit,
+            )
+        return attempted
+
+    @classmethod
+    def _consume_optional(
+        cls,
+        dimension: QueryWorkDimension,
+        *,
+        current: int,
+        amount: int,
+        limit: int | None,
+    ) -> int:
+        cls._validate_non_negative(dimension, amount)
+        attempted = current + amount
+        if limit is not None and attempted > limit:
             raise QueryWorkBudgetExceeded(
                 dimension=dimension,
                 attempted=attempted,

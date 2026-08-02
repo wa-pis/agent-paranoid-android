@@ -3,6 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import FrozenInstanceError
 from threading import Barrier
+from typing import Any
 
 import pytest
 
@@ -19,8 +20,8 @@ from test_data_agent.trino_work_budget import (
 )
 
 
-def work_limits(**overrides: int) -> QueryWorkLimits:
-    values = {
+def work_limits(**overrides: Any) -> QueryWorkLimits:
+    values: dict[str, Any] = {
         "raw_transport_payload_bytes": 100,
         "canonical_argument_bytes": 90,
         "sql_formula_chars": 80,
@@ -28,6 +29,9 @@ def work_limits(**overrides: int) -> QueryWorkLimits:
         "ast_depth": 6,
         "projected_columns": 5,
         "statements": 4,
+        "max_profiled_columns": 5,
+        "max_invocation_seconds": 10.0,
+        "max_cumulative_estimated_scan_bytes": 1_000,
         "database_result_bytes": 60,
         "transport_response_bytes": MIN_TRANSPORT_RESPONSE_BYTES,
     }
@@ -46,6 +50,8 @@ def test_budget_tracks_every_dimension_monotonically() -> None:
     budget.observe_ast_depth(2)
     budget.consume_projected_columns(2)
     budget.consume_statements()
+    budget.consume_profiled_columns(3)
+    budget.consume_cumulative_estimated_scan_bytes(900)
     budget.consume_database_result_bytes(50)
     budget.consume_transport_response_bytes(40)
 
@@ -57,6 +63,8 @@ def test_budget_tracks_every_dimension_monotonically() -> None:
         ast_depth=3,
         projected_columns=2,
         statements=1,
+        profiled_columns=3,
+        cumulative_estimated_scan_bytes=900,
         database_result_bytes=50,
         transport_response_bytes=40,
     )
@@ -95,6 +103,63 @@ def test_transport_response_budget_is_independent_from_database_result() -> None
     )
 
 
+def test_cumulative_limits_reject_overspend_without_restoring_work() -> None:
+    budget = QueryWorkBudget(
+        work_limits(
+            max_profiled_columns=2,
+            max_cumulative_estimated_scan_bytes=10,
+        )
+    )
+    budget.consume_profiled_columns()
+    budget.consume_cumulative_estimated_scan_bytes(8)
+
+    with pytest.raises(QueryWorkBudgetExceeded) as columns_error:
+        budget.consume_profiled_columns(2)
+    with pytest.raises(QueryWorkBudgetExceeded) as scan_error:
+        budget.consume_cumulative_estimated_scan_bytes(3)
+
+    assert columns_error.value.dimension is QueryWorkDimension.PROFILED_COLUMNS
+    assert columns_error.value.attempted == 3
+    assert columns_error.value.limit == 2
+    assert scan_error.value.dimension is (
+        QueryWorkDimension.CUMULATIVE_ESTIMATED_SCAN_BYTES
+    )
+    assert scan_error.value.attempted == 11
+    assert scan_error.value.limit == 10
+    assert budget.snapshot().profiled_columns == 1
+    assert budget.snapshot().cumulative_estimated_scan_bytes == 8
+
+
+def test_optional_scan_limit_tracks_without_enforcing_a_cap() -> None:
+    budget = QueryWorkBudget(
+        work_limits(max_cumulative_estimated_scan_bytes=None)
+    )
+
+    budget.consume_cumulative_estimated_scan_bytes(10_000)
+
+    assert budget.snapshot().cumulative_estimated_scan_bytes == 10_000
+
+
+def test_invocation_deadline_uses_injected_monotonic_clock() -> None:
+    now = 10.0
+    budget = QueryWorkBudget(
+        work_limits(max_invocation_seconds=5.0),
+        monotonic_clock=lambda: now,
+    )
+
+    now = 14.5
+    assert budget.elapsed_invocation_seconds() == 4.5
+    assert budget.remaining_invocation_seconds() == 0.5
+
+    now = 15.0
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        budget.check_invocation_deadline()
+
+    assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
+    assert error.value.attempted == 5.0
+    assert error.value.limit == 5.0
+
+
 def test_limits_reserve_transport_overflow_error() -> None:
     with pytest.raises(ValueError, match="transport_response_bytes must be at least"):
         work_limits(transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES - 1)
@@ -120,6 +185,8 @@ def test_budget_rejects_excessive_depth_without_lowering_high_water_mark() -> No
         "ast_depth",
         "projected_columns",
         "statements",
+        "max_profiled_columns",
+        "max_invocation_seconds",
         "database_result_bytes",
         "transport_response_bytes",
     ],
@@ -127,6 +194,25 @@ def test_budget_rejects_excessive_depth_without_lowering_high_water_mark() -> No
 def test_limits_require_positive_values(field: str) -> None:
     with pytest.raises(ValueError, match=f"{field} must be positive"):
         work_limits(**{field: 0})
+
+
+def test_optional_scan_limit_must_be_positive_when_set() -> None:
+    with pytest.raises(
+        ValueError,
+        match="max_cumulative_estimated_scan_bytes must be positive when set",
+    ):
+        work_limits(max_cumulative_estimated_scan_bytes=0)
+
+
+def test_cumulative_fields_preserve_existing_typed_constructors() -> None:
+    limits = QueryWorkLimits(100, 90, 80, 70, 6, 5, 4, 60, 350)
+    snapshot = QueryWorkSnapshot(10, 20, 30, 40, 3, 2, 1, 50, 40)
+
+    assert limits.max_profiled_columns == 100
+    assert limits.max_invocation_seconds == 120.0
+    assert limits.max_cumulative_estimated_scan_bytes is None
+    assert snapshot.profiled_columns == 0
+    assert snapshot.cumulative_estimated_scan_bytes == 0
 
 
 def test_limits_and_snapshots_are_immutable() -> None:

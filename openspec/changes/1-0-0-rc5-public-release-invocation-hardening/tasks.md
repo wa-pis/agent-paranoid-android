@@ -56,7 +56,7 @@
 
 ## P2 — Cumulative invocation limits
 
-- [ ] Add `max_profiled_columns`, `max_invocation_seconds`, and optional
+- [x] Add `max_profiled_columns`, `max_invocation_seconds`, and optional
   `max_cumulative_estimated_scan_bytes` to the typed configuration and budget.
 - [ ] Start with defaults of 100 profiled columns, 150 statements, and 120
   seconds; either retain them with benchmark evidence or document justified

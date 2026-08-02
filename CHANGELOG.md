@@ -12,6 +12,8 @@ All notable changes to this project are documented here.
   reject transport-response limits too small to reserve that error.
 - Cover wide-row database overflow and final JSON-RPC growth from nested
   metadata and escaping with explicit response-budget regression tests.
+- Add typed cumulative profiled-column, invocation-deadline, and optional
+  estimated-scan limits to the shared Trino invocation budget.
 
 ## [1.0.0rc4] - 2026-08-02
 
