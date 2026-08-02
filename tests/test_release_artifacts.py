@@ -390,7 +390,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v1.0.0rc3")
+    check_release_tag("v1.0.0rc4")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")

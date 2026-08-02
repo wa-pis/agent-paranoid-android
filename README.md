@@ -15,7 +15,7 @@ Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
-Current version: `1.0.0rc3`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
+Current version: `1.0.0rc4`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## What It Preserves
 

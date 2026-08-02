@@ -207,10 +207,10 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The merged release baseline is `1.0.0rc3`. `1.0.0rc2` completed public
-acceptance; `1.0.0rc3` includes the contract-preserving application-boundary
-refactor. The next candidate is explicitly `1.0.0rc4`, which closes the
-remaining privacy and invocation-budget findings before stable publication.
+The package release candidate is `1.0.0rc4`. `1.0.0rc2` completed public
+acceptance; `1.0.0rc3` added the contract-preserving application-boundary
+refactor. `1.0.0rc4` closes the remaining privacy and invocation-budget
+findings before stable publication.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
