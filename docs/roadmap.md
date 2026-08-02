@@ -628,6 +628,23 @@ Scope:
   default aggregate-only Trino profiling responses from explicit opt-in
   row-returning capabilities. Remove server-wide claims that imply every MCP
   response is source-free.
+- [ ] Add the [RC5 agent throughput and advisor budget
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md):
+  make local profile caching `auto` by default with an explicit `--no-cache`
+  escape hatch, avoid the current two-pass CSV-folder profile where practical,
+  and enforce a local profile deadline plus bounded relationship/rule samples.
+- [ ] Add bounded advisor presets and evidence: model, reasoning effort,
+  prompt/input budget, output budget, timeout, and retry count must be typed,
+  configurable, and visible in non-sensitive run metadata. Select
+  fast/normal/quality defaults only after measuring proposal validity, latency,
+  tokens, and cost on representative synthetic profiles.
+- [ ] Ensure advisor byte/token accounting covers the complete provider request,
+  not only the serialized `AdvisorRequest`; compact or partition oversized
+  metadata rather than sending an unbounded multi-megabyte prompt.
+- [ ] Wire the provider-neutral relationship-candidate ranking contract to the
+  optional advisor integration as a separate, review-gated operation. The model
+  may rank deterministic candidates and explain bounded evidence, but may not
+  invent fields, receive source rows, or modify `DatasetSpec` directly.
 - [ ] Repeat direct-service, transport, integration, package, documentation,
   security, and public-artifact gates against the exact RC5 commit.
 
@@ -640,6 +657,13 @@ Exit criteria:
   separately in tests and diagnostics.
 - A wide-table profile fails closed on cumulative columns, statements, or
   invocation time before unbounded work continues.
+- Repeated local planning reuses a metadata-only profile cache, forced refresh
+  works, and a profile fails closed on its deadline or sample budget.
+- Advisor fast/normal/quality behavior is benchmark-backed, the full provider
+  request and response are bounded, and latency/retry/token metadata contains
+  no source values or secrets.
+- Relationship ranking is candidate-only, deterministic-candidate-bound, and
+  still requires explicit human review before any spec or generation change.
 - Configuration reference, OpenSpec, MCP examples, README, and release
   evidence use the same default-vs-opt-in terminology.
 - Stable promotion is allowed only from the accepted RC5 source tree plus a

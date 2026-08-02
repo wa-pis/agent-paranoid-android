@@ -2,7 +2,7 @@
 
 ## Approach
 
-Implement RC5 in four bounded stages:
+Implement RC5 in six bounded stages:
 
 1. Complete public-artifact acceptance. Resolve the RC4 PyPI/public-index
    state, verify wheel and sdist filenames, hashes, version metadata, and
@@ -25,6 +25,15 @@ Implement RC5 in four bounded stages:
    distinguish default aggregate-only responses from explicit opt-in
    row-returning responses. Stable promotion reuses the accepted RC5 source
    tree and permits only release metadata changes.
+5. Bound local planning throughput. Change agent folder profiling to an
+   `auto` metadata-cache policy with an explicit refresh path, retain a bounded
+   row-level sample while streaming schema statistics where practical, and
+   enforce a monotonic local profile deadline plus sample/size limits.
+6. Bound and measure optional AI advice. Introduce typed fast/normal/quality
+   advisor settings for model, reasoning effort, complete prompt/input budget,
+   output tokens, timeout, and retries. Record only non-sensitive run metadata.
+   Add a separate candidate-ranking adapter for relationship discovery; it
+   receives deterministic candidate evidence only and remains review-gated.
 
 ## Data And Contracts
 
@@ -36,6 +45,14 @@ Implement RC5 in four bounded stages:
   accounting before output.
 - `src/test_data_agent/trino_profiling.py`: cumulative column and statement
   consumption across table and nested column profiling.
+- `src/test_data_agent/profiling/`: one-pass/local-deadline profile path and
+  metadata-only cache policy for repeated agent planning.
+- `src/test_data_agent/providers/openai.py` and advisor configuration:
+  benchmarked presets, complete request accounting, timeout/retry behavior, and
+  non-sensitive latency/usage metadata.
+- `src/test_data_agent/relationship_discovery.py`: provider adapter boundary for
+  candidate ranking without candidate invention, source rows, or direct spec
+  mutation.
 - `src/test_data_agent/trino_config.py` and `docs/reference/configuration.md`:
   application-level environment names, defaults, units, and failure behavior.
 - `README.md`, `docs/getting-started/installation.md`, `docs/mcp_examples.md`,
@@ -71,6 +88,13 @@ preflight estimate followed by final serialization verification.
 - Documentation or configuration that claims all MCP responses are source-free
   fails the documentation gate; only default aggregate-only surfaces receive
   that guarantee.
+- A local profile that reaches its deadline or sample budget fails closed and
+  leaves no partial profile cache trusted.
+- An advisor request that exceeds its complete prompt budget, timeout, or retry
+  policy fails with a bounded provider error and no prompt/source data in
+  diagnostics.
+- A relationship-ranking response that changes candidate identity or bypasses
+  review is rejected before it can affect a `DatasetSpec`.
 
 ## Alternatives
 
@@ -83,3 +107,8 @@ preflight estimate followed by final serialization verification.
 - Treat the existing RC4 tag as sufficient publication evidence: rejected
   because a tag is not a public PyPI install or an external-artifact smoke
   test.
+- Keep agent folder cache opt-in while the library cache is opt-out: rejected
+  because repeated review-first planning needlessly repeats safe metadata work.
+- Let a byte cap on `AdvisorRequest` stand in for a complete provider budget:
+  rejected because instructions, wrappers, schemas, and tokenization add
+  unaccounted work.

@@ -60,11 +60,46 @@
 - [ ] Add a documentation test that rejects stale `sample_rows_masked` names
   and broad source-free/privacy-safe claims around `run_safe_select`.
 
+## P1 — Agent throughput and local profiling
+
+- [ ] Change review-first folder planning to `cache_mode=auto` by default and
+  replace the opt-in `--use-cache` UX with an explicit `--no-cache` refresh
+  escape hatch. Preserve metadata-only cache contents and source fingerprint
+  invalidation tests.
+- [ ] Remove the avoidable two-pass CSV-folder profile where practical by
+  retaining a bounded relationship/rule sample during schema streaming.
+- [ ] Add typed local profiling budgets for deadline, sample rows, and any
+  applicable input byte/cell work; fail closed before publishing partial cache
+  metadata and document the defaults.
+
+## P1 — Advisor performance and relationship assistance
+
+- [ ] Add typed advisor settings for model, reasoning effort, complete prompt
+  bytes/tokens, output tokens, timeout, retries, and optional service tier.
+  Keep provider credentials and prompts out of persisted diagnostics.
+- [ ] Add fast/normal/quality presets and benchmark them on representative
+  synthetic profiles for proposal validity, safety-preservation rate, latency,
+  input/output tokens, retries, and cost before selecting defaults.
+- [ ] Make the complete provider request budget include trusted instructions,
+  structured-output/schema overhead, and serialization—not only
+  `AdvisorRequest.model_dump_json()`.
+- [ ] Record bounded non-sensitive advisor run metadata: model, settings,
+  request/response sizes, latency, status, retry count, and provider usage.
+- [ ] Implement the optional relationship-candidate ranking adapter using the
+  existing provider-neutral contract; keep deterministic candidate identity,
+  no source rows/raw values, human review, and no direct DatasetSpec mutation.
+- [ ] Add tests for cache reuse/refresh, local deadline/sample exhaustion,
+  complete advisor budget rejection before network, bounded timeout/retry,
+  redacted metrics, and candidate-identity tampering.
+
 ## Release gates
 
 - [ ] Run `python3 -m ruff check src tests scripts`.
 - [ ] Run `python3 -m compileall -q src tests scripts`.
 - [ ] Run `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
 - [ ] Run `scripts/check_release.sh` and `mkdocs build --strict`.
+- [ ] Run the representative throughput benchmark and attach its results to
+  the RC5 release evidence; no performance default is accepted without the
+  corresponding latency/safety/quality measurements.
 - [ ] Confirm the public artifact evidence is attached to the exact RC5 tag
   and that stable promotion has only the allowed release-metadata diff.
