@@ -24,6 +24,7 @@ from test_data_agent.trino_query_builders import (
     require_non_negative_float,
 )
 from test_data_agent.trino_sql_policy import check_allowlist
+from test_data_agent.trino_work_budget import consume_profiled_column_work
 
 MIN_RULE_CONFIDENCE = 0.9
 
@@ -114,18 +115,20 @@ class TrinoProfiler:
         self._check_allowlist(catalog=catalog, schema=schema)
         bounded_top_values = min(max(1, max_top_values), 50)
         table_profile = self.profile_table(catalog, schema, table)
-        columns = [
-            column_profiler(
-                catalog,
-                schema,
-                table,
-                column["column_name"],
-                column.get("data_type", "varchar"),
-                str(column.get("is_nullable", "")).upper() == "YES",
-                bounded_top_values,
+        columns: list[dict[str, Any]] = []
+        for column in self.describe_table(catalog, schema, table):
+            consume_profiled_column_work()
+            columns.append(
+                column_profiler(
+                    catalog,
+                    schema,
+                    table,
+                    column["column_name"],
+                    column.get("data_type", "varchar"),
+                    str(column.get("is_nullable", "")).upper() == "YES",
+                    bounded_top_values,
+                )
             )
-            for column in self.describe_table(catalog, schema, table)
-        ]
         return {
             "source_type": "trino",
             "table": table,

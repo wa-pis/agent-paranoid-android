@@ -12,9 +12,11 @@ from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_masking import TrinoMasker
 from test_data_agent.trino_profiling import TrinoProfiler
 from test_data_agent.trino_query_builders import TrinoQuery
+from test_data_agent.trino_sql_policy import consume_query_execution_work
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
+    with_query_work_budget,
 )
 
 
@@ -78,8 +80,7 @@ def run_invocation_default_benchmark() -> InvocationDefaultMetrics:
     columns = _representative_columns()
 
     def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
-        budget.check_invocation_deadline()
-        budget.consume_statements()
+        consume_query_execution_work(query.sql)
         sql = query.sql
         if "information_schema.columns" in sql:
             return columns
@@ -122,8 +123,6 @@ def run_invocation_default_benchmark() -> InvocationDefaultMetrics:
         nullable: bool,
         max_top_values: int,
     ) -> dict[str, Any]:
-        budget.check_invocation_deadline()
-        budget.consume_profiled_columns()
         return masker.profile_column_safe(
             catalog,
             schema,
@@ -134,14 +133,21 @@ def run_invocation_default_benchmark() -> InvocationDefaultMetrics:
             max_top_values,
         )
 
+    def profile_table() -> dict[str, Any]:
+        return profiler.profile_table_safe(
+            "synthetic",
+            "benchmark",
+            "representative",
+            max_top_values=20,
+            column_profiler=profile_column,
+        )
+
     started = time.perf_counter()
-    profile = profiler.profile_table_safe(
-        "synthetic",
-        "benchmark",
-        "representative",
-        max_top_values=20,
-        column_profiler=profile_column,
-    )
+    profile = with_query_work_budget(
+        profile_table,
+        budget.limits,
+        budget_provider=lambda: budget,
+    )()
     elapsed = time.perf_counter() - started
     snapshot = budget.snapshot()
     if len(profile["columns"]) != REPRESENTATIVE_COLUMNS:

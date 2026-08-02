@@ -15,7 +15,9 @@ from test_data_agent.trino_client import (
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
     QueryWorkBudgetExceeded,
+    QueryWorkDimension,
     with_query_work_budget,
 )
 
@@ -202,6 +204,34 @@ def test_client_rejects_statement_budget_before_opening_connection() -> None:
     with pytest.raises(QueryWorkBudgetExceeded, match="statements"):
         execute("SELECT first_value; SELECT second_value")
 
+    assert driver.dbapi.connect_kwargs is None
+    assert cursor.executed == []
+
+
+def test_client_rejects_cumulative_scan_estimate_before_opening_connection() -> None:
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+    config = client_config()
+    estimated_scan_bytes = 128 * 1024**2
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        max_cumulative_estimated_scan_bytes=estimated_scan_bytes - 1,
+    )
+    budget = QueryWorkBudget(limits)
+    execute = with_query_work_budget(
+        TrinoClient(config=config, driver=driver).execute_query,
+        limits,
+        budget_provider=lambda: budget,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        execute("SELECT bounded")
+
+    assert error.value.dimension is (
+        QueryWorkDimension.CUMULATIVE_ESTIMATED_SCAN_BYTES
+    )
+    assert budget.snapshot().statements == 1
+    assert budget.snapshot().cumulative_estimated_scan_bytes == 0
     assert driver.dbapi.connect_kwargs is None
     assert cursor.executed == []
 
