@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
   reflected in Trino MCP success or error responses.
 - Replace oversized Trino MCP responses with a fixed bounded JSON-RPC error and
   reject transport-response limits too small to reserve that error.
+- Cover wide-row database overflow and final JSON-RPC growth from nested
+  metadata and escaping with explicit response-budget regression tests.
 
 ## [1.0.0rc4] - 2026-08-02
 

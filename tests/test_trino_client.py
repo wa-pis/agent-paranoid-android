@@ -259,6 +259,45 @@ def test_fetch_dicts_accounts_for_row_conversion_before_retaining_result() -> No
     assert driver.dbapi.connection.closed is True
 
 
+def test_fetch_dicts_rejects_wide_row_at_database_result_boundary() -> None:
+    description = [(f"column_{index:03d}",) for index in range(64)]
+    row = tuple(f"synthetic_{index:03d}" for index in range(64))
+    converted_row = {
+        column[0]: value for column, value in zip(description, row, strict=True)
+    }
+
+    def payload_size(value: Any) -> int:
+        return len(
+            json.dumps(
+                value,
+                default=str,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+
+    description_size = payload_size(description)
+    converted_row_size = payload_size(converted_row)
+    cursor = FakeCursor([row, tuple("must-not-be-fetched" for _ in row)])
+    cursor.description = description
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        database_result_bytes=description_size + converted_row_size - 1,
+    )
+    fetch = with_query_work_budget(client.fetch_dicts, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        fetch("SELECT synthetic_payload FROM safe_table")
+
+    assert error.value.attempted == description_size + converted_row_size
+    assert error.value.limit == description_size + converted_row_size - 1
+    assert cursor.fetch_sizes == [1]
+    assert cursor.closed is True
+    assert driver.dbapi.connection.closed is True
+
+
 def test_server_keeps_client_compatibility_exports() -> None:
     assert mcp_trino_server.TrinoClient is TrinoClient
     assert mcp_trino_server.TrinoResultLimitError is TrinoResultLimitError

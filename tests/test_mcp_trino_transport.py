@@ -265,6 +265,72 @@ def test_transport_response_budget_counts_final_jsonrpc_and_framing(
     assert budget.snapshot().transport_response_bytes == len(expected)
 
 
+def test_transport_budget_counts_nested_metadata_and_escaping_expansion() -> None:
+    import anyio
+    import mcp.types as types
+
+    escaped_value = 'line\n"quoted"\\path\tunicodé' * 16
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": "nested-metadata",
+                    "result": {
+                        "metadata": {
+                            "columns": [
+                                {
+                                    "name": "synthetic_note",
+                                    "labels": [escaped_value],
+                                }
+                            ]
+                        }
+                    },
+                },
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=None,
+    )
+    expected = response.message.model_dump_json(
+        by_alias=True,
+        exclude_none=True,
+    ).encode("utf-8") + b"\n"
+    assert len(expected) >= MIN_TRANSPORT_RESPONSE_BYTES
+    assert len(json.dumps(escaped_value).encode("utf-8")) > len(
+        escaped_value.encode("utf-8")
+    )
+
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=len(expected),
+    )
+    budget = QueryWorkBudget(limits)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":"nested-metadata","method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    assert stdout.payloads == [expected]
+    assert b'\\"quoted\\"' in expected
+    assert b"\\n" in expected
+    assert b"\\\\path" in expected
+    assert budget.snapshot().transport_response_bytes == len(expected)
+
+
 def test_transport_response_overflow_writes_reserved_error() -> None:
     import anyio
     import mcp.types as types
@@ -319,6 +385,65 @@ def test_transport_response_overflow_writes_reserved_error() -> None:
     assert error_message.root.error.code == -32001
     assert error_message.root.error.message == "response exceeds transport budget"
     assert stdout.flush_count == 1
+    assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
+
+
+def test_transport_escaping_expansion_writes_bounded_overflow_error() -> None:
+    import anyio
+    import mcp.types as types
+
+    source_value = "source\n" * 40
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 11,
+                    "result": {"metadata": {"escaped": source_value}},
+                },
+                separators=(",", ":"),
+            )
+        ),
+        metadata=None,
+    )
+    serialized = response.message.model_dump_json(
+        by_alias=True,
+        exclude_none=True,
+    ).encode("utf-8") + b"\n"
+    escaping_growth = len(json.dumps(source_value).encode("utf-8")) - len(
+        source_value.encode("utf-8")
+    )
+    assert len(serialized) > MIN_TRANSPORT_RESPONSE_BYTES
+    assert len(serialized) - escaping_growth <= MIN_TRANSPORT_RESPONSE_BYTES
+
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES,
+    )
+    budget = QueryWorkBudget(limits)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":11,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    assert b"source" not in stdout.payloads[0]
+    error_message = types.JSONRPCMessage.model_validate_json(stdout.payloads[0])
+    assert isinstance(error_message.root, types.JSONRPCError)
+    assert error_message.root.id == 11
+    assert error_message.root.error.code == -32001
+    assert len(stdout.payloads[0]) <= MIN_TRANSPORT_RESPONSE_BYTES
     assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
 
 
