@@ -39,7 +39,7 @@
 
 ## P2 — Database versus transport response budgets
 
-- [ ] Rename/split the typed budget counters into
+- [x] Rename/split the typed budget counters into
   `database_result_bytes` and `transport_response_bytes`.
 - [ ] Enforce database-result bytes incrementally during cursor consumption,
   including row conversion overhead needed by the client result boundary.

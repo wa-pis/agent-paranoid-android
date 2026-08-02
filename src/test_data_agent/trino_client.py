@@ -8,7 +8,7 @@ from typing import Any
 
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_sql_policy import consume_query_execution_work
-from test_data_agent.trino_work_budget import consume_response_payload
+from test_data_agent.trino_work_budget import consume_database_result_payload
 
 try:  # pragma: no cover - live Trino is not used in unit tests.
     import trino as trino
@@ -59,7 +59,7 @@ class TrinoClient:
         try:
             cursor.execute(sql, parameters or [])
             description = cursor.description or []
-            consume_response_payload(description)
+            consume_database_result_payload(description)
             rows: list[tuple[Any, ...]] = []
             while batch := cursor.fetchmany(1):
                 if len(rows) >= self.config.max_result_rows:
@@ -68,7 +68,7 @@ class TrinoClient:
                         f"{self.config.max_result_rows} rows"
                     )
                 row = batch[0]
-                consume_response_payload(row)
+                consume_database_result_payload(row)
                 rows.append(row)
             return rows, description
         finally:

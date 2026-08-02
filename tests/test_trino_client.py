@@ -205,14 +205,14 @@ def test_client_rejects_statement_budget_before_opening_connection() -> None:
     assert cursor.executed == []
 
 
-def test_client_rejects_response_budget_before_retaining_complete_result() -> None:
+def test_client_rejects_database_result_budget_before_retaining_result() -> None:
     cursor = FakeCursor([("x" * 256,), ("must-not-be-fetched",)])
     driver = FakeDriver(cursor)
     client = TrinoClient(config=client_config(), driver=driver)
-    limits = replace(DEFAULT_QUERY_WORK_LIMITS, response_bytes=128)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, database_result_bytes=128)
     execute = with_query_work_budget(client.execute_query, limits)
 
-    with pytest.raises(QueryWorkBudgetExceeded, match="response bytes"):
+    with pytest.raises(QueryWorkBudgetExceeded, match="database result bytes"):
         execute("SELECT synthetic_value FROM safe_table")
 
     assert cursor.fetch_sizes == [1]
