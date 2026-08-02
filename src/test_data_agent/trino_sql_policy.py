@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import cast
 
 try:  # pragma: no cover - optional Trino support.
     import sqlglot as sqlglot
@@ -16,6 +17,7 @@ from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_work_budget import (
     consume_ast_work,
     consume_sql_formula_chars,
+    current_query_work_budget,
 )
 
 FORBIDDEN_SQL_RE = re.compile(
@@ -127,7 +129,7 @@ def validate_safe_select_shape(tree: exp.Expression) -> None:
         raise SqlSafetyError("table functions and UNNEST are not allowed")
 
 
-def parse_select_ast(sql: str) -> exp.Expression:
+def parse_trino_statements(sql: str) -> list[exp.Expression]:
     consume_sql_formula_chars(sql)
     if sqlglot is None or exp is None:
         raise RuntimeError(
@@ -138,18 +140,44 @@ def parse_select_ast(sql: str) -> exp.Expression:
         statements = sqlglot.parse(sql, read="trino")
     except sqlglot.errors.ParseError as exc:
         raise SqlSafetyError(f"invalid SQL: {exc}") from exc
+    parsed_statements: list[exp.Expression] = []
     for statement in statements:
         if statement is not None:
             consume_ast_work(
                 statement,
                 child_nodes=lambda node: node.iter_expressions(),
             )
+            parsed_statements.append(cast(exp.Expression, statement))
+    return parsed_statements
+
+
+def parse_select_ast(sql: str) -> exp.Expression:
+    statements = parse_trino_statements(sql)
     if len(statements) != 1:
         raise SqlSafetyError("exactly one SQL statement is allowed")
     tree = statements[0]
     if not isinstance(tree, exp.Select):
         raise SqlSafetyError("only SELECT queries are allowed")
     return tree
+
+
+def consume_projected_column_work(sql: str) -> None:
+    """Charge every explicit SELECT projection before database access."""
+    budget = current_query_work_budget()
+    if budget is None:
+        return
+
+    for statement in parse_trino_statements(sql):
+        for select in statement.find_all(exp.Select):
+            projections = select.expressions
+            if any(
+                isinstance(projection, exp.Star) or is_star_column(projection)
+                for projection in projections
+            ):
+                budget.consume_projected_columns(
+                    budget.limits.projected_columns + 1
+                )
+            budget.consume_projected_columns(len(projections))
 
 
 def unquoted_char_positions(sql: str, char: str) -> list[int]:
