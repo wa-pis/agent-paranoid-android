@@ -587,12 +587,12 @@ Exit criteria:
 - MCP golden contracts, OpenSpec requirements, documentation, changelog,
   package metadata, attestations, and container tags describe the same RC4
   behavior.
-- Stable publication is allowed only from the accepted RC4 production source
+- Stable publication is allowed only from the accepted RC5 production source
   tree plus a reviewed version/changelog/release-metadata-only diff. No
-  executable production or dependency changes may be added between RC4
+  executable production or dependency changes may be added between RC5
   acceptance and `1.0.0`; all final release gates must run again. The exact
   allowlist and new-candidate fallback are defined in the
-  [release process](release.md#rc4-to-stable-promotion).
+  [release process](release.md#rc5-to-stable-promotion).
 
 ### 1.0.0rc5: Public Release And Invocation Hardening
 
@@ -605,11 +605,22 @@ Scope:
 
 - [ ] Complete the [RC5 public release and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md).
-- [ ] Complete and record RC4 public-artifact acceptance: publish and verify
-  the exact `1.0.0rc4` wheel and sdist on PyPI, a GitHub prerelease with
-  checksums/SBOM/attestations, and clean-environment installs from the public
-  indexes. Run the README commands without edits for base, `[trino]`, `[mcp]`,
-  and `[mcp,trino]`, including `--version`, `demo`, and `doctor`.
+- [x] Publish and verify the exact `1.0.0rc4` wheel and sdist on PyPI, a
+  GitHub prerelease with checksums/SBOM/attestations, and the corresponding
+  immutable release identity. Evidence: [RC4 published release
+  evidence](release-evidence-1.0.0rc4.md).
+- [x] Install the public RC4 wheel in clean environments and run the literal
+  README `doctor` and `demo` commands for base, `[trino]`, `[mcp]`, and
+  `[mcp,trino]`. Evidence: the [public profile smoke
+  run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757).
+- [ ] Verify `--version`, `demo`, and `doctor` for every published wheel
+  profile, recording package version, artifact hash, Python version, and
+  extra profile in the release evidence.
+- [ ] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
+  verify the CLI, generator-MCP, and Trino-MCP container targets in their
+  separate container matrix.
+- [ ] Re-run public documentation, package attestation, and upgrade-from
+  `0.12.0` checks from published artifacts only.
 - [ ] Split database-result and transport-response budgets. Enforce
   `database_result_bytes` incrementally while reading the cursor and
   `transport_response_bytes` after final MCP JSON serialization, including

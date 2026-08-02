@@ -139,7 +139,7 @@ def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
         invalid_ratio=args.invalid_ratio,
         table_name=args.table,
         rule_sample_rows=args.rule_sample_rows,
-        use_cache=args.use_cache,
+        use_cache=not args.no_cache,
     )
 
 

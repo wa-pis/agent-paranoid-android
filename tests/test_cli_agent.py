@@ -32,7 +32,7 @@ def test_agent_handler_plans_without_generating_rows(
         invalid_ratio=0.0,
         table=None,
         rule_sample_rows=50_000,
-        use_cache=False,
+        no_cache=True,
         json_output=True,
     )
 

@@ -411,7 +411,7 @@ def _cli_parser_surface() -> dict[str, Any]:
         "invalid_ratio",
         "table",
         "rule_sample_rows",
-        "use_cache",
+        "no_cache",
         "json_output",
     )
     return {

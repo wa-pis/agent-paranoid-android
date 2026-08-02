@@ -21,6 +21,9 @@
   checkout and passed the literal README `doctor` and `demo` commands.
 - [ ] Verify `--version`, `demo`, and `doctor` for each applicable profile;
   record package version, artifact hashes, Python version, and extra profile.
+- [ ] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
+  verify the CLI, generator-MCP, and Trino-MCP images in the separate
+  container matrix.
 - [ ] Re-run public documentation, container signature, package attestation,
   and upgrade-from-`0.12.0` checks from published artifacts only.
 
@@ -31,8 +34,11 @@
 - [ ] Enforce database-result bytes incrementally during cursor consumption,
   including row conversion overhead needed by the client result boundary.
 - [ ] Enforce transport-response bytes after final MCP JSON serialization and
-  before stdout/transport write, including envelopes, escaping, dictionaries,
-  nested metadata, and error objects.
+  at the production writer boundary before stdout/transport framing is
+  emitted, including the complete UTF-8 JSON-RPC envelope, request ID,
+  framing, escaping, dictionaries, nested metadata, and error objects.
+- [ ] Bound JSON-RPC request IDs, including long, Unicode, and escaped IDs, so
+  success and overflow responses cannot expand beyond the configured budget.
 - [ ] Reserve and test a fixed small error response that always fits the
   transport budget; reject configurations whose limit is below that minimum.
 - [ ] Add tests for wide rows, nested metadata, escaping expansion, database
@@ -48,6 +54,8 @@
 - [ ] Enforce column, statement, deadline, and scan limits across nested table
   profiling with one shared monotonic budget; no helper may reset or restore
   consumed work.
+- [ ] Propagate remaining invocation time into query timeouts and cancel or
+  close an active cursor/connection when the deadline expires.
 - [ ] Document environment names, defaults, units, per-query versus
   per-invocation scope, and failure behavior in configuration reference.
 - [ ] Add wide-table, statement-fan-out, timeout, concurrency-isolation, and

@@ -123,7 +123,7 @@ silently merge into an existing dataset.
 | --- | --- |
 | `--table NAME` | Override the inferred entity name for one CSV |
 | `--cache-dir PATH` | Safe profile cache location |
-| `--no-cache` | Force fresh folder profiling |
+| `--no-cache` | Force fresh folder profiling; caching is enabled by default for review-first planning |
 | `--rule-sample-rows N` | Bound row-level relationship and rule mining |
 
 Full-file schema and distribution profiling remains streaming. The rule sample

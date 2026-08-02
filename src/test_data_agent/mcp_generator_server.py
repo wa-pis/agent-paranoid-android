@@ -234,7 +234,7 @@ def plan_dataset(
     invalid_ratio: float = 0.0,
     table_name: str | None = None,
     rule_sample_rows: int = 50_000,
-    use_cache: bool = False,
+    use_cache: bool = True,
 ) -> dict[str, Any]:
     """Plan a review-first workflow from one bounded workspace source."""
 

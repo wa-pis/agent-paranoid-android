@@ -44,6 +44,7 @@ REQUIRED_DOCS = {
     "changelog-policy.md",
     "release-evidence-1.0.0rc1.md",
     "release-evidence-1.0.0rc2.md",
+    "release-evidence-1.0.0rc4.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
 }
@@ -591,8 +592,8 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
         / "tasks.md"
     ).read_text()
 
-    assert "## RC4 To Stable Promotion" in release
-    assert "git diff --name-status v1.0.0rc4 HEAD" in release
+    assert "## RC5 To Stable Promotion" in release
+    assert "git diff --name-status v1.0.0rc5 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",
