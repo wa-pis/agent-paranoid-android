@@ -63,7 +63,7 @@
   alternatives. Do not use 1000 columns or 2048 statements without evidence.
   Evidence: [invocation-default benchmark](benchmark-evidence.md) exercises a
   representative 100-column aggregate-only profile in 122 statements.
-- [ ] Enforce column, statement, deadline, and scan limits across nested table
+- [x] Enforce column, statement, deadline, and scan limits across nested table
   profiling with one shared monotonic budget; no helper may reset or restore
   consumed work.
 - [ ] Propagate remaining invocation time into query timeouts and cancel or

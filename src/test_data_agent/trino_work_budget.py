@@ -353,6 +353,14 @@ def current_query_work_budget() -> QueryWorkBudget | None:
     return _CURRENT_QUERY_WORK_BUDGET.get()
 
 
+def consume_profiled_column_work() -> None:
+    """Charge one nested column operation to the current invocation."""
+    budget = current_query_work_budget()
+    if budget is not None:
+        budget.check_invocation_deadline()
+        budget.consume_profiled_columns()
+
+
 def consume_sql_formula_chars(value: str) -> None:
     """Charge text work to the current invocation before parsing or I/O."""
     budget = current_query_work_budget()
@@ -420,13 +428,16 @@ def with_query_work_budget(
 
     @wraps(function)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        budget = budget_provider() if budget_provider is not None else None
+        budget = current_query_work_budget()
+        if budget is None and budget_provider is not None:
+            budget = budget_provider()
         if budget is None:
             budget = QueryWorkBudget(limits)
         elif budget.limits != limits:
             raise ValueError("transport and application work limits must match")
         token = _CURRENT_QUERY_WORK_BUDGET.set(budget)
         try:
+            budget.check_invocation_deadline()
             budget.consume_canonical_argument_bytes(
                 canonical_argument_size(function, *args, **kwargs)
             )

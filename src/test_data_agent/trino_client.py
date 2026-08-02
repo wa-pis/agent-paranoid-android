@@ -6,7 +6,11 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any, TypeVar, cast
 
-from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_config import (
+    MAX_QUERY_SCAN_BYTES,
+    TrinoConfig,
+    parse_data_size_value,
+)
 from test_data_agent.trino_sql_policy import consume_query_execution_work
 from test_data_agent.trino_work_budget import consume_database_result_payload
 
@@ -73,7 +77,15 @@ class TrinoClient:
         if self.driver is None:
             raise RuntimeError("trino package is not installed")
 
-        consume_query_execution_work(sql)
+        estimated_scan_bytes = parse_data_size_value(
+            self.config.query_max_scan_physical_bytes,
+            "TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES",
+            MAX_QUERY_SCAN_BYTES,
+        )
+        consume_query_execution_work(
+            sql,
+            estimated_scan_bytes_per_statement=estimated_scan_bytes,
+        )
         connection = self.driver.dbapi.connect(
             host=self.config.host,
             port=self.config.port,

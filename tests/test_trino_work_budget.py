@@ -275,6 +275,39 @@ def test_invocation_wrapper_reuses_transport_budget() -> None:
     assert current_query_work_budget() is None
 
 
+def test_nested_wrapper_reuses_active_budget_without_provider_reset() -> None:
+    limits = work_limits()
+    outer_budget = QueryWorkBudget(limits)
+    provider_calls = 0
+
+    def provide_nested_budget() -> QueryWorkBudget:
+        nonlocal provider_calls
+        provider_calls += 1
+        return QueryWorkBudget(limits)
+
+    def consume_nested_work() -> QueryWorkBudget:
+        budget = current_query_work_budget()
+        assert budget is not None
+        budget.consume_statements()
+        return budget
+
+    nested = with_query_work_budget(
+        consume_nested_work,
+        limits,
+        budget_provider=provide_nested_budget,
+    )
+    outer = with_query_work_budget(
+        nested,
+        limits,
+        budget_provider=lambda: outer_budget,
+    )
+
+    assert outer() is outer_budget
+    assert outer_budget.snapshot().statements == 1
+    assert provider_calls == 0
+    assert current_query_work_budget() is None
+
+
 def test_invocation_wrapper_rejects_mismatched_transport_limits() -> None:
     budget = QueryWorkBudget(work_limits(canonical_argument_bytes=89))
     wrapped = with_query_work_budget(

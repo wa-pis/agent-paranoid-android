@@ -3,8 +3,9 @@
 ## Scope
 
 The benchmark uses the production `TrinoProfiler`, `TrinoMasker`, query
-builders, and `QueryWorkBudget` against deterministic synthetic responses. Its
-representative table has 100 columns: 20 sensitive string columns, 20
+builders, SQL execution accounting, and shared `QueryWorkBudget` against
+deterministic synthetic responses. Its representative table has 100 columns:
+20 sensitive string columns, 20
 low-cardinality string columns, and 60 numeric columns.
 
 The workload requires two table-level statements, one aggregate statement per
@@ -20,7 +21,7 @@ leaving 28 statements of headroom under the 150-statement default.
 - Command: `.venv/bin/python scripts/benchmark_trino_invocation_defaults.py`
 
 ```json
-{"configured_deadline_seconds": 120.0, "elapsed_seconds": 0.000683, "profiled_columns": 100, "remaining_deadline_seconds": 119.999287, "statement_headroom": 28, "statements": 122}
+{"configured_deadline_seconds": 120.0, "elapsed_seconds": 0.031659, "profiled_columns": 100, "remaining_deadline_seconds": 119.968316, "statement_headroom": 28, "statements": 122}
 ```
 
 ## Decision

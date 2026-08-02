@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,18 @@ from test_data_agent import trino_profiling
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_profiling import TrinoProfiler
 from test_data_agent.trino_query_builders import TrinoQuery
-from test_data_agent.trino_sql_policy import AllowlistError
+from test_data_agent.trino_sql_policy import (
+    AllowlistError,
+    consume_query_execution_work,
+)
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+    QueryWorkDimension,
+    current_query_work_budget,
+    with_query_work_budget,
+)
 
 
 def profiler_config() -> TrinoConfig:
@@ -95,6 +107,121 @@ def test_profiler_coordinates_aggregate_only_safe_table_profile() -> None:
         ("analytics", "safe_schema", "orders", "status", "varchar", True, 50)
     ]
     assert all("SELECT *" not in query.sql.upper() for query in queries)
+
+
+def test_nested_table_profile_shares_monotonic_cumulative_budget() -> None:
+    columns = [
+        {
+            "column_name": f"column_{index}",
+            "data_type": "bigint",
+            "is_nullable": "NO",
+        }
+        for index in range(3)
+    ]
+    queries: list[str] = []
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        max_profiled_columns=2,
+        statements=10,
+        max_cumulative_estimated_scan_bytes=40,
+    )
+    budget = QueryWorkBudget(limits)
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        consume_query_execution_work(
+            query.sql,
+            estimated_scan_bytes_per_statement=10,
+        )
+        queries.append(query.sql)
+        if query.sql.startswith("SELECT count(*) AS row_count"):
+            return [{"row_count": 12}]
+        if "information_schema.columns" in query.sql:
+            return columns
+        return [{"name": "synthetic"}]
+
+    def profile_column(*_args: Any) -> dict[str, Any]:
+        assert current_query_work_budget() is budget
+        fetch_query(TrinoQuery("SELECT 1 AS synthetic"))
+        return {"name": "synthetic", "sensitive": False}
+
+    nested_column_profiler = with_query_work_budget(profile_column, limits)
+    profiler = TrinoProfiler(config=profiler_config(), fetch_query=fetch_query)
+
+    def profile_table() -> dict[str, Any]:
+        return profiler.profile_table_safe(
+            "analytics",
+            "safe_schema",
+            "orders",
+            max_top_values=20,
+            column_profiler=nested_column_profiler,
+        )
+
+    invoke = with_query_work_budget(
+        profile_table,
+        limits,
+        budget_provider=lambda: budget,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        invoke()
+
+    assert error.value.dimension is QueryWorkDimension.PROFILED_COLUMNS
+    assert len(queries) == 4
+    assert budget.snapshot().profiled_columns == 2
+    assert budget.snapshot().statements == 4
+    assert budget.snapshot().cumulative_estimated_scan_bytes == 40
+    assert current_query_work_budget() is None
+
+
+def test_nested_table_profile_stops_before_column_after_shared_deadline() -> None:
+    now = 0.0
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        max_invocation_seconds=2.0,
+    )
+    budget = QueryWorkBudget(limits, monotonic_clock=lambda: now)
+    queries: list[str] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        nonlocal now
+        consume_query_execution_work(query.sql)
+        queries.append(query.sql)
+        now += 1.0
+        if query.sql.startswith("SELECT count(*) AS row_count"):
+            return [{"row_count": 12}]
+        return [
+            {
+                "column_name": "status",
+                "data_type": "varchar",
+                "is_nullable": "YES",
+            }
+        ]
+
+    profiler = TrinoProfiler(config=profiler_config(), fetch_query=fetch_query)
+
+    def profile_table() -> dict[str, Any]:
+        return profiler.profile_table_safe(
+            "analytics",
+            "safe_schema",
+            "orders",
+            max_top_values=20,
+            column_profiler=lambda *_args: {"name": "must-not-run"},
+        )
+
+    invoke = with_query_work_budget(
+        profile_table,
+        limits,
+        budget_provider=lambda: budget,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        invoke()
+
+    assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
+    assert len(queries) == 2
+    assert budget.snapshot().statements == 2
+    assert budget.snapshot().profiled_columns == 0
+    assert current_query_work_budget() is None
 
 
 def test_profiler_keeps_condition_values_bound_and_out_of_results() -> None:

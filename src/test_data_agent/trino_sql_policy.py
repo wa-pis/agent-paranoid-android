@@ -171,14 +171,23 @@ def consume_projected_column_work(sql: str) -> None:
     _consume_projected_columns(parse_trino_statements(sql), budget)
 
 
-def consume_query_execution_work(sql: str) -> None:
+def consume_query_execution_work(
+    sql: str,
+    *,
+    estimated_scan_bytes_per_statement: int = 0,
+) -> None:
     """Charge statement and projection work before opening Trino resources."""
     budget = current_query_work_budget()
     if budget is None:
         return
 
+    budget.check_invocation_deadline()
     statements = parse_trino_statements(sql)
+    budget.check_invocation_deadline()
     budget.consume_statements(len(statements))
+    budget.consume_cumulative_estimated_scan_bytes(
+        estimated_scan_bytes_per_statement * len(statements)
+    )
     _consume_projected_columns(statements, budget)
 
 
