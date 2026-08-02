@@ -48,14 +48,14 @@
     - [x] Create and concurrency-isolate a fresh application budget, then
       enforce canonical UTF-8 argument bytes before tool execution.
     - [x] Enforce raw transport payload bytes before MCP argument parsing.
-  - [ ] Enforce SQL/formula, AST, depth, column, statement, and response limits
+  - [x] Enforce SQL/formula, AST, depth, column, statement, and response limits
     at their resource-consuming boundaries.
     - [x] Enforce cumulative SQL/formula character work before Python/sqlglot
       parsing and before opening a Trino connection.
     - [x] Enforce AST node and depth work before query execution.
     - [x] Enforce projected-column work before query execution.
     - [x] Enforce statement work before opening a connection or cursor.
-    - [ ] Consume response bytes incrementally before retaining complete
+    - [x] Consume response bytes incrementally before retaining complete
       oversized results.
 - [ ] Thread one budget through nested table/column profiling and safe-query
   execution; consume response bytes incrementally, stop after exhaustion, and

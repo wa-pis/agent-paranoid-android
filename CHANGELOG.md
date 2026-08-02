@@ -25,6 +25,8 @@ All notable changes to this project are documented here.
   and fail closed when a projection wildcard has unknown width.
 - Bound cumulative parsed SQL statements before opening a Trino connection or
   cursor.
+- Consume Trino response metadata and rows incrementally against the shared
+  byte budget before retaining a complete oversized result.
 
 ### Migration
 
