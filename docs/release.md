@@ -56,6 +56,47 @@ environment. That smoke check verifies package version metadata, the PEP 561
 `py.typed` marker, console entry points, and `test-data-agent doctor
 --skip-smoke` before release attestations are created.
 
+## RC4 To Stable Promotion
+
+The accepted RC4 baseline is the exact commit named by the annotated
+`v1.0.0rc4` tag after the public-package, documentation, container,
+attestation, signature, integration, and clean-environment acceptance checks
+have all passed. Record the tag commit and acceptance evidence before opening
+the stable release pull request.
+
+Review the stable tree directly against that immutable baseline:
+
+```bash
+git diff --name-status v1.0.0rc4 HEAD
+git diff v1.0.0rc4 HEAD
+```
+
+The stable promotion diff may contain only these reviewed release changes:
+
+- `pyproject.toml`: the project version and release-status classifiers only;
+  dependencies, build settings, entry points, and extras remain unchanged;
+- `src/test_data_agent/version.py`: `__version__` only;
+- `uv.lock`: the root `agent-paranoid-android` version only, with the resolved
+  dependency graph and hashes unchanged;
+- `CHANGELOG.md`: move the already accepted entries to `1.0.0`, add the date
+  and links, and do not introduce a new behavior claim; and
+- release-facing version references, release evidence, roadmap status, and
+  OpenSpec completion or archive metadata. These documentation files may
+  describe only behavior already accepted in RC4.
+
+File membership alone is not approval: every changed hunk must match one of
+those categories. Any executable production, test, schema, fixture,
+dependency, build, workflow, or container change means RC4 is not the accepted
+stable source tree. Stop the promotion, make the change in a newly numbered
+release candidate, and complete that candidate's acceptance before trying
+stable promotion again.
+
+Run every final release gate, including `scripts/check_release.sh` and
+`mkdocs build --strict`, on the exact stable release commit. Merge only after
+the required pipeline is green and conflict-free. Create `v1.0.0` only from
+the verified merge commit in `main`; the stable tag and post-publish checks are
+separate explicit steps.
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.

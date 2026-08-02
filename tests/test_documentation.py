@@ -571,6 +571,41 @@ def test_artifact_durability_contract_matches_implementation() -> None:
         assert "fsync" not in source.read_text()
 
 
+def test_stable_promotion_contract_is_metadata_only() -> None:
+    release = (ROOT / "docs" / "release.md").read_text()
+    normalized_release = " ".join(release.split())
+    design = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "1-0-0-rc4-privacy-invocation-hardening"
+        / "design.md"
+    ).read_text()
+    normalized_design = " ".join(design.split())
+    tasks = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "1-0-0-rc4-privacy-invocation-hardening"
+        / "tasks.md"
+    ).read_text()
+
+    assert "## RC4 To Stable Promotion" in release
+    assert "git diff --name-status v1.0.0rc4 HEAD" in release
+    for path in (
+        "pyproject.toml",
+        "src/test_data_agent/version.py",
+        "uv.lock",
+        "CHANGELOG.md",
+    ):
+        assert f"`{path}`" in release
+    assert "newly numbered release candidate" in normalized_release
+    assert "every final release gate" in normalized_release
+    assert "## Stable Promotion Contract" in design
+    assert "remain byte-for-byte at the accepted RC4 state" in normalized_design
+    assert "- [x] Define stable promotion" in tasks
+
+
 def test_compatibility_inventory_covers_retained_surfaces() -> None:
     compatibility = (
         ROOT / "docs" / "reference" / "compatibility.md"
