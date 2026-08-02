@@ -159,10 +159,16 @@ jobs:
             --index-url https://pypi.org/simple \
             --requirement /tmp/public-package-requirement.txt
 
-      - name: Run public package smoke tests
+      - name: Run README quickstart from public wheel
+        env:
+          PYPI_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
           cd /tmp
+          test "$(
+            /tmp/published-release/bin/python -c \
+              'import test_data_agent; print(test_data_agent.__version__)'
+          )" = "${PYPI_VERSION}"
           /tmp/published-release/bin/python \
             "${GITHUB_WORKSPACE}/scripts/check_installed_package.py"
           /tmp/published-release/bin/test-data-agent doctor

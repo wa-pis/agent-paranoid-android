@@ -111,7 +111,7 @@ def test_public_docs_disclose_ai_assisted_development() -> None:
 def test_pypi_readme_starts_with_public_installation() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert "python3 -m pip install agent-paranoid-android" in readme
+    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc4"' in readme
     assert "PyPI Trusted Publishing" in readme
     assert 'pip install -e ".[dev]"' not in readme
 
@@ -357,6 +357,9 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "GITHUB_STEP_SUMMARY" in workflow
     assert "scripts.verify_pypi_release" in workflow
     assert "--require-hashes" in workflow
+    assert "Run README quickstart from public wheel" in workflow
+    assert 'print(test_data_agent.__version__)' in workflow
+    assert '= "${PYPI_VERSION}"' in workflow
     assert "/test-data-agent doctor" in workflow
     assert "/test-data-agent demo" in workflow
     assert "/test-data-agent agent-plan" in workflow

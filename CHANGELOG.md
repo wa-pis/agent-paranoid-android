@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Remove the `sample_rows_masked` Trino MCP tool, masking-service method, and
   query builder from the RC4 compatibility surface.
+- Pin RC4 installation guidance and optional extras to `1.0.0rc4`, with a
+  tag-matched clean-environment README smoke gate for the public wheel.
 
 ### Security
 

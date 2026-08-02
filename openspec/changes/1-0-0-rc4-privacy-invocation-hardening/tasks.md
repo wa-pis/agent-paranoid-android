@@ -65,6 +65,11 @@
   `agent-paranoid-android==1.0.0rc4` command, update extras, and add a
   clean-environment README smoke check against that public wheel. Do not use
   floating `--pre` in the RC-specific instructions.
+  - [x] Pin the README and installation guide to the exact RC4 base and extras
+    requirements.
+  - [x] Make the post-publish clean-environment workflow verify the tag version
+    before running the literal README `doctor` and `demo` quickstart.
+  - [ ] Execute the clean-environment check after the RC4 wheel is public.
 - [ ] Verify the base wheel and CSV/JSON quickstart without `trino`, `sqlglot`,
   or the MCP SDK; verify Trino separately through the `trino` extra and keep
   failures isolated to that optional capability.

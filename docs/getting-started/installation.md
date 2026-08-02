@@ -14,6 +14,10 @@ changing this matrix are defined in
 
 ## Install From PyPI
 
+The active prerelease acceptance target is `1.0.0rc4`. Once it is public, pin
+that exact version; do not use a floating `--pre` install for candidate
+verification.
+
 Create an isolated environment:
 
 ### macOS and Linux
@@ -22,17 +26,17 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install agent-paranoid-android
+python3 -m pip install "agent-paranoid-android==1.0.0rc4"
 ```
 
 The base package supports CSV and JSON workflows. Add only the integrations
 you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]"
-python3 -m pip install "agent-paranoid-android[mcp]"
-python3 -m pip install "agent-paranoid-android[mcp,trino]"
-python3 -m pip install "agent-paranoid-android[openai]"
+python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc4"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -60,7 +64,7 @@ It is not the recommended user installation. Use
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install agent-paranoid-android
+python -m pip install "agent-paranoid-android==1.0.0rc4"
 ```
 
 Run the self-contained environment check:
