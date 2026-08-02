@@ -16,6 +16,9 @@ All notable changes to this project are documented here.
   separately enabled safe-select rows as potentially containing source values.
 - Define atomic visibility and process-interruption recovery separately from
   crash durability, with artifact fsync explicitly deferred until after 1.0.
+- Define stable 1.0 promotion as the accepted RC4 production tree plus only
+  reviewed version, changelog, and release-metadata updates; any code or
+  dependency change requires another release candidate.
 
 ### Security
 

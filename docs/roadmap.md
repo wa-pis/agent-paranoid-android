@@ -589,7 +589,9 @@ Exit criteria:
 - Stable publication is allowed only from the accepted RC4 production source
   tree plus a reviewed version/changelog/release-metadata-only diff. No
   executable production or dependency changes may be added between RC4
-  acceptance and `1.0.0`; all final release gates must run again.
+  acceptance and `1.0.0`; all final release gates must run again. The exact
+  allowlist and new-candidate fallback are defined in the
+  [release process](release.md#rc4-to-stable-promotion).
 
 ### 1.0.0: Stable Release
 

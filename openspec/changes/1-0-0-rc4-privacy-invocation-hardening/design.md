@@ -97,6 +97,23 @@ crash-durability promise, when deployment requirements demand it, after an
 artifact-loss incident, or when platform-specific implementation and
 crash-consistency tests are ready.
 
+## Stable Promotion Contract
+
+The accepted RC4 baseline is the exact annotated `v1.0.0rc4` tag commit after
+all public-artifact acceptance checks pass. Stable promotion compares its
+entire tree to that immutable commit. The only allowed changes are package and
+lockfile root-version metadata, release-status classifiers, changelog
+classification, already-accepted version references, release evidence,
+roadmap status, and OpenSpec completion or archive metadata.
+
+Every changed hunk must be reviewed as release metadata. Production code,
+tests, schemas, fixtures, dependency resolution, build configuration,
+workflows, and container definitions remain byte-for-byte at the accepted RC4
+state. If any of them must change, stable promotion stops and the fix must pass
+through a newly numbered release candidate and public acceptance. All final
+release gates run again on the exact stable release commit before its verified
+`main` merge commit can be tagged.
+
 ## Alternatives
 
 - Retain heuristic `sample_rows_masked` behind a new opt-in in RC4: rejected;
