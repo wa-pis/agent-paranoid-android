@@ -209,8 +209,9 @@ core to one model vendor:
 
 The package release candidate is `1.0.0rc4`. `1.0.0rc2` completed public
 acceptance; `1.0.0rc3` added the contract-preserving application-boundary
-refactor. `1.0.0rc4` closes the remaining privacy and invocation-budget
-findings before stable publication.
+refactor. `1.0.0rc4` closes the privacy and first invocation-budget findings,
+but its public-index acceptance remains an explicit gate until the exact wheel
+and sdist are verifiably installable outside the repository.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -593,9 +594,60 @@ Exit criteria:
   allowlist and new-candidate fallback are defined in the
   [release process](release.md#rc4-to-stable-promotion).
 
+### 1.0.0rc5: Public Release And Invocation Hardening
+
+**Goal:** finish public RC acceptance and close the remaining response-size,
+invocation-duration, and MCP documentation ambiguities before stable
+promotion. RC5 is required if any RC4 public-artifact gate is incomplete or if
+the new cumulative limits are not yet benchmark-backed.
+
+Scope:
+
+- [ ] Complete the [RC5 public release and invocation hardening
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md).
+- [ ] Complete and record RC4 public-artifact acceptance: publish and verify
+  the exact `1.0.0rc4` wheel and sdist on PyPI, a GitHub prerelease with
+  checksums/SBOM/attestations, and clean-environment installs from the public
+  indexes. Run the README commands without edits for base, `[trino]`, `[mcp]`,
+  and `[mcp,trino]`, including `--version`, `demo`, and `doctor`.
+- [ ] Split database-result and transport-response budgets. Enforce
+  `database_result_bytes` incrementally while reading the cursor and
+  `transport_response_bytes` after final MCP JSON serialization, including
+  envelopes, keys, escaping, dictionaries, nested metadata, and other
+  transport overhead. On overflow, return a small fixed error response that
+  is reserved and proven to fit the transport budget.
+- [ ] Add cumulative invocation limits: `max_profiled_columns`,
+  `max_invocation_seconds`, and, if measurable, cumulative estimated scan
+  bytes. Start with `100` columns, `150` statements, and `120` seconds unless
+  operational benchmarks justify different defaults; do not treat per-query
+  Trino session limits as a substitute.
+- [ ] Document every application-level limit in the configuration reference,
+  including defaults, environment names, failure behavior, and whether the
+  limit is per query or per invocation.
+- [ ] Normalize all MCP documentation to distinguish default generator and
+  default aggregate-only Trino profiling responses from explicit opt-in
+  row-returning capabilities. Remove server-wide claims that imply every MCP
+  response is source-free.
+- [ ] Repeat direct-service, transport, integration, package, documentation,
+  security, and public-artifact gates against the exact RC5 commit.
+
+Exit criteria:
+
+- PyPI and GitHub public artifacts are present, mutually identified by commit
+  and version, and install successfully in clean environments.
+- Final MCP JSON responses and bounded error responses cannot exceed the
+  configured transport budget; database and transport budgets are reported
+  separately in tests and diagnostics.
+- A wide-table profile fails closed on cumulative columns, statements, or
+  invocation time before unbounded work continues.
+- Configuration reference, OpenSpec, MCP examples, README, and release
+  evidence use the same default-vs-opt-in terminology.
+- Stable promotion is allowed only from the accepted RC5 source tree plus a
+  reviewed version/changelog/release-metadata-only diff.
+
 ### 1.0.0: Stable Release
 
-**Goal:** promote the verified RC4 baseline to the first stable compatibility
+**Goal:** promote the verified RC5 baseline to the first stable compatibility
 baseline.
 
 Scope:
@@ -604,8 +656,8 @@ Scope:
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
   without changing public Python, CLI, MCP, artifact, error, or safety
   contracts.
-- [ ] Promote the accepted `1.0.0rc4` commit without unrelated feature work.
-- [ ] Apply only fixes proven necessary by RC4 acceptance and repeat the
+- [ ] Promote the accepted `1.0.0rc5` commit without unrelated feature work.
+- [ ] Apply only fixes proven necessary by RC5 acceptance and repeat the
   affected release gates.
 - [ ] Re-run every release candidate gate on the exact release commit.
 - [ ] Publish signed and attested wheel, source distribution, documentation,
