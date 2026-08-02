@@ -163,6 +163,29 @@ def test_client_rejects_sql_budget_before_opening_connection() -> None:
     assert cursor.executed == []
 
 
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT first_value, second_value FROM safe_table",
+        "SELECT * FROM safe_table",
+    ],
+)
+def test_client_rejects_projected_column_budget_before_opening_connection(
+    sql: str,
+) -> None:
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, projected_columns=1)
+    execute = with_query_work_budget(client.execute_query, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="projected columns"):
+        execute(sql)
+
+    assert driver.dbapi.connect_kwargs is None
+    assert cursor.executed == []
+
+
 def test_server_keeps_client_compatibility_exports() -> None:
     assert mcp_trino_server.TrinoClient is TrinoClient
     assert mcp_trino_server.TrinoResultLimitError is TrinoResultLimitError

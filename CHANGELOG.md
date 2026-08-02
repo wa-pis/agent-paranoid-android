@@ -21,6 +21,8 @@ All notable changes to this project are documented here.
   parsing and before opening a Trino connection.
 - Bound cumulative Python and sqlglot AST nodes and maximum depth before
   formula rendering, policy traversal, or Trino query execution.
+- Bound cumulative explicit SQL projections before opening a Trino connection
+  and fail closed when a projection wildcard has unknown width.
 
 ### Migration
 
