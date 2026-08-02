@@ -15,14 +15,81 @@ except ImportError:  # pragma: no cover
     FastMCP = None  # type: ignore[misc, assignment]
 
 from test_data_agent.audit import audited_mcp_tool
+from test_data_agent.trino_work_budget import QueryWorkBudget
 
 
-RawRequestContextFactory = Callable[[int], object]
+RawRequestContextFactory = Callable[[int], QueryWorkBudget]
 
 
 @dataclass(frozen=True, slots=True)
 class _OversizedRawPayload:
     attempted_bytes: int
+
+
+class _RequestBudgetRegistry:
+    """Associate response messages with the budget of their input request."""
+
+    __slots__ = ("_budgets",)
+
+    def __init__(self) -> None:
+        self._budgets: dict[Any, QueryWorkBudget] = {}
+
+    def register_incoming_request(self, session_message: Any) -> None:
+        import mcp.types as types
+
+        root = session_message.message.root
+        if not isinstance(root, types.JSONRPCRequest):
+            return
+        budget = getattr(session_message.metadata, "request_context", None)
+        if not isinstance(budget, QueryWorkBudget):
+            raise TypeError("MCP request context must be a QueryWorkBudget")
+        self._budgets[root.id] = budget
+
+    def resolve_outgoing(self, session_message: Any) -> QueryWorkBudget | None:
+        import mcp.types as types
+
+        root = session_message.message.root
+        if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
+            try:
+                return self._budgets[root.id]
+            except KeyError as exc:
+                raise RuntimeError(
+                    "MCP response has no registered request budget"
+                ) from exc
+
+        related_request_id = getattr(
+            session_message.metadata,
+            "related_request_id",
+            None,
+        )
+        if related_request_id is None:
+            return None
+        return self._budgets.get(related_request_id)
+
+    def complete_outgoing(self, session_message: Any) -> None:
+        import mcp.types as types
+
+        root = session_message.message.root
+        if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
+            self._budgets.pop(root.id, None)
+
+
+async def _write_bounded_session_message(
+    stdout: Any,
+    session_message: Any,
+    budget_registry: _RequestBudgetRegistry,
+) -> None:
+    """Serialize, charge, and write one production-framed MCP message."""
+    payload = session_message.message.model_dump_json(
+        by_alias=True,
+        exclude_none=True,
+    ).encode("utf-8") + b"\n"
+    budget = budget_registry.resolve_outgoing(session_message)
+    if budget is not None:
+        budget.consume_transport_response_bytes(len(payload))
+    await stdout.write(payload)
+    await stdout.flush()
+    budget_registry.complete_outgoing(session_message)
 
 
 async def _bounded_raw_payloads(
@@ -108,6 +175,7 @@ async def bounded_stdio_server(
     write_stream_reader: Any
     read_stream_writer, read_stream = anyio.create_memory_object_stream(0)
     write_stream, write_stream_reader = anyio.create_memory_object_stream(0)
+    budget_registry = _RequestBudgetRegistry()
 
     async def stdin_reader() -> None:
         try:
@@ -131,6 +199,7 @@ async def bounded_stdio_server(
                             payload,
                             request_context_factory,
                         )
+                        budget_registry.register_incoming_request(message)
                     except Exception as exc:
                         await read_stream_writer.send(exc)
                         continue
@@ -142,12 +211,11 @@ async def bounded_stdio_server(
         try:
             async with write_stream_reader:
                 async for session_message in write_stream_reader:
-                    payload = session_message.message.model_dump_json(
-                        by_alias=True,
-                        exclude_none=True,
-                    ).encode("utf-8")
-                    await stdout.write(payload + b"\n")
-                    await stdout.flush()
+                    await _write_bounded_session_message(
+                        stdout,
+                        session_message,
+                        budget_registry,
+                    )
         except anyio.ClosedResourceError:  # pragma: no cover
             await anyio.lowlevel.checkpoint()
 

@@ -92,20 +92,26 @@ def test_safety_policy_is_enforced_below_transports(
 
 
 @pytest.mark.parametrize(
-    "module",
+    ("module", "allowed_imports"),
     [
-        "test_data_agent.mcp_generator_transport",
-        "test_data_agent.mcp_trino_transport",
+        ("test_data_agent.mcp_generator_transport", {"test_data_agent.audit"}),
+        (
+            "test_data_agent.mcp_trino_transport",
+            {"test_data_agent.audit", "test_data_agent.trino_work_budget"},
+        ),
     ],
 )
-def test_mcp_transports_only_register_injected_services(module: str) -> None:
+def test_mcp_transports_only_register_injected_services(
+    module: str,
+    allowed_imports: set[str],
+) -> None:
     application_imports = {
         imported
         for imported in imported_modules(module)
         if imported.startswith("test_data_agent.")
     }
 
-    assert application_imports == {"test_data_agent.audit"}
+    assert application_imports == allowed_imports
 
 
 @pytest.mark.parametrize(
