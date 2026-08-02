@@ -10,7 +10,10 @@ from collections.abc import Callable, Sequence
 from typing import Any
 
 from test_data_agent.audit import audit_logger_from_env
-from test_data_agent.mcp_trino_transport import create_trino_mcp
+from test_data_agent.mcp_trino_transport import (
+    create_trino_mcp,
+    run_bounded_trino_mcp,
+)
 from test_data_agent.trino_config import (
     ABSOLUTE_MAX_RESULT_ROWS as ABSOLUTE_MAX_RESULT_ROWS,
     DATA_SIZE_MULTIPLIERS as DATA_SIZE_MULTIPLIERS,
@@ -119,6 +122,7 @@ from test_data_agent.trino_sql_policy import (
 )
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
     QueryWorkLimits,
     with_query_work_budget,
 )
@@ -372,14 +376,37 @@ def trino_mcp_tools() -> list[Callable[..., Any]]:
 def trino_mcp_services(
     *,
     work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+    budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
 ) -> list[Callable[..., Any]]:
     return [
-        with_query_work_budget(tool, work_limits)
+        with_query_work_budget(
+            tool,
+            work_limits,
+            budget_provider=budget_provider,
+        )
         for tool in trino_mcp_tools()
     ]
 
 
-mcp: Any = create_trino_mcp(trino_mcp_services())
+def _new_transport_query_work_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+    return budget
+
+
+def _current_transport_query_work_budget() -> QueryWorkBudget | None:
+    if mcp is None:
+        return None
+    try:
+        request = mcp.get_context().request_context.request
+    except (LookupError, ValueError):
+        return None
+    return request if isinstance(request, QueryWorkBudget) else None
+
+
+mcp: Any = create_trino_mcp(
+    trino_mcp_services(budget_provider=_current_transport_query_work_budget)
+)
 
 
 def main() -> None:
@@ -398,7 +425,11 @@ def main() -> None:
         )
     TrinoConfig.from_env()
     audit_logger_from_env("trino-mcp")
-    mcp.run()
+    run_bounded_trino_mcp(
+        mcp,
+        max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes,
+        request_context_factory=_new_transport_query_work_budget,
+    )
 
 
 if __name__ == "__main__":

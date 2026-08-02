@@ -43,11 +43,11 @@
   resource-consuming operations.
   - [x] Define typed immutable limits, monotonic counters, immutable usage
     snapshots, and a bounded typed exhaustion error.
-  - [ ] Create one fresh budget per invocation and enforce separate raw
+  - [x] Create one fresh budget per invocation and enforce separate raw
     transport and canonical application-argument limits.
     - [x] Create and concurrency-isolate a fresh application budget, then
       enforce canonical UTF-8 argument bytes before tool execution.
-    - [ ] Enforce raw transport payload bytes before MCP argument parsing.
+    - [x] Enforce raw transport payload bytes before MCP argument parsing.
   - [ ] Enforce SQL/formula, AST, depth, column, statement, and response limits
     at their resource-consuming boundaries.
 - [ ] Thread one budget through nested table/column profiling and safe-query
