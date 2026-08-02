@@ -310,6 +310,107 @@ def test_transport_response_overflow_fails_before_writer() -> None:
     assert budget.snapshot().transport_response_bytes == 0
 
 
+@pytest.mark.parametrize(
+    "request_id",
+    [
+        "a" * 254,
+        "é" * 127,
+        "\\" * 127,
+    ],
+    ids=("ascii", "unicode", "escaped"),
+)
+@pytest.mark.parametrize("response_kind", ["result", "error"])
+def test_jsonrpc_request_id_at_serialized_cap_is_bounded_in_responses(
+    request_id: str,
+    response_kind: str,
+) -> None:
+    import anyio
+    import mcp.types as types
+
+    serialized_id = json.dumps(
+        request_id,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    assert len(serialized_id) == transport._MAX_JSONRPC_REQUEST_ID_BYTES
+
+    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {"jsonrpc": "2.0", "id": request_id, "method": "ping"},
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    response_body: dict[str, Any]
+    if response_kind == "result":
+        response_body = {"result": {}}
+    else:
+        response_body = {
+            "error": {"code": -32603, "message": "bounded error"}
+        }
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {"jsonrpc": "2.0", "id": request_id, **response_body},
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    assert len(stdout.payloads) == 1
+    assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
+
+
+@pytest.mark.parametrize(
+    "request_id",
+    [
+        "a" * 255,
+        "é" * 128,
+        "\\" * 128,
+    ],
+    ids=("ascii", "unicode", "escaped"),
+)
+def test_jsonrpc_request_id_over_serialized_cap_is_rejected(
+    request_id: str,
+) -> None:
+    import mcp.types as types
+
+    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {"jsonrpc": "2.0", "id": request_id, "method": "ping"},
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    registry = transport._RequestBudgetRegistry()
+
+    with pytest.raises(ValueError, match="256-byte serialized limit") as error:
+        registry.register_incoming_request(request)
+
+    assert request_id not in str(error.value)
+    assert budget.snapshot().transport_response_bytes == 0
+
+
 def test_raw_transport_reader_discards_oversized_frame() -> None:
     async def collect_payloads() -> list[Any]:
         import anyio

@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Security
+
+- Bound JSON-RPC request IDs by their serialized UTF-8 size before they can be
+  reflected in Trino MCP success or error responses.
+
 ## [1.0.0rc4] - 2026-08-02
 
 ### Changed
