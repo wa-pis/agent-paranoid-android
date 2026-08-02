@@ -27,6 +27,8 @@ All notable changes to this project are documented here.
   cursor.
 - Consume Trino response metadata and rows incrementally against the shared
   byte budget before retaining a complete oversized result.
+- Share one monotonic budget across nested table/column profiling and opt-in
+  safe SELECT execution, stopping before later Trino work after exhaustion.
 
 ### Migration
 

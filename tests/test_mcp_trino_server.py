@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from typing import Any
 
 import pytest
@@ -30,9 +31,14 @@ from test_data_agent.mcp_trino_server import (
     profile_table_safe,
     profile_temporal_ordering,
     run_safe_select,
+    trino_mcp_services,
     trino_mcp_tools,
     validate_table_references_allowed,
     validate_safe_select,
+)
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudgetExceeded,
 )
 from tests.trino_source_literals import (
     SOURCE_ROWS,
@@ -246,6 +252,137 @@ def test_raw_sql_tool_is_opt_in(
 
     monkeypatch.setenv("TRINO_ENABLE_SAFE_SELECT", "true")
     assert "run_safe_select" in {tool.__name__ for tool in trino_mcp_tools()}
+
+
+def test_safe_select_shares_preflight_budget_without_opening_connection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sql = (
+        "SELECT synthetic_id FROM analytics.safe_schema.customers "
+        "LIMIT 1"
+    )
+
+    class RejectingDbApi:
+        def __init__(self) -> None:
+            self.connect_calls = 0
+
+        def connect(self, **_: object) -> None:
+            self.connect_calls += 1
+            raise AssertionError("budget failure must precede Trino connection")
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = RejectingDbApi()
+
+    fake_trino = FakeTrino()
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        sql_formula_chars=2 * len(sql),
+    )
+    monkeypatch.setenv("TRINO_ENABLE_SAFE_SELECT", "true")
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+    service = next(
+        tool
+        for tool in trino_mcp_services(work_limits=limits)
+        if tool.__name__ == "run_safe_select"
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="SQL/formula characters"):
+        service(sql)
+
+    assert fake_trino.dbapi.connect_calls == 0
+
+
+def test_nested_profile_budget_stops_before_later_column_connection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    executed_sql: list[str] = []
+
+    class FakeCursor:
+        def __init__(self) -> None:
+            self.description: list[tuple[str]] = []
+            self.rows: list[tuple[object, ...]] = []
+            self.closed = False
+
+        def execute(self, sql: str, parameters: list[object]) -> None:
+            executed_sql.append(sql)
+            if "information_schema.columns" in sql:
+                self.description = [
+                    ("column_name",),
+                    ("data_type",),
+                    ("is_nullable",),
+                ]
+                self.rows = [
+                    ("customer_email", "varchar", "NO"),
+                    ("amount", "double", "NO"),
+                ]
+            elif sql.startswith("SELECT count(*) AS row_count FROM"):
+                self.description = [("row_count",)]
+                self.rows = [(12,)]
+            elif 'approx_distinct("customer_email")' in sql:
+                self.description = [
+                    ("row_count",),
+                    ("non_null_count",),
+                    ("approx_distinct_count",),
+                ]
+                self.rows = [(12, 12, 12)]
+            else:
+                raise AssertionError(f"unexpected query: {sql}")
+
+        def fetchmany(self, size: int) -> list[tuple[object, ...]]:
+            assert size == 1
+            batch = self.rows[:size]
+            self.rows = self.rows[size:]
+            return batch
+
+        def close(self) -> None:
+            self.closed = True
+
+    class FakeConnection:
+        def __init__(self) -> None:
+            self.cursor_instance = FakeCursor()
+            self.closed = False
+
+        def cursor(self) -> FakeCursor:
+            return self.cursor_instance
+
+        def close(self) -> None:
+            self.closed = True
+
+    class FakeDbApi:
+        def __init__(self) -> None:
+            self.connections: list[FakeConnection] = []
+
+        def connect(self, **_: object) -> FakeConnection:
+            connection = FakeConnection()
+            self.connections.append(connection)
+            return connection
+
+    class FakeTrino:
+        def __init__(self) -> None:
+            self.dbapi = FakeDbApi()
+
+    fake_trino = FakeTrino()
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, statements=3)
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.setattr("test_data_agent.mcp_trino_server.trino", fake_trino)
+    service = next(
+        tool
+        for tool in trino_mcp_services(work_limits=limits)
+        if tool.__name__ == "profile_table_safe"
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="statements"):
+        service("analytics", "safe_schema", "orders")
+
+    assert len(fake_trino.dbapi.connections) == 3
+    assert len(executed_sql) == 3
+    assert any('approx_distinct("customer_email")' in sql for sql in executed_sql)
+    assert all('"amount"' not in sql for sql in executed_sql)
+    assert all(
+        connection.closed and connection.cursor_instance.closed
+        for connection in fake_trino.dbapi.connections
+    )
 
 
 def test_row_sampling_surface_is_removed() -> None:

@@ -36,7 +36,7 @@
 
 ## P1 — Invocation and release hardening
 
-- [ ] Add a typed shared `QueryWorkBudget` with separate raw transport payload
+- [x] Add a typed shared `QueryWorkBudget` with separate raw transport payload
   and canonical application-argument limits. Create it fresh per invocation,
   keep it concurrency-isolated and non-resettable, and enforce SQL/formula,
   AST, depth, columns, statements, and response limits before their respective
@@ -57,7 +57,7 @@
     - [x] Enforce statement work before opening a connection or cursor.
     - [x] Consume response bytes incrementally before retaining complete
       oversized results.
-- [ ] Thread one budget through nested table/column profiling and safe-query
+- [x] Thread one budget through nested table/column profiling and safe-query
   execution; consume response bytes incrementally, stop after exhaustion, and
   prove no connection/cursor or later statement is opened after preflight or
   nested-budget failure.
