@@ -27,7 +27,8 @@ def work_limits(**overrides: int) -> QueryWorkLimits:
         "ast_depth": 6,
         "projected_columns": 5,
         "statements": 4,
-        "response_bytes": 60,
+        "database_result_bytes": 60,
+        "transport_response_bytes": 50,
     }
     values.update(overrides)
     return QueryWorkLimits(**values)
@@ -44,7 +45,8 @@ def test_budget_tracks_every_dimension_monotonically() -> None:
     budget.observe_ast_depth(2)
     budget.consume_projected_columns(2)
     budget.consume_statements()
-    budget.consume_response_bytes(50)
+    budget.consume_database_result_bytes(50)
+    budget.consume_transport_response_bytes(40)
 
     assert budget.snapshot() == QueryWorkSnapshot(
         raw_transport_payload_bytes=10,
@@ -54,23 +56,39 @@ def test_budget_tracks_every_dimension_monotonically() -> None:
         ast_depth=3,
         projected_columns=2,
         statements=1,
-        response_bytes=50,
+        database_result_bytes=50,
+        transport_response_bytes=40,
     )
 
 
-def test_budget_rejects_overspend_without_restoring_prior_work() -> None:
-    budget = QueryWorkBudget(work_limits(response_bytes=10))
+def test_database_result_budget_rejects_overspend_without_restoring_work() -> None:
+    budget = QueryWorkBudget(work_limits(database_result_bytes=10))
     budget.consume_statements()
-    budget.consume_response_bytes(6)
+    budget.consume_database_result_bytes(6)
 
     with pytest.raises(QueryWorkBudgetExceeded) as error:
-        budget.consume_response_bytes(5)
+        budget.consume_database_result_bytes(5)
 
-    assert error.value.dimension is QueryWorkDimension.RESPONSE_BYTES
+    assert error.value.dimension is QueryWorkDimension.DATABASE_RESULT_BYTES
     assert error.value.attempted == 11
     assert error.value.limit == 10
     assert budget.snapshot().statements == 1
-    assert budget.snapshot().response_bytes == 6
+    assert budget.snapshot().database_result_bytes == 6
+
+
+def test_transport_response_budget_is_independent_from_database_result() -> None:
+    budget = QueryWorkBudget(work_limits(transport_response_bytes=10))
+    budget.consume_database_result_bytes(8)
+    budget.consume_transport_response_bytes(6)
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        budget.consume_transport_response_bytes(5)
+
+    assert error.value.dimension is QueryWorkDimension.TRANSPORT_RESPONSE_BYTES
+    assert error.value.attempted == 11
+    assert error.value.limit == 10
+    assert budget.snapshot().database_result_bytes == 8
+    assert budget.snapshot().transport_response_bytes == 6
 
 
 def test_budget_rejects_excessive_depth_without_lowering_high_water_mark() -> None:
@@ -93,7 +111,8 @@ def test_budget_rejects_excessive_depth_without_lowering_high_water_mark() -> No
         "ast_depth",
         "projected_columns",
         "statements",
-        "response_bytes",
+        "database_result_bytes",
+        "transport_response_bytes",
     ],
 )
 def test_limits_require_positive_values(field: str) -> None:

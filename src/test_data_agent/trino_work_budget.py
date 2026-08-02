@@ -24,7 +24,8 @@ class QueryWorkDimension(StrEnum):
     AST_DEPTH = "AST depth"
     PROJECTED_COLUMNS = "projected columns"
     STATEMENTS = "statements"
-    RESPONSE_BYTES = "response bytes"
+    DATABASE_RESULT_BYTES = "database result bytes"
+    TRANSPORT_RESPONSE_BYTES = "transport response bytes"
 
 
 class QueryWorkBudgetExceeded(ValueError):
@@ -55,7 +56,8 @@ class QueryWorkLimits:
     ast_depth: int
     projected_columns: int
     statements: int
-    response_bytes: int
+    database_result_bytes: int
+    transport_response_bytes: int
 
     def __post_init__(self) -> None:
         for name, value in (
@@ -66,7 +68,8 @@ class QueryWorkLimits:
             ("ast_depth", self.ast_depth),
             ("projected_columns", self.projected_columns),
             ("statements", self.statements),
-            ("response_bytes", self.response_bytes),
+            ("database_result_bytes", self.database_result_bytes),
+            ("transport_response_bytes", self.transport_response_bytes),
         ):
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
@@ -80,7 +83,8 @@ DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
     ast_depth=100,
     projected_columns=1_000,
     statements=2_048,
-    response_bytes=4 * 1024 * 1024,
+    database_result_bytes=4 * 1024 * 1024,
+    transport_response_bytes=4 * 1024 * 1024,
 )
 
 
@@ -93,7 +97,8 @@ class QueryWorkSnapshot:
     ast_depth: int
     projected_columns: int
     statements: int
-    response_bytes: int
+    database_result_bytes: int
+    transport_response_bytes: int
 
 
 class QueryWorkBudget:
@@ -103,12 +108,13 @@ class QueryWorkBudget:
         "_ast_depth",
         "_ast_nodes",
         "_canonical_argument_bytes",
+        "_database_result_bytes",
         "_limits",
         "_projected_columns",
         "_raw_transport_payload_bytes",
-        "_response_bytes",
         "_sql_formula_chars",
         "_statements",
+        "_transport_response_bytes",
     )
 
     def __init__(self, limits: QueryWorkLimits) -> None:
@@ -120,7 +126,8 @@ class QueryWorkBudget:
         self._ast_depth = 0
         self._projected_columns = 0
         self._statements = 0
-        self._response_bytes = 0
+        self._database_result_bytes = 0
+        self._transport_response_bytes = 0
 
     @property
     def limits(self) -> QueryWorkLimits:
@@ -135,7 +142,8 @@ class QueryWorkBudget:
             ast_depth=self._ast_depth,
             projected_columns=self._projected_columns,
             statements=self._statements,
-            response_bytes=self._response_bytes,
+            database_result_bytes=self._database_result_bytes,
+            transport_response_bytes=self._transport_response_bytes,
         )
 
     def consume_raw_transport_payload_bytes(self, amount: int) -> None:
@@ -196,12 +204,20 @@ class QueryWorkBudget:
             limit=self._limits.statements,
         )
 
-    def consume_response_bytes(self, amount: int) -> None:
-        self._response_bytes = self._consume(
-            QueryWorkDimension.RESPONSE_BYTES,
-            current=self._response_bytes,
+    def consume_database_result_bytes(self, amount: int) -> None:
+        self._database_result_bytes = self._consume(
+            QueryWorkDimension.DATABASE_RESULT_BYTES,
+            current=self._database_result_bytes,
             amount=amount,
-            limit=self._limits.response_bytes,
+            limit=self._limits.database_result_bytes,
+        )
+
+    def consume_transport_response_bytes(self, amount: int) -> None:
+        self._transport_response_bytes = self._consume(
+            QueryWorkDimension.TRANSPORT_RESPONSE_BYTES,
+            current=self._transport_response_bytes,
+            amount=amount,
+            limit=self._limits.transport_response_bytes,
         )
 
     @classmethod
@@ -268,8 +284,8 @@ def consume_ast_work(
         pending.extend((child, depth + 1) for child in child_nodes(node))
 
 
-def consume_response_payload(value: Any) -> None:
-    """Charge one response fragment before its value is retained by the caller."""
+def consume_database_result_payload(value: Any) -> None:
+    """Charge one database-result fragment before the client retains it."""
     budget = current_query_work_budget()
     if budget is None:
         return
@@ -280,7 +296,7 @@ def consume_response_payload(value: Any) -> None:
         ensure_ascii=False,
         separators=(",", ":"),
     ).encode("utf-8")
-    budget.consume_response_bytes(len(payload))
+    budget.consume_database_result_bytes(len(payload))
 
 
 def canonical_argument_size(
