@@ -19,8 +19,12 @@
   Evidence: [Verify Published Release #7](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757)
   installed the exact public RC4 wheel for all four profiles without a source
   checkout and passed the literal README `doctor` and `demo` commands.
-- [ ] Verify `--version`, `demo`, and `doctor` for each applicable profile;
+- [x] Verify `--version`, `demo`, and `doctor` for each applicable profile;
   record package version, artifact hashes, Python version, and extra profile.
+  Evidence: [Verify Published Release #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272)
+  passed all seven public install profiles and recorded the exact version,
+  wheel hash, Python version, and profile in each job summary; its package job
+  reverified the wheel, source-distribution, and SBOM hashes.
 - [ ] Extend the public wheel matrix to `[parquet]`, `[openai]`, and `[all]`;
   verify the CLI, generator-MCP, and Trino-MCP images in the separate
   container matrix.
