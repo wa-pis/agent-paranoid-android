@@ -152,6 +152,18 @@ class FakeMCP:
         return register
 
 
+class RecordingStdout:
+    def __init__(self) -> None:
+        self.payloads: list[bytes] = []
+        self.flush_count = 0
+
+    async def write(self, payload: bytes) -> None:
+        self.payloads.append(payload)
+
+    async def flush(self) -> None:
+        self.flush_count += 1
+
+
 def test_raw_transport_budget_is_charged_before_json_parsing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -196,6 +208,101 @@ def test_raw_transport_budget_is_attached_to_valid_request() -> None:
 
     assert isinstance(budget, QueryWorkBudget)
     assert budget.snapshot().raw_transport_payload_bytes == len(payload)
+
+
+@pytest.mark.parametrize(
+    "response_json",
+    [
+        (
+            '{"jsonrpc":"2.0","id":"request-1",'
+            '"result":{"nested":{"escaped":"line\\nvalue","unicode":"é"}}}'
+        ),
+        (
+            '{"jsonrpc":"2.0","id":"request-1",'
+            '"error":{"code":-32603,"message":"bounded error",'
+            '"data":{"retryable":false}}}'
+        ),
+    ],
+    ids=("result", "error"),
+)
+def test_transport_response_budget_counts_final_jsonrpc_and_framing(
+    response_json: str,
+) -> None:
+    import anyio
+    import mcp.types as types
+    from mcp.shared.message import SessionMessage
+
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, transport_response_bytes=512)
+    budget = QueryWorkBudget(limits)
+    request = transport._bounded_session_message(
+        b'{"jsonrpc":"2.0","id":"request-1","method":"ping"}\n',
+        lambda raw_payload_bytes: budget,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    response = SessionMessage(
+        types.JSONRPCMessage.model_validate_json(response_json)
+    )
+    expected = response.message.model_dump_json(
+        by_alias=True,
+        exclude_none=True,
+    ).encode("utf-8") + b"\n"
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    assert stdout.payloads == [expected]
+    assert stdout.flush_count == 1
+    assert budget.snapshot().transport_response_bytes == len(expected)
+
+
+def test_transport_response_overflow_fails_before_writer() -> None:
+    import anyio
+    import mcp.types as types
+    from mcp.shared.message import SessionMessage
+
+    response = SessionMessage(
+        types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":7,"result":{"value":"too-wide"}}'
+        )
+    )
+    response_size = len(
+        response.message.model_dump_json(
+            by_alias=True,
+            exclude_none=True,
+        ).encode("utf-8")
+    ) + 1
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=response_size - 1,
+    )
+    budget = QueryWorkBudget(limits)
+    request = transport._bounded_session_message(
+        b'{"jsonrpc":"2.0","id":7,"method":"ping"}\n',
+        lambda raw_payload_bytes: budget,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        anyio.run(
+            transport._write_bounded_session_message,
+            stdout,
+            response,
+            registry,
+        )
+
+    assert error.value.attempted == response_size
+    assert error.value.limit == response_size - 1
+    assert stdout.payloads == []
+    assert stdout.flush_count == 0
+    assert budget.snapshot().transport_response_bytes == 0
 
 
 def test_raw_transport_reader_discards_oversized_frame() -> None:

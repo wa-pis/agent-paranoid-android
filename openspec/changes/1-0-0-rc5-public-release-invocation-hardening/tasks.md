@@ -43,7 +43,7 @@
   `database_result_bytes` and `transport_response_bytes`.
 - [x] Enforce database-result bytes incrementally during cursor consumption,
   including row conversion overhead needed by the client result boundary.
-- [ ] Enforce transport-response bytes after final MCP JSON serialization and
+- [x] Enforce transport-response bytes after final MCP JSON serialization and
   at the production writer boundary before stdout/transport framing is
   emitted, including the complete UTF-8 JSON-RPC envelope, request ID,
   framing, escaping, dictionaries, nested metadata, and error objects.
