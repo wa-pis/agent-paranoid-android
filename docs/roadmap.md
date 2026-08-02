@@ -207,7 +207,7 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The package release candidate is `1.0.0rc4`. `1.0.0rc2` completed public
+The accepted release candidate is `1.0.0rc4`. `1.0.0rc2` completed public
 acceptance; `1.0.0rc3` added the contract-preserving application-boundary
 refactor. `1.0.0rc4` closes the privacy and first invocation-budget findings,
 but its public-index acceptance remains an explicit gate until the exact wheel
@@ -381,7 +381,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Record full local and exact-commit GitHub gate evidence.
      - [x] Confirm no canonical deltas are required and archive the completed
        change.
-8. [ ] Complete the [1.0.0rc4 privacy and invocation hardening
+8. [x] Complete the [1.0.0rc4 privacy and invocation hardening
    OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md),
    publish `1.0.0rc4` from the verified merge commit, and repeat
    public-artifact acceptance against that candidate.
@@ -397,7 +397,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      canonical application-input limits, fresh per-invocation lifecycle,
      concurrency isolation, non-resettable counters, and incremental response
      accumulation limits.
-   - [ ] Correct prerelease installation instructions to use the exact
+   - [x] Correct prerelease installation instructions to use the exact
      `agent-paranoid-android==1.0.0rc4` command and execute the README
      quickstart from a clean environment using that public artifact.
    - [x] Clarify that default aggregate-only MCP is source-literal-free while
@@ -541,7 +541,7 @@ optional milestone after `1.0.0`.
 
 Scope:
 
-- [ ] Complete and review the [RC4 privacy and invocation hardening
+- [x] Complete and review the [RC4 privacy and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md).
 - [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
   query builder, and public compatibility exports. Do not retain a row
@@ -555,7 +555,7 @@ Scope:
   separate raw transport and canonical application-input limits, fresh
   per-invocation lifecycle, concurrency isolation, non-resettable counters,
   shared nested consumption, and incremental response-byte accounting.
-- [ ] Change prerelease installation guidance to the exact
+- [x] Change prerelease installation guidance to the exact
   `agent-paranoid-android==1.0.0rc4` command, keep extras consistent, and run
   the literal README quickstart in a clean environment against that public
   wheel.
@@ -571,7 +571,7 @@ Scope:
 - [x] Document the durability boundary between atomic visibility, process
   interruption recovery, and crash/power-loss durability. Decide explicitly
   whether fsync is a post-1.0 improvement or a release requirement.
-- [ ] Run the direct API adversarial suite, Trino integration checks, typing,
+- [x] Run the direct API adversarial suite, Trino integration checks, typing,
   lint, compile, full tests, wheel/container checks, documentation build,
   security scans, and public package acceptance against the exact RC4 commit.
 
