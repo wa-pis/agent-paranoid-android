@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Bound JSON-RPC request IDs by their serialized UTF-8 size before they can be
   reflected in Trino MCP success or error responses.
+- Replace oversized Trino MCP responses with a fixed bounded JSON-RPC error and
+  reject transport-response limits too small to reserve that error.
 
 ## [1.0.0rc4] - 2026-08-02
 

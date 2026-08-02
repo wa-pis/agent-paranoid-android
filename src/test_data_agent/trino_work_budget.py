@@ -14,6 +14,7 @@ from typing import Any, ParamSpec, TypeVar
 
 P = ParamSpec("P")
 R = TypeVar("R")
+MIN_TRANSPORT_RESPONSE_BYTES = 350
 
 
 class QueryWorkDimension(StrEnum):
@@ -73,6 +74,11 @@ class QueryWorkLimits:
         ):
             if value <= 0:
                 raise ValueError(f"{name} must be positive")
+        if self.transport_response_bytes < MIN_TRANSPORT_RESPONSE_BYTES:
+            raise ValueError(
+                "transport_response_bytes must be at least "
+                f"{MIN_TRANSPORT_RESPONSE_BYTES}"
+            )
 
 
 DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(

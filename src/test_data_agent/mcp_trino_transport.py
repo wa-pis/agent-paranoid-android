@@ -16,11 +16,27 @@ except ImportError:  # pragma: no cover
     FastMCP = None  # type: ignore[misc, assignment]
 
 from test_data_agent.audit import audited_mcp_tool
-from test_data_agent.trino_work_budget import QueryWorkBudget
+from test_data_agent.trino_work_budget import (
+    MIN_TRANSPORT_RESPONSE_BYTES,
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+)
 
 
 RawRequestContextFactory = Callable[[int], QueryWorkBudget]
 _MAX_JSONRPC_REQUEST_ID_BYTES = 256
+_TRANSPORT_OVERFLOW_ERROR_PREFIX = b'{"jsonrpc":"2.0","id":'
+_TRANSPORT_OVERFLOW_ERROR_SUFFIX = (
+    b',"error":{"code":-32001,'
+    b'"message":"response exceeds transport budget"}}\n'
+)
+_RESERVED_TRANSPORT_ERROR_BYTES = (
+    len(_TRANSPORT_OVERFLOW_ERROR_PREFIX)
+    + _MAX_JSONRPC_REQUEST_ID_BYTES
+    + len(_TRANSPORT_OVERFLOW_ERROR_SUFFIX)
+)
+if _RESERVED_TRANSPORT_ERROR_BYTES != MIN_TRANSPORT_RESPONSE_BYTES:
+    raise RuntimeError("transport overflow error reservation is inconsistent")
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,15 +94,30 @@ class _RequestBudgetRegistry:
 
 
 def _validate_jsonrpc_request_id(request_id: Any) -> None:
-    serialized = json.dumps(
-        request_id,
-        ensure_ascii=False,
-        separators=(",", ":"),
-    ).encode("utf-8")
+    serialized = _serialize_jsonrpc_request_id(request_id)
     if len(serialized) > _MAX_JSONRPC_REQUEST_ID_BYTES:
         raise ValueError(
             "JSON-RPC request ID exceeds the 256-byte serialized limit"
         )
+
+
+def _serialize_jsonrpc_request_id(request_id: Any) -> bytes:
+    return json.dumps(
+        request_id,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _transport_overflow_error_payload(request_id: Any) -> bytes:
+    serialized_id = _serialize_jsonrpc_request_id(request_id)
+    if len(serialized_id) > _MAX_JSONRPC_REQUEST_ID_BYTES:
+        raise ValueError("cannot reflect an oversized JSON-RPC request ID")
+    return (
+        _TRANSPORT_OVERFLOW_ERROR_PREFIX
+        + serialized_id
+        + _TRANSPORT_OVERFLOW_ERROR_SUFFIX
+    )
 
 
 async def _write_bounded_session_message(
@@ -101,7 +132,16 @@ async def _write_bounded_session_message(
     ).encode("utf-8") + b"\n"
     budget = budget_registry.resolve_outgoing(session_message)
     if budget is not None:
-        budget.consume_transport_response_bytes(len(payload))
+        try:
+            budget.consume_transport_response_bytes(len(payload))
+        except QueryWorkBudgetExceeded:
+            import mcp.types as types
+
+            root = session_message.message.root
+            if not isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
+                raise
+            payload = _transport_overflow_error_payload(root.id)
+            budget.consume_transport_response_bytes(len(payload))
     await stdout.write(payload)
     await stdout.flush()
     budget_registry.complete_outgoing(session_message)

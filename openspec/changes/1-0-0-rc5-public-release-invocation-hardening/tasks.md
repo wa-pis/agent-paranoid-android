@@ -49,7 +49,7 @@
   framing, escaping, dictionaries, nested metadata, and error objects.
 - [x] Bound JSON-RPC request IDs, including long, Unicode, and escaped IDs, so
   success and overflow responses cannot expand beyond the configured budget.
-- [ ] Reserve and test a fixed small error response that always fits the
+- [x] Reserve and test a fixed small error response that always fits the
   transport budget; reject configurations whose limit is below that minimum.
 - [ ] Add tests for wide rows, nested metadata, escaping expansion, database
   overflow, transport overflow, and bounded overflow errors.
