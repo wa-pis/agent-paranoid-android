@@ -111,9 +111,13 @@ with evidence from the candidate commit.
 | RC4-F3 | P2 | Opt-in `run_safe_select` rows may contain allowed source values or values missed by heuristic masking. | Repository maintainer (`@wa-pis`) for implementation; deploying operator for enablement. | Accepted as an explicit, disabled-by-default contract risk outside the source-literal-free guarantee. | 2026-11-01; review immediately before default enablement, a source-free claim, a new row-returning capability, returned values in errors or audit records, or a query/privacy incident. |
 
 The public-wheel clean-environment check and exact-commit package, container,
-documentation, attestation, signature, and integration acceptance are pending
-release evidence, not findings. They remain release-blocking tasks and cannot
-be accepted or deferred through this register.
+documentation, attestation, signature, and integration checks were pending
+release evidence, not findings before publication.
+They remain release-blocking tasks for any replacement candidate and completed
+successfully for `v1.0.0rc4`. The
+immutable commit, workflow runs, package hashes, and container
+digests are recorded in the
+[RC4 published-release evidence](../../../docs/release-evidence-1.0.0rc4.md).
 
 ## Stable Promotion Contract
 
