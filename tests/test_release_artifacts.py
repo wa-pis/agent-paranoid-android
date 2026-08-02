@@ -380,6 +380,19 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "tests/fixtures" not in workflow
     assert "source_rows_copied" in workflow
     assert "wa-pis.github.io/agent-paranoid-android" in workflow
+    profile_job = workflow.split("\n  public-install-profiles:\n", maxsplit=1)[1]
+    profile_job = profile_job.split("\n  containers:\n", maxsplit=1)[0]
+    for requirement in (
+        "agent-paranoid-android",
+        "agent-paranoid-android[trino]",
+        "agent-paranoid-android[mcp]",
+        "agent-paranoid-android[mcp,trino]",
+    ):
+        assert f'requirement: "{requirement}"' in profile_job
+    assert "--index-url https://pypi.org/simple" in profile_job
+    assert "--only-binary=:all:" in profile_job
+    assert "-m pip check" in profile_job
+    assert "actions/checkout@" not in profile_job
     assert "docker buildx imagetools inspect" in workflow
     assert "linux/amd64" in workflow
     assert "linux/arm64" in workflow
