@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from test_data_agent import mcp_trino_server
@@ -21,6 +23,11 @@ from test_data_agent.trino_query_builders import (
     build_top_values_query,
 )
 from test_data_agent.trino_sql_policy import SqlSafetyError
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudgetExceeded,
+    with_query_work_budget,
+)
 
 
 def test_metadata_builders_return_parameterized_queries() -> None:
@@ -141,6 +148,37 @@ def test_builders_reject_identifier_and_formula_injection() -> None:
             "__import__('os').system('id')",
             0.01,
         )
+
+
+def test_formula_budget_fails_before_python_ast_parsing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parsed: list[str] = []
+
+    def parse_expression(expression: str, *, mode: str) -> None:
+        parsed.append(f"{mode}:{expression}")
+
+    monkeypatch.setattr(
+        "test_data_agent.trino_query_builders.ast.parse",
+        parse_expression,
+    )
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, sql_formula_chars=5)
+    wrapped = with_query_work_budget(
+        build_formula_rule_profile_query,
+        limits,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="SQL/formula characters"):
+        wrapped(
+            "analytics",
+            "safe_schema",
+            "synthetic_orders",
+            "total",
+            "subtotal + tax",
+            0.01,
+        )
+
+    assert parsed == []
 
 
 def test_server_keeps_query_builder_compatibility_exports() -> None:

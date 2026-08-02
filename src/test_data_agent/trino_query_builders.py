@@ -12,6 +12,7 @@ from test_data_agent.trino_sql_policy import (
     quote_identifier,
     require_identifier,
 )
+from test_data_agent.trino_work_budget import consume_sql_formula_chars
 
 
 @dataclass(frozen=True)
@@ -361,6 +362,7 @@ def require_non_negative_float(value: float, label: str) -> float:
 
 
 def build_formula_sql(expression: str) -> FormulaSql:
+    consume_sql_formula_chars(expression)
     try:
         node = ast.parse(expression, mode="eval")
     except SyntaxError as exc:

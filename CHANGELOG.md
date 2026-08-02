@@ -17,6 +17,8 @@ All notable changes to this project are documented here.
   reject canonical application arguments over 256 KiB before tool execution.
 - Reject raw Trino MCP stdio payloads over 1 MiB before JSON-RPC argument
   parsing, without retaining the complete oversized frame in memory.
+- Bound cumulative SQL and formula character work before Python/sqlglot
+  parsing and before opening a Trino connection.
 
 ### Migration
 

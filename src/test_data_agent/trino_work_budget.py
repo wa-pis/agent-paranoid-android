@@ -243,6 +243,13 @@ def current_query_work_budget() -> QueryWorkBudget | None:
     return _CURRENT_QUERY_WORK_BUDGET.get()
 
 
+def consume_sql_formula_chars(value: str) -> None:
+    """Charge text work to the current invocation before parsing or I/O."""
+    budget = current_query_work_budget()
+    if budget is not None:
+        budget.consume_sql_formula_chars(len(value))
+
+
 def canonical_argument_size(
     function: Callable[..., Any],
     *args: Any,
