@@ -51,7 +51,7 @@
   success and overflow responses cannot expand beyond the configured budget.
 - [x] Reserve and test a fixed small error response that always fits the
   transport budget; reject configurations whose limit is below that minimum.
-- [ ] Add tests for wide rows, nested metadata, escaping expansion, database
+- [x] Add tests for wide rows, nested metadata, escaping expansion, database
   overflow, transport overflow, and bounded overflow errors.
 
 ## P2 — Cumulative invocation limits
