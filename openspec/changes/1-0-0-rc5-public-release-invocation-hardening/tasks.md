@@ -41,7 +41,7 @@
 
 - [x] Rename/split the typed budget counters into
   `database_result_bytes` and `transport_response_bytes`.
-- [ ] Enforce database-result bytes incrementally during cursor consumption,
+- [x] Enforce database-result bytes incrementally during cursor consumption,
   including row conversion overhead needed by the client result boundary.
 - [ ] Enforce transport-response bytes after final MCP JSON serialization and
   at the production writer boundary before stdout/transport framing is

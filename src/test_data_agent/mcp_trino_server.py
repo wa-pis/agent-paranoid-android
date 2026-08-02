@@ -141,8 +141,8 @@ def _execute_query(
 def _fetch_dicts(
     sql: str, parameters: Sequence[Any] | None = None
 ) -> list[dict[str, Any]]:
-    rows, description = _execute_query(sql, parameters)
-    return rows_to_dicts(description, rows)
+    client = TrinoClient(config=TrinoConfig.from_env(), driver=trino)
+    return client.fetch_dicts(sql, parameters)
 
 
 def _fetch_built_query(query: TrinoQuery) -> list[dict[str, Any]]:
