@@ -75,6 +75,19 @@ structured `business_rules_payload`.
 
 ## Safe Trino Sequence
 
+The default Trino registration is source-literal-free and contains only
+metadata and aggregate profiling tools:
+
+- `list_catalogs`, `list_schemas`, `list_tables`, `describe_table`;
+- `profile_table`, `profile_table_safe`, `profile_column`;
+- `profile_foreign_key`, `profile_temporal_ordering`, `profile_formula_rule`;
+- `profile_conditional_required`, `profile_conditional_allowed_values`;
+- `profile_aggregate_mapping`.
+
+This default surface has no row-returning diagnostic. Its successful
+responses, validation and database errors, and metadata-only audit records do
+not contain source-cell literals.
+
 1. Call `list_catalogs`, `list_schemas`, and `list_tables`.
 2. Call `describe_table`.
 3. Call `profile_table_safe` for an allowlisted table.
@@ -93,7 +106,11 @@ isolated local Trino instance.
 The raw-SQL `run_safe_select` MCP tool is not exposed by default. Trusted
 clients that need the separately validated query tool must explicitly set
 `TRINO_ENABLE_SAFE_SELECT=true`. The review-first planning sequence above does
-not require it.
+not require it. Its bounded row-shaped result may contain allowed source
+values, including values not recognized as sensitive by heuristic masking.
+Enabling it does not make returned rows source-free, PII-free, anonymous, or
+privacy-safe; use a separately trusted client and do not relay its results to
+an LLM or generated output.
 
 ## Expected Result
 

@@ -388,10 +388,10 @@ into `1.0.0rc1`. Finish the release stage in this order:
      query builder, and public compatibility exports. Do not retain a row
      diagnostic in RC4; require a separate OpenSpec for any future
      row-returning capability.
-   - [ ] Test the complete production-registered default Trino toolset through
+   - [x] Test the complete production-registered default Trino toolset through
      direct-service and transport boundaries, including serialized success,
      error, and audit payloads with typed source-literal sentinels.
-   - [ ] Add and enforce a shared invocation-level Trino work budget across
+   - [x] Add and enforce a shared invocation-level Trino work budget across
      nested profiling and query operations. Define separate raw transport and
      canonical application-input limits, fresh per-invocation lifecycle,
      concurrency isolation, non-resettable counters, and incremental response
@@ -399,7 +399,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
    - [ ] Correct prerelease installation instructions to use the exact
      `agent-paranoid-android==1.0.0rc4` command and execute the README
      quickstart from a clean environment using that public artifact.
-   - [ ] Clarify that default aggregate-only MCP is source-literal-free while
+   - [x] Clarify that default aggregate-only MCP is source-literal-free while
      `run_safe_select` is a separate explicit opt-in and is not source-free.
      Remove stale `sample_rows_masked` documentation.
    - [ ] Record the disposition of crash-durability/fsync work; it is not an
@@ -546,11 +546,11 @@ Scope:
   query builder, and public compatibility exports. Do not retain a row
   diagnostic in RC4; require a separate OpenSpec for any future
   row-returning capability.
-- [ ] Add adversarial regression tests over the complete production-registered
+- [x] Add adversarial regression tests over the complete production-registered
   default toolset through direct-service and transport boundaries. Check
   serialized success, error, and audit payloads with typed source-literal
   sentinels, including values that heuristic PII masking would not flag.
-- [ ] Introduce a common `QueryWorkBudget` for one MCP invocation with
+- [x] Introduce a common `QueryWorkBudget` for one MCP invocation with
   separate raw transport and canonical application-input limits, fresh
   per-invocation lifecycle, concurrency isolation, non-resettable counters,
   shared nested consumption, and incremental response-byte accounting.
@@ -558,11 +558,11 @@ Scope:
   `agent-paranoid-android==1.0.0rc4` command, keep extras consistent, and run
   the literal README quickstart in a clean environment against that public
   wheel.
-- [ ] Reconfirm the dependency boundary: Trino is an optional integration.
+- [x] Reconfirm the dependency boundary: Trino is an optional integration.
   The base wheel and CSV/JSON workflow must install and run without `trino`,
   `sqlglot`, or the MCP SDK; Trino capability checks belong to the separate
   `trino` extra and must not become a base-install release gate.
-- [ ] Update MCP documentation and compatibility fixtures to distinguish the
+- [x] Update MCP documentation and compatibility fixtures to distinguish the
   source-literal-free aggregate-only default from the separate opt-in
   `run_safe_select` capability. Remove stale `sample_rows_masked` references
   and do not describe row-returning output as source-free, PII-free,

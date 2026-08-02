@@ -79,7 +79,7 @@
 
 ## P2/P3 — Contract clarity and durability decision
 
-- [ ] Document the aggregate-only default toolset and the separate
+- [x] Document the aggregate-only default toolset and the separate
   `run_safe_select` opt-in. Remove stale `sample_rows_masked` references and
   claims that row-returning output is source-free, PII-free, anonymous, or
   privacy-safe.

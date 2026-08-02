@@ -12,6 +12,8 @@ All notable changes to this project are documented here.
   tag-matched clean-environment README smoke gate for the public wheel.
 - Verify installed-wheel CSV and JSON quickstarts without optional integration
   dependencies, and isolate Trino-extra failures in a separate CI check.
+- Document the exact aggregate-only default Trino MCP surface and classify the
+  separately enabled safe-select rows as potentially containing source values.
 
 ### Security
 
