@@ -31,8 +31,11 @@
   Evidence: [Verify Published Release #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272)
   passed all three added public wheel profiles and the three separate
   published-image container jobs.
-- [ ] Re-run public documentation, container signature, package attestation,
+- [x] Re-run public documentation, container signature, package attestation,
   and upgrade-from-`0.12.0` checks from published artifacts only.
+  Evidence: [Verify Published Release #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369)
+  passed from workflow commit `92a4e1a` against immutable tag `v1.0.0rc4` and
+  release commit `33073c0`.
 
 ## P2 — Database versus transport response budgets
 
