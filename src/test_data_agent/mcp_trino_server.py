@@ -117,6 +117,11 @@ from test_data_agent.trino_sql_policy import (
     validate_safe_select_shape as validate_safe_select_shape,
     validate_table_references_allowed as validate_table_references_allowed,
 )
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkLimits,
+    with_query_work_budget,
+)
 
 DEFAULT_LIMIT = 100
 ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
@@ -364,7 +369,17 @@ def trino_mcp_tools() -> list[Callable[..., Any]]:
     return tools
 
 
-mcp: Any = create_trino_mcp(trino_mcp_tools())
+def trino_mcp_services(
+    *,
+    work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+) -> list[Callable[..., Any]]:
+    return [
+        with_query_work_budget(tool, work_limits)
+        for tool in trino_mcp_tools()
+    ]
+
+
+mcp: Any = create_trino_mcp(trino_mcp_services())
 
 
 def main() -> None:

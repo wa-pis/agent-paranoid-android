@@ -72,6 +72,18 @@ class QueryWorkLimits:
                 raise ValueError(f"{name} must be positive")
 
 
+DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
+    raw_transport_payload_bytes=1024 * 1024,
+    canonical_argument_bytes=256 * 1024,
+    sql_formula_chars=100_000,
+    ast_nodes=10_000,
+    ast_depth=100,
+    projected_columns=1_000,
+    statements=2_048,
+    response_bytes=4 * 1024 * 1024,
+)
+
+
 @dataclass(frozen=True, slots=True)
 class QueryWorkSnapshot:
     raw_transport_payload_bytes: int
