@@ -366,6 +366,20 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "GITHUB_STEP_SUMMARY" in workflow
     assert "scripts.verify_pypi_release" in workflow
     assert "--require-hashes" in workflow
+    upgrade_step = workflow.split(
+        "      - name: Upgrade from public 0.12.0\n", maxsplit=1
+    )[1]
+    upgrade_step = upgrade_step.split("\n      - name:", maxsplit=1)[0]
+    assert '"agent-paranoid-android==0.12.0"' in upgrade_step
+    assert '"agent-paranoid-android==${PYPI_VERSION}"' in upgrade_step
+    assert "--index-url https://pypi.org/simple" in upgrade_step
+    assert "--only-binary=:all:" in upgrade_step
+    assert "--upgrade" in upgrade_step
+    assert "-m pip check" in upgrade_step
+    assert "test-data-agent --version" in upgrade_step
+    assert "test-data-agent doctor" in upgrade_step
+    assert "test-data-agent demo" in upgrade_step
+    assert 'manifest["source_rows_copied"] is False' in upgrade_step
     assert "Run README quickstart from public wheel" in workflow
     assert 'print(test_data_agent.__version__)' in workflow
     assert '= "${PYPI_VERSION}"' in workflow
