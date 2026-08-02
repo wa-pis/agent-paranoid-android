@@ -136,6 +136,43 @@ def test_invocation_wrapper_creates_fresh_budgets_and_clears_context() -> None:
     assert current_query_work_budget() is None
 
 
+def test_invocation_wrapper_reuses_transport_budget() -> None:
+    budget = QueryWorkBudget(work_limits())
+    budget.consume_raw_transport_payload_bytes(12)
+
+    def inspect_budget(value: str) -> QueryWorkSnapshot:
+        current = current_query_work_budget()
+        assert current is budget
+        return current.snapshot()
+
+    wrapped = with_query_work_budget(
+        inspect_budget,
+        budget.limits,
+        budget_provider=lambda: budget,
+    )
+
+    snapshot = wrapped("value")
+
+    assert snapshot.raw_transport_payload_bytes == 12
+    assert snapshot.canonical_argument_bytes == canonical_argument_size(
+        inspect_budget,
+        "value",
+    )
+    assert current_query_work_budget() is None
+
+
+def test_invocation_wrapper_rejects_mismatched_transport_limits() -> None:
+    budget = QueryWorkBudget(work_limits(canonical_argument_bytes=89))
+    wrapped = with_query_work_budget(
+        lambda: None,
+        work_limits(),
+        budget_provider=lambda: budget,
+    )
+
+    with pytest.raises(ValueError, match="work limits must match"):
+        wrapped()
+
+
 def test_invocation_wrapper_isolates_concurrent_budgets() -> None:
     barrier = Barrier(2)
 

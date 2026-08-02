@@ -15,6 +15,8 @@ All notable changes to this project are documented here.
   masking to prevent unknown source literals from reaching MCP clients.
 - Create a concurrency-isolated work budget for every Trino MCP invocation and
   reject canonical application arguments over 256 KiB before tool execution.
+- Reject raw Trino MCP stdio payloads over 1 MiB before JSON-RPC argument
+  parsing, without retaining the complete oversized frame in memory.
 
 ### Migration
 

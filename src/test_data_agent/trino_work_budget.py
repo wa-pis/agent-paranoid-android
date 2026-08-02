@@ -263,12 +263,18 @@ def canonical_argument_size(
 def with_query_work_budget(
     function: Callable[P, R],
     limits: QueryWorkLimits,
+    *,
+    budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
 ) -> Callable[P, R]:
     """Create and isolate one work budget around an application invocation."""
 
     @wraps(function)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-        budget = QueryWorkBudget(limits)
+        budget = budget_provider() if budget_provider is not None else None
+        if budget is None:
+            budget = QueryWorkBudget(limits)
+        elif budget.limits != limits:
+            raise ValueError("transport and application work limits must match")
         token = _CURRENT_QUERY_WORK_BUDGET.set(budget)
         try:
             budget.consume_canonical_argument_bytes(

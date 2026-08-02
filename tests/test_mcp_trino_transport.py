@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import io
 import inspect
 import json
 from collections.abc import Callable
@@ -19,6 +20,7 @@ from test_data_agent.audit import (
 )
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
     QueryWorkBudgetExceeded,
     canonical_argument_size,
     with_query_work_budget,
@@ -148,6 +150,105 @@ class FakeMCP:
             return function
 
         return register
+
+
+def test_raw_transport_budget_is_charged_before_json_parsing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parsed: list[bytes] = []
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, raw_transport_payload_bytes=5)
+
+    def parse_payload(payload: bytes) -> Any:
+        parsed.append(payload)
+        raise AssertionError("oversized payload must not be parsed")
+
+    monkeypatch.setattr(
+        "mcp.types.JSONRPCMessage.model_validate_json",
+        parse_payload,
+    )
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="raw transport payload bytes"):
+        transport._bounded_session_message(b"123456", create_budget)
+
+    assert parsed == []
+
+
+def test_raw_transport_budget_is_attached_to_valid_request() -> None:
+    pytest.importorskip("mcp.shared.message")
+    payload = b'{"jsonrpc":"2.0","id":1,"method":"ping"}\n'
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        raw_transport_payload_bytes=len(payload),
+    )
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    session_message = transport._bounded_session_message(payload, create_budget)
+    budget = session_message.metadata.request_context
+
+    assert isinstance(budget, QueryWorkBudget)
+    assert budget.snapshot().raw_transport_payload_bytes == len(payload)
+
+
+def test_raw_transport_reader_discards_oversized_frame() -> None:
+    async def collect_payloads() -> list[Any]:
+        import anyio
+
+        stdin = anyio.wrap_file(io.BytesIO(b"123456789\n{}\n"))
+        return [
+            payload
+            async for payload in transport._bounded_raw_payloads(stdin, 5)
+        ]
+
+    import anyio
+
+    payloads = anyio.run(collect_payloads)
+
+    assert len(payloads) == 2
+    assert payloads[0].attempted_bytes == 6
+    assert payloads[1] == b"{}\n"
+
+
+def test_raw_transport_exhaustion_closes_input_without_later_frames() -> None:
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, raw_transport_payload_bytes=5)
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    async def receive_failure() -> Exception:
+        import anyio
+
+        stdin = anyio.wrap_file(io.BytesIO(b"123456789\n{}\n"))
+        stdout = anyio.wrap_file(io.BytesIO())
+        async with transport.bounded_stdio_server(
+            max_payload_bytes=limits.raw_transport_payload_bytes,
+            request_context_factory=create_budget,
+            stdin=stdin,
+            stdout=stdout,
+        ) as (read_stream, write_stream):
+            async with read_stream, write_stream:
+                failure = await read_stream.receive()
+                with pytest.raises(anyio.EndOfStream):
+                    await read_stream.receive()
+        assert isinstance(failure, Exception)
+        return failure
+
+    import anyio
+
+    failure = anyio.run(receive_failure)
+
+    assert isinstance(failure, QueryWorkBudgetExceeded)
+    assert failure.dimension.value == "raw transport payload bytes"
 
 
 def test_trino_transport_registers_audited_services_in_order(
