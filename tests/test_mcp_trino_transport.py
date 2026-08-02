@@ -53,15 +53,20 @@ DEFAULT_ARGUMENT_VALUES: dict[str, Any] = {
 
 
 class RecordingProfiler:
-    def __init__(self, failure_message: str | None = None) -> None:
+    def __init__(
+        self,
+        failure_message: str | None = None,
+        failure_type: type[Exception] = ValueError,
+    ) -> None:
         self.calls: list[str] = []
         self.failure_message = failure_message
+        self.failure_type = failure_type
 
     def __getattr__(self, name: str) -> Any:
         def invoke(*args: Any, **kwargs: Any) -> Any:
             self.calls.append(name)
             if self.failure_message is not None:
-                raise ValueError(self.failure_message)
+                raise self.failure_type(self.failure_message)
             if name == "list_catalogs":
                 return ["analytics"]
             if name == "list_schemas":
@@ -201,6 +206,38 @@ def test_transport_validation_errors_are_source_free(
     errors: dict[str, dict[str, str]] = {}
     for tool in mcp.tools:
         with pytest.raises(ValueError) as error_info:
+            tool(**required_tool_arguments(tool))
+        errors[tool.__name__] = {
+            "type": type(error_info.value).__name__,
+            "message": str(error_info.value),
+        }
+
+    assert tuple(errors) == DEFAULT_TRINO_TOOL_NAMES
+    assert profiler.calls == list(DEFAULT_TRINO_TOOL_NAMES)
+    serialized = json.dumps(errors, sort_keys=True)
+    assert "transport-source-literal-condition" not in serialized
+    assert "transport-source-literal-allowed" not in serialized
+
+
+def test_transport_database_errors_are_source_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profiler = RecordingProfiler(
+        failure_message="database request failed",
+        failure_type=ConnectionError,
+    )
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_LOG", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_HMAC_KEY", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE", raising=False)
+    monkeypatch.setattr(server, "_trino_profiler", lambda: profiler)
+    monkeypatch.setattr(transport, "FastMCP", FakeMCP)
+    mcp = transport.create_trino_mcp(tuple(server.trino_mcp_tools()))
+
+    assert isinstance(mcp, FakeMCP)
+    errors: dict[str, dict[str, str]] = {}
+    for tool in mcp.tools:
+        with pytest.raises(ConnectionError) as error_info:
             tool(**required_tool_arguments(tool))
         errors[tool.__name__] = {
             "type": type(error_info.value).__name__,

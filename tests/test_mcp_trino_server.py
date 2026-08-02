@@ -114,15 +114,20 @@ DEFAULT_TOOL_ARGUMENTS: dict[str, dict[str, Any]] = {
 
 
 class RecordingProfiler:
-    def __init__(self, failure_message: str | None = None) -> None:
+    def __init__(
+        self,
+        failure_message: str | None = None,
+        failure_type: type[Exception] = ValueError,
+    ) -> None:
         self.calls: list[str] = []
         self.failure_message = failure_message
+        self.failure_type = failure_type
 
     def __getattr__(self, name: str) -> Any:
         def invoke(*args: Any, **kwargs: Any) -> Any:
             self.calls.append(name)
             if self.failure_message is not None:
-                raise ValueError(self.failure_message)
+                raise self.failure_type(self.failure_message)
             if name == "list_catalogs":
                 return ["analytics"]
             if name == "list_schemas":
@@ -251,6 +256,36 @@ def test_default_tools_direct_validation_errors_are_source_free(
 
     for tool in trino_mcp_tools():
         with pytest.raises(ValueError) as error_info:
+            tool(**DEFAULT_TOOL_ARGUMENTS[tool.__name__])
+        errors[tool.__name__] = {
+            "type": type(error_info.value).__name__,
+            "message": str(error_info.value),
+        }
+
+    assert tuple(errors) == tuple(DEFAULT_TOOL_ARGUMENTS)
+    assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
+    serialized = json.dumps(errors, sort_keys=True)
+    for source_literal in (
+        "source-literal-condition",
+        "source-literal-kind",
+        "source-literal-allowed",
+    ):
+        assert source_literal not in serialized
+
+
+def test_default_tools_direct_database_errors_are_source_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profiler = RecordingProfiler(
+        failure_message="database request failed",
+        failure_type=ConnectionError,
+    )
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.setattr(mcp_trino_server, "_trino_profiler", lambda: profiler)
+    errors: dict[str, dict[str, str]] = {}
+
+    for tool in trino_mcp_tools():
+        with pytest.raises(ConnectionError) as error_info:
             tool(**DEFAULT_TOOL_ARGUMENTS[tool.__name__])
         errors[tool.__name__] = {
             "type": type(error_info.value).__name__,
