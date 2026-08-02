@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import importlib.util
 import json
 import re
@@ -116,6 +117,7 @@ def main(argv: list[str] | None = None) -> None:
 
     verify_install_profile(args.profile)
     verify_installed_demo()
+    verify_installed_csv_json_quickstart()
     if args.wheel is not None:
         verify_wheel_size(args.wheel)
 
@@ -221,6 +223,72 @@ def verify_installed_demo() -> None:
             and manifest.get("validation_valid") is True
         ):
             raise SystemExit("installed demo manifest failed safety validation")
+
+
+def verify_installed_csv_json_quickstart(
+    *,
+    entrypoint: Path | None = None,
+) -> None:
+    cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
+    with tempfile.TemporaryDirectory(prefix="test-data-agent-quickstart-") as temp:
+        root = Path(temp)
+        source = root / "customers.csv"
+        source.write_text(
+            "customer_id,email,segment\n"
+            "C1,alice@example.test,retail\n"
+            "C2,bob@example.test,business\n",
+            encoding="utf-8",
+        )
+        for output_format in ("csv", "json"):
+            output = root / f"generated-{output_format}" / f"customers.{output_format}"
+            completed = subprocess.run(
+                [
+                    cli,
+                    "generate-from-csv",
+                    source,
+                    "--count",
+                    "3",
+                    "--seed",
+                    "12345",
+                    "--format",
+                    output_format,
+                    "--output",
+                    output,
+                ],
+                cwd=temp,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if completed.returncode != 0:
+                raise SystemExit(
+                    f"installed {output_format} quickstart failed: "
+                    f"{completed.stderr.strip() or completed.stdout.strip()}"
+                )
+            manifest = json.loads(
+                (output.parent / "generation_manifest.json").read_text()
+            )
+            if not (
+                manifest.get("synthetic") is True
+                and manifest.get("source_rows_copied") is False
+                and manifest.get("validation_valid") is True
+                and manifest.get("output_format") == output_format
+            ):
+                raise SystemExit(
+                    f"installed {output_format} quickstart manifest failed "
+                    "safety validation"
+                )
+            if output_format == "csv":
+                with output.open(newline="") as handle:
+                    row_count = sum(1 for _ in csv.DictReader(handle))
+            else:
+                rows = json.loads(output.read_text())
+                row_count = len(rows) if isinstance(rows, list) else -1
+            if row_count != 3:
+                raise SystemExit(
+                    f"installed {output_format} quickstart generated "
+                    f"{row_count} rows instead of 3"
+                )
 
 
 def requirement_name(requirement: str) -> str:

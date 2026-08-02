@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
   query builder from the RC4 compatibility surface.
 - Pin RC4 installation guidance and optional extras to `1.0.0rc4`, with a
   tag-matched clean-environment README smoke gate for the public wheel.
+- Verify installed-wheel CSV and JSON quickstarts without optional integration
+  dependencies, and isolate Trino-extra failures in a separate CI check.
 
 ### Security
 

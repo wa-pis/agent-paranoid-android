@@ -70,7 +70,7 @@
   - [x] Make the post-publish clean-environment workflow verify the tag version
     before running the literal README `doctor` and `demo` quickstart.
   - [ ] Execute the clean-environment check after the RC4 wheel is public.
-- [ ] Verify the base wheel and CSV/JSON quickstart without `trino`, `sqlglot`,
+- [x] Verify the base wheel and CSV/JSON quickstart without `trino`, `sqlglot`,
   or the MCP SDK; verify Trino separately through the `trino` extra and keep
   failures isolated to that optional capability.
 - [ ] Publish `1.0.0rc4` from the exact verified merge commit and run public

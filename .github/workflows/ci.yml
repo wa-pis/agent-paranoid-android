@@ -128,51 +128,69 @@ jobs:
 
       - name: Install locked build environment
         run: |
-          uv sync --frozen --all-extras --python python --no-install-project
-          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
 
       - name: Build wheel and source distribution
         run: uv build --no-build-isolation
 
-      - name: Verify isolated install profiles
+      - name: Verify isolated base install and CSV/JSON quickstart
         run: |
           set -euo pipefail
           wheel_path="$(realpath "$(find dist -maxdepth 1 -name '*.whl' -print -quit)")"
-          wheel_uri="file://${wheel_path}"
 
           uv run --isolated --no-project --with "${wheel_path}" \
             python scripts/check_installed_package.py \
             --profile base --wheel "${wheel_path}"
           uv run --isolated --no-project --with "${wheel_path}" \
-            test-data-agent doctor --skip-smoke
+            test-data-agent doctor
+
+  package-optional:
+    name: Optional wheel / ${{ matrix.profile }}
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [parquet, mcp, openai, trino]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.14"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.11.23"
+          enable-cache: true
+          prune-cache: true
+
+      - name: Install locked build environment
+        run: |
+          uv sync --frozen --extra dev --python python --no-install-project
+          uv sync --frozen --extra dev --python python --no-editable --no-build-isolation
+
+      - name: Build wheel
+        run: uv build --wheel --no-build-isolation
+
+      - name: Verify isolated optional capability
+        run: |
+          set -euo pipefail
+          wheel_path="$(realpath "$(find dist -maxdepth 1 -name '*.whl' -print -quit)")"
+          wheel_uri="file://${wheel_path}"
 
           uv run --isolated --no-project \
-            --with "agent-paranoid-android[parquet] @ ${wheel_uri}" \
-            python scripts/check_installed_package.py --profile parquet
+            --with "agent-paranoid-android[${{ matrix.profile }}] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py \
+            --profile "${{ matrix.profile }}"
           uv run --isolated --no-project \
-            --with "agent-paranoid-android[parquet] @ ${wheel_uri}" \
-            test-data-agent doctor --require-extra parquet
-
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[mcp] @ ${wheel_uri}" \
-            python scripts/check_installed_package.py --profile mcp
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[mcp] @ ${wheel_uri}" \
-            test-data-agent doctor --require-extra mcp
-
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[openai] @ ${wheel_uri}" \
-            python scripts/check_installed_package.py --profile openai
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[openai] @ ${wheel_uri}" \
-            test-data-agent doctor --require-extra openai
-
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
-            python scripts/check_installed_package.py --profile trino
-          uv run --isolated --no-project \
-            --with "agent-paranoid-android[trino] @ ${wheel_uri}" \
-            test-data-agent doctor --require-extra trino
+            --with "agent-paranoid-android[${{ matrix.profile }}] @ ${wheel_uri}" \
+            test-data-agent doctor --require-extra "${{ matrix.profile }}"
 
   package-compatibility:
     name: Wheel compatibility (Python ${{ matrix.python-version }})
