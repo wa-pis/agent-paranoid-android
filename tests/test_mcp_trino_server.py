@@ -118,10 +118,12 @@ class RecordingProfiler:
         self,
         failure_message: str | None = None,
         failure_type: type[Exception] = ValueError,
+        nested: bool = False,
     ) -> None:
         self.calls: list[str] = []
         self.failure_message = failure_message
         self.failure_type = failure_type
+        self.nested = nested
 
     def __getattr__(self, name: str) -> Any:
         def invoke(*args: Any, **kwargs: Any) -> Any:
@@ -135,7 +137,28 @@ class RecordingProfiler:
             if name == "list_tables":
                 return ["synthetic_orders"]
             if name == "describe_table":
+                if self.nested:
+                    return [
+                        {
+                            "name": "amount",
+                            "data_type": "double",
+                            "metadata": {"nullable": True},
+                        }
+                    ]
                 return [{"name": "amount", "data_type": "double"}]
+            if self.nested:
+                return {
+                    "tool": name,
+                    "summary": {
+                        "counts": {"checked": 1, "failed": 0},
+                        "columns": [
+                            {
+                                "name": "synthetic_metric",
+                                "metrics": {"null_ratio": 0.0},
+                            }
+                        ],
+                    },
+                }
             return {"tool": name, "counts": {"checked": 1, "failed": 0}}
 
         return invoke
@@ -295,6 +318,34 @@ def test_default_tools_direct_database_errors_are_source_free(
     assert tuple(errors) == tuple(DEFAULT_TOOL_ARGUMENTS)
     assert profiler.calls == list(DEFAULT_TOOL_ARGUMENTS)
     serialized = json.dumps(errors, sort_keys=True)
+    for source_literal in (
+        "source-literal-condition",
+        "source-literal-kind",
+        "source-literal-allowed",
+    ):
+        assert source_literal not in serialized
+
+
+def test_default_tools_direct_nested_responses_round_trip_source_free(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profiler = RecordingProfiler(nested=True)
+    monkeypatch.delenv("TRINO_ENABLE_SAFE_SELECT", raising=False)
+    monkeypatch.setattr(mcp_trino_server, "_trino_profiler", lambda: profiler)
+
+    outputs = {
+        tool.__name__: tool(**DEFAULT_TOOL_ARGUMENTS[tool.__name__])
+        for tool in trino_mcp_tools()
+    }
+    serialized = json.dumps(outputs, sort_keys=True)
+
+    assert json.loads(serialized) == outputs
+    assert outputs["describe_table"][0]["metadata"] == {"nullable": True}
+    for name, output in outputs.items():
+        if name.startswith("profile_"):
+            assert output["summary"]["columns"][0]["metrics"] == {
+                "null_ratio": 0.0
+            }
     for source_literal in (
         "source-literal-condition",
         "source-literal-kind",

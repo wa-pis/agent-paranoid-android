@@ -9,14 +9,14 @@
   diagnostic in RC4; any future row-returning capability requires a separate
   OpenSpec change.
 - [x] Update MCP golden contracts, docs, migration notes, and release notes.
-- [ ] Enumerate the production-registered default tool list from
+- [x] Enumerate the production-registered default tool list from
   `trino_mcp_tools()` and test every Trino-accessing tool through both direct
   service and transport boundaries. Check success responses, validation and
   database errors, nested structures after JSON serialization, and metadata-
   only audit records for source literals.
   - [x] Freeze the exact default list and verify transport registration order
     plus audit wrapping for every production-registered tool.
-  - [ ] Exercise every tool through direct and transport success, validation,
+  - [x] Exercise every tool through direct and transport success, validation,
     database-error, serialized nested-response, and audit paths.
     - [x] Invoke every production default wrapper through a direct-service
       success path and assert request sentinels are not echoed.
@@ -26,7 +26,7 @@
       echoing request sentinels.
     - [x] Cover database failures through direct and transport paths without
       echoing request sentinels.
-    - [ ] Cover direct and transport nested serialization paths.
+    - [x] Cover direct and transport nested serialization paths.
     - [x] Cover every default transport audit path with metadata-only success
       and failure records that omit arguments, results, and source literals.
 - [ ] Add source fixtures covering strings, integers, decimals, floats,
