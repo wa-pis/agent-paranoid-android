@@ -354,7 +354,7 @@
           "title": "Table Name"
         },
         "use_cache": {
-          "default": false,
+          "default": true,
           "title": "Use Cache",
           "type": "boolean"
         },

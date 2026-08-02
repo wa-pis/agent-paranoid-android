@@ -61,6 +61,34 @@ def test_agent_plan_parser_defaults_match_contract(
     assert {name: actual[name] for name in expected} == expected
 
 
+def test_agent_plan_parser_exposes_no_cache_as_an_explicit_refresh(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parsed: list[argparse.Namespace] = []
+
+    def capture(args: argparse.Namespace) -> int:
+        parsed.append(args)
+        return 0
+
+    monkeypatch.setattr(cli_module, "run_command", capture)
+
+    assert (
+        cli_module.main(
+            [
+                "agent-plan",
+                "source.csv",
+                "--workspace",
+                "workspace",
+                "--no-cache",
+            ]
+        )
+        == 0
+    )
+
+    assert len(parsed) == 1
+    assert parsed[0].no_cache is True
+
+
 @pytest.mark.parametrize(
     ("alias", "arguments"),
     [

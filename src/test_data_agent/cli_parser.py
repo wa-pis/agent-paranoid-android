@@ -378,9 +378,9 @@ def register_agent_commands(
         default=50_000,
     )
     agent_plan_parser.add_argument(
-        "--use-cache",
+        "--no-cache",
         action="store_true",
-        help="Use a safe profile cache inside the agent workspace.",
+        help="Force a fresh profile instead of reusing the metadata-only cache.",
     )
     agent_plan_parser.add_argument(
         "--json",

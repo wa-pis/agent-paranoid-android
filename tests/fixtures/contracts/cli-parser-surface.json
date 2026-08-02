@@ -9,7 +9,7 @@
     "seed": 12345,
     "source_type": null,
     "table": null,
-    "use_cache": false
+    "no_cache": false
   },
   "aliases": {
     "generate-from-csv-folder": "generate-from-example",

@@ -8,19 +8,26 @@ Implement RC5 in six bounded stages:
    state, verify wheel and sdist filenames, hashes, version metadata, and
    signatures/attestations from clean environments. Run the literal README
    commands for base, `trino`, `mcp`, and `mcp,trino` profiles, including
-   `--version`, `demo`, and `doctor`.
+   `--version`, `demo`, and `doctor`. The wheel matrix also covers `parquet`,
+   `openai`, and `all`; CLI, generator-MCP, and Trino-MCP images are verified
+   by the separate container matrix.
 2. Split result and transport accounting. Consume
    `database_result_bytes` incrementally while reading cursor rows. Build the
    final MCP result, serialize it with the production JSON serializer, and
-   charge `transport_response_bytes` for the complete envelope before writing
-   it to stdout or another transport. Reserve a fixed minimal error envelope
-   and fail with that envelope when the normal result does not fit.
+   charge `transport_response_bytes` for the complete UTF-8 JSON-RPC envelope
+   and transport framing at the production writer boundary, before emitting it
+   to stdout or another transport. Bound the request ID used in normal and
+   error responses, reserve a fixed minimal error envelope, and fail with that
+   envelope when the normal result does not fit. The final check must occur at
+   the same writer boundary used in production, not only in a helper.
 3. Add cumulative invocation controls. Extend the typed budget with
    `max_profiled_columns`, `max_statements`, `max_invocation_seconds`, and an
    optional `max_cumulative_estimated_scan_bytes`. Create a monotonic deadline
    at invocation start, enforce it before each query/column operation, and
-   share the same counters through nested profiling. Start with 100 columns,
-   150 statements, and 120 seconds; retain evidence for any different values.
+   share the same counters through nested profiling. Pass the remaining
+   deadline into query timeouts and cancel/close an active cursor and
+   connection when the deadline expires. Start with 100 columns, 150
+   statements, and 120 seconds; retain evidence for any different values.
 4. Normalize public wording and rerun release gates. Every document must
    distinguish default aggregate-only responses from explicit opt-in
    row-returning responses. Stable promotion reuses the accepted RC5 source
@@ -41,8 +48,12 @@ Implement RC5 in six bounded stages:
   counters, monotonic deadline, cumulative column/statement/scan limits, and a
   bounded error-envelope path.
 - `src/test_data_agent/trino_client.py` and MCP transport composition:
-  incremental database-result accounting and final serialized transport-result
+  incremental database-result accounting, remaining-deadline propagation,
+  active-query cancellation/cleanup, and final serialized transport-result
   accounting before output.
+- `src/test_data_agent/mcp_trino_transport.py`: the production writer boundary,
+  full JSON-RPC envelope/framing accounting, bounded request IDs, and bounded
+  overflow errors.
 - `src/test_data_agent/trino_profiling.py`: cumulative column and statement
   consumption across table and nested column profiling.
 - `src/test_data_agent/profiling/`: one-pass/local-deadline profile path and
@@ -63,12 +74,15 @@ Implement RC5 in six bounded stages:
   metadata, checksums, SBOM, provenance, and attestations: one versioned
   acceptance contract.
 
-Transport output accounting must measure the same final serialized JSON shape
-that the production MCP transport writes, including envelope fields, keys,
-escaping, dictionaries, nested metadata, and error objects. A normal response
-must not be materialized in full if its measured size already exceeds the
-transport budget; use bounded incremental construction or a conservative
-preflight estimate followed by final serialization verification.
+Transport output accounting must measure UTF-8 bytes for the same final
+serialized JSON-RPC shape that the production MCP transport writes, including
+the request ID, envelope fields, keys, escaping, dictionaries, nested metadata,
+error objects, and any transport framing bytes. The request ID has an explicit
+size cap so a bounded error cannot be expanded by attacker-controlled IDs. A
+normal response must not be materialized in full if its measured size already
+exceeds the transport budget; use bounded incremental construction or a
+conservative preflight estimate followed by final serialization verification at
+the real writer.
 
 ## Failure Modes
 
@@ -80,8 +94,14 @@ preflight estimate followed by final serialization verification.
   a fixed error envelope whose own serialized size is reserved below the
   configured limit. If the configured limit is below that minimum, reject the
   configuration at startup.
+- A long, Unicode, or escaped JSON-RPC request ID is bounded before it is copied
+  into a success or overflow response; the resulting UTF-8 error envelope is
+  measured and still fits the configured transport budget.
 - A wide-table profile fails closed before another column or statement starts
   when cumulative columns, statements, scan estimate, or deadline is spent.
+- When the invocation deadline expires during a query, the client applies the
+  remaining timeout and closes/cancels the active cursor and connection before
+  returning a bounded timeout error.
 - Each invocation gets independent counters and a fresh deadline. Helpers
   cannot reset or restore consumed budget, and concurrent invocations cannot
   consume one another's counters.

@@ -387,6 +387,9 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
         "agent-paranoid-android[trino]",
         "agent-paranoid-android[mcp]",
         "agent-paranoid-android[mcp,trino]",
+        "agent-paranoid-android[parquet]",
+        "agent-paranoid-android[openai]",
+        "agent-paranoid-android[all]",
     ):
         assert f'requirement: "{requirement}"' in profile_job
     assert "--index-url https://pypi.org/simple" in profile_job
@@ -394,6 +397,9 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "-m pip check" in profile_job
     assert "test-data-agent doctor" in profile_job
     assert "test-data-agent demo --output out/demo" in profile_job
+    assert "test-data-agent --version" in profile_job
+    assert "install-report.json" in profile_job
+    assert "Wheel SHA-256" in profile_job
     assert 'manifest["synthetic"] is True' in profile_job
     assert 'manifest["source_rows_copied"] is False' in profile_job
     assert 'manifest["validation_valid"] is True' in profile_job

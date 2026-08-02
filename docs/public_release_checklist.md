@@ -40,7 +40,8 @@ Enable or verify these repository settings after publishing:
 - Branch protection for `main`.
 - Required CI status checks before merge.
 - Require linear history if the project will avoid merge commits.
-- Require signed commits if all maintainers have signing keys configured.
+- Require verified signed commits on protected branches and reject unsigned
+  commits at the merge gate.
 - Disallow force-pushes to protected branches after the initial history cleanup.
 - Create a `pypi` environment for the tokenless publish job.
 - Configure a matching PyPI Trusted Publisher for
