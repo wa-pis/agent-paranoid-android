@@ -58,9 +58,11 @@
 
 - [x] Add `max_profiled_columns`, `max_invocation_seconds`, and optional
   `max_cumulative_estimated_scan_bytes` to the typed configuration and budget.
-- [ ] Start with defaults of 100 profiled columns, 150 statements, and 120
+- [x] Start with defaults of 100 profiled columns, 150 statements, and 120
   seconds; either retain them with benchmark evidence or document justified
   alternatives. Do not use 1000 columns or 2048 statements without evidence.
+  Evidence: [invocation-default benchmark](benchmark-evidence.md) exercises a
+  representative 100-column aggregate-only profile in 122 statements.
 - [ ] Enforce column, statement, deadline, and scan limits across nested table
   profiling with one shared monotonic budget; no helper may reset or restore
   consumed work.

@@ -14,6 +14,8 @@ All notable changes to this project are documented here.
   metadata and escaping with explicit response-budget regression tests.
 - Add typed cumulative profiled-column, invocation-deadline, and optional
   estimated-scan limits to the shared Trino invocation budget.
+- Set benchmark-backed Trino invocation defaults of 100 profiled columns, 150
+  statements, and 120 seconds.
 
 ## [1.0.0rc4] - 2026-08-02
 
