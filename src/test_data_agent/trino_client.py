@@ -7,12 +7,20 @@ from dataclasses import dataclass
 from typing import Any, TypeVar, cast
 
 from test_data_agent.trino_config import (
+    MAX_QUERY_EXECUTION_TIME_MS,
+    MAX_QUERY_RUN_TIME_MS,
     MAX_QUERY_SCAN_BYTES,
     TrinoConfig,
     parse_data_size_value,
+    parse_duration_value,
 )
 from test_data_agent.trino_sql_policy import consume_query_execution_work
-from test_data_agent.trino_work_budget import consume_database_result_payload
+from test_data_agent.trino_work_budget import (
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+    consume_database_result_payload,
+    current_query_work_budget,
+)
 
 try:  # pragma: no cover - live Trino is not used in unit tests.
     import trino as trino
@@ -86,26 +94,38 @@ class TrinoClient:
             sql,
             estimated_scan_bytes_per_statement=estimated_scan_bytes,
         )
+        budget = current_query_work_budget()
+        request_timeout, execution_timeout, run_timeout = _bounded_query_timeouts(
+            self.config,
+            budget,
+        )
         connection = self.driver.dbapi.connect(
             host=self.config.host,
             port=self.config.port,
             user=self.config.user,
             http_scheme=self.config.http_scheme,
-            request_timeout=self.config.request_timeout,
+            request_timeout=request_timeout,
             session_properties={
-                "query_max_execution_time": self.config.query_max_execution_time,
-                "query_max_run_time": self.config.query_max_run_time,
+                "query_max_execution_time": execution_timeout,
+                "query_max_run_time": run_timeout,
                 "query_max_scan_physical_bytes": self.config.query_max_scan_physical_bytes,
             },
         )
         cursor = connection.cursor()
         try:
             cursor.execute(sql, parameters or [])
+            _check_invocation_deadline(budget)
             description = cursor.description or []
             consume_database_result_payload(description)
+            _check_invocation_deadline(budget)
             convert_row = row_converter_factory(description)
             rows: list[RowT] = []
-            while batch := cursor.fetchmany(1):
+            while True:
+                _check_invocation_deadline(budget)
+                batch = cursor.fetchmany(1)
+                _check_invocation_deadline(budget)
+                if not batch:
+                    break
                 if len(rows) >= self.config.max_result_rows:
                     raise TrinoResultLimitError(
                         "Trino result exceeds the client limit of "
@@ -115,11 +135,66 @@ class TrinoClient:
                 consume_database_result_payload(row)
                 rows.append(row)
             return rows, description
+        except QueryWorkBudgetExceeded:
+            raise
+        except Exception as error:
+            try:
+                _check_invocation_deadline(budget)
+            except QueryWorkBudgetExceeded as deadline_error:
+                raise deadline_error from error
+            raise
         finally:
             try:
                 cursor.close()
             finally:
                 connection.close()
+
+
+def _bounded_query_timeouts(
+    config: TrinoConfig,
+    budget: QueryWorkBudget | None,
+) -> tuple[float, str, str]:
+    if budget is None:
+        return (
+            config.request_timeout,
+            config.query_max_execution_time,
+            config.query_max_run_time,
+        )
+
+    remaining_seconds = budget.remaining_invocation_seconds()
+    remaining_ms = max(1, int(remaining_seconds * 1_000))
+    return (
+        min(config.request_timeout, remaining_seconds),
+        _bounded_duration(
+            config.query_max_execution_time,
+            "TRINO_QUERY_MAX_EXECUTION_TIME",
+            MAX_QUERY_EXECUTION_TIME_MS,
+            remaining_ms,
+        ),
+        _bounded_duration(
+            config.query_max_run_time,
+            "TRINO_QUERY_MAX_RUN_TIME",
+            MAX_QUERY_RUN_TIME_MS,
+            remaining_ms,
+        ),
+    )
+
+
+def _bounded_duration(
+    configured: str,
+    name: str,
+    maximum_ms: int,
+    remaining_ms: int,
+) -> str:
+    configured_ms = parse_duration_value(configured, name, maximum_ms)
+    if configured_ms <= remaining_ms:
+        return configured
+    return f"{remaining_ms}ms"
+
+
+def _check_invocation_deadline(budget: QueryWorkBudget | None) -> None:
+    if budget is not None:
+        budget.check_invocation_deadline()
 
 
 def _identity_row_converter(

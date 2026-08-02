@@ -18,6 +18,8 @@ All notable changes to this project are documented here.
   statements, and 120 seconds.
 - Enforce profiled-column, statement, deadline, and conservative scan estimates
   through one monotonic budget across nested Trino table profiling.
+- Clamp Trino HTTP, execution, and run timeouts to the remaining invocation
+  deadline and close active query resources when it expires.
 
 ## [1.0.0rc4] - 2026-08-02
 

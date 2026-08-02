@@ -152,6 +152,58 @@ def test_client_closes_resources_when_execution_fails() -> None:
     assert driver.dbapi.connection.closed is True
 
 
+def test_client_bounds_query_timeouts_by_remaining_invocation_time() -> None:
+    now = 10.0
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, max_invocation_seconds=5.0)
+    budget = QueryWorkBudget(limits, monotonic_clock=lambda: now)
+    execute = with_query_work_budget(
+        TrinoClient(config=client_config(), driver=driver).execute_query,
+        limits,
+        budget_provider=lambda: budget,
+    )
+
+    execute("SELECT bounded")
+
+    assert driver.dbapi.connect_kwargs is not None
+    assert driver.dbapi.connect_kwargs["request_timeout"] == 5.0
+    assert driver.dbapi.connect_kwargs["session_properties"] == {
+        "query_max_execution_time": "5000ms",
+        "query_max_run_time": "5000ms",
+        "query_max_scan_physical_bytes": "128MB",
+    }
+
+
+def test_client_closes_active_query_when_invocation_deadline_expires() -> None:
+    now = 10.0
+
+    class ExpiringCursor(FakeCursor):
+        def execute(self, sql: str, parameters: list[Any]) -> None:
+            nonlocal now
+            super().execute(sql, parameters)
+            now = 15.0
+            raise TimeoutError("request timed out")
+
+    cursor = ExpiringCursor([])
+    driver = FakeDriver(cursor)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, max_invocation_seconds=5.0)
+    budget = QueryWorkBudget(limits, monotonic_clock=lambda: now)
+    execute = with_query_work_budget(
+        TrinoClient(config=client_config(), driver=driver).execute_query,
+        limits,
+        budget_provider=lambda: budget,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        execute("SELECT bounded")
+
+    assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
+    assert isinstance(error.value.__cause__, TimeoutError)
+    assert cursor.closed is True
+    assert driver.dbapi.connection.closed is True
+
+
 def test_client_requires_optional_trino_driver() -> None:
     with pytest.raises(RuntimeError, match="trino package is not installed"):
         TrinoClient(config=client_config(), driver=None).execute_query("SELECT bounded")
