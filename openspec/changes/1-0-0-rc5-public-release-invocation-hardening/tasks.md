@@ -2,9 +2,12 @@
 
 ## P1 — Public RC4/RC5 artifact acceptance
 
-- [ ] Publish and verify the exact `1.0.0rc4` wheel and sdist on public PyPI,
+- [x] Publish and verify the exact `1.0.0rc4` wheel and sdist on public PyPI,
   or record the exact RC5 replacement candidate if RC4 publication cannot be
   completed without changing the verified source tree.
+  Evidence: [RC4 published release](../../../docs/release-evidence-1.0.0rc4.md)
+  records matching public PyPI and GitHub Release hashes from verification run
+  [#5](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985).
 - [ ] Publish a complete GitHub prerelease with checksums, SBOM, provenance,
   and attestations, all bound to the exact tag and commit.
 - [ ] Install from public indexes in clean environments and run README
