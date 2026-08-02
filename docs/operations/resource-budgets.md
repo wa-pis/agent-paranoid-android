@@ -30,6 +30,42 @@ operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure
 cleanup are covered by separate operational-readiness gates.
 
+## Artifact Persistence Contract
+
+Atomic visibility is not the same as durable persistence. Generated artifacts,
+profiles, specs, and agent workspace state use these boundaries:
+
+- completion-state and advisor-handoff writes that use atomic writers create a
+  sibling temporary file and atomically replace the destination;
+- new folder, review, and agent-plan bundles are completed in a sibling staging
+  directory and published with one same-filesystem directory rename;
+- a single-entity update to an existing directory uses several per-file moves,
+  so it is not one atomic multi-file transaction;
+- approval receipt and result markers are separately atomic, and an
+  interruption between them is represented as a recoverable agent state.
+
+For an exception or interactive cancellation that the process can handle, the
+workflow removes staging data or rolls moved files back. Agent recovery then
+revalidates the existing checkpoint, spec fingerprint, manifest, report, and
+generated files before publishing missing completion metadata. Recovery does
+not regenerate rows.
+
+Artifact writers do not call `fsync` for file contents or parent-directory
+metadata. Therefore a hard stop, kernel or host crash, storage failure, or
+power loss can leave an abandoned staging directory or lose a recently written
+or renamed artifact. Atomic replacement prevents partial visibility for the
+state transitions and new bundles that use it during normal operation; it does
+not cover every standalone artifact command or promise persistence across
+those failures.
+
+**Disposition:** artifact `fsync` support is deferred until after 1.0 and is
+not release-blocking for RC4 or stable 1.0. The repository maintainer owns the
+follow-up. Revisit this decision before promising crash/power-loss durability,
+when deployment requirements demand it, after an artifact-loss incident, or
+when a platform-specific implementation and crash-consistency test plan are
+ready. The HMAC audit log has separate flush behavior and does not broaden the
+artifact durability contract.
+
 ## Cancellation Cleanup
 
 Folder and single-entity generation stage artifacts beside the destination.
@@ -39,8 +75,8 @@ the cancellation is re-raised. The final destination and success metadata are
 not published.
 
 Hard termination such as `SIGKILL`, power loss, or host failure cannot run
-in-process cleanup. A later operational gate covers discovery and recovery for
-those abandoned staging directories.
+in-process cleanup and may leave an abandoned staging directory. Follow the
+recovery guidance below; do not interpret staging data as a completed bundle.
 
 ## Disk Exhaustion
 
@@ -76,4 +112,5 @@ back, restoring replaced files while leaving unrelated files untouched.
 
 The caller receives the original interruption error. A failed publication does
 not leave a generation manifest or output file that can be mistaken for a
-successful run.
+successful run when the process can complete rollback. This process-level
+behavior is not a crash/power-loss guarantee.

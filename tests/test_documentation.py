@@ -544,6 +544,33 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
     assert "local fakes" in support
 
 
+def test_artifact_durability_contract_matches_implementation() -> None:
+    stability = (ROOT / "docs" / "reference" / "stability.md").read_text()
+    operations = (
+        ROOT / "docs" / "operations" / "resource-budgets.md"
+    ).read_text()
+    normalized_operations = " ".join(operations.split())
+    persistence_sources = (
+        ROOT / "src" / "test_data_agent" / "io" / "artifacts.py",
+        ROOT / "src" / "test_data_agent" / "io" / "workflows.py",
+        ROOT / "src" / "test_data_agent" / "workspace_store.py",
+    )
+
+    for boundary in (
+        "Atomic visibility",
+        "Process-interruption recovery",
+        "Crash or power-loss durability",
+    ):
+        assert boundary in stability
+    assert "not one filesystem transaction" in stability
+    assert "deferred until after 1.0" in stability
+    assert "not release-blocking for RC4 or stable 1.0" in normalized_operations
+    assert "repository maintainer owns the follow-up" in normalized_operations
+    assert "before promising crash/power-loss durability" in normalized_operations
+    for source in persistence_sources:
+        assert "fsync" not in source.read_text()
+
+
 def test_compatibility_inventory_covers_retained_surfaces() -> None:
     compatibility = (
         ROOT / "docs" / "reference" / "compatibility.md"

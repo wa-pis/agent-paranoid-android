@@ -83,7 +83,7 @@
   `run_safe_select` opt-in. Remove stale `sample_rows_masked` references and
   claims that row-returning output is source-free, PII-free, anonymous, or
   privacy-safe.
-- [ ] Document atomic visibility, process-interruption recovery, and
+- [x] Document atomic visibility, process-interruption recovery, and
   crash/power-loss durability separately; record whether fsync is deferred or
   release-blocking.
 - [ ] Define stable promotion as the accepted RC4 production source tree plus

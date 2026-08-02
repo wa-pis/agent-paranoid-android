@@ -89,6 +89,26 @@ revalidates the existing generated bundle, and does not generate new rows.
 Do not edit files under `generated/` before recovery. A changed checkpoint,
 manifest, report, spec, profile, or row file causes recovery to fail closed.
 
+## Process Or Host Stopped During Publication
+
+For an agent workspace, run `agent-status` first. Use `agent-recover` only when
+the status reports `recovery_required`; it revalidates the existing generated
+bundle before publishing missing completion metadata.
+
+For a non-agent generation command, do not treat a hidden staging directory or
+a destination without its expected manifest and validation report as success.
+Confirm that no generation process is still running, retain the incomplete
+files for investigation when needed, and rerun with the same reviewed inputs
+and seed into a new destination.
+
+Where an atomic state writer or staged bundle publication is used, replacement
+prevents readers from observing its partial state during normal operation.
+Standalone artifact commands are not one global transaction, and artifact
+files and parent directories are not flushed with `fsync`. A hard process
+stop, host or storage failure, or power loss can therefore leave staging data
+or lose a recent artifact. Use storage with the durability and backup
+guarantees required by the deployment.
+
 ## Input Limit Exceeded
 
 The error names the failed limit. Prefer splitting an oversized source or
