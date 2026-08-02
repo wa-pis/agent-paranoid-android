@@ -4,6 +4,7 @@ import base64
 import inspect
 import json
 from collections.abc import Callable
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,11 @@ from test_data_agent.audit import (
     AUDIT_HMAC_KEY_ENV,
     AUDIT_LOG_ENV,
     verify_audit_log,
+)
+from test_data_agent.mcp_trino_transport import DEFAULT_QUERY_WORK_LIMITS
+from test_data_agent.trino_work_budget import (
+    QueryWorkBudgetExceeded,
+    canonical_argument_size,
 )
 from tests.trino_source_literals import (
     SOURCE_ROWS,
@@ -178,6 +184,50 @@ def test_trino_transport_registers_audited_services_in_order(
     ]
     assert mcp.tools[0]() == ["catalog"]
     assert mcp.tools[1]() == []
+
+
+def test_transport_rejects_canonical_arguments_before_tool_execution(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    calls: list[str] = []
+    audit_key_bytes = b"k" * 32
+    log_path = tmp_path / "canonical-budget-audit.jsonl"
+
+    def list_schemas(catalog: str) -> list[str]:
+        calls.append(catalog)
+        return []
+
+    argument_size = canonical_argument_size(list_schemas, "analytics")
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        canonical_argument_bytes=argument_size - 1,
+    )
+    monkeypatch.setenv(AUDIT_LOG_ENV, str(log_path))
+    monkeypatch.setenv(
+        AUDIT_HMAC_KEY_ENV,
+        base64.b64encode(audit_key_bytes).decode("ascii"),
+    )
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE", raising=False)
+    monkeypatch.delenv("TEST_DATA_AGENT_AUDIT_ACTOR", raising=False)
+    monkeypatch.setattr(transport, "FastMCP", FakeMCP)
+
+    mcp = transport.create_trino_mcp((list_schemas,), work_limits=limits)
+
+    assert isinstance(mcp, FakeMCP)
+    with pytest.raises(QueryWorkBudgetExceeded, match="canonical argument bytes"):
+        mcp.tools[0](catalog="analytics")
+    assert calls == []
+    records = [
+        json.loads(line)
+        for line in log_path.read_text(encoding="utf-8").splitlines()
+    ]
+    assert [(record["status"], record.get("error_type")) for record in records] == [
+        ("started", None),
+        ("failed", "QueryWorkBudgetExceeded"),
+    ]
+    assert verify_audit_log(log_path, audit_key_bytes).record_count == 2
+    assert "analytics" not in log_path.read_text(encoding="utf-8")
 
 
 def test_transport_registers_complete_default_tool_inventory(
