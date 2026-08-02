@@ -159,6 +159,49 @@ jobs:
             --index-url https://pypi.org/simple \
             --requirement /tmp/public-package-requirement.txt
 
+      - name: Upgrade from public 0.12.0
+        env:
+          PYPI_VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          python3 -m venv /tmp/published-upgrade
+          /tmp/published-upgrade/bin/python -m pip install \
+            --disable-pip-version-check \
+            --no-cache-dir \
+            --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            "agent-paranoid-android==0.12.0"
+          test "$(
+            /tmp/published-upgrade/bin/python -c \
+              'import test_data_agent; print(test_data_agent.__version__)'
+          )" = "0.12.0"
+          /tmp/published-upgrade/bin/python -m pip install \
+            --disable-pip-version-check \
+            --no-cache-dir \
+            --only-binary=:all: \
+            --index-url https://pypi.org/simple \
+            --upgrade \
+            "agent-paranoid-android==${PYPI_VERSION}"
+          /tmp/published-upgrade/bin/python -m pip check
+          test "$(
+            /tmp/published-upgrade/bin/test-data-agent --version
+          )" = "test-data-agent ${PYPI_VERSION}"
+          cd /tmp
+          /tmp/published-upgrade/bin/test-data-agent doctor
+          /tmp/published-upgrade/bin/test-data-agent demo \
+            --output /tmp/published-upgrade-demo
+          /tmp/published-upgrade/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("/tmp/published-upgrade-demo/generation_manifest.json").read_text()
+          )
+          assert manifest["synthetic"] is True
+          assert manifest["source_rows_copied"] is False
+          assert manifest["validation_valid"] is True
+          PY
+
       - name: Run README quickstart from public wheel
         env:
           PYPI_VERSION: ${{ needs.prepare.outputs.version }}
