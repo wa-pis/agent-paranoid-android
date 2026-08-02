@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc4] - 2026-08-02
+
 ### Changed
 
 - Remove the `sample_rows_masked` Trino MCP tool, masking-service method, and
@@ -618,7 +620,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc3...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc4...HEAD
+[1.0.0rc4]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc3...v1.0.0rc4
 [1.0.0rc3]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...v1.0.0rc3
 [1.0.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc1...v1.0.0rc2
 [1.0.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v0.12.0...v1.0.0rc1
