@@ -392,6 +392,11 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "--index-url https://pypi.org/simple" in profile_job
     assert "--only-binary=:all:" in profile_job
     assert "-m pip check" in profile_job
+    assert "test-data-agent doctor" in profile_job
+    assert "test-data-agent demo --output out/demo" in profile_job
+    assert 'manifest["synthetic"] is True' in profile_job
+    assert 'manifest["source_rows_copied"] is False' in profile_job
+    assert 'manifest["validation_valid"] is True' in profile_job
     assert "actions/checkout@" not in profile_job
     assert "docker buildx imagetools inspect" in workflow
     assert "linux/amd64" in workflow

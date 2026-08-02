@@ -346,6 +346,23 @@ jobs:
             "${PACKAGE_REQUIREMENT}==${PYPI_VERSION}"
           "${environment}/bin/python" -m pip check
 
+          source "${environment}/bin/activate"
+          readme_workspace="/tmp/published-${PROFILE}-readme"
+          mkdir -p "${readme_workspace}"
+          cd "${readme_workspace}"
+          test-data-agent doctor
+          test-data-agent demo --output out/demo
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("out/demo/generation_manifest.json").read_text())
+          assert manifest["synthetic"] is True
+          assert manifest["source_rows_copied"] is False
+          assert manifest["validation_valid"] is True
+          PY
+
   containers:
     name: Verify ${{ matrix.target }} container
     needs: prepare
