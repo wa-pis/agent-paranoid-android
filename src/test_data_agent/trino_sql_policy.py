@@ -13,7 +13,10 @@ except ImportError:  # pragma: no cover
 
 from test_data_agent.core.privacy import infer_sensitive_from_name
 from test_data_agent.trino_config import TrinoConfig
-from test_data_agent.trino_work_budget import consume_sql_formula_chars
+from test_data_agent.trino_work_budget import (
+    consume_ast_work,
+    consume_sql_formula_chars,
+)
 
 FORBIDDEN_SQL_RE = re.compile(
     r"\b(insert|update|delete|merge|drop|truncate|alter|create|grant|revoke|call|execute)\b",
@@ -135,6 +138,12 @@ def parse_select_ast(sql: str) -> exp.Expression:
         statements = sqlglot.parse(sql, read="trino")
     except sqlglot.errors.ParseError as exc:
         raise SqlSafetyError(f"invalid SQL: {exc}") from exc
+    for statement in statements:
+        if statement is not None:
+            consume_ast_work(
+                statement,
+                child_nodes=lambda node: node.iter_expressions(),
+            )
     if len(statements) != 1:
         raise SqlSafetyError("exactly one SQL statement is allowed")
     tree = statements[0]

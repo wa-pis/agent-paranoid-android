@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,11 @@ from test_data_agent.trino_masking import (
 )
 from test_data_agent.trino_query_builders import TrinoQuery
 from test_data_agent.trino_sql_policy import AllowlistError, SqlSafetyError
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudgetExceeded,
+    with_query_work_budget,
+)
 
 
 def masker_config() -> TrinoConfig:
@@ -156,6 +162,21 @@ def test_masker_rejects_disallowed_sql_source_before_fetch() -> None:
     with pytest.raises(AllowlistError, match="catalog is not allowed"):
         masker.run_safe_select(
             "SELECT synthetic_id FROM production.safe_schema.customers LIMIT 1"
+        )
+
+
+def test_masker_rejects_ast_budget_before_fetch() -> None:
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=reject_sql,
+    )
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, ast_nodes=1)
+    run_safe_select = with_query_work_budget(masker.run_safe_select, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="AST nodes"):
+        run_safe_select(
+            "SELECT synthetic_id FROM analytics.safe_schema.customers LIMIT 1"
         )
 
 

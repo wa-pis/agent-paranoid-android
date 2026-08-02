@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 from dataclasses import replace
 
 import pytest
@@ -179,6 +180,51 @@ def test_formula_budget_fails_before_python_ast_parsing(
         )
 
     assert parsed == []
+
+
+@pytest.mark.parametrize(
+    ("limit_name", "error_match"),
+    [
+        ("ast_nodes", "AST nodes"),
+        ("ast_depth", "AST depth"),
+    ],
+)
+def test_formula_ast_budget_fails_before_sql_rendering(
+    monkeypatch: pytest.MonkeyPatch,
+    limit_name: str,
+    error_match: str,
+) -> None:
+    rendered: list[ast.AST] = []
+
+    def render_formula(
+        node: ast.AST,
+        columns: set[str],
+        extra_conditions: list[str],
+    ) -> str:
+        rendered.append(node)
+        return "0"
+
+    monkeypatch.setattr(
+        "test_data_agent.trino_query_builders.formula_node_to_sql",
+        render_formula,
+    )
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, **{limit_name: 1})
+    wrapped = with_query_work_budget(
+        build_formula_rule_profile_query,
+        limits,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match=error_match):
+        wrapped(
+            "analytics",
+            "safe_schema",
+            "synthetic_orders",
+            "total",
+            "subtotal + tax",
+            0.01,
+        )
+
+    assert rendered == []
 
 
 def test_server_keeps_query_builder_compatibility_exports() -> None:
