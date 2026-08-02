@@ -8,8 +8,12 @@
   Evidence: [RC4 published release](../../../docs/release-evidence-1.0.0rc4.md)
   records matching public PyPI and GitHub Release hashes from verification run
   [#5](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985).
-- [ ] Publish a complete GitHub prerelease with checksums, SBOM, provenance,
+- [x] Publish a complete GitHub prerelease with checksums, SBOM, provenance,
   and attestations, all bound to the exact tag and commit.
+  Evidence: [Release #16](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30734941005)
+  published `v1.0.0rc4` from commit `33073c0` and the independent
+  [verification run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985)
+  validated checksums, SBOM, provenance, and tag-bound attestations.
 - [ ] Install from public indexes in clean environments and run README
   commands without edits for base, `[trino]`, `[mcp]`, and `[mcp,trino]`.
 - [ ] Verify `--version`, `demo`, and `doctor` for each applicable profile;
