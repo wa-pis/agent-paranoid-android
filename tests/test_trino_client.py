@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from typing import Any
 
@@ -215,6 +216,44 @@ def test_client_rejects_database_result_budget_before_retaining_result() -> None
     with pytest.raises(QueryWorkBudgetExceeded, match="database result bytes"):
         execute("SELECT synthetic_value FROM safe_table")
 
+    assert cursor.fetch_sizes == [1]
+    assert cursor.closed is True
+    assert driver.dbapi.connection.closed is True
+
+
+def test_fetch_dicts_accounts_for_row_conversion_before_retaining_result() -> None:
+    row = (1, "synthetic")
+    converted_row = {"synthetic_id": 1, "status": "synthetic"}
+
+    def payload_size(value: Any) -> int:
+        return len(
+            json.dumps(
+                value,
+                default=str,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        )
+
+    description_size = payload_size(FakeCursor.description)
+    tuple_result_size = payload_size(row)
+    converted_result_size = payload_size(converted_row)
+    assert converted_result_size > tuple_result_size
+
+    cursor = FakeCursor([row, (2, "must-not-be-fetched")])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        database_result_bytes=description_size + tuple_result_size,
+    )
+    fetch = with_query_work_budget(client.fetch_dicts, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded) as error:
+        fetch("SELECT synthetic_id, status FROM safe_table")
+
+    assert error.value.attempted == description_size + converted_result_size
+    assert error.value.limit == description_size + tuple_result_size
     assert cursor.fetch_sizes == [1]
     assert cursor.closed is True
     assert driver.dbapi.connection.closed is True

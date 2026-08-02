@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TypeVar, cast
 
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_sql_policy import consume_query_execution_work
@@ -18,6 +18,9 @@ except ImportError:  # pragma: no cover
 
 class TrinoResultLimitError(ValueError):
     """Raised when a Trino response exceeds the client-side safety limit."""
+
+
+RowT = TypeVar("RowT")
 
 
 @dataclass(frozen=True)
@@ -39,6 +42,34 @@ class TrinoClient:
         sql: str,
         parameters: Sequence[Any] | None = None,
     ) -> tuple[list[tuple[Any, ...]], list[Any]]:
+        return self._fetch_rows(
+            sql,
+            parameters,
+            row_converter_factory=_identity_row_converter,
+        )
+
+    def fetch_dicts(
+        self,
+        sql: str,
+        parameters: Sequence[Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        rows, _ = self._fetch_rows(
+            sql,
+            parameters,
+            row_converter_factory=_dict_row_converter,
+        )
+        return rows
+
+    def _fetch_rows(
+        self,
+        sql: str,
+        parameters: Sequence[Any] | None,
+        *,
+        row_converter_factory: Callable[
+            [Sequence[Any]],
+            Callable[[Any], RowT],
+        ],
+    ) -> tuple[list[RowT], list[Any]]:
         if self.driver is None:
             raise RuntimeError("trino package is not installed")
 
@@ -60,14 +91,15 @@ class TrinoClient:
             cursor.execute(sql, parameters or [])
             description = cursor.description or []
             consume_database_result_payload(description)
-            rows: list[tuple[Any, ...]] = []
+            convert_row = row_converter_factory(description)
+            rows: list[RowT] = []
             while batch := cursor.fetchmany(1):
                 if len(rows) >= self.config.max_result_rows:
                     raise TrinoResultLimitError(
                         "Trino result exceeds the client limit of "
                         f"{self.config.max_result_rows} rows"
                     )
-                row = batch[0]
+                row = convert_row(batch[0])
                 consume_database_result_payload(row)
                 rows.append(row)
             return rows, description
@@ -77,18 +109,30 @@ class TrinoClient:
             finally:
                 connection.close()
 
-    def fetch_dicts(
-        self,
-        sql: str,
-        parameters: Sequence[Any] | None = None,
-    ) -> list[dict[str, Any]]:
-        rows, description = self.execute_query(sql, parameters)
-        return rows_to_dicts(description, rows)
+
+def _identity_row_converter(
+    _description: Sequence[Any],
+) -> Callable[[Any], tuple[Any, ...]]:
+    def convert(row: Any) -> tuple[Any, ...]:
+        return cast(tuple[Any, ...], row)
+
+    return convert
+
+
+def _dict_row_converter(
+    description: Sequence[Any],
+) -> Callable[[Sequence[Any]], dict[str, Any]]:
+    names = [column[0] for column in description]
+
+    def convert(row: Sequence[Any]) -> dict[str, Any]:
+        return dict(zip(names, row, strict=True))
+
+    return convert
 
 
 def rows_to_dicts(
     description: Sequence[Any],
     rows: Iterable[Sequence[Any]],
 ) -> list[dict[str, Any]]:
-    names = [column[0] for column in description]
-    return [dict(zip(names, row, strict=True)) for row in rows]
+    convert_row = _dict_row_converter(description)
+    return [convert_row(row) for row in rows]
