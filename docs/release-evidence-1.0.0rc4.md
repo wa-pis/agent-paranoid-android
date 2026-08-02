@@ -17,6 +17,7 @@ verification checked out that tag and resolved the same commit.
 | PyPI trusted publication and public-index smoke | [Publish PyPI #15](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735001368) | Passed |
 | Independent public-artifact, agent, and audit verification | [Verify Published Release #5](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985) | Passed |
 | Clean public-index profile installs and literal README smoke | [Verify Published Release #7](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757) | Passed |
+| Seven-profile CLI and install-metadata verification | [Verify Published Release #8](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30737685272) | Passed |
 
 ## Package Digests
 
@@ -65,3 +66,13 @@ Every profile passed `pip check`, then ran the literal README commands
 `test-data-agent doctor` and `test-data-agent demo --output out/demo`. Each
 demo manifest reported `synthetic: true`, `source_rows_copied: false`, and
 `validation_valid: true`.
+
+Verification run #8 executed from workflow commit `130c00a` against the same
+immutable tag and release commit. Separate clean environments covered the
+base, `trino`, `mcp`, `mcp,trino`, `parquet`, `openai`, and `all` profiles.
+Every profile passed the exact `test-data-agent --version` assertion,
+`doctor`, `demo`, and manifest checks on Python `3.12.13`. The install reports
+recorded version `1.0.0rc4`, the profile name, and wheel SHA-256
+`f38ac6cadacec56229ffe25ae12170aaf388fad842ae8ed14d0675b24bd8fde4`.
+The package job also reverified the wheel, source-distribution, and SBOM
+digests listed above.
