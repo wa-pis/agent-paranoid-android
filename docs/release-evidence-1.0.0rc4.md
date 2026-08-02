@@ -16,6 +16,7 @@ verification checked out that tag and resolved the same commit.
 | Multi-platform GHCR images | [Containers #528](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30734941011) | Passed |
 | PyPI trusted publication and public-index smoke | [Publish PyPI #15](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735001368) | Passed |
 | Independent public-artifact, agent, and audit verification | [Verify Published Release #5](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985) | Passed |
+| Clean public-index profile installs and literal README smoke | [Verify Published Release #7](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757) | Passed |
 
 ## Package Digests
 
@@ -55,3 +56,12 @@ same run completed `agent-plan`, metadata-only `agent-review`, and
 exact-fingerprint `agent-approve`. It then verified the generated bundle and a
 two-record HMAC-authenticated MCP audit chain. No checkout fixture or release
 artifact was changed by the verification run.
+
+Verification run #7 executed from workflow commit `fd6dec9` against immutable
+tag `v1.0.0rc4` and release commit `33073c0`. Its checkout-free profile matrix
+installed the exact public wheel for the base, `trino`, `mcp`, and `mcp,trino`
+requirements from `https://pypi.org/simple` in separate clean environments.
+Every profile passed `pip check`, then ran the literal README commands
+`test-data-agent doctor` and `test-data-agent demo --output out/demo`. Each
+demo manifest reported `synthetic: true`, `source_rows_copied: false`, and
+`validation_valid: true`.

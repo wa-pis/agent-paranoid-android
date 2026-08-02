@@ -14,8 +14,11 @@
   published `v1.0.0rc4` from commit `33073c0` and the independent
   [verification run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30735097985)
   validated checksums, SBOM, provenance, and tag-bound attestations.
-- [ ] Install from public indexes in clean environments and run README
+- [x] Install from public indexes in clean environments and run README
   commands without edits for base, `[trino]`, `[mcp]`, and `[mcp,trino]`.
+  Evidence: [Verify Published Release #7](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30736848757)
+  installed the exact public RC4 wheel for all four profiles without a source
+  checkout and passed the literal README `doctor` and `demo` commands.
 - [ ] Verify `--version`, `demo`, and `doctor` for each applicable profile;
   record package version, artifact hashes, Python version, and extra profile.
 - [ ] Re-run public documentation, container signature, package attestation,
