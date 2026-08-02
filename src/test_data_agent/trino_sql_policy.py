@@ -15,6 +15,7 @@ except ImportError:  # pragma: no cover
 from test_data_agent.core.privacy import infer_sensitive_from_name
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_work_budget import (
+    QueryWorkBudget,
     consume_ast_work,
     consume_sql_formula_chars,
     current_query_work_budget,
@@ -167,7 +168,25 @@ def consume_projected_column_work(sql: str) -> None:
     if budget is None:
         return
 
-    for statement in parse_trino_statements(sql):
+    _consume_projected_columns(parse_trino_statements(sql), budget)
+
+
+def consume_query_execution_work(sql: str) -> None:
+    """Charge statement and projection work before opening Trino resources."""
+    budget = current_query_work_budget()
+    if budget is None:
+        return
+
+    statements = parse_trino_statements(sql)
+    budget.consume_statements(len(statements))
+    _consume_projected_columns(statements, budget)
+
+
+def _consume_projected_columns(
+    statements: list[exp.Expression],
+    budget: QueryWorkBudget,
+) -> None:
+    for statement in statements:
         for select in statement.find_all(exp.Select):
             projections = select.expressions
             if any(

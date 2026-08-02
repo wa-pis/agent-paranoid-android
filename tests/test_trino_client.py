@@ -186,6 +186,20 @@ def test_client_rejects_projected_column_budget_before_opening_connection(
     assert cursor.executed == []
 
 
+def test_client_rejects_statement_budget_before_opening_connection() -> None:
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, statements=1)
+    execute = with_query_work_budget(client.execute_query, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="statements"):
+        execute("SELECT first_value; SELECT second_value")
+
+    assert driver.dbapi.connect_kwargs is None
+    assert cursor.executed == []
+
+
 def test_server_keeps_client_compatibility_exports() -> None:
     assert mcp_trino_server.TrinoClient is TrinoClient
     assert mcp_trino_server.TrinoResultLimitError is TrinoResultLimitError

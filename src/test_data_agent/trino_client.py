@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from test_data_agent.trino_config import TrinoConfig
-from test_data_agent.trino_sql_policy import consume_projected_column_work
+from test_data_agent.trino_sql_policy import consume_query_execution_work
 
 try:  # pragma: no cover - live Trino is not used in unit tests.
     import trino as trino
@@ -41,7 +41,7 @@ class TrinoClient:
         if self.driver is None:
             raise RuntimeError("trino package is not installed")
 
-        consume_projected_column_work(sql)
+        consume_query_execution_work(sql)
         connection = self.driver.dbapi.connect(
             host=self.config.host,
             port=self.config.port,

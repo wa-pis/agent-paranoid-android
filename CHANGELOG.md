@@ -23,6 +23,8 @@ All notable changes to this project are documented here.
   formula rendering, policy traversal, or Trino query execution.
 - Bound cumulative explicit SQL projections before opening a Trino connection
   and fail closed when a projection wildcard has unknown width.
+- Bound cumulative parsed SQL statements before opening a Trino connection or
+  cursor.
 
 ### Migration
 
