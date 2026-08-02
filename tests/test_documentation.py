@@ -606,6 +606,34 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     assert "- [x] Define stable promotion" in tasks
 
 
+def test_rc4_remaining_findings_have_dispositions() -> None:
+    change = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "1-0-0-rc4-privacy-invocation-hardening"
+    )
+    design = (change / "design.md").read_text()
+    tasks = (change / "tasks.md").read_text()
+    finding_register = design.split("## Remaining Finding Register", 1)[1].split(
+        "## Stable Promotion Contract", 1
+    )[0]
+    normalized_register = " ".join(finding_register.split())
+    finding_rows = [
+        line for line in finding_register.splitlines() if line.startswith("| RC4-F")
+    ]
+
+    assert len(finding_rows) == 3
+    for finding_id, row in zip(("RC4-F1", "RC4-F2", "RC4-F3"), finding_rows):
+        assert finding_id in row
+        assert "@wa-pis" in row
+        assert "2026-11-01" in row
+    assert "No unresolved P0 or release-blocking P1" in finding_register
+    assert "pending release evidence, not findings" in normalized_register
+    assert "remain release-blocking tasks" in normalized_register
+    assert "- [x] Confirm every remaining finding" in tasks
+
+
 def test_compatibility_inventory_covers_retained_surfaces() -> None:
     compatibility = (
         ROOT / "docs" / "reference" / "compatibility.md"

@@ -97,6 +97,24 @@ crash-durability promise, when deployment requirements demand it, after an
 artifact-loss incident, or when platform-specific implementation and
 crash-consistency tests are ready.
 
+## Remaining Finding Register
+
+No unresolved P0 or release-blocking P1 implementation finding remains in this
+change. The residual Medium and P2/P3 risks are dispositioned below; the exact
+RC4 security pipeline may supersede a carried-forward scanner finding only
+with evidence from the candidate commit.
+
+| ID | Priority | Finding | Owner | Disposition | Revisit date and triggers |
+| --- | --- | --- | --- | --- | --- |
+| RC4-F1 | Medium | Scorecard SAST coverage score of 8 is carried forward from the RC2 review until an exact-RC4 Scorecard result supersedes it. | Repository maintainer (`@wa-pis`). | Accepted as a non-release-blocking CI maturity risk; code-affecting changes retain required CodeQL. | 2026-11-01; review immediately if code can merge without CodeQL, path classification broadens, the score falls below 8, or another maintainer joins. |
+| RC4-F2 | P2/P3 | Artifact writes do not promise crash or power-loss durability without file and directory `fsync`. | Repository maintainer (`@wa-pis`). | Deferred until after 1.0; not release-blocking while the public contract makes no crash-durability promise. | 2026-11-01 or the first post-1.0 hardening cycle; review immediately for a public durability promise, deployment requirement, artifact-loss incident, or platform crash-test plan. |
+| RC4-F3 | P2 | Opt-in `run_safe_select` rows may contain allowed source values or values missed by heuristic masking. | Repository maintainer (`@wa-pis`) for implementation; deploying operator for enablement. | Accepted as an explicit, disabled-by-default contract risk outside the source-literal-free guarantee. | 2026-11-01; review immediately before default enablement, a source-free claim, a new row-returning capability, returned values in errors or audit records, or a query/privacy incident. |
+
+The public-wheel clean-environment check and exact-commit package, container,
+documentation, attestation, signature, and integration acceptance are pending
+release evidence, not findings. They remain release-blocking tasks and cannot
+be accepted or deferred through this register.
+
 ## Stable Promotion Contract
 
 The accepted RC4 baseline is the exact annotated `v1.0.0rc4` tag commit after
