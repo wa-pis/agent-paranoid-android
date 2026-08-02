@@ -46,10 +46,11 @@ introduced.
 
 ## Five-Minute Check
 
-Install the package and run the self-contained smoke test:
+After RC4 is public, install the exact candidate and run the self-contained
+smoke test:
 
 ```bash
-python3 -m pip install agent-paranoid-android
+python3 -m pip install "agent-paranoid-android==1.0.0rc4"
 test-data-agent doctor
 ```
 

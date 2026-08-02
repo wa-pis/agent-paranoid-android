@@ -68,7 +68,9 @@ def test_readme_is_a_focused_entrypoint() -> None:
     readme = (ROOT / "README.md").read_text()
 
     assert len(readme.splitlines()) <= 140
-    assert "python3 -m pip install agent-paranoid-android" in readme
+    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc4"' in readme
+    assert '"agent-paranoid-android[mcp,trino]==1.0.0rc4"' in readme
+    assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
@@ -383,6 +385,10 @@ def test_installation_documents_dependency_budgets() -> None:
     for maximum in (10, 11, 20, 25, 35):
         assert f"| {maximum} |" in installation
     assert 'pip install "agent-paranoid-android[all]"' not in installation
+    assert '"agent-paranoid-android==1.0.0rc4"' in installation
+    for extra in ("parquet", "mcp", "mcp,trino", "openai"):
+        assert f'"agent-paranoid-android[{extra}]==1.0.0rc4"' in installation
+    assert "floating `--pre`" in installation
     assert "not the recommended user installation" in installation
 
 

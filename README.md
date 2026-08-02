@@ -31,25 +31,26 @@ recorded package, dependency, locale, and serializer environment.
 
 ## Install
 
-Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14.
+Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. After
+publication, install the exact RC4 candidate used for acceptance:
 
 ```bash
-python3 -m pip install agent-paranoid-android
+python3 -m pip install "agent-paranoid-android==1.0.0rc4"
 test-data-agent doctor
 ```
 
 Install only features you use:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]"
-python3 -m pip install "agent-paranoid-android[mcp]"
-python3 -m pip install "agent-paranoid-android[trino]"
-python3 -m pip install "agent-paranoid-android[openai]"
+python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[trino]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc4"
+python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc4"
 ```
 
 The `trino` extra is required only for Trino profiling and contains the Trino
-client and safe SQL parser. The `mcp` extra is separate; install both extras
-when using the Trino MCP server.
+client and safe SQL parser. Add `mcp` when using the Trino MCP server.
 
 ## First Offline Run
 
