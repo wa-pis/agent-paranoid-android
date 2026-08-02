@@ -73,6 +73,31 @@ Duration values use `ms`, `s`, `m`, or `h`. Data-size values use `B`, `kB`,
 `TRINO_QUERY_MAX_RUN_TIME` must be greater than or equal to
 `TRINO_QUERY_MAX_EXECUTION_TIME`.
 
+## Trino Invocation Limits
+
+These limits apply to one MCP tool invocation, including nested table and
+column profiling. Every invocation receives a fresh monotonic budget.
+
+| Variable | Default | Unit | Scope | Failure behavior |
+| --- | ---: | --- | --- | --- |
+| `TRINO_MAX_INVOCATION_PROFILED_COLUMNS` | `100` | columns | Per invocation | Rejects before profiling the next column |
+| `TRINO_MAX_INVOCATION_STATEMENTS` | `150` | statements | Per invocation | Rejects before opening the next Trino connection |
+| `TRINO_MAX_INVOCATION_SECONDS` | `120` | seconds | Per invocation | Clamps HTTP and Trino query timeouts; closes active query resources on expiry |
+| `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` | unset | bytes | Per invocation, optional | Rejects before a statement whose conservative estimate would exceed the limit |
+
+All configured values must be finite and positive. Column, statement, and scan
+limits accept integers; invocation seconds accepts a number. Invalid values
+fail server startup. Budget exhaustion raises a bounded query-work error and
+does not restore work already consumed by nested helpers.
+
+`TRINO_QUERY_MAX_EXECUTION_TIME`, `TRINO_QUERY_MAX_RUN_TIME`, and
+`TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` remain per-query limits. The invocation
+deadline clamps the two per-query time limits and `TRINO_REQUEST_TIMEOUT_SECONDS`
+to the remaining invocation time. When the optional cumulative scan limit is
+set, each statement conservatively consumes the configured per-query
+`TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` cap; leaving it unset disables that
+cumulative cap while retaining the per-query Trino limit.
+
 ## Explicit Safety Overrides
 
 | Variable | Default | Effect |

@@ -20,6 +20,8 @@ All notable changes to this project are documented here.
   through one monotonic budget across nested Trino table profiling.
 - Clamp Trino HTTP, execution, and run timeouts to the remaining invocation
   deadline and close active query resources when it expires.
+- Add fail-closed environment configuration and scope documentation for Trino
+  invocation column, statement, deadline, and optional scan limits.
 
 ## [1.0.0rc4] - 2026-08-02
 
