@@ -175,6 +175,7 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
     }
     assert active == {
         "1-0-0-rc4-privacy-invocation-hardening",
+        "1-0-0-rc5-public-release-invocation-hardening",
         "_template",
     }
 
@@ -220,7 +221,7 @@ def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
 
     assert "Status: required before the stable 1.0" in proposal
     assert "2026-08-01-application-boundaries-refactor/proposal.md" in stable_scope
-    assert "promote the verified RC4 baseline" in stable_scope
+    assert "promote the verified RC5 baseline" in stable_scope
     assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
     assert "- [ ]" not in tasks
 
