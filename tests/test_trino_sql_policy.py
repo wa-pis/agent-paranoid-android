@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from test_data_agent import mcp_trino_server
@@ -10,6 +12,11 @@ from test_data_agent.trino_sql_policy import (
     check_allowlist,
     quote_identifier,
     validate_safe_select,
+)
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudgetExceeded,
+    with_query_work_budget,
 )
 
 
@@ -44,6 +51,31 @@ def test_direct_sql_policy_accepts_bounded_allowlisted_select() -> None:
     sql = "SELECT synthetic_id FROM analytics.safe.records LIMIT 10"
 
     assert validate_safe_select(sql, config=policy_config()) == sql
+
+
+def test_sql_budget_fails_before_sqlglot_parsing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    parsed: list[str] = []
+
+    def parse_sql(sql: str, *, read: str) -> list[object]:
+        parsed.append(f"{read}:{sql}")
+        return []
+
+    monkeypatch.setattr(
+        "test_data_agent.trino_sql_policy.sqlglot.parse",
+        parse_sql,
+    )
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, sql_formula_chars=5)
+    wrapped = with_query_work_budget(
+        lambda sql: validate_safe_select(sql, config=policy_config()),
+        limits,
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="SQL/formula characters"):
+        wrapped("SELECT synthetic_id FROM analytics.safe.records LIMIT 1")
+
+    assert parsed == []
 
 
 def test_direct_allowlist_policy_fails_closed() -> None:

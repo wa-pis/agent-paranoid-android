@@ -13,6 +13,7 @@ except ImportError:  # pragma: no cover
 
 from test_data_agent.core.privacy import infer_sensitive_from_name
 from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_work_budget import consume_sql_formula_chars
 
 FORBIDDEN_SQL_RE = re.compile(
     r"\b(insert|update|delete|merge|drop|truncate|alter|create|grant|revoke|call|execute)\b",
@@ -72,6 +73,7 @@ def strip_sql_comments(sql: str) -> str:
 
 
 def normalize_sql(sql: str) -> str:
+    consume_sql_formula_chars(sql)
     cleaned = strip_sql_comments(sql).strip()
     semicolon_positions = unquoted_char_positions(cleaned, ";")
     if len(semicolon_positions) > 1:
@@ -123,6 +125,7 @@ def validate_safe_select_shape(tree: exp.Expression) -> None:
 
 
 def parse_select_ast(sql: str) -> exp.Expression:
+    consume_sql_formula_chars(sql)
     if sqlglot is None or exp is None:
         raise RuntimeError(
             "Trino support is not installed; "

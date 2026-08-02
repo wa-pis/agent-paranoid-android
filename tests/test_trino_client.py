@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any
 
 import pytest
@@ -11,6 +12,11 @@ from test_data_agent.trino_client import (
     rows_to_dicts,
 )
 from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudgetExceeded,
+    with_query_work_budget,
+)
 
 
 class FakeCursor:
@@ -141,6 +147,20 @@ def test_client_closes_resources_when_execution_fails() -> None:
 def test_client_requires_optional_trino_driver() -> None:
     with pytest.raises(RuntimeError, match="trino package is not installed"):
         TrinoClient(config=client_config(), driver=None).execute_query("SELECT bounded")
+
+
+def test_client_rejects_sql_budget_before_opening_connection() -> None:
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, sql_formula_chars=5)
+    execute = with_query_work_budget(client.execute_query, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="SQL/formula characters"):
+        execute("SELECT bounded")
+
+    assert driver.dbapi.connect_kwargs is None
+    assert cursor.executed == []
 
 
 def test_server_keeps_client_compatibility_exports() -> None:
