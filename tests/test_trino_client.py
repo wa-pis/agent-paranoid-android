@@ -32,6 +32,8 @@ class FakeCursor:
         self.execute_error = execute_error
         self.executed: list[tuple[str, list[Any]]] = []
         self.fetch_size: int | None = None
+        self.fetch_sizes: list[int] = []
+        self.row_offset = 0
         self.closed = False
 
     def execute(self, sql: str, parameters: list[Any]) -> None:
@@ -41,7 +43,10 @@ class FakeCursor:
 
     def fetchmany(self, size: int) -> list[tuple[Any, ...]]:
         self.fetch_size = size
-        return self.rows
+        self.fetch_sizes.append(size)
+        batch = self.rows[self.row_offset : self.row_offset + size]
+        self.row_offset += len(batch)
+        return batch
 
     def close(self) -> None:
         self.closed = True
@@ -101,7 +106,7 @@ def test_client_applies_budgets_and_closes_resources() -> None:
     assert cursor.executed == [
         ("SELECT synthetic_id, status FROM safe_table LIMIT 1", [])
     ]
-    assert cursor.fetch_size == 3
+    assert cursor.fetch_size == 1
     assert cursor.closed is True
     assert driver.dbapi.connection.closed is True
     assert driver.dbapi.connect_kwargs == {
@@ -198,6 +203,21 @@ def test_client_rejects_statement_budget_before_opening_connection() -> None:
 
     assert driver.dbapi.connect_kwargs is None
     assert cursor.executed == []
+
+
+def test_client_rejects_response_budget_before_retaining_complete_result() -> None:
+    cursor = FakeCursor([("x" * 256,), ("must-not-be-fetched",)])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, response_bytes=128)
+    execute = with_query_work_budget(client.execute_query, limits)
+
+    with pytest.raises(QueryWorkBudgetExceeded, match="response bytes"):
+        execute("SELECT synthetic_value FROM safe_table")
+
+    assert cursor.fetch_sizes == [1]
+    assert cursor.closed is True
+    assert driver.dbapi.connection.closed is True
 
 
 def test_server_keeps_client_compatibility_exports() -> None:

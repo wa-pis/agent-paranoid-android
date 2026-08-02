@@ -668,14 +668,16 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
 
         def __init__(self) -> None:
             self.closed = False
+            self.rows = iter([(1,)])
 
         def execute(self, sql, parameters):
             assert sql == "SELECT id FROM users LIMIT 1"
             assert parameters == []
 
         def fetchmany(self, size):
-            assert size == 10_001
-            return [(1,)]
+            assert size == 1
+            row = next(self.rows, None)
+            return [row] if row is not None else []
 
         def close(self):
             self.closed = True
@@ -817,13 +819,15 @@ def test_execute_query_rejects_oversized_result_and_closes_resources(
 
         def __init__(self) -> None:
             self.closed = False
+            self.rows = iter([(1,), (2,), (3,)])
 
         def execute(self, sql, parameters):
             pass
 
         def fetchmany(self, size):
-            assert size == 3
-            return [(1,), (2,), (3,)]
+            assert size == 1
+            row = next(self.rows, None)
+            return [row] if row is not None else []
 
         def close(self):
             self.closed = True

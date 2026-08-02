@@ -268,6 +268,21 @@ def consume_ast_work(
         pending.extend((child, depth + 1) for child in child_nodes(node))
 
 
+def consume_response_payload(value: Any) -> None:
+    """Charge one response fragment before its value is retained by the caller."""
+    budget = current_query_work_budget()
+    if budget is None:
+        return
+
+    payload = json.dumps(
+        value,
+        default=str,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    budget.consume_response_bytes(len(payload))
+
+
 def canonical_argument_size(
     function: Callable[..., Any],
     *args: Any,
