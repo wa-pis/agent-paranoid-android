@@ -7,6 +7,7 @@ import json
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -230,18 +231,20 @@ def test_transport_response_budget_counts_final_jsonrpc_and_framing(
 ) -> None:
     import anyio
     import mcp.types as types
-    from mcp.shared.message import SessionMessage
 
     limits = replace(DEFAULT_QUERY_WORK_LIMITS, transport_response_bytes=512)
     budget = QueryWorkBudget(limits)
-    request = transport._bounded_session_message(
-        b'{"jsonrpc":"2.0","id":"request-1","method":"ping"}\n',
-        lambda raw_payload_bytes: budget,
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":"request-1","method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
     )
     registry = transport._RequestBudgetRegistry()
     registry.register_incoming_request(request)
-    response = SessionMessage(
-        types.JSONRPCMessage.model_validate_json(response_json)
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(response_json),
+        metadata=None,
     )
     expected = response.message.model_dump_json(
         by_alias=True,
@@ -264,12 +267,12 @@ def test_transport_response_budget_counts_final_jsonrpc_and_framing(
 def test_transport_response_overflow_fails_before_writer() -> None:
     import anyio
     import mcp.types as types
-    from mcp.shared.message import SessionMessage
 
-    response = SessionMessage(
-        types.JSONRPCMessage.model_validate_json(
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
             '{"jsonrpc":"2.0","id":7,"result":{"value":"too-wide"}}'
-        )
+        ),
+        metadata=None,
     )
     response_size = len(
         response.message.model_dump_json(
@@ -282,9 +285,11 @@ def test_transport_response_overflow_fails_before_writer() -> None:
         transport_response_bytes=response_size - 1,
     )
     budget = QueryWorkBudget(limits)
-    request = transport._bounded_session_message(
-        b'{"jsonrpc":"2.0","id":7,"method":"ping"}\n',
-        lambda raw_payload_bytes: budget,
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":7,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
     )
     registry = transport._RequestBudgetRegistry()
     registry.register_incoming_request(request)
