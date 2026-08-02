@@ -24,8 +24,9 @@
       path and assert request sentinels are not echoed.
     - [x] Cover validation failures through direct and transport paths without
       echoing request sentinels.
-    - [ ] Cover direct and transport database-error, nested serialization, and
-      audit paths.
+    - [x] Cover database failures through direct and transport paths without
+      echoing request sentinels.
+    - [ ] Cover direct and transport nested serialization and audit paths.
 - [ ] Add source fixtures covering strings, integers, decimals, floats,
   booleans, dates, timestamps with timezone, UUID-like values, binary/base64-
   like values, Unicode, nested JSON, and null mixtures. Ensure sentinel values
