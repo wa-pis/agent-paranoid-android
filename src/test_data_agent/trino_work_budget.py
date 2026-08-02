@@ -1,0 +1,210 @@
+"""Typed monotonic work budget for one Trino invocation."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from enum import StrEnum
+
+
+class QueryWorkDimension(StrEnum):
+    RAW_TRANSPORT_PAYLOAD_BYTES = "raw transport payload bytes"
+    CANONICAL_ARGUMENT_BYTES = "canonical argument bytes"
+    SQL_FORMULA_CHARS = "SQL/formula characters"
+    AST_NODES = "AST nodes"
+    AST_DEPTH = "AST depth"
+    PROJECTED_COLUMNS = "projected columns"
+    STATEMENTS = "statements"
+    RESPONSE_BYTES = "response bytes"
+
+
+class QueryWorkBudgetExceeded(ValueError):
+    """Raised before an invocation can exceed a configured work limit."""
+
+    def __init__(
+        self,
+        *,
+        dimension: QueryWorkDimension,
+        attempted: int,
+        limit: int,
+    ) -> None:
+        self.dimension = dimension
+        self.attempted = attempted
+        self.limit = limit
+        super().__init__(
+            f"query work budget exceeded for {dimension.value}: "
+            f"attempted {attempted}, limit {limit}"
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class QueryWorkLimits:
+    raw_transport_payload_bytes: int
+    canonical_argument_bytes: int
+    sql_formula_chars: int
+    ast_nodes: int
+    ast_depth: int
+    projected_columns: int
+    statements: int
+    response_bytes: int
+
+    def __post_init__(self) -> None:
+        for name, value in (
+            ("raw_transport_payload_bytes", self.raw_transport_payload_bytes),
+            ("canonical_argument_bytes", self.canonical_argument_bytes),
+            ("sql_formula_chars", self.sql_formula_chars),
+            ("ast_nodes", self.ast_nodes),
+            ("ast_depth", self.ast_depth),
+            ("projected_columns", self.projected_columns),
+            ("statements", self.statements),
+            ("response_bytes", self.response_bytes),
+        ):
+            if value <= 0:
+                raise ValueError(f"{name} must be positive")
+
+
+@dataclass(frozen=True, slots=True)
+class QueryWorkSnapshot:
+    raw_transport_payload_bytes: int
+    canonical_argument_bytes: int
+    sql_formula_chars: int
+    ast_nodes: int
+    ast_depth: int
+    projected_columns: int
+    statements: int
+    response_bytes: int
+
+
+class QueryWorkBudget:
+    """Track work monotonically without exposing a reset operation."""
+
+    __slots__ = (
+        "_ast_depth",
+        "_ast_nodes",
+        "_canonical_argument_bytes",
+        "_limits",
+        "_projected_columns",
+        "_raw_transport_payload_bytes",
+        "_response_bytes",
+        "_sql_formula_chars",
+        "_statements",
+    )
+
+    def __init__(self, limits: QueryWorkLimits) -> None:
+        self._limits = limits
+        self._raw_transport_payload_bytes = 0
+        self._canonical_argument_bytes = 0
+        self._sql_formula_chars = 0
+        self._ast_nodes = 0
+        self._ast_depth = 0
+        self._projected_columns = 0
+        self._statements = 0
+        self._response_bytes = 0
+
+    @property
+    def limits(self) -> QueryWorkLimits:
+        return self._limits
+
+    def snapshot(self) -> QueryWorkSnapshot:
+        return QueryWorkSnapshot(
+            raw_transport_payload_bytes=self._raw_transport_payload_bytes,
+            canonical_argument_bytes=self._canonical_argument_bytes,
+            sql_formula_chars=self._sql_formula_chars,
+            ast_nodes=self._ast_nodes,
+            ast_depth=self._ast_depth,
+            projected_columns=self._projected_columns,
+            statements=self._statements,
+            response_bytes=self._response_bytes,
+        )
+
+    def consume_raw_transport_payload_bytes(self, amount: int) -> None:
+        self._raw_transport_payload_bytes = self._consume(
+            QueryWorkDimension.RAW_TRANSPORT_PAYLOAD_BYTES,
+            current=self._raw_transport_payload_bytes,
+            amount=amount,
+            limit=self._limits.raw_transport_payload_bytes,
+        )
+
+    def consume_canonical_argument_bytes(self, amount: int) -> None:
+        self._canonical_argument_bytes = self._consume(
+            QueryWorkDimension.CANONICAL_ARGUMENT_BYTES,
+            current=self._canonical_argument_bytes,
+            amount=amount,
+            limit=self._limits.canonical_argument_bytes,
+        )
+
+    def consume_sql_formula_chars(self, amount: int) -> None:
+        self._sql_formula_chars = self._consume(
+            QueryWorkDimension.SQL_FORMULA_CHARS,
+            current=self._sql_formula_chars,
+            amount=amount,
+            limit=self._limits.sql_formula_chars,
+        )
+
+    def consume_ast_nodes(self, amount: int) -> None:
+        self._ast_nodes = self._consume(
+            QueryWorkDimension.AST_NODES,
+            current=self._ast_nodes,
+            amount=amount,
+            limit=self._limits.ast_nodes,
+        )
+
+    def observe_ast_depth(self, depth: int) -> None:
+        self._validate_non_negative(QueryWorkDimension.AST_DEPTH, depth)
+        if depth > self._limits.ast_depth:
+            raise QueryWorkBudgetExceeded(
+                dimension=QueryWorkDimension.AST_DEPTH,
+                attempted=depth,
+                limit=self._limits.ast_depth,
+            )
+        self._ast_depth = max(self._ast_depth, depth)
+
+    def consume_projected_columns(self, amount: int) -> None:
+        self._projected_columns = self._consume(
+            QueryWorkDimension.PROJECTED_COLUMNS,
+            current=self._projected_columns,
+            amount=amount,
+            limit=self._limits.projected_columns,
+        )
+
+    def consume_statements(self, amount: int = 1) -> None:
+        self._statements = self._consume(
+            QueryWorkDimension.STATEMENTS,
+            current=self._statements,
+            amount=amount,
+            limit=self._limits.statements,
+        )
+
+    def consume_response_bytes(self, amount: int) -> None:
+        self._response_bytes = self._consume(
+            QueryWorkDimension.RESPONSE_BYTES,
+            current=self._response_bytes,
+            amount=amount,
+            limit=self._limits.response_bytes,
+        )
+
+    @classmethod
+    def _consume(
+        cls,
+        dimension: QueryWorkDimension,
+        *,
+        current: int,
+        amount: int,
+        limit: int,
+    ) -> int:
+        cls._validate_non_negative(dimension, amount)
+        attempted = current + amount
+        if attempted > limit:
+            raise QueryWorkBudgetExceeded(
+                dimension=dimension,
+                attempted=attempted,
+                limit=limit,
+            )
+        return attempted
+
+    @staticmethod
+    def _validate_non_negative(
+        dimension: QueryWorkDimension,
+        amount: int,
+    ) -> None:
+        if amount < 0:
+            raise ValueError(f"{dimension.value} must be non-negative")
