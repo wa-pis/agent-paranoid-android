@@ -96,5 +96,5 @@
 - [x] Run `python3 -m compileall -q src tests`.
 - [x] Run `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
 - [x] Run `scripts/check_release.sh` and `mkdocs build --strict`.
-- [ ] Confirm every remaining finding has an owner, disposition, and revisit
+- [x] Confirm every remaining finding has an owner, disposition, and revisit
   trigger before stable promotion.
