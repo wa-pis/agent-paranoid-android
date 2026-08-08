@@ -95,19 +95,27 @@ advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(settings=settings))
 fast_settings = openai_advisor_settings_for_preset("fast")
 ```
 
-The typed defaults are model `gpt-5.6`, low reasoning effort, a 4 MiB complete
-provider-request budget, 16,384 output tokens, a 30-second timeout, two SDK
-retries, and no service-tier override. The byte budget includes static trusted
+The benchmark-backed typed defaults are the `fast` candidate: model `gpt-5.6`,
+reasoning effort `none`, a 4 MiB complete provider-request budget, 4,096 output
+tokens, a 15-second timeout, no SDK retries, and no service-tier override. The
+byte budget includes static trusted
 instructions, untrusted request metadata, structured-output schema overhead,
 settings, and final UTF-8 JSON serialization. Oversized requests fail before
 network access. Settings are bounded and kept out of advisor review artifacts.
 The optional service tier accepts `auto`, `default`, `flex`, or `priority`.
 
+The provider sends the public JSON Schema in non-strict mode because the stable
+dataset contract permits bounded free-form distribution and condition objects.
+Every returned JSON object is still parsed and validated locally against the
+typed `AdvisorProposal`; invalid output fails closed and is never applied.
+
 The optional `fast`, `normal`, and `quality` candidate presets use the same
-bounded settings model. They are explicit choices and do not change the client
-constructor defaults. RC5 will select a recommended default only after the
-synthetic-profile benchmark records proposal validity, safety preservation,
-latency, tokens, retries, and cost.
+bounded settings model. The `fast` candidate uses GPT-5.6 reasoning effort
+`none`; the legacy typed `minimal` value remains accepted for compatibility but
+is not used by a GPT-5.6 candidate. The constructor defaults now match `fast`
+after the
+[synthetic-profile benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
+recorded equal validity and safety with the lowest latency and cost.
 
 After each provider call, `OpenAIAdvisorClient.last_run_metadata` exposes a
 bounded in-memory record with the model, settings, canonical request and parsed

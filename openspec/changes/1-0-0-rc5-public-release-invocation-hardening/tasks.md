@@ -118,16 +118,19 @@
   Keep provider credentials and prompts out of persisted diagnostics.
   Evidence: `test_openai_advisor_applies_typed_settings`, SDK timeout/retry
   wiring, and bounded-settings validation tests.
-- [ ] Add fast/normal/quality presets and benchmark them on representative
+- [x] Add fast/normal/quality presets and benchmark them on representative
   synthetic profiles for proposal validity, safety-preservation rate, latency,
   input/output tokens, retries, and cost before selecting defaults.
   - [x] Add explicit typed candidate presets without changing constructor
     defaults before evidence exists.
-  - [ ] Run and record the synthetic-profile benchmark for all candidates.
+  - [x] Run and record the synthetic-profile benchmark for all candidates.
     - [x] Add a synthetic-only runner with explicit price inputs and redacted
       aggregate validity, safety, latency, token, retry, and cost output.
-    - [ ] Execute the runner against the provider and attach exact evidence.
-  - [ ] Select and document the benchmark-backed default.
+    - [x] Execute the runner against the provider and attach exact evidence.
+      Evidence: [advisor preset benchmark](advisor-benchmark-evidence.md).
+  - [x] Select and document the benchmark-backed default.
+    Evidence: `fast` retained 100% validity and safety with the lowest measured
+    latency and cost, so its bounded settings are now the constructor defaults.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.
