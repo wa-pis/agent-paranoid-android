@@ -131,9 +131,12 @@
   Evidence: run-metadata, unbounded-provider-metric, and provider-error tests
   verify bounded fields without prompts, source values, credentials, or
   exception text.
-- [ ] Implement the optional relationship-candidate ranking adapter using the
+- [x] Implement the optional relationship-candidate ranking adapter using the
   existing provider-neutral contract; keep deterministic candidate identity,
   no source rows/raw values, human review, and no direct DatasetSpec mutation.
+  Evidence: OpenAI relationship-advisor safe-request, candidate-limit, and
+  candidate-invention tests exercise the deterministic validator and
+  review-only result.
 - [ ] Add tests for cache reuse/refresh, local deadline/sample exhaustion,
   complete advisor budget rejection before network, bounded timeout/retry,
   redacted metrics, and candidate-identity tampering.

@@ -10,6 +10,8 @@ All notable changes to this project are documented here.
   input bytes, output tokens, timeout, retries, and optional service tier.
 - Add bounded in-memory OpenAI advisor run metadata for settings, sizes,
   latency, status, provider-reported retries, and token usage.
+- Add a separate OpenAI relationship-candidate ranking adapter that accepts
+  only bounded deterministic candidates and returns review-required proposals.
 
 ### Security
 

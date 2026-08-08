@@ -213,6 +213,26 @@ against those candidates, and `review_relationship_proposal(...)` records the
 separate human decision. Even an accepted review does not authorize generation
 or modify a `DatasetSpec`.
 
+The optional OpenAI integration wires this contract as a separate operation:
+
+```python
+from test_data_agent.providers.openai import (
+    OpenAIAdvisorClient,
+    OpenAIRelationshipDiscoveryAdvisor,
+)
+from test_data_agent.relationship_discovery import rank_relationship_candidates
+
+client = OpenAIAdvisorClient()
+proposals = rank_relationship_candidates(
+    candidates,
+    OpenAIRelationshipDiscoveryAdvisor(client),
+)
+```
+
+The adapter submits only bounded candidate metadata, reuses the configured
+request-size, timeout, retry, and run-metadata limits, and rejects invented IDs
+or changed kinds and fields before returning a review-required proposal.
+
 ## Agent Workspace Handoff
 
 Use `advise_agent_workspace` after `agent-plan` to persist one validated
