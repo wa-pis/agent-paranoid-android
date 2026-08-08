@@ -483,6 +483,33 @@ def test_trino_mcp_docs_define_default_privacy_boundary() -> None:
     ) in guide
 
 
+def test_public_mcp_docs_reject_stale_or_broad_privacy_claims() -> None:
+    markdown_paths = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
+    forbidden_claims = (
+        "all mcp responses are source-free",
+        "all mcp responses are privacy-safe",
+        "every mcp response is source-free",
+        "every mcp response is privacy-safe",
+        "run_safe_select is source-free",
+        "run_safe_select is pii-free",
+        "run_safe_select is anonymous",
+        "run_safe_select is privacy-safe",
+    )
+
+    for markdown_path in markdown_paths:
+        if markdown_path.name == "roadmap.md":
+            continue
+        content = markdown_path.read_text()
+        normalized = " ".join(content.lower().replace("`", "").split())
+        assert "sample_rows_masked" not in normalized, markdown_path
+        if "run_safe_select" not in normalized:
+            continue
+        assert "default aggregate-only" in normalized, markdown_path
+        assert "explicit opt-in" in normalized, markdown_path
+        for claim in forbidden_claims:
+            assert claim not in normalized, f"{markdown_path}: {claim}"
+
+
 def test_local_markdown_links_resolve() -> None:
     markdown_files = [ROOT / "README.md", *sorted((ROOT / "docs").rglob("*.md"))]
     failures: list[str] = []

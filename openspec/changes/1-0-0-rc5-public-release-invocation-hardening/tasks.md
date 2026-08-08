@@ -91,7 +91,7 @@
 - [x] Use the terms `default aggregate-only tools` and `explicit opt-in
   row-returning tools` consistently. Narrow all server-wide claims that imply
   every MCP response is source-free.
-- [ ] Add a documentation test that rejects stale `sample_rows_masked` names
+- [x] Add a documentation test that rejects stale `sample_rows_masked` names
   and broad source-free/privacy-safe claims around `run_safe_select`.
 
 ## P1 — Agent throughput and local profiling
