@@ -8,7 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, cast
 
-from openai import OpenAI, OpenAIError
+from openai import OpenAI
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -261,7 +261,7 @@ class OpenAIAdvisorClient:
                         max_retries=effective_settings.max_retries,
                     ),
                 )
-            except OpenAIError:
+            except Exception:
                 pass
         if client is None:
             raise ValueError(
@@ -350,7 +350,7 @@ class OpenAIAdvisorClient:
                 metadata=metadata,
             )
 
-        provider_failure: tuple[OpenAIAdvisorRunMetadata, str] | None = None
+        provider_failure: OpenAIAdvisorRunMetadata | None = None
         try:
             response = self._client.responses.create(**request_options)
         except Exception as exc:
@@ -363,12 +363,11 @@ class OpenAIAdvisorClient:
                     else "provider_error"
                 ),
             )
-            provider_failure = (metadata, type(exc).__name__)
+            provider_failure = metadata
         if provider_failure is not None:
-            metadata, error_type = provider_failure
             raise OpenAIAdvisorCallError(
-                f"OpenAI advisor request failed ({error_type})",
-                metadata=metadata,
+                "OpenAI advisor request failed",
+                metadata=provider_failure,
             ) from None
 
         if response.status != "completed":
