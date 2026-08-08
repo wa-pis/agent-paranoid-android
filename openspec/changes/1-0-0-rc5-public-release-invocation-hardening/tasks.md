@@ -121,9 +121,11 @@
 - [ ] Add fast/normal/quality presets and benchmark them on representative
   synthetic profiles for proposal validity, safety-preservation rate, latency,
   input/output tokens, retries, and cost before selecting defaults.
-- [ ] Make the complete provider request budget include trusted instructions,
+- [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.
+  Evidence: `test_openai_advisor_budget_includes_instructions_and_schema`
+  rejects before network when the application request alone would fit.
 - [ ] Record bounded non-sensitive advisor run metadata: model, settings,
   request/response sizes, latency, status, retry count, and provider usage.
 - [ ] Implement the optional relationship-candidate ranking adapter using the

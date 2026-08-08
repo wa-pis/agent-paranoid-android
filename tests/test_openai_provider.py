@@ -133,6 +133,23 @@ def test_openai_advisor_rejects_oversized_request_before_network() -> None:
     assert responses.calls == []
 
 
+def test_openai_advisor_budget_includes_instructions_and_schema() -> None:
+    exchange = safe_exchange()
+    responses = FakeResponses(output_parsed=proposal_for(exchange))
+    application_request_bytes = len(
+        exchange.request.model_dump_json().encode("utf-8")
+    )
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(responses),
+        max_exchange_bytes=application_request_bytes + 1,
+    )
+
+    with pytest.raises(AdvisorContractError, match="byte limit"):
+        client.complete(exchange)
+
+    assert responses.calls == []
+
+
 def test_openai_advisor_applies_typed_settings() -> None:
     exchange = safe_exchange()
     responses = FakeResponses(output_parsed=proposal_for(exchange))

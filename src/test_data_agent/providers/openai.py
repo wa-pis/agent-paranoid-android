@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any, Literal, Protocol, cast
 
 from openai import OpenAI, OpenAIError
@@ -138,12 +139,6 @@ class OpenAIAdvisorClient:
             exchange.model_dump(mode="python")
         )
         request_json = validated.request.model_dump_json()
-        request_size = len(request_json.encode("utf-8"))
-        if request_size > self._settings.max_input_bytes:
-            raise AdvisorContractError(
-                "OpenAI advisor request exceeds the configured byte limit"
-            )
-
         request_options: dict[str, Any] = {
             "model": self._settings.model,
             "input": [
@@ -167,6 +162,14 @@ class OpenAIAdvisorClient:
         }
         if self._settings.service_tier is not None:
             request_options["service_tier"] = self._settings.service_tier
+        request_size = _complete_request_size(
+            request_options,
+            response_json_schema=validated.response_json_schema,
+        )
+        if request_size > self._settings.max_input_bytes:
+            raise AdvisorContractError(
+                "OpenAI advisor request exceeds the configured byte limit"
+            )
 
         try:
             response = self._client.responses.parse(**request_options)
@@ -184,3 +187,31 @@ class OpenAIAdvisorClient:
                 "OpenAI advisor response did not contain a structured proposal"
             )
         return response.output_parsed.model_dump(mode="json")
+
+
+def _complete_request_size(
+    request_options: dict[str, Any],
+    *,
+    response_json_schema: dict[str, Any],
+) -> int:
+    budget_payload = {
+        key: value
+        for key, value in request_options.items()
+        if key != "text_format"
+    }
+    budget_payload["text"] = {
+        "format": {
+            "type": "json_schema",
+            "name": AdvisorProposal.__name__,
+            "strict": True,
+            "schema": response_json_schema,
+        }
+    }
+    return len(
+        json.dumps(
+            budget_payload,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        ).encode("utf-8")
+    )

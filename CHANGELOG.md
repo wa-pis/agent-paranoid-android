@@ -29,6 +29,8 @@ All notable changes to this project are documented here.
   invocation column, statement, deadline, and optional scan limits.
 - Bound each fresh local CSV-folder profile with typed deadline, sample, input
   byte, and cell limits, leaving no partial metadata cache after exhaustion.
+- Count trusted instructions, untrusted metadata, structured-output schema,
+  settings, and serialization in the OpenAI advisor request budget.
 
 ## [1.0.0rc4] - 2026-08-02
 
