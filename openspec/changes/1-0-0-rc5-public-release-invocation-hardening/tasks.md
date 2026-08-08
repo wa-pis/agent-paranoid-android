@@ -70,7 +70,8 @@
   close an active cursor/connection when the deadline expires.
 - [x] Document environment names, defaults, units, per-query versus
   per-invocation scope, and failure behavior in configuration reference.
-- [ ] Add wide-table, statement-fan-out, timeout, concurrency-isolation, and
+- [x] Add a wide-table cumulative column-limit test.
+- [ ] Add statement-fan-out, timeout, concurrency-isolation, and
   preflight/no-connection tests.
 
 ## P3 — MCP documentation contract
