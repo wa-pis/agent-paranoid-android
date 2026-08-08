@@ -89,6 +89,7 @@ row-returning tools are configured separately:
 | `TRINO_QUERY_MAX_EXECUTION_TIME` | `30s` | Trino execution-time session budget |
 | `TRINO_QUERY_MAX_RUN_TIME` | `45s` | Trino total run-time session budget |
 | `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` | `1GB` | Trino physical scan budget |
+| `TRINO_DEPLOYMENT_PROFILE` | `trusted-local` | `trusted-local` permits an unset cumulative scan ceiling; `shared-hardened` requires a finite `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` |
 
 Duration values use `ms`, `s`, `m`, or `h`. Data-size values use `B`, `kB`,
 `MB`, or `GB`.
@@ -106,11 +107,12 @@ column profiling. Every invocation receives a fresh monotonic budget.
 | `TRINO_MAX_INVOCATION_PROFILED_COLUMNS` | `100` | columns | Per invocation | Rejects before profiling the next column |
 | `TRINO_MAX_INVOCATION_STATEMENTS` | `150` | statements | Per invocation | Rejects before opening the next Trino connection |
 | `TRINO_MAX_INVOCATION_SECONDS` | `120` | seconds | Per invocation | Clamps HTTP and Trino query timeouts; closes active query resources on expiry |
-| `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` | unset | bytes | Per invocation, optional | Rejects before a statement whose conservative estimate would exceed the limit |
+| `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` | unset | bytes | Per invocation; required for `shared-hardened` | Rejects before a statement whose conservative estimate would exceed the limit |
 
 All configured values must be finite and positive. Column, statement, and scan
 limits accept integers; invocation seconds accepts a number. Invalid values
-fail server startup. Budget exhaustion raises a bounded query-work error and
+fail server startup. The `shared-hardened` profile fails closed when the
+cumulative scan ceiling is unset. Budget exhaustion raises a bounded query-work error and
 does not restore work already consumed by nested helpers.
 
 The typed budget also keeps `database_result_bytes` and
@@ -127,8 +129,9 @@ per-invocation budget.
 deadline clamps the two per-query time limits and `TRINO_REQUEST_TIMEOUT_SECONDS`
 to the remaining invocation time. When the optional cumulative scan limit is
 set, each statement conservatively consumes the configured per-query
-`TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` cap; leaving it unset disables that
-cumulative cap while retaining the per-query Trino limit.
+`TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` cap. Leaving the cumulative cap unset is
+allowed only for the explicitly named `trusted-local` profile; the
+`shared-hardened` profile requires a finite cap before startup.
 
 ## Explicit Safety Overrides
 

@@ -24,6 +24,7 @@ from test_data_agent.trino_work_budget import (
     query_work_limits_from_env,
     with_query_work_budget,
 )
+from test_data_agent.trino_config import TrinoDeploymentProfile
 
 
 def work_limits(**overrides: Any) -> QueryWorkLimits:
@@ -251,6 +252,29 @@ def test_cumulative_invocation_limits_load_from_environment(
     assert limits.max_invocation_seconds == 5.5
     assert limits.max_cumulative_estimated_scan_bytes == 678
     assert limits.database_result_bytes == DEFAULT_QUERY_WORK_LIMITS.database_result_bytes
+
+
+def test_shared_hardened_profile_requires_cumulative_scan_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV, raising=False)
+
+    with pytest.raises(ValueError, match="shared-hardened"):
+        query_work_limits_from_env(
+            deployment_profile=TrinoDeploymentProfile.SHARED_HARDENED
+        )
+
+
+def test_trusted_local_profile_allows_unset_cumulative_scan_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV, raising=False)
+
+    limits = query_work_limits_from_env(
+        deployment_profile=TrinoDeploymentProfile.TRUSTED_LOCAL
+    )
+
+    assert limits.max_cumulative_estimated_scan_bytes is None
 
 
 @pytest.mark.parametrize(

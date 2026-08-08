@@ -4,6 +4,25 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc6] - 2026-08-08
+
+### Added
+
+- Add field-scoped, collision-safe placeholders for rare categorical values.
+- Add typed per-call OpenAI structured completion results and failure metadata;
+  retain `last_run_metadata` only as a legacy compatibility view.
+- Add `trusted-local` and `shared-hardened` Trino deployment profiles, with a
+  required finite cumulative scan ceiling for shared environments.
+- Add bounded Trino deployment profile and effective scan-limit status to
+  `doctor`.
+
+### Security
+
+- Prevent equal rare values in different fields from sharing a synthetic
+  placeholder and prevent placeholders from colliding with normal categories.
+- Keep provider metadata attached to the invocation that produced it, including
+  preflight and provider-error paths, without retaining prompts or source data.
+
 ## [1.0.0rc5] - 2026-08-08
 
 ### Added
@@ -677,7 +696,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc5...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc6...HEAD
+[1.0.0rc6]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc5...v1.0.0rc6
 [1.0.0rc5]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc4...v1.0.0rc5
 [1.0.0rc4]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc3...v1.0.0rc4
 [1.0.0rc3]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc2...v1.0.0rc3

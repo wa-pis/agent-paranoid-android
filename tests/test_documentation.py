@@ -46,6 +46,7 @@ REQUIRED_DOCS = {
     "release-evidence-1.0.0rc2.md",
     "release-evidence-1.0.0rc4.md",
     "release-evidence-1.0.0rc5.md",
+    "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
 }
@@ -70,8 +71,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     readme = (ROOT / "README.md").read_text()
 
     assert len(readme.splitlines()) <= 140
-    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc5"' in readme
-    assert '"agent-paranoid-android[mcp,trino]==1.0.0rc5"' in readme
+    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc6"' in readme
+    assert '"agent-paranoid-android[mcp,trino]==1.0.0rc6"' in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -83,6 +84,23 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "## Choose A Guide" in readme
     assert "## Release Checklist" not in readme
     assert "## Legacy GenerationSpec Compatibility" not in readme
+
+
+def test_active_release_surfaces_do_not_use_stale_rc5_version() -> None:
+    active_surfaces = (
+        ROOT / "README.md",
+        ROOT / "docs" / "index.md",
+        ROOT / "docs" / "getting-started" / "installation.md",
+        ROOT / "docs" / "release.md",
+        ROOT / "pyproject.toml",
+        ROOT / "src" / "test_data_agent" / "version.py",
+        ROOT / "uv.lock",
+    )
+
+    for path in active_surfaces:
+        content = path.read_text()
+        assert "1.0.0rc5" not in content, path
+        assert "1.0.0rc6" in content, path
 
 
 def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
@@ -195,6 +213,7 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
     assert active == {
         "1-0-0-rc4-privacy-invocation-hardening",
         "1-0-0-rc5-public-release-invocation-hardening",
+        "1-0-0-rc6-final-release-candidate",
         "_template",
     }
 
@@ -240,7 +259,7 @@ def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
 
     assert "Status: required before the stable 1.0" in proposal
     assert "2026-08-01-application-boundaries-refactor/proposal.md" in stable_scope
-    assert "promote the verified RC5 baseline" in stable_scope
+    assert "promote the verified RC6 baseline" in stable_scope
     assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
     assert "- [ ]" not in tasks
 
@@ -405,9 +424,9 @@ def test_installation_documents_dependency_budgets() -> None:
     for maximum in (10, 11, 20, 25, 35):
         assert f"| {maximum} |" in installation
     assert 'pip install "agent-paranoid-android[all]"' not in installation
-    assert '"agent-paranoid-android==1.0.0rc5"' in installation
+    assert '"agent-paranoid-android==1.0.0rc6"' in installation
     for extra in ("parquet", "mcp", "mcp,trino", "openai"):
-        assert f'"agent-paranoid-android[{extra}]==1.0.0rc5"' in installation
+        assert f'"agent-paranoid-android[{extra}]==1.0.0rc6"' in installation
     assert "floating `--pre`" in installation
     assert "not the recommended user installation" in installation
 
@@ -637,8 +656,8 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
         / "tasks.md"
     ).read_text()
 
-    assert "## RC5 To Stable Promotion" in release
-    assert "git diff --name-status v1.0.0rc5 HEAD" in release
+    assert "## RC6 To Stable Promotion" in release
+    assert "git diff --name-status v1.0.0rc6 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",

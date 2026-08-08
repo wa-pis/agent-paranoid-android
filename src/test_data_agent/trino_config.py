@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass
+from enum import StrEnum
 
 DEFAULT_MAX_RESULT_ROWS = 10_000
 ABSOLUTE_MAX_RESULT_ROWS = 100_000
@@ -18,6 +19,12 @@ DATA_SIZE_MULTIPLIERS = {"B": 1, "kB": 1_024, "MB": 1_024**2, "GB": 1_024**3}
 MAX_QUERY_EXECUTION_TIME_MS = 3_600_000
 MAX_QUERY_RUN_TIME_MS = 7_200_000
 MAX_QUERY_SCAN_BYTES = 100 * 1_024**3
+TRINO_DEPLOYMENT_PROFILE_ENV = "TRINO_DEPLOYMENT_PROFILE"
+
+
+class TrinoDeploymentProfile(StrEnum):
+    TRUSTED_LOCAL = "trusted-local"
+    SHARED_HARDENED = "shared-hardened"
 
 
 class TrinoConfigurationError(ValueError):
@@ -39,6 +46,7 @@ class TrinoConfig:
     query_max_scan_physical_bytes: str = DEFAULT_QUERY_MAX_SCAN_PHYSICAL_BYTES
     allow_unrestricted: bool = False
     allow_insecure_http: bool = False
+    deployment_profile: TrinoDeploymentProfile = TrinoDeploymentProfile.TRUSTED_LOCAL
 
     @classmethod
     def from_env(cls) -> TrinoConfig:
@@ -68,6 +76,7 @@ class TrinoConfig:
             ),
             allow_unrestricted=parse_env_bool("TRINO_ALLOW_UNRESTRICTED"),
             allow_insecure_http=parse_env_bool("TRINO_ALLOW_INSECURE_HTTP"),
+            deployment_profile=deployment_profile_from_env(),
         )
         config.validate_security()
         return config
@@ -119,6 +128,19 @@ class TrinoConfig:
                 "TRINO_QUERY_MAX_RUN_TIME must be greater than or equal to "
                 "TRINO_QUERY_MAX_EXECUTION_TIME"
             )
+
+
+def deployment_profile_from_env() -> TrinoDeploymentProfile:
+    raw_value = os.environ.get(
+        TRINO_DEPLOYMENT_PROFILE_ENV,
+        TrinoDeploymentProfile.TRUSTED_LOCAL.value,
+    ).strip().lower()
+    try:
+        return TrinoDeploymentProfile(raw_value)
+    except ValueError as exc:
+        raise TrinoConfigurationError(
+            f"{TRINO_DEPLOYMENT_PROFILE_ENV} must be trusted-local or shared-hardened"
+        ) from exc
 
 
 def parse_allowlist(value: str | None) -> frozenset[str] | None:

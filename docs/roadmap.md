@@ -208,11 +208,12 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The accepted release candidate is `1.0.0rc5`. `1.0.0rc2` completed public
+The active release candidate is `1.0.0rc6`. `1.0.0rc2` completed public
 acceptance; `1.0.0rc3` added the contract-preserving application-boundary
 refactor, and
 `1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closed the remaining
-invocation, transport, advisor, and exact-publication acceptance findings.
+invocation, transport, advisor, and exact-publication acceptance findings and
+is now historical; RC6 is the active candidate for stable promotion.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -593,9 +594,9 @@ Exit criteria:
   executable production or dependency changes may be added between RC5
   acceptance and `1.0.0`; all final release gates must run again. The exact
   allowlist and new-candidate fallback are defined in the
-  [release process](release.md#rc5-to-stable-promotion).
+  [release process](release.md#rc6-to-stable-promotion).
 
-### 1.0.0rc5: Public Release And Invocation Hardening
+### Historical 1.0.0rc5: Public Release And Invocation Hardening
 
 **Goal:** finish public RC acceptance and close the remaining response-size,
 invocation-duration, and MCP documentation ambiguities before stable
@@ -603,6 +604,9 @@ promotion. RC5 is required if any RC4 public-artifact gate is incomplete or if
 the new cumulative limits are not yet benchmark-backed.
 
 Scope:
+
+RC5 is historical and superseded for stable promotion. Do not add new RC5
+work; the active final-candidate checklist is RC6 below.
 
 - [x] Complete the [RC5 public release and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md).
@@ -698,9 +702,47 @@ Exit criteria:
 - Stable promotion is allowed only from the accepted RC5 source tree plus a
   reviewed version/changelog/release-metadata-only diff.
 
+### 1.0.0rc6: Final Release Candidate
+
+**Goal:** make RC6 the single reviewed source tree for stable promotion after
+closing the remaining rare-category, provider-metadata, Trino deployment, and
+public-review evidence gaps.
+
+Scope:
+
+- [x] Implement field-scoped, deterministic rare-category placeholders that
+  avoid normal-category and placeholder collisions.
+- [x] Return typed per-call OpenAI completion metadata and attach the same
+  bounded metadata to preflight/provider failures; keep the mutable last-call
+  view legacy-only.
+- [x] Add `trusted-local` and `shared-hardened` Trino deployment profiles;
+  require a finite cumulative scan ceiling for `shared-hardened` and expose the
+  effective policy in `doctor`.
+- [x] Add focused tests for placeholder collisions/determinism, concurrent
+  provider calls and failures, and fail-closed Trino profile configuration.
+- [ ] Record a publicly verifiable security review with reviewer identity or
+  stable pseudonym, reviewed commit, date, scope, findings/disposition, and a
+  signature or approval URL.
+- [ ] Retag the fixed RC6 source tree and publish wheel, sdist, checksums, SBOM,
+  provenance, attestations, signatures, documentation, and all supported wheel
+  and container profiles.
+- [ ] Install the public RC6 artifacts in clean environments and run the
+  literal README `--version`, `demo`, and `doctor` checks, including base,
+  `parquet`, `mcp`, `trino`, `mcp,trino`, `openai`, `all`, and all three
+  published containers, plus the `0.12.0` upgrade check.
+- [ ] Run the complete release, security, documentation, typing, lint, and
+  test gates against the immutable RC6 commit before stable promotion.
+
+Exit criteria:
+
+- No unresolved P0 or release-blocking P1 findings remain.
+- RC6 public artifacts and documentation identify the same immutable commit.
+- Stable promotion is allowed only from the accepted RC6 source tree plus a
+  reviewed metadata-only version bump.
+
 ### 1.0.0: Stable Release
 
-**Goal:** promote the verified RC5 baseline to the first stable compatibility
+**Goal:** promote the verified RC6 baseline to the first stable compatibility
 baseline.
 
 Scope:
@@ -709,8 +751,8 @@ Scope:
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
   without changing public Python, CLI, MCP, artifact, error, or safety
   contracts.
-- [ ] Promote the accepted `1.0.0rc5` commit without unrelated feature work.
-- [ ] Apply only fixes proven necessary by RC5 acceptance and repeat the
+- [ ] Promote the accepted `1.0.0rc6` commit without unrelated feature work.
+- [ ] Apply only fixes proven necessary by RC6 acceptance and repeat the
   affected release gates.
 - [ ] Re-run every release candidate gate on the exact release commit.
 - [ ] Publish signed and attested wheel, source distribution, documentation,
