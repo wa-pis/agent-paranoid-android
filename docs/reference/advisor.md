@@ -91,11 +91,13 @@ settings = OpenAIAdvisorSettings(
 advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(settings=settings))
 ```
 
-The typed defaults are model `gpt-5.6`, low reasoning effort, a 4 MiB input
-budget, 16,384 output tokens, a 30-second timeout, two SDK retries, and no
-service-tier override. Settings are bounded and kept out of advisor review
-artifacts. The optional service tier accepts `auto`, `default`, `flex`, or
-`priority`.
+The typed defaults are model `gpt-5.6`, low reasoning effort, a 4 MiB complete
+provider-request budget, 16,384 output tokens, a 30-second timeout, two SDK
+retries, and no service-tier override. The byte budget includes static trusted
+instructions, untrusted request metadata, structured-output schema overhead,
+settings, and final UTF-8 JSON serialization. Oversized requests fail before
+network access. Settings are bounded and kept out of advisor review artifacts.
+The optional service tier accepts `auto`, `default`, `flex`, or `priority`.
 
 The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
 a secret manager or private environment configuration; never write it into an
