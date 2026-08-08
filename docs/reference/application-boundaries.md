@@ -99,7 +99,7 @@ those contracts.
 - `plan_trino_dataset`, `profile_csv`,
   `recover_dataset_plan`, `validate_dataset`
 
-`mcp-trino-tools.json` freezes these Trino tools:
+`mcp-trino-tools.json` freezes these default aggregate-only Trino tools:
 
 - `describe_table`, `list_catalogs`, `list_schemas`,
   `list_tables`
@@ -109,6 +109,10 @@ those contracts.
 - `profile_foreign_key`, `profile_formula_rule`
 - `profile_table`, `profile_table_safe`
 - `profile_temporal_ordering`
+
+The explicit opt-in row-returning tools are outside that default fixture.
+`run_safe_select` is registered only when `TRINO_ENABLE_SAFE_SELECT=true` and
+does not inherit the default source-literal-free guarantee.
 
 Tool names, descriptions, input/output schemas, ordering, audit wrapping, and
 safety behavior remain compatibility-gated. Transport extraction must not move
@@ -318,18 +322,18 @@ patterns, synthetic category-rank summaries, safe column-profile completion,
 and opt-in safe-select result masking. Aggregate profiles replace source
 categories with synthetic labels or masked patterns. Safe-select masking is
 heuristic: returned rows may retain allowed source values that are not
-classified as sensitive, so they are outside the source-literal-free default
-contract. `mcp_trino_server.py` retains the remaining tool functions and
-privacy helper imports as compatibility exports while delegating masking below
-the transport boundary.
+classified as sensitive, so they are outside the source-literal-free guarantee
+for the default aggregate-only tools. `mcp_trino_server.py` retains the
+remaining tool functions and privacy helper imports as compatibility exports
+while delegating masking below the transport boundary.
 
-### RC4 Trino MCP Privacy Migration
+### Trino MCP Privacy Boundary
 
 The former row-sampling diagnostic is no longer registered or retained as a
 public Python compatibility wrapper, masking-service method, or query builder.
-MCP clients must use metadata and aggregate profiling tools. `run_safe_select`
-remains a separately configured opt-in and is not a source-literal-free
-replacement for that diagnostic.
+The default aggregate-only tools provide metadata and profiling. The explicit
+opt-in row-returning tools include `run_safe_select`, which is not a
+source-literal-free replacement for that diagnostic.
 
 ### Architecture Gate
 
