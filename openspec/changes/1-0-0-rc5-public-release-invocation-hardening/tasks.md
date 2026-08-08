@@ -137,9 +137,13 @@
   Evidence: OpenAI relationship-advisor safe-request, candidate-limit, and
   candidate-invention tests exercise the deterministic validator and
   review-only result.
-- [ ] Add tests for cache reuse/refresh, local deadline/sample exhaustion,
+- [x] Add tests for cache reuse/refresh, local deadline/sample exhaustion,
   complete advisor budget rejection before network, bounded timeout/retry,
   redacted metrics, and candidate-identity tampering.
+  Evidence: `test_profile_example_uses_safe_profile_cache`, the `--no-cache`
+  parser contract, `test_local_profile_budget.py`, complete-request and SDK
+  timeout/retry tests, bounded redacted run-metadata tests, and deterministic
+  relationship candidate-identity rejection tests pass together.
 
 ## Release gates
 
