@@ -27,6 +27,7 @@ from test_data_agent.advisor import (
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.relationship import Relationship
 from test_data_agent.safety import ProfileSafetyError
 
 
@@ -98,6 +99,68 @@ def test_build_advisor_request_contains_only_safe_typed_metadata() -> None:
     assert len(request.profile_sha256) == 64
     assert len(request.baseline_spec_sha256) == 64
     assert "rows" not in request.model_dump(mode="json")
+
+
+def test_rare_category_sanitization_preserves_structural_references() -> None:
+    profile = DatasetProfile(
+        source_type="test",
+        entities=[
+            safe_profile().entities[0],
+            EntityProfile(
+                name="orders",
+                row_count=2,
+                primary_key_candidates=["order_id"],
+                fields=[
+                    FieldProfile(
+                        name="order_id",
+                        data_type=FieldType.INTEGER,
+                        unique_ratio=1.0,
+                        is_identifier=True,
+                    ),
+                    FieldProfile(
+                        name="customer_id",
+                        data_type=FieldType.INTEGER,
+                    ),
+                ],
+            ),
+        ],
+        relationships=[
+            Relationship(
+                parent_entity="customers",
+                parent_field="customer_id",
+                child_entity="orders",
+                child_field="customer_id",
+                confidence=1.0,
+            )
+        ],
+    )
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": "customers", "count": 1},
+            {"value": "segment", "count": 1},
+            {"value": "customer_id", "count": 1},
+        ],
+    }
+
+    request = build_advisor_request(profile)
+
+    assert request.profile.entities[0].name == "customers"
+    assert request.profile.entities[0].fields[2].name == "segment"
+    assert request.profile.entities[0].primary_key_candidates == ["customer_id"]
+    assert request.profile.relationships[0].parent_entity == "customers"
+    assert request.profile.relationships[0].parent_field == "customer_id"
+    values = [
+        category["value"]
+        for category in request.profile.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ]
+    assert values == [
+        "synthetic_category_1",
+        "synthetic_category_2",
+        "synthetic_category_3",
+    ]
 
 
 def test_advisor_request_marks_instruction_like_names_as_untrusted_data() -> None:

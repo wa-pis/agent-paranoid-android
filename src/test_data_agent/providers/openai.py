@@ -51,6 +51,7 @@ OpenAIAdvisorRunStatus = Literal[
     "incomplete",
     "invalid_response",
     "provider_error",
+    "preflight_rejected",
 ]
 OPENAI_RELATIONSHIP_INSTRUCTIONS = (
     "Rank only the supplied relationship candidates; never invent candidates, "
@@ -198,7 +199,11 @@ class _OpenAIClient(Protocol):
 
 
 class OpenAIAdvisorClient:
-    """Map a safe AdvisorExchange to one OpenAI structured response."""
+    """Map a safe AdvisorExchange to one OpenAI structured response.
+
+    The compatibility ``last_run_metadata`` property is per client and is not
+    safe to read as per-call state while calls run concurrently.
+    """
 
     def __init__(
         self,
@@ -276,6 +281,8 @@ class OpenAIAdvisorClient:
         response_model: type[_ResponseModel],
         response_json_schema: dict[str, Any],
     ) -> _ResponseModel:
+        self._last_run_metadata = None
+        started_at = self._clock()
         request_options: dict[str, Any] = {
             "model": self._settings.model,
             "input": [
@@ -308,11 +315,15 @@ class OpenAIAdvisorClient:
             request_options["service_tier"] = self._settings.service_tier
         request_size = _json_size(request_options)
         if request_size > self._settings.max_input_bytes:
+            self._record_run_metadata(
+                request_bytes=request_size,
+                started_at=started_at,
+                status="preflight_rejected",
+            )
             raise AdvisorContractError(
                 "OpenAI advisor request exceeds the configured byte limit"
             )
 
-        started_at = self._clock()
         try:
             response = self._client.responses.create(**request_options)
         except (OpenAIError, ValidationError) as exc:

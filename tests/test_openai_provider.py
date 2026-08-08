@@ -187,6 +187,23 @@ def test_openai_advisor_rejects_oversized_request_before_network() -> None:
     assert responses.calls == []
 
 
+def test_openai_advisor_records_preflight_rejection_metadata() -> None:
+    exchange = safe_exchange()
+    responses = FakeResponses(output_parsed=proposal_for(exchange))
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(responses),
+        max_exchange_bytes=1,
+    )
+
+    with pytest.raises(AdvisorContractError, match="byte limit"):
+        client.complete(exchange)
+
+    assert client.last_run_metadata is not None
+    assert client.last_run_metadata.status == "preflight_rejected"
+    assert client.last_run_metadata.request_bytes > 1
+    assert client.last_run_metadata.response_bytes is None
+
+
 def test_openai_advisor_budget_includes_instructions_and_schema() -> None:
     exchange = safe_exchange()
     responses = FakeResponses(output_parsed=proposal_for(exchange))

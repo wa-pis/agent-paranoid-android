@@ -277,21 +277,51 @@ def _sanitize_rare_profile_values(
                         f"synthetic_category_{len(replacements) + 1}",
                     )
 
-    def replace(value: Any) -> Any:
-        if isinstance(value, dict):
-            return {key: replace(item) for key, item in value.items()}
-        if isinstance(value, list):
-            return [replace(item) for item in value]
-        if isinstance(value, tuple):
-            return tuple(replace(item) for item in value)
-        if isinstance(value, str):
-            return replacements.get(value, value)
-        return value
+    safe_profile = profile.model_copy(deep=True)
+    safe_spec = spec.model_copy(deep=True)
+    _replace_rare_category_values(safe_profile, replacements)
+    _replace_rare_category_values(safe_spec, replacements)
+    if _structural_identity(profile) != _structural_identity(safe_profile):
+        raise AdvisorContractError("profile sanitization changed structural identity")
+    if _structural_identity(spec) != _structural_identity(safe_spec):
+        raise AdvisorContractError("spec sanitization changed structural identity")
+    return safe_profile, safe_spec
 
-    return (
-        DatasetProfile.model_validate(replace(profile.model_dump(mode="python"))),
-        DatasetSpec.model_validate(replace(spec.model_dump(mode="python"))),
-    )
+
+def _replace_rare_category_values(
+    dataset: DatasetProfile | DatasetSpec,
+    replacements: dict[str, str],
+) -> None:
+    for entity in dataset.entities:
+        for field in entity.fields:
+            distribution = field.distribution
+            if distribution.get("kind") != "categorical":
+                continue
+            categories = distribution.get("categories")
+            if not isinstance(categories, list):
+                continue
+            for category in categories:
+                if not isinstance(category, dict):
+                    continue
+                value = category.get("value")
+                if isinstance(value, str) and value in replacements:
+                    category["value"] = replacements[value]
+
+
+def _structural_identity(dataset: DatasetProfile | DatasetSpec) -> dict[str, Any]:
+    payload = dataset.model_dump(mode="python")
+    for entity in payload.get("entities", []):
+        for field in entity.get("fields", []):
+            distribution = field.get("distribution")
+            if not isinstance(distribution, dict):
+                continue
+            categories = distribution.get("categories")
+            if not isinstance(categories, list):
+                continue
+            for category in categories:
+                if isinstance(category, dict):
+                    category.pop("value", None)
+    return payload
 
 
 def advisor_proposal_json_schema() -> dict[str, Any]:

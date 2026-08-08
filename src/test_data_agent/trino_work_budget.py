@@ -187,6 +187,7 @@ class QueryWorkSnapshot:
     transport_response_bytes: int
     profiled_columns: int = 0
     cumulative_estimated_scan_bytes: int = 0
+    terminal_error_bytes: int = 0
 
 
 class QueryWorkBudget:
@@ -206,6 +207,7 @@ class QueryWorkBudget:
         "_sql_formula_chars",
         "_started_at",
         "_statements",
+        "_terminal_error_bytes",
         "_transport_response_bytes",
     )
 
@@ -228,6 +230,7 @@ class QueryWorkBudget:
         self._profiled_columns = 0
         self._cumulative_estimated_scan_bytes = 0
         self._database_result_bytes = 0
+        self._terminal_error_bytes = 0
         self._transport_response_bytes = 0
 
     @property
@@ -247,6 +250,7 @@ class QueryWorkBudget:
             cumulative_estimated_scan_bytes=self._cumulative_estimated_scan_bytes,
             database_result_bytes=self._database_result_bytes,
             transport_response_bytes=self._transport_response_bytes,
+            terminal_error_bytes=self._terminal_error_bytes,
         )
 
     def consume_raw_transport_payload_bytes(self, amount: int) -> None:
@@ -349,12 +353,34 @@ class QueryWorkBudget:
         )
 
     def consume_transport_response_bytes(self, amount: int) -> None:
-        self._transport_response_bytes = self._consume(
+        normal_limit = (
+            self._limits.transport_response_bytes - MIN_TRANSPORT_RESPONSE_BYTES
+        )
+        normal_current = self._transport_response_bytes - self._terminal_error_bytes
+        normal_total = self._consume(
+            QueryWorkDimension.TRANSPORT_RESPONSE_BYTES,
+            current=normal_current,
+            amount=amount,
+            limit=normal_limit,
+        )
+        self._transport_response_bytes = normal_total + self._terminal_error_bytes
+
+    def consume_terminal_error_bytes(self, amount: int) -> None:
+        """Consume only the fixed allowance reserved for a bounded error."""
+        terminal_total = self._consume(
+            QueryWorkDimension.TRANSPORT_RESPONSE_BYTES,
+            current=self._terminal_error_bytes,
+            amount=amount,
+            limit=MIN_TRANSPORT_RESPONSE_BYTES,
+        )
+        response_total = self._consume(
             QueryWorkDimension.TRANSPORT_RESPONSE_BYTES,
             current=self._transport_response_bytes,
             amount=amount,
             limit=self._limits.transport_response_bytes,
         )
+        self._terminal_error_bytes = terminal_total
+        self._transport_response_bytes = response_total
 
     @classmethod
     def _consume(

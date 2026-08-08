@@ -46,7 +46,9 @@ def work_limits(**overrides: Any) -> QueryWorkLimits:
 
 
 def test_budget_tracks_every_dimension_monotonically() -> None:
-    budget = QueryWorkBudget(work_limits())
+    budget = QueryWorkBudget(
+        work_limits(transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES + 40)
+    )
 
     budget.consume_raw_transport_payload_bytes(10)
     budget.consume_canonical_argument_bytes(20)
@@ -73,6 +75,7 @@ def test_budget_tracks_every_dimension_monotonically() -> None:
         cumulative_estimated_scan_bytes=900,
         database_result_bytes=50,
         transport_response_bytes=40,
+        terminal_error_bytes=0,
     )
 
 
@@ -92,21 +95,33 @@ def test_database_result_budget_rejects_overspend_without_restoring_work() -> No
 
 
 def test_transport_response_budget_is_independent_from_database_result() -> None:
-    budget = QueryWorkBudget(work_limits())
+    budget = QueryWorkBudget(
+        work_limits(transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES + 10)
+    )
     budget.consume_database_result_bytes(8)
-    budget.consume_transport_response_bytes(MIN_TRANSPORT_RESPONSE_BYTES - 4)
+    budget.consume_transport_response_bytes(6)
 
     with pytest.raises(QueryWorkBudgetExceeded) as error:
         budget.consume_transport_response_bytes(5)
 
     assert error.value.dimension is QueryWorkDimension.TRANSPORT_RESPONSE_BYTES
-    assert error.value.attempted == MIN_TRANSPORT_RESPONSE_BYTES + 1
-    assert error.value.limit == MIN_TRANSPORT_RESPONSE_BYTES
+    assert error.value.attempted == 11
+    assert error.value.limit == 10
     assert budget.snapshot().database_result_bytes == 8
-    assert (
-        budget.snapshot().transport_response_bytes
-        == MIN_TRANSPORT_RESPONSE_BYTES - 4
-    )
+    assert budget.snapshot().transport_response_bytes == 6
+
+
+def test_terminal_error_uses_reserved_transport_allowance() -> None:
+    budget = QueryWorkBudget(work_limits())
+
+    budget.consume_terminal_error_bytes(MIN_TRANSPORT_RESPONSE_BYTES)
+
+    assert budget.snapshot().transport_response_bytes == MIN_TRANSPORT_RESPONSE_BYTES
+    assert budget.snapshot().terminal_error_bytes == MIN_TRANSPORT_RESPONSE_BYTES
+    with pytest.raises(QueryWorkBudgetExceeded):
+        budget.consume_terminal_error_bytes(1)
+    with pytest.raises(QueryWorkBudgetExceeded):
+        budget.consume_transport_response_bytes(1)
 
 
 def test_cumulative_limits_reject_overspend_without_restoring_work() -> None:

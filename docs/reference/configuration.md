@@ -113,6 +113,15 @@ limits accept integers; invocation seconds accepts a number. Invalid values
 fail server startup. Budget exhaustion raises a bounded query-work error and
 does not restore work already consumed by nested helpers.
 
+The typed budget also keeps `database_result_bytes` and
+`transport_response_bytes` separate; each defaults to `4 MiB` in the Trino MCP
+work limits. The transport limit is measured in UTF-8 bytes after final MCP
+JSON serialization and framing, at the production writer boundary. Its
+minimum is `350` bytes: that fixed amount is reserved for the bounded terminal
+error response, so normal responses can use at most the configured total minus
+the reserve. A related notification and its final response share the same
+per-invocation budget.
+
 `TRINO_QUERY_MAX_EXECUTION_TIME`, `TRINO_QUERY_MAX_RUN_TIME`, and
 `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` remain per-query limits. The invocation
 deadline clamps the two per-query time limits and `TRINO_REQUEST_TIMEOUT_SECONDS`

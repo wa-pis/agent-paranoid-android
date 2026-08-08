@@ -624,6 +624,9 @@ Scope:
 - [x] Re-run public documentation, package attestation, and upgrade-from
   `0.12.0` checks from published artifacts only. Evidence: [public
   verification run #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369).
+- [ ] Publish and verify the exact `1.0.0rc5` wheel, sdist, GitHub prerelease,
+  checksums, SBOM, provenance, attestations, and clean-install matrix from
+  the immutable RC5 tag.
 - [ ] Split database-result and transport-response budgets. Enforce
   `database_result_bytes` incrementally while reading the cursor and
   `transport_response_bytes` after final MCP JSON serialization, including
@@ -652,6 +655,11 @@ Scope:
   configurable, and visible in non-sensitive run metadata. Select
   fast/normal/quality defaults only after measuring proposal validity, latency,
   tokens, and cost on representative synthetic profiles.
+- [ ] Run the RC5 acceptance advisor benchmark with at least 20 runs per
+  preset and at least five synthetic profile shapes, including p50/p95,
+  timeout/error, retry, token, validity, safety, and cost measurements.
+- [ ] Complete an independent security review of RC5 sanitization, request-ID
+  lifecycle, and transport budget enforcement before RC5 acceptance.
 - [ ] Ensure advisor byte/token accounting covers the complete provider request,
   not only the serialized `AdvisorRequest`; compact or partition oversized
   metadata rather than sending an unbounded multi-megabyte prompt.

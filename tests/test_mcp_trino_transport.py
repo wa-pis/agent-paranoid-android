@@ -166,6 +166,22 @@ class RecordingStdout:
         self.flush_count += 1
 
 
+class FailingStdout(RecordingStdout):
+    def __init__(self, *, fail_on: str) -> None:
+        super().__init__()
+        self.fail_on = fail_on
+
+    async def write(self, payload: bytes) -> None:
+        if self.fail_on == "write":
+            raise OSError("write failed")
+        await super().write(payload)
+
+    async def flush(self) -> None:
+        if self.fail_on == "flush":
+            raise OSError("flush failed")
+        await super().flush()
+
+
 def test_raw_transport_budget_is_charged_before_json_parsing(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -233,7 +249,10 @@ def test_transport_response_budget_counts_final_jsonrpc_and_framing(
     import anyio
     import mcp.types as types
 
-    limits = replace(DEFAULT_QUERY_WORK_LIMITS, transport_response_bytes=512)
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=512 + MIN_TRANSPORT_RESPONSE_BYTES,
+    )
     budget = QueryWorkBudget(limits)
     request = SimpleNamespace(
         message=types.JSONRPCMessage.model_validate_json(
@@ -304,7 +323,7 @@ def test_transport_budget_counts_nested_metadata_and_escaping_expansion() -> Non
 
     limits = replace(
         DEFAULT_QUERY_WORK_LIMITS,
-        transport_response_bytes=len(expected),
+        transport_response_bytes=len(expected) + MIN_TRANSPORT_RESPONSE_BYTES,
     )
     budget = QueryWorkBudget(limits)
     request = SimpleNamespace(
@@ -388,6 +407,76 @@ def test_transport_response_overflow_writes_reserved_error() -> None:
     assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
 
 
+def test_transport_reserve_survives_related_notification_before_overflow() -> None:
+    import anyio
+    import mcp.types as types
+
+    request_id = 7
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":7,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=None),
+    )
+    notification = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","method":"notifications/progress",'
+            '"params":{"progress":1}}'
+        ),
+        metadata=SimpleNamespace(related_request_id=request_id),
+    )
+    notification_payload = notification.message.model_dump_json(
+        by_alias=True,
+        exclude_none=True,
+    ).encode("utf-8") + b"\n"
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=(
+            MIN_TRANSPORT_RESPONSE_BYTES + len(notification_payload)
+        ),
+    )
+    budget = QueryWorkBudget(limits)
+    request.metadata.request_context = budget
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": request_id,
+                    "result": {"value": "x" * 1_000},
+                },
+                separators=(",", ":"),
+            )
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    stdout = RecordingStdout()
+
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        notification,
+        registry,
+    )
+    anyio.run(
+        transport._write_bounded_session_message,
+        stdout,
+        response,
+        registry,
+    )
+
+    error_message = types.JSONRPCMessage.model_validate_json(stdout.payloads[1])
+    assert isinstance(error_message.root, types.JSONRPCError)
+    assert len(stdout.payloads[0]) == len(notification_payload)
+    assert len(stdout.payloads[1]) <= MIN_TRANSPORT_RESPONSE_BYTES
+    assert budget.snapshot().transport_response_bytes == sum(
+        map(len, stdout.payloads)
+    )
+    assert budget.snapshot().terminal_error_bytes == len(stdout.payloads[1])
+
+
 def test_transport_escaping_expansion_writes_bounded_overflow_error() -> None:
     import anyio
     import mcp.types as types
@@ -445,6 +534,156 @@ def test_transport_escaping_expansion_writes_bounded_overflow_error() -> None:
     assert error_message.root.error.code == -32001
     assert len(stdout.payloads[0]) <= MIN_TRANSPORT_RESPONSE_BYTES
     assert budget.snapshot().transport_response_bytes == len(stdout.payloads[0])
+
+
+def test_duplicate_active_request_id_is_rejected_without_overwriting_budget() -> None:
+    import mcp.types as types
+
+    registry = transport._RequestBudgetRegistry()
+    first_budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    second_budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+
+    def request(budget: QueryWorkBudget) -> SimpleNamespace:
+        return SimpleNamespace(
+            message=types.JSONRPCMessage.model_validate_json(
+                '{"jsonrpc":"2.0","id":"same","method":"ping"}'
+            ),
+            metadata=SimpleNamespace(request_context=budget),
+        )
+
+    registry.register_incoming_request(request(first_budget))
+    with pytest.raises(
+        transport.DuplicateActiveRequestIdError,
+        match="already active",
+    ):
+        registry.register_incoming_request(request(second_budget))
+
+    resolved = registry.resolve_outgoing(
+        SimpleNamespace(
+            message=types.JSONRPCMessage.model_validate_json(
+                '{"jsonrpc":"2.0","id":"same","result":{}}'
+            ),
+            metadata=None,
+        )
+    )
+    assert resolved is first_budget
+
+
+@pytest.mark.parametrize("fail_on", ["write", "flush"])
+def test_transport_writer_cleans_request_registry_on_output_failure(
+    fail_on: str,
+) -> None:
+    import anyio
+    import mcp.types as types
+
+    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":19,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":19,"result":{}}'
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+
+    with pytest.raises(OSError, match=f"{fail_on} failed"):
+        anyio.run(
+            transport._write_bounded_session_message,
+            FailingStdout(fail_on=fail_on),
+            response,
+            registry,
+        )
+
+    registry.register_incoming_request(request)
+
+
+def test_transport_writer_cleans_request_registry_on_cancellation() -> None:
+    import anyio
+    import mcp.types as types
+
+    class BlockingStdout:
+        async def write(self, payload: bytes) -> None:
+            await anyio.sleep_forever()
+
+        async def flush(self) -> None:
+            await anyio.sleep_forever()
+
+    budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":20,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":20,"result":{}}'
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+
+    async def cancel_writer() -> None:
+        with anyio.CancelScope() as scope:
+            scope.cancel()
+            await transport._write_bounded_session_message(
+                BlockingStdout(),
+                response,
+                registry,
+            )
+
+    anyio.run(cancel_writer)
+    registry.register_incoming_request(request)
+
+
+def test_transport_writer_cleans_request_registry_when_error_fallback_fails(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import anyio
+    import mcp.types as types
+
+    budget = QueryWorkBudget(
+        replace(
+            DEFAULT_QUERY_WORK_LIMITS,
+            transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES,
+        )
+    )
+    request = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":21,"method":"ping"}'
+        ),
+        metadata=SimpleNamespace(request_context=budget),
+    )
+    response = SimpleNamespace(
+        message=types.JSONRPCMessage.model_validate_json(
+            '{"jsonrpc":"2.0","id":21,"result":{"value":"large"}}'
+        ),
+        metadata=None,
+    )
+    registry = transport._RequestBudgetRegistry()
+    registry.register_incoming_request(request)
+    monkeypatch.setattr(
+        transport,
+        "_transport_overflow_error_payload",
+        lambda request_id: b"x" * (MIN_TRANSPORT_RESPONSE_BYTES + 1),
+    )
+
+    with pytest.raises(QueryWorkBudgetExceeded):
+        anyio.run(
+            transport._write_bounded_session_message,
+            RecordingStdout(),
+            response,
+            registry,
+        )
+
+    registry.register_incoming_request(request)
 
 
 @pytest.mark.parametrize(

@@ -36,6 +36,14 @@
   Evidence: [Verify Published Release #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369)
   passed from workflow commit `92a4e1a` against immutable tag `v1.0.0rc4` and
   release commit `33073c0`.
+- [ ] Publish the exact `1.0.0rc5` wheel and sdist to public PyPI and publish
+  the matching GitHub prerelease with checksums, SBOM, provenance, and
+  attestations bound to the RC5 tag and commit.
+- [ ] Install the public RC5 artifacts in clean environments and run the
+  literal README commands for base, `[trino]`, `[mcp]`, `[mcp,trino]`,
+  `[parquet]`, `[openai]`, and `[all]`, plus the published container matrix.
+- [ ] Re-run public documentation, package attestation, upgrade, signature,
+  and dependency checks from the published RC5 artifacts only.
 
 ## P2 — Database versus transport response budgets
 
@@ -53,6 +61,9 @@
   transport budget; reject configurations whose limit is below that minimum.
 - [x] Add tests for wide rows, nested metadata, escaping expansion, database
   overflow, transport overflow, and bounded overflow errors.
+- [x] Add adversarial transport tests for a related notification before
+  overflow, duplicate active request IDs, writer/flush failure, cancellation,
+  and fallback failure; registry cleanup must permit ID reuse.
 
 ## P2 — Cumulative invocation limits
 
@@ -131,6 +142,11 @@
   - [x] Select and document the benchmark-backed default.
     Evidence: `fast` retained 100% validity and safety with the lowest measured
     latency and cost, so its bounded settings are now the constructor defaults.
+- [ ] Run the RC5 acceptance operational benchmark with at least 20 runs per
+  preset and at least five synthetic profile shapes; report p50/p95 latency,
+  timeout/error rates, retry behavior, tokens, validity, safety, and cost.
+  The current evidence is an RC5 smoke benchmark with two profiles and one
+  call per preset/profile.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.
@@ -164,5 +180,8 @@
 - [x] Run the representative throughput benchmark and attach its results to
   the RC5 release evidence; no performance default is accepted without the
   corresponding latency/safety/quality measurements.
+- [ ] Obtain an independent security review of the RC5 implementation before
+  RC5 acceptance, covering advisor sanitization, request-ID lifecycle, and
+  transport budget enforcement.
 - [ ] Confirm the public artifact evidence is attached to the exact RC5 tag
-  and that stable promotion has only the allowed release-metadata diff.
+  and all RC5 acceptance gates pass before opening stable promotion.
