@@ -14,8 +14,8 @@ status fingerprint and explicit approval remain the only path to generation.
 This project can be used by an AI agent in three practical modes:
 
 1. As a local CLI tool.
-2. Through two MCP servers that cover safe Trino profiling and synthetic data
-   generation.
+2. Through two MCP servers that cover default aggregate-only Trino profiling
+   and synthetic data generation.
 3. Through the review-first local agent workflow.
 
 ## CLI Mode
@@ -192,8 +192,8 @@ protocol, wire-field tables, adapter template, and required contract tests.
 
 ## MCP Mode
 
-The default Trino server is read-only and exposes source-literal-free metadata
-and aggregate profiling tools:
+The default aggregate-only tools on the Trino server are read-only and
+source-literal-free:
 
 ```bash
 python3 -m test_data_agent.mcp_trino_server
@@ -215,12 +215,12 @@ Its tools are:
 - `profile_conditional_allowed_values`
 - `profile_aggregate_mapping`
 
-No row-sampling diagnostic is registered in RC4. The separately configured
-`run_safe_select` tool is available only when
-`TRINO_ENABLE_SAFE_SELECT=true`; its bounded row-shaped result may contain
-allowed source values, including values not recognized as sensitive by
-heuristic masking. It is not part of the source-literal-free default surface
-and must not be treated as PII-free, anonymous, or privacy-safe.
+The explicit opt-in row-returning tools are not registered by default.
+`run_safe_select` is available only when `TRINO_ENABLE_SAFE_SELECT=true`; its
+bounded row-shaped result may contain allowed source values, including values
+not recognized as sensitive by heuristic masking. It is outside the
+source-literal-free guarantee for the default aggregate-only tools and must not
+be treated as PII-free, anonymous, or privacy-safe.
 
 The generator server exposes the local synthetic pipeline:
 
