@@ -131,7 +131,7 @@
 - [x] Run `python3 -m ruff check src tests scripts`.
 - [x] Run `python3 -m compileall -q src tests scripts`.
 - [x] Run `python3 -m pytest --cov=test_data_agent --cov-report=term-missing --cov-fail-under=85`.
-- [ ] Run `scripts/check_release.sh` and `mkdocs build --strict`.
+- [x] Run `scripts/check_release.sh` and `mkdocs build --strict`.
 - [ ] Run the representative throughput benchmark and attach its results to
   the RC5 release evidence; no performance default is accepted without the
   corresponding latency/safety/quality measurements.
