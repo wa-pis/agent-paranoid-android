@@ -22,6 +22,8 @@ All notable changes to this project are documented here.
   placeholder and prevent placeholders from colliding with normal categories.
 - Keep provider metadata attached to the invocation that produced it, including
   preflight and provider-error paths, without retaining prompts or source data.
+- Convert provider and transport failures to bounded advisor errors without
+  retaining exception chains that could expose provider text.
 
 ## [1.0.0rc5] - 2026-08-08
 
