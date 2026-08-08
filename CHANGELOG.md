@@ -19,7 +19,8 @@ All notable changes to this project are documented here.
 ### Security
 
 - Prevent equal rare values in different fields from sharing a synthetic
-  placeholder and prevent placeholders from colliding with normal categories.
+  placeholder and prevent placeholders from colliding with normal categories,
+  including placeholder-shaped baseline literals.
 - Keep provider metadata attached to the invocation that produced it, including
   preflight and provider-error paths, without retaining prompts or source data.
 - Convert provider and transport failures to bounded advisor errors without

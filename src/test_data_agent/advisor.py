@@ -35,9 +35,6 @@ ADVISOR_TRUSTED_INSTRUCTIONS = (
     "advisory and cannot approve or generate data.",
     "When uncertain, return the baseline DatasetSpec unchanged.",
 )
-_RARE_CATEGORY_PLACEHOLDER_RE = re.compile(
-    r"^__apa_rare_e[0-9]+_f[0-9]+_c[0-9]+(?:_[0-9]+)?__$"
-)
 
 
 class AdvisorContractError(ValueError):
@@ -263,14 +260,80 @@ def build_advisor_request(
     )
 
 
+def _rebuild_advisor_request_for_profile_verification(
+    profile: DatasetProfile,
+    previous_request: AdvisorRequest,
+) -> AdvisorRequest:
+    baseline = previous_request.baseline_spec.model_copy(deep=True)
+    _restore_generated_placeholders(
+        profile,
+        previous_request.profile,
+        baseline,
+    )
+    return build_advisor_request(profile, baseline_spec=baseline)
+
+
+def _restore_generated_placeholders(
+    profile: DatasetProfile,
+    previous_profile: DatasetProfile,
+    baseline: DatasetSpec,
+) -> None:
+    entities = zip(profile.entities, previous_profile.entities, baseline.entities)
+    for entity_index, (entity, previous_entity, baseline_entity) in enumerate(entities):
+        fields = zip(entity.fields, previous_entity.fields, baseline_entity.fields)
+        for field_index, (field, previous_field, baseline_field) in enumerate(fields):
+            categories = field.distribution.get("categories", [])
+            previous_categories = previous_field.distribution.get("categories", [])
+            baseline_categories = baseline_field.distribution.get("categories", [])
+            category_sets = zip(
+                categories,
+                previous_categories,
+                baseline_categories,
+            )
+            for category_index, category_set in enumerate(category_sets):
+                category, previous_category, baseline_category = category_set
+                if (
+                    not isinstance(category, dict)
+                    or not isinstance(previous_category, dict)
+                    or not isinstance(baseline_category, dict)
+                ):
+                    continue
+                value = category.get("value")
+                count = category.get("count", 0)
+                if not isinstance(value, str) or float(count) > 1:
+                    continue
+                placeholder = previous_category.get("value")
+                if (
+                    placeholder == baseline_category.get("value")
+                    and _placeholder_matches_position(
+                        placeholder,
+                        entity_index,
+                        field_index,
+                        category_index,
+                    )
+                ):
+                    baseline_category["value"] = value
+
+
+def _placeholder_matches_position(
+    value: Any,
+    entity_index: int,
+    field_index: int,
+    category_index: int,
+) -> bool:
+    return isinstance(value, str) and re.fullmatch(
+        rf"__apa_rare_e{entity_index}_f{field_index}_c{category_index}"
+        r"(?:_[1-9][0-9]*)?__",
+        value,
+    ) is not None
+
+
 def _sanitize_rare_profile_values(
     profile: DatasetProfile,
     spec: DatasetSpec,
 ) -> tuple[DatasetProfile, DatasetSpec]:
     replacements: dict[tuple[str, str, int], tuple[str, str]] = {}
-    original_values = _categorical_string_values(profile) | _categorical_string_values(
-        spec, ignore_generated_placeholders=True
-    )
+    original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
     used_placeholders: set[str] = set()
     for entity_index, entity in enumerate(profile.entities):
         for field_index, field in enumerate(entity.fields):
@@ -334,8 +397,6 @@ def _replace_rare_category_values(
 
 def _categorical_string_values(
     dataset: DatasetProfile | DatasetSpec,
-    *,
-    ignore_generated_placeholders: bool = False,
 ) -> set[str]:
     values: set[str] = set()
     for entity in dataset.entities:
@@ -345,12 +406,7 @@ def _categorical_string_values(
             categories = field.distribution.get("categories", [])
             for category in categories:
                 if isinstance(category, dict) and isinstance(category.get("value"), str):
-                    value = category["value"]
-                    if not (
-                        ignore_generated_placeholders
-                        and _RARE_CATEGORY_PLACEHOLDER_RE.fullmatch(value)
-                    ):
-                        values.add(value)
+                    values.add(category["value"])
     return values
 
 

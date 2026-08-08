@@ -28,6 +28,7 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.relationship import Relationship
+from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.safety import ProfileSafetyError
 
 
@@ -195,6 +196,30 @@ def test_rare_category_placeholders_are_field_scoped_and_collision_free() -> Non
     assert segment_values[1]["value"] == "__apa_rare_e0_f2_c1__"
     assert region_values[0]["value"] == "__apa_rare_e0_f3_c0__"
     assert segment_values[1]["value"] != region_values[0]["value"]
+
+
+def test_rare_category_placeholder_pattern_in_baseline_is_reserved() -> None:
+    profile = safe_profile()
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [{"value": "north-island", "count": 1}],
+    }
+    baseline = infer_dataset_spec(profile)
+    baseline_category = baseline.entity("customers").field("segment").distribution[
+        "categories"
+    ][0]
+    baseline_category["value"] = "__apa_rare_e0_f2_c0__"
+
+    request = build_advisor_request(profile, baseline_spec=baseline)
+    profile_category = request.profile.entity("customers").field(
+        "segment"
+    ).distribution["categories"][0]
+    request_baseline_category = request.baseline_spec.entity("customers").field(
+        "segment"
+    ).distribution["categories"][0]
+
+    assert profile_category["value"] == "__apa_rare_e0_f2_c0_1__"
+    assert request_baseline_category["value"] == "__apa_rare_e0_f2_c0__"
 
 
 def test_rare_category_sanitization_is_deterministic() -> None:
