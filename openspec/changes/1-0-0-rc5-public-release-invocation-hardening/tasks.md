@@ -96,10 +96,12 @@
 
 ## P1 — Agent throughput and local profiling
 
-- [ ] Change review-first folder planning to `cache_mode=auto` by default and
+- [x] Change review-first folder planning to `cache_mode=auto` by default and
   replace the opt-in `--use-cache` UX with an explicit `--no-cache` refresh
   escape hatch. Preserve metadata-only cache contents and source fingerprint
   invalidation tests.
+  Evidence: parser-contract, safe-cache reuse, fingerprint/sample invalidation,
+  and staged workspace cache tests pass together.
 - [ ] Remove the avoidable two-pass CSV-folder profile where practical by
   retaining a bounded relationship/rule sample during schema streaming.
 - [ ] Add typed local profiling budgets for deadline, sample rows, and any
