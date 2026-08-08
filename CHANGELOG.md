@@ -14,6 +14,8 @@ All notable changes to this project are documented here.
   only bounded deterministic candidates and returns review-required proposals.
 - Add explicit bounded fast, normal, and quality OpenAI advisor candidate
   presets without changing constructor defaults before benchmark evidence.
+- Add a synthetic-only OpenAI advisor preset benchmark runner with explicit
+  pricing inputs and redacted aggregate quality, latency, usage, and cost data.
 
 ### Security
 
