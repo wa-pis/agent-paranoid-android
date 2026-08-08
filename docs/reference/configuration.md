@@ -26,10 +26,25 @@ All byte values are integer bytes unless stated otherwise.
 | `TEST_DATA_AGENT_MAX_OUTPUT_BYTES` | `536870912` | Maximum complete generated bundle size |
 | `TEST_DATA_AGENT_MIN_FREE_DISK_BYTES` | `134217728` | Disk space kept in reserve |
 | `TEST_DATA_AGENT_MAX_GENERATION_SECONDS` | `300` | Generation wall-clock limit |
+| `TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SECONDS` | `120` | Wall-clock limit for one local CSV-folder profile |
+| `TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SAMPLE_ROWS` | `1000000` | Cumulative relationship/rule sample-row ceiling per folder profile |
 
-Values must be positive integers, except
-`TEST_DATA_AGENT_MAX_GENERATION_SECONDS`, which accepts a positive number.
-Invalid environment values fail closed.
+Values must be positive integers, except the two `*_SECONDS` values, which
+accept positive finite numbers. Invalid environment values fail closed.
+
+## Local CSV-Folder Profile Limits
+
+Each fresh local folder profile receives one typed monotonic budget. Its
+defaults are 120 seconds, at most 1,000,000 retained sample rows, 536,870,912
+input bytes, and 10,000,000 streamed cells. The byte and cell caps reuse
+`TEST_DATA_AGENT_MAX_TOTAL_INPUT_BYTES` and
+`TEST_DATA_AGENT_MAX_INPUT_CELLS`; the normal CLI sample is smaller at 50,000
+rows via `--rule-sample-rows`.
+
+The Python API can pass narrower `LocalProfileLimits` through a fresh
+`LocalProfileBudget`. Deadline, sample, byte, or cell exhaustion raises a
+structured `LocalProfileLimitError`. A failed profile is not written to the
+metadata-only cache.
 
 ## Generator MCP
 

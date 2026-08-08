@@ -127,7 +127,11 @@ silently merge into an existing dataset.
 | `--rule-sample-rows N` | Bound row-level relationship and rule mining |
 
 Full-file schema and distribution profiling remains streaming. The rule sample
-limit bounds comparisons that require row-level relationships.
+limit bounds comparisons that require row-level relationships. Fresh folder
+profiles also fail closed after 120 seconds by default, reject sample requests
+above 1,000,000 rows or cumulative samples beyond that ceiling, and share the
+configured 512 MiB input and 10,000,000-cell limits. Budget failures do not
+publish partial cache metadata.
 
 ## Agent Review Flow
 

@@ -104,9 +104,12 @@
   and staged workspace cache tests pass together.
 - [x] Remove the avoidable two-pass CSV-folder profile where practical by
   retaining a bounded relationship/rule sample during schema streaming.
-- [ ] Add typed local profiling budgets for deadline, sample rows, and any
+- [x] Add typed local profiling budgets for deadline, sample rows, and any
   applicable input byte/cell work; fail closed before publishing partial cache
   metadata and document the defaults.
+  Evidence: `test_local_profile_budget.py` covers structured sample request and
+  cumulative sample, deadline, byte, and cell exhaustion with no partial cache
+  publication.
 
 ## P1 — Advisor performance and relationship assistance
 
