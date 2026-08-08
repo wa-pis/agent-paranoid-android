@@ -80,7 +80,8 @@
 
 ## P3 — MCP documentation contract
 
-- [ ] Update README, MCP examples, MCP how-to, AI integration, configuration,
+- [x] Update README.
+- [ ] Update MCP examples, MCP how-to, AI integration, configuration,
   application-boundary references, diagrams, and canonical OpenSpec wording.
 - [ ] Use the terms `default aggregate-only tools` and `explicit opt-in
   row-returning tools` consistently. Narrow all server-wide claims that imply
