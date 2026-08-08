@@ -15,7 +15,7 @@ Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 
-Current version: `1.0.0rc5`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
+Current version: `1.0.0rc6`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## What It Preserves
 
@@ -32,21 +32,21 @@ recorded package, dependency, locale, and serializer environment.
 ## Install
 
 Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. After
-publication, install the exact RC5 candidate used for acceptance:
+publication, install the exact RC6 candidate used for acceptance:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.0.0rc5"
+python3 -m pip install "agent-paranoid-android==1.0.0rc6"
 test-data-agent doctor
 ```
 
 Install only features you use:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc5"
-python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc5"
-python3 -m pip install "agent-paranoid-android[trino]==1.0.0rc5"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc5"
-python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc5"
+python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[trino]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc6"
 ```
 
 The `trino` extra is required only for Trino profiling and contains the Trino

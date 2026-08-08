@@ -5,7 +5,8 @@ from __future__ import annotations
 import json
 import time
 from collections.abc import Callable
-from typing import Any, Literal, Protocol, TypeVar, cast
+from dataclasses import dataclass
+from typing import Any, Generic, Literal, Protocol, TypeVar, cast
 
 from openai import OpenAI, OpenAIError
 from pydantic import (
@@ -162,6 +163,22 @@ class OpenAIAdvisorRunMetadata(BaseModel):
     provider_usage: OpenAIAdvisorUsage | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class StructuredCompletionResult(Generic[_ResponseModel]):
+    """Provider response and its metadata, scoped to one invocation."""
+
+    value: _ResponseModel
+    metadata: OpenAIAdvisorRunMetadata
+
+
+class OpenAIAdvisorCallError(AdvisorContractError):
+    """A failed provider call with metadata owned by that call."""
+
+    def __init__(self, message: str, *, metadata: OpenAIAdvisorRunMetadata) -> None:
+        self.metadata = metadata
+        super().__init__(message)
+
+
 class _RelationshipRankingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -255,22 +272,29 @@ class OpenAIAdvisorClient:
 
     @property
     def last_run_metadata(self) -> OpenAIAdvisorRunMetadata | None:
-        """Return metadata for the most recent provider call, if any."""
+        """Deprecated sequential compatibility view of the last provider call."""
 
         return self._last_run_metadata
 
     def complete(self, exchange: AdvisorExchange) -> AdvisorProposalPayload:
+        """Return the validated payload without exposing compatibility metadata."""
+        return self.complete_with_metadata(exchange).value.model_dump(mode="json")
+
+    def complete_with_metadata(
+        self,
+        exchange: AdvisorExchange,
+    ) -> StructuredCompletionResult[AdvisorProposal]:
+        """Complete one exchange and return metadata owned by that call."""
         validated = AdvisorExchange.model_validate(
             exchange.model_dump(mode="python")
         )
-        response = self._complete_structured(
+        return self._complete_structured(
             trusted_instructions=validated.trusted_instructions,
             untrusted_description="profile metadata",
             untrusted_json=validated.request.model_dump_json(),
             response_model=AdvisorProposal,
             response_json_schema=validated.response_json_schema,
         )
-        return response.model_dump(mode="json")
 
     def _complete_structured(
         self,
@@ -280,8 +304,7 @@ class OpenAIAdvisorClient:
         untrusted_json: str,
         response_model: type[_ResponseModel],
         response_json_schema: dict[str, Any],
-    ) -> _ResponseModel:
-        self._last_run_metadata = None
+    ) -> StructuredCompletionResult[_ResponseModel]:
         started_at = self._clock()
         request_options: dict[str, Any] = {
             "model": self._settings.model,
@@ -315,19 +338,20 @@ class OpenAIAdvisorClient:
             request_options["service_tier"] = self._settings.service_tier
         request_size = _json_size(request_options)
         if request_size > self._settings.max_input_bytes:
-            self._record_run_metadata(
+            metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
                 status="preflight_rejected",
             )
-            raise AdvisorContractError(
-                "OpenAI advisor request exceeds the configured byte limit"
+            raise OpenAIAdvisorCallError(
+                "OpenAI advisor request exceeds the configured byte limit",
+                metadata=metadata,
             )
 
         try:
             response = self._client.responses.create(**request_options)
         except (OpenAIError, ValidationError) as exc:
-            self._record_run_metadata(
+            metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
                 status=(
@@ -336,51 +360,55 @@ class OpenAIAdvisorClient:
                     else "provider_error"
                 ),
             )
-            raise AdvisorContractError(
-                f"OpenAI advisor request failed ({type(exc).__name__})"
+            raise OpenAIAdvisorCallError(
+                f"OpenAI advisor request failed ({type(exc).__name__})",
+                metadata=metadata,
             ) from exc
 
         if response.status != "completed":
-            self._record_run_metadata(
+            metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
                 status="incomplete",
                 response=response,
             )
-            raise AdvisorContractError(
-                f"OpenAI advisor response did not complete (status={response.status!r})"
+            raise OpenAIAdvisorCallError(
+                f"OpenAI advisor response did not complete (status={response.status!r})",
+                metadata=metadata,
             )
         if not response.output_text:
-            self._record_run_metadata(
+            metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
                 status="invalid_response",
                 response=response,
             )
-            raise AdvisorContractError(
-                "OpenAI advisor response did not contain a structured proposal"
+            raise OpenAIAdvisorCallError(
+                "OpenAI advisor response did not contain a structured proposal",
+                metadata=metadata,
             )
         try:
             parsed = response_model.model_validate_json(response.output_text)
         except ValidationError as exc:
-            self._record_run_metadata(
+            metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
                 status="invalid_response",
                 response=response,
             )
-            raise AdvisorContractError(
-                "OpenAI advisor response failed structured validation"
+            raise OpenAIAdvisorCallError(
+                "OpenAI advisor response failed structured validation",
+                metadata=metadata,
             ) from exc
         payload = parsed.model_dump(mode="json")
-        self._record_run_metadata(
+        metadata = self._record_run_metadata(
             request_bytes=request_size,
             started_at=started_at,
             status="completed",
             response=response,
             response_bytes=_json_size(payload),
         )
-        return parsed
+        return StructuredCompletionResult(value=parsed, metadata=metadata)
 
     def _record_run_metadata(
         self,
@@ -390,9 +418,9 @@ class OpenAIAdvisorClient:
         status: OpenAIAdvisorRunStatus,
         response: _ProviderResponse | None = None,
         response_bytes: int | None = None,
-    ) -> None:
+    ) -> OpenAIAdvisorRunMetadata:
         elapsed_ms = round(max(0.0, self._clock() - started_at) * 1_000)
-        self._last_run_metadata = OpenAIAdvisorRunMetadata(
+        metadata = OpenAIAdvisorRunMetadata(
             model=self._settings.model,
             settings=self._settings,
             request_bytes=request_bytes,
@@ -402,6 +430,8 @@ class OpenAIAdvisorClient:
             retry_count=_bounded_retry_count(response),
             provider_usage=_bounded_provider_usage(response),
         )
+        self._last_run_metadata = metadata
+        return metadata
 
 
 class OpenAIRelationshipDiscoveryAdvisor:
@@ -437,7 +467,7 @@ class OpenAIRelationshipDiscoveryAdvisor:
         )
         return validate_relationship_discovery_proposals(
             request.candidates,
-            response.proposals,
+            response.value.proposals,
         )
 
 

@@ -13,6 +13,10 @@ from functools import wraps
 from time import monotonic
 from typing import Any, ParamSpec, TypeVar
 
+from test_data_agent.trino_config import (
+    TrinoDeploymentProfile,
+    deployment_profile_from_env,
+)
 
 P = ParamSpec("P")
 R = TypeVar("R")
@@ -120,8 +124,22 @@ DEFAULT_QUERY_WORK_LIMITS = QueryWorkLimits(
 )
 
 
-def query_work_limits_from_env() -> QueryWorkLimits:
-    """Load cumulative Trino invocation limits without changing other defaults."""
+def query_work_limits_from_env(
+    *, deployment_profile: TrinoDeploymentProfile | None = None
+) -> QueryWorkLimits:
+    """Load cumulative Trino invocation limits for one deployment profile."""
+    profile = deployment_profile or deployment_profile_from_env()
+    cumulative_scan_bytes = _optional_positive_int_env(
+        MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV
+    )
+    if (
+        profile is TrinoDeploymentProfile.SHARED_HARDENED
+        and cumulative_scan_bytes is None
+    ):
+        raise ValueError(
+            "shared-hardened deployment requires a finite "
+            f"{MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV}"
+        )
     return replace(
         DEFAULT_QUERY_WORK_LIMITS,
         max_profiled_columns=_positive_int_env(
@@ -136,9 +154,7 @@ def query_work_limits_from_env() -> QueryWorkLimits:
             MAX_INVOCATION_SECONDS_ENV,
             DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds,
         ),
-        max_cumulative_estimated_scan_bytes=_optional_positive_int_env(
-            MAX_INVOCATION_ESTIMATED_SCAN_BYTES_ENV
-        ),
+        max_cumulative_estimated_scan_bytes=cumulative_scan_bytes,
     )
 
 

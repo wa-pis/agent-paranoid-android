@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from typing import Annotated, Any, Literal, Protocol, runtime_checkable
 
@@ -33,6 +34,9 @@ ADVISOR_TRUSTED_INSTRUCTIONS = (
     "Keep approval_required true and generation_performed false; proposal is "
     "advisory and cannot approve or generate data.",
     "When uncertain, return the baseline DatasetSpec unchanged.",
+)
+_RARE_CATEGORY_PLACEHOLDER_RE = re.compile(
+    r"^__apa_rare_e[0-9]+_f[0-9]+_c[0-9]+(?:_[0-9]+)?__$"
 )
 
 
@@ -263,19 +267,38 @@ def _sanitize_rare_profile_values(
     profile: DatasetProfile,
     spec: DatasetSpec,
 ) -> tuple[DatasetProfile, DatasetSpec]:
-    replacements: dict[str, str] = {}
-    for entity in profile.entities:
-        for field in entity.fields:
+    replacements: dict[tuple[str, str, int], tuple[str, str]] = {}
+    original_values = _categorical_string_values(profile) | _categorical_string_values(
+        spec, ignore_generated_placeholders=True
+    )
+    used_placeholders: set[str] = set()
+    for entity_index, entity in enumerate(profile.entities):
+        for field_index, field in enumerate(entity.fields):
             if field.distribution.get("kind") != "categorical":
                 continue
-            for category in field.distribution.get("categories", []):
-                value = category.get("value") if isinstance(category, dict) else None
-                count = category.get("count", 0) if isinstance(category, dict) else 0
-                if isinstance(value, str) and float(count) <= 1:
-                    replacements.setdefault(
-                        value,
-                        f"synthetic_category_{len(replacements) + 1}",
+            categories = field.distribution.get("categories", [])
+            for category_index, category in enumerate(categories):
+                if not isinstance(category, dict):
+                    continue
+                value = category.get("value")
+                count = category.get("count", 0)
+                if not isinstance(value, str) or float(count) > 1:
+                    continue
+                placeholder = (
+                    f"__apa_rare_e{entity_index}_f{field_index}_c{category_index}__"
+                )
+                suffix = 1
+                while placeholder in original_values or placeholder in used_placeholders:
+                    placeholder = (
+                        "__apa_rare_"
+                        f"e{entity_index}_f{field_index}_c{category_index}_{suffix}__"
                     )
+                    suffix += 1
+                replacements[(entity.name, field.name, category_index)] = (
+                    value,
+                    placeholder,
+                )
+                used_placeholders.add(placeholder)
 
     safe_profile = profile.model_copy(deep=True)
     safe_spec = spec.model_copy(deep=True)
@@ -290,7 +313,7 @@ def _sanitize_rare_profile_values(
 
 def _replace_rare_category_values(
     dataset: DatasetProfile | DatasetSpec,
-    replacements: dict[str, str],
+    replacements: dict[tuple[str, str, int], tuple[str, str]],
 ) -> None:
     for entity in dataset.entities:
         for field in entity.fields:
@@ -300,12 +323,35 @@ def _replace_rare_category_values(
             categories = distribution.get("categories")
             if not isinstance(categories, list):
                 continue
-            for category in categories:
+            for category_index, category in enumerate(categories):
                 if not isinstance(category, dict):
                     continue
                 value = category.get("value")
-                if isinstance(value, str) and value in replacements:
-                    category["value"] = replacements[value]
+                replacement = replacements.get((entity.name, field.name, category_index))
+                if replacement is not None and value == replacement[0]:
+                    category["value"] = replacement[1]
+
+
+def _categorical_string_values(
+    dataset: DatasetProfile | DatasetSpec,
+    *,
+    ignore_generated_placeholders: bool = False,
+) -> set[str]:
+    values: set[str] = set()
+    for entity in dataset.entities:
+        for field in entity.fields:
+            if field.distribution.get("kind") != "categorical":
+                continue
+            categories = field.distribution.get("categories", [])
+            for category in categories:
+                if isinstance(category, dict) and isinstance(category.get("value"), str):
+                    value = category["value"]
+                    if not (
+                        ignore_generated_placeholders
+                        and _RARE_CATEGORY_PLACEHOLDER_RE.fullmatch(value)
+                    ):
+                        values.add(value)
+    return values
 
 
 def _structural_identity(dataset: DatasetProfile | DatasetSpec) -> dict[str, Any]:

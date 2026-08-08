@@ -70,6 +70,7 @@ nav:
       - Container Deployment: operations/containers.md
       - Migrating To 0.6: operations/migrating-to-0.6.md
       - Release Process: release.md
+      - RC6 Acceptance Checklist: rc6-acceptance-checklist.md
   - Maintainers:
       - Architecture: agent_design.md
       - Application Boundary Baseline: reference/application-boundaries.md
