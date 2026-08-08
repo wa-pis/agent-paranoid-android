@@ -78,6 +78,7 @@ from test_data_agent import ExchangeDatasetAdvisor
 from test_data_agent.providers.openai import (
     OpenAIAdvisorClient,
     OpenAIAdvisorSettings,
+    openai_advisor_settings_for_preset,
 )
 
 settings = OpenAIAdvisorSettings(
@@ -89,6 +90,9 @@ settings = OpenAIAdvisorSettings(
     max_retries=2,
 )
 advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(settings=settings))
+
+# Explicit candidates for benchmarked workloads; no candidate is implicit.
+fast_settings = openai_advisor_settings_for_preset("fast")
 ```
 
 The typed defaults are model `gpt-5.6`, low reasoning effort, a 4 MiB complete
@@ -98,6 +102,12 @@ instructions, untrusted request metadata, structured-output schema overhead,
 settings, and final UTF-8 JSON serialization. Oversized requests fail before
 network access. Settings are bounded and kept out of advisor review artifacts.
 The optional service tier accepts `auto`, `default`, `flex`, or `priority`.
+
+The optional `fast`, `normal`, and `quality` candidate presets use the same
+bounded settings model. They are explicit choices and do not change the client
+constructor defaults. RC5 will select a recommended default only after the
+synthetic-profile benchmark records proposal validity, safety preservation,
+latency, tokens, retries, and cost.
 
 After each provider call, `OpenAIAdvisorClient.last_run_metadata` exposes a
 bounded in-memory record with the model, settings, canonical request and parsed

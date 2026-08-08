@@ -12,6 +12,8 @@ All notable changes to this project are documented here.
   latency, status, provider-reported retries, and token usage.
 - Add a separate OpenAI relationship-candidate ranking adapter that accepts
   only bounded deterministic candidates and returns review-required proposals.
+- Add explicit bounded fast, normal, and quality OpenAI advisor candidate
+  presets without changing constructor defaults before benchmark evidence.
 
 ### Security
 

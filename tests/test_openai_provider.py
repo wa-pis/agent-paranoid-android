@@ -24,6 +24,7 @@ from test_data_agent.providers.openai import (
     OpenAIAdvisorClient,
     OpenAIAdvisorSettings,
     OpenAIRelationshipDiscoveryAdvisor,
+    openai_advisor_settings_for_preset,
 )
 from test_data_agent.relationship_discovery import rank_relationship_candidates
 
@@ -220,6 +221,45 @@ def test_openai_advisor_applies_typed_settings() -> None:
     assert call["max_output_tokens"] == 2_000
     assert call["timeout"] == 12.5
     assert call["service_tier"] == "flex"
+
+
+@pytest.mark.parametrize(
+    (
+        "preset",
+        "reasoning_effort",
+        "max_output_tokens",
+        "timeout_seconds",
+        "max_retries",
+    ),
+    [
+        ("fast", "minimal", 4_096, 15.0, 0),
+        ("normal", "low", 16_384, 30.0, 2),
+        ("quality", "high", 32_768, 60.0, 2),
+    ],
+)
+def test_openai_advisor_candidate_presets_are_bounded(
+    preset: Any,
+    reasoning_effort: str,
+    max_output_tokens: int,
+    timeout_seconds: float,
+    max_retries: int,
+) -> None:
+    settings = openai_advisor_settings_for_preset(preset)
+
+    assert settings.model == "gpt-5.6"
+    assert settings.reasoning_effort == reasoning_effort
+    assert settings.max_input_bytes == 4 * 1024 * 1024
+    assert settings.max_output_tokens == max_output_tokens
+    assert settings.timeout_seconds == timeout_seconds
+    assert settings.max_retries == max_retries
+    assert settings.service_tier is None
+
+
+def test_openai_advisor_rejects_unknown_candidate_preset() -> None:
+    preset: Any = "unknown"
+
+    with pytest.raises(ValueError, match="unsupported OpenAI advisor preset"):
+        openai_advisor_settings_for_preset(preset)
 
 
 def test_openai_advisor_records_bounded_redacted_run_metadata() -> None:
