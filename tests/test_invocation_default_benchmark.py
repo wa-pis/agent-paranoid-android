@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from scripts.benchmark_trino_invocation_defaults import (
     REPRESENTATIVE_COLUMNS,
+    REPRESENTATIVE_SENSITIVE_COLUMNS,
     run_invocation_default_benchmark,
 )
 from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS
@@ -14,6 +15,11 @@ def test_invocation_defaults_cover_representative_profile_fanout() -> None:
     assert DEFAULT_QUERY_WORK_LIMITS.statements == 150
     assert DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds == 120.0
     assert metrics.profiled_columns == REPRESENTATIVE_COLUMNS
+    assert metrics.profile_completion_ratio == 1.0
+    assert (
+        metrics.sensitive_columns_aggregate_only
+        == REPRESENTATIVE_SENSITIVE_COLUMNS
+    )
     assert metrics.statements == 122
     assert metrics.statement_headroom == 28
     assert metrics.elapsed_seconds < metrics.configured_deadline_seconds

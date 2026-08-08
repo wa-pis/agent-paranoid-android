@@ -28,6 +28,8 @@ REPRESENTATIVE_SENSITIVE_COLUMNS = 20
 @dataclass(frozen=True, slots=True)
 class InvocationDefaultMetrics:
     profiled_columns: int
+    profile_completion_ratio: float
+    sensitive_columns_aggregate_only: int
     statements: int
     statement_headroom: int
     configured_deadline_seconds: float
@@ -150,7 +152,8 @@ def run_invocation_default_benchmark() -> InvocationDefaultMetrics:
     )()
     elapsed = time.perf_counter() - started
     snapshot = budget.snapshot()
-    if len(profile["columns"]) != REPRESENTATIVE_COLUMNS:
+    profiled_columns = profile["columns"]
+    if len(profiled_columns) != REPRESENTATIVE_COLUMNS:
         raise RuntimeError("benchmark did not profile every representative column")
     if snapshot.profiled_columns != REPRESENTATIVE_COLUMNS:
         raise RuntimeError("profiled-column accounting differs from the workload")
@@ -159,9 +162,22 @@ def run_invocation_default_benchmark() -> InvocationDefaultMetrics:
     )
     if snapshot.statements != expected_statements:
         raise RuntimeError("statement accounting differs from the workload")
+    sensitive_columns_aggregate_only = sum(
+        column.get("sensitive") is True
+        and "top_values" not in column
+        and "masked_patterns" not in column
+        for column in profiled_columns
+    )
+    if sensitive_columns_aggregate_only != REPRESENTATIVE_SENSITIVE_COLUMNS:
+        raise RuntimeError("sensitive-column profiling left aggregate-only mode")
 
     return InvocationDefaultMetrics(
         profiled_columns=snapshot.profiled_columns,
+        profile_completion_ratio=round(
+            len(profiled_columns) / REPRESENTATIVE_COLUMNS,
+            6,
+        ),
+        sensitive_columns_aggregate_only=sensitive_columns_aggregate_only,
         statements=snapshot.statements,
         statement_headroom=DEFAULT_QUERY_WORK_LIMITS.statements
         - snapshot.statements,
