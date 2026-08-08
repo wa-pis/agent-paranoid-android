@@ -36,14 +36,22 @@
   Evidence: [Verify Published Release #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369)
   passed from workflow commit `92a4e1a` against immutable tag `v1.0.0rc4` and
   release commit `33073c0`.
-- [ ] Publish the exact `1.0.0rc5` wheel and sdist to public PyPI and publish
+- [x] Publish the exact `1.0.0rc5` wheel and sdist to public PyPI and publish
   the matching GitHub prerelease with checksums, SBOM, provenance, and
   attestations bound to the RC5 tag and commit.
-- [ ] Install the public RC5 artifacts in clean environments and run the
+  Evidence: [RC5 published release](../../../docs/release-evidence-1.0.0rc5.md)
+  records the exact tag, commit, package hashes, and successful Release #17,
+  Publish PyPI #16, and Containers #715 runs.
+- [x] Install the public RC5 artifacts in clean environments and run the
   literal README commands for base, `[trino]`, `[mcp]`, `[mcp,trino]`,
   `[parquet]`, `[openai]`, and `[all]`, plus the published container matrix.
-- [ ] Re-run public documentation, package attestation, upgrade, signature,
+  Evidence: [Verify Published Release #10](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31274217410)
+  passed all seven clean-install profiles and all three published containers.
+- [x] Re-run public documentation, package attestation, upgrade, signature,
   and dependency checks from the published RC5 artifacts only.
+  Evidence: the same independent verification passed public documentation,
+  PyPI/GitHub hash equality, package attestations, dependency checks, the
+  upgrade from `0.12.0`, and container attestations and signatures.
 
 ## P2 — Database versus transport response budgets
 
@@ -189,5 +197,8 @@
   transport budget enforcement.
   Evidence: [RC5 security review](security-review-evidence.md) found and closed
   non-protocol request-ID aliasing before dispatch.
-- [ ] Confirm the public artifact evidence is attached to the exact RC5 tag
+- [x] Confirm the public artifact evidence is attached to the exact RC5 tag
   and all RC5 acceptance gates pass before opening stable promotion.
+  Evidence: [RC5 published release](../../../docs/release-evidence-1.0.0rc5.md)
+  binds all successful release and independent verification runs to commit
+  `9e6e55fa6eeceab925e4432dcbb147de9c88f201`.

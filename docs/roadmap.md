@@ -208,10 +208,11 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The release target is `1.0.0rc5`. `1.0.0rc2` completed public acceptance;
-`1.0.0rc3` added the contract-preserving application-boundary refactor, and
-`1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closes the remaining
-invocation, transport, and advisor-acceptance findings before stable promotion.
+The accepted release candidate is `1.0.0rc5`. `1.0.0rc2` completed public
+acceptance; `1.0.0rc3` added the contract-preserving application-boundary
+refactor, and
+`1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closed the remaining
+invocation, transport, advisor, and exact-publication acceptance findings.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -603,7 +604,7 @@ the new cumulative limits are not yet benchmark-backed.
 
 Scope:
 
-- [ ] Complete the [RC5 public release and invocation hardening
+- [x] Complete the [RC5 public release and invocation hardening
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md).
 - [x] Publish and verify the exact `1.0.0rc4` wheel and sdist on PyPI, a
   GitHub prerelease with checksums/SBOM/attestations, and the corresponding
@@ -623,9 +624,10 @@ Scope:
 - [x] Re-run public documentation, package attestation, and upgrade-from
   `0.12.0` checks from published artifacts only. Evidence: [public
   verification run #9](https://github.com/wa-pis/agent-paranoid-android/actions/runs/30738435369).
-- [ ] Publish and verify the exact `1.0.0rc5` wheel, sdist, GitHub prerelease,
+- [x] Publish and verify the exact `1.0.0rc5` wheel, sdist, GitHub prerelease,
   checksums, SBOM, provenance, attestations, and clean-install matrix from
-  the immutable RC5 tag.
+  the immutable RC5 tag. Evidence: [RC5 published release
+  evidence](release-evidence-1.0.0rc5.md).
 - [x] Split database-result and transport-response budgets. Enforce
   `database_result_bytes` incrementally while reading the cursor and
   `transport_response_bytes` after final MCP JSON serialization, including
@@ -670,8 +672,10 @@ Scope:
   optional advisor integration as a separate, review-gated operation. The model
   may rank deterministic candidates and explain bounded evidence, but may not
   invent fields, receive source rows, or modify `DatasetSpec` directly.
-- [ ] Repeat direct-service, transport, integration, package, documentation,
-  security, and public-artifact gates against the exact RC5 commit.
+- [x] Repeat direct-service, transport, integration, package, documentation,
+  security, and public-artifact gates against the exact RC5 commit. Evidence:
+  [Release #17](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31274057391)
+  and [Verify Published Release #10](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31274217410).
 
 Exit criteria:
 
