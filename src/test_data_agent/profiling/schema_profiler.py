@@ -40,6 +40,7 @@ from test_data_agent.csv_profiler import (
     parse_int,
     validate_csv_headers,
 )
+from test_data_agent.profiling.budget import LocalProfileBudget
 
 MAX_DISTINCT_TRACKED = 10_000
 MAX_CATEGORY_TRACKED = 1_000
@@ -78,7 +79,11 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
 
 
 def profile_schema(input_folder: Path) -> DatasetProfile:
-    profile, _ = _profile_schema_with_sample(input_folder, max_rows_per_entity=0)
+    profile, _ = _profile_schema_with_sample(
+        input_folder,
+        max_rows_per_entity=0,
+        budget=LocalProfileBudget(),
+    )
     return profile
 
 
@@ -86,16 +91,18 @@ def _profile_schema_with_sample(
     input_folder: Path,
     *,
     max_rows_per_entity: int,
+    budget: LocalProfileBudget,
 ) -> tuple[DatasetProfile, dict[str, list[dict[str, str]]]]:
     entities: list[EntityProfile] = []
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
-    csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
+    budget.check_sample_rows(max_rows_per_entity)
+    csv_paths = budget.check_input_files(sorted(input_folder.glob("*.csv")))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
     configure_csv_field_limit(csv)
     total_rows = 0
-    total_cells = 0
     for path in csv_paths:
+        budget.check_deadline("CSV file start")
         entity_name = path.stem
         encoding = detect_csv_encoding(path)
         with path.open(newline="", encoding=encoding) as handle:
@@ -109,12 +116,13 @@ def _profile_schema_with_sample(
             sampled_rows: list[dict[str, str]] = []
             row_count = 0
             for row in reader:
+                budget.check_deadline("CSV row start")
                 row_count += 1
                 total_rows += 1
-                total_cells += len(fieldnames)
                 enforce_input_row_count(total_rows, label="CSV folder")
-                enforce_input_cell_count(total_cells, label="CSV folder")
+                budget.consume_cells(len(fieldnames))
                 if len(sampled_rows) < max_rows_per_entity:
+                    budget.consume_sample_row()
                     sampled_rows.append(dict(row))
                 for name, accumulator in accumulators.items():
                     accumulator.add(row.get(name, ""))
@@ -129,6 +137,7 @@ def _profile_schema_with_sample(
                 primary_key_candidates=primary_key_candidates,
             )
         )
+    budget.check_deadline("profile finalization")
     return DatasetProfile(entities=entities), rows_by_entity
 
 

@@ -22,6 +22,8 @@ All notable changes to this project are documented here.
   deadline and close active query resources when it expires.
 - Add fail-closed environment configuration and scope documentation for Trino
   invocation column, statement, deadline, and optional scan limits.
+- Bound each fresh local CSV-folder profile with typed deadline, sample, input
+  byte, and cell limits, leaving no partial metadata cache after exhaustion.
 
 ## [1.0.0rc4] - 2026-08-02
 
