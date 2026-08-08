@@ -24,6 +24,23 @@ leaving 28 statements of headroom under the 150-statement default.
 {"configured_deadline_seconds": 120.0, "elapsed_seconds": 0.031659, "profiled_columns": 100, "remaining_deadline_seconds": 119.968316, "statement_headroom": 28, "statements": 122}
 ```
 
+## RC5 Gate Rerun
+
+- Date: 2026-08-08
+- Base main commit: `a5553406d39e55cb8e4b3fe6ddbcb5c4cb7aff85`
+- Platform: Darwin 25.6.0 arm64
+- Python: 3.11.2
+- Command: `.venv/bin/python scripts/benchmark_trino_invocation_defaults.py`
+
+```json
+{"configured_deadline_seconds": 120.0, "elapsed_seconds": 0.036346, "profile_completion_ratio": 1.0, "profiled_columns": 100, "remaining_deadline_seconds": 119.963621, "sensitive_columns_aggregate_only": 20, "statement_headroom": 28, "statements": 122}
+```
+
+The latency measurement is 0.036346 seconds of local orchestration. Quality is
+a 1.0 completion ratio: 100 of 100 representative columns profiled with the
+exact expected 122 statements and 28 statements of headroom. Safety is 20 of
+20 name-sensitive columns kept on aggregate-only profiling.
+
 ## Decision
 
 Retain the OpenSpec starting defaults of 100 profiled columns, 150 statements,
