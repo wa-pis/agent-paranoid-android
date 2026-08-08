@@ -32,6 +32,7 @@ DEFAULT_MAX_OUTPUT_TOKENS = 16_384
 DEFAULT_MAX_EXCHANGE_BYTES = 4 * 1024 * 1024
 OpenAIReasoningEffort = Literal["minimal", "low", "medium", "high"]
 OpenAIServiceTier = Literal["auto", "default", "flex", "priority"]
+OpenAIAdvisorPreset = Literal["fast", "normal", "quality"]
 DEFAULT_OPENAI_REASONING_EFFORT: OpenAIReasoningEffort = "low"
 DEFAULT_OPENAI_TIMEOUT_SECONDS = 30.0
 DEFAULT_OPENAI_MAX_RETRIES = 2
@@ -102,6 +103,33 @@ class OpenAIAdvisorSettings(BaseModel):
         if not value.strip():
             raise ValueError("OpenAI model must not be blank")
         return value
+
+
+def openai_advisor_settings_for_preset(
+    preset: OpenAIAdvisorPreset,
+) -> OpenAIAdvisorSettings:
+    """Return an explicit candidate preset without changing client defaults."""
+
+    candidates: dict[
+        OpenAIAdvisorPreset,
+        tuple[OpenAIReasoningEffort, int, float, int],
+    ] = {
+        "fast": ("minimal", 4_096, 15.0, 0),
+        "normal": ("low", 16_384, 30.0, 2),
+        "quality": ("high", 32_768, 60.0, 2),
+    }
+    values = candidates.get(preset)
+    if values is None:
+        raise ValueError(f"unsupported OpenAI advisor preset: {preset!r}")
+    reasoning_effort, max_output_tokens, timeout_seconds, max_retries = values
+    return OpenAIAdvisorSettings(
+        model=DEFAULT_OPENAI_MODEL,
+        reasoning_effort=reasoning_effort,
+        max_input_bytes=DEFAULT_MAX_EXCHANGE_BYTES,
+        max_output_tokens=max_output_tokens,
+        timeout_seconds=timeout_seconds,
+        max_retries=max_retries,
+    )
 
 
 class OpenAIAdvisorUsage(BaseModel):

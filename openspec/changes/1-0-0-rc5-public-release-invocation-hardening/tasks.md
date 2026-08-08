@@ -121,6 +121,10 @@
 - [ ] Add fast/normal/quality presets and benchmark them on representative
   synthetic profiles for proposal validity, safety-preservation rate, latency,
   input/output tokens, retries, and cost before selecting defaults.
+  - [x] Add explicit typed candidate presets without changing constructor
+    defaults before evidence exists.
+  - [ ] Run and record the synthetic-profile benchmark for all candidates.
+  - [ ] Select and document the benchmark-backed default.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.
