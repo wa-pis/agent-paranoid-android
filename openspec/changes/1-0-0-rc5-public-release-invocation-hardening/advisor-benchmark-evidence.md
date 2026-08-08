@@ -7,7 +7,8 @@ representative synthetic-only profiles (`relational` and `wide`). It sent no
 source rows, raw PII, credentials, or production metadata, and retained only
 the aggregate metrics below.
 
-Command:
+Historical smoke command, executed against commit
+[`5bed2ea`](https://github.com/wa-pis/agent-paranoid-android/commit/5bed2ea):
 
 ```bash
 uv run --extra openai python scripts/benchmark_openai_advisor_presets.py \
@@ -42,3 +43,20 @@ constraint-heavy shapes. Record p50 and p95 latency, validity and safety
 failures, timeouts/errors, token usage, cost, and the effect of zero retries
 versus the bounded retry preset. Keep all fixtures synthetic and retain
 aggregate results only.
+
+The acceptance runner is prepared with those five fixed synthetic shapes and
+requires an explicit bounded 5-25 runs per preset. Acceptance uses 20 runs per
+preset (60 provider calls total). Latency percentiles use the deterministic
+nearest-rank method across all attempts, including failed attempts:
+
+```bash
+uv run --extra openai python scripts/benchmark_openai_advisor_presets.py \
+  --runs-per-preset 20 \
+  --input-usd-per-million 5 --output-usd-per-million 30
+```
+
+Do not treat this command as execution evidence. The live acceptance run and
+its aggregate output remain pending explicit cost approval and valid provider
+credentials. Scaling the six-call smoke total of `$0.279090` to 60 calls gives
+an approval estimate of about `$2.79`; allow headroom to `$4` for profile and
+response variance.

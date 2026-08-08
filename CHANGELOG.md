@@ -16,6 +16,8 @@ All notable changes to this project are documented here.
   presets without changing constructor defaults before benchmark evidence.
 - Add a synthetic-only OpenAI advisor preset benchmark runner with explicit
   pricing inputs and redacted aggregate quality, latency, usage, and cost data.
+- Expand the advisor acceptance runner to five synthetic profile shapes and an
+  explicit bounded run count with p50/p95, error, retry, token, and cost metrics.
 
 ### Changed
 
