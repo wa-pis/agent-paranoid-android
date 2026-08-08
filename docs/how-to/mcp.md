@@ -3,7 +3,8 @@
 The project exposes two MCP servers with separate trust boundaries:
 
 - the generator server reads and writes only inside one workspace;
-- the Trino server provides allowlisted, read-only metadata and profiling.
+- the Trino server's default aggregate-only tools provide allowlisted,
+  read-only metadata and profiling.
 
 Start with the generator server. Add Trino only when database profiling is
 required.
@@ -75,8 +76,8 @@ structured `business_rules_payload`.
 
 ## Safe Trino Sequence
 
-The default Trino registration is source-literal-free and contains only
-metadata and aggregate profiling tools:
+The default aggregate-only tools are source-literal-free and contain only
+metadata and aggregate profiling operations:
 
 - `list_catalogs`, `list_schemas`, `list_tables`, `describe_table`;
 - `profile_table`, `profile_table_safe`, `profile_column`;
@@ -84,9 +85,9 @@ metadata and aggregate profiling tools:
 - `profile_conditional_required`, `profile_conditional_allowed_values`;
 - `profile_aggregate_mapping`.
 
-This default surface has no row-returning diagnostic. Its successful
-responses, validation and database errors, and metadata-only audit records do
-not contain source-cell literals.
+This default aggregate-only surface has no row-returning diagnostic. Its
+successful responses, validation and database errors, and metadata-only audit
+records do not contain source-cell literals.
 
 1. Call `list_catalogs`, `list_schemas`, and `list_tables`.
 2. Call `describe_table`.
@@ -103,18 +104,19 @@ Both catalog and schema allowlists are mandatory by default. HTTPS is the
 default. Plain HTTP requires an explicit override and is intended only for an
 isolated local Trino instance.
 
-The raw-SQL `run_safe_select` MCP tool is not exposed by default. Trusted
-clients that need the separately validated query tool must explicitly set
-`TRINO_ENABLE_SAFE_SELECT=true`. The review-first planning sequence above does
-not require it. Its bounded row-shaped result may contain allowed source
-values, including values not recognized as sensitive by heuristic masking.
+The explicit opt-in row-returning tool `run_safe_select` is not exposed by
+default. Trusted clients that need it must set `TRINO_ENABLE_SAFE_SELECT=true`.
+The review-first planning sequence above does not require it. Its bounded
+row-shaped result may contain allowed source values, including values not
+recognized as sensitive by heuristic masking.
 Enabling it does not make returned rows source-free, PII-free, anonymous, or
 privacy-safe; use a separately trusted client and do not relay its results to
 an LLM or generated output.
 
 ## Expected Result
 
-MCP responses contain compact metadata:
+The default generator and default aggregate-only Trino tools return compact
+metadata:
 
 ```text
 rows: customers=25, orders=25
@@ -124,8 +126,9 @@ synthetic: true
 source rows copied: false
 ```
 
-Generated files stay in the workspace. Dataset rows are not returned through
-MCP responses.
+Generated files stay in the workspace. These default tools do not return
+dataset or source rows; explicit opt-in row-returning tools are outside this
+expected result.
 
 ## Failure Conditions
 

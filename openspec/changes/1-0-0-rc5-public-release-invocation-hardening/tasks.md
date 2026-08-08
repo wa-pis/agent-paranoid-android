@@ -82,7 +82,8 @@
 
 - [x] Update README.
 - [x] Update MCP examples.
-- [ ] Update MCP how-to, AI integration, configuration,
+- [x] Update MCP how-to.
+- [ ] Update AI integration, configuration,
   application-boundary references, diagrams, and canonical OpenSpec wording.
 - [ ] Use the terms `default aggregate-only tools` and `explicit opt-in
   row-returning tools` consistently. Narrow all server-wide claims that imply
