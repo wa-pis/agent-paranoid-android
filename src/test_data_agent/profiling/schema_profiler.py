@@ -78,7 +78,17 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
 
 
 def profile_schema(input_folder: Path) -> DatasetProfile:
+    profile, _ = _profile_schema_with_sample(input_folder, max_rows_per_entity=0)
+    return profile
+
+
+def _profile_schema_with_sample(
+    input_folder: Path,
+    *,
+    max_rows_per_entity: int,
+) -> tuple[DatasetProfile, dict[str, list[dict[str, str]]]]:
     entities: list[EntityProfile] = []
+    rows_by_entity: dict[str, list[dict[str, str]]] = {}
     csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
@@ -96,6 +106,7 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
             accumulators = {name: FieldAccumulator(name=name) for name in fieldnames}
+            sampled_rows: list[dict[str, str]] = []
             row_count = 0
             for row in reader:
                 row_count += 1
@@ -103,8 +114,11 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
                 total_cells += len(fieldnames)
                 enforce_input_row_count(total_rows, label="CSV folder")
                 enforce_input_cell_count(total_cells, label="CSV folder")
+                if len(sampled_rows) < max_rows_per_entity:
+                    sampled_rows.append(dict(row))
                 for name, accumulator in accumulators.items():
                     accumulator.add(row.get(name, ""))
+        rows_by_entity[entity_name] = sampled_rows
         fields = [accumulator.to_profile(row_count) for accumulator in accumulators.values()]
         primary_key_candidates = [field.name for field in fields if field.is_identifier and field.unique_ratio >= 0.98]
         entities.append(
@@ -115,7 +129,7 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
                 primary_key_candidates=primary_key_candidates,
             )
         )
-    return DatasetProfile(entities=entities)
+    return DatasetProfile(entities=entities), rows_by_entity
 
 
 def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:

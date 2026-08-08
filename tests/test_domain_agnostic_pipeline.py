@@ -51,6 +51,33 @@ def test_folder_csv_profiling_detects_semicolon_delimiter_and_bom(tmp_path) -> N
     }
 
 
+def test_folder_profile_streams_schema_and_rule_sample_in_one_text_pass(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    source = tmp_path / "customers.csv"
+    source.write_text("customer_id,status\n1,active\n2,paused\n")
+    original_open = Path.open
+    text_opens = 0
+
+    def counting_open(path, mode="r", *args, **kwargs):
+        nonlocal text_opens
+        if path == source and "b" not in mode:
+            text_opens += 1
+        return original_open(path, mode, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counting_open)
+
+    profile = profile_example_folder(
+        tmp_path,
+        cache_dir=None,
+        rule_sample_rows=1,
+    )
+
+    assert profile.entity("customers").row_count == 2
+    assert text_opens == 1
+
+
 def test_relationship_inference() -> None:
     profile = profile_example_folder(FIXTURE)
 
