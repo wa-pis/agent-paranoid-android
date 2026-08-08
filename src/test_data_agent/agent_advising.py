@@ -15,6 +15,7 @@ from test_data_agent.advisor import (
     build_advisor_exchange,
     build_advisor_request,
     build_advisor_review_artifact,
+    _rebuild_advisor_request_for_profile_verification,
 )
 from test_data_agent.agent_contracts import (
     AgentPhase,
@@ -168,11 +169,11 @@ class AgentAdvisingService:
             artifacts,
             current_plan.review,
         )
-        current_advisor_request = build_advisor_request(
+        profile_verification_request = _rebuild_advisor_request_for_profile_verification(
             current_profile,
-            baseline_spec=current_spec,
+            review_artifact.request,
         )
-        profile_sha256 = current_advisor_request.profile_sha256
+        profile_sha256 = profile_verification_request.profile_sha256
         if not hmac.compare_digest(
             review_artifact.request.profile_sha256,
             profile_sha256,
@@ -184,6 +185,10 @@ class AgentAdvisingService:
             review_artifact.proposed_spec_sha256,
         ):
             return self._inspect_workspace(resolved_workspace)
+        current_advisor_request = build_advisor_request(
+            current_profile,
+            baseline_spec=current_spec,
+        )
         if not hmac.compare_digest(
             current_advisor_request.baseline_spec_sha256,
             review_artifact.request.baseline_spec_sha256,
