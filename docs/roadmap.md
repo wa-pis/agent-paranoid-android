@@ -647,7 +647,7 @@ Scope:
   make local profile caching `auto` by default with an explicit `--no-cache`
   escape hatch, avoid the current two-pass CSV-folder profile where practical,
   and enforce a local profile deadline plus bounded relationship/rule samples.
-- [ ] Add bounded advisor presets and evidence: model, reasoning effort,
+- [x] Add bounded advisor presets and evidence: model, reasoning effort,
   prompt/input budget, output budget, timeout, and retry count must be typed,
   configurable, and visible in non-sensitive run metadata. Select
   fast/normal/quality defaults only after measuring proposal validity, latency,

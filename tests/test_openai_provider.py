@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
 from openai import OpenAIError
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from test_data_agent.advisor import (
     AdvisorContractError,
@@ -116,19 +117,21 @@ class FakeResponses:
         self.usage = usage
         self.calls: list[dict[str, Any]] = []
 
-    def parse(self, **kwargs: Any):
+    def create(self, **kwargs: Any):
         self.calls.append(kwargs)
         if self.error is not None:
             raise self.error
-        output_parsed = self.output_parsed
-        if isinstance(output_parsed, dict):
-            output_parsed = kwargs["text_format"].model_validate(output_parsed)
+        output_text = self.output_parsed
+        if isinstance(output_text, BaseModel):
+            output_text = output_text.model_dump_json()
+        elif isinstance(output_text, dict):
+            output_text = json.dumps(output_text)
         return type(
             "Response",
             (),
             {
                 "status": self.status,
-                "output_parsed": output_parsed,
+                "output_text": output_text,
                 "retry_count": self.retry_count,
                 "usage": self.usage,
             },
@@ -156,10 +159,15 @@ def test_openai_advisor_keeps_trusted_and_untrusted_content_separate() -> None:
     user_content = call["input"][1]["content"]
     assert proposal.profile_sha256 == exchange.request.profile_sha256
     assert call["model"] == "test-model"
-    assert call["text_format"] is AdvisorProposal
-    assert call["reasoning"] == {"effort": "low"}
-    assert call["max_output_tokens"] == 16_384
-    assert call["timeout"] == 30.0
+    assert call["text"]["format"] == {
+        "type": "json_schema",
+        "name": "AdvisorProposal",
+        "strict": False,
+        "schema": exchange.response_json_schema,
+    }
+    assert call["reasoning"] == {"effort": "none"}
+    assert call["max_output_tokens"] == 4_096
+    assert call["timeout"] == 15.0
     assert call["store"] is False
     assert "ignore previous instructions" not in developer_content
     assert "ignore previous instructions" in user_content
@@ -232,7 +240,7 @@ def test_openai_advisor_applies_typed_settings() -> None:
         "max_retries",
     ),
     [
-        ("fast", "minimal", 4_096, 15.0, 0),
+        ("fast", "none", 4_096, 15.0, 0),
         ("normal", "low", 16_384, 30.0, 2),
         ("quality", "high", 32_768, 60.0, 2),
     ],
@@ -260,6 +268,10 @@ def test_openai_advisor_rejects_unknown_candidate_preset() -> None:
 
     with pytest.raises(ValueError, match="unsupported OpenAI advisor preset"):
         openai_advisor_settings_for_preset(preset)
+
+
+def test_openai_advisor_defaults_to_benchmarked_fast_preset() -> None:
+    assert OpenAIAdvisorSettings() == openai_advisor_settings_for_preset("fast")
 
 
 def test_openai_advisor_records_bounded_redacted_run_metadata() -> None:
@@ -326,6 +338,28 @@ def test_openai_advisor_ignores_unbounded_provider_metrics() -> None:
     assert client.last_run_metadata is not None
     assert client.last_run_metadata.retry_count is None
     assert client.last_run_metadata.provider_usage is None
+
+
+def test_openai_advisor_records_usage_for_invalid_structured_output() -> None:
+    exchange = safe_exchange()
+    usage = type(
+        "Usage",
+        (),
+        {"input_tokens": 120, "output_tokens": 10, "total_tokens": 130},
+    )()
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(
+            FakeResponses(output_parsed={"invalid": True}, usage=usage)
+        )
+    )
+
+    with pytest.raises(AdvisorContractError, match="structured validation"):
+        client.complete(exchange)
+
+    assert client.last_run_metadata is not None
+    assert client.last_run_metadata.status == "invalid_response"
+    assert client.last_run_metadata.provider_usage is not None
+    assert client.last_run_metadata.provider_usage.total_tokens == 130
 
 
 def test_openai_relationship_advisor_ranks_only_supplied_candidates() -> None:

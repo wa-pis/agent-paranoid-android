@@ -17,6 +17,18 @@ All notable changes to this project are documented here.
 - Add a synthetic-only OpenAI advisor preset benchmark runner with explicit
   pricing inputs and redacted aggregate quality, latency, usage, and cost data.
 
+### Changed
+
+- Use GPT-5.6 reasoning effort `none` for the fast advisor candidate while
+  retaining the legacy typed `minimal` value for compatibility.
+- Select the benchmark-backed fast advisor settings as the constructor defaults:
+  4,096 output tokens, a 15-second timeout, and no SDK retries.
+
+### Fixed
+
+- Send the advisor's public free-form-compatible JSON Schema in non-strict mode
+  and fail closed through local typed validation of every provider response.
+
 ### Security
 
 - Bound JSON-RPC request IDs by their serialized UTF-8 size before they can be
