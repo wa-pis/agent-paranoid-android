@@ -71,8 +71,12 @@
 - [x] Document environment names, defaults, units, per-query versus
   per-invocation scope, and failure behavior in configuration reference.
 - [x] Add a wide-table cumulative column-limit test.
-- [ ] Add statement-fan-out, timeout, concurrency-isolation, and
+- [x] Add statement-fan-out, timeout, concurrency-isolation, and
   preflight/no-connection tests.
+  Evidence: `test_nested_profile_budget_stops_before_later_column_connection`,
+  `test_client_closes_active_query_when_invocation_deadline_expires`,
+  `test_invocation_wrapper_isolates_concurrent_budgets`, and
+  `test_client_rejects_statement_budget_before_opening_connection`.
 
 ## P3 — MCP documentation contract
 
