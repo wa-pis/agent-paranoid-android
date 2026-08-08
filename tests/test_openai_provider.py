@@ -3,6 +3,7 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor
 import json
 from threading import Barrier
+import traceback
 from typing import Any
 
 import pytest
@@ -456,13 +457,23 @@ def test_openai_advisor_records_usage_for_invalid_structured_output() -> None:
     )()
     client = OpenAIAdvisorClient(
         client=FakeOpenAI(
-            FakeResponses(output_parsed={"invalid": True}, usage=usage)
+            FakeResponses(
+                output_parsed={"secret": "sk-secret-value"},
+                usage=usage,
+            )
         )
     )
 
-    with pytest.raises(AdvisorContractError, match="structured validation"):
+    with pytest.raises(
+        AdvisorContractError,
+        match="structured validation",
+    ) as raised:
         client.complete(exchange)
 
+    assert raised.value.__cause__ is None
+    assert "sk-secret-value" not in "".join(
+        traceback.format_exception(raised.value)
+    )
     assert client.last_run_metadata is not None
     assert client.last_run_metadata.status == "invalid_response"
     assert client.last_run_metadata.provider_usage is not None
@@ -611,6 +622,7 @@ def test_openai_advisor_rejects_unusable_responses(
     "provider_error",
     [
         OpenAIError("sk-secret-value"),
+        RuntimeError("sk-secret-value"),
         pytest.param(
             None,
             id="structured-output-validation",
@@ -636,6 +648,10 @@ def test_openai_advisor_does_not_leak_provider_error_text(
         client.complete(exchange)
 
     assert "sk-secret-value" not in str(raised.value)
+    assert raised.value.__cause__ is None
+    assert "sk-secret-value" not in "".join(
+        traceback.format_exception(raised.value)
+    )
     assert client.last_run_metadata is not None
     assert client.last_run_metadata.status in {
         "invalid_response",

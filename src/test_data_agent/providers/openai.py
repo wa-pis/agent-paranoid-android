@@ -350,7 +350,7 @@ class OpenAIAdvisorClient:
 
         try:
             response = self._client.responses.create(**request_options)
-        except (OpenAIError, ValidationError) as exc:
+        except Exception as exc:
             metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
@@ -363,7 +363,7 @@ class OpenAIAdvisorClient:
             raise OpenAIAdvisorCallError(
                 f"OpenAI advisor request failed ({type(exc).__name__})",
                 metadata=metadata,
-            ) from exc
+            ) from None
 
         if response.status != "completed":
             metadata = self._record_run_metadata(
@@ -389,7 +389,7 @@ class OpenAIAdvisorClient:
             )
         try:
             parsed = response_model.model_validate_json(response.output_text)
-        except ValidationError as exc:
+        except ValidationError:
             metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
@@ -399,7 +399,7 @@ class OpenAIAdvisorClient:
             raise OpenAIAdvisorCallError(
                 "OpenAI advisor response failed structured validation",
                 metadata=metadata,
-            ) from exc
+            ) from None
         payload = parsed.model_dump(mode="json")
         metadata = self._record_run_metadata(
             request_bytes=request_size,
