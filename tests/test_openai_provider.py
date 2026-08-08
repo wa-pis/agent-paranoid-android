@@ -471,6 +471,7 @@ def test_openai_advisor_records_usage_for_invalid_structured_output() -> None:
         client.complete(exchange)
 
     assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
     assert "sk-secret-value" not in "".join(
         traceback.format_exception(raised.value)
     )
@@ -564,6 +565,24 @@ def test_openai_advisor_applies_timeout_and_retries_to_sdk(
     )
 
     assert created_with == {"timeout": 8.0, "max_retries": 3}
+
+
+def test_openai_advisor_does_not_retain_initialization_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail_client(**kwargs: Any) -> FakeOpenAI:
+        raise OpenAIError("sk-secret-value")
+
+    monkeypatch.setattr("test_data_agent.providers.openai.OpenAI", fail_client)
+
+    with pytest.raises(ValueError, match="initialization failed") as raised:
+        OpenAIAdvisorClient()
+
+    assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
+    assert "sk-secret-value" not in "".join(
+        traceback.format_exception(raised.value)
+    )
 
 
 @pytest.mark.parametrize(
@@ -660,6 +679,7 @@ def test_openai_advisor_does_not_leak_provider_error_text(
 
     assert "sk-secret-value" not in str(raised.value)
     assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
     assert "sk-secret-value" not in "".join(
         traceback.format_exception(raised.value)
     )

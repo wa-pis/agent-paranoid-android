@@ -261,10 +261,12 @@ class OpenAIAdvisorClient:
                         max_retries=effective_settings.max_retries,
                     ),
                 )
-            except OpenAIError as exc:
-                raise ValueError(
-                    "OpenAI client initialization failed; configure OPENAI_API_KEY"
-                ) from exc
+            except OpenAIError:
+                pass
+        if client is None:
+            raise ValueError(
+                "OpenAI client initialization failed; configure OPENAI_API_KEY"
+            ) from None
         self._client = client
         self._settings = effective_settings
         self._clock = clock
@@ -348,6 +350,7 @@ class OpenAIAdvisorClient:
                 metadata=metadata,
             )
 
+        provider_failure: tuple[OpenAIAdvisorRunMetadata, str] | None = None
         try:
             response = self._client.responses.create(**request_options)
         except Exception as exc:
@@ -360,8 +363,11 @@ class OpenAIAdvisorClient:
                     else "provider_error"
                 ),
             )
+            provider_failure = (metadata, type(exc).__name__)
+        if provider_failure is not None:
+            metadata, error_type = provider_failure
             raise OpenAIAdvisorCallError(
-                f"OpenAI advisor request failed ({type(exc).__name__})",
+                f"OpenAI advisor request failed ({error_type})",
                 metadata=metadata,
             ) from None
 
@@ -387,9 +393,12 @@ class OpenAIAdvisorClient:
                 "OpenAI advisor response did not contain a structured proposal",
                 metadata=metadata,
             )
+        parsed: _ResponseModel | None = None
         try:
             parsed = response_model.model_validate_json(response.output_text)
         except ValidationError:
+            pass
+        if parsed is None:
             metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
