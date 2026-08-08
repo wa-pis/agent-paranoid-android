@@ -567,11 +567,16 @@ def test_openai_advisor_applies_timeout_and_retries_to_sdk(
     assert created_with == {"timeout": 8.0, "max_retries": 3}
 
 
+@pytest.mark.parametrize(
+    "initialization_error",
+    [OpenAIError("sk-secret-value"), RuntimeError("sk-secret-value")],
+)
 def test_openai_advisor_does_not_retain_initialization_error(
     monkeypatch: pytest.MonkeyPatch,
+    initialization_error: Exception,
 ) -> None:
     def fail_client(**kwargs: Any) -> FakeOpenAI:
-        raise OpenAIError("sk-secret-value")
+        raise initialization_error
 
     monkeypatch.setattr("test_data_agent.providers.openai.OpenAI", fail_client)
 
@@ -677,6 +682,7 @@ def test_openai_advisor_does_not_leak_provider_error_text(
     with pytest.raises(AdvisorContractError) as raised:
         client.complete(exchange)
 
+    assert str(raised.value) == "OpenAI advisor request failed"
     assert "sk-secret-value" not in str(raised.value)
     assert raised.value.__cause__ is None
     assert raised.value.__context__ is None
