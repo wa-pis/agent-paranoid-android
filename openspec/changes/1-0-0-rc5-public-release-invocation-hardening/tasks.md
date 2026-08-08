@@ -180,8 +180,10 @@
 - [x] Run the representative throughput benchmark and attach its results to
   the RC5 release evidence; no performance default is accepted without the
   corresponding latency/safety/quality measurements.
-- [ ] Obtain an independent security review of the RC5 implementation before
+- [x] Obtain an independent security review of the RC5 implementation before
   RC5 acceptance, covering advisor sanitization, request-ID lifecycle, and
   transport budget enforcement.
+  Evidence: [RC5 security review](security-review-evidence.md) found and closed
+  non-protocol request-ID aliasing before dispatch.
 - [ ] Confirm the public artifact evidence is attached to the exact RC5 tag
   and all RC5 acceptance gates pass before opening stable promotion.

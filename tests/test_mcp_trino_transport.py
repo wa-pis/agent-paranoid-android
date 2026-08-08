@@ -569,6 +569,63 @@ def test_duplicate_active_request_id_is_rejected_without_overwriting_budget() ->
     assert resolved is first_budget
 
 
+def test_request_registry_preserves_exact_request_id_type_identity() -> None:
+    import mcp.types as types
+
+    registry = transport._RequestBudgetRegistry()
+    integer_budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+    string_budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+
+    def request(raw_id: str, budget: QueryWorkBudget) -> SimpleNamespace:
+        return SimpleNamespace(
+            message=types.JSONRPCMessage.model_validate_json(
+                f'{{"jsonrpc":"2.0","id":{raw_id},"method":"ping"}}'
+            ),
+            metadata=SimpleNamespace(request_context=budget),
+        )
+
+    registry.register_incoming_request(request("1", integer_budget))
+    registry.register_incoming_request(request('"1"', string_budget))
+
+    def response(raw_id: str) -> SimpleNamespace:
+        return SimpleNamespace(
+            message=types.JSONRPCMessage.model_validate_json(
+                f'{{"jsonrpc":"2.0","id":{raw_id},"result":{{}}}}'
+            ),
+            metadata=None,
+        )
+
+    assert registry.resolve_outgoing(response("1")) is integer_budget
+    assert registry.resolve_outgoing(response('"1"')) is string_budget
+
+
+@pytest.mark.parametrize(
+    ("raw_id", "message"),
+    [
+        ("true", "string or integer"),
+        ("false", "string or integer"),
+        ("null", "string or integer"),
+        ("1.0", "string or integer"),
+        ("NaN", "string or integer"),
+        ("Infinity", "string or integer"),
+        ("-Infinity", "string or integer"),
+    ],
+)
+def test_raw_transport_rejects_non_protocol_request_ids(
+    raw_id: str,
+    message: str,
+) -> None:
+    payload = f'{{"jsonrpc":"2.0","id":{raw_id},"method":"ping"}}'.encode()
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    with pytest.raises(ValueError, match=message):
+        transport._bounded_session_message(payload, create_budget)
+
+
 @pytest.mark.parametrize("fail_on", ["write", "flush"])
 def test_transport_writer_cleans_request_registry_on_output_failure(
     fail_on: str,

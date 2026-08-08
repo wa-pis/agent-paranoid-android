@@ -40,6 +40,8 @@ or access to secrets, credentials, tokens, or raw PII.
 - Reserve the fixed bounded transport-error allowance before charging normal
   responses; the writer must clean the request registry even when writing,
   flushing, fallback serialization, or cancellation fails.
+- Accept only string or integer JSON-RPC request IDs and key active requests by
+  their exact serialized representation so distinct wire types cannot alias.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
 
 Keep the Trino dependency optional for workflows that do not use Trino. Mock

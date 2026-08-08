@@ -51,6 +51,8 @@ All notable changes to this project are documented here.
   byte, and cell limits, leaving no partial metadata cache after exhaustion.
 - Count trusted instructions, untrusted metadata, structured-output schema,
   settings, and serialization in the OpenAI advisor request budget.
+- Reject non-protocol JSON-RPC request IDs before dispatch and isolate active
+  request budgets by exact serialized ID type and value.
 
 ## [1.0.0rc4] - 2026-08-02
 
