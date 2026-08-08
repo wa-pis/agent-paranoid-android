@@ -18,7 +18,7 @@ package "Inputs" {
 
 package "Interfaces" {
   component "cli.py\nprofile-csv, generate,\ngenerate-from-csv,\nprofile-example, infer-spec,\ngenerate-from-example,\nvalidate, agent-plan,\nagent-review, agent-advise,\nagent-approve, agent-recover" as Cli
-  component "mcp_trino_server.py\nSafe Trino MCP Tools" as TrinoMcp
+  component "mcp_trino_server.py\nDefault Aggregate-Only Tools\n+ Explicit Opt-In Row-Returning Tools" as TrinoMcp
   component "mcp_generator_server.py\nProfile, Infer, Generate,\nValidate, Export" as GeneratorMcp
 }
 
@@ -115,7 +115,7 @@ Cli --> TrinoMcp : MCP metadata/profiling calls
 TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
-TrinoMcp --> DatasetProfile : source-literal-free\nmetadata and aggregates
+TrinoMcp --> DatasetProfile : default source-literal-free\nmetadata and aggregates
 TrinoMcp --> GeneratorMcp : inline safe profile payload
 
 GeneratorMcp --> WorkspaceBoundary
@@ -198,6 +198,13 @@ note right of SqlSafety
   Unsafe SQL, unrestricted SELECT *,
   multiple statements, and likely PII
   projections are rejected.
+end note
+
+note right of TrinoMcp
+  Default aggregate-only tools are
+  source-literal-free. Explicit opt-in
+  row-returning tools may contain
+  allowed source values.
 end note
 
 note bottom of NoCopy
