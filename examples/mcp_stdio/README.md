@@ -16,5 +16,8 @@ rows.
 
 The automated script stands in for a human only because the profile is a
 checked-in synthetic fixture. With a new domain, stop after planning and review
-`dataset_spec.yaml` before approving its exact digest. MCP responses contain
-summaries and artifact paths, never dataset rows.
+`dataset_spec.yaml` before approving its exact digest. The default aggregate-only
+tools return summaries and artifact paths rather than source rows. The explicit
+opt-in row-returning tools are disabled here; `run_safe_select` can return
+bounded, masked allowed source values and is outside the source-literal-free
+guarantee.
