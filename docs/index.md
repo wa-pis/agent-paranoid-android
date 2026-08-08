@@ -46,11 +46,11 @@ introduced.
 
 ## Five-Minute Check
 
-After RC5 is public, install the exact candidate and run the self-contained
+After RC6 is public, install the exact candidate and run the self-contained
 smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.0.0rc5"
+python3 -m pip install "agent-paranoid-android==1.0.0rc6"
 test-data-agent doctor
 ```
 
@@ -79,7 +79,7 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current package version is `1.0.0rc5`. `DatasetSpec` is the generation and
+The current package version is `1.0.0rc6`. `DatasetSpec` is the generation and
 validation contract for the CLI and Python API.
 
 Development is substantially AI-assisted. Human review, automated tests, and

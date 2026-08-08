@@ -157,10 +157,54 @@ def test_rare_category_sanitization_preserves_structural_references() -> None:
         .distribution["categories"]
     ]
     assert values == [
-        "synthetic_category_1",
-        "synthetic_category_2",
-        "synthetic_category_3",
+        "__apa_rare_e0_f2_c0__",
+        "__apa_rare_e0_f2_c1__",
+        "__apa_rare_e0_f2_c2__",
     ]
+
+
+def test_rare_category_placeholders_are_field_scoped_and_collision_free() -> None:
+    profile = safe_profile()
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": "synthetic_category_1", "count": 4},
+            {"value": "north-island", "count": 1},
+        ],
+    }
+    profile.entities[0].fields.append(
+        FieldProfile(
+            name="region",
+            data_type=FieldType.STRING,
+            distribution={
+                "kind": "categorical",
+                "categories": [{"value": "north-island", "count": 1}],
+            },
+        )
+    )
+
+    request = build_advisor_request(profile)
+    segment_values = request.profile.entity("customers").field("segment").distribution[
+        "categories"
+    ]
+    region_values = request.profile.entity("customers").field("region").distribution[
+        "categories"
+    ]
+
+    assert segment_values[0]["value"] == "synthetic_category_1"
+    assert segment_values[1]["value"] == "__apa_rare_e0_f2_c1__"
+    assert region_values[0]["value"] == "__apa_rare_e0_f3_c0__"
+    assert segment_values[1]["value"] != region_values[0]["value"]
+
+
+def test_rare_category_sanitization_is_deterministic() -> None:
+    profile = safe_profile()
+
+    first = build_advisor_request(profile)
+    second = build_advisor_request(profile)
+
+    assert first.profile == second.profile
+    assert first.baseline_spec == second.baseline_spec
 
 
 def test_advisor_request_marks_instruction_like_names_as_untrusted_data() -> None:

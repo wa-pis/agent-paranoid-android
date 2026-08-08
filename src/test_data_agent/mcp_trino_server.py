@@ -431,8 +431,8 @@ def main() -> None:
             f"(missing: {', '.join(missing)}); "
             "install agent-paranoid-android[mcp,trino]"
         )
-    work_limits = query_work_limits_from_env()
     TrinoConfig.from_env()
+    work_limits = query_work_limits_from_env()
     audit_logger_from_env("trino-mcp")
     mcp = create_trino_mcp(
         trino_mcp_services(

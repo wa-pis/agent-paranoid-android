@@ -21,9 +21,23 @@ from test_data_agent.cli_dependencies import (
 )
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io import generate_dataset_from_example_artifacts
+from test_data_agent.trino_config import deployment_profile_from_env
+from test_data_agent.trino_work_budget import query_work_limits_from_env
 
 DoctorSmoke = Callable[[], None]
 ParquetDoctorSmoke = Callable[[Path, Path], None]
+
+
+def trino_deployment_status() -> str:
+    """Return bounded effective Trino deployment-policy status."""
+    profile = deployment_profile_from_env()
+    limits = query_work_limits_from_env(deployment_profile=profile)
+    scan_limit = limits.max_cumulative_estimated_scan_bytes
+    effective_limit = "unlimited" if scan_limit is None else f"{scan_limit} bytes"
+    return (
+        f"profile={profile.value}; "
+        f"max_cumulative_estimated_scan_bytes={effective_limit}"
+    )
 
 
 @dataclass(frozen=True)
@@ -35,6 +49,7 @@ class CliDoctorService:
     mcp_smoke: DoctorSmoke
     trino_smoke: DoctorSmoke
     openai_smoke: DoctorSmoke
+    trino_status: Callable[[], str] = trino_deployment_status
 
     def inspect(
         self,
@@ -128,6 +143,7 @@ class CliDoctorService:
             if extra not in required:
                 continue
             try:
+                status = self.trino_status() if extra == "trino" else None
                 smoke()
             except Exception:
                 failures.append(
@@ -135,7 +151,8 @@ class CliDoctorService:
                     f"(reinstall agent-paranoid-android[{extra}] and retry)"
                 )
             else:
-                checks.append(f"capability {extra}: ok")
+                suffix = f" ({status})" if status is not None else ""
+                checks.append(f"capability {extra}: ok{suffix}")
 
 
 def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:

@@ -8,6 +8,8 @@ from test_data_agent import mcp_trino_server
 from test_data_agent.trino_config import (
     TrinoConfig,
     TrinoConfigurationError,
+    TrinoDeploymentProfile,
+    deployment_profile_from_env,
     parse_data_size_value,
     parse_duration_value,
     parse_trino_port,
@@ -38,6 +40,18 @@ def test_trino_config_loads_explicit_allowlists_and_budgets(
     assert config.query_max_execution_time == "20s"
     assert config.query_max_run_time == "30s"
     assert config.query_max_scan_physical_bytes == "512MB"
+    assert config.deployment_profile is TrinoDeploymentProfile.TRUSTED_LOCAL
+
+
+def test_trino_config_requires_a_known_deployment_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_DEPLOYMENT_PROFILE", "shared-hardened")
+    assert deployment_profile_from_env() is TrinoDeploymentProfile.SHARED_HARDENED
+
+    monkeypatch.setenv("TRINO_DEPLOYMENT_PROFILE", "unknown")
+    with pytest.raises(TrinoConfigurationError, match="TRINO_DEPLOYMENT_PROFILE"):
+        deployment_profile_from_env()
 
 
 @pytest.mark.parametrize(

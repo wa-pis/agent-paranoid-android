@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import json
+from threading import Barrier
 from typing import Any
 
 import pytest
@@ -23,14 +25,16 @@ from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.providers.openai import (
     MAX_OPENAI_RELATIONSHIP_CANDIDATES,
     OpenAIAdvisorClient,
+    OpenAIAdvisorCallError,
     OpenAIAdvisorSettings,
     OpenAIRelationshipDiscoveryAdvisor,
+    StructuredCompletionResult,
     openai_advisor_settings_for_preset,
 )
 from test_data_agent.relationship_discovery import rank_relationship_candidates
 
 
-def safe_exchange():
+def safe_exchange(count: int | None = None):
     profile = DatasetProfile(
         source_type="test",
         entities=[
@@ -59,7 +63,7 @@ def safe_exchange():
             )
         ],
     )
-    return build_advisor_exchange(build_advisor_request(profile))
+    return build_advisor_exchange(build_advisor_request(profile, count=count))
 
 
 def proposal_for(exchange):
@@ -143,6 +147,28 @@ class FakeOpenAI:
         self.responses = responses
 
 
+class ConcurrentResponses:
+    def __init__(self, output_parsed: object, *, error_count: int | None = None) -> None:
+        self.output_parsed = output_parsed
+        self.error_count = error_count
+        self.barrier = Barrier(2)
+
+    def create(self, **kwargs: Any):
+        self.barrier.wait(timeout=5)
+        if self.error_count is not None and f'"row_count":{self.error_count}' in (
+            kwargs["input"][1]["content"]
+        ):
+            raise OpenAIError("provider secret")
+        output_text = self.output_parsed
+        if isinstance(output_text, BaseModel):
+            output_text = output_text.model_dump_json()
+        return type(
+            "Response",
+            (),
+            {"status": "completed", "output_text": output_text},
+        )()
+
+
 def test_openai_advisor_keeps_trusted_and_untrusted_content_separate() -> None:
     exchange = safe_exchange()
     responses = FakeResponses(output_parsed=proposal_for(exchange))
@@ -187,6 +213,67 @@ def test_openai_advisor_rejects_oversized_request_before_network() -> None:
     assert responses.calls == []
 
 
+def test_openai_advisor_returns_metadata_owned_by_one_call() -> None:
+    exchange = safe_exchange()
+    responses = FakeResponses(output_parsed=proposal_for(exchange))
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(responses),
+        model="test-model",
+    )
+
+    result = client.complete_with_metadata(exchange)
+
+    assert isinstance(result, StructuredCompletionResult)
+    assert result.value.profile_sha256 == exchange.request.profile_sha256
+    assert result.metadata.status == "completed"
+    assert result.metadata.model == "test-model"
+    assert result.metadata.request_bytes > 0
+    assert "ignore previous instructions" not in result.metadata.model_dump_json()
+    assert "retail" not in result.metadata.model_dump_json()
+
+
+def test_openai_advisor_parallel_metadata_stays_with_each_call() -> None:
+    small = safe_exchange(count=3)
+    large = safe_exchange(count=123)
+    responses = ConcurrentResponses(proposal_for(small))
+    client = OpenAIAdvisorClient(client=FakeOpenAI(responses), model="test-model")
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(
+            pool.map(client.complete_with_metadata, (small, large))
+        )
+
+    assert [result.metadata.status for result in results] == [
+        "completed",
+        "completed",
+    ]
+    assert results[0].metadata.request_bytes != results[1].metadata.request_bytes
+    assert results[0].value.profile_sha256 == small.request.profile_sha256
+    assert results[1].value.profile_sha256 == large.request.profile_sha256
+
+
+def test_openai_advisor_parallel_provider_error_has_isolated_metadata() -> None:
+    small = safe_exchange(count=3)
+    failing = safe_exchange(count=123)
+    responses = ConcurrentResponses(proposal_for(small), error_count=123)
+    client = OpenAIAdvisorClient(client=FakeOpenAI(responses), model="test-model")
+
+    def complete(exchange):
+        try:
+            return client.complete_with_metadata(exchange)
+        except OpenAIAdvisorCallError as exc:
+            return exc
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(complete, (small, failing)))
+
+    assert isinstance(results[0], StructuredCompletionResult)
+    assert results[0].metadata.status == "completed"
+    assert isinstance(results[1], OpenAIAdvisorCallError)
+    assert results[1].metadata.status == "provider_error"
+    assert "provider secret" not in str(results[1])
+
+
 def test_openai_advisor_records_preflight_rejection_metadata() -> None:
     exchange = safe_exchange()
     responses = FakeResponses(output_parsed=proposal_for(exchange))
@@ -195,9 +282,12 @@ def test_openai_advisor_records_preflight_rejection_metadata() -> None:
         max_exchange_bytes=1,
     )
 
-    with pytest.raises(AdvisorContractError, match="byte limit"):
+    with pytest.raises(OpenAIAdvisorCallError, match="byte limit") as raised:
         client.complete(exchange)
 
+    assert raised.value.metadata.status == "preflight_rejected"
+    assert raised.value.metadata.request_bytes > 1
+    assert raised.value.metadata.response_bytes is None
     assert client.last_run_metadata is not None
     assert client.last_run_metadata.status == "preflight_rejected"
     assert client.last_run_metadata.request_bytes > 1

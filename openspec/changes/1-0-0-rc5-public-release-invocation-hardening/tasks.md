@@ -1,5 +1,9 @@
 # Tasks: 1-0-0-rc5-public-release-invocation-hardening
 
+> Historical status: RC5 is superseded by the separate RC6 final-candidate
+> checklist for stable promotion. Do not publish a new RC5 candidate or use
+> these remaining public-artifact tasks as the stable release gate.
+
 ## P1 — Public RC4/RC5 artifact acceptance
 
 - [x] Publish and verify the exact `1.0.0rc4` wheel and sdist on public PyPI,

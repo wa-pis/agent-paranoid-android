@@ -2,8 +2,14 @@ import ast
 from pathlib import Path
 from types import ModuleType
 
+import pytest
+
 import test_data_agent.cli_doctor as cli_doctor_module
-from test_data_agent.cli_doctor import CliDoctorService, ModuleImporter
+from test_data_agent.cli_doctor import (
+    CliDoctorService,
+    ModuleImporter,
+    trino_deployment_status,
+)
 
 
 def test_doctor_service_reports_optional_and_required_extras() -> None:
@@ -41,6 +47,22 @@ def test_doctor_service_redacts_capability_failure() -> None:
         "capability mcp: failed (reinstall agent-paranoid-android[mcp] and retry)",
     )
     assert "secret-provider-token" not in repr(report)
+
+
+def test_doctor_reports_effective_trino_deployment_profile(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_DEPLOYMENT_PROFILE", "shared-hardened")
+    monkeypatch.setenv("TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES", "4096")
+
+    service = _service(lambda name: ModuleType(name))
+    report = service.inspect(required_extras={"trino"})
+
+    assert (
+        "capability trino: ok (profile=shared-hardened; "
+        "max_cumulative_estimated_scan_bytes=4096 bytes)"
+    ) in report.checks
+    assert trino_deployment_status().endswith("4096 bytes")
 
 
 def test_doctor_boundary_has_no_cli_compatibility_import() -> None:

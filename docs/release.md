@@ -56,19 +56,20 @@ environment. That smoke check verifies package version metadata, the PEP 561
 `py.typed` marker, console entry points, and `test-data-agent doctor
 --skip-smoke` before release attestations are created.
 
-## RC5 To Stable Promotion
+## RC6 To Stable Promotion
 
-The accepted RC5 baseline is the exact commit named by the annotated
-`v1.0.0rc5` tag after the public-package, documentation, container,
+The active RC6 baseline is the exact commit named by the annotated
+`v1.0.0rc6` tag after the public-package, documentation, container,
 attestation, signature, integration, invocation-hardening, and
-clean-environment acceptance checks have all passed. Record the tag commit and
-acceptance evidence before opening the stable release pull request.
+clean-environment acceptance checks have all passed. RC5 remains historical
+release evidence and is superseded for stable promotion. Record the RC6 tag
+commit and acceptance evidence before opening the stable release pull request.
 
 Review the stable tree directly against that immutable baseline:
 
 ```bash
-git diff --name-status v1.0.0rc5 HEAD
-git diff v1.0.0rc5 HEAD
+git diff --name-status v1.0.0rc6 HEAD
+git diff v1.0.0rc6 HEAD
 ```
 
 The stable promotion diff may contain only these reviewed release changes:
@@ -82,11 +83,11 @@ The stable promotion diff may contain only these reviewed release changes:
   and links, and do not introduce a new behavior claim; and
 - release-facing version references, release evidence, roadmap status, and
   OpenSpec completion or archive metadata. These documentation files may
-  describe only behavior already accepted in RC5.
+  describe only behavior already accepted in RC6.
 
 File membership alone is not approval: every changed hunk must match one of
 those categories. Any executable production, test, schema, fixture,
-dependency, build, workflow, or container change means RC5 is not the accepted
+dependency, build, workflow, or container change means RC6 is not the accepted
 stable source tree. Stop the promotion, make the change in a newly numbered
 release candidate, and complete that candidate's acceptance before trying
 stable promotion again.
