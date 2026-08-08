@@ -42,7 +42,6 @@ Invalid environment values fail closed.
 | `TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE` | Alternative to key value | Path to a bounded base64 secret file |
 | `TEST_DATA_AGENT_AUDIT_ACTOR` | Optional | Stable non-sensitive worker or deployment label |
 | `TEST_DATA_AGENT_AUDIT_MAX_BYTES` | Optional | Audit log size limit; defaults to 64 MiB |
-| `TRINO_ENABLE_SAFE_SELECT` | Optional | Exposes separately trusted, row-returning `run_safe_select`; disabled by default and not covered by the source-literal-free guarantee |
 
 When unset, the generator server uses the current working directory. For shared
 or production-like use, always set a dedicated narrow workspace.
@@ -50,6 +49,15 @@ or production-like use, always set a dedicated narrow workspace.
 Configure exactly one of `TEST_DATA_AGENT_AUDIT_HMAC_KEY` and
 `TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE`. Secret files must be regular,
 non-linked, at most 4096 bytes, and not group- or world-writable.
+
+## Trino MCP
+
+The default aggregate-only tools are source-literal-free. The explicit opt-in
+row-returning tools are configured separately:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `TRINO_ENABLE_SAFE_SELECT` | `false` | Enables `run_safe_select`; its bounded, masked rows may contain allowed source values and are outside the source-literal-free guarantee |
 
 ## Trino Connection
 

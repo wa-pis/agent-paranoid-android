@@ -84,8 +84,9 @@
 - [x] Update MCP examples.
 - [x] Update MCP how-to.
 - [x] Update AI integration.
-- [ ] Update configuration,
-  application-boundary references, diagrams, and canonical OpenSpec wording.
+- [x] Update configuration.
+- [ ] Update application-boundary references, diagrams, and canonical OpenSpec
+  wording.
 - [ ] Use the terms `default aggregate-only tools` and `explicit opt-in
   row-returning tools` consistently. Narrow all server-wide claims that imply
   every MCP response is source-free.
