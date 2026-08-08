@@ -54,23 +54,26 @@ class _RequestBudgetRegistry:
     __slots__ = ("_budgets",)
 
     def __init__(self) -> None:
-        self._budgets: dict[Any, QueryWorkBudget] = {}
+        self._budgets: dict[bytes, QueryWorkBudget] = {}
 
     def register_incoming_request(self, session_message: Any) -> None:
         import mcp.types as types
 
         root = session_message.message.root
         if not isinstance(root, types.JSONRPCRequest):
+            if hasattr(root, "id"):
+                raise ValueError("JSON-RPC request ID must be a string or integer")
             return
         _validate_jsonrpc_request_id(root.id)
-        if root.id in self._budgets:
+        request_key = _jsonrpc_request_id_key(root.id)
+        if request_key in self._budgets:
             raise DuplicateActiveRequestIdError(
                 "JSON-RPC request ID is already active"
             )
         budget = getattr(session_message.metadata, "request_context", None)
         if not isinstance(budget, QueryWorkBudget):
             raise TypeError("MCP request context must be a QueryWorkBudget")
-        self._budgets[root.id] = budget
+        self._budgets[request_key] = budget
 
     def resolve_outgoing(self, session_message: Any) -> QueryWorkBudget | None:
         import mcp.types as types
@@ -78,7 +81,7 @@ class _RequestBudgetRegistry:
         root = session_message.message.root
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
             try:
-                return self._budgets[root.id]
+                return self._budgets[_jsonrpc_request_id_key(root.id)]
             except KeyError as exc:
                 raise RuntimeError(
                     "MCP response has no registered request budget"
@@ -91,22 +94,29 @@ class _RequestBudgetRegistry:
         )
         if related_request_id is None:
             return None
-        return self._budgets.get(related_request_id)
+        return self._budgets.get(_jsonrpc_request_id_key(related_request_id))
 
     def complete_outgoing(self, session_message: Any) -> None:
         import mcp.types as types
 
         root = session_message.message.root
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
-            self._budgets.pop(root.id, None)
+            self._budgets.pop(_jsonrpc_request_id_key(root.id), None)
 
 
 def _validate_jsonrpc_request_id(request_id: Any) -> None:
+    if isinstance(request_id, bool) or not isinstance(request_id, (str, int)):
+        raise ValueError("JSON-RPC request ID must be a string or integer")
     serialized = _serialize_jsonrpc_request_id(request_id)
     if len(serialized) > _MAX_JSONRPC_REQUEST_ID_BYTES:
         raise ValueError(
             "JSON-RPC request ID exceeds the 256-byte serialized limit"
         )
+
+
+def _jsonrpc_request_id_key(request_id: Any) -> bytes:
+    _validate_jsonrpc_request_id(request_id)
+    return _serialize_jsonrpc_request_id(request_id)
 
 
 def _serialize_jsonrpc_request_id(request_id: Any) -> bytes:
@@ -205,6 +215,14 @@ def _bounded_session_message(
 ) -> Any:
     """Attach a request budget only after charging bytes and before parsing."""
     request_context = request_context_factory(len(raw_payload))
+
+    raw_message = json.loads(raw_payload)
+    if (
+        isinstance(raw_message, dict)
+        and "method" in raw_message
+        and "id" in raw_message
+    ):
+        _validate_jsonrpc_request_id(raw_message["id"])
 
     import mcp.types as types
     from mcp.shared.message import ServerMessageMetadata, SessionMessage

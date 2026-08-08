@@ -79,6 +79,8 @@ serialized JSON-RPC shape that the production MCP transport writes, including
 the request ID, envelope fields, keys, escaping, dictionaries, nested metadata,
 error objects, and any transport framing bytes. The request ID has an explicit
 size cap so a bounded error cannot be expanded by attacker-controlled IDs. A
+request enters the active registry only with a string or integer ID, keyed by
+its exact serialized representation so different wire types cannot alias. A
 normal response must not be materialized in full if its measured size already
 exceeds the transport budget; use bounded incremental construction or a
 conservative preflight estimate followed by final serialization verification at
