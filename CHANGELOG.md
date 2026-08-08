@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Add bounded typed OpenAI advisor settings for model, reasoning effort,
   input bytes, output tokens, timeout, retries, and optional service tier.
+- Add bounded in-memory OpenAI advisor run metadata for settings, sizes,
+  latency, status, provider-reported retries, and token usage.
 
 ### Security
 

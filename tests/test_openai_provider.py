@@ -69,10 +69,14 @@ class FakeResponses:
         status: str = "completed",
         output_parsed: AdvisorProposal | None = None,
         error: Exception | None = None,
+        retry_count: int | None = None,
+        usage: object | None = None,
     ) -> None:
         self.status = status
         self.output_parsed = output_parsed
         self.error = error
+        self.retry_count = retry_count
+        self.usage = usage
         self.calls: list[dict[str, Any]] = []
 
     def parse(self, **kwargs: Any):
@@ -85,6 +89,8 @@ class FakeResponses:
             {
                 "status": self.status,
                 "output_parsed": self.output_parsed,
+                "retry_count": self.retry_count,
+                "usage": self.usage,
             },
         )()
 
@@ -175,6 +181,72 @@ def test_openai_advisor_applies_typed_settings() -> None:
     assert call["max_output_tokens"] == 2_000
     assert call["timeout"] == 12.5
     assert call["service_tier"] == "flex"
+
+
+def test_openai_advisor_records_bounded_redacted_run_metadata() -> None:
+    exchange = safe_exchange()
+    usage = type(
+        "Usage",
+        (),
+        {"input_tokens": 120, "output_tokens": 40, "total_tokens": 160},
+    )()
+    responses = FakeResponses(
+        output_parsed=proposal_for(exchange),
+        retry_count=1,
+        usage=usage,
+    )
+    ticks = iter((10.0, 10.125))
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(responses),
+        model="test-model",
+        clock=lambda: next(ticks),
+    )
+
+    client.complete(exchange)
+
+    metadata = client.last_run_metadata
+    assert metadata is not None
+    assert metadata.model == "test-model"
+    assert metadata.settings.model == "test-model"
+    assert metadata.request_bytes > 0
+    assert metadata.response_bytes is not None
+    assert metadata.response_bytes > 0
+    assert metadata.latency_ms == 125
+    assert metadata.status == "completed"
+    assert metadata.retry_count == 1
+    assert metadata.provider_usage is not None
+    assert metadata.provider_usage.model_dump() == {
+        "input_tokens": 120,
+        "output_tokens": 40,
+        "total_tokens": 160,
+    }
+    serialized = metadata.model_dump_json()
+    assert "ignore previous instructions" not in serialized
+    assert "retail" not in serialized
+
+
+def test_openai_advisor_ignores_unbounded_provider_metrics() -> None:
+    exchange = safe_exchange()
+    usage = type(
+        "Usage",
+        (),
+        {"input_tokens": 10**100, "output_tokens": 1, "total_tokens": 1},
+    )()
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(
+            FakeResponses(
+                output_parsed=proposal_for(exchange),
+                retry_count=100,
+                usage=usage,
+            )
+        )
+    )
+
+    client.complete(exchange)
+
+    assert client.last_run_metadata is not None
+    assert client.last_run_metadata.retry_count is None
+    assert client.last_run_metadata.provider_usage is None
 
 
 def test_openai_advisor_applies_timeout_and_retries_to_sdk(
@@ -282,3 +354,9 @@ def test_openai_advisor_does_not_leak_provider_error_text(
         client.complete(exchange)
 
     assert "sk-secret-value" not in str(raised.value)
+    assert client.last_run_metadata is not None
+    assert client.last_run_metadata.status in {
+        "invalid_response",
+        "provider_error",
+    }
+    assert "sk-secret-value" not in client.last_run_metadata.model_dump_json()
