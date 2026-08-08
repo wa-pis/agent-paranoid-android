@@ -147,6 +147,9 @@
   timeout/error rates, retry behavior, tokens, validity, safety, and cost.
   The current evidence is an RC5 smoke benchmark with two profiles and one
   call per preset/profile.
+  - [x] Prepare a synthetic-only runner that deterministically covers five
+    profile shapes and emits only aggregate acceptance metrics.
+  - [ ] Execute 20 live runs per preset and attach the aggregate evidence.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.

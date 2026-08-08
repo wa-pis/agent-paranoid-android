@@ -658,6 +658,8 @@ Scope:
 - [ ] Run the RC5 acceptance advisor benchmark with at least 20 runs per
   preset and at least five synthetic profile shapes, including p50/p95,
   timeout/error, retry, token, validity, safety, and cost measurements.
+  The synthetic-only five-shape runner is prepared; live execution remains
+  gated on explicit cost approval and valid provider credentials.
 - [x] Complete an independent security review of RC5 sanitization, request-ID
   lifecycle, and transport budget enforcement before RC5 acceptance. Evidence:
   [RC5 security review](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/security-review-evidence.md).
