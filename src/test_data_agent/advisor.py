@@ -285,17 +285,12 @@ def _restore_generated_placeholders(
             categories = field.distribution.get("categories", [])
             previous_categories = previous_field.distribution.get("categories", [])
             baseline_categories = baseline_field.distribution.get("categories", [])
-            category_sets = zip(
-                categories,
-                previous_categories,
-                baseline_categories,
-            )
+            category_sets = zip(categories, previous_categories)
             for category_index, category_set in enumerate(category_sets):
-                category, previous_category, baseline_category = category_set
+                category, previous_category = category_set
                 if (
                     not isinstance(category, dict)
                     or not isinstance(previous_category, dict)
-                    or not isinstance(baseline_category, dict)
                 ):
                     continue
                 value = category.get("value")
@@ -304,15 +299,19 @@ def _restore_generated_placeholders(
                     continue
                 placeholder = previous_category.get("value")
                 if (
-                    placeholder == baseline_category.get("value")
-                    and _placeholder_matches_position(
+                    _placeholder_matches_position(
                         placeholder,
                         entity_index,
                         field_index,
                         category_index,
                     )
                 ):
-                    baseline_category["value"] = value
+                    for baseline_category in baseline_categories:
+                        if (
+                            isinstance(baseline_category, dict)
+                            and baseline_category.get("value") == placeholder
+                        ):
+                            baseline_category["value"] = value
 
 
 def _placeholder_matches_position(
@@ -332,7 +331,7 @@ def _sanitize_rare_profile_values(
     profile: DatasetProfile,
     spec: DatasetSpec,
 ) -> tuple[DatasetProfile, DatasetSpec]:
-    replacements: dict[tuple[str, str, int], tuple[str, str]] = {}
+    replacements: dict[tuple[str, str, str], str] = {}
     original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
     used_placeholders: set[str] = set()
     for entity_index, entity in enumerate(profile.entities):
@@ -347,6 +346,9 @@ def _sanitize_rare_profile_values(
                 count = category.get("count", 0)
                 if not isinstance(value, str) or float(count) > 1:
                     continue
+                replacement_key = (entity.name, field.name, value)
+                if replacement_key in replacements:
+                    continue
                 placeholder = (
                     f"__apa_rare_e{entity_index}_f{field_index}_c{category_index}__"
                 )
@@ -357,10 +359,7 @@ def _sanitize_rare_profile_values(
                         f"e{entity_index}_f{field_index}_c{category_index}_{suffix}__"
                     )
                     suffix += 1
-                replacements[(entity.name, field.name, category_index)] = (
-                    value,
-                    placeholder,
-                )
+                replacements[replacement_key] = placeholder
                 used_placeholders.add(placeholder)
 
     safe_profile = profile.model_copy(deep=True)
@@ -376,7 +375,7 @@ def _sanitize_rare_profile_values(
 
 def _replace_rare_category_values(
     dataset: DatasetProfile | DatasetSpec,
-    replacements: dict[tuple[str, str, int], tuple[str, str]],
+    replacements: dict[tuple[str, str, str], str],
 ) -> None:
     for entity in dataset.entities:
         for field in entity.fields:
@@ -386,13 +385,15 @@ def _replace_rare_category_values(
             categories = distribution.get("categories")
             if not isinstance(categories, list):
                 continue
-            for category_index, category in enumerate(categories):
+            for category in categories:
                 if not isinstance(category, dict):
                     continue
                 value = category.get("value")
-                replacement = replacements.get((entity.name, field.name, category_index))
-                if replacement is not None and value == replacement[0]:
-                    category["value"] = replacement[1]
+                if not isinstance(value, str):
+                    continue
+                replacement = replacements.get((entity.name, field.name, value))
+                if replacement is not None:
+                    category["value"] = replacement
 
 
 def _categorical_string_values(
