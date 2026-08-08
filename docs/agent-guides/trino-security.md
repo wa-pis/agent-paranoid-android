@@ -5,13 +5,13 @@ budgets, or transport changes.
 
 ## Tool surface
 
-Default profiling and generator tools may return schema metadata, aggregates,
-distributions, counts, validation status, manifest context, and masked values.
-They must not return source rows.
+Default generator and default aggregate-only Trino tools may return schema
+metadata, aggregates, distributions, counts, validation status, manifest
+context, and masked values. They must not return source rows.
 
-`run_safe_select` or another explicit row-returning capability is a separate
-opt-in surface. Keep it bounded, allowlisted, and masked according to its
-contract. Do not describe the whole MCP server as source-free while such a
+Explicit opt-in row-returning tools, including `run_safe_select`, are a separate
+surface. Keep them bounded, allowlisted, and masked according to their
+contracts. Do not describe the whole MCP server as source-free while such a
 capability exists, and never use its results as generated output.
 
 Allowed operations are limited to:

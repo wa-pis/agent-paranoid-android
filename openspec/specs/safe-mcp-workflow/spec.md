@@ -90,7 +90,7 @@ granting the planning client raw-SQL access.
   `reviewed_spec_sha256`
 - **AND** successful approval returns receipt and artifact metadata, not rows
 
-#### Scenario: Default Trino MCP surface is inspected
+#### Scenario: Default aggregate-only Trino surface is inspected
 
 - **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false
 - **WHEN** the Trino MCP server registers its tools
@@ -222,7 +222,7 @@ aggregate profiling. The explicit opt-in row-returning tools, including
 - **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false
 - **WHEN** the Trino MCP server registers its tools
 - **THEN** fixed allowlisted metadata and aggregate profiling tools are exposed
-- **AND** the generic `run_safe_select` tool is not exposed
+- **AND** the explicit opt-in row-returning tool `run_safe_select` is not exposed
 
 ### Requirement: External Trino Execution Is Read-Only And Validated
 
@@ -255,7 +255,7 @@ cells.
 
 - **GIVEN** a source fixture whose every column contains a distinct literal,
   including non-PII-looking identifiers, statuses, dates, and free text
-- **WHEN** a default Trino MCP profiling tool is invoked
+- **WHEN** a default aggregate-only Trino tool is invoked
 - **THEN** no source literal is present in the response, error, or audit payload
 
 ### Requirement: Default Toolset Has No Row-Sampling Diagnostic

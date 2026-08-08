@@ -5,19 +5,19 @@ and where each responsibility lives in the codebase.
 
 ## Objective
 
-An AI client should be able to inspect a source safely, create a reviewable
-generation contract, generate deterministic synthetic data, validate it, and
-export it without receiving production rows or gaining unrestricted filesystem
-or database access.
+The default review-first AI workflow should inspect a source safely, create a
+reviewable generation contract, generate deterministic synthetic data,
+validate it, and export it without receiving production rows or gaining
+unrestricted filesystem or database access.
 
 The implementation keeps planning and orchestration in the AI layer while all
 generation and validation decisions remain deterministic Python code.
 
-The generic Trino `run_safe_select` tool is intentionally narrower than an
-arbitrary read-only SQL client. It requires a literal bounded `LIMIT`, rejects
-unrestricted projections and likely sensitive fields, and also rejects joins,
-CTEs, subqueries, ordering, table functions, and `UNNEST`. Dedicated aggregate
-profiling tools should be used for expensive multi-table analysis.
+The explicit opt-in row-returning tool `run_safe_select` is intentionally
+narrower than an arbitrary read-only SQL client. It requires a literal bounded
+`LIMIT`, rejects unrestricted projections and likely sensitive fields, and also
+rejects joins, CTEs, subqueries, ordering, table functions, and `UNNEST`.
+Default aggregate-only tools should be used for profiling.
 
 ## Why Two MCP Servers
 
@@ -258,8 +258,9 @@ CSV, JSON, or Parquet format.
 - One MCP server with both database credentials and broad filesystem access.
 - Arbitrary unrestricted SQL tools.
 - Returning raw or generated datasets directly in MCP responses.
-- Giving the planning client `run_safe_select`; raw-SQL access is opt-in and
-  not needed by `profile_table_safe` -> `plan_trino_dataset`.
+- Giving the planning client the explicit opt-in row-returning tool
+  `run_safe_select`; it is not needed by `profile_table_safe` ->
+  `plan_trino_dataset`.
 - Exporting or converting arbitrary row files.
 - Building output by copying, shuffling, or duplicating source rows.
 - Treating free-form LLM reasoning as validation.
