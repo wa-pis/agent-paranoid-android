@@ -34,29 +34,33 @@ no service-tier override.
 
 ## RC5 acceptance gate
 
-This is a two-profile smoke benchmark with one call per preset/profile. It is
-enough to select the initial RC5 default, but it does not close the RC5
-acceptance gate. Before publishing the RC5 release candidate, repeat each
-preset for at least 20 runs (preferably 25) across at least five synthetic
-profiles, including narrow, wide, multi-table, nullable-heavy, and
-constraint-heavy shapes. Record p50 and p95 latency, validity and safety
-failures, timeouts/errors, token usage, cost, and the effect of zero retries
-versus the bounded retry preset. Keep all fixtures synthetic and retain
-aggregate results only.
-
-The acceptance runner is prepared with those five fixed synthetic shapes and
-requires an explicit bounded 5-25 runs per preset. Acceptance uses 20 runs per
-preset (60 provider calls total). Latency percentiles use the deterministic
-nearest-rank method across all attempts, including failed attempts:
+The live acceptance benchmark executed against commit
+[`2067dd1`](https://github.com/wa-pis/agent-paranoid-android/commit/2067dd11e77fd1428833c2e9de2b15ae8ff15908)
+after explicit cost approval. It used the five fixed synthetic shapes
+`narrow`, `wide`, `multi_table`, `nullable_heavy`, and `constraint_heavy`, with
+20 runs per preset and 60 provider calls total. No source rows, raw values,
+credentials, or production metadata were sent or retained.
 
 ```bash
-uv run --extra openai python scripts/benchmark_openai_advisor_presets.py \
+.venv/bin/python scripts/benchmark_openai_advisor_presets.py \
   --runs-per-preset 20 \
   --input-usd-per-million 5 --output-usd-per-million 30
 ```
 
-Do not treat this command as execution evidence. The live acceptance run and
-its aggregate output remain pending explicit cost approval and valid provider
-credentials. Scaling the six-call smoke total of `$0.279090` to 60 calls gives
-an approval estimate of about `$2.79`; allow headroom to `$4` for profile and
-response variance.
+Latency percentiles use the deterministic nearest-rank method across all
+attempts, including failed attempts. Provider usage was present for every
+response. The response object did not expose retry counts, so retry reporting
+remained unavailable even though the configured caps were enforced.
+
+| Preset | Reasoning | Retry cap | Valid | Safety preserved | Errors | Timeouts | Mean | p50 | p95 | Input tokens | Output tokens | Cost |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `fast` | `none` | 0 | 20/20 | 20/20 | 0 | 0 | 8,640 ms | 7,688 ms | 13,079 ms | 59,340 | 15,228 | $0.753540 |
+| `normal` | `low` | 2 | 20/20 | 20/20 | 0 | 0 | 9,126 ms | 7,701 ms | 15,714 ms | 59,340 | 15,438 | $0.759840 |
+| `quality` | `high` | 2 | 20/20 | 20/20 | 0 | 0 | 9,619 ms | 8,427 ms | 14,901 ms | 59,340 | 17,024 | $0.807420 |
+
+All 60 responses completed, validated, and preserved safety, with zero errors
+and zero timeouts. Total usage was 178,020 input tokens and 47,690 output
+tokens, costing `$2.320800`. Because no call failed and the provider exposed no
+retry count, the run showed no observable retry difference between the
+zero-retry and bounded-retry presets. The acceptance gate passes and continues
+to support `fast` as the lowest-latency, lowest-token, lowest-cost default.

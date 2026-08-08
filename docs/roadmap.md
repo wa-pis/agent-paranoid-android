@@ -655,11 +655,12 @@ Scope:
   configurable, and visible in non-sensitive run metadata. Select
   fast/normal/quality defaults only after measuring proposal validity, latency,
   tokens, and cost on representative synthetic profiles.
-- [ ] Run the RC5 acceptance advisor benchmark with at least 20 runs per
+- [x] Run the RC5 acceptance advisor benchmark with at least 20 runs per
   preset and at least five synthetic profile shapes, including p50/p95,
   timeout/error, retry, token, validity, safety, and cost measurements.
-  The synthetic-only five-shape runner is prepared; live execution remains
-  gated on explicit cost approval and valid provider credentials.
+  Evidence: the [advisor benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
+  records 60/60 valid and safety-preserving responses, zero errors/timeouts,
+  and `$2.320800` total cost across all three presets.
 - [x] Complete an independent security review of RC5 sanitization, request-ID
   lifecycle, and transport budget enforcement before RC5 acceptance. Evidence:
   [RC5 security review](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/security-review-evidence.md).

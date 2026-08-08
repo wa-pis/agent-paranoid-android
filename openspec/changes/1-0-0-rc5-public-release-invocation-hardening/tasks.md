@@ -142,14 +142,15 @@
   - [x] Select and document the benchmark-backed default.
     Evidence: `fast` retained 100% validity and safety with the lowest measured
     latency and cost, so its bounded settings are now the constructor defaults.
-- [ ] Run the RC5 acceptance operational benchmark with at least 20 runs per
+- [x] Run the RC5 acceptance operational benchmark with at least 20 runs per
   preset and at least five synthetic profile shapes; report p50/p95 latency,
   timeout/error rates, retry behavior, tokens, validity, safety, and cost.
-  The current evidence is an RC5 smoke benchmark with two profiles and one
-  call per preset/profile.
+  Evidence: the [advisor preset benchmark](advisor-benchmark-evidence.md)
+  records 60/60 valid and safety-preserving responses across five shapes, with
+  zero errors/timeouts and `$2.320800` total cost.
   - [x] Prepare a synthetic-only runner that deterministically covers five
     profile shapes and emits only aggregate acceptance metrics.
-  - [ ] Execute 20 live runs per preset and attach the aggregate evidence.
+  - [x] Execute 20 live runs per preset and attach the aggregate evidence.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
   `AdvisorRequest.model_dump_json()`.
