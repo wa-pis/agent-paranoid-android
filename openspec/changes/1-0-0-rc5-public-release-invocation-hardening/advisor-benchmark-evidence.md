@@ -30,3 +30,14 @@ All candidates achieved 100% proposal validity and safety preservation.
 bounded settings as the default: `gpt-5.6`, reasoning `none`, 4 MiB complete
 request budget, 4,096 output tokens, 15-second timeout, zero SDK retries, and
 no service-tier override.
+
+## Stable-release follow-up
+
+This is a two-profile smoke benchmark with one call per preset/profile. It is
+enough to select the initial RC5 default, but it is not the stable-release
+operational benchmark. Before `1.0.0`, repeat each preset for at least 20 runs
+(preferably 25) across at least five synthetic profiles, including narrow,
+wide, multi-table, nullable-heavy, and constraint-heavy shapes. Record p50 and
+p95 latency, validity and safety failures, timeouts/errors, token usage, cost,
+and the effect of zero retries versus the bounded retry preset. Keep all
+fixtures synthetic and retain aggregate results only.

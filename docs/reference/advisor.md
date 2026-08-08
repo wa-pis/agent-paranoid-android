@@ -117,12 +117,16 @@ after the
 [synthetic-profile benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
 recorded equal validity and safety with the lowest latency and cost.
 
-After each provider call, `OpenAIAdvisorClient.last_run_metadata` exposes a
-bounded in-memory record with the model, settings, canonical request and parsed
-response sizes, elapsed milliseconds, status, provider-reported retry count,
-and token usage. Missing provider fields remain `None`. The record contains no
-prompts, request values, response values, rows, credentials, or exception text,
-and the adapter does not persist it automatically.
+After each provider attempt, including a preflight rejection,
+`OpenAIAdvisorClient.last_run_metadata` exposes a bounded in-memory record with
+the model, settings, canonical request and parsed response sizes, elapsed
+milliseconds, status, provider-reported retry count, and token usage. Missing
+provider fields remain `None`; a preflight rejection has status
+`preflight_rejected`. The record contains no prompts, request values, response
+values, rows, credentials, or exception text, and the adapter does not persist
+it automatically. This compatibility property is per client, not per call;
+do not share one client between concurrent calls when call-level metadata is
+required.
 
 The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
 a secret manager or private environment configuration; never write it into an

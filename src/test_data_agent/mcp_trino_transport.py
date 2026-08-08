@@ -44,6 +44,10 @@ class _OversizedRawPayload:
     attempted_bytes: int
 
 
+class DuplicateActiveRequestIdError(ValueError):
+    """Raised when a second request reuses an active JSON-RPC ID."""
+
+
 class _RequestBudgetRegistry:
     """Associate response messages with the budget of their input request."""
 
@@ -59,6 +63,10 @@ class _RequestBudgetRegistry:
         if not isinstance(root, types.JSONRPCRequest):
             return
         _validate_jsonrpc_request_id(root.id)
+        if root.id in self._budgets:
+            raise DuplicateActiveRequestIdError(
+                "JSON-RPC request ID is already active"
+            )
         budget = getattr(session_message.metadata, "request_context", None)
         if not isinstance(budget, QueryWorkBudget):
             raise TypeError("MCP request context must be a QueryWorkBudget")
@@ -126,25 +134,27 @@ async def _write_bounded_session_message(
     budget_registry: _RequestBudgetRegistry,
 ) -> None:
     """Serialize, charge, and write one production-framed MCP message."""
-    payload = session_message.message.model_dump_json(
-        by_alias=True,
-        exclude_none=True,
-    ).encode("utf-8") + b"\n"
-    budget = budget_registry.resolve_outgoing(session_message)
-    if budget is not None:
-        try:
-            budget.consume_transport_response_bytes(len(payload))
-        except QueryWorkBudgetExceeded:
-            import mcp.types as types
+    try:
+        payload = session_message.message.model_dump_json(
+            by_alias=True,
+            exclude_none=True,
+        ).encode("utf-8") + b"\n"
+        budget = budget_registry.resolve_outgoing(session_message)
+        if budget is not None:
+            try:
+                budget.consume_transport_response_bytes(len(payload))
+            except QueryWorkBudgetExceeded:
+                import mcp.types as types
 
-            root = session_message.message.root
-            if not isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
-                raise
-            payload = _transport_overflow_error_payload(root.id)
-            budget.consume_transport_response_bytes(len(payload))
-    await stdout.write(payload)
-    await stdout.flush()
-    budget_registry.complete_outgoing(session_message)
+                root = session_message.message.root
+                if not isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
+                    raise
+                payload = _transport_overflow_error_payload(root.id)
+                budget.consume_terminal_error_bytes(len(payload))
+        await stdout.write(payload)
+        await stdout.flush()
+    finally:
+        budget_registry.complete_outgoing(session_message)
 
 
 async def _bounded_raw_payloads(

@@ -37,6 +37,9 @@ or access to secrets, credentials, tokens, or raw PII.
   uncertain masking decisions.
 - Keep source/database byte budgets separate from the final serialized
   transport response budget.
+- Reserve the fixed bounded transport-error allowance before charging normal
+  responses; the writer must clean the request registry even when writing,
+  flushing, fallback serialization, or cancellation fails.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
 
 Keep the Trino dependency optional for workflows that do not use Trino. Mock
