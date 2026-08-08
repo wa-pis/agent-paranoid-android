@@ -15,7 +15,10 @@ from test_data_agent.advisor import (
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
-from test_data_agent.providers.openai import OpenAIAdvisorClient
+from test_data_agent.providers.openai import (
+    OpenAIAdvisorClient,
+    OpenAIAdvisorSettings,
+)
 
 
 def safe_exchange():
@@ -109,6 +112,8 @@ def test_openai_advisor_keeps_trusted_and_untrusted_content_separate() -> None:
     assert call["model"] == "test-model"
     assert call["text_format"] is AdvisorProposal
     assert call["reasoning"] == {"effort": "low"}
+    assert call["max_output_tokens"] == 16_384
+    assert call["timeout"] == 30.0
     assert call["store"] is False
     assert "ignore previous instructions" not in developer_content
     assert "ignore previous instructions" in user_content
@@ -126,6 +131,86 @@ def test_openai_advisor_rejects_oversized_request_before_network() -> None:
         client.complete(exchange)
 
     assert responses.calls == []
+
+
+def test_openai_advisor_applies_typed_settings() -> None:
+    exchange = safe_exchange()
+    responses = FakeResponses(output_parsed=proposal_for(exchange))
+    settings = OpenAIAdvisorSettings(
+        model="typed-model",
+        reasoning_effort="medium",
+        max_input_bytes=1_000_000,
+        max_output_tokens=2_000,
+        timeout_seconds=12.5,
+        max_retries=1,
+        service_tier="flex",
+    )
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(responses),
+        settings=settings,
+    )
+
+    client.complete(exchange)
+
+    call = responses.calls[0]
+    assert call["model"] == "typed-model"
+    assert call["reasoning"] == {"effort": "medium"}
+    assert call["max_output_tokens"] == 2_000
+    assert call["timeout"] == 12.5
+    assert call["service_tier"] == "flex"
+
+
+def test_openai_advisor_applies_timeout_and_retries_to_sdk(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_with: dict[str, Any] = {}
+
+    def build_client(**kwargs: Any) -> FakeOpenAI:
+        created_with.update(kwargs)
+        return FakeOpenAI(FakeResponses())
+
+    monkeypatch.setattr(
+        "test_data_agent.providers.openai.OpenAI",
+        build_client,
+    )
+
+    OpenAIAdvisorClient(
+        settings=OpenAIAdvisorSettings(
+            timeout_seconds=8.0,
+            max_retries=3,
+        )
+    )
+
+    assert created_with == {"timeout": 8.0, "max_retries": 3}
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("model", " "),
+        ("max_input_bytes", 0),
+        ("max_output_tokens", 0),
+        ("timeout_seconds", 0),
+        ("max_retries", 6),
+        ("reasoning_effort", "unbounded"),
+        ("service_tier", "unknown"),
+    ],
+)
+def test_openai_advisor_settings_reject_unbounded_values(
+    field: str,
+    value: Any,
+) -> None:
+    with pytest.raises(ValidationError):
+        OpenAIAdvisorSettings.model_validate({field: value})
+
+
+def test_openai_advisor_rejects_settings_with_legacy_overrides() -> None:
+    with pytest.raises(ValueError, match="legacy overrides"):
+        OpenAIAdvisorClient(
+            client=FakeOpenAI(FakeResponses()),
+            settings=OpenAIAdvisorSettings(),
+            model="legacy-model",
+        )
 
 
 @pytest.mark.parametrize(

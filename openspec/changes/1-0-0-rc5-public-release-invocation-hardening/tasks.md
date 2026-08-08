@@ -113,9 +113,11 @@
 
 ## P1 — Advisor performance and relationship assistance
 
-- [ ] Add typed advisor settings for model, reasoning effort, complete prompt
+- [x] Add typed advisor settings for model, reasoning effort, complete prompt
   bytes/tokens, output tokens, timeout, retries, and optional service tier.
   Keep provider credentials and prompts out of persisted diagnostics.
+  Evidence: `test_openai_advisor_applies_typed_settings`, SDK timeout/retry
+  wiring, and bounded-settings validation tests.
 - [ ] Add fast/normal/quality presets and benchmark them on representative
   synthetic profiles for proposal validity, safety-preservation rate, latency,
   input/output tokens, retries, and cost before selecting defaults.

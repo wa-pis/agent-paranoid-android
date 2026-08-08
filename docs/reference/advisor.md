@@ -75,10 +75,27 @@ incomplete or unparsed responses.
 
 ```python
 from test_data_agent import ExchangeDatasetAdvisor
-from test_data_agent.providers.openai import OpenAIAdvisorClient
+from test_data_agent.providers.openai import (
+    OpenAIAdvisorClient,
+    OpenAIAdvisorSettings,
+)
 
-advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(model="gpt-5.6"))
+settings = OpenAIAdvisorSettings(
+    model="gpt-5.6",
+    reasoning_effort="low",
+    max_input_bytes=4 * 1024 * 1024,
+    max_output_tokens=16_384,
+    timeout_seconds=30,
+    max_retries=2,
+)
+advisor = ExchangeDatasetAdvisor(OpenAIAdvisorClient(settings=settings))
 ```
+
+The typed defaults are model `gpt-5.6`, low reasoning effort, a 4 MiB input
+budget, 16,384 output tokens, a 30-second timeout, two SDK retries, and no
+service-tier override. Settings are bounded and kept out of advisor review
+artifacts. The optional service tier accepts `auto`, `default`, `flex`, or
+`priority`.
 
 The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
 a secret manager or private environment configuration; never write it into an

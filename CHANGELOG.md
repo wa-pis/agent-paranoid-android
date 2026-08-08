@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add bounded typed OpenAI advisor settings for model, reasoning effort,
+  input bytes, output tokens, timeout, retries, and optional service tier.
+
 ### Security
 
 - Bound JSON-RPC request IDs by their serialized UTF-8 size before they can be
