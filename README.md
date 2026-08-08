@@ -51,6 +51,8 @@ python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc4"
 
 The `trino` extra is required only for Trino profiling and contains the Trino
 client and safe SQL parser. Add `mcp` when using the Trino MCP server.
+The default aggregate-only tools return summaries, not source rows. The explicit opt-in row-returning tools include
+`run_safe_select`, which requires `TRINO_ENABLE_SAFE_SELECT=true`; bounded, masked rows may contain allowed source values and are not source-free, PII-free, anonymous, or privacy-safe.
 
 ## First Offline Run
 
