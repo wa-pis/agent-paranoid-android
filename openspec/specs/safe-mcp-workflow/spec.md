@@ -39,9 +39,11 @@ explicit workspace root.
 - **WHEN** a generator MCP tool resolves the path
 - **THEN** the operation is rejected
 
-### Requirement: No Dataset Rows In MCP Responses
+### Requirement: No Dataset Rows In Default MCP Responses
 
-MCP responses SHALL return summaries and artifact paths instead of dataset rows.
+Default generator and default aggregate-only Trino MCP responses SHALL return
+summaries and artifact paths instead of dataset rows. Explicit opt-in
+row-returning tools are outside this guarantee.
 
 #### Scenario: Dataset is generated through MCP
 
@@ -209,13 +211,13 @@ MCP business-rule responses SHALL remain metadata-only and bounded.
 - **AND** detailed bounded errors are written to the workspace report
 - **AND** generated rows are not returned inline
 
-### Requirement: Safe Trino Surface
+### Requirement: Default Aggregate-Only And Explicit Opt-In Trino Surfaces
 
-The default MCP surface SHALL expose fixed allowlisted metadata and aggregate
-profiling tools. The generic `run_safe_select` tool SHALL require explicit
-operator opt-in.
+The default aggregate-only tools SHALL expose fixed allowlisted metadata and
+aggregate profiling. The explicit opt-in row-returning tools, including
+`run_safe_select`, SHALL require operator opt-in.
 
-#### Scenario: Default safe Trino surface is registered
+#### Scenario: Default aggregate-only Trino surface is registered
 
 - **GIVEN** `TRINO_ENABLE_SAFE_SELECT` is unset or false
 - **WHEN** the Trino MCP server registers its tools
@@ -242,11 +244,12 @@ pass the safe SQL policy before DB-API execution.
 - **THEN** it may use the private executor
 - **AND** only masked or aggregate metadata is returned
 
-### Requirement: Default Trino MCP Responses Are Source-Literal-Free
+### Requirement: Default Aggregate-Only Responses Are Source-Literal-Free
 
-The default Trino MCP surface SHALL expose only metadata and bounded aggregate
-profiling responses. Successful responses, typed errors, and metadata-only
-audit records SHALL NOT contain literal values copied from source cells.
+The default aggregate-only tools SHALL expose only metadata and bounded
+aggregate profiling responses. Successful responses, typed errors, and
+metadata-only audit records SHALL NOT contain literal values copied from source
+cells.
 
 #### Scenario: A profile contains distinct values in every source column
 
@@ -255,33 +258,33 @@ audit records SHALL NOT contain literal values copied from source cells.
 - **WHEN** a default Trino MCP profiling tool is invoked
 - **THEN** no source literal is present in the response, error, or audit payload
 
-### Requirement: RC4 Has No Row-Sampling Diagnostic
+### Requirement: Default Toolset Has No Row-Sampling Diagnostic
 
-The RC4 public MCP and Python compatibility surfaces SHALL NOT expose
+The default public MCP and Python compatibility surfaces SHALL NOT expose
 `sample_rows_masked` or another masked-row sampling diagnostic. A future
 row-returning diagnostic SHALL require a separate OpenSpec change with an
 independent configuration flag, catalog/schema/table/column allowlists, no
 wildcard projection, strict row and column limits, metadata-only audit
 logging, and visible capability status.
 
-#### Scenario: RC4 tool surfaces are registered
+#### Scenario: Default tool surfaces are registered
 
-- **GIVEN** the RC4 Trino MCP server and its public compatibility module are
+- **GIVEN** the Trino MCP server and its public compatibility module are
   loaded
 - **WHEN** the Trino MCP server registers its tools
 - **THEN** `sample_rows_masked` is not registered or exported as a supported
-  RC4 tool
+  tool
 - **AND** `run_safe_select` is registered only when its independent explicit
   opt-in is enabled
 
-### Requirement: Opt-In Safe Select Is Not Source-Free
+### Requirement: Explicit Opt-In Row-Returning Tools Are Not Source-Free
 
-The opt-in `run_safe_select` capability SHALL remain disabled by default and
-separate from the aggregate-only toolset. Its bounded result MAY contain
-allowed non-PII source values and SHALL NOT be described as source-free,
-anonymous, PII-free, or privacy-safe solely because heuristic masking is
-applied. Its errors and metadata-only audit records SHALL NOT contain returned
-values or source literals.
+The explicit opt-in row-returning tools SHALL remain disabled by default and
+separate from the default aggregate-only tools. A bounded `run_safe_select`
+result MAY contain allowed non-PII source values and SHALL NOT be described as
+source-free, anonymous, PII-free, or privacy-safe solely because heuristic
+masking is applied. Its errors and metadata-only audit records SHALL NOT
+contain returned values or source literals.
 
 #### Scenario: Safe select is explicitly enabled
 
