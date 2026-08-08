@@ -156,7 +156,8 @@ Keep the current MVP focused on the reliable golden path:
 - Deterministic generation by explicit seed.
 - CSV, JSON, and Parquet export.
 - Validation report and generation manifest.
-- MCP responses that return summaries and artifact paths, not dataset rows.
+- Default generator and default aggregate-only Trino MCP responses that return
+  summaries and artifact paths, not dataset rows.
 
 Treat these as non-negotiable release gates rather than new feature work:
 
@@ -637,7 +638,7 @@ Scope:
 - [ ] Document every application-level limit in the configuration reference,
   including defaults, environment names, failure behavior, and whether the
   limit is per query or per invocation.
-- [ ] Normalize all MCP documentation to distinguish default generator and
+- [x] Normalize all MCP documentation to distinguish default generator and
   default aggregate-only Trino profiling responses from explicit opt-in
   row-returning capabilities. Remove server-wide claims that imply every MCP
   response is source-free.

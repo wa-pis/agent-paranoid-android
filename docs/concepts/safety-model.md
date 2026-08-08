@@ -47,10 +47,10 @@ checks. Workspace-bound MCP paths reject traversal and symlink escapes.
 
 Trino access is read-only, allowlisted, bounded by client row limits and
 server-side time and scan budgets. Unsafe query shapes and likely sensitive
-projections are rejected before execution. The default MCP tools return only
-source-literal-free metadata and aggregates. Separately enabling
-`run_safe_select` permits bounded row-shaped results that may contain allowed
-source values or values missed by heuristic masking; those rows are not
+projections are rejected before execution. The default aggregate-only tools
+return only source-literal-free metadata and aggregates. The explicit opt-in
+row-returning tool `run_safe_select` permits bounded rows that may contain
+allowed source values or values missed by heuristic masking; those rows are not
 source-free, PII-free, anonymous, or privacy-safe.
 
 ### Resource limits
