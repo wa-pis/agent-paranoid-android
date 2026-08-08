@@ -87,7 +87,7 @@
 - [x] Update configuration.
 - [x] Update application-boundary references.
 - [x] Update diagrams.
-- [ ] Update canonical OpenSpec wording.
+- [x] Update canonical OpenSpec wording.
 - [ ] Use the terms `default aggregate-only tools` and `explicit opt-in
   row-returning tools` consistently. Narrow all server-wide claims that imply
   every MCP response is source-free.
