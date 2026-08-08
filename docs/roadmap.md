@@ -208,11 +208,10 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The accepted release candidate is `1.0.0rc4`. `1.0.0rc2` completed public
-acceptance; `1.0.0rc3` added the contract-preserving application-boundary
-refactor. `1.0.0rc4` closes the privacy and first invocation-budget findings,
-but its public-index acceptance remains an explicit gate until the exact wheel
-and sdist are verifiably installable outside the repository.
+The release target is `1.0.0rc5`. `1.0.0rc2` completed public acceptance;
+`1.0.0rc3` added the contract-preserving application-boundary refactor, and
+`1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closes the remaining
+invocation, transport, and advisor-acceptance findings before stable promotion.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -627,25 +626,25 @@ Scope:
 - [ ] Publish and verify the exact `1.0.0rc5` wheel, sdist, GitHub prerelease,
   checksums, SBOM, provenance, attestations, and clean-install matrix from
   the immutable RC5 tag.
-- [ ] Split database-result and transport-response budgets. Enforce
+- [x] Split database-result and transport-response budgets. Enforce
   `database_result_bytes` incrementally while reading the cursor and
   `transport_response_bytes` after final MCP JSON serialization, including
   envelopes, keys, escaping, dictionaries, nested metadata, and other
   transport overhead. On overflow, return a small fixed error response that
   is reserved and proven to fit the transport budget.
-- [ ] Add cumulative invocation limits: `max_profiled_columns`,
+- [x] Add cumulative invocation limits: `max_profiled_columns`,
   `max_invocation_seconds`, and, if measurable, cumulative estimated scan
   bytes. Start with `100` columns, `150` statements, and `120` seconds unless
   operational benchmarks justify different defaults; do not treat per-query
   Trino session limits as a substitute.
-- [ ] Document every application-level limit in the configuration reference,
+- [x] Document every application-level limit in the configuration reference,
   including defaults, environment names, failure behavior, and whether the
   limit is per query or per invocation.
 - [x] Normalize all MCP documentation to distinguish default generator and
   default aggregate-only Trino profiling responses from explicit opt-in
   row-returning capabilities. Remove server-wide claims that imply every MCP
   response is source-free.
-- [ ] Add the [RC5 agent throughput and advisor budget
+- [x] Add the [RC5 agent throughput and advisor budget
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md):
   make local profile caching `auto` by default with an explicit `--no-cache`
   escape hatch, avoid the current two-pass CSV-folder profile where practical,
@@ -664,7 +663,7 @@ Scope:
 - [x] Complete an independent security review of RC5 sanitization, request-ID
   lifecycle, and transport budget enforcement before RC5 acceptance. Evidence:
   [RC5 security review](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/security-review-evidence.md).
-- [ ] Ensure advisor byte/token accounting covers the complete provider request,
+- [x] Ensure advisor byte/token accounting covers the complete provider request,
   not only the serialized `AdvisorRequest`; compact or partition oversized
   metadata rather than sending an unbounded multi-megabyte prompt.
 - [x] Wire the provider-neutral relationship-candidate ranking contract to the
