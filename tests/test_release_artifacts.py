@@ -111,7 +111,7 @@ def test_public_docs_disclose_ai_assisted_development() -> None:
 def test_pypi_readme_starts_with_public_installation() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc4"' in readme
+    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc5"' in readme
     assert "PyPI Trusted Publishing" in readme
     assert 'pip install -e ".[dev]"' not in readme
 
@@ -428,7 +428,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v1.0.0rc4")
+    check_release_tag("v1.0.0rc5")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")
