@@ -126,8 +126,11 @@
   `AdvisorRequest.model_dump_json()`.
   Evidence: `test_openai_advisor_budget_includes_instructions_and_schema`
   rejects before network when the application request alone would fit.
-- [ ] Record bounded non-sensitive advisor run metadata: model, settings,
+- [x] Record bounded non-sensitive advisor run metadata: model, settings,
   request/response sizes, latency, status, retry count, and provider usage.
+  Evidence: run-metadata, unbounded-provider-metric, and provider-error tests
+  verify bounded fields without prompts, source values, credentials, or
+  exception text.
 - [ ] Implement the optional relationship-candidate ranking adapter using the
   existing provider-neutral contract; keep deterministic candidate identity,
   no source rows/raw values, human review, and no direct DatasetSpec mutation.

@@ -99,6 +99,13 @@ settings, and final UTF-8 JSON serialization. Oversized requests fail before
 network access. Settings are bounded and kept out of advisor review artifacts.
 The optional service tier accepts `auto`, `default`, `flex`, or `priority`.
 
+After each provider call, `OpenAIAdvisorClient.last_run_metadata` exposes a
+bounded in-memory record with the model, settings, canonical request and parsed
+response sizes, elapsed milliseconds, status, provider-reported retry count,
+and token usage. Missing provider fields remain `None`. The record contains no
+prompts, request values, response values, rows, credentials, or exception text,
+and the adapter does not persist it automatically.
+
 The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
 a secret manager or private environment configuration; never write it into an
 agent workspace or dataset artifact.
