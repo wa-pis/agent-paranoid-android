@@ -21,6 +21,7 @@ from test_data_agent.advisor import (
     build_advisor_exchange,
     build_advisor_request,
     build_advisor_review_artifact,
+    _rebuild_advisor_request_for_profile_verification,
     validate_advisor_proposal,
     validate_relationship_discovery_proposals,
 )
@@ -220,6 +221,35 @@ def test_rare_category_placeholder_pattern_in_baseline_is_reserved() -> None:
 
     assert profile_category["value"] == "__apa_rare_e0_f2_c0_1__"
     assert request_baseline_category["value"] == "__apa_rare_e0_f2_c0__"
+
+
+def test_rare_category_sanitization_handles_reordered_baseline() -> None:
+    profile = safe_profile()
+    baseline = infer_dataset_spec(profile)
+    baseline_categories = baseline.entity("customers").field(
+        "segment"
+    ).distribution["categories"]
+    baseline_categories.reverse()
+
+    request = build_advisor_request(profile, baseline_spec=baseline)
+
+    assert request.baseline_spec.entity("customers").field(
+        "segment"
+    ).distribution["categories"][0]["value"] == "__apa_rare_e0_f2_c1__"
+    assert "business" not in request.model_dump_json()
+
+
+def test_persisted_review_restores_reordered_baseline_placeholder() -> None:
+    profile = safe_profile()
+    baseline = infer_dataset_spec(profile)
+    baseline.entity("customers").field("segment").distribution[
+        "categories"
+    ].reverse()
+    request = build_advisor_request(profile, baseline_spec=baseline)
+
+    rebuilt = _rebuild_advisor_request_for_profile_verification(profile, request)
+
+    assert rebuilt == request
 
 
 def test_rare_category_sanitization_is_deterministic() -> None:
