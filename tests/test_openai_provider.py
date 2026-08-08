@@ -9,6 +9,10 @@ from pydantic import ValidationError
 from test_data_agent.advisor import (
     AdvisorContractError,
     AdvisorProposal,
+    DiscoveryFieldReference,
+    RelationshipDiscoveryCandidate,
+    RelationshipDiscoveryEvidence,
+    RelationshipDiscoveryProposal,
     build_advisor_exchange,
     build_advisor_request,
 )
@@ -16,9 +20,12 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.providers.openai import (
+    MAX_OPENAI_RELATIONSHIP_CANDIDATES,
     OpenAIAdvisorClient,
     OpenAIAdvisorSettings,
+    OpenAIRelationshipDiscoveryAdvisor,
 )
+from test_data_agent.relationship_discovery import rank_relationship_candidates
 
 
 def safe_exchange():
@@ -62,12 +69,41 @@ def proposal_for(exchange):
     )
 
 
+def relationship_candidate() -> RelationshipDiscoveryCandidate:
+    return RelationshipDiscoveryCandidate(
+        candidate_id="a" * 64,
+        kind="foreign_key",
+        fields=[
+            DiscoveryFieldReference(entity="customers", field="customer_id"),
+            DiscoveryFieldReference(entity="orders", field="customer_id"),
+        ],
+        confidence=0.9,
+        evidence=[
+            RelationshipDiscoveryEvidence(metric="type_compatibility", value=1.0)
+        ],
+    )
+
+
+def relationship_proposal(
+    candidate: RelationshipDiscoveryCandidate,
+    *,
+    candidate_id: str | None = None,
+) -> RelationshipDiscoveryProposal:
+    return RelationshipDiscoveryProposal(
+        candidate_id=candidate_id or candidate.candidate_id,
+        kind=candidate.kind,
+        fields=candidate.fields,
+        confidence=0.8,
+        evidence=["Normalized metadata supports this candidate."],
+    )
+
+
 class FakeResponses:
     def __init__(
         self,
         *,
         status: str = "completed",
-        output_parsed: AdvisorProposal | None = None,
+        output_parsed: object | None = None,
         error: Exception | None = None,
         retry_count: int | None = None,
         usage: object | None = None,
@@ -83,12 +119,15 @@ class FakeResponses:
         self.calls.append(kwargs)
         if self.error is not None:
             raise self.error
+        output_parsed = self.output_parsed
+        if isinstance(output_parsed, dict):
+            output_parsed = kwargs["text_format"].model_validate(output_parsed)
         return type(
             "Response",
             (),
             {
                 "status": self.status,
-                "output_parsed": self.output_parsed,
+                "output_parsed": output_parsed,
                 "retry_count": self.retry_count,
                 "usage": self.usage,
             },
@@ -247,6 +286,68 @@ def test_openai_advisor_ignores_unbounded_provider_metrics() -> None:
     assert client.last_run_metadata is not None
     assert client.last_run_metadata.retry_count is None
     assert client.last_run_metadata.provider_usage is None
+
+
+def test_openai_relationship_advisor_ranks_only_supplied_candidates() -> None:
+    candidate = relationship_candidate()
+    responses = FakeResponses(
+        output_parsed={
+            "proposals": [relationship_proposal(candidate).model_dump(mode="json")]
+        }
+    )
+    client = OpenAIAdvisorClient(client=FakeOpenAI(responses), model="test-model")
+
+    proposals = rank_relationship_candidates(
+        [candidate],
+        OpenAIRelationshipDiscoveryAdvisor(client),
+    )
+
+    call = responses.calls[0]
+    developer_content = call["input"][0]["content"]
+    user_content = call["input"][1]["content"]
+    assert "never invent candidates" in developer_content
+    assert '"operation":"rank_relationship_candidates"' in user_content
+    assert '"raw_values_included":false' in user_content
+    assert proposals[0].candidate_id == candidate.candidate_id
+    assert proposals[0].review_status == "requires_human_review"
+    assert proposals[0].approved is False
+    assert proposals[0].generation_performed is False
+    assert client.last_run_metadata is not None
+    assert client.last_run_metadata.status == "completed"
+
+
+def test_openai_relationship_advisor_rejects_candidate_invention() -> None:
+    candidate = relationship_candidate()
+    responses = FakeResponses(
+        output_parsed={
+            "proposals": [
+                relationship_proposal(
+                    candidate,
+                    candidate_id="b" * 64,
+                ).model_dump(mode="json")
+            ]
+        }
+    )
+    advisor = OpenAIRelationshipDiscoveryAdvisor(
+        OpenAIAdvisorClient(client=FakeOpenAI(responses))
+    )
+
+    with pytest.raises(AdvisorContractError, match="unknown candidate"):
+        advisor.rank([candidate])
+
+
+def test_openai_relationship_advisor_bounds_candidates_before_network() -> None:
+    responses = FakeResponses()
+    advisor = OpenAIRelationshipDiscoveryAdvisor(
+        OpenAIAdvisorClient(client=FakeOpenAI(responses))
+    )
+
+    with pytest.raises(AdvisorContractError, match="candidate count"):
+        advisor.rank(
+            [relationship_candidate()] * (MAX_OPENAI_RELATIONSHIP_CANDIDATES + 1)
+        )
+
+    assert responses.calls == []
 
 
 def test_openai_advisor_applies_timeout_and_retries_to_sdk(

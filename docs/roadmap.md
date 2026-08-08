@@ -655,7 +655,7 @@ Scope:
 - [ ] Ensure advisor byte/token accounting covers the complete provider request,
   not only the serialized `AdvisorRequest`; compact or partition oversized
   metadata rather than sending an unbounded multi-megabyte prompt.
-- [ ] Wire the provider-neutral relationship-candidate ranking contract to the
+- [x] Wire the provider-neutral relationship-candidate ranking contract to the
   optional advisor integration as a separate, review-gated operation. The model
   may rank deterministic candidates and explain bounded evidence, but may not
   invent fields, receive source rows, or modify `DatasetSpec` directly.
