@@ -373,7 +373,7 @@ class OpenAIAdvisorClient:
                 response=response,
             )
             raise OpenAIAdvisorCallError(
-                f"OpenAI advisor response did not complete (status={response.status!r})",
+                "OpenAI advisor response did not complete",
                 metadata=metadata,
             )
         if not response.output_text:

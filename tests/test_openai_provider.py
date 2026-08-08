@@ -618,6 +618,17 @@ def test_openai_advisor_rejects_unusable_responses(
         client.complete(exchange)
 
 
+def test_openai_advisor_does_not_expose_incomplete_response_status() -> None:
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(FakeResponses(status="sk-secret-value"))
+    )
+
+    with pytest.raises(AdvisorContractError) as raised:
+        client.complete(safe_exchange())
+
+    assert str(raised.value) == "OpenAI advisor response did not complete"
+
+
 @pytest.mark.parametrize(
     "provider_error",
     [
