@@ -124,6 +124,9 @@
   - [x] Add explicit typed candidate presets without changing constructor
     defaults before evidence exists.
   - [ ] Run and record the synthetic-profile benchmark for all candidates.
+    - [x] Add a synthetic-only runner with explicit price inputs and redacted
+      aggregate validity, safety, latency, token, retry, and cost output.
+    - [ ] Execute the runner against the provider and attach exact evidence.
   - [ ] Select and document the benchmark-backed default.
 - [x] Make the complete provider request budget include trusted instructions,
   structured-output/schema overhead, and serialization—not only
