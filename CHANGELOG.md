@@ -25,6 +25,9 @@ All notable changes to this project are documented here.
   retaining the legacy typed `minimal` value for compatibility.
 - Select the benchmark-backed fast advisor settings as the constructor defaults:
   4,096 output tokens, a 15-second timeout, and no SDK retries.
+- Complete the 60-call RC5 advisor acceptance benchmark across five synthetic
+  profile shapes with 100% validity and safety preservation, no errors or
+  timeouts, and aggregate latency, token, retry-reporting, and cost evidence.
 
 ### Fixed
 
