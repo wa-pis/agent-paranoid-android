@@ -42,6 +42,7 @@ from test_data_agent.trino_config import (
 )
 from test_data_agent.trino_client import (
     TrinoClient as TrinoClient,
+    TrinoCapacityError as TrinoCapacityError,
     TrinoResultLimitError as TrinoResultLimitError,
     rows_to_dicts as rows_to_dicts,
     trino as trino,
@@ -124,6 +125,7 @@ from test_data_agent.trino_sql_policy import (
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
+    QueryWorkBudgetExceeded,
     QueryWorkLimits,
     query_work_limits_from_env,
     with_query_work_budget,
@@ -144,7 +146,13 @@ def _fetch_dicts(
     sql: str, parameters: Sequence[Any] | None = None
 ) -> list[dict[str, Any]]:
     client = TrinoClient(config=TrinoConfig.from_env(), driver=trino)
-    return client.fetch_dicts(sql, parameters)
+    try:
+        return client.fetch_dicts(sql, parameters)
+    except (QueryWorkBudgetExceeded, TrinoCapacityError, TrinoResultLimitError):
+        raise
+    except Exception:
+        pass
+    raise RuntimeError("Trino request failed") from None
 
 
 def _fetch_built_query(query: TrinoQuery) -> list[dict[str, Any]]:

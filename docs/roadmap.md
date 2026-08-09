@@ -740,7 +740,7 @@ Scope:
 - [x] Bound active MCP requests and shared Trino concurrency, release all
   request state on cancellation/disconnect/timeout/teardown, and return fixed
   bounded capacity errors.
-- [ ] Redact Trino driver failures and define the allowed catalog/schema
+- [x] Redact Trino driver failures and define the allowed catalog/schema
   enumeration metadata surface before it reaches MCP clients.
 - [ ] Define and enforce a separate privacy contract for opt-in
   `run_safe_select`, including names, addresses, and heuristic false-negative

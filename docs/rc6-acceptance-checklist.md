@@ -49,7 +49,7 @@ source checkouts are not substitutes for the public-artifact checks.
   enforced.
 - [x] RC6-S13: active MCP requests and shared Trino work are globally bounded;
   cancellation, disconnect, timeout, and teardown release state exactly once.
-- [ ] RC6-S14: Trino driver errors are fixed and redacted, and catalog/schema
+- [x] RC6-S14: Trino driver errors are fixed and redacted, and catalog/schema
   enumeration has an explicit tested metadata-exposure policy.
 - [ ] RC6-S15: the explicit opt-in `run_safe_select` has a separately
   documented and

@@ -96,6 +96,11 @@ metadata and aggregate profiling operations:
 - `profile_conditional_required`, `profile_conditional_allowed_values`;
 - `profile_aggregate_mapping`.
 
+Catalog and schema discovery returns only names present in the configured
+allowlists. Tables may be listed only after their catalog and schema pass those
+allowlists. Backend-controlled driver and enumeration failures are exposed as
+the fixed `Trino request failed` error without retaining the original text.
+
 This default aggregate-only surface has no row-returning diagnostic. Its
 successful responses, validation and database errors, and metadata-only audit
 records do not contain source-cell literals.
