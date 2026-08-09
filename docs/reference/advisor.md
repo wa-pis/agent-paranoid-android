@@ -155,11 +155,13 @@ data, not concatenate them into privileged instructions.
 that:
 
 - do not match the request fingerprints;
-- add, remove, reorder, or rename entities or fields;
+- add, remove, reorder, or rename entities or fields, or change field types;
 - change primary keys or core-owned privacy, generation, or validation
   settings;
 - weaken sensitive or identifier classifications;
 - contain raw-looking sensitive distributions;
+- add formulas with string literals, aggregate calls, unknown or non-numeric
+  references, non-numeric targets, or sensitive/identifier targets;
 - exceed the configured generation row limit.
 
 A successful proposal still has `approval_required: true` and

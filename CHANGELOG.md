@@ -27,6 +27,9 @@ All notable changes to this project are documented here.
 - Detach handled OpenAI provider and validation failures from their original
   cause/context chains, and replace incomplete-response status text with a
   fixed bounded local error.
+- Reject advisor formulas with string constants, unknown or incompatible
+  references, and protected targets; enforce fixed post-solve type and privacy
+  checks before generated rows reach publication adapters.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

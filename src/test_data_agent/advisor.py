@@ -8,12 +8,17 @@ from typing import Annotated, Any, Literal, Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
+from test_data_agent.core.constraint import ConstraintType
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntityProfile
-from test_data_agent.core.field import FieldProfile
+from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import enforce_row_count_limit
 from test_data_agent.core.privacy import is_sensitive_field
 from test_data_agent.generation import infer_dataset_spec
+from test_data_agent.rules.expressions import (
+    expression_constants,
+    expression_references,
+)
 from test_data_agent.io.artifacts import (
     dataset_profile_fingerprint,
     dataset_spec_fingerprint,
@@ -505,6 +510,7 @@ def validate_advisor_proposal(
     candidate = proposal.dataset_spec
     _validate_schema_identity(request.baseline_spec, candidate)
     _validate_core_owned_settings(request.baseline_spec, candidate)
+    _validate_advisor_constraints(request.baseline_spec, candidate)
     _validate_spec_against_profile(request.profile, candidate)
     return proposal
 
@@ -560,6 +566,15 @@ def _validate_schema_identity(baseline: DatasetSpec, candidate: DatasetSpec) -> 
             )
         if candidate_entity.primary_key != baseline_entity.primary_key:
             raise AdvisorContractError("advisor proposal cannot change primary keys")
+        if any(
+            candidate_field.data_type != baseline_field.data_type
+            for baseline_field, candidate_field in zip(
+                baseline_entity.fields,
+                candidate_entity.fields,
+                strict=True,
+            )
+        ):
+            raise AdvisorContractError("advisor proposal cannot change field types")
 
 
 def _validate_core_owned_settings(baseline: DatasetSpec, candidate: DatasetSpec) -> None:
@@ -571,6 +586,84 @@ def _validate_core_owned_settings(baseline: DatasetSpec, candidate: DatasetSpec)
         raise AdvisorContractError("advisor proposal cannot change generation settings")
     if candidate.validation_settings != baseline.validation_settings:
         raise AdvisorContractError("advisor proposal cannot change validation settings")
+
+
+def _validate_advisor_constraints(
+    baseline: DatasetSpec,
+    candidate: DatasetSpec,
+) -> None:
+    remaining_baseline = [
+        constraint.model_dump(mode="json") for constraint in baseline.constraints
+    ]
+    for constraint in candidate.constraints:
+        serialized = constraint.model_dump(mode="json")
+        if serialized in remaining_baseline:
+            remaining_baseline.remove(serialized)
+            continue
+        entity = candidate.entity(constraint.entity)
+        if (
+            constraint.type == ConstraintType.FORMULA
+            and constraint.expression is not None
+        ):
+            try:
+                references, aggregate_references, functions = expression_references(
+                    constraint.expression
+                )
+                constants = expression_constants(constraint.expression)
+            except ValueError:
+                raise AdvisorContractError(
+                    "advisor formula constraint is invalid"
+                ) from None
+            if any(isinstance(value, str) for value in constants):
+                raise AdvisorContractError(
+                    "advisor formula constraint cannot contain string constants"
+                )
+            known_fields = {field.name for field in entity.fields}
+            referenced_fields = references | aggregate_references
+            if referenced_fields - known_fields:
+                raise AdvisorContractError(
+                    "advisor formula constraint references an unknown field"
+                )
+            if functions:
+                raise AdvisorContractError(
+                    "advisor formula constraint must use row arithmetic"
+                )
+            if any(
+                entity.field(name).data_type not in {FieldType.INTEGER, FieldType.FLOAT}
+                for name in referenced_fields
+            ):
+                raise AdvisorContractError(
+                    "advisor formula constraint requires numeric source fields"
+                )
+
+        target_names = constraint.fields
+        if constraint.type == ConstraintType.TEMPORAL:
+            target_names = constraint.fields[1:2]
+        elif constraint.type in {
+            ConstraintType.FORMULA,
+            ConstraintType.AGGREGATE_MAPPING,
+        }:
+            target_names = constraint.fields[:1]
+        for target_name in target_names:
+            target = entity.field(target_name)
+            if (
+                target.sensitive
+                or is_sensitive_field(
+                    target.name,
+                    target.semantic_type,
+                )
+                or target.is_identifier
+            ):
+                raise AdvisorContractError(
+                    "advisor constraint cannot target a sensitive field"
+                )
+            if constraint.type == ConstraintType.FORMULA and target.data_type not in {
+                FieldType.INTEGER,
+                FieldType.FLOAT,
+            }:
+                raise AdvisorContractError(
+                    "advisor formula constraint requires a numeric target field"
+                )
 
 
 def _validate_spec_against_profile(
