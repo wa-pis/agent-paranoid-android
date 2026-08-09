@@ -76,8 +76,8 @@ uv.lock
 | Severity | Finding | Disposition | Evidence |
 | --- | --- | --- | --- |
 | Low | RC6-S1: profile-indexed replacement can leave a raw rare category in a reordered baseline and provider-bound `AdvisorRequest` | **Closed by PR #335** | [PR #335](https://github.com/wa-pis/agent-paranoid-android/pull/335), merge `5b3ad7f`; exact-tree follow-up reproduced no leak and verified persisted placeholder provenance |
-| Low | RC6-S2: provider-call and structured-validation failures can retain provider context or derive public text from a dynamic exception class | **Partially closed by PR #334; acceptance mismatch remains release-blocking** | [PR #334](https://github.com/wa-pis/agent-paranoid-android/pull/334), merge `33ba64e`, removes retained `__cause__`/`__context__`; follow-up scan suppressed the dynamic-class case as a security finding but confirmed that `type(exc).__name__` violates the finite local allowlist |
-| Low | RC6-S3: SDK client initialization failures can retain or directly expose raw exception text | **Partially closed by PR #334; one Low finding remains release-blocking** | [PR #334](https://github.com/wa-pis/agent-paranoid-android/pull/334), merge `33ba64e`, detaches expected `OpenAIError`; exact-tree follow-up proves an ordinary non-`OpenAIError` constructor exception still escapes unchanged |
+| Low | RC6-S2: provider-call and structured-validation failures can retain provider context or derive public text from a dynamic exception class | **Closed by PRs #334 and #336** | [PR #334](https://github.com/wa-pis/agent-paranoid-android/pull/334), merge `33ba64e`, removes retained `__cause__`/`__context__`; [PR #336](https://github.com/wa-pis/agent-paranoid-android/pull/336), merge `f459ab8`, replaces dynamic class names with the fixed `OpenAI advisor request failed` message |
+| Low | RC6-S3: SDK client initialization failures can retain or directly expose raw exception text | **Closed by PRs #334 and #336** | [PR #334](https://github.com/wa-pis/agent-paranoid-android/pull/334), merge `33ba64e`, detaches expected `OpenAIError`; [PR #336](https://github.com/wa-pis/agent-paranoid-android/pull/336), merge `f459ab8`, catches ordinary constructor exceptions and raises the fixed local initialization error outside the handler |
 | Low | RC6-S4: incomplete responses interpolate raw `response.status` into the public advisor error | **Closed by PR #333** | [PR #333](https://github.com/wa-pis/agent-paranoid-android/pull/333), merge `e8aba91`; fixed local message and synthetic status-redaction regression |
 | Informational | RC6-S5: provider-call and structured-validation error text no longer appears in normal formatted tracebacks | **Closed by PR #331** | [PR #331](https://github.com/wa-pis/agent-paranoid-android/pull/331), merge `d491acb` |
 | Informational | RC6-S6: placeholder-shaped baseline literals are reserved from generated placeholder names | **Closed by PR #332** | [PR #332](https://github.com/wa-pis/agent-paranoid-android/pull/332), merge `e448b8f` |
@@ -120,6 +120,22 @@ existing RC6-S2; no new RC6 finding identifier was created. PR #335 is approved
 for RC6-S1 only. Trino trusted-local/shared-hardened behavior was unchanged and
 showed no new regression. Approval of the exact merge commit remains blocked
 pending the residual RC6-S2/S3 remediation and another exact-commit review.
+
+## PR #336 S2/S3 closure verification
+
+PR #336 closed the two residual OpenAI error-boundary findings. The behavior
+was reverified on current main commit
+`6a4f20816464f28083a98d9f5004269437131906` with synthetic failures only; no
+live OpenAI call was made.
+
+- RC6-S2: provider and structured-validation failures use fixed local text and
+  retain neither `__cause__` nor `__context__`.
+- RC6-S3: both `OpenAIError` and ordinary `RuntimeError` constructor failures
+  become the same fixed local `ValueError` without retained exception chains.
+- Focused command: `pytest tests/test_openai_provider.py -k
+  'does_not_retain_initialization_error or does_not_leak_provider_error_text or
+  records_usage_for_invalid_structured_output' -q`
+- Result: **6 passed, 30 deselected**.
 
 ## Current-tree critical review
 
@@ -174,11 +190,9 @@ cannot be established from repository contents alone.
 
 ## Review Conclusion
 
-**Blocked.** PR #335 closes RC6-S1 and PR #333 closes RC6-S4. PR #334 closes
-the retained-exception portions of RC6-S2 and RC6-S3, but RC6-S2 still needs a
-fixed allowlisted provider-call message and RC6-S3 still needs to contain every
-ordinary SDK constructor exception. Do not tag or promote RC6 until those
-residuals, RC6-S7 through RC6-S20, and their synthetic regressions are closed
+**Blocked.** PR #335 closes RC6-S1, PR #333 closes RC6-S4, and PRs #334 and
+#336 close RC6-S2 and RC6-S3. Do not tag or promote RC6 until RC6-S7 through
+RC6-S20 and their synthetic regressions are closed
 or explicitly approved, an independent reviewer approves the exact fixed
 commit, and the immutable tag, public artifacts, final gates, external
 configuration evidence, and verifiable approval link are recorded. The
