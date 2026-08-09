@@ -21,6 +21,9 @@ All notable changes to this project are documented here.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.
+- Replace source-derived advisor constraint literals with the same field-scoped
+  category labels, reject unrepresented strings, and preserve executable
+  conditions across persisted-review verification.
 - Prevent equal rare values in different fields from sharing a synthetic
   placeholder and prevent placeholders from colliding with normal categories,
   including placeholder-shaped baseline literals, while preserving sanitizer

@@ -24,3 +24,9 @@ Provider adapters should remain optional and provider-neutral at the contract
 boundary. Normal tests use fake transports and synthetic profiles; no
 production data or private infrastructure context may be sent to an external
 provider.
+
+Categorical constraint predicates are part of the same provider-bound data as
+their distributions. Replace `equals`, `not_equals`, and `in_values` strings
+with the field-scoped category labels before serialization. Reject a string
+that is not represented by that field's categorical domain; do not send it or
+silently create a condition that generated rows cannot satisfy.

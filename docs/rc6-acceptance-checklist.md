@@ -71,6 +71,9 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] FS-01: CSV-folder profiles, caches, specs, and generated rows contain
   collision-safe ranked labels instead of source-derived text categories;
   inferred conditional rules use the matching labels.
+- [x] AG-01/FS-02: provider-bound profile and baseline constraints replace
+  `equals`, `not_equals`, and `in_values` strings with the matching
+  field-scoped category labels; unrepresented strings fail closed.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

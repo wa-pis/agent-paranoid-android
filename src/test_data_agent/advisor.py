@@ -303,6 +303,7 @@ def _restore_generated_placeholders(
     previous_profile: DatasetProfile,
     baseline: DatasetSpec,
 ) -> None:
+    restorations: dict[tuple[str, str, str], str] = {}
     entities = zip(profile.entities, previous_profile.entities, baseline.entities)
     for entity_index, (entity, previous_entity, baseline_entity) in enumerate(entities):
         fields = zip(entity.fields, previous_entity.fields, baseline_entity.fields)
@@ -323,19 +324,22 @@ def _restore_generated_placeholders(
                     continue
                 placeholder = previous_category.get("value")
                 if (
-                    _placeholder_matches_position(
+                    isinstance(placeholder, str)
+                    and _placeholder_matches_position(
                         placeholder,
                         entity_index,
                         field_index,
                         category_index,
                     )
                 ):
+                    restorations[(entity.name, field.name, placeholder)] = value
                     for baseline_category in baseline_categories:
                         if (
                             isinstance(baseline_category, dict)
                             and baseline_category.get("value") == placeholder
                         ):
                             baseline_category["value"] = value
+    _replace_constraint_values(baseline, restorations, strict=False)
 
 
 def _placeholder_matches_position(
@@ -359,7 +363,12 @@ def _sanitize_categorical_values(
 ) -> tuple[DatasetProfile, DatasetSpec]:
     preserved_labels = preserved_labels or set()
     replacements = {key: key[2] for key in preserved_labels}
-    original_keys = _categorical_string_keys(profile) | _categorical_string_keys(spec)
+    original_keys = (
+        _categorical_string_keys(profile)
+        | _categorical_string_keys(spec)
+        | _constraint_string_keys(profile)
+        | _constraint_string_keys(spec)
+    )
     original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
     used_placeholders = {key[2] for key in preserved_labels}
     field_positions = {
@@ -404,12 +413,17 @@ def _sanitize_categorical_values(
     safe_spec = spec.model_copy(deep=True)
     _replace_categorical_values(safe_profile, replacements)
     _replace_categorical_values(safe_spec, replacements)
+    _replace_constraint_values(safe_profile, replacements)
+    _replace_constraint_values(safe_spec, replacements)
     if _structural_identity(profile) != _structural_identity(safe_profile):
         raise AdvisorContractError("profile sanitization changed structural identity")
     if _structural_identity(spec) != _structural_identity(safe_spec):
         raise AdvisorContractError("spec sanitization changed structural identity")
-    safe_keys = _categorical_string_keys(safe_profile) | _categorical_string_keys(
-        safe_spec
+    safe_keys = (
+        _categorical_string_keys(safe_profile)
+        | _categorical_string_keys(safe_spec)
+        | _constraint_string_keys(safe_profile)
+        | _constraint_string_keys(safe_spec)
     )
     if (original_keys - preserved_labels) & safe_keys:
         raise AdvisorContractError("advisor request contains an original categorical value")
@@ -439,6 +453,66 @@ def _replace_categorical_values(
                     category["value"] = replacement
 
 
+def _replace_constraint_values(
+    dataset: DatasetProfile | DatasetSpec,
+    replacements: dict[tuple[str, str, str], str],
+    *,
+    strict: bool = True,
+) -> None:
+    for constraint in dataset.constraints:
+        condition = constraint.condition
+        if condition is None:
+            continue
+        field_name = condition.get("field")
+        if not isinstance(field_name, str):
+            raise AdvisorContractError("advisor constraint uses an invalid condition")
+        safe_condition = dict(condition)
+        for predicate in ("equals", "not_equals"):
+            if predicate in safe_condition:
+                safe_condition[predicate] = _replace_constraint_value(
+                    constraint.entity,
+                    field_name,
+                    safe_condition[predicate],
+                    replacements,
+                    strict=strict,
+                )
+        if "in_values" in safe_condition:
+            values = safe_condition["in_values"]
+            if not isinstance(values, list):
+                raise AdvisorContractError("advisor constraint uses an invalid condition")
+            safe_condition["in_values"] = [
+                _replace_constraint_value(
+                    constraint.entity,
+                    field_name,
+                    value,
+                    replacements,
+                    strict=strict,
+                )
+                for value in values
+            ]
+        constraint.condition = safe_condition
+
+
+def _replace_constraint_value(
+    entity_name: str,
+    field_name: str,
+    value: Any,
+    replacements: dict[tuple[str, str, str], str],
+    *,
+    strict: bool,
+) -> Any:
+    if not isinstance(value, str):
+        return value
+    replacement = replacements.get((entity_name, field_name, value))
+    if replacement is None:
+        if strict:
+            raise AdvisorContractError(
+                "advisor constraint contains an unrepresented categorical value"
+            )
+        return value
+    return replacement
+
+
 def _categorical_string_values(
     dataset: DatasetProfile | DatasetSpec,
 ) -> set[str]:
@@ -460,6 +534,29 @@ def _categorical_string_keys(
     return values
 
 
+def _constraint_string_keys(
+    dataset: DatasetProfile | DatasetSpec,
+) -> set[tuple[str, str, str]]:
+    values: set[tuple[str, str, str]] = set()
+    for constraint in dataset.constraints:
+        condition = constraint.condition
+        if condition is None or not isinstance(condition.get("field"), str):
+            continue
+        field_name = condition["field"]
+        for predicate in ("equals", "not_equals"):
+            value = condition.get(predicate)
+            if isinstance(value, str):
+                values.add((constraint.entity, field_name, value))
+        in_values = condition.get("in_values")
+        if isinstance(in_values, list):
+            values.update(
+                (constraint.entity, field_name, value)
+                for value in in_values
+                if isinstance(value, str)
+            )
+    return values
+
+
 def _structural_identity(dataset: DatasetProfile | DatasetSpec) -> dict[str, Any]:
     payload = dataset.model_dump(mode="python")
     for entity in payload.get("entities", []):
@@ -473,6 +570,15 @@ def _structural_identity(dataset: DatasetProfile | DatasetSpec) -> dict[str, Any
             for category in categories:
                 if isinstance(category, dict):
                     category.pop("value", None)
+    for constraint in payload.get("constraints", []):
+        condition = constraint.get("condition")
+        if not isinstance(condition, dict):
+            continue
+        for predicate in ("equals", "not_equals", "in_values"):
+            if predicate not in condition:
+                continue
+            value = condition[predicate]
+            condition[predicate] = [None] * len(value) if isinstance(value, list) else None
     return payload
 
 

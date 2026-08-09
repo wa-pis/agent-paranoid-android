@@ -130,6 +130,9 @@
   collision-safe rank labels before cache publication or generation, rewrite
   inferred conditional predicates to the same labels, and invalidate legacy
   profile-cache payloads.
+- [x] AG-01/FS-02: sanitize every supported string constraint predicate with
+  the same field-scoped category map in profile and baseline requests, reject
+  unrepresented literals, and preserve persisted-review reconstruction.
 
 ## Release and review gates
 

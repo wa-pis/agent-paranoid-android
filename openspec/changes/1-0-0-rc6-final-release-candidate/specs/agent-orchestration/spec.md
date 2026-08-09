@@ -98,6 +98,18 @@ categorical value may cross the provider boundary.
 - **AND** category counts, nullability, and non-value structural relationships
   remain available for deterministic planning
 
+#### Scenario: A source category controls a conditional rule
+
+- **GIVEN** a profile or baseline constraint uses `equals`, `not_equals`, or
+  `in_values` with a source-derived categorical string
+- **WHEN** an external advisor request is built or a persisted review is
+  reverified
+- **THEN** the condition uses the same field-scoped label as its category in
+  both request models
+- **AND** the raw string is absent while the generated condition remains
+  executable
+- **AND** an unrepresented string fails closed with a fixed local error
+
 ### Requirement: Provider Constraints Are Semantically Enforced
 
 Untrusted advisor proposals SHALL preserve the local DatasetSpec constraint
