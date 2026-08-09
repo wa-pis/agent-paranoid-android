@@ -113,18 +113,24 @@ separate explicit steps.
 3. Commit the release preparation.
 4. Tag the commit after `scripts/check_release.sh` passes.
 
-Merging a release pull request does not publish a package. Publication starts
-only after the matching annotated tag is pushed:
+Merging a release pull request does not publish a package. After the full
+security review and independent approval, set the repository variable
+`RELEASE_ACCEPTED_COMMIT` to that exact immutable commit. Publication starts
+only after a matching tag signed by a key in `.github/release-signers` is
+pushed:
 
 ```bash
-git tag -a vX.Y.Z -m "Release vX.Y.Z" <verified-main-commit>
+git tag -s vX.Y.Z -m "Release vX.Y.Z" <verified-main-commit>
 git push origin vX.Y.Z
 ```
 
-The tag triggers `.github/workflows/release.yml`, which creates the GitHub
-Release and then dispatches the dedicated PyPI Trusted Publishing workflow.
-It also triggers `.github/workflows/containers.yml`, which independently
-validates and publishes the three GHCR images.
+Release, container, and PyPI workflows fail before building or publishing when
+the tag is unsigned, its signer is not allowed, or its target and checked-out
+source differ from `RELEASE_ACCEPTED_COMMIT`. The tag triggers
+`.github/workflows/release.yml`, which creates the GitHub Release and then
+dispatches the dedicated PyPI Trusted Publishing workflow. It also triggers
+`.github/workflows/containers.yml`, which independently validates and publishes
+the three GHCR images.
 
 Keep compatibility changes explicit. Breaking `DatasetSpec`, CLI, artifact, or
 Python API changes require a migration guide and a versioned changelog entry.

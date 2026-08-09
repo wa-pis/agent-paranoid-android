@@ -161,7 +161,7 @@ repository settings were used.
 | Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Closed by the focused RC6-S10 change**; generator MCP uses the shared bounded stdio writer with a fresh request budget, reserved terminal-error bytes, and focused transport wiring regressions |
 | Medium | JSON structural limits run after full parsing/materialization | **Closed by the focused RC6-S10 change**; the raw-byte preflight bounds depth, nodes/containers, and scalar bytes before JSON or MCP model materialization, including escaped-scalar regressions |
 | Medium | Pull requests control the classifier that can skip required checks | **Closed by the focused RC6-S12 classifier change**; CI, Security, and Containers extract and execute the classifier from the trusted PR base commit, and control-path changes fail into the heavy-check set |
-| Medium | Release publication is bound to tag/version, not approved commit identity | **Open; RC6 release-blocking** |
+| Medium | Release publication is bound to tag/version, not approved commit identity | **Closed by the focused RC6-S12 release-identity change**; release, container, and PyPI workflows verify an allowed SSH signature and exact externally accepted commit before build or publication |
 | Medium | RC6 acceptance evidence is not enforced by the release workflow | **Open; RC6 release-blocking** |
 | Medium | CSV output does not neutralize spreadsheet formula markers | **Closed by the focused RC6-S11 change**; the central CSV writer prefixes dangerous string cells and headers while preserving numeric values, with synthetic marker regressions |
 | Medium | Formula/validation errors can reflect provider-controlled text | **Closed by the focused RC6-S11 change**; solver, business-rule, and constraint diagnostics use exact fixed reasons with detached nested exceptions and value-redaction regressions |
@@ -290,6 +290,23 @@ therefore force all heavy checks.
 
 - Focused command: `pytest tests/test_ci_change_scope.py -q`
 - Result: **4 passed**.
+
+### RC6-S12 release-identity verification
+
+The focused release-identity change verifies the annotated tag with Git's SSH
+signature support and the committed public signer policy. Release, container,
+and PyPI entry points extract the verifier from the externally accepted commit,
+require the tag target and checked-out source to equal that exact SHA, and run
+the check before any build, attestation, signing, or publication step. Deployed
+tag immutability remains open under RC6-S20 and is not claimed by this change.
+
+- Focused command: `pytest tests/test_release_identity.py
+  tests/test_release_artifacts.py tests/test_containers.py
+  tests/test_ci_change_scope.py -q`
+- Result: **37 passed**.
+- Full gate: `scripts/check_release.sh` completed with **895 passed**, **3
+  skipped** integration tests, and **89.55%** coverage; `mkdocs build --strict`
+  also passed.
 
 ## Review Conclusion
 

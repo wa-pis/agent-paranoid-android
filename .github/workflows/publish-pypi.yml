@@ -28,7 +28,25 @@ jobs:
       - name: Check out trusted workflow helpers
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          fetch-depth: 0
+          fetch-tags: true
           persist-credentials: false
+
+      - name: Verify signed accepted release source
+        env:
+          RELEASE_ACCEPTED_COMMIT: ${{ vars.RELEASE_ACCEPTED_COMMIT }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "${RELEASE_ACCEPTED_COMMIT:-}" =~ ^[0-9a-f]{40}$ ]]
+          git show "${RELEASE_ACCEPTED_COMMIT}:scripts/check_release_identity.py" \
+            > "${RUNNER_TEMP}/check_release_identity.py"
+          git show "${RELEASE_ACCEPTED_COMMIT}:.github/release-signers" \
+            > "${RUNNER_TEMP}/release-signers"
+          python3 "${RUNNER_TEMP}/check_release_identity.py" \
+            "${RELEASE_TAG}" \
+            "${RELEASE_ACCEPTED_COMMIT}" \
+            "${RUNNER_TEMP}/release-signers"
 
       - name: Resolve published release tag
         id: release

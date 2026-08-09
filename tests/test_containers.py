@@ -106,8 +106,16 @@ def test_container_workflow_builds_before_tag_only_publish() -> None:
     assert 'tags:\n      - "v*.*.*"' in workflow
     assert "packages: write" not in validate_job
     assert "push: false" in validate_job
+    assert "release-gate" in validate_job
     assert "scripts/check_release_tag.py" in release_gate
     assert "scripts/check_release.sh" in release_gate
+    assert "Verify signed accepted release source" in release_gate
+    assert "RELEASE_ACCEPTED_COMMIT" in release_gate
+    assert "scripts/check_release_identity.py" in release_gate
+    assert "fetch-depth: 0" in release_gate
+    assert release_gate.index(
+        "Verify signed accepted release source"
+    ) < release_gate.index("Set up Python")
     assert (
         "needs:\n      - validate\n      - validate-arm64\n      - release-gate"
         in publish_job

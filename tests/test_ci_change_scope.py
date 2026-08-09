@@ -111,7 +111,12 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         assert '>> "${GITHUB_OUTPUT}"' in classifier["run"]
         for job_name in job_names:
             job = jobs[job_name]
-            assert job["needs"] == "changes"
+            if workflow_name == "containers.yml":
+                assert job["needs"] == ["changes", "release-gate"]
+                assert "always()" in job["if"]
+                assert "needs.release-gate.result == 'success'" in job["if"]
+            else:
+                assert job["needs"] == "changes"
             assert "needs.changes.outputs.code == 'true'" in job["if"]
 
     security = yaml.safe_load(
