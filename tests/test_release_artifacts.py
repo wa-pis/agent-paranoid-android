@@ -204,7 +204,7 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflow_text = "\n".join(path.read_text() for path in workflows)
 
     setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 11
+    assert setup_count == 12
     assert workflow_text.count("prune-cache: true") == setup_count
 
 
@@ -370,8 +370,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
         "      - name: Upgrade from public 0.12.0\n", maxsplit=1
     )[1]
     upgrade_step = upgrade_step.split("\n      - name:", maxsplit=1)[0]
-    assert '"agent-paranoid-android==0.12.0"' in upgrade_step
-    assert '"agent-paranoid-android==${PYPI_VERSION}"' in upgrade_step
+    assert "agent-paranoid-android==0.12.0 --hash=sha256:" in upgrade_step
     assert "--index-url https://pypi.org/simple" in upgrade_step
     assert "--only-binary=:all:" in upgrade_step
     assert "--upgrade" in upgrade_step
@@ -388,6 +387,16 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert "/test-data-agent agent-plan" in workflow
     assert "/test-data-agent agent-review" in workflow
     assert "/test-data-agent agent-approve" in workflow
+    assert "--requirement /tmp/runtime-requirements.txt" in upgrade_step
+    assert "--requirement /tmp/public-0.12.0-requirement.txt" in upgrade_step
+    assert "--requirement /tmp/public-package-requirement.txt" in upgrade_step
+
+    profile_job = workflow.split("  public-install-profiles:\n", maxsplit=1)[1]
+    assert "astral-sh/setup-uv@" in profile_job
+    assert "uv export" in profile_job
+    assert "--requirement \"/tmp/published-${PROFILE}-runtime-requirements.txt\"" in profile_job
+    assert "WHEEL_SHA256: ${{ needs.prepare.outputs.wheel_sha256 }}" in profile_job
+    assert "--requirement /tmp/public-package-requirement.txt" in profile_job
     assert "/test-data-agent audit-verify" in workflow
     assert 'files("test_data_agent.resources")' in workflow
     assert "audited_mcp_tool" in workflow
@@ -417,7 +426,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert 'manifest["synthetic"] is True' in profile_job
     assert 'manifest["source_rows_copied"] is False' in profile_job
     assert 'manifest["validation_valid"] is True' in profile_job
-    assert "actions/checkout@" not in profile_job
+    assert "actions/checkout@" in profile_job
     assert "docker buildx imagetools inspect" in workflow
     assert "linux/amd64" in workflow
     assert "linux/arm64" in workflow
