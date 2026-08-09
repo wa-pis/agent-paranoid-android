@@ -162,7 +162,7 @@ repository settings were used.
 | Medium | JSON structural limits run after full parsing/materialization | **Closed by the focused RC6-S10 change**; the raw-byte preflight bounds depth, nodes/containers, and scalar bytes before JSON or MCP model materialization, including escaped-scalar regressions |
 | Medium | Pull requests control the classifier that can skip required checks | **Closed by the focused RC6-S12 classifier change**; CI, Security, and Containers extract and execute the classifier from the trusted PR base commit, and control-path changes fail into the heavy-check set |
 | Medium | Release publication is bound to tag/version, not approved commit identity | **Closed by the focused RC6-S12 release-identity change**; release, container, and PyPI workflows verify an allowed SSH signature and exact externally accepted commit before build or publication |
-| Medium | RC6 acceptance evidence is not enforced by the release workflow | **Open; RC6 release-blocking** |
+| Medium | RC6 acceptance evidence is not enforced by the release workflow | **Closed by the focused RC6-S12 acceptance-manifest change**; the signed tag carries strict JSON evidence for the exact source, findings, approvals, gates, and wheel/sdist digests, and every publication path fails closed on missing or stale evidence |
 | Medium | CSV output does not neutralize spreadsheet formula markers | **Closed by the focused RC6-S11 change**; the central CSV writer prefixes dangerous string cells and headers while preserving numeric values, with synthetic marker regressions |
 | Medium | Formula/validation errors can reflect provider-controlled text | **Closed by the focused RC6-S11 change**; solver, business-rule, and constraint diagnostics use exact fixed reasons with detached nested exceptions and value-redaction regressions |
 | Low | Public workflow API accepts an unsafe profile artifact name | **Closed by the focused RC6-S11 change**; public generation artifacts validate the profile name as one safe component before creating directories or files |
@@ -307,6 +307,22 @@ tag immutability remains open under RC6-S20 and is not claimed by this change.
 - Full gate: `scripts/check_release.sh` completed with **895 passed**, **3
   skipped** integration tests, and **89.55%** coverage; `mkdocs build --strict`
   also passed.
+
+### RC6-S12 acceptance-manifest verification
+
+The focused acceptance-manifest change uses the already required SSH-signed
+annotated tag as the immutable envelope for strict schema-versioned JSON. The
+validator requires the exact reviewed commit, complete RC6 finding
+dispositions, attributable approval URLs, exact-commit CI/Containers/
+Documentation/Security results, and expected wheel/sdist SHA-256 digests.
+Release, container, and PyPI workflows load the validator from the accepted
+commit before setup or build; release and PyPI also compare the actual
+distributions before attestation or publication.
+
+- Focused command: `pytest tests/test_release_acceptance.py
+  tests/test_release_identity.py tests/test_release_artifacts.py
+  tests/test_containers.py -q`
+- Result: **35 passed**.
 
 ## Review Conclusion
 

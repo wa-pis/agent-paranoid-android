@@ -87,6 +87,7 @@ def test_public_release_artifacts_are_present() -> None:
         ".github/ISSUE_TEMPLATE/bug_report.yml",
         ".github/ISSUE_TEMPLATE/feature_request.yml",
         "scripts/check_installed_package.py",
+        "scripts/check_release_acceptance.py",
         "scripts/check_release_identity.py",
         "scripts/check_dependency_compatibility.py",
         "scripts/check_pypi_artifacts.py",
@@ -270,11 +271,24 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "permissions: {}" in workflow
     assert "Verify signed accepted release source" in workflow
     assert "RELEASE_ACCEPTED_COMMIT" in workflow
+    assert "scripts/check_release_acceptance.py" in workflow
     assert "scripts/check_release_identity.py" in workflow
     assert "fetch-depth: 0" in workflow
     assert workflow.index("Verify signed accepted release source") < workflow.index(
         "Set up Python"
     )
+    assert workflow.index(
+        'python3 "${RUNNER_TEMP}/check_release_identity.py"'
+    ) < workflow.index(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    )
+    assert "SOURCE_DATE_EPOCH" in workflow
+    assert workflow.index("uv build --no-build-isolation") < workflow.rindex(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    )
+    assert workflow.rindex(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    ) < workflow.index("Attest build provenance")
     assert "scripts/check_release_tag.py" in workflow
     assert "scripts/check_release.sh" in workflow
     assert "uv build --no-build-isolation" in workflow
@@ -321,11 +335,20 @@ def test_pypi_workflow_uses_oidc_and_published_release_artifacts() -> None:
     assert "workflow_dispatch:" in workflow
     assert "Verify signed accepted release source" in workflow
     assert "RELEASE_ACCEPTED_COMMIT" in workflow
+    assert "scripts/check_release_acceptance.py" in workflow
     assert "scripts/check_release_identity.py" in workflow
     assert "fetch-depth: 0" in workflow
     assert workflow.index("Verify signed accepted release source") < workflow.index(
         "Download published release distributions"
     )
+    assert workflow.index(
+        'python3 "${RUNNER_TEMP}/check_release_identity.py"'
+    ) < workflow.index(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    )
+    assert workflow.count(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    ) == 2
     assert "environment:\n      name: pypi" in workflow
     assert "attestations: read" in workflow
     assert "contents: read" in workflow

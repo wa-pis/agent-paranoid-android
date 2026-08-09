@@ -112,10 +112,16 @@ def test_container_workflow_builds_before_tag_only_publish() -> None:
     assert "Verify signed accepted release source" in release_gate
     assert "RELEASE_ACCEPTED_COMMIT" in release_gate
     assert "scripts/check_release_identity.py" in release_gate
+    assert "scripts/check_release_acceptance.py" in release_gate
     assert "fetch-depth: 0" in release_gate
     assert release_gate.index(
         "Verify signed accepted release source"
     ) < release_gate.index("Set up Python")
+    assert release_gate.index(
+        'python3 "${RUNNER_TEMP}/check_release_identity.py"'
+    ) < release_gate.index(
+        'python3 "${RUNNER_TEMP}/check_release_acceptance.py"'
+    )
     assert (
         "needs:\n      - validate\n      - validate-arm64\n      - release-gate"
         in publish_job
