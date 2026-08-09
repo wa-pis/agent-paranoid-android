@@ -104,6 +104,15 @@ that evade heuristic classification.
   returned
 - **AND** the default aggregate-only guarantee remains scoped to default tools
 
+#### Scenario: Opt-in query returns a composite value
+
+- **GIVEN** a permitted query returns bounded maps, arrays, or row-like values
+  containing nested strings
+- **WHEN** the opt-in result is prepared for the MCP client
+- **THEN** every nested string is masked while safe non-string values and
+  container structure remain available
+- **AND** excessive depth or value count fails closed before the response
+
 ### Requirement: Catalog And Schema Enumeration Policy Is Explicit
 
 Catalog and schema discovery SHALL apply the same allowlist and metadata

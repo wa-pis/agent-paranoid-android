@@ -108,6 +108,8 @@
   row-privacy contract: either allowlist non-sensitive columns or synthesize/
   mask all returned strings, with tests for names, addresses, and heuristic
   false negatives.
+- [x] MT-01: recursively enforce that contract for bounded nested map, array,
+  and row values and fail closed on excessive composite complexity.
 - [x] Make semantic-provider execution bounded and reproducible: enforce a
   timeout/cancellation boundary, require a deterministic replay or output
   fingerprint for an explicit seed, restrict names/addresses to a synthetic
