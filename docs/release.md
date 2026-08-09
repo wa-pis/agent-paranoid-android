@@ -98,6 +98,19 @@ reviewed commit digest, require closed release-blocking findings and recorded
 approval, and match the published artifact digests. A version-matching tag or
 unchecked Markdown checklist is not sufficient evidence.
 
+The manifest is the complete JSON message of the signed annotated tag. Schema
+version `1` requires exact `release`, `findings`, `approvals`, `gates`, and
+`artifacts` objects. Findings RC6-S1-S4 and RC6-S7-S20 must be `closed` or
+explicitly `approved` with HTTPS evidence; every approval and the CI,
+Containers, Documentation, and Security gate result must identify the reviewed
+commit and an HTTPS evidence URL. `artifacts` contains the exact wheel and
+sdist basenames with lowercase SHA-256 digests.
+
+Build the candidate artifacts with `SOURCE_DATE_EPOCH` set to the reviewed
+commit timestamp before recording those digests. The tag-triggered build uses
+the same epoch and fails before attestation or publication if either digest is
+different.
+
 Run every final release gate, including `scripts/check_release.sh` and
 `mkdocs build --strict`, on the exact stable release commit. Merge only after
 the required pipeline is green and conflict-free. Create `v1.0.0` only from
@@ -120,13 +133,15 @@ only after a matching tag signed by a key in `.github/release-signers` is
 pushed:
 
 ```bash
-git tag -s vX.Y.Z -m "Release vX.Y.Z" <verified-main-commit>
+git tag -s vX.Y.Z -F /path/to/acceptance-manifest.json <verified-main-commit>
 git push origin vX.Y.Z
 ```
 
 Release, container, and PyPI workflows fail before building or publishing when
 the tag is unsigned, its signer is not allowed, or its target and checked-out
-source differ from `RELEASE_ACCEPTED_COMMIT`. The tag triggers
+source differ from `RELEASE_ACCEPTED_COMMIT`. They also fail when the signed
+manifest is missing, stale, incomplete, or disagrees with the built wheel and
+sdist. The tag triggers
 `.github/workflows/release.yml`, which creates the GitHub Release and then
 dispatches the dedicated PyPI Trusted Publishing workflow. It also triggers
 `.github/workflows/containers.yml`, which independently validates and publishes
