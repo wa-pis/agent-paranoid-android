@@ -49,9 +49,10 @@ Trino access is read-only, allowlisted, bounded by client row limits and
 server-side time and scan budgets. Unsafe query shapes and likely sensitive
 projections are rejected before execution. The default aggregate-only tools
 return only source-literal-free metadata and aggregates. The explicit opt-in
-row-returning tool `run_safe_select` masks every returned string and any
-non-string field or value recognized as sensitive. Other non-string source
-values may remain, so those rows are not source-free or anonymous.
+row-returning tool `run_safe_select` recursively masks every returned string in
+bounded scalar or composite values and any non-string field or value recognized
+as sensitive. Other non-string source values may remain, so those rows are not
+source-free or anonymous.
 
 ### Resource limits
 

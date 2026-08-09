@@ -72,7 +72,7 @@ row-returning tools are configured separately:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `TRINO_ENABLE_SAFE_SELECT` | `false` | Enables `run_safe_select`; every returned string is masked, but other non-string source values may remain outside the source-literal-free guarantee |
+| `TRINO_ENABLE_SAFE_SELECT` | `false` | Enables `run_safe_select`; every returned string is recursively masked in bounded composite values, but other non-string source values may remain outside the source-literal-free guarantee |
 
 ## Trino Connection
 

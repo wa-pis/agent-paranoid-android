@@ -198,6 +198,77 @@ def test_safe_select_masks_every_returned_string() -> None:
     assert all(value not in str(result) for value in source_values)
 
 
+def test_safe_select_masks_strings_in_nested_values() -> None:
+    source_values = {"ordinary note", "nested label", "tuple label"}
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=lambda _sql: [
+            {
+                "payload": {
+                    "note": "ordinary note",
+                    "items": ["nested label", 3],
+                    "pair": ("tuple label", 4),
+                },
+                "count": 2,
+            }
+        ],
+    )
+
+    result = masker.run_safe_select(
+        "SELECT payload, count FROM analytics.safe_schema.customers LIMIT 1"
+    )
+
+    assert result == [
+        {
+            "payload": {
+                "note": "[MASKED]",
+                "items": ["[MASKED]", 3],
+                "pair": ("[MASKED]", 4),
+            },
+            "count": 2,
+        }
+    ]
+    assert all(value not in str(result) for value in source_values)
+
+
+@pytest.mark.parametrize(
+    ("limit_name", "limit", "payload", "message"),
+    [
+        (
+            "TEST_DATA_AGENT_MAX_JSON_DEPTH",
+            2,
+            {"outer": {"value": "hidden"}},
+            "Trino safe-select result values must have depth <= 2",
+        ),
+        (
+            "TEST_DATA_AGENT_MAX_INPUT_CELLS",
+            2,
+            ["first", "second"],
+            "Trino safe-select result contains too many values",
+        ),
+    ],
+)
+def test_safe_select_rejects_excessive_nested_complexity(
+    monkeypatch: pytest.MonkeyPatch,
+    limit_name: str,
+    limit: int,
+    payload: Any,
+    message: str,
+) -> None:
+    monkeypatch.setenv(limit_name, str(limit))
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": payload}],
+    )
+
+    with pytest.raises(ValueError, match=f"^{message}$"):
+        masker.run_safe_select(
+            "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+        )
+
+
 @pytest.mark.parametrize(
     "sql",
     [

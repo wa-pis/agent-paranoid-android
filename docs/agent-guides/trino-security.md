@@ -11,8 +11,10 @@ context, and masked values. They must not return source rows.
 
 Explicit opt-in row-returning tools, including `run_safe_select`, are a separate
 surface. Keep them bounded, allowlisted, and masked according to their
-contracts. Do not describe the whole MCP server as source-free while such a
-capability exists, and never use its results as generated output.
+contracts. Mask strings recursively inside bounded composite values and reject
+excessive depth or value counts. Do not describe the whole MCP server as
+source-free while such a capability exists, and never use its results as
+generated output.
 
 Allowed operations are limited to:
 

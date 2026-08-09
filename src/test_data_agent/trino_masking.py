@@ -16,6 +16,7 @@ from test_data_agent.core.privacy import (
     mask_value as mask_value,
     synthetic_category_distribution as synthetic_category_distribution,
 )
+from test_data_agent.core.limits import InputLimitError, max_input_cells, max_json_depth
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
@@ -42,16 +43,70 @@ def mask_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _mask_returned_row(row: dict[str, Any]) -> dict[str, Any]:
-    """Mask every string on the explicit row-returning surface."""
-    return {
-        key: mask_value(value)
-        if isinstance(value, str)
+def _mask_returned_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Mask nested strings on the bounded explicit row-returning surface."""
+    remaining = [max_input_cells()]
+    depth_limit = max_json_depth()
+    return [
+        {
+            key: _mask_returned_value(
+                value,
+                key=key,
+                depth=1,
+                depth_limit=depth_limit,
+                remaining=remaining,
+            )
+            for key, value in row.items()
+        }
+        for row in rows
+    ]
+
+
+def _mask_returned_value(
+    value: Any,
+    *,
+    key: str,
+    depth: int,
+    depth_limit: int,
+    remaining: list[int],
+) -> Any:
+    remaining[0] -= 1
+    if remaining[0] < 0:
+        raise InputLimitError("Trino safe-select result contains too many values")
+    if depth > depth_limit:
+        raise InputLimitError(
+            f"Trino safe-select result values must have depth <= {depth_limit}"
+        )
+    if (
+        isinstance(value, str)
         or infer_sensitive_from_name(key)
         or looks_sensitive_value(value)
-        else value
-        for key, value in row.items()
-    }
+    ):
+        return mask_value(value)
+    if isinstance(value, dict):
+        return {
+            nested_key: _mask_returned_value(
+                nested,
+                key=str(nested_key),
+                depth=depth + 1,
+                depth_limit=depth_limit,
+                remaining=remaining,
+            )
+            for nested_key, nested in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        container_type = tuple if isinstance(value, tuple) else list
+        return container_type(
+            _mask_returned_value(
+                nested,
+                key="",
+                depth=depth + 1,
+                depth_limit=depth_limit,
+                remaining=remaining,
+            )
+            for nested in value
+        )
+    return value
 
 
 def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
@@ -166,4 +221,4 @@ class TrinoMasker:
 
     def run_safe_select(self, sql: str) -> list[dict[str, Any]]:
         safe_sql = validate_safe_select(sql, require_limit=True, config=self.config)
-        return [_mask_returned_row(row) for row in self.fetch_sql(safe_sql)]
+        return _mask_returned_rows(self.fetch_sql(safe_sql))

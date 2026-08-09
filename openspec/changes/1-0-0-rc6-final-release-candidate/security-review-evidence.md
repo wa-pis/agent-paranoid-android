@@ -393,6 +393,7 @@ critical findings.
 | FS-01: rare source categories can be generated verbatim | Medium | **Closed by the focused FS-01 change**; CSV-folder profiling now replaces source text categories with collision-safe rank labels after local rule inference and before cache, spec, or generation use. Matching conditional predicates are rewritten consistently, legacy caches fail closed, and numeric magnitude semantics are unchanged. |
 | AG-01/FS-02: raw constraint literals can cross the advisor boundary | Medium | **Closed by the focused AG-01/FS-02 change**; `equals`, `not_equals`, and `in_values` strings use the same field-scoped replacements in provider-bound profiles and baseline specs, unrepresented strings fail closed, and persisted reviews restore and rebuild the exact request. |
 | AG-03: non-string categories bypass advisor sanitization | Medium | **Closed by the focused AG-03 change**; every JSON scalar category and matching constraint literal uses a type-distinct field-scoped label in both request models, persisted review reconstruction is exact, and ordinary numeric bounds are unchanged. |
+| MT-01: nested Trino values bypass safe-select masking | Medium | **Closed by the focused MT-01 change**; bounded nested maps, lists, and tuples apply the same string and sensitive-value policy before the opt-in response, while excessive depth or value count fails closed. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -402,6 +403,9 @@ critical findings.
 - Focused command: `pytest tests/test_advisor.py -q`
 - Result: **43 passed** using synthetic fixtures only; integer, float, boolean,
   and null categories are absent from provider-bound models.
+- Focused command: `pytest tests/test_trino_masking.py -q`
+- Result: **19 passed** using synthetic fixtures only; no nested string marker
+  survives and excessive composite depth is rejected.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

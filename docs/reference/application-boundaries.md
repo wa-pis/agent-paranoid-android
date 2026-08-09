@@ -338,7 +338,8 @@ The former row-sampling diagnostic is no longer registered or retained as a
 public Python compatibility wrapper, masking-service method, or query builder.
 The default aggregate-only tools provide metadata and profiling. The explicit
 opt-in row-returning tools include `run_safe_select`, which masks every string
-but is not a source-literal-free replacement for that diagnostic.
+recursively inside bounded composite values but is not a source-literal-free
+replacement for that diagnostic.
 
 ### Architecture Gate
 
