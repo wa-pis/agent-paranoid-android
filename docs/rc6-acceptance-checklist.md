@@ -55,7 +55,7 @@ source checkouts are not substitutes for the public-artifact checks.
   documented and
   enforced row-privacy contract, including names, addresses, and heuristic
   false negatives; default aggregate-only tools remain a separate surface.
-- [ ] RC6-S16: semantic-provider calls have bounded timeout/cancellation,
+- [x] RC6-S16: semantic-provider calls have bounded timeout/cancellation,
   deterministic replay or a seed-bound fingerprint, synthetic-only identity
   output, and post-generation privacy/type checks.
 - [ ] RC6-S17: filesystem publication and overwrite paths reject symlink and

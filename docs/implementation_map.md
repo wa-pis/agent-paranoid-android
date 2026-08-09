@@ -54,7 +54,13 @@ This is a map of the codebase for the domain-agnostic generator.
   Converts a `DatasetProfile` into a reviewable `DatasetSpec`.
 
 - `entity_generator.py`
-  Generates synthetic rows per entity from distributions and seed.
+  Generates synthetic rows per entity from distributions and seed, then runs
+  post-solve privacy and type checks before returning a dataset.
+
+- `semantic_provider.py`
+  Isolates optional synchronous semantic providers behind a fixed deadline,
+  verifies same-request replay, and restricts string output to the
+  `synthetic_` namespace.
 
 - `constraint_solver.py`
   Reconciles rows after initial generation:
