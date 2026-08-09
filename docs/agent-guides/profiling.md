@@ -42,6 +42,8 @@ digests collected during the same CSV read that produced the profile; it does
 not reopen the mutable source path before publication.
 Dataset folders require one artifact stem per entity across CSV, JSON, and
 Parquet inputs; duplicate stems fail before any row artifact is read.
+The local profiling deadline is checked between individual field operations
+and field finalization steps, not only between rows and files.
 
 The normal flow is:
 

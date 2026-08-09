@@ -398,6 +398,7 @@ critical findings.
 | FS-03: CSV replacement can defeat source-row exclusion | Low | **Closed by the focused FS-03 change**; single-CSV profiling records only SHA-256 row digests from the same parse stream, and pre-publication no-copy validation uses that immutable set instead of reopening the source path. |
 | FS-06: reserved entity name can replace dataset content | Low | **Closed by the focused FS-06 change**; every fixed generation-control basename is rejected during dataset-spec validation, and the writer repeats the check before creating any dataset file. |
 | FS-08: duplicate entity stems are last-wins | Low | **Closed by the focused FS-08 change**; dataset-row loading rejects duplicate stems across CSV, JSON, and Parquet artifacts before reading any row file. |
+| FS-10: profiling deadline omits inner loops | Low | **Closed by the focused FS-10 change**; local CSV profiling checks the monotonic deadline before each field-processing and field-finalization operation. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -424,6 +425,9 @@ critical findings.
 - Focused command: `pytest tests/test_io_commands.py -q`
 - Result: **26 passed**; the synthetic mixed-format regression requires a fixed
   duplicate-name failure before either artifact is loaded.
+- Focused command: `pytest tests/test_local_profile_budget.py -q`
+- Result: **13 passed**; synthetic clocks require profiling to stop before the
+  next field operation and leave no partial cache.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

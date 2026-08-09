@@ -185,9 +185,13 @@ def _profile_schema_with_sample(
                     budget.consume_sample_row()
                     sampled_rows.append(dict(row))
                 for name, accumulator in accumulators.items():
+                    budget.check_deadline("CSV field profiling")
                     accumulator.add(row.get(name, ""))
         rows_by_entity[entity_name] = sampled_rows
-        fields = [accumulator.to_profile(row_count) for accumulator in accumulators.values()]
+        fields: list[FieldProfile] = []
+        for accumulator in accumulators.values():
+            budget.check_deadline("field finalization")
+            fields.append(accumulator.to_profile(row_count))
         primary_key_candidates = [field.name for field in fields if field.is_identifier and field.unique_ratio >= 0.98]
         entities.append(
             EntityProfile(

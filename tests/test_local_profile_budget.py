@@ -10,6 +10,7 @@ from test_data_agent.profiling import (
     LocalProfileLimits,
     profile_example_folder,
 )
+from test_data_agent.profiling.schema_profiler import FieldAccumulator
 
 
 def write_source(path: Path) -> None:
@@ -76,6 +77,68 @@ def test_local_profile_deadline_leaves_no_partial_cache(tmp_path: Path) -> None:
         profile_example_folder(tmp_path, cache_dir=cache_dir, budget=budget)
 
     assert error.value.dimension is LocalProfileDimension.DEADLINE_SECONDS
+    assert_no_cache(cache_dir)
+
+
+def test_local_profile_checks_deadline_between_fields(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "customers.csv").write_text("first,second\n1,2\n", encoding="utf-8")
+    cache_dir = tmp_path / "cache"
+    now = [0.0]
+    budget = LocalProfileBudget(
+        LocalProfileLimits(max_seconds=1.0),
+        clock=lambda: now[0],
+    )
+    calls: list[str] = []
+    original_add = FieldAccumulator.add
+
+    def expire_after_first(self: FieldAccumulator, value: str | None) -> None:
+        calls.append(self.name)
+        original_add(self, value)
+        now[0] = 2.0
+
+    monkeypatch.setattr(FieldAccumulator, "add", expire_after_first)
+
+    with pytest.raises(LocalProfileLimitError) as error:
+        profile_example_folder(tmp_path, cache_dir=cache_dir, budget=budget)
+
+    assert error.value.stage == "CSV field profiling"
+    assert calls == ["first"]
+    assert_no_cache(cache_dir)
+
+
+def test_local_profile_checks_deadline_between_field_finalization(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "customers.csv").write_text("first,second\n1,2\n", encoding="utf-8")
+    cache_dir = tmp_path / "cache"
+    now = [0.0]
+    budget = LocalProfileBudget(
+        LocalProfileLimits(max_seconds=1.0),
+        clock=lambda: now[0],
+    )
+    calls: list[str] = []
+    original_to_profile = FieldAccumulator.to_profile
+
+    def expire_after_first(
+        self: FieldAccumulator,
+        row_count: int,
+    ) -> Any:
+        calls.append(self.name)
+        result = original_to_profile(self, row_count)
+        now[0] = 2.0
+        return result
+
+    monkeypatch.setattr(FieldAccumulator, "to_profile", expire_after_first)
+
+    with pytest.raises(LocalProfileLimitError) as error:
+        profile_example_folder(tmp_path, cache_dir=cache_dir, budget=budget)
+
+    assert error.value.stage == "field finalization"
+    assert calls == ["first"]
     assert_no_cache(cache_dir)
 
 
