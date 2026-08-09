@@ -8,13 +8,21 @@ is understandable.
 ## The User Problem
 
 The product is useful when a team has enough structure and examples to describe a
-source system, but cannot give developers the source rows themselves. Typical
-inputs include:
+source system, but cannot give developers the source rows themselves. Potential
+evidence inputs include:
 
 - SQL DDL with primary keys, foreign keys, and checks;
 - Django, SQLAlchemy, or another ORM model description;
 - a bounded sample or safe profile with representative distributions;
 - a short description of the business invariants that must reconcile.
+
+The current RC6 user-facing source paths are CSV files or folders, validated
+safe profiles, and the optional Trino integration. Direct PostgreSQL, SQL DDL,
+Django models, and SQLAlchemy models are not yet first-class CLI inputs. If the
+source lives in PostgreSQL today, prepare a safe profile or bounded export in
+the protected environment; do not interpret this list as proof that the product
+already connects to PostgreSQL directly. Direct PostgreSQL support is a planned
+`1.0` release gate.
 
 The output is a fresh synthetic dataset for development, integration tests,
 analytics changes, forecasting, or budgeting experiments. It is not a masked
