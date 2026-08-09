@@ -124,6 +124,49 @@ def test_masker_skips_category_query_for_sensitive_column_name() -> None:
     assert "GROUP BY" not in queries[0].sql
 
 
+def test_masker_suppresses_sensitive_numeric_summaries_at_query_boundary() -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        return [
+            {
+                "row_count": 10,
+                "non_null_count": 10,
+                "approx_distinct_count": 10,
+                "max_abs_magnitude": 8,
+                "has_negative": False,
+                "has_positive": True,
+            }
+        ]
+
+    profile = TrinoMasker(
+        config=masker_config(),
+        fetch_query=fetch_query,
+        fetch_sql=reject_sql,
+    ).profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "tax_id",
+        "bigint",
+        False,
+        20,
+    )
+
+    assert profile["sensitive"] is True
+    assert not {"min_value", "max_value", "p05", "p95"} & profile.keys()
+    assert profile["numeric_shape"] == {
+        "max_abs_magnitude": 8,
+        "has_negative": False,
+        "has_positive": True,
+    }
+    assert all(
+        expression not in queries[0].sql
+        for expression in ("min(", "approx_percentile(")
+    )
+
+
 @pytest.mark.parametrize(
     "sql",
     [

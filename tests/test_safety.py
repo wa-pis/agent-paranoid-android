@@ -48,6 +48,38 @@ def test_safe_profile_accepts_masked_sensitive_patterns() -> None:
     assert_profile_safe(profile)
 
 
+def test_safe_profile_rejects_exact_sensitive_trino_numeric_summaries() -> None:
+    profile = DatasetProfile.model_validate(
+        {
+            "source_type": "trino",
+            "entities": [
+                {
+                    "name": "customers",
+                    "row_count": 1,
+                    "fields": [
+                        {
+                            "name": "tax_number",
+                            "data_type": "integer",
+                            "sensitive": True,
+                            "distribution": {
+                                "kind": "numeric",
+                                "min_value": 912345678,
+                                "max_value": 912345678,
+                                "p05": 912345678,
+                                "p95": 912345678,
+                                "scale_factor": 0.9,
+                            },
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+
+    with pytest.raises(ProfileSafetyError, match="exact numeric summaries"):
+        assert_profile_safe(profile)
+
+
 def test_safe_profile_rejects_raw_sensitive_categories_without_echoing_value() -> None:
     raw_email = "private-person@example.com"
     profile = DatasetProfile.model_validate(

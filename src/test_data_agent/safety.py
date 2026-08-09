@@ -39,7 +39,7 @@ class SourceRowReuseError(ValueError):
 
 
 _SAFE_SENSITIVE_DISTRIBUTIONS = frozenset(
-    {"masked_patterns", "numeric", "synthetic_identifier"}
+    {"masked_patterns", "numeric", "numeric_shape", "synthetic_identifier"}
 )
 _TEXT_LENGTH_PATTERN = re.compile(r"text_len_\d+")
 
@@ -85,6 +85,14 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
                         f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
                         "requires a non-identity numeric scale_factor"
                     )
+            if sensitive and kind == "numeric_shape" and field.data_type.value not in {
+                "integer",
+                "float",
+            }:
+                raise SpecSafetyError(
+                    f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
+                    "uses a numeric shape for a non-numeric field"
+                )
             if kind != "categorical":
                 continue
 
@@ -139,6 +147,14 @@ def assert_profile_safe(profile: DatasetProfile) -> None:
                     )
             if not sensitive:
                 continue
+            if profile.source_type == "trino" and kind == "numeric" and any(
+                field.distribution.get(key) is not None
+                for key in ("min_value", "max_value", "p05", "p95")
+            ):
+                raise ProfileSafetyError(
+                    f"sensitive Trino profile field {entity.name!r}.{field.name!r} "
+                    "contains exact numeric summaries"
+                )
             if kind not in _SAFE_SENSITIVE_DISTRIBUTIONS:
                 raise ProfileSafetyError(
                     f"sensitive profile field {entity.name!r}.{field.name!r} uses unsafe distribution kind {kind!r}"
