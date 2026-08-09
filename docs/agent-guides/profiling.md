@@ -40,6 +40,8 @@ or budget failure, do not publish a partial profile as trusted evidence.
 Single-CSV generation binds its complete-row reuse check to non-reversible row
 digests collected during the same CSV read that produced the profile; it does
 not reopen the mutable source path before publication.
+Dataset folders require one artifact stem per entity across CSV, JSON, and
+Parquet inputs; duplicate stems fail before any row artifact is read.
 
 The normal flow is:
 

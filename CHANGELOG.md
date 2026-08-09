@@ -25,6 +25,8 @@ All notable changes to this project are documented here.
   the checked source before publication.
 - Reject entity names reserved for generation control artifacts during spec
   validation and again before any dataset file is written.
+- Reject duplicate entity stems across CSV, JSON, and Parquet dataset folders
+  before any row artifact is read.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

@@ -143,6 +143,8 @@
   read and reject atomic source-path replacement before publication.
 - [x] FS-06: reserve generation control-artifact basenames in dataset specs and
   reject them again before the writer creates any file.
+- [x] FS-08: reject duplicate entity stems across dataset row artifact formats
+  before reading any row file.
 
 ## Release and review gates
 

@@ -397,6 +397,7 @@ critical findings.
 | SC-08: mutable Dockerfile syntax frontend | Low | **Closed by the focused SC-08 change**; the reviewed `docker/dockerfile:1.7` OCI index is bound to digest `sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e`, and the container contract test rejects a tag-only directive. |
 | FS-03: CSV replacement can defeat source-row exclusion | Low | **Closed by the focused FS-03 change**; single-CSV profiling records only SHA-256 row digests from the same parse stream, and pre-publication no-copy validation uses that immutable set instead of reopening the source path. |
 | FS-06: reserved entity name can replace dataset content | Low | **Closed by the focused FS-06 change**; every fixed generation-control basename is rejected during dataset-spec validation, and the writer repeats the check before creating any dataset file. |
+| FS-08: duplicate entity stems are last-wins | Low | **Closed by the focused FS-08 change**; dataset-row loading rejects duplicate stems across CSV, JSON, and Parquet artifacts before reading any row file. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -420,6 +421,9 @@ critical findings.
 - Focused command: `pytest tests/test_dataset_spec_contract.py tests/test_io_writers.py -q`
 - Result: **49 passed**; all reserved basenames fail spec validation and a
   direct writer call fails before publishing an earlier non-colliding entity.
+- Focused command: `pytest tests/test_io_commands.py -q`
+- Result: **26 passed**; the synthetic mixed-format regression requires a fixed
+  duplicate-name failure before either artifact is loaded.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

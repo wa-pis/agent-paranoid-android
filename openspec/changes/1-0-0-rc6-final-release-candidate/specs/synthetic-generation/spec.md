@@ -29,6 +29,18 @@ publication of a profiled source row.
 - **THEN** reuse of the originally profiled row is rejected
 - **AND** no generated artifact is published
 
+### Requirement: Dataset Artifact Stems Are Unique
+
+Dataset-row readers SHALL reject duplicate entity stems across supported input
+formats before reading any row artifact.
+
+#### Scenario: CSV and JSON artifacts share an entity stem
+
+- **GIVEN** a dataset folder contains `customers.csv` and `customers.json`
+- **WHEN** the folder is loaded for validation or recovery
+- **THEN** loading fails with a fixed duplicate-name error
+- **AND** neither artifact silently replaces the other
+
 ### Requirement: Source Categories Never Become Generated Values
 
 CSV-folder profiling SHALL replace source-derived text categories with
