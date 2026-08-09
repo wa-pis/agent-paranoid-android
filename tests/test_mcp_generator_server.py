@@ -1,11 +1,13 @@
 import csv
 import json
 import shutil
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
 
 import test_data_agent.agent_approval as agent_approval_module
+import test_data_agent.mcp_generator_server as server
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.mcp_generator_server import (
     WorkspacePathError,
@@ -22,10 +24,63 @@ from test_data_agent.mcp_generator_server import (
     validate_dataset,
 )
 from test_data_agent.safety import ProfileSafetyError, SpecSafetyError
+from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS, QueryWorkBudget
 
 
 def configure_workspace(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(root))
+
+
+def test_main_applies_shared_invocation_and_transport_budgets(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    initial_mcp = object()
+    runtime_mcp = object()
+    service_arguments: dict[str, object] = {}
+    transport_arguments: dict[str, object] = {}
+
+    monkeypatch.setattr(server, "mcp", initial_mcp)
+    monkeypatch.setattr(server, "audit_logger_from_env", lambda service: None)
+
+    def fake_services(**kwargs: object) -> list[object]:
+        service_arguments.update(kwargs)
+        return [object()]
+
+    monkeypatch.setattr(server, "generator_mcp_services", fake_services)
+    monkeypatch.setattr(
+        server,
+        "create_generator_mcp",
+        lambda tools: runtime_mcp,
+    )
+
+    def fake_run(
+        mcp: object,
+        *,
+        max_payload_bytes: int,
+        request_context_factory: Callable[[int], QueryWorkBudget],
+    ) -> None:
+        transport_arguments.update(
+            mcp=mcp,
+            max_payload_bytes=max_payload_bytes,
+            request_context_factory=request_context_factory,
+        )
+
+    monkeypatch.setattr(server, "run_bounded_generator_mcp", fake_run)
+
+    server.main()
+
+    assert server.mcp is runtime_mcp
+    assert service_arguments["work_limits"] == DEFAULT_QUERY_WORK_LIMITS
+    assert service_arguments["budget_provider"] is server._current_transport_work_budget
+    assert transport_arguments["mcp"] is runtime_mcp
+    assert (
+        transport_arguments["max_payload_bytes"]
+        == DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes
+    )
+    factory = transport_arguments["request_context_factory"]
+    assert callable(factory)
+    budget = factory(123)
+    assert budget.snapshot().raw_transport_payload_bytes == 123
 
 
 def write_source_csv(root: Path) -> None:

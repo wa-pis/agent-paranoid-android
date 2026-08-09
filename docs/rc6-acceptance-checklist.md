@@ -39,7 +39,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [ ] RC6-S9: advisor-proposed constraints reject string constants, unknown
   references, and sensitive targets; post-solve privacy/type validation runs
   before publication.
-- [ ] RC6-S10: generator MCP enforces pre-parse raw-frame, shared invocation,
+- [x] RC6-S10: generator MCP enforces pre-parse raw-frame, shared invocation,
   and final-response budgets; JSON structural limits apply before full
   materialization.
 - [ ] RC6-S11: public artifact names are safe path components, CSV formula
