@@ -156,7 +156,10 @@ test-data-agent agent-approve out/agent \
 context before running `agent-approve`. Add `--json` to `agent-plan`,
 `agent-review`, `agent-status`, or `agent-approve` for a versioned, row-free
 automation contract. Source type is detected for CSV files, CSV folders, and
-safe-profile JSON; use `--source-type` to override it.
+safe-profile JSON; use `--source-type` to override it. Human-facing errors,
+paths, and provider-derived metadata are escaped and bounded before terminal
+output. JSON errors remain structured and bound their text fields before
+serialization.
 
 `agent-advise` is the shortest provider-backed path. It loads the optional
 OpenAI adapter only when invoked, sends safe metadata through the structured

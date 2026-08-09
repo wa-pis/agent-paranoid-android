@@ -32,6 +32,19 @@ def test_root_help_matches_public_command_contract(capsys) -> None:
         assert f"{canonical} ({alias})" in output.out
 
 
+def test_parser_errors_escape_control_characters(capsys) -> None:
+    parser = cli_module.HelpfulArgumentParser(prog="test-data-agent")
+
+    with pytest.raises(SystemExit) as exc_info:
+        parser.error("invalid\nFORGED\x1b[31m")
+
+    output = capsys.readouterr()
+    assert exc_info.value.code == 2
+    assert output.err.count("\n") == 3
+    assert r"invalid\nFORGED\u001b[31m" in output.err
+    assert "\x1b" not in output.err
+
+
 def test_agent_plan_parser_defaults_match_contract(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

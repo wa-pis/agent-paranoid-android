@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 import shlex
 import sys
 from pathlib import Path
@@ -22,6 +21,7 @@ from test_data_agent.agent import (
 from test_data_agent.audit import AuditVerificationResult
 from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_parser import write_cli_error_response
+from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.validation import DatasetValidationReport
 
 
@@ -53,9 +53,13 @@ def report_cli_error(
             exit_code=exit_code,
         )
         return exit_code
-    print(f"Error: {message}", file=sys.stderr)
+    print(f"Error: {display_untrusted_text(message)}", file=sys.stderr)
     if help_command is not None:
-        print(f"Run '{help_command}' for examples and options.", file=sys.stderr)
+        print(
+            f"Run '{display_untrusted_text(help_command, limit=256)}' "
+            "for examples and options.",
+            file=sys.stderr,
+        )
     return exit_code
 
 
@@ -67,7 +71,11 @@ def write_validation_result(
     failed = sum(section.failed for section in report.sections)
     passed = sum(section.passed for section in report.sections)
     status = "passed" if report.valid else "failed"
-    destination = f" Report: {output}" if output is not None else ""
+    destination = (
+        f" Report: {display_untrusted_text(str(output), limit=240)}"
+        if output is not None
+        else ""
+    )
     print(
         f"Validation {status}: {passed} checks passed, {failed} failed."
         f"{destination}",
@@ -93,7 +101,7 @@ def write_audit_verification_result(result: AuditVerificationResult) -> int:
     """Write a successful audit verification summary."""
     print(
         f"Audit log verified: {result.record_count} records, "
-        f"last MAC {result.last_mac}",
+        f"last MAC {display_untrusted_text(result.last_mac, limit=128)}",
         file=sys.stderr,
     )
     return 0
@@ -102,9 +110,9 @@ def write_audit_verification_result(result: AuditVerificationResult) -> int:
 def write_doctor_report(report: DoctorReport) -> int:
     """Write installation checks and return their public exit code."""
     for check in report.checks:
-        print(check, file=sys.stderr)
+        print(display_untrusted_text(check), file=sys.stderr)
     for failure in report.failures:
-        print(f"doctor failed: {failure}", file=sys.stderr)
+        print(f"doctor failed: {display_untrusted_text(failure)}", file=sys.stderr)
     if report.failures:
         return 1
     print("doctor passed", file=sys.stderr)
@@ -160,14 +168,28 @@ def write_agent_result_summary(result: AgentResult) -> None:
     if not isinstance(result.summary, AgentGenerationSummary):
         raise ValueError("completed agent result is missing its generation summary")
     row_counts = result.summary.row_counts
-    rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"
+    rows_text = (
+        display_untrusted_text(
+            ", ".join(f"{name}={count}" for name, count in row_counts.items())
+        )
+        if row_counts
+        else "no rows"
+    )
     validation = "passed" if result.summary.validation_valid else "failed"
+    generated_folder = display_untrusted_text(
+        str(result.artifacts.generated_folder),
+        limit=240,
+    )
+    approval_receipt = display_untrusted_text(
+        str(result.artifacts.approval_receipt_path),
+        limit=240,
+    )
     print(
         "Agent generation completed: "
-        f"{result.artifacts.generated_folder} | rows: {rows_text} | "
+        f"{generated_folder} | rows: {rows_text} | "
         f"seed: {result.summary.seed} | validation: {validation} | "
         "source rows copied: no | "
-        f"approval receipt: {result.artifacts.approval_receipt_path}",
+        f"approval receipt: {approval_receipt}",
         file=sys.stderr,
     )
 
@@ -209,9 +231,13 @@ def write_agent_status_summary(
     if not isinstance(status.summary, AgentGenerationSummary):
         raise ValueError("completed agent status is missing its generation summary")
     validation = "passed" if status.summary.validation_valid else "failed"
+    generated_folder = display_untrusted_text(
+        str(status.artifacts.generated_folder),
+        limit=240,
+    )
     print(
         "Agent status: completed | "
-        f"output: {status.artifacts.generated_folder} | "
+        f"output: {generated_folder} | "
         f"validation: {validation} | source rows copied: no",
         file=sys.stderr,
     )
@@ -324,9 +350,9 @@ def write_agent_review_report(report: AgentReviewReport) -> None:
             )
     print(f"Constraints: {report.constraint_count}", file=sys.stderr)
     for assumption in report.assumptions:
-        print(f"Assumption: {assumption}", file=sys.stderr)
+        print(f"Assumption: {display_untrusted_text(assumption)}", file=sys.stderr)
     for warning in report.warnings:
-        print(f"Warning: {warning}", file=sys.stderr)
+        print(f"Warning: {display_untrusted_text(warning)}", file=sys.stderr)
     print("Approve only after reviewing the complete DatasetSpec:", file=sys.stderr)
     print(
         f"  test-data-agent agent-approve {workspace_command} "
@@ -355,7 +381,7 @@ def write_agent_plan_review(
     workspace_text = display_untrusted_name(str(workspace), limit=240)
     workspace_command = display_untrusted_name(shlex.quote(str(workspace)), limit=260)
     spec_path_text = display_untrusted_name(str(spec_path), limit=240)
-    print(f"{heading}: {workspace_text}", file=sys.stderr)
+    print(f"{display_untrusted_text(heading)}: {workspace_text}", file=sys.stderr)
     print(
         f"Source: {display_untrusted_name(summary.source_type)} | seed: {summary.seed} | "
         f"format: {summary.output_format.value}",
@@ -397,9 +423,9 @@ def write_agent_plan_review(
                 file=sys.stderr,
             )
     for assumption in summary.assumptions:
-        print(f"Assumption: {assumption}", file=sys.stderr)
+        print(f"Assumption: {display_untrusted_text(assumption)}", file=sys.stderr)
     for warning in summary.warnings:
-        print(f"Warning: {warning}", file=sys.stderr)
+        print(f"Warning: {display_untrusted_text(warning)}", file=sys.stderr)
     print(f"Review: {spec_path_text}", file=sys.stderr)
     if review is None:
         print(
@@ -422,9 +448,7 @@ def write_agent_plan_review(
 
 def display_untrusted_name(value: str, *, limit: int = 80) -> str:
     """Escape and bound untrusted names before terminal presentation."""
-    truncated = value[:limit]
-    escaped = json.dumps(truncated, ensure_ascii=False)[1:-1]
-    return f"{escaped}..." if len(value) > limit else escaped
+    return display_untrusted_text(value, limit=limit)
 
 
 def format_review_items(items: list[str], *, limit: int = 8) -> str:

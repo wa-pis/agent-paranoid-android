@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from test_data_agent.audit import (
+    AUDIT_ACTOR_ENV,
     AUDIT_HMAC_KEY_FILE_ENV,
     AUDIT_HMAC_KEY_ENV,
     AUDIT_LOG_ENV,
@@ -73,6 +74,23 @@ def test_audited_tool_records_failure_type(
     assert records[-1]["error_type"] == "ValueError"
     assert "raw sensitive detail" not in log_path.read_text(encoding="utf-8")
     assert verify_audit_log(log_path, AUDIT_KEY_BYTES).record_count == 2
+
+
+def test_audit_log_escapes_control_characters_in_physical_records(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    log_path = tmp_path / "audit.jsonl"
+    configure_audit(monkeypatch, log_path)
+    monkeypatch.setenv(AUDIT_ACTOR_ENV, "operator\t\x1b[31m\u0085")
+
+    audited_mcp_tool("generator-mcp", lambda: None)()
+
+    payload = log_path.read_bytes()
+    assert payload.count(b"\n") == 2
+    assert b"\t" not in payload
+    assert b"\x1b" not in payload
+    assert b"\\t\\u001b[31m\\u0085" in payload
 
 
 def test_audit_verification_detects_tampering(

@@ -805,7 +805,7 @@ Scope:
   TOCTOU races with descriptor-relative no-follow and inode revalidation.
 - [x] Define completion/read-validation semantics and explicit approval for
   sibling-artifact replacement.
-- [ ] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
+- [x] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
 - [ ] Move CI classification to trusted code, bind release publication to a
   signed tag and reviewed commit digest, and enforce a machine-readable RC
   acceptance manifest plus hash-pinned public profile installs.
