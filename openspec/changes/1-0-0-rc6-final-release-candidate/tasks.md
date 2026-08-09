@@ -116,7 +116,7 @@
 - [x] Define single-entity publication completion/read-validation semantics,
   and require explicit approval before replacing sibling artifacts in a
   bundle; test interrupted publication and collision cases.
-- [ ] Escape or otherwise bound untrusted metadata, paths, and error text in
+- [x] Escape or otherwise bound untrusted metadata, paths, and error text in
   CLI and log output so control characters cannot forge terminal or log lines.
 - [ ] Record external branch/tag ruleset, required-check, and PyPI Trusted
   Publisher evidence in the RC6 acceptance record; static workflow checks are

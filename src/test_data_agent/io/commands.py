@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from test_data_agent.adapters import load_profile_or_spec
+from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
@@ -160,7 +161,9 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
         raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
     spec = infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
     print(
-        f"Wrote dataset spec: {args.output} ({len(spec.entities)} entities)",
+        "Wrote dataset spec: "
+        f"{display_untrusted_text(str(args.output), limit=240)} "
+        f"({len(spec.entities)} entities)",
         file=sys.stderr,
     )
     return 0
@@ -278,7 +281,7 @@ def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
 def write_generation_errors(schema_report: Any, business_report: Any | None) -> None:
     for section in schema_report.sections:
         for error in section.errors:
-            print(error, file=sys.stderr)
+            print(display_untrusted_text(str(error)), file=sys.stderr)
     if business_report is not None and not business_report.valid:
         print("business validation failed", file=sys.stderr)
 
@@ -303,11 +306,19 @@ def write_profile_summary(profile_path: Path) -> None:
     try:
         profile = json.loads(profile_path.read_text())
     except (OSError, json.JSONDecodeError):
-        print(f"Wrote safe profile: {profile_path}", file=sys.stderr)
+        print(
+            f"Wrote safe profile: {display_untrusted_text(str(profile_path), limit=240)}",
+            file=sys.stderr,
+        )
         return
     entity_count = len(profile.get("entities", []))
     source_type = profile.get("source_type", "profile")
-    print(f"Wrote safe {source_type} profile: {profile_path} ({entity_count} entities)", file=sys.stderr)
+    print(
+        f"Wrote safe {display_untrusted_text(str(source_type))} profile: "
+        f"{display_untrusted_text(str(profile_path), limit=240)} "
+        f"({entity_count} entities)",
+        file=sys.stderr,
+    )
 
 
 def write_generation_summary(artifact_folder: Path) -> None:
@@ -320,12 +331,19 @@ def write_generation_summary(artifact_folder: Path) -> None:
         print("Synthetic dataset bundle is incomplete", file=sys.stderr)
         return
     row_counts = manifest.get("row_counts", {})
-    rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"
+    rows_text = (
+        display_untrusted_text(
+            ", ".join(f"{name}={count}" for name, count in row_counts.items())
+        )
+        if row_counts
+        else "no rows"
+    )
     validation = "passed" if manifest.get("validation_valid") else "failed"
     copied = "yes" if manifest.get("source_rows_copied") else "no"
     print(
         "Generated synthetic dataset: "
-        f"{artifact_folder} | rows: {rows_text} | seed: {manifest.get('seed')} | "
+        f"{display_untrusted_text(str(artifact_folder), limit=240)} | "
+        f"rows: {rows_text} | seed: {manifest.get('seed')} | "
         f"validation: {validation} | source rows copied: {copied}",
         file=sys.stderr,
     )

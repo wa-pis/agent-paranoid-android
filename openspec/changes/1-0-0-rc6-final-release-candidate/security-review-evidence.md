@@ -229,7 +229,7 @@ Their lower confidence changes the evidence required, not the release scope.
 | Medium | Semantic providers are not uniformly bounded, deterministic for a seed, or restricted to synthetic identity output | **Closed**; synchronous calls run in an isolated daemon thread with a fixed deadline, same-request replay must match, string values require the `synthetic_` namespace, and post-solve privacy/type checks remain mandatory |
 | Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Closed by the focused RC6-S17 change**; one descriptor-relative no-follow policy revalidates source and destination inode identity before atomic file/folder replacement and cleanup |
 | Low | Single-entity publication has no explicit completion/read-validation contract and bundle publication can replace sibling artifacts without approval | **Closed by the focused RC6-S18 change**; manifest publication is last, readers verify every recorded artifact hash, and any staged-name collision requires explicit overwrite approval |
-| Low | CLI and log output can emit unescaped provider-controlled metadata, paths, or errors | **Open; RC6 required hardening** |
+| Low | CLI and log output can emit unescaped provider-controlled metadata, paths, or errors | **Closed by the focused RC6-S19 change**; shared presentation helpers bound and escape human-facing diagnostics, while canonical audit JSON remains one bounded physical record per event |
 | High | Deployed branch/tag protection, required checks, and PyPI Trusted Publisher settings were not observable in the repository scan | **Open; RC6 external-evidence gate** |
 
 These findings require focused synthetic regressions, implementation review on
@@ -264,12 +264,26 @@ symlinks.
   tests/test_mcp_generator_server.py -q`
 - Result: **117 passed**.
 
+### RC6-S19 closure verification
+
+The focused RC6-S19 change routes untrusted human-facing errors, paths,
+metadata, assumptions, warnings, and row-count labels through one bounded
+escaping helper. CLI JSON errors retain their structured contract while
+bounding text before serialization. Audit events already use bounded canonical
+JSON; the new regression verifies that control characters cannot create a
+physical record or terminal-line boundary.
+
+- Focused command: `pytest tests/test_cli_presenter.py
+  tests/test_cli_parser_contract.py tests/test_audit.py
+  tests/test_io_commands.py tests/test_cli.py -q`
+- Result: **107 passed**.
+
 ## Review Conclusion
 
 **Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4,
-RC6-S7 through RC6-S11, and RC6-S13 through RC6-S18. Do not tag or promote RC6
-until RC6-S12, RC6-S19, and RC6-S20 are closed, a full repository-wide review
-is clean, an independent reviewer approves the exact fixed commit, and the
+RC6-S7 through RC6-S11, and RC6-S13 through RC6-S19. Do not tag or promote RC6
+until RC6-S12 and RC6-S20 are closed, a full repository-wide review is clean,
+an independent reviewer approves the exact fixed commit, and the
 immutable tag, public artifacts, final gates, external configuration evidence,
 and verifiable approval link are recorded. The follow-up scan of `5b3ad7f` is
 a blocking historical review, not release approval.

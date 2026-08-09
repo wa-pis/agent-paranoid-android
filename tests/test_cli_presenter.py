@@ -1,18 +1,23 @@
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
+from test_data_agent.agent import AgentPlanSummary
 from test_data_agent.audit import AuditVerificationResult
-from test_data_agent.cli_contract import DoctorReport
+from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_presenter import (
     display_untrusted_name,
     format_review_items,
+    report_cli_error,
     write_audit_verification_result,
+    write_agent_plan_review,
     write_doctor_report,
     write_examples,
     write_validation_result,
 )
+from test_data_agent.core.settings import OutputFormat
 from test_data_agent.validation import DatasetValidationReport
 
 
@@ -57,11 +62,79 @@ def test_validation_result_with_output_path_suppresses_stdout(capsys) -> None:
 
 def test_untrusted_review_names_are_escaped_and_bounded() -> None:
     assert display_untrusted_name("name\x1b[31m") == r"name\u001b[31m"
+    assert display_untrusted_name("name\u0085\u2028") == r"name\u0085\u2028"
     assert display_untrusted_name("x" * 81) == f"{'x' * 80}..."
     assert format_review_items([str(index) for index in range(10)]) == (
         "0, 1, 2, 3, 4, 5, 6, 7, +2 more"
     )
     assert format_review_items([]) == "none"
+
+
+def test_cli_errors_are_escaped_and_bounded(capsys) -> None:
+    message = "invalid\nFORGED\x1b[31m" + "x" * 1_000
+
+    assert (
+        report_cli_error(
+            argparse.Namespace(json_output=False, command="generate"),
+            code=CliErrorCode.INVALID_INPUT,
+            message=message,
+        )
+        == 2
+    )
+
+    output = capsys.readouterr().err
+    assert output.count("\n") == 1
+    assert r"invalid\nFORGED\u001b[31m" in output
+    assert "\x1b" not in output
+    assert len(output) < 600
+
+
+def test_json_cli_errors_remain_structured_and_bounded(capsys) -> None:
+    message = "invalid\nFORGED\x1b[31m" + "x" * 1_000
+
+    assert (
+        report_cli_error(
+            argparse.Namespace(json_output=True, command="generate"),
+            code=CliErrorCode.INVALID_INPUT,
+            message=message,
+        )
+        == 2
+    )
+
+    output = capsys.readouterr().out
+    payload = json.loads(output)
+    assert payload["error"]["message"].startswith("invalid\nFORGED\x1b[31m")
+    assert len(payload["error"]["message"]) == 515
+    assert "\x1b" not in output
+
+
+def test_agent_metadata_and_paths_are_escaped_and_bounded(capsys) -> None:
+    summary = AgentPlanSummary(
+        source_type="csv\nFORGED",
+        entities=[],
+        relationship_count=0,
+        constraint_count=0,
+        seed=7,
+        output_format=OutputFormat.JSON,
+        assumptions=["assumption\nFORGED"],
+        warnings=["warning\x1b[31m" + "x" * 1_000],
+    )
+
+    write_agent_plan_review(
+        heading="Agent plan ready",
+        summary=summary,
+        workspace=Path("workspace\nFORGED"),
+        spec_path=Path("spec\x1b[31m.json"),
+        review=None,
+    )
+
+    output = capsys.readouterr().err
+    assert "csv\\nFORGED" in output
+    assert "workspace\\nFORGED" in output
+    assert "Assumption: assumption\\nFORGED" in output
+    assert r"Warning: warning\u001b[31m" in output
+    assert "\x1b" not in output
+    assert max(map(len, output.splitlines())) < 600
 
 
 def test_examples_and_audit_results_use_existing_output_streams(capsys) -> None:

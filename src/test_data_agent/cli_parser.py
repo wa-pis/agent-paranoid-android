@@ -12,6 +12,7 @@ from test_data_agent.cli_contract import (
     CliErrorDetail,
     CliErrorResponse,
 )
+from test_data_agent.cli_text import bound_untrusted_text, display_untrusted_text
 from test_data_agent.core.settings import (
     GenerationMode as CoreGenerationMode,
     OutputFormat as CoreOutputFormat,
@@ -40,7 +41,10 @@ class HelpfulArgumentParser(argparse.ArgumentParser):
             )
             raise SystemExit(2)
         self.print_usage(sys.stderr)
-        print(f"{self.prog}: error: {message}", file=sys.stderr)
+        print(
+            f"{self.prog}: error: {display_untrusted_text(message)}",
+            file=sys.stderr,
+        )
         print(f"Try '{self.prog} --help' for examples and options.", file=sys.stderr)
         raise SystemExit(2)
 
@@ -84,10 +88,14 @@ def write_cli_error_response(
     response = CliErrorResponse(
         error=CliErrorDetail(
             code=code,
-            message=message,
-            command=command,
+            message=bound_untrusted_text(message),
+            command=bound_untrusted_text(command, limit=256),
             exit_code=exit_code,
-            help=help_command,
+            help=(
+                bound_untrusted_text(help_command, limit=256)
+                if help_command is not None
+                else None
+            ),
         )
     )
     print(response.model_dump_json(indent=2))

@@ -64,11 +64,11 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] RC6-S18: single-entity publication has completion/read-validation
   semantics and sibling-artifact replacement requires explicit approval;
   interrupted and collision cases are covered.
-- [ ] RC6-S19: untrusted metadata, paths, and errors are escaped and bounded
+- [x] RC6-S19: untrusted metadata, paths, and errors are escaped and bounded
   in CLI and log output, with control-character injection regressions.
 - [ ] RC6-S20: deployed branch/tag rulesets, required checks, and PyPI Trusted
   Publisher approvals are recorded as external acceptance evidence.
-- [ ] Synthetic regression tests cover category reordering, placeholder-shaped
+- [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback
   output, direct exception-chain inspection, source-free common categories,

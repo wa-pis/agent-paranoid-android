@@ -19,10 +19,26 @@ from test_data_agent.io.commands import (
     profile_example_command,
     profile_example_artifacts,
     validate_dataset_artifacts,
+    write_profile_summary,
 )
 from test_data_agent.io.readers import load_dataset_spec
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "example_dataset"
+
+
+def test_profile_summary_escapes_untrusted_metadata_and_path(tmp_path, capsys) -> None:
+    profile_path = tmp_path / "profile\nFORGED.json"
+    profile_path.write_text(
+        json.dumps({"source_type": "csv\x1b[31m", "entities": []})
+    )
+
+    write_profile_summary(profile_path)
+
+    output = capsys.readouterr().err
+    assert output.count("\n") == 1
+    assert "profile\\nFORGED.json" in output
+    assert r"csv\u001b[31m" in output
+    assert "\x1b" not in output
 
 
 def test_dataset_spec_loader_rejects_removed_shape_with_migration_help(tmp_path) -> None:
