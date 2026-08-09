@@ -136,12 +136,13 @@ def apply_valid_defaults(
                     row[row_rule.end_field] = row.get(row_rule.start_field)
         elif isinstance(row_rule, FormulaRule):
             for row in rows_by_table.get(row_rule.table, []):
+                failed = False
                 try:
                     row[row_rule.field] = safe_eval(row_rule.expression, row)
-                except Exception as exc:
-                    raise ValueError(
-                        f"{row_rule.table}.{row_rule.field} formula failed: {exc}"
-                    ) from exc
+                except Exception:
+                    failed = True
+                if failed:
+                    raise ValueError("formula evaluation failed")
 
 
 def apply_edge_cases(rows_by_table: dict[str, list[dict[str, Any]]], rules: BusinessRules) -> None:

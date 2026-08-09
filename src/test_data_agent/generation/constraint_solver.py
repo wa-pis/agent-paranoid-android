@@ -54,14 +54,15 @@ def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], s
             continue
         target = constraint.fields[0]
         for row in rows_by_entity.get(constraint.entity, []):
+            failed = False
             try:
                 row[target] = safe_eval(constraint.expression, row)
-            except Exception as exc:
+            except Exception:
                 if allow_invalid_values:
                     continue
-                raise ValueError(
-                    f"{constraint.entity}.{target} formula failed: {exc}"
-                ) from exc
+                failed = True
+            if failed:
+                raise ValueError("formula evaluation failed")
 
 
 def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:

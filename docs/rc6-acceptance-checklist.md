@@ -42,7 +42,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] RC6-S10: generator MCP enforces pre-parse raw-frame, shared invocation,
   and final-response budgets; JSON structural limits apply before full
   materialization.
-- [ ] RC6-S11: public artifact names are safe path components, CSV formula
+- [x] RC6-S11: public artifact names are safe path components, CSV formula
   markers are neutralized, and formula/validation diagnostics are bounded.
 - [ ] RC6-S12: CI classification uses trusted code, release publication checks
   signed tag and accepted commit identity, and RC acceptance is machine-

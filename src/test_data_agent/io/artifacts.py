@@ -20,6 +20,7 @@ from test_data_agent.core.settings import GenerationMode, OutputFormat, Validati
 from test_data_agent.io.writers import (
     dataset_spec_to_json,
     dataset_spec_to_yaml,
+    require_safe_artifact_name,
     write_bounded_text,
 )
 from test_data_agent.version import __version__
@@ -144,6 +145,7 @@ def write_dataset_generation_artifacts(
     profile_artifact_name: str = "csv_profile.json",
     row_counts: dict[str, int] | None = None,
 ) -> None:
+    require_safe_artifact_name(profile_artifact_name)
     artifact_dir = output.parent if output is not None else Path.cwd()
     artifact_dir.mkdir(parents=True, exist_ok=True)
     write_bounded_text(profile.model_dump_json(indent=2), artifact_dir / profile_artifact_name)

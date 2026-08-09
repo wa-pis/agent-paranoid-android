@@ -86,6 +86,13 @@ Inspect generated data for domain usefulness, but do not compare or publish raw
 source rows during that review. For sensitive domains, perform review in the
 same protected environment as the source data.
 
+CSV export prefixes string cells and headers that could be interpreted as
+spreadsheet formulas with a single quote. Numeric values, including negative
+numbers, remain numeric. Artifact names supplied through public workflows must
+be one safe filename component; separators and parent-directory components are
+rejected before any artifact is written. Formula failures expose only fixed
+local reasons, never expressions, values, or nested exception text.
+
 Re-run with the same spec, rules, package version, and seed when reproducibility
 is required. A change to any of those inputs can legitimately change output.
 

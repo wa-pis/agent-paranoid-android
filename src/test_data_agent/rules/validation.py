@@ -166,12 +166,12 @@ def validate_formula(rows_by_table: dict[str, list[dict[str, Any]]], rule: Formu
     for index, row in enumerate(rows_by_table.get(rule.table, [])):
         try:
             expected = safe_eval(rule.expression, row)
-        except Exception as exc:
-            record_result(result, False, f"{rule.table}[{index}].{rule.field} formula evaluation failed: {exc}")
+        except Exception:
+            record_result(result, False, "formula evaluation failed")
             continue
         actual = row.get(rule.field)
         ok = numbers_close(actual, expected, rule.tolerance)
-        record_result(result, ok, f"{rule.table}[{index}].{rule.field} expected {expected}, got {actual}")
+        record_result(result, ok, "formula mismatch")
     return result
 
 
@@ -190,10 +190,14 @@ def validate_aggregate_formula(rows_by_table: dict[str, list[dict[str, Any]]], r
     actual = aggregate(rule.field, rows)
     try:
         expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows})
-    except Exception as exc:
-        record_result(result, False, f"{rule.table}.{rule.field} aggregate formula evaluation failed: {exc}")
+    except Exception:
+        record_result(result, False, "aggregate formula evaluation failed")
         return result
-    record_result(result, numbers_close(actual, expected, rule.tolerance), f"{rule.table}.{rule.field} aggregate expected {expected}, got {actual}")
+    record_result(
+        result,
+        numbers_close(actual, expected, rule.tolerance),
+        "aggregate formula mismatch",
+    )
     return result
 
 

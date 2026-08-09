@@ -28,7 +28,7 @@
 - [ ] Validate advisor-proposed DatasetSpec constraints semantically before
   persistence; reject string constants, unknown references, and sensitive
   targets, then re-run privacy and type checks after constraint solving.
-- [ ] Replace formula/validation diagnostics that reflect expressions, ASTs,
+- [x] Replace formula/validation diagnostics that reflect expressions, ASTs,
   expected/actual values, or nested exceptions with fixed local reasons.
 - [x] Apply the same bounded pre-parse raw-frame and final-response transport
   policy to generator MCP, with a fresh invocation budget and tests for
@@ -36,9 +36,9 @@
 - [x] Enforce JSON node/container/depth/scalar limits before full object
   materialization and convert parser recursion/resource failures to bounded
   input errors.
-- [ ] Validate public artifact names as safe single components and reject
-  symlink targets in overwrite-capable CLI artifact paths.
-- [ ] Neutralize or reject spreadsheet formula markers at the CSV export
+- [x] Validate public artifact names as safe single components.
+- [ ] Reject symlink targets in overwrite-capable CLI artifact paths.
+- [x] Neutralize or reject spreadsheet formula markers at the CSV export
   boundary and test advisor, semantic-provider, and categorical inputs.
 
 ## Independent security review follow-ups
