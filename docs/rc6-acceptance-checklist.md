@@ -51,7 +51,7 @@ source checkouts are not substitutes for the public-artifact checks.
   cancellation, disconnect, timeout, and teardown release state exactly once.
 - [x] RC6-S14: Trino driver errors are fixed and redacted, and catalog/schema
   enumeration has an explicit tested metadata-exposure policy.
-- [ ] RC6-S15: the explicit opt-in `run_safe_select` has a separately
+- [x] RC6-S15: the explicit opt-in `run_safe_select` has a separately
   documented and
   enforced row-privacy contract, including names, addresses, and heuristic
   false negatives; default aggregate-only tools remain a separate surface.

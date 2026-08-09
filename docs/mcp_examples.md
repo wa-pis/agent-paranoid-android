@@ -111,10 +111,10 @@ The `TRINO_QUERY_MAX_*` values are sent as Trino session properties so a query
 is terminated by the server when it exceeds its time or scan budget.
 The explicit opt-in row-returning tool `run_safe_select` is excluded from the
 default aggregate-only tools. Set `TRINO_ENABLE_SAFE_SELECT=true` only for a
-trusted client that needs it; the planning workflow does not use raw SQL. Its
-bounded rows may contain allowed source values or values missed by heuristic
-masking, so they are not covered by the default source-literal-free guarantee
-and must not be treated as PII-free, anonymous, or privacy-safe.
+trusted client that needs it; the planning workflow does not use raw SQL. Every
+returned string is masked, including values missed by heuristics, while other
+non-string source values may remain. The rows are therefore outside the default
+source-literal-free guarantee and must not be treated as anonymous.
 
 ## Guardrails For AI Clients
 

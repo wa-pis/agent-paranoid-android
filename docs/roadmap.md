@@ -795,7 +795,7 @@ Scope:
   bounded capacity errors.
 - [x] Redact Trino driver failures and define the allowed catalog/schema
   enumeration metadata surface before it reaches MCP clients.
-- [ ] Define and enforce a separate privacy contract for opt-in
+- [x] Define and enforce a separate privacy contract for opt-in
   `run_safe_select`, including names, addresses, and heuristic false-negative
   regressions.
 - [ ] Bound semantic-provider execution and cancellation, require deterministic

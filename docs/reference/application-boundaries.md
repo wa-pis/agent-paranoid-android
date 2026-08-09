@@ -111,8 +111,9 @@ those contracts.
 - `profile_temporal_ordering`
 
 The explicit opt-in row-returning tools are outside that default fixture.
-`run_safe_select` is registered only when `TRINO_ENABLE_SAFE_SELECT=true` and
-does not inherit the default source-literal-free guarantee.
+`run_safe_select` is registered only when `TRINO_ENABLE_SAFE_SELECT=true`,
+masks every returned string, and does not inherit the default
+source-literal-free guarantee for remaining non-string values.
 
 Tool names, descriptions, input/output schemas, ordering, audit wrapping, and
 safety behavior remain compatibility-gated. Transport extraction must not move
@@ -335,8 +336,8 @@ while delegating masking below the transport boundary.
 The former row-sampling diagnostic is no longer registered or retained as a
 public Python compatibility wrapper, masking-service method, or query builder.
 The default aggregate-only tools provide metadata and profiling. The explicit
-opt-in row-returning tools include `run_safe_select`, which is not a
-source-literal-free replacement for that diagnostic.
+opt-in row-returning tools include `run_safe_select`, which masks every string
+but is not a source-literal-free replacement for that diagnostic.
 
 ### Architecture Gate
 

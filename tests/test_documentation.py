@@ -511,13 +511,10 @@ def test_trino_mcp_docs_define_default_privacy_boundary() -> None:
     }
     assert "source-literal-free" in guide
     assert "TRINO_ENABLE_SAFE_SELECT=true" in guide
-    assert "may contain allowed source" in guide
+    assert "row-shaped result masks every string" in guide
     for public_doc in (guide, integration, boundaries):
         assert "sample_rows_masked" not in public_doc
-    assert (
-        "does not make returned rows source-free, PII-free, anonymous, or\n"
-        "privacy-safe"
-    ) in guide
+    assert "does not\nmake returned rows source-free, anonymous" in guide
 
 
 def test_public_mcp_docs_reject_stale_or_broad_privacy_claims() -> None:

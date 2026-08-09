@@ -102,7 +102,7 @@
 - [x] Redact Trino driver, catalog, and schema enumeration failures at the
   MCP boundary; define and test whether catalog/schema discovery is allowed to
   reveal backend metadata before allowlist filtering.
-- [ ] Give the explicit opt-in `run_safe_select` surface a separate, explicit
+- [x] Give the explicit opt-in `run_safe_select` surface a separate, explicit
   row-privacy contract: either allowlist non-sensitive columns or synthesize/
   mask all returned strings, with tests for names, addresses, and heuristic
   false negatives.
