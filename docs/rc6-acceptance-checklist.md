@@ -20,12 +20,14 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] PR #334 detaches handled OpenAI failures from their cause/context chains.
 - [x] PR #335 preserves rare-category replacement and placeholder provenance
   across reordered baselines.
+- [x] PR #336 replaces dynamic provider exception names with fixed text and
+  contains every ordinary SDK constructor exception.
 - [x] RC6-S1: reordered baseline categories cannot leave an original rare value
   in the sanitized profile, baseline, or serialized advisor request.
-- [ ] RC6-S2: handled provider/validation failures have empty `__cause__` and
+- [x] RC6-S2: handled provider/validation failures have empty `__cause__` and
   `__context__`, and their public messages use only fixed local allowlisted
   text rather than dynamic Python exception class names.
-- [ ] RC6-S3: every ordinary SDK constructor exception, including exceptions
+- [x] RC6-S3: every ordinary SDK constructor exception, including exceptions
   outside `OpenAIError`, becomes the fixed local `ValueError` with no raw text,
   `__cause__`, or `__context__`.
 - [x] RC6-S4: incomplete responses use a fixed bounded local reason and never

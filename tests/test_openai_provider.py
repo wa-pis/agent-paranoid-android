@@ -35,6 +35,10 @@ from test_data_agent.providers.openai import (
 from test_data_agent.relationship_discovery import rank_relationship_candidates
 
 
+class ProviderSecretMarkerError(RuntimeError):
+    pass
+
+
 def safe_exchange(count: int | None = None):
     profile = DatasetProfile(
         source_type="test",
@@ -583,6 +587,9 @@ def test_openai_advisor_does_not_retain_initialization_error(
     with pytest.raises(ValueError, match="initialization failed") as raised:
         OpenAIAdvisorClient()
 
+    assert str(raised.value) == (
+        "OpenAI client initialization failed; configure OPENAI_API_KEY"
+    )
     assert raised.value.__cause__ is None
     assert raised.value.__context__ is None
     assert "sk-secret-value" not in "".join(
@@ -657,7 +664,7 @@ def test_openai_advisor_does_not_expose_incomplete_response_status() -> None:
     "provider_error",
     [
         OpenAIError("sk-secret-value"),
-        RuntimeError("sk-secret-value"),
+        ProviderSecretMarkerError("sk-secret-value"),
         pytest.param(
             None,
             id="structured-output-validation",

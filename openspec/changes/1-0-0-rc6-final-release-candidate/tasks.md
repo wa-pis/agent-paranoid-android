@@ -60,17 +60,17 @@
 - [x] Drop handled SDK/provider exceptions from both `__cause__` and
   `__context__` for client initialization, provider calls, and structured
   validation.
-- [ ] Catch every ordinary SDK constructor `Exception`, including exceptions
+- [x] Catch every ordinary SDK constructor `Exception`, including exceptions
   outside `OpenAIError`, then raise the fixed local `ValueError` only after
   leaving the active handler so no raw text or exception chain survives.
-- [ ] Replace dynamic Python exception class names in provider-call errors with
+- [x] Replace dynamic Python exception class names in provider-call errors with
   one fixed allowlisted local message.
 - [x] Replace raw `response.status` reflection with a fixed bounded local error
   reason and keep provider-controlled status text out of errors and metadata.
 - [x] Add synthetic regressions for reordered baselines, placeholder literals,
   handled constructor/provider failures, invalid output, incomplete status,
   formatted tracebacks, and direct `__cause__`/`__context__` inspection.
-- [ ] Add regressions for an ordinary non-`OpenAIError` constructor exception
+- [x] Add regressions for an ordinary non-`OpenAIError` constructor exception
   and a provider exception with a marker in its Python class name; assert exact
   fixed messages and empty cause/context chains.
 - [x] Rerun the independent review for the exact PR #335 merge tree and record
