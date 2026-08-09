@@ -145,6 +145,8 @@
   reject them again before the writer creates any file.
 - [x] FS-08: reject duplicate entity stems across dataset row artifact formats
   before reading any row file.
+- [x] FS-10: check the local profile deadline between field processing and
+  field finalization operations.
 
 ## Release and review gates
 

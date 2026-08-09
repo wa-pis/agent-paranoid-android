@@ -60,6 +60,18 @@ distributions SHALL retain their existing type and magnitude semantics.
   collision-safe synthetic label
 - **AND** generation remains deterministic for an explicit seed
 
+### Requirement: Local Profiling Deadline Covers Field Work
+
+CSV-folder profiling SHALL check its monotonic deadline between individual
+field processing and field finalization operations.
+
+#### Scenario: A field operation exhausts the deadline
+
+- **GIVEN** a local profile has more than one field to process or finalize
+- **WHEN** one field operation exhausts the configured deadline
+- **THEN** the next field operation is not started
+- **AND** no partial profile cache is published
+
 ### Requirement: CSV Output Neutralizes Spreadsheet Formula Markers
 
 CSV export SHALL reject or neutralize string cells beginning with spreadsheet

@@ -27,6 +27,8 @@ All notable changes to this project are documented here.
   validation and again before any dataset file is written.
 - Reject duplicate entity stems across CSV, JSON, and Parquet dataset folders
   before any row artifact is read.
+- Check local CSV profiling deadlines between individual field-processing and
+  field-finalization operations.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

@@ -86,6 +86,8 @@ source checkouts are not substitutes for the public-artifact checks.
   artifacts before any output file is created.
 - [x] FS-08: dataset-row readers reject duplicate entity stems across supported
   artifact formats before reading any row file.
+- [x] FS-10: local CSV profiling checks its monotonic deadline between field
+  processing and finalization operations.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback
