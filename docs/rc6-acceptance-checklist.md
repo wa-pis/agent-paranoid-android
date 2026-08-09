@@ -88,6 +88,8 @@ source checkouts are not substitutes for the public-artifact checks.
   artifact formats before reading any row file.
 - [x] FS-10: local CSV profiling checks its monotonic deadline between field
   processing and finalization operations.
+- [x] MT-04: audit capacity rejects new invocations before execution unless a
+  bounded terminal record can be retained.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

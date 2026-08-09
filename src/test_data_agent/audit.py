@@ -343,7 +343,11 @@ def _append_record(
         encoded = _canonical_json(record) + b"\n"
         if len(encoded) > MAX_AUDIT_RECORD_BYTES:
             raise AuditConfigurationError("audit record is too large")
-        if file_stat.st_size + len(encoded) > settings.max_bytes:
+        if (
+            status_value == "started"
+            and file_stat.st_size + len(encoded) + MAX_AUDIT_RECORD_BYTES
+            > settings.max_bytes
+        ):
             raise AuditConfigurationError(
                 f"audit log reached {AUDIT_MAX_BYTES_ENV}; rotate it before retrying"
             )
