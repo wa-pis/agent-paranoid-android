@@ -58,7 +58,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] RC6-S16: semantic-provider calls have bounded timeout/cancellation,
   deterministic replay or a seed-bound fingerprint, synthetic-only identity
   output, and post-generation privacy/type checks.
-- [ ] RC6-S17: filesystem publication and overwrite paths reject symlink and
+- [x] RC6-S17: filesystem publication and overwrite paths reject symlink and
   TOCTOU attacks, use no-follow/inode validation, and revalidate before
   publication and cleanup.
 - [ ] RC6-S18: single-entity publication has completion/read-validation

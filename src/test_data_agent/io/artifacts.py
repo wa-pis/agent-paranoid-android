@@ -5,10 +5,8 @@ from __future__ import annotations
 import hashlib
 import importlib.metadata
 import json
-import os
 import platform
 import re
-import tempfile
 from pathlib import Path
 from typing import Any, Literal
 
@@ -23,6 +21,7 @@ from test_data_agent.io.writers import (
     require_safe_artifact_name,
     write_bounded_text,
 )
+from test_data_agent.io.path_policy import open_regular_file
 from test_data_agent.version import __version__
 
 
@@ -85,7 +84,6 @@ class GenerationManifest(BaseModel):
 
 
 def write_json_artifact(payload: Any, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
     if hasattr(payload, "model_dump_json"):
         write_bounded_text(payload.model_dump_json(indent=2), output)
         return
@@ -93,19 +91,7 @@ def write_json_artifact(payload: Any, output: Path) -> None:
 
 
 def write_json_artifact_atomic(payload: Any, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary_name = tempfile.mkstemp(
-        dir=output.parent,
-        prefix=f".{output.name}.",
-        suffix=output.suffix,
-    )
-    temporary_path = Path(temporary_name)
-    os.close(descriptor)
-    try:
-        write_json_artifact(payload, temporary_path)
-        temporary_path.replace(output)
-    finally:
-        temporary_path.unlink(missing_ok=True)
+    write_json_artifact(payload, output)
 
 
 def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
@@ -113,7 +99,6 @@ def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> Non
 
 
 def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
     if output.suffix.lower() == ".json":
         write_bounded_text(dataset_spec_to_json(spec), output)
     else:
@@ -121,19 +106,7 @@ def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:
 
 
 def write_dataset_spec_artifact_atomic(spec: DatasetSpec, output: Path) -> None:
-    output.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary_name = tempfile.mkstemp(
-        dir=output.parent,
-        prefix=f".{output.name}.",
-        suffix=output.suffix,
-    )
-    temporary_path = Path(temporary_name)
-    os.close(descriptor)
-    try:
-        write_dataset_spec_artifact(spec, temporary_path)
-        temporary_path.replace(output)
-    finally:
-        temporary_path.unlink(missing_ok=True)
+    write_dataset_spec_artifact(spec, output)
 
 
 def write_dataset_generation_artifacts(
@@ -147,7 +120,6 @@ def write_dataset_generation_artifacts(
 ) -> None:
     require_safe_artifact_name(profile_artifact_name)
     artifact_dir = output.parent if output is not None else Path.cwd()
-    artifact_dir.mkdir(parents=True, exist_ok=True)
     write_bounded_text(profile.model_dump_json(indent=2), artifact_dir / profile_artifact_name)
     write_bounded_text(spec.model_dump_json(indent=2), artifact_dir / "dataset_spec.json")
     write_bounded_text(report.model_dump_json(indent=2), artifact_dir / "validation_report.json")
@@ -302,7 +274,7 @@ def artifact_hashes(output_folder: Path) -> dict[str, str]:
         if not path.is_file() or path.name == "generation_manifest.json":
             continue
         digest = hashlib.sha256()
-        with path.open("rb") as handle:
+        with open_regular_file(path) as handle:
             for chunk in iter(lambda: handle.read(1024 * 1024), b""):
                 digest.update(chunk)
         hashes[path.relative_to(output_folder).as_posix()] = digest.hexdigest()

@@ -8,10 +8,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-import tempfile
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import read_limited_text
+from test_data_agent.io.path_policy import atomic_write_bytes
 
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
@@ -57,23 +57,15 @@ def write_cached_profile(
     cache_dir: Path = DEFAULT_PROFILE_CACHE_DIR,
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
 ) -> Path:
-    cache_dir.mkdir(parents=True, exist_ok=True)
     path = cache_path(cache_dir, csv_folder_fingerprint(input_folder, rule_sample_rows))
     payload = {
         "fingerprint": csv_folder_fingerprint(input_folder, rule_sample_rows),
         "profile": profile.model_dump(mode="json"),
     }
-    with tempfile.NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        dir=cache_dir,
-        prefix=f".{path.name}.",
-        suffix=".tmp",
-        delete=False,
-    ) as handle:
-        temporary_path = Path(handle.name)
-        json.dump(payload, handle, indent=2, sort_keys=True)
-    temporary_path.replace(path)
+    atomic_write_bytes(
+        path,
+        json.dumps(payload, indent=2, sort_keys=True).encode("utf-8"),
+    )
     return path
 
 

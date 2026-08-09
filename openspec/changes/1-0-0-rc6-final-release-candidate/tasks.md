@@ -110,7 +110,7 @@
   timeout/cancellation boundary, require a deterministic replay or output
   fingerprint for an explicit seed, restrict names/addresses to a synthetic
   namespace, and run post-generation privacy/type checks.
-- [ ] Harden every filesystem publication and overwrite path against symlink
+- [x] Harden every filesystem publication and overwrite path against symlink
   and TOCTOU races using one centralized path policy, no-follow descriptor or
   inode validation, and revalidation before publication and cleanup.
 - [ ] Define single-entity publication completion/read-validation semantics,

@@ -93,7 +93,7 @@ class CliDoctorService:
 
         if not skip_smoke and not failures:
             with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
-                root = Path(tmp)
+                root = Path(tmp).resolve(strict=True)
                 fixture = root / "example_dataset"
                 output = root / "generated"
                 cache_dir = root / "cache"

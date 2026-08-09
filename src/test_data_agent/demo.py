@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import shutil
 from importlib.resources import as_file, files
 from pathlib import Path
 
 from test_data_agent.core.settings import OutputFormat
+from test_data_agent.io.path_policy import discard_staging_directory
 from test_data_agent.io.workflows import (
     commit_temp_output_folder,
     generate_dataset_from_csv_artifacts,
@@ -43,6 +43,6 @@ def run_demo(output_folder: Path) -> int:
             raise ValueError("installed demo dataset failed validation")
         commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        discard_staging_directory(temp_folder)
         raise
     return 0
