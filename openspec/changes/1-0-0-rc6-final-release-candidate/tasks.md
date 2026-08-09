@@ -84,9 +84,10 @@
 - [x] Run change classification from trusted base code or force heavy checks
   whenever classifier, workflow, dependency, build, release, or configuration
   paths change.
-- [ ] Require a signed immutable release tag and verify it resolves to the
+- [x] Require a signed release tag and verify it resolves to the
   reviewed RC6 commit digest before building, attesting, signing, or
-  publishing any artifact or container.
+  publishing any artifact or container; deployed tag immutability remains
+  part of the external ruleset evidence below.
 - [ ] Add a machine-readable RC acceptance manifest containing reviewed commit,
   closed findings, approvals, artifact digests, and gate results; make release
   workflows fail closed when it is missing, stale, or incomplete.

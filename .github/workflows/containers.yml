@@ -46,8 +46,14 @@ jobs:
 
   validate:
     name: Validate ${{ matrix.target }}
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
+    needs:
+      - changes
+      - release-gate
+    if: >-
+      always() &&
+      needs.changes.outputs.code == 'true' &&
+      (!startsWith(github.ref, 'refs/tags/') ||
+      needs.release-gate.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -132,8 +138,14 @@ jobs:
 
   validate-arm64:
     name: Validate ARM64 ${{ matrix.target }}
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
+    needs:
+      - changes
+      - release-gate
+    if: >-
+      always() &&
+      needs.changes.outputs.code == 'true' &&
+      (!startsWith(github.ref, 'refs/tags/') ||
+      needs.release-gate.result == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -221,7 +233,24 @@ jobs:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          fetch-depth: 0
+          fetch-tags: true
           persist-credentials: false
+
+      - name: Verify signed accepted release source
+        env:
+          RELEASE_ACCEPTED_COMMIT: ${{ vars.RELEASE_ACCEPTED_COMMIT }}
+        run: |
+          set -euo pipefail
+          [[ "${RELEASE_ACCEPTED_COMMIT:-}" =~ ^[0-9a-f]{40}$ ]]
+          git show "${RELEASE_ACCEPTED_COMMIT}:scripts/check_release_identity.py" \
+            > "${RUNNER_TEMP}/check_release_identity.py"
+          git show "${RELEASE_ACCEPTED_COMMIT}:.github/release-signers" \
+            > "${RUNNER_TEMP}/release-signers"
+          python3 "${RUNNER_TEMP}/check_release_identity.py" \
+            "${GITHUB_REF_NAME}" \
+            "${RELEASE_ACCEPTED_COMMIT}" \
+            "${RUNNER_TEMP}/release-signers"
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
