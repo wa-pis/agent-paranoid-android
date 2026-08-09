@@ -303,8 +303,8 @@ exports while passing built queries to the existing bounded client path.
 ### Trino Client Migration
 
 `trino_client.py` now owns configured driver connections, fail-closed session
-resource budgets, client-side result limits, row conversion, and nested
-cursor/connection cleanup. `mcp_trino_server.py` retains its existing
+resource budgets, a process-wide concurrency cap, client-side result limits,
+row conversion, and nested cursor/connection cleanup. `mcp_trino_server.py` retains its existing
 `_execute_query`, `_fetch_dicts`, `trino`, and error imports as compatibility
 wrappers while delegating execution to the injected `TrinoClient` boundary.
 

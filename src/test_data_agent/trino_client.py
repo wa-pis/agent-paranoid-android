@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable, Sequence
+from contextlib import closing
 from dataclasses import dataclass
+from threading import BoundedSemaphore
 from typing import Any, TypeVar, cast
 
 from test_data_agent.trino_config import (
@@ -30,6 +32,14 @@ except ImportError:  # pragma: no cover
 
 class TrinoResultLimitError(ValueError):
     """Raised when a Trino response exceeds the client-side safety limit."""
+
+
+class TrinoCapacityError(RuntimeError):
+    """Raised when the shared in-process Trino work cap is exhausted."""
+
+
+DEFAULT_MAX_CONCURRENT_TRINO_QUERIES = 8
+_TRINO_WORK_SLOTS = BoundedSemaphore(DEFAULT_MAX_CONCURRENT_TRINO_QUERIES)
 
 
 RowT = TypeVar("RowT")
@@ -99,55 +109,55 @@ class TrinoClient:
             self.config,
             budget,
         )
-        connection = self.driver.dbapi.connect(
-            host=self.config.host,
-            port=self.config.port,
-            user=self.config.user,
-            http_scheme=self.config.http_scheme,
-            request_timeout=request_timeout,
-            session_properties={
-                "query_max_execution_time": execution_timeout,
-                "query_max_run_time": run_timeout,
-                "query_max_scan_physical_bytes": self.config.query_max_scan_physical_bytes,
-            },
-        )
-        cursor = connection.cursor()
+        if not _TRINO_WORK_SLOTS.acquire(blocking=False):
+            raise TrinoCapacityError("Trino request capacity exhausted")
         try:
-            cursor.execute(sql, parameters or [])
-            _check_invocation_deadline(budget)
-            description = cursor.description or []
-            consume_database_result_payload(description)
-            _check_invocation_deadline(budget)
-            convert_row = row_converter_factory(description)
-            rows: list[RowT] = []
-            while True:
-                _check_invocation_deadline(budget)
-                batch = cursor.fetchmany(1)
-                _check_invocation_deadline(budget)
-                if not batch:
-                    break
-                if len(rows) >= self.config.max_result_rows:
-                    raise TrinoResultLimitError(
-                        "Trino result exceeds the client limit of "
-                        f"{self.config.max_result_rows} rows"
-                    )
-                row = convert_row(batch[0])
-                consume_database_result_payload(row)
-                rows.append(row)
-            return rows, description
-        except QueryWorkBudgetExceeded:
-            raise
-        except Exception as error:
-            try:
-                _check_invocation_deadline(budget)
-            except QueryWorkBudgetExceeded as deadline_error:
-                raise deadline_error from error
-            raise
+            connection = self.driver.dbapi.connect(
+                host=self.config.host,
+                port=self.config.port,
+                user=self.config.user,
+                http_scheme=self.config.http_scheme,
+                request_timeout=request_timeout,
+                session_properties={
+                    "query_max_execution_time": execution_timeout,
+                    "query_max_run_time": run_timeout,
+                    "query_max_scan_physical_bytes": self.config.query_max_scan_physical_bytes,
+                },
+            )
+            with closing(connection), closing(connection.cursor()) as cursor:
+                try:
+                    cursor.execute(sql, parameters or [])
+                    _check_invocation_deadline(budget)
+                    description = cursor.description or []
+                    consume_database_result_payload(description)
+                    _check_invocation_deadline(budget)
+                    convert_row = row_converter_factory(description)
+                    rows: list[RowT] = []
+                    while True:
+                        _check_invocation_deadline(budget)
+                        batch = cursor.fetchmany(1)
+                        _check_invocation_deadline(budget)
+                        if not batch:
+                            break
+                        if len(rows) >= self.config.max_result_rows:
+                            raise TrinoResultLimitError(
+                                "Trino result exceeds the client limit of "
+                                f"{self.config.max_result_rows} rows"
+                            )
+                        row = convert_row(batch[0])
+                        consume_database_result_payload(row)
+                        rows.append(row)
+                    return rows, description
+                except QueryWorkBudgetExceeded:
+                    raise
+                except Exception as error:
+                    try:
+                        _check_invocation_deadline(budget)
+                    except QueryWorkBudgetExceeded as deadline_error:
+                        raise deadline_error from error
+                    raise
         finally:
-            try:
-                cursor.close()
-            finally:
-                connection.close()
+            _TRINO_WORK_SLOTS.release()
 
 
 def _bounded_query_timeouts(

@@ -47,7 +47,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [ ] RC6-S12: CI classification uses trusted code, release publication checks
   signed tag and accepted commit identity, and RC acceptance is machine-
   enforced.
-- [ ] RC6-S13: active MCP requests and shared Trino work are globally bounded;
+- [x] RC6-S13: active MCP requests and shared Trino work are globally bounded;
   cancellation, disconnect, timeout, and teardown release state exactly once.
 - [ ] RC6-S14: Trino driver errors are fixed and redacted, and catalog/schema
   enumeration has an explicit tested metadata-exposure policy.
