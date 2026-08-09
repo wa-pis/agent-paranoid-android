@@ -452,6 +452,9 @@ For teams whose source system is PostgreSQL, stable `1.0` also requires one
 documented direct database workflow. Trino remains an optional integration and
 must not be a prerequisite for PostgreSQL users.
 
+The implementation contract is the [PostgreSQL and multi-source
+OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-postgres-multi-source/proposal.md).
+
 The minimum PostgreSQL scope is:
 
 - [ ] Add a separate optional `postgres` installation profile.
