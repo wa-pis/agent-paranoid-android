@@ -732,10 +732,10 @@ Scope:
   MCP, legacy conversion, and planning artifacts.
 - [ ] Validate provider-added DatasetSpec constraints and run privacy/type
   checks after constraint solving, before output publication.
-- [ ] Make formula and validation diagnostics fixed-reason and source-free.
+- [x] Make formula and validation diagnostics fixed-reason and source-free.
 - [x] Apply bounded raw-frame, invocation, and final-response budgets to the
   generator MCP and enforce JSON structure limits before materialization.
-- [ ] Harden public artifact names and neutralize spreadsheet formula markers
+- [x] Harden public artifact names and neutralize spreadsheet formula markers
   in CSV output.
 - [ ] Bound active MCP requests and shared Trino concurrency, release all
   request state on cancellation/disconnect/timeout/teardown, and return fixed

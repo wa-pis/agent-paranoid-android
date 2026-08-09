@@ -163,9 +163,9 @@ repository settings were used.
 | Medium | Pull requests control the classifier that can skip required checks | **Open; RC6 release-blocking** |
 | Medium | Release publication is bound to tag/version, not approved commit identity | **Open; RC6 release-blocking** |
 | Medium | RC6 acceptance evidence is not enforced by the release workflow | **Open; RC6 release-blocking** |
-| Medium | CSV output does not neutralize spreadsheet formula markers | **Open; RC6 required hardening** |
-| Medium | Formula/validation errors can reflect provider-controlled text | **Open; RC6 required hardening** |
-| Low | Public workflow API accepts an unsafe profile artifact name | **Open; RC6 required hardening** |
+| Medium | CSV output does not neutralize spreadsheet formula markers | **Closed by the focused RC6-S11 change**; the central CSV writer prefixes dangerous string cells and headers while preserving numeric values, with synthetic marker regressions |
+| Medium | Formula/validation errors can reflect provider-controlled text | **Closed by the focused RC6-S11 change**; solver, business-rule, and constraint diagnostics use exact fixed reasons with detached nested exceptions and value-redaction regressions |
+| Low | Public workflow API accepts an unsafe profile artifact name | **Closed by the focused RC6-S11 change**; public generation artifacts validate the profile name as one safe component before creating directories or files |
 
 ### RC6-S7 closure verification
 

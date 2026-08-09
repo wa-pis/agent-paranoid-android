@@ -33,7 +33,8 @@ def test_formula_constraint_reports_evaluation_errors_without_crashing() -> None
     report = validate_dataset({"orders": [{"amount": 10.0, "quantity": 2.0}]}, spec)
 
     assert report.valid is False
-    assert "formula evaluation failed" in report.sections[2].errors[0]
+    assert report.sections[2].errors == ["formula evaluation failed"]
+    assert "division by zero" not in str(report)
 
 
 def test_aggregate_mapping_reports_non_numeric_child_values_without_crashing() -> None:

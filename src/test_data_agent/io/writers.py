@@ -38,10 +38,35 @@ def rows_to_csv(rows: list[dict[str, Any]]) -> str:
         return ""
 
     handle = StringIO()
-    writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
-    writer.writeheader()
-    writer.writerows(rows)
+    fieldnames = list(rows[0])
+    fieldname_set = set(fieldnames)
+    writer = csv.writer(handle)
+    writer.writerow([neutralize_csv_cell(name) for name in fieldnames])
+    for row in rows:
+        if set(row) - fieldname_set:
+            raise ValueError("CSV rows must share one schema")
+        writer.writerow([neutralize_csv_cell(row.get(name)) for name in fieldnames])
     return handle.getvalue()
+
+
+def neutralize_csv_cell(value: Any) -> Any:
+    """Prevent string cells from being interpreted as spreadsheet formulas."""
+    if not isinstance(value, str) or not value:
+        return value
+    stripped = value.lstrip(" \t\r\n")
+    if value[0] in "\t\r\n" or (stripped and stripped[0] in "=+-@"):
+        return "'" + value
+    return value
+
+
+def require_safe_artifact_name(name: str) -> str:
+    if (
+        name in {".", ".."}
+        or Path(name).name != name
+        or not SAFE_ARTIFACT_NAME_RE.fullmatch(name)
+    ):
+        raise ValueError("unsafe artifact name")
+    return name
 
 
 def rows_to_sql(entity_name: str, rows: list[dict[str, Any]]) -> str:
@@ -157,8 +182,10 @@ def write_dataset_rows(
 
 
 def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str) -> Path:
-    if not SAFE_ARTIFACT_NAME_RE.fullmatch(entity_name):
-        raise ValueError(f"unsafe entity artifact name: {entity_name!r}")
+    try:
+        require_safe_artifact_name(entity_name)
+    except ValueError:
+        raise ValueError(f"unsafe entity artifact name: {entity_name!r}") from None
     path = (output_folder / f"{entity_name}{suffix}").resolve(strict=False)
     if not path.is_relative_to(output_folder):
         raise ValueError("entity artifact path escapes output folder")

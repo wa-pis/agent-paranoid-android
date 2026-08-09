@@ -222,8 +222,41 @@ cross_table_rules:
     assert report.valid is False
     assert report.rule_fail_count == 2
     errors = [error for result in report.results for error in result.errors]
-    assert any("formula evaluation failed" in error for error in errors)
-    assert any("aggregate formula evaluation failed" in error for error in errors)
+    assert errors == [
+        "formula evaluation failed",
+        "aggregate formula evaluation failed",
+    ]
+    assert "division by zero" not in str(report)
+
+
+def test_business_validator_does_not_report_formula_values(tmp_path) -> None:
+    rules_path = tmp_path / "rules.yaml"
+    rules_path.write_text(
+        """
+row_rules:
+  - type: formula
+    table: orders
+    field: total
+    expression: quantity * price
+cross_table_rules:
+  - type: aggregate_formula
+    table: orders
+    field: total
+    expression: "10"
+    expected: 10
+"""
+    )
+    rows_by_table = {
+        "orders": [{"quantity": 2, "price": 5, "total": 999_999}]
+    }
+
+    report = validate_business_rules(rows_by_table, load_business_rules(rules_path))
+
+    assert [error for result in report.results for error in result.errors] == [
+        "formula mismatch",
+        "aggregate formula mismatch",
+    ]
+    assert "999999" not in str(report)
 
 
 def test_business_rule_application_reports_bad_formula(tmp_path) -> None:
@@ -240,8 +273,11 @@ row_rules:
     rules = load_business_rules(rules_path)
     rows_by_table = {"orders": [{"quantity": 2, "total": 10}]}
 
-    with pytest.raises(ValueError, match="orders.total formula failed"):
+    with pytest.raises(ValueError, match="^formula evaluation failed$") as raised:
         apply_business_rules(rows_by_table, rules, seed=7, mode="valid", invalid_ratio=0.0)
+
+    assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
 
 
 def test_scenario_distribution_and_controlled_invalid_generation_are_deterministic(tmp_path) -> None:

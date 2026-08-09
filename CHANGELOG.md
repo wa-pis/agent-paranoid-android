@@ -33,6 +33,9 @@ All notable changes to this project are documented here.
 - Run generator MCP over the bounded stdio transport with fresh shared request
   budgets, bounded final responses, and pre-materialization JSON structure
   limits.
+- Restrict public artifact names to safe path components, neutralize
+  spreadsheet formula markers in CSV cells, and replace formula diagnostics
+  with fixed local reasons.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

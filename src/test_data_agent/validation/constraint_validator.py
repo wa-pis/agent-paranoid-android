@@ -33,12 +33,12 @@ def validate_formula(rows_by_entity: dict[str, list[dict[str, Any]]], constraint
     for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
         try:
             expected = safe_eval(constraint.expression, coerce_numeric_row(row))
-        except Exception as exc:
-            errors.append(f"{constraint.entity}[{index}].{target} formula evaluation failed: {exc}")
+        except Exception:
+            errors.append("formula evaluation failed")
             continue
         actual = row.get(target)
         if not numbers_close(actual, expected):
-            errors.append(f"{constraint.entity}[{index}].{target} formula mismatch")
+            errors.append("formula mismatch")
     return errors
 
 

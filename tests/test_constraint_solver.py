@@ -34,8 +34,11 @@ def test_formula_solver_reports_unappliable_constraints_in_valid_mode() -> None:
         ],
     )
 
-    with pytest.raises(ValueError, match="orders.amount formula failed"):
+    with pytest.raises(ValueError, match="^formula evaluation failed$") as raised:
         generate_dataset(spec, seed=3)
+
+    assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
 
 
 def test_formula_solver_leaves_unappliable_constraints_for_negative_validation() -> None:
