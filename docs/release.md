@@ -92,6 +92,12 @@ stable source tree. Stop the promotion, make the change in a newly numbered
 release candidate, and complete that candidate's acceptance before trying
 stable promotion again.
 
+Before any RC6 or stable publication, the release workflow must also validate
+the machine-readable RC acceptance manifest. It must bind the tag to the
+reviewed commit digest, require closed release-blocking findings and recorded
+approval, and match the published artifact digests. A version-matching tag or
+unchecked Markdown checklist is not sufficient evidence.
+
 Run every final release gate, including `scripts/check_release.sh` and
 `mkdocs build --strict`, on the exact stable release commit. Merge only after
 the required pipeline is green and conflict-free. Create `v1.0.0` only from

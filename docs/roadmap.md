@@ -705,21 +705,58 @@ Exit criteria:
 ### 1.0.0rc6: Final Release Candidate
 
 **Goal:** make RC6 the single reviewed source tree for stable promotion after
-closing the remaining rare-category, provider-metadata, Trino deployment, and
-public-review evidence gaps.
+closing the remaining privacy-boundary, provider-trust, transport, filesystem,
+supply-chain, and public-review evidence gaps. RC6 remains active because no
+`v1.0.0rc6` tag has been accepted yet; the current-tree security review adds
+requirements to this candidate rather than creating an unnecessary RC7.
 
 Scope:
 
 - [x] Implement field-scoped, deterministic rare-category placeholders that
-  avoid normal-category and placeholder collisions.
+  avoid normal-category and placeholder collisions and preserve sanitizer
+  provenance across reordered baselines.
 - [x] Return typed per-call OpenAI completion metadata and attach the same
   bounded metadata to preflight/provider failures; keep the mutable last-call
   view legacy-only.
+- [ ] Convert every ordinary SDK construction exception to the fixed local
+  error, detach all provider exception chains, and keep dynamic Python exception
+  class names out of public provider-call messages.
 - [x] Add `trusted-local` and `shared-hardened` Trino deployment profiles;
   require a finite cumulative scan ceiling for `shared-hardened` and expose the
   effective policy in `doctor`.
 - [x] Add focused tests for placeholder collisions/determinism, concurrent
   provider calls and failures, and fail-closed Trino profile configuration.
+- [ ] Make every categorical value in an external advisor request synthetic or
+  non-reversible; heuristic PII detection is not an egress guarantee.
+- [ ] Suppress exact sensitive numeric Trino extrema and percentiles through
+  MCP, legacy conversion, and planning artifacts.
+- [ ] Validate provider-added DatasetSpec constraints and run privacy/type
+  checks after constraint solving, before output publication.
+- [ ] Make formula and validation diagnostics fixed-reason and source-free.
+- [ ] Apply bounded raw-frame, invocation, and final-response budgets to the
+  generator MCP and enforce JSON structure limits before materialization.
+- [ ] Harden public artifact names and neutralize spreadsheet formula markers
+  in CSV output.
+- [ ] Bound active MCP requests and shared Trino concurrency, release all
+  request state on cancellation/disconnect/timeout/teardown, and return fixed
+  bounded capacity errors.
+- [ ] Redact Trino driver failures and define the allowed catalog/schema
+  enumeration metadata surface before it reaches MCP clients.
+- [ ] Define and enforce a separate privacy contract for opt-in
+  `run_safe_select`, including names, addresses, and heuristic false-negative
+  regressions.
+- [ ] Bound semantic-provider execution and cancellation, require deterministic
+  replay or a seed-bound output fingerprint, restrict identity output to a
+  synthetic namespace, and run post-generation privacy/type checks.
+- [ ] Harden filesystem publication and overwrite paths against symlink and
+  TOCTOU races; define completion/read-validation semantics and explicit
+  approval for sibling-artifact replacement.
+- [ ] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
+- [ ] Move CI classification to trusted code, bind release publication to a
+  signed tag and reviewed commit digest, and enforce a machine-readable RC
+  acceptance manifest plus hash-pinned public profile installs.
+- [ ] Record deployed branch/tag rulesets, required checks, and PyPI Trusted
+  Publisher approvals as external RC6 acceptance evidence.
 - [ ] Record a publicly verifiable security review with reviewer identity or
   stable pseudonym, reviewed commit, date, scope, findings/disposition, and a
   signature or approval URL.
@@ -735,7 +772,7 @@ Scope:
 
 Exit criteria:
 
-- No unresolved P0 or release-blocking P1 findings remain.
+- No unresolved release-blocking finding remains at any severity.
 - RC6 public artifacts and documentation identify the same immutable commit.
 - Stable promotion is allowed only from the accepted RC6 source tree plus a
   reviewed metadata-only version bump.

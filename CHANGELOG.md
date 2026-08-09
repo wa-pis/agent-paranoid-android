@@ -20,11 +20,20 @@ All notable changes to this project are documented here.
 
 - Prevent equal rare values in different fields from sharing a synthetic
   placeholder and prevent placeholders from colliding with normal categories,
-  including placeholder-shaped baseline literals.
+  including placeholder-shaped baseline literals, while preserving sanitizer
+  provenance across reordered baseline categories.
 - Keep provider metadata attached to the invocation that produced it, including
   preflight and provider-error paths, without retaining prompts or source data.
-- Convert provider and transport failures to bounded advisor errors without
-  retaining exception chains that could expose provider text.
+- Detach handled OpenAI provider and validation failures from their original
+  cause/context chains, and replace incomplete-response status text with a
+  fixed bounded local error.
+- RC6 acceptance additionally requires source-free external advisor payloads,
+  suppression of exact sensitive numeric profile metrics, semantically
+  validated provider constraints, bounded generator MCP framing and JSON
+  materialization, bounded active requests, explicit opt-in row privacy,
+  semantic-provider and filesystem boundaries, safe CSV/artifact boundaries,
+  escaped diagnostics, trusted release identity, and external acceptance
+  evidence.
 
 ## [1.0.0rc5] - 2026-08-08
 
