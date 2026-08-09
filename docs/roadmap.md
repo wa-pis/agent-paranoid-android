@@ -803,7 +803,7 @@ Scope:
   synthetic namespace, and run post-generation privacy/type checks.
 - [x] Harden filesystem publication and overwrite paths against symlink and
   TOCTOU races with descriptor-relative no-follow and inode revalidation.
-- [ ] Define completion/read-validation semantics and explicit approval for
+- [x] Define completion/read-validation semantics and explicit approval for
   sibling-artifact replacement.
 - [ ] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
 - [ ] Move CI classification to trusted code, bind release publication to a

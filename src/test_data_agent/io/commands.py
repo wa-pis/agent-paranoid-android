@@ -12,7 +12,7 @@ from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.io.artifacts import write_json_artifact
+from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact
 from test_data_agent.io.path_policy import discard_staging_directory, inspect_file_output
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
@@ -108,6 +108,7 @@ def generate_dataset_from_profile_command(
             mode=args.mode,
             invalid_ratio=args.invalid_ratio,
             business_rules_applier=business_rules_applier,
+            overwrite=getattr(args, "overwrite", False),
         )
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
@@ -189,6 +190,7 @@ def generate_dataset_from_csv_command(
         mode=args.mode,
         invalid_ratio=args.invalid_ratio,
         business_rules_applier=business_rules_applier,
+        overwrite=getattr(args, "overwrite", False),
     )
     if should_fail_generation(report, business_report, args.mode):
         write_generation_errors(report, business_report)
@@ -313,9 +315,9 @@ def write_generation_summary(artifact_folder: Path) -> None:
     if not manifest_path.exists():
         return
     try:
-        manifest = json.loads(manifest_path.read_text())
-    except (OSError, json.JSONDecodeError):
-        print(f"Wrote synthetic dataset artifacts: {artifact_folder}", file=sys.stderr)
+        manifest = validate_generation_bundle(artifact_folder).model_dump(mode="json")
+    except ValueError:
+        print("Synthetic dataset bundle is incomplete", file=sys.stderr)
         return
     row_counts = manifest.get("row_counts", {})
     rows_text = ", ".join(f"{name}={count}" for name, count in row_counts.items()) or "no rows"

@@ -11,8 +11,10 @@ from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec
 from test_data_agent.core.limits import GenerationLimitError
 from test_data_agent.core.settings import OutputFormat
-from test_data_agent.io.artifacts import write_json_artifact_atomic
+from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact_atomic
+from test_data_agent.io.commands import write_generation_summary
 from test_data_agent.io.workflows import (
+    commit_single_entity_bundle,
     commit_temp_output_folder,
     generate_dataset_bundle,
     generate_dataset_review_artifacts,
@@ -119,6 +121,86 @@ def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tm
     assert "generation_manifest.json" not in evidence["output_sha256"]
     assert applied and applied[0][1] == 41
     assert applied[0][0] == rows
+
+
+@pytest.mark.parametrize("failure", ["missing", "tampered"])
+def test_validate_generation_bundle_rejects_incomplete_artifacts(
+    tmp_path,
+    capsys,
+    failure,
+) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    output_path = tmp_path / "generated" / "orders.json"
+    generate_dataset_from_profile_artifacts(
+        profile,
+        count=1,
+        seed=41,
+        output_path=output_path,
+        output_format=OutputFormat.JSON,
+    )
+
+    assert validate_generation_bundle(output_path.parent).row_counts == {"orders": 1}
+    if failure == "missing":
+        output_path.unlink()
+    else:
+        output_path.write_text("tampered")
+
+    with pytest.raises(ValueError, match="generation bundle is incomplete or invalid"):
+        validate_generation_bundle(output_path.parent)
+    write_generation_summary(output_path.parent)
+
+    assert capsys.readouterr().err == "Synthetic dataset bundle is incomplete\n"
+
+
+def test_single_entity_bundle_requires_approval_to_replace_siblings(tmp_path) -> None:
+    profile = DatasetProfile(
+        source_type="json_profile",
+        entities=[
+            EntityProfile(
+                name="orders",
+                row_count=1,
+                fields=[FieldProfile(name="status", data_type="string")],
+            )
+        ],
+    )
+    output_path = tmp_path / "generated" / "orders.json"
+    output_path.parent.mkdir()
+    existing_profile = output_path.parent / "profile.json"
+    existing_profile.write_text("keep")
+
+    with pytest.raises(ValueError, match="bundle output already exists"):
+        generate_dataset_from_profile_artifacts(
+            profile,
+            count=1,
+            seed=41,
+            output_path=output_path,
+            output_format=OutputFormat.JSON,
+        )
+
+    assert existing_profile.read_text() == "keep"
+    assert not output_path.exists()
+    assert not (output_path.parent / "generation_manifest.json").exists()
+
+    generate_dataset_from_profile_artifacts(
+        profile,
+        count=1,
+        seed=41,
+        output_path=output_path,
+        output_format=OutputFormat.JSON,
+        overwrite=True,
+    )
+
+    assert json.loads(existing_profile.read_text())["source_type"] == "json_profile"
+    assert validate_generation_bundle(output_path.parent).row_counts == {"orders": 1}
 
 
 def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_artifacts(tmp_path) -> None:
@@ -815,12 +897,38 @@ def test_single_entity_commit_restores_existing_files_when_interrupted(
             seed=19,
             output_path=output_path,
             output_format=OutputFormat.JSON,
+            overwrite=True,
         )
 
     assert not output_path.exists()
     assert existing_profile.read_text() == "previous profile"
     assert unrelated.read_text() == "keep"
     assert not list(output_folder.glob(".orders.*"))
+
+
+def test_single_entity_bundle_publishes_manifest_last(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    temp_folder = tmp_path / ".bundle"
+    output_folder = tmp_path / "bundle"
+    temp_folder.mkdir()
+    for name in ("generation_manifest.json", "orders.json", "profile.json"):
+        (temp_folder / name).write_text(name)
+    from test_data_agent.io.path_policy import replace_path as original_replace
+
+    published: list[str] = []
+
+    def record_publication(path: Path, target: Path) -> None:
+        original_replace(path, target)
+        if path.parent == temp_folder and target.parent == output_folder:
+            published.append(target.name)
+
+    monkeypatch.setattr("test_data_agent.io.workflows.replace_path", record_publication)
+
+    commit_single_entity_bundle(temp_folder, output_folder)
+
+    assert published[-1] == "generation_manifest.json"
 
 
 def test_generate_dataset_from_profile_artifacts_enforces_configured_row_limit(

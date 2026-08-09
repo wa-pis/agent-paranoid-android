@@ -113,7 +113,7 @@
 - [x] Harden every filesystem publication and overwrite path against symlink
   and TOCTOU races using one centralized path policy, no-follow descriptor or
   inode validation, and revalidation before publication and cleanup.
-- [ ] Define single-entity publication completion/read-validation semantics,
+- [x] Define single-entity publication completion/read-validation semantics,
   and require explicit approval before replacing sibling artifacts in a
   bundle; test interrupted publication and collision cases.
 - [ ] Escape or otherwise bound untrusted metadata, paths, and error text in

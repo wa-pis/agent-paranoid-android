@@ -228,7 +228,7 @@ Their lower confidence changes the evidence required, not the release scope.
 | Medium | Explicit opt-in `run_safe_select` can return unrecognized raw names, addresses, or other sensitive strings | **Closed**; the separate row-return policy masks every string and retains existing sensitive-name/value masking for non-strings, with regressions for heuristic false negatives |
 | Medium | Semantic providers are not uniformly bounded, deterministic for a seed, or restricted to synthetic identity output | **Closed**; synchronous calls run in an isolated daemon thread with a fixed deadline, same-request replay must match, string values require the `synthetic_` namespace, and post-solve privacy/type checks remain mandatory |
 | Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Closed by the focused RC6-S17 change**; one descriptor-relative no-follow policy revalidates source and destination inode identity before atomic file/folder replacement and cleanup |
-| Low | Single-entity publication has no explicit completion/read-validation contract and bundle publication can replace sibling artifacts without approval | **Open; RC6 required hardening** |
+| Low | Single-entity publication has no explicit completion/read-validation contract and bundle publication can replace sibling artifacts without approval | **Closed by the focused RC6-S18 change**; manifest publication is last, readers verify every recorded artifact hash, and any staged-name collision requires explicit overwrite approval |
 | Low | CLI and log output can emit unescaped provider-controlled metadata, paths, or errors | **Open; RC6 required hardening** |
 | High | Deployed branch/tag protection, required checks, and PyPI Trusted Publisher settings were not observable in the repository scan | **Open; RC6 external-evidence gate** |
 
@@ -251,13 +251,25 @@ is preserved rather than traversed or removed.
   tests/test_demo.py -q`
 - Result: **114 passed**.
 
+### RC6-S18 closure verification
+
+The focused RC6-S18 change publishes `generation_manifest.json` only after the
+other single-entity artifacts, verifies every manifest-recorded SHA-256 before
+reporting or validating a completed bundle, and rejects any staged-name
+collision unless the caller explicitly approves replacement. Catchable
+interruptions continue to restore replaced siblings without following
+symlinks.
+
+- Focused command: `pytest tests/test_io_workflows.py tests/test_cli.py
+  tests/test_mcp_generator_server.py -q`
+- Result: **117 passed**.
+
 ## Review Conclusion
 
-**Blocked.** PR #335 closes RC6-S1, PR #333 closes RC6-S4, PRs #334 and #336
-close RC6-S2 and RC6-S3, PR #337 closes RC6-S7, and PR #338 closes RC6-S8. Do
-not tag or promote RC6 until RC6-S9 through RC6-S20 and their synthetic
-regressions are closed
-or explicitly approved, an independent reviewer approves the exact fixed
-commit, and the immutable tag, public artifacts, final gates, external
-configuration evidence, and verifiable approval link are recorded. The
-follow-up scan of `5b3ad7f` is a blocking review, not release approval.
+**Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4,
+RC6-S7 through RC6-S11, and RC6-S13 through RC6-S18. Do not tag or promote RC6
+until RC6-S12, RC6-S19, and RC6-S20 are closed, a full repository-wide review
+is clean, an independent reviewer approves the exact fixed commit, and the
+immutable tag, public artifacts, final gates, external configuration evidence,
+and verifiable approval link are recorded. The follow-up scan of `5b3ad7f` is
+a blocking historical review, not release approval.

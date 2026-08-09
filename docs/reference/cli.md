@@ -112,7 +112,7 @@ data file and requires `--count` and `--seed`.
 | `--invalid-ratio R` | Invalid share from `0` to `1` for applicable modes |
 | `--business-rules PATH` | Reviewed YAML or JSON rule file |
 | `--output PATH` | Output file or new output directory |
-| `--overwrite` | Replace supported single-file outputs |
+| `--overwrite` | Replace supported single-file outputs or single-entity bundle siblings |
 
 Folder bundle generation requires a new or empty output directory. It does not
 silently merge into an existing dataset.

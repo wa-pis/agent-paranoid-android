@@ -47,6 +47,9 @@ All notable changes to this project are documented here.
 - Publish files, folders, caches, and agent workspaces through one no-follow,
   descriptor-relative path policy that revalidates inode identity before
   replacement and cleanup.
+- Publish single-entity manifests last, verify recorded artifact hashes before
+  reporting completion, and require explicit overwrite approval for every
+  replaced sibling artifact.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

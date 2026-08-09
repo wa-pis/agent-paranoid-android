@@ -72,7 +72,9 @@ test-data-agent generate-from-example data/example_dataset \
 ```
 
 Use `--overwrite` only for commands that explicitly support replacing a
-single-file output. Never point output at a source file or source folder.
+single-file output or a single-entity bundle. For a bundle it approves
+replacement of every same-named sibling artifact, not only the generated row
+file. Never point output at a source file or source folder.
 
 ## Agent Approval Was Interrupted
 

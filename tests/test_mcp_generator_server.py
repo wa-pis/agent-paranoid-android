@@ -996,5 +996,5 @@ def test_validate_dataset_rejects_tampered_business_validation_report(
     report["rule_pass_count"] += 1
     report_path.write_text(json.dumps(report))
 
-    with pytest.raises(WorkspacePathError, match="does not match"):
+    with pytest.raises(WorkspacePathError, match="bundle is incomplete or invalid"):
         validate_dataset("generated/dataset_spec.yaml", "generated")
