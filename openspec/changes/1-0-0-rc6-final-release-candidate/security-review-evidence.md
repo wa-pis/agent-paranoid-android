@@ -157,7 +157,7 @@ repository settings were used.
 | --- | --- | --- |
 | High | Raw common categorical profile values can reach the external advisor | **Closed by PR #337**; current-main synthetic regression verifies common names and address-like values are replaced with deterministic field-scoped labels |
 | High | Provider formulas can inject arbitrary constants into generated rows | **Open; RC6 release-blocking** |
-| Medium | Sensitive numeric Trino extrema/percentiles can reveal source values | **Open; RC6 release-blocking** |
+| Medium | Sensitive numeric Trino extrema/percentiles can reveal source values | **Closed by PR #338**; query, masking, safety, persistence, and generation regressions verify only coarse numeric shape survives |
 | Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Open; RC6 release-blocking** |
 | Medium | JSON structural limits run after full parsing/materialization | **Open; RC6 release-blocking** |
 | Medium | Pull requests control the classifier that can skip required checks | **Open; RC6 release-blocking** |
@@ -183,6 +183,24 @@ no live OpenAI call was made.
   baseline-only categories, placeholder collisions, persisted review rebuilds,
   and repeated deterministic construction.
 
+### RC6-S8 closure verification
+
+[PR #338](https://github.com/wa-pis/agent-paranoid-android/pull/338), merge
+`89fb0cf`, removes exact extrema and percentiles from sensitive numeric Trino
+profiling at the query and masking boundaries. Profiles, inferred specs, MCP
+planning persistence, and generated values retain only coarse sign and decimal
+order through `numeric_shape`. Generation follows the original source order of
+magnitude without preserving singleton values or artificially increasing the
+order.
+
+The behavior was reverified on current main commit
+`4978783d6ffd4782057934462a24f6dcbd8534f7` with synthetic fixtures only; no
+live Trino access was used.
+
+- Focused command: `pytest tests/test_safety.py tests/test_trino_masking.py
+  tests/test_trino_query_builders.py tests/test_mcp_generator_server.py -q`
+- Result: **66 passed**.
+
 ## Additional RC6 closure findings
 
 The review also identified deployment-conditional or lower-confidence risks.
@@ -207,8 +225,9 @@ cannot be established from repository contents alone.
 ## Review Conclusion
 
 **Blocked.** PR #335 closes RC6-S1, PR #333 closes RC6-S4, PRs #334 and #336
-close RC6-S2 and RC6-S3, and PR #337 closes RC6-S7. Do not tag or promote RC6
-until RC6-S8 through RC6-S20 and their synthetic regressions are closed
+close RC6-S2 and RC6-S3, PR #337 closes RC6-S7, and PR #338 closes RC6-S8. Do
+not tag or promote RC6 until RC6-S9 through RC6-S20 and their synthetic
+regressions are closed
 or explicitly approved, an independent reviewer approves the exact fixed
 commit, and the immutable tag, public artifacts, final gates, external
 configuration evidence, and verifiable approval link are recorded. The

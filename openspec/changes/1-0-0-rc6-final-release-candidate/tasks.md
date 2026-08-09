@@ -22,7 +22,7 @@
 - [x] Replace all categorical values in external advisor requests with
   field-scoped synthetic labels/ranks or non-reversible summaries; add common
   name/address values that evade current heuristics.
-- [ ] Suppress exact `min`, `max`, and percentile metrics for sensitive numeric
+- [x] Suppress exact `min`, `max`, and percentile metrics for sensitive numeric
   Trino columns; verify `profile_table_safe`, legacy conversion, and generated
   planning artifacts do not contain singleton source values.
 - [ ] Validate advisor-proposed DatasetSpec constraints semantically before
