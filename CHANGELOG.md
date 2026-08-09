@@ -18,6 +18,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Pin the Dockerfile frontend to the immutable multi-platform digest behind
+  `docker/dockerfile:1.7`.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

@@ -137,6 +137,8 @@
   unrepresented literals, and preserve persisted-review reconstruction.
 - [x] AG-03: replace every categorical JSON scalar and matching constraint
   literal with a typed field-scoped label without changing numeric bounds.
+- [x] SC-08: pin the Dockerfile syntax frontend to the reviewed immutable OCI
+  index digest and enforce the exact reference in container tests.
 
 ## Release and review gates
 

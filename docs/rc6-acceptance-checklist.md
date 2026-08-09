@@ -78,6 +78,8 @@ source checkouts are not substitutes for the public-artifact checks.
   field-scoped category labels; unrepresented strings fail closed.
 - [x] AG-03: provider-bound integer, float, boolean, and null categories use
   typed field-scoped labels while ordinary numeric bounds remain unchanged.
+- [x] SC-08: the Dockerfile frontend is pinned to the immutable OCI index
+  digest for the reviewed `docker/dockerfile:1.7` release.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback
