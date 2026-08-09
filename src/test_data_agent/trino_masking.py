@@ -42,6 +42,18 @@ def mask_row(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _mask_returned_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Mask every string on the explicit row-returning surface."""
+    return {
+        key: mask_value(value)
+        if isinstance(value, str)
+        or infer_sensitive_from_name(key)
+        or looks_sensitive_value(value)
+        else value
+        for key, value in row.items()
+    }
+
+
 def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
     """Replace source categories with masked patterns or synthetic rank labels."""
     content_sensitive_type = infer_sensitive_type_from_values(
@@ -154,4 +166,4 @@ class TrinoMasker:
 
     def run_safe_select(self, sql: str) -> list[dict[str, Any]]:
         safe_sql = validate_safe_select(sql, require_limit=True, config=self.config)
-        return [mask_row(row) for row in self.fetch_sql(safe_sql)]
+        return [_mask_returned_row(row) for row in self.fetch_sql(safe_sql)]

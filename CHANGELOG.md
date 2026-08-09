@@ -40,6 +40,8 @@ All notable changes to this project are documented here.
   fixed capacity error, and release admission state on every terminal path.
 - Replace backend-controlled Trino failures with a fixed detached MCP error and
   expose catalog/schema discovery only through configured allowlists.
+- Mask every string returned by the explicit opt-in `run_safe_select` surface,
+  including names and addresses missed by heuristic classification.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

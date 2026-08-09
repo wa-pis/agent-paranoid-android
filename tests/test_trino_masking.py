@@ -167,6 +167,37 @@ def test_masker_suppresses_sensitive_numeric_summaries_at_query_boundary() -> No
     )
 
 
+def test_safe_select_masks_every_returned_string() -> None:
+    source_values = {"Jane Doe", "14 Elm Crescent", "ordinary note"}
+    masker = TrinoMasker(
+        config=masker_config(),
+        fetch_query=reject_query,
+        fetch_sql=lambda _sql: [
+            {
+                "label": "Jane Doe",
+                "location": "14 Elm Crescent",
+                "note": "ordinary note",
+                "count": 3,
+            }
+        ],
+    )
+
+    result = masker.run_safe_select(
+        "SELECT label, location, note, count "
+        "FROM analytics.safe_schema.customers LIMIT 1"
+    )
+
+    assert result == [
+        {
+            "label": "[MASKED]",
+            "location": "[MASKED]",
+            "note": "[MASKED]",
+            "count": 3,
+        }
+    ]
+    assert all(value not in str(result) for value in source_values)
+
+
 @pytest.mark.parametrize(
     "sql",
     [

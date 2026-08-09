@@ -123,11 +123,11 @@ isolated local Trino instance.
 The explicit opt-in row-returning tool `run_safe_select` is not exposed by
 default. Trusted clients that need it must set `TRINO_ENABLE_SAFE_SELECT=true`.
 The review-first planning sequence above does not require it. Its bounded
-row-shaped result may contain allowed source values, including values not
-recognized as sensitive by heuristic masking.
-Enabling it does not make returned rows source-free, PII-free, anonymous, or
-privacy-safe; use a separately trusted client and do not relay its results to
-an LLM or generated output.
+row-shaped result masks every string, including names and addresses missed by
+heuristic classification, plus non-string fields or values recognized as
+sensitive. Other non-string source values may remain, so enabling it does not
+make returned rows source-free, anonymous, or suitable for relay to an LLM or
+generated output.
 
 ## Expected Result
 

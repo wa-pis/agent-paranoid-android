@@ -17,7 +17,9 @@ The explicit opt-in row-returning tool `run_safe_select` is intentionally
 narrower than an arbitrary read-only SQL client. It requires a literal bounded
 `LIMIT`, rejects unrestricted projections and likely sensitive fields, and also
 rejects joins, CTEs, subqueries, ordering, table functions, and `UNNEST`.
-Default aggregate-only tools should be used for profiling.
+It masks every returned string, including heuristic false negatives. Other
+non-string source values may remain, so default aggregate-only tools should be
+used for profiling.
 
 ## Why Two MCP Servers
 

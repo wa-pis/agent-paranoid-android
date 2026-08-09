@@ -222,11 +222,11 @@ Its tools are:
 - `profile_aggregate_mapping`
 
 The explicit opt-in row-returning tools are not registered by default.
-`run_safe_select` is available only when `TRINO_ENABLE_SAFE_SELECT=true`; its
-bounded row-shaped result may contain allowed source values, including values
-not recognized as sensitive by heuristic masking. It is outside the
-source-literal-free guarantee for the default aggregate-only tools and must not
-be treated as PII-free, anonymous, or privacy-safe.
+`run_safe_select` is available only when `TRINO_ENABLE_SAFE_SELECT=true`; it
+masks every returned string, including heuristic false negatives, and masks
+recognized sensitive non-string fields or values. Other non-string source
+values may remain, so it is outside the source-literal-free guarantee for the
+default aggregate-only tools and must not be treated as anonymous.
 
 The generator server exposes the local synthetic pipeline:
 
