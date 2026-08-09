@@ -224,7 +224,7 @@ Their lower confidence changes the evidence required, not the release scope.
 | Severity | Finding | Disposition |
 | --- | --- | --- |
 | Medium | Active MCP request registry and shared Trino concurrency have no global admission cap or complete cancellation/disconnect teardown | **Closed**; the transport admits at most 32 active requests, emits a fixed bounded capacity error, and clears state on teardown, while the client admits at most 8 shared Trino operations and releases its slot in `finally` |
-| Medium | Trino driver failures and catalog/schema enumeration can expose backend-controlled error or metadata text | **Open; RC6 release-blocking** |
+| Medium | Trino driver failures and catalog/schema enumeration can expose backend-controlled error or metadata text | **Closed**; backend failures become the fixed detached `Trino request failed` error, while catalog/schema discovery returns only configured allowlist members with positional filtering regressions |
 | Medium | Explicit opt-in `run_safe_select` can return unrecognized raw names, addresses, or other sensitive strings | **Open; RC6 release-blocking** |
 | Medium | Semantic providers are not uniformly bounded, deterministic for a seed, or restricted to synthetic identity output | **Open; RC6 release-blocking** |
 | Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Open; RC6 release-blocking** |

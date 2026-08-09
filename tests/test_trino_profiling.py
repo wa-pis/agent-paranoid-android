@@ -47,6 +47,28 @@ def test_profiler_rejects_disallowed_source_before_query_execution() -> None:
         profiler.profile_table("production", "safe_schema", "customers")
 
 
+def test_enumeration_exposes_only_allowlisted_catalogs_and_schemas() -> None:
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        if query.sql == "SHOW CATALOGS":
+            return [
+                {"Catalog": "private_before"},
+                {"Catalog": "analytics"},
+                {"Catalog": "private_after"},
+            ]
+        if query.sql == 'SHOW SCHEMAS FROM "analytics"':
+            return [
+                {"Schema": "private_before"},
+                {"Schema": "safe_schema"},
+                {"Schema": "private_after"},
+            ]
+        raise AssertionError(query.sql)
+
+    profiler = TrinoProfiler(config=profiler_config(), fetch_query=fetch_query)
+
+    assert profiler.list_catalogs() == ["analytics"]
+    assert profiler.list_schemas("analytics") == ["safe_schema"]
+
+
 def test_profiler_coordinates_aggregate_only_safe_table_profile() -> None:
     queries: list[TrinoQuery] = []
     column_calls: list[tuple[Any, ...]] = []

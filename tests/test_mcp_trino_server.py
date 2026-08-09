@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import traceback
 from dataclasses import replace
 from typing import Any
 
@@ -11,6 +12,7 @@ from test_data_agent.mcp_trino_server import (
     AllowlistError,
     SqlSafetyError,
     TrinoConfig,
+    TrinoCapacityError,
     TrinoConfigurationError,
     TrinoResultLimitError,
     check_allowlist,
@@ -929,6 +931,63 @@ def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPa
         "query_max_run_time": "45s",
         "query_max_scan_physical_bytes": "1GB",
     }
+
+
+def test_fetch_dicts_redacts_driver_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    source_error = "https://trino.internal/query?qid=secret-token"
+
+    class FailingClient:
+        def __init__(self, **_kwargs: Any) -> None:
+            pass
+
+        def fetch_dicts(self, *_args: Any) -> list[dict[str, Any]]:
+            raise ConnectionError(source_error)
+
+    monkeypatch.setattr(mcp_trino_server, "TrinoClient", FailingClient)
+    monkeypatch.setattr(
+        mcp_trino_server.TrinoConfig,
+        "from_env",
+        lambda: object(),
+    )
+
+    with pytest.raises(RuntimeError) as raised:
+        mcp_trino_server._fetch_dicts("SELECT bounded")
+
+    assert str(raised.value) == "Trino request failed"
+    assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
+    assert source_error not in "".join(traceback.format_exception(raised.value))
+
+
+@pytest.mark.parametrize(
+    "local_error",
+    [
+        TrinoCapacityError("Trino request capacity exhausted"),
+        TrinoResultLimitError("Trino result exceeds the client limit of 1 rows"),
+    ],
+)
+def test_fetch_dicts_preserves_fixed_local_errors(
+    monkeypatch: pytest.MonkeyPatch,
+    local_error: Exception,
+) -> None:
+    class FailingClient:
+        def __init__(self, **_kwargs: Any) -> None:
+            pass
+
+        def fetch_dicts(self, *_args: Any) -> list[dict[str, Any]]:
+            raise local_error
+
+    monkeypatch.setattr(mcp_trino_server, "TrinoClient", FailingClient)
+    monkeypatch.setattr(
+        mcp_trino_server.TrinoConfig,
+        "from_env",
+        lambda: object(),
+    )
+
+    with pytest.raises(type(local_error)) as raised:
+        mcp_trino_server._fetch_dicts("SELECT bounded")
+
+    assert raised.value is local_error
 
 
 def test_execute_query_closes_resources_on_error(monkeypatch: pytest.MonkeyPatch) -> None:

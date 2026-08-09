@@ -99,7 +99,7 @@
 - [x] Bound the active MCP request registry and Trino concurrency globally;
   release request state on cancellation, disconnect, timeout, and teardown,
   and return a fixed bounded error when the cap is exhausted.
-- [ ] Redact Trino driver, catalog, and schema enumeration failures at the
+- [x] Redact Trino driver, catalog, and schema enumeration failures at the
   MCP boundary; define and test whether catalog/schema discovery is allowed to
   reveal backend metadata before allowlist filtering.
 - [ ] Give the explicit opt-in `run_safe_select` surface a separate, explicit
