@@ -35,6 +35,7 @@ nav:
   - Home: index.md
   - Getting Started:
       - Installation: getting-started/installation.md
+      - Product Validation Pilot: getting-started/product-validation-pilot.md
       - First CSV Dataset: getting-started/first-csv.md
       - Related Tables: getting-started/related-tables.md
       - Review The Output: getting-started/review-output.md

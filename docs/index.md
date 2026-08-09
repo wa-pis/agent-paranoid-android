@@ -13,6 +13,7 @@ generated output.
 | --- | --- |
 | One CSV file | [First CSV Dataset](getting-started/first-csv.md) |
 | A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
+| A real development or analytics task | [Product Validation Pilot](getting-started/product-validation-pilot.md) |
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |
 | Any structured-output AI client | [AI Integration](ai_integration.md) |
@@ -63,6 +64,9 @@ doctor passed
 
 Continue with [First CSV Dataset](getting-started/first-csv.md) to create and
 inspect a complete synthetic output bundle.
+
+If you are evaluating whether the workflow solves a real team problem, use the
+[Product Validation Pilot](getting-started/product-validation-pilot.md) guide.
 
 ## Safety Boundaries
 

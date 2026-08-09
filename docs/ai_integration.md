@@ -11,7 +11,13 @@ never generates data or bypasses approval.
 `advisor_review.json` and update the pending `dataset_spec.yaml`. The existing
 status fingerprint and explicit approval remain the only path to generation.
 
-This project can be used by an AI agent in three practical modes:
+AI is optional. The deterministic CLI and Python library can complete the full
+profile → review → generate → validate workflow without a provider, MCP client,
+or network access. Add AI only when it reduces manual work in relationship
+discovery, semantic interpretation, or business-rule hypothesis generation.
+
+When AI is used, this project can be used by an AI client in three practical
+ways:
 
 1. As a local CLI tool.
 2. Through two MCP servers that cover default aggregate-only Trino profiling

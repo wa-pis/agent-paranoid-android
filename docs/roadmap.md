@@ -418,6 +418,59 @@ Do not create retroactive intermediate tags unless maintainers explicitly need
 those public milestones. Version changes, release commits, tags, and publication
 remain separate release-stage work.
 
+### Product Validation Before Stable 1.0
+
+**Goal:** verify that the frozen workflow solves a real development or analytics
+problem before adding more platform surface.
+
+Scope:
+
+- [ ] Run the [Product Validation Pilot](getting-started/product-validation-pilot.md)
+  with at least two people who own a development, integration-testing, analytics,
+  or budgeting task.
+- [ ] Use at least one relational input with declared or discoverable
+  relationships and one business invariant that must reconcile.
+- [ ] Record the input type, evidence coverage, participant task, time to first
+  useful bundle, specification edits, validation failures, and unresolved
+  assumptions.
+- [ ] Confirm that participants can understand the review-first flow without
+  treating AI hypotheses as facts or the output as a privacy certificate.
+- [ ] Confirm that at least one generated bundle is used successfully in the
+  stated target workflow, or document the concrete blocker and decision to
+  change scope.
+
+Exit criteria:
+
+- The team can name the first target persona and repeatable use case.
+- The normal path from schema/profile to validated output is understandable.
+- The remaining work is prioritized by observed user friction or task value,
+  not by speculative feature completeness.
+
+### PostgreSQL Source Adapter Gate
+
+For teams whose source system is PostgreSQL, stable `1.0` also requires one
+documented direct database workflow. Trino remains an optional integration and
+must not be a prerequisite for PostgreSQL users.
+
+The minimum PostgreSQL scope is:
+
+- [ ] Add a separate optional `postgres` installation profile.
+- [ ] Add a read-only connection with schema/table allowlists and bounded
+  statements, bytes, columns, and wall-clock time.
+- [ ] Extract tables, types, nullability, primary keys, foreign keys, and checks.
+- [ ] Compute aggregate profiles for null ratios, cardinality, ranges, and safe
+  distributions without returning source rows.
+- [ ] Reuse the existing review-first and deterministic validation boundaries
+  for relationship discovery and reconciliation checks.
+- [ ] Add a synthetic PostgreSQL fixture and clean-environment acceptance path
+  from profile to generated and validated output.
+- [ ] Correct all user-facing documentation so DDL, ORM models, and direct
+  PostgreSQL access are not presented as already-supported CLI inputs.
+
+Do not expand this gate into arbitrary SQL execution, every relational database,
+automatic ORM introspection, or mandatory AI/MCP support. AI may help rank
+ambiguous relationships, but it is not part of the required generation chain.
+
 ### 1.0.0rc1: Release Candidate
 
 **Goal:** rehearse the final release from frozen contracts without adding
