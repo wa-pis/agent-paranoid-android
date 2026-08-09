@@ -91,9 +91,10 @@
 - [x] Add a machine-readable RC acceptance manifest containing reviewed commit,
   closed findings, approvals, artifact digests, and gate results; make release
   workflows fail closed when it is missing, stale, or incomplete.
-- [ ] Install every public profile and upgrade from public `0.12.0` with
-  hash-pinned dependency and package requirements matching the verified
-  release wheel, not only a version constraint.
+- [x] Make the public acceptance workflow install every profile and upgrade
+  from public `0.12.0` with hash-pinned dependency and package requirements
+  matching the verified release wheel, not only a version constraint; actual
+  RC6 public execution remains in the post-publication release gate below.
 
 ## Additional RC6 findings previously treated as follow-up questions
 

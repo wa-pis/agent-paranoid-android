@@ -324,12 +324,30 @@ distributions before attestation or publication.
   tests/test_containers.py -q`
 - Result: **35 passed**.
 
+### RC6-S12 hash-pinned profile disposition
+
+The reported pre-release enforcement gap does not reproduce on exact commit
+`40b0410f2efe0d49bdded7dc2bf59d59e1cf48bc`. The published-release workflow
+derives the package hash from the single GitHub Release wheel, matches the
+public PyPI files to that release, exports hash-locked runtime dependencies
+from the reviewed lockfile, and installs the exact package under
+`--require-hashes`. Its seven-profile matrix covers base, Parquet, MCP, Trino,
+MCP+Trino, OpenAI, and all extras. The upgrade path separately pins the public
+`0.12.0` wheel and the verified candidate wheel.
+
+- Focused command: `pytest tests/test_release_artifacts.py -q`
+- Result: **22 passed**.
+- Disposition: **closed for pre-release implementation**. The seven public
+  installs and upgrade remain unchecked in `docs/rc6-acceptance-checklist.md`
+  until an explicitly approved RC6 publication provides external URLs and
+  digests; no public artifact evidence is claimed here.
+
 ## Review Conclusion
 
-**Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4,
-RC6-S7 through RC6-S11, and RC6-S13 through RC6-S19. Do not tag or promote RC6
-until RC6-S12 and RC6-S20 are closed, a full repository-wide review is clean,
-an independent reviewer approves the exact fixed commit, and the
-immutable tag, public artifacts, final gates, external configuration evidence,
-and verifiable approval link are recorded. The follow-up scan of `5b3ad7f` is
-a blocking historical review, not release approval.
+**Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4
+and RC6-S7 through RC6-S19. Do not tag or promote RC6 until RC6-S20 is closed,
+a full repository-wide review is clean, an independent reviewer approves the
+exact fixed commit, and the immutable tag, final gates, external configuration
+evidence, and verifiable approval link are recorded. Public artifact acceptance
+remains pending until an explicitly approved publication. The follow-up scan
+of `5b3ad7f` is a blocking historical review, not release approval.
