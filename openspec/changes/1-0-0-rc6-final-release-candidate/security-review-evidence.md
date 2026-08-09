@@ -395,6 +395,7 @@ critical findings.
 | AG-03: non-string categories bypass advisor sanitization | Medium | **Closed by the focused AG-03 change**; every JSON scalar category and matching constraint literal uses a type-distinct field-scoped label in both request models, persisted review reconstruction is exact, and ordinary numeric bounds are unchanged. |
 | MT-01: nested Trino values bypass safe-select masking | Medium | **Closed by the focused MT-01 change**; bounded nested maps, lists, and tuples apply the same string and sensitive-value policy before the opt-in response, while excessive depth or value count fails closed. |
 | SC-08: mutable Dockerfile syntax frontend | Low | **Closed by the focused SC-08 change**; the reviewed `docker/dockerfile:1.7` OCI index is bound to digest `sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e`, and the container contract test rejects a tag-only directive. |
+| FS-03: CSV replacement can defeat source-row exclusion | Low | **Closed by the focused FS-03 change**; single-CSV profiling records only SHA-256 row digests from the same parse stream, and pre-publication no-copy validation uses that immutable set instead of reopening the source path. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -411,6 +412,10 @@ critical findings.
 - Result: **9 passed**; the container contract suite verifies the exact
   immutable frontend reference together with the existing digest-pinned base
   images.
+- Focused command: `pytest tests/test_io_workflows.py -q`
+- Result: **33 passed**; the workflow regression atomically replaces the CSV
+  path during generation and still rejects reuse of a row from the exact
+  profiling read before any output is published.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

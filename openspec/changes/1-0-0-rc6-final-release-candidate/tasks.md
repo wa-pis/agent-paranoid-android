@@ -139,6 +139,8 @@
   literal with a typed field-scoped label without changing numeric bounds.
 - [x] SC-08: pin the Dockerfile syntax frontend to the reviewed immutable OCI
   index digest and enforce the exact reference in container tests.
+- [x] FS-03: bind single-CSV complete-row exclusion to the exact profiling
+  read and reject atomic source-path replacement before publication.
 
 ## Release and review gates
 

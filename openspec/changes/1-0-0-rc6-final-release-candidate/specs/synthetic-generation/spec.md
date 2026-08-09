@@ -2,6 +2,20 @@
 
 ## ADDED Requirements
 
+### Requirement: Source-Row Exclusion Uses The Profiled CSV Read
+
+Single-CSV generation SHALL compare generated rows with the complete source
+rows observed by the same read that produced the profile. Replacing the source
+path after profiling SHALL NOT change the comparison input or permit
+publication of a profiled source row.
+
+#### Scenario: Source path is replaced during generation
+
+- **GIVEN** a CSV row has been profiled and generation is in progress
+- **WHEN** the source path is atomically replaced before no-copy validation
+- **THEN** reuse of the originally profiled row is rejected
+- **AND** no generated artifact is published
+
 ### Requirement: Source Categories Never Become Generated Values
 
 CSV-folder profiling SHALL replace source-derived text categories with

@@ -20,6 +20,9 @@ All notable changes to this project are documented here.
 
 - Pin the Dockerfile frontend to the immutable multi-platform digest behind
   `docker/dockerfile:1.7`.
+- Bind single-CSV no-copy validation to SHA-256 row digests collected during
+  the same read that produced the profile, so path replacement cannot switch
+  the checked source before publication.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

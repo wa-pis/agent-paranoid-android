@@ -7,9 +7,12 @@ It never includes raw values for likely PII columns.
 from __future__ import annotations
 
 import csv
+import hashlib
+import json
 import re
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -43,6 +46,12 @@ MAX_NUMERIC_SAMPLE_VALUES = 10_000
 CSV_SAMPLE_BYTES = 8192
 
 
+@dataclass(frozen=True, slots=True)
+class CSVSourceRowDigests:
+    field_names: tuple[str, ...]
+    digests: frozenset[bytes]
+
+
 class CSVColumnProfile(BaseModel):
     name: str
     data_type: str
@@ -72,6 +81,27 @@ class CSVProfile(BaseModel):
 
 
 def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
+    return _profile_csv(path, table_name=table_name)
+
+
+def profile_csv_with_row_digests(
+    path: Path,
+    table_name: str | None = None,
+) -> tuple[CSVProfile, CSVSourceRowDigests]:
+    digests: set[bytes] = set()
+    profile = _profile_csv(path, table_name=table_name, row_digests=digests)
+    return profile, CSVSourceRowDigests(
+        field_names=tuple(column.name for column in profile.columns),
+        digests=frozenset(digests),
+    )
+
+
+def _profile_csv(
+    path: Path,
+    *,
+    table_name: str | None = None,
+    row_digests: set[bytes] | None = None,
+) -> CSVProfile:
     enforce_input_files([path])
     configure_csv_field_limit(csv)
     encoding = detect_csv_encoding(path)
@@ -90,11 +120,19 @@ def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
             enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
             for name in fieldnames:
                 accumulators[name].add(row.get(name, ""))
+            if row_digests is not None:
+                row_digests.add(csv_row_digest(row, fieldnames))
     return CSVProfile(
         table=table_name or path.stem,
         row_count=row_count,
         columns=[accumulator.to_profile(row_count) for accumulator in accumulators.values()],
     )
+
+
+def csv_row_digest(row: Mapping[str, Any], field_names: Sequence[str]) -> bytes:
+    values = ["" if row.get(name) is None else str(row.get(name)) for name in field_names]
+    payload = json.dumps(values, ensure_ascii=True, separators=(",", ":")).encode()
+    return hashlib.sha256(payload).digest()
 
 
 def detect_csv_encoding(path: Path) -> str:
