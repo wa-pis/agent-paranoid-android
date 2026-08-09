@@ -156,7 +156,7 @@ repository settings were used.
 | Severity | Current-tree finding | Disposition |
 | --- | --- | --- |
 | High | Raw common categorical profile values can reach the external advisor | **Closed by PR #337**; current-main synthetic regression verifies common names and address-like values are replaced with deterministic field-scoped labels |
-| High | Provider formulas can inject arbitrary constants into generated rows | **Open; RC6 release-blocking** |
+| High | Provider formulas can inject arbitrary constants into generated rows | **Closed by PR #343**; provider constraints reject unsafe constants, references, target types, and sensitive targets, while post-solve privacy/type validation runs before publication |
 | Medium | Sensitive numeric Trino extrema/percentiles can reveal source values | **Closed by PR #338**; query, masking, safety, persistence, and generation regressions verify only coarse numeric shape survives |
 | Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Closed by the focused RC6-S10 change**; generator MCP uses the shared bounded stdio writer with a fresh request budget, reserved terminal-error bytes, and focused transport wiring regressions |
 | Medium | JSON structural limits run after full parsing/materialization | **Closed by the focused RC6-S10 change**; the raw-byte preflight bounds depth, nodes/containers, and scalar bytes before JSON or MCP model materialization, including escaped-scalar regressions |
@@ -200,6 +200,20 @@ live Trino access was used.
 - Focused command: `pytest tests/test_safety.py tests/test_trino_masking.py
   tests/test_trino_query_builders.py tests/test_mcp_generator_server.py -q`
 - Result: **66 passed**.
+
+### RC6-S9 closure verification
+
+[PR #343](https://github.com/wa-pis/agent-paranoid-android/pull/343), merge
+`3f4d1ec`, validates advisor-proposed constraints before persistence and runs
+privacy/type validation after constraint solving. String constants, unknown or
+incompatible references, sensitive targets, and provider-driven field-type
+changes fail closed before publication.
+
+The behavior was reverified on current main commit
+`043365ac3c4e9b5eb25ce691d348ec3cda08cd2b` with synthetic fixtures only.
+
+- Focused command: `pytest tests/test_advisor.py tests/test_constraint_solver.py -q`
+- Result: **46 passed**.
 
 ## Additional RC6 closure findings
 
