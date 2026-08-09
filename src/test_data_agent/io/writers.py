@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.dataset import RESERVED_ENTITY_ARTIFACT_BASENAMES, DatasetSpec
 from test_data_agent.core.limits import (
     enforce_output_folder_size,
     enforce_output_payload_size,
@@ -161,6 +161,8 @@ def write_dataset_rows(
     output_folder: Path,
 ) -> None:
     root = output_folder.absolute()
+    if any(name in RESERVED_ENTITY_ARTIFACT_BASENAMES for name in rows_by_entity):
+        raise ValueError("reserved entity name")
     for entity_name, rows in rows_by_entity.items():
         if output_format == DatasetOutputFormat.CSV:
             write_bounded_text(

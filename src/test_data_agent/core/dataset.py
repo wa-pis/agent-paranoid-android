@@ -17,6 +17,17 @@ from test_data_agent.core.settings import GenerationSettings, ValidationSettings
 DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
 SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS = frozenset({DATASET_SPEC_SCHEMA_VERSION})
 DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS: frozenset[str] = frozenset()
+RESERVED_ENTITY_ARTIFACT_BASENAMES = frozenset(
+    {
+        "agent_completion",
+        "business_validation_report",
+        "csv_profile",
+        "dataset_spec",
+        "generation_manifest",
+        "profile",
+        "validation_report",
+    }
+)
 
 
 class DatasetProfile(BaseModel):
@@ -56,6 +67,7 @@ class DatasetSpec(BaseModel):
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetSpec:
         _validate_entity_names(self.entities, "dataset spec")
+        _validate_reserved_entity_names(self.entities)
         _validate_relationship_references(self.entities, self.relationships)
         _validate_constraint_references(self.entities, self.constraints)
         entity_fields = {entity.name: {field.name for field in entity.fields} for entity in self.entities}
@@ -95,6 +107,11 @@ def _validate_entity_names(entities: list[EntityProfile] | list[EntitySpec], con
     names = [entity.name for entity in entities]
     if len(names) != len(set(names)):
         raise ValueError(f"{context} has duplicate entity names")
+
+
+def _validate_reserved_entity_names(entities: list[EntitySpec]) -> None:
+    if any(entity.name in RESERVED_ENTITY_ARTIFACT_BASENAMES for entity in entities):
+        raise ValueError("dataset spec uses a reserved entity name")
 
 
 def _entity_fields(entities: list[EntityProfile] | list[EntitySpec]) -> dict[str, set[str]]:
