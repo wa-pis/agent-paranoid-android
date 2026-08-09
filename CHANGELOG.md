@@ -42,6 +42,8 @@ All notable changes to this project are documented here.
   expose catalog/schema discovery only through configured allowlists.
 - Mask every string returned by the explicit opt-in `run_safe_select` surface,
   including names and addresses missed by heuristic classification.
+- Isolate semantic-provider calls behind a fixed deadline, require matching
+  same-seed replay, and restrict string output to the `synthetic_` namespace.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

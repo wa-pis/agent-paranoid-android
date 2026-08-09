@@ -106,7 +106,7 @@
   row-privacy contract: either allowlist non-sensitive columns or synthesize/
   mask all returned strings, with tests for names, addresses, and heuristic
   false negatives.
-- [ ] Make semantic-provider execution bounded and reproducible: enforce a
+- [x] Make semantic-provider execution bounded and reproducible: enforce a
   timeout/cancellation boundary, require a deterministic replay or output
   fingerprint for an explicit seed, restrict names/addresses to a synthetic
   namespace, and run post-generation privacy/type checks.

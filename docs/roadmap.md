@@ -798,7 +798,7 @@ Scope:
 - [x] Define and enforce a separate privacy contract for opt-in
   `run_safe_select`, including names, addresses, and heuristic false-negative
   regressions.
-- [ ] Bound semantic-provider execution and cancellation, require deterministic
+- [x] Bound semantic-provider execution and cancellation, require deterministic
   replay or a seed-bound output fingerprint, restrict identity output to a
   synthetic namespace, and run post-generation privacy/type checks.
 - [ ] Harden filesystem publication and overwrite paths against symlink and

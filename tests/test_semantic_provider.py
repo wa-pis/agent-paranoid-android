@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from typing import Any
 
 import pytest
@@ -12,6 +13,7 @@ from test_data_agent.generation import (
     SemanticValueRequest,
     generate_dataset,
 )
+from test_data_agent.generation.semantic_provider import request_semantic_value
 
 
 class RecordingProvider:
@@ -25,7 +27,7 @@ class RecordingProvider:
 
 
 def test_semantic_provider_receives_only_row_free_metadata() -> None:
-    provider = RecordingProvider("north")
+    provider = RecordingProvider("synthetic_north")
     spec = _spec(
         FieldSpec(
             name="region",
@@ -37,7 +39,7 @@ def test_semantic_provider_receives_only_row_free_metadata() -> None:
     first = generate_dataset(spec, seed=17, semantic_provider=provider)
     second = generate_dataset(spec, seed=17, semantic_provider=provider)
 
-    assert first == second == {"accounts": [{"region": "north"}]}
+    assert first == second == {"accounts": [{"region": "synthetic_north"}]}
     assert provider.requests[0] == SemanticValueRequest(
         entity_name="accounts",
         field_name="region",
@@ -112,6 +114,53 @@ def test_semantic_provider_can_defer_to_builtin_generation() -> None:
     without_provider = generate_dataset(spec, seed=17)
 
     assert with_provider == without_provider
+
+
+def test_semantic_provider_timeout_is_bounded_and_discards_output() -> None:
+    release = threading.Event()
+
+    class BlockingProvider:
+        def generate(self, request: SemanticValueRequest) -> str:
+            release.wait()
+            return "synthetic_late"
+
+    try:
+        with pytest.raises(SemanticProviderError, match="timed out"):
+            request_semantic_value(
+                BlockingProvider(),
+                _request(),
+                timeout_seconds=0.01,
+            )
+    finally:
+        release.set()
+
+
+def test_semantic_provider_rejects_non_reproducible_output() -> None:
+    values = iter(("synthetic_north", "synthetic_south"))
+
+    class ChangingProvider:
+        def generate(self, request: SemanticValueRequest) -> str:
+            return next(values)
+
+    with pytest.raises(SemanticProviderError, match="not reproducible"):
+        request_semantic_value(ChangingProvider(), _request())
+
+
+@pytest.mark.parametrize("value", ["Jane Doe", "14 Elm Crescent", "north"])
+def test_semantic_provider_requires_synthetic_string_namespace(value: str) -> None:
+    with pytest.raises(SemanticProviderError, match="synthetic namespace"):
+        request_semantic_value(RecordingProvider(value), _request())
+
+
+def _request() -> SemanticValueRequest:
+    return SemanticValueRequest(
+        entity_name="accounts",
+        field_name="region",
+        semantic_type="sales_region",
+        data_type=FieldType.STRING,
+        row_index=0,
+        seed=17,
+    )
 
 
 def _spec(field: FieldSpec) -> DatasetSpec:
