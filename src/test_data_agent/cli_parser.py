@@ -115,7 +115,7 @@ def register_dataset_commands(
     generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
     generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
     generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
-    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-file output.")
+    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity bundle.")
 
     profile_example_parser = subparsers.add_parser(
         "profile-example",
@@ -194,7 +194,7 @@ def register_dataset_commands(
     generate_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Generated output file.")
     generate_csv_parser.add_argument("--table", type=str, help="Table/entity name to use for the generated dataset.")
     generate_csv_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
-    generate_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing generated file.")
+    generate_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity bundle.")
 
     validate_parser = subparsers.add_parser(
         "validate",

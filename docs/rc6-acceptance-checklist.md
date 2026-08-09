@@ -61,7 +61,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] RC6-S17: filesystem publication and overwrite paths reject symlink and
   TOCTOU attacks, use no-follow/inode validation, and revalidate before
   publication and cleanup.
-- [ ] RC6-S18: single-entity publication has completion/read-validation
+- [x] RC6-S18: single-entity publication has completion/read-validation
   semantics and sibling-artifact replacement requires explicit approval;
   interrupted and collision cases are covered.
 - [ ] RC6-S19: untrusted metadata, paths, and errors are escaped and bounded

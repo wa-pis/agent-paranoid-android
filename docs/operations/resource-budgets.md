@@ -108,7 +108,10 @@ Folder and review bundles use an atomic directory rename. If publication is
 interrupted after that rename but before the caller receives success, the new
 destination is removed. Single-entity publication may update several files in
 an existing directory; it keeps temporary backups and rolls every moved file
-back, restoring replaced files while leaving unrelated files untouched.
+back, restoring replaced files while leaving unrelated files untouched. It
+publishes `generation_manifest.json` last and reports completion only after
+the manifest-recorded artifact hashes pass read validation. Replacing any
+same-named sibling requires explicit overwrite approval.
 
 The caller receives the original interruption error. A failed publication does
 not leave a generation manifest or output file that can be mistaken for a

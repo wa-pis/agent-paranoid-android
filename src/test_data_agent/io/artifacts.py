@@ -7,13 +7,14 @@ import importlib.metadata
 import json
 import platform
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import max_input_file_bytes, max_output_bytes
 from test_data_agent.core.settings import GenerationMode, OutputFormat, ValidationSettings
 from test_data_agent.io.writers import (
     dataset_spec_to_json,
@@ -279,6 +280,50 @@ def artifact_hashes(output_folder: Path) -> dict[str, str]:
                 digest.update(chunk)
         hashes[path.relative_to(output_folder).as_posix()] = digest.hexdigest()
     return hashes
+
+
+def validate_generation_bundle(output_folder: Path) -> GenerationManifest:
+    manifest_path = output_folder / "generation_manifest.json"
+    try:
+        with open_regular_file(manifest_path) as handle:
+            limit = max_input_file_bytes()
+            payload = handle.read(limit + 1)
+        if len(payload) > limit:
+            raise ValueError
+        manifest = GenerationManifest.model_validate_json(payload)
+        reproducibility = manifest.reproducibility
+        if reproducibility is None:
+            raise ValueError
+        expected_hashes = reproducibility.output_sha256
+        if not expected_hashes:
+            raise ValueError
+    except (OSError, ValueError):
+        raise ValueError("generation bundle is incomplete or invalid") from None
+
+    total_size = 0
+    output_limit = max_output_bytes()
+    for name, expected in expected_hashes.items():
+        relative = PurePosixPath(name)
+        if (
+            relative.is_absolute()
+            or not relative.parts
+            or any(part in {"", ".", ".."} for part in relative.parts)
+            or "\\" in name
+        ):
+            raise ValueError("generation bundle is incomplete or invalid")
+        digest = hashlib.sha256()
+        try:
+            with open_regular_file(output_folder.joinpath(*relative.parts)) as handle:
+                for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                    total_size += len(chunk)
+                    if total_size > output_limit:
+                        raise ValueError
+                    digest.update(chunk)
+        except (OSError, ValueError):
+            raise ValueError("generation bundle is incomplete or invalid") from None
+        if digest.hexdigest() != expected:
+            raise ValueError("generation bundle is incomplete or invalid")
+    return manifest
 
 
 def business_validation_manifest(

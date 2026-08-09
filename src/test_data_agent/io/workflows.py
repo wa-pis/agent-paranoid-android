@@ -229,6 +229,7 @@ def generate_single_entity_profile_artifacts(
     business_report: Any | None = None,
     profile_artifact_name: str = "profile.json",
     budget: GenerationBudget | None = None,
+    overwrite: bool = False,
 ) -> DatasetValidationReport:
     budget = budget or prepare_generation_budget(spec, output_path or Path.cwd())
     rows_by_entity = rows_by_entity or generate_dataset(
@@ -269,7 +270,11 @@ def generate_single_entity_profile_artifacts(
         )
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
-        commit_single_entity_bundle(temp_folder, output_path.parent)
+        commit_single_entity_bundle(
+            temp_folder,
+            output_path.parent,
+            overwrite=overwrite,
+        )
     except BaseException:
         remove_tree(temp_folder, temp_identity)
         raise
@@ -287,6 +292,7 @@ def generate_dataset_from_profile_artifacts(
     invalid_ratio: float = 0.0,
     business_rules_applier: BusinessRulesApplier | None = None,
     profile_artifact_name: str = "profile.json",
+    overwrite: bool = False,
 ) -> tuple[DatasetValidationReport, Any | None]:
     spec = build_dataset_spec_from_profile(
         profile,
@@ -320,6 +326,7 @@ def generate_dataset_from_profile_artifacts(
         business_report=business_report,
         profile_artifact_name=profile_artifact_name,
         budget=budget,
+        overwrite=overwrite,
     )
     return report, business_report
 
@@ -335,6 +342,7 @@ def generate_dataset_from_csv_artifacts(
     mode: str = "valid",
     invalid_ratio: float = 0.0,
     business_rules_applier: BusinessRulesApplier | None = None,
+    overwrite: bool = False,
 ) -> tuple[DatasetValidationReport, Any | None]:
     ensure_paths_distinct(input_path, output_path)
     profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
@@ -367,6 +375,7 @@ def generate_dataset_from_csv_artifacts(
         business_report=business_report,
         profile_artifact_name="csv_profile.json",
         budget=budget,
+        overwrite=overwrite,
     )
     return report, business_report
 
@@ -528,17 +537,36 @@ def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> PathIde
     return publish_directory(temp_folder, output_folder)
 
 
-def commit_single_entity_bundle(temp_folder: Path, output_folder: Path) -> None:
+def commit_single_entity_bundle(
+    temp_folder: Path,
+    output_folder: Path,
+    *,
+    overwrite: bool = False,
+) -> None:
     output_identity, output_created = ensure_directory(output_folder)
-    staged_paths = sorted(temp_folder.iterdir())
+    staged_paths = sorted(
+        temp_folder.iterdir(),
+        key=lambda path: (path.name == "generation_manifest.json", path.name),
+    )
+    collisions = [
+        path
+        for path in staged_paths
+        if (output_folder / path.name).exists()
+        or (output_folder / path.name).is_symlink()
+    ]
+    if collisions and not overwrite:
+        if output_created:
+            remove_tree_if_identity(output_folder, output_identity)
+        raise ValueError("bundle output already exists; use overwrite to replace it")
     rollback_folder = temp_folder / ".rollback"
     rollback_identity, _ = ensure_directory(rollback_folder)
     temp_identity = path_identity(temp_folder)
     try:
+        for path in collisions:
+            destination = output_folder / path.name
+            replace_path(destination, rollback_folder / path.name)
         for path in staged_paths:
             destination = output_folder / path.name
-            if destination.exists() or destination.is_symlink():
-                replace_path(destination, rollback_folder / path.name)
             replace_path(path, destination)
     except BaseException:
         for path in reversed(staged_paths):

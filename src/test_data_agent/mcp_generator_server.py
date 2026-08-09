@@ -34,7 +34,6 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
-    GenerationManifest,
     dataset_spec_fingerprint,
     generate_dataset_bundle,
     infer_dataset_spec_artifact,
@@ -46,7 +45,10 @@ from test_data_agent.mcp_generator_transport import (
     create_generator_mcp,
     run_bounded_generator_mcp,
 )
-from test_data_agent.io.artifacts import business_validation_manifest
+from test_data_agent.io.artifacts import (
+    business_validation_manifest,
+    validate_generation_bundle,
+)
 from test_data_agent.rules.business_config import make_business_rules_applier
 from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.rules.models import (
@@ -153,13 +155,12 @@ def validate_dataset(
     spec = resolve_workspace_path(spec_path, must_exist=True, expect_file=True)
     rows = resolve_workspace_path(rows_folder, must_exist=True, expect_directory=True)
     _require_suffix(spec, {".json", ".yaml", ".yml"}, "spec input")
-    manifest_path = rows / "generation_manifest.json"
-    if not manifest_path.is_file():
+    if not (rows / "generation_manifest.json").is_file():
         raise WorkspacePathError("rows folder is not a synthetic generation bundle")
     try:
-        manifest = GenerationManifest.model_validate_json(read_limited_text(manifest_path))
+        manifest = validate_generation_bundle(rows)
     except ValueError as exc:
-        raise WorkspacePathError("generation manifest is invalid") from exc
+        raise WorkspacePathError("generation bundle is incomplete or invalid") from exc
     loaded_spec = load_dataset_spec(spec)
     if manifest.spec_sha256 != dataset_spec_fingerprint(loaded_spec):
         raise WorkspacePathError("generation manifest does not match the dataset spec")
