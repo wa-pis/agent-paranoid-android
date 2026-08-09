@@ -52,6 +52,10 @@ def test_code_configuration_and_examples_require_heavy_checks() -> None:
     for path in (
         "src/test_data_agent/cli.py",
         "pyproject.toml",
+        "uv.lock",
+        "Dockerfile",
+        "scripts/classify_ci_changes.py",
+        "scripts/check_release_tag.py",
         ".github/workflows/ci.yml",
         "examples/negative_cases/dataset_spec.yaml",
     ):
@@ -92,6 +96,18 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         jobs = workflow["jobs"]
         assert jobs["changes"]["outputs"]["code"] == "${{ steps.scope.outputs.code }}"
         classifier = jobs["changes"]["steps"][1]
+        assert classifier["env"]["TRUSTED_SHA"] == (
+            "${{ github.event.pull_request.base.sha || github.sha }}"
+        )
+        assert (
+            'git show "${TRUSTED_SHA}:scripts/classify_ci_changes.py"'
+            in classifier["run"]
+        )
+        assert (
+            'python3 "${RUNNER_TEMP}/classify_ci_changes.py"'
+            in classifier["run"]
+        )
+        assert "python3 scripts/classify_ci_changes.py" not in classifier["run"]
         assert '>> "${GITHUB_OUTPUT}"' in classifier["run"]
         for job_name in job_names:
             job = jobs[job_name]
