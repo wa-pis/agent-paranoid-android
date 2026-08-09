@@ -34,7 +34,7 @@ source checkouts are not substitutes for the public-artifact checks.
   reflect raw provider status text.
 - [x] RC6-S7: external advisor requests contain no raw categorical values,
   including common names or address-like values missed by heuristics.
-- [ ] RC6-S8: sensitive numeric Trino profiling suppresses exact extrema and
+- [x] RC6-S8: sensitive numeric Trino profiling suppresses exact extrema and
   percentiles in MCP responses, profiles, specs, and planning artifacts.
 - [ ] RC6-S9: advisor-proposed constraints reject string constants, unknown
   references, and sensitive targets; post-solve privacy/type validation runs
