@@ -379,6 +379,25 @@ does not claim otherwise. The branch and release-tag rulesets themselves have
 no bypass actors. **Disposition: RC6-S20 closed.** RC6 publication still
 requires the final exact-commit acceptance manifest and explicit user approval.
 
+## 2026-08-09 Repository-Wide Review Remediation
+
+Repository-wide scan `484dfa30-85d2-4059-b39b-2c52c9d0f5ed` completed on
+immutable commit `2c714a6d4df75a1faab422055593fc50a2061a03`. Its exact
+`v1.0.0rc5..2c714a6d4df75a1faab422055593fc50a2061a03` diff is bound by
+`codex-security-snapshot/v1:sha256:1deb01578cde84b077d74d0845a417ab78dcc7c1d0e401b066dd6fc9c07f3740`.
+The scan reported 14 findings: four medium and ten low, with no high or
+critical findings.
+
+| Finding | Severity | Disposition |
+| --- | --- | --- |
+| FS-01: rare source categories can be generated verbatim | Medium | **Closed by the focused FS-01 change**; CSV-folder profiling now replaces source text categories with collision-safe rank labels after local rule inference and before cache, spec, or generation use. Matching conditional predicates are rewritten consistently, legacy caches fail closed, and numeric magnitude semantics are unchanged. |
+
+- Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
+- Result: **18 passed** using synthetic fixtures only.
+
+The remaining findings retain their canonical scan dispositions and continue
+to block RC6 until they are fixed or explicitly accepted in committed evidence.
+
 ## Review Conclusion
 
 **Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4

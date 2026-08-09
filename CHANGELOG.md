@@ -18,6 +18,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Replace source-derived CSV-folder text categories with collision-safe rank
+  labels before caching, spec inference, or generation while preserving counts
+  and conditional-rule semantics.
 - Prevent equal rare values in different fields from sharing a synthetic
   placeholder and prevent placeholders from colliding with normal categories,
   including placeholder-shaped baseline literals, while preserving sanitizer

@@ -68,6 +68,9 @@ source checkouts are not substitutes for the public-artifact checks.
   in CLI and log output, with control-character injection regressions.
 - [x] RC6-S20: deployed branch/tag rulesets, required checks, and PyPI Trusted
   Publisher approvals are recorded as external acceptance evidence.
+- [x] FS-01: CSV-folder profiles, caches, specs, and generated rows contain
+  collision-safe ranked labels instead of source-derived text categories;
+  inferred conditional rules use the matching labels.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

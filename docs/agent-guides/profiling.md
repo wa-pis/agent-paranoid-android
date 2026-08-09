@@ -10,7 +10,7 @@ metadata and bounded evidence needed to build a generation specification.
 
 - column names and inferred data types;
 - null ratios and approximate distinct counts;
-- non-sensitive enum-like distributions;
+- frequency-ranked categorical distributions with synthetic labels;
 - numeric ranges and percentiles;
 - date/time ranges;
 - string-length distributions;
@@ -33,8 +33,10 @@ inference.
 
 Bound file size, rows, cells, sample size, and wall-clock work. A cache may
 store metadata-only profiles and source fingerprints, but never raw rows or
-unmasked values. On deadline or budget failure, do not publish a partial
-profile as trusted evidence.
+source-derived categorical values. Infer local relationships and conditional
+rules before replacing categorical values, then rewrite their predicates to
+the same synthetic labels so generation semantics remain intact. On deadline
+or budget failure, do not publish a partial profile as trusted evidence.
 
 The normal flow is:
 

@@ -16,6 +16,7 @@ from test_data_agent.io.path_policy import atomic_write_bytes
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
 DEFAULT_RULE_SAMPLE_ROWS = 50_000
+PROFILE_CACHE_FORMAT_VERSION = 2
 
 
 def csv_folder_fingerprint(
@@ -59,6 +60,7 @@ def write_cached_profile(
 ) -> Path:
     path = cache_path(cache_dir, csv_folder_fingerprint(input_folder, rule_sample_rows))
     payload = {
+        "format_version": PROFILE_CACHE_FORMAT_VERSION,
         "fingerprint": csv_folder_fingerprint(input_folder, rule_sample_rows),
         "profile": profile.model_dump(mode="json"),
     }
@@ -71,7 +73,9 @@ def write_cached_profile(
 
 def read_profile_cache_file(path: Path, expected_fingerprint: str | None = None) -> DatasetProfile:
     payload = json.loads(read_limited_text(path))
-    cached_fingerprint = payload.get("fingerprint") if isinstance(payload, dict) else None
+    if not isinstance(payload, dict) or payload.get("format_version") != PROFILE_CACHE_FORMAT_VERSION:
+        raise ValueError("unsupported profile cache format")
+    cached_fingerprint = payload.get("fingerprint")
     if expected_fingerprint is not None and cached_fingerprint != expected_fingerprint:
         raise ValueError("profile cache fingerprint mismatch")
-    return DatasetProfile.model_validate(payload.get("profile", payload))
+    return DatasetProfile.model_validate(payload.get("profile"))

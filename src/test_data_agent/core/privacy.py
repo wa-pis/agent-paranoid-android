@@ -212,12 +212,23 @@ def mask_pattern(value: str, semantic_type: str | None) -> str:
     return f"text_len_{len(value)}"
 
 
-def synthetic_category_distribution(counts: Iterable[int]) -> list[dict[str, str | int]]:
+def synthetic_category_distribution(
+    counts: Iterable[int],
+    *,
+    reserved_values: Iterable[str] = (),
+) -> list[dict[str, str | int]]:
     """Preserve category frequency ranks without exposing source values."""
-    return [
-        {"value": f"category_{rank}", "count": int(count)}
-        for rank, count in enumerate(counts, start=1)
-    ]
+    reserved = set(reserved_values)
+    categories: list[dict[str, str | int]] = []
+    for rank, count in enumerate(counts, start=1):
+        value = f"category_{rank}"
+        suffix = 1
+        while value in reserved:
+            value = f"category_{rank}_{suffix}"
+            suffix += 1
+        reserved.add(value)
+        categories.append({"value": value, "count": int(count)})
+    return categories
 
 
 def mask_value(value: Any) -> Any:
