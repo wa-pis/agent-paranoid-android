@@ -103,7 +103,7 @@ def test_build_advisor_request_contains_only_safe_typed_metadata() -> None:
     assert "rows" not in request.model_dump(mode="json")
 
 
-def test_rare_category_sanitization_preserves_structural_references() -> None:
+def test_categorical_sanitization_preserves_structural_references() -> None:
     profile = DatasetProfile(
         source_type="test",
         entities=[
@@ -159,13 +159,13 @@ def test_rare_category_sanitization_preserves_structural_references() -> None:
         .distribution["categories"]
     ]
     assert values == [
-        "__apa_rare_e0_f2_c0__",
-        "__apa_rare_e0_f2_c1__",
-        "__apa_rare_e0_f2_c2__",
+        "__apa_category_e0_f2_c0__",
+        "__apa_category_e0_f2_c1__",
+        "__apa_category_e0_f2_c2__",
     ]
 
 
-def test_rare_category_placeholders_are_field_scoped_and_collision_free() -> None:
+def test_category_placeholders_are_field_scoped_and_collision_free() -> None:
     profile = safe_profile()
     profile.entity("customers").field("segment").distribution = {
         "kind": "categorical",
@@ -193,13 +193,13 @@ def test_rare_category_placeholders_are_field_scoped_and_collision_free() -> Non
         "categories"
     ]
 
-    assert segment_values[0]["value"] == "synthetic_category_1"
-    assert segment_values[1]["value"] == "__apa_rare_e0_f2_c1__"
-    assert region_values[0]["value"] == "__apa_rare_e0_f3_c0__"
+    assert segment_values[0]["value"] == "__apa_category_e0_f2_c0__"
+    assert segment_values[1]["value"] == "__apa_category_e0_f2_c1__"
+    assert region_values[0]["value"] == "__apa_category_e0_f3_c0__"
     assert segment_values[1]["value"] != region_values[0]["value"]
 
 
-def test_rare_category_placeholder_pattern_in_baseline_is_reserved() -> None:
+def test_category_placeholder_pattern_in_baseline_is_reserved() -> None:
     profile = safe_profile()
     profile.entity("customers").field("segment").distribution = {
         "kind": "categorical",
@@ -209,7 +209,7 @@ def test_rare_category_placeholder_pattern_in_baseline_is_reserved() -> None:
     baseline_category = baseline.entity("customers").field("segment").distribution[
         "categories"
     ][0]
-    baseline_category["value"] = "__apa_rare_e0_f2_c0__"
+    baseline_category["value"] = "__apa_category_e0_f2_c0__"
 
     request = build_advisor_request(profile, baseline_spec=baseline)
     profile_category = request.profile.entity("customers").field(
@@ -219,11 +219,11 @@ def test_rare_category_placeholder_pattern_in_baseline_is_reserved() -> None:
         "segment"
     ).distribution["categories"][0]
 
-    assert profile_category["value"] == "__apa_rare_e0_f2_c0_1__"
-    assert request_baseline_category["value"] == "__apa_rare_e0_f2_c0__"
+    assert profile_category["value"] == "__apa_category_e0_f2_c0_1__"
+    assert request_baseline_category["value"] == "__apa_category_e0_f2_c1__"
 
 
-def test_rare_category_sanitization_handles_reordered_baseline() -> None:
+def test_categorical_sanitization_handles_reordered_baseline() -> None:
     profile = safe_profile()
     baseline = infer_dataset_spec(profile)
     baseline_categories = baseline.entity("customers").field(
@@ -235,7 +235,7 @@ def test_rare_category_sanitization_handles_reordered_baseline() -> None:
 
     assert request.baseline_spec.entity("customers").field(
         "segment"
-    ).distribution["categories"][0]["value"] == "__apa_rare_e0_f2_c1__"
+    ).distribution["categories"][0]["value"] == "__apa_category_e0_f2_c1__"
     assert "business" not in request.model_dump_json()
 
 
@@ -252,7 +252,20 @@ def test_persisted_review_restores_reordered_baseline_placeholder() -> None:
     assert rebuilt == request
 
 
-def test_rare_category_sanitization_is_deterministic() -> None:
+def test_persisted_review_restores_baseline_only_category_placeholder() -> None:
+    profile = safe_profile()
+    baseline = infer_dataset_spec(profile)
+    baseline.entity("customers").field("segment").distribution["categories"].append(
+        {"value": "preferred", "count": 3}
+    )
+    request = build_advisor_request(profile, baseline_spec=baseline)
+
+    rebuilt = _rebuild_advisor_request_for_profile_verification(profile, request)
+
+    assert rebuilt == request
+
+
+def test_categorical_sanitization_is_deterministic() -> None:
     profile = safe_profile()
 
     first = build_advisor_request(profile)
@@ -260,6 +273,28 @@ def test_rare_category_sanitization_is_deterministic() -> None:
 
     assert first.profile == second.profile
     assert first.baseline_spec == second.baseline_spec
+
+
+def test_advisor_request_replaces_common_categories_with_synthetic_labels() -> None:
+    profile = safe_profile()
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": "Alice Smith", "count": 50},
+            {"value": "10 Main Street", "count": 25},
+        ],
+    }
+
+    request = build_advisor_request(profile)
+
+    assert "Alice Smith" not in request.model_dump_json()
+    assert "10 Main Street" not in request.model_dump_json()
+    assert [
+        category["value"]
+        for category in request.profile.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ] == ["__apa_category_e0_f2_c0__", "__apa_category_e0_f2_c1__"]
 
 
 def test_advisor_request_marks_instruction_like_names_as_untrusted_data() -> None:

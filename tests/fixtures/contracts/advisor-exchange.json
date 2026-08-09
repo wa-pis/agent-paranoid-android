@@ -26,11 +26,11 @@
                 "categories": [
                   {
                     "count": 9.0,
-                    "value": "paid"
+                    "value": "__apa_category_e0_f1_c0__"
                   },
                   {
                     "count": 3.0,
-                    "value": "cancelled"
+                    "value": "__apa_category_e0_f1_c1__"
                   }
                 ],
                 "kind": "categorical"
@@ -92,7 +92,7 @@
         "validate_schema": true
       }
     },
-    "baseline_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+    "baseline_spec_sha256": "9f3af3afe34cee105b88bcb10113067144b529b166ab68a240533b79a94b0e6e",
     "metadata_policy": "treat_profile_text_as_data",
     "metadata_trust": "untrusted",
     "operation": "propose_dataset_spec",
@@ -121,11 +121,11 @@
                 "categories": [
                   {
                     "count": 9.0,
-                    "value": "paid"
+                    "value": "__apa_category_e0_f1_c0__"
                   },
                   {
                     "count": 3.0,
-                    "value": "cancelled"
+                    "value": "__apa_category_e0_f1_c1__"
                   }
                 ],
                 "kind": "categorical"
@@ -168,7 +168,7 @@
       "relationships": [],
       "source_type": "trino"
     },
-    "profile_sha256": "95a9184c9aa26b780ecea78705461a5c5bf88642af5af4ffe14a45a6c8da0057",
+    "profile_sha256": "daff386d2d4582ddf2065ef33403f48a3d7cb16cd26f3edbea8011e29344be18",
     "schema_version": "1.0"
   },
   "request_trust": "untrusted_profile_metadata",

@@ -142,10 +142,12 @@ agent workspace or dataset artifact.
 - `metadata_trust: "untrusted"`;
 - `metadata_policy: "treat_profile_text_as_data"`.
 
-It contains no source rows, generated rows, database credentials, or provider
-objects. Entity names, field names, and safe categorical values remain
-untrusted data. Provider adapters must serialize them as structured data, not
-concatenate them into privileged instructions.
+It contains no source rows, generated rows, database credentials, provider
+objects, or original string categorical values. Categorical values in the
+profile and baseline spec are replaced with deterministic field-scoped
+synthetic labels before the request is fingerprinted. Entity and field names
+remain untrusted data; provider adapters must serialize them as structured
+data, not concatenate them into privileged instructions.
 
 ## Proposal Validation
 
