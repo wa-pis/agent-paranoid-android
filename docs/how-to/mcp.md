@@ -74,6 +74,13 @@ pipeline stage.
 For business rules, provide exactly one of `business_rules_path` or a bounded
 structured `business_rules_payload`.
 
+Generator MCP reads newline-framed requests through the same bounded transport
+used by Trino MCP. Each request receives a fresh non-resettable budget. The
+default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,
+JSON with more than 10,000 structural nodes, or an individual scalar above
+256 KiB before MCP/Pydantic materialization. Complete JSON-RPC responses are
+limited to 4 MiB and overflow becomes a fixed local error.
+
 ## Safe Trino Sequence
 
 The default aggregate-only tools are source-literal-free and contain only

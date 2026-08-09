@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 from typing import Any, Literal
 
@@ -40,7 +42,10 @@ from test_data_agent.io import (
     validate_dataset_artifacts,
     write_csv_profile_artifact,
 )
-from test_data_agent.mcp_generator_transport import create_generator_mcp
+from test_data_agent.mcp_generator_transport import (
+    create_generator_mcp,
+    run_bounded_generator_mcp,
+)
 from test_data_agent.io.artifacts import business_validation_manifest
 from test_data_agent.rules.business_config import make_business_rules_applier
 from test_data_agent.rules.contract import validate_business_rules_for_spec
@@ -51,6 +56,12 @@ from test_data_agent.rules.models import (
 )
 from test_data_agent.rules.validation import BusinessValidationReport
 from test_data_agent.safety import assert_profile_safe
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
+    QueryWorkLimits,
+    with_query_work_budget,
+)
 
 
 WORKSPACE_ROOT_ENV = "TEST_DATA_AGENT_WORKSPACE_ROOT"
@@ -671,17 +682,67 @@ _GENERATOR_MCP_TOOLS = (
     export_dataset,
 )
 
-mcp: Any = create_generator_mcp(_GENERATOR_MCP_TOOLS)
+
+def generator_mcp_services(
+    *,
+    work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+    budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
+) -> list[Callable[..., Any]]:
+    return [
+        with_query_work_budget(tool, work_limits, budget_provider=budget_provider)
+        for tool in _GENERATOR_MCP_TOOLS
+    ]
+
+
+def _new_transport_work_budget(
+    raw_payload_bytes: int,
+    *,
+    work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+) -> QueryWorkBudget:
+    budget = QueryWorkBudget(work_limits)
+    budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+    return budget
+
+
+def _current_transport_work_budget() -> QueryWorkBudget | None:
+    if mcp is None:
+        return None
+    try:
+        request = mcp.get_context().request_context.request
+    except (LookupError, ValueError):
+        return None
+    return request if isinstance(request, QueryWorkBudget) else None
+
+
+mcp: Any = create_generator_mcp(
+    generator_mcp_services(budget_provider=_current_transport_work_budget)
+)
 
 
 def main() -> None:
+    global mcp
+
     if mcp is None:
         raise RuntimeError(
             "Generator MCP support is not installed; "
             "install agent-paranoid-android[mcp]"
         )
+    work_limits = DEFAULT_QUERY_WORK_LIMITS
     audit_logger_from_env("generator-mcp")
-    mcp.run()
+    mcp = create_generator_mcp(
+        generator_mcp_services(
+            work_limits=work_limits,
+            budget_provider=_current_transport_work_budget,
+        )
+    )
+    run_bounded_generator_mcp(
+        mcp,
+        max_payload_bytes=work_limits.raw_transport_payload_bytes,
+        request_context_factory=partial(
+            _new_transport_work_budget,
+            work_limits=work_limits,
+        ),
+    )
 
 
 if __name__ == "__main__":

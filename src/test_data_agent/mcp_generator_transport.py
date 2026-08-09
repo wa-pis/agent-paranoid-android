@@ -11,6 +11,7 @@ except ImportError:  # pragma: no cover
     FastMCP = None  # type: ignore[misc, assignment]
 
 from test_data_agent.audit import audited_mcp_tool
+from test_data_agent.mcp_trino_transport import run_bounded_mcp
 
 
 def create_generator_mcp(
@@ -25,3 +26,6 @@ def create_generator_mcp(
     for tool in tools:
         mcp.tool()(audited_mcp_tool("generator-mcp", tool))
     return mcp
+
+
+run_bounded_generator_mcp = run_bounded_mcp

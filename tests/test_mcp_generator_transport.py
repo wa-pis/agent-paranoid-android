@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
+from dataclasses import replace
 from typing import Any
 
 import pytest
 
 import test_data_agent.mcp_generator_transport as transport
+import test_data_agent.mcp_trino_transport as shared_transport
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+    QueryWorkDimension,
+)
 
 
 class FakeMCP:
@@ -65,3 +74,51 @@ def test_generator_transport_is_optional(
     monkeypatch.setattr(transport, "FastMCP", None)
 
     assert transport.create_generator_mcp(()) is None
+
+
+def test_generator_transport_uses_shared_bounded_runner() -> None:
+    assert transport.run_bounded_generator_mcp is shared_transport.run_bounded_mcp
+
+
+@pytest.mark.parametrize(
+    ("limits", "params", "dimension"),
+    [
+        ({"ast_depth": 2}, {"value": [[[1]]]}, QueryWorkDimension.AST_DEPTH),
+        ({"ast_nodes": 6}, {"value": [1, 2, 3, 4]}, QueryWorkDimension.AST_NODES),
+    ],
+)
+def test_generator_transport_rejects_structurally_oversized_json_before_parse(
+    limits: dict[str, int],
+    params: dict[str, Any],
+    dimension: QueryWorkDimension,
+) -> None:
+    work_limits = replace(DEFAULT_QUERY_WORK_LIMITS, **limits)
+    raw_payload = json.dumps(
+        {"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": params}
+    ).encode()
+
+    def budget_factory(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(work_limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    with pytest.raises(QueryWorkBudgetExceeded) as raised:
+        shared_transport._bounded_session_message(raw_payload, budget_factory)
+
+    assert raised.value.dimension is dimension
+
+
+@pytest.mark.parametrize("method", ["123456789", "\\" * 9])
+def test_generator_transport_rejects_oversized_json_scalar_before_parse(
+    method: str,
+) -> None:
+    work_limits = replace(DEFAULT_QUERY_WORK_LIMITS, canonical_argument_bytes=8)
+    raw_payload = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method}).encode()
+
+    def budget_factory(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(work_limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    with pytest.raises(ValueError, match="JSON scalar exceeds structural limit"):
+        shared_transport._bounded_session_message(raw_payload, budget_factory)

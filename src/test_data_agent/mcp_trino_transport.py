@@ -215,6 +215,7 @@ def _bounded_session_message(
 ) -> Any:
     """Attach a request budget only after charging bytes and before parsing."""
     request_context = request_context_factory(len(raw_payload))
+    _consume_json_structure(raw_payload, request_context)
 
     raw_message = json.loads(raw_payload)
     if (
@@ -232,6 +233,66 @@ def _bounded_session_message(
         message,
         metadata=ServerMessageMetadata(request_context=request_context),
     )
+
+
+def _consume_json_structure(
+    raw_payload: bytes,
+    budget: QueryWorkBudget,
+) -> None:
+    """Bound JSON depth, nodes, and scalar bytes before materialization."""
+    depth = 0
+    in_string = False
+    escaped = False
+    scalar_bytes = 0
+    primitive_bytes = 0
+    scalar_limit = budget.limits.canonical_argument_bytes
+
+    for byte in raw_payload:
+        if in_string:
+            if escaped:
+                escaped = False
+                scalar_bytes += 1
+            elif byte == ord("\\"):
+                escaped = True
+                scalar_bytes += 1
+            elif byte == ord('"'):
+                in_string = False
+                budget.consume_ast_nodes(1)
+                scalar_bytes = 0
+            else:
+                scalar_bytes += 1
+            if scalar_bytes > scalar_limit:
+                raise ValueError("JSON scalar exceeds structural limit")
+            continue
+
+        if byte == ord('"'):
+            if primitive_bytes:
+                budget.consume_ast_nodes(1)
+                primitive_bytes = 0
+            in_string = True
+        elif byte in (ord("{"), ord("[")):
+            if primitive_bytes:
+                budget.consume_ast_nodes(1)
+                primitive_bytes = 0
+            depth += 1
+            budget.consume_ast_nodes(1)
+            budget.observe_ast_depth(depth)
+        elif byte in (ord("}"), ord("]")):
+            if primitive_bytes:
+                budget.consume_ast_nodes(1)
+                primitive_bytes = 0
+            depth = max(0, depth - 1)
+        elif byte in b" \t\r\n,:":
+            if primitive_bytes:
+                budget.consume_ast_nodes(1)
+                primitive_bytes = 0
+        else:
+            primitive_bytes += 1
+            if primitive_bytes > scalar_limit:
+                raise ValueError("JSON scalar exceeds structural limit")
+
+    if primitive_bytes:
+        budget.consume_ast_nodes(1)
 
 
 @asynccontextmanager
@@ -326,7 +387,7 @@ async def _run_bounded_stdio(
         )
 
 
-def run_bounded_trino_mcp(
+def run_bounded_mcp(
     mcp: Any,
     *,
     max_payload_bytes: int,
@@ -343,6 +404,9 @@ def run_bounded_trino_mcp(
             request_context_factory=request_context_factory,
         )
     )
+
+
+run_bounded_trino_mcp = run_bounded_mcp
 
 
 def create_trino_mcp(

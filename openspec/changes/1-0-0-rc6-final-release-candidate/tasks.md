@@ -30,10 +30,10 @@
   targets, then re-run privacy and type checks after constraint solving.
 - [ ] Replace formula/validation diagnostics that reflect expressions, ASTs,
   expected/actual values, or nested exceptions with fixed local reasons.
-- [ ] Apply the same bounded pre-parse raw-frame and final-response transport
+- [x] Apply the same bounded pre-parse raw-frame and final-response transport
   policy to generator MCP, with a fresh invocation budget and tests for
   oversized frames, IDs, errors, and nested responses.
-- [ ] Enforce JSON node/container/depth/scalar limits before full object
+- [x] Enforce JSON node/container/depth/scalar limits before full object
   materialization and convert parser recursion/resource failures to bounded
   input errors.
 - [ ] Validate public artifact names as safe single components and reject

@@ -30,6 +30,9 @@ All notable changes to this project are documented here.
 - Reject advisor formulas with string constants, unknown or incompatible
   references, and protected targets; enforce fixed post-solve type and privacy
   checks before generated rows reach publication adapters.
+- Run generator MCP over the bounded stdio transport with fresh shared request
+  budgets, bounded final responses, and pre-materialization JSON structure
+  limits.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON

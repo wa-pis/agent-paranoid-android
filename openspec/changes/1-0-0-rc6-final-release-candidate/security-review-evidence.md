@@ -158,8 +158,8 @@ repository settings were used.
 | High | Raw common categorical profile values can reach the external advisor | **Closed by PR #337**; current-main synthetic regression verifies common names and address-like values are replaced with deterministic field-scoped labels |
 | High | Provider formulas can inject arbitrary constants into generated rows | **Open; RC6 release-blocking** |
 | Medium | Sensitive numeric Trino extrema/percentiles can reveal source values | **Closed by PR #338**; query, masking, safety, persistence, and generation regressions verify only coarse numeric shape survives |
-| Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Open; RC6 release-blocking** |
-| Medium | JSON structural limits run after full parsing/materialization | **Open; RC6 release-blocking** |
+| Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Closed by the focused RC6-S10 change**; generator MCP uses the shared bounded stdio writer with a fresh request budget, reserved terminal-error bytes, and focused transport wiring regressions |
+| Medium | JSON structural limits run after full parsing/materialization | **Closed by the focused RC6-S10 change**; the raw-byte preflight bounds depth, nodes/containers, and scalar bytes before JSON or MCP model materialization, including escaped-scalar regressions |
 | Medium | Pull requests control the classifier that can skip required checks | **Open; RC6 release-blocking** |
 | Medium | Release publication is bound to tag/version, not approved commit identity | **Open; RC6 release-blocking** |
 | Medium | RC6 acceptance evidence is not enforced by the release workflow | **Open; RC6 release-blocking** |

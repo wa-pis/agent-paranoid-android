@@ -733,7 +733,7 @@ Scope:
 - [ ] Validate provider-added DatasetSpec constraints and run privacy/type
   checks after constraint solving, before output publication.
 - [ ] Make formula and validation diagnostics fixed-reason and source-free.
-- [ ] Apply bounded raw-frame, invocation, and final-response budgets to the
+- [x] Apply bounded raw-frame, invocation, and final-response budgets to the
   generator MCP and enforce JSON structure limits before materialization.
 - [ ] Harden public artifact names and neutralize spreadsheet formula markers
   in CSV output.
