@@ -399,6 +399,7 @@ critical findings.
 | FS-06: reserved entity name can replace dataset content | Low | **Closed by the focused FS-06 change**; every fixed generation-control basename is rejected during dataset-spec validation, and the writer repeats the check before creating any dataset file. |
 | FS-08: duplicate entity stems are last-wins | Low | **Closed by the focused FS-08 change**; dataset-row loading rejects duplicate stems across CSV, JSON, and Parquet artifacts before reading any row file. |
 | FS-10: profiling deadline omits inner loops | Low | **Closed by the focused FS-10 change**; local CSV profiling checks the monotonic deadline before each field-processing and field-finalization operation. |
+| MT-04: audit terminal event can be lost at capacity | Low | **Closed by the focused MT-04 change**; audit admission reserves one maximum-size terminal record before execution, and an admitted bounded terminal record is not rejected at the admission threshold. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -428,6 +429,9 @@ critical findings.
 - Focused command: `pytest tests/test_local_profile_budget.py -q`
 - Result: **13 passed**; synthetic clocks require profiling to stop before the
   next field operation and leave no partial cache.
+- Focused command: `pytest tests/test_audit.py -q`
+- Result: **12 passed**; a synthetic exact-capacity regression requires
+  rejection before tool execution and leaves no unmatched start.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

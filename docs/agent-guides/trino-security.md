@@ -45,6 +45,9 @@ or access to secrets, credentials, tokens, or raw PII.
 - Accept only string or integer JSON-RPC request IDs and key active requests by
   their exact serialized representation so distinct wire types cannot alias.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
+- Audit-log capacity must reject a new invocation before its `started` record
+  unless one maximum-size terminal record is reserved; an admitted terminal
+  event must not be dropped at the configured admission threshold.
 
 Keep the Trino dependency optional for workflows that do not use Trino. Mock
 Trino responses in normal unit tests; use live access only in explicitly gated

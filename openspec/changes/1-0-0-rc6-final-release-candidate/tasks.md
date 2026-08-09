@@ -147,6 +147,8 @@
   before reading any row file.
 - [x] FS-10: check the local profile deadline between field processing and
   field finalization operations.
+- [x] MT-04: reserve terminal audit capacity before executing a new invocation
+  and retain the terminal record after admission.
 
 ## Release and review gates
 

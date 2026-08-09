@@ -29,6 +29,8 @@ All notable changes to this project are documented here.
   before any row artifact is read.
 - Check local CSV profiling deadlines between individual field-processing and
   field-finalization operations.
+- Reserve bounded terminal audit capacity before MCP tool execution so a full
+  log rejects admission instead of losing the completion event.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

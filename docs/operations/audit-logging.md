@@ -42,8 +42,12 @@ sources is rejected. See [Container Deployment](containers.md) for the
 least-privilege Compose example.
 
 When audit configuration is present but invalid, MCP operations fail closed.
-The default maximum log size is 64 MiB. Override it with
-`TEST_DATA_AGENT_AUDIT_MAX_BYTES`, up to 1 GiB.
+The default admission limit is 64 MiB. Override it with
+`TEST_DATA_AGENT_AUDIT_MAX_BYTES`, up to 1 GiB. A new invocation starts only
+when the log has room for its `started` record plus one maximum-size terminal
+record. Once admitted, its terminal record is always appended; concurrent
+terminal records may therefore exceed the admission limit by at most one
+bounded record per active invocation.
 
 ## Verify
 
@@ -69,5 +73,5 @@ external storage when stronger retention guarantees are required.
 3. Store the verified file and final MAC in the retention system.
 4. Move the old file and restart the workers with a new empty path.
 
-The size limit intentionally fails closed instead of silently dropping audit
-events.
+The admission limit fails closed before a new operation starts instead of
+silently dropping its terminal audit event.

@@ -4,12 +4,15 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.audit as audit_module
 from test_data_agent.audit import (
     AUDIT_ACTOR_ENV,
     AUDIT_HMAC_KEY_FILE_ENV,
     AUDIT_HMAC_KEY_ENV,
     AUDIT_LOG_ENV,
     AuditConfigurationError,
+    AuditLogger,
+    AuditSettings,
     AuditVerificationError,
     audited_mcp_tool,
     decode_audit_key,
@@ -74,6 +77,45 @@ def test_audited_tool_records_failure_type(
     assert records[-1]["error_type"] == "ValueError"
     assert "raw sensitive detail" not in log_path.read_text(encoding="utf-8")
     assert verify_audit_log(log_path, AUDIT_KEY_BYTES).record_count == 2
+
+
+def test_audited_tool_rejects_before_start_when_terminal_record_will_not_fit(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    probe_path = tmp_path / "probe.jsonl"
+    probe = AuditLogger(
+        "generator-mcp",
+        AuditSettings(
+            path=probe_path,
+            key=AUDIT_KEY_BYTES,
+            actor=None,
+            max_bytes=1_000_000,
+        ),
+    )
+    probe.record("operation", "started", "0" * 32)
+    log_path = tmp_path / "audit.jsonl"
+    logger = AuditLogger(
+        "generator-mcp",
+        AuditSettings(
+            path=log_path,
+            key=AUDIT_KEY_BYTES,
+            actor=None,
+            max_bytes=probe_path.stat().st_size,
+        ),
+    )
+    monkeypatch.setattr(audit_module, "audit_logger_from_env", lambda service: logger)
+    called = False
+
+    def operation() -> None:
+        nonlocal called
+        called = True
+
+    with pytest.raises(AuditConfigurationError, match="rotate it before retrying"):
+        audited_mcp_tool("generator-mcp", operation)()
+
+    assert called is False
+    assert log_path.read_bytes() == b""
 
 
 def test_audit_log_escapes_control_characters_in_physical_records(

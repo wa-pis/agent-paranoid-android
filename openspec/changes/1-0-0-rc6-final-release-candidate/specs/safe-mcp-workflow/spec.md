@@ -87,6 +87,21 @@ local errors without provider-controlled text.
 - **AND** the backend error text is absent from the response, logs, and
   retained exception chain
 
+### Requirement: Audit Admission Preserves Terminal Events
+
+Audit-log capacity SHALL reject a new invocation before execution unless one
+maximum-size terminal record is reserved. Once admitted, the invocation's
+bounded `succeeded` or `failed` record SHALL NOT be dropped at the configured
+admission threshold.
+
+#### Scenario: Only the started record fits
+
+- **GIVEN** the remaining audit capacity can hold `started` but not a maximum
+  terminal record
+- **WHEN** a new MCP tool invocation is attempted
+- **THEN** the invocation is rejected before the tool executes
+- **AND** no unmatched `started` record is appended
+
 ### Requirement: Opt-In Row Returning Has A Separate Privacy Contract
 
 The explicit opt-in `run_safe_select` capability SHALL NOT inherit the default
