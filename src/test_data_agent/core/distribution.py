@@ -46,6 +46,19 @@ class NumericDistribution(BaseModel):
         return self
 
 
+class NumericShapeDistribution(BaseModel):
+    kind: Literal["numeric_shape"] = "numeric_shape"
+    max_abs_magnitude: int = Field(ge=-308, le=307)
+    has_negative: bool = False
+    has_positive: bool = False
+
+    @model_validator(mode="after")
+    def validate_nonzero_shape(self) -> NumericShapeDistribution:
+        if not self.has_negative and not self.has_positive:
+            raise ValueError("numeric shape must include a non-zero sign")
+        return self
+
+
 class BooleanDistribution(BaseModel):
     kind: Literal["boolean"] = "boolean"
     true_ratio: float = Field(default=0.5, ge=0.0, le=1.0)
@@ -140,6 +153,7 @@ FieldDistribution: TypeAlias = Annotated[
     SyntheticIdentifierDistribution
     | MaskedPatternsDistribution
     | NumericDistribution
+    | NumericShapeDistribution
     | BooleanDistribution
     | DateRangeDistribution
     | DateTimeRangeDistribution
@@ -155,6 +169,7 @@ _TYPED_DISTRIBUTION_KINDS = frozenset(
         "synthetic_identifier",
         "masked_patterns",
         "numeric",
+        "numeric_shape",
         "boolean",
         "date_range",
         "datetime_range",

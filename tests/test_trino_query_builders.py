@@ -11,6 +11,7 @@ from test_data_agent.trino_query_builders import (
     build_aggregate_mapping_profile_query,
     build_column_cardinality_query,
     build_column_profile_query,
+    build_sensitive_numeric_shape_query,
     build_conditional_allowed_values_profile_query,
     build_conditional_required_profile_query,
     build_describe_table_query,
@@ -58,6 +59,9 @@ def test_profile_builders_are_bounded_aggregate_queries() -> None:
         build_column_profile_query(
             "analytics", "safe_schema", "synthetic_orders", "amount", "double"
         ),
+        build_sensitive_numeric_shape_query(
+            "analytics", "safe_schema", "synthetic_orders", "tax_number"
+        ),
         build_top_values_query(
             "analytics", "safe_schema", "synthetic_orders", "status", 20
         ),
@@ -101,7 +105,12 @@ def test_profile_builders_are_bounded_aggregate_queries() -> None:
 
     assert all(isinstance(query, TrinoQuery) for query in queries)
     assert all("SELECT *" not in query.sql.upper() for query in queries)
-    assert queries[3].sql.endswith("LIMIT 20")
+
+    sensitive_numeric = queries[3]
+    assert "min(" not in sensitive_numeric.sql
+    assert "approx_percentile(" not in sensitive_numeric.sql
+    assert "max_abs_magnitude" in sensitive_numeric.sql
+    assert queries[4].sql.endswith("LIMIT 20")
 
 
 def test_conditional_builders_keep_values_out_of_sql() -> None:

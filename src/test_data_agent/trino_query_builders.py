@@ -94,6 +94,28 @@ def build_column_profile_query(
     )
 
 
+def build_sensitive_numeric_shape_query(
+    catalog: str,
+    schema: str,
+    table: str,
+    column: str,
+) -> TrinoQuery:
+    safe_table = qualified_table(catalog, schema, table)
+    safe_column = quote_identifier(column)
+    magnitude = (
+        f"TRY_CAST(floor(log10(abs(CAST({safe_column} AS double)))) AS integer)"
+    )
+    return TrinoQuery(
+        f"SELECT count(*) AS row_count, count({safe_column}) AS non_null_count, "
+        f"approx_distinct({safe_column}) AS approx_distinct_count, "
+        f"max(CASE WHEN {safe_column} = 0 THEN NULL ELSE {magnitude} END) "
+        "AS max_abs_magnitude, "
+        f"count_if({safe_column} < 0) > 0 AS has_negative, "
+        f"count_if({safe_column} > 0) > 0 AS has_positive "
+        f"FROM {safe_table}"
+    )
+
+
 def build_top_values_query(
     catalog: str,
     schema: str,

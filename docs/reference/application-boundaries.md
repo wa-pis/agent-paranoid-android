@@ -117,6 +117,9 @@ does not inherit the default source-literal-free guarantee.
 Tool names, descriptions, input/output schemas, ordering, audit wrapping, and
 safety behavior remain compatibility-gated. Transport extraction must not move
 SQL, path, profile, or generation policy into FastMCP registration.
+Sensitive numeric Trino columns expose counts, cardinality, sign presence, and
+decimal order of magnitude only. Exact extrema and percentiles are neither
+queried nor carried into profiles, specs, or planning artifacts.
 
 ## Artifact Contracts
 

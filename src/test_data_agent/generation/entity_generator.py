@@ -16,6 +16,7 @@ from test_data_agent.core.distribution import (
     DateRangeDistribution,
     DateTimeRangeDistribution,
     NumericDistribution,
+    NumericShapeDistribution,
     StringPatternDistribution,
 )
 from test_data_agent.core.entity import EntitySpec
@@ -149,14 +150,15 @@ def generate_field_value(
     if isinstance(typed_distribution, CategoricalDistribution) and typed_distribution.categories:
         return weighted_choice(typed_distribution.categories, rng)
     numeric_distribution = typed_distribution if isinstance(typed_distribution, NumericDistribution) else None
+    numeric_shape = typed_distribution if isinstance(typed_distribution, NumericShapeDistribution) else None
     boolean_distribution = typed_distribution if isinstance(typed_distribution, BooleanDistribution) else None
     date_distribution = typed_distribution if isinstance(typed_distribution, DateRangeDistribution) else None
     datetime_distribution = typed_distribution if isinstance(typed_distribution, DateTimeRangeDistribution) else None
     string_distribution = typed_distribution if isinstance(typed_distribution, StringPatternDistribution) else None
     if field.data_type == FieldType.INTEGER:
-        return int(round(ranged_number(numeric_distribution, distribution, rng, default_min=0, default_max=1000)))
+        return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
     if field.data_type == FieldType.FLOAT:
-        return round(ranged_number(numeric_distribution, distribution, rng, default_min=0.0, default_max=1000.0), 6)
+        return round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0), 6)
     if field.data_type == FieldType.BOOLEAN:
         return boolean_value(boolean_distribution, distribution, rng)
     if field.data_type == FieldType.DATE:
@@ -205,6 +207,7 @@ def weighted_choice(categories: list[Any], rng: random.Random) -> Any:
 
 def ranged_number(
     typed_distribution: NumericDistribution | None,
+    numeric_shape: NumericShapeDistribution | None,
     distribution: dict[str, Any],
     rng: random.Random,
     default_min: float,
@@ -214,6 +217,11 @@ def ranged_number(
         low = typed_distribution.p05 if typed_distribution.p05 is not None else typed_distribution.min_value
         high = typed_distribution.p95 if typed_distribution.p95 is not None else typed_distribution.max_value
         scale_factor = typed_distribution.scale_factor
+    elif numeric_shape is not None:
+        bound = 9.0 * (10.0**numeric_shape.max_abs_magnitude)
+        low = -bound if numeric_shape.has_negative else 0.0
+        high = bound if numeric_shape.has_positive else 0.0
+        scale_factor = 1.0
     else:
         low = distribution.get("p05", distribution.get("min_value", default_min))
         high = distribution.get("p95", distribution.get("max_value", default_max))

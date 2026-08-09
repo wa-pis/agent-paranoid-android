@@ -288,6 +288,20 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
                 "semantic_type": "email",
                 "masked_patterns": [{"pattern": "email", "count": 100}],
             },
+            {
+                "name": "tax_number",
+                "data_type": "bigint",
+                "sensitive": True,
+                "min_value": 912345678,
+                "max_value": 987654321,
+                "p05": 923456789,
+                "p95": 976543210,
+                "numeric_shape": {
+                    "max_abs_magnitude": 8,
+                    "has_negative": False,
+                    "has_positive": True,
+                },
+            },
         ],
     }
 
@@ -306,11 +320,20 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     assert len(planned["profile_sha256"]) == 64
     assert planned["planned_spec_sha256"] == planned["current_spec_sha256"]
     assert planned["entities"] == [
-        {"name": "orders", "row_count": 4, "field_count": 3}
+        {"name": "orders", "row_count": 4, "field_count": 4}
     ]
     assert (tmp_path / "agent" / "orders" / "dataset_spec.yaml").is_file()
     assert not (tmp_path / "agent" / "orders" / "generated").exists()
     assert "paid" not in json.dumps(planned)
+    persisted = "\n".join(
+        (tmp_path / "agent" / "orders" / name).read_text()
+        for name in ("profile.json", "dataset_spec.yaml", "agent_plan.json")
+    )
+    assert all(
+        str(value) not in persisted
+        for value in (912345678, 987654321, 923456789, 976543210)
+    )
+    assert "max_abs_magnitude: 8" in persisted
 
     inspected = inspect_dataset_plan("agent/orders")
     assert inspected["phase"] == "awaiting_approval"
@@ -327,6 +350,8 @@ def test_plan_and_approve_safe_trino_dataset_through_mcp(
     generated_rows = json.loads(
         (tmp_path / "agent" / "orders" / "generated" / "orders.json").read_text()
     )
+    assert all(0 <= row["tax_number"] <= 900_000_000 for row in generated_rows)
+    assert any(row["tax_number"] >= 100_000_000 for row in generated_rows)
 
     assert approved["operation"] == "approve_dataset_plan"
     assert approved["approval_required"] is False

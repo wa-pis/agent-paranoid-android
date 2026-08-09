@@ -19,8 +19,11 @@ from test_data_agent.core.privacy import (
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
+    build_column_cardinality_query,
     build_column_profile_query,
+    build_sensitive_numeric_shape_query,
     build_top_values_query,
+    is_numeric_trino_type,
     is_string_trino_type,
 )
 from test_data_agent.trino_sql_policy import check_allowlist, validate_safe_select
@@ -88,8 +91,17 @@ class TrinoMasker:
     ) -> dict[str, Any]:
         check_allowlist(catalog=catalog, schema=schema, config=self.config)
         sensitive = infer_sensitive_from_name(column)
+        sensitive_numeric = sensitive and is_numeric_trino_type(data_type)
         aggregate_rows = self.fetch_query(
-            build_column_profile_query(catalog, schema, table, column, data_type)
+            build_sensitive_numeric_shape_query(catalog, schema, table, column)
+            if sensitive_numeric
+            else (
+                build_column_cardinality_query(catalog, schema, table, column)
+                if sensitive
+                else build_column_profile_query(
+                    catalog, schema, table, column, data_type
+                )
+            )
         )
         aggregates = aggregate_rows[0] if aggregate_rows else {}
         row_count = int(aggregates.get("row_count") or 0)
@@ -110,9 +122,18 @@ class TrinoMasker:
             {
                 key: value
                 for key, value in aggregates.items()
-                if key not in profile and value is not None
+                if key not in profile
+                and key
+                not in {"max_abs_magnitude", "has_negative", "has_positive"}
+                and value is not None
             }
         )
+        if sensitive_numeric and aggregates.get("max_abs_magnitude") is not None:
+            profile["numeric_shape"] = {
+                "max_abs_magnitude": int(aggregates["max_abs_magnitude"]),
+                "has_negative": bool(aggregates.get("has_negative", False)),
+                "has_positive": bool(aggregates.get("has_positive", False)),
+            }
         approx_distinct = int(profile.get("approx_distinct_count") or 0)
         if (
             is_string_trino_type(data_type)

@@ -27,7 +27,12 @@ def legacy_profile_to_dataset_profile(
     table_name = str(profile.get("table", "synthetic_table"))
     row_count = int(profile.get("row_count", 0) or 0)
     field_profiles = [
-        _field_profile_from_column(table_name, row_count, column)
+        _field_profile_from_column(
+            table_name,
+            row_count,
+            column,
+            suppress_sensitive_numeric=source_type == "trino",
+        )
         for column in profile.get("columns", [])
     ]
 
@@ -70,6 +75,8 @@ def _field_profile_from_column(
     table_name: str,
     row_count: int,
     column: Mapping[str, Any],
+    *,
+    suppress_sensitive_numeric: bool = False,
 ) -> FieldProfile:
     name = str(column.get("name", "column"))
     unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
@@ -95,7 +102,15 @@ def _field_profile_from_column(
         sensitive=sensitive,
         semantic_type=semantic_type,
         is_identifier=is_identifier,
-        distribution=_distribution_from_profile_column(name, table_name, is_identifier, sensitive, semantic_type, column),
+        distribution=_distribution_from_profile_column(
+            name,
+            table_name,
+            is_identifier,
+            sensitive,
+            semantic_type,
+            column,
+            suppress_sensitive_numeric=suppress_sensitive_numeric,
+        ),
     )
 
 
@@ -145,6 +160,8 @@ def _distribution_from_profile_column(
     sensitive: bool,
     semantic_type: str | None,
     column: Mapping[str, Any],
+    *,
+    suppress_sensitive_numeric: bool = False,
 ) -> dict[str, Any]:
     top_values = column.get("top_values") or []
     masked_patterns = column.get("masked_patterns") or []
@@ -177,6 +194,12 @@ def _distribution_from_profile_column(
                 for item in top_values
             ],
         }
+
+    if suppress_sensitive_numeric and sensitive:
+        numeric_shape = column.get("numeric_shape")
+        if isinstance(numeric_shape, Mapping):
+            return {"kind": "numeric_shape", **dict(numeric_shape)}
+        return {}
 
     numeric_distribution = {
         "kind": "numeric",
