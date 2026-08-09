@@ -96,7 +96,7 @@
 
 ## Additional RC6 findings previously treated as follow-up questions
 
-- [ ] Bound the active MCP request registry and Trino concurrency globally;
+- [x] Bound the active MCP request registry and Trino concurrency globally;
   release request state on cancellation, disconnect, timeout, and teardown,
   and return a fixed bounded error when the cap is exhausted.
 - [ ] Redact Trino driver, catalog, and schema enumeration failures at the

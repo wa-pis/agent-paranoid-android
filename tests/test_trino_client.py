@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from threading import BoundedSemaphore
 from typing import Any
 
 import pytest
@@ -9,6 +10,7 @@ import pytest
 from test_data_agent import mcp_trino_server
 from test_data_agent.trino_client import (
     TrinoClient,
+    TrinoCapacityError,
     TrinoResultLimitError,
     rows_to_dicts,
 )
@@ -150,6 +152,45 @@ def test_client_closes_resources_when_execution_fails() -> None:
 
     assert cursor.closed is True
     assert driver.dbapi.connection.closed is True
+
+
+def test_client_rejects_exhausted_shared_capacity_before_connecting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import test_data_agent.trino_client as client_module
+
+    slots = BoundedSemaphore(1)
+    slots.acquire()
+    monkeypatch.setattr(client_module, "_TRINO_WORK_SLOTS", slots)
+    cursor = FakeCursor([])
+    driver = FakeDriver(cursor)
+
+    with pytest.raises(
+        TrinoCapacityError,
+        match="^Trino request capacity exhausted$",
+    ) as error:
+        TrinoClient(config=client_config(), driver=driver).execute_query(
+            "SELECT bounded"
+        )
+
+    assert error.value.__cause__ is None
+    assert error.value.__context__ is None
+    assert driver.dbapi.connect_kwargs is None
+
+
+def test_client_releases_shared_capacity_after_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import test_data_agent.trino_client as client_module
+
+    monkeypatch.setattr(client_module, "_TRINO_WORK_SLOTS", BoundedSemaphore(1))
+    cursor = FakeCursor([], execute_error=RuntimeError("query failed"))
+    client = TrinoClient(config=client_config(), driver=FakeDriver(cursor))
+
+    with pytest.raises(RuntimeError, match="query failed"):
+        client.execute_query("SELECT bounded")
+    cursor.execute_error = None
+    assert client.execute_query("SELECT bounded") == ([], cursor.description)
 
 
 def test_client_bounds_query_timeouts_by_remaining_invocation_time() -> None:

@@ -737,7 +737,7 @@ Scope:
   generator MCP and enforce JSON structure limits before materialization.
 - [x] Harden public artifact names and neutralize spreadsheet formula markers
   in CSV output.
-- [ ] Bound active MCP requests and shared Trino concurrency, release all
+- [x] Bound active MCP requests and shared Trino concurrency, release all
   request state on cancellation/disconnect/timeout/teardown, and return fixed
   bounded capacity errors.
 - [ ] Redact Trino driver failures and define the allowed catalog/schema

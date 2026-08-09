@@ -80,6 +80,10 @@ default boundary rejects raw frames above 1 MiB, JSON deeper than 100 levels,
 JSON with more than 10,000 structural nodes, or an individual scalar above
 256 KiB before MCP/Pydantic materialization. Complete JSON-RPC responses are
 limited to 4 MiB and overflow becomes a fixed local error.
+Each server process admits at most 32 active requests. Excess requests receive
+a fixed bounded capacity error, and disconnect or teardown clears retained
+request state. Trino execution is separately capped at eight concurrent
+operations per process.
 
 ## Safe Trino Sequence
 

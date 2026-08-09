@@ -569,6 +569,59 @@ def test_duplicate_active_request_id_is_rejected_without_overwriting_budget() ->
     assert resolved is first_budget
 
 
+def test_active_request_capacity_returns_fixed_bounded_error_and_clears_teardown(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import anyio
+    import mcp.types as types
+
+    pytest.importorskip("mcp.shared.message")
+    first = b'{"jsonrpc":"2.0","id":1,"method":"ping"}\n'
+    second = b'{"jsonrpc":"2.0","id":2,"method":"ping"}\n'
+    stdout_buffer = io.BytesIO()
+    registries: list[transport._RequestBudgetRegistry] = []
+    registry_type = transport._RequestBudgetRegistry
+
+    def create_registry(max_active_requests: int) -> transport._RequestBudgetRegistry:
+        registry = registry_type(max_active_requests)
+        registries.append(registry)
+        return registry
+
+    monkeypatch.setattr(transport, "_RequestBudgetRegistry", create_registry)
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    async def exercise() -> bytes:
+        stdin = anyio.wrap_file(io.BytesIO(first + second))
+        stdout = anyio.wrap_file(stdout_buffer)
+        async with transport.bounded_stdio_server(
+            max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes,
+            request_context_factory=create_budget,
+            max_active_requests=1,
+            stdin=stdin,
+            stdout=stdout,
+        ) as (read_stream, write_stream):
+            async with read_stream, write_stream:
+                accepted = await read_stream.receive()
+                assert accepted.message.root.id == 1
+                with pytest.raises(anyio.EndOfStream):
+                    await read_stream.receive()
+        return stdout_buffer.getvalue()
+
+    payload = anyio.run(exercise)
+    error = types.JSONRPCMessage.model_validate_json(payload).root
+
+    assert isinstance(error, types.JSONRPCError)
+    assert error.id == 2
+    assert error.error.code == -32002
+    assert error.error.message == "server request capacity exhausted"
+    assert len(payload) <= MIN_TRANSPORT_RESPONSE_BYTES
+    assert registries[0]._budgets == {}
+
+
 def test_request_registry_preserves_exact_request_id_type_identity() -> None:
     import mcp.types as types
 

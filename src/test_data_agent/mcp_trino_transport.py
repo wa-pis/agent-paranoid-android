@@ -25,10 +25,15 @@ from test_data_agent.trino_work_budget import (
 
 RawRequestContextFactory = Callable[[int], QueryWorkBudget]
 _MAX_JSONRPC_REQUEST_ID_BYTES = 256
+DEFAULT_MAX_ACTIVE_MCP_REQUESTS = 32
 _TRANSPORT_OVERFLOW_ERROR_PREFIX = b'{"jsonrpc":"2.0","id":'
 _TRANSPORT_OVERFLOW_ERROR_SUFFIX = (
     b',"error":{"code":-32001,'
     b'"message":"response exceeds transport budget"}}\n'
+)
+_TRANSPORT_CAPACITY_ERROR_SUFFIX = (
+    b',"error":{"code":-32002,'
+    b'"message":"server request capacity exhausted"}}\n'
 )
 _RESERVED_TRANSPORT_ERROR_BYTES = (
     len(_TRANSPORT_OVERFLOW_ERROR_PREFIX)
@@ -37,6 +42,13 @@ _RESERVED_TRANSPORT_ERROR_BYTES = (
 )
 if _RESERVED_TRANSPORT_ERROR_BYTES != MIN_TRANSPORT_RESPONSE_BYTES:
     raise RuntimeError("transport overflow error reservation is inconsistent")
+if (
+    len(_TRANSPORT_OVERFLOW_ERROR_PREFIX)
+    + _MAX_JSONRPC_REQUEST_ID_BYTES
+    + len(_TRANSPORT_CAPACITY_ERROR_SUFFIX)
+    > MIN_TRANSPORT_RESPONSE_BYTES
+):
+    raise RuntimeError("transport capacity error exceeds reserved response bytes")
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,13 +60,23 @@ class DuplicateActiveRequestIdError(ValueError):
     """Raised when a second request reuses an active JSON-RPC ID."""
 
 
+class ActiveRequestCapacityError(RuntimeError):
+    """Raised when the process-wide MCP request cap is exhausted."""
+
+
 class _RequestBudgetRegistry:
     """Associate response messages with the budget of their input request."""
 
-    __slots__ = ("_budgets",)
+    __slots__ = ("_budgets", "_max_active_requests")
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        max_active_requests: int = DEFAULT_MAX_ACTIVE_MCP_REQUESTS,
+    ) -> None:
+        if max_active_requests <= 0:
+            raise ValueError("max_active_requests must be positive")
         self._budgets: dict[bytes, QueryWorkBudget] = {}
+        self._max_active_requests = max_active_requests
 
     def register_incoming_request(self, session_message: Any) -> None:
         import mcp.types as types
@@ -70,6 +92,8 @@ class _RequestBudgetRegistry:
             raise DuplicateActiveRequestIdError(
                 "JSON-RPC request ID is already active"
             )
+        if len(self._budgets) >= self._max_active_requests:
+            raise ActiveRequestCapacityError("MCP request capacity exhausted")
         budget = getattr(session_message.metadata, "request_context", None)
         if not isinstance(budget, QueryWorkBudget):
             raise TypeError("MCP request context must be a QueryWorkBudget")
@@ -103,6 +127,9 @@ class _RequestBudgetRegistry:
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
             self._budgets.pop(_jsonrpc_request_id_key(root.id), None)
 
+    def clear(self) -> None:
+        self._budgets.clear()
+
 
 def _validate_jsonrpc_request_id(request_id: Any) -> None:
     if isinstance(request_id, bool) or not isinstance(request_id, (str, int)):
@@ -135,6 +162,17 @@ def _transport_overflow_error_payload(request_id: Any) -> bytes:
         _TRANSPORT_OVERFLOW_ERROR_PREFIX
         + serialized_id
         + _TRANSPORT_OVERFLOW_ERROR_SUFFIX
+    )
+
+
+def _transport_capacity_error_payload(request_id: Any) -> bytes:
+    serialized_id = _serialize_jsonrpc_request_id(request_id)
+    if len(serialized_id) > _MAX_JSONRPC_REQUEST_ID_BYTES:
+        raise ValueError("cannot reflect an oversized JSON-RPC request ID")
+    return (
+        _TRANSPORT_OVERFLOW_ERROR_PREFIX
+        + serialized_id
+        + _TRANSPORT_CAPACITY_ERROR_SUFFIX
     )
 
 
@@ -300,6 +338,7 @@ async def bounded_stdio_server(
     *,
     max_payload_bytes: int,
     request_context_factory: RawRequestContextFactory,
+    max_active_requests: int = DEFAULT_MAX_ACTIVE_MCP_REQUESTS,
     stdin: Any | None = None,
     stdout: Any | None = None,
 ) -> AsyncIterator[tuple[Any, Any]]:
@@ -319,7 +358,8 @@ async def bounded_stdio_server(
     write_stream_reader: Any
     read_stream_writer, read_stream = anyio.create_memory_object_stream(0)
     write_stream, write_stream_reader = anyio.create_memory_object_stream(0)
-    budget_registry = _RequestBudgetRegistry()
+    budget_registry = _RequestBudgetRegistry(max_active_requests)
+    output_lock = anyio.Lock()
 
     async def stdin_reader() -> None:
         try:
@@ -344,6 +384,15 @@ async def bounded_stdio_server(
                             request_context_factory,
                         )
                         budget_registry.register_incoming_request(message)
+                    except ActiveRequestCapacityError:
+                        root = message.message.root
+                        payload = _transport_capacity_error_payload(root.id)
+                        budget = message.metadata.request_context
+                        budget.consume_terminal_error_bytes(len(payload))
+                        async with output_lock:
+                            await stdout.write(payload)
+                            await stdout.flush()
+                        continue
                     except Exception as exc:
                         await read_stream_writer.send(exc)
                         continue
@@ -355,18 +404,22 @@ async def bounded_stdio_server(
         try:
             async with write_stream_reader:
                 async for session_message in write_stream_reader:
-                    await _write_bounded_session_message(
-                        stdout,
-                        session_message,
-                        budget_registry,
-                    )
+                    async with output_lock:
+                        await _write_bounded_session_message(
+                            stdout,
+                            session_message,
+                            budget_registry,
+                        )
         except anyio.ClosedResourceError:  # pragma: no cover
             await anyio.lowlevel.checkpoint()
 
-    async with anyio.create_task_group() as task_group:
-        task_group.start_soon(stdin_reader)
-        task_group.start_soon(stdout_writer)
-        yield read_stream, write_stream
+    try:
+        async with anyio.create_task_group() as task_group:
+            task_group.start_soon(stdin_reader)
+            task_group.start_soon(stdout_writer)
+            yield read_stream, write_stream
+    finally:
+        budget_registry.clear()
 
 
 async def _run_bounded_stdio(

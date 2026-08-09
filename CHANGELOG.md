@@ -36,6 +36,8 @@ All notable changes to this project are documented here.
 - Restrict public artifact names to safe path components, neutralize
   spreadsheet formula markers in CSV cells, and replace formula diagnostics
   with fixed local reasons.
+- Bound active MCP requests and shared Trino operations process-wide, return a
+  fixed capacity error, and release admission state on every terminal path.
 - RC6 acceptance additionally requires source-free external advisor payloads,
   suppression of exact sensitive numeric profile metrics, semantically
   validated provider constraints, bounded generator MCP framing and JSON
