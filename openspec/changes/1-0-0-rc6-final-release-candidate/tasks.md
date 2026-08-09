@@ -81,7 +81,7 @@
 
 ## Supply-chain and release gate hardening
 
-- [ ] Run change classification from trusted base code or force heavy checks
+- [x] Run change classification from trusted base code or force heavy checks
   whenever classifier, workflow, dependency, build, release, or configuration
   paths change.
 - [ ] Require a signed immutable release tag and verify it resolves to the
