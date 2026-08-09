@@ -400,6 +400,10 @@ critical findings.
 | FS-08: duplicate entity stems are last-wins | Low | **Closed by the focused FS-08 change**; dataset-row loading rejects duplicate stems across CSV, JSON, and Parquet artifacts before reading any row file. |
 | FS-10: profiling deadline omits inner loops | Low | **Closed by the focused FS-10 change**; local CSV profiling checks the monotonic deadline before each field-processing and field-finalization operation. |
 | MT-04: audit terminal event can be lost at capacity | Low | **Closed by the focused MT-04 change**; audit admission reserves one maximum-size terminal record before execution, and an admitted bounded terminal record is not rejected at the admission threshold. |
+| AG-04: provider output parsed before local bounds | Low | **Accepted Known Issue** `csf_83170308250423cefd103d0d` / `occ_9873a9a253a90382015b81c6` / `codex-security/v1:sha256:154204f45b99b73f72dc88274da62359310ee2361b851b29428b234cd133bc96`; optional provider use and output hints reduce likelihood. Owner `@wa-pis`; revisit before untrusted providers, larger limits, or shared advisor deployment; target first post-1.0 hardening release. |
+| FS-11: JSON depth enforced after parse or omitted | Low | **Accepted Known Issue** `csf_d7760aedb0596e6d0998da23` / `occ_9d4d5c81982172b3c0e0bde5` / `codex-security/v1:sha256:31c3e170ade78db51d05d695d3b574b8ee50eec060702cdfb03a4d8706de55dd`; byte caps and typed models bound common cases. Owner `@wa-pis`; revisit before larger byte caps or shared import services; target first post-1.0 hardening release. |
+| MT-02: rejected MCP argument reflected to caller | Low | **Accepted Known Issue** `csf_7b1cee56a15d9ea40705a6e0` / `occ_3490f19b25f4117b792cdbca` / `codex-security/v1:sha256:da37d59b6b33173a5b0db72ecceef92694ad6ce0c7f942180e9478266e45aedf`; the bounded value returns to its originating caller. Owner `@wa-pis`; revisit before cross-principal gateways or error routing; target first post-1.0 hardening release. |
+| MT-03: malformed MCP value retained in local log | Low | **Accepted Known Issue** `csf_afe00adf1fc2884d910eea07` / `occ_a29278197dd63475ead2653e` / `codex-security/v1:sha256:b118d28265c9382250b940dda7d9027ad9ed96c4053d66a98797a5c19061c794`; input is bounded, client errors are fixed, and no server-secret path was shown. Owner `@wa-pis`; revisit before broad log access or cross-principal gateways; target first post-1.0 hardening release. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -433,8 +437,11 @@ critical findings.
 - Result: **12 passed**; a synthetic exact-capacity regression requires
   rejection before tool execution and leaves no unmatched start.
 
-The remaining findings retain their canonical scan dispositions and continue
-to block RC6 until they are fixed or explicitly accepted in committed evidence.
+All canonical findings now have a focused fix or the explicit Low-risk
+disposition above. The four accepted issues are also published in
+[`docs/known-issues.md`](../../../docs/known-issues.md). This product-risk
+acceptance does not satisfy the independent exact-commit security approval
+gate.
 
 ## Review Conclusion
 

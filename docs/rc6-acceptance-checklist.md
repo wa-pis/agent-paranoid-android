@@ -90,6 +90,9 @@ source checkouts are not substitutes for the public-artifact checks.
   processing and finalization operations.
 - [x] MT-04: audit capacity rejects new invocations before execution unless a
   bounded terminal record can be retained.
+- [x] AG-04, FS-11, MT-02, and MT-03: exact Low finding identities, risk owner,
+  rationale, revisit triggers, and post-1.0 target are recorded in
+  [Known Issues](known-issues.md).
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

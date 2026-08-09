@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Document four accepted Low security findings with exact identities, risk
+  ownership, revisit triggers, and a first post-1.0 hardening target.
+
 ## [1.0.0rc6] - 2026-08-08
 
 ### Added

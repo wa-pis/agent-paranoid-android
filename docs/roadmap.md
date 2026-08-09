@@ -866,6 +866,9 @@ Scope:
 After the stable baseline, continue the remaining maintenance and community
 work without reopening the completed 1.0 application-boundary gate:
 
+- [ ] Resolve the four accepted Low [Known Issues](known-issues.md) in the
+  first post-1.0 security-hardening release, or earlier if a documented revisit
+  trigger occurs.
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
   production package, using narrow overrides only for external integrations.
 - [ ] Add a public maintainership/governance model, support expectations,
