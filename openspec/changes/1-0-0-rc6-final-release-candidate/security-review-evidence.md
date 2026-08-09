@@ -155,7 +155,7 @@ repository settings were used.
 
 | Severity | Current-tree finding | Disposition |
 | --- | --- | --- |
-| High | Raw common categorical profile values can reach the external advisor | **Open; RC6 release-blocking** |
+| High | Raw common categorical profile values can reach the external advisor | **Closed by PR #337**; current-main synthetic regression verifies common names and address-like values are replaced with deterministic field-scoped labels |
 | High | Provider formulas can inject arbitrary constants into generated rows | **Open; RC6 release-blocking** |
 | Medium | Sensitive numeric Trino extrema/percentiles can reveal source values | **Open; RC6 release-blocking** |
 | Medium | Generator MCP stdio has no pre-parse raw-frame/final-response budget | **Open; RC6 release-blocking** |
@@ -166,6 +166,22 @@ repository settings were used.
 | Medium | CSV output does not neutralize spreadsheet formula markers | **Open; RC6 required hardening** |
 | Medium | Formula/validation errors can reflect provider-controlled text | **Open; RC6 required hardening** |
 | Low | Public workflow API accepts an unsafe profile artifact name | **Open; RC6 required hardening** |
+
+### RC6-S7 closure verification
+
+[PR #337](https://github.com/wa-pis/agent-paranoid-android/pull/337), merge
+`1a7d1ff`, replaces every string categorical value in advisor profiles and
+baseline specs with a deterministic field-scoped synthetic label before the
+request is fingerprinted or serialized. The behavior was reverified on current
+main commit `a8a4fe4cae807de7d5fe1af59074999e72c3469c` using synthetic fixtures only;
+no live OpenAI call was made.
+
+- Focused command: `pytest tests/test_advisor.py -k
+  'categorical or category_placeholder or persisted_review' -q`
+- Result: **7 passed, 23 deselected**.
+- Covered values include a common person name, an address-like string,
+  baseline-only categories, placeholder collisions, persisted review rebuilds,
+  and repeated deterministic construction.
 
 ## Additional RC6 closure findings
 
@@ -190,9 +206,9 @@ cannot be established from repository contents alone.
 
 ## Review Conclusion
 
-**Blocked.** PR #335 closes RC6-S1, PR #333 closes RC6-S4, and PRs #334 and
-#336 close RC6-S2 and RC6-S3. Do not tag or promote RC6 until RC6-S7 through
-RC6-S20 and their synthetic regressions are closed
+**Blocked.** PR #335 closes RC6-S1, PR #333 closes RC6-S4, PRs #334 and #336
+close RC6-S2 and RC6-S3, and PR #337 closes RC6-S7. Do not tag or promote RC6
+until RC6-S8 through RC6-S20 and their synthetic regressions are closed
 or explicitly approved, an independent reviewer approves the exact fixed
 commit, and the immutable tag, public artifacts, final gates, external
 configuration evidence, and verifiable approval link are recorded. The

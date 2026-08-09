@@ -32,7 +32,7 @@ source checkouts are not substitutes for the public-artifact checks.
   `__cause__`, or `__context__`.
 - [x] RC6-S4: incomplete responses use a fixed bounded local reason and never
   reflect raw provider status text.
-- [ ] RC6-S7: external advisor requests contain no raw categorical values,
+- [x] RC6-S7: external advisor requests contain no raw categorical values,
   including common names or address-like values missed by heuristics.
 - [ ] RC6-S8: sensitive numeric Trino profiling suppresses exact extrema and
   percentiles in MCP responses, profiles, specs, and planning artifacts.

@@ -19,7 +19,7 @@
 
 ## Repository-wide security review follow-ups
 
-- [ ] Replace all categorical values in external advisor requests with
+- [x] Replace all categorical values in external advisor requests with
   field-scoped synthetic labels/ranks or non-reversible summaries; add common
   name/address values that evade current heuristics.
 - [ ] Suppress exact `min`, `max`, and percentile metrics for sensitive numeric
