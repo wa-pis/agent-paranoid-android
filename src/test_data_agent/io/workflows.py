@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import inspect
 import json
-import shutil
-import tempfile
 from pathlib import Path
 from typing import Any, Callable, Literal
 
@@ -34,6 +32,16 @@ from test_data_agent.io.artifacts import (
     write_dataset_validation_report,
     write_generation_manifest,
     write_json_artifact,
+)
+from test_data_agent.io.path_policy import (
+    PathIdentity,
+    ensure_directory,
+    make_staging_directory,
+    path_identity,
+    publish_directory,
+    remove_tree,
+    remove_tree_if_identity,
+    replace_path,
 )
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
 from test_data_agent.safety import (
@@ -103,6 +111,7 @@ def generate_dataset_bundle(
     )
     budget.check("business rule application")
     temp_folder = make_temp_output_folder(output_folder)
+    temp_identity = path_identity(temp_folder)
     try:
         write_dataset_rows(rows_by_entity, effective_output_format, temp_folder)
         budget.check("dataset export")
@@ -130,7 +139,7 @@ def generate_dataset_bundle(
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
-        cleanup_failed_folder_publication(temp_folder, output_folder)
+        cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
     row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
     return DatasetGenerationResult(
@@ -245,6 +254,7 @@ def generate_single_entity_profile_artifacts(
         return report
 
     temp_folder = make_temp_output_folder(output_path.parent / output_path.stem)
+    temp_identity = path_identity(temp_folder)
     temp_output_path = temp_folder / output_path.name
     try:
         write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path)
@@ -261,7 +271,7 @@ def generate_single_entity_profile_artifacts(
         budget.check("artifact publication")
         commit_single_entity_bundle(temp_folder, output_path.parent)
     except BaseException:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        remove_tree(temp_folder, temp_identity)
         raise
     return report
 
@@ -382,6 +392,7 @@ def generate_dataset_review_artifacts(
     rows_by_entity = generate_dataset(effective_spec, seed=seed, budget=budget)
     budget.check("dataset generation")
     temp_folder = make_temp_output_folder(output_folder)
+    temp_identity = path_identity(temp_folder)
     try:
         if source_folder is not None:
             assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
@@ -402,7 +413,7 @@ def generate_dataset_review_artifacts(
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
-        cleanup_failed_folder_publication(temp_folder, output_folder)
+        cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
     return 0 if report.valid else 1
 
@@ -509,57 +520,49 @@ def estimate_field_output_bytes(field: Any) -> int:
 
 
 def make_temp_output_folder(output_folder: Path) -> Path:
-    output_folder.parent.mkdir(parents=True, exist_ok=True)
     enforce_output_capacity(output_folder.parent)
-    return Path(tempfile.mkdtemp(prefix=f".{output_folder.name}.", dir=output_folder.parent))
+    return make_staging_directory(output_folder)
 
 
-def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> None:
-    if output_folder.exists():
-        if not output_folder.is_dir():
-            raise ValueError("generation output must be a folder")
-        if any(output_folder.iterdir()):
-            raise ValueError("generation output folder must be empty")
-        output_folder.rmdir()
-    temp_folder.replace(output_folder)
+def commit_temp_output_folder(temp_folder: Path, output_folder: Path) -> PathIdentity:
+    return publish_directory(temp_folder, output_folder)
 
 
 def commit_single_entity_bundle(temp_folder: Path, output_folder: Path) -> None:
-    output_folder_existed = output_folder.exists()
-    output_folder.mkdir(parents=True, exist_ok=True)
+    output_identity, output_created = ensure_directory(output_folder)
     staged_paths = sorted(temp_folder.iterdir())
     rollback_folder = temp_folder / ".rollback"
-    rollback_folder.mkdir()
+    rollback_identity, _ = ensure_directory(rollback_folder)
+    temp_identity = path_identity(temp_folder)
     try:
         for path in staged_paths:
             destination = output_folder / path.name
             if destination.exists() or destination.is_symlink():
-                destination.replace(rollback_folder / path.name)
-            path.replace(destination)
+                replace_path(destination, rollback_folder / path.name)
+            replace_path(path, destination)
     except BaseException:
         for path in reversed(staged_paths):
             destination = output_folder / path.name
             backup = rollback_folder / path.name
             if not path.exists() and (destination.exists() or destination.is_symlink()):
-                destination.replace(path)
+                replace_path(destination, path)
             if backup.exists() or backup.is_symlink():
-                backup.replace(destination)
-        rollback_folder.rmdir()
-        if not output_folder_existed and not any(output_folder.iterdir()):
-            output_folder.rmdir()
+                replace_path(backup, destination)
+        remove_tree(rollback_folder, rollback_identity)
+        if output_created:
+            remove_tree_if_identity(output_folder, output_identity)
         raise
-    shutil.rmtree(rollback_folder)
-    temp_folder.rmdir()
+    remove_tree(rollback_folder, rollback_identity)
+    remove_tree(temp_folder, temp_identity)
 
 
-def cleanup_failed_folder_publication(temp_folder: Path, output_folder: Path) -> None:
-    if temp_folder.exists():
-        shutil.rmtree(temp_folder, ignore_errors=True)
-        return
-    if output_folder.is_symlink() or not output_folder.is_dir():
-        output_folder.unlink(missing_ok=True)
-    else:
-        shutil.rmtree(output_folder, ignore_errors=True)
+def cleanup_failed_folder_publication(
+    temp_folder: Path,
+    output_folder: Path,
+    expected: PathIdentity,
+) -> None:
+    remove_tree_if_identity(temp_folder, expected)
+    remove_tree_if_identity(output_folder, expected)
 
 
 def ensure_paths_distinct(first: Path, second: Path) -> None:

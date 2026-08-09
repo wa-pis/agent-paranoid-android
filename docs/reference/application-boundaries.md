@@ -168,6 +168,7 @@ The current dependencies after completed extraction increments are:
 | `agent_advising.py` | advisor contracts, review context, bounded artifact readers, atomic spec publication, and injected workspace status |
 | `agent_status.py` | contracts, bounded artifact readers, review/recovery inspection, and read-only lifecycle reconstruction |
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
+| `io/path_policy.py` | descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |

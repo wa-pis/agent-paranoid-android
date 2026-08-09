@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import os
 import re
 from collections import defaultdict
 from numbers import Number
@@ -20,6 +21,7 @@ from test_data_agent.core.limits import (
     enforce_output_payload_size,
 )
 from test_data_agent.core.settings import OutputFormat as DatasetOutputFormat
+from test_data_agent.io.path_policy import atomic_binary_writer, atomic_write_bytes
 
 
 SAFE_ARTIFACT_NAME_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
@@ -114,13 +116,13 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
             "Parquet output requires agent-paranoid-android[parquet]"
         ) from exc
 
-    output.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), output)
-        enforce_output_payload_size(output.stat().st_size, label=f"output file {output.name!r}")
-    except Exception:
-        output.unlink(missing_ok=True)
-        raise
+    with atomic_binary_writer(output) as handle:
+        pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), handle)
+        handle.flush()
+        enforce_output_payload_size(
+            os.fstat(handle.fileno()).st_size,
+            label=f"output file {output.name!r}",
+        )
 
 
 def parquet_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -158,8 +160,7 @@ def write_dataset_rows(
     output_format: DatasetOutputFormat,
     output_folder: Path,
 ) -> None:
-    output_folder.mkdir(parents=True, exist_ok=True)
-    root = output_folder.resolve(strict=True)
+    root = output_folder.absolute()
     for entity_name, rows in rows_by_entity.items():
         if output_format == DatasetOutputFormat.CSV:
             write_bounded_text(
@@ -186,7 +187,7 @@ def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str
         require_safe_artifact_name(entity_name)
     except ValueError:
         raise ValueError(f"unsafe entity artifact name: {entity_name!r}") from None
-    path = (output_folder / f"{entity_name}{suffix}").resolve(strict=False)
+    path = output_folder / f"{entity_name}{suffix}"
     if not path.is_relative_to(output_folder):
         raise ValueError("entity artifact path escapes output folder")
     return path
@@ -195,8 +196,7 @@ def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str
 def write_bounded_text(text: str, output: Path) -> None:
     payload = text.encode("utf-8")
     enforce_output_payload_size(len(payload), label=f"output file {output.name!r}")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_bytes(payload)
+    atomic_write_bytes(output, payload)
 
 
 def write_single_entity_rows(

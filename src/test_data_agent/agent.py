@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hmac
-import shutil
 from pathlib import Path
 from typing import Any
 
@@ -85,6 +84,7 @@ from test_data_agent.io.artifacts import (
     write_json_artifact,
 )
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
+from test_data_agent.io.path_policy import discard_staging_directory
 from test_data_agent.io.workflows import (
     commit_temp_output_folder,
     make_temp_output_folder,
@@ -224,7 +224,7 @@ def generate_agent_dataset(
         budget.check("artifact publication")
         commit_temp_output_folder(temp_folder, output_folder)
     except Exception:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        discard_staging_directory(temp_folder)
         raise
     return checkpoint
 

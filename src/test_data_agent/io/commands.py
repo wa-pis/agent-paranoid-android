@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import sys
 from pathlib import Path
 from typing import Any, Callable
@@ -14,6 +13,7 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import write_json_artifact
+from test_data_agent.io.path_policy import discard_staging_directory, inspect_file_output
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     ensure_empty_output_folder,
@@ -254,7 +254,7 @@ def generate_dataset_from_example_artifacts(
         commit_temp_output_folder(temp_folder, output_folder)
         return result
     except Exception:
-        shutil.rmtree(temp_folder, ignore_errors=True)
+        discard_staging_directory(temp_folder)
         raise
 
 
@@ -290,10 +290,9 @@ def should_fail_generation(schema_report: Any, business_report: Any | None, mode
 
 
 def ensure_file_output_available(path: Path, *, overwrite: bool = False) -> None:
-    if not path.exists():
+    existing = inspect_file_output(path)
+    if existing is None:
         return
-    if path.is_dir():
-        raise ValueError(f"output path is a directory, expected a file: {path}")
     if not overwrite:
         raise ValueError(f"output already exists: {path}. Use --overwrite to replace it.")
 

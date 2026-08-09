@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import shutil
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from types import TracebackType
@@ -19,6 +17,14 @@ from test_data_agent.io.artifacts import (
     write_dataset_spec_artifact,
     write_json_artifact,
     write_json_artifact_atomic,
+)
+from test_data_agent.io.path_policy import (
+    PathIdentity,
+    ensure_directory,
+    make_staging_directory,
+    path_identity,
+    publish_directory,
+    remove_tree_if_identity,
 )
 
 if TYPE_CHECKING:
@@ -88,6 +94,7 @@ class AgentWorkspaceStore(Protocol):
 class _FilesystemWorkspacePlanTransition:
     workspace: Path
     staging_workspace: Path
+    staging_identity: PathIdentity
     _committed: bool = False
 
     @property
@@ -98,20 +105,12 @@ class _FilesystemWorkspacePlanTransition:
         if self._committed:
             raise RuntimeError("workspace plan transition is already committed")
         _validate_new_workspace(self.workspace)
-        restore_empty_workspace = self.workspace.exists()
-        if restore_empty_workspace:
-            self.workspace.rmdir()
-        try:
-            self.staging_workspace.replace(self.workspace)
-        except BaseException:
-            if restore_empty_workspace and not self.workspace.exists():
-                self.workspace.mkdir()
-            raise
+        publish_directory(self.staging_workspace, self.workspace)
         self._committed = True
 
     def rollback(self) -> None:
         if not self._committed:
-            shutil.rmtree(self.staging_workspace, ignore_errors=True)
+            remove_tree_if_identity(self.staging_workspace, self.staging_identity)
 
     def __enter__(self) -> Self:
         return self
@@ -131,18 +130,16 @@ class FilesystemAgentWorkspaceStore:
     def ensure_new(self, workspace: Path, *, create: bool = False) -> None:
         _validate_new_workspace(workspace)
         if create:
-            workspace.mkdir(parents=True, exist_ok=True)
+            ensure_directory(workspace)
 
     def begin_plan(self, workspace: Path) -> WorkspacePlanTransition:
         self.ensure_new(workspace)
-        workspace.parent.mkdir(parents=True, exist_ok=True)
-        staging_workspace = Path(
-            tempfile.mkdtemp(
-                prefix=f".{workspace.name}.plan.",
-                dir=workspace.parent,
-            )
+        staging_workspace = make_staging_directory(workspace)
+        return _FilesystemWorkspacePlanTransition(
+            workspace,
+            staging_workspace,
+            path_identity(staging_workspace),
         )
-        return _FilesystemWorkspacePlanTransition(workspace, staging_workspace)
 
     def persist_plan(
         self,

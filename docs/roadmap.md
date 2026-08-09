@@ -801,9 +801,10 @@ Scope:
 - [x] Bound semantic-provider execution and cancellation, require deterministic
   replay or a seed-bound output fingerprint, restrict identity output to a
   synthetic namespace, and run post-generation privacy/type checks.
-- [ ] Harden filesystem publication and overwrite paths against symlink and
-  TOCTOU races; define completion/read-validation semantics and explicit
-  approval for sibling-artifact replacement.
+- [x] Harden filesystem publication and overwrite paths against symlink and
+  TOCTOU races with descriptor-relative no-follow and inode revalidation.
+- [ ] Define completion/read-validation semantics and explicit approval for
+  sibling-artifact replacement.
 - [ ] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
 - [ ] Move CI classification to trusted code, bind release publication to a
   signed tag and reviewed commit digest, and enforce a machine-readable RC

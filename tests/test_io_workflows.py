@@ -30,11 +30,11 @@ def test_atomic_json_artifact_does_not_follow_target_symlink(tmp_path) -> None:
     output = tmp_path / "result.json"
     output.symlink_to(outside)
 
-    write_json_artifact_atomic({"safe": True}, output)
+    with pytest.raises(ValueError, match="regular file"):
+        write_json_artifact_atomic({"safe": True}, output)
 
     assert outside.read_text() == "unchanged"
-    assert output.is_symlink() is False
-    assert json.loads(output.read_text()) == {"safe": True}
+    assert output.is_symlink()
 
 
 def test_generate_dataset_from_profile_artifacts_writes_outputs_and_uses_seed(tmp_path) -> None:
@@ -792,19 +792,21 @@ def test_single_entity_commit_restores_existing_files_when_interrupted(
     unrelated = output_folder / "keep.txt"
     unrelated.write_text("keep")
     output_path = output_folder / "orders.json"
-    original_replace = Path.replace
+    from test_data_agent.io.path_policy import replace_path as original_replace
 
-    def interrupt_profile_move(path: Path, target: Path) -> Path:
-        result = original_replace(path, target)
+    def interrupt_profile_move(path: Path, target: Path) -> None:
+        original_replace(path, target)
         if (
             path.parent.name.startswith(".orders.")
             and path.name == "profile.json"
             and Path(target).parent == output_folder
         ):
             raise RuntimeError("single publication interrupted")
-        return result
 
-    monkeypatch.setattr(Path, "replace", interrupt_profile_move)
+    monkeypatch.setattr(
+        "test_data_agent.io.workflows.replace_path",
+        interrupt_profile_move,
+    )
 
     with pytest.raises(RuntimeError, match="single publication interrupted"):
         generate_dataset_from_profile_artifacts(

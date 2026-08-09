@@ -227,7 +227,7 @@ Their lower confidence changes the evidence required, not the release scope.
 | Medium | Trino driver failures and catalog/schema enumeration can expose backend-controlled error or metadata text | **Closed**; backend failures become the fixed detached `Trino request failed` error, while catalog/schema discovery returns only configured allowlist members with positional filtering regressions |
 | Medium | Explicit opt-in `run_safe_select` can return unrecognized raw names, addresses, or other sensitive strings | **Closed**; the separate row-return policy masks every string and retains existing sensitive-name/value masking for non-strings, with regressions for heuristic false negatives |
 | Medium | Semantic providers are not uniformly bounded, deterministic for a seed, or restricted to synthetic identity output | **Closed**; synchronous calls run in an isolated daemon thread with a fixed deadline, same-request replay must match, string values require the `synthetic_` namespace, and post-solve privacy/type checks remain mandatory |
-| Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Open; RC6 release-blocking** |
+| Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Closed by the focused RC6-S17 change**; one descriptor-relative no-follow policy revalidates source and destination inode identity before atomic file/folder replacement and cleanup |
 | Low | Single-entity publication has no explicit completion/read-validation contract and bundle publication can replace sibling artifacts without approval | **Open; RC6 required hardening** |
 | Low | CLI and log output can emit unescaped provider-controlled metadata, paths, or errors | **Open; RC6 required hardening** |
 | High | Deployed branch/tag protection, required checks, and PyPI Trusted Publisher settings were not observable in the repository scan | **Open; RC6 external-evidence gate** |
@@ -235,6 +235,21 @@ Their lower confidence changes the evidence required, not the release scope.
 These findings require focused synthetic regressions, implementation review on
 the exact RC6 commit, and external configuration evidence where the property
 cannot be established from repository contents alone.
+
+### RC6-S17 closure verification
+
+The focused RC6-S17 change routes bounded text, Parquet, cache, workspace, and
+folder publication through one standard-library path policy. Every path
+component is opened relative to a no-follow directory descriptor; destination
+and staging inode identity is checked again immediately before replacement or
+cleanup. Symlinked leaves and parents fail closed, and a replaced cleanup target
+is preserved rather than traversed or removed.
+
+- Focused command: `pytest tests/test_io_path_policy.py
+  tests/test_io_workflows.py tests/test_workspace_store.py
+  tests/test_io_commands.py tests/test_csv_profiler.py tests/test_agent.py
+  tests/test_demo.py -q`
+- Result: **114 passed**.
 
 ## Review Conclusion
 

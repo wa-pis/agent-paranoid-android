@@ -52,6 +52,18 @@ def test_workspace_store_rejects_symlink_before_staging(tmp_path: Path) -> None:
     assert not any(target.iterdir())
 
 
+def test_workspace_store_rejects_symlinked_parent_before_staging(tmp_path: Path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    linked = tmp_path / "linked"
+    linked.symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(ValueError, match="unsafe filesystem path"):
+        FilesystemAgentWorkspaceStore().begin_plan(linked / "workspace")
+
+    assert not list(outside.iterdir())
+
+
 def test_agent_plan_failure_rolls_back_staged_workspace(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
