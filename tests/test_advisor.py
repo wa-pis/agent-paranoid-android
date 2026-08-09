@@ -479,6 +479,17 @@ def test_advisor_proposal_cannot_change_schema_identity() -> None:
         validate_advisor_proposal(request, payload)
 
 
+def test_advisor_proposal_cannot_change_field_types() -> None:
+    request = build_advisor_request(safe_profile())
+    payload = proposal_payload(
+        request,
+        customers__segment__data_type=FieldType.INTEGER,
+    )
+
+    with pytest.raises(AdvisorContractError, match="cannot change field types"):
+        validate_advisor_proposal(request, payload)
+
+
 def test_advisor_proposal_cannot_weaken_sensitive_classification() -> None:
     request = build_advisor_request(safe_profile())
     payload = proposal_payload(request, customers__email__sensitive=False)
@@ -498,6 +509,73 @@ def test_advisor_proposal_rejects_raw_sensitive_distribution() -> None:
     )
 
     with pytest.raises(ProfileSafetyError, match="unsafe distribution"):
+        validate_advisor_proposal(request, payload)
+
+
+@pytest.mark.parametrize(
+    ("constraint", "message"),
+    [
+        (
+            {
+                "type": "formula",
+                "entity": "customers",
+                "fields": ["customer_id"],
+                "expression": "'person@example.com'",
+                "confidence": 1.0,
+            },
+            "cannot contain string constants",
+        ),
+        (
+            {
+                "type": "formula",
+                "entity": "customers",
+                "fields": ["customer_id"],
+                "expression": "missing_field + 1",
+                "confidence": 1.0,
+            },
+            "references an unknown field",
+        ),
+        (
+            {
+                "type": "formula",
+                "entity": "customers",
+                "fields": ["email"],
+                "expression": "customer_id + 1",
+                "confidence": 1.0,
+            },
+            "cannot target a sensitive field",
+        ),
+        (
+            {
+                "type": "formula",
+                "entity": "customers",
+                "fields": ["segment"],
+                "expression": "customer_id + 1",
+                "confidence": 1.0,
+            },
+            "requires a numeric target field",
+        ),
+        (
+            {
+                "type": "formula",
+                "entity": "customers",
+                "fields": ["customer_id"],
+                "expression": "segment + 1",
+                "confidence": 1.0,
+            },
+            "requires numeric source fields",
+        ),
+    ],
+)
+def test_advisor_proposal_rejects_unsafe_constraints(
+    constraint: dict[str, Any],
+    message: str,
+) -> None:
+    request = build_advisor_request(safe_profile())
+    payload = proposal_payload(request)
+    payload["dataset_spec"]["constraints"] = [constraint]
+
+    with pytest.raises(AdvisorContractError, match=message):
         validate_advisor_proposal(request, payload)
 
 

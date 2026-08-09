@@ -69,6 +69,59 @@ def test_formula_solver_leaves_unappliable_constraints_for_negative_validation()
     assert report.valid is False
 
 
+@pytest.mark.parametrize(
+    ("field", "expression", "message"),
+    [
+        (
+            FieldSpec(name="amount", data_type=FieldType.INTEGER),
+            "'wrong-type'",
+            "post-solve type validation",
+        ),
+        (
+            FieldSpec(name="label", data_type=FieldType.STRING),
+            "'person@example.com'",
+            "post-solve privacy validation",
+        ),
+        (
+            FieldSpec(
+                name="full_name",
+                data_type=FieldType.STRING,
+                sensitive=True,
+                semantic_type="name",
+            ),
+            "'Alice Smith'",
+            "post-solve privacy validation",
+        ),
+    ],
+)
+def test_formula_solver_enforces_post_solve_safety(
+    field: FieldSpec,
+    expression: str,
+    message: str,
+) -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="orders",
+                row_count=1,
+                fields=[field],
+            )
+        ],
+        constraints=[
+            Constraint(
+                type=ConstraintType.FORMULA,
+                entity="orders",
+                fields=[field.name],
+                expression=expression,
+                confidence=1.0,
+            )
+        ],
+    )
+
+    with pytest.raises(ValueError, match=message):
+        generate_dataset(spec, seed=3)
+
+
 def test_aggregate_solver_does_not_crash_on_controlled_invalid_child_values() -> None:
     spec = DatasetSpec(
         entities=[

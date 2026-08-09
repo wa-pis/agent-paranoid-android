@@ -24,6 +24,12 @@ The generator must:
 - validate every rule after generation; and
 - produce a business-validation report.
 
+After constraint solving, valid-mode generation also performs unconditional
+schema/type and recognizable-PII checks before returning rows to any export or
+publication adapter. These safety checks are not disabled by validation-report
+settings. Controlled negative generation may violate schema rules by design,
+but it must still pass the privacy check.
+
 Important rules must be represented by typed models and executable validators,
 not only by free-form LLM reasoning. Keep generation deterministic with an
 explicit local seeded random source. Do not introduce source-row reuse,
