@@ -230,7 +230,7 @@ Their lower confidence changes the evidence required, not the release scope.
 | Medium | Filesystem publication and CLI overwrite paths are vulnerable to symlink/TOCTOU races without descriptor or inode revalidation | **Closed by the focused RC6-S17 change**; one descriptor-relative no-follow policy revalidates source and destination inode identity before atomic file/folder replacement and cleanup |
 | Low | Single-entity publication has no explicit completion/read-validation contract and bundle publication can replace sibling artifacts without approval | **Closed by the focused RC6-S18 change**; manifest publication is last, readers verify every recorded artifact hash, and any staged-name collision requires explicit overwrite approval |
 | Low | CLI and log output can emit unescaped provider-controlled metadata, paths, or errors | **Closed by the focused RC6-S19 change**; shared presentation helpers bound and escape human-facing diagnostics, while canonical audit JSON remains one bounded physical record per event |
-| High | Deployed branch/tag protection, required checks, and PyPI Trusted Publisher settings were not observable in the repository scan | **Open; RC6 external-evidence gate** |
+| High | Deployed branch/tag protection, required checks, and PyPI Trusted Publisher settings were not observable in the repository scan | **Closed by RC6-S20 external evidence**; active GitHub rulesets, required checks, the deployed `pypi` environment, and public PyPI provenance for both RC5 distributions are linked below |
 
 These findings require focused synthetic regressions, implementation review on
 the exact RC6 commit, and external configuration evidence where the property
@@ -342,12 +342,49 @@ MCP+Trino, OpenAI, and all extras. The upgrade path separately pins the public
   until an explicitly approved RC6 publication provides external URLs and
   digests; no public artifact evidence is claimed here.
 
+### RC6-S20 external release-policy evidence
+
+The following external settings and provenance were read on 2026-08-09 against
+exact current-main commit `a82e6fb2f549a057f98b0da70881a8fa1d4f1787`.
+They are deployed receipts, not conclusions inferred from workflow source.
+
+- [Main branch ruleset](https://github.com/wa-pis/agent-paranoid-android/rules/19376395)
+  `19376395` is active for the default branch with no bypass actors and reports
+  `current_user_can_bypass: never`. It requires signed commits, pull requests,
+  resolved review threads, a strict up-to-date branch, and these GitHub Actions
+  checks: Python 3.11, Python 3.12, Wheel smoke, Trino integration, CodeQL,
+  Secret history scan, and Dependency review.
+- [Release tag ruleset](https://github.com/wa-pis/agent-paranoid-android/rules/19637531)
+  `19637531` is active for `refs/tags/v*.*.*`, has no bypass actors, reports
+  `current_user_can_bypass: never`, and blocks deletion, non-fast-forward
+  changes, and updates.
+- The deployed [`pypi` GitHub environment](https://github.com/wa-pis/agent-paranoid-android/deployments/activity_log?environments_filter=pypi)
+  uses custom deployment policies for branch `main` and tag `v*`; the exact
+  settings are available from the [environment API](https://api.github.com/repos/wa-pis/agent-paranoid-android/environments/pypi)
+  and [deployment-policy API](https://api.github.com/repos/wa-pis/agent-paranoid-android/environments/pypi/deployment-branch-policies).
+- Public PyPI provenance for the RC5
+  [wheel](https://pypi.org/integrity/agent-paranoid-android/1.0.0rc5/agent_paranoid_android-1.0.0rc5-py3-none-any.whl/provenance)
+  and [sdist](https://pypi.org/integrity/agent-paranoid-android/1.0.0rc5/agent_paranoid_android-1.0.0rc5.tar.gz/provenance)
+  independently identifies publisher kind `GitHub`, repository
+  `wa-pis/agent-paranoid-android`, workflow `publish-pypi.yml`, and environment
+  `pypi`. The PyPI SHA-256 digests are
+  `f4f04d23b70f9d9d7997f5f4ecfdac1207007f07ff30ec7f1e9155c4be841cbc`
+  for the wheel and
+  `4001fea17f4d6312cec635152072e731c0b9df2b76a97b9b1ef94a4010309a79`
+  for the sdist.
+
+The GitHub environment currently reports `can_admins_bypass: true`; repository
+administrators therefore remain in the release trust base, and this evidence
+does not claim otherwise. The branch and release-tag rulesets themselves have
+no bypass actors. **Disposition: RC6-S20 closed.** RC6 publication still
+requires the final exact-commit acceptance manifest and explicit user approval.
+
 ## Review Conclusion
 
 **Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4
-and RC6-S7 through RC6-S19. Do not tag or promote RC6 until RC6-S20 is closed,
-a full repository-wide review is clean, an independent reviewer approves the
-exact fixed commit, and the immutable tag, final gates, external configuration
-evidence, and verifiable approval link are recorded. Public artifact acceptance
-remains pending until an explicitly approved publication. The follow-up scan
-of `5b3ad7f` is a blocking historical review, not release approval.
+and RC6-S7 through RC6-S20. Do not tag or promote RC6 until a full
+repository-wide review is clean, an independent reviewer approves the exact
+fixed commit, and the immutable tag, final gates, and verifiable approval link
+are recorded. Public artifact acceptance remains pending until an explicitly
+approved publication. The follow-up scan of `5b3ad7f` is a blocking historical
+review, not release approval.

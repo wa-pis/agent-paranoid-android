@@ -66,7 +66,7 @@ source checkouts are not substitutes for the public-artifact checks.
   interrupted and collision cases are covered.
 - [x] RC6-S19: untrusted metadata, paths, and errors are escaped and bounded
   in CLI and log output, with control-character injection regressions.
-- [ ] RC6-S20: deployed branch/tag rulesets, required checks, and PyPI Trusted
+- [x] RC6-S20: deployed branch/tag rulesets, required checks, and PyPI Trusted
   Publisher approvals are recorded as external acceptance evidence.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,

@@ -120,7 +120,7 @@
   bundle; test interrupted publication and collision cases.
 - [x] Escape or otherwise bound untrusted metadata, paths, and error text in
   CLI and log output so control characters cannot forge terminal or log lines.
-- [ ] Record external branch/tag ruleset, required-check, and PyPI Trusted
+- [x] Record external branch/tag ruleset, required-check, and PyPI Trusted
   Publisher evidence in the RC6 acceptance record; static workflow checks are
   not sufficient proof of the deployed release policy.
 

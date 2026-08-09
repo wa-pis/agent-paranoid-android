@@ -809,7 +809,7 @@ Scope:
 - [ ] Move CI classification to trusted code, bind release publication to a
   signed tag and reviewed commit digest, and enforce a machine-readable RC
   acceptance manifest plus hash-pinned public profile installs.
-- [ ] Record deployed branch/tag rulesets, required checks, and PyPI Trusted
+- [x] Record deployed branch/tag rulesets, required checks, and PyPI Trusted
   Publisher approvals as external RC6 acceptance evidence.
 - [ ] Record a publicly verifiable security review with reviewer identity or
   stable pseudonym, reviewed commit, date, scope, findings/disposition, and a
