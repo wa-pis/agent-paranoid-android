@@ -124,6 +124,13 @@
   Publisher evidence in the RC6 acceptance record; static workflow checks are
   not sufficient proof of the deployed release policy.
 
+## 2026-08-09 repository-wide review remediation
+
+- [x] FS-01: replace source-derived CSV-folder text categories with
+  collision-safe rank labels before cache publication or generation, rewrite
+  inferred conditional predicates to the same labels, and invalidate legacy
+  profile-cache payloads.
+
 ## Release and review gates
 
 - [x] Bump active metadata, version module, lockfile, README, installation

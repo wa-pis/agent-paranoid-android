@@ -14,6 +14,7 @@ from test_data_agent.profiling.constraint_miner import infer_constraints
 from test_data_agent.profiling.relationship_profiler import infer_relationships
 from test_data_agent.profiling.schema_profiler import (
     _profile_schema_with_sample,
+    _sanitize_source_categories,
     load_csv_folder,
     profile_schema,
 )
@@ -51,6 +52,7 @@ def profile_example_folder(
     profile.relationships = infer_relationships(profile, rows_by_entity)
     work_budget.check_deadline("constraint inference")
     profile.constraints = infer_constraints(profile, rows_by_entity)
+    profile = _sanitize_source_categories(profile)
     work_budget.check_deadline("cache publication")
     if use_cache and cache_dir is not None:
         write_cached_profile(

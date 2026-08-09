@@ -771,6 +771,9 @@ Scope:
 - [x] Implement field-scoped, deterministic rare-category placeholders that
   avoid normal-category and placeholder collisions and preserve sanitizer
   provenance across reordered baselines.
+- [x] Replace source-derived CSV-folder text categories with collision-safe
+  ranked labels before caching or generation while preserving category counts
+  and inferred conditional rules.
 - [x] Return typed per-call OpenAI completion metadata and attach the same
   bounded metadata to preflight/provider failures; keep the mutable last-call
   view legacy-only.

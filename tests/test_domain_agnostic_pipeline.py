@@ -9,7 +9,11 @@ from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling import load_csv_folder, profile_example_folder
-from test_data_agent.profiling.cache import csv_folder_fingerprint, load_cached_profile
+from test_data_agent.profiling.cache import (
+    PROFILE_CACHE_FORMAT_VERSION,
+    csv_folder_fingerprint,
+    load_cached_profile,
+)
 from test_data_agent.validation import validate_dataset
 
 
@@ -76,6 +80,71 @@ def test_folder_profile_streams_schema_and_rule_sample_in_one_text_pass(
 
     assert profile.entity("customers").row_count == 2
     assert text_opens == 1
+
+
+def test_folder_profile_replaces_source_categories_without_losing_conditions(
+    tmp_path,
+) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "events.csv").write_text(
+        "event_id,segment,detail,metric\n"
+        "1,opaque_alpha,filled,9.12345678e8\n"
+        "2,opaque_alpha,filled,9.12345679e8\n"
+        "3,opaque_alpha,filled,9.12345680e8\n"
+        "4,opaque_beta,,9.12345681e8\n"
+        "5,category_1,,9.12345682e8\n"
+    )
+    cache_dir = tmp_path / "cache"
+    cache_file = cache_dir / f"{csv_folder_fingerprint(source)}.json"
+
+    profile = profile_example_folder(source, cache_dir=cache_dir)
+    spec = infer_dataset_spec(profile, count=32)
+    rows_a = generate_dataset(spec, seed=123)
+    rows_b = generate_dataset(spec, seed=123)
+    serialized = (
+        profile.model_dump_json()
+        + spec.model_dump_json()
+        + cache_file.read_text()
+        + json.dumps(rows_a)
+    )
+    conditional = next(
+        constraint
+        for constraint in profile.constraints
+        if constraint.type == ConstraintType.CONDITIONAL_REQUIRED
+    )
+
+    assert "opaque_alpha" not in serialized
+    assert "opaque_beta" not in serialized
+    assert "filled" not in serialized
+    assert profile.entity("events").field("segment").distribution == {
+        "kind": "categorical",
+        "categories": [
+            {"value": "category_1_1", "count": 3},
+            {"value": "category_2", "count": 1},
+            {"value": "category_3", "count": 1},
+        ],
+    }
+    assert conditional.condition == {"field": "segment", "equals": "category_1_1"}
+    assert profile.entity("events").field("metric").distribution == {
+        "kind": "numeric",
+        "min_value": 912345678.0,
+        "max_value": 912345682.0,
+        "p05": 912345678.2,
+        "p95": 912345681.8,
+        "scale_factor": 1.0,
+    }
+    assert rows_a == rows_b
+    assert {row["segment"] for row in rows_a["events"]}.isdisjoint(
+        {"opaque_alpha", "opaque_beta", "category_1"}
+    )
+    assert any(row["segment"] == "category_1_1" for row in rows_a["events"])
+    assert all(
+        row["detail"] is not None
+        for row in rows_a["events"]
+        if row["segment"] == "category_1_1"
+    )
+    assert validate_dataset(rows_a, spec).valid is True
 
 
 def test_relationship_inference() -> None:
@@ -330,6 +399,7 @@ def test_profile_cache_treats_fingerprint_mismatch_as_cache_miss(tmp_path) -> No
     cache_file.write_text(
         json.dumps(
             {
+                "format_version": PROFILE_CACHE_FORMAT_VERSION,
                 "fingerprint": "wrong",
                 "profile": {
                     "source_type": "csv_folder",
@@ -340,6 +410,30 @@ def test_profile_cache_treats_fingerprint_mismatch_as_cache_miss(tmp_path) -> No
     )
 
     assert load_cached_profile(source, cache_dir=cache_dir) is None
+
+
+def test_profile_cache_treats_legacy_format_as_cache_miss(tmp_path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "customers.csv").write_text("customer_id,status\n1,opaque_source\n")
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    cache_file = cache_dir / f"{csv_folder_fingerprint(source)}.json"
+    cache_file.write_text(
+        json.dumps(
+            {
+                "fingerprint": csv_folder_fingerprint(source),
+                "profile": {"source_type": "csv_folder", "entities": []},
+            }
+        )
+    )
+
+    profile = profile_example_folder(source, cache_dir=cache_dir)
+    cached_payload = json.loads(cache_file.read_text())
+
+    assert profile.entity("customers").row_count == 1
+    assert "opaque_source" not in cache_file.read_text()
+    assert cached_payload["format_version"] == PROFILE_CACHE_FORMAT_VERSION
 
 
 def test_profile_cache_key_includes_rule_sample_size(tmp_path) -> None:

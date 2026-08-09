@@ -26,6 +26,7 @@ from test_data_agent.core.privacy import (
     infer_sensitive_value_type,
     mask_pattern,
     semantic_type_is_sensitive,
+    synthetic_category_distribution,
 )
 from test_data_agent.csv_profiler import (
     detect_csv_dialect,
@@ -84,7 +85,66 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
         max_rows_per_entity=0,
         budget=LocalProfileBudget(),
     )
-    return profile
+    return _sanitize_source_categories(profile)
+
+
+def _sanitize_source_categories(profile: DatasetProfile) -> DatasetProfile:
+    """Replace source categories after local inference and align predicates."""
+    safe_profile = profile.model_copy(deep=True)
+    replacements: dict[tuple[str, str], dict[str, str]] = {}
+    for entity in safe_profile.entities:
+        for profile_field in entity.fields:
+            distribution = profile_field.distribution
+            if distribution.get("kind") != "categorical":
+                continue
+            categories = distribution.get("categories")
+            if not isinstance(categories, list):
+                raise ValueError("source categorical distribution is invalid")
+            source_values: list[str] = []
+            counts: list[int] = []
+            for category in categories:
+                if not isinstance(category, dict) or not isinstance(category.get("value"), str):
+                    raise ValueError("source categorical distribution is invalid")
+                source_values.append(category["value"])
+                counts.append(int(category.get("count", 0)))
+            safe_categories = synthetic_category_distribution(
+                counts,
+                reserved_values=source_values,
+            )
+            replacements[(entity.name, profile_field.name)] = {
+                source: str(safe["value"])
+                for source, safe in zip(source_values, safe_categories, strict=True)
+            }
+            profile_field.distribution = {**distribution, "categories": safe_categories}
+
+    for constraint in safe_profile.constraints:
+        if constraint.condition is None:
+            continue
+        field_name = constraint.condition.get("field")
+        if not isinstance(field_name, str):
+            raise ValueError("source categorical constraint is invalid")
+        mapping = replacements.get((constraint.entity, field_name))
+        if mapping is None:
+            continue
+        condition = dict(constraint.condition)
+        for predicate in ("equals", "not_equals"):
+            if predicate in condition:
+                condition[predicate] = _safe_condition_value(condition[predicate], mapping)
+        if "in_values" in condition:
+            values = condition["in_values"]
+            if not isinstance(values, list):
+                raise ValueError("source categorical constraint is invalid")
+            condition["in_values"] = [
+                _safe_condition_value(value, mapping) for value in values
+            ]
+        constraint.condition = condition
+    return safe_profile
+
+
+def _safe_condition_value(value: Any, mapping: dict[str, str]) -> str:
+    if not isinstance(value, str) or value not in mapping:
+        raise ValueError("source categorical constraint is invalid")
+    return mapping[value]
 
 
 def _profile_schema_with_sample(
