@@ -25,7 +25,7 @@
 - [x] Suppress exact `min`, `max`, and percentile metrics for sensitive numeric
   Trino columns; verify `profile_table_safe`, legacy conversion, and generated
   planning artifacts do not contain singleton source values.
-- [ ] Validate advisor-proposed DatasetSpec constraints semantically before
+- [x] Validate advisor-proposed DatasetSpec constraints semantically before
   persistence; reject string constants, unknown references, and sensitive
   targets, then re-run privacy and type checks after constraint solving.
 - [x] Replace formula/validation diagnostics that reflect expressions, ASTs,

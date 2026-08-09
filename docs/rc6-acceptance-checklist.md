@@ -36,7 +36,7 @@ source checkouts are not substitutes for the public-artifact checks.
   including common names or address-like values missed by heuristics.
 - [x] RC6-S8: sensitive numeric Trino profiling suppresses exact extrema and
   percentiles in MCP responses, profiles, specs, and planning artifacts.
-- [ ] RC6-S9: advisor-proposed constraints reject string constants, unknown
+- [x] RC6-S9: advisor-proposed constraints reject string constants, unknown
   references, and sensitive targets; post-solve privacy/type validation runs
   before publication.
 - [x] RC6-S10: generator MCP enforces pre-parse raw-frame, shared invocation,
