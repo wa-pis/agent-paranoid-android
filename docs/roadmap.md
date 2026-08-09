@@ -787,7 +787,7 @@ Scope:
   effective policy in `doctor`.
 - [x] Add focused tests for placeholder collisions/determinism, concurrent
   provider calls and failures, and fail-closed Trino profile configuration.
-- [ ] Make every categorical value in an external advisor request synthetic or
+- [x] Make every categorical value in an external advisor request synthetic or
   non-reversible; heuristic PII detection is not an egress guarantee.
 - [ ] Suppress exact sensitive numeric Trino extrema and percentiles through
   MCP, legacy conversion, and planning artifacts.

@@ -133,6 +133,8 @@
 - [x] AG-01/FS-02: sanitize every supported string constraint predicate with
   the same field-scoped category map in profile and baseline requests, reject
   unrepresented literals, and preserve persisted-review reconstruction.
+- [x] AG-03: replace every categorical JSON scalar and matching constraint
+  literal with a typed field-scoped label without changing numeric bounds.
 
 ## Release and review gates
 

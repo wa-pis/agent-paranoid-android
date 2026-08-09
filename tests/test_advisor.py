@@ -277,6 +277,85 @@ def test_categorical_sanitization_is_deterministic() -> None:
     assert first.baseline_spec == second.baseline_spec
 
 
+def test_categorical_sanitization_replaces_every_json_scalar() -> None:
+    profile = safe_profile()
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": 901234567, "count": 1},
+            {"value": 1.25, "count": 1},
+            {"value": True, "count": 1},
+            {"value": None, "count": 1},
+        ],
+    }
+    profile.entities[0].fields.append(
+        FieldProfile(
+            name="amount",
+            data_type=FieldType.FLOAT,
+            distribution={
+                "kind": "numeric",
+                "min_value": 1_000_000,
+                "max_value": 9_000_000,
+            },
+        )
+    )
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["email"],
+            condition={
+                "field": "segment",
+                "in_values": [901234567, 1.25, True, None],
+            },
+            confidence=1.0,
+        )
+    ]
+
+    request = build_advisor_request(profile)
+
+    expected = [
+        "__apa_category_e0_f2_c0__",
+        "__apa_category_e0_f2_c1__",
+        "__apa_category_e0_f2_c2__",
+        "__apa_category_e0_f2_c3__",
+    ]
+    assert [
+        category["value"]
+        for category in request.profile.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ] == expected
+    assert [
+        category["value"]
+        for category in request.baseline_spec.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ] == expected
+    numeric = request.profile.entity("customers").field("amount").distribution
+    assert numeric["min_value"] == 1_000_000
+    assert numeric["max_value"] == 9_000_000
+    assert request.profile.constraints[0].condition == {
+        "field": "segment",
+        "in_values": expected,
+    }
+    assert _rebuild_advisor_request_for_profile_verification(profile, request) == request
+
+
+def test_categorical_sanitization_rejects_non_json_scalar() -> None:
+    profile = safe_profile()
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [{"value": ["nested"], "count": 1}],
+    }
+
+    with pytest.raises(
+        AdvisorContractError,
+        match="^advisor category uses a non-scalar value$",
+    ):
+        build_advisor_request(profile)
+
+
 def test_advisor_request_replaces_common_categories_with_synthetic_labels() -> None:
     profile = safe_profile()
     profile.entity("customers").field("segment").distribution = {

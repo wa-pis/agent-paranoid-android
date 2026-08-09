@@ -88,8 +88,8 @@ categorical value may cross the provider boundary.
 
 #### Scenario: Common categorical values are profiled
 
-- **GIVEN** a profile contains a low-cardinality string field whose values are
-  not recognized by the sensitive-value heuristics
+- **GIVEN** a profile contains a low-cardinality field with string, integer,
+  float, boolean, or null category values
 - **WHEN** an external advisor request is built
 - **THEN** every category value is replaced with a field-scoped synthetic label,
   rank, masked pattern, or count-only representation
@@ -97,18 +97,19 @@ categorical value may cross the provider boundary.
   fingerprints, metadata, logs, and provider error surfaces
 - **AND** category counts, nullability, and non-value structural relationships
   remain available for deterministic planning
+- **AND** continuous numeric distribution bounds remain unchanged
 
 #### Scenario: A source category controls a conditional rule
 
 - **GIVEN** a profile or baseline constraint uses `equals`, `not_equals`, or
-  `in_values` with a source-derived categorical string
+  `in_values` with a source-derived categorical JSON scalar
 - **WHEN** an external advisor request is built or a persisted review is
   reverified
 - **THEN** the condition uses the same field-scoped label as its category in
   both request models
-- **AND** the raw string is absent while the generated condition remains
+- **AND** the raw scalar is absent while the generated condition remains
   executable
-- **AND** an unrepresented string fails closed with a fixed local error
+- **AND** an unrepresented scalar fails closed with a fixed local error
 
 ### Requirement: Provider Constraints Are Semantically Enforced
 

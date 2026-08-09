@@ -24,6 +24,8 @@ All notable changes to this project are documented here.
 - Replace source-derived advisor constraint literals with the same field-scoped
   category labels, reject unrepresented strings, and preserve executable
   conditions across persisted-review verification.
+- Replace every provider-bound categorical JSON scalar with a deterministic
+  field-scoped label while preserving numeric distribution bounds.
 - Prevent equal rare values in different fields from sharing a synthetic
   placeholder and prevent placeholders from colliding with normal categories,
   including placeholder-shaped baseline literals, while preserving sanitizer

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import math
 import re
 from collections.abc import Mapping
 from typing import Annotated, Any, Literal, Protocol, runtime_checkable
@@ -303,7 +305,7 @@ def _restore_generated_placeholders(
     previous_profile: DatasetProfile,
     baseline: DatasetSpec,
 ) -> None:
-    restorations: dict[tuple[str, str, str], str] = {}
+    restorations: dict[tuple[str, str, str], Any] = {}
     entities = zip(profile.entities, previous_profile.entities, baseline.entities)
     for entity_index, (entity, previous_entity, baseline_entity) in enumerate(entities):
         fields = zip(entity.fields, previous_entity.fields, baseline_entity.fields)
@@ -320,8 +322,7 @@ def _restore_generated_placeholders(
                 ):
                     continue
                 value = category.get("value")
-                if not isinstance(value, str):
-                    continue
+                _json_scalar_identity(value)
                 placeholder = previous_category.get("value")
                 if (
                     isinstance(placeholder, str)
@@ -332,7 +333,9 @@ def _restore_generated_placeholders(
                         category_index,
                     )
                 ):
-                    restorations[(entity.name, field.name, placeholder)] = value
+                    restorations[
+                        _category_value_key(entity.name, field.name, placeholder)
+                    ] = value
                     for baseline_category in baseline_categories:
                         if (
                             isinstance(baseline_category, dict)
@@ -362,12 +365,13 @@ def _sanitize_categorical_values(
     preserved_labels: set[tuple[str, str, str]] | None = None,
 ) -> tuple[DatasetProfile, DatasetSpec]:
     preserved_labels = preserved_labels or set()
-    replacements = {key: key[2] for key in preserved_labels}
+    replacements = {_category_value_key(*key): key[2] for key in preserved_labels}
+    preserved_keys = set(replacements)
     original_keys = (
-        _categorical_string_keys(profile)
-        | _categorical_string_keys(spec)
-        | _constraint_string_keys(profile)
-        | _constraint_string_keys(spec)
+        _categorical_value_keys(profile)
+        | _categorical_value_keys(spec)
+        | _constraint_value_keys(profile)
+        | _constraint_value_keys(spec)
     )
     original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
     used_placeholders = {key[2] for key in preserved_labels}
@@ -388,9 +392,9 @@ def _sanitize_categorical_values(
                     if not isinstance(category, dict):
                         continue
                     value = category.get("value")
-                    if not isinstance(value, str):
-                        continue
-                    replacement_key = (entity.name, field.name, value)
+                    replacement_key = _category_value_key(
+                        entity.name, field.name, value
+                    )
                     if replacement_key in replacements:
                         continue
                     entity_index, field_index = field_positions[field_key]
@@ -420,19 +424,19 @@ def _sanitize_categorical_values(
     if _structural_identity(spec) != _structural_identity(safe_spec):
         raise AdvisorContractError("spec sanitization changed structural identity")
     safe_keys = (
-        _categorical_string_keys(safe_profile)
-        | _categorical_string_keys(safe_spec)
-        | _constraint_string_keys(safe_profile)
-        | _constraint_string_keys(safe_spec)
+        _categorical_value_keys(safe_profile)
+        | _categorical_value_keys(safe_spec)
+        | _constraint_value_keys(safe_profile)
+        | _constraint_value_keys(safe_spec)
     )
-    if (original_keys - preserved_labels) & safe_keys:
+    if (original_keys - preserved_keys) & safe_keys:
         raise AdvisorContractError("advisor request contains an original categorical value")
     return safe_profile, safe_spec
 
 
 def _replace_categorical_values(
     dataset: DatasetProfile | DatasetSpec,
-    replacements: dict[tuple[str, str, str], str],
+    replacements: dict[tuple[str, str, str], Any],
 ) -> None:
     for entity in dataset.entities:
         for field in entity.fields:
@@ -446,16 +450,14 @@ def _replace_categorical_values(
                 if not isinstance(category, dict):
                     continue
                 value = category.get("value")
-                if not isinstance(value, str):
-                    continue
-                replacement = replacements.get((entity.name, field.name, value))
-                if replacement is not None:
-                    category["value"] = replacement
+                key = _category_value_key(entity.name, field.name, value)
+                if key in replacements:
+                    category["value"] = replacements[key]
 
 
 def _replace_constraint_values(
     dataset: DatasetProfile | DatasetSpec,
-    replacements: dict[tuple[str, str, str], str],
+    replacements: dict[tuple[str, str, str], Any],
     *,
     strict: bool = True,
 ) -> None:
@@ -497,26 +499,40 @@ def _replace_constraint_value(
     entity_name: str,
     field_name: str,
     value: Any,
-    replacements: dict[tuple[str, str, str], str],
+    replacements: dict[tuple[str, str, str], Any],
     *,
     strict: bool,
 ) -> Any:
-    if not isinstance(value, str):
-        return value
-    replacement = replacements.get((entity_name, field_name, value))
-    if replacement is None:
+    key = _category_value_key(entity_name, field_name, value)
+    if key not in replacements:
         if strict:
             raise AdvisorContractError(
                 "advisor constraint contains an unrepresented categorical value"
             )
         return value
-    return replacement
+    return replacements[key]
 
 
 def _categorical_string_values(
     dataset: DatasetProfile | DatasetSpec,
 ) -> set[str]:
     return {key[2] for key in _categorical_string_keys(dataset)}
+
+
+def _category_value_key(
+    entity_name: str,
+    field_name: str,
+    value: Any,
+) -> tuple[str, str, str]:
+    return (entity_name, field_name, _json_scalar_identity(value))
+
+
+def _json_scalar_identity(value: Any) -> str:
+    if value is not None and not isinstance(value, (str, int, float, bool)):
+        raise AdvisorContractError("advisor category uses a non-scalar value")
+    if isinstance(value, float) and not math.isfinite(value):
+        raise AdvisorContractError("advisor category uses a non-scalar value")
+    return json.dumps(value, ensure_ascii=True, allow_nan=False)
 
 
 def _categorical_string_keys(
@@ -534,7 +550,26 @@ def _categorical_string_keys(
     return values
 
 
-def _constraint_string_keys(
+def _categorical_value_keys(
+    dataset: DatasetProfile | DatasetSpec,
+) -> set[tuple[str, str, str]]:
+    values: set[tuple[str, str, str]] = set()
+    for entity in dataset.entities:
+        for field in entity.fields:
+            if field.distribution.get("kind") != "categorical":
+                continue
+            categories = field.distribution.get("categories", [])
+            for category in categories:
+                if isinstance(category, dict):
+                    values.add(
+                        _category_value_key(
+                            entity.name, field.name, category.get("value")
+                        )
+                    )
+    return values
+
+
+def _constraint_value_keys(
     dataset: DatasetProfile | DatasetSpec,
 ) -> set[tuple[str, str, str]]:
     values: set[tuple[str, str, str]] = set()
@@ -544,15 +579,17 @@ def _constraint_string_keys(
             continue
         field_name = condition["field"]
         for predicate in ("equals", "not_equals"):
-            value = condition.get(predicate)
-            if isinstance(value, str):
-                values.add((constraint.entity, field_name, value))
+            if predicate in condition:
+                values.add(
+                    _category_value_key(
+                        constraint.entity, field_name, condition[predicate]
+                    )
+                )
         in_values = condition.get("in_values")
         if isinstance(in_values, list):
             values.update(
-                (constraint.entity, field_name, value)
+                _category_value_key(constraint.entity, field_name, value)
                 for value in in_values
-                if isinstance(value, str)
             )
     return values
 
