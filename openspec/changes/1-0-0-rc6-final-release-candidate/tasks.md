@@ -149,6 +149,8 @@
   field finalization operations.
 - [x] MT-04: reserve terminal audit capacity before executing a new invocation
   and retain the terminal record after admission.
+- [x] Record exact AG-04, FS-11, MT-02, and MT-03 identities as accepted Low
+  Known Issues with an owner, revisit trigger, and post-1.0 target.
 
 ## Release and review gates
 

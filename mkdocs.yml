@@ -66,6 +66,7 @@ nav:
       - MCP Tools: mcp_examples.md
   - Operations:
       - Troubleshooting: operations/troubleshooting.md
+      - Known Issues: known-issues.md
       - Resource Budgets: operations/resource-budgets.md
       - MCP Audit Logging: operations/audit-logging.md
       - Container Deployment: operations/containers.md
