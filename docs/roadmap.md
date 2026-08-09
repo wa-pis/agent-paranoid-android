@@ -774,6 +774,8 @@ Scope:
 - [x] Replace source-derived CSV-folder text categories with collision-safe
   ranked labels before caching or generation while preserving category counts
   and inferred conditional rules.
+- [x] Sanitize source-derived advisor constraint predicates with the same
+  field-scoped category map and reject unrepresented string literals.
 - [x] Return typed per-call OpenAI completion metadata and attach the same
   bounded metadata to preflight/provider failures; keep the mutable last-call
   view legacy-only.

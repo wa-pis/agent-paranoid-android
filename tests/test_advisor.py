@@ -25,12 +25,14 @@ from test_data_agent.advisor import (
     validate_advisor_proposal,
     validate_relationship_discovery_proposals,
 )
+from test_data_agent.core.constraint import Constraint, ConstraintType
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.relationship import Relationship
-from test_data_agent.generation import infer_dataset_spec
+from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.safety import ProfileSafetyError
+from test_data_agent.validation import validate_dataset
 
 
 def safe_profile() -> DatasetProfile:
@@ -295,6 +297,106 @@ def test_advisor_request_replaces_common_categories_with_synthetic_labels() -> N
         .field("segment")
         .distribution["categories"]
     ] == ["__apa_category_e0_f2_c0__", "__apa_category_e0_f2_c1__"]
+
+
+@pytest.mark.parametrize(
+    ("condition", "expected"),
+    [
+        (
+            {"field": "segment", "equals": "business"},
+            {"field": "segment", "equals": "__apa_category_e0_f2_c1__"},
+        ),
+        (
+            {"field": "segment", "not_equals": "retail"},
+            {"field": "segment", "not_equals": "__apa_category_e0_f2_c0__"},
+        ),
+        (
+            {"field": "segment", "in_values": ["retail", "business"]},
+            {
+                "field": "segment",
+                "in_values": [
+                    "__apa_category_e0_f2_c0__",
+                    "__apa_category_e0_f2_c1__",
+                ],
+            },
+        ),
+    ],
+)
+def test_advisor_request_sanitizes_constraint_literals_and_rebuilds(
+    condition: dict[str, Any],
+    expected: dict[str, Any],
+) -> None:
+    profile = safe_profile()
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["email"],
+            condition=condition,
+            confidence=1.0,
+        )
+    ]
+
+    request = build_advisor_request(profile)
+
+    assert request.profile.constraints[0].condition == expected
+    assert request.baseline_spec.constraints[0].condition == expected
+    assert "retail" not in request.model_dump_json()
+    assert "business" not in request.model_dump_json()
+    assert _rebuild_advisor_request_for_profile_verification(profile, request) == request
+
+
+def test_sanitized_constraint_literal_remains_executable() -> None:
+    profile = safe_profile()
+    profile.entities[0].fields.append(
+        FieldProfile(
+            name="note",
+            data_type=FieldType.STRING,
+            nullable=True,
+            null_ratio=1.0,
+            distribution={"kind": "string_pattern", "min_length": 4, "max_length": 8},
+        )
+    )
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["note"],
+            condition={"field": "segment", "equals": "business"},
+            confidence=1.0,
+        )
+    ]
+
+    request = build_advisor_request(profile, count=32)
+    rows = generate_dataset(request.baseline_spec, seed=17)
+    matching = [
+        row
+        for row in rows["customers"]
+        if row["segment"] == "__apa_category_e0_f2_c1__"
+    ]
+
+    assert matching
+    assert all(row["note"] is not None for row in matching)
+    assert validate_dataset(rows, request.baseline_spec).valid is True
+
+
+def test_advisor_request_rejects_unrepresented_constraint_literal() -> None:
+    profile = safe_profile()
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["email"],
+            condition={"field": "segment", "equals": "opaque_unrepresented"},
+            confidence=1.0,
+        )
+    ]
+
+    with pytest.raises(
+        AdvisorContractError,
+        match="^advisor constraint contains an unrepresented categorical value$",
+    ):
+        build_advisor_request(profile)
 
 
 def test_advisor_request_marks_instruction_like_names_as_untrusted_data() -> None:
