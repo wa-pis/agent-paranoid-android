@@ -94,6 +94,7 @@ to profile your own input.
 
 | Goal | Documentation |
 | --- | --- |
+| Validate the workflow with a real development or analytics task | [Product Validation Pilot](https://wa-pis.github.io/agent-paranoid-android/getting-started/product-validation-pilot/) |
 | Generate from one CSV | [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/) |
 | Generate related tables | [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/) |
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
