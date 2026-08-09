@@ -23,6 +23,8 @@ All notable changes to this project are documented here.
 - Bind single-CSV no-copy validation to SHA-256 row digests collected during
   the same read that produced the profile, so path replacement cannot switch
   the checked source before publication.
+- Reject entity names reserved for generation control artifacts during spec
+  validation and again before any dataset file is written.
 - Replace source-derived CSV-folder text categories with collision-safe rank
   labels before caching, spec inference, or generation while preserving counts
   and conditional-rule semantics.

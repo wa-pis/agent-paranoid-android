@@ -5,12 +5,14 @@ from io import StringIO
 
 import pytest
 
+from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.artifacts import write_dataset_generation_artifacts
 from test_data_agent.io.writers import (
     quote_sql_identifier,
     rows_to_csv,
     rows_to_sql,
     sql_literal,
+    write_dataset_rows,
 )
 
 
@@ -58,6 +60,20 @@ def test_generation_artifacts_reject_unsafe_profile_name_before_writes(
             object(),
             tmp_path / "rows.csv",
             profile_artifact_name=artifact_name,
+        )
+
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_dataset_writer_rejects_reserved_entity_before_writes(tmp_path) -> None:
+    with pytest.raises(ValueError, match="reserved entity name"):
+        write_dataset_rows(
+            {
+                "orders": [{"id": 1}],
+                "generation_manifest": [{"id": 2}],
+            },
+            OutputFormat.JSON,
+            tmp_path,
         )
 
     assert list(tmp_path.iterdir()) == []

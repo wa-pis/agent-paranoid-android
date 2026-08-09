@@ -34,3 +34,5 @@ Important rules must be represented by typed models and executable validators,
 not only by free-form LLM reasoning. Keep generation deterministic with an
 explicit local seeded random source. Do not introduce source-row reuse,
 identity preservation, or implicit real-value dictionaries as a shortcut.
+Entity names reserved for generated control artifacts are rejected by the
+dataset specification and writer before any output file is created.

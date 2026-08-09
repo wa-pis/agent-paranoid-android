@@ -2,6 +2,19 @@
 
 ## ADDED Requirements
 
+### Requirement: Control Artifact Names Are Reserved
+
+Dataset specifications and output writers SHALL reject entity names reserved
+for generated control artifacts. The writer SHALL reject the complete entity
+set before creating any dataset file.
+
+#### Scenario: Entity collides with the generation manifest
+
+- **GIVEN** a dataset contains an entity named `generation_manifest`
+- **WHEN** the specification is validated or rows are written directly
+- **THEN** generation fails with a fixed reserved-name error
+- **AND** no dataset or control artifact is created
+
 ### Requirement: Source-Row Exclusion Uses The Profiled CSV Read
 
 Single-CSV generation SHALL compare generated rows with the complete source

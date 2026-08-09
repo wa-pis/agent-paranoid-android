@@ -82,6 +82,8 @@ source checkouts are not substitutes for the public-artifact checks.
   digest for the reviewed `docker/dockerfile:1.7` release.
 - [x] FS-03: single-CSV generation checks complete-row reuse against digests
   captured during the exact profiling read, including atomic path replacement.
+- [x] FS-06: dataset specs and writers reject entity names reserved for control
+  artifacts before any output file is created.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

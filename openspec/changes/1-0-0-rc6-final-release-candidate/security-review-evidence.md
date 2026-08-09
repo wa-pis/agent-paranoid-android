@@ -396,6 +396,7 @@ critical findings.
 | MT-01: nested Trino values bypass safe-select masking | Medium | **Closed by the focused MT-01 change**; bounded nested maps, lists, and tuples apply the same string and sensitive-value policy before the opt-in response, while excessive depth or value count fails closed. |
 | SC-08: mutable Dockerfile syntax frontend | Low | **Closed by the focused SC-08 change**; the reviewed `docker/dockerfile:1.7` OCI index is bound to digest `sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e`, and the container contract test rejects a tag-only directive. |
 | FS-03: CSV replacement can defeat source-row exclusion | Low | **Closed by the focused FS-03 change**; single-CSV profiling records only SHA-256 row digests from the same parse stream, and pre-publication no-copy validation uses that immutable set instead of reopening the source path. |
+| FS-06: reserved entity name can replace dataset content | Low | **Closed by the focused FS-06 change**; every fixed generation-control basename is rejected during dataset-spec validation, and the writer repeats the check before creating any dataset file. |
 
 - Focused command: `pytest tests/test_domain_agnostic_pipeline.py -q`
 - Result: **18 passed** using synthetic fixtures only.
@@ -416,6 +417,9 @@ critical findings.
 - Result: **33 passed**; the workflow regression atomically replaces the CSV
   path during generation and still rejects reuse of a row from the exact
   profiling read before any output is published.
+- Focused command: `pytest tests/test_dataset_spec_contract.py tests/test_io_writers.py -q`
+- Result: **49 passed**; all reserved basenames fail spec validation and a
+  direct writer call fails before publishing an earlier non-colliding entity.
 
 The remaining findings retain their canonical scan dispositions and continue
 to block RC6 until they are fixed or explicitly accepted in committed evidence.

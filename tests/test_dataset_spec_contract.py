@@ -401,6 +401,25 @@ def test_dataset_spec_rejects_duplicate_entities_and_dangling_relationships() ->
         )
 
 
+@pytest.mark.parametrize(
+    "entity_name",
+    [
+        "agent_completion",
+        "business_validation_report",
+        "csv_profile",
+        "dataset_spec",
+        "generation_manifest",
+        "profile",
+        "validation_report",
+    ],
+)
+def test_dataset_spec_rejects_reserved_artifact_entity_names(entity_name: str) -> None:
+    with pytest.raises(ValidationError, match="reserved entity name"):
+        DatasetSpec.model_validate(
+            {"entities": [{"name": entity_name, "row_count": 1, "fields": []}]}
+        )
+
+
 def test_entity_spec_rejects_duplicate_fields_and_unknown_primary_key() -> None:
     with pytest.raises(ValidationError, match="duplicate field names"):
         EntitySpec.model_validate(

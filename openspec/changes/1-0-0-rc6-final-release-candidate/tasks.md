@@ -141,6 +141,8 @@
   index digest and enforce the exact reference in container tests.
 - [x] FS-03: bind single-CSV complete-row exclusion to the exact profiling
   read and reject atomic source-path replacement before publication.
+- [x] FS-06: reserve generation control-artifact basenames in dataset specs and
+  reject them again before the writer creates any file.
 
 ## Release and review gates
 
