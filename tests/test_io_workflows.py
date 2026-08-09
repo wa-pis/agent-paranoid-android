@@ -296,6 +296,35 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
     assert not output_path.exists()
 
 
+def test_generate_dataset_from_csv_binds_no_copy_check_to_profiled_rows(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    input_path = tmp_path / "orders.csv"
+    replacement = tmp_path / "replacement.csv"
+    output_path = tmp_path / "generated" / "orders.csv"
+    input_path.write_text("order_id,status\n1,new\n")
+    replacement.write_text("order_id,status\n2,shipped\n")
+
+    def replace_source(spec, seed, budget):
+        replacement.replace(input_path)
+        return {"orders": [{"order_id": "1", "status": "new"}]}
+
+    monkeypatch.setattr("test_data_agent.io.workflows.generate_dataset", replace_source)
+
+    with pytest.raises(SourceRowReuseError):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=1,
+            seed=0,
+            output_path=output_path,
+            output_format=OutputFormat.CSV,
+            table_name="orders",
+        )
+
+    assert not output_path.exists()
+
+
 def test_generate_dataset_from_csv_does_not_publish_rows_when_artifact_write_fails(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

@@ -80,6 +80,8 @@ source checkouts are not substitutes for the public-artifact checks.
   typed field-scoped labels while ordinary numeric bounds remain unchanged.
 - [x] SC-08: the Dockerfile frontend is pinned to the immutable OCI index
   digest for the reviewed `docker/dockerfile:1.7` release.
+- [x] FS-03: single-CSV generation checks complete-row reuse against digests
+  captured during the exact profiling read, including atomic path replacement.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback

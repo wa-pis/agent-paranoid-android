@@ -37,6 +37,9 @@ source-derived categorical values. Infer local relationships and conditional
 rules before replacing categorical values, then rewrite their predicates to
 the same synthetic labels so generation semantics remain intact. On deadline
 or budget failure, do not publish a partial profile as trusted evidence.
+Single-CSV generation binds its complete-row reuse check to non-reversible row
+digests collected during the same CSV read that produced the profile; it does
+not reopen the mutable source path before publication.
 
 The normal flow is:
 

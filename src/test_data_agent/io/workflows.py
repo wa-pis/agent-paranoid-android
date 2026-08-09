@@ -11,7 +11,9 @@ from pydantic import BaseModel
 
 from test_data_agent.adapters import (
     csv_file_to_dataset_profile,
+    csv_profile_to_dataset_profile,
 )
+from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
     GenerationBudget,
@@ -46,7 +48,7 @@ from test_data_agent.io.path_policy import (
 from test_data_agent.io.writers import write_dataset_rows, write_single_entity_rows
 from test_data_agent.safety import (
     assert_no_csv_folder_source_rows,
-    assert_no_csv_source_rows,
+    assert_no_profiled_csv_rows,
     assert_profile_safe,
 )
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
@@ -345,7 +347,11 @@ def generate_dataset_from_csv_artifacts(
     overwrite: bool = False,
 ) -> tuple[DatasetValidationReport, Any | None]:
     ensure_paths_distinct(input_path, output_path)
-    profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
+    csv_profile, source_rows = profile_csv_with_row_digests(
+        input_path,
+        table_name=table_name,
+    )
+    profile = csv_profile_to_dataset_profile(csv_profile)
     spec = build_dataset_spec_from_profile(
         profile,
         count=count,
@@ -366,7 +372,11 @@ def generate_dataset_from_csv_artifacts(
             spec,
         )
         budget.check("business rule application")
-    assert_no_csv_source_rows(input_path, rows_by_entity[spec.entities[0].name])
+    assert_no_profiled_csv_rows(
+        source_rows,
+        rows_by_entity[spec.entities[0].name],
+        entity_name=spec.entities[0].name,
+    )
     report = generate_single_entity_profile_artifacts(
         profile,
         spec,

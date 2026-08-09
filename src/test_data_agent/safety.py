@@ -23,7 +23,13 @@ from test_data_agent.core.privacy import (
     infer_sensitive_type_from_values,
     is_sensitive_field,
 )
-from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
+from test_data_agent.csv_profiler import (
+    CSVSourceRowDigests,
+    csv_row_digest,
+    detect_csv_dialect,
+    detect_csv_encoding,
+    validate_csv_headers,
+)
 
 
 class ProfileSafetyError(ValueError):
@@ -195,6 +201,23 @@ def assert_no_csv_source_rows(
                 raise SourceRowReuseError(
                     f"generated entity {label!r} repeats a complete source row; generation stopped"
                 )
+
+
+def assert_no_profiled_csv_rows(
+    source_rows: CSVSourceRowDigests,
+    generated_rows: Iterable[Mapping[str, Any]],
+    *,
+    entity_name: str,
+) -> None:
+    """Fail when generated output repeats a row from the profiled CSV read."""
+
+    if any(
+        csv_row_digest(row, source_rows.field_names) in source_rows.digests
+        for row in generated_rows
+    ):
+        raise SourceRowReuseError(
+            f"generated entity {entity_name!r} repeats a complete source row; generation stopped"
+        )
 
 
 def assert_no_csv_folder_source_rows(
