@@ -51,6 +51,9 @@ def _is_dataset_profile_payload(payload: Any) -> bool:
 def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     input_paths = [path for path in sorted(input_folder.iterdir()) if path.suffix in {".csv", ".json", ".parquet"}]
+    stems = [path.stem for path in input_paths]
+    if len(stems) != len(set(stems)):
+        raise ValueError("duplicate entity artifact names")
     enforce_input_files(input_paths)
     configure_csv_field_limit(csv)
     total_rows = 0

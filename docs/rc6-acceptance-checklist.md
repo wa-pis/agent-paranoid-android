@@ -84,6 +84,8 @@ source checkouts are not substitutes for the public-artifact checks.
   captured during the exact profiling read, including atomic path replacement.
 - [x] FS-06: dataset specs and writers reject entity names reserved for control
   artifacts before any output file is created.
+- [x] FS-08: dataset-row readers reject duplicate entity stems across supported
+  artifact formats before reading any row file.
 - [x] Synthetic regression tests cover category reordering, placeholder-shaped
   literals, ordinary and typed constructor/provider/validation failures,
   dynamic exception-class markers, incomplete status, formatted traceback
