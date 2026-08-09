@@ -242,7 +242,6 @@ def build_advisor_request(
 ) -> AdvisorRequest:
     """Build a fingerprint-bound request from safe metadata only."""
 
-    assert_profile_safe(profile)
     if baseline_spec is not None and count is not None:
         raise ValueError("count cannot be combined with an explicit baseline spec")
     effective_spec = (
@@ -250,8 +249,22 @@ def build_advisor_request(
         if baseline_spec is not None
         else infer_dataset_spec(profile, count=count)
     )
-    _validate_spec_against_profile(profile, effective_spec)
-    safe_profile, safe_spec = _sanitize_rare_profile_values(profile, effective_spec)
+    return _build_advisor_request(profile, effective_spec)
+
+
+def _build_advisor_request(
+    profile: DatasetProfile,
+    spec: DatasetSpec,
+    *,
+    preserved_labels: set[tuple[str, str, str]] | None = None,
+) -> AdvisorRequest:
+    assert_profile_safe(profile)
+    _validate_spec_against_profile(profile, spec)
+    safe_profile, safe_spec = _sanitize_categorical_values(
+        profile,
+        spec,
+        preserved_labels=preserved_labels,
+    )
     return AdvisorRequest(
         profile_sha256=dataset_profile_fingerprint(safe_profile),
         baseline_spec_sha256=dataset_spec_fingerprint(safe_spec),
@@ -270,7 +283,14 @@ def _rebuild_advisor_request_for_profile_verification(
         previous_request.profile,
         baseline,
     )
-    return build_advisor_request(profile, baseline_spec=baseline)
+    preserved_labels = _categorical_string_keys(
+        previous_request.baseline_spec
+    ) - _categorical_string_keys(previous_request.profile)
+    return _build_advisor_request(
+        profile,
+        baseline,
+        preserved_labels=preserved_labels,
+    )
 
 
 def _restore_generated_placeholders(
@@ -294,8 +314,7 @@ def _restore_generated_placeholders(
                 ):
                     continue
                 value = category.get("value")
-                count = category.get("count", 0)
-                if not isinstance(value, str) or float(count) > 1:
+                if not isinstance(value, str):
                     continue
                 placeholder = previous_category.get("value")
                 if (
@@ -321,59 +340,78 @@ def _placeholder_matches_position(
     category_index: int,
 ) -> bool:
     return isinstance(value, str) and re.fullmatch(
-        rf"__apa_rare_e{entity_index}_f{field_index}_c{category_index}"
+        rf"__apa_(?:category|rare)_e{entity_index}_f{field_index}_c{category_index}"
         r"(?:_[1-9][0-9]*)?__",
         value,
     ) is not None
 
 
-def _sanitize_rare_profile_values(
+def _sanitize_categorical_values(
     profile: DatasetProfile,
     spec: DatasetSpec,
+    *,
+    preserved_labels: set[tuple[str, str, str]] | None = None,
 ) -> tuple[DatasetProfile, DatasetSpec]:
-    replacements: dict[tuple[str, str, str], str] = {}
+    preserved_labels = preserved_labels or set()
+    replacements = {key: key[2] for key in preserved_labels}
+    original_keys = _categorical_string_keys(profile) | _categorical_string_keys(spec)
     original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
-    used_placeholders: set[str] = set()
-    for entity_index, entity in enumerate(profile.entities):
-        for field_index, field in enumerate(entity.fields):
-            if field.distribution.get("kind") != "categorical":
-                continue
-            categories = field.distribution.get("categories", [])
-            for category_index, category in enumerate(categories):
-                if not isinstance(category, dict):
+    used_placeholders = {key[2] for key in preserved_labels}
+    field_positions = {
+        (entity.name, field.name): (entity_index, field_index)
+        for entity_index, entity in enumerate(profile.entities)
+        for field_index, field in enumerate(entity.fields)
+    }
+    category_indexes: dict[tuple[str, str], int] = {}
+    for dataset in (profile, spec):
+        for entity in dataset.entities:
+            for field in entity.fields:
+                if field.distribution.get("kind") != "categorical":
                     continue
-                value = category.get("value")
-                count = category.get("count", 0)
-                if not isinstance(value, str) or float(count) > 1:
-                    continue
-                replacement_key = (entity.name, field.name, value)
-                if replacement_key in replacements:
-                    continue
-                placeholder = (
-                    f"__apa_rare_e{entity_index}_f{field_index}_c{category_index}__"
-                )
-                suffix = 1
-                while placeholder in original_values or placeholder in used_placeholders:
+                field_key = (entity.name, field.name)
+                categories = field.distribution.get("categories", [])
+                for category in categories:
+                    if not isinstance(category, dict):
+                        continue
+                    value = category.get("value")
+                    if not isinstance(value, str):
+                        continue
+                    replacement_key = (entity.name, field.name, value)
+                    if replacement_key in replacements:
+                        continue
+                    entity_index, field_index = field_positions[field_key]
+                    category_index = category_indexes.get(field_key, 0)
+                    category_indexes[field_key] = category_index + 1
                     placeholder = (
-                        "__apa_rare_"
-                        f"e{entity_index}_f{field_index}_c{category_index}_{suffix}__"
+                        f"__apa_category_e{entity_index}_f{field_index}_c{category_index}__"
                     )
-                    suffix += 1
-                replacements[replacement_key] = placeholder
-                used_placeholders.add(placeholder)
+                    suffix = 1
+                    while placeholder in original_values or placeholder in used_placeholders:
+                        placeholder = (
+                            "__apa_category_"
+                            f"e{entity_index}_f{field_index}_c{category_index}_{suffix}__"
+                        )
+                        suffix += 1
+                    replacements[replacement_key] = placeholder
+                    used_placeholders.add(placeholder)
 
     safe_profile = profile.model_copy(deep=True)
     safe_spec = spec.model_copy(deep=True)
-    _replace_rare_category_values(safe_profile, replacements)
-    _replace_rare_category_values(safe_spec, replacements)
+    _replace_categorical_values(safe_profile, replacements)
+    _replace_categorical_values(safe_spec, replacements)
     if _structural_identity(profile) != _structural_identity(safe_profile):
         raise AdvisorContractError("profile sanitization changed structural identity")
     if _structural_identity(spec) != _structural_identity(safe_spec):
         raise AdvisorContractError("spec sanitization changed structural identity")
+    safe_keys = _categorical_string_keys(safe_profile) | _categorical_string_keys(
+        safe_spec
+    )
+    if (original_keys - preserved_labels) & safe_keys:
+        raise AdvisorContractError("advisor request contains an original categorical value")
     return safe_profile, safe_spec
 
 
-def _replace_rare_category_values(
+def _replace_categorical_values(
     dataset: DatasetProfile | DatasetSpec,
     replacements: dict[tuple[str, str, str], str],
 ) -> None:
@@ -399,7 +437,13 @@ def _replace_rare_category_values(
 def _categorical_string_values(
     dataset: DatasetProfile | DatasetSpec,
 ) -> set[str]:
-    values: set[str] = set()
+    return {key[2] for key in _categorical_string_keys(dataset)}
+
+
+def _categorical_string_keys(
+    dataset: DatasetProfile | DatasetSpec,
+) -> set[tuple[str, str, str]]:
+    values: set[tuple[str, str, str]] = set()
     for entity in dataset.entities:
         for field in entity.fields:
             if field.distribution.get("kind") != "categorical":
@@ -407,7 +451,7 @@ def _categorical_string_values(
             categories = field.distribution.get("categories", [])
             for category in categories:
                 if isinstance(category, dict) and isinstance(category.get("value"), str):
-                    values.add(category["value"])
+                    values.add((entity.name, field.name, category["value"]))
     return values
 
 
