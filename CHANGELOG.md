@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Bind review-first CSV agent plans and final no-copy validation to the exact
+  source version captured before profiling, rejecting changed or legacy
+  unbound plans before publication.
 - Document four accepted Low security findings with exact identities, risk
   ownership, revisit triggers, and a first post-1.0 hardening target.
 

@@ -154,6 +154,10 @@
 
 ## Release and review gates
 
+- [x] Close `csf_f728d80224b3c9ee96c9af09` /
+  `occ_f6c784febc6dd1b32f3f57e0` by binding agent review and final no-copy
+  validation to the source version captured before profiling.
+
 - [x] Bump active metadata, version module, lockfile, README, installation
   docs, changelog, release docs, and roadmap to `1.0.0rc6`.
 - [x] Add this RC6 OpenSpec and a separate acceptance checklist.

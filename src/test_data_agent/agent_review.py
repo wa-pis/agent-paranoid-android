@@ -18,7 +18,10 @@ from test_data_agent.agent_contracts import (
     AgentReviewState,
     AgentWorkspaceStatus,
 )
-from test_data_agent.agent_planning import validate_spec_for_approval
+from test_data_agent.agent_planning import (
+    validate_agent_source_fingerprint,
+    validate_spec_for_approval,
+)
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.io.artifacts import (
@@ -135,6 +138,7 @@ def inspect_agent_review_context(
     request = AgentRequest.model_validate_json(
         read_limited_text(artifacts.request_path)
     )
+    validate_agent_source_fingerprint(request, planned_review.source_sha256)
     profile = DatasetProfile.model_validate_json(
         read_limited_text(artifacts.profile_path)
     )

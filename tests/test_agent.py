@@ -153,6 +153,8 @@ def test_agent_plan_stops_before_generation_for_csv_folder(tmp_path) -> None:
     assert result.review is not None
     assert len(result.review.plan_id) == 32
     assert len(result.review.profile_sha256) == 64
+    assert result.review.source_sha256 is not None
+    assert len(result.review.source_sha256) == 64
     assert result.review.planned_spec_sha256 == result.review.current_spec_sha256
     assert result.review.spec_changed_since_plan is False
     assert (workspace / "dataset_spec.yaml").is_file()
@@ -243,6 +245,35 @@ def test_agent_approve_generates_safe_single_csv_bundle(tmp_path) -> None:
     assert len(rows) == 4
     assert "alice@example.com" not in profile_text
     assert {tuple(row.items()) for row in rows}.isdisjoint({tuple(row.items()) for row in source_rows})
+
+
+def test_agent_approve_rejects_csv_replaced_after_planning(tmp_path) -> None:
+    source = tmp_path / "source.csv"
+    source.write_text("color,size\nred,small\n")
+    workspace = tmp_path / "agent_csv"
+    planned = plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV,
+            source_path=source,
+            workspace=workspace,
+            count=1,
+            seed=19,
+            output_format=OutputFormat.CSV,
+        )
+    )
+
+    source.write_text("color,size\nblue,large\n")
+
+    assert planned.review is not None
+    with pytest.raises(
+        ValueError,
+        match="^agent source changed since planning; create a new plan$",
+    ):
+        approve_agent_workspace(
+            workspace,
+            reviewed_spec_sha256=planned.review.current_spec_sha256,
+        )
+    assert not (workspace / "generated").exists()
 
 
 def test_agent_workspace_status_tracks_plan_and_completion(tmp_path) -> None:

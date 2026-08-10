@@ -443,6 +443,22 @@ disposition above. The four accepted issues are also published in
 acceptance does not satisfy the independent exact-commit security approval
 gate.
 
+## 2026-08-10 Repository-Wide Review Remediation
+
+Repository-wide scan `1a54d2a3-7742-48b5-a9c9-e24283819459` reported agent
+source-version binding finding `csf_f728d80224b3c9ee96c9af09` /
+`occ_f6c784febc6dd1b32f3f57e0` /
+`codex-security/v1:sha256:f7b4f7443eab25a29ccb8ff5bb551065e4981188f0f144cceb68f2eee9b96fc7`
+on immutable commit `864dc7d5b7748663f6ab66928d06f65cb284bd8e`.
+
+**Disposition: closed by the focused agent source-binding change.** CSV and
+CSV-folder plans persist a bounded SHA-256 digest captured before profiling;
+review, approval, generation publication, and recovery reject a changed source
+or a legacy source-backed plan without that binding. A synthetic replacement
+regression proves approval fails before output publication. Other findings
+from this scan remain blocking and the required final repository-wide review
+has not run.
+
 ## Review Conclusion
 
 **Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4

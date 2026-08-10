@@ -185,6 +185,7 @@ class AgentGenerationSummary(AgentSummary):
 class AgentReviewState(BaseModel):
     plan_id: str = Field(pattern=r"^[0-9a-f]{32}$")
     profile_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    source_sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     planned_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     current_spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     spec_changed_since_plan: bool
