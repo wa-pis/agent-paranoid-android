@@ -79,10 +79,7 @@ class CSVProfile(BaseModel):
     table: str
     row_count: int
     columns: list[CSVColumnProfile]
-    local_category_fields: list[LocalCategoryField] = Field(
-        default_factory=list,
-        exclude_if=lambda value: not value,
-    )
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_local_category_fields(self) -> CSVProfile:

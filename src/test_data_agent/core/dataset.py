@@ -37,10 +37,7 @@ class DatasetProfile(BaseModel):
     entities: list[EntityProfile] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
-    local_category_fields: list[LocalCategoryField] = Field(
-        default_factory=list,
-        exclude_if=lambda value: not value,
-    )
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetProfile:
@@ -66,10 +63,7 @@ class DatasetSpec(BaseModel):
     constraints: list[Constraint] = Field(default_factory=list)
     privacy_rules: list[PrivacyRule] = Field(default_factory=list)
     privacy_settings: PrivacySettings = Field(default_factory=PrivacySettings)
-    local_category_fields: list[LocalCategoryField] = Field(
-        default_factory=list,
-        exclude_if=lambda value: not value,
-    )
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
     generation_settings: GenerationSettings = Field(default_factory=GenerationSettings)
     validation_settings: ValidationSettings = Field(default_factory=ValidationSettings)
 
