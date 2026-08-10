@@ -22,7 +22,7 @@
 - [x] Restore the baseline field-and-destination privacy contract: local
   generation may preserve explicitly allowlisted safe business enums, while
   provider-bound categories remain source-literal free.
-- [ ] Add a typed explicit local-category allowlist shared by CSV, folder,
+- [x] Add a typed explicit local-category allowlist shared by CSV, folder,
   agent, CLI, and generation boundaries.
 - [ ] Preserve allowlisted bounded non-sensitive enums and their conditional
   rules; reject PII, secrets, identifiers, free text, and unknown fields even

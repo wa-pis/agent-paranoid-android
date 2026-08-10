@@ -9,6 +9,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.core.field import FieldType
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.relationship import RelationshipType
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 
@@ -58,6 +59,7 @@ class AgentRequest(BaseModel):
     table_name: str | None = None
     rule_sample_rows: int = Field(default=50_000, ge=1)
     use_cache: bool = True
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
 
 
 class AgentStep(BaseModel):

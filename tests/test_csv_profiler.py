@@ -9,6 +9,7 @@ from test_data_agent.cli import main
 from test_data_agent.adapters import csv_profile_to_dataset_spec
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import InputLimitError
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generation import generate_dataset
 from test_data_agent.io.writers import write_parquet
@@ -35,6 +36,26 @@ def test_csv_profile_uses_safe_metadata_and_masks_pii() -> None:
     assert total.data_type == "float"
     assert total.p05 is not None
     assert total.p95 is not None
+
+
+def test_csv_profile_carries_typed_local_category_allowlist() -> None:
+    allowed = LocalCategoryField(entity="customers", field="status")
+
+    profile = profile_csv(FIXTURE_CSV, local_category_fields=(allowed,))
+    spec = csv_profile_to_dataset_spec(profile, seed=10, count=12)
+
+    assert profile.local_category_fields == [allowed]
+    assert spec.local_category_fields == [allowed]
+
+
+def test_csv_profile_rejects_unknown_local_category_field() -> None:
+    with pytest.raises(ValueError, match="unknown field"):
+        profile_csv(
+            FIXTURE_CSV,
+            local_category_fields=(
+                LocalCategoryField(entity="customers", field="missing"),
+            ),
+        )
 
 
 def test_csv_profile_detects_semicolon_delimiter_and_utf8_bom(tmp_path) -> None:
@@ -130,13 +151,25 @@ def test_csv_profile_infers_dataset_spec_without_copying_rows() -> None:
 def test_profile_csv_cli_writes_safe_profile(tmp_path) -> None:
     output = tmp_path / "profile.json"
 
-    assert main(["profile-csv", str(FIXTURE_CSV), "--output", str(output)]) == 0
+    assert main(
+        [
+            "profile-csv",
+            str(FIXTURE_CSV),
+            "--output",
+            str(output),
+            "--local-category",
+            "customers.status",
+        ]
+    ) == 0
 
     profile = json.loads(output.read_text())
     assert profile["source_type"] == "csv"
     assert len(profile["entities"]) == 1
     assert profile["entities"][0]["name"] == "customers"
     assert profile["entities"][0]["row_count"] == 5
+    assert profile["local_category_fields"] == [
+        {"entity": "customers", "field": "status"}
+    ]
     assert "alice@example.com" not in output.read_text()
 
 

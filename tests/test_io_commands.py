@@ -6,6 +6,7 @@ import pytest
 
 from test_data_agent.cli import main
 from test_data_agent.core.limits import InputLimitError
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io.commands import (
     generate_dataset_command,
@@ -535,6 +536,9 @@ def test_profile_csv_command_writes_dataset_profile_json(tmp_path) -> None:
             input=Path("tests/fixtures/customers.csv"),
             table="customers_alias",
             output=output_path,
+            local_category_fields=[
+                LocalCategoryField(entity="customers_alias", field="status")
+            ],
         )
     )
 
@@ -543,6 +547,9 @@ def test_profile_csv_command_writes_dataset_profile_json(tmp_path) -> None:
     assert exit_code == 0
     assert payload["source_type"] == "csv"
     assert payload["entities"][0]["name"] == "customers_alias"
+    assert payload["local_category_fields"] == [
+        {"entity": "customers_alias", "field": "status"}
+    ]
 
 
 def test_generate_dataset_from_csv_command_writes_generation_bundle(tmp_path) -> None:

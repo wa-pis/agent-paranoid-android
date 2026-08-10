@@ -49,7 +49,12 @@ from test_data_agent.advisor import (
     build_advisor_review_artifact,
     validate_advisor_proposal,
 )
-from test_data_agent.core import DATASET_SPEC_SCHEMA_VERSION, DatasetProfile, DatasetSpec
+from test_data_agent.core import (
+    DATASET_SPEC_SCHEMA_VERSION,
+    DatasetProfile,
+    DatasetSpec,
+    LocalCategoryField,
+)
 from test_data_agent.cli_contract import CliErrorCode, CliErrorDetail, CliErrorResponse
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
 from test_data_agent.io.workflows import DatasetGenerationResult, generate_dataset_bundle
@@ -86,6 +91,7 @@ __all__ = [
     "CliErrorResponse",
     "DatasetProfile",
     "DatasetSpec",
+    "LocalCategoryField",
     "DatasetGenerationResult",
     "DatasetAdvisor",
     "ExchangeDatasetAdvisor",

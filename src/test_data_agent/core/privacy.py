@@ -10,7 +10,7 @@ from datetime import date
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 SENSITIVE_NAME_PARTS = {
@@ -84,6 +84,21 @@ class PrivacyAction(StrEnum):
     SYNTHETIC = "synthetic"
     MASK = "mask"
     SUPPRESS = "suppress"
+
+
+class LocalCategoryField(BaseModel):
+    """Explicit field scope for local non-sensitive category preservation."""
+
+    entity: str = Field(max_length=256)
+    field: str = Field(max_length=256)
+
+    @field_validator("entity", "field")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("local category entity and field must be non-empty")
+        return value
 
 
 class PrivacyRule(BaseModel):

@@ -10,6 +10,7 @@ from test_data_agent.core.distribution import CategoryWeight, MaskedPattern
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import (
+    LocalCategoryField,
     infer_sensitive_type_from_values,
     infer_sensitive_value_type,
     is_sensitive_field,
@@ -44,6 +45,10 @@ def legacy_profile_to_dataset_profile(
 
     return DatasetProfile(
         source_type=source_type,
+        local_category_fields=[
+            LocalCategoryField.model_validate(item)
+            for item in profile.get("local_category_fields", [])
+        ],
         entities=[
             EntityProfile(
                 name=table_name,

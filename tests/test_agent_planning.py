@@ -1,4 +1,5 @@
 import ast
+import json
 from pathlib import Path
 from types import ModuleType
 
@@ -15,11 +16,14 @@ from test_data_agent.agent_contracts import (
 )
 from test_data_agent.agent_planning import AgentPlanningService
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.privacy import LocalCategoryField
+from test_data_agent.io.readers import load_dataset_spec
 from test_data_agent.safety import ProfileSafetyError
 from test_data_agent.workspace_store import FilesystemAgentWorkspaceStore
 
 
 FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
+FIXTURE_FOLDER = Path("tests/fixtures/example_dataset")
 
 
 def test_planning_service_persists_review_only_plan(tmp_path: Path) -> None:
@@ -42,6 +46,26 @@ def test_planning_service_persists_review_only_plan(tmp_path: Path) -> None:
     assert (workspace / "agent_plan.json").is_file()
     assert (workspace / "dataset_spec.yaml").is_file()
     assert not (workspace / "generated").exists()
+
+
+def test_agent_folder_plan_carries_local_category_allowlist(tmp_path: Path) -> None:
+    workspace = tmp_path / "agent"
+    allowed = LocalCategoryField(entity="orders", field="status")
+
+    AgentPlanningService(FilesystemAgentWorkspaceStore()).plan_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_FOLDER,
+            workspace=workspace,
+            local_category_fields=[allowed],
+            use_cache=False,
+        )
+    )
+
+    profile = json.loads((workspace / "profile.json").read_text())
+    spec = load_dataset_spec(workspace / "dataset_spec.yaml")
+    assert profile["local_category_fields"] == [allowed.model_dump()]
+    assert spec.local_category_fields == [allowed]
 
 
 def test_planning_service_rejects_workspace_inside_csv_source(

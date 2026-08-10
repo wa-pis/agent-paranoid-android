@@ -27,6 +27,7 @@ from test_data_agent.core.distribution import (
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec, FieldType
 from test_data_agent.core.privacy import (
+    LocalCategoryField,
     SENSITIVE_NAME_PARTS,
     PrivacyAction,
     PrivacyClassification,
@@ -64,6 +65,7 @@ __all__ = [
     "FieldType",
     "GenerationMode",
     "GenerationSettings",
+    "LocalCategoryField",
     "MaskedPattern",
     "MaskedPatternsDistribution",
     "NumericDistribution",

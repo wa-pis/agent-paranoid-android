@@ -319,6 +319,13 @@
           "generation_settings": {
             "$ref": "#/$defs/GenerationSettings"
           },
+          "local_category_fields": {
+            "items": {
+              "$ref": "#/$defs/LocalCategoryField"
+            },
+            "title": "Local Category Fields",
+            "type": "array"
+          },
           "privacy_rules": {
             "items": {
               "$ref": "#/$defs/PrivacyRule"
@@ -511,6 +518,27 @@
           }
         },
         "title": "GenerationSettings",
+        "type": "object"
+      },
+      "LocalCategoryField": {
+        "description": "Explicit field scope for local non-sensitive category preservation.",
+        "properties": {
+          "entity": {
+            "maxLength": 256,
+            "title": "Entity",
+            "type": "string"
+          },
+          "field": {
+            "maxLength": 256,
+            "title": "Field",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity",
+          "field"
+        ],
+        "title": "LocalCategoryField",
         "type": "object"
       },
       "OutputFormat": {

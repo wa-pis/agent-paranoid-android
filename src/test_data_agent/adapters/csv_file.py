@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+from collections.abc import Sequence
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.csv_profiler import CSVProfile, profile_csv
 from test_data_agent.adapters.legacy_profile import (
     legacy_profile_to_dataset_profile,
@@ -16,8 +18,19 @@ def csv_profile_to_dataset_profile(profile: CSVProfile) -> DatasetProfile:
     return legacy_profile_to_dataset_profile(profile.model_dump(mode="json"), source_type="csv")
 
 
-def csv_file_to_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
-    return csv_profile_to_dataset_profile(profile_csv(path, table_name=table_name))
+def csv_file_to_dataset_profile(
+    path: Path,
+    table_name: str | None = None,
+    *,
+    local_category_fields: Sequence[LocalCategoryField] = (),
+) -> DatasetProfile:
+    return csv_profile_to_dataset_profile(
+        profile_csv(
+            path,
+            table_name=table_name,
+            local_category_fields=local_category_fields,
+        )
+    )
 
 
 def csv_profile_to_dataset_spec(
@@ -40,9 +53,14 @@ def csv_file_to_dataset_spec(
     table_name: str | None = None,
     count: int | None = None,
     seed: int | None = None,
+    local_category_fields: Sequence[LocalCategoryField] = (),
 ) -> DatasetSpec:
     return csv_profile_to_dataset_spec(
-        profile_csv(path, table_name=table_name),
+        profile_csv(
+            path,
+            table_name=table_name,
+            local_category_fields=local_category_fields,
+        ),
         count=count,
         seed=seed,
     )
@@ -58,10 +76,12 @@ def dataset_spec_from_csv_file(
     table_name: str | None = None,
     count: int | None = None,
     seed: int | None = None,
+    local_category_fields: Sequence[LocalCategoryField] = (),
 ) -> DatasetSpec:
     return csv_file_to_dataset_spec(
         path,
         table_name=table_name,
         count=count,
         seed=seed,
+        local_category_fields=local_category_fields,
     )

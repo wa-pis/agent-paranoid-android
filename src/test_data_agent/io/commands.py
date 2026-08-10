@@ -11,6 +11,7 @@ from typing import Any, Callable
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact
@@ -171,7 +172,12 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
 
 def profile_csv_command(args: argparse.Namespace) -> int:
     ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
-    write_csv_profile_artifact(args.input, output_path=args.output, table_name=args.table)
+    write_csv_profile_artifact(
+        args.input,
+        output_path=args.output,
+        table_name=args.table,
+        local_category_fields=tuple(getattr(args, "local_category_fields", ())),
+    )
     write_profile_summary(args.output)
     return 0
 
@@ -194,6 +200,7 @@ def generate_dataset_from_csv_command(
         invalid_ratio=args.invalid_ratio,
         business_rules_applier=business_rules_applier,
         overwrite=getattr(args, "overwrite", False),
+        local_category_fields=tuple(getattr(args, "local_category_fields", ())),
     )
     if should_fail_generation(report, business_report, args.mode):
         write_generation_errors(report, business_report)
@@ -209,6 +216,7 @@ def profile_example_artifacts(
     cache_dir: Path,
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> DatasetProfile:
     require_output_suffix(output_path, {".json"}, "profile output")
     input_folder_resolved = input_folder.resolve(strict=True)
@@ -220,6 +228,7 @@ def profile_example_artifacts(
         cache_dir=cache_dir,
         use_cache=use_cache,
         rule_sample_rows=rule_sample_rows,
+        local_category_fields=local_category_fields,
     )
     assert_profile_safe(profile)
     write_json_artifact(profile, output_path)
@@ -236,6 +245,7 @@ def generate_dataset_from_example_artifacts(
     cache_dir: Path,
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> int:
     ensure_folders_distinct(input_folder, output_folder)
     ensure_empty_output_folder(output_folder)
@@ -244,6 +254,7 @@ def generate_dataset_from_example_artifacts(
         cache_dir=cache_dir,
         use_cache=use_cache,
         rule_sample_rows=rule_sample_rows,
+        local_category_fields=local_category_fields,
     )
     temp_folder = make_temp_output_folder(output_folder)
     try:
@@ -273,6 +284,7 @@ def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
         cache_dir=args.cache_dir,
         use_cache=not args.no_cache,
         rule_sample_rows=args.rule_sample_rows,
+        local_category_fields=tuple(getattr(args, "local_category_fields", ())),
     )
     write_generation_summary(args.output)
     return exit_code
