@@ -19,6 +19,7 @@
     "plan_id": "00000000000000000000000000000000",
     "planned_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
     "profile_sha256": "95a9184c9aa26b780ecea78705461a5c5bf88642af5af4ffe14a45a6c8da0057",
+    "source_sha256": null,
     "spec_changed_since_plan": false
   },
   "schema_version": "1.0",
