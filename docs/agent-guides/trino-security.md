@@ -31,6 +31,9 @@ or access to secrets, credentials, tokens, or raw PII.
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.
+- Return raw categorical aggregates only for explicitly non-sensitive columns
+  covered by both table and column allowlists; a table allowlist alone does not
+  authorize category disclosure.
 - Parse and reject unsafe SQL; do not rely on CLI or MCP schema validation as
   the only enforcement layer.
 - Apply statement, column, row, scan, result, transport-response, and

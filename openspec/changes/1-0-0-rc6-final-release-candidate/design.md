@@ -2,12 +2,14 @@
 
 ## Approach
 
-1. Build a local deterministic rare-value map scoped by entity and field and
-   apply it by category value rather than by category position. Placeholder
-   names remain opaque and deterministic from profile structure, while every
-   categorical string in both profile and baseline is reserved before a name
-   is selected. Verify both structural identity and the postcondition that no
-   original rare value remains in either sanitized object.
+1. Resolve privacy policy by field and destination. Preserve source categories
+   locally only for fields explicitly allowlisted as bounded non-sensitive
+   business enums. Content-based PII, secret, identifier, and free-text checks
+   remain fail-closed. Provider-bound categories always use synthetic labels,
+   and Trino/MCP aggregate disclosure additionally requires table and column
+   allowlists. For transformed fields, build a deterministic map scoped by
+   entity and field, reserve original and generated labels, and verify provider
+   payloads contain no original literals.
 2. Make the structured provider path return a frozen generic result containing
    the parsed model and immutable bounded metadata. Failed calls raise a typed
    contract error carrying the same call-local metadata. Keep the mutable
@@ -102,7 +104,9 @@
 ## Failure Modes
 
 - A placeholder collision is resolved by a deterministic suffix; no source
-  category is silently merged with another category.
+  category selected for transformation is silently merged with another
+  category. An explicitly allowlisted local business enum is preserved by
+  policy rather than relabeled.
 - Reordering categories in the baseline does not change which rare values are
   sanitized and cannot leave a raw rare value in the serialized advisor
   request.

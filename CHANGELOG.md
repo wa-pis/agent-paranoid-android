@@ -4,6 +4,9 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Restore field-and-destination privacy policy: preserve explicitly allowlisted
+  safe business enums locally, keep sensitive and unknown fields transformed,
+  and keep every external-provider category source-literal free.
 - Bind review-first CSV agent plans and final no-copy validation to the exact
   source version captured before profiling, rejecting changed or legacy
   unbound plans before publication.

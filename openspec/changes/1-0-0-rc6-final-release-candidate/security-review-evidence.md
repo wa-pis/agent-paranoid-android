@@ -459,6 +459,24 @@ regression proves approval fails before output publication. Other findings
 from this scan remain blocking and the required final repository-wide review
 has not run.
 
+### Field-And-Destination Policy Correction
+
+The product privacy invariant is not blanket removal of every source category.
+Explicitly allowlisted bounded non-sensitive business enums may be preserved in
+local profiles and synthetic generation; sensitive, identifier-like,
+free-text, and unknown fields remain transformed, and every provider-bound
+source literal remains synthetic. Trino/MCP raw category aggregates require
+both table and column allowlisting.
+
+Finding `csf_f7a0c0612fdd86a99bdf0c97` /
+`occ_4029f085876f9eac2d39892e` remains applicable only where policy already
+requires transformation: a generated label must not alias an original value.
+It is not evidence that an explicitly allowlisted safe local enum must be
+replaced. FS-01 and the AG-01/FS-02/AG-03 remediations therefore require
+re-review: retain source-literal removal at external provider boundaries and
+remove local over-redaction. No collision finding is closed by documentation
+alone.
+
 ## Review Conclusion
 
 **Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4

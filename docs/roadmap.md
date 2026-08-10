@@ -214,6 +214,14 @@ refactor, and
 `1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closed the remaining
 invocation, transport, advisor, and exact-publication acceptance findings and
 is now historical; RC6 is the active candidate for stable promotion.
+RC6 also restores the original field-and-destination privacy boundary. Local
+profiles and deterministic generation may preserve explicitly allowlisted,
+bounded, non-sensitive business enums. PII, secrets, identifiers, free text,
+and unknown fields remain transformed by default, while every categorical
+literal sent to an external advisor remains synthetic. Trino/MCP category
+aggregates require both table and column allowlisting. Blanket replacement of
+all categorical fields is not a release goal because it destroys reviewed
+business semantics without improving the sensitive-data boundary.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
