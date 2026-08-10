@@ -10,7 +10,8 @@ metadata and bounded evidence needed to build a generation specification.
 
 - column names and inferred data types;
 - null ratios and approximate distinct counts;
-- frequency-ranked categorical distributions with synthetic labels;
+- bounded values and counts for explicitly allowlisted non-sensitive business
+  enums, or frequency-ranked synthetic labels for other categorical fields;
 - numeric ranges and percentiles;
 - date/time ranges;
 - string-length distributions;
@@ -32,10 +33,11 @@ mask sensitive evidence; and produce a reusable profile suitable for spec
 inference.
 
 Bound file size, rows, cells, sample size, and wall-clock work. A cache may
-store metadata-only profiles and source fingerprints, but never raw rows or
-source-derived categorical values. Infer local relationships and conditional
-rules before replacing categorical values, then rewrite their predicates to
-the same synthetic labels so generation semantics remain intact. On deadline
+store metadata-only profiles, source fingerprints, and explicitly allowlisted
+bounded non-sensitive enum values, but never raw rows or sensitive source
+values. Infer local relationships and conditional rules before replacing
+non-allowlisted categorical values, then rewrite their predicates to the same
+synthetic labels so generation semantics remain intact. On deadline
 or budget failure, do not publish a partial profile as trusted evidence.
 Single-CSV generation binds its complete-row reuse check to non-reversible row
 digests collected during the same CSV read that produced the profile; it does

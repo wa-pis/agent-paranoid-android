@@ -19,6 +19,20 @@
 
 ## Repository-wide security review follow-ups
 
+- [x] Restore the baseline field-and-destination privacy contract: local
+  generation may preserve explicitly allowlisted safe business enums, while
+  provider-bound categories remain source-literal free.
+- [ ] Add a typed explicit local-category allowlist shared by CSV, folder,
+  agent, CLI, and generation boundaries.
+- [ ] Preserve allowlisted bounded non-sensitive enums and their conditional
+  rules; reject PII, secrets, identifiers, free text, and unknown fields even
+  when requested for preservation.
+- [ ] Require table plus column allowlisting before Trino/MCP returns raw
+  non-sensitive category aggregates.
+- [ ] Re-review FS-01, AG-01/FS-02, AG-03, and the category-collision finding
+  against this policy; retain provider sanitization and remove local
+  over-redaction.
+
 - [x] Replace all categorical values in external advisor requests with
   field-scoped synthetic labels/ranks or non-reversible summaries; add common
   name/address values that evade current heuristics.

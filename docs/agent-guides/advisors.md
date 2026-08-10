@@ -25,6 +25,11 @@ boundary. Normal tests use fake transports and synthetic profiles; no
 production data or private infrastructure context may be sent to an external
 provider.
 
+Local category preservation does not weaken this boundary. Even when a
+reviewed field keeps an explicitly allowlisted business enum for deterministic
+generation, every provider-bound source literal uses a field-scoped synthetic
+label and is restored only inside the fingerprint-bound local review flow.
+
 Categorical constraint predicates are part of the same provider-bound data as
 their distributions. Replace every string, number, boolean, or null category
 and matching `equals`, `not_equals`, or `in_values` value with field-scoped

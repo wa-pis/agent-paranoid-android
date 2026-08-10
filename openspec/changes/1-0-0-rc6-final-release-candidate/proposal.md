@@ -4,8 +4,9 @@
 
 Make `1.0.0rc6` the final release candidate before stable promotion. RC6
 tracks and closes the remaining security and operational findings around
-rare-category sanitization, provider failure redaction, per-call advisor
-metadata, shared Trino scan policy, and publicly verifiable review evidence.
+field-and-destination privacy policy, provider failure redaction, per-call
+advisor metadata, shared Trino scan policy, and publicly verifiable review
+evidence.
 
 ## Motivation
 
@@ -55,6 +56,12 @@ release controls.
 
 In scope:
 
+- Preserve explicitly allowlisted, bounded, non-sensitive business enums in
+  local profiles and synthetic generation while transforming PII, secrets,
+  identifiers, free text, unknown categories, and every provider-bound source
+  literal.
+- Require both table and column allowlists before Trino or MCP returns a
+  non-sensitive category aggregate; table allowlisting alone is insufficient.
 - Use field-scoped deterministic rare-category placeholders that avoid normal
   category values and other generated placeholders, remain independent of
   baseline category order, and leave no original rare value in the provider
@@ -117,17 +124,21 @@ Out of scope:
 
 ## Safety Impact
 
-Rare values are replaced in safe advisor metadata only; source rows and raw
-values never enter generated output or provider metadata, including when the
-profile and baseline use different category order. Per-call metadata and public
-errors are bounded and exclude prompts, profile values, credentials, provider
-status text, and retained exception objects.
+Raw sensitive values and source rows never enter generated output or provider
+metadata. Explicitly reviewed safe business enums may remain in local profiles
+and generated rows because preserving domain semantics is part of the product
+contract, not a privacy failure. Every provider-bound category remains
+source-literal free. Per-call metadata and public errors are bounded and
+exclude prompts, sensitive profile values, credentials, provider status text,
+and retained exception objects.
 The shared-hardened profile fails closed before Trino MCP startup when total
 estimated scan work is unbounded. `trusted-local` is an explicit local policy,
 not a production privacy claim.
 
 ## Compatibility
 
+Local category preservation requires an explicit field policy; existing
+unallowlisted workflows continue to transform or suppress source literals.
 `OpenAIAdvisorClient.complete` remains compatible and returns the same payload;
 new callers use `complete_with_metadata`. `last_run_metadata` remains only as a
 legacy sequential compatibility view. Existing Trino configuration is

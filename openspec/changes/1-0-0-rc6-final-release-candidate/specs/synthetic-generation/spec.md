@@ -41,24 +41,36 @@ formats before reading any row artifact.
 - **THEN** loading fails with a fixed duplicate-name error
 - **AND** neither artifact silently replaces the other
 
-### Requirement: Source Categories Never Become Generated Values
+### Requirement: Source Categories Follow The Effective Field Policy
 
-CSV-folder profiling SHALL replace source-derived text categories with
-collision-safe synthetic rank labels before a profile is cached, returned, or
-used for specification inference and generation. Category counts and inferred
-conditional rules SHALL remain consistent after replacement. Numeric
-distributions SHALL retain their existing type and magnitude semantics.
+CSV-folder profiling SHALL preserve source-derived text categories only for
+fields explicitly allowlisted as bounded non-sensitive business enums. Other
+text categories SHALL use collision-safe synthetic rank labels before a
+profile is cached, returned, or used for specification inference and
+generation. Category counts and inferred conditional rules SHALL remain
+consistent with the selected representation. Numeric distributions SHALL
+retain their existing type and magnitude semantics.
 
 #### Scenario: A rare category controls a conditional rule
 
-- **GIVEN** a low-cardinality text field contains source values missed by
-  sensitive-value heuristics and one value implies another field is required
+- **GIVEN** a non-allowlisted low-cardinality text field contains source values
+  missed by sensitive-value heuristics and one value implies another field is
+  required
 - **WHEN** the folder is profiled and synthetic rows are generated
 - **THEN** the profile, cache, specification, and rows contain no source text
   category
 - **AND** the category counts and conditional requirement use the same
   collision-safe synthetic label
 - **AND** generation remains deterministic for an explicit seed
+
+#### Scenario: An allowlisted business enum controls a conditional rule
+
+- **GIVEN** a bounded non-sensitive enum is explicitly allowlisted for local
+  preservation and one value implies another field is required
+- **WHEN** the folder is profiled and synthetic rows are generated
+- **THEN** the reviewed enum values, counts, and conditional predicate remain
+  aligned
+- **AND** provider-bound serialization still replaces the literals
 
 ### Requirement: Local Profiling Deadline Covers Field Work
 
