@@ -60,6 +60,7 @@ from test_data_agent.agent_planning import (
     prepare_spec_for_approval as prepare_spec_for_approval,
     relationship_summary as relationship_summary,
     sensitive_field_summary as sensitive_field_summary,
+    validate_agent_source_fingerprint as validate_agent_source_fingerprint,
     validate_spec_for_approval as validate_spec_for_approval,
 )
 from test_data_agent.agent_recovery import (
@@ -194,7 +195,12 @@ def generate_agent_dataset(
     try:
         rows_by_entity = generate_dataset(spec, seed=request.seed, budget=budget)
         budget.check("dataset generation")
-        assert_agent_source_not_copied(request, spec, rows_by_entity)
+        assert_agent_source_not_copied(
+            request,
+            spec,
+            rows_by_entity,
+            source_sha256=review.source_sha256,
+        )
         write_dataset_rows(rows_by_entity, request.output_format, temp_folder)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, spec)
@@ -320,7 +326,12 @@ def validate_agent_completion_checkpoint(
     ):
         raise ValueError("generated manifest, checkpoint, or validation report is inconsistent")
 
-    assert_agent_source_not_copied(request, spec, rows_by_entity)
+    assert_agent_source_not_copied(
+        request,
+        spec,
+        rows_by_entity,
+        source_sha256=review.source_sha256,
+    )
     recovered_report = validate_dataset(rows_by_entity, spec)
     if recovered_report != report:
         raise ValueError("generated rows do not match the persisted validation report")
@@ -350,7 +361,10 @@ def assert_agent_source_not_copied(
     request: AgentRequest,
     spec: DatasetSpec,
     rows_by_entity: dict[str, list[dict[str, Any]]],
+    *,
+    source_sha256: str | None,
 ) -> None:
+    validate_agent_source_fingerprint(request, source_sha256)
     if request.source_type == AgentSourceType.CSV:
         if len(spec.entities) != 1:
             raise ValueError("csv agent source expects exactly one generated entity")

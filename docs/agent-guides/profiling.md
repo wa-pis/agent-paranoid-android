@@ -40,6 +40,10 @@ or budget failure, do not publish a partial profile as trusted evidence.
 Single-CSV generation binds its complete-row reuse check to non-reversible row
 digests collected during the same CSV read that produced the profile; it does
 not reopen the mutable source path before publication.
+Review-first agent plans also bind CSV and CSV-folder approval to a SHA-256
+digest of the source bytes captured before profiling. Approval and final
+publication fail closed if those bytes change, and older unbound plans must be
+replanned.
 Dataset folders require one artifact stem per entity across CSV, JSON, and
 Parquet inputs; duplicate stems fail before any row artifact is read.
 The local profiling deadline is checked between individual field operations

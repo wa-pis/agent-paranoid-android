@@ -18,6 +18,7 @@
   "profile_sha256": "95a9184c9aa26b780ecea78705461a5c5bf88642af5af4ffe14a45a6c8da0057",
   "relationship_count": 0,
   "seed": 73,
+  "source_sha256": null,
   "source_type": "trino",
   "spec_changed_since_plan": false,
   "spec_path": "agent/orders/dataset_spec.yaml",

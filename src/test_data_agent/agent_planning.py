@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import secrets
 from pathlib import Path
 
@@ -20,6 +22,7 @@ from test_data_agent.agent_contracts import (
     AgentStep,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import enforce_input_files
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     dataset_profile_fingerprint,
@@ -29,6 +32,7 @@ from test_data_agent.io.workflows import (
     apply_dataset_mode_options,
     enforce_generation_row_count_limits,
 )
+from test_data_agent.io.path_policy import open_regular_file
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.workspace_store import (
@@ -49,11 +53,17 @@ class AgentPlanningService:
     def plan_request(self, request: AgentRequest) -> AgentResult:
         normalized = normalize_agent_request(request)
         with self._workspace_store.begin_plan(normalized.workspace) as transition:
+            source_sha256 = agent_source_fingerprint(normalized)
             profile = build_agent_profile(
                 normalized,
                 cache_workspace=transition.staging_workspace,
             )
-            return self._persist_plan(normalized, profile, transition)
+            return self._persist_plan(
+                normalized,
+                profile,
+                transition,
+                source_sha256=source_sha256,
+            )
 
     def plan_profile(
         self,
@@ -78,6 +88,8 @@ class AgentPlanningService:
         normalized: AgentRequest,
         profile: DatasetProfile,
         transition: WorkspacePlanTransition,
+        *,
+        source_sha256: str | None = None,
     ) -> AgentResult:
         spec = build_agent_spec(profile, normalized)
         artifacts = agent_artifacts(normalized.workspace)
@@ -86,6 +98,7 @@ class AgentPlanningService:
         review = AgentReviewState(
             plan_id=secrets.token_hex(16),
             profile_sha256=profile_sha256,
+            source_sha256=source_sha256,
             planned_spec_sha256=spec_sha256,
             current_spec_sha256=spec_sha256,
             spec_changed_since_plan=False,
@@ -127,6 +140,41 @@ class AgentPlanningService:
             plan=result,
         )
         return result
+
+
+def agent_source_fingerprint(request: AgentRequest) -> str | None:
+    if request.source_type == AgentSourceType.PROFILE:
+        return None
+    paths = (
+        [request.source_path]
+        if request.source_type == AgentSourceType.CSV
+        else sorted(request.source_path.glob("*.csv"))
+    )
+    digest = hashlib.sha256(b"agent-source-v1\0")
+    for path in enforce_input_files(paths):
+        name = path.name.encode("utf-8")
+        digest.update(len(name).to_bytes(8, "big"))
+        digest.update(name)
+        with open_regular_file(path) as handle:
+            while chunk := handle.read(1024 * 1024):
+                digest.update(len(chunk).to_bytes(8, "big"))
+                digest.update(chunk)
+        digest.update((0).to_bytes(8, "big"))
+    return digest.hexdigest()
+
+
+def validate_agent_source_fingerprint(
+    request: AgentRequest,
+    expected_sha256: str | None,
+) -> None:
+    if request.source_type == AgentSourceType.PROFILE:
+        return
+    if expected_sha256 is None:
+        raise ValueError(
+            "agent plan predates source-bound approval; create a new plan"
+        )
+    if not hmac.compare_digest(agent_source_fingerprint(request) or "", expected_sha256):
+        raise ValueError("agent source changed since planning; create a new plan")
 
 
 def detect_agent_source_type(source: Path) -> AgentSourceType:
