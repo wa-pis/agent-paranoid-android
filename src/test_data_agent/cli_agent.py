@@ -140,6 +140,7 @@ def agent_request_from_args(args: argparse.Namespace) -> AgentRequest:
         table_name=args.table,
         rule_sample_rows=args.rule_sample_rows,
         use_cache=not args.no_cache,
+        local_category_fields=getattr(args, "local_category_fields", []),
     )
 
 

@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.core.constraint import Constraint
 from test_data_agent.core.entity import EntityProfile, EntitySpec
-from test_data_agent.core.privacy import PrivacyRule, PrivacySettings
+from test_data_agent.core.privacy import LocalCategoryField, PrivacyRule, PrivacySettings
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, ValidationSettings
 
@@ -37,12 +37,14 @@ class DatasetProfile(BaseModel):
     entities: list[EntityProfile] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetProfile:
         _validate_entity_names(self.entities, "dataset profile")
         _validate_relationship_references(self.entities, self.relationships)
         _validate_constraint_references(self.entities, self.constraints)
+        _validate_local_category_fields(self.entities, self.local_category_fields)
         return self
 
     def entity(self, name: str) -> EntityProfile:
@@ -61,6 +63,7 @@ class DatasetSpec(BaseModel):
     constraints: list[Constraint] = Field(default_factory=list)
     privacy_rules: list[PrivacyRule] = Field(default_factory=list)
     privacy_settings: PrivacySettings = Field(default_factory=PrivacySettings)
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
     generation_settings: GenerationSettings = Field(default_factory=GenerationSettings)
     validation_settings: ValidationSettings = Field(default_factory=ValidationSettings)
 
@@ -70,6 +73,7 @@ class DatasetSpec(BaseModel):
         _validate_reserved_entity_names(self.entities)
         _validate_relationship_references(self.entities, self.relationships)
         _validate_constraint_references(self.entities, self.constraints)
+        _validate_local_category_fields(self.entities, self.local_category_fields)
         entity_fields = {entity.name: {field.name for field in entity.fields} for entity in self.entities}
         for rule in self.privacy_rules:
             if rule.entity is not None and rule.entity not in entity_fields:
@@ -160,3 +164,18 @@ def _validate_constraint_references(
                     "constraint references unknown target field: "
                     f"{constraint.target_entity!r}.{constraint.target_field!r}"
                 )
+
+
+def _validate_local_category_fields(
+    entities: list[EntityProfile] | list[EntitySpec],
+    fields: list[LocalCategoryField],
+) -> None:
+    entity_fields = _entity_fields(entities)
+    references = [(item.entity, item.field) for item in fields]
+    if len(references) != len(set(references)):
+        raise ValueError("local category allowlist has duplicate fields")
+    for entity_name, field_name in references:
+        if entity_name not in entity_fields or field_name not in entity_fields[entity_name]:
+            raise ValueError(
+                f"local category allowlist references unknown field: {entity_name!r}.{field_name!r}"
+            )

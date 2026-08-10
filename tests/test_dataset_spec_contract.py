@@ -10,6 +10,7 @@ from test_data_agent.core import (
     FieldProfile,
     FieldSpec,
     GenerationMode,
+    LocalCategoryField,
     NumericDistribution,
     PrivacyAction,
     PrivacyClassification,
@@ -68,6 +69,24 @@ def test_dataset_spec_loads_minimal_shape_with_default_settings() -> None:
 def test_dataset_spec_compatibility_registry_matches_current_contract() -> None:
     assert SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS == {"1.0"}
     assert DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS == set()
+
+
+def test_local_category_allowlist_rejects_unknown_and_duplicate_fields() -> None:
+    entity = EntitySpec(
+        name="orders",
+        row_count=1,
+        fields=[FieldSpec(name="status", data_type=FieldType.STRING)],
+    )
+
+    with pytest.raises(ValueError, match="unknown field"):
+        DatasetSpec(
+            entities=[entity],
+            local_category_fields=[LocalCategoryField(entity="orders", field="missing")],
+        )
+
+    allowed = LocalCategoryField(entity="orders", field="status")
+    with pytest.raises(ValueError, match="duplicate fields"):
+        DatasetSpec(entities=[entity], local_category_fields=[allowed, allowed])
 
 
 def test_json_spec_loader_fails_closed_on_unknown_schema_version(tmp_path) -> None:

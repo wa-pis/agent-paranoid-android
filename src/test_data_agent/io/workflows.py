@@ -23,6 +23,7 @@ from test_data_agent.core.limits import (
     enforce_row_count_limit,
     max_generation_count as configured_max_generation_count,
 )
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
@@ -213,10 +214,15 @@ def write_csv_profile_artifact(
     *,
     output_path: Path,
     table_name: str | None = None,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> DatasetProfile:
     ensure_paths_distinct(input_path, output_path)
     require_output_suffix(output_path, {".json"}, "profile output")
-    profile = csv_file_to_dataset_profile(input_path, table_name=table_name)
+    profile = csv_file_to_dataset_profile(
+        input_path,
+        table_name=table_name,
+        local_category_fields=local_category_fields,
+    )
     assert_profile_safe(profile)
     write_dataset_profile_artifact(profile, output_path)
     return profile
@@ -345,11 +351,13 @@ def generate_dataset_from_csv_artifacts(
     invalid_ratio: float = 0.0,
     business_rules_applier: BusinessRulesApplier | None = None,
     overwrite: bool = False,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> tuple[DatasetValidationReport, Any | None]:
     ensure_paths_distinct(input_path, output_path)
     csv_profile, source_rows = profile_csv_with_row_digests(
         input_path,
         table_name=table_name,
+        local_category_fields=local_category_fields,
     )
     profile = csv_profile_to_dataset_profile(csv_profile)
     spec = build_dataset_spec_from_profile(

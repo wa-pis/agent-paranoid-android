@@ -366,11 +366,18 @@ def dataset_profile_fingerprint(profile: DatasetProfile) -> str:
 
 
 def model_fingerprint(model: BaseModel) -> str:
-    canonical = json.dumps(
-        model.model_dump(mode="json"),
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
+    payload = model.model_dump(mode="json")
+
+    # Compatibility: keep previous fingerprints stable for persisted contracts when
+    # the newly added local_category_fields feature is absent from external payloads.
+    if isinstance(model, (DatasetProfile, DatasetSpec)):
+        payload = dict(payload)
+        if payload.get("local_category_fields", None) == []:
+            payload.pop("local_category_fields", None)
+
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
     return hashlib.sha256(canonical).hexdigest()
 
 

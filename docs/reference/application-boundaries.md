@@ -28,7 +28,8 @@ ownership; grouping does not change their compatibility status.
 
 Core data, result, error, and version contracts:
 
-- `DATASET_SPEC_SCHEMA_VERSION`, `DatasetProfile`, `DatasetSpec`
+- `DATASET_SPEC_SCHEMA_VERSION`, `DatasetProfile`, `DatasetSpec`,
+  `LocalCategoryField`
 - `DatasetGenerationResult`, `DatasetValidationReport`
 - `CliErrorCode`, `CliErrorDetail`, `CliErrorResponse`
 - `__version__`

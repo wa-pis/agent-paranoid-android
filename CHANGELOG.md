@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Add a typed field-scoped local category allowlist across CSV, folder, agent,
+  CLI, profile, and generation-spec boundaries without weakening default
+  category replacement.
+
 - Restore field-and-destination privacy policy: preserve explicitly allowlisted
   safe business enums locally, keep sensitive and unknown fields transformed,
   and keep every external-provider category source-literal free.

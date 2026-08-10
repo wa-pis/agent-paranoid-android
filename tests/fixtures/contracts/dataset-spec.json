@@ -69,6 +69,7 @@
     "output_format": "json",
     "seed": 73
   },
+  "local_category_fields": [],
   "privacy_rules": [],
   "privacy_settings": {
     "allow_raw_sensitive_values": false,

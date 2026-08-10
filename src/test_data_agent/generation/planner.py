@@ -38,4 +38,5 @@ def infer_dataset_spec(profile: DatasetProfile, count: int | None = None) -> Dat
         entities=entities,
         relationships=profile.relationships,
         constraints=profile.constraints,
+        local_category_fields=profile.local_category_fields,
     )

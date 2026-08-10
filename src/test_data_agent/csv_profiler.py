@@ -17,7 +17,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from test_data_agent.core.limits import (
     configure_csv_field_limit,
@@ -27,6 +27,7 @@ from test_data_agent.core.limits import (
     enforce_input_row_count,
 )
 from test_data_agent.core.privacy import (
+    LocalCategoryField,
     infer_sensitive_from_name,
     infer_sensitive_type_from_values,
     infer_sensitive_value_type,
@@ -78,18 +79,48 @@ class CSVProfile(BaseModel):
     table: str
     row_count: int
     columns: list[CSVColumnProfile]
+    local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_local_category_fields(self) -> CSVProfile:
+        available = {column.name for column in self.columns}
+        references = [(item.entity, item.field) for item in self.local_category_fields]
+        if len(references) != len(set(references)):
+            raise ValueError("local category allowlist has duplicate fields")
+        for entity, field in references:
+            if entity != self.table or field not in available:
+                raise ValueError(
+                    f"local category allowlist references unknown field: {entity!r}.{field!r}"
+                )
+        return self
 
 
-def profile_csv(path: Path, table_name: str | None = None) -> CSVProfile:
-    return _profile_csv(path, table_name=table_name)
+def profile_csv(
+    path: Path,
+    table_name: str | None = None,
+    *,
+    local_category_fields: Sequence[LocalCategoryField] = (),
+) -> CSVProfile:
+    return _profile_csv(
+        path,
+        table_name=table_name,
+        local_category_fields=local_category_fields,
+    )
 
 
 def profile_csv_with_row_digests(
     path: Path,
     table_name: str | None = None,
+    *,
+    local_category_fields: Sequence[LocalCategoryField] = (),
 ) -> tuple[CSVProfile, CSVSourceRowDigests]:
     digests: set[bytes] = set()
-    profile = _profile_csv(path, table_name=table_name, row_digests=digests)
+    profile = _profile_csv(
+        path,
+        table_name=table_name,
+        row_digests=digests,
+        local_category_fields=local_category_fields,
+    )
     return profile, CSVSourceRowDigests(
         field_names=tuple(column.name for column in profile.columns),
         digests=frozenset(digests),
@@ -101,6 +132,7 @@ def _profile_csv(
     *,
     table_name: str | None = None,
     row_digests: set[bytes] | None = None,
+    local_category_fields: Sequence[LocalCategoryField] = (),
 ) -> CSVProfile:
     enforce_input_files([path])
     configure_csv_field_limit(csv)
@@ -126,6 +158,7 @@ def _profile_csv(
         table=table_name or path.stem,
         row_count=row_count,
         columns=[accumulator.to_profile(row_count) for accumulator in accumulators.values()],
+        local_category_fields=list(local_category_fields),
     )
 
 

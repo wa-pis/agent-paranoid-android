@@ -73,6 +73,7 @@
         "output_format": "json",
         "seed": 73
       },
+      "local_category_fields": [],
       "privacy_rules": [],
       "privacy_settings": {
         "allow_raw_sensitive_values": false,
@@ -165,6 +166,7 @@
           "row_count": 12
         }
       ],
+      "local_category_fields": [],
       "relationships": [],
       "source_type": "trino"
     },
@@ -318,6 +320,13 @@
           },
           "generation_settings": {
             "$ref": "#/$defs/GenerationSettings"
+          },
+          "local_category_fields": {
+            "items": {
+              "$ref": "#/$defs/LocalCategoryField"
+            },
+            "title": "Local Category Fields",
+            "type": "array"
           },
           "privacy_rules": {
             "items": {
@@ -511,6 +520,27 @@
           }
         },
         "title": "GenerationSettings",
+        "type": "object"
+      },
+      "LocalCategoryField": {
+        "description": "Explicit field scope for local non-sensitive category preservation.",
+        "properties": {
+          "entity": {
+            "maxLength": 256,
+            "title": "Entity",
+            "type": "string"
+          },
+          "field": {
+            "maxLength": 256,
+            "title": "Field",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entity",
+          "field"
+        ],
+        "title": "LocalCategoryField",
         "type": "object"
       },
       "OutputFormat": {

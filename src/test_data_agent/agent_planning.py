@@ -241,6 +241,7 @@ def build_agent_profile(
         profile = csv_file_to_dataset_profile(
             request.source_path,
             table_name=request.table_name,
+            local_category_fields=request.local_category_fields,
         )
     elif request.source_type == AgentSourceType.CSV_FOLDER:
         profile = profile_example_folder(
@@ -250,6 +251,7 @@ def build_agent_profile(
             else None,
             use_cache=request.use_cache,
             rule_sample_rows=request.rule_sample_rows,
+            local_category_fields=tuple(request.local_category_fields),
         )
     else:
         loaded = load_profile_or_spec(request.source_path)
@@ -258,6 +260,8 @@ def build_agent_profile(
                 "agent profile source expects a dataset profile, not a dataset spec"
             )
         profile = loaded
+        if request.local_category_fields:
+            profile.local_category_fields = request.local_category_fields
     assert_profile_safe(profile)
     return profile
 

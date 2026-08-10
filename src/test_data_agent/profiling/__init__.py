@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.profiling.cache import DEFAULT_PROFILE_CACHE_DIR, load_cached_profile, write_cached_profile
 from test_data_agent.profiling.budget import (
     LocalProfileBudget,
@@ -28,6 +29,7 @@ def profile_example_folder(
     use_cache: bool = True,
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
     budget: LocalProfileBudget | None = None,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> DatasetProfile:
     work_budget = budget or LocalProfileBudget()
     work_budget.check_sample_rows(rule_sample_rows)
@@ -41,6 +43,7 @@ def profile_example_folder(
         )
         if cached is not None:
             work_budget.check_deadline("cache load")
+            cached.local_category_fields = list(local_category_fields)
             return cached
 
     profile, rows_by_entity = _profile_schema_with_sample(
@@ -53,6 +56,7 @@ def profile_example_folder(
     work_budget.check_deadline("constraint inference")
     profile.constraints = infer_constraints(profile, rows_by_entity)
     profile = _sanitize_source_categories(profile)
+    profile.local_category_fields = list(local_category_fields)
     work_budget.check_deadline("cache publication")
     if use_cache and cache_dir is not None:
         write_cached_profile(

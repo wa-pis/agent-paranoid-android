@@ -32,6 +32,13 @@ practical; infer types; estimate nulls and cardinality; detect likely PII;
 mask sensitive evidence; and produce a reusable profile suitable for spec
 inference.
 
+Local category preservation is requested with a typed, field-scoped
+`entity.field` allowlist. CLI workflows accept repeatable
+`--local-category ENTITY.FIELD` options and persist the reviewed scopes in the
+safe profile and inferred DatasetSpec. The allowlist is authorization input,
+not proof that a value is safe; content checks remain mandatory before any
+source literal is preserved.
+
 Bound file size, rows, cells, sample size, and wall-clock work. A cache may
 store metadata-only profiles, source fingerprints, and explicitly allowlisted
 bounded non-sensitive enum values, but never raw rows or sensitive source

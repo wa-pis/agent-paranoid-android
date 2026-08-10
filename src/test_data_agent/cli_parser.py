@@ -13,6 +13,7 @@ from test_data_agent.cli_contract import (
     CliErrorResponse,
 )
 from test_data_agent.cli_text import bound_untrusted_text, display_untrusted_text
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import (
     GenerationMode as CoreGenerationMode,
     OutputFormat as CoreOutputFormat,
@@ -75,6 +76,28 @@ def ratio(value: str) -> float:
     if not 0.0 <= parsed <= 1.0:
         raise argparse.ArgumentTypeError("must be between 0 and 1")
     return parsed
+
+
+def local_category_field(value: str) -> LocalCategoryField:
+    entity, separator, field = value.partition(".")
+    if not separator:
+        raise argparse.ArgumentTypeError("must use ENTITY.FIELD")
+    try:
+        return LocalCategoryField(entity=entity, field=field)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must use non-empty ENTITY.FIELD") from exc
+
+
+def add_local_category_option(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--local-category",
+        action="append",
+        type=local_category_field,
+        default=[],
+        dest="local_category_fields",
+        metavar="ENTITY.FIELD",
+        help="Allow a reviewed bounded non-sensitive enum to remain local. Repeat per field.",
+    )
 
 
 def write_cli_error_response(
@@ -145,6 +168,7 @@ def register_dataset_commands(
     profile_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
     profile_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
     profile_example_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
+    add_local_category_option(profile_example_parser)
 
     infer_spec_parser = subparsers.add_parser(
         "infer-spec",
@@ -179,6 +203,7 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--table", type=str, help="Table/entity name to use in the profile.")
     profile_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
+    add_local_category_option(profile_csv_parser)
 
     generate_csv_parser = subparsers.add_parser(
         "generate-from-csv",
@@ -203,6 +228,7 @@ def register_dataset_commands(
     generate_csv_parser.add_argument("--table", type=str, help="Table/entity name to use for the generated dataset.")
     generate_csv_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
     generate_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity bundle.")
+    add_local_category_option(generate_csv_parser)
 
     validate_parser = subparsers.add_parser(
         "validate",
@@ -243,6 +269,7 @@ def register_dataset_commands(
     generate_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"), help="Safe profile cache directory.")
     generate_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
     generate_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
+    add_local_category_option(generate_example_parser)
 
 
 def register_utility_commands(
@@ -390,6 +417,7 @@ def register_agent_commands(
         action="store_true",
         help="Force a fresh profile instead of reusing the metadata-only cache.",
     )
+    add_local_category_option(agent_plan_parser)
     agent_plan_parser.add_argument(
         "--json",
         action="store_true",

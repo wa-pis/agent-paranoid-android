@@ -34,6 +34,7 @@
     "DatasetSpec",
     "DatasetValidationReport",
     "ExchangeDatasetAdvisor",
+    "LocalCategoryField",
     "__version__",
     "advise_agent_workspace",
     "advise_dataset_spec",
