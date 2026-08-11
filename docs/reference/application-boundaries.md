@@ -184,6 +184,11 @@ The current dependencies after completed extraction increments are:
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
+Exact local category values pass the shared `core.privacy` content validator
+before retention. The validator rejects sensitive fields, identifiers,
+quasi-identifiers, unsupported scalars, sensitive-looking values, free text,
+excess cardinality, and overlong values without echoing source content.
+
 The two server modules currently import their transport factory to assemble the
 executable server. `agent.py` and `cli.py` remain compatibility owners around
 their extracted services; `mcp_trino_server.py` retains responsibilities named
