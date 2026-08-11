@@ -55,7 +55,7 @@ def profile_example_folder(
     profile.relationships = infer_relationships(profile, rows_by_entity)
     work_budget.check_deadline("constraint inference")
     profile.constraints = infer_constraints(profile, rows_by_entity)
-    profile = _sanitize_source_categories(profile)
+    profile = _sanitize_source_categories(profile, local_category_fields=local_category_fields)
     profile.local_category_fields = list(local_category_fields)
     work_budget.check_deadline("cache publication")
     if use_cache and cache_dir is not None:

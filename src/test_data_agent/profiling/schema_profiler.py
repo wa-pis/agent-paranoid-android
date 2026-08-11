@@ -21,10 +21,12 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.privacy import (
+    LocalCategoryField,
     infer_sensitive_from_name,
     infer_sensitive_type_from_values,
     infer_sensitive_value_type,
     mask_pattern,
+    PrivacySettings,
     semantic_type_is_sensitive,
     synthetic_category_distribution,
 )
@@ -88,10 +90,16 @@ def profile_schema(input_folder: Path) -> DatasetProfile:
     return _sanitize_source_categories(profile)
 
 
-def _sanitize_source_categories(profile: DatasetProfile) -> DatasetProfile:
+def _sanitize_source_categories(
+    profile: DatasetProfile,
+    local_category_fields: tuple[LocalCategoryField, ...] = (),
+) -> DatasetProfile:
     """Replace source categories after local inference and align predicates."""
+    allowlisted_fields = {(item.entity, item.field) for item in local_category_fields}
     safe_profile = profile.model_copy(deep=True)
     replacements: dict[tuple[str, str], dict[str, str]] = {}
+    profile_safety_settings = PrivacySettings()
+
     for entity in safe_profile.entities:
         for profile_field in entity.fields:
             distribution = profile_field.distribution
@@ -107,6 +115,19 @@ def _sanitize_source_categories(profile: DatasetProfile) -> DatasetProfile:
                     raise ValueError("source categorical distribution is invalid")
                 source_values.append(category["value"])
                 counts.append(int(category.get("count", 0)))
+
+            allowed = (entity.name, profile_field.name) in allowlisted_fields
+            if allowed:
+                if _is_unsafe_local_category_field(profile_field, source_values, profile_safety_settings):
+                    raise ValueError(
+                        f"local category field {entity.name!r}.{profile_field.name!r} "
+                        "is not safe for raw preservation"
+                    )
+                replacements[(entity.name, profile_field.name)] = {
+                    source: source for source in source_values
+                }
+                continue
+
             safe_categories = synthetic_category_distribution(
                 counts,
                 reserved_values=source_values,
@@ -145,6 +166,42 @@ def _safe_condition_value(value: Any, mapping: dict[str, str]) -> str:
     if not isinstance(value, str) or value not in mapping:
         raise ValueError("source categorical constraint is invalid")
     return mapping[value]
+
+
+def _is_unsafe_local_category_field(
+    field: FieldProfile,
+    source_values: list[str],
+    settings: PrivacySettings,
+) -> bool:
+    if field.sensitive:
+        return True
+    if infer_sensitive_from_name(field.name) or semantic_type_is_sensitive(field.semantic_type):
+        return True
+    if len(source_values) > settings.max_safe_categories:
+        return True
+    if infer_sensitive_type_from_values(source_values) is not None:
+        return True
+    return any(_looks_like_free_text(value) for value in source_values)
+
+
+def _looks_like_free_text(value: str) -> bool:
+    if len(value) > 64:
+        return True
+    if value.count(" ") > 3:
+        return True
+    if not value:
+        return True
+    if any(char.isspace() for char in value) and any(
+        ch.isdigit() for ch in value
+    ):
+        return False
+    if value.lower() in {"unknown", "other", "misc", "miscellaneous"}:
+        return False
+    if any(char == ":" for char in value):
+        return True
+    if infer_sensitive_value_type(value) is not None:
+        return True
+    return False
 
 
 def _profile_schema_with_sample(

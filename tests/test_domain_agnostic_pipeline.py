@@ -2,11 +2,14 @@ import csv
 import json
 from pathlib import Path
 
+import pytest
+
 from test_data_agent.cli import main
 from test_data_agent.core.constraint import ConstraintType
-from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling import load_csv_folder, profile_example_folder
 from test_data_agent.profiling.cache import (
@@ -14,6 +17,7 @@ from test_data_agent.profiling.cache import (
     csv_folder_fingerprint,
     load_cached_profile,
 )
+from test_data_agent.profiling.schema_profiler import _sanitize_source_categories
 from test_data_agent.validation import validate_dataset
 
 
@@ -145,6 +149,94 @@ def test_folder_profile_replaces_source_categories_without_losing_conditions(
         if row["segment"] == "category_1_1"
     )
     assert validate_dataset(rows_a, spec).valid is True
+
+
+def test_folder_profile_preserves_allowlisted_local_categories(tmp_path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "events.csv").write_text(
+        "event_id,segment,detail\n"
+        "1,active,filled\n"
+        "2,active,filled\n"
+        "3,paused,filled\n"
+        "4,failed,\n"
+    )
+
+    allowed_field = LocalCategoryField(entity="events", field="segment")
+    profile = profile_example_folder(
+        source,
+        cache_dir=None,
+        local_category_fields=(allowed_field,),
+    )
+    segment_distribution = profile.entity("events").field("segment").distribution
+
+    assert profile.local_category_fields == [allowed_field]
+    assert segment_distribution == {
+        "kind": "categorical",
+        "categories": [
+            {"value": "active", "count": 2},
+            {"value": "paused", "count": 1},
+            {"value": "failed", "count": 1},
+        ],
+    }
+
+    conditional = next(
+        constraint
+        for constraint in profile.constraints
+        if constraint.type == ConstraintType.CONDITIONAL_REQUIRED
+    )
+    assert conditional.condition == {"field": "segment", "equals": "active"}
+
+
+def test_folder_profile_rejects_unsafe_local_category_allowlist(tmp_path) -> None:
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "events.csv").write_text(
+        "event_id,segment\n"
+        "1,customer note with too much personal context\n"
+        "2,another private narrative with identifiers 12345\n"
+    )
+
+    allowed_field = LocalCategoryField(entity="events", field="segment")
+
+    with pytest.raises(ValueError, match="not safe for raw preservation"):
+        profile_example_folder(
+            source,
+            cache_dir=None,
+            local_category_fields=(allowed_field,),
+        )
+
+
+def test_folder_profile_rejects_too_many_local_categories_for_allowlist() -> None:
+    profile = DatasetProfile.model_validate(
+        {
+            "entities": [
+                {
+                    "name": "events",
+                    "row_count": 21,
+                    "fields": [
+                        {
+                            "name": "segment",
+                            "data_type": "string",
+                            "distribution": {
+                                "kind": "categorical",
+                                "categories": [
+                                    {"value": f"category_{idx}", "count": 1}
+                                    for idx in range(25)
+                                ],
+                            },
+                        }
+                    ],
+                }
+            ]
+        }
+    )
+
+    with pytest.raises(ValueError, match="not safe for raw preservation"):
+        _sanitize_source_categories(
+            profile,
+            local_category_fields=(LocalCategoryField(entity="events", field="segment"),),
+        )
 
 
 def test_relationship_inference() -> None:
