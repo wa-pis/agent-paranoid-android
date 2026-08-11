@@ -222,6 +222,9 @@ literal sent to an external advisor remains synthetic. Trino/MCP category
 aggregates require both table and column allowlisting. Blanket replacement of
 all categorical fields is not a release goal because it destroys reviewed
 business semantics without improving the sensitive-data boundary.
+RC6 also includes direct read-only PostgreSQL profiling through mandatory
+schema/table/column allowlists and one deterministic PostgreSQL DDL+INSERT
+export built only from validated generated records.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -466,17 +469,22 @@ OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/ch
 The minimum PostgreSQL scope is:
 
 - [x] Add a separate optional `postgres` installation profile.
-- [ ] Add a read-only connection with schema/table allowlists and bounded
-  statements, bytes, columns, and wall-clock time.
-- [ ] Extract tables, types, nullability, primary keys, foreign keys, and checks.
+- [x] Add a read-only connection with schema/table/column allowlists and bounded
+  statements, result rows/cells, columns, and wall-clock time.
+- [x] Extract tables, types, nullability, primary keys, foreign keys, and
+  supported checks.
 - [x] Compute aggregate profiles for null ratios, cardinality, ranges, and safe
   distributions without returning source rows.
 - [ ] Reuse the existing review-first and deterministic validation boundaries
   for relationship discovery and reconciliation checks.
-- [ ] Add a synthetic PostgreSQL fixture and clean-environment acceptance path
+- [x] Add a synthetic PostgreSQL fixture and clean-environment acceptance path
   from profile to generated and validated output.
-- [x] Correct all user-facing documentation so DDL, ORM models, and direct
-  PostgreSQL access are not presented as already-supported CLI inputs.
+- [x] Document direct PostgreSQL as supported while keeping DDL and ORM models
+  outside the first-class CLI input contract.
+- [x] Add explicit default-off local enum preservation with fail-closed content
+  checks and no external-provider or default-MCP literal egress.
+- [x] Export one deterministic PostgreSQL DDL+INSERT transaction from validated
+  generated records and execute it in an opt-in disposable acceptance example.
 
 Do not expand this gate into arbitrary SQL execution, every relational database,
 automatic ORM introspection, or mandatory AI/MCP support. AI may help rank
@@ -795,6 +803,13 @@ Scope:
   effective policy in `doctor`.
 - [x] Add focused tests for placeholder collisions/determinism, concurrent
   provider calls and failures, and fail-closed Trino profile configuration.
+- [x] Add direct read-only PostgreSQL profiling with mandatory
+  schema/table/column allowlists, shared resource budgets, qualified entity
+  identity, and declared PK/FK evidence.
+- [x] Add default-off field-scoped local enum preservation while replacing
+  every external-provider literal and keeping default MCP source-row free.
+- [x] Add deterministic atomic PostgreSQL DDL+INSERT export and a disposable
+  synthetic execution example with read-only and FK checks.
 - [x] Make every categorical value in an external advisor request synthetic or
   non-reversible; heuristic PII detection is not an egress guarantee.
 - [ ] Suppress exact sensitive numeric Trino extrema and percentiles through

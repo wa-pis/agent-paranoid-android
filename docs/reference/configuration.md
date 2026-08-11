@@ -60,6 +60,33 @@ The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 `POSTGRES_STATEMENT_TIMEOUT_MS` and `POSTGRES_LOCK_TIMEOUT_MS`. See the
 [PostgreSQL workflow](../how-to/postgresql.md) for a complete example.
 
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `POSTGRES_SOURCE_ID` | `postgres` | Stable non-secret source identity used in qualified entity names |
+| `POSTGRES_HOST` | `localhost` | PostgreSQL host; never serialized into profile identity |
+| `POSTGRES_PORT` | `5432` | PostgreSQL port |
+| `POSTGRES_DATABASE` | `postgres` | Database name |
+| `POSTGRES_USER` | `test_data_agent` | Existing read-only database role |
+| `POSTGRES_PASSWORD_ENV` | unset | Name of the environment variable containing the password |
+| `POSTGRES_SSLMODE` | `require` | `require`, `verify-ca`, `verify-full`, or explicitly approved local `disable` |
+| `POSTGRES_ALLOW_INSECURE` | `false` | Required with `POSTGRES_SSLMODE=disable`; local isolated testing only |
+| `POSTGRES_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
+| `POSTGRES_ALLOWED_TABLES` | required | Comma-separated `schema.table` allowlist |
+| `POSTGRES_ALLOWED_COLUMNS` | required | Comma-separated `schema.table.column` allowlist |
+| `POSTGRES_STATEMENT_TIMEOUT_MS` | `30000` | Per-statement timeout requested on the read-only session |
+| `POSTGRES_LOCK_TIMEOUT_MS` | `5000` | Lock wait timeout requested on the read-only session |
+| `POSTGRES_MAX_TABLES` | `100` | Maximum profiled tables |
+| `POSTGRES_MAX_COLUMNS` | `1000` | Maximum profiled columns |
+| `POSTGRES_MAX_STATEMENTS` | `1500` | Cumulative statement limit |
+| `POSTGRES_MAX_RESULT_ROWS` | `10000` | Cumulative aggregate/metadata result rows |
+| `POSTGRES_MAX_RESULT_CELLS` | `100000` | Cumulative aggregate/metadata result cells |
+| `POSTGRES_MAX_SECONDS` | `120` | Shared monotonic profile deadline |
+
+The database role must independently lack write privileges. The client also
+requests `default_transaction_read_only=on`, but that setting is defense in
+depth rather than a replacement for role permissions. No arbitrary SQL or
+source-row profiling option exists.
+
 ## Generator MCP
 
 | Variable | Required | Purpose |

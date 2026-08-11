@@ -26,7 +26,8 @@ read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
 results. It accepts no arbitrary SQL and never profiles source rows.
 
 Create a safe profile, review a generation specification, generate, and
-validate:
+validate. Output paths must not already exist unless the command explicitly
+supports `--overwrite`:
 
 ```bash
 test-data-agent profile-postgres --output out/postgres-profile.json
@@ -34,6 +35,25 @@ test-data-agent infer-spec out/postgres-profile.json --output out/dataset-spec.y
 test-data-agent generate out/dataset-spec.yaml --seed 12345 --output out/generated
 test-data-agent validate out/dataset-spec.yaml out/generated
 test-data-agent export-postgres-sql out/dataset-spec.yaml --seed 12345 --output out/generated.sql
+```
+
+Run the SQL only in the intended local or disposable target database:
+
+```bash
+psql --set ON_ERROR_STOP=1 --dbname synthetic_target --file out/generated.sql
+```
+
+The SQL file contains one transaction, deterministic quoted `CREATE TABLE`,
+foreign-key, and `INSERT` statements, PostgreSQL scalar literals, and `NULL`.
+It is built from validated generated records, not profile query rows. Render or
+validation failure leaves no partial output file. Repeating export with the
+same reviewed spec, seed, package, and recorded environment produces the same
+logical SQL; compare files directly when verifying one environment:
+
+```bash
+test-data-agent export-postgres-sql out/dataset-spec.yaml \
+  --seed 12345 --output out/generated-second.sql
+cmp out/generated.sql out/generated-second.sql
 ```
 
 Exact values remain disabled by default. A bounded, reviewed, non-sensitive
@@ -48,6 +68,11 @@ test-data-agent profile-postgres \
 PII, secrets, identifiers, quasi-identifiers, free text, excessive cardinality,
 and long values fail closed. Original literals are not sent to providers, MCP,
 logs, or errors.
+
+The selector authorizes only the bounded value domain and aggregate counts. It
+does not retain source row order or a mapping that reconstructs source rows.
+The generated SQL may contain approved values because its input is the
+validated synthetic dataset.
 
 The same profiling boundary is available from Python:
 
@@ -70,3 +95,10 @@ assert report.valid
 
 Keep profile and generated artifacts local unless their destination policy
 explicitly permits otherwise.
+
+For a complete synthetic end-to-end check against a temporary local
+PostgreSQL cluster, run the
+[`examples/local_postgres`](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/local_postgres)
+example. It creates a SELECT-only role, proves that writes are denied, profiles
+two related tables, validates deterministic generation, executes the exported
+SQL in an empty target database, and removes the cluster.

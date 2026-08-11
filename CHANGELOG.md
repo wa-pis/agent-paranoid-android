@@ -4,11 +4,20 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
 - Add an allowlist-only `profile-postgres` CLI workflow that writes safe
   metadata and bounded aggregate profiles through the optional PostgreSQL driver.
 - Add a typed field-scoped local category allowlist across CSV, folder, agent,
   CLI, profile, and generation-spec boundaries without weakening default
   category replacement.
+- Add `export-postgres-sql` for one deterministic, atomically published
+  PostgreSQL transaction containing quoted DDL, foreign keys, and INSERT
+  statements generated from validated synthetic records.
+- Add complete PostgreSQL and Trino guides plus runnable synthetic local
+  examples for disposable profiling, generation, validation, and SQL execution.
+
+### Changed
 
 - Restore field-and-destination privacy policy: preserve explicitly allowlisted
   safe business enums locally, keep sensitive and unknown fields transformed,
@@ -16,6 +25,15 @@ All notable changes to this project are documented here.
 - Bind review-first CSV agent plans and final no-copy validation to the exact
   source version captured before profiling, rejecting changed or legacy
   unbound plans before publication.
+
+### Fixed
+
+- Validate JSON dataset fields by membership rather than object-key order, so
+  deterministic sorted-key artifacts pass the documented standalone
+  validation command.
+
+### Security
+
 - Document four accepted Low security findings with exact identities, risk
   ownership, revisit triggers, and a first post-1.0 hardening target.
 

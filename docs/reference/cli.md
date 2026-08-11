@@ -26,6 +26,7 @@ commands.
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
 | `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
+| `export-postgres-sql` | Generate and export one executable PostgreSQL DDL+INSERT file | `.sql` file |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |
 | `generate-from-csv` | Run the complete single-table workflow | Data file and review artifacts |
@@ -69,9 +70,26 @@ test-data-agent generate-from-csv data/customers.csv \
   --output out/customers.csv
 ```
 
-For PostgreSQL, install the `postgres` extra, configure the mandatory
+For PostgreSQL profiling, install the `postgres` extra, configure the mandatory
 schema/table/column allowlists, and follow the
 [PostgreSQL workflow](../how-to/postgresql.md).
+
+The complete deterministic path is:
+
+```bash
+test-data-agent profile-postgres --output out/postgres-profile.json
+test-data-agent infer-spec out/postgres-profile.json --output out/dataset-spec.yaml
+test-data-agent generate out/dataset-spec.yaml --seed 12345 --output out/generated
+test-data-agent validate out/dataset-spec.yaml out/generated
+test-data-agent export-postgres-sql out/dataset-spec.yaml \
+  --seed 12345 --output out/generated.sql
+```
+
+`export-postgres-sql` validates generated records before atomically writing one
+PostgreSQL file containing quoted DDL, foreign keys, INSERT statements, and a
+transaction. Generic `generate --format sql` remains the existing INSERT-only
+dataset format and does not create table DDL. Export itself is available in the
+base package; only direct PostgreSQL profiling needs the optional driver.
 
 For a folder containing one related table per CSV file:
 
@@ -130,6 +148,7 @@ silently merge into an existing dataset.
 | `--cache-dir PATH` | Safe profile cache location |
 | `--no-cache` | Force fresh folder profiling; caching is enabled by default for review-first planning |
 | `--rule-sample-rows N` | Bound row-level relationship and rule mining |
+| `--local-category ENTITY.FIELD` | Retain one reviewed bounded non-sensitive local enum/constant; repeatable and default-off |
 
 Full-file schema and distribution profiling remains streaming. The rule sample
 limit bounds comparisons that require row-level relationships. Fresh folder
@@ -137,6 +156,12 @@ profiles also fail closed after 120 seconds by default, reject sample requests
 above 1,000,000 rows or cumulative samples beyond that ceiling, and share the
 configured 512 MiB input and 10,000,000-cell limits. Budget failures do not
 publish partial cache metadata.
+
+For PostgreSQL, `ENTITY.FIELD` uses the source-qualified form
+`SOURCE.SCHEMA.TABLE.COLUMN`, for example
+`warehouse.public.orders.status`. The selector does not bypass sensitive-name,
+content, cardinality, value-length, or resource checks. Exact approved values
+remain local and are replaced before external-provider requests.
 
 ## Agent Review Flow
 

@@ -29,8 +29,8 @@ python3 -m pip install --upgrade pip
 python3 -m pip install "agent-paranoid-android==1.0.0rc6"
 ```
 
-The base package supports CSV and JSON workflows. Add only the integrations
-you need:
+The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
+Add only the source and format integrations you need:
 
 ```bash
 python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"

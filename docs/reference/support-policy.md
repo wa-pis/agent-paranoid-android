@@ -33,7 +33,7 @@ the capabilities they need.
 | `parquet` | Parquet import and export | isolated wheel install, `doctor --require-extra parquet`, Parquet tests |
 | `mcp` | Generator MCP transport | isolated wheel install, `doctor --require-extra mcp`, MCP contract tests |
 | `trino` | Read-only Trino client and safe SQL parsing | isolated wheel install, `doctor --require-extra trino`, mocked and live opt-in Trino tests |
-| `postgres` | Read-only allowlisted PostgreSQL profiling | isolated wheel install, `doctor --require-extra postgres`, fake-driver tests |
+| `postgres` | Read-only allowlisted PostgreSQL profiling driver; deterministic PostgreSQL SQL export remains in base | isolated wheel install, `doctor --require-extra postgres`, fake-driver tests, and opt-in disposable execution example |
 | `openai` | Reference OpenAI advisor adapter | isolated wheel install, `doctor --require-extra openai`, fake-transport provider tests |
 | `all` | Development, demos, and container builds | full install and container smoke tests; not recommended for normal users |
 
