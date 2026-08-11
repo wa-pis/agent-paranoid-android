@@ -79,7 +79,7 @@
   SQL export as RC6 scope inherited by the stable gate.
 - [ ] Add public wheel/install, `doctor`, profile, generation, validation, and
   upgrade acceptance for the `postgres` extra and base installation.
-- [ ] Add a documented CLI and Python path that writes one PostgreSQL `.sql`
+- [x] Add a documented CLI and Python path that writes one PostgreSQL `.sql`
   file from validated generated records.
 - [x] Implement deterministic PostgreSQL identifier, type, scalar literal,
   NULL, DDL, INSERT, and relationship rendering without a live connection.

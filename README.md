@@ -103,7 +103,7 @@ to profile your own input.
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |
 | Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) · [Runnable local Trino example](examples/local_trino/) |
-| Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/) |
+| Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/); PostgreSQL: `test-data-agent export-postgres-sql dataset_spec.yaml --seed 12345 -o out/dataset.sql` |
 | Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
 | Decide whether this tool fits | [Choose An Approach](https://wa-pis.github.io/agent-paranoid-android/concepts/choosing-an-approach/) |
 

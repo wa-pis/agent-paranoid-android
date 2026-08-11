@@ -22,6 +22,7 @@ from test_data_agent.io import (
     generate_dataset_from_example_command,
     generate_dataset_from_profile_command,
     generate_dataset_command,
+    export_postgres_sql_command,
     infer_dataset_spec_command,
     profile_csv_command,
     profile_example_command,
@@ -71,6 +72,9 @@ def run_dataset_command(
             args,
             business_rules_applier=apply_rules,
         )
+
+    if args.command == "export-postgres-sql":
+        return export_postgres_sql_command(args)
 
     if args.command in {"profile-example", "profile-csv-folder"}:
         return profile_example_command(args)
