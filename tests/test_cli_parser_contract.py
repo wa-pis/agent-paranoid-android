@@ -8,6 +8,7 @@ from typing import Any
 import pytest
 
 import test_data_agent.cli as cli_module
+from test_data_agent.cli_parser import local_category_field
 
 
 CONTRACT_PATH = Path("tests/fixtures/contracts/cli-parser-surface.json")
@@ -100,6 +101,13 @@ def test_agent_plan_parser_exposes_no_cache_as_an_explicit_refresh(
 
     assert len(parsed) == 1
     assert parsed[0].no_cache is True
+
+
+def test_local_category_parser_preserves_qualified_entity_scope() -> None:
+    field = local_category_field("hr.public.employees.status")
+
+    assert field.entity == "hr.public.employees"
+    assert field.field == "status"
 
 
 @pytest.mark.parametrize(

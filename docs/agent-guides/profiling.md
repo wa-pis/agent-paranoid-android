@@ -37,7 +37,8 @@ Local category preservation is requested with a typed, field-scoped
 `--local-category ENTITY.FIELD` options and persist the reviewed scopes in the
 safe profile and inferred DatasetSpec. The allowlist is authorization input,
 not proof that a value is safe; content checks remain mandatory before any
-source literal is preserved.
+source literal is preserved. Database entities use their complete qualified
+identity, for example `--local-category hr.public.employees.status`.
 
 Bound file size, rows, cells, sample size, and wall-clock work. A cache may
 store metadata-only profiles, source fingerprints, and explicitly allowlisted

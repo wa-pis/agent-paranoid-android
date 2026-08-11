@@ -79,7 +79,7 @@ def ratio(value: str) -> float:
 
 
 def local_category_field(value: str) -> LocalCategoryField:
-    entity, separator, field = value.partition(".")
+    entity, separator, field = value.rpartition(".")
     if not separator:
         raise argparse.ArgumentTypeError("must use ENTITY.FIELD")
     try:
