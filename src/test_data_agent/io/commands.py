@@ -13,6 +13,8 @@ from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
+from test_data_agent.core.limits import max_generation_count
+from test_data_agent.generation import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact
 from test_data_agent.io.path_policy import discard_staging_directory, inspect_file_output
@@ -32,6 +34,7 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
+from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
@@ -76,6 +79,35 @@ def generate_dataset_command(
         count=args.count,
         business_rules_applier=business_rules_applier,
     )
+
+
+def export_postgres_sql_command(args: argparse.Namespace) -> int:
+    """Generate validated synthetic rows and atomically export PostgreSQL SQL."""
+
+    ensure_paths_distinct(args.spec, args.output)
+    ensure_file_output_available(args.output, overwrite=args.overwrite)
+    spec = load_dataset_spec(args.spec).model_copy(deep=True)
+    if not spec.entities:
+        raise ValueError("dataset spec must contain at least one entity")
+    if args.count is not None:
+        if args.count > max_generation_count():
+            raise ValueError(f"count must be <= {max_generation_count()}")
+        for entity in spec.entities:
+            entity.row_count = args.count
+    seed = args.seed
+    if seed is None:
+        seed = spec.generation_settings.seed
+    if seed is None:
+        seed = 0
+    spec.generation_settings.seed = seed
+    rows_by_entity = generate_dataset(spec, seed=seed)
+    write_postgres_sql(spec, rows_by_entity, args.output)
+    print(
+        "Wrote PostgreSQL SQL: "
+        f"{display_untrusted_text(str(args.output), limit=240)}",
+        file=sys.stderr,
+    )
+    return 0
 
 
 def generate_dataset_from_profile_command(

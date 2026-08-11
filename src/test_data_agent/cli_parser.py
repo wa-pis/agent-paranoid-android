@@ -148,6 +148,26 @@ def register_dataset_commands(
     generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
     generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity bundle.")
 
+    postgres_sql_parser = subparsers.add_parser(
+        "export-postgres-sql",
+        help="Generate and export one validated PostgreSQL SQL file.",
+        description=(
+            "Generate deterministic synthetic rows from a reviewed DatasetSpec "
+            "and atomically write one PostgreSQL SQL file."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent export-postgres-sql dataset_spec.yaml "
+            "--seed 12345 --output out/dataset.sql"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    postgres_sql_parser.add_argument("spec", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
+    postgres_sql_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed; defaults to the spec seed, then 0.")
+    postgres_sql_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
+    postgres_sql_parser.add_argument("--output", "-o", type=Path, required=True, help="PostgreSQL .sql file to write.")
+    postgres_sql_parser.add_argument("--overwrite", action="store_true", help="Allow atomically replacing an existing SQL file.")
+
     profile_example_parser = subparsers.add_parser(
         "profile-example",
         aliases=["profile-csv-folder"],

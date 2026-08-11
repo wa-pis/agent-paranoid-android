@@ -17,6 +17,7 @@
   },
   "commands": [
     "generate",
+    "export-postgres-sql",
     "profile-example",
     "infer-spec",
     "profile-csv",
