@@ -255,7 +255,7 @@ def reproducibility_evidence(
 
 def normalized_dependency_versions() -> dict[str, str]:
     required = ("Faker", "pydantic", "PyYAML")
-    optional = ("pyarrow", "mcp", "sqlglot", "trino", "openai")
+    optional = ("pyarrow", "mcp", "sqlglot", "trino", "openai", "psycopg")
     versions: dict[str, str] = {}
     for distribution in (*required, *optional):
         try:
