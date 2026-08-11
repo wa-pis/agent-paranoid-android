@@ -365,7 +365,9 @@ def _sanitize_categorical_values(
     preserved_labels: set[tuple[str, str, str]] | None = None,
 ) -> tuple[DatasetProfile, DatasetSpec]:
     preserved_labels = set(preserved_labels or set())
-    replacements = {_category_value_key(*key): key[2] for key in preserved_labels}
+    replacements: dict[tuple[str, str, str], Any] = {
+        _category_value_key(*key): key[2] for key in preserved_labels
+    }
     preserved_keys = set(replacements)
     original_keys = (
         _categorical_value_keys(profile)
