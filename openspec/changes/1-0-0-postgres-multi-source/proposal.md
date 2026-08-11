@@ -3,9 +3,14 @@
 ## Summary
 
 Add a provider-neutral source-adapter boundary and a first direct PostgreSQL
-adapter before stable `1.0.0`. The adapter will produce the existing safe
-`DatasetProfile` contract from read-only PostgreSQL metadata and bounded
-aggregate evidence, without making Trino a prerequisite.
+adapter in `1.0.0rc6`, before stable `1.0.0`. The adapter will produce the
+existing safe `DatasetProfile` contract from read-only PostgreSQL metadata and
+bounded aggregate evidence, without making Trino a prerequisite.
+
+Add two explicit local-only contracts to the same release scope: field-scoped
+preservation of reviewed non-sensitive bounded values, and deterministic export
+of generated datasets as one valid PostgreSQL SQL file. Preservation remains
+off by default and does not authorize source-row reuse or provider disclosure.
 
 Extend the same boundary to named source bundles. A bundle may contain several
 PostgreSQL databases on different hosts, one Trino coordinator with multiple
@@ -41,6 +46,14 @@ In scope:
   foreign keys, and a supported safe subset of checks.
 - Aggregate PostgreSQL profiling for row counts, null ratios, cardinality,
   ranges, safe distributions, and bounded relationship/reconciliation evidence.
+- A typed field-scoped allowlist that may preserve reviewed bounded,
+  non-sensitive business enum or constant values as-is in local profiles,
+  generation, and local SQL export.
+- Fail-closed classification, content, cardinality, and value-length checks for
+  every field requesting as-is preservation.
+- Deterministic PostgreSQL SQL export from validated generated records,
+  including quoted DDL, INSERT statements, relationships, scalar literals,
+  atomic publication, and one `.sql` artifact.
 - Named `SourceBundle` inputs for multiple PostgreSQL hosts, one Trino
   coordinator with multiple catalogs, or multiple Trino coordinators.
 - Stable source-qualified entity identities and source metadata that do not
@@ -60,6 +73,13 @@ Out of scope:
   SQLAlchemy, or other ORM introspection in this change.
 - Cross-host raw-value joins, copying source rows between databases, or sending
   source values to an AI provider.
+- A global masking bypass, preservation of PII, secrets, credentials,
+  identifiers, quasi-identifiers, or free text, or preservation based only on
+  low cardinality.
+- Exporting source tables or profile query results directly to SQL. SQL output
+  is built from validated generated records only.
+- Executing the generated SQL against a live PostgreSQL service as part of the
+  normal offline test suite.
 - Automatic approval of AI-discovered relationships or business rules.
 - A requirement that AI, MCP, or a network provider be present for the
   deterministic PostgreSQL workflow.
@@ -78,6 +98,17 @@ safe profile and may rank hypotheses but cannot access a connection or approve
 generation. A requested source or table that cannot be profiled fails closed;
 the system must not silently publish a partial bundle as complete.
 
+As-is preservation is an explicit local destination exception for a reviewed
+field, not a masking switch. A requested field must pass sensitive-content and
+bounded-domain checks before its values can be retained. The exact values may
+then be used by deterministic local generation and appear in local SQL output,
+but they remain replaced at external provider boundaries and absent from
+default MCP responses, logs, errors, and source-bundle metadata.
+
+SQL export consumes validated generated records and reviewed schema metadata;
+it never reads from a source connection. Unsupported values or identifiers fail
+before publication, and an interrupted export must not leave a partial target.
+
 ## Compatibility
 
 - The base installation remains PostgreSQL- and Trino-free.
@@ -86,6 +117,11 @@ the system must not silently publish a partial bundle as complete.
 - Existing CSV, JSON, Parquet, Trino, CLI, MCP, `DatasetSpec`, and artifact
   contracts remain compatible unless an additive source-bundle contract is
   explicitly introduced and covered by golden fixtures.
+- Existing masking behavior remains the default. As-is preservation is an
+  additive explicit field policy and existing `LocalCategoryField` inputs keep
+  their field-scoped semantics.
+- PostgreSQL SQL is an additive output format. Existing CSV, JSON, and Parquet
+  defaults, names, and serialization behavior remain unchanged.
 - Single-source profiles continue to use the existing `DatasetProfile` shape.
 - Multi-source profiles use stable qualified entity names and a versioned
   source-bundle metadata contract; credentials and host-specific connection
