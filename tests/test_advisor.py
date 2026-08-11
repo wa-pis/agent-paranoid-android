@@ -30,6 +30,7 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.relationship import Relationship
+from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.safety import ProfileSafetyError
 from test_data_agent.validation import validate_dataset
@@ -423,6 +424,74 @@ def test_advisor_request_sanitizes_constraint_literals_and_rebuilds(
     assert "retail" not in request.model_dump_json()
     assert "business" not in request.model_dump_json()
     assert _rebuild_advisor_request_for_profile_verification(profile, request) == request
+
+
+def test_advisor_request_preserves_allowlisted_local_category_values() -> None:
+    profile = safe_profile()
+    profile.local_category_fields = [LocalCategoryField(entity="customers", field="segment")]
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": "retail", "count": 4},
+            {"value": "business", "count": 1},
+        ],
+    }
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["email"],
+            condition={"field": "segment", "equals": "business"},
+            confidence=1.0,
+        )
+    ]
+    baseline = infer_dataset_spec(profile, count=7)
+
+    request = build_advisor_request(profile, baseline_spec=baseline)
+
+    assert [
+        category["value"]
+        for category in request.profile.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ] == ["retail", "business"]
+    assert [
+        category["value"]
+        for category in request.baseline_spec.entity("customers")
+        .field("segment")
+        .distribution["categories"]
+    ] == ["retail", "business"]
+    assert request.profile.constraints[0].condition == {
+        "field": "segment",
+        "equals": "business",
+    }
+
+
+def test_advisor_request_rejects_unrepresented_constraint_for_allowlisted_local_category() -> None:
+    profile = safe_profile()
+    profile.local_category_fields = [LocalCategoryField(entity="customers", field="segment")]
+    profile.entity("customers").field("segment").distribution = {
+        "kind": "categorical",
+        "categories": [
+            {"value": "retail", "count": 4},
+            {"value": "business", "count": 1},
+        ],
+    }
+    profile.constraints = [
+        Constraint(
+            type=ConstraintType.CONDITIONAL_REQUIRED,
+            entity="customers",
+            fields=["email"],
+            condition={"field": "segment", "equals": "unexpected"},
+            confidence=1.0,
+        )
+    ]
+
+    with pytest.raises(
+        AdvisorContractError,
+        match="^advisor constraint contains an unrepresented categorical value$",
+    ):
+        build_advisor_request(profile)
 
 
 def test_sanitized_constraint_literal_remains_executable() -> None:

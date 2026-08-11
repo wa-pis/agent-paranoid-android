@@ -364,7 +364,7 @@ def _sanitize_categorical_values(
     *,
     preserved_labels: set[tuple[str, str, str]] | None = None,
 ) -> tuple[DatasetProfile, DatasetSpec]:
-    preserved_labels = preserved_labels or set()
+    preserved_labels = set(preserved_labels or set())
     replacements = {_category_value_key(*key): key[2] for key in preserved_labels}
     preserved_keys = set(replacements)
     original_keys = (
@@ -375,6 +375,10 @@ def _sanitize_categorical_values(
     )
     original_values = _categorical_string_values(profile) | _categorical_string_values(spec)
     used_placeholders = {key[2] for key in preserved_labels}
+    local_category_fields = {
+        (item.entity, item.field)
+        for item in (*profile.local_category_fields, *spec.local_category_fields)
+    }
     field_positions = {
         (entity.name, field.name): (entity_index, field_index)
         for entity_index, entity in enumerate(profile.entities)
@@ -396,6 +400,10 @@ def _sanitize_categorical_values(
                         entity.name, field.name, value
                     )
                     if replacement_key in replacements:
+                        continue
+                    if (entity.name, field.name) in local_category_fields:
+                        replacements[replacement_key] = value
+                        preserved_keys.add(replacement_key)
                         continue
                     entity_index, field_index = field_positions[field_key]
                     category_index = category_indexes.get(field_key, 0)
