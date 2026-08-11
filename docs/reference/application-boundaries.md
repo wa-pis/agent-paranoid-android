@@ -172,6 +172,7 @@ The current dependencies after completed extraction increments are:
 | `io/path_policy.py` | descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
+| `postgres_config.py` | PostgreSQL source identity, connection settings, mandatory schema/table/column allowlists, secret indirection, and profiling budgets |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
