@@ -10,6 +10,26 @@
   placing credentials, DSNs, hostnames, or raw source values in artifacts.
 - [ ] Define local declared relationship versus cross-source hypothesis status
   and evidence semantics.
+- [ ] Extend the typed field-scoped local category policy to source-qualified
+  PostgreSQL entities without adding a global masking bypass.
+- [ ] Define the additive PostgreSQL SQL output contract and deterministic
+  artifact metadata.
+
+## Selective As-Is Preservation
+
+- [ ] Reuse the explicit `LocalCategoryField` scope for local files and
+  canonical source-qualified PostgreSQL fields.
+- [ ] Require reviewed non-sensitive business enum/constant classification and
+  fail-closed PII, secret, identifier, quasi-identifier, and free-text checks.
+- [ ] Enforce cardinality, value-length, and profiling budgets before retaining
+  exact values or counts.
+- [ ] Preserve approved values, distributions, and conditional rules through
+  local profile, specification, deterministic generation, and SQL export.
+- [ ] Replace all source literals at external provider boundaries and suppress
+  them from default MCP responses, logs, errors, and source metadata.
+- [ ] Add focused tests for default-off behavior, exact approved values,
+  rejected unsafe/unbounded values, source-row exclusion, and destination
+  egress prevention.
 
 ## PostgreSQL Adapter
 
@@ -55,10 +75,21 @@
 - [ ] Add regression tests for source-row, secret, DSN, host, backend-error,
   arbitrary-SQL, partial-profile, cross-source, and budget bypass attempts.
 - [ ] Update README, installation, configuration, product-validation, support,
-  and roadmap documentation; distinguish current RC6 support from the new
-  stable gate.
+  and roadmap documentation; record PostgreSQL, selective preservation, and
+  SQL export as RC6 scope inherited by the stable gate.
 - [ ] Add public wheel/install, `doctor`, profile, generation, validation, and
   upgrade acceptance for the `postgres` extra and base installation.
+- [ ] Add a documented CLI and Python path that writes one PostgreSQL `.sql`
+  file from validated generated records.
+- [ ] Implement deterministic PostgreSQL identifier, type, scalar literal,
+  NULL, DDL, INSERT, and relationship rendering without a live connection.
+- [ ] Publish SQL through a temporary sibling and atomic replacement; reject
+  unsupported input without leaving a partial target.
+- [ ] Add golden and parser tests for valid PostgreSQL syntax, stable ordering,
+  quoting, literals, NULL, foreign keys, approved as-is values, and failures.
+- [ ] Add isolated-wheel PostgreSQL/SQL smoke coverage without live database
+  access, plus an optional explicitly gated disposable-PostgreSQL execution
+  check.
 - [ ] Run lint, type checking, compile, focused tests, full tests, documentation
   build, dependency/license checks, and the release acceptance workflow on the
   exact implementation commit.

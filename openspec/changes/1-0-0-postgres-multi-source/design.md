@@ -8,15 +8,18 @@ for safe inspection and aggregate profiling; the existing deterministic
 remains responsible for synthesis.
 
 ```text
-PostgresSource / TrinoSource
+PostgresSource / TrinoSource / local files
           ↓
    SourceProfiler port
           ↓
   DatasetProfile + source map
+  + reviewed preserve scopes
           ↓
  agent review / optional AI hypotheses
           ↓
  existing DatasetSpec and deterministic generation
+          ↓
+ validated records → CSV / JSON / Parquet / PostgreSQL SQL
 ```
 
 Do not begin with a large generic database framework. A minimal protocol and
@@ -122,6 +125,58 @@ escape hatch for profiling. Each query consumes the shared invocation budget.
 Sensitive numeric fields follow the existing non-reversible Trino policy: exact
 extrema or singleton values must not cross the safe profile boundary.
 
+## Selective As-Is Preservation
+
+Reuse the existing typed `LocalCategoryField(entity, field)` authorization
+instead of adding a global masking flag. For database sources, `entity` is the
+canonical source-qualified entity identity, so authorization resolves to one
+source, schema, table, and column. For local files, it retains the existing
+entity-and-field scope.
+
+Authorization is necessary but not sufficient. Before retaining values, the
+profiler must verify that the field is explicitly classified as a bounded,
+non-sensitive business enum or constant and that observed values remain within
+configured cardinality and value-length limits. Recognizable PII, secrets,
+credentials, identifiers, quasi-identifiers, or free text make the requested
+preservation fail closed. Low cardinality alone is not a safe classification.
+
+Successful preservation retains the reviewed scalar values and bounded counts
+without retaining source rows or row order. The same exact values may be used
+by deterministic local generation, constraints, conditional rules, and local
+SQL export. Non-allowlisted fields keep the existing mask, suppress, or
+synthetic replacement policy.
+
+Destination policy remains independent of local authorization. External
+provider payloads always replace source literals with deterministic labels.
+Default MCP responses, logs, errors, and source-bundle metadata never disclose
+the values. Provider responses are mapped back only inside the local reviewed
+workflow under the existing field-scoped contract.
+
+## PostgreSQL SQL Export
+
+SQL export is a deterministic output adapter after generation and validation;
+it is not part of the PostgreSQL source adapter and cannot access a source
+connection. Its only row input is the generated dataset. Exact values from an
+approved as-is field can therefore appear only after they have entered those
+generated records through the reviewed field policy.
+
+The exporter writes one UTF-8 `.sql` file containing deterministic PostgreSQL
+DDL and INSERT statements. It quotes schema, table, and column identifiers,
+serializes supported scalar values with PostgreSQL-compatible literals,
+preserves NULL, and emits tables and relationships in a stable dependency-aware
+order. The file is transaction-delimited so successful execution is atomic.
+
+All identifiers, type mappings, relationships, and values are validated before
+the destination is replaced. Unsupported or ambiguous types and values fail
+closed. The writer uses a sibling temporary file and atomic replacement, and
+removes the temporary file after failure or cancellation so a partial SQL file
+is never reported as complete.
+
+Normal tests use golden files plus a PostgreSQL parser or parse-only validation
+that does not require a live server. An explicitly gated integration test may
+execute the file against disposable PostgreSQL, but live access is not required
+for the package test suite.
+
 ## Trino Coordinator Boundary
 
 A `TrinoSource` represents one coordinator and its allowlisted catalogs and
@@ -193,6 +248,10 @@ either of them.
   permit generation from a partial source set.
 - AI/provider failure: preserve the deterministic profile and return to human
   review; never grant database access or approval authority.
+- Requested as-is field fails classification, content, or bounded-domain
+  checks: reject the preservation request without publishing a partial profile.
+- SQL identifier, type, or value cannot be represented safely: reject before
+  replacing the target and remove the temporary file.
 
 ## Alternatives
 
@@ -205,3 +264,8 @@ either of them.
 - **Join all sources in the application:** rejected because it would move source
   values across trust boundaries. Cross-source evidence must remain aggregate,
   explicitly configured, or human-reviewed.
+- **Add a global no-mask switch:** rejected because destination and field
+  classification cannot be reviewed or enforced at that granularity.
+- **Dump PostgreSQL source rows as SQL:** rejected because it violates the
+  synthetic-only output boundary. SQL is rendered only after deterministic
+  generation and validation.
