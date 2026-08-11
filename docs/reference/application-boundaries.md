@@ -71,9 +71,10 @@ Public operations:
 
 ## CLI Surface
 
-`cli-parser-surface.json` freezes these 20 commands:
+`cli-parser-surface.json` freezes these 21 commands:
 
-- `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`
+- `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
+  `profile-postgres`
 - `generate-from-csv`, `validate`, `generate-from-example`
 - `demo`, `doctor`, `audit-verify`
 - `agent-plan`, `agent-approve`, `agent-recover`

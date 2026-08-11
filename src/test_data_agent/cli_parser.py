@@ -225,6 +225,25 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
 
+    profile_postgres_parser = subparsers.add_parser(
+        "profile-postgres",
+        help="Create a safe profile from an allowlisted PostgreSQL source.",
+        description=(
+            "Profile PostgreSQL metadata and bounded aggregates through the "
+            "read-only POSTGRES_* configuration."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-postgres --output out/profile.json\n\n"
+            "Install the postgres extra and configure the required schema, table, "
+            "and column allowlists first."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    profile_postgres_parser.add_argument("--output", "-o", type=Path, required=True, help="Safe profile JSON to write.")
+    profile_postgres_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
+    add_local_category_option(profile_postgres_parser)
+
     generate_csv_parser = subparsers.add_parser(
         "generate-from-csv",
         help="Generate a synthetic single-table dataset directly from one CSV file.",

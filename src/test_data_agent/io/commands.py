@@ -16,7 +16,7 @@ from test_data_agent.core.settings import OutputFormat
 from test_data_agent.core.limits import max_generation_count
 from test_data_agent.generation import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
-from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact
+from test_data_agent.io.artifacts import validate_generation_bundle, write_dataset_profile_artifact, write_json_artifact
 from test_data_agent.io.path_policy import discard_staging_directory, inspect_file_output
 from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
@@ -34,6 +34,9 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.profiling import profile_example_folder
+from test_data_agent.postgres_client import PostgresClient, PostgresClientError
+from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.postgres_profiler import PostgresProfileError, dataset_profile_from_postgres
 from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
@@ -210,6 +213,21 @@ def profile_csv_command(args: argparse.Namespace) -> int:
         table_name=args.table,
         local_category_fields=tuple(getattr(args, "local_category_fields", ())),
     )
+    write_profile_summary(args.output)
+    return 0
+
+
+def profile_postgres_command(args: argparse.Namespace, *, driver: Any) -> int:
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
+    config = PostgresConfig.from_env()
+    try:
+        profile = dataset_profile_from_postgres(
+            PostgresClient(config=config, driver=driver),
+            local_category_fields=tuple(getattr(args, "local_category_fields", ())),
+        )
+    except (PostgresClientError, PostgresProfileError) as exc:
+        raise ValueError(str(exc)) from exc
+    write_dataset_profile_artifact(profile, args.output)
     write_profile_summary(args.output)
     return 0
 

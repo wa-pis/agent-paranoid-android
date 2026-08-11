@@ -8,6 +8,7 @@ from typing import Any, Protocol
 
 from test_data_agent.audit import verify_audit_log_from_env
 from test_data_agent.cli_contract import DoctorReport
+from test_data_agent.cli_dependencies import DEFAULT_CLI_DEPENDENCY_RESOLVER
 from test_data_agent.cli_presenter import (
     write_audit_verification_result,
     write_doctor_report,
@@ -24,6 +25,7 @@ from test_data_agent.io import (
     generate_dataset_command,
     export_postgres_sql_command,
     infer_dataset_spec_command,
+    profile_postgres_command,
     profile_csv_command,
     profile_example_command,
     validate_dataset_artifacts,
@@ -84,6 +86,14 @@ def run_dataset_command(
 
     if args.command == "profile-csv":
         return profile_csv_command(args)
+
+    if args.command == "profile-postgres":
+        driver = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+            "psycopg",
+            extra="postgres",
+            purpose="PostgreSQL profiling",
+        )
+        return profile_postgres_command(args, driver=driver)
 
     if args.command == "generate-from-csv":
         return generate_dataset_from_csv_command(

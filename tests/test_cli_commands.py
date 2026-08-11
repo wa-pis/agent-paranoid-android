@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.cli_commands as cli_commands_module
 from test_data_agent.cli import build_parser
 from test_data_agent.cli_commands import run_dataset_command, run_utility_command
 from test_data_agent.cli_contract import DoctorReport
@@ -15,6 +16,36 @@ def test_dataset_handler_does_not_claim_non_dataset_command() -> None:
     args = argparse.Namespace(command="agent-status")
 
     assert run_dataset_command(args) is None
+
+
+def test_postgres_profile_command_loads_optional_driver(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    driver = object()
+    captured: dict[str, object] = {}
+
+    class Resolver:
+        def require_module(self, module_name: str, *, extra: str, purpose: str) -> object:
+            captured["dependency"] = (module_name, extra, purpose)
+            return driver
+
+    def profile_postgres(args: argparse.Namespace, *, driver: object) -> int:
+        captured["output"] = args.output
+        captured["driver"] = driver
+        return 0
+
+    monkeypatch.setattr(cli_commands_module, "DEFAULT_CLI_DEPENDENCY_RESOLVER", Resolver())
+    monkeypatch.setattr(cli_commands_module, "profile_postgres_command", profile_postgres)
+    arguments = ["profile-postgres", "--output", str(tmp_path / "profile.json")]
+    args = build_parser(arguments).parse_args(arguments)
+
+    assert run_dataset_command(args) == 0
+    assert captured == {
+        "dependency": ("psycopg", "postgres", "PostgreSQL profiling"),
+        "output": tmp_path / "profile.json",
+        "driver": driver,
+    }
 
 
 def test_utility_handler_injects_doctor_boundary(capsys) -> None:

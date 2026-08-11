@@ -465,17 +465,17 @@ OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/ch
 
 The minimum PostgreSQL scope is:
 
-- [ ] Add a separate optional `postgres` installation profile.
+- [x] Add a separate optional `postgres` installation profile.
 - [ ] Add a read-only connection with schema/table allowlists and bounded
   statements, bytes, columns, and wall-clock time.
 - [ ] Extract tables, types, nullability, primary keys, foreign keys, and checks.
-- [ ] Compute aggregate profiles for null ratios, cardinality, ranges, and safe
+- [x] Compute aggregate profiles for null ratios, cardinality, ranges, and safe
   distributions without returning source rows.
 - [ ] Reuse the existing review-first and deterministic validation boundaries
   for relationship discovery and reconciliation checks.
 - [ ] Add a synthetic PostgreSQL fixture and clean-environment acceptance path
   from profile to generated and validated output.
-- [ ] Correct all user-facing documentation so DDL, ORM models, and direct
+- [x] Correct all user-facing documentation so DDL, ORM models, and direct
   PostgreSQL access are not presented as already-supported CLI inputs.
 
 Do not expand this gate into arbitrary SQL execution, every relational database,

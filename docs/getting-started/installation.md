@@ -133,5 +133,6 @@ The package name is `agent-paranoid-android`. The command remains
 
 ## Next Step
 
-Use [First CSV Dataset](first-csv.md) for one table or
-[Related Tables](related-tables.md) for a folder containing one CSV per table.
+Use [First CSV Dataset](first-csv.md) for one table,
+[Related Tables](related-tables.md) for a folder containing one CSV per table,
+or [Profile PostgreSQL](../how-to/postgresql.md) for an allowlisted database.
