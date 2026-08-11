@@ -24,6 +24,9 @@ def test_trino_config_loads_explicit_allowlists_and_budgets(
     monkeypatch.setenv("TRINO_USER", "synthetic-agent")
     monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics, testing")
     monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe, fixtures")
+    monkeypatch.setenv(
+        "TRINO_ALLOWED_TABLE_COLUMNS", "analytics.safe.customers.country_code"
+    )
     monkeypatch.setenv("TRINO_MAX_RESULT_ROWS", "250")
     monkeypatch.setenv("TRINO_QUERY_MAX_EXECUTION_TIME", "20s")
     monkeypatch.setenv("TRINO_QUERY_MAX_RUN_TIME", "30s")
@@ -36,11 +39,35 @@ def test_trino_config_loads_explicit_allowlists_and_budgets(
     assert config.user == "synthetic-agent"
     assert config.allowed_catalogs == frozenset({"analytics", "testing"})
     assert config.allowed_schemas == frozenset({"safe", "fixtures"})
+    assert config.allowed_table_columns == frozenset(
+        {"analytics.safe.customers.country_code"}
+    )
     assert config.max_result_rows == 250
     assert config.query_max_execution_time == "20s"
     assert config.query_max_run_time == "30s"
     assert config.query_max_scan_physical_bytes == "512MB"
     assert config.deployment_profile is TrinoDeploymentProfile.TRUSTED_LOCAL
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "analytics",
+        "analytics.safe.customers",
+        "analytics.safe.customers.",
+        ".analytics.safe.customers.country_code",
+    ],
+)
+def test_trino_config_rejects_invalid_table_column_allowlist(
+    monkeypatch: pytest.MonkeyPatch,
+    value: str,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe")
+    monkeypatch.setenv("TRINO_ALLOWED_TABLE_COLUMNS", value)
+
+    with pytest.raises(TrinoConfigurationError, match="catalog.schema.table.column"):
+        TrinoConfig.from_env()
 
 
 def test_trino_config_requires_a_known_deployment_profile(

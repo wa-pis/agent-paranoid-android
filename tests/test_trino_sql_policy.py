@@ -117,6 +117,40 @@ def test_direct_allowlist_policy_fails_closed() -> None:
         validate_safe_select("SELECT id FROM records LIMIT 1", config=config)
 
 
+def test_direct_allowlist_policy_fails_closed_for_table_columns() -> None:
+    config = TrinoConfig(
+        host="trino.internal",
+        port=8443,
+        user="synthetic-agent",
+        http_scheme="https",
+        allowed_catalogs=frozenset({"analytics"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"analytics.safe.customers.country_code"}),
+    )
+
+    check_allowlist(
+        catalog="analytics",
+        schema="safe",
+        table="customers",
+        column="country_code",
+        config=config,
+    )
+    with pytest.raises(AllowlistError, match="table.column is not allowed"):
+        check_allowlist(
+            catalog="analytics",
+            schema="safe",
+            table="customers",
+            column="location_code",
+            config=config,
+        )
+    with pytest.raises(AllowlistError, match="catalog and schema are required"):
+        check_allowlist(
+            table="customers",
+            column="country_code",
+            config=config,
+        )
+
+
 def test_identifier_policy_rejects_sql_fragments() -> None:
     assert quote_identifier("safe_name") == '"safe_name"'
 

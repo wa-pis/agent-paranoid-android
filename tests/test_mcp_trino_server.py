@@ -873,6 +873,80 @@ def test_profile_column_safe_suppresses_quasi_identifier_categories(
     assert all(value not in str(profile) for value in source_values)
 
 
+def test_profile_column_safe_skips_top_values_without_table_column_allowlist(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+    monkeypatch.setenv(
+        "TRINO_ALLOWED_TABLE_COLUMNS",
+        "analytics.safe_schema.customers.country_code",
+    )
+
+    queries: list[str] = []
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        queries.append(sql)
+        if "GROUP BY" in sql:
+            return [
+                {"value": "district-7-house-41", "count": 2},
+                {"value": "district-7-house-99", "count": 1},
+            ]
+        return [{"row_count": 3, "non_null_count": 3, "approx_distinct_count": 2}]
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
+
+    profile = profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "region_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert "top_values" not in profile
+    assert queries
+    assert len(queries) == 1
+    assert "GROUP BY" not in queries[0]
+
+
+def test_profile_column_safe_returns_top_values_for_allowlisted_table_column(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe_schema")
+    monkeypatch.setenv(
+        "TRINO_ALLOWED_TABLE_COLUMNS",
+        "analytics.safe_schema.customers.country_code",
+    )
+
+    queries: list[str] = []
+
+    def fake_fetch_dicts(sql: str, parameters=None):
+        queries.append(sql)
+        if "GROUP BY" in sql:
+            return [{"value": "district-7-house-41", "count": 2}]
+        return [{"row_count": 3, "non_null_count": 3, "approx_distinct_count": 1}]
+
+    monkeypatch.setattr("test_data_agent.mcp_trino_server._fetch_dicts", fake_fetch_dicts)
+
+    profile = profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "country_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert profile["top_values"] == [{"value": "category_1", "count": 2}]
+    assert len(queries) == 2
+    assert any("GROUP BY" in query for query in queries)
+
+
 def test_execute_query_closes_cursor_and_connection(monkeypatch: pytest.MonkeyPatch) -> None:
     class FakeCursor:
         description = [("id",)]

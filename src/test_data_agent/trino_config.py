@@ -39,6 +39,7 @@ class TrinoConfig:
     http_scheme: str
     allowed_catalogs: frozenset[str] | None
     allowed_schemas: frozenset[str] | None
+    allowed_table_columns: frozenset[str] | None = None
     request_timeout: float = 30.0
     max_result_rows: int = DEFAULT_MAX_RESULT_ROWS
     query_max_execution_time: str = DEFAULT_QUERY_MAX_EXECUTION_TIME
@@ -57,6 +58,9 @@ class TrinoConfig:
             http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "https"),
             allowed_catalogs=parse_allowlist(os.environ.get("TRINO_ALLOWED_CATALOGS")),
             allowed_schemas=parse_allowlist(os.environ.get("TRINO_ALLOWED_SCHEMAS")),
+            allowed_table_columns=parse_allowlist(
+                os.environ.get("TRINO_ALLOWED_TABLE_COLUMNS")
+            ),
             request_timeout=parse_request_timeout(),
             max_result_rows=parse_max_result_rows(),
             query_max_execution_time=parse_duration_env(
@@ -123,6 +127,9 @@ class TrinoConfig:
             "TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES",
             MAX_QUERY_SCAN_BYTES,
         )
+        if self.allowed_table_columns is not None:
+            for value in self.allowed_table_columns:
+                validate_fully_qualified_table_column(value)
         if run_ms < execution_ms:
             raise TrinoConfigurationError(
                 "TRINO_QUERY_MAX_RUN_TIME must be greater than or equal to "
@@ -147,6 +154,20 @@ def parse_allowlist(value: str | None) -> frozenset[str] | None:
     if value is None or not value.strip():
         return None
     return frozenset(item.strip() for item in value.split(",") if item.strip())
+
+
+_TABLE_COLUMN_ALLOWLIST_RE = re.compile(
+    r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_]"
+    r"[A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$"
+)
+
+
+def validate_fully_qualified_table_column(value: str) -> None:
+    if not _TABLE_COLUMN_ALLOWLIST_RE.fullmatch(value):
+        raise TrinoConfigurationError(
+            "TRINO_ALLOWED_TABLE_COLUMNS entries must be "
+            "catalog.schema.table.column values"
+        )
 
 
 def parse_env_bool(name: str) -> bool:

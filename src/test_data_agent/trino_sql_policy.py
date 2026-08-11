@@ -59,6 +59,8 @@ def quote_identifier(value: str) -> str:
 def check_allowlist(
     catalog: str | None = None,
     schema: str | None = None,
+    table: str | None = None,
+    column: str | None = None,
     config: TrinoConfig | None = None,
 ) -> None:
     config = config or TrinoConfig.from_env()
@@ -71,6 +73,18 @@ def check_allowlist(
         raise AllowlistError(f"catalog is not allowed: {catalog}")
     if schema and config.allowed_schemas is not None and schema not in config.allowed_schemas:
         raise AllowlistError(f"schema is not allowed: {schema}")
+    if (
+        table is not None
+        and column is not None
+        and config.allowed_table_columns is not None
+    ):
+        if catalog is None or schema is None:
+            raise AllowlistError(
+                "catalog and schema are required for table-column allowlist checks"
+            )
+        table_column = f"{catalog}.{schema}.{table}.{column}"
+        if table_column not in config.allowed_table_columns:
+            raise AllowlistError(f"table.column is not allowed: {table_column}")
 
 
 def strip_sql_comments(sql: str) -> str:
