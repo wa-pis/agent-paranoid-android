@@ -35,11 +35,11 @@
 
 - [ ] Add an optional `postgres` dependency profile with minimum/latest support
   evidence and no base-installation dependency.
-- [ ] Implement injected PostgreSQL driver and connection/session boundary.
+- [x] Implement injected PostgreSQL driver and connection/session boundary.
 - [ ] Enforce schema/table allowlists, read-only mode, identifier validation,
   statement timeout, lock timeout, cancellation, cleanup, and invocation
   budgets.
-- [ ] Add metadata query builders for tables, columns, nullability, primary
+- [x] Add metadata query builders for tables, columns, nullability, primary
   keys, foreign keys, and supported CHECK constraints.
 - [ ] Add aggregate query builders for row counts, cardinality, null ratios,
   ranges, safe categories, FK coverage, and configured reconciliation checks.
