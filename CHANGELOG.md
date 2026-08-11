@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+- Add an allowlist-only `profile-postgres` CLI workflow that writes safe
+  metadata and bounded aggregate profiles through the optional PostgreSQL driver.
 - Add a typed field-scoped local category allowlist across CSV, folder, agent,
   CLI, profile, and generation-spec boundaries without weakening default
   category replacement.

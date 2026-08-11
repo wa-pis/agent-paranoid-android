@@ -4,7 +4,9 @@ from pathlib import Path
 
 import pytest
 
+import test_data_agent.io.commands as commands_module
 from test_data_agent.cli import main
+from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import InputLimitError
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
@@ -17,12 +19,14 @@ from test_data_agent.io.commands import (
     generate_dataset_from_spec_path,
     infer_dataset_spec_command,
     profile_csv_command,
+    profile_postgres_command,
     profile_example_command,
     profile_example_artifacts,
     validate_dataset_artifacts,
     write_profile_summary,
 )
 from test_data_agent.io.readers import load_dataset_spec
+from test_data_agent.postgres_client import PostgresConnectionError
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "example_dataset"
 
@@ -550,6 +554,97 @@ def test_profile_csv_command_writes_dataset_profile_json(tmp_path) -> None:
     assert payload["local_category_fields"] == [
         {"entity": "customers_alias", "field": "status"}
     ]
+
+
+def test_profile_postgres_command_writes_safe_profile(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    output_path = tmp_path / "profile.json"
+    driver = object()
+    config = object()
+    allowed = LocalCategoryField(entity="warehouse.public.orders", field="status")
+    captured: dict[str, object] = {}
+
+    class ConfigFactory:
+        @staticmethod
+        def from_env() -> object:
+            return config
+
+    def client_factory(*, config: object, driver: object) -> object:
+        captured["client"] = (config, driver)
+        return "bounded-client"
+
+    def profile_loader(
+        client: object,
+        *,
+        local_category_fields: tuple[LocalCategoryField, ...],
+    ) -> DatasetProfile:
+        captured["profile"] = (client, local_category_fields)
+        return DatasetProfile(
+            source_type="postgres",
+            entities=[
+                {
+                    "name": "warehouse.public.orders",
+                    "row_count": 2,
+                    "fields": [{"name": "status", "data_type": "string"}],
+                }
+            ],
+            local_category_fields=list(local_category_fields),
+        )
+
+    monkeypatch.setattr(commands_module, "PostgresConfig", ConfigFactory)
+    monkeypatch.setattr(commands_module, "PostgresClient", client_factory)
+    monkeypatch.setattr(commands_module, "dataset_profile_from_postgres", profile_loader)
+
+    exit_code = profile_postgres_command(
+        Namespace(
+            output=output_path,
+            overwrite=False,
+            local_category_fields=[allowed],
+        ),
+        driver=driver,
+    )
+
+    payload = json.loads(output_path.read_text())
+    assert exit_code == 0
+    assert captured == {
+        "client": (config, driver),
+        "profile": ("bounded-client", (allowed,)),
+    }
+    assert payload["source_type"] == "postgres"
+    assert payload["entities"][0]["name"] == "warehouse.public.orders"
+    assert payload["local_category_fields"] == [
+        {"entity": "warehouse.public.orders", "field": "status"}
+    ]
+
+
+def test_profile_postgres_command_reports_bounded_connection_error(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class ConfigFactory:
+        @staticmethod
+        def from_env() -> object:
+            return object()
+
+    monkeypatch.setattr(commands_module, "PostgresConfig", ConfigFactory)
+    monkeypatch.setattr(commands_module, "PostgresClient", lambda **_kwargs: object())
+    monkeypatch.setattr(
+        commands_module,
+        "dataset_profile_from_postgres",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            PostgresConnectionError("PostgreSQL connection failed")
+        ),
+    )
+
+    with pytest.raises(ValueError, match="PostgreSQL connection failed"):
+        profile_postgres_command(
+            Namespace(output=tmp_path / "profile.json", overwrite=False),
+            driver=object(),
+        )
+
+    assert not (tmp_path / "profile.json").exists()
 
 
 def test_generate_dataset_from_csv_command_writes_generation_bundle(tmp_path) -> None:

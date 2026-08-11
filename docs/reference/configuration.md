@@ -46,6 +46,20 @@ The Python API can pass narrower `LocalProfileLimits` through a fresh
 structured `LocalProfileLimitError`. A failed profile is not written to the
 metadata-only cache.
 
+## PostgreSQL Profiling
+
+`profile-postgres` requires `POSTGRES_ALLOWED_SCHEMAS`,
+`POSTGRES_ALLOWED_TABLES`, and `POSTGRES_ALLOWED_COLUMNS`. Connection settings
+use `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DATABASE`, `POSTGRES_USER`, and
+`POSTGRES_SSLMODE`. Set `POSTGRES_PASSWORD_ENV` to the name of the environment
+variable containing the password; never put the password in configuration.
+
+The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
+`POSTGRES_MAX_RESULT_ROWS`, `POSTGRES_MAX_RESULT_CELLS`, and
+`POSTGRES_MAX_SECONDS` limits bound one profile. Statement and lock timeouts use
+`POSTGRES_STATEMENT_TIMEOUT_MS` and `POSTGRES_LOCK_TIMEOUT_MS`. See the
+[PostgreSQL workflow](../how-to/postgresql.md) for a complete example.
+
 ## Generator MCP
 
 | Variable | Required | Purpose |

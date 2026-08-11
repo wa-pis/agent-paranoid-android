@@ -25,6 +25,7 @@ commands.
 | `doctor` | Check installation and run a temporary smoke generation | Terminal report |
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
+| `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |
 | `generate-from-csv` | Run the complete single-table workflow | Data file and review artifacts |
@@ -67,6 +68,10 @@ test-data-agent generate-from-csv data/customers.csv \
   --format csv \
   --output out/customers.csv
 ```
+
+For PostgreSQL, install the `postgres` extra, configure the mandatory
+schema/table/column allowlists, and follow the
+[PostgreSQL workflow](../how-to/postgresql.md).
 
 For a folder containing one related table per CSV file:
 

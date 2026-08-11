@@ -21,6 +21,7 @@
     "profile-example",
     "infer-spec",
     "profile-csv",
+    "profile-postgres",
     "generate-from-csv",
     "validate",
     "generate-from-example",

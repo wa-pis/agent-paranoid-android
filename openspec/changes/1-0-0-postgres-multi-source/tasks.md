@@ -64,7 +64,7 @@
 
 ## User Workflow And Release Evidence
 
-- [ ] Add one documented CLI/configuration path and one Python API example from
+- [x] Add one documented CLI/configuration path and one Python API example from
   PostgreSQL profile to reviewed spec, generation, and validation.
 - [ ] Add a synthetic PostgreSQL fixture with multiple tables, PK/FK/CHECK,
   nullable fields, distributions, and one reconciliation rule.
