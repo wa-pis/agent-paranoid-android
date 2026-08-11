@@ -207,18 +207,39 @@ class TrinoMasker:
             and not sensitive
             and 0 < approx_distinct <= max_top_values
         ):
-            top_values = self.fetch_query(
-                build_top_values_query(
-                    catalog,
-                    schema,
-                    table,
-                    column,
-                    max_top_values,
+            can_return_categories = (
+                self.config.allowed_table_columns is None
+                or _is_table_column_allowlisted(
+                    self.config, catalog, schema, table, column
                 )
             )
-            profile.update(summarize_top_values(top_values))
+            if can_return_categories:
+                top_values = self.fetch_query(
+                    build_top_values_query(
+                        catalog,
+                        schema,
+                        table,
+                        column,
+                        max_top_values,
+                    )
+                )
+                profile.update(summarize_top_values(top_values))
         return profile
 
     def run_safe_select(self, sql: str) -> list[dict[str, Any]]:
         safe_sql = validate_safe_select(sql, require_limit=True, config=self.config)
         return _mask_returned_rows(self.fetch_sql(safe_sql))
+
+
+def _is_table_column_allowlisted(
+    config: TrinoConfig,
+    catalog: str,
+    schema: str,
+    table: str,
+    column: str,
+) -> bool:
+    if config.allowed_table_columns is None:
+        return True
+    return (
+        f"{catalog}.{schema}.{table}.{column}" in config.allowed_table_columns
+    )

@@ -34,6 +34,13 @@ def masker_config() -> TrinoConfig:
     )
 
 
+def masker_config_allowlisted_columns() -> TrinoConfig:
+    return replace(
+        masker_config(),
+        allowed_table_columns=frozenset({"analytics.safe_schema.customers.country_code"}),
+    )
+
+
 def reject_query(query: TrinoQuery) -> list[dict[str, Any]]:
     raise AssertionError(f"query must not execute: {query.sql}")
 
@@ -122,6 +129,77 @@ def test_masker_skips_category_query_for_sensitive_column_name() -> None:
     assert profile["sensitive"] is True
     assert len(queries) == 1
     assert "GROUP BY" not in queries[0].sql
+
+
+def test_masker_profile_column_safe_skips_top_values_for_disallowed_table_column() -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "GROUP BY" in query.sql:
+            return [{"value": "allowed", "count": 2}]
+        return [
+            {
+                "row_count": 10,
+                "non_null_count": 10,
+                "approx_distinct_count": 2,
+            }
+        ]
+
+    profile = TrinoMasker(
+        config=masker_config_allowlisted_columns(),
+        fetch_query=fetch_query,
+        fetch_sql=reject_sql,
+    ).profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "region_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert "top_values" not in profile
+    assert len(queries) == 1
+    assert "GROUP BY" not in queries[0].sql
+
+
+def test_masker_profile_column_safe_returns_top_values_for_allowlisted_table_column() -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "GROUP BY" in query.sql:
+            return [{"value": "allowed", "count": 2}, {"value": "other", "count": 1}]
+        return [
+            {
+                "row_count": 10,
+                "non_null_count": 10,
+                "approx_distinct_count": 2,
+            }
+        ]
+
+    profile = TrinoMasker(
+        config=masker_config_allowlisted_columns(),
+        fetch_query=fetch_query,
+        fetch_sql=reject_sql,
+    ).profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "country_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert profile["top_values"] == [
+        {"value": "category_1", "count": 2},
+        {"value": "category_2", "count": 1},
+    ]
+    assert len(queries) == 2
+    assert any("GROUP BY" in query.sql for query in queries)
 
 
 def test_masker_suppresses_sensitive_numeric_summaries_at_query_boundary() -> None:
