@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-paranoid-android"
-version = "1.0.0rc6"
+version = "1.0.0"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,7 +19,7 @@ keywords = [
     "trino",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",

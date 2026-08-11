@@ -1,4 +1,6 @@
 import json
+import tomllib
+from pathlib import Path
 
 import pytest
 import test_data_agent
@@ -33,6 +35,11 @@ from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldType
+
+
+PROJECT_VERSION = tomllib.loads(
+    (Path(__file__).parent.parent / "pyproject.toml").read_text()
+)["project"]["version"]
 
 
 def test_dataset_spec_loads_minimal_shape_with_default_settings() -> None:
@@ -377,7 +384,7 @@ def test_privacy_policy_helpers_detect_and_mask_sensitive_values() -> None:
 def test_package_root_exposes_only_dataset_oriented_api() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
     assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
-    assert test_data_agent.__version__ == "1.0.0rc6"
+    assert test_data_agent.__version__ == PROJECT_VERSION
     assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None
     assert test_data_agent.infer_dataset_spec is not None

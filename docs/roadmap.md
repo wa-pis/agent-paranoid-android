@@ -225,6 +225,8 @@ business semantics without improving the sensitive-data boundary.
 RC6 also includes direct read-only PostgreSQL profiling through mandatory
 schema/table/column allowlists and one deterministic PostgreSQL DDL+INSERT
 export built only from validated generated records.
+Stable `1.0.0` promotes that accepted runtime and the reconciled public
+release evidence without adding product behavior.
 `1.0.0rc1` completed package and GitHub publication but was superseded after
 GHCR rejected its PEP 440 version as a SemVer tag. Assign work to the release
 where it forms
@@ -661,9 +663,11 @@ Exit criteria:
 - MCP golden contracts, OpenSpec requirements, documentation, changelog,
   package metadata, attestations, and container tags describe the same RC4
   behavior.
-- Stable publication is allowed only from the accepted RC5 production source
-  tree plus a reviewed version/changelog/release-metadata-only diff. No
-  executable production or dependency changes may be added between RC5
+- Stable publication is allowed only from the accepted RC6 runtime source
+  tree plus package version, changelog, release notes, documentation,
+  acceptance evidence, and generated release metadata. Version-only release
+  assertions may consume that metadata, but no executable production,
+  runtime-test scenario, or dependency changes may be added between RC6
   acceptance and `1.0.0`; all final release gates must run again. The exact
   allowlist and new-candidate fallback are defined in the
   [release process](release.md#rc6-to-stable-promotion).
@@ -859,8 +863,9 @@ Exit criteria:
 
 - No unresolved release-blocking finding remains at any severity.
 - RC6 public artifacts and documentation identify the same immutable commit.
-- Stable promotion is allowed only from the accepted RC6 source tree plus a
-  reviewed metadata-only version bump.
+- Stable promotion is allowed only from the accepted RC6 runtime plus package
+  version, changelog, release notes, documentation, acceptance evidence, and
+  generated release metadata; no product behavior may change.
 
 ### 1.0.0: Stable Release
 
@@ -873,8 +878,9 @@ Scope:
   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-01-application-boundaries-refactor/proposal.md)
   without changing public Python, CLI, MCP, artifact, error, or safety
   contracts.
-- [ ] Promote the accepted `1.0.0rc6` commit without unrelated feature work.
-- [ ] Apply only fixes proven necessary by RC6 acceptance and repeat the
+- [x] Promote the accepted `1.0.0rc6` runtime without unrelated feature work.
+- [x] Apply only release-contract corrections proven necessary by RC6
+  acceptance and repeat the
   affected release gates.
 - [ ] Re-run every release candidate gate on the exact release commit.
 - [ ] Publish signed and attested wheel, source distribution, documentation,

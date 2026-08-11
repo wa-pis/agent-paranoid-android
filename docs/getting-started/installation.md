@@ -14,8 +14,8 @@ changing this matrix are defined in
 
 ## Install From PyPI
 
-The published and accepted prerelease is `1.0.0rc6`. Pin that exact version;
-do not use a floating `--pre` install for candidate verification.
+The stable release is `1.0.0`. Pin that exact version for reproducible
+installations.
 
 Create an isolated environment:
 
@@ -25,18 +25,18 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android==1.0.0"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[postgres]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[parquet]==1.0.0"
+python3 -m pip install "agent-paranoid-android[mcp]==1.0.0"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0"
+python3 -m pip install "agent-paranoid-android[postgres]==1.0.0"
+python3 -m pip install "agent-paranoid-android[openai]==1.0.0"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -65,7 +65,7 @@ It is not the recommended user installation. Use
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.0.0rc6"
+python -m pip install "agent-paranoid-android==1.0.0"
 ```
 
 Run the self-contained environment check:
