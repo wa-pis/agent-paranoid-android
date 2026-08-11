@@ -489,6 +489,7 @@ def test_release_script_is_executable_and_covers_release_gates() -> None:
     text = script.read_text()
 
     assert script.stat().st_mode & stat.S_IXUSR
+    assert 'TMP_DIR="$(cd "$TMP_DIR" && pwd -P)"' in text
     assert "python3 -m ruff check src tests scripts" in text
     assert "python3 -m mypy" in text
     assert "python3 -m compileall -q src tests scripts" in text
