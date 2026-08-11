@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.0.0rc6] - 2026-08-11
+
 ### Added
 
 - Add an allowlist-only `profile-postgres` CLI workflow that writes safe
@@ -16,6 +18,13 @@ All notable changes to this project are documented here.
   statements generated from validated synthetic records.
 - Add complete PostgreSQL and Trino guides plus runnable synthetic local
   examples for disposable profiling, generation, validation, and SQL execution.
+- Add field-scoped, collision-safe placeholders for rare categorical values.
+- Add typed per-call OpenAI structured completion results and failure metadata;
+  retain `last_run_metadata` only as a legacy compatibility view.
+- Add `trusted-local` and `shared-hardened` Trino deployment profiles, with a
+  required finite cumulative scan ceiling for shared environments.
+- Add bounded Trino deployment profile and effective scan-limit status to
+  `doctor`.
 
 ### Changed
 
@@ -36,21 +45,6 @@ All notable changes to this project are documented here.
 
 - Document four accepted Low security findings with exact identities, risk
   ownership, revisit triggers, and a first post-1.0 hardening target.
-
-## [1.0.0rc6] - 2026-08-08
-
-### Added
-
-- Add field-scoped, collision-safe placeholders for rare categorical values.
-- Add typed per-call OpenAI structured completion results and failure metadata;
-  retain `last_run_metadata` only as a legacy compatibility view.
-- Add `trusted-local` and `shared-hardened` Trino deployment profiles, with a
-  required finite cumulative scan ceiling for shared environments.
-- Add bounded Trino deployment profile and effective scan-limit status to
-  `doctor`.
-
-### Security
-
 - Pin the Dockerfile frontend to the immutable multi-platform digest behind
   `docker/dockerfile:1.7`.
 - Bind single-CSV no-copy validation to SHA-256 row digests collected during

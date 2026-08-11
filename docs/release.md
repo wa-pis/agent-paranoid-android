@@ -64,6 +64,9 @@ attestation, signature, integration, invocation-hardening, and
 clean-environment acceptance checks have all passed. RC5 remains historical
 release evidence and is superseded for stable promotion. Record the RC6 tag
 commit and acceptance evidence before opening the stable release pull request.
+The accepted baseline, artifact hashes, public profile checks, and container
+digests are recorded in the
+[RC6 published release evidence](release-evidence-1.0.0rc6.md).
 
 Review the stable tree directly against that immutable baseline:
 

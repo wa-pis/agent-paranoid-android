@@ -49,8 +49,7 @@ introduced.
 
 ## Five-Minute Check
 
-After RC6 is public, install the exact candidate and run the self-contained
-smoke test:
+Install the accepted RC6 candidate and run the self-contained smoke test:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.0.0rc6"

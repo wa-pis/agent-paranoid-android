@@ -1,5 +1,9 @@
 # Change Proposal: 1-0-0-rc6-final-release-candidate
 
+Status: **Implemented and accepted in `v1.0.0rc6` at
+`2b65515313281aaeb180bb95328785ef46be0202`. Stable promotion remains a
+separate release step.**
+
 ## Summary
 
 Make `1.0.0rc6` the final release candidate before stable promotion. RC6
@@ -36,13 +40,14 @@ constructor exceptions outside `OpenAIError` still escape unchanged, and the
 provider-call error message still incorporates a dynamic Python exception class
 name. Both remain RC6 acceptance work; they do not create new finding IDs.
 
-The repository-wide security review of the current RC6 worktree found further
+The repository-wide security review of the RC6 worktree found further
 release-blocking gaps: common categorical values can cross the external advisor
 boundary, sensitive numeric Trino aggregates can reveal exact source values,
 provider constraints can inject literals into generated rows, generator MCP
 stdio input is not framed before parsing, and the release workflow does not
 cryptographically bind publication to an accepted source tree. These findings
-are added to RC6 because `v1.0.0rc6` has not yet been tagged or accepted.
+were added before the tag existed and were closed before the accepted
+`v1.0.0rc6` publication.
 
 The same RC6 scope now includes the deployment-conditional and lower-confidence
 follow-ups from that review. They are acceptance requirements, not a deferred

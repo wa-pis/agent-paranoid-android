@@ -208,12 +208,12 @@ core to one model vendor:
 
 ## Version Plan To 1.0
 
-The active release candidate is `1.0.0rc6`. `1.0.0rc2` completed public
-acceptance; `1.0.0rc3` added the contract-preserving application-boundary
-refactor, and
+The published and accepted release candidate is `1.0.0rc6`. `1.0.0rc2`
+completed public acceptance; `1.0.0rc3` added the contract-preserving
+application-boundary refactor, and
 `1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closed the remaining
 invocation, transport, advisor, and exact-publication acceptance findings and
-is now historical; RC6 is the active candidate for stable promotion.
+is now historical; RC6 is the immutable baseline for stable promotion.
 RC6 also restores the original field-and-destination privacy boundary. Local
 profiles and deterministic generation may preserve explicitly allowlisted,
 bounded, non-sensitive business enums. PII, secrets, identifiers, free text,
@@ -778,9 +778,9 @@ Exit criteria:
 
 **Goal:** make RC6 the single reviewed source tree for stable promotion after
 closing the remaining privacy-boundary, provider-trust, transport, filesystem,
-supply-chain, and public-review evidence gaps. RC6 remains active because no
-`v1.0.0rc6` tag has been accepted yet; the current-tree security review adds
-requirements to this candidate rather than creating an unnecessary RC7.
+supply-chain, and public-review evidence gaps. The accepted `v1.0.0rc6` tag
+resolves to `2b65515313281aaeb180bb95328785ef46be0202`; its public acceptance is
+recorded in the [RC6 release evidence](release-evidence-1.0.0rc6.md).
 
 Scope:
 
@@ -795,7 +795,7 @@ Scope:
 - [x] Return typed per-call OpenAI completion metadata and attach the same
   bounded metadata to preflight/provider failures; keep the mutable last-call
   view legacy-only.
-- [ ] Convert every ordinary SDK construction exception to the fixed local
+- [x] Convert every ordinary SDK construction exception to the fixed local
   error, detach all provider exception chains, and keep dynamic Python exception
   class names out of public provider-call messages.
 - [x] Add `trusted-local` and `shared-hardened` Trino deployment profiles;
@@ -812,9 +812,9 @@ Scope:
   synthetic execution example with read-only and FK checks.
 - [x] Make every categorical value in an external advisor request synthetic or
   non-reversible; heuristic PII detection is not an egress guarantee.
-- [ ] Suppress exact sensitive numeric Trino extrema and percentiles through
+- [x] Suppress exact sensitive numeric Trino extrema and percentiles through
   MCP, legacy conversion, and planning artifacts.
-- [ ] Validate provider-added DatasetSpec constraints and run privacy/type
+- [x] Validate provider-added DatasetSpec constraints and run privacy/type
   checks after constraint solving, before output publication.
 - [x] Make formula and validation diagnostics fixed-reason and source-free.
 - [x] Apply bounded raw-frame, invocation, and final-response budgets to the
@@ -837,22 +837,22 @@ Scope:
 - [x] Define completion/read-validation semantics and explicit approval for
   sibling-artifact replacement.
 - [x] Escape and bound untrusted metadata, paths, and errors in CLI and logs.
-- [ ] Move CI classification to trusted code, bind release publication to a
+- [x] Move CI classification to trusted code, bind release publication to a
   signed tag and reviewed commit digest, and enforce a machine-readable RC
   acceptance manifest plus hash-pinned public profile installs.
 - [x] Record deployed branch/tag rulesets, required checks, and PyPI Trusted
   Publisher approvals as external RC6 acceptance evidence.
-- [ ] Record a publicly verifiable security review with reviewer identity or
+- [x] Record a publicly verifiable security review with reviewer identity or
   stable pseudonym, reviewed commit, date, scope, findings/disposition, and a
   signature or approval URL.
-- [ ] Retag the fixed RC6 source tree and publish wheel, sdist, checksums, SBOM,
+- [x] Tag the fixed RC6 source tree and publish wheel, sdist, checksums, SBOM,
   provenance, attestations, signatures, documentation, and all supported wheel
   and container profiles.
-- [ ] Install the public RC6 artifacts in clean environments and run the
+- [x] Install the public RC6 artifacts in clean environments and run the
   literal README `--version`, `demo`, and `doctor` checks, including base,
-  `parquet`, `mcp`, `trino`, `mcp,trino`, `openai`, `all`, and all three
-  published containers, plus the `0.12.0` upgrade check.
-- [ ] Run the complete release, security, documentation, typing, lint, and
+  `parquet`, `mcp`, `trino`, `postgres`, `mcp,trino`, `openai`, `all`, and all
+  three published containers, plus the `0.12.0` upgrade check.
+- [x] Run the complete release, security, documentation, typing, lint, and
   test gates against the immutable RC6 commit before stable promotion.
 
 Exit criteria:

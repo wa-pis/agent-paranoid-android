@@ -14,9 +14,8 @@ changing this matrix are defined in
 
 ## Install From PyPI
 
-The active prerelease acceptance target is `1.0.0rc6`. Once it is public, pin
-that exact version; do not use a floating `--pre` install for candidate
-verification.
+The published and accepted prerelease is `1.0.0rc6`. Pin that exact version;
+do not use a floating `--pre` install for candidate verification.
 
 Create an isolated environment:
 

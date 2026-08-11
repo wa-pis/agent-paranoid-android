@@ -24,12 +24,12 @@
   provider-bound categories remain source-literal free.
 - [x] Add a typed explicit local-category allowlist shared by CSV, folder,
   agent, CLI, and generation boundaries.
-- [ ] Preserve allowlisted bounded non-sensitive enums and their conditional
+- [x] Preserve allowlisted bounded non-sensitive enums and their conditional
   rules; reject PII, secrets, identifiers, free text, and unknown fields even
   when requested for preservation.
-- [ ] Require table plus column allowlisting before Trino/MCP returns raw
+- [x] Require table plus column allowlisting before Trino/MCP returns raw
   non-sensitive category aggregates.
-- [ ] Re-review FS-01, AG-01/FS-02, AG-03, and the category-collision finding
+- [x] Re-review FS-01, AG-01/FS-02, AG-03, and the category-collision finding
   against this policy; retain provider sanitization and remove local
   over-redaction.
 
@@ -51,7 +51,7 @@
   materialization and convert parser recursion/resource failures to bounded
   input errors.
 - [x] Validate public artifact names as safe single components.
-- [ ] Reject symlink targets in overwrite-capable CLI artifact paths.
+- [x] Reject symlink targets in overwrite-capable CLI artifact paths.
 - [x] Neutralize or reject spreadsheet formula markers at the CSV export
   boundary and test advisor, semantic-provider, and categorical inputs.
 
@@ -90,7 +90,7 @@
 - [x] Rerun the independent review for the exact PR #335 merge tree and record
   scan `0ba29f2e-47fe-4baa-af7a-4b4a64cbe348`; it closes RC6-S1 and identifies
   the remaining RC6-S2/S3 work.
-- [ ] Rerun independent review on the next fixed immutable commit and close or
+- [x] Rerun independent review on the next fixed immutable commit and close or
   explicitly approve every finding in `security-review-evidence.md`.
 
 ## Supply-chain and release gate hardening
@@ -175,13 +175,13 @@
 - [x] Bump active metadata, version module, lockfile, README, installation
   docs, changelog, release docs, and roadmap to `1.0.0rc6`.
 - [x] Add this RC6 OpenSpec and a separate acceptance checklist.
-- [ ] Record reviewer identity or stable pseudonym, reviewed commit/date,
+- [x] Record reviewer identity or stable pseudonym, reviewed commit/date,
   files and scope, findings/disposition, and signature or approval URL.
-- [ ] Build the exact RC6 wheel and sdist and publish checksums, SBOM,
+- [x] Build the exact RC6 wheel and sdist and publish checksums, SBOM,
   provenance, attestations, and signatures.
-- [ ] Verify public base, parquet, mcp, trino, mcp+trino, openai, all, and
-  container profiles, including `--version`, `demo`, `doctor`, and upgrade
-  from `0.12.0`.
-- [ ] Run release, security, documentation, lint, typing, compile, and full
+- [x] Verify public base, parquet, mcp, trino, postgres, mcp+trino, openai,
+  all, and container profiles, including `--version`, `demo`, `doctor`, and
+  upgrade from `0.12.0`.
+- [x] Run release, security, documentation, lint, typing, compile, and full
   test gates against the immutable RC6 commit.
 - [ ] Promote stable only from the accepted RC6 source tree.

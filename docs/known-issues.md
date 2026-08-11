@@ -8,9 +8,11 @@ The source is repository-wide Codex Security scan
 `484dfa30-85d2-4059-b39b-2c52c9d0f5ed` of immutable commit
 `2c714a6d4df75a1faab422055593fc50a2061a03`. All four findings are **Low**.
 Risk owner: [@wa-pis](https://github.com/wa-pis). Target: the first post-1.0
-security-hardening release. The RC6 disposition PR and its merge are the
-attributable product-risk acceptance; they are not independent security
-approval of the final release commit.
+security-hardening release. Their disposition is product-risk acceptance, not
+proof that the broader deployment models are safe. The separate AI-assisted
+independent review of the exact RC6 commit is recorded in the
+[RC6 security evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc6-final-release-candidate/security-review-evidence.md)
+and [issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397).
 
 ## AG-04: Provider Response Pre-Parse Bounds
 

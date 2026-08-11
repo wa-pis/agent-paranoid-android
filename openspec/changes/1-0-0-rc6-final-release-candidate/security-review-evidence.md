@@ -1,12 +1,12 @@
 # RC6 Independent Security Review Evidence
 
-Status: **Findings recorded — remediation required**
+Status: **Exact immutable RC6 commit approved; public release accepted**
 
-This file records successive independent reviews. A completed review is
-evidence, not approval: the RC6 acceptance checklist remains incomplete until
-the exact immutable RC6 commit has an explicit approval disposition.
+This file records successive independent reviews. Earlier blocked conclusions
+are historical checkpoints. The final exact-commit approval and public release
+evidence at the end of this file supersede those release-status conclusions.
 
-## Attribution
+## Initial Review Attribution
 
 - Reviewer: **codex-security-reviewer-rc6** (stable pseudonym)
 - Base release: **v1.0.0rc5**
@@ -71,7 +71,7 @@ tests/test_version.py
 uv.lock
 ```
 
-## Findings And Disposition
+## Initial Findings And Disposition
 
 | Severity | Finding | Disposition | Evidence |
 | --- | --- | --- | --- |
@@ -118,8 +118,9 @@ dispositions. The scan produced one reportable Low finding, mapped to existing
 RC6-S3, and one security-suppressed but acceptance-relevant mismatch, mapped to
 existing RC6-S2; no new RC6 finding identifier was created. PR #335 is approved
 for RC6-S1 only. Trino trusted-local/shared-hardened behavior was unchanged and
-showed no new regression. Approval of the exact merge commit remains blocked
-pending the residual RC6-S2/S3 remediation and another exact-commit review.
+showed no new regression. At this historical checkpoint, approval of the exact
+merge commit remained blocked pending the residual RC6-S2/S3 remediation and
+another exact-commit review.
 
 ## PR #336 S2/S3 closure verification
 
@@ -376,8 +377,9 @@ They are deployed receipts, not conclusions inferred from workflow source.
 The GitHub environment currently reports `can_admins_bypass: true`; repository
 administrators therefore remain in the release trust base, and this evidence
 does not claim otherwise. The branch and release-tag rulesets themselves have
-no bypass actors. **Disposition: RC6-S20 closed.** RC6 publication still
-requires the final exact-commit acceptance manifest and explicit user approval.
+no bypass actors. **Disposition: RC6-S20 closed.** At this historical
+checkpoint, RC6 publication still required the final exact-commit acceptance
+manifest and explicit user approval.
 
 ## 2026-08-09 Repository-Wide Review Remediation
 
@@ -440,8 +442,8 @@ critical findings.
 All canonical findings now have a focused fix or the explicit Low-risk
 disposition above. The four accepted issues are also published in
 [`docs/known-issues.md`](../../../docs/known-issues.md). This product-risk
-acceptance does not satisfy the independent exact-commit security approval
-gate.
+acceptance did not by itself satisfy the independent exact-commit security
+approval gate at that historical checkpoint.
 
 ## 2026-08-10 Repository-Wide Review Remediation
 
@@ -455,9 +457,9 @@ on immutable commit `864dc7d5b7748663f6ab66928d06f65cb284bd8e`.
 CSV-folder plans persist a bounded SHA-256 digest captured before profiling;
 review, approval, generation publication, and recovery reject a changed source
 or a legacy source-backed plan without that binding. A synthetic replacement
-regression proves approval fails before output publication. Other findings
-from this scan remain blocking and the required final repository-wide review
-has not run.
+regression proves approval fails before output publication. At this historical
+checkpoint, other findings remained blocking and the required final
+repository-wide review had not run.
 
 ### Field-And-Destination Policy Correction
 
@@ -469,20 +471,46 @@ source literal remains synthetic. Trino/MCP raw category aggregates require
 both table and column allowlisting.
 
 Finding `csf_f7a0c0612fdd86a99bdf0c97` /
-`occ_4029f085876f9eac2d39892e` remains applicable only where policy already
-requires transformation: a generated label must not alias an original value.
-It is not evidence that an explicitly allowlisted safe local enum must be
-replaced. FS-01 and the AG-01/FS-02/AG-03 remediations therefore require
-re-review: retain source-literal removal at external provider boundaries and
-remove local over-redaction. No collision finding is closed by documentation
-alone.
+`occ_4029f085876f9eac2d39892e` applies only where policy requires
+transformation: a generated label must not alias an original value. It is not
+evidence that an explicitly allowlisted safe local enum must be replaced. The
+subsequent implementation and final review retained source-literal removal at
+external provider boundaries, restored bounded local preservation, and closed
+the collision finding with executable tests rather than documentation alone.
 
-## Review Conclusion
+## Historical Review Conclusion
 
-**Blocked.** Focused implementation and evidence close RC6-S1 through RC6-S4
-and RC6-S7 through RC6-S20. Do not tag or promote RC6 until a full
-repository-wide review is clean, an independent reviewer approves the exact
-fixed commit, and the immutable tag, final gates, and verifiable approval link
-are recorded. Public artifact acceptance remains pending until an explicitly
-approved publication. The follow-up scan of `5b3ad7f` is a blocking historical
-review, not release approval.
+Before final exact-commit approval and publication, the review was
+**blocked**. Focused implementation and evidence had closed RC6-S1 through
+RC6-S4 and RC6-S7 through RC6-S20, but the immutable tag, final gates, and
+verifiable approval link were not yet recorded. The follow-up scan of
+`5b3ad7f` was historical review evidence, not release approval.
+
+## 2026-08-11 Final Exact-Commit Approval
+
+- Reviewer stable pseudonym: **opencode-nemotron-3-ultra-free-rc6**
+- Runtime: **OpenCode using Nemotron 3 Ultra Free**
+- Reviewed commit: **`2b65515313281aaeb180bb95328785ef46be0202`**
+- Review date: **2026-08-11 UTC**
+- Approval record: [Issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397)
+- Review mode: read-only inspection and local synthetic/workflow verification;
+  no production data, paid provider call, or production database access
+
+This was an AI-assisted independent review, not a human-review claim and not a
+waiver. It covered the PostgreSQL read-only/allowlist/budget boundaries,
+field-and-destination preservation policy, external/default-MCP egress
+boundaries, deterministic atomic PostgreSQL SQL export, packaging, and release
+identity. It found no unresolved Critical or High defect and accepted the
+owned Low findings in `docs/known-issues.md` as non-blocking.
+
+The signed annotated `v1.0.0rc6` tag embeds the approval URL and binds the
+reviewed commit, closed findings, successful CI/Containers/Documentation/
+Security gates, and wheel/sdist hashes. The
+[published RC6 evidence](../../../docs/release-evidence-1.0.0rc6.md) records
+the public PyPI, GitHub Release, profile, and container verification.
+
+## Final Review Conclusion
+
+**APPROVED.** Commit `2b65515313281aaeb180bb95328785ef46be0202` is the
+accepted immutable RC6 source. RC6 publication is complete; promotion to
+stable `1.0.0` remains a separate release operation.
