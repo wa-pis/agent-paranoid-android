@@ -22,7 +22,9 @@ def test_source_literal_fixture_covers_supported_types() -> None:
     assert isinstance(SOURCE_LITERAL_VALUES["uuid"], UUID)
     assert isinstance(SOURCE_LITERAL_VALUES["binary"], bytes)
     assert type(SOURCE_LITERAL_VALUES["base64_like"]) is str
-    assert "源" in SOURCE_LITERAL_VALUES["unicode"]
+    unicode_value = SOURCE_LITERAL_VALUES["unicode"]
+    assert isinstance(unicode_value, str)
+    assert "源" in unicode_value
     assert isinstance(SOURCE_LITERAL_VALUES["nested_json"], dict)
     assert SOURCE_ROWS[0]["nullable_metric"] is None
     assert SOURCE_ROWS[1]["nullable_metric"] is not None
