@@ -11,6 +11,11 @@ from test_data_agent.postgres_client import (
     PostgresQueryError,
 )
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
+from test_data_agent.postgres_query_builders import PostgresQuery
+
+
+def query(sql: str) -> PostgresQuery:
+    return PostgresQuery(sql)
 
 
 class FakeCursor:
@@ -101,7 +106,7 @@ def test_session_forces_read_only_timeouts_and_resolves_password_late() -> None:
     assert requested_names == []
 
     with client.session() as session:
-        assert session.fetch_aggregate_dicts("SELECT count(*) FROM orders") == [
+        assert session.fetch_aggregate_dicts(query("SELECT count(*) FROM orders")) == [
             {"count": 2}
         ]
 
@@ -134,9 +139,9 @@ def test_statement_budget_is_cumulative_across_session() -> None:
     )
 
     with client.session() as session:
-        assert session.fetch_aggregate_dicts("SELECT 1") == []
+        assert session.fetch_aggregate_dicts(query("SELECT 1")) == []
         with pytest.raises(PostgresBudgetExceeded, match="statement budget"):
-            session.fetch_aggregate_dicts("SELECT 2")
+            session.fetch_aggregate_dicts(query("SELECT 2"))
 
     assert cursors[1].executions == []
 
@@ -164,7 +169,7 @@ def test_result_budgets_fail_closed(
 
     with client.session() as session:
         with pytest.raises(PostgresBudgetExceeded, match=message):
-            session.fetch_aggregate_dicts("SELECT bounded_aggregate")
+            session.fetch_aggregate_dicts(query("SELECT bounded_aggregate"))
 
     assert cursor.closed is True
     assert connection.closed is True
@@ -181,11 +186,11 @@ def test_result_budget_is_cumulative_across_queries() -> None:
     )
 
     with client.session() as session:
-        assert session.fetch_aggregate_dicts("SELECT first_aggregate") == [
+        assert session.fetch_aggregate_dicts(query("SELECT first_aggregate")) == [
             {"count": 1}
         ]
         with pytest.raises(PostgresBudgetExceeded, match="result row budget"):
-            session.fetch_aggregate_dicts("SELECT second_aggregate")
+            session.fetch_aggregate_dicts(query("SELECT second_aggregate"))
 
 
 def test_backend_error_text_is_not_exposed() -> None:
@@ -198,7 +203,7 @@ def test_backend_error_text_is_not_exposed() -> None:
 
     with client.session() as session:
         with pytest.raises(PostgresQueryError) as error:
-            session.fetch_aggregate_dicts("SELECT aggregate")
+            session.fetch_aggregate_dicts(query("SELECT aggregate"))
 
     assert secret not in str(error.value)
     assert error.value.__cause__ is None
@@ -237,10 +242,10 @@ def test_deadline_is_checked_before_next_statement() -> None:
     )
 
     with client.session() as session:
-        assert session.fetch_aggregate_dicts("SELECT 1") == []
+        assert session.fetch_aggregate_dicts(query("SELECT 1")) == []
         now = 1.0
         with pytest.raises(PostgresBudgetExceeded, match="session deadline"):
-            session.fetch_aggregate_dicts("SELECT 2")
+            session.fetch_aggregate_dicts(query("SELECT 2"))
 
     assert cursors[1].executions == []
 
@@ -254,3 +259,17 @@ def test_missing_password_environment_variable_fails_before_connect() -> None:
             pass
 
     assert driver.connect_kwargs == {}
+
+
+def test_raw_sql_is_rejected_before_cursor_execution() -> None:
+    cursor = FakeCursor([])
+    client = PostgresClient(
+        postgres_config(password_env=None),
+        FakeDriver(FakeConnection([cursor])),
+    )
+
+    with client.session() as session:
+        with pytest.raises(TypeError, match="trusted PostgresQuery"):
+            session.fetch_aggregate_dicts("SELECT arbitrary_sql")  # type: ignore[arg-type]
+
+    assert cursor.executions == []

@@ -5,12 +5,13 @@ from __future__ import annotations
 import math
 import os
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Literal
 
 from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.postgres_query_builders import PostgresQuery
 
 
 class PostgresClientError(RuntimeError):
@@ -113,11 +114,12 @@ class PostgresProfileSession:
 
     def fetch_aggregate_dicts(
         self,
-        sql: str,
-        parameters: Sequence[object] = (),
+        query: PostgresQuery,
     ) -> list[dict[str, object]]:
         """Fetch trusted metadata or aggregate rows without exposing backend errors."""
 
+        if not isinstance(query, PostgresQuery):
+            raise TypeError("PostgreSQL execution requires a trusted PostgresQuery")
         if self._connection is None:
             raise PostgresConnectionError("PostgreSQL session is not open")
         self._check_deadline()
@@ -127,7 +129,7 @@ class PostgresProfileSession:
         cursor: Any = None
         try:
             cursor = self._connection.cursor()
-            cursor.execute(sql, parameters)
+            cursor.execute(query.sql, query.parameters)
             self._check_deadline()
             description = cursor.description or ()
             names = [str(column[0]) for column in description]
