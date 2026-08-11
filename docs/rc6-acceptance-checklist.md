@@ -153,5 +153,6 @@ literal README commands plus `test-data-agent --version`, `demo`, and `doctor`.
   compile checks pass.
 - [x] Release script and strict documentation build pass on the exact RC6
   commit.
-- [ ] Stable promotion uses only the accepted RC6 source tree plus reviewed
-  release metadata changes.
+- [x] Stable promotion uses only the accepted RC6 source tree plus reviewed
+  release metadata changes; see the
+  [stable published release evidence](release-evidence-1.0.0.md).
