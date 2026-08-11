@@ -29,6 +29,7 @@ from test_data_agent.core.privacy import (
     PrivacySettings,
     semantic_type_is_sensitive,
     synthetic_category_distribution,
+    validate_local_category_values,
 )
 from test_data_agent.csv_profiler import (
     detect_csv_dialect,
@@ -118,11 +119,19 @@ def _sanitize_source_categories(
 
             allowed = (entity.name, profile_field.name) in allowlisted_fields
             if allowed:
-                if _is_unsafe_local_category_field(profile_field, source_values, profile_safety_settings):
+                try:
+                    validate_local_category_values(
+                        field_name=profile_field.name,
+                        semantic_type=profile_field.semantic_type,
+                        sensitive=profile_field.sensitive,
+                        values=source_values,
+                        max_categories=profile_safety_settings.max_safe_categories,
+                    )
+                except ValueError:
                     raise ValueError(
                         f"local category field {entity.name!r}.{profile_field.name!r} "
                         "is not safe for raw preservation"
-                    )
+                    ) from None
                 replacements[(entity.name, profile_field.name)] = {
                     source: source for source in source_values
                 }
@@ -166,42 +175,6 @@ def _safe_condition_value(value: Any, mapping: dict[str, str]) -> str:
     if not isinstance(value, str) or value not in mapping:
         raise ValueError("source categorical constraint is invalid")
     return mapping[value]
-
-
-def _is_unsafe_local_category_field(
-    field: FieldProfile,
-    source_values: list[str],
-    settings: PrivacySettings,
-) -> bool:
-    if field.sensitive:
-        return True
-    if infer_sensitive_from_name(field.name) or semantic_type_is_sensitive(field.semantic_type):
-        return True
-    if len(source_values) > settings.max_safe_categories:
-        return True
-    if infer_sensitive_type_from_values(source_values) is not None:
-        return True
-    return any(_looks_like_free_text(value) for value in source_values)
-
-
-def _looks_like_free_text(value: str) -> bool:
-    if len(value) > 64:
-        return True
-    if value.count(" ") > 3:
-        return True
-    if not value:
-        return True
-    if any(char.isspace() for char in value) and any(
-        ch.isdigit() for ch in value
-    ):
-        return False
-    if value.lower() in {"unknown", "other", "misc", "miscellaneous"}:
-        return False
-    if any(char == ":" for char in value):
-        return True
-    if infer_sensitive_value_type(value) is not None:
-        return True
-    return False
 
 
 def _profile_schema_with_sample(

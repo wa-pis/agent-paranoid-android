@@ -119,6 +119,64 @@ class PrivacySettings(BaseModel):
     max_safe_categories: int = Field(default=20, ge=0)
 
 
+def validate_local_category_values(
+    *,
+    field_name: str,
+    semantic_type: str | None,
+    sensitive: bool,
+    values: Iterable[Any],
+    max_categories: int = 20,
+    max_value_length: int = 64,
+) -> None:
+    """Fail closed unless exact local values are bounded non-sensitive scalars."""
+
+    if sensitive or infer_sensitive_from_name(field_name):
+        raise ValueError("local category field is sensitive")
+    normalized_name = normalize_field_name(field_name)
+    name_parts = set(normalized_name.split("_"))
+    if (
+        normalized_name == "id"
+        or normalized_name.endswith("_id")
+        or normalized_name == "key"
+        or normalized_name.endswith("_key")
+        or name_parts & {"uuid", "guid"}
+    ):
+        raise ValueError("local category identifiers cannot be preserved")
+    if name_parts & {"age", "ip", "latitude", "longitude", "postal", "postcode", "zip"}:
+        raise ValueError("local category quasi-identifiers cannot be preserved")
+    normalized_semantic_type = (semantic_type or "").strip().lower()
+    if semantic_type_is_sensitive(semantic_type) or normalized_semantic_type in {
+        "identifier",
+        "quasi_identifier",
+        "quasi-identifier",
+    }:
+        raise ValueError("local category semantic type is sensitive")
+    if max_categories < 1 or max_value_length < 1:
+        raise ValueError("local category limits must be positive")
+
+    candidates = tuple(values)
+    if not candidates:
+        raise ValueError("local category values must not be empty")
+    if len(candidates) > max_categories:
+        raise ValueError("local category cardinality exceeds its limit")
+
+    seen: set[tuple[type[object], object]] = set()
+    for value in candidates:
+        if type(value) not in {str, int, bool}:
+            raise ValueError("local category values must be bounded scalars")
+        key = (type(value), value)
+        if key in seen:
+            raise ValueError("local category values must be unique")
+        seen.add(key)
+        text = str(value)
+        if len(text) > max_value_length:
+            raise ValueError("local category value length exceeds its limit")
+        if isinstance(value, str) and _looks_like_local_free_text(value):
+            raise ValueError("local category values contain free text")
+    if infer_sensitive_type_from_values(candidates) is not None:
+        raise ValueError("local category values contain sensitive content")
+
+
 def normalize_field_name(name: str) -> str:
     return name.lower().replace("-", "_").replace(" ", "_")
 
@@ -176,6 +234,14 @@ def infer_sensitive_type_from_values(values: Iterable[Any]) -> str | None:
     return detected
 
 
+def _looks_like_local_free_text(value: str) -> bool:
+    if not value or value.count(" ") > 3 or ":" in value:
+        return True
+    if any(char.isspace() for char in value) and any(char.isdigit() for char in value):
+        return False
+    return False
+
+
 def looks_sensitive_value(value: Any) -> bool:
     return infer_sensitive_value_type(value) is not None
 
@@ -194,7 +260,9 @@ def looks_high_entropy_token(text: str) -> bool:
     if character_classes < 2:
         return False
     counts = Counter(text)
-    entropy = -sum((count / len(text)) * math.log2(count / len(text)) for count in counts.values())
+    entropy = -sum(
+        (count / len(text)) * math.log2(count / len(text)) for count in counts.values()
+    )
     return entropy >= 3.5
 
 
