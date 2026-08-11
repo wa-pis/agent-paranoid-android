@@ -24,9 +24,9 @@ Run the executable release gate:
 scripts/check_release.sh
 ```
 
-The gate runs direct Python privacy checks and direct Trino service-boundary
-tests before the full coverage suite, so transport-level tests cannot mask a
-bypass in the underlying application API.
+The gate runs direct Python privacy checks plus direct PostgreSQL and Trino
+service-boundary tests before the full coverage suite, so transport-level tests
+cannot mask a bypass in the underlying application API.
 
 The script runs linting, strict type checks for the full production package,
 compilation, coverage tests, DatasetSpec schema freshness, and the README

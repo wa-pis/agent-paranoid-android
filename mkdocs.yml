@@ -47,6 +47,7 @@ nav:
       - Run The Reference Agent: how-to/reference-agent.md
       - Connect An MCP Client: how-to/mcp.md
       - Profile PostgreSQL: how-to/postgresql.md
+      - Profile Through Trino: how-to/trino.md
   - Safety And Concepts:
       - Safety Model: concepts/safety-model.md
       - Threat Model: concepts/threat-model.md

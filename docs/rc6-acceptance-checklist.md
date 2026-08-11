@@ -102,6 +102,13 @@ source checkouts are not substitutes for the public-artifact checks.
   request-cap exhaustion, backend-error redaction, opt-in row privacy,
   semantic-provider timeout/replay/output policy, filesystem races, interrupted
   publication, overwrite approval, and terminal escaping.
+- [x] A disposable synthetic PostgreSQL check proves the profiling role cannot
+  write, applies mandatory schema/table/column allowlists and budgets, preserves
+  only the approved enum, validates generated rows, executes the deterministic
+  SQL file in an empty target, and leaves zero FK violations.
+- [x] Public documentation distinguishes default replacement, selective local
+  preservation, external/default-MCP egress boundaries, generic SQL output,
+  and executable PostgreSQL export, with runnable CSV/PostgreSQL/Trino examples.
 - [ ] Independent review is rerun against the exact fixed RC6 commit and every
   finding has a closed or explicitly approved disposition.
 
@@ -116,6 +123,7 @@ literal README commands plus `test-data-agent --version`, `demo`, and `doctor`.
 | `parquet` | [ ] | |
 | `mcp` | [ ] | |
 | `trino` | [ ] | |
+| `postgres` | [ ] | |
 | `mcp,trino` | [ ] | |
 | `openai` | [ ] | |
 | `all` | [ ] | |

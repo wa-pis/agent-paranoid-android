@@ -22,4 +22,8 @@ for format in csv json sql parquet; do
     --output "$OUTPUT/$format"
 done
 
+"${CLI[@]}" export-postgres-sql "$ROOT/dataset_spec.yaml" \
+  --seed 271828 \
+  --output "$OUTPUT/postgres.sql"
+
 echo "Output-format example complete: $OUTPUT"

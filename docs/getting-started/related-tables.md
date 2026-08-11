@@ -83,5 +83,18 @@ test-data-agent validate out/dataset_spec.yaml out/generated \
 Do not generate until a reviewer accepts inferred relationships and
 constraints for a new domain.
 
+To preserve one reviewed local enum across the staged workflow, pass the same
+field-scoped selector while profiling:
+
+```bash
+test-data-agent profile-example tests/fixtures/example_dataset \
+  --local-category orders.status \
+  --output out/profile-with-status.json
+```
+
+`orders.cancellation_reason` is free text and is not eligible. The allowlist
+does not copy source rows or expose exact values to external advisors or
+default MCP responses.
+
 See [Profiles And Specs](../concepts/profiles-and-specs.md) for the purpose of
 each stage.

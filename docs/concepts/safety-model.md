@@ -25,9 +25,16 @@ Treat all of these as untrusted:
 Likely PII and secrets are detected from both field names and values. Sensitive
 columns suppress raw top values and expose masked patterns or aggregate metadata
 instead. Sensitive examples use an opaque placeholder rather than intentionally
-preserving source values. Non-sensitive category profiles also replace source
-values, including rare free text and quasi-identifiers, with ranked synthetic
-labels while preserving counts.
+preserving source values. Non-sensitive category profiles replace source values
+with ranked synthetic labels by default. An explicit field-scoped local
+allowlist may preserve only a reviewed bounded non-sensitive business enum or
+constant after content, cardinality, and value-length checks. Rare free text,
+PII, secrets, identifiers, and quasi-identifiers are never eligible.
+
+Approved exact values may appear only in local profiles, reviewed specs,
+deterministic generated rows, and local SQL export. External providers receive
+field-scoped labels, and default MCP responses, logs, and public errors remain
+source-literal free.
 
 ### Source-row reuse
 
@@ -53,6 +60,15 @@ row-returning tool `run_safe_select` recursively masks every returned string in
 bounded scalar or composite values and any non-string field or value recognized
 as sensitive. Other non-string source values may remain, so those rows are not
 source-free or anonymous.
+
+### PostgreSQL
+
+Direct PostgreSQL profiling uses the optional driver through a forced
+read-only session. Schema, table, and column allowlists are mandatory, and one
+shared statement/result/deadline budget bounds metadata and aggregate queries.
+The profiler accepts no caller SQL and reads no source rows. Qualified local
+category selectors may retain only values that pass the selective local policy
+above.
 
 ### Resource limits
 

@@ -13,6 +13,8 @@ generated output.
 | --- | --- |
 | One CSV file | [First CSV Dataset](getting-started/first-csv.md) |
 | A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
+| An allowlisted PostgreSQL database | [Profile PostgreSQL](how-to/postgresql.md) |
+| An allowlisted Trino coordinator | [Profile Through Trino](how-to/trino.md) |
 | A real development or analytics task | [Product Validation Pilot](getting-started/product-validation-pilot.md) |
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |
@@ -77,6 +79,12 @@ The project intentionally refuses:
 - unrestricted SQL or write operations through Trino tools;
 - output paths that overwrite source input;
 - unbounded input, output, rule, query, or generation work.
+
+Exact source literals are disabled by default. A field-scoped local allowlist
+may retain only a reviewed bounded non-sensitive business enum or constant in
+local profiles, deterministic generation, and local SQL export. It never
+authorizes source rows, PII, secrets, identifiers, free text, external-provider
+payloads, or default MCP responses.
 
 Read [Safety Model](concepts/safety-model.md) before connecting the project to
 production-adjacent data or an AI client.

@@ -16,7 +16,9 @@ dataset. It can contain:
 - inferred relationship and constraint candidates.
 
 A profile must not contain source rows, raw PII, credentials, tokens, or rare
-free-text values.
+free-text values. Exact values are disabled by default. An explicit
+field-scoped local allowlist may retain a reviewed bounded non-sensitive
+business enum or constant after content, cardinality, and value-length checks.
 
 Create one from a CSV folder:
 
@@ -24,6 +26,18 @@ Create one from a CSV folder:
 test-data-agent profile-example data/example_dataset \
   --output out/profile.json
 ```
+
+For example, retain a reviewed local enum while replacing every other source
+literal:
+
+```bash
+test-data-agent profile-example data/example_dataset \
+  --local-category orders.status \
+  --output out/profile.json
+```
+
+This authorization remains local. External advisors receive deterministic
+field-scoped labels, and default MCP responses do not receive the exact enum.
 
 ## DatasetSpec
 

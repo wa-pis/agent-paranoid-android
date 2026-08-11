@@ -92,9 +92,12 @@ Field profiles contain schema and safe distribution metadata:
 }
 ```
 
-Sensitive fields use masked patterns, not raw top values. Low-cardinality
-non-sensitive fields preserve category frequency ranks with synthetic labels
-such as `category_1`; source category values are not included in profiles.
+Sensitive fields use masked patterns, not raw top values. By default,
+low-cardinality non-sensitive fields preserve category frequency ranks with
+synthetic labels such as `category_1`. Exact values appear only for a field in
+the typed local category allowlist after bounded non-sensitive content checks;
+that exception does not apply to source rows, provider payloads, or default MCP
+responses.
 
 Common distribution kinds:
 

@@ -26,6 +26,11 @@ The output is a fresh synthetic dataset for development, integration tests,
 analytics changes, forecasting, or budgeting experiments. It is not a masked
 copy of the source and it is not a privacy certification.
 
+Exact values are replaced by default. A reviewer may explicitly preserve a
+bounded non-sensitive business enum or constant for local generation and SQL
+export; that exception is field-scoped, fails closed on unsafe content, and
+never extends to source rows, external providers, or default MCP responses.
+
 ## AI Is Optional
 
 The core workflow does not require an AI provider, an MCP client, or an

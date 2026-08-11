@@ -96,4 +96,20 @@ profile artifacts, or command logs until you have reviewed them. The profiler
 suppresses raw values for fields detected as sensitive, but ambiguous domain
 fields still require human review.
 
+Exact values remain replaced by default. When `customers.status` has been
+reviewed as a bounded non-sensitive business enum, authorize only that field:
+
+```bash
+test-data-agent generate-from-csv tests/fixtures/customers.csv \
+  --local-category customers.status \
+  --count 25 \
+  --seed 12345 \
+  --format csv \
+  --output out/approved-status/customers.csv
+```
+
+The request fails closed if the field contains PII, secrets, identifiers,
+quasi-identifiers, free text, excessive cardinality, or long values. The option
+does not authorize any other field or any external-provider destination.
+
 Next, read [Review The Output](review-output.md).

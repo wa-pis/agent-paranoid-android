@@ -1,17 +1,7 @@
 # Agent Paranoid Android
 
-[![PyPI](https://img.shields.io/pypi/v/agent-paranoid-android.svg)](https://pypi.org/project/agent-paranoid-android/)
-[![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://wa-pis.github.io/agent-paranoid-android/)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/wa-pis/agent-paranoid-android/badge)](https://scorecard.dev/viewer/?uri=github.com/wa-pis/agent-paranoid-android)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
-Safety-first, deterministic synthetic test data generation from CSV structure,
-safe profiles, reviewed `DatasetSpec` files, and allowlisted Trino metadata. The
-CLI and Python library are primary; MCP, Trino, and AI providers are optional
-integrations. The base package supports CSV/JSON workflows without installing
-the Trino client, SQL parser, or MCP SDK.
-Source rows are profiled, never shuffled or copied into generated output.
+[![PyPI](https://img.shields.io/pypi/v/agent-paranoid-android.svg)](https://pypi.org/project/agent-paranoid-android/) [![CI](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml/badge.svg)](https://github.com/wa-pis/agent-paranoid-android/actions/workflows/ci.yml) [![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue.svg)](https://wa-pis.github.io/agent-paranoid-android/) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/wa-pis/agent-paranoid-android/badge)](https://scorecard.dev/viewer/?uri=github.com/wa-pis/agent-paranoid-android) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+Safety-first, deterministic synthetic test data generation from CSV structure, safe profiles, reviewed `DatasetSpec` files, and allowlisted PostgreSQL or Trino metadata. The CLI and Python library are primary; PostgreSQL, MCP, Trino, and AI providers are optional integrations. The base package supports CSV/JSON workflows without installing a database client, SQL parser, or MCP SDK. Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
 Current version: `1.0.0rc6`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
@@ -23,10 +13,14 @@ and types, nullability, ranked distribution and scale shape, approved FK graphs,
 temporal dependencies, and executable business rules. AI may propose relationships
 and rules; human review and deterministic validation remain the authority boundary.
 
-It intentionally does not preserve or copy source values or real PII. It does not
-certify statistical anonymity, protection from every re-identification attack, or
-cross-environment byte identity. A seed provides logical reproducibility under the
-recorded package, dependency, locale, and serializer environment.
+It never copies source rows or preserves real PII. Exact source literals remain
+off by default; an explicit field-scoped allowlist may preserve only a reviewed,
+bounded, non-sensitive business enum or constant in local profiles,
+deterministic generation, and local SQL export. External providers and default
+MCP responses remain source-literal free. The project does not certify
+statistical anonymity, protection from every re-identification attack, or
+cross-environment byte identity. A seed provides logical reproducibility under
+the recorded package, dependency, locale, and serializer environment.
 
 ## Install
 
@@ -44,12 +38,14 @@ Install only features you use:
 python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[trino]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[postgres]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc6"
 ```
 
-The `trino` extra is required only for Trino profiling and contains the Trino
-client and safe SQL parser. Add `mcp` when using the Trino MCP server.
+The `postgres` extra provides the Psycopg driver for direct read-only
+PostgreSQL profiling. The `trino` extra contains the Trino client and safe SQL
+parser; add `mcp` when using the Trino MCP server.
 The default aggregate-only tools return summaries, not source rows. The explicit opt-in row-returning tools include
 `run_safe_select`, which requires `TRINO_ENABLE_SAFE_SELECT=true`; bounded, masked rows may contain allowed source values and are not source-free, PII-free, anonymous, or privacy-safe.
 
@@ -96,14 +92,16 @@ to profile your own input.
 | Validate the workflow with a real development or analytics task | [Product Validation Pilot](https://wa-pis.github.io/agent-paranoid-android/getting-started/product-validation-pilot/) |
 | Generate from one CSV | [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/) |
 | Generate related tables | [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/) |
+| Profile PostgreSQL and export executable SQL | [PostgreSQL workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/postgresql/) · [Runnable disposable example](examples/local_postgres/) |
+| Profile through Trino | [Trino workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/trino/) · [Runnable local example](examples/local_trino/) |
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
 | Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |
 | Connect an AI client or provider | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) · [Provider Adapter](https://wa-pis.github.io/agent-paranoid-android/how-to/custom-advisor-provider/) · [Runnable MCP example](examples/mcp_stdio/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |
-| Configure limits and Trino | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) · [Runnable local Trino example](examples/local_trino/) |
-| Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/); PostgreSQL: `test-data-agent export-postgres-sql dataset_spec.yaml --seed 12345 -o out/dataset.sql` |
+| Configure limits and database access | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
+| Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/); use `export-postgres-sql` for one executable PostgreSQL DDL+INSERT file |
 | Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
 | Decide whether this tool fits | [Choose An Approach](https://wa-pis.github.io/agent-paranoid-android/concepts/choosing-an-approach/) |
 
@@ -114,6 +112,8 @@ masked patterns, and safe low-cardinality distributions. It rejects or bounds:
 
 - raw detected PII, credentials, tokens, and private keys in profiles;
 - source-row copying and source/output path reuse;
+- exact literals outside an explicit local field allowlist and its bounded
+  non-sensitive content checks;
 - path traversal and symlink escapes through generator MCP tools;
 - unrestricted SQL and write operations through Trino tools;
 - oversized input, output, rule, query, and generation work.
