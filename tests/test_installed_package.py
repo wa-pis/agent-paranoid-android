@@ -12,6 +12,7 @@ from scripts.check_installed_package import (
     group_dependencies_by_extra,
     requirement_extras,
     verify_installed_csv_json_quickstart,
+    verify_installed_postgres_sql_smoke,
     verify_wheel_size,
 )
 
@@ -103,3 +104,39 @@ def test_installed_quickstart_checks_csv_and_json(
     verify_installed_csv_json_quickstart(entrypoint=Path("test-data-agent"))
 
     assert formats == ["csv", "json"]
+
+
+def test_installed_postgres_smoke_checks_profile_command_and_deterministic_sql(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    commands: list[str] = []
+    physical = tmp_path / "physical"
+    physical.mkdir()
+
+    def fake_run(
+        command: list[str | Path],
+        **_kwargs: object,
+    ) -> subprocess.CompletedProcess[str]:
+        commands.append(str(command[1]))
+        if command[1] == "export-postgres-sql":
+            output = Path(command[command.index("--output") + 1])
+            output.write_text(
+                'BEGIN;\nCREATE TABLE "orders" ();\n'
+                'INSERT INTO "orders" DEFAULT VALUES;\nCOMMIT;\n'
+            )
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    monkeypatch.setattr("scripts.check_installed_package.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "scripts.check_installed_package.tempfile.TemporaryDirectory",
+        lambda **_: nullcontext(str(physical)),
+    )
+
+    verify_installed_postgres_sql_smoke(entrypoint=Path("test-data-agent"))
+
+    assert commands == [
+        "profile-postgres",
+        "export-postgres-sql",
+        "export-postgres-sql",
+    ]

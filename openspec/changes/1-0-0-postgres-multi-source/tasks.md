@@ -87,9 +87,9 @@
   unsupported input without leaving a partial target.
 - [x] Add golden and parser tests for valid PostgreSQL syntax, stable ordering,
   quoting, literals, NULL, foreign keys, approved as-is values, and failures.
-- [ ] Add isolated-wheel PostgreSQL/SQL smoke coverage without live database
-  access, plus an optional explicitly gated disposable-PostgreSQL execution
-  check.
+- [x] Add isolated-wheel PostgreSQL/SQL smoke coverage without live database
+  access.
+- [ ] Add an optional explicitly gated disposable-PostgreSQL execution check.
 - [ ] Run lint, type checking, compile, focused tests, full tests, documentation
   build, dependency/license checks, and the release acceptance workflow on the
   exact implementation commit.

@@ -121,6 +121,8 @@ def main(argv: list[str] | None = None) -> None:
     verify_install_profile(args.profile)
     verify_installed_demo()
     verify_installed_csv_json_quickstart()
+    if args.profile == "postgres":
+        verify_installed_postgres_sql_smoke()
     if args.wheel is not None:
         verify_wheel_size(args.wheel)
 
@@ -293,6 +295,85 @@ def verify_installed_csv_json_quickstart(
                     f"installed {output_format} quickstart generated "
                     f"{row_count} rows instead of 3"
                 )
+
+
+def verify_installed_postgres_sql_smoke(
+    *,
+    entrypoint: Path | None = None,
+) -> None:
+    cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
+    with tempfile.TemporaryDirectory(prefix="test-data-agent-postgres-") as temp:
+        root = Path(temp).resolve(strict=True)
+        spec = root / "dataset-spec.json"
+        first = root / "first.sql"
+        second = root / "second.sql"
+        spec.write_text(
+            json.dumps(
+                {
+                    "entities": [
+                        {
+                            "name": "orders",
+                            "row_count": 2,
+                            "primary_key": "order_id",
+                            "fields": [
+                                {
+                                    "name": "order_id",
+                                    "data_type": "integer",
+                                    "is_identifier": True,
+                                },
+                                {"name": "status", "data_type": "string"},
+                            ],
+                        }
+                    ],
+                    "generation_settings": {"seed": 12345},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        help_result = subprocess.run(
+            [cli, "profile-postgres", "--help"],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if help_result.returncode != 0:
+            raise SystemExit("installed PostgreSQL profile command is unavailable")
+
+        for output in (first, second):
+            completed = subprocess.run(
+                [
+                    cli,
+                    "export-postgres-sql",
+                    spec,
+                    "--seed",
+                    "12345",
+                    "--output",
+                    output,
+                ],
+                cwd=root,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if completed.returncode != 0:
+                raise SystemExit(
+                    "installed PostgreSQL SQL export failed: "
+                    f"{completed.stderr.strip() or completed.stdout.strip()}"
+                )
+
+        sql = first.read_text(encoding="utf-8")
+        if sql != second.read_text(encoding="utf-8"):
+            raise SystemExit("installed PostgreSQL SQL export is not deterministic")
+        required = (
+            "BEGIN;",
+            'CREATE TABLE "orders"',
+            'INSERT INTO "orders"',
+            "COMMIT;",
+        )
+        if not all(fragment in sql for fragment in required):
+            raise SystemExit("installed PostgreSQL SQL export is incomplete")
 
 
 def requirement_name(requirement: str) -> str:
