@@ -67,6 +67,10 @@ commit and acceptance evidence before opening the stable release pull request.
 The accepted baseline, artifact hashes, public profile checks, and container
 digests are recorded in the
 [RC6 published release evidence](release-evidence-1.0.0rc6.md).
+Stable `v1.0.0` was subsequently published from exact commit
+`eb4ef2a5d111ef31390f0a204068369e3f934a3b`; its signed tag, artifact hashes,
+image digests, and post-publish checks are recorded in the
+[stable published release evidence](release-evidence-1.0.0.md).
 
 Review the stable tree directly against that immutable baseline:
 

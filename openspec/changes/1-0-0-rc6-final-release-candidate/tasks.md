@@ -187,4 +187,5 @@
 - [x] Prepare stable only from the accepted RC6 runtime, with package version,
   changelog, release notes, documentation, acceptance evidence, and generated
   release metadata only.
-- [ ] Publish and verify stable `1.0.0` from the accepted exact commit.
+- [x] Publish and verify stable `1.0.0` from the accepted exact commit; see the
+  [stable published release evidence](../../../docs/release-evidence-1.0.0.md).

@@ -206,9 +206,11 @@ core to one model vendor:
 - Measure the base environment separately from development and `all` installs
   in CI, and document the installation cost of each optional capability.
 
-## Version Plan To 1.0
+## Version Plan And 1.0 Baseline
 
-The published and accepted release candidate is `1.0.0rc6`. `1.0.0rc2`
+Stable `1.0.0` is published from exact commit
+`eb4ef2a5d111ef31390f0a204068369e3f934a3b`; RC6 remains its immutable
+accepted runtime baseline. `1.0.0rc2`
 completed public acceptance; `1.0.0rc3` added the contract-preserving
 application-boundary refactor, and
 `1.0.0rc4` completed public-index acceptance. `1.0.0rc5` closed the remaining
@@ -420,9 +422,10 @@ into `1.0.0rc1`. Finish the release stage in this order:
      Remove stale `sample_rows_masked` documentation.
    - [x] Record the disposition of crash-durability/fsync work; it is not an
      ordinary stable-release blocker unless the product contract promises it.
-9. [ ] Apply only release-blocking fixes found during RC4 acceptance, repeat
+9. [x] Apply only release-blocking fixes found during RC4 acceptance, repeat
    the exact release gates, and publish `1.0.0` from the verified release
-   commit.
+   commit. The exact results are recorded in the
+   [stable published release evidence](release-evidence-1.0.0.md).
 
 The preferred release path is to consolidate the already completed `0.13.0`
 through `0.15.0` scopes into the 1.0 release candidate after the OpenSpec and
@@ -431,10 +434,11 @@ Do not create retroactive intermediate tags unless maintainers explicitly need
 those public milestones. Version changes, release commits, tags, and publication
 remain separate release-stage work.
 
-### Product Validation Before Stable 1.0
+### Product Validation Follow-up After 1.0
 
-**Goal:** verify that the frozen workflow solves a real development or analytics
-problem before adding more platform surface.
+**Goal:** collect observed user feedback on the frozen workflow before adding
+more platform surface. Stable technical acceptance is complete; this pilot is
+post-release product discovery, not a condition on the published `1.0.0`.
 
 Scope:
 
@@ -461,9 +465,10 @@ Exit criteria:
 
 ### PostgreSQL Source Adapter Gate
 
-For teams whose source system is PostgreSQL, stable `1.0` also requires one
+For teams whose source system is PostgreSQL, stable `1.0` includes one
 documented direct database workflow. Trino remains an optional integration and
-must not be a prerequisite for PostgreSQL users.
+is not a prerequisite for PostgreSQL users. The unchecked relationship-
+discovery enhancement below remains post-1.0 work, not a release blocker.
 
 The implementation contract is the [PostgreSQL and multi-source
 OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-postgres-multi-source/proposal.md).
@@ -882,13 +887,16 @@ Scope:
 - [x] Apply only release-contract corrections proven necessary by RC6
   acceptance and repeat the
   affected release gates.
-- [ ] Re-run every release candidate gate on the exact release commit.
-- [ ] Publish signed and attested wheel, source distribution, documentation,
+- [x] Re-run every release candidate gate on the exact release commit.
+- [x] Publish signed and attested wheel, source distribution, documentation,
   and separate CLI, generator MCP, and Trino MCP container images.
-- [ ] Verify PyPI and GitHub Release digests, public installation, `doctor`,
+- [x] Verify PyPI and GitHub Release digests, public installation, `doctor`,
   quickstart, and container signatures after publication.
-- [ ] Start the post-1.0 compatibility and deprecation policy from the published
+- [x] Start the post-1.0 compatibility and deprecation policy from the published
   contracts.
+
+The signed tag, package and container digests, and public verification runs are
+recorded in the [stable published release evidence](release-evidence-1.0.0.md).
 
 ### Post-1.0: Follow-up Architecture And Community
 
