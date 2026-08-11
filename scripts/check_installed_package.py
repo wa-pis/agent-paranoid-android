@@ -202,11 +202,12 @@ def verify_wheel_size(path: Path) -> None:
 
 def verify_installed_demo() -> None:
     with tempfile.TemporaryDirectory(prefix="test-data-agent-demo-") as temp:
-        output = Path(temp) / "generated"
+        root = Path(temp).resolve(strict=True)
+        output = root / "generated"
         entrypoint = Path(sys.executable).with_name("test-data-agent")
         completed = subprocess.run(
             [entrypoint, "demo", "--output", str(output)],
-            cwd=temp,
+            cwd=root,
             check=False,
             capture_output=True,
             text=True,
@@ -231,7 +232,7 @@ def verify_installed_csv_json_quickstart(
 ) -> None:
     cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
     with tempfile.TemporaryDirectory(prefix="test-data-agent-quickstart-") as temp:
-        root = Path(temp)
+        root = Path(temp).resolve(strict=True)
         source = root / "customers.csv"
         source.write_text(
             "customer_id,email,segment\n"
@@ -255,7 +256,7 @@ def verify_installed_csv_json_quickstart(
                     "--output",
                     output,
                 ],
-                cwd=temp,
+                cwd=root,
                 check=False,
                 capture_output=True,
                 text=True,

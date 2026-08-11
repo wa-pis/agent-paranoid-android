@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+from contextlib import nullcontext
 from pathlib import Path
 
 import pytest
@@ -55,15 +56,24 @@ def test_wheel_size_budget_rejects_large_wheel(tmp_path: Path) -> None:
 
 def test_installed_quickstart_checks_csv_and_json(
     monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     formats: list[str] = []
+    physical = tmp_path / "physical"
+    physical.mkdir()
+    alias = tmp_path / "alias"
+    alias.symlink_to(physical, target_is_directory=True)
 
     def fake_run(
-        command: list[object],
-        **_: object,
+        command: list[str | Path],
+        **kwargs: object,
     ) -> subprocess.CompletedProcess[str]:
         output_format = str(command[command.index("--format") + 1])
         output = Path(command[command.index("--output") + 1])
+        cwd = kwargs["cwd"]
+        assert isinstance(cwd, Path)
+        assert cwd == physical
+        assert output.is_relative_to(physical)
         formats.append(output_format)
         output.parent.mkdir()
         if output_format == "csv":
@@ -85,6 +95,10 @@ def test_installed_quickstart_checks_csv_and_json(
         return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
 
     monkeypatch.setattr("scripts.check_installed_package.subprocess.run", fake_run)
+    monkeypatch.setattr(
+        "scripts.check_installed_package.tempfile.TemporaryDirectory",
+        lambda **_: nullcontext(str(alias)),
+    )
 
     verify_installed_csv_json_quickstart(entrypoint=Path("test-data-agent"))
 
