@@ -24,8 +24,8 @@ the recorded package, dependency, locale, and serializer environment.
 
 ## Install
 
-Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. After
-publication, install the exact RC6 candidate used for acceptance:
+Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. Install
+the accepted RC6 candidate:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.0.0rc6"

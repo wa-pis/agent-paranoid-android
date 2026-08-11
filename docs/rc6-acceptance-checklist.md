@@ -3,13 +3,16 @@
 This checklist applies to the immutable `1.0.0rc6` tag. Local wheels and
 source checkouts are not substitutes for the public-artifact checks.
 
+The immutable public results are recorded in the
+[RC6 published release evidence](release-evidence-1.0.0rc6.md).
+
 ## Source and review identity
 
-- [ ] RC6 tag points to the reviewed fixed commit.
-- [ ] Independent security review records reviewer identity or stable
+- [x] RC6 tag points to the reviewed fixed commit.
+- [x] Independent security review records reviewer identity or stable
   pseudonym, commit, UTC date, scope, findings/disposition, and signature or
   approval URL in the [review evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc6-final-release-candidate/security-review-evidence.md).
-- [ ] RC5 is treated as historical and superseded for stable promotion.
+- [x] RC5 is treated as historical and superseded for stable promotion.
 
 ## Security review closure
 
@@ -44,7 +47,7 @@ source checkouts are not substitutes for the public-artifact checks.
   materialization.
 - [x] RC6-S11: public artifact names are safe path components, CSV formula
   markers are neutralized, and formula/validation diagnostics are bounded.
-- [ ] RC6-S12: CI classification uses trusted code, release publication checks
+- [x] RC6-S12: CI classification uses trusted code, release publication checks
   signed tag and accepted commit identity, and RC acceptance is machine-
   enforced.
 - [x] RC6-S13: active MCP requests and shared Trino work are globally bounded;
@@ -109,7 +112,7 @@ source checkouts are not substitutes for the public-artifact checks.
 - [x] Public documentation distinguishes default replacement, selective local
   preservation, external/default-MCP egress boundaries, generic SQL output,
   and executable PostgreSQL export, with runnable CSV/PostgreSQL/Trino examples.
-- [ ] Independent review is rerun against the exact fixed RC6 commit and every
+- [x] Independent review is rerun against the exact fixed RC6 commit and every
   finding has a closed or explicitly approved disposition.
 
 ## Public Python artifacts
@@ -119,36 +122,36 @@ literal README commands plus `test-data-agent --version`, `demo`, and `doctor`.
 
 | Profile | Status | Evidence |
 | --- | --- | --- |
-| base | [ ] | |
-| `parquet` | [ ] | |
-| `mcp` | [ ] | |
-| `trino` | [ ] | |
-| `postgres` | [ ] | |
-| `mcp,trino` | [ ] | |
-| `openai` | [ ] | |
-| `all` | [ ] | |
+| base | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `parquet` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `mcp` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `trino` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `postgres` | [x] | [Public PostgreSQL profile evidence](https://github.com/wa-pis/agent-paranoid-android/issues/398) |
+| `mcp,trino` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `openai` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
+| `all` | [x] | [Verify Published Release](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31526588778) |
 
-- [ ] Public wheel and sdist match the release commit and version.
-- [ ] Checksums, SBOM, provenance, attestations, and signatures are published
+- [x] Public wheel and sdist match the release commit and version.
+- [x] Checksums, SBOM, provenance, attestations, and signatures are published
   and independently verified.
-- [ ] Each public profile is installed with `--require-hashes` against the
+- [x] Each public profile is installed with `--require-hashes` against the
   independently verified wheel digest.
-- [ ] Upgrade from public `0.12.0` succeeds without changing the README
+- [x] Upgrade from public `0.12.0` succeeds without changing the README
   commands and uses hash-pinned dependencies plus verified old and new wheels.
 
 ## Public containers
 
-- [ ] CLI image: version, doctor, demo, signature, SBOM, and digest verified.
-- [ ] Generator MCP image: version, health check, signature, SBOM, and digest
+- [x] CLI image: version, doctor, demo, signature, SBOM, and digest verified.
+- [x] Generator MCP image: version, health check, signature, SBOM, and digest
   verified.
-- [ ] Trino MCP image: hardened configuration, health check, signature, SBOM,
+- [x] Trino MCP image: hardened configuration, health check, signature, SBOM,
   and digest verified.
 
 ## Quality gates
 
-- [ ] Full unit/integration test suite, coverage threshold, lint, typing, and
+- [x] Full unit/integration test suite, coverage threshold, lint, typing, and
   compile checks pass.
-- [ ] Release script and strict documentation build pass on the exact RC6
+- [x] Release script and strict documentation build pass on the exact RC6
   commit.
 - [ ] Stable promotion uses only the accepted RC6 source tree plus reviewed
   release metadata changes.
