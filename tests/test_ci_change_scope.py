@@ -147,8 +147,9 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         "parquet",
         "mcp",
         "trino",
-        "openai",
-    }
+            "openai",
+            "postgres",
+        }
     assert minimum["steps"][1]["with"]["python-version"] == "3.11"
     assert "matrix.constraint-file" in minimum["steps"][3]["run"]
     contracts = {

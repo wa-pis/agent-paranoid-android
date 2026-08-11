@@ -18,6 +18,7 @@ range in package metadata alone is not compatibility evidence.
 | sqlglot | Read-only SQL parsing and policy enforcement | `trino` |
 | Trino client | Connection construction and bounded query execution | `trino` |
 | OpenAI | Optional advisor-provider request/response transport | `openai` |
+| Psycopg | Read-only PostgreSQL connection boundary | `postgres` |
 
 Transitive packages are recorded by the lock and supply-chain evidence, but do
 not receive an independent support promise unless they affect one of these
@@ -36,7 +37,8 @@ are the versions in the reviewed `uv.lock` used by the release gate on
 | `mcp-minimum` | 3.11 | Faker 25.0.0; Pydantic 2.8.0; PyYAML 6.0.0; MCP 1.0.0 |
 | `trino-minimum` | 3.11 | Base minimum; sqlglot 30.0.0; Trino 0.330.0 |
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
-| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 2.50.0 |
+| `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0 |
+| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 2.50.0; Psycopg 3.3.4 |
 
 MCP 1.0.0 requires Pydantic 2.8.0, so its minimum profile cannot reuse the
 base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
@@ -56,6 +58,7 @@ The minimum profiles run focused contracts instead of the full locked suite:
 | `mcp-minimum` | Generator and Trino MCP transport schemas | `tests/test_mcp_generator_transport.py`, `tests/test_mcp_trino_transport.py` |
 | `trino-minimum` | SQL policy and Trino client construction | `tests/test_mcp_trino_server.py` |
 | `openai-minimum` | Provider request, response, and error contracts | `tests/test_openai_provider.py` |
+| `postgres-minimum` | Read-only connection, allowlists, budgets, and profile normalization | `tests/test_postgres_config.py`, `tests/test_postgres_client.py`, `tests/test_postgres_query_builders.py`, `tests/test_postgres_profiler.py` |
 
 The `latest-all` quality matrix runs the complete test suite on every
 supported Python version. A minimum profile must not be replaced by a resolver
@@ -106,7 +109,7 @@ hashed dependency evidence in a generated manifest.
 | --- | --- | --- |
 | MCP | Retain `<2.0.0` | The transport contract is tested only on MCP 1.x. |
 | OpenAI | Retain `<3.0.0` | The structured provider adapter is tested only on OpenAI 2.x. |
-| Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
+| Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
 
 A newly discovered incompatibility must first be reproduced by a focused
 contract test. Narrowing a range then requires a user-facing changelog entry

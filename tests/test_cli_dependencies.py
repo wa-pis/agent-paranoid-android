@@ -18,6 +18,17 @@ def test_dependency_resolver_reports_missing_extra_modules_in_order() -> None:
     assert resolver.missing_modules("trino") == ("sqlglot", "trino")
 
 
+def test_dependency_resolver_tracks_postgres_as_optional() -> None:
+    def import_without_postgres(name: str) -> ModuleType:
+        if name == "psycopg":
+            raise ImportError("not installed")
+        return ModuleType(name)
+
+    assert CliDependencyResolver(import_without_postgres).missing_modules(
+        "postgres"
+    ) == ("psycopg",)
+
+
 def test_dependency_resolver_normalizes_required_extra_error() -> None:
     cause = ImportError("secret-local-path")
 

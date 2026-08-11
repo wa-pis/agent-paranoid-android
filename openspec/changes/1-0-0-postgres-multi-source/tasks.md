@@ -33,7 +33,7 @@
 
 ## PostgreSQL Adapter
 
-- [ ] Add an optional `postgres` dependency profile with minimum/latest support
+- [x] Add an optional `postgres` dependency profile with minimum/latest support
   evidence and no base-installation dependency.
 - [x] Implement injected PostgreSQL driver and connection/session boundary.
 - [ ] Enforce schema/table allowlists, read-only mode, identifier validation,
