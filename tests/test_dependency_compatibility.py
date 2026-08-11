@@ -11,6 +11,7 @@ from scripts.check_dependency_compatibility import (
     check_manifest,
     check_repository,
 )
+from test_data_agent.io import artifacts as artifacts_module
 
 
 ROOT = Path(__file__).parent.parent
@@ -53,3 +54,11 @@ def test_manifest_dependency_evidence_must_be_complete_and_hashed(
 
     with pytest.raises(CompatibilityError, match="incomplete"):
         check_manifest(manifest, {"faker": "40.35.0", "pyyaml": "6.0.3"})
+
+
+def test_manifest_dependency_discovery_includes_installed_psycopg(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(artifacts_module.importlib.metadata, "version", lambda name: name)
+
+    assert artifacts_module.normalized_dependency_versions()["psycopg"] == "psycopg"

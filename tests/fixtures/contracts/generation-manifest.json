@@ -37,6 +37,7 @@
       "faker": "<dependency-version>",
       "mcp": "<dependency-version>",
       "openai": "<dependency-version>",
+      "psycopg": "<dependency-version>",
       "pyarrow": "<dependency-version>",
       "pydantic": "<dependency-version>",
       "pyyaml": "<dependency-version>",
