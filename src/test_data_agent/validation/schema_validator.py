@@ -25,13 +25,13 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
             errors.append(
                 f"{entity.name} row count mismatch: expected {entity.row_count}, got {len(rows)}"
             )
-        expected_fields = [field.name for field in entity.fields]
+        expected_fields = {field.name for field in entity.fields}
         primary_key_values: set[Any] = set()
         for row_index, row in enumerate(rows):
             if not isinstance(row, Mapping):
                 errors.append(f"{entity.name}[{row_index}] row must be an object")
                 continue
-            if list(row.keys()) != expected_fields:
+            if set(row) != expected_fields:
                 errors.append(f"{entity.name}[{row_index}] fields mismatch")
                 continue
             if entity.primary_key is not None:
