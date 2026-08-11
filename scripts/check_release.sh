@@ -6,6 +6,7 @@ cd "$ROOT"
 export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 
 TMP_DIR="$(mktemp -d)"
+TMP_DIR="$(cd "$TMP_DIR" && pwd -P)"
 cleanup() {
   rm -rf "$TMP_DIR"
 }
