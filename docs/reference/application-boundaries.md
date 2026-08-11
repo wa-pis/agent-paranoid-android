@@ -174,7 +174,7 @@ The current dependencies after completed extraction increments are:
 | `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
 | `postgres_config.py` | PostgreSQL source identity, connection settings, mandatory schema/table/column allowlists, secret indirection, and profiling budgets |
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
-| `postgres_query_builders.py` | parameterized PostgreSQL table, column, primary-key, foreign-key, and CHECK metadata queries constrained by explicit allowlists |
+| `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
