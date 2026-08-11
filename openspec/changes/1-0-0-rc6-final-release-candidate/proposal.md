@@ -1,8 +1,9 @@
 # Change Proposal: 1-0-0-rc6-final-release-candidate
 
 Status: **Implemented and accepted in `v1.0.0rc6` at
-`2b65515313281aaeb180bb95328785ef46be0202`. Stable promotion remains a
-separate release step.**
+`2b65515313281aaeb180bb95328785ef46be0202`. Stable `1.0.0` promotion may add
+only package version, changelog, release notes, documentation, acceptance
+evidence, and generated release metadata; runtime behavior remains fixed.**
 
 ## Summary
 

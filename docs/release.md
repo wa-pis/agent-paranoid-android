@@ -75,6 +75,13 @@ git diff --name-status v1.0.0rc6 HEAD
 git diff v1.0.0rc6 HEAD
 ```
 
+A new release candidate is required only when a change affects runtime
+behavior, public APIs, dependencies, packaging, security boundaries,
+container behavior, or published artifact integrity. Documentation,
+changelog, review evidence, checklist reconciliation, release notes, and
+version-only promotion changes do not require a new release candidate when the
+accepted runtime tree remains unchanged.
+
 The stable promotion diff may contain only these reviewed release changes:
 
 - `pyproject.toml`: the project version and release-status classifiers only;
@@ -82,14 +89,20 @@ The stable promotion diff may contain only these reviewed release changes:
 - `src/test_data_agent/version.py`: `__version__` only;
 - `uv.lock`: the root `agent-paranoid-android` version only, with the resolved
   dependency graph and hashes unchanged;
-- `CHANGELOG.md`: move the already accepted entries to `1.0.0`, add the date
-  and links, and do not introduce a new behavior claim; and
+- `CHANGELOG.md`: add the `1.0.0` promotion entry, date, and links while
+  retaining prerelease history and introducing no new behavior claim;
 - release-facing version references, release evidence, roadmap status, and
   OpenSpec completion or archive metadata. These documentation files may
   describe only behavior already accepted in RC6.
 
+Release-validation assertions that only replace a hard-coded candidate
+version with the active package version are generated release metadata for
+this purpose. They may be normalized during promotion, but no test scenario,
+fixture, runtime assertion, safety assertion, or product coverage may change.
+
 File membership alone is not approval: every changed hunk must match one of
-those categories. Any executable production, test, schema, fixture,
+those categories. All other changes require a new release candidate. In
+particular, any executable production, runtime or safety test, schema, fixture,
 dependency, build, workflow, or container change means RC6 is not the accepted
 stable source tree. Stop the promotion, make the change in a newly numbered
 release candidate, and complete that candidate's acceptance before trying

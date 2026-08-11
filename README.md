@@ -4,7 +4,7 @@
 Safety-first, deterministic synthetic test data generation from CSV structure, safe profiles, reviewed `DatasetSpec` files, and allowlisted PostgreSQL or Trino metadata. The CLI and Python library are primary; PostgreSQL, MCP, Trino, and AI providers are optional integrations. The base package supports CSV/JSON workflows without installing a database client, SQL parser, or MCP SDK. Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
-Current version: `1.0.0rc6`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
+Current version: `1.0.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## What It Preserves
 
@@ -25,22 +25,22 @@ the recorded package, dependency, locale, and serializer environment.
 ## Install
 
 Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. Install
-the accepted RC6 candidate:
+the stable release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android==1.0.0"
 test-data-agent doctor
 ```
 
 Install only features you use:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[trino]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[postgres]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc6"
-python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[parquet]==1.0.0"
+python3 -m pip install "agent-paranoid-android[mcp]==1.0.0"
+python3 -m pip install "agent-paranoid-android[trino]==1.0.0"
+python3 -m pip install "agent-paranoid-android[postgres]==1.0.0"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0"
+python3 -m pip install "agent-paranoid-android[openai]==1.0.0"
 ```
 
 The `postgres` extra provides the Psycopg driver for direct read-only

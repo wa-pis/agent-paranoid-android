@@ -12,6 +12,9 @@ from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetSpe
 
 
 ROOT = Path(__file__).parent.parent
+PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
+    "version"
+]
 
 
 def test_dataset_spec_schema_matches_pydantic_contract() -> None:
@@ -33,6 +36,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["description"] == "Safety-first synthetic data generation agent"
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
+    assert "Development Status :: 5 - Production/Stable" in metadata["classifiers"]
     for version in ("3.11", "3.12", "3.13", "3.14"):
         assert (
             f"Programming Language :: Python :: {version}"
@@ -115,7 +119,10 @@ def test_public_docs_disclose_ai_assisted_development() -> None:
 def test_pypi_readme_starts_with_public_installation() -> None:
     readme = (ROOT / "README.md").read_text()
 
-    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc6"' in readme
+    assert (
+        f'python3 -m pip install "agent-paranoid-android=={PROJECT_VERSION}"'
+        in readme
+    )
     assert "PyPI Trusted Publishing" in readme
     assert 'pip install -e ".[dev]"' not in readme
 
@@ -478,7 +485,7 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
 
 
 def test_release_tag_must_match_package_version() -> None:
-    check_release_tag("v1.0.0rc6")
+    check_release_tag(f"v{PROJECT_VERSION}")
 
     with pytest.raises(ValueError, match="does not match"):
         check_release_tag("v9.9.9")

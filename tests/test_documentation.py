@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import tomllib
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -15,6 +16,9 @@ from test_data_agent.mcp_generator_server import (
 
 
 ROOT = Path(__file__).parent.parent
+PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
+    "version"
+]
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_DOCS = {
     "index.md",
@@ -72,8 +76,11 @@ def test_readme_is_a_focused_entrypoint() -> None:
     readme = (ROOT / "README.md").read_text()
 
     assert len(readme.splitlines()) <= 140
-    assert 'python3 -m pip install "agent-paranoid-android==1.0.0rc6"' in readme
-    assert '"agent-paranoid-android[mcp,trino]==1.0.0rc6"' in readme
+    assert (
+        f'python3 -m pip install "agent-paranoid-android=={PROJECT_VERSION}"'
+        in readme
+    )
+    assert f'"agent-paranoid-android[mcp,trino]=={PROJECT_VERSION}"' in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -87,7 +94,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "## Legacy GenerationSpec Compatibility" not in readme
 
 
-def test_active_release_surfaces_do_not_use_stale_rc5_version() -> None:
+def test_active_release_surfaces_match_project_version() -> None:
     active_surfaces = (
         ROOT / "README.md",
         ROOT / "docs" / "index.md",
@@ -101,7 +108,10 @@ def test_active_release_surfaces_do_not_use_stale_rc5_version() -> None:
     for path in active_surfaces:
         content = path.read_text()
         assert "1.0.0rc5" not in content, path
-        assert "1.0.0rc6" in content, path
+        assert re.search(
+            rf"(?<![0-9A-Za-z]){re.escape(PROJECT_VERSION)}(?![0-9A-Za-z])",
+            content,
+        ), path
 
 
 def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
@@ -446,10 +456,13 @@ def test_installation_documents_dependency_budgets() -> None:
     for maximum in (10, 11, 20, 25, 35):
         assert f"| {maximum} |" in installation
     assert 'pip install "agent-paranoid-android[all]"' not in installation
-    assert '"agent-paranoid-android==1.0.0rc6"' in installation
+    assert f'"agent-paranoid-android=={PROJECT_VERSION}"' in installation
     for extra in ("parquet", "mcp", "mcp,trino", "openai"):
-        assert f'"agent-paranoid-android[{extra}]==1.0.0rc6"' in installation
-    assert "floating `--pre`" in installation
+        assert (
+            f'"agent-paranoid-android[{extra}]=={PROJECT_VERSION}"'
+            in installation
+        )
+    assert "The stable release is" in installation
     assert "not the recommended user installation" in installation
 
 
@@ -685,6 +698,8 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ):
         assert f"`{path}`" in release
     assert "newly numbered release candidate" in normalized_release
+    assert "All other changes require a new release candidate" in release
+    assert "generated release metadata" in release
     assert "every final release gate" in normalized_release
     assert "## Stable Promotion Contract" in design
     assert "remain byte-for-byte at the accepted RC4 state" in normalized_design

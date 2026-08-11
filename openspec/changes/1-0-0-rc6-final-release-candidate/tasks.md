@@ -184,4 +184,7 @@
   upgrade from `0.12.0`.
 - [x] Run release, security, documentation, lint, typing, compile, and full
   test gates against the immutable RC6 commit.
-- [ ] Promote stable only from the accepted RC6 source tree.
+- [x] Prepare stable only from the accepted RC6 runtime, with package version,
+  changelog, release notes, documentation, acceptance evidence, and generated
+  release metadata only.
+- [ ] Publish and verify stable `1.0.0` from the accepted exact commit.
