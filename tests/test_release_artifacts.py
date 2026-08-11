@@ -49,6 +49,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
         "mcp",
         "openai",
         "trino",
+        "postgres",
         "all",
         "dev",
     }
@@ -139,8 +140,9 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert jobs["package-optional"]["strategy"]["matrix"]["profile"] == [
         "parquet",
         "mcp",
-        "openai",
-        "trino",
+            "openai",
+            "postgres",
+            "trino",
     ]
     assert jobs["package-optional"]["strategy"]["fail-fast"] is False
     assert "actions/checkout@v7" not in workflow

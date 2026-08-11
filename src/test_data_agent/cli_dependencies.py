@@ -13,6 +13,7 @@ OPTIONAL_EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "parquet": ("pyarrow",),
     "mcp": ("mcp",),
     "trino": ("sqlglot", "trino"),
+    "postgres": ("psycopg",),
     "openai": ("openai",),
 }
 

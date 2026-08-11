@@ -157,7 +157,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [parquet, mcp, openai, trino]
+        profile: [parquet, mcp, openai, postgres, trino]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -269,6 +269,14 @@ jobs:
             project-spec: ".[dev,openai]"
             constraint-file: dependency-minimum.txt
             test-paths: tests/test_openai_provider.py
+          - profile: postgres
+            project-spec: ".[dev,postgres]"
+            constraint-file: dependency-minimum.txt
+            test-paths: >-
+              tests/test_postgres_config.py
+              tests/test_postgres_client.py
+              tests/test_postgres_query_builders.py
+              tests/test_postgres_profiler.py
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7

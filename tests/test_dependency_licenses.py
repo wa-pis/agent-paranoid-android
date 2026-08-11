@@ -28,6 +28,14 @@ def test_approved_license_accepts_spdx_expression_in_legacy_field() -> None:
     assert approved_license(metadata) == "MPL-2.0 AND MIT"
 
 
+def test_approved_license_accepts_psycopg_lgpl_runtime_dependency() -> None:
+    metadata = message_from_string(
+        "Name: psycopg\nLicense-Expression: LGPL-3.0-only\n"
+    )
+
+    assert approved_license(metadata) == "LGPL-3.0-only"
+
+
 def test_approved_license_rejects_unknown_or_unapproved_metadata() -> None:
     unknown = message_from_string("Name: unknown\n")
     proprietary = message_from_string(

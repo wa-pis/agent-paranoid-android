@@ -327,7 +327,7 @@ def register_utility_commands(
     doctor_parser.add_argument(
         "--require-extra",
         action="append",
-        choices=["parquet", "mcp", "trino", "openai", "all"],
+        choices=["parquet", "mcp", "trino", "postgres", "openai", "all"],
         default=[],
         help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
     )

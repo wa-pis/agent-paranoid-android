@@ -48,6 +48,12 @@ minimum = "2.46.0"
 latest = "2.50.0"
 upper_major = 3
 
+[dependencies.psycopg]
+requirement = "psycopg"
+extra = "postgres"
+minimum = "3.2.0"
+latest = "3.3.4"
+
 [minimum_profiles.base]
 constraint = ".github/constraints/dependency-minimum.txt"
 
@@ -62,4 +68,7 @@ pydantic = "2.8.0"
 constraint = ".github/constraints/dependency-minimum.txt"
 
 [minimum_profiles.openai]
+constraint = ".github/constraints/dependency-minimum.txt"
+
+[minimum_profiles.postgres]
 constraint = ".github/constraints/dependency-minimum.txt"

@@ -36,6 +36,7 @@ you need:
 python3 -m pip install "agent-paranoid-android[parquet]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[mcp]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0rc6"
+python3 -m pip install "agent-paranoid-android[postgres]==1.0.0rc6"
 python3 -m pip install "agent-paranoid-android[openai]==1.0.0rc6"
 ```
 
@@ -49,6 +50,7 @@ growth:
 | `mcp` | Generator MCP server | 35 |
 | `openai` | Optional structured-output advisor | 20 |
 | `trino` | Trino client and safe SQL parser | 25 |
+| `postgres` | Read-only PostgreSQL profiling driver | 12 |
 
 These are regression budgets, not a guarantee that every platform installs the
 same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
@@ -89,6 +91,8 @@ registration without starting a server or opening a network connection.
 `doctor --require-extra trino` parses an allowlisted read-only query and
 constructs then closes a local client object without executing SQL or
 contacting a Trino coordinator.
+`doctor --require-extra postgres` verifies that the optional PostgreSQL driver
+is installed without opening a connection.
 `doctor --require-extra openai` constructs and closes a local SDK client with
 a non-secret placeholder, then verifies the structured Responses API and
 advisor adapter without contacting the provider.

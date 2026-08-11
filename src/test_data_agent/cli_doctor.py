@@ -61,7 +61,7 @@ class CliDoctorService:
         failures: list[str] = []
         required = set(required_extras or ())
         if "all" in required:
-            required.update({"parquet", "mcp", "trino", "openai"})
+            required.update({"parquet", "mcp", "trino", "postgres", "openai"})
 
         if sys.version_info >= (3, 11):
             checks.append(
