@@ -30,7 +30,10 @@ def coerce_profile_type(raw_type: str) -> ProfileDataType:
         return ProfileDataType.ADDRESS
     if any(part in type_name for part in ("int", "bigint", "smallint", "tinyint")):
         return ProfileDataType.INTEGER
-    if any(part in type_name for part in ("decimal", "double", "float", "real")):
+    if any(
+        part in type_name
+        for part in ("decimal", "double", "float", "numeric", "real")
+    ):
         return ProfileDataType.FLOAT
     if "bool" in type_name:
         return ProfileDataType.BOOLEAN

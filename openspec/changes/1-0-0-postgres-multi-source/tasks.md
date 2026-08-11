@@ -43,7 +43,7 @@
   keys, foreign keys, and supported CHECK constraints.
 - [ ] Add aggregate query builders for row counts, cardinality, null ratios,
   ranges, safe categories, FK coverage, and configured reconciliation checks.
-- [ ] Normalize results into `DatasetProfile(source_type="postgres")` without
+- [x] Normalize results into `DatasetProfile(source_type="postgres")` without
   returning source rows or exact sensitive numeric values.
 - [ ] Convert unsupported/ambiguous database constraints into bounded review
   warnings rather than silently dropping them or exposing raw expressions.

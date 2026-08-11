@@ -32,7 +32,7 @@ def legacy_profile_to_dataset_profile(
             table_name,
             row_count,
             column,
-            suppress_sensitive_numeric=source_type == "trino",
+            suppress_sensitive_numeric=source_type in {"postgres", "trino"},
         )
         for column in profile.get("columns", [])
     ]
@@ -205,6 +205,10 @@ def _distribution_from_profile_column(
         if isinstance(numeric_shape, Mapping):
             return {"kind": "numeric_shape", **dict(numeric_shape)}
         return {}
+
+    numeric_shape = column.get("numeric_shape")
+    if isinstance(numeric_shape, Mapping):
+        return {"kind": "numeric_shape", **dict(numeric_shape)}
 
     numeric_distribution = {
         "kind": "numeric",
