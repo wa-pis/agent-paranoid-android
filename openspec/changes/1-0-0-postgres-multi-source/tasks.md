@@ -81,11 +81,11 @@
   upgrade acceptance for the `postgres` extra and base installation.
 - [ ] Add a documented CLI and Python path that writes one PostgreSQL `.sql`
   file from validated generated records.
-- [ ] Implement deterministic PostgreSQL identifier, type, scalar literal,
+- [x] Implement deterministic PostgreSQL identifier, type, scalar literal,
   NULL, DDL, INSERT, and relationship rendering without a live connection.
-- [ ] Publish SQL through a temporary sibling and atomic replacement; reject
+- [x] Publish SQL through a temporary sibling and atomic replacement; reject
   unsupported input without leaving a partial target.
-- [ ] Add golden and parser tests for valid PostgreSQL syntax, stable ordering,
+- [x] Add golden and parser tests for valid PostgreSQL syntax, stable ordering,
   quoting, literals, NULL, foreign keys, approved as-is values, and failures.
 - [ ] Add isolated-wheel PostgreSQL/SQL smoke coverage without live database
   access, plus an optional explicitly gated disposable-PostgreSQL execution

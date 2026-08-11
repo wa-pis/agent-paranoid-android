@@ -176,6 +176,7 @@ The current dependencies after completed extraction increments are:
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
 | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
 | `postgres_profiler.py` | complete allowlisted PostgreSQL metadata/aggregate normalization into qualified `DatasetProfile` entities and declared relationships |
+| `postgres_sql_export.py` | deterministic validated PostgreSQL DDL/INSERT rendering and atomic one-file publication without source access |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
