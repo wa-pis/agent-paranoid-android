@@ -9,6 +9,7 @@ import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, cast
 
 from test_data_agent.cli_contract import DoctorReport
@@ -49,6 +50,7 @@ class CliDoctorService:
     mcp_smoke: DoctorSmoke
     trino_smoke: DoctorSmoke
     openai_smoke: DoctorSmoke
+    gigachat_smoke: DoctorSmoke
     trino_status: Callable[[], str] = trino_deployment_status
 
     def inspect(
@@ -61,7 +63,9 @@ class CliDoctorService:
         failures: list[str] = []
         required = set(required_extras or ())
         if "all" in required:
-            required.update({"parquet", "mcp", "trino", "postgres", "openai"})
+            required.update(
+                {"parquet", "mcp", "trino", "postgres", "openai", "gigachat"}
+            )
 
         if sys.version_info >= (3, 11):
             checks.append(
@@ -138,6 +142,7 @@ class CliDoctorService:
             ("mcp", self.mcp_smoke),
             ("trino", self.trino_smoke),
             ("openai", self.openai_smoke),
+            ("gigachat", self.gigachat_smoke),
         )
         for extra, smoke in smoke_checks:
             if extra not in required:
@@ -272,6 +277,97 @@ def run_openai_doctor_smoke() -> None:
         OpenAIAdvisorClient(client=cast(Any, sdk), model="doctor-local")
     finally:
         sdk.close()
+
+
+def run_gigachat_doctor_smoke() -> None:
+    """Validate the optional adapter locally without credentials or network."""
+
+    def load_gigachat_dependencies() -> type[Any]:
+        from test_data_agent.providers.gigachat import GigaChatAdvisorClient
+
+        return GigaChatAdvisorClient
+
+    GigaChatAdvisorClient = DEFAULT_CLI_DEPENDENCY_RESOLVER.load(
+        extra="gigachat",
+        purpose="GigaChat capability",
+        loader=load_gigachat_dependencies,
+    )
+
+    from test_data_agent.advisor import (
+        AdvisorProposal,
+        build_advisor_exchange,
+        build_advisor_request,
+    )
+    from test_data_agent.core.dataset import DatasetProfile
+    from test_data_agent.core.entity import EntityProfile
+    from test_data_agent.core.field import FieldProfile, FieldType
+
+    exchange = build_advisor_exchange(
+        build_advisor_request(
+            DatasetProfile(
+                source_type="doctor",
+                entities=[
+                    EntityProfile(
+                        name="synthetic",
+                        row_count=1,
+                        fields=[
+                            FieldProfile(
+                                name="synthetic_id",
+                                data_type=FieldType.INTEGER,
+                                unique_ratio=1.0,
+                                is_identifier=True,
+                            )
+                        ],
+                    )
+                ],
+            )
+        )
+    )
+    proposal = AdvisorProposal(
+        profile_sha256=exchange.request.profile_sha256,
+        baseline_spec_sha256=exchange.request.baseline_spec_sha256,
+        dataset_spec=exchange.request.baseline_spec.model_copy(deep=True),
+    )
+
+    class LocalGigaChat:
+        closed = False
+
+        @property
+        def chat(self) -> LocalGigaChat:
+            return self
+
+        def create(self, payload: Any) -> Any:
+            response_format = payload.model_options.response_format
+            if response_format is None or response_format.strict is not True:
+                raise RuntimeError("strict structured response is unavailable")
+            return SimpleNamespace(
+                messages=[
+                    SimpleNamespace(
+                        role="assistant",
+                        content=[SimpleNamespace(text=proposal.model_dump_json())],
+                    )
+                ],
+                finish_reason="stop",
+                usage=SimpleNamespace(
+                    input_tokens=1,
+                    output_tokens=1,
+                    total_tokens=2,
+                ),
+            )
+
+        def close(self) -> None:
+            self.closed = True
+
+    sdk = LocalGigaChat()
+    client = GigaChatAdvisorClient(client=cast(Any, sdk), model="doctor-local")
+    try:
+        payload = client.complete(exchange)
+        if payload["profile_sha256"] != exchange.request.profile_sha256:
+            raise RuntimeError("GigaChat structured response validation failed")
+    finally:
+        client.close()
+    if not sdk.closed:
+        raise RuntimeError("GigaChat local client cleanup failed")
 
 
 def write_doctor_fixture(directory: Path) -> None:

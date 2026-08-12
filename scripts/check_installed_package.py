@@ -35,9 +35,19 @@ EXPECTED_PROJECT_URLS = {
     ),
 }
 EXPECTED_BASE_DEPENDENCIES = {"faker", "pydantic", "pyyaml"}
-EXPECTED_EXTRAS = {"all", "dev", "mcp", "openai", "parquet", "postgres", "trino"}
+EXPECTED_EXTRAS = {
+    "all",
+    "dev",
+    "gigachat",
+    "mcp",
+    "openai",
+    "parquet",
+    "postgres",
+    "trino",
+}
 EXPECTED_RUNTIME_EXTRA_DEPENDENCIES = {
-    "all": {"mcp", "openai", "psycopg", "pyarrow", "sqlglot", "trino"},
+    "all": {"gigachat", "mcp", "openai", "psycopg", "pyarrow", "sqlglot", "trino"},
+    "gigachat": {"gigachat"},
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
@@ -45,6 +55,7 @@ EXPECTED_RUNTIME_EXTRA_DEPENDENCIES = {
     "trino": {"sqlglot", "trino"},
 }
 OPTIONAL_MODULES = {
+    "gigachat": {"gigachat"},
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
@@ -52,7 +63,9 @@ OPTIONAL_MODULES = {
     "trino": {"sqlglot", "trino"},
 }
 MAX_DISTRIBUTIONS = {
+    "all": 70,
     "base": 10,
+    "gigachat": 20,
     "mcp": 35,
     "openai": 20,
     "parquet": 11,
@@ -170,11 +183,15 @@ def requirement_extras(requirement: str) -> set[str]:
 
 
 def verify_install_profile(profile: str) -> None:
-    expected_feature = None if profile == "base" else profile
+    expected_features = (
+        set(OPTIONAL_MODULES)
+        if profile == "all"
+        else ({profile} if profile != "base" else set())
+    )
     for feature, modules in OPTIONAL_MODULES.items():
         for module in modules:
             available = importlib.util.find_spec(module) is not None
-            if available != (feature == expected_feature):
+            if available != (feature in expected_features):
                 state = "present" if available else "missing"
                 raise SystemExit(
                     f"{profile} profile has invalid optional module "

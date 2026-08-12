@@ -21,6 +21,7 @@ from test_data_agent.cli_contract import CliErrorCode, DoctorReport
 from test_data_agent.cli_dependencies import CliDependencyResolver
 from test_data_agent.cli_doctor import (
     CliDoctorService,
+    run_gigachat_doctor_smoke as _run_gigachat_doctor_smoke,
     run_mcp_doctor_smoke as _run_mcp_doctor_smoke,
     run_openai_doctor_smoke as _run_openai_doctor_smoke,
     run_parquet_doctor_smoke as _run_parquet_doctor_smoke,
@@ -262,6 +263,7 @@ def inspect_doctor(
         mcp_smoke=run_mcp_doctor_smoke,
         trino_smoke=run_trino_doctor_smoke,
         openai_smoke=run_openai_doctor_smoke,
+        gigachat_smoke=_run_gigachat_doctor_smoke,
     ).inspect(
         skip_smoke=skip_smoke,
         required_extras=required_extras,

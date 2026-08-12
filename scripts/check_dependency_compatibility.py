@@ -12,7 +12,7 @@ from typing import Any
 ROOT = Path(__file__).parent.parent
 REQUIREMENT_RE = re.compile(
     r"^(?P<name>[A-Za-z0-9_.-]+)>=(?P<minimum>[0-9.]+)"
-    r"(?:,<(?P<upper>[0-9]+)\.0\.0)?$"
+    r"(?:,<(?P<upper>[0-9.]+))?$"
 )
 
 
@@ -24,7 +24,7 @@ def _normalized_name(name: str) -> str:
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def _parse_requirement(requirement: str) -> tuple[str, str, int | None]:
+def _parse_requirement(requirement: str) -> tuple[str, str, str | None]:
     match = REQUIREMENT_RE.fullmatch(requirement)
     if match is None:
         raise CompatibilityError(f"unsupported dependency declaration: {requirement}")
@@ -32,7 +32,7 @@ def _parse_requirement(requirement: str) -> tuple[str, str, int | None]:
     return (
         _normalized_name(match.group("name")),
         match.group("minimum"),
-        int(upper) if upper is not None else None,
+        upper,
     )
 
 
@@ -59,7 +59,7 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
     dependencies: dict[str, dict[str, Any]] = policy["dependencies"]
     project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
 
-    declared: dict[str, tuple[str, str, int | None]] = {}
+    declared: dict[str, tuple[str, str, str | None]] = {}
     for requirement in project["dependencies"]:
         name, minimum, upper = _parse_requirement(requirement)
         declared[name] = ("base", minimum, upper)
@@ -79,11 +79,14 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
 
     for name, entry in dependencies.items():
         actual = declared[name]
-        expected = (entry["extra"], entry["minimum"], entry.get("upper_major"))
-        if actual != expected:
+        upper = entry.get("upper")
+        if upper is None and entry.get("upper_major") is not None:
+            upper = f"{entry['upper_major']}.0.0"
+        expected_range = (entry["extra"], entry["minimum"], upper)
+        if actual != expected_range:
             raise CompatibilityError(
                 f"unreviewed dependency range drift for {name}: "
-                f"expected {expected}, got {actual}"
+                f"expected {expected_range}, got {actual}"
             )
 
     all_names = {
@@ -100,8 +103,8 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
         name: entry["minimum"] for name, entry in dependencies.items()
     }
     for profile, profile_entry in policy["minimum_profiles"].items():
-        expected = dict(minimum_expected)
-        expected.update(
+        expected_constraints = dict(minimum_expected)
+        expected_constraints.update(
             {
                 _normalized_name(name): version
                 for name, version in profile_entry.items()
@@ -109,17 +112,17 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
             }
         )
         constraint = root / profile_entry["constraint"]
-        actual = _read_constraints(constraint)
+        actual_constraints = _read_constraints(constraint)
         if profile == "mcp":
-            expected = {
+            expected_constraints = {
                 name: version
-                for name, version in expected.items()
+                for name, version in expected_constraints.items()
                 if dependencies[name]["extra"] in {"base", "mcp"}
             }
-        if actual != expected:
+        if actual_constraints != expected_constraints:
             raise CompatibilityError(
                 f"minimum constraint drift for {profile}: "
-                f"expected {expected}, got {actual}"
+                f"expected {expected_constraints}, got {actual_constraints}"
             )
 
     lock = tomllib.loads((root / "uv.lock").read_text())

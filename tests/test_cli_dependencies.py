@@ -29,6 +29,17 @@ def test_dependency_resolver_tracks_postgres_as_optional() -> None:
     ) == ("psycopg",)
 
 
+def test_dependency_resolver_tracks_gigachat_as_optional() -> None:
+    def import_without_gigachat(name: str) -> ModuleType:
+        if name == "gigachat":
+            raise ImportError("not installed")
+        return ModuleType(name)
+
+    assert CliDependencyResolver(import_without_gigachat).missing_modules(
+        "gigachat"
+    ) == ("gigachat",)
+
+
 def test_dependency_resolver_normalizes_required_extra_error() -> None:
     cause = ImportError("secret-local-path")
 

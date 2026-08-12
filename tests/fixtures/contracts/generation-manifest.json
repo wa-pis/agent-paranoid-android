@@ -35,6 +35,7 @@
     "locale": "en_US",
     "normalized_dependencies": {
       "faker": "<dependency-version>",
+      "gigachat": "<dependency-version>",
       "mcp": "<dependency-version>",
       "openai": "<dependency-version>",
       "psycopg": "<dependency-version>",

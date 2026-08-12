@@ -151,24 +151,42 @@ def advise_agent_workspace_with_provider(
     model: str | None,
     dependencies: CliDependencyResolver = DEFAULT_CLI_DEPENDENCY_RESOLVER,
 ) -> AgentWorkspaceStatus:
-    if provider != "openai":
+    if provider == "openai":
+
+        def load_provider() -> tuple[str, Any]:
+            from test_data_agent.providers.openai import (
+                DEFAULT_OPENAI_MODEL,
+                OpenAIAdvisorClient,
+            )
+
+            return DEFAULT_OPENAI_MODEL, OpenAIAdvisorClient
+
+        purpose = "OpenAI advice"
+    elif provider == "gigachat":
+
+        def load_provider() -> tuple[str, Any]:
+            from test_data_agent.providers.gigachat import (
+                DEFAULT_GIGACHAT_MODEL,
+                GigaChatAdvisorClient,
+            )
+
+            return DEFAULT_GIGACHAT_MODEL, GigaChatAdvisorClient
+
+        purpose = "GigaChat advice"
+    else:
         raise ValueError(f"unsupported advisor provider: {provider}")
 
-    def load_openai_provider() -> tuple[str, Any]:
-        from test_data_agent.providers.openai import (
-            DEFAULT_OPENAI_MODEL,
-            OpenAIAdvisorClient,
-        )
-
-        return DEFAULT_OPENAI_MODEL, OpenAIAdvisorClient
-
     default_model, advisor_client = dependencies.load(
-        extra="openai",
-        purpose="OpenAI advice",
-        loader=load_openai_provider,
+        extra=provider,
+        purpose=purpose,
+        loader=load_provider,
     )
     client = advisor_client(model=model or default_model)
-    return advise_agent_workspace(
-        workspace,
-        ExchangeDatasetAdvisor(client),
-    )
+    try:
+        return advise_agent_workspace(
+            workspace,
+            ExchangeDatasetAdvisor(client),
+        )
+    finally:
+        if provider == "gigachat":
+            client.close()

@@ -338,7 +338,7 @@ def register_utility_commands(
         epilog=(
             "Examples:\n"
             "  test-data-agent doctor\n"
-            "  test-data-agent doctor --require-extra openai"
+            "  test-data-agent doctor --require-extra gigachat"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -346,7 +346,15 @@ def register_utility_commands(
     doctor_parser.add_argument(
         "--require-extra",
         action="append",
-        choices=["parquet", "mcp", "trino", "postgres", "openai", "all"],
+        choices=[
+            "parquet",
+            "mcp",
+            "trino",
+            "postgres",
+            "openai",
+            "gigachat",
+            "all",
+        ],
         default=[],
         help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
     )
@@ -537,8 +545,8 @@ def register_agent_commands(
         ),
         epilog=(
             "Example:\n"
-            "  python3 -m pip install \"agent-paranoid-android[openai]\"\n"
-            "  test-data-agent agent-advise out/agent --provider openai\n"
+            "  python3 -m pip install \"agent-paranoid-android[gigachat]\"\n"
+            "  test-data-agent agent-advise out/agent --provider gigachat\n"
             "  test-data-agent agent-review out/agent\n\n"
             "The provider receives metadata, not source rows. This command never "
             "approves a spec or generates data."
@@ -552,9 +560,9 @@ def register_agent_commands(
     )
     agent_advise_parser.add_argument(
         "--provider",
-        choices=["openai"],
+        choices=["openai", "gigachat"],
         default="openai",
-        help="Structured-output provider. Currently supported: openai.",
+        help="Structured-output provider. GigaChat support is experimental.",
     )
     agent_advise_parser.add_argument(
         "--model",

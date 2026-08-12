@@ -15,6 +15,7 @@ OPTIONAL_EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "trino": ("sqlglot", "trino"),
     "postgres": ("psycopg",),
     "openai": ("openai",),
+    "gigachat": ("gigachat",),
 }
 
 ModuleImporter = Callable[[str], ModuleType]
