@@ -82,8 +82,11 @@ The post-1.0 GigaChat adapter changes runtime behavior, dependencies,
 packaging, public CLI selection, and an external security boundary. It must be
 accepted in a new minor release candidate; it cannot be folded into a
 documentation-only `1.0.0` promotion. Version selection, tagging, and
-publication remain separate explicit release work. The selected candidate is
-`1.1.0rc1`.
+publication remain separate explicit release work. Candidate `v1.1.0rc1` was
+published from exact commit `5f95ccfd3774a6d16a4a5c77d1460a8cebf5eca1`;
+its signed tag, artifact hashes, image digests, and post-publish checks are
+recorded in the
+[1.1.0rc1 published release evidence](release-evidence-1.1.0rc1.md).
 
 Review the stable tree directly against that immutable baseline:
 

@@ -917,8 +917,8 @@ Scope:
   local baseline.
 - [x] Add fake-SDK, dependency, isolated-wheel, documentation, and local-only
   doctor coverage without requiring credentials or network access.
-- [ ] Publish and verify the exact signed `1.1.0rc1` artifacts and record the
-  immutable release evidence.
+- [x] Publish and verify the exact signed `1.1.0rc1` artifacts and record the
+  [immutable release evidence](release-evidence-1.1.0rc1.md).
 
 ### Post-1.0: Follow-up Architecture And Community
 
@@ -942,9 +942,10 @@ work without reopening the completed 1.0 application-boundary gate:
   tests on Python 3.11 through 3.14.
 - [x] Document source installation, runtime-only authentication, CA trust,
   cost, synthetic usage, and the unchanged deterministic approval boundary.
-- [ ] Publish the feature only through a new minor release candidate because
+- [x] Publish the feature only through a new minor release candidate because
   it changes runtime behavior, dependencies, public CLI, packaging, and an
-  external security boundary.
+  external security boundary. Evidence: the signed and publicly verified
+  [`v1.1.0rc1` release](release-evidence-1.1.0rc1.md).
 
 ### Required For Every Remaining Release
 
