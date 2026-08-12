@@ -696,6 +696,114 @@ def test_agent_advise_cli_guides_review_without_generating(
     assert not (workspace / "generated").exists()
 
 
+def test_agent_advise_cli_supports_gigachat_and_closes_client(
+    tmp_path,
+    monkeypatch,
+    capsys,
+) -> None:
+    from test_data_agent.providers import gigachat as gigachat_provider
+
+    workspace = tmp_path / "agent-gigachat"
+    models: list[str] = []
+    closed: list[bool] = []
+
+    class FakeGigaChatAdvisorClient:
+        def __init__(self, *, model: str) -> None:
+            models.append(model)
+
+        def complete(self, exchange):
+            request = exchange.request
+            return AdvisorProposal(
+                profile_sha256=request.profile_sha256,
+                baseline_spec_sha256=request.baseline_spec_sha256,
+                dataset_spec=request.baseline_spec.model_copy(deep=True),
+            ).model_dump(mode="json")
+
+        def close(self) -> None:
+            closed.append(True)
+
+    monkeypatch.setattr(
+        gigachat_provider,
+        "GigaChatAdvisorClient",
+        FakeGigaChatAdvisorClient,
+    )
+    assert (
+        main(
+            [
+                "agent-plan",
+                str(FIXTURE_EXAMPLE_DATASET),
+                "--workspace",
+                str(workspace),
+                "--count",
+                "3",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+    assert main(["agent-review", str(workspace)]) == 0
+    capsys.readouterr()
+
+    assert (
+        main(
+            [
+                "agent-advise",
+                str(workspace),
+                "--provider",
+                "gigachat",
+                "--model",
+                "test-gigachat-model",
+            ]
+        )
+        == 0
+    )
+
+    output = capsys.readouterr()
+    assert "AI proposal ready; review required" in output.err
+    assert models == ["test-gigachat-model"]
+    assert closed == [True]
+    assert (workspace / "advisor_review.json").is_file()
+    assert not (workspace / "generated").exists()
+
+
+def test_agent_advise_cli_rejects_missing_gigachat_secret_locally(
+    tmp_path,
+    monkeypatch,
+    capsys,
+) -> None:
+    workspace = tmp_path / "agent-gigachat-missing-secret"
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_EXAMPLE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    monkeypatch.delenv("GIGACHAT_CREDENTIALS", raising=False)
+    monkeypatch.delenv("GIGACHAT_ACCESS_TOKEN", raising=False)
+
+    exit_code = main(
+        [
+            "agent-advise",
+            str(workspace),
+            "--provider",
+            "gigachat",
+            "--json",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert exit_code == 2
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_input"
+    assert "requires exactly one" in payload["error"]["message"]
+    assert "Traceback" not in captured.out
+    assert not (workspace / "advisor_review.json").exists()
+    assert not (workspace / "generated").exists()
+
+
 def test_agent_advisor_cli_json_handoff_stops_before_generation(
     tmp_path,
     capsys,

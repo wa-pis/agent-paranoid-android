@@ -6,4 +6,5 @@ mcp==1.0.0
 sqlglot==30.0.0
 trino==0.330.0
 openai==2.46.0
+gigachat==0.2.3
 psycopg==3.2.0

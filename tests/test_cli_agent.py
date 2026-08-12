@@ -6,10 +6,13 @@ from types import ModuleType
 
 import pytest
 import test_data_agent.cli_agent as cli_agent_module
+from test_data_agent.agent import plan_agent_request
+from test_data_agent.agent_contracts import AgentRequest, AgentSourceType
 from test_data_agent.cli_agent import (
     advise_agent_workspace_with_provider,
     run_agent_command,
 )
+from test_data_agent.cli_dependencies import CliDependencyResolver
 
 
 FIXTURE_DATASET = Path("tests/fixtures/example_dataset")
@@ -58,6 +61,53 @@ def test_agent_provider_rejects_unknown_provider_before_workspace_access() -> No
             provider="unknown",
             model=None,
         )
+
+
+def test_gigachat_provider_closes_on_cancellation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace = tmp_path / "agent"
+    from test_data_agent.providers import gigachat as gigachat_provider
+
+    plan_agent_request(
+        AgentRequest(
+            source_type=AgentSourceType.CSV_FOLDER,
+            source_path=FIXTURE_DATASET,
+            workspace=workspace,
+            count=3,
+        )
+    )
+    closed = False
+
+    class CancellingClient:
+        def __init__(self, *, model: str) -> None:
+            assert model == "test-model"
+
+        def complete(self, exchange: object) -> None:
+            raise KeyboardInterrupt
+
+        def close(self) -> None:
+            nonlocal closed
+            closed = True
+
+    monkeypatch.setattr(
+        gigachat_provider,
+        "GigaChatAdvisorClient",
+        CancellingClient,
+    )
+
+    with pytest.raises(KeyboardInterrupt):
+        advise_agent_workspace_with_provider(
+            workspace,
+            provider="gigachat",
+            model="test-model",
+            dependencies=CliDependencyResolver(lambda name: ModuleType(name)),
+        )
+
+    assert closed is True
+    assert not (workspace / "advisor_review.json").exists()
+    assert not (workspace / "generated").exists()
 
 
 def test_agent_handler_boundary_has_no_composition_or_mcp_imports() -> None:

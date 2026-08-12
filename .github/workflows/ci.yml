@@ -157,7 +157,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [parquet, mcp, openai, postgres, trino]
+        profile: [parquet, mcp, openai, gigachat, postgres, trino]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -235,6 +235,19 @@ jobs:
             --profile base --wheel "${wheel_path}"
           uv run --isolated --no-project --with "${wheel_path}" \
             test-data-agent doctor
+          wheel_uri="file://${wheel_path}"
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[gigachat] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile gigachat
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[gigachat] @ ${wheel_uri}" \
+            test-data-agent doctor --require-extra gigachat
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[all] @ ${wheel_uri}" \
+            python scripts/check_installed_package.py --profile all
+          uv run --isolated --no-project \
+            --with "agent-paranoid-android[all] @ ${wheel_uri}" \
+            test-data-agent doctor --require-extra all
 
   dependency-minimum:
     name: Minimum dependencies / ${{ matrix.profile }}
@@ -269,6 +282,10 @@ jobs:
             project-spec: ".[dev,openai]"
             constraint-file: dependency-minimum.txt
             test-paths: tests/test_openai_provider.py
+          - profile: gigachat
+            project-spec: ".[dev,gigachat]"
+            constraint-file: dependency-minimum.txt
+            test-paths: tests/test_gigachat_provider.py
           - profile: postgres
             project-spec: ".[dev,postgres]"
             constraint-file: dependency-minimum.txt

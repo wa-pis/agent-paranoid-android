@@ -52,6 +52,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
         "parquet",
         "mcp",
         "openai",
+        "gigachat",
         "trino",
         "postgres",
         "all",
@@ -59,6 +60,9 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     }
     assert metadata["optional-dependencies"]["mcp"] == ["mcp>=1.0.0,<2.0.0"]
     assert "mcp>=1.0.0,<2.0.0" in metadata["optional-dependencies"]["all"]
+    assert metadata["optional-dependencies"]["gigachat"] == [
+        "gigachat>=0.2.3,<0.2.4"
+    ]
     assert metadata["urls"] == {
         "Homepage": "https://github.com/wa-pis/agent-paranoid-android",
         "Repository": "https://github.com/wa-pis/agent-paranoid-android",
@@ -147,9 +151,10 @@ def test_ci_uses_locked_dependencies_and_runs_vulnerability_audit() -> None:
     assert jobs["package-optional"]["strategy"]["matrix"]["profile"] == [
         "parquet",
         "mcp",
-            "openai",
-            "postgres",
-            "trino",
+        "openai",
+        "gigachat",
+        "postgres",
+        "trino",
     ]
     assert jobs["package-optional"]["strategy"]["fail-fast"] is False
     assert "actions/checkout@v7" not in workflow

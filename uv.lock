@@ -22,6 +22,7 @@ dependencies = [
 
 [package.optional-dependencies]
 all = [
+    { name = "gigachat" },
     { name = "mcp" },
     { name = "openai" },
     { name = "psycopg" },
@@ -38,6 +39,9 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "types-pyyaml" },
+]
+gigachat = [
+    { name = "gigachat" },
 ]
 mcp = [
     { name = "mcp" },
@@ -64,6 +68,8 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "faker", specifier = ">=25.0.0" },
+    { name = "gigachat", marker = "extra == 'all'", specifier = ">=0.2.3,<0.2.4" },
+    { name = "gigachat", marker = "extra == 'gigachat'", specifier = ">=0.2.3,<0.2.4" },
     { name = "hatchling", marker = "extra == 'dev'", specifier = "==1.31.0" },
     { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.100.0" },
     { name = "mcp", marker = "extra == 'all'", specifier = ">=1.0.0,<2.0.0" },
@@ -87,7 +93,7 @@ requires-dist = [
     { name = "trino", marker = "extra == 'trino'", specifier = ">=0.330.0" },
     { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.12" },
 ]
-provides-extras = ["parquet", "mcp", "trino", "postgres", "openai", "all", "dev"]
+provides-extras = ["parquet", "mcp", "trino", "postgres", "openai", "gigachat", "all", "dev"]
 
 [package.metadata.requires-dev]
 docs = [{ name = "mkdocs", specifier = ">=1.6.1,<2.0.0" }]
@@ -603,6 +609,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d9/29/d40217cbe2f6b1359e00c6c307bb3fc876ba74068cbab3dde77f03ca0dc4/ghp-import-2.1.0.tar.gz", hash = "sha256:9c535c4c61193c2df8871222567d7fd7e5014d835f97dc7b7439069e2413d343", size = 10943, upload-time = "2022-05-02T15:47:16.11Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f7/ec/67fbef5d497f86283db54c22eec6f6140243aae73265799baaaa19cd17fb/ghp_import-2.1.0-py3-none-any.whl", hash = "sha256:8337dd7b50877f163d4c0289bc1f1c7f127550241988d568c1db512c4324a619", size = 11034, upload-time = "2022-05-02T15:47:14.552Z" },
+]
+
+[[package]]
+name = "gigachat"
+version = "0.2.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/3e/42105fe7be2aa33907349fd177a2d8a97e14f434cfc1b8cbf3ba7b4a03f8/gigachat-0.2.3.tar.gz", hash = "sha256:b298dc70d28153e83780cdb7f40ec7273462ce497daafb1bee7e08509126aab3", size = 42631, upload-time = "2026-07-31T14:30:32.776Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/89/c6/cea9fd75f06c4c5a3f00a96c157c183146cb42b20e58b7580cd723c359bb/gigachat-0.2.3-py3-none-any.whl", hash = "sha256:61a51bcb9c3888c7643a9ffabe191695279f7cfca6b9d9d639e60c073a2385da", size = 55335, upload-time = "2026-07-31T14:30:34.101Z" },
 ]
 
 [[package]]

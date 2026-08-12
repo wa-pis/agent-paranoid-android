@@ -147,9 +147,10 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
         "parquet",
         "mcp",
         "trino",
-            "openai",
-            "postgres",
-        }
+        "openai",
+        "gigachat",
+        "postgres",
+    }
     assert minimum["steps"][1]["with"]["python-version"] == "3.11"
     assert "matrix.constraint-file" in minimum["steps"][3]["run"]
     contracts = {
@@ -163,6 +164,7 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
     assert "test_mcp_trino_transport.py" in contracts["mcp"]
     assert "test_mcp_trino_server.py" in contracts["trino"]
     assert "test_openai_provider.py" in contracts["openai"]
+    assert "test_gigachat_provider.py" in contracts["gigachat"]
     mcp_profile = next(profile for profile in profiles if profile["profile"] == "mcp")
     assert mcp_profile["constraint-file"] == "dependency-minimum-mcp.txt"
     assert "--all-extras" in quality["steps"][4]["run"]

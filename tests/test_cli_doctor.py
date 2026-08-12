@@ -8,6 +8,7 @@ import test_data_agent.cli_doctor as cli_doctor_module
 from test_data_agent.cli_doctor import (
     CliDoctorService,
     ModuleImporter,
+    run_gigachat_doctor_smoke,
     trino_deployment_status,
 )
 
@@ -39,6 +40,7 @@ def test_doctor_service_redacts_capability_failure() -> None:
         mcp_smoke=fail_with_secret,
         trino_smoke=lambda: None,
         openai_smoke=lambda: None,
+        gigachat_smoke=lambda: None,
     )
 
     report = service.inspect(required_extras={"mcp"})
@@ -69,6 +71,10 @@ def test_doctor_boundary_has_no_cli_compatibility_import() -> None:
     assert "test_data_agent.cli" not in _top_level_imports(cli_doctor_module)
 
 
+def test_gigachat_doctor_smoke_is_local_and_structured() -> None:
+    run_gigachat_doctor_smoke()
+
+
 def _service(import_module: ModuleImporter) -> CliDoctorService:
     return CliDoctorService(
         import_module=import_module,
@@ -76,6 +82,7 @@ def _service(import_module: ModuleImporter) -> CliDoctorService:
         mcp_smoke=lambda: None,
         trino_smoke=lambda: None,
         openai_smoke=lambda: None,
+        gigachat_smoke=lambda: None,
     )
 
 
