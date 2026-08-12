@@ -107,6 +107,6 @@ explicit human approval before deterministic generation.
 This OpenSpec alone changes no runtime behavior and requires no release
 candidate. Its implementation changes dependencies, a public CLI choice, and
 an external security boundary, so the implementation must enter a new release
-candidate under the current release policy. As an additive provider feature it
-is expected to target the next minor release; the exact version is a separate
-release decision.
+candidate under the current release policy. The selected additive minor
+candidate is `1.1.0rc1`; tagging and publication remain separate acceptance
+steps.

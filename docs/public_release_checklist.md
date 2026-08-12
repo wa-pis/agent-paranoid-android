@@ -69,9 +69,10 @@ Before creating a tag:
 - Mention safety guarantees and known limitations.
 - Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
   change.
-- Use a new minor release candidate for the GigaChat addition because it
-  changes dependencies, packaging, public CLI behavior, and an external
-  security boundary; documentation alone does not require another candidate.
+- Use `1.1.0rc1` as the new minor release candidate for the GigaChat addition
+  because it changes dependencies, packaging, public CLI behavior, and an
+  external security boundary; documentation alone does not require another
+  candidate.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

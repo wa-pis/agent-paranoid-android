@@ -14,8 +14,9 @@ changing this matrix are defined in
 
 ## Install From PyPI
 
-The stable release is `1.0.0`. Pin that exact version for reproducible
-installations.
+The stable release is `1.0.0`. The active prerelease acceptance target is
+`1.1.0rc1`; the commands below pin that exact candidate for reproducible
+verification.
 
 Create an isolated environment:
 
@@ -25,18 +26,19 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.0.0"
+python3 -m pip install "agent-paranoid-android==1.1.0rc1"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.0.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.0.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.0.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.0.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[mcp]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[postgres]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[openai]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.1.0rc1"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -60,11 +62,11 @@ The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 `test-data-agent doctor --require-extra all` to verify that full environment.
 
-The GigaChat adapter is implemented on `main` for the next minor release
-candidate and is not present in the published `1.0.0` wheel. Until a release
-containing it is published, follow [Use The GigaChat Advisor](../how-to/gigachat.md)
-to install the source checkout. Do not add `[gigachat]` to the pinned `1.0.0`
-commands above; pip cannot retrofit an extra into an already published wheel.
+The experimental GigaChat adapter is included in `1.1.0rc1` through its
+explicit `gigachat` extra. Follow
+[Use The GigaChat Advisor](../how-to/gigachat.md) for authentication, mandatory
+TLS verification, and the review-first workflow. The default provider remains
+OpenAI.
 
 ### Windows PowerShell
 
@@ -72,7 +74,7 @@ commands above; pip cannot retrofit an extra into an already published wheel.
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.0.0"
+python -m pip install "agent-paranoid-android==1.1.0rc1"
 ```
 
 Run the self-contained environment check:
