@@ -965,10 +965,10 @@ adding runtime dependencies or optimizing for an OpenSSF Scorecard number.
 
 Scope:
 
-- [ ] Export a portable Sigstore/in-toto attestation bundle for each wheel and
-  source distribution, publish it with the existing checksums and SBOM, and
-  retain the current GitHub artifact attestations.
-- [ ] Extend public-release acceptance to bind every portable bundle to the
+- [x] Export a portable Sigstore/in-toto attestation bundle covering each
+  wheel and source distribution, publish it with the existing checksums and
+  SBOM, and retain the current GitHub artifact attestations.
+- [x] Extend public-release acceptance to bind every portable bundle to the
   exact published artifact digest and fail closed on missing, malformed, or
   mismatched provenance.
 - [ ] Expand the existing Hypothesis suite around high-risk parsers and policy

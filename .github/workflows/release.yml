@@ -98,15 +98,31 @@ jobs:
           --quiet
           --output-file dist/sbom.cdx.json
 
-      - name: Write artifact checksums
-        run: sha256sum dist/*.whl dist/*.tar.gz dist/sbom.cdx.json > dist/SHA256SUMS
-
       - name: Attest build provenance
+        id: provenance
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: |
             dist/*.whl
             dist/*.tar.gz
+
+      - name: Export and verify portable build provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROVENANCE_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+        run: |
+          set -euo pipefail
+          test -f "${PROVENANCE_BUNDLE}"
+          bundle="dist/agent-paranoid-android-${GITHUB_REF_NAME#v}.sigstore.json"
+          cp -- "${PROVENANCE_BUNDLE}" "${bundle}"
+          for artifact in dist/*.whl dist/*.tar.gz; do
+            gh attestation verify "${artifact}" \
+              --bundle "${bundle}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
+              --source-ref "refs/tags/${GITHUB_REF_NAME}" \
+              --deny-self-hosted-runners
+          done
 
       - name: Attest package SBOM
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
@@ -116,6 +132,15 @@ jobs:
             dist/*.tar.gz
           sbom-path: dist/sbom.cdx.json
 
+      - name: Write artifact checksums
+        run: >-
+          sha256sum
+          dist/*.whl
+          dist/*.tar.gz
+          dist/sbom.cdx.json
+          dist/*.sigstore.json
+          > dist/SHA256SUMS
+
       - name: Preserve release artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -124,6 +149,7 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
             dist/sbom.cdx.json
+            dist/*.sigstore.json
             dist/SHA256SUMS
           if-no-files-found: error
 
@@ -148,6 +174,7 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
             dist/sbom.cdx.json
+            dist/*.sigstore.json
             dist/SHA256SUMS
           fail_on_unmatched_files: true
           generate_release_notes: true

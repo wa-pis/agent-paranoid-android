@@ -86,6 +86,9 @@ Before creating a tag:
 - Confirm the tag-triggered release workflow publishes wheel, source
   distribution, CycloneDX SBOM, SHA-256 checksums, provenance, and SBOM
   attestations.
+- Confirm the GitHub Release includes exactly one `*.sigstore.json` build
+  provenance bundle, that its checksum is recorded, and that the downloaded
+  bundle verifies both distributions against the tag and `release.yml`.
 - Confirm the release workflow invokes the PyPI workflow after creating the
   GitHub Release and uploads the same wheel and source distribution with
   verified tag-bound provenance, Trusted Publishing, and publish attestations.

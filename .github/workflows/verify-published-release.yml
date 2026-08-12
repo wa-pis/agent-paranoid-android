@@ -115,6 +115,8 @@ jobs:
           cp /tmp/release-assets/*.whl /tmp/release-assets/dist/
           cp /tmp/release-assets/*.tar.gz /tmp/release-assets/dist/
           cp /tmp/release-assets/sbom.cdx.json /tmp/release-assets/dist/
+          bundle_count="$(find /tmp/release-assets -maxdepth 1 -type f -name '*.sigstore.json' | wc -l | tr -d ' ')"
+          test "${bundle_count}" = "1"
           (
             cd /tmp/release-assets
             sha256sum --check SHA256SUMS
@@ -123,6 +125,7 @@ jobs:
           cp /tmp/release-assets/dist/*.tar.gz /tmp/release-dist/
           for artifact in /tmp/release-dist/*.whl /tmp/release-dist/*.tar.gz; do
             gh attestation verify "${artifact}" \
+              --bundle /tmp/release-assets/*.sigstore.json \
               --repo "${GITHUB_REPOSITORY}" \
               --signer-workflow "${GITHUB_REPOSITORY}/.github/workflows/release.yml" \
               --source-ref "refs/tags/${RELEASE_TAG}" \
