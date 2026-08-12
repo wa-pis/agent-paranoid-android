@@ -4,7 +4,7 @@
 Safety-first, deterministic synthetic test data generation from CSV structure, safe profiles, reviewed `DatasetSpec` files, and allowlisted PostgreSQL or Trino metadata. The CLI and Python library are primary; PostgreSQL, MCP, Trino, and AI providers are optional integrations. The base package supports CSV/JSON workflows without installing a database client, SQL parser, or MCP SDK. Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
-Current version: `1.0.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
+Current prerelease: `1.1.0rc1`; stable release: `1.0.0`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## What It Preserves
 
@@ -24,28 +24,28 @@ the recorded package, dependency, locale, and serializer environment.
 
 ## Install
 
-Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. Install
-the stable release:
+Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. To evaluate the GigaChat candidate, install the exact prerelease:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.0.0"
+python3 -m pip install "agent-paranoid-android==1.1.0rc1"
 test-data-agent doctor
 ```
 
 Install only features you use:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.0.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.0.0"
-python3 -m pip install "agent-paranoid-android[trino]==1.0.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.0.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.0.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[mcp]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[trino]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[postgres]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[openai]==1.1.0rc1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.1.0rc1"
 ```
 
 The `postgres` extra provides the Psycopg driver for direct read-only PostgreSQL profiling. The `trino` extra contains the Trino client and safe SQL
-parser; add `mcp` when using the Trino MCP server. The experimental GigaChat
-extra is on `main`, not in published `1.0.0`; see its source-install guide.
+parser; add `mcp` when using the Trino MCP server. The experimental GigaChat advisor is an explicit opt-in through the `gigachat` extra; OpenAI remains the
+default provider.
 The default aggregate-only tools return summaries, not source rows. The explicit opt-in row-returning tools include `run_safe_select`, which requires `TRINO_ENABLE_SAFE_SELECT=true`; bounded, masked rows may contain allowed source values and are not source-free, PII-free, anonymous, or privacy-safe.
 
 ## First Offline Run

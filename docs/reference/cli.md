@@ -175,7 +175,7 @@ test-data-agent agent-plan data/example_dataset \
 test-data-agent agent-review out/agent
 # Optional; requires agent-paranoid-android[openai].
 test-data-agent agent-advise out/agent --provider openai
-# Or explicitly select the experimental GigaChat adapter from a source install:
+# Or explicitly select the experimental GigaChat adapter:
 # test-data-agent agent-advise out/agent --provider gigachat
 # Advice changes the spec, so review it again.
 test-data-agent agent-review out/agent
@@ -199,9 +199,9 @@ is loaded only when invoked, receives safe metadata through the structured
 advisor contract, and never approves or generates data. Install the matching
 provider extra, configure its secret only in the runtime environment, and use
 `--model` only when the adapter default is unsuitable. Always run
-`agent-review` again after advice. The published `1.0.0` wheel does not yet
-contain the GigaChat extra; see [Use The GigaChat Advisor](../how-to/gigachat.md)
-for the source-install workflow and authentication variables.
+`agent-review` again after advice. The `1.1.0rc1` prerelease contains the
+GigaChat extra; see [Use The GigaChat Advisor](../how-to/gigachat.md) for the
+exact installation command and authentication variables.
 
 `agent-review` shows every field's type, nullability, sensitive and identifier
 flags, semantic type, distribution kind, entity row count, primary key,

@@ -692,8 +692,8 @@ def test_gigachat_documentation_matches_provider_boundary() -> None:
         assert expected in guide
     assert "--provider gigachat" in cli
     assert "default remains\n`openai`" in cli
-    assert "published `1.0.0` wheel does not contain" in guide
-    assert "published `1.0.0` wheel" in installation
+    assert f'agent-paranoid-android[gigachat]=={PROJECT_VERSION}' in guide
+    assert f'agent-paranoid-android[gigachat]=={PROJECT_VERSION}' in installation
     assert "TLS verification cannot be disabled" in configuration
 
 

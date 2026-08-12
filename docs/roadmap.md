@@ -898,6 +898,28 @@ Scope:
 The signed tag, package and container digests, and public verification runs are
 recorded in the [stable published release evidence](release-evidence-1.0.0.md).
 
+### 1.1.0rc1: GigaChat Advisor Candidate
+
+**Goal:** accept the additive experimental GigaChat advisor without changing
+the provider-neutral review, approval, generation, or privacy boundaries.
+
+Scope:
+
+- [x] Add the official `gigachat` SDK in an explicit optional extra and keep
+  base installs independent of the SDK.
+- [x] Add the explicit `gigachat` advisor choice while keeping OpenAI as the
+  default provider.
+- [x] Enforce fixed verified-TLS endpoints, mutually exclusive runtime-only
+  credentials, bounded requests and responses, redacted failures, and no
+  source-row or exact preserved-literal egress.
+- [x] Validate provider output through the existing fingerprint-bound review
+  gate and narrowly recover known beta schema-default failures from the exact
+  local baseline.
+- [x] Add fake-SDK, dependency, isolated-wheel, documentation, and local-only
+  doctor coverage without requiring credentials or network access.
+- [ ] Publish and verify the exact signed `1.1.0rc1` artifacts and record the
+  immutable release evidence.
+
 ### Post-1.0: Follow-up Architecture And Community
 
 After the stable baseline, continue the remaining maintenance and community

@@ -82,7 +82,8 @@ The post-1.0 GigaChat adapter changes runtime behavior, dependencies,
 packaging, public CLI selection, and an external security boundary. It must be
 accepted in a new minor release candidate; it cannot be folded into a
 documentation-only `1.0.0` promotion. Version selection, tagging, and
-publication remain separate explicit release work.
+publication remain separate explicit release work. The selected candidate is
+`1.1.0rc1`.
 
 Review the stable tree directly against that immutable baseline:
 

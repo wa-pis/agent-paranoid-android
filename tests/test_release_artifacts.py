@@ -36,7 +36,7 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     assert metadata["description"] == "Safety-first synthetic data generation agent"
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
-    assert "Development Status :: 5 - Production/Stable" in metadata["classifiers"]
+    assert "Development Status :: 4 - Beta" in metadata["classifiers"]
     for version in ("3.11", "3.12", "3.13", "3.14"):
         assert (
             f"Programming Language :: Python :: {version}"
