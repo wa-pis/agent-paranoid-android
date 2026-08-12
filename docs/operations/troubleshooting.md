@@ -37,6 +37,28 @@ used by the advisor adapter. It does not read `OPENAI_API_KEY`, send a request,
 or contact the provider. On failure, reinstall
 `agent-paranoid-android[openai]` before checking deployment credentials.
 
+`doctor --require-extra gigachat` uses a local fake SDK client to verify strict
+structured-response mapping and cleanup. It does not read
+`GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
+GigaChat. Before the next minor release candidate, run it only from a source
+checkout installed with `.[gigachat]`; published `1.0.0` does not contain the
+extra.
+
+## GigaChat Advice Failed
+
+Check the fixed local category first: missing extra, authentication, scope,
+TLS/CA bundle, rate limit, timeout, filtered response, invalid response, or
+unavailable service. Remote response bodies and SDK exception text are
+intentionally suppressed because they may reflect credentials or request
+metadata.
+
+Configure exactly one of `GIGACHAT_CREDENTIALS` and
+`GIGACHAT_ACCESS_TOKEN`. Match `GIGACHAT_SCOPE` to the API project, keep TLS
+verification enabled, and use `GIGACHAT_CA_BUNDLE_FILE` only for a reviewed
+readable CA bundle. Do not work around a certificate failure with an insecure
+SDK example. A failed provider call leaves the workspace awaiting review and
+does not create generated rows; retry only after correcting the local cause.
+
 ## Command Not Found
 
 Symptom:

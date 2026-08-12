@@ -56,6 +56,12 @@ environment. That smoke check verifies package version metadata, the PEP 561
 `py.typed` marker, console entry points, and `test-data-agent doctor
 --skip-smoke` before release attestations are created.
 
+For a candidate containing GigaChat, the release matrix additionally requires
+isolated base, `gigachat`, and `all` wheel checks on Python 3.11 through 3.14,
+`doctor --require-extra gigachat`, dependency/license verification, and the
+fake-SDK provider suite with no credentials or network access. A live provider
+call is optional manual evidence and must use only the fictional fixture.
+
 ## RC6 To Stable Promotion
 
 The active RC6 baseline is the exact commit named by the annotated
@@ -71,6 +77,12 @@ Stable `v1.0.0` was subsequently published from exact commit
 `eb4ef2a5d111ef31390f0a204068369e3f934a3b`; its signed tag, artifact hashes,
 image digests, and post-publish checks are recorded in the
 [stable published release evidence](release-evidence-1.0.0.md).
+
+The post-1.0 GigaChat adapter changes runtime behavior, dependencies,
+packaging, public CLI selection, and an external security boundary. It must be
+accepted in a new minor release candidate; it cannot be folded into a
+documentation-only `1.0.0` promotion. Version selection, tagging, and
+publication remain separate explicit release work.
 
 Review the stable tree directly against that immutable baseline:
 

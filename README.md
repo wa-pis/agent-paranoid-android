@@ -43,11 +43,10 @@ python3 -m pip install "agent-paranoid-android[mcp,trino]==1.0.0"
 python3 -m pip install "agent-paranoid-android[openai]==1.0.0"
 ```
 
-The `postgres` extra provides the Psycopg driver for direct read-only
-PostgreSQL profiling. The `trino` extra contains the Trino client and safe SQL
-parser; add `mcp` when using the Trino MCP server.
-The default aggregate-only tools return summaries, not source rows. The explicit opt-in row-returning tools include
-`run_safe_select`, which requires `TRINO_ENABLE_SAFE_SELECT=true`; bounded, masked rows may contain allowed source values and are not source-free, PII-free, anonymous, or privacy-safe.
+The `postgres` extra provides the Psycopg driver for direct read-only PostgreSQL profiling. The `trino` extra contains the Trino client and safe SQL
+parser; add `mcp` when using the Trino MCP server. The experimental GigaChat
+extra is on `main`, not in published `1.0.0`; see its source-install guide.
+The default aggregate-only tools return summaries, not source rows. The explicit opt-in row-returning tools include `run_safe_select`, which requires `TRINO_ENABLE_SAFE_SELECT=true`; bounded, masked rows may contain allowed source values and are not source-free, PII-free, anonymous, or privacy-safe.
 
 ## First Offline Run
 
@@ -97,6 +96,7 @@ to profile your own input.
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
 | Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |
+| Use the experimental GigaChat advisor | [GigaChat workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/gigachat/) |
 | Connect an AI client or provider | [AI Integration](https://wa-pis.github.io/agent-paranoid-android/ai_integration/) · [Provider Adapter](https://wa-pis.github.io/agent-paranoid-android/how-to/custom-advisor-provider/) · [Runnable MCP example](examples/mcp_stdio/) |
 | Run isolated OCI images | [Container Deployment](https://wa-pis.github.io/agent-paranoid-android/operations/containers/) |
 | Understand the trust boundaries | [Safety Model](https://wa-pis.github.io/agent-paranoid-android/concepts/safety-model/) |

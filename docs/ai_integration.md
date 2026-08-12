@@ -51,6 +51,10 @@ python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
 ```
 
+The experimental GigaChat adapter is implemented on `main` but is not in the
+published `1.0.0` wheel. Until its next minor release candidate, install it
+from a source checkout and follow [Use The GigaChat Advisor](how-to/gigachat.md).
+
 ## Agent Mode
 
 Use `agent-plan` when an AI client should prepare work but stop before
@@ -114,6 +118,13 @@ The OpenAI adapter is optional, uses structured Responses API output, disables
 response storage, and accepts only completed parsed responses. The package
 root and base installation do not import its SDK.
 
+The optional `GigaChatAdvisorClient` implements the same exchange boundary
+through the official `gigachat` SDK. It is selected explicitly by
+`agent-advise --provider gigachat`, uses fixed verified-TLS endpoints, and
+accepts credentials only from the runtime environment. It sends no source
+rows or exact locally preserved category values. See the GigaChat guide for a
+complete synthetic, review-gated example.
+
 For another provider, implement the same application-owned contract:
 
 ```python
@@ -146,7 +157,8 @@ base installation. The client must return a parsed object matching
 
 For an executable application-layer example, run
 [The Reference Agent](how-to/reference-agent.md). It uses a deterministic
-stand-in by default and can select the optional OpenAI adapter. Both paths
+stand-in by default and can select the optional OpenAI adapter. The CLI
+GigaChat path uses the same review and approval contract. All paths
 stop for explicit human review, require the exact reviewed spec fingerprint,
 and then run the normal deterministic generation and validation pipeline.
 

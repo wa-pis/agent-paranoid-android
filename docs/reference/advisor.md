@@ -132,6 +132,58 @@ The SDK reads `OPENAI_API_KEY` from the process environment. Supply it through
 a secret manager or private environment configuration; never write it into an
 agent workspace or dataset artifact.
 
+## GigaChat Adapter
+
+The experimental GigaChat adapter uses the official `gigachat` Python SDK
+directly; it does not require GigaChain or LangChain. It is available on
+`main` for the next minor release candidate and is not part of the published
+`1.0.0` wheel. Follow [Use The GigaChat Advisor](../how-to/gigachat.md) for the
+current source-install and CLI workflow.
+
+Applications may use the same provider-neutral adapter in process:
+
+```python
+from pathlib import Path
+
+from test_data_agent import ExchangeDatasetAdvisor, advise_agent_workspace
+from test_data_agent.providers.gigachat import (
+    GigaChatAdvisorClient,
+    GigaChatAdvisorSettings,
+)
+
+settings = GigaChatAdvisorSettings(
+    model="GigaChat",
+    scope="GIGACHAT_API_PERS",
+    max_input_bytes=4 * 1024 * 1024,
+    max_response_bytes=1024 * 1024,
+    max_output_tokens=4096,
+    timeout_seconds=15,
+    max_retries=0,
+)
+client = GigaChatAdvisorClient(settings=settings)
+try:
+    status = advise_agent_workspace(
+        Path("out/agent"),
+        ExchangeDatasetAdvisor(client),
+    )
+finally:
+    client.close()
+```
+
+Authentication is resolved at client construction from exactly one of
+`GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`; the authorization-key mode
+also uses the allowlisted `GIGACHAT_SCOPE`. Settings never retain credentials.
+The adapter fixes official HTTPS endpoints, requires TLS verification, accepts
+only an optional validated `GIGACHAT_CA_BUNDLE_FILE`, separates system policy
+from untrusted metadata, disables streaming and storage, and requests strict
+`json_schema` output.
+
+Each completion returns a locally validated proposal. Per-call metadata is
+bounded to model, safe settings, byte counts, latency, normalized status and
+finish category, and validated token counters. It contains no prompt,
+response body, credential, token, source literal, or exception text. Provider
+failure is detached and leaves the workspace unchanged.
+
 ## Request Boundary
 
 `AdvisorRequest` contains:

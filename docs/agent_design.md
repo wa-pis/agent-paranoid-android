@@ -65,6 +65,11 @@ test-data-agent agent-approve out/agent \
   --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
 ```
 
+The provider default remains OpenAI. To select the experimental direct
+GigaChat adapter explicitly, use `--provider gigachat` and follow
+[Use The GigaChat Advisor](how-to/gigachat.md). Both adapters receive the same
+safe exchange and stop before approval.
+
 Inspect the same workspace as versioned JSON for automation or an AI client:
 
 ```bash

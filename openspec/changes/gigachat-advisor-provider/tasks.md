@@ -62,17 +62,18 @@ release gates must not make live or paid GigaChat calls.
 
 ## Documentation And Release
 
-- [ ] Update README, installation, configuration, advisor, CLI, doctor,
+- [x] Update README, installation, configuration, advisor, CLI, doctor,
   privacy, support-policy, implementation-map, and troubleshooting docs.
-- [ ] Add a runnable synthetic GigaChat example with placeholder credentials,
+- [x] Add a runnable synthetic GigaChat example with placeholder credentials,
   supported scopes, CA-bundle guidance, review/approval steps, and cost notice.
-- [ ] Document that external GigaChat receives safe metadata, not source rows
+- [x] Document that external GigaChat receives safe metadata, not source rows
   or exact locally preserved values, and that TLS verification cannot be
   disabled.
-- [ ] Update changelog, roadmap, public stability map, and release checklist
+- [x] Update changelog, roadmap, public stability map, and release checklist
   for an experimental additive provider.
-- [ ] Run ruff, mypy, compile, focused and full pytest, strict docs build,
+- [x] Run ruff, mypy, compile, focused and full pytest, strict docs build,
   package build, dependency/license checks, isolated-wheel installs, and
-  synthetic CLI/doctor smokes on the exact implementation commit.
+  synthetic CLI/doctor smokes on exact implementation tip
+  `f7fc12b97a7ebeae79bd83f9b82aa41ea588d4c3` from PR #404.
 - [ ] Put the implementation through a new minor release candidate because it
   changes runtime behavior, dependencies, public CLI, and a security boundary.

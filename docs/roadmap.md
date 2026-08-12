@@ -176,8 +176,8 @@ core to one model vendor:
   metadata and proposes structured `DatasetSpec` changes. The typed,
   fingerprint-bound core contract, recoverable workspace handoff, and external
   self-describing JSON exchange are implemented. The in-process exchange
-  adapter, first optional OpenAI provider, and custom-provider guide are
-  implemented; additional provider examples remain.
+  adapter, optional OpenAI and GigaChat providers, and custom-provider guide
+  are implemented; additional provider examples are not currently planned.
 - Validate every model-produced proposal with Pydantic and the existing
   deterministic safety, generation, and validation layers.
 - Keep model SDKs out of the base package; ship provider integrations as
@@ -913,6 +913,16 @@ work without reopening the completed 1.0 application-boundary gate:
   guidance.
 - [ ] Publish a small benchmark dataset, demo recording, and a technical note
   explaining how source-row copying is prevented and tested.
+- [x] Add an explicit experimental GigaChat advisor through the official
+  `gigachat` SDK, keeping GigaChain/LangChain out of the dependency graph.
+- [x] Keep the adapter optional, metadata-only, review-gated, fixed-endpoint,
+  verified-TLS, resource-bounded, and covered by fake-SDK and isolated-wheel
+  tests on Python 3.11 through 3.14.
+- [x] Document source installation, runtime-only authentication, CA trust,
+  cost, synthetic usage, and the unchanged deterministic approval boundary.
+- [ ] Publish the feature only through a new minor release candidate because
+  it changes runtime behavior, dependencies, public CLI, packaging, and an
+  external security boundary.
 
 ### Required For Every Remaining Release
 

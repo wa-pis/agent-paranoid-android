@@ -43,6 +43,7 @@ nav:
       - Add Business Rules: how-to/business-rules.md
       - Connect An AI Client: ai_integration.md
       - Build A Provider Adapter: how-to/custom-advisor-provider.md
+      - Use The GigaChat Advisor: how-to/gigachat.md
       - Build A Semantic Provider: how-to/custom-semantic-provider.md
       - Run The Reference Agent: how-to/reference-agent.md
       - Connect An MCP Client: how-to/mcp.md
