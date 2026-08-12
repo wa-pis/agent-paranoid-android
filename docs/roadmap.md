@@ -950,11 +950,12 @@ Scope:
 
 - [x] Limit the promotion diff to version identity, changelog, public
   documentation, roadmap/OpenSpec status, and release evidence.
-- [ ] Merge the focused stable-promotion PR with all required checks green.
-- [ ] Record independent approval and Linux-derived wheel/sdist hashes for the
+- [x] Merge the focused stable-promotion PR with all required checks green.
+- [x] Record independent approval and Linux-derived wheel/sdist hashes for the
   exact merge commit.
-- [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
-  artifacts for `1.1.0`.
+- [x] Publish and verify GitHub, PyPI, and signed multi-platform container
+  artifacts for `1.1.0`; see the
+  [stable release evidence](release-evidence-1.1.0.md).
 
 ### 1.2.0: Portable Release Evidence And Safety Properties
 

@@ -106,6 +106,12 @@ documentation-only diff with Linux-derived artifact digests. Exact outcomes
 and published container digests are recorded in the
 [1.1.0rc2 partial release evidence](release-evidence-1.1.0rc2.md).
 
+Stable `v1.1.0` was subsequently published from exact commit
+`a536629c209878754c4250ef21a47f69e4c01cae`. Its signed tag, independent
+exact-commit approval, package hashes, signed image digests, and successful
+post-publish checks are recorded in the
+[1.1.0 published release evidence](release-evidence-1.1.0.md).
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash
