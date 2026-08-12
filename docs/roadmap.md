@@ -936,8 +936,25 @@ Scope:
   show defaults, wrap at standard widths, and generate completion for bash,
   zsh, fish, and PowerShell from argparse.
 - [x] Merge the focused implementation PR with full release gates green.
-- [ ] Create and publish `1.1.0rc2` only after a separate explicit release
-  command and exact-commit acceptance.
+- [x] Publish signed `1.1.0rc2` container images from the accepted exact
+  commit. Python publication failed closed before GitHub Release and PyPI when
+  the Linux sdist digest did not match the macOS-derived manifest; the
+  protected candidate tag remains immutable.
+
+### 1.1.0: Stable Promotion
+
+**Goal:** promote the accepted RC2 runtime without changing runtime behavior,
+public APIs, dependencies, workflows, containers, or security boundaries.
+
+Scope:
+
+- [x] Limit the promotion diff to version identity, changelog, public
+  documentation, roadmap/OpenSpec status, and release evidence.
+- [ ] Merge the focused stable-promotion PR with all required checks green.
+- [ ] Record independent approval and Linux-derived wheel/sdist hashes for the
+  exact merge commit.
+- [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
+  artifacts for `1.1.0`.
 
 ### Post-1.0: Follow-up Architecture And Community
 

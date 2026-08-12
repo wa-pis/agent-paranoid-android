@@ -78,6 +78,9 @@ Before creating a tag:
   exit-code, and overwrite behavior. Re-run base/optional entrypoint, JSON,
   cancellation, help-width, completion, and isolated-wheel gates. Do not tag
   or publish it from the implementation PR.
+- Promote stable `1.1.0` only from the accepted RC2 runtime with the documented
+  version- and documentation-only diff. Derive wheel and sdist hashes in Linux
+  before creating the protected stable tag.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

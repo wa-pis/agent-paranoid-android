@@ -96,14 +96,21 @@ and acceptance steps, but it must not create the tag or publish artifacts.
 Exact-commit RC2 acceptance must repeat the core/doctor JSON, malformed-input,
 missing-extra entrypoint, Ctrl+C cleanup, suffix/overwrite rollback,
 80-column help, four-shell completion, full package, and isolated-wheel gates.
-The selected candidate version is `1.1.0rc2`; tagging and publication require
-the verified merge commit, independent approval, and exact artifact digests.
+Candidate `v1.1.0rc2` targets accepted commit
+`9ff776b8fc59ed8037f7dc5aa23d124a61eb6a90`. Its signed multi-platform
+container images were published, but Python publication failed closed before a
+GitHub Release or PyPI upload because a macOS-derived sdist digest did not
+match the Linux release build. The protected tag remains immutable. Stable
+`1.1.0` therefore promotes the same accepted runtime through a version- and
+documentation-only diff with Linux-derived artifact digests. Exact outcomes
+and published container digests are recorded in the
+[1.1.0rc2 partial release evidence](release-evidence-1.1.0rc2.md).
 
 Review the stable tree directly against that immutable baseline:
 
 ```bash
-git diff --name-status v1.0.0rc6 HEAD
-git diff v1.0.0rc6 HEAD
+git diff --name-status v1.1.0rc2 HEAD
+git diff v1.1.0rc2 HEAD
 ```
 
 A new release candidate is required only when a change affects runtime
@@ -120,11 +127,11 @@ The stable promotion diff may contain only these reviewed release changes:
 - `src/test_data_agent/version.py`: `__version__` only;
 - `uv.lock`: the root `agent-paranoid-android` version only, with the resolved
   dependency graph and hashes unchanged;
-- `CHANGELOG.md`: add the `1.0.0` promotion entry, date, and links while
+- `CHANGELOG.md`: add the stable promotion entry, date, and links while
   retaining prerelease history and introducing no new behavior claim;
 - release-facing version references, release evidence, roadmap status, and
   OpenSpec completion or archive metadata. These documentation files may
-  describe only behavior already accepted in RC6.
+  describe only behavior already accepted in the selected candidate.
 
 Release-validation assertions that only replace a hard-coded candidate
 version with the active package version are generated release metadata for
@@ -134,12 +141,12 @@ fixture, runtime assertion, safety assertion, or product coverage may change.
 File membership alone is not approval: every changed hunk must match one of
 those categories. All other changes require a new release candidate. In
 particular, any executable production, runtime or safety test, schema, fixture,
-dependency, build, workflow, or container change means RC6 is not the accepted
-stable source tree. Stop the promotion, make the change in a newly numbered
-release candidate, and complete that candidate's acceptance before trying
-stable promotion again.
+dependency, build, workflow, or container change means the candidate is not
+the accepted stable source tree. Stop the promotion, make the change in a newly
+numbered release candidate, and complete that candidate's acceptance before
+trying stable promotion again.
 
-Before any RC6 or stable publication, the release workflow must also validate
+Before any candidate or stable publication, the release workflow must validate
 the machine-readable RC acceptance manifest. It must bind the tag to the
 reviewed commit digest, require closed release-blocking findings and recorded
 approval, and match the published artifact digests. A version-matching tag or
@@ -160,8 +167,8 @@ different.
 
 Run every final release gate, including `scripts/check_release.sh` and
 `mkdocs build --strict`, on the exact stable release commit. Merge only after
-the required pipeline is green and conflict-free. Create `v1.0.0` only from
-the verified merge commit in `main`; the stable tag and post-publish checks are
+the required pipeline is green and conflict-free. Create the stable tag only
+from the verified merge commit in `main`; tagging and post-publish checks are
 separate explicit steps.
 
 ## Version And Tag

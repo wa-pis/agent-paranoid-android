@@ -46,4 +46,11 @@ release command.
 - [x] Run ruff, mypy, compileall, full pytest, strict docs, package build, and
   isolated base-wheel CLI smoke.
 - [x] Open a signed focused PR and require clean mergeability plus green CI.
-- [x] Prepare, but do not publish, a separately reviewed `1.1.0rc2` decision.
+- [x] Prepare and independently review the exact `1.1.0rc2` decision. Signed
+  containers were published; Python publication failed closed before GitHub
+  Release and PyPI because the protected manifest carried a non-Linux sdist
+  digest.
+- [x] Prepare a version- and documentation-only stable `1.1.0` promotion from
+  the accepted RC2 runtime.
+- [ ] Merge the stable promotion with required CI green, record exact-commit
+  approval and Linux-derived hashes, then publish and verify `1.1.0`.
