@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Security
+
+- Publish portable, checksum-covered Sigstore build provenance with each
+  GitHub Release and verify both Python distributions against the downloaded
+  bundle during release creation and post-publish acceptance.
+
 ## [1.1.0] - 2026-08-12
 
 ### Changed

@@ -316,6 +316,18 @@ def test_release_workflow_builds_sbom_and_attests_packages() -> None:
     assert "--format cyclonedx1.5" in workflow
     assert workflow.count("actions/attest@") == 2
     assert "sbom-path: dist/sbom.cdx.json" in workflow
+    assert "id: provenance" in workflow
+    assert "${{ steps.provenance.outputs.bundle-path }}" in workflow
+    assert "name: Export and verify portable build provenance" in workflow
+    assert 'bundle="dist/agent-paranoid-android-${GITHUB_REF_NAME#v}.sigstore.json"' in workflow
+    assert '--bundle "${bundle}"' in workflow
+    assert "dist/*.sigstore.json" in workflow
+    assert workflow.index("Export and verify portable build provenance") < workflow.index(
+        "Attest package SBOM"
+    )
+    assert workflow.index("Attest package SBOM") < workflow.index(
+        "Write artifact checksums"
+    )
     assert "softprops/action-gh-release@" in workflow
     assert "name: Build and attest distributions" in workflow
     assert "name: Create GitHub Release" in workflow
@@ -421,6 +433,9 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     )
     assert "sha256sum --check SHA256SUMS" in workflow
     assert "gh attestation verify" in workflow
+    assert "bundle_count=" in workflow
+    assert 'test "${bundle_count}" = "1"' in workflow
+    assert "--bundle /tmp/release-assets/*.sigstore.json" in workflow
     assert "GITHUB_STEP_SUMMARY" in workflow
     assert "scripts.verify_pypi_release" in workflow
     assert "--require-hashes" in workflow

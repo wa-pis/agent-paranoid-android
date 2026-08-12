@@ -222,6 +222,14 @@ same digest with keyless Cosign using GitHub OIDC. It does not use a registry
 password or signing key. After the first publication, confirm all three GHCR
 packages are public and linked to this repository.
 
+For Python distributions, `release.yml` also exports the signed GitHub build
+attestation as one `agent-paranoid-android-<version>.sigstore.json` release
+asset covering the wheel and source distribution. Before the GitHub Release is
+created, both files are verified against that local bundle, the release tag,
+and the exact `release.yml` signer identity. The bundle is included in
+`SHA256SUMS`; the GitHub attestation API record remains available as a second
+verification path.
+
 ## Post-Publish Verification
 
 After a GitHub Release, PyPI version, documentation site, and all three GHCR
@@ -229,7 +237,8 @@ images are public, run the `Verify Published Release` workflow with the exact
 release tag. The workflow checks out the immutable annotated tag and records
 its commit, then:
 
-- verifies GitHub Release checksums and tag-bound attestations;
+- verifies GitHub Release checksums and tag-bound attestations, including the
+  downloaded portable Sigstore bundle without relying on the attestation API;
 - compares the public PyPI hashes with the GitHub Release distributions;
 - installs the hash-pinned wheel from public PyPI and runs `doctor` plus the
   bundled synthetic demo;
@@ -243,6 +252,17 @@ its commit, then:
 
 Keep the successful workflow run URL and emitted image digests in the release
 evidence. This is a post-publish gate and never creates or mutates a release.
+
+Users can verify either distribution from the downloaded release assets:
+
+```bash
+gh attestation verify agent_paranoid_android-<version>-py3-none-any.whl \
+  --bundle agent-paranoid-android-<version>.sigstore.json \
+  --repo wa-pis/agent-paranoid-android \
+  --signer-workflow wa-pis/agent-paranoid-android/.github/workflows/release.yml \
+  --source-ref refs/tags/v<version> \
+  --deny-self-hosted-runners
+```
 
 ## PyPI Trusted Publishing
 

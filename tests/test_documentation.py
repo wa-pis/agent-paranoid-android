@@ -269,6 +269,7 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
         "1-0-0-rc6-final-release-candidate",
         "1-0-0-postgres-multi-source",
         "1-1-0-cli-ux",
+        "1-2-0-portable-release-provenance",
         "_template",
         "gigachat-advisor-provider",
     }
