@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-paranoid-android"
-version = "1.1.0rc1"
+version = "1.1.0rc2"
 description = "Safety-first synthetic data generation agent"
 readme = "README.md"
 requires-python = ">=3.11"

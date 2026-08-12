@@ -45,5 +45,5 @@ release command.
 - [x] Run focused CLI/artifact/docs tests.
 - [x] Run ruff, mypy, compileall, full pytest, strict docs, package build, and
   isolated base-wheel CLI smoke.
-- [ ] Open a signed focused PR and require clean mergeability plus green CI.
-- [ ] Prepare, but do not publish, a separately reviewed `1.1.0rc2` decision.
+- [x] Open a signed focused PR and require clean mergeability plus green CI.
+- [x] Prepare, but do not publish, a separately reviewed `1.1.0rc2` decision.

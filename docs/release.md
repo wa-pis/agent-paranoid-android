@@ -96,6 +96,8 @@ and acceptance steps, but it must not create the tag or publish artifacts.
 Exact-commit RC2 acceptance must repeat the core/doctor JSON, malformed-input,
 missing-extra entrypoint, Ctrl+C cleanup, suffix/overwrite rollback,
 80-column help, four-shell completion, full package, and isolated-wheel gates.
+The selected candidate version is `1.1.0rc2`; tagging and publication require
+the verified merge commit, independent approval, and exact artifact digests.
 
 Review the stable tree directly against that immutable baseline:
 
