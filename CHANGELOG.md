@@ -10,6 +10,11 @@ All notable changes to this project are documented here.
   SDK, its optional `gigachat` extra, local-only doctor smoke, and the existing
   review-gated `agent-advise --provider gigachat` workflow.
 
+### Fixed
+
+- Replace only identity-matched GigaChat beta structured-output failures with
+  the validated local baseline before repeating full proposal and core checks.
+
 ### Security
 
 - Keep GigaChat on fixed verified-TLS endpoints with runtime-only mutually

@@ -128,6 +128,18 @@ is passed to `ExchangeDatasetAdvisor`, which validates it again against the
 original request fingerprints, entity and field identities, and core safety
 rules.
 
+GigaChat structured output is currently beta and can materialize schema
+defaults instead of copying nested baseline-owned values. If the first
+Pydantic pass fails only at known baseline entity or constraint model
+validators, and entity plus constraint identity still matches the validated
+request, the adapter may replace the malformed `dataset_spec` with the exact
+local baseline. No provider-proposed dataset change survives this fallback.
+The adapter then repeats full Pydantic, fingerprint, profile, privacy, and
+advisor-contract validation. Other validation locations, invented identity,
+or provider-added invalid constraints fail closed. A normally valid response
+never uses this fallback, so valid unauthorized changes remain visible to and
+rejected by the existing core contract.
+
 No raw provider response is stored. A successful run may persist only the
 existing validated `advisor_review.json`, whose safe request remains labelled
 and whose proposal is bound to the current profile and baseline-spec
@@ -227,6 +239,9 @@ production data, and must not print or retain the request or response.
   discard it before persistence or generation.
 - Fingerprint or safety mismatch after parsing: reject through the existing
   core contract; do not apply a partial proposal.
+- Beta structured output fails only known baseline model validators: substitute
+  the exact fingerprint-bound local baseline and rerun every normal validation;
+  reject all other invalid response shapes.
 - Cancellation: close client resources and propagate a fixed cancellation
   outcome without logging provider text.
 

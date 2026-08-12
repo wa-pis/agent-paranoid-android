@@ -148,6 +148,13 @@ output tokens, 15 seconds per attempt, and no retries. The request disables
 streaming and provider storage. Invalid, filtered, incomplete, oversized, or
 schema-invalid output fails before the workspace changes.
 
+GigaChat structured output is currently beta. When it emits schema defaults in
+place of nested immutable values, the adapter may replace an identity-matched
+invalid `dataset_spec` with the exact fingerprint-bound local baseline. No
+provider-proposed dataset change survives that fallback. The result still must
+pass the normal Pydantic, fingerprint, privacy, and advisor-contract checks
+before a review is written; every other invalid response fails closed.
+
 ## Cost And Testing
 
 A real `agent-advise` call consumes provider quota and may be billable. Normal
