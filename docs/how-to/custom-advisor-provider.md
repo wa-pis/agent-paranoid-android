@@ -222,9 +222,11 @@ At minimum, test that the adapter:
 8. leaves the workspace awaiting approval and creates no generated rows.
 
 Use a fake transport; tests must not contact a real provider. The built-in
-OpenAI adapter and
+OpenAI and GigaChat adapters plus
 [`tests/test_openai_provider.py`](https://github.com/wa-pis/agent-paranoid-android/blob/main/tests/test_openai_provider.py)
-provide a concrete contract-test example.
+and
+[`tests/test_gigachat_provider.py`](https://github.com/wa-pis/agent-paranoid-android/blob/main/tests/test_gigachat_provider.py)
+provide concrete contract-test examples.
 
 ## Compatibility
 

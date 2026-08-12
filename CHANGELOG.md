@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add an explicit experimental GigaChat advisor through the official Python
+  SDK, its optional `gigachat` extra, local-only doctor smoke, and the existing
+  review-gated `agent-advise --provider gigachat` workflow.
+
+### Security
+
+- Keep GigaChat on fixed verified-TLS endpoints with runtime-only mutually
+  exclusive authentication, bounded requests and responses, strict structured
+  output, redacted failures, and no source-row or exact preserved-literal
+  egress.
+
 ## [1.0.0] - 2026-08-12
 
 ### Changed

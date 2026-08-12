@@ -175,6 +175,8 @@ test-data-agent agent-plan data/example_dataset \
 test-data-agent agent-review out/agent
 # Optional; requires agent-paranoid-android[openai].
 test-data-agent agent-advise out/agent --provider openai
+# Or explicitly select the experimental GigaChat adapter from a source install:
+# test-data-agent agent-advise out/agent --provider gigachat
 # Advice changes the spec, so review it again.
 test-data-agent agent-review out/agent
 REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
@@ -191,12 +193,15 @@ paths, and provider-derived metadata are escaped and bounded before terminal
 output. JSON errors remain structured and bound their text fields before
 serialization.
 
-`agent-advise` is the shortest provider-backed path. It loads the optional
-OpenAI adapter only when invoked, sends safe metadata through the structured
-advisor contract, validates the proposal, updates the pending spec, and never
-approves or generates data. Install `agent-paranoid-android[openai]`, configure
-`OPENAI_API_KEY` through a secret manager, and use `--model` only when the
-adapter default is unsuitable. Always run `agent-review` again after advice.
+`agent-advise` is the shortest provider-backed path. Its default remains
+`openai`; `gigachat` is an explicit experimental choice. The selected adapter
+is loaded only when invoked, receives safe metadata through the structured
+advisor contract, and never approves or generates data. Install the matching
+provider extra, configure its secret only in the runtime environment, and use
+`--model` only when the adapter default is unsuitable. Always run
+`agent-review` again after advice. The published `1.0.0` wheel does not yet
+contain the GigaChat extra; see [Use The GigaChat Advisor](../how-to/gigachat.md)
+for the source-install workflow and authentication variables.
 
 `agent-review` shows every field's type, nullability, sensitive and identifier
 flags, semantic type, distribution kind, entity row count, primary key,

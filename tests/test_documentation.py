@@ -27,6 +27,7 @@ REQUIRED_DOCS = {
     "getting-started/related-tables.md",
     "getting-started/review-output.md",
     "how-to/business-rules.md",
+    "how-to/gigachat.md",
     "how-to/mcp.md",
     "how-to/reference-agent.md",
     "concepts/safety-model.md",
@@ -536,6 +537,7 @@ def test_ai_guidance_matches_safe_public_contract() -> None:
 
     assert 'pip install -e ".[all,dev]"' not in integration
     assert 'agent-paranoid-android[mcp,trino]' in integration
+    assert "Use The GigaChat Advisor" in integration
     assert "`plan_trino_dataset`" in integration
     assert "`inspect_dataset_plan`" in integration
     assert "`approve_dataset_plan`" in integration
@@ -656,12 +658,43 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
 
     for version in ("3.11", "3.12", "3.13", "3.14"):
         assert version in support
-    for extra in ("parquet", "mcp", "trino", "openai", "all"):
+    for extra in ("parquet", "mcp", "trino", "openai", "gigachat", "all"):
         assert f"`{extra}`" in support
     assert "breaking packaging change" in support
     assert "provider-neutral" in support
     assert "safe metadata only" in support
     assert "local fakes" in support
+
+
+def test_gigachat_documentation_matches_provider_boundary() -> None:
+    guide = (ROOT / "docs" / "how-to" / "gigachat.md").read_text()
+    configuration = (
+        ROOT / "docs" / "reference" / "configuration.md"
+    ).read_text()
+    cli = (ROOT / "docs" / "reference" / "cli.md").read_text()
+    installation = (
+        ROOT / "docs" / "getting-started" / "installation.md"
+    ).read_text()
+
+    for expected in (
+        "official `gigachat` Python SDK directly",
+        "GIGACHAT_CREDENTIALS",
+        "GIGACHAT_ACCESS_TOKEN",
+        "GIGACHAT_API_PERS",
+        "GIGACHAT_API_B2B",
+        "GIGACHAT_API_CORP",
+        "GIGACHAT_CA_BUNDLE_FILE",
+        "TLS verification is mandatory",
+        "locally preserved category values",
+        "agent-approve",
+        "provider quota",
+    ):
+        assert expected in guide
+    assert "--provider gigachat" in cli
+    assert "default remains\n`openai`" in cli
+    assert "published `1.0.0` wheel does not contain" in guide
+    assert "published `1.0.0` wheel" in installation
+    assert "TLS verification cannot be disabled" in configuration
 
 
 def test_artifact_durability_contract_matches_implementation() -> None:

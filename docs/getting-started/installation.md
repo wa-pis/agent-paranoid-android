@@ -48,6 +48,7 @@ growth:
 | `parquet` | Parquet files | 11 |
 | `mcp` | Generator MCP server | 35 |
 | `openai` | Optional structured-output advisor | 20 |
+| `gigachat` | Experimental GigaChat advisor | 20 |
 | `trino` | Trino client and safe SQL parser | 25 |
 | `postgres` | Read-only PostgreSQL profiling driver | 12 |
 
@@ -58,6 +59,12 @@ environments that do not produce Parquet files.
 The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 `test-data-agent doctor --require-extra all` to verify that full environment.
+
+The GigaChat adapter is implemented on `main` for the next minor release
+candidate and is not present in the published `1.0.0` wheel. Until a release
+containing it is published, follow [Use The GigaChat Advisor](../how-to/gigachat.md)
+to install the source checkout. Do not add `[gigachat]` to the pinned `1.0.0`
+commands above; pip cannot retrofit an extra into an already published wheel.
 
 ### Windows PowerShell
 
@@ -95,6 +102,9 @@ is installed without opening a connection.
 `doctor --require-extra openai` constructs and closes a local SDK client with
 a non-secret placeholder, then verifies the structured Responses API and
 advisor adapter without contacting the provider.
+`doctor --require-extra gigachat` validates strict structured-response mapping
+and cleanup through a local fake SDK client. It does not resolve credentials,
+obtain an access token, or contact GigaChat.
 
 ## Install For Development
 

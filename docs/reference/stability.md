@@ -1,9 +1,10 @@
 # Public Stability
 
-This page defines the supported integration surfaces before the `1.0`
+This page defines the supported integration surfaces at and after the `1.0`
 compatibility baseline. "Supported" means changes are reviewed against the
 listed contract gate and announced when migration is required. It does not
-mean that every internal module is public.
+mean that every internal module is public. Provider adapters remain
+experimental unless a later feature release promotes one explicitly.
 
 ## Stability Table
 

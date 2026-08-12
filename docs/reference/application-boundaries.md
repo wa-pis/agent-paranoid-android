@@ -161,6 +161,7 @@ The current dependencies after completed extraction increments are:
 | `cli_commands.py` | dataset and utility handlers, I/O workflows, audit, demo, rules, and presenters |
 | `cli_dependencies.py` | optional-extra module catalog, injected availability inspection, and normalized installation errors |
 | `cli_doctor.py` | installation diagnostics, synthetic quickstart smoke, and redacted optional-capability smoke orchestration |
+| `providers/openai.py`, `providers/gigachat.py` | optional provider-specific structured transports behind the provider-neutral exchange; no application authority |
 | `agent.py` | compatibility exports plus deterministic generation and completion validation |
 | `agent_contracts.py` | core field, relationship, and settings models only |
 | `agent_planning.py` | adapters, contracts, core, generation planning, profiling, safety, and workspace-store port |
@@ -274,7 +275,7 @@ module importer and smoke callables, preserving existing output, redaction, and
 test override points while command dispatch remains unchanged.
 
 `cli_dependencies.py` centralizes optional-extra discovery and installation
-errors for doctor capability checks and OpenAI advice. Importers and loaders
+errors for doctor capability checks and provider advice. Importers and loaders
 remain injectable so direct service calls preserve fail-closed behavior.
 
 `cli_agent.py` now owns review-first `agent-*` request translation and command

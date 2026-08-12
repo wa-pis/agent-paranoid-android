@@ -8,8 +8,9 @@ agent workflow. The adapter will send only the current safe, provider-neutral
 the proposal to the existing deterministic validation and approval boundary.
 
 The integration is explicit and off by default. It adds a `gigachat` optional
-dependency profile and a `gigachat` choice to the existing advisor provider
-selection; it does not add a generator, an MCP tool, or a new artifact format.
+dependency profile and a `gigachat` choice while preserving `openai` as the
+existing CLI default; it does not add a generator, an MCP tool, or a new
+artifact format.
 
 ## Motivation
 
@@ -29,7 +30,7 @@ In scope:
 - A `GigaChatAdvisorClient` implementing the existing structured-output client
   boundary and accepting only a validated `AdvisorExchange`.
 - Explicit `--provider gigachat` selection for the existing `agent-advise`
-  workflow, with the existing deterministic advisor remaining the default.
+  workflow, with the existing OpenAI CLI default unchanged.
 - Typed, bounded provider settings for model, scope, request bytes, response
   bytes, output tokens, timeout, retries, and total invocation work.
 - Runtime-only authentication from either an authorization key plus an

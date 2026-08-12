@@ -35,6 +35,7 @@ the capabilities they need.
 | `trino` | Read-only Trino client and safe SQL parsing | isolated wheel install, `doctor --require-extra trino`, mocked and live opt-in Trino tests |
 | `postgres` | Read-only allowlisted PostgreSQL profiling driver; deterministic PostgreSQL SQL export remains in base | isolated wheel install, `doctor --require-extra postgres`, fake-driver tests, and opt-in disposable execution example |
 | `openai` | Reference OpenAI advisor adapter | isolated wheel install, `doctor --require-extra openai`, fake-transport provider tests |
+| `gigachat` | Experimental GigaChat advisor through the official SDK | isolated wheel install, `doctor --require-extra gigachat`, fake-SDK provider tests |
 | `all` | Development, demos, and container builds | full install and container smoke tests; not recommended for normal users |
 
 Removing an extra, moving a base capability behind an extra, or making one
@@ -54,8 +55,9 @@ The provider-neutral `DatasetAdvisor`, `AdvisorExchange`, and
 separate from model SDKs and never grant approval, generation, filesystem, or
 database access.
 
-Provider-specific adapters, including the bundled OpenAI reference adapter,
-are experimental before 1.0. They may change between feature releases as
+Provider-specific adapters, including the bundled OpenAI reference adapter
+and experimental GigaChat adapter, remain experimental unless the stability
+table explicitly promotes them. They may change between feature releases as
 provider APIs evolve, while these requirements remain mandatory:
 
 - requests contain safe metadata only, never source rows, raw PII, secrets,

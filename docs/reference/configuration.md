@@ -87,6 +87,28 @@ requests `default_transaction_read_only=on`, but that setting is defense in
 depth rather than a replacement for role permissions. No arbitrary SQL or
 source-row profiling option exists.
 
+## GigaChat Advisor
+
+GigaChat is explicit and off unless `agent-advise --provider gigachat` is
+selected. Configure exactly one runtime authentication value:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `GIGACHAT_CREDENTIALS` | unset | Authorization key used by the official SDK to obtain an access token |
+| `GIGACHAT_ACCESS_TOKEN` | unset | Pre-obtained short-lived access token; mutually exclusive with `GIGACHAT_CREDENTIALS` |
+| `GIGACHAT_SCOPE` | `GIGACHAT_API_PERS` | `GIGACHAT_API_PERS`, `GIGACHAT_API_B2B`, or `GIGACHAT_API_CORP` |
+| `GIGACHAT_CA_BUNDLE_FILE` | system trust store | Absolute or relative path to a reviewed readable CA bundle |
+
+Credentials are never accepted as CLI arguments or written to settings,
+workspaces, logs, or errors. The API and authorization endpoints are fixed to
+the official HTTPS services. TLS verification cannot be disabled; endpoint,
+client-certificate, SSL-context, or token-expiry overrides fail locally.
+
+The CLI exposes only the optional `--model` override. Applications that use
+the Python adapter can provide frozen `GigaChatAdvisorSettings` to narrow the
+default 4 MiB request, 1 MiB response, 4,096 output-token, 15-second timeout,
+and zero-retry budgets. See [Use The GigaChat Advisor](../how-to/gigachat.md).
+
 ## Generator MCP
 
 | Variable | Required | Purpose |

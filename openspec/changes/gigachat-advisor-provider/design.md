@@ -51,7 +51,7 @@ This design is based on official documentation checked on 2026-08-12:
 - [OpenAI compatibility](https://developers.sber.ru/docs/ru/gigachat/guides/compatible-openai)
 - [Quotas and limits](https://developers.sber.ru/docs/ru/gigachat/limitations)
 - [Models](https://developers.sber.ru/docs/ru/gigachat/models/main)
-- [Official Python SDK](https://developers.sber.ru/docs/ru/gigachain/tools/python/gigachat)
+- [Official Python SDK](https://developers.sber.ru/docs/ru/gigachat/guides/using-sdks)
 - [API errors](https://developers.sber.ru/docs/ru/gigachat/api/errors-description)
 
 The target service URL is `https://api.giga.chat`, and the first adapter uses
@@ -165,10 +165,10 @@ completion, credentials, token, and CA path are never copied into a public
 error or log.
 
 Per-call metadata may contain only bounded local values: configured model,
-safe setting values, request and response byte counts, elapsed time, retry
-count, normalized status, normalized finish category, and validated usage
-counters. It contains neither the request nor the response. Concurrent or
-failed calls cannot overwrite metadata belonging to another call.
+safe setting values, request and response byte counts, elapsed time,
+normalized status, normalized finish category, and validated usage counters.
+It contains neither the request nor the response. Concurrent or failed calls
+cannot overwrite metadata belonging to another call.
 
 ## CLI, Packaging, And Doctor
 
@@ -236,6 +236,8 @@ production data, and must not print or retain the request or response.
   compatibility is partial and the current adapter uses a different API.
 - **Implement OAuth and HTTP directly:** rejected for the first integration;
   the official SDK is smaller to maintain if it passes project gates.
+- **Use GigaChain or LangChain:** rejected because one bounded structured
+  advisor request needs no chain, graph, memory, tool, or framework dependency.
 - **Allow arbitrary endpoint overrides:** rejected because it expands the
   credential and data-egress boundary without a current user requirement.
 - **Disable TLS verification like some upstream examples:** rejected because

@@ -202,6 +202,18 @@ generated proposal schema while keeping the request explicitly untrusted.
 to `DatasetAdvisor`, passes a defensive exchange copy, and validates the
 untrusted response against the original fingerprint-bound request.
 
+`src/test_data_agent/providers/openai.py`
+
+Maps the safe exchange to the optional OpenAI Responses API adapter.
+
+`src/test_data_agent/providers/gigachat.py`
+
+Maps the same safe exchange to one bounded non-streaming strict-schema request
+through the official `gigachat` SDK. It owns GigaChat authentication, fixed
+verified-TLS endpoints, request/response budgets, redacted failures, and local
+field-label restoration. It has no source, workspace, generation, approval,
+database, SQL, or MCP authority.
+
 `examples/reference_agent.py`
 
 The runnable application-layer example composes planning, the exchange
@@ -211,6 +223,9 @@ and the command never auto-approves or returns rows. With the optional
 `openai` extra, `test_data_agent.providers.openai.OpenAIAdvisorClient` maps
 the same exchange to the OpenAI Responses API with bounded non-streaming
 structured output and response storage disabled.
+The review-first CLI may instead select the experimental `gigachat` extra;
+the reference-agent script itself retains its existing deterministic/OpenAI
+choices.
 
 ## Tests
 

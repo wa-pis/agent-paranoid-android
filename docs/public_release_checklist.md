@@ -26,6 +26,12 @@ python3 -m pip wheel --no-deps . -w /tmp/agent-paranoid-android-wheel
 The release gate must pass before publishing. The wheel build confirms package
 metadata and entry points are valid.
 
+For a release containing GigaChat, also install isolated base, `gigachat`, and
+`all` wheels on every supported Python version. Run
+`doctor --require-extra gigachat` and the fake-SDK provider suite with network
+access and credentials absent. Any live GigaChat smoke is separate, manual,
+synthetic-only, and never a required release gate.
+
 Review the latest [RC2 security review](security-review-2026-08-01-rc2.md) and
 repeat its automated evidence collection against the release commit.
 
@@ -63,6 +69,9 @@ Before creating a tag:
 - Mention safety guarantees and known limitations.
 - Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
   change.
+- Use a new minor release candidate for the GigaChat addition because it
+  changes dependencies, packaging, public CLI behavior, and an external
+  security boundary; documentation alone does not require another candidate.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source
