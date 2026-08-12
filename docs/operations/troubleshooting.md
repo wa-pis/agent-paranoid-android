@@ -41,8 +41,7 @@ or contact the provider. On failure, reinstall
 `doctor --require-extra gigachat` uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
-GigaChat. Install the exact `1.1.0rc2` candidate with the `gigachat` extra;
-stable `1.0.0` does not contain it.
+GigaChat. Install stable `1.1.0` with the `gigachat` extra.
 
 ## GigaChat Advice Failed
 

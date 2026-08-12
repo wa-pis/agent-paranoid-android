@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.1.0] - 2026-08-12
+
+### Changed
+
+- Promote the accepted RC2 runtime and public CLI contracts to the stable
+  `1.1.0` feature line without changing runtime behavior.
+
 ## [1.1.0rc2] - 2026-08-12
 
 ### Added
@@ -837,7 +844,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc2...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc2...v1.1.0
 [1.1.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc1...v1.1.0rc2
 [1.1.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0...v1.1.0rc1
 [1.0.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc6...v1.0.0

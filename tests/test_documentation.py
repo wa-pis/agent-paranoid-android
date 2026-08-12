@@ -745,7 +745,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.0.0rc6 HEAD" in release
+    assert "git diff --name-status v1.1.0rc2 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",
@@ -757,6 +757,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     assert "All other changes require a new release candidate" in release
     assert "generated release metadata" in release
     assert "every final release gate" in normalized_release
+    assert "macOS-derived sdist digest" in normalized_release
     assert "## Stable Promotion Contract" in design
     assert "remain byte-for-byte at the accepted RC4 state" in normalized_design
     assert "- [x] Define stable promotion" in tasks
