@@ -80,10 +80,22 @@ workspaces, persistence, approval, generation, or validation.
 - **GIVEN** GigaChat returns instructions, invented entities, changed safety
   settings, stale fingerprints, or an attempted approval
 - **WHEN** the proposal enters the provider-neutral boundary
-- **THEN** deterministic core validation rejects unauthorized content
+- **THEN** deterministic code either substitutes the exact local baseline
+  during the documented compatibility fallback or rejects unauthorized content
 - **AND** the adapter cannot access a database, filesystem publisher, or
   generator to act on it
 - **AND** the existing pending workspace remains safe and retryable
+
+#### Scenario: Beta structured output materializes invalid baseline defaults
+
+- **GIVEN** GigaChat returns schema-shaped JSON that omits known fields or
+  weakens baseline-owned identity, privacy, or existing constraint values
+- **WHEN** the first `AdvisorProposal` validation fails
+- **THEN** the adapter requires matching baseline entity and constraint identity
+  and substitutes the exact local fingerprint-bound `dataset_spec`
+- **AND** no provider-proposed dataset value survives the compatibility fallback
+- **AND** the normalized proposal passes the same Pydantic, fingerprint,
+  profile, privacy, and advisor-contract validation or fails closed
 
 ### Requirement: GigaChat Errors And Metrics Are Redacted
 

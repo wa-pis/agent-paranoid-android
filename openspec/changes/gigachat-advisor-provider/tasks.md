@@ -31,6 +31,8 @@ release gates must not make live or paid GigaChat calls.
   bounded metadata without retaining raw requests or responses.
 - [x] Reuse the existing fingerprint, safety, review, and local field-label
   restoration boundaries without giving the adapter persistence authority.
+- [x] Replace only identity-matched beta structured-output failures with the
+  validated local baseline, then repeat full proposal and core validation.
 
 ## CLI And Packaging
 

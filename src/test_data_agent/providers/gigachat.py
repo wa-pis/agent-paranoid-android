@@ -34,6 +34,7 @@ from test_data_agent.advisor import (
     AdvisorProposalPayload,
     AdvisorRequest,
 )
+from test_data_agent.core.dataset import DatasetSpec
 
 
 GigaChatScope = Literal[
@@ -320,9 +321,8 @@ class GigaChatAdvisorClient:
             try:
                 response = self._client.chat.create(request)
             except Exception as exc:
-                if (
-                    retry_index < self._settings.max_retries
-                    and _provider_retryable(exc)
+                if retry_index < self._settings.max_retries and _provider_retryable(
+                    exc
                 ):
                     retry = True
                 else:
@@ -407,11 +407,10 @@ class GigaChatAdvisorClient:
                 finish_category="stop",
             )
 
-        parsed: AdvisorProposal | None = None
-        try:
-            parsed = AdvisorProposal.model_validate_json(content)
-        except ValidationError:
-            pass
+        parsed = _parse_provider_proposal(
+            content,
+            baseline=validated.request.baseline_spec,
+        )
         if parsed is None:
             return self._reject_response(
                 request_bytes=request_bytes,
@@ -707,9 +706,9 @@ def _provider_safe_request(
                             )
                             suffix += 1
                         replacements[key] = placeholder
-                        restorations[
-                            (*field_key, _scalar_identity(placeholder))
-                        ] = value
+                        restorations[(*field_key, _scalar_identity(placeholder))] = (
+                            value
+                        )
                         used_values.add(_scalar_identity(placeholder))
                     category["value"] = placeholder
         _replace_constraint_literals(
@@ -717,6 +716,69 @@ def _provider_safe_request(
             replacements,
         )
     return payload, restorations
+
+
+def _parse_provider_proposal(
+    content: str,
+    *,
+    baseline: DatasetSpec,
+) -> AdvisorProposal | None:
+    try:
+        return AdvisorProposal.model_validate_json(content)
+    except ValidationError as validation_error:
+        try:
+            payload = json.loads(content)
+            if not _is_beta_baseline_default_failure(
+                validation_error,
+                payload,
+                baseline,
+            ):
+                return None
+            payload["dataset_spec"] = baseline.model_dump(mode="json")
+            return AdvisorProposal.model_validate(payload)
+        except Exception:
+            return None
+
+
+def _is_beta_baseline_default_failure(
+    validation_error: ValidationError,
+    payload: Any,
+    baseline: DatasetSpec,
+) -> bool:
+    if type(payload) is not dict or type(payload.get("dataset_spec")) is not dict:
+        return False
+    candidate = payload["dataset_spec"]
+    entities = candidate.get("entities")
+    constraints = candidate.get("constraints")
+    if type(entities) is not list or type(constraints) is not list:
+        return False
+    if [item.get("name") for item in entities if type(item) is dict] != [
+        item.name for item in baseline.entities
+    ]:
+        return False
+    if len(constraints) < len(baseline.constraints) or any(
+        type(candidate_constraint) is not dict
+        or candidate_constraint.get("type") != baseline_constraint.type.value
+        or candidate_constraint.get("entity") != baseline_constraint.entity
+        for candidate_constraint, baseline_constraint in zip(
+            constraints,
+            baseline.constraints,
+            strict=False,
+        )
+    ):
+        return False
+    allowed_locations = {
+        ("dataset_spec", "entities", index) for index in range(len(baseline.entities))
+    } | {
+        ("dataset_spec", "constraints", index)
+        for index in range(len(baseline.constraints))
+    }
+    errors = validation_error.errors(include_url=False, include_input=False)
+    return bool(errors) and all(
+        error.get("type") == "value_error"
+        and tuple(error.get("loc", ())) in allowed_locations
+        for error in errors
+    )
 
 
 def _restore_local_categories(

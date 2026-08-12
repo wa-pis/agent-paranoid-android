@@ -59,6 +59,12 @@ readable CA bundle. Do not work around a certificate failure with an insecure
 SDK example. A failed provider call leaves the workspace awaiting review and
 does not create generated rows; retry only after correcting the local cause.
 
+GigaChat's structured-output feature is currently beta. The adapter performs a
+single local baseline-compatibility pass only after initial structured
+validation fails, then reruns every normal validation. If `invalid response`
+persists, the remaining provider proposal is not safe to review; use another
+supported model or retry later instead of weakening validation.
+
 ## Command Not Found
 
 Symptom:
