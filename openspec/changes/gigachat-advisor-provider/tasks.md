@@ -77,5 +77,8 @@ release gates must not make live or paid GigaChat calls.
   package build, dependency/license checks, isolated-wheel installs, and
   synthetic CLI/doctor smokes on exact implementation tip
   `f7fc12b97a7ebeae79bd83f9b82aa41ea588d4c3` from PR #404.
-- [ ] Put the implementation through a new minor release candidate because it
+- [x] Put the implementation through a new minor release candidate because it
   changes runtime behavior, dependencies, public CLI, and a security boundary.
+  Evidence: signed tag `v1.1.0rc1`, exact commit
+  `5f95ccfd3774a6d16a4a5c77d1460a8cebf5eca1`, and
+  [public release verification](https://github.com/wa-pis/agent-paranoid-android/actions/runs/31579591912).
