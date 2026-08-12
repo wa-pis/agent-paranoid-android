@@ -577,6 +577,8 @@ def test_gigachat_sdk_local_contract_makes_no_network_call(
 def test_gigachat_sdk_redacts_initialization_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    secret = "secret" + "-credentials"
+
     def build_client(**kwargs: Any) -> FakeGigaChat:
         raise RuntimeError(f"failed for {kwargs['credentials']}")
 
@@ -584,12 +586,12 @@ def test_gigachat_sdk_redacts_initialization_errors(
 
     with pytest.raises(ValueError, match="client initialization failed") as raised:
         GigaChatAdvisorClient(
-            credentials="secret-credentials",
+            credentials=secret,
             environment={},
         )
 
     formatted = "".join(traceback.format_exception(raised.value))
-    assert "secret-credentials" not in formatted
+    assert secret not in formatted
     assert raised.value.__cause__ is None
     assert raised.value.__context__ is None
 
