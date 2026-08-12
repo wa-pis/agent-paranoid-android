@@ -227,9 +227,14 @@ def test_setup_uv_keeps_cache_pruning_enabled() -> None:
 
 def test_security_workflow_runs_code_and_secret_scans() -> None:
     workflow = (ROOT / ".github" / "workflows" / "security.yml").read_text()
+    codeql_references = re.findall(
+        r"github/codeql-action/(?:init|analyze)@([0-9a-f]{40})", workflow
+    )
 
     assert "permissions: {}" in workflow
     assert "github/codeql-action/init@" in workflow
+    assert len(codeql_references) == 2
+    assert len(set(codeql_references)) == 1
     assert "queries: security-extended" in workflow
     assert "gitleaks/gitleaks-action@" in workflow
     assert "actions/dependency-review-action@" in workflow
