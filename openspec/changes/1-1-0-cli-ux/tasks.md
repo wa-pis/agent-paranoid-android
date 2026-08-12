@@ -52,5 +52,6 @@ release command.
   digest.
 - [x] Prepare a version- and documentation-only stable `1.1.0` promotion from
   the accepted RC2 runtime.
-- [ ] Merge the stable promotion with required CI green, record exact-commit
-  approval and Linux-derived hashes, then publish and verify `1.1.0`.
+- [x] Merge the stable promotion with required CI green, record exact-commit
+  approval and Linux-derived hashes, then publish and verify `1.1.0`; see the
+  [stable release evidence](../../../docs/release-evidence-1.1.0.md).
