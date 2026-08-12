@@ -22,7 +22,7 @@ composition root moves internally.
 
 ## Public Python Imports
 
-The exact 57-name `test_data_agent.__all__` baseline is protected by
+The exact 61-name `test_data_agent.__all__` baseline is protected by
 `public-python-api.json`. The exports are grouped below only to show
 ownership; grouping does not change their compatibility status.
 
@@ -31,7 +31,8 @@ Core data, result, error, and version contracts:
 - `DATASET_SPEC_SCHEMA_VERSION`, `DatasetProfile`, `DatasetSpec`,
   `LocalCategoryField`
 - `DatasetGenerationResult`, `DatasetValidationReport`
-- `CliErrorCode`, `CliErrorDetail`, `CliErrorResponse`
+- `CliErrorCode`, `CliErrorDetail`, `CliErrorResponse`, `CliSuccessResponse`
+- `DoctorCheck`, `DoctorResponse`, `DoctorStatus`
 - `__version__`
 
 Agent models and enums:
@@ -71,12 +72,12 @@ Public operations:
 
 ## CLI Surface
 
-`cli-parser-surface.json` freezes these 21 commands:
+`cli-parser-surface.json` freezes these 22 commands:
 
 - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
   `profile-postgres`
 - `generate-from-csv`, `validate`, `generate-from-example`
-- `demo`, `doctor`, `audit-verify`
+- `demo`, `doctor`, `audit-verify`, `completion`
 - `agent-plan`, `agent-approve`, `agent-recover`
 - `agent-advise`, `agent-advisor-request`
 - `agent-advisor-apply`, `agent-status`, `agent-review`
@@ -87,10 +88,10 @@ Compatibility aliases remain:
 - `generate-from-csv-folder` -> `generate-from-example`
 - `profile-csv-folder` -> `profile-example`
 
-The parser, option defaults, structured errors, human output, and exit-code
-meanings remain owned by `cli_parser.py`, `cli_contract.py`, and
-`cli_presenter.py`. Moving handlers out of `cli.py` must not change
-those contracts.
+The parser, option defaults, structured success/errors, doctor states,
+parser-derived completion, human output, and exit-code meanings remain owned
+by `cli_parser.py`, `cli_contract.py`, and `cli_presenter.py`. Moving handlers
+out of `cli.py` must not change those contracts.
 
 ## MCP Tool Surfaces
 
@@ -269,10 +270,11 @@ transports.
 
 ### CLI Doctor Service Migration
 
-`cli_doctor.py` now owns installation diagnostics and capability smoke
+`cli_doctor.py` owns installation diagnostics and local capability smoke
 orchestration. `cli.py` retains compatibility wrappers and injects its current
-module importer and smoke callables, preserving existing output, redaction, and
-test override points while command dispatch remains unchanged.
+module importer and smoke callables. `DoctorReport` separates human text from
+typed JSON states and never interprets an import or local smoke as proof of
+remote configuration or reachability.
 
 `cli_dependencies.py` centralizes optional-extra discovery and installation
 errors for doctor capability checks and provider advice. Importers and loaders

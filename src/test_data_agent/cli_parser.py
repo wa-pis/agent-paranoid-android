@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any, Never
 
@@ -55,6 +56,41 @@ class JsonHelpfulArgumentParser(HelpfulArgumentParser):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, json_errors=True, **kwargs)
+
+
+class PublicHelpFormatter(
+    argparse.RawDescriptionHelpFormatter,
+    argparse.ArgumentDefaultsHelpFormatter,
+):
+    """Readable examples plus visible defaults for public command help."""
+
+    def _fill_text(self, text: str, width: int, indent: str) -> str:
+        if "\n" not in text:
+            return textwrap.fill(
+                text,
+                width,
+                initial_indent=indent,
+                subsequent_indent=indent,
+            )
+        lines: list[str] = []
+        for raw_line in text.splitlines():
+            if not raw_line:
+                lines.append("")
+                continue
+            leading = raw_line[: len(raw_line) - len(raw_line.lstrip())]
+            content = raw_line.strip()
+            wrapped = textwrap.wrap(
+                content,
+                max(20, width - len(leading)),
+                subsequent_indent="  ",
+            ) or [""]
+            command = content.startswith(
+                ("test-data-agent ", "python ", "python3 ", "TEST_DATA_AGENT_")
+            )
+            for index, part in enumerate(wrapped):
+                continuation = " \\" if command and index < len(wrapped) - 1 else ""
+                lines.append(f"{leading}{part}{continuation}")
+        return "\n".join(lines)
 
 
 def positive_int(value: str) -> int:
@@ -124,6 +160,65 @@ def write_cli_error_response(
     print(response.model_dump_json(indent=2))
 
 
+def add_common_runtime_options(parser: argparse.ArgumentParser) -> None:
+    """Add automation and diagnostics flags without duplicating local options."""
+    option_strings = {
+        option
+        for action in parser._actions
+        for option in action.option_strings
+    }
+    if "--json" not in option_strings:
+        parser.add_argument(
+            "--json",
+            action="store_true",
+            dest="json_output",
+            help="Write one versioned JSON document to stdout.",
+        )
+    if "--debug" not in option_strings:
+        parser.add_argument(
+            "--debug",
+            action="store_true",
+            help="Include a traceback for unexpected internal errors.",
+        )
+
+
+def register_completion_command(
+    subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
+) -> None:
+    parser = subparsers.add_parser(
+        "completion",
+        help="Generate shell completion from the installed command inventory.",
+        description="Write a completion script for the installed CLI version.",
+    )
+    parser.add_argument(
+        "shell",
+        choices=["bash", "zsh", "fish", "powershell"],
+        help="Shell whose completion script should be written to stdout.",
+    )
+
+
+def configure_completion_inventory(
+    subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
+) -> None:
+    commands = sorted(set(subparsers.choices))
+    options: dict[str, tuple[str, ...]] = {}
+    for command, command_parser in subparsers.choices.items():
+        options[command] = tuple(
+            sorted(
+                {
+                    option
+                    for action in command_parser._actions
+                    for option in action.option_strings
+                    if option.startswith("--")
+                }
+            )
+        )
+    subparsers.choices["completion"].set_defaults(
+        completion_commands=tuple(commands),
+        completion_options=options,
+    )
+
+
 def register_dataset_commands(
     subparsers: argparse._SubParsersAction[HelpfulArgumentParser],
     *,
@@ -135,12 +230,12 @@ def register_dataset_commands(
         help="Generate a dataset from a DatasetSpec, or from a safe profile with --profile.",
         description="Generate synthetic rows from a DatasetSpec file or safe profile metadata.",
         epilog=generate_epilog,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
     generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
-    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], metavar="MODE", default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
     generate_parser.add_argument("--invalid-ratio", type=ratio, default=0.0, help="Share of invalid values for mixed/negative modes, between 0 and 1.")
     generate_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed. Reuse it to reproduce the same output.")
     generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
@@ -160,7 +255,7 @@ def register_dataset_commands(
             "  test-data-agent export-postgres-sql dataset_spec.yaml "
             "--seed 12345 --output out/dataset.sql"
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     postgres_sql_parser.add_argument("spec", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     postgres_sql_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed; defaults to the spec seed, then 0.")
@@ -180,13 +275,13 @@ def register_dataset_commands(
             "Then review the profile and run:\n"
             "  test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml"
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     profile_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
     profile_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
     profile_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"), help="Safe profile cache directory.")
     profile_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
-    profile_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
+    profile_example_parser.add_argument("--rule-sample-rows", type=positive_int, metavar="N", default=50_000, help="Rows sampled for relationship and rule mining.")
     profile_example_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_example_parser)
 
@@ -200,7 +295,7 @@ def register_dataset_commands(
             "--count 100 --output out/dataset_spec.yaml\n\n"
             "Review the spec before passing it to the generate command."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     infer_spec_parser.add_argument("profile", type=Path, help="Safe profile JSON.")
     infer_spec_parser.add_argument("--output", "-o", type=Path, required=True, help="DatasetSpec YAML/JSON to write.")
@@ -217,7 +312,7 @@ def register_dataset_commands(
             "--output out/customers_profile.json\n\n"
             "For the complete one-command workflow, use generate-from-csv."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     profile_csv_parser.add_argument("input", type=Path, help="Source CSV file. Source rows are not copied to the profile.")
     profile_csv_parser.add_argument("--table", type=str, help="Table/entity name to use in the profile.")
@@ -238,7 +333,7 @@ def register_dataset_commands(
             "Install the postgres extra and configure the required schema, table, "
             "and column allowlists first."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     profile_postgres_parser.add_argument("--output", "-o", type=Path, required=True, help="Safe profile JSON to write.")
     profile_postgres_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
@@ -250,16 +345,16 @@ def register_dataset_commands(
         description="Profile one CSV file, infer a DatasetSpec, generate synthetic rows, and validate the result.",
         epilog=(
             "Example:\n"
-            "  test-data-agent generate-from-csv tests/fixtures/customers.csv "
+            "  test-data-agent generate-from-csv data/customers.csv "
             "--count 25 --seed 12345 --format csv --output out/customers.csv\n\n"
             "Writes csv_profile.json, dataset_spec.json, validation_report.json, "
             "and generation_manifest.json next to the output file."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     generate_csv_parser.add_argument("input", type=Path, help="Source CSV file used only for safe metadata.")
     generate_csv_parser.add_argument("--count", type=positive_int, required=True, help="Number of synthetic rows to generate.")
-    generate_csv_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
+    generate_csv_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], metavar="MODE", default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
     generate_csv_parser.add_argument("--invalid-ratio", type=ratio, default=0.0, help="Share of invalid values for mixed/negative modes, between 0 and 1.")
     generate_csv_parser.add_argument("--seed", type=non_negative_int, required=True, help="Deterministic seed. Reuse it to reproduce the same output.")
     generate_csv_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format", help="Output format for generated rows.")
@@ -279,7 +374,7 @@ def register_dataset_commands(
             "--output out/generated/validation_report.json\n\n"
             "The rows argument must be the generated dataset folder, not one data file."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     validate_parser.add_argument("spec", type=Path, help="DatasetSpec YAML/JSON.")
     validate_parser.add_argument("rows", type=Path, help="Generated output folder.")
@@ -293,12 +388,12 @@ def register_dataset_commands(
         description="Profile a CSV folder, infer a DatasetSpec, generate synthetic related tables, and validate them.",
         epilog=(
             "Example:\n"
-            "  test-data-agent generate-from-example tests/fixtures/example_dataset "
+            "  test-data-agent generate-from-example data/example_dataset "
             "--count 25 --seed 12345 --format csv --output out/example_dataset\n\n"
             "Writes profile.json, dataset_spec.yaml, validation_report.json, "
             "generation_manifest.json, and one synthetic data file per entity."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     generate_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
     generate_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Output folder for generated tables and review artifacts.")
@@ -307,7 +402,7 @@ def register_dataset_commands(
     generate_example_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format", help="Output format for generated rows.")
     generate_example_parser.add_argument("--cache-dir", type=Path, default=Path(".test_data_agent_cache/profiles"), help="Safe profile cache directory.")
     generate_example_parser.add_argument("--no-cache", action="store_true", help="Force a fresh profile instead of reusing the cache.")
-    generate_example_parser.add_argument("--rule-sample-rows", type=positive_int, default=50_000, help="Rows sampled for relationship and rule mining.")
+    generate_example_parser.add_argument("--rule-sample-rows", type=positive_int, metavar="N", default=50_000, help="Rows sampled for relationship and rule mining.")
     add_local_category_option(generate_example_parser)
 
 
@@ -340,7 +435,7 @@ def register_utility_commands(
             "  test-data-agent doctor\n"
             "  test-data-agent doctor --require-extra gigachat"
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     doctor_parser.add_argument("--skip-smoke", action="store_true", help="Only check Python and importable dependencies.")
     doctor_parser.add_argument(
@@ -355,6 +450,7 @@ def register_utility_commands(
             "gigachat",
             "all",
         ],
+        metavar="EXTRA",
         default=[],
         help="Fail when an optional feature is unavailable. Repeat to require multiple extras.",
     )
@@ -368,7 +464,7 @@ def register_utility_commands(
             "  TEST_DATA_AGENT_AUDIT_KEY_FILE=/run/secrets/audit.key "
             "test-data-agent audit-verify logs/mcp-audit.jsonl"
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     audit_verify_parser.add_argument("log", type=Path, help="Audit JSONL file to verify.")
 
@@ -383,7 +479,7 @@ def register_examples_command(
         "examples",
         help="Show copy-ready examples for common workflows.",
         description=examples_text,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
 
 
@@ -397,13 +493,13 @@ def register_agent_commands(
         description="Profile input data, infer a reviewable DatasetSpec, and require approval before generation.",
         epilog=(
             "Example:\n"
-            "  test-data-agent agent-plan tests/fixtures/example_dataset "
+            "  test-data-agent agent-plan data/example_dataset "
             "--workspace out/agent --count 25 --seed 12345 --format csv\n"
             "  test-data-agent agent-review out/agent\n"
             "  test-data-agent agent-approve out/agent "
             "--reviewed-spec-sha256 SHA256_FROM_STATUS"
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_plan_parser.add_argument(
         "source",
@@ -484,7 +580,7 @@ def register_agent_commands(
             "Run this only after reviewing out/agent/dataset_spec.yaml and "
             "recording the fingerprint reported by agent-review."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_approve_parser.add_argument(
         "workspace",
@@ -517,7 +613,7 @@ def register_agent_commands(
             "--reviewed-spec-sha256 SHA256_FROM_STATUS\n\n"
             "Use this only when agent-status reports recovery_required."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_recover_parser.add_argument(
         "workspace",
@@ -551,7 +647,7 @@ def register_agent_commands(
             "The provider receives metadata, not source rows. This command never "
             "approves a spec or generates data."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_advise_parser.add_argument(
         "workspace",
@@ -592,7 +688,7 @@ def register_agent_commands(
             "Exchange mode separates trusted instructions, untrusted request "
             "metadata, and the AdvisorProposal JSON Schema."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_advisor_request_parser.add_argument(
         "workspace",
@@ -623,7 +719,7 @@ def register_agent_commands(
             "Review dataset_spec.yaml after this command, then use agent-review "
             "and agent-approve with the exact reviewed fingerprint."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_advisor_apply_parser.add_argument(
         "workspace",
@@ -652,7 +748,7 @@ def register_agent_commands(
             "  test-data-agent agent-status out/agent --json\n\n"
             "Status inspection never generates data or changes the workspace."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_status_parser.add_argument(
         "workspace",
@@ -680,7 +776,7 @@ def register_agent_commands(
             "Review dataset_spec.yaml, then pass the reported current SHA-256 "
             "unchanged to agent-approve."
         ),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=PublicHelpFormatter,
     )
     agent_review_parser.add_argument(
         "workspace",

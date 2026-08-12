@@ -108,6 +108,18 @@ advisor adapter without contacting the provider.
 and cleanup through a local fake SDK client. It does not resolve credentials,
 obtain an access token, or contact GigaChat.
 
+For CI, add `--json` to receive one versioned stdout document. For interactive
+shells, generate completion from the installed command inventory:
+
+```bash
+test-data-agent completion bash
+test-data-agent completion zsh
+test-data-agent completion fish
+test-data-agent completion powershell
+```
+
+The command prints a script; it does not modify shell startup files.
+
 ## Install For Development
 
 Clone the repository and install the locked development environment:

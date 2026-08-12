@@ -36,6 +36,7 @@
     "agent-advisor-apply",
     "agent-status",
     "agent-review",
+    "completion",
     "examples"
   ],
   "schema_version": "1.0"

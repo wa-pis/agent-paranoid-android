@@ -197,6 +197,20 @@ def test_main_applies_invocation_limits_to_tools_and_transport(
     assert budget.limits == configured_limits
 
 
+def test_main_reports_missing_extras_without_traceback(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(mcp_trino_server, "mcp", None)
+    monkeypatch.setattr(mcp_trino_server, "sqlglot", None)
+    monkeypatch.setattr(mcp_trino_server, "trino", None)
+
+    assert mcp_trino_server.main() == 69
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "python -m pip install" in captured.err
+    assert "agent-paranoid-android[mcp,trino]==" in captured.err
+    assert "Traceback" not in captured.err
+
+
 class RecordingProfiler:
     def __init__(
         self,

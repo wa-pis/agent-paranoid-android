@@ -920,6 +920,25 @@ Scope:
 - [x] Publish and verify the exact signed `1.1.0rc1` artifacts and record the
   [immutable release evidence](release-evidence-1.1.0rc1.md).
 
+### 1.1.0rc2: CLI Automation And Artifact Integrity Candidate
+
+**Goal:** include the confirmed CLI/automation review fixes in the `1.1.0`
+feature line without renaming or removing an existing command or option.
+
+Scope:
+
+- [x] Reject format/suffix mismatches and cross-format or mixed-bundle
+  overwrite before changing an existing destination.
+- [x] Add one versioned core JSON result, structured doctor states, stable
+  technical exit codes, bounded Ctrl+C handling, and `--debug` tracebacks.
+- [x] Add copy-ready optional-extra failures for CLI and MCP entry points.
+- [x] Lead installed help with the offline demo, remove checkout-only paths,
+  show defaults, wrap at standard widths, and generate completion for bash,
+  zsh, fish, and PowerShell from argparse.
+- [ ] Merge the focused implementation PR with full release gates green.
+- [ ] Create and publish `1.1.0rc2` only after a separate explicit release
+  command and exact-commit acceptance.
+
 ### Post-1.0: Follow-up Architecture And Community
 
 After the stable baseline, continue the remaining maintenance and community

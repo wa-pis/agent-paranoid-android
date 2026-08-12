@@ -281,6 +281,7 @@ def generate_single_entity_profile_artifacts(
         commit_single_entity_bundle(
             temp_folder,
             output_path.parent,
+            primary_output_name=output_path.name,
             overwrite=overwrite,
         )
     except BaseException:
@@ -310,6 +311,7 @@ def generate_dataset_from_profile_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
+    require_output_format_suffix(output_path, spec.generation_settings.output_format)
     budget = prepare_generation_budget(spec, output_path)
     rows_by_entity = generate_dataset(
         spec,
@@ -354,6 +356,7 @@ def generate_dataset_from_csv_artifacts(
     local_category_fields: tuple[LocalCategoryField, ...] = (),
 ) -> tuple[DatasetValidationReport, Any | None]:
     ensure_paths_distinct(input_path, output_path)
+    require_output_format_suffix(output_path, output_format)
     csv_profile, source_rows = profile_csv_with_row_digests(
         input_path,
         table_name=table_name,
@@ -559,6 +562,7 @@ def commit_single_entity_bundle(
     temp_folder: Path,
     output_folder: Path,
     *,
+    primary_output_name: str,
     overwrite: bool = False,
 ) -> None:
     output_identity, output_created = ensure_directory(output_folder)
@@ -566,16 +570,25 @@ def commit_single_entity_bundle(
         temp_folder.iterdir(),
         key=lambda path: (path.name == "generation_manifest.json", path.name),
     )
-    collisions = [
-        path
-        for path in staged_paths
-        if (output_folder / path.name).exists()
-        or (output_folder / path.name).is_symlink()
-    ]
-    if collisions and not overwrite:
+    existing_paths = sorted(
+        (path for path in output_folder.iterdir() if path != temp_folder),
+        key=lambda path: path.name,
+    )
+    if existing_paths and not overwrite:
         if output_created:
             remove_tree_if_identity(output_folder, output_identity)
-        raise ValueError("bundle output already exists; use overwrite to replace it")
+        raise ValueError(
+            "single-entity output folder is not empty; use a new folder or "
+            "--overwrite to replace the same bundle"
+        )
+    if existing_paths:
+        _validate_existing_single_entity_bundle(
+            output_folder,
+            primary_output_name=primary_output_name,
+            staged_names={path.name for path in staged_paths},
+            existing_names={path.name for path in existing_paths},
+        )
+    collisions = [path for path in staged_paths if (output_folder / path.name).exists()]
     rollback_folder = temp_folder / ".rollback"
     rollback_identity, _ = ensure_directory(rollback_folder)
     temp_identity = path_identity(temp_folder)
@@ -600,6 +613,37 @@ def commit_single_entity_bundle(
         raise
     remove_tree(rollback_folder, rollback_identity)
     remove_tree(temp_folder, temp_identity)
+
+
+def _validate_existing_single_entity_bundle(
+    output_folder: Path,
+    *,
+    primary_output_name: str,
+    staged_names: set[str],
+    existing_names: set[str],
+) -> None:
+    from test_data_agent.io.artifacts import validate_generation_bundle
+
+    if existing_names == {primary_output_name}:
+        return
+    try:
+        manifest = validate_generation_bundle(output_folder)
+        reproducibility = manifest.reproducibility
+        if reproducibility is None:
+            raise ValueError
+        tracked_names = set(reproducibility.output_sha256)
+        expected_names = tracked_names | {"generation_manifest.json"}
+        if (
+            primary_output_name not in tracked_names
+            or existing_names != expected_names
+            or staged_names != expected_names
+        ):
+            raise ValueError
+    except (OSError, ValueError):
+        raise ValueError(
+            "--overwrite may replace only the same complete single-entity "
+            "bundle; use a new output folder"
+        ) from None
 
 
 def cleanup_failed_folder_publication(
@@ -632,3 +676,13 @@ def require_output_suffix(path: Path, allowed: set[str], label: str) -> None:
     if path.suffix.lower() not in allowed:
         expected = ", ".join(sorted(allowed))
         raise ValueError(f"{label} must use one of: {expected}")
+
+
+def require_output_format_suffix(path: Path | None, output_format: OutputFormat) -> None:
+    if path is None:
+        return
+    expected = f".{output_format.value}"
+    if path.suffix.lower() != expected:
+        raise ValueError(
+            f"{output_format.value} output must use a {expected} suffix: {path.name}"
+        )

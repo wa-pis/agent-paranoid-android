@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from collections.abc import Callable
 from functools import partial
 from pathlib import Path
@@ -64,6 +65,7 @@ from test_data_agent.trino_work_budget import (
     QueryWorkLimits,
     with_query_work_budget,
 )
+from test_data_agent.version import __version__
 
 
 WORKSPACE_ROOT_ENV = "TEST_DATA_AGENT_WORKSPACE_ROOT"
@@ -720,14 +722,16 @@ mcp: Any = create_generator_mcp(
 )
 
 
-def main() -> None:
+def main() -> int:
     global mcp
 
     if mcp is None:
-        raise RuntimeError(
-            "Generator MCP support is not installed; "
-            "install agent-paranoid-android[mcp]"
+        print(
+            "Generator MCP requires the `mcp` extra. Install it with: "
+            f'python -m pip install "agent-paranoid-android[mcp]=={__version__}"',
+            file=sys.stderr,
         )
+        return 69
     work_limits = DEFAULT_QUERY_WORK_LIMITS
     audit_logger_from_env("generator-mcp")
     mcp = create_generator_mcp(
@@ -744,7 +748,8 @@ def main() -> None:
             work_limits=work_limits,
         ),
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

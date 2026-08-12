@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from functools import partial
+import sys
 from typing import Any
 
 from test_data_agent.audit import audit_logger_from_env
@@ -130,6 +131,7 @@ from test_data_agent.trino_work_budget import (
     query_work_limits_from_env,
     with_query_work_budget,
 )
+from test_data_agent.version import __version__
 
 DEFAULT_LIMIT = 100
 ENABLE_SAFE_SELECT_ENV = "TRINO_ENABLE_SAFE_SELECT"
@@ -423,7 +425,7 @@ mcp: Any = create_trino_mcp(
 )
 
 
-def main() -> None:
+def main() -> int:
     global mcp
 
     missing = []
@@ -434,11 +436,14 @@ def main() -> None:
     if trino is None:
         missing.append("trino")
     if missing:
-        raise RuntimeError(
-            "Trino MCP support is not installed "
-            f"(missing: {', '.join(missing)}); "
-            "install agent-paranoid-android[mcp,trino]"
+        print(
+            "Trino MCP requires the `mcp,trino` extras "
+            f"(missing: {', '.join(missing)}). Install them with: "
+            "python -m pip install "
+            f'"agent-paranoid-android[mcp,trino]=={__version__}"',
+            file=sys.stderr,
         )
+        return 69
     TrinoConfig.from_env()
     work_limits = query_work_limits_from_env()
     audit_logger_from_env("trino-mcp")
@@ -456,7 +461,8 @@ def main() -> None:
             work_limits=work_limits,
         ),
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

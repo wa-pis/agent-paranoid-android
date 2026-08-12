@@ -11,6 +11,7 @@ from test_data_agent.cli_doctor import (
     run_gigachat_doctor_smoke,
     trino_deployment_status,
 )
+from test_data_agent.cli_dependencies import install_extra_command
 
 
 def test_doctor_service_reports_optional_and_required_extras() -> None:
@@ -25,8 +26,13 @@ def test_doctor_service_reports_optional_and_required_extras() -> None:
     required = service.inspect(skip_smoke=True, required_extras={"parquet"})
 
     assert "extra parquet: not installed (optional)" in optional.checks
+    optional_parquet = next(
+        check for check in optional.states if check.name == "extra:parquet"
+    )
+    assert optional_parquet.remediation == install_extra_command("parquet")
     assert required.failures == (
-        "extra parquet: missing pyarrow (install agent-paranoid-android[parquet])",
+        "extra parquet: missing pyarrow "
+        f"(install with: {install_extra_command('parquet')})",
     )
 
 
@@ -46,7 +52,8 @@ def test_doctor_service_redacts_capability_failure() -> None:
     report = service.inspect(required_extras={"mcp"})
 
     assert report.failures == (
-        "capability mcp: failed (reinstall agent-paranoid-android[mcp] and retry)",
+        "capability mcp: failed (reinstall agent-paranoid-android[mcp] with: "
+        f"{install_extra_command('mcp')})",
     )
     assert "secret-provider-token" not in repr(report)
 

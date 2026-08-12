@@ -4,7 +4,8 @@ from types import ModuleType
 
 import pytest
 import test_data_agent.cli_dependencies as cli_dependencies_module
-from test_data_agent.cli_dependencies import CliDependencyResolver
+from test_data_agent.cli_dependencies import CliDependencyError, CliDependencyResolver
+from test_data_agent.version import __version__
 
 
 def test_dependency_resolver_reports_missing_extra_modules_in_order() -> None:
@@ -49,8 +50,8 @@ def test_dependency_resolver_normalizes_required_extra_error() -> None:
     resolver = CliDependencyResolver()
 
     with pytest.raises(
-        ValueError,
-        match=r"OpenAI advice requires agent-paranoid-android\[openai\]",
+        CliDependencyError,
+        match="OpenAI advice requires the `openai` extra",
     ) as exc_info:
         resolver.load(
             extra="openai",
@@ -60,6 +61,10 @@ def test_dependency_resolver_normalizes_required_extra_error() -> None:
 
     assert exc_info.value.__cause__ is cause
     assert "secret-local-path" not in str(exc_info.value)
+    assert (
+        f'python -m pip install "agent-paranoid-android[openai]=={__version__}"'
+        in str(exc_info.value)
+    )
 
 
 def test_dependency_resolver_rejects_unknown_extra() -> None:

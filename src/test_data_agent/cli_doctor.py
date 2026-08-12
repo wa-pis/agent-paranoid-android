@@ -12,13 +12,14 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, cast
 
-from test_data_agent.cli_contract import DoctorReport
+from test_data_agent.cli_contract import DoctorCheck, DoctorReport, DoctorStatus
 from test_data_agent.cli_dependencies import (
     CORE_DEPENDENCY_MODULES,
     DEFAULT_CLI_DEPENDENCY_RESOLVER,
     OPTIONAL_EXTRA_MODULES,
     CliDependencyResolver,
     ModuleImporter as ModuleImporter,
+    install_extra_command,
 )
 from test_data_agent.core.settings import OutputFormat
 from test_data_agent.io import generate_dataset_from_example_artifacts
@@ -61,6 +62,7 @@ class CliDoctorService:
     ) -> DoctorReport:
         checks: list[str] = []
         failures: list[str] = []
+        states: dict[str, DoctorCheck] = {}
         required = set(required_extras or ())
         if "all" in required:
             required.update(
@@ -71,16 +73,37 @@ class CliDoctorService:
             checks.append(
                 f"python: ok ({sys.version_info.major}.{sys.version_info.minor})"
             )
+            states["python"] = DoctorCheck(
+                name="python",
+                status=DoctorStatus.AVAILABLE,
+                detail=f"Python {sys.version_info.major}.{sys.version_info.minor}",
+            )
         else:
             failures.append("python: Python 3.11 or newer is required")
+            states["python"] = DoctorCheck(
+                name="python",
+                status=DoctorStatus.FAILED,
+                detail="Python 3.11 or newer is required",
+            )
 
         for module_name in CORE_DEPENDENCY_MODULES:
             try:
                 self.import_module(module_name)
             except ImportError as exc:
                 failures.append(f"dependency {module_name}: missing ({exc})")
+                states[f"dependency:{module_name}"] = DoctorCheck(
+                    name=f"dependency:{module_name}",
+                    status=DoctorStatus.NOT_INSTALLED,
+                    detail="required dependency is missing",
+                    remediation="reinstall agent-paranoid-android",
+                )
             else:
                 checks.append(f"dependency {module_name}: ok")
+                states[f"dependency:{module_name}"] = DoctorCheck(
+                    name=f"dependency:{module_name}",
+                    status=DoctorStatus.AVAILABLE,
+                    detail="installed",
+                )
 
         dependencies = CliDependencyResolver(self.import_module)
         for extra in OPTIONAL_EXTRA_MODULES:
@@ -88,12 +111,29 @@ class CliDoctorService:
             if missing and extra in required:
                 failures.append(
                     f"extra {extra}: missing {', '.join(missing)} "
-                    f"(install agent-paranoid-android[{extra}])"
+                    f"(install with: {install_extra_command(extra)})"
+                )
+                states[f"extra:{extra}"] = DoctorCheck(
+                    name=f"extra:{extra}",
+                    status=DoctorStatus.NOT_INSTALLED,
+                    detail=f"missing modules: {', '.join(missing)}",
+                    remediation=install_extra_command(extra),
                 )
             elif missing:
                 checks.append(f"extra {extra}: not installed (optional)")
+                states[f"extra:{extra}"] = DoctorCheck(
+                    name=f"extra:{extra}",
+                    status=DoctorStatus.NOT_INSTALLED,
+                    detail="optional extra is not installed",
+                    remediation=install_extra_command(extra),
+                )
             else:
                 checks.append(f"extra {extra}: ok")
+                states[f"extra:{extra}"] = DoctorCheck(
+                    name=f"extra:{extra}",
+                    status=DoctorStatus.AVAILABLE,
+                    detail="installed; network reachability was not tested",
+                )
 
         if not skip_smoke and not failures:
             with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
@@ -118,13 +158,35 @@ class CliDoctorService:
                     and manifest.get("validation_valid") is True
                 ):
                     checks.append("quickstart smoke: ok")
+                    states["quickstart"] = DoctorCheck(
+                        name="quickstart",
+                        status=DoctorStatus.AVAILABLE,
+                        detail="offline synthetic generation passed",
+                    )
                 else:
                     failures.append(
                         "quickstart smoke: manifest safety flags are not valid"
                     )
-                self._run_capability_smokes(required, fixture, root, checks, failures)
+                    states["quickstart"] = DoctorCheck(
+                        name="quickstart",
+                        status=DoctorStatus.FAILED,
+                        detail="manifest safety flags are not valid",
+                    )
+                self._run_capability_smokes(
+                    required, fixture, root, checks, failures, states
+                )
+        elif skip_smoke:
+            states["quickstart"] = DoctorCheck(
+                name="quickstart",
+                status=DoctorStatus.SKIPPED,
+                detail="skipped by --skip-smoke",
+            )
 
-        return DoctorReport(checks=tuple(checks), failures=tuple(failures))
+        return DoctorReport(
+            checks=tuple(checks),
+            failures=tuple(failures),
+            states=tuple(states.values()),
+        )
 
     def _run_capability_smokes(
         self,
@@ -133,6 +195,7 @@ class CliDoctorService:
         root: Path,
         checks: list[str],
         failures: list[str],
+        states: dict[str, DoctorCheck],
     ) -> None:
         smoke_checks: tuple[tuple[str, Callable[[], None]], ...] = (
             (
@@ -153,11 +216,26 @@ class CliDoctorService:
             except Exception:
                 failures.append(
                     f"capability {extra}: failed "
-                    f"(reinstall agent-paranoid-android[{extra}] and retry)"
+                    f"(reinstall agent-paranoid-android[{extra}] with: "
+                    f"{install_extra_command(extra)})"
+                )
+                states[f"capability:{extra}"] = DoctorCheck(
+                    name=f"capability:{extra}",
+                    status=DoctorStatus.FAILED,
+                    detail="local capability smoke failed",
+                    remediation=install_extra_command(extra),
                 )
             else:
                 suffix = f" ({status})" if status is not None else ""
                 checks.append(f"capability {extra}: ok{suffix}")
+                states[f"capability:{extra}"] = DoctorCheck(
+                    name=f"capability:{extra}",
+                    status=DoctorStatus.AVAILABLE,
+                    detail=(
+                        f"local no-network smoke passed{suffix}; "
+                        "remote reachability was not tested"
+                    ),
+                )
 
 
 def run_parquet_doctor_smoke(fixture: Path, output: Path) -> None:

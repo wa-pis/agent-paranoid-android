@@ -13,6 +13,7 @@ from test_data_agent.cli_presenter import (
     write_audit_verification_result,
     write_doctor_report,
     write_examples,
+    write_shell_completion,
     write_validation_result,
 )
 from test_data_agent.core.dataset import DatasetSpec
@@ -127,6 +128,13 @@ def run_utility_command(
     if args.command == "examples":
         return write_examples(examples_text)
 
+    if args.command == "completion":
+        return write_shell_completion(
+            args.shell,
+            args.completion_commands,
+            args.completion_options,
+        )
+
     if args.command == "demo":
         exit_code = run_demo(args.output)
         write_generation_summary(args.output)
@@ -137,7 +145,8 @@ def run_utility_command(
             doctor_inspector(
                 skip_smoke=args.skip_smoke,
                 required_extras=set(args.require_extra),
-            )
+            ),
+            json_output=getattr(args, "json_output", False),
         )
 
     if args.command == "audit-verify":
