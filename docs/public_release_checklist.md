@@ -73,6 +73,11 @@ Before creating a tag:
   because it changes dependencies, packaging, public CLI behavior, and an
   external security boundary; documentation alone does not require another
   candidate.
+- Use `1.1.0rc2` for the reviewed CLI automation and artifact-integrity change
+  because it adds a public command and JSON contract and changes runtime error,
+  exit-code, and overwrite behavior. Re-run base/optional entrypoint, JSON,
+  cancellation, help-width, completion, and isolated-wheel gates. Do not tag
+  or publish it from the implementation PR.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

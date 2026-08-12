@@ -4,6 +4,7 @@ Start with:
 
 ```bash
 test-data-agent doctor
+test-data-agent doctor --json
 ```
 
 The final line should be `doctor passed`.
@@ -99,9 +100,43 @@ test-data-agent generate-from-example data/example_dataset \
 ```
 
 Use `--overwrite` only for commands that explicitly support replacing a
-single-file output or a single-entity bundle. For a bundle it approves
-replacement of every same-named sibling artifact, not only the generated row
-file. Never point output at a source file or source folder.
+single-file output or the same complete manifest-owned single-entity bundle.
+A different primary filename or format, invalid or missing manifest, stale
+sidecar, or unrelated sibling is rejected before replacement. Use a new output
+folder instead of deleting evidence from an incomplete or mixed bundle. Never
+point output at a source file or source folder.
+
+## Missing Optional Dependency
+
+Optional commands print a version-pinned installation command and exit `69`.
+Run that command in the same environment as `test-data-agent`, then verify the
+capability locally:
+
+```bash
+python -m pip install "agent-paranoid-android[postgres]==PACKAGE_VERSION"
+test-data-agent doctor --require-extra postgres
+```
+
+Replace the extra and version with the exact values from the error. A passing
+local doctor check does not verify credentials or contact a remote service.
+
+## Malformed Input Or Unexpected Traceback
+
+Malformed YAML/JSON and invalid models are normal input failures: they exit
+`2`, publish no success artifact, and do not show a traceback. Use `--json` in
+automation to branch on `error.code`.
+
+Unexpected internal failures exit `70` with a fixed bounded message. Retry
+with `--debug` only in a trusted terminal where technical paths and exception
+context are safe to display. Provider response bodies and credentials remain
+redacted even in normal provider errors.
+
+## Cancelled Operation
+
+Ctrl+C exits `130` after catchable staging cleanup or bundle rollback. The
+message confirms that no successful final bundle was published. Inspect an
+agent workspace with `agent-status`; for a non-agent command, keep any
+unexpected destination for investigation and retry into a new path.
 
 ## Agent Approval Was Interrupted
 

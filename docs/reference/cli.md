@@ -23,6 +23,7 @@ commands.
 | `examples` | Show complete examples for common workflows | Terminal guide |
 | `demo` | Run the installed package offline with a bundled fictional fixture | Synthetic CSV bundle |
 | `doctor` | Check installation and run a temporary smoke generation | Terminal report |
+| `completion` | Generate completion for bash, zsh, fish, or PowerShell | Shell script |
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
 | `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
@@ -135,10 +136,16 @@ data file and requires `--count` and `--seed`.
 | `--invalid-ratio R` | Invalid share from `0` to `1` for applicable modes |
 | `--business-rules PATH` | Reviewed YAML or JSON rule file |
 | `--output PATH` | Output file or new output directory |
-| `--overwrite` | Replace supported single-file outputs or single-entity bundle siblings |
+| `--overwrite` | Replace one existing target file or the same complete manifest-owned single-entity bundle |
 
 Folder bundle generation requires a new or empty output directory. It does not
 silently merge into an existing dataset.
+
+For single-entity generation, the selected format must match the output suffix.
+For example, `--format json` requires `.json`. A complete bundle can be
+overwritten only when its valid manifest owns the same primary output and no
+unrelated file is present. A different format, primary filename, missing or
+invalid manifest, or extra sibling fails before any existing file is changed.
 
 ## Profiling Options
 
@@ -253,7 +260,33 @@ validation report, and source-row non-reuse before publishing missing
 completion metadata. It never regenerates rows. Repeating `agent-approve` for
 an already completed matching plan returns the persisted result.
 
-## Agent JSON Contract
+## Machine-Readable Output
+
+Every core command accepts `--json`. Success writes one `CliSuccessResponse`
+to stdout and leaves stderr empty:
+
+```json
+{
+  "schema_version": "1.0",
+  "ok": true,
+  "command": "test-data-agent demo",
+  "exit_code": 0,
+  "status": "succeeded",
+  "artifacts": ["out/demo"],
+  "result": null
+}
+```
+
+Validation failures use the same envelope with exit code `1` and status
+`validation_failed`. Artifact paths are included only after publication.
+Human summaries and progress never share stdout with the JSON document.
+
+`doctor --json` returns typed local statuses including `available`,
+`not_installed`, `failed`, and `skipped`. An installed extra or successful
+local smoke does not claim that credentials are configured or that a remote
+service is reachable.
+
+### Agent JSON Contract
 
 Use JSON output when invoking the review flow from automation or an AI client:
 
@@ -309,8 +342,9 @@ to stdout when `--json` is present:
 ```
 
 Stable error codes are `invalid_arguments`, `input_not_found`, `invalid_path`,
-and `invalid_input`. Messages may become clearer over time; clients should
-branch on `error.code`, not message text.
+`invalid_input`, `configuration`, `missing_dependency`, `external_service`, `io_failure`,
+`internal_error`, and `cancelled`. Messages may become clearer over time;
+clients should branch on `error.code`, not message text.
 
 ## Exit Behavior
 
@@ -319,8 +353,27 @@ branch on `error.code`, not message text.
 | `0` | The command completed successfully. Running without a command also prints the starting guide and returns `0`. |
 | `1` | The command completed, but dataset validation failed. This can be intentional for negative datasets. |
 | `2` | Arguments, input, paths, safety checks, resources, or configuration prevented completion. |
+| `69` | An optional dependency or external service is unavailable. |
+| `70` | An unexpected internal error occurred. Retry with `--debug` only when technical details are safe to display. |
+| `74` | The operating system could not complete an I/O operation. |
+| `130` | The user cancelled the operation with Ctrl+C; catchable staging and rollback completed first. |
 
 Without `--json`, errors use concise stderr text and an exact recovery command
 when contextual help is available.
+
+## Shell Completion
+
+Generate completion from the installed parser so command aliases and options
+match the exact package version:
+
+```bash
+test-data-agent completion bash > test-data-agent.bash
+test-data-agent completion zsh > _test-data-agent
+test-data-agent completion fish > test-data-agent.fish
+test-data-agent completion powershell > test-data-agent.ps1
+```
+
+Source or install the generated file according to your shell. The command does
+not create or edit shell configuration.
 
 For recovery steps, see [Troubleshooting](../operations/troubleshooting.md).

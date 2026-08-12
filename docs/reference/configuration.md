@@ -5,6 +5,13 @@ volume, available resources, and the trust level of the input.
 
 All byte values are integer bytes unless stated otherwise.
 
+CLI flags override the corresponding command defaults. Environment variables
+configure resource, database, provider, and transport boundaries only where
+listed below; they do not silently activate an optional provider or overwrite
+an explicit CLI value. Use `COMMAND --help` to inspect CLI defaults and
+`doctor --json` for installed/local capability states. `doctor` deliberately
+does not read provider credentials or test remote reachability.
+
 ## Input And Generation Limits
 
 | Variable | Default | Purpose |

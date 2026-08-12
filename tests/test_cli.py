@@ -1,3 +1,4 @@
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -10,6 +11,9 @@ import test_data_agent.cli as cli_module
 from test_data_agent.agent import AgentRequest, AgentSourceType, plan_agent_request
 from test_data_agent.advisor import AdvisorExchange, AdvisorProposal, AdvisorRequest
 from test_data_agent.cli import main
+from test_data_agent.cli_contract import CliExternalServiceError
+from test_data_agent.cli_dependencies import CliDependencyError
+from test_data_agent.postgres_config import PostgresConfigurationError
 
 
 FIXTURE_CUSTOMERS = Path("tests/fixtures/customers.csv")
@@ -42,6 +46,47 @@ def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     assert "doctor" in captured.out
     assert "generation_manifest.json" in captured.out
     assert "synthetic" in captured.out
+
+
+def test_help_is_checkout_free_and_readable_at_80_columns(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setenv("COLUMNS", "80")
+
+    with pytest.raises(SystemExit) as exc_info:
+        main(["agent-plan", "--help"])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 0
+    assert "tests/fixtures" not in captured.out
+    assert "(default: 100)" in captured.out
+    assert max(map(len, captured.out.splitlines())) <= 80
+
+
+@pytest.mark.parametrize("width", [80, 120])
+def test_all_public_help_respects_terminal_width(width, monkeypatch) -> None:
+    monkeypatch.setenv("COLUMNS", str(width))
+    parser = cli_module.build_parser([])
+    subparsers = next(
+        action
+        for action in parser._actions
+        if isinstance(action, argparse._SubParsersAction)
+    )
+
+    for command_parser in {id(value): value for value in subparsers.choices.values()}.values():
+        assert max(map(len, command_parser.format_help().splitlines())) <= width
+
+
+@pytest.mark.parametrize("shell", ["bash", "zsh", "fish", "powershell"])
+def test_completion_is_generated_from_public_inventory(shell, capsys) -> None:
+    assert main(["completion", shell]) == 0
+
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert "test-data-agent" in captured.out
+    assert "generate-from-csv" in captured.out
+    assert "--json" in captured.out or "-l json" in captured.out
 
 
 def test_cli_examples_cover_supported_input_workflows(capsys) -> None:
@@ -138,6 +183,19 @@ def test_doctor_can_skip_smoke(capsys) -> None:
     assert "doctor passed" in captured.err
 
 
+def test_doctor_json_reports_explicit_local_states(capsys) -> None:
+    assert main(["doctor", "--skip-smoke", "--json"]) == 0
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["schema_version"] == "1.0"
+    assert payload["ok"] is True
+    states = {check["name"]: check["status"] for check in payload["checks"]}
+    assert states["python"] == "available"
+    assert states["quickstart"] == "skipped"
+
+
 def test_doctor_allows_missing_optional_extra(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -172,6 +230,7 @@ def test_doctor_fails_when_required_extra_is_missing(
     captured = capsys.readouterr()
     assert "extra parquet: missing pyarrow" in captured.err
     assert "agent-paranoid-android[parquet]" in captured.err
+    assert f"=={cli_module.__version__}" in captured.err
 
 
 def test_doctor_runs_required_parquet_capability_smoke(capsys) -> None:
@@ -464,6 +523,167 @@ def test_agent_json_argument_error_is_structured(capsys) -> None:
     assert payload["error"]["code"] == "invalid_arguments"
     assert payload["error"]["command"] == "test-data-agent agent-plan"
     assert payload["error"]["help"] == "test-data-agent agent-plan --help"
+
+
+def test_core_json_mode_emits_one_document_without_stderr(tmp_path, capsys) -> None:
+    output = tmp_path / "demo"
+
+    assert main(["demo", "--output", str(output), "--json"]) == 0
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload == {
+        "schema_version": "1.0",
+        "ok": True,
+        "command": "test-data-agent demo",
+        "exit_code": 0,
+        "status": "succeeded",
+        "artifacts": [str(output)],
+        "result": None,
+    }
+
+
+def test_missing_dependency_has_stable_json_error_and_exit_code(
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_command",
+        lambda args: (_ for _ in ()).throw(
+            CliDependencyError("install the optional extra")
+        ),
+    )
+
+    assert main(["examples", "--json"]) == 69
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == "missing_dependency"
+    assert payload["error"]["exit_code"] == 69
+
+
+def test_configuration_error_has_stable_json_category(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_command",
+        lambda args: (_ for _ in ()).throw(
+            PostgresConfigurationError("allowlist is required")
+        ),
+    )
+
+    assert main(["profile-postgres", "--output", "profile.json", "--json"]) == 2
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == "configuration"
+
+
+@pytest.mark.parametrize(
+    ("error", "exit_code", "error_code"),
+    [
+        (CliExternalServiceError("provider unavailable"), 69, "external_service"),
+        (OSError("disk unavailable"), 74, "io_failure"),
+    ],
+)
+def test_technical_failures_have_stable_json_categories(
+    error,
+    exit_code,
+    error_code,
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_command",
+        lambda args: (_ for _ in ()).throw(error),
+    )
+
+    assert main(["examples", "--json"]) == exit_code
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == error_code
+    assert payload["error"]["exit_code"] == exit_code
+    assert "disk unavailable" not in captured.out
+
+
+def test_unexpected_error_is_redacted_without_debug(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_command",
+        lambda args: (_ for _ in ()).throw(RuntimeError("secret internal detail")),
+    )
+
+    assert main(["examples"]) == 70
+
+    captured = capsys.readouterr()
+    assert "unexpected internal error" in captured.err
+    assert "secret internal detail" not in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_keyboard_interrupt_is_reported_without_traceback(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        cli_module,
+        "run_command",
+        lambda args: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+
+    assert main(["examples"]) == 130
+
+    captured = capsys.readouterr()
+    assert "operation cancelled" in captured.err
+    assert "Traceback" not in captured.err
+
+
+def test_generate_json_semantic_error_is_one_document(capsys) -> None:
+    assert main(["generate", "--json"]) == 2
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_arguments"
+
+
+def test_profile_generation_json_requires_artifact_output(tmp_path, capsys) -> None:
+    profile = tmp_path / "profile.json"
+    profile.write_text(
+        json.dumps(
+            {
+                "table": "orders",
+                "columns": [{"name": "order_id", "data_type": "bigint"}],
+            }
+        )
+    )
+
+    assert (
+        main(
+            [
+                "generate",
+                "--profile",
+                str(profile),
+                "--count",
+                "1",
+                "--seed",
+                "1",
+                "--format",
+                "json",
+                "--json",
+            ]
+        )
+        == 2
+    )
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_arguments"
+    assert "requires --output" in payload["error"]["message"]
 
 
 def test_agent_plan_cli_detects_csv_folder_without_source_type(tmp_path, capsys) -> None:
@@ -994,11 +1214,13 @@ def test_quickstart_subcommand_help_mentions_artifacts(capsys) -> None:
     folder_output = capsys.readouterr().out
 
     assert csv_help.value.code == 0
-    assert "tests/fixtures/customers.csv" in csv_output
+    assert "data/customers.csv" in csv_output
+    assert "tests/fixtures" not in csv_output
     assert "csv_profile.json" in csv_output
     assert "generation_manifest.json" in csv_output
     assert folder_help.value.code == 0
-    assert "tests/fixtures/example_dataset" in folder_output
+    assert "data/example_dataset" in folder_output
+    assert "tests/fixtures" not in folder_output
     assert "dataset_spec.yaml" in folder_output
     assert "generation_manifest.json" in folder_output
 
@@ -1599,6 +1821,26 @@ def test_missing_csv_reports_friendly_error_without_traceback(tmp_path, capsys) 
     assert exit_code == 2
     assert "Error: file not found:" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_malformed_yaml_reports_structured_error_without_traceback(
+    tmp_path,
+    capsys,
+) -> None:
+    spec = tmp_path / "broken.yaml"
+    output = tmp_path / "generated"
+    spec.write_text("entities: [SECRET_SOURCE_LITERAL\n")
+
+    assert main(["generate", str(spec), "--output", str(output), "--json"]) == 2
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert captured.err == ""
+    assert payload["error"]["code"] == "invalid_input"
+    assert payload["error"]["message"] == "invalid YAML document"
+    assert "SECRET_SOURCE_LITERAL" not in captured.out
+    assert "Traceback" not in captured.out
+    assert not output.exists()
 
 
 def test_generate_from_csv_refuses_to_overwrite_existing_output(tmp_path, capsys) -> None:

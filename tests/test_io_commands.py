@@ -25,6 +25,7 @@ from test_data_agent.io.commands import (
     validate_dataset_artifacts,
     write_profile_summary,
 )
+from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.io.readers import load_dataset_spec
 from test_data_agent.postgres_client import PostgresConnectionError
 
@@ -664,7 +665,7 @@ def test_profile_postgres_command_reports_bounded_connection_error(
         ),
     )
 
-    with pytest.raises(ValueError, match="PostgreSQL connection failed"):
+    with pytest.raises(CliExternalServiceError, match="PostgreSQL connection failed"):
         profile_postgres_command(
             Namespace(output=tmp_path / "profile.json", overwrite=False),
             driver=object(),

@@ -4,6 +4,30 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add one versioned `--json` success/error document for core CLI commands,
+  structured local-only doctor states, and parser-derived completion for bash,
+  zsh, fish, and PowerShell.
+- Add stable process codes for missing dependencies or external services (`69`),
+  unexpected internal errors (`70`), I/O failures (`74`), and cancellation
+  (`130`) while retaining validation failure as `1` and usage/input failure as
+  `2`.
+
+### Changed
+
+- Lead installed help with the bundled offline demo, remove checkout-only paths,
+  show significant defaults, wrap command help at standard terminal widths,
+  and reserve tracebacks for explicit `--debug` runs.
+
+### Fixed
+
+- Reject single-entity output format/suffix mismatches before generation and
+  prevent `--overwrite` from replacing a different, incomplete, or mixed
+  artifact bundle.
+- Make optional MCP console scripts return concise, version-pinned installation
+  guidance instead of a missing-dependency traceback.
+
 ## [1.1.0rc1] - 2026-08-12
 
 ### Added

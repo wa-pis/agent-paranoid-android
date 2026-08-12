@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from test_data_agent.adapters import load_profile_or_spec
+from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.privacy import LocalCategoryField
@@ -226,7 +227,7 @@ def profile_postgres_command(args: argparse.Namespace, *, driver: Any) -> int:
             local_category_fields=tuple(getattr(args, "local_category_fields", ())),
         )
     except (PostgresClientError, PostgresProfileError) as exc:
-        raise ValueError(str(exc)) from exc
+        raise CliExternalServiceError(str(exc)) from None
     write_dataset_profile_artifact(profile, args.output)
     write_profile_summary(args.output)
     return 0

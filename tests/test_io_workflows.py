@@ -177,7 +177,7 @@ def test_single_entity_bundle_requires_approval_to_replace_siblings(tmp_path) ->
     existing_profile = output_path.parent / "profile.json"
     existing_profile.write_text("keep")
 
-    with pytest.raises(ValueError, match="bundle output already exists"):
+    with pytest.raises(ValueError, match="single-entity output folder is not empty"):
         generate_dataset_from_profile_artifacts(
             profile,
             count=1,
@@ -190,17 +190,38 @@ def test_single_entity_bundle_requires_approval_to_replace_siblings(tmp_path) ->
     assert not output_path.exists()
     assert not (output_path.parent / "generation_manifest.json").exists()
 
+    with pytest.raises(ValueError, match="replace only the same complete"):
+        generate_dataset_from_profile_artifacts(
+            profile,
+            count=1,
+            seed=41,
+            output_path=output_path,
+            output_format=OutputFormat.JSON,
+            overwrite=True,
+        )
+
+    assert existing_profile.read_text() == "keep"
+    assert not output_path.exists()
+
+    existing_profile.unlink()
     generate_dataset_from_profile_artifacts(
         profile,
         count=1,
         seed=41,
         output_path=output_path,
         output_format=OutputFormat.JSON,
+    )
+    generate_dataset_from_profile_artifacts(
+        profile,
+        count=2,
+        seed=42,
+        output_path=output_path,
+        output_format=OutputFormat.JSON,
         overwrite=True,
     )
 
     assert json.loads(existing_profile.read_text())["source_type"] == "json_profile"
-    assert validate_generation_bundle(output_path.parent).row_counts == {"orders": 1}
+    assert validate_generation_bundle(output_path.parent).row_counts == {"orders": 2}
 
 
 def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_artifacts(tmp_path) -> None:
@@ -241,6 +262,50 @@ def test_generate_dataset_from_csv_artifacts_writes_csv_profile_and_generation_a
     assert manifest["seed"] == 23
     assert applied and applied[0][1] == 23
     assert [{key: str(value) for key, value in row.items()} for row in applied[0][0]] == rows
+
+
+def test_generation_rejects_format_suffix_mismatch_before_writing(tmp_path) -> None:
+    input_path = tmp_path / "orders.csv"
+    output_path = tmp_path / "generated" / "orders.csv"
+    input_path.write_text("order_id,status\n101,new\n")
+
+    with pytest.raises(ValueError, match="json output must use a .json suffix"):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=1,
+            seed=23,
+            output_path=output_path,
+            output_format=OutputFormat.JSON,
+        )
+
+    assert not output_path.parent.exists()
+
+
+def test_overwrite_rejects_cross_format_bundle_and_preserves_original(tmp_path) -> None:
+    input_path = tmp_path / "orders.csv"
+    output_folder = tmp_path / "generated"
+    csv_output = output_folder / "orders.csv"
+    input_path.write_text("order_id,status\n101,new\n")
+    generate_dataset_from_csv_artifacts(
+        input_path,
+        count=1,
+        seed=23,
+        output_path=csv_output,
+        output_format=OutputFormat.CSV,
+    )
+    original = {path.name: path.read_bytes() for path in output_folder.iterdir()}
+
+    with pytest.raises(ValueError, match="replace only the same complete"):
+        generate_dataset_from_csv_artifacts(
+            input_path,
+            count=1,
+            seed=24,
+            output_path=output_folder / "orders.json",
+            output_format=OutputFormat.JSON,
+            overwrite=True,
+        )
+
+    assert {path.name: path.read_bytes() for path in output_folder.iterdir()} == original
 
 
 def test_generate_dataset_from_csv_artifacts_uses_shared_profile_builder_for_mode_settings(tmp_path) -> None:
@@ -897,12 +962,17 @@ def test_single_entity_commit_restores_existing_files_when_interrupted(
         ],
     )
     output_folder = tmp_path / "single"
-    output_folder.mkdir()
-    existing_profile = output_folder / "profile.json"
-    existing_profile.write_text("previous profile")
-    unrelated = output_folder / "keep.txt"
-    unrelated.write_text("keep")
     output_path = output_folder / "orders.json"
+    generate_dataset_from_profile_artifacts(
+        profile,
+        count=1,
+        seed=18,
+        output_path=output_path,
+        output_format=OutputFormat.JSON,
+    )
+    existing_contents = {
+        path.name: path.read_bytes() for path in output_folder.iterdir()
+    }
     from test_data_agent.io.path_policy import replace_path as original_replace
 
     def interrupt_profile_move(path: Path, target: Path) -> None:
@@ -922,16 +992,16 @@ def test_single_entity_commit_restores_existing_files_when_interrupted(
     with pytest.raises(RuntimeError, match="single publication interrupted"):
         generate_dataset_from_profile_artifacts(
             profile,
-            count=1,
+            count=2,
             seed=19,
             output_path=output_path,
             output_format=OutputFormat.JSON,
             overwrite=True,
         )
 
-    assert not output_path.exists()
-    assert existing_profile.read_text() == "previous profile"
-    assert unrelated.read_text() == "keep"
+    assert {
+        path.name: path.read_bytes() for path in output_folder.iterdir()
+    } == existing_contents
     assert not list(output_folder.glob(".orders.*"))
 
 
@@ -955,7 +1025,11 @@ def test_single_entity_bundle_publishes_manifest_last(
 
     monkeypatch.setattr("test_data_agent.io.workflows.replace_path", record_publication)
 
-    commit_single_entity_bundle(temp_folder, output_folder)
+    commit_single_entity_bundle(
+        temp_folder,
+        output_folder,
+        primary_output_name="orders.json",
+    )
 
     assert published[-1] == "generation_manifest.json"
 

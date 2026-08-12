@@ -103,6 +103,7 @@ to profile your own input.
 | Configure limits and database access | [Configuration](https://wa-pis.github.io/agent-paranoid-android/reference/configuration/) |
 | Inspect CSV, JSON, SQL, and Parquet output | [Runnable output-format example](examples/output_formats/); use `export-postgres-sql` for one executable PostgreSQL DDL+INSERT file |
 | Recover from an error | [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/) |
+| Automate JSON, exit codes, and shell completion | [CLI Reference](https://wa-pis.github.io/agent-paranoid-android/reference/cli/) |
 | Decide whether this tool fits | [Choose An Approach](https://wa-pis.github.io/agent-paranoid-android/concepts/choosing-an-approach/) |
 
 ## Safety
@@ -136,5 +137,4 @@ See [Contributing](CONTRIBUTING.md), [Support](SUPPORT.md), [Governance](GOVERNA
 Releases use tokenless PyPI Trusted Publishing with verified wheels/source distributions, checksums, SBOMs, and GitHub attestations.
 
 ## AI-Assisted Development
-
 AI-assisted changes require human review and tests; never send production data, raw PII, credentials, or tokens to AI. The name nods to Radiohead's "Paranoid Android"; this project is unaffiliated.

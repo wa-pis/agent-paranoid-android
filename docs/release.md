@@ -88,6 +88,15 @@ its signed tag, artifact hashes, image digests, and post-publish checks are
 recorded in the
 [1.1.0rc1 published release evidence](release-evidence-1.1.0rc1.md).
 
+The subsequent CLI automation and artifact-integrity work changes runtime
+behavior, adds the public `completion` command and core success JSON contract,
+and extends documented process codes. It therefore requires `1.1.0rc2` before
+stable `1.1.0`. The implementation PR may prepare tests, OpenSpec, changelog,
+and acceptance steps, but it must not create the tag or publish artifacts.
+Exact-commit RC2 acceptance must repeat the core/doctor JSON, malformed-input,
+missing-extra entrypoint, Ctrl+C cleanup, suffix/overwrite rollback,
+80-column help, four-shell completion, full package, and isolated-wheel gates.
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash

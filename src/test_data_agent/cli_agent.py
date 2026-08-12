@@ -22,11 +22,16 @@ from test_data_agent.agent import (
     recover_agent_workspace,
     review_agent_workspace,
 )
-from test_data_agent.advisor import AdvisorProposal, ExchangeDatasetAdvisor
+from test_data_agent.advisor import (
+    AdvisorContractError,
+    AdvisorProposal,
+    ExchangeDatasetAdvisor,
+)
 from test_data_agent.cli_dependencies import (
     DEFAULT_CLI_DEPENDENCY_RESOLVER,
     CliDependencyResolver,
 )
+from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.cli_presenter import (
     write_agent_command_result,
     write_agent_review_result,
@@ -183,10 +188,13 @@ def advise_agent_workspace_with_provider(
     )
     client = advisor_client(model=model or default_model)
     try:
-        return advise_agent_workspace(
-            workspace,
-            ExchangeDatasetAdvisor(client),
-        )
+        try:
+            return advise_agent_workspace(
+                workspace,
+                ExchangeDatasetAdvisor(client),
+            )
+        except AdvisorContractError as exc:
+            raise CliExternalServiceError(str(exc)) from None
     finally:
         if provider == "gigachat":
             client.close()

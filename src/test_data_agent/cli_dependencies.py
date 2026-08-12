@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from types import ModuleType
 from typing import TypeVar
 
+from test_data_agent.version import __version__
+
 CORE_DEPENDENCY_MODULES = ("faker", "pydantic", "yaml")
 OPTIONAL_EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "parquet": ("pyarrow",),
@@ -20,6 +22,18 @@ OPTIONAL_EXTRA_MODULES: dict[str, tuple[str, ...]] = {
 
 ModuleImporter = Callable[[str], ModuleType]
 LoadedDependency = TypeVar("LoadedDependency")
+
+
+class CliDependencyError(ValueError):
+    """An unavailable optional CLI capability with copy-ready recovery."""
+
+
+def install_extra_command(extra: str) -> str:
+    """Return the exact package-version install command for one extra."""
+    return (
+        'python -m pip install '
+        f'"agent-paranoid-android[{extra}]=={__version__}"'
+    )
 
 
 @dataclass(frozen=True)
@@ -67,8 +81,9 @@ class CliDependencyResolver:
         try:
             return loader()
         except ImportError as exc:
-            raise ValueError(
-                f"{purpose} requires agent-paranoid-android[{extra}]"
+            raise CliDependencyError(
+                f"{purpose} requires the `{extra}` extra. Install it with: "
+                f"{install_extra_command(extra)}"
             ) from exc
 
 

@@ -55,6 +55,7 @@ Install the exact active prerelease and run the self-contained smoke test:
 ```bash
 python3 -m pip install "agent-paranoid-android==1.1.0rc1"
 test-data-agent doctor
+test-data-agent demo --output out/demo
 ```
 
 A healthy installation ends with:
@@ -66,6 +67,10 @@ doctor passed
 
 Continue with [First CSV Dataset](getting-started/first-csv.md) to create and
 inspect a complete synthetic output bundle.
+
+Use `--json` on core commands for one versioned automation document, or
+`test-data-agent completion SHELL` to generate completion for bash, zsh, fish,
+or PowerShell from the installed command inventory.
 
 If you are evaluating whether the workflow solves a real team problem, use the
 [Product Validation Pilot](getting-started/product-validation-pilot.md) guide.

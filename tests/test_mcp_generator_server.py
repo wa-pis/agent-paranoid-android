@@ -83,6 +83,18 @@ def test_main_applies_shared_invocation_and_transport_budgets(
     assert budget.snapshot().raw_transport_payload_bytes == 123
 
 
+def test_main_reports_missing_extra_without_traceback(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(server, "mcp", None)
+
+    assert server.main() == 69
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "python -m pip install" in captured.err
+    assert "agent-paranoid-android[mcp]==" in captured.err
+    assert "Traceback" not in captured.err
+
+
 def write_source_csv(root: Path) -> None:
     (root / "customers.csv").write_text(
         "customer_id,email,status\n"

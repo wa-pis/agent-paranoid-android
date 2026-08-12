@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shlex
 import sys
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, ValidationError
+from yaml import YAMLError
 
 from test_data_agent.agent import (
     AgentGenerationSummary,
@@ -19,7 +22,7 @@ from test_data_agent.agent import (
     AgentWorkspaceStatus,
 )
 from test_data_agent.audit import AuditVerificationResult
-from test_data_agent.cli_contract import CliErrorCode, DoctorReport
+from test_data_agent.cli_contract import CliErrorCode, DoctorReport, DoctorResponse
 from test_data_agent.cli_parser import write_cli_error_response
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.validation import DatasetValidationReport
@@ -27,6 +30,10 @@ from test_data_agent.validation import DatasetValidationReport
 
 def friendly_error(exc: Exception) -> str:
     """Return a bounded, user-facing validation error."""
+    if isinstance(exc, json.JSONDecodeError):
+        return f"invalid JSON document at line {exc.lineno}, column {exc.colno}"
+    if isinstance(exc, YAMLError):
+        return "invalid YAML document"
     if isinstance(exc, ValidationError):
         first = exc.errors()[0]
         location = ".".join(str(part) for part in first.get("loc", ()))
@@ -97,6 +104,85 @@ def write_examples(examples_text: str) -> int:
     return 0
 
 
+def write_shell_completion(
+    shell: str,
+    commands: tuple[str, ...],
+    options: dict[str, tuple[str, ...]],
+) -> int:
+    """Write completion generated from the installed argparse inventory."""
+    command_words = " ".join(commands)
+    if shell == "bash":
+        lines = [
+            "_test_data_agent_complete() {",
+            "  local cur cmd",
+            '  cur="${COMP_WORDS[COMP_CWORD]}"',
+            '  cmd="${COMP_WORDS[1]}"',
+            "  if (( COMP_CWORD == 1 )); then",
+            f'    COMPREPLY=( $(compgen -W "{command_words}" -- "$cur") )',
+            "    return",
+            "  fi",
+            '  case "$cmd" in',
+        ]
+        lines.extend(
+            f'    {command}) COMPREPLY=( $(compgen -W "{" ".join(flags)}" -- "$cur") ) ;;'
+            for command, flags in options.items()
+        )
+        lines.extend(("  esac", "}", "complete -F _test_data_agent_complete test-data-agent"))
+    elif shell == "zsh":
+        lines = [
+            "#compdef test-data-agent",
+            "if (( CURRENT == 2 )); then",
+            f"  compadd -- {command_words}",
+            "  return",
+            "fi",
+            "case $words[2] in",
+        ]
+        lines.extend(
+            f"  {command}) compadd -- {' '.join(flags)} ;;"
+            for command, flags in options.items()
+        )
+        lines.append("esac")
+    elif shell == "fish":
+        lines = [
+            "complete -c test-data-agent -f",
+            "complete -c test-data-agent -n '__fish_use_subcommand' "
+            f'-a "{command_words}"',
+        ]
+        for command, flags in options.items():
+            condition = f"__fish_seen_subcommand_from {command}"
+            lines.extend(
+                f"complete -c test-data-agent -n '{condition}' -l {flag[2:]}"
+                for flag in flags
+            )
+    elif shell == "powershell":
+        lines = [
+            "Register-ArgumentCompleter -Native -CommandName test-data-agent -ScriptBlock {",
+            "  param($wordToComplete, $commandAst, $cursorPosition)",
+            "  $words = $commandAst.CommandElements.Value",
+            f"  $commands = '{command_words}'.Split(' ')",
+            "  if ($words.Count -le 2) { $candidates = $commands } else {",
+            "    switch ($words[1]) {",
+        ]
+        lines.extend(
+            f"      '{command}' {{ $candidates = '{' '.join(flags)}'.Split(' ') }}"
+            for command, flags in options.items()
+        )
+        lines.extend(
+            (
+                "    }",
+                "  }",
+                "  $candidates | Where-Object { $_ -like \"$wordToComplete*\" } | ForEach-Object {",
+                "    [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)",
+                "  }",
+                "}",
+            )
+        )
+    else:
+        raise ValueError(f"unsupported completion shell: {shell}")
+    print("\n".join(lines))
+    return 0
+
+
 def write_audit_verification_result(result: AuditVerificationResult) -> int:
     """Write a successful audit verification summary."""
     print(
@@ -107,16 +193,26 @@ def write_audit_verification_result(result: AuditVerificationResult) -> int:
     return 0
 
 
-def write_doctor_report(report: DoctorReport) -> int:
+def write_doctor_report(report: DoctorReport, *, json_output: bool = False) -> int:
     """Write installation checks and return their public exit code."""
+    exit_code: Literal[0, 1] = 1 if report.failures else 0
+    if json_output:
+        write_json_document(
+            DoctorResponse(
+                ok=not report.failures,
+                exit_code=exit_code,
+                checks=list(report.states),
+            )
+        )
+        return exit_code
     for check in report.checks:
         print(display_untrusted_text(check), file=sys.stderr)
     for failure in report.failures:
         print(f"doctor failed: {display_untrusted_text(failure)}", file=sys.stderr)
     if report.failures:
-        return 1
+        return exit_code
     print("doctor passed", file=sys.stderr)
-    return 0
+    return exit_code
 
 
 def write_agent_command_result(result: AgentResult, *, json_output: bool) -> None:
