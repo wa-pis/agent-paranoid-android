@@ -956,6 +956,38 @@ Scope:
 - [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
   artifacts for `1.1.0`.
 
+### 1.2.0: Portable Release Evidence And Safety Properties
+
+**Goal:** make package provenance easier to verify outside GitHub and deepen
+property-based coverage at the existing untrusted-input boundaries without
+adding runtime dependencies or optimizing for an OpenSSF Scorecard number.
+
+Scope:
+
+- [ ] Export a portable Sigstore/in-toto attestation bundle for each wheel and
+  source distribution, publish it with the existing checksums and SBOM, and
+  retain the current GitHub artifact attestations.
+- [ ] Extend public-release acceptance to bind every portable bundle to the
+  exact published artifact digest and fail closed on missing, malformed, or
+  mismatched provenance.
+- [ ] Expand the existing Hypothesis suite around high-risk parsers and policy
+  boundaries: SQL allowlist bypasses, malformed or oversized JSON-RPC input,
+  request/response byte budgets, placeholder restoration shape, and redaction.
+- [ ] Keep the work focused on release evidence and tests: do not add an
+  external fuzzing service, a runtime dependency, or a mandatory approval rule
+  that a single maintainer cannot satisfy solely to improve Scorecard results.
+
+Exit criteria:
+
+- Public wheel and source-distribution provenance is portable, digest-bound,
+  and verified by the published-release workflow from a clean environment.
+- Focused property tests exercise the named trust boundaries in the normal CI
+  suite without live databases, provider credentials, or source-derived test
+  values.
+- Release acceptance remains based on verifiable artifacts and safety gates;
+  the aggregate OpenSSF Scorecard score is informational rather than a release
+  gate.
+
 ### Post-1.0: Follow-up Architecture And Community
 
 After the stable baseline, continue the remaining maintenance and community
