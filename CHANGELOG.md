@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.1.0rc2] - 2026-08-12
+
 ### Added
 
 - Add one versioned `--json` success/error document for core CLI commands,
@@ -835,7 +837,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc2...HEAD
+[1.1.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0rc1...v1.1.0rc2
 [1.1.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0...v1.1.0rc1
 [1.0.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc6...v1.0.0
 [1.0.0rc6]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.0.0rc5...v1.0.0rc6

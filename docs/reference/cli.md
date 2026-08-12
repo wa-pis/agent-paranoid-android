@@ -206,7 +206,7 @@ is loaded only when invoked, receives safe metadata through the structured
 advisor contract, and never approves or generates data. Install the matching
 provider extra, configure its secret only in the runtime environment, and use
 `--model` only when the adapter default is unsuitable. Always run
-`agent-review` again after advice. The `1.1.0rc1` prerelease contains the
+`agent-review` again after advice. The `1.1.0rc2` prerelease contains the
 GigaChat extra; see [Use The GigaChat Advisor](../how-to/gigachat.md) for the
 exact installation command and authentication variables.
 

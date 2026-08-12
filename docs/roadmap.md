@@ -935,7 +935,7 @@ Scope:
 - [x] Lead installed help with the offline demo, remove checkout-only paths,
   show defaults, wrap at standard widths, and generate completion for bash,
   zsh, fish, and PowerShell from argparse.
-- [ ] Merge the focused implementation PR with full release gates green.
+- [x] Merge the focused implementation PR with full release gates green.
 - [ ] Create and publish `1.1.0rc2` only after a separate explicit release
   command and exact-commit acceptance.
 
