@@ -25,6 +25,12 @@ They are deliberately high enough for ordinary CI variance while still
 detecting accidental unbounded work or large allocation growth. Tightening a
 ceiling requires repeated measurements on every supported CI runtime.
 
+Local JSON datasets, JSON profile/spec imports, and profile-cache documents are
+also scanned for structural depth before `json.loads` or Pydantic materializes
+them. `TEST_DATA_AGENT_MAX_JSON_DEPTH` defaults to `100`; brackets inside JSON
+strings do not count toward the limit. Oversized nesting fails before a partial
+dataset, profile, or spec can be returned.
+
 A failure identifies the phase and exceeded ceiling. Investigate the measured
 operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure

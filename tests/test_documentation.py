@@ -264,6 +264,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
+        "1-2-0-json-depth-preparse-bound",
         "1-2-0-portable-release-provenance",
         "_template",
     }

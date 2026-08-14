@@ -36,19 +36,21 @@ as a shared multi-tenant service.
 
 ## FS-11: JSON Depth After Materialization
 
+**Status:** resolved on `main` for the next `1.2.0` release.
+
 - Finding: `csf_d7760aedb0596e6d0998da23`
 - Occurrence: `occ_9d4d5c81982172b3c0e0bde5`
 - Fingerprint:
   `codex-security/v1:sha256:31c3e170ade78db51d05d695d3b574b8ee50eec060702cdfb03a4d8706de55dd`
 - Rule: `resource-exhaustion.json-depth-after-parse`
 
-Dataset JSON is materialized before its structural check, while profile and
-spec importers do not uniformly apply that check. Input byte limits and typed
-models bound common cases, but adversarial nesting can consume parser work
-first.
+JSON datasets, JSON profile/spec imports, and profile-cache documents now pass
+through one non-recursive structural-depth scan before `json.loads` or Pydantic
+can materialize nested objects. The scan ignores brackets inside JSON strings,
+uses the existing typed environment budget, and fails closed without publishing
+a partial dataset, profile, or spec.
 
-Revisit before increasing JSON byte limits or exposing file importers through a
-shared or multi-tenant service.
+Input byte, row, cell, and typed-model limits remain independent defenses.
 
 ## MT-02: Same-Caller MCP Argument Reflection
 

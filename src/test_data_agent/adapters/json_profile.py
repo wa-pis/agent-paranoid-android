@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -18,12 +17,13 @@ from test_data_agent.core.dataset import (
     parse_dataset_spec_payload,
 )
 from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.serialization import load_limited_json
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.migration import reject_removed_spec_payload
 
 
 def load_json_payload(path: Path) -> dict[str, Any]:
-    payload = json.loads(read_limited_text(path))
+    payload = load_limited_json(read_limited_text(path), label=f"JSON {path.name!r}")
     if not isinstance(payload, dict):
         raise ValueError("JSON adapter expects an object payload")
     return payload

@@ -11,6 +11,7 @@ from pathlib import Path
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import read_limited_text
+from test_data_agent.core.serialization import load_limited_json
 from test_data_agent.io.path_policy import atomic_write_bytes
 
 
@@ -72,7 +73,7 @@ def write_cached_profile(
 
 
 def read_profile_cache_file(path: Path, expected_fingerprint: str | None = None) -> DatasetProfile:
-    payload = json.loads(read_limited_text(path))
+    payload = load_limited_json(read_limited_text(path), label="profile cache")
     if not isinstance(payload, dict) or payload.get("format_version") != PROFILE_CACHE_FORMAT_VERSION:
         raise ValueError("unsupported profile cache format")
     cached_fingerprint = payload.get("fingerprint")

@@ -6,9 +6,11 @@ import pytest
 from test_data_agent.core.limits import (
     GenerationBudget,
     GenerationLimitError,
+    InputLimitError,
     enforce_output_capacity,
     enforce_output_folder_size,
 )
+from test_data_agent.core.serialization import load_limited_json
 
 
 def test_generation_budget_rejects_expired_work() -> None:
@@ -65,3 +67,27 @@ def test_output_folder_limit_rejects_symlinks(tmp_path: Path) -> None:
 
     with pytest.raises(GenerationLimitError, match="symbolic links"):
         enforce_output_folder_size(tmp_path)
+
+
+def test_limited_json_rejects_depth_before_materialization(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_JSON_DEPTH", "1")
+
+    def fail_if_called(payload: str) -> object:
+        raise AssertionError("json.loads must not receive oversized nesting")
+
+    monkeypatch.setattr("test_data_agent.core.serialization.json.loads", fail_if_called)
+
+    with pytest.raises(InputLimitError, match="profile must have depth <= 1"):
+        load_limited_json('{"nested": {"value": 1}}', label="profile")
+
+
+def test_limited_json_ignores_structural_tokens_inside_strings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_JSON_DEPTH", "1")
+
+    assert load_limited_json('{"value": "[{\\\"nested\\\": true}]"}') == {
+        "value": '[{"nested": true}]'
+    }
