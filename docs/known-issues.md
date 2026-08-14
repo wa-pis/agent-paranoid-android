@@ -19,6 +19,8 @@ and [issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397).
 
 **Status:** resolved on `main` for the next `1.2.0` release.
 
+Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-2-0-provider-response-preparse-bound/proposal.md).
+
 - Finding: `csf_83170308250423cefd103d0d`
 - Occurrence: `occ_9873a9a253a90382015b81c6`
 - Fingerprint:
@@ -39,6 +41,8 @@ as a shared multi-tenant service.
 
 **Status:** resolved on `main` for the next `1.2.0` release.
 
+Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-json-depth-preparse-bound/proposal.md).
+
 - Finding: `csf_d7760aedb0596e6d0998da23`
 - Occurrence: `occ_9d4d5c81982172b3c0e0bde5`
 - Fingerprint:
@@ -57,6 +61,8 @@ Input byte, row, cell, and typed-model limits remain independent defenses.
 
 **Status:** resolved on `main` for the next `1.2.0` release.
 
+Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-argument-redaction/proposal.md).
+
 - Finding: `csf_7b1cee56a15d9ea40705a6e0`
 - Occurrence: `occ_3490f19b25f4117b792cdbca`
 - Fingerprint:
@@ -73,6 +79,8 @@ Tool schemas and non-validation application errors are unchanged.
 ## MT-03: Malformed MCP Value In Local Logs
 
 **Status:** resolved on `main` for the next `1.2.0` release.
+
+Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-malformed-log-redaction/proposal.md).
 
 - Finding: `csf_afe00adf1fc2884d910eea07`
 - Occurrence: `occ_a29278197dd63475ead2653e`

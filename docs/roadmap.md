@@ -996,10 +996,16 @@ Exit criteria:
 After the stable baseline, continue the remaining maintenance and community
 work without reopening the completed 1.0 application-boundary gate:
 
+- [x] Resolve AG-04 by bounding OpenAI provider output before application
+  parsing; see the [archived OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-2-0-provider-response-preparse-bound/proposal.md).
+- [x] Resolve FS-11 by enforcing JSON structural depth before application
+  materialization; see the [archived OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-json-depth-preparse-bound/proposal.md).
 - [x] Resolve MT-02 by replacing FastMCP/Pydantic argument-validation details
-  with a fixed source-free MCP error before tool execution.
+  with a fixed source-free MCP error before tool execution; see the
+  [archived OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-argument-redaction/proposal.md).
 - [x] Resolve MT-03 by rejecting malformed typed MCP messages before SDK
-  dispatch so caller-controlled values cannot enter local SDK logs.
+  dispatch so caller-controlled values cannot enter local SDK logs; see the
+  [archived OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-malformed-log-redaction/proposal.md).
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
   production package, using narrow overrides only for external integrations.
 - [ ] Add a public maintainership/governance model, support expectations,
