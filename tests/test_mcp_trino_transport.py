@@ -4,6 +4,7 @@ import base64
 import io
 import inspect
 import json
+import logging
 from collections.abc import Callable
 from dataclasses import replace
 from pathlib import Path
@@ -226,6 +227,82 @@ def test_raw_transport_budget_is_attached_to_valid_request() -> None:
 
     assert isinstance(budget, QueryWorkBudget)
     assert budget.snapshot().raw_transport_payload_bytes == len(payload)
+
+
+def test_malformed_request_is_fixed_before_mcp_sdk_logging(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    import anyio
+    import mcp.types as types
+
+    source_literal = "synthetic_malformed_secret_marker"
+    raw_payload = json.dumps(
+        {
+            "jsonrpc": "2.0",
+            "id": 17,
+            "method": "tools/call",
+            "params": {"name": "missing", "arguments": source_literal},
+        }
+    ).encode() + b"\n"
+    output = io.BytesIO()
+    mcp = transport.create_trino_mcp(())
+    assert mcp is not None
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    async def exercise() -> bytes:
+        stdin = anyio.wrap_file(io.BytesIO(raw_payload))
+        stdout = anyio.wrap_file(output)
+        async with transport.bounded_stdio_server(
+            max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes,
+            request_context_factory=create_budget,
+            stdin=stdin,
+            stdout=stdout,
+        ) as (read_stream, write_stream):
+            low_level_server = mcp._mcp_server
+            await low_level_server.run(
+                read_stream,
+                write_stream,
+                low_level_server.create_initialization_options(),
+            )
+        return output.getvalue()
+
+    with caplog.at_level(logging.DEBUG):
+        response_payload = anyio.run(exercise)
+
+    response = types.JSONRPCMessage.model_validate_json(response_payload).root
+    log_text = "\n".join(record.getMessage() for record in caplog.records)
+    assert isinstance(response, types.JSONRPCError)
+    assert response.id == 17
+    assert response.error.code == -32602
+    assert response.error.message == "Invalid request parameters"
+    assert source_literal not in response_payload.decode()
+    assert source_literal not in log_text
+
+
+def test_malformed_envelope_does_not_retain_unvalidated_request_id() -> None:
+    if getattr(transport, "FastMCP", None) is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    source_literal = "synthetic_oversized_request_id_marker" * 20
+    raw_payload = json.dumps({"jsonrpc": "2.0", "id": source_literal}).encode()
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    rejected = transport._bounded_session_message(raw_payload, create_budget)
+
+    assert isinstance(rejected, transport._InvalidMCPMessage)
+    assert rejected.request_id is None
+    assert source_literal not in repr(rejected)
 
 
 def test_fastmcp_argument_validation_error_is_fixed_and_source_free() -> None:

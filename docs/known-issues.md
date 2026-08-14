@@ -1,14 +1,14 @@
 # Known Issues
 
 This page records security findings that are understood and accepted for the
-`1.0.0rc6` and `1.0.0` product scope. They remain scheduled work; acceptance
-does not mean that the behavior is safe for a broader deployment model.
+`1.0.0rc6` and `1.0.0` product scope. They are retained as historical finding
+records after resolution; the original acceptance did not prove that the
+behavior was safe for a broader deployment model.
 
 The source is repository-wide Codex Security scan
 `484dfa30-85d2-4059-b39b-2c52c9d0f5ed` of immutable commit
-`2c714a6d4df75a1faab422055593fc50a2061a03`. All four findings are **Low**;
-AG-04, FS-11, and MT-02 are resolved on `main`, while MT-03 remains scheduled
-for the first post-1.0 security-hardening release. Risk owner:
+`2c714a6d4df75a1faab422055593fc50a2061a03`. All four findings are **Low** and
+are resolved on `main` for the next `1.2.0` release. Risk owner:
 [@wa-pis](https://github.com/wa-pis). The original disposition was product-risk
 acceptance, not proof that broader deployment models are safe. The separate
 AI-assisted independent review of the exact RC6 commit is recorded in the
@@ -72,15 +72,19 @@ Tool schemas and non-validation application errors are unchanged.
 
 ## MT-03: Malformed MCP Value In Local Logs
 
+**Status:** resolved on `main` for the next `1.2.0` release.
+
 - Finding: `csf_afe00adf1fc2884d910eea07`
 - Occurrence: `occ_a29278197dd63475ead2653e`
 - Fingerprint:
   `codex-security/v1:sha256:b118d28265c9382250b940dda7d9027ad9ed96c4053d66a98797a5c19061c794`
 - Rule: `log-disclosure.malformed-mcp-payload`
 
-Bounded malformed JSON-RPC values can remain in local MCP SDK logs. Client
-errors are fixed and no server secret or log-forging path was demonstrated,
-but caller text can persist in operator diagnostics.
+The shared bounded stdio transport now validates typed MCP client messages
+before SDK dispatch. Malformed requests receive the fixed
+`Invalid request parameters` response, while malformed notifications remain
+response-free. Rejected values are not passed to the SDK and therefore cannot
+enter its local validation logs or retained exception state.
 
-Revisit before logs become broadly accessible or a gateway can submit values
-belonging to another principal.
+Valid requests, notifications, tool schemas, and non-validation application
+errors are unchanged.

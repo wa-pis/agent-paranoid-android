@@ -15,6 +15,8 @@ All notable changes to this project are documented here.
   application JSON/Pydantic materialization.
 - Replace FastMCP/Pydantic argument-validation details with one fixed detached
   error before generator or Trino MCP can reflect a rejected caller value.
+- Reject malformed typed MCP messages before SDK dispatch so caller-controlled
+  values cannot enter local SDK validation logs or retained exceptions.
 
 ## [1.1.0] - 2026-08-12
 

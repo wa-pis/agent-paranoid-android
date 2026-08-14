@@ -998,9 +998,8 @@ work without reopening the completed 1.0 application-boundary gate:
 
 - [x] Resolve MT-02 by replacing FastMCP/Pydantic argument-validation details
   with a fixed source-free MCP error before tool execution.
-- [ ] Resolve the remaining accepted Low MT-03 [Known Issue](known-issues.md) in
-  the first post-1.0 security-hardening release, or earlier if its documented
-  revisit trigger occurs.
+- [x] Resolve MT-03 by rejecting malformed typed MCP messages before SDK
+  dispatch so caller-controlled values cannot enter local SDK logs.
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full
   production package, using narrow overrides only for external integrations.
 - [ ] Add a public maintainership/governance model, support expectations,

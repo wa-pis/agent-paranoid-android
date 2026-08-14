@@ -50,6 +50,8 @@ or access to secrets, credentials, tokens, or raw PII.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
 - Replace FastMCP/Pydantic argument-validation failures with a fixed detached
   error before returning a tool result; never reflect rejected values.
+- Reject malformed typed MCP requests and notifications before SDK dispatch;
+  never pass their caller-controlled values into SDK logs or exceptions.
 - Audit-log capacity must reject a new invocation before its `started` record
   unless one maximum-size terminal record is reserved; an admitted terminal
   event must not be dropped at the configured admission threshold.
