@@ -342,6 +342,34 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
             assert f"### Requirement: {heading}" in spec
 
 
+def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
+    known_issues = (ROOT / "docs" / "known-issues.md").read_text()
+    roadmap = (ROOT / "docs" / "roadmap.md").read_text()
+    changelog = (ROOT / "CHANGELOG.md").read_text()
+    archives = {
+        "AG-04": "2026-08-14-1-2-0-provider-response-preparse-bound",
+        "FS-11": "2026-08-15-1-2-0-json-depth-preparse-bound",
+        "MT-02": "2026-08-15-1-2-0-mcp-argument-redaction",
+        "MT-03": "2026-08-15-1-2-0-mcp-malformed-log-redaction",
+    }
+
+    assert known_issues.count(
+        "**Status:** resolved on `main` for the next `1.2.0` release."
+    ) == len(archives)
+    for finding, archive in archives.items():
+        assert f"## {finding}:" in known_issues
+        assert archive in known_issues
+        assert archive in roadmap
+
+    for expected in (
+        "Bound OpenAI advisor response text before application",
+        "Reject excessive JSON dataset, profile/spec, and profile-cache nesting",
+        "Replace FastMCP/Pydantic argument-validation details",
+        "Reject malformed typed MCP messages before SDK dispatch",
+    ):
+        assert expected in changelog
+
+
 def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
     roadmap = (ROOT / "docs" / "roadmap.md").read_text()
     archive = (
