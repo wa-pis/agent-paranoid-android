@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any
 
+from pydantic import ValidationError
+
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
     from mcp.server.fastmcp import FastMCP
 except ImportError:  # pragma: no cover
@@ -36,6 +38,10 @@ _TRANSPORT_CAPACITY_ERROR_SUFFIX = (
     b',"error":{"code":-32002,'
     b'"message":"server request capacity exhausted"}}\n'
 )
+_INVALID_REQUEST_ERROR_SUFFIX = (
+    b',"error":{"code":-32602,'
+    b'"message":"Invalid request parameters"}}\n'
+)
 _RESERVED_TRANSPORT_ERROR_BYTES = (
     len(_TRANSPORT_OVERFLOW_ERROR_PREFIX)
     + _MAX_JSONRPC_REQUEST_ID_BYTES
@@ -50,11 +56,25 @@ if (
     > MIN_TRANSPORT_RESPONSE_BYTES
 ):
     raise RuntimeError("transport capacity error exceeds reserved response bytes")
+if (
+    len(_TRANSPORT_OVERFLOW_ERROR_PREFIX)
+    + _MAX_JSONRPC_REQUEST_ID_BYTES
+    + len(_INVALID_REQUEST_ERROR_SUFFIX)
+    > MIN_TRANSPORT_RESPONSE_BYTES
+):
+    raise RuntimeError("invalid request error exceeds reserved response bytes")
 
 
 @dataclass(frozen=True, slots=True)
 class _OversizedRawPayload:
     attempted_bytes: int
+
+
+@dataclass(frozen=True, slots=True)
+class _InvalidMCPMessage:
+    request_id: str | int | None
+    budget: QueryWorkBudget
+    respond: bool
 
 
 class DuplicateActiveRequestIdError(ValueError):
@@ -199,6 +219,14 @@ def _transport_capacity_error_payload(request_id: Any) -> bytes:
     )
 
 
+def _invalid_request_error_payload(request_id: str | int | None) -> bytes:
+    return (
+        _TRANSPORT_OVERFLOW_ERROR_PREFIX
+        + _serialize_jsonrpc_request_id(request_id)
+        + _INVALID_REQUEST_ERROR_SUFFIX
+    )
+
+
 async def _write_bounded_session_message(
     stdout: Any,
     session_message: Any,
@@ -289,7 +317,36 @@ def _bounded_session_message(
     import mcp.types as types
     from mcp.shared.message import ServerMessageMetadata, SessionMessage
 
-    message = types.JSONRPCMessage.model_validate_json(raw_payload)
+    try:
+        message = types.JSONRPCMessage.model_validate_json(raw_payload)
+    except ValidationError:
+        request_id = raw_message.get("id") if isinstance(raw_message, dict) else None
+        try:
+            _validate_jsonrpc_request_id(request_id)
+        except ValueError:
+            request_id = None
+        return _InvalidMCPMessage(
+            request_id=request_id,
+            budget=request_context,
+            respond=True,
+        )
+    root = message.root
+    try:
+        if isinstance(root, types.JSONRPCRequest):
+            types.ClientRequest.model_validate(
+                root.model_dump(by_alias=True, mode="json", exclude_none=True)
+            )
+        elif isinstance(root, types.JSONRPCNotification):
+            types.ClientNotification.model_validate(
+                root.model_dump(by_alias=True, mode="json", exclude_none=True)
+            )
+    except ValidationError:
+        request_id = root.id if isinstance(root, types.JSONRPCRequest) else None
+        return _InvalidMCPMessage(
+            request_id=request_id,
+            budget=request_context,
+            respond=isinstance(root, types.JSONRPCRequest),
+        )
     return SessionMessage(
         message,
         metadata=ServerMessageMetadata(request_context=request_context),
@@ -406,6 +463,18 @@ async def bounded_stdio_server(
                             payload,
                             request_context_factory,
                         )
+                        if isinstance(message, _InvalidMCPMessage):
+                            if message.respond:
+                                error_payload = _invalid_request_error_payload(
+                                    message.request_id
+                                )
+                                message.budget.consume_terminal_error_bytes(
+                                    len(error_payload)
+                                )
+                                async with output_lock:
+                                    await stdout.write(error_payload)
+                                    await stdout.flush()
+                            continue
                         budget_registry.register_incoming_request(message)
                     except ActiveRequestCapacityError:
                         root = message.message.root

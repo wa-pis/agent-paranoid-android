@@ -80,6 +80,63 @@ def test_generator_transport_uses_shared_bounded_runner() -> None:
     assert transport.run_bounded_generator_mcp is shared_transport.run_bounded_mcp
 
 
+@pytest.mark.parametrize(
+    ("message", "request_id", "respond"),
+    [
+        (
+            {
+                "jsonrpc": "2.0",
+                "id": 19,
+                "method": "tools/call",
+                "params": {"name": "missing", "arguments": None},
+            },
+            19,
+            True,
+        ),
+        (
+            {
+                "jsonrpc": "2.0",
+                "method": "tools/call",
+                "params": {"name": "missing", "arguments": None},
+            },
+            None,
+            False,
+        ),
+        (None, None, True),
+    ],
+)
+def test_generator_malformed_message_is_redacted_before_sdk_dispatch(
+    message: dict[str, Any] | None,
+    request_id: int | None,
+    respond: bool,
+) -> None:
+    if getattr(shared_transport, "FastMCP", None) is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    source_literal = "synthetic_malformed_generator_marker"
+    if message is None:
+        payload: Any = source_literal
+    else:
+        payload = message
+        payload["params"]["arguments"] = source_literal
+    raw_payload = json.dumps(payload).encode()
+
+    def create_budget(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(DEFAULT_QUERY_WORK_LIMITS)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    rejected = shared_transport._bounded_session_message(
+        raw_payload,
+        create_budget,
+    )
+
+    assert isinstance(rejected, shared_transport._InvalidMCPMessage)
+    assert rejected.request_id == request_id
+    assert rejected.respond is respond
+    assert source_literal not in repr(rejected)
+
+
 def test_generator_fastmcp_argument_validation_is_fixed_and_source_free() -> None:
     if transport.FastMCP is None:
         pytest.skip("installed MCP version does not provide FastMCP")

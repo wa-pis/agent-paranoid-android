@@ -83,6 +83,9 @@ limited to 4 MiB and overflow becomes a fixed local error.
 Typed argument-validation failures also become the fixed
 `Tool arguments failed validation` error; rejected caller values and nested
 Pydantic diagnostics are not returned.
+Malformed typed requests are rejected before SDK dispatch with fixed
+`Invalid request parameters` text, and malformed notifications are dropped;
+their caller-controlled values do not enter SDK logs or retained exceptions.
 Each server process admits at most 32 active requests. Excess requests receive
 a fixed bounded capacity error, and disconnect or teardown clears retained
 request state. Trino execution is separately capped at eight concurrent
