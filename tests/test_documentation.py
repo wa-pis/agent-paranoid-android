@@ -265,6 +265,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     }
     assert active == {
         "1-2-0-portable-release-provenance",
+        "1-2-0-provider-response-preparse-bound",
         "_template",
     }
 

@@ -299,6 +299,28 @@ def test_openai_advisor_records_preflight_rejection_metadata() -> None:
     assert client.last_run_metadata.response_bytes is None
 
 
+def test_openai_advisor_rejects_oversized_response_before_structured_parse() -> None:
+    exchange = safe_exchange()
+    content = proposal_for(exchange).model_dump_json() + "SOURCE_SECRET_SENTINEL"
+    client = OpenAIAdvisorClient(
+        client=FakeOpenAI(FakeResponses(output_parsed=content)),
+        settings=OpenAIAdvisorSettings(
+            max_response_bytes=len(content.encode("utf-8")) - 1
+        ),
+    )
+
+    with pytest.raises(OpenAIAdvisorCallError, match="response exceeds") as raised:
+        client.complete(exchange)
+
+    assert raised.value.metadata.status == "invalid_response"
+    assert raised.value.metadata.response_bytes == len(content.encode("utf-8"))
+    assert raised.value.__cause__ is None
+    assert raised.value.__context__ is None
+    assert "SOURCE_SECRET_SENTINEL" not in "".join(
+        traceback.format_exception(raised.value)
+    )
+
+
 def test_openai_advisor_budget_includes_instructions_and_schema() -> None:
     exchange = safe_exchange()
     responses = FakeResponses(output_parsed=proposal_for(exchange))
@@ -602,6 +624,7 @@ def test_openai_advisor_does_not_retain_initialization_error(
     [
         ("model", " "),
         ("max_input_bytes", 0),
+        ("max_response_bytes", 0),
         ("max_output_tokens", 0),
         ("timeout_seconds", 0),
         ("max_retries", 6),

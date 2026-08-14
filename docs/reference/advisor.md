@@ -85,6 +85,7 @@ settings = OpenAIAdvisorSettings(
     model="gpt-5.6",
     reasoning_effort="low",
     max_input_bytes=4 * 1024 * 1024,
+    max_response_bytes=1024 * 1024,
     max_output_tokens=16_384,
     timeout_seconds=30,
     max_retries=2,
@@ -96,13 +97,15 @@ fast_settings = openai_advisor_settings_for_preset("fast")
 ```
 
 The benchmark-backed typed defaults are the `fast` candidate: model `gpt-5.6`,
-reasoning effort `none`, a 4 MiB complete provider-request budget, 4,096 output
-tokens, a 15-second timeout, no SDK retries, and no service-tier override. The
-byte budget includes static trusted
+reasoning effort `none`, a 4 MiB complete provider-request budget, a 1 MiB
+provider-response budget, 4,096 output tokens, a 15-second timeout, no SDK
+retries, and no service-tier override. The request byte budget includes static trusted
 instructions, untrusted request metadata, structured-output schema overhead,
 settings, and final UTF-8 JSON serialization. Oversized requests fail before
-network access. Settings are bounded and kept out of advisor review artifacts.
-The optional service tier accepts `auto`, `default`, `flex`, or `priority`.
+network access. The response byte budget is measured on UTF-8 output text
+before application JSON/Pydantic parsing. Settings are bounded and kept out of
+advisor review artifacts. The optional service tier accepts `auto`, `default`,
+`flex`, or `priority`.
 
 The provider sends the public JSON Schema in non-strict mode because the stable
 dataset contract permits bounded free-form distribution and condition objects.
