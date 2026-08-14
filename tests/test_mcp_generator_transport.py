@@ -81,6 +81,9 @@ def test_generator_transport_uses_shared_bounded_runner() -> None:
 
 
 def test_generator_fastmcp_argument_validation_is_fixed_and_source_free() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
     import anyio
     import mcp.types as types
 

@@ -229,6 +229,9 @@ def test_raw_transport_budget_is_attached_to_valid_request() -> None:
 
 
 def test_fastmcp_argument_validation_error_is_fixed_and_source_free() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
     import anyio
     import mcp.types as types
 
@@ -260,6 +263,9 @@ def test_fastmcp_argument_validation_error_is_fixed_and_source_free() -> None:
 
 
 def test_fastmcp_preserves_non_validation_tool_errors() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
     import anyio
     import mcp.types as types
 
