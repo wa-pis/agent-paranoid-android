@@ -8,4 +8,4 @@
   and changelog.
 - [x] Run full lint, type checking, tests, release checks, and strict
   documentation build.
-- [ ] Merge through a normal pull request with required CI green.
+- [x] Merge through a normal pull request with required CI green.
