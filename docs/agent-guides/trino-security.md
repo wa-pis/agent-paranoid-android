@@ -48,6 +48,8 @@ or access to secrets, credentials, tokens, or raw PII.
 - Accept only string or integer JSON-RPC request IDs and key active requests by
   their exact serialized representation so distinct wire types cannot alias.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
+- Replace FastMCP/Pydantic argument-validation failures with a fixed detached
+  error before returning a tool result; never reflect rejected values.
 - Audit-log capacity must reject a new invocation before its `started` record
   unless one maximum-size terminal record is reserved; an admitted terminal
   event must not be dropped at the configured admission threshold.

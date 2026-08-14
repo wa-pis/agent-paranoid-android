@@ -80,6 +80,40 @@ def test_generator_transport_uses_shared_bounded_runner() -> None:
     assert transport.run_bounded_generator_mcp is shared_transport.run_bounded_mcp
 
 
+def test_generator_fastmcp_argument_validation_is_fixed_and_source_free() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    import anyio
+    import mcp.types as types
+
+    source_literal = "synthetic_rejected_argument"
+    calls: list[int] = []
+
+    def bounded_tool(limit: int) -> str:
+        calls.append(limit)
+        return str(limit)
+
+    mcp = transport.create_generator_mcp((bounded_tool,))
+    assert mcp is not None
+    request = types.CallToolRequest(
+        method="tools/call",
+        params=types.CallToolRequestParams(
+            name="bounded_tool",
+            arguments={"limit": source_literal},
+        ),
+    )
+    handler = mcp._mcp_server.request_handlers[types.CallToolRequest]
+
+    result = anyio.run(handler, request)
+    payload = result.root.model_dump_json()
+
+    assert result.root.isError is True
+    assert shared_transport._INVALID_TOOL_ARGUMENTS_MESSAGE in payload
+    assert source_literal not in payload
+    assert calls == []
+
+
 @pytest.mark.parametrize(
     ("limits", "params", "dimension"),
     [

@@ -13,6 +13,8 @@ All notable changes to this project are documented here.
   and reject oversized provider output with fixed redacted diagnostics.
 - Reject excessive JSON dataset, profile/spec, and profile-cache nesting before
   application JSON/Pydantic materialization.
+- Replace FastMCP/Pydantic argument-validation details with one fixed detached
+  error before generator or Trino MCP can reflect a rejected caller value.
 
 ## [1.1.0] - 2026-08-12
 

@@ -228,6 +228,66 @@ def test_raw_transport_budget_is_attached_to_valid_request() -> None:
     assert budget.snapshot().raw_transport_payload_bytes == len(payload)
 
 
+def test_fastmcp_argument_validation_error_is_fixed_and_source_free() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    import anyio
+    import mcp.types as types
+
+    source_literal = "synthetic_rejected_argument"
+    calls: list[int] = []
+
+    def bounded_tool(limit: int) -> str:
+        calls.append(limit)
+        return str(limit)
+
+    mcp = transport.create_trino_mcp((bounded_tool,))
+    assert mcp is not None
+    request = types.CallToolRequest(
+        method="tools/call",
+        params=types.CallToolRequestParams(
+            name="bounded_tool",
+            arguments={"limit": source_literal},
+        ),
+    )
+    handler = mcp._mcp_server.request_handlers[types.CallToolRequest]
+
+    result = anyio.run(handler, request)
+    payload = result.root.model_dump_json()
+
+    assert result.root.isError is True
+    assert transport._INVALID_TOOL_ARGUMENTS_MESSAGE in payload
+    assert source_literal not in payload
+    assert calls == []
+
+
+def test_fastmcp_preserves_non_validation_tool_errors() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+
+    import anyio
+    import mcp.types as types
+
+    def failing_tool() -> str:
+        raise RuntimeError("fixed application failure")
+
+    mcp = transport.create_trino_mcp((failing_tool,))
+    assert mcp is not None
+    request = types.CallToolRequest(
+        method="tools/call",
+        params=types.CallToolRequestParams(name="failing_tool", arguments={}),
+    )
+    handler = mcp._mcp_server.request_handlers[types.CallToolRequest]
+
+    result = anyio.run(handler, request)
+    payload = result.root.model_dump_json()
+
+    assert result.root.isError is True
+    assert "fixed application failure" in payload
+    assert transport._INVALID_TOOL_ARGUMENTS_MESSAGE not in payload
+
+
 @pytest.mark.parametrize(
     "response_json",
     [
