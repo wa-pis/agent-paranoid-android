@@ -11,6 +11,8 @@ All notable changes to this project are documented here.
   bundle during release creation and post-publish acceptance.
 - Bound OpenAI advisor response text before application JSON/Pydantic parsing
   and reject oversized provider output with fixed redacted diagnostics.
+- Reject excessive JSON dataset, profile/spec, and profile-cache nesting before
+  application JSON/Pydantic materialization.
 
 ## [1.1.0] - 2026-08-12
 

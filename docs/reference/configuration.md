@@ -27,7 +27,7 @@ does not read provider credentials or test remote reachability.
 | `TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES` | `536870912` | Maximum estimated expanded Parquet bytes |
 | `TEST_DATA_AGENT_MAX_YAML_ALIASES` | `50` | Maximum YAML aliases |
 | `TEST_DATA_AGENT_MAX_YAML_DEPTH` | `100` | Maximum YAML nesting depth |
-| `TEST_DATA_AGENT_MAX_JSON_DEPTH` | `100` | Maximum nesting depth for JSON dataset values |
+| `TEST_DATA_AGENT_MAX_JSON_DEPTH` | `100` | Maximum structural depth for JSON datasets, profile/spec imports, and profile caches before parsing |
 | `TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES` | `1048576` | Maximum rule payload bytes |
 | `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS` | `5000000` | Estimated row/rule work limit |
 | `TEST_DATA_AGENT_MAX_OUTPUT_BYTES` | `536870912` | Maximum complete generated bundle size |

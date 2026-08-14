@@ -16,6 +16,7 @@ from test_data_agent.profiling.cache import (
     PROFILE_CACHE_FORMAT_VERSION,
     csv_folder_fingerprint,
     load_cached_profile,
+    read_profile_cache_file,
 )
 from test_data_agent.profiling.schema_profiler import _sanitize_source_categories
 from test_data_agent.validation import validate_dataset
@@ -502,6 +503,20 @@ def test_profile_cache_treats_fingerprint_mismatch_as_cache_miss(tmp_path) -> No
     )
 
     assert load_cached_profile(source, cache_dir=cache_dir) is None
+
+
+def test_profile_cache_rejects_excessive_json_depth(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_file = tmp_path / "profile.json"
+    cache_file.write_text(
+        '{"format_version": 2, "profile": {"entities": []}}'
+    )
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_JSON_DEPTH", "2")
+
+    with pytest.raises(ValueError, match="depth <= 2"):
+        read_profile_cache_file(cache_file)
 
 
 def test_profile_cache_treats_legacy_format_as_cache_miss(tmp_path) -> None:

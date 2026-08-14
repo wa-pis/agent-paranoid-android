@@ -996,7 +996,7 @@ Exit criteria:
 After the stable baseline, continue the remaining maintenance and community
 work without reopening the completed 1.0 application-boundary gate:
 
-- [ ] Resolve the remaining three accepted Low [Known Issues](known-issues.md) in the
+- [ ] Resolve the remaining two accepted Low [Known Issues](known-issues.md) in the
   first post-1.0 security-hardening release, or earlier if a documented revisit
   trigger occurs.
 - [ ] Define a typed error taxonomy and expand strict mypy coverage to the full

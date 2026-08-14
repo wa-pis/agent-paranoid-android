@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import json
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +17,7 @@ from test_data_agent.core.limits import (
     inspect_json_rows,
     read_limited_text,
 )
-from test_data_agent.core.serialization import load_limited_yaml
+from test_data_agent.core.serialization import load_limited_json, load_limited_yaml
 from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
 from test_data_agent.migration import reject_removed_spec_payload
 
@@ -77,7 +76,10 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
                     enforce_input_cell_count(total_cells, label="dataset")
                 rows_by_entity[path.stem] = rows
         elif path.suffix == ".json":
-            payload = json.loads(read_limited_text(path))
+            payload = load_limited_json(
+                read_limited_text(path),
+                label=f"JSON {path.name!r}",
+            )
             if isinstance(payload, list):
                 row_count, cell_count = inspect_json_rows(
                     payload,

@@ -116,6 +116,18 @@ def test_json_spec_loader_fails_closed_on_unknown_schema_version(tmp_path) -> No
         load_json_dataset_spec(path)
 
 
+def test_json_spec_loader_rejects_excessive_depth_before_validation(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "deep_spec.json"
+    path.write_text('{"entities": [{"name": "customers"}]}')
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_JSON_DEPTH", "2")
+
+    with pytest.raises(ValueError, match="depth <= 2"):
+        load_json_dataset_spec(path)
+
+
 def test_entities_only_json_spec_preserves_primary_key(tmp_path) -> None:
     path = tmp_path / "dataset_spec.json"
     path.write_text(
