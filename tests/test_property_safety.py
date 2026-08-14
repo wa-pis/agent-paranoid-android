@@ -1,5 +1,8 @@
 import json
+import string
+from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -7,6 +10,8 @@ import pytest
 from hypothesis import given, strategies as st
 
 import test_data_agent.mcp_trino_transport as mcp_transport
+import test_data_agent.cli as cli_module
+from test_data_agent.cli import main
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.mcp_trino_server import (
     AllowlistError,
@@ -33,6 +38,11 @@ OUTSIDE_ALLOWLIST = IDENTIFIER.filter(
 SENSITIVE_FIELD = st.sampled_from(
     ["email", "customer_email", "phone_number", "api_token", "ssn"]
 )
+ERROR_TEXT = st.text(
+    alphabet=string.ascii_letters + string.digits + " \n\r\t\x1b'\"\\/",
+    min_size=1,
+    max_size=64,
+).map("SOURCE_SECRET_".__add__)
 
 
 @given(field=SENSITIVE_FIELD, alias=IDENTIFIER)
@@ -223,3 +233,27 @@ def test_sensitive_mask_never_returns_plain_value(value: str) -> None:
     masked = mask_row({"customer_email": value})["customer_email"]
 
     assert masked != value
+
+
+@given(secret=ERROR_TEXT, json_output=st.booleans())
+def test_cli_redacts_every_unexpected_error_without_debug(
+    secret: str,
+    json_output: bool,
+) -> None:
+    def fail(_args: object) -> int:
+        raise RuntimeError(secret)
+
+    stdout = StringIO()
+    stderr = StringIO()
+    arguments = ["examples", "--json"] if json_output else ["examples"]
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(cli_module, "run_command", fail)
+        monkeypatch.setattr(cli_module, "run_json_command", fail)
+        with redirect_stdout(stdout), redirect_stderr(stderr):
+            exit_code = main(arguments)
+
+    rendered = stdout.getvalue() + stderr.getvalue()
+    assert exit_code == 70
+    assert secret not in rendered
+    assert "Traceback" not in rendered
+    assert "unexpected internal error" in rendered
