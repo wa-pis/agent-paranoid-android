@@ -1,9 +1,12 @@
+import json
+from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
 from hypothesis import given, strategies as st
 
+import test_data_agent.mcp_trino_transport as mcp_transport
 from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.mcp_trino_server import (
     AllowlistError,
@@ -13,6 +16,13 @@ from test_data_agent.mcp_trino_server import (
     validate_safe_select,
 )
 from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_work_budget import (
+    DEFAULT_QUERY_WORK_LIMITS,
+    MIN_TRANSPORT_RESPONSE_BYTES,
+    QueryWorkBudget,
+    QueryWorkBudgetExceeded,
+    QueryWorkDimension,
+)
 
 
 IDENTIFIER = st.from_regex(r"[A-Za-z_][A-Za-z0-9_]{0,24}", fullmatch=True)
@@ -108,6 +118,94 @@ def test_table_column_allowlist_requires_an_exact_qualified_match(
             column=outside if boundary == "column" else "country_code",
             config=config,
         )
+
+
+@given(
+    limit=st.integers(min_value=1, max_value=512),
+    overflow=st.integers(min_value=1, max_value=512),
+)
+def test_oversized_jsonrpc_payload_fails_before_structural_parsing(
+    limit: int,
+    overflow: int,
+) -> None:
+    limits = replace(DEFAULT_QUERY_WORK_LIMITS, raw_transport_payload_bytes=limit)
+    parsed: list[bytes] = []
+
+    def reject_parse(raw_payload: bytes, budget: QueryWorkBudget) -> None:
+        parsed.append(raw_payload)
+        raise AssertionError(f"unexpected parser budget: {budget!r}")
+
+    def budget_factory(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        return budget
+
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            mcp_transport,
+            "_consume_json_structure",
+            reject_parse,
+        )
+        with pytest.raises(QueryWorkBudgetExceeded) as raised:
+            mcp_transport._bounded_session_message(
+                b"x" * (limit + overflow),
+                budget_factory,
+            )
+
+    assert raised.value.dimension is QueryWorkDimension.RAW_TRANSPORT_PAYLOAD_BYTES
+    assert parsed == []
+
+
+@given(method=IDENTIFIER)
+def test_truncated_jsonrpc_is_charged_then_rejected(method: str) -> None:
+    raw_payload = json.dumps(
+        {"jsonrpc": "2.0", "id": 1, "method": method},
+        separators=(",", ":"),
+    ).encode()[:-1]
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        raw_transport_payload_bytes=len(raw_payload),
+    )
+    budgets: list[QueryWorkBudget] = []
+
+    def budget_factory(raw_payload_bytes: int) -> QueryWorkBudget:
+        budget = QueryWorkBudget(limits)
+        budget.consume_raw_transport_payload_bytes(raw_payload_bytes)
+        budgets.append(budget)
+        return budget
+
+    with pytest.raises(json.JSONDecodeError):
+        mcp_transport._bounded_session_message(raw_payload, budget_factory)
+
+    assert budgets[0].snapshot().raw_transport_payload_bytes == len(raw_payload)
+
+
+@given(
+    capacity=st.integers(min_value=0, max_value=4096),
+    data=st.data(),
+)
+def test_transport_response_budget_is_monotonic_and_fail_closed(
+    capacity: int,
+    data: st.DataObject,
+) -> None:
+    accepted = data.draw(st.integers(min_value=0, max_value=capacity))
+    overflow = data.draw(
+        st.integers(min_value=capacity - accepted + 1, max_value=8192)
+    )
+    limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        transport_response_bytes=MIN_TRANSPORT_RESPONSE_BYTES + capacity,
+    )
+    budget = QueryWorkBudget(limits)
+
+    budget.consume_transport_response_bytes(accepted)
+    assert budget.snapshot().transport_response_bytes == accepted
+
+    with pytest.raises(QueryWorkBudgetExceeded) as raised:
+        budget.consume_transport_response_bytes(overflow)
+
+    assert raised.value.dimension is QueryWorkDimension.TRANSPORT_RESPONSE_BYTES
+    assert budget.snapshot().transport_response_bytes == accepted
 
 
 @given(header=IDENTIFIER)
