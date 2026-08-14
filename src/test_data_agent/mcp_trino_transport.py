@@ -24,6 +24,7 @@ from test_data_agent.trino_work_budget import (
 
 
 RawRequestContextFactory = Callable[[int], QueryWorkBudget]
+_INVALID_TOOL_ARGUMENTS_MESSAGE = "Tool arguments failed validation"
 _MAX_JSONRPC_REQUEST_ID_BYTES = 256
 DEFAULT_MAX_ACTIVE_MCP_REQUESTS = 32
 _TRANSPORT_OVERFLOW_ERROR_PREFIX = b'{"jsonrpc":"2.0","id":'
@@ -62,6 +63,28 @@ class DuplicateActiveRequestIdError(ValueError):
 
 class ActiveRequestCapacityError(RuntimeError):
     """Raised when the process-wide MCP request cap is exhausted."""
+
+
+def _create_redacted_fast_mcp(name: str, fast_mcp_type: type[Any]) -> Any:
+    """Create FastMCP with source-free argument validation failures."""
+
+    class RedactedFastMCP(fast_mcp_type):  # type: ignore[misc]
+        async def call_tool(
+            self,
+            tool_name: str,
+            arguments: dict[str, Any],
+        ) -> Any:
+            from mcp.server.fastmcp.exceptions import ToolError
+            from pydantic import ValidationError
+
+            try:
+                return await super().call_tool(tool_name, arguments)
+            except ToolError as exc:
+                if isinstance(exc.__cause__, ValidationError):
+                    raise ToolError(_INVALID_TOOL_ARGUMENTS_MESSAGE) from None
+                raise
+
+    return RedactedFastMCP(name)
 
 
 class _RequestBudgetRegistry:
@@ -470,7 +493,7 @@ def create_trino_mcp(
     if FastMCP is None:
         return None
 
-    mcp = FastMCP("test-data-agent-trino")
+    mcp = _create_redacted_fast_mcp("test-data-agent-trino", FastMCP)
     for tool in tools:
         mcp.tool()(audited_mcp_tool("trino-mcp", tool))
     return mcp
