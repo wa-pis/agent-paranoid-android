@@ -973,10 +973,10 @@ Scope:
 - [x] Extend public-release acceptance to bind every portable bundle to the
   exact published artifact digest and fail closed on missing, malformed, or
   mismatched provenance.
-- [ ] Expand the existing Hypothesis suite around high-risk parsers and policy
+- [x] Expand the existing Hypothesis suite around high-risk parsers and policy
   boundaries: SQL allowlist bypasses, malformed or oversized JSON-RPC input,
   request/response byte budgets, placeholder restoration shape, and redaction.
-- [ ] Keep the work focused on release evidence and tests: do not add an
+- [x] Keep the work focused on release evidence and tests: do not add an
   external fuzzing service, a runtime dependency, or a mandatory approval rule
   that a single maintainer cannot satisfy solely to improve Scorecard results.
 
