@@ -9,6 +9,8 @@ All notable changes to this project are documented here.
 - Publish portable, checksum-covered Sigstore build provenance with each
   GitHub Release and verify both Python distributions against the downloaded
   bundle during release creation and post-publish acceptance.
+- Bound OpenAI advisor response text before application JSON/Pydantic parsing
+  and reject oversized provider output with fixed redacted diagnostics.
 
 ## [1.1.0] - 2026-08-12
 

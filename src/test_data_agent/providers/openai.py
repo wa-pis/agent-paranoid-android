@@ -31,6 +31,7 @@ from test_data_agent.advisor import (
 DEFAULT_OPENAI_MODEL = "gpt-5.6"
 DEFAULT_MAX_OUTPUT_TOKENS = 4_096
 DEFAULT_MAX_EXCHANGE_BYTES = 4 * 1024 * 1024
+DEFAULT_MAX_RESPONSE_BYTES = 1024 * 1024
 OpenAIReasoningEffort = Literal["none", "minimal", "low", "medium", "high"]
 OpenAIServiceTier = Literal["auto", "default", "flex", "priority"]
 OpenAIAdvisorPreset = Literal["fast", "normal", "quality"]
@@ -38,6 +39,7 @@ DEFAULT_OPENAI_REASONING_EFFORT: OpenAIReasoningEffort = "none"
 DEFAULT_OPENAI_TIMEOUT_SECONDS = 15.0
 DEFAULT_OPENAI_MAX_RETRIES = 0
 MAX_OPENAI_INPUT_BYTES = 16 * 1024 * 1024
+MAX_OPENAI_RESPONSE_BYTES = 4 * 1024 * 1024
 MAX_OPENAI_OUTPUT_TOKENS = 100_000
 MAX_OPENAI_TIMEOUT_SECONDS = 300.0
 MAX_OPENAI_RETRIES = 5
@@ -81,6 +83,11 @@ class OpenAIAdvisorSettings(BaseModel):
         default=DEFAULT_MAX_EXCHANGE_BYTES,
         ge=1,
         le=MAX_OPENAI_INPUT_BYTES,
+    )
+    max_response_bytes: int = Field(
+        default=DEFAULT_MAX_RESPONSE_BYTES,
+        ge=1,
+        le=MAX_OPENAI_RESPONSE_BYTES,
     )
     max_output_tokens: int = Field(
         default=DEFAULT_MAX_OUTPUT_TOKENS,
@@ -229,6 +236,7 @@ class OpenAIAdvisorClient:
         model: str = DEFAULT_OPENAI_MODEL,
         max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKENS,
         max_exchange_bytes: int = DEFAULT_MAX_EXCHANGE_BYTES,
+        max_response_bytes: int = DEFAULT_MAX_RESPONSE_BYTES,
         settings: OpenAIAdvisorSettings | None = None,
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
@@ -236,6 +244,7 @@ class OpenAIAdvisorClient:
             model != DEFAULT_OPENAI_MODEL
             or max_output_tokens != DEFAULT_MAX_OUTPUT_TOKENS
             or max_exchange_bytes != DEFAULT_MAX_EXCHANGE_BYTES
+            or max_response_bytes != DEFAULT_MAX_RESPONSE_BYTES
         ):
             raise ValueError(
                 "OpenAI settings cannot be combined with legacy overrides"
@@ -251,6 +260,7 @@ class OpenAIAdvisorClient:
             model=model,
             max_output_tokens=max_output_tokens,
             max_input_bytes=max_exchange_bytes,
+            max_response_bytes=max_response_bytes,
         )
         if client is None:
             try:
@@ -381,7 +391,8 @@ class OpenAIAdvisorClient:
                 "OpenAI advisor response did not complete",
                 metadata=metadata,
             )
-        if not response.output_text:
+        content = response.output_text
+        if not isinstance(content, str) or not content:
             metadata = self._record_run_metadata(
                 request_bytes=request_size,
                 started_at=started_at,
@@ -392,9 +403,22 @@ class OpenAIAdvisorClient:
                 "OpenAI advisor response did not contain a structured proposal",
                 metadata=metadata,
             )
+        response_bytes = len(content.encode("utf-8"))
+        if response_bytes > self._settings.max_response_bytes:
+            metadata = self._record_run_metadata(
+                request_bytes=request_size,
+                started_at=started_at,
+                status="invalid_response",
+                response=response,
+                response_bytes=response_bytes,
+            )
+            raise OpenAIAdvisorCallError(
+                "OpenAI advisor response exceeds the configured byte limit",
+                metadata=metadata,
+            ) from None
         parsed: _ResponseModel | None = None
         try:
-            parsed = response_model.model_validate_json(response.output_text)
+            parsed = response_model.model_validate_json(content)
         except ValidationError:
             pass
         if parsed is None:
@@ -408,13 +432,12 @@ class OpenAIAdvisorClient:
                 "OpenAI advisor response failed structured validation",
                 metadata=metadata,
             ) from None
-        payload = parsed.model_dump(mode="json")
         metadata = self._record_run_metadata(
             request_bytes=request_size,
             started_at=started_at,
             status="completed",
             response=response,
-            response_bytes=_json_size(payload),
+            response_bytes=response_bytes,
         )
         return StructuredCompletionResult(value=parsed, metadata=metadata)
 

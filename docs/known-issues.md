@@ -16,19 +16,23 @@ and [issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397).
 
 ## AG-04: Provider Response Pre-Parse Bounds
 
+**Status:** resolved on `main` for the next `1.2.0` release.
+
 - Finding: `csf_83170308250423cefd103d0d`
 - Occurrence: `occ_9873a9a253a90382015b81c6`
 - Fingerprint:
   `codex-security/v1:sha256:154204f45b99b73f72dc88274da62359310ee2361b851b29428b234cd133bc96`
 - Rule: `resource-exhaustion.provider-response-preparse`
 
-The optional advisor adapter can pass oversized provider output into JSON
-parsing before applying local byte and structural limits. Provider output-token
-hints, typed validation, and optional use reduce likelihood, but do not provide
-a local pre-parse guarantee.
+The OpenAI advisor previously passed provider output text into application JSON
+parsing before applying a local response-byte limit. The typed provider settings
+now impose a bounded UTF-8 response budget and reject oversized output with a
+fixed redacted error before application JSON/Pydantic parsing. GigaChat already
+enforced the equivalent boundary.
 
-Revisit before accepting an untrusted provider or proxy, increasing provider
-response limits, or operating the advisor as a shared multi-tenant service.
+The SDK still materializes its own response envelope before the application can
+inspect `output_text`; revisit transport streaming before operating an advisor
+as a shared multi-tenant service.
 
 ## FS-11: JSON Depth After Materialization
 
