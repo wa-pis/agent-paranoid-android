@@ -264,7 +264,6 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "1-2-0-mcp-malformed-log-redaction",
         "1-2-0-portable-release-provenance",
         "_template",
     }
@@ -298,6 +297,13 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     ).read_text()
     assert "- [ ]" not in mcp_argument_tasks
 
+    mcp_malformed_tasks = (
+        archived
+        / "2026-08-15-1-2-0-mcp-malformed-log-redaction"
+        / "tasks.md"
+    ).read_text()
+    assert "- [ ]" not in mcp_malformed_tasks
+
     superseded = archived / "2026-08-14-1-0-0-postgres-multi-source"
     assert "Status: superseded" in (superseded / "proposal.md").read_text()
     assert "not an active backlog" in (superseded / "tasks.md").read_text()
@@ -324,6 +330,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "safe-mcp-workflow": (
             "External Trino Execution Is Read-Only And Validated",
             "Rejected MCP Arguments Are Not Reflected",
+            "Malformed MCP Values Do Not Reach SDK Logs",
         ),
         "agent-orchestration": (
             "Relationship Discovery Is Reviewable And Deterministic",
