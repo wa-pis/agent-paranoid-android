@@ -264,7 +264,6 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
-        "1-2-0-json-depth-preparse-bound",
         "1-2-0-portable-release-provenance",
         "_template",
     }
@@ -283,6 +282,13 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
             archived / f"2026-08-14-{change_id}" / "tasks.md"
         ).read_text()
         assert "- [ ]" not in archived_tasks
+
+    json_depth_tasks = (
+        archived
+        / "2026-08-15-1-2-0-json-depth-preparse-bound"
+        / "tasks.md"
+    ).read_text()
+    assert "- [ ]" not in json_depth_tasks
 
     superseded = archived / "2026-08-14-1-0-0-postgres-multi-source"
     assert "Status: superseded" in (superseded / "proposal.md").read_text()
