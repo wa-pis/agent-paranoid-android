@@ -11,7 +11,7 @@ The immutable public results are recorded in the
 - [x] RC6 tag points to the reviewed fixed commit.
 - [x] Independent security review records reviewer identity or stable
   pseudonym, commit, UTC date, scope, findings/disposition, and signature or
-  approval URL in the [review evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc6-final-release-candidate/security-review-evidence.md).
+  approval URL in the [review evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc6-final-release-candidate/security-review-evidence.md).
 - [x] RC5 is treated as historical and superseded for stable promotion.
 
 ## Security review closure

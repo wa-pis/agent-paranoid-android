@@ -399,7 +399,7 @@ into `1.0.0rc1`. Finish the release stage in this order:
      - [x] Confirm no canonical deltas are required and archive the completed
        change.
 8. [x] Complete the [1.0.0rc4 privacy and invocation hardening
-   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md),
+   OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc4-privacy-invocation-hardening/proposal.md),
    publish `1.0.0rc4` from the verified merge commit, and repeat
    public-artifact acceptance against that candidate.
    - [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
@@ -470,8 +470,10 @@ documented direct database workflow. Trino remains an optional integration and
 is not a prerequisite for PostgreSQL users. The unchecked relationship-
 discovery enhancement below remains post-1.0 work, not a release blocker.
 
-The implementation contract is the [PostgreSQL and multi-source
-OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-postgres-multi-source/proposal.md).
+The historical implementation contract is the archived [PostgreSQL and
+multi-source OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-postgres-multi-source/proposal.md).
+The single-source PostgreSQL scope shipped in `1.0.0rc6`; its unfinished
+multi-source and federation scope was superseded and is not an active backlog.
 
 The minimum PostgreSQL scope is:
 
@@ -623,7 +625,7 @@ optional milestone after `1.0.0`.
 Scope:
 
 - [x] Complete and review the [RC4 privacy and invocation hardening
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc4-privacy-invocation-hardening/proposal.md).
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc4-privacy-invocation-hardening/proposal.md).
 - [x] Remove `sample_rows_masked` from the Trino MCP server, masking service,
   query builder, and public compatibility exports. Do not retain a row
   diagnostic in RC4; require a separate OpenSpec for any future
@@ -690,7 +692,7 @@ RC5 is historical and superseded for stable promotion. Do not add new RC5
 work; the active final-candidate checklist is RC6 below.
 
 - [x] Complete the [RC5 public release and invocation hardening
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md).
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/proposal.md).
 - [x] Publish and verify the exact `1.0.0rc4` wheel and sdist on PyPI, a
   GitHub prerelease with checksums/SBOM/attestations, and the corresponding
   immutable release identity. Evidence: [RC4 published release
@@ -732,7 +734,7 @@ work; the active final-candidate checklist is RC6 below.
   row-returning capabilities. Remove server-wide claims that imply every MCP
   response is source-free.
 - [x] Add the [RC5 agent throughput and advisor budget
-  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/proposal.md):
+  OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/proposal.md):
   make local profile caching `auto` by default with an explicit `--no-cache`
   escape hatch, avoid the current two-pass CSV-folder profile where practical,
   and enforce a local profile deadline plus bounded relationship/rule samples.
@@ -744,12 +746,12 @@ work; the active final-candidate checklist is RC6 below.
 - [x] Run the RC5 acceptance advisor benchmark with at least 20 runs per
   preset and at least five synthetic profile shapes, including p50/p95,
   timeout/error, retry, token, validity, safety, and cost measurements.
-  Evidence: the [advisor benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
+  Evidence: the [advisor benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
   records 60/60 valid and safety-preserving responses, zero errors/timeouts,
   and `$2.320800` total cost across all three presets.
 - [x] Complete an independent security review of RC5 sanitization, request-ID
   lifecycle, and transport budget enforcement before RC5 acceptance. Evidence:
-  [RC5 security review](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/security-review-evidence.md).
+  [RC5 security review](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/security-review-evidence.md).
 - [x] Ensure advisor byte/token accounting covers the complete provider request,
   not only the serialized `AdvisorRequest`; compact or partition oversized
   metadata rather than sending an unbounded multi-megabyte prompt.

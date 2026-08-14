@@ -250,7 +250,7 @@ def test_rc2_security_review_records_exact_disposition() -> None:
         assert expected in review
 
 
-def test_rc2_security_hardening_is_archived_and_baselined() -> None:
+def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     changes = ROOT / "openspec" / "changes"
     archive = (
         changes / "archive" / "2026-08-01-1-0-0-rc1-security-hardening"
@@ -264,15 +264,35 @@ def test_rc2_security_hardening_is_archived_and_baselined() -> None:
         if path.is_dir() and path.name != "archive"
     }
     assert active == {
+        "1-2-0-portable-release-provenance",
+        "_template",
+    }
+
+    archived = changes / "archive"
+    completed = (
         "1-0-0-rc4-privacy-invocation-hardening",
         "1-0-0-rc5-public-release-invocation-hardening",
         "1-0-0-rc6-final-release-candidate",
-        "1-0-0-postgres-multi-source",
         "1-1-0-cli-ux",
-        "1-2-0-portable-release-provenance",
-        "_template",
         "gigachat-advisor-provider",
-    }
+    )
+    for change_id in completed:
+        archived_tasks = (
+            archived / f"2026-08-14-{change_id}" / "tasks.md"
+        ).read_text()
+        assert "- [ ]" not in archived_tasks
+
+    superseded = archived / "2026-08-14-1-0-0-postgres-multi-source"
+    assert "Status: superseded" in (superseded / "proposal.md").read_text()
+    assert "not an active backlog" in (superseded / "tasks.md").read_text()
+
+    provenance_tasks = (
+        changes / "1-2-0-portable-release-provenance" / "tasks.md"
+    ).read_text()
+    assert "- [x] Merge through a normal pull request" in provenance_tasks
+    assert "- [ ] Exercise the contract on the next release candidate" in (
+        provenance_tasks
+    )
 
     requirements = {
         "synthetic-generation": (
@@ -733,7 +753,8 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
         ROOT
         / "openspec"
         / "changes"
-        / "1-0-0-rc4-privacy-invocation-hardening"
+        / "archive"
+        / "2026-08-14-1-0-0-rc4-privacy-invocation-hardening"
         / "design.md"
     ).read_text()
     normalized_design = " ".join(design.split())
@@ -741,7 +762,8 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
         ROOT
         / "openspec"
         / "changes"
-        / "1-0-0-rc4-privacy-invocation-hardening"
+        / "archive"
+        / "2026-08-14-1-0-0-rc4-privacy-invocation-hardening"
         / "tasks.md"
     ).read_text()
 
@@ -769,7 +791,8 @@ def test_rc4_remaining_findings_have_dispositions() -> None:
         ROOT
         / "openspec"
         / "changes"
-        / "1-0-0-rc4-privacy-invocation-hardening"
+        / "archive"
+        / "2026-08-14-1-0-0-rc4-privacy-invocation-hardening"
     )
     design = (change / "design.md").read_text()
     tasks = (change / "tasks.md").read_text()

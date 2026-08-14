@@ -11,6 +11,6 @@
 - [x] Add focused workflow contract tests.
 - [x] Update the roadmap, changelog, release guide, and public checklist.
 - [x] Run focused lint, tests, YAML parsing, and strict documentation build.
-- [ ] Merge through a normal pull request with required CI green.
+- [x] Merge through a normal pull request with required CI green.
 - [ ] Exercise the contract on the next release candidate; do not mutate
   historical releases.

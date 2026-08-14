@@ -11,7 +11,7 @@ Risk owner: [@wa-pis](https://github.com/wa-pis). Target: the first post-1.0
 security-hardening release. Their disposition is product-risk acceptance, not
 proof that the broader deployment models are safe. The separate AI-assisted
 independent review of the exact RC6 commit is recorded in the
-[RC6 security evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc6-final-release-candidate/security-review-evidence.md)
+[RC6 security evidence](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc6-final-release-candidate/security-review-evidence.md)
 and [issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397).
 
 ## AG-04: Provider Response Pre-Parse Bounds

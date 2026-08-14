@@ -114,7 +114,7 @@ bounded settings model. The `fast` candidate uses GPT-5.6 reasoning effort
 `none`; the legacy typed `minimal` value remains accepted for compatibility but
 is not used by a GPT-5.6 candidate. The constructor defaults now match `fast`
 after the
-[synthetic-profile benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
+[synthetic-profile benchmark](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-0-0-rc5-public-release-invocation-hardening/advisor-benchmark-evidence.md)
 recorded equal validity and safety with the lowest latency and cost.
 
 After each provider attempt, including a preflight rejection,

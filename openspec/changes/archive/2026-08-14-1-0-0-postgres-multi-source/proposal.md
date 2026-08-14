@@ -1,5 +1,12 @@
 # Change Proposal: 1-0-0-postgres-multi-source
 
+> **Status: superseded and archived on 2026-08-14.** The single-source
+> PostgreSQL adapter, selective local preservation, and PostgreSQL SQL export
+> shipped in `1.0.0rc6`. The source-bundle, multi-host, and Trino-federation
+> scope did not ship and is not active work. Any future implementation of that
+> scope requires a new release-scoped OpenSpec based on the current public
+> contracts.
+
 ## Summary
 
 Add a provider-neutral source-adapter boundary and a first direct PostgreSQL
