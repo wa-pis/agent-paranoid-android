@@ -1,5 +1,11 @@
 # Tasks: 1-0-0-postgres-multi-source
 
+> **Status: superseded and archived on 2026-08-14.** Checked tasks record the
+> PostgreSQL, selective-preservation, and SQL-export work delivered in
+> `1.0.0rc6`. Unchecked tasks are deliberately retained as historical evidence
+> of the deferred multi-source scope; they are not an active backlog. Reopen
+> that work only through a new OpenSpec.
+
 ## Contracts And Models
 
 - [ ] Define the typed source-profiler port and keep deterministic profile
