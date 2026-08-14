@@ -265,7 +265,6 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     }
     assert active == {
         "1-2-0-portable-release-provenance",
-        "1-2-0-provider-response-preparse-bound",
         "_template",
     }
 
@@ -275,6 +274,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "1-0-0-rc5-public-release-invocation-hardening",
         "1-0-0-rc6-final-release-candidate",
         "1-1-0-cli-ux",
+        "1-2-0-provider-response-preparse-bound",
         "gigachat-advisor-provider",
     )
     for change_id in completed:

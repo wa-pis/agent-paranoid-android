@@ -7,4 +7,4 @@
 - [x] Update advisor documentation, known-issue status, roadmap, and changelog.
 - [x] Run focused lint, type checking, tests, OpenSpec validation, and strict
   documentation build.
-- [ ] Merge through a normal pull request with required CI green.
+- [x] Merge through a normal pull request with required CI green.
