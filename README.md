@@ -4,7 +4,7 @@
 Safety-first, deterministic synthetic test data generation from CSV structure, safe profiles, reviewed `DatasetSpec` files, and allowlisted PostgreSQL or Trino metadata. The CLI and Python library are primary; PostgreSQL, MCP, Trino, and AI providers are optional integrations. The base package supports CSV/JSON workflows without installing a database client, SQL parser, or MCP SDK. Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
-Stable release: `1.1.0` (recommended). Package: `agent-paranoid-android`; CLI: `test-data-agent`.
+Stable release: `1.1.0` (recommended). Preview release: `1.2.0rc1` (explicit opt-in): `python3 -m pip install "agent-paranoid-android==1.2.0rc1"`. Package: `agent-paranoid-android`; CLI: `test-data-agent`.
 
 ## What It Preserves
 

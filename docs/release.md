@@ -112,6 +112,13 @@ exact-commit approval, package hashes, signed image digests, and successful
 post-publish checks are recorded in the
 [1.1.0 published release evidence](release-evidence-1.1.0.md).
 
+The post-1.1 portable-provenance and security-boundary changes require
+`1.2.0rc1`. Keep stable `1.1.0` as the recommended default while the candidate
+is evaluated. The exact release-PR merge commit must pass the complete release
+gate and independent approval before tagging. Public acceptance must verify the
+downloaded portable `*.sigstore.json` bundle against both Python distributions;
+only then may the remaining provenance OpenSpec task be completed and archived.
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash
