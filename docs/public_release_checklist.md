@@ -85,6 +85,8 @@ Before creating a tag:
   verification exposed a portable-bundle staging mismatch. Require exact-commit
   approval and verify the public `*.sigstore.json` bundle against both Python
   distributions before considering stable `1.2.0`.
+- Promote stable `1.2.0` only through a version- and documentation-only diff
+  from the publicly accepted RC2 runtime.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

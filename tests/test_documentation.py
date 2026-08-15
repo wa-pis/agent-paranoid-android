@@ -19,7 +19,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
-STABLE_VERSION = "1.1.0"
+STABLE_VERSION = "1.2.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_DOCS = {
     "index.md",
@@ -86,7 +86,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
     assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
-    assert f"Preview release: `{PROJECT_VERSION}` (explicit opt-in):" in readme
+    assert PROJECT_VERSION == STABLE_VERSION
+    assert "Preview release:" not in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -377,9 +378,9 @@ def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
         "MT-03": "2026-08-15-1-2-0-mcp-malformed-log-redaction",
     }
 
-    assert known_issues.count(
-        "**Status:** resolved on `main` for the next `1.2.0` release."
-    ) == len(archives)
+    assert known_issues.count("**Status:** resolved in stable `1.2.0`.") == len(
+        archives
+    )
     for finding, archive in archives.items():
         assert f"## {finding}:" in known_issues
         assert archive in known_issues
@@ -845,7 +846,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.1.0rc2 HEAD" in release
+    assert "git diff --name-status v1.2.0rc2 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",

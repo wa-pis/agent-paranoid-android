@@ -1014,6 +1014,22 @@ Exit criteria:
   the aggregate OpenSSF Scorecard score is informational rather than a release
   gate.
 
+### 1.2.0: Stable Promotion
+
+**Goal:** promote the publicly accepted RC2 runtime without changing runtime
+behavior, public APIs, dependencies, workflows, containers, or security
+boundaries.
+
+Scope:
+
+- [x] Limit the promotion diff to version identity, changelog, public
+  documentation, roadmap status, and generated release checks.
+- [ ] Merge the focused stable-promotion PR with all required checks green.
+- [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
+  artifacts for stable `1.2.0`.
+- [ ] Record exact public artifact hashes, image digests, and post-publish
+  acceptance in immutable release evidence.
+
 ### Post-1.0: Follow-up Architecture And Community
 
 After the stable baseline, continue the remaining maintenance and community

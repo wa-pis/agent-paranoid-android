@@ -53,7 +53,7 @@ introduced.
 Install the exact stable release and run the self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.1.0"
+python3 -m pip install "agent-paranoid-android==1.2.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -96,8 +96,8 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable release is `1.1.0`. Preview `1.2.0rc2` completed public
-artifact acceptance and remains available only by explicit version pin.
+The current stable release is `1.2.0`, promoted without runtime changes from
+the publicly accepted `1.2.0rc2` candidate.
 `DatasetSpec` is the generation and validation contract for the CLI and Python
 API.
 
