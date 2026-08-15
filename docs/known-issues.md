@@ -8,7 +8,7 @@ behavior was safe for a broader deployment model.
 The source is repository-wide Codex Security scan
 `484dfa30-85d2-4059-b39b-2c52c9d0f5ed` of immutable commit
 `2c714a6d4df75a1faab422055593fc50a2061a03`. All four findings are **Low** and
-are resolved on `main` for the next `1.2.0` release. Risk owner:
+are resolved in stable `1.2.0`. Risk owner:
 [@wa-pis](https://github.com/wa-pis). The original disposition was product-risk
 acceptance, not proof that broader deployment models are safe. The separate
 AI-assisted independent review of the exact RC6 commit is recorded in the
@@ -17,7 +17,7 @@ and [issue #397](https://github.com/wa-pis/agent-paranoid-android/issues/397).
 
 ## AG-04: Provider Response Pre-Parse Bounds
 
-**Status:** resolved on `main` for the next `1.2.0` release.
+**Status:** resolved in stable `1.2.0`.
 
 Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-14-1-2-0-provider-response-preparse-bound/proposal.md).
 
@@ -39,7 +39,7 @@ as a shared multi-tenant service.
 
 ## FS-11: JSON Depth After Materialization
 
-**Status:** resolved on `main` for the next `1.2.0` release.
+**Status:** resolved in stable `1.2.0`.
 
 Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-json-depth-preparse-bound/proposal.md).
 
@@ -59,7 +59,7 @@ Input byte, row, cell, and typed-model limits remain independent defenses.
 
 ## MT-02: Same-Caller MCP Argument Reflection
 
-**Status:** resolved on `main` for the next `1.2.0` release.
+**Status:** resolved in stable `1.2.0`.
 
 Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-argument-redaction/proposal.md).
 
@@ -78,7 +78,7 @@ Tool schemas and non-validation application errors are unchanged.
 
 ## MT-03: Malformed MCP Value In Local Logs
 
-**Status:** resolved on `main` for the next `1.2.0` release.
+**Status:** resolved in stable `1.2.0`.
 
 Resolution contract: [archived OpenSpec change](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-15-1-2-0-mcp-malformed-log-redaction/proposal.md).
 
