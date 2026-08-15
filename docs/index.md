@@ -96,9 +96,8 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable release is `1.1.0`. Preview `1.2.0rc2` is available only by
-explicit version pin while its security and portable-provenance changes are
-being accepted.
+The current stable release is `1.1.0`. Preview `1.2.0rc2` completed public
+artifact acceptance and remains available only by explicit version pin.
 `DatasetSpec` is the generation and validation contract for the CLI and Python
 API.
 

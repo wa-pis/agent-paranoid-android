@@ -117,12 +117,13 @@ The post-1.1 portable-provenance and security-boundary changes first shipped as
 acceptance failed because the verifier did not stage the portable bundle at the
 path recorded in `SHA256SUMS`. That published candidate remains immutable and
 is superseded by `1.2.0rc2`, which contains only the verifier correction and
-release identity changes. Keep stable `1.1.0` as the recommended default while
-RC2 is evaluated. The exact release-PR merge commit must pass the complete
-release gate and independent approval before tagging. Public acceptance must
-verify the downloaded portable `*.sigstore.json` bundle against both Python
-distributions; only then may the remaining provenance OpenSpec task be
-completed and archived.
+release identity changes. Keep stable `1.1.0` as the recommended default until
+stable promotion. RC2 completed public acceptance; its immutable results are
+recorded in the
+[1.2.0rc2 published release evidence](release-evidence-1.2.0rc2.md). Future
+candidates must still pass the complete release gate and independent approval
+before tagging, then verify the downloaded portable `*.sigstore.json` bundle
+against both Python distributions before acceptance.
 
 Review the stable tree directly against that immutable baseline:
 

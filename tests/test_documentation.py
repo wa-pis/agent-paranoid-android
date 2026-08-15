@@ -54,6 +54,7 @@ REQUIRED_DOCS = {
     "release-evidence-1.0.0rc5.md",
     "release-evidence-1.0.0rc6.md",
     "release-evidence-1.0.0.md",
+    "release-evidence-1.2.0rc2.md",
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
@@ -235,6 +236,26 @@ def test_stable_public_evidence_records_immutable_release() -> None:
         assert expected in evidence
 
 
+def test_rc2_portable_provenance_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.2.0rc2.md").read_text()
+
+    for expected in (
+        "4473774ebb9dad7e53b25401021757c2863f877c",
+        "issues/441",
+        "actions/runs/31872986712",
+        "actions/runs/31872986706",
+        "actions/runs/31873093279",
+        "actions/runs/31873544030",
+        "324b589e1c455b2950e70458c984727c9effc75edbb036b30744cd84f729f983",
+        "175a5e855a66fa019995713a33742bca05b3eb03cbc1a85ea2cf35ef65b3d984",
+        "sha256:f3cfca41f79eb856b0b506ebbdccd196bd71a5385fb64c2e05f85702c379aaa8",
+        "sha256:d7ec3bbc488c2ab7bde147fde799af30801222d69e633212a14433d94deca98e",
+        "sha256:e7078aea452e33b66cac5d7b55839bf8b6f34851ef644358965b2acd7e4fade5",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
 def test_rc2_security_review_records_exact_disposition() -> None:
     review = (ROOT / "docs" / "security-review-2026-08-01-rc2.md").read_text()
 
@@ -266,10 +287,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {
-        "1-2-0-portable-release-provenance",
-        "_template",
-    }
+    assert active == {"_template"}
 
     archived = changes / "archive"
     completed = (
@@ -312,12 +330,15 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     assert "not an active backlog" in (superseded / "tasks.md").read_text()
 
     provenance_tasks = (
-        changes / "1-2-0-portable-release-provenance" / "tasks.md"
+        archived
+        / "2026-08-15-1-2-0-portable-release-provenance"
+        / "tasks.md"
     ).read_text()
     assert "- [x] Merge through a normal pull request" in provenance_tasks
-    assert "- [ ] Exercise the contract on the next release candidate" in (
+    assert "- [x] Exercise the contract on the next release candidate" in (
         provenance_tasks
     )
+    assert "- [ ]" not in provenance_tasks
 
     requirements = {
         "synthetic-generation": (
