@@ -127,7 +127,9 @@ against both Python distributions before acceptance.
 Stable `1.2.0` promotes that accepted RC2 runtime through the permitted
 version- and documentation-only diff. No application runtime, public API,
 dependency, workflow, container, or security-boundary change belongs in the
-promotion.
+promotion. The signed tag, reviewed promotion, package hashes, signed image
+digests, and successful post-publish checks are recorded in the
+[1.2.0 published release evidence](release-evidence-1.2.0.md).
 
 Review the stable tree directly against that immutable baseline:
 
