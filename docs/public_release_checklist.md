@@ -81,9 +81,10 @@ Before creating a tag:
 - Promote stable `1.1.0` only from the accepted RC2 runtime with the documented
   version- and documentation-only diff. Derive wheel and sdist hashes in Linux
   before creating the protected stable tag.
-- Use `1.2.0rc1` for the portable-provenance and security-boundary changes.
-  Require exact-commit approval and verify the public `*.sigstore.json` bundle
-  against both Python distributions before considering stable `1.2.0`.
+- Use `1.2.0rc2` to supersede the published RC1 whose post-publish checksum
+  verification exposed a portable-bundle staging mismatch. Require exact-commit
+  approval and verify the public `*.sigstore.json` bundle against both Python
+  distributions before considering stable `1.2.0`.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

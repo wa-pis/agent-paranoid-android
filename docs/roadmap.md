@@ -981,10 +981,26 @@ Scope:
   that a single maintainer cannot satisfy solely to improve Scorecard results.
 - [x] Resolve AG-04, FS-11, MT-02, and MT-03 with bounded, source-free
   regressions and archive their completed OpenSpec changes.
-- [ ] Obtain independent approval for the exact candidate commit after all
+- [x] Obtain independent approval for the exact RC1 commit after all
   required CI, security, documentation, container, and release gates pass.
-- [ ] Publish and verify the signed `1.2.0rc1` package and container artifacts,
-  including the portable provenance bundle, before promoting stable `1.2.0`.
+- [x] Publish the signed `1.2.0rc1` package and container artifacts. The final
+  post-publish workflow failed closed because the portable bundle was not
+  staged at its checksum-recorded path, so RC1 was not accepted for promotion.
+
+### 1.2.0rc2: Portable Bundle Verification Candidate
+
+**Goal:** repeat candidate acceptance with the portable bundle staged at the
+exact path recorded in `SHA256SUMS`, without changing application runtime.
+
+Scope:
+
+- [x] Correct the post-publish verifier and add a focused workflow contract
+  regression.
+- [ ] Obtain independent approval for the exact RC2 commit after all required
+  CI, security, documentation, container, and release gates pass.
+- [ ] Publish and verify the signed `1.2.0rc2` package and container artifacts,
+  including bundle-backed verification of both Python distributions, before
+  promoting stable `1.2.0`.
 
 Exit criteria:
 
