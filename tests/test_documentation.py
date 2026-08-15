@@ -19,6 +19,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
+STABLE_VERSION = "1.1.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_DOCS = {
     "index.md",
@@ -82,7 +83,9 @@ def test_readme_is_a_focused_entrypoint() -> None:
         f'python3 -m pip install "agent-paranoid-android=={PROJECT_VERSION}"'
         in readme
     )
-    assert f'"agent-paranoid-android[mcp,trino]=={PROJECT_VERSION}"' in readme
+    assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
+    assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
+    assert f"Preview release: `{PROJECT_VERSION}` (explicit opt-in):" in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -556,10 +559,11 @@ def test_installation_documents_dependency_budgets() -> None:
     assert f'"agent-paranoid-android=={PROJECT_VERSION}"' in installation
     for extra in ("parquet", "mcp", "mcp,trino", "openai"):
         assert (
-            f'"agent-paranoid-android[{extra}]=={PROJECT_VERSION}"'
+            f'"agent-paranoid-android[{extra}]=={STABLE_VERSION}"'
             in installation
         )
-    assert "The stable release is" in installation
+    assert f"The stable release is `{STABLE_VERSION}`" in installation
+    assert f"Stable `{STABLE_VERSION}` remains the recommended default" in installation
     assert "not the recommended user installation" in installation
 
 
@@ -766,8 +770,8 @@ def test_gigachat_documentation_matches_provider_boundary() -> None:
         assert expected in guide
     assert "--provider gigachat" in cli
     assert "default remains\n`openai`" in cli
-    assert f'agent-paranoid-android[gigachat]=={PROJECT_VERSION}' in guide
-    assert f'agent-paranoid-android[gigachat]=={PROJECT_VERSION}' in installation
+    assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in guide
+    assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in installation
     assert "TLS verification cannot be disabled" in configuration
 
 

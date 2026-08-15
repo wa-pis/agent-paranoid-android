@@ -959,7 +959,7 @@ Scope:
   artifacts for `1.1.0`; see the
   [stable release evidence](release-evidence-1.1.0.md).
 
-### 1.2.0: Portable Release Evidence And Safety Properties
+### 1.2.0rc1: Portable Release Evidence And Safety Candidate
 
 **Goal:** make package provenance easier to verify outside GitHub and deepen
 property-based coverage at the existing untrusted-input boundaries without
@@ -979,6 +979,12 @@ Scope:
 - [x] Keep the work focused on release evidence and tests: do not add an
   external fuzzing service, a runtime dependency, or a mandatory approval rule
   that a single maintainer cannot satisfy solely to improve Scorecard results.
+- [x] Resolve AG-04, FS-11, MT-02, and MT-03 with bounded, source-free
+  regressions and archive their completed OpenSpec changes.
+- [ ] Obtain independent approval for the exact candidate commit after all
+  required CI, security, documentation, container, and release gates pass.
+- [ ] Publish and verify the signed `1.2.0rc1` package and container artifacts,
+  including the portable provenance bundle, before promoting stable `1.2.0`.
 
 Exit criteria:
 

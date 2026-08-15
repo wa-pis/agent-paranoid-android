@@ -67,6 +67,18 @@ explicit `gigachat` extra. Follow
 TLS verification, and the review-first workflow. The default provider remains
 OpenAI.
 
+## Evaluate The Preview
+
+Stable `1.1.0` remains the recommended default. To evaluate the security and
+portable-provenance changes in `1.2.0rc1`, pin the candidate explicitly:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.2.0rc1"
+```
+
+Add an optional extra to the same exact pin only when needed. Pip does not
+select this prerelease for the stable commands above.
+
 ### Windows PowerShell
 
 ```powershell
