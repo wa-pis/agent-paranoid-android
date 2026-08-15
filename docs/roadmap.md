@@ -1024,11 +1024,12 @@ Scope:
 
 - [x] Limit the promotion diff to version identity, changelog, public
   documentation, roadmap status, and generated release checks.
-- [ ] Merge the focused stable-promotion PR with all required checks green.
-- [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
+- [x] Merge the focused stable-promotion PR with all required checks green.
+- [x] Publish and verify GitHub, PyPI, and signed multi-platform container
   artifacts for stable `1.2.0`.
-- [ ] Record exact public artifact hashes, image digests, and post-publish
-  acceptance in immutable release evidence.
+- [x] Record exact public artifact hashes, image digests, and post-publish
+  acceptance in the
+  [immutable release evidence](release-evidence-1.2.0.md).
 
 ### Post-1.0: Follow-up Architecture And Community
 
