@@ -996,11 +996,12 @@ Scope:
 
 - [x] Correct the post-publish verifier and add a focused workflow contract
   regression.
-- [ ] Obtain independent approval for the exact RC2 commit after all required
+- [x] Obtain independent approval for the exact RC2 commit after all required
   CI, security, documentation, container, and release gates pass.
-- [ ] Publish and verify the signed `1.2.0rc2` package and container artifacts,
+- [x] Publish and verify the signed `1.2.0rc2` package and container artifacts,
   including bundle-backed verification of both Python distributions, before
-  promoting stable `1.2.0`.
+  promoting stable `1.2.0`; see the
+  [immutable release evidence](release-evidence-1.2.0rc2.md).
 
 Exit criteria:
 

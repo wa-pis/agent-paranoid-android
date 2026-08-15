@@ -55,3 +55,8 @@ by consumers that continue to verify through the GitHub API.
 This changes published artifact integrity and therefore requires the next
 release candidate under the release policy. The implementation does not create
 a tag, mutate an existing release, or publish a package.
+
+## Completion
+
+Completed and publicly exercised by `v1.2.0rc2` on 2026-08-15. The immutable
+release evidence is recorded in `docs/release-evidence-1.2.0rc2.md`.
