@@ -117,6 +117,7 @@ jobs:
           cp /tmp/release-assets/sbom.cdx.json /tmp/release-assets/dist/
           bundle_count="$(find /tmp/release-assets -maxdepth 1 -type f -name '*.sigstore.json' | wc -l | tr -d ' ')"
           test "${bundle_count}" = "1"
+          cp /tmp/release-assets/*.sigstore.json /tmp/release-assets/dist/
           (
             cd /tmp/release-assets
             sha256sum --check SHA256SUMS

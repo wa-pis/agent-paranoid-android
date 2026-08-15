@@ -431,7 +431,10 @@ def test_published_release_workflow_verifies_public_artifacts() -> None:
     assert (
         "cp /tmp/release-assets/sbom.cdx.json /tmp/release-assets/dist/" in workflow
     )
+    bundle_copy = "cp /tmp/release-assets/*.sigstore.json /tmp/release-assets/dist/"
+    assert bundle_copy in workflow
     assert "sha256sum --check SHA256SUMS" in workflow
+    assert workflow.index(bundle_copy) < workflow.index("sha256sum --check SHA256SUMS")
     assert "gh attestation verify" in workflow
     assert "bundle_count=" in workflow
     assert 'test "${bundle_count}" = "1"' in workflow
