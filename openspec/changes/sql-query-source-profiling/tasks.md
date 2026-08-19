@@ -6,6 +6,8 @@
   and physical source allowlist enforcement.
 - [x] Add trusted PostgreSQL and Trino no-row schema and aggregate query
   builders for the initial SQL subset.
+- [x] Normalize psycopg built-in scalar type aliases at the PostgreSQL client
+  boundary while keeping unknown and composite output types fail closed.
 - [x] Produce one source-free virtual-entity profile with query fingerprint,
   safe metadata, aggregates, and bounded warnings.
 - [x] Connect the profile to existing infer, review, deterministic generation,

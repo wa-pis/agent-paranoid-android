@@ -30,6 +30,18 @@ class PostgresBudgetExceeded(PostgresClientError):
     """Raised when cumulative PostgreSQL profiling work exceeds its budget."""
 
 
+_POSTGRES_TYPE_ALIASES = {
+    "bool": "boolean",
+    "bpchar": "character",
+    "float4": "real",
+    "float8": "double precision",
+    "int2": "smallint",
+    "int4": "integer",
+    "int8": "bigint",
+    "timestamptz": "timestamp with time zone",
+}
+
+
 @dataclass(frozen=True, slots=True)
 class PostgresResultColumn:
     name: str
@@ -257,7 +269,7 @@ def _postgres_type_name(connection: Any, item: Any) -> str:
             type_code = None
     name = getattr(type_code, "name", None)
     if isinstance(name, str) and name:
-        return name
+        return _POSTGRES_TYPE_ALIASES.get(name, name)
     try:
         type_info = connection.adapters.types.get(type_code)
     except (AttributeError, KeyError, TypeError):
@@ -265,7 +277,7 @@ def _postgres_type_name(connection: Any, item: Any) -> str:
     name = getattr(type_info, "name", None)
     if not isinstance(name, str) or not name:
         raise PostgresQueryError("PostgreSQL schema metadata is invalid")
-    return name
+    return _POSTGRES_TYPE_ALIASES.get(name, name)
 
 
 def _description_nullable(item: Any) -> bool:
