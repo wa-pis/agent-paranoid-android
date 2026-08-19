@@ -59,16 +59,24 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
     dependencies: dict[str, dict[str, Any]] = policy["dependencies"]
     project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
 
-    declared: dict[str, tuple[str, str, str | None]] = {}
+    declared: dict[str, tuple[set[str], str, str | None]] = {}
     for requirement in project["dependencies"]:
         name, minimum, upper = _parse_requirement(requirement)
-        declared[name] = ("base", minimum, upper)
+        declared[name] = ({"base"}, minimum, upper)
     for extra, requirements in project["optional-dependencies"].items():
         if extra in {"all", "dev"}:
             continue
         for requirement in requirements:
             name, minimum, upper = _parse_requirement(requirement)
-            declared[name] = (extra, minimum, upper)
+            if name in declared:
+                extras, declared_minimum, declared_upper = declared[name]
+                if (minimum, upper) != (declared_minimum, declared_upper):
+                    raise CompatibilityError(
+                        f"dependency range differs across extras for {name}"
+                    )
+                extras.add(extra)
+            else:
+                declared[name] = ({extra}, minimum, upper)
 
     expected_names = set(dependencies)
     if set(declared) != expected_names:
@@ -82,7 +90,8 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
         upper = entry.get("upper")
         if upper is None and entry.get("upper_major") is not None:
             upper = f"{entry['upper_major']}.0.0"
-        expected_range = (entry["extra"], entry["minimum"], upper)
+        expected_extras = set(entry.get("extras", [entry["extra"]]))
+        expected_range = (expected_extras, entry["minimum"], upper)
         if actual != expected_range:
             raise CompatibilityError(
                 f"unreviewed dependency range drift for {name}: "
@@ -94,7 +103,9 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
         for requirement in project["optional-dependencies"]["all"]
     }
     optional_names = {
-        name for name, entry in dependencies.items() if entry["extra"] != "base"
+        name
+        for name, entry in dependencies.items()
+        if "base" not in set(entry.get("extras", [entry["extra"]]))
     }
     if all_names != optional_names:
         raise CompatibilityError("the all extra does not match reviewed optional dependencies")
@@ -117,7 +128,12 @@ def check_repository(root: Path = ROOT) -> dict[str, str]:
             expected_constraints = {
                 name: version
                 for name, version in expected_constraints.items()
-                if dependencies[name]["extra"] in {"base", "mcp"}
+                if set(
+                    dependencies[name].get(
+                        "extras", [dependencies[name]["extra"]]
+                    )
+                )
+                & {"base", "mcp"}
             }
         if actual_constraints != expected_constraints:
             raise CompatibilityError(

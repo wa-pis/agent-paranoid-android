@@ -33,21 +33,49 @@ def run_example(output: Path) -> dict[str, object]:
         tempfile.mkdtemp(prefix=f".{output.name}-", dir=output.parent)
     )
     try:
+        profile_path = temporary / "profile.json"
+        query_mode = os.environ.get("TRINO_EXAMPLE_USE_QUERY") == "true"
         catalogs = list_catalogs()
         schemas = list_schemas("tpch")
         tables = list_tables("tpch", "tiny")
         columns = describe_table("tpch", "tiny", "nation")
-        profile = profile_table_safe(
-            "tpch",
-            "tiny",
-            "nation",
-            max_top_values=5,
-        )
-        profile_fields = [str(column["name"]) for column in profile["columns"]]
-        if os.environ.get("TRINO_EXAMPLE_USE_WILDCARD") == "true":
-            assert profile_fields == ["comment", "name", "nationkey", "regionkey"]
-        profile_path = temporary / "profile.json"
-        profile_path.write_text(json.dumps(profile, indent=2, sort_keys=True) + "\n")
+        if query_mode:
+            subprocess.run(
+                [
+                    cli,
+                    "profile-query",
+                    str(Path(__file__).with_name("query.sql")),
+                    "--adapter",
+                    "trino",
+                    "--source-id",
+                    "warehouse",
+                    "--entity",
+                    "nations_query",
+                    "--output",
+                    str(profile_path),
+                ],
+                check=True,
+            )
+            profile = json.loads(profile_path.read_text())
+            entity = profile["entities"][0]
+            profile_fields = [str(field["name"]) for field in entity["fields"]]
+            profile_row_count = entity["row_count"]
+            assert profile_fields == ["nationkey", "nation_name", "regionkey"]
+            assert len(profile["source_fingerprint"]) == 64
+            assert profile["source_policy_version"] == "1.0"
+            assert "999999" not in json.dumps(profile, sort_keys=True)
+        else:
+            profile = profile_table_safe(
+                "tpch",
+                "tiny",
+                "nation",
+                max_top_values=5,
+            )
+            profile_fields = [str(column["name"]) for column in profile["columns"]]
+            profile_row_count = profile["row_count"]
+            if os.environ.get("TRINO_EXAMPLE_USE_WILDCARD") == "true":
+                assert profile_fields == ["comment", "name", "nationkey", "regionkey"]
+            profile_path.write_text(json.dumps(profile, indent=2, sort_keys=True) + "\n")
         spec_path = temporary / "dataset_spec.yaml"
         generated = temporary / "generated"
         subprocess.run(
@@ -76,12 +104,16 @@ def run_example(output: Path) -> dict[str, object]:
             ],
             check=True,
         )
+        subprocess.run(
+            [cli, "validate", str(spec_path), str(generated)],
+            check=True,
+        )
         manifest = json.loads((generated / "generation_manifest.json").read_text())
         result: dict[str, object] = {
             "catalog_available": "tpch" in catalogs,
             "schema_available": "tiny" in schemas,
             "table_available": "nation" in tables,
-            "profile_row_count": profile["row_count"],
+            "profile_row_count": profile_row_count,
             "profile_column_count": len(columns),
             "profile_fields": profile_fields,
             "generated_row_counts": manifest["row_counts"],
@@ -89,6 +121,7 @@ def run_example(output: Path) -> dict[str, object]:
             "validation_valid": manifest["validation_valid"],
             "synthetic": manifest["synthetic"],
             "source_rows_copied": manifest["source_rows_copied"],
+            "query_source": query_mode,
         }
         (temporary / "example_result.json").write_text(
             json.dumps(result, indent=2, sort_keys=True) + "\n"

@@ -51,7 +51,7 @@ EXPECTED_RUNTIME_EXTRA_DEPENDENCIES = {
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
-    "postgres": {"psycopg"},
+    "postgres": {"psycopg", "sqlglot"},
     "trino": {"sqlglot", "trino"},
 }
 OPTIONAL_MODULES = {
@@ -59,7 +59,7 @@ OPTIONAL_MODULES = {
     "mcp": {"mcp"},
     "openai": {"openai"},
     "parquet": {"pyarrow"},
-    "postgres": {"psycopg"},
+    "postgres": {"psycopg", "sqlglot"},
     "trino": {"sqlglot", "trino"},
 }
 MAX_DISTRIBUTIONS = {
@@ -188,15 +188,22 @@ def verify_install_profile(profile: str) -> None:
         if profile == "all"
         else ({profile} if profile != "base" else set())
     )
-    for feature, modules in OPTIONAL_MODULES.items():
-        for module in modules:
-            available = importlib.util.find_spec(module) is not None
-            if available != (feature in expected_features):
-                state = "present" if available else "missing"
-                raise SystemExit(
-                    f"{profile} profile has invalid optional module "
-                    f"{module}: {state}"
-                )
+    expected_modules = {
+        module
+        for feature in expected_features
+        for module in OPTIONAL_MODULES[feature]
+    }
+    known_modules = {
+        module for modules in OPTIONAL_MODULES.values() for module in modules
+    }
+    for module in known_modules:
+        available = importlib.util.find_spec(module) is not None
+        if available != (module in expected_modules):
+            state = "present" if available else "missing"
+            raise SystemExit(
+                f"{profile} profile has invalid optional module "
+                f"{module}: {state}"
+            )
 
     installed_names = {
         requirement_name(str(item.metadata["Name"]))

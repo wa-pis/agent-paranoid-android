@@ -66,6 +66,15 @@ from test_data_agent.cli_contract import (
 )
 from test_data_agent.generation import generate_dataset, infer_dataset_spec, solve_constraints
 from test_data_agent.io.workflows import DatasetGenerationResult, generate_dataset_bundle
+from test_data_agent.sql_query_adapters import (
+    profile_postgres_query_source,
+    profile_trino_query_source,
+)
+from test_data_agent.sql_query_source import (
+    SqlQueryAdapter,
+    SqlQueryProfileLimits,
+    SqlQueryProfileRequest,
+)
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 from test_data_agent.version import __version__
 
@@ -101,6 +110,9 @@ __all__ = [
     "DatasetProfile",
     "DatasetSpec",
     "LocalCategoryField",
+    "SqlQueryAdapter",
+    "SqlQueryProfileLimits",
+    "SqlQueryProfileRequest",
     "DatasetGenerationResult",
     "DatasetAdvisor",
     "ExchangeDatasetAdvisor",
@@ -126,6 +138,8 @@ __all__ = [
     "inspect_agent_workspace",
     "plan_agent_request",
     "plan_agent_profile",
+    "profile_postgres_query_source",
+    "profile_trino_query_source",
     "recover_agent_workspace",
     "review_agent_workspace",
     "solve_constraints",

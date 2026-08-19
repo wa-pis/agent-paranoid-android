@@ -104,6 +104,25 @@ requests `default_transaction_read_only=on`, but that setting is defense in
 depth rather than a replacement for role permissions. No arbitrary SQL or
 source-row profiling option exists.
 
+## SQL Query Source Limits
+
+`profile-query` uses the selected adapter's existing connection, physical
+table/column allowlists, statement/result/time/scan budgets, and read-only
+enforcement. Trino query sources require `TRINO_ALLOWED_TABLE_COLUMNS`; an
+unrestricted Trino configuration is rejected for this command.
+
+| Variable | Default | Purpose |
+| --- | ---: | --- |
+| `SQL_QUERY_MAX_BYTES` | `65536` | Maximum UTF-8 bytes in the local query file |
+| `SQL_QUERY_MAX_AST_NODES` | `500` | Maximum parsed SQL nodes |
+| `SQL_QUERY_MAX_AST_DEPTH` | `32` | Maximum parsed SQL nesting depth |
+| `SQL_QUERY_MAX_PROJECTED_COLUMNS` | `100` | Maximum explicit fields after wildcard expansion |
+
+Values must be positive integers and remain below the built-in absolute caps.
+The file is read once with descriptor metadata revalidation. SQL text and
+literals are not accepted through environment variables or CLI options and are
+not written to profiles, manifests, errors, providers, or MCP responses.
+
 ## GigaChat Advisor
 
 GigaChat is explicit and off unless `agent-advise --provider gigachat` is

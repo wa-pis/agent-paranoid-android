@@ -168,9 +168,11 @@
       ],
       "local_category_fields": [],
       "relationships": [],
+      "source_fingerprint": null,
+      "source_policy_version": null,
       "source_type": "trino"
     },
-    "profile_sha256": "daff386d2d4582ddf2065ef33403f48a3d7cb16cd26f3edbea8011e29344be18",
+    "profile_sha256": "1d1b24aac8286b391315468fb1b0c4f24d84124861c50fbe1283028357caed35",
     "schema_version": "1.0"
   },
   "request_trust": "untrusted_profile_metadata",

@@ -89,3 +89,37 @@ def test_local_trino_example_profiles_then_generates_from_installed_package(
     assert "ALGERIA" not in profile_text
     assert manifest["synthetic"] is True
     assert manifest["seed"] == 141421
+
+
+def test_local_trino_query_example_is_source_free(tmp_path: Path) -> None:
+    output = tmp_path / "local-trino-query"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    environment["PATH"] = os.pathsep.join(
+        [str(Path(sys.executable).parent), environment.get("PATH", "")]
+    )
+    environment["TRINO_EXAMPLE_USE_QUERY"] = "true"
+    environment["TRINO_ALLOWED_TABLE_COLUMNS"] = "tpch.tiny.nation.*"
+
+    subprocess.run(
+        [sys.executable, ROOT / "examples/local_trino/run.py", output],
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    profile_text = (output / "profile.json").read_text()
+    profile = json.loads(profile_text)
+    result = json.loads((output / "example_result.json").read_text())
+    manifest = json.loads(
+        (output / "generated/generation_manifest.json").read_text()
+    )
+    assert profile["source_type"] == "trino_query"
+    assert len(profile["source_fingerprint"]) == 64
+    assert profile["source_policy_version"] == "1.0"
+    assert "999999" not in profile_text
+    assert result["query_source"] is True
+    assert manifest["synthetic"] is True
+    assert manifest["source_rows_copied"] is False

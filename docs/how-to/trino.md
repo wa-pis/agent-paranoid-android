@@ -78,6 +78,39 @@ Use `examples/local_trino/run-jdbc.sh OUTPUT` to run the identical disposable
 workflow with its endpoint and `tpch/tiny` defaults supplied in JDBC syntax.
 Use `examples/local_trino/run-wildcard.sh OUTPUT` to exercise bounded
 `tpch.tiny.nation.*` expansion and deterministic field ordering.
+Use `examples/local_trino/run-query.sh OUTPUT` to profile one reviewed local
+`SELECT` as a virtual entity. Query-source mode additionally requires exact
+`TRINO_ALLOWED_TABLE_COLUMNS` entries or a table-qualified wildcard and rejects
+unrestricted mode. It stores a fingerprint, not query text, literals, backend
+messages, endpoints, or result rows.
+
+The typed Python entry point uses the same environment configuration and
+policy boundary:
+
+```python
+from pathlib import Path
+
+import trino
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_trino_query_source,
+)
+from test_data_agent.trino_config import TrinoConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.TRINO,
+    source_id="warehouse",
+    entity="nation_query",
+    query_file=Path("query.sql"),
+)
+profile = profile_trino_query_source(
+    request,
+    config=TrinoConfig.from_env(),
+    driver=trino,
+)
+```
 
 The example removes its container on success or failure and leaves only the
 safe profile, reviewed spec, generated rows, validation report, manifest, and a

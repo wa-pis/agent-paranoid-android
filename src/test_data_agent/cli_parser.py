@@ -340,6 +340,58 @@ def register_dataset_commands(
     profile_postgres_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_postgres_parser)
 
+    profile_query_parser = subparsers.add_parser(
+        "profile-query",
+        help="Create a safe profile from one reviewed SQL query file.",
+        description=(
+            "Profile one bounded PostgreSQL or Trino SELECT as a virtual "
+            "aggregate-only source. Query rows are never returned or copied."
+        ),
+        epilog=(
+            "Example:\n"
+            "  test-data-agent profile-query query.sql --adapter postgres "
+            "--source-id warehouse --entity paid_orders "
+            "--output out/profile.json\n\n"
+            "The adapter's exact table/column allowlists and resource budgets "
+            "remain mandatory."
+        ),
+        formatter_class=PublicHelpFormatter,
+    )
+    profile_query_parser.add_argument(
+        "query",
+        type=Path,
+        help="UTF-8 SQL file containing exactly one allowed SELECT.",
+    )
+    profile_query_parser.add_argument(
+        "--adapter",
+        choices=("postgres", "trino"),
+        required=True,
+        help="Database adapter used to parse and profile the query.",
+    )
+    profile_query_parser.add_argument(
+        "--source-id",
+        required=True,
+        help="Stable identifier for the virtual source.",
+    )
+    profile_query_parser.add_argument(
+        "--entity",
+        required=True,
+        help="Entity name assigned to the derived relation.",
+    )
+    profile_query_parser.add_argument(
+        "--output",
+        "-o",
+        type=Path,
+        required=True,
+        help="Safe profile JSON to write.",
+    )
+    profile_query_parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Allow replacing an existing profile JSON.",
+    )
+    add_local_category_option(profile_query_parser)
+
     generate_csv_parser = subparsers.add_parser(
         "generate-from-csv",
         help="Generate a synthetic single-table dataset directly from one CSV file.",

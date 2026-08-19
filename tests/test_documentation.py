@@ -485,6 +485,45 @@ def test_wildcard_examples_and_public_docs_match_runtime_contract() -> None:
     assert "category literals" in public_docs
 
 
+def test_query_examples_and_public_docs_match_runtime_contract() -> None:
+    postgres_launcher = ROOT / "examples/local_postgres/run-query.sh"
+    trino_launcher = ROOT / "examples/local_trino/run-query.sh"
+    postgres_query = ROOT / "examples/local_postgres/query.sql"
+    trino_query = ROOT / "examples/local_trino/query.sql"
+
+    assert postgres_launcher.stat().st_mode & 0o111
+    assert trino_launcher.stat().st_mode & 0o111
+    assert "POSTGRES_EXAMPLE_USE_QUERY=true" in postgres_launcher.read_text()
+    assert "TRINO_EXAMPLE_USE_QUERY=true" in trino_launcher.read_text()
+
+    for query in (postgres_query, trino_query):
+        sql = query.read_text()
+        assert sql.startswith("SELECT")
+        assert " FROM " in sql.replace("\n", " ")
+        assert "password" not in sql.lower()
+        assert "token" not in sql.lower()
+
+    public_docs = "\n".join(
+        (ROOT / path).read_text()
+        for path in (
+            "README.md",
+            "docs/index.md",
+            "docs/how-to/postgresql.md",
+            "docs/how-to/trino.md",
+            "docs/reference/cli.md",
+            "docs/reference/configuration.md",
+            "docs/concepts/profiles-and-specs.md",
+            "docs/concepts/safety-model.md",
+            "docs/implementation_map.md",
+            "docs/reference/application-boundaries.md",
+        )
+    )
+    assert "profile-query" in public_docs
+    assert "source_fingerprint" in public_docs
+    assert "query rows" in public_docs
+    assert "SqlQueryProfileRequest" in public_docs
+
+
 def test_database_source_documentation_reconciliation_covers_all_layers() -> None:
     change = (
         ROOT

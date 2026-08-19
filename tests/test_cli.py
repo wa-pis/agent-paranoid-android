@@ -48,6 +48,20 @@ def test_cli_help_mentions_quickstart_paths(capsys) -> None:
     assert "synthetic" in captured.out
 
 
+def test_query_profile_help_freezes_file_only_safe_contract(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["profile-query", "--help"])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 0
+    assert "query.sql" in captured.out
+    assert "--adapter" in captured.out
+    assert "--source-id" in captured.out
+    assert "--entity" in captured.out
+    assert "Query rows are never returned or copied" in captured.out
+    assert max(map(len, captured.out.splitlines())) <= 80
+
+
 def test_help_is_checkout_free_and_readable_at_80_columns(
     monkeypatch,
     capsys,

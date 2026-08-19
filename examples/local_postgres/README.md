@@ -28,11 +28,20 @@ metadata into explicit columns before aggregate profiling:
 examples/local_postgres/run-wildcard.sh /tmp/agent-paranoid-postgres-wildcard-example
 ```
 
+Run the checked-in reviewed `query.sql` as one virtual aggregate-only source:
+
+```bash
+examples/local_postgres/run-query.sh /tmp/agent-paranoid-postgres-query-example
+```
+
 The second launcher changes only endpoint configuration. It still uses the
 Python Psycopg adapter, mandatory exact allowlists, the same fixed seed, and the
 same disposable synthetic databases; no Java or JDBC driver is involved.
 The wildcard launcher changes only the column authorization syntax. Executed
 profiling SQL still enumerates quoted columns and never uses a projection star.
+The query launcher records only a SHA-256 query fingerprint and policy version
+in its profile. It never writes query text, query literals, backend messages,
+endpoints, or result rows to artifacts.
 
 Requirements are `initdb`, `pg_ctl`, `psql`, and either the installed
 `test-data-agent` command or `TDA_PYTHON=/path/to/python`. Set

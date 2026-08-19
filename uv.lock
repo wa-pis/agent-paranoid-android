@@ -54,6 +54,7 @@ parquet = [
 ]
 postgres = [
     { name = "psycopg" },
+    { name = "sqlglot" },
 ]
 trino = [
     { name = "sqlglot" },
@@ -88,6 +89,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.15.0" },
     { name = "sqlglot", marker = "extra == 'all'", specifier = ">=30.0.0" },
+    { name = "sqlglot", marker = "extra == 'postgres'", specifier = ">=30.0.0" },
     { name = "sqlglot", marker = "extra == 'trino'", specifier = ">=30.0.0" },
     { name = "trino", marker = "extra == 'all'", specifier = ">=0.330.0" },
     { name = "trino", marker = "extra == 'trino'", specifier = ">=0.330.0" },

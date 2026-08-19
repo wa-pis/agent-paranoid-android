@@ -18,11 +18,10 @@ DatasetProfile(query fingerprint, schema, aggregates)
 existing infer -> review -> generate -> validate -> export
 ```
 
-The initial public workflow SHOULD use a dedicated profile command or
-equivalent provider-specific profile flags, followed by existing commands.
-The exact CLI shape must be frozen with help and JSON golden tests before
-implementation. SQL is accepted from a file, not as a command-line string, to
-avoid shell history and process-list disclosure.
+The public workflow uses `profile-query QUERY_FILE --adapter postgres|trino`
+with explicit source id, virtual entity, and output options, followed by the
+existing pipeline commands. SQL is accepted from a file, not as a command-line
+string, to avoid shell history and process-list disclosure.
 
 ## Data And Contracts
 
@@ -42,9 +41,9 @@ subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, locking clauses, and multiple statements.
 
 Every physical table and source column resolves to the existing qualified
-allowlists. A projection star remains invalid until the separate qualified
-wildcard contract is implemented; then it is expanded to explicit authorized
-columns before trusted SQL construction.
+allowlists. A projection star is expanded to sorted explicit authorized
+columns through the separate qualified-wildcard contract before trusted SQL
+construction.
 
 The query is canonicalized only for local validation and SHA-256
 fingerprinting. The profile stores the fingerprint and a bounded policy
@@ -93,8 +92,8 @@ database examples.
   before database access.
 - Parse error, multiple statements, forbidden AST node/function, ambiguous or
   duplicate output name, or unauthorized reference: reject before execution.
-- Wildcard before its dependency is implemented: reject with a fixed
-  source-free policy error.
+- Wildcard expansion exceeds authorization or metadata budgets: reject with a
+  fixed source-free policy error before aggregate execution.
 - Schema introspection returns an unsupported type or unexpected result shape:
   fail the whole profile.
 - Timeout, scan/statement/result budget exhaustion, cancellation, backend

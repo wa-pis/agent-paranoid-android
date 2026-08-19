@@ -80,9 +80,18 @@ export POSTGRES_MAX_RESULT_ROWS=500
 export POSTGRES_MAX_RESULT_CELLS=5000
 export POSTGRES_MAX_SECONDS=30
 
-"${CLI[@]}" profile-postgres \
-  --local-category warehouse.public.orders.state \
-  --output "$OUTPUT/profile.json"
+if [[ "${POSTGRES_EXAMPLE_USE_QUERY:-false}" == "true" ]]; then
+  "${CLI[@]}" profile-query "$ROOT/query.sql" \
+    --adapter postgres \
+    --source-id warehouse \
+    --entity orders_query \
+    --local-category warehouse.orders_query.state \
+    --output "$OUTPUT/profile.json"
+else
+  "${CLI[@]}" profile-postgres \
+    --local-category warehouse.public.orders.state \
+    --output "$OUTPUT/profile.json"
+fi
 "${CLI[@]}" infer-spec "$OUTPUT/profile.json" \
   --output "$OUTPUT/dataset_spec.yaml"
 "${CLI[@]}" generate "$OUTPUT/dataset_spec.yaml" \
@@ -100,6 +109,15 @@ import sys
 
 profile = json.load(open(sys.argv[1], encoding="utf-8"))
 entities = {entity["name"]: entity for entity in profile["entities"]}
+if "warehouse.orders_query" in entities:
+    fields = {field["name"]: field for field in entities["warehouse.orders_query"]["fields"]}
+    assert list(fields) == ["order_id", "customer_id", "state", "doubled_amount", "expedited"]
+    assert len(profile["source_fingerprint"]) == 64
+    assert profile["source_policy_version"] == "1.0"
+    assert "999999" not in json.dumps(profile, sort_keys=True)
+    values = {item["value"] for item in fields["state"]["distribution"]["categories"]}
+    assert values == {"new", "paid", "shipped"}
+    raise SystemExit
 orders = {field["name"]: field for field in entities["warehouse.public.orders"]["fields"]}
 customers = {field["name"]: field for field in entities["warehouse.public.customers"]["fields"]}
 assert list(orders) == ["order_id", "customer_id", "state", "amount", "expedited"]
@@ -112,20 +130,30 @@ PY
 psql -h 127.0.0.1 -p "$PORT" -d apa_target -v ON_ERROR_STOP=1 \
   -f "$OUTPUT/generated.sql" >/dev/null
 
-COUNTS="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
-  -c 'SELECT (SELECT count(*) FROM "warehouse.public.customers"), (SELECT count(*) FROM "warehouse.public.orders"), (SELECT count(*) FROM "warehouse.public.orders" o LEFT JOIN "warehouse.public.customers" c ON c.customer_id = o.customer_id WHERE c.customer_id IS NULL);')"
-if [[ "$COUNTS" != "3|4|0" ]]; then
-  echo "Unexpected target counts or foreign-key coverage: $COUNTS" >&2
-  exit 1
+if [[ "${POSTGRES_EXAMPLE_USE_QUERY:-false}" == "true" ]]; then
+  COUNTS="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
+    -c 'SELECT count(*) FROM "warehouse.orders_query";')"
+  POLICY="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
+    -c "SELECT bool_and(state = ANY (ARRAY['new','paid','shipped'])) FROM \"warehouse.orders_query\";")"
+  if [[ "$COUNTS" != "4" || "$POLICY" != "t" ]]; then
+    echo "Unexpected query-source target result" >&2
+    exit 1
+  fi
+  echo "Disposable PostgreSQL query-source example complete: $OUTPUT"
+else
+  COUNTS="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
+    -c 'SELECT (SELECT count(*) FROM "warehouse.public.customers"), (SELECT count(*) FROM "warehouse.public.orders"), (SELECT count(*) FROM "warehouse.public.orders" o LEFT JOIN "warehouse.public.customers" c ON c.customer_id = o.customer_id WHERE c.customer_id IS NULL);')"
+  if [[ "$COUNTS" != "3|4|0" ]]; then
+    echo "Unexpected target counts or foreign-key coverage: $COUNTS" >&2
+    exit 1
+  fi
+  POLICY="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
+    -c "SELECT bool_and(state = ANY (ARRAY['new','paid','shipped'])) FROM \"warehouse.public.orders\";" \
+    -c "SELECT bool_and(status LIKE 'syn_%') FROM \"warehouse.public.customers\";")"
+  if [[ "$POLICY" != $'t\nt' ]]; then
+    echo "Selective local-value policy check failed" >&2
+    exit 1
+  fi
+  echo "Disposable PostgreSQL example complete: $OUTPUT"
+  echo "Target rows: customers=3, orders=4; foreign-key violations=0"
 fi
-
-POLICY="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
-  -c "SELECT bool_and(state = ANY (ARRAY['new','paid','shipped'])) FROM \"warehouse.public.orders\";" \
-  -c "SELECT bool_and(status LIKE 'syn_%') FROM \"warehouse.public.customers\";")"
-if [[ "$POLICY" != $'t\nt' ]]; then
-  echo "Selective local-value policy check failed" >&2
-  exit 1
-fi
-
-echo "Disposable PostgreSQL example complete: $OUTPUT"
-echo "Target rows: customers=3, orders=4; foreign-key violations=0"

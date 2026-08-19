@@ -39,6 +39,30 @@ test-data-agent profile-example data/example_dataset \
 This authorization remains local. External advisors receive deterministic
 field-scoped labels, and default MCP responses do not receive the exact enum.
 
+### SQL Query Source
+
+One reviewed local query file can shape a PostgreSQL or Trino virtual entity:
+
+```bash
+test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity paid_orders \
+  --output out/profile.json
+```
+
+The initial policy accepts exactly one fully qualified, single-table `SELECT`
+with explicit projections or an authorized qualified wildcard, bounded filters,
+and a small deterministic scalar-expression set. It rejects joins, CTEs,
+subqueries, set operations, windows, table functions, commands, volatile or
+unknown functions, multiple statements, and unauthorized references before
+derived aggregate work begins.
+
+The profile records `source_fingerprint` and `source_policy_version`, not SQL
+text or literals. The adapter performs a no-row schema probe followed by
+bounded aggregates. Query result rows are never returned, persisted, sent to a
+provider or MCP, or supplied to generation.
+
 ## DatasetSpec
 
 `DatasetSpec` is the reviewed, executable generation contract. It contains:

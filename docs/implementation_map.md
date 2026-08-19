@@ -138,6 +138,13 @@ wildcards through bounded table metadata into immutable deterministic explicit
 snapshots. Query builders receive only validated concrete identifiers; local
 value policy remains a separate exact-field boundary.
 
+`sql_query_source.py` owns the typed local query request, bounded stable file
+read, strict PostgreSQL/Trino AST subset, physical table/column authorization,
+explicit wildcard expansion, and source-free fingerprint. The paired
+`sql_query_profiling.py` and `sql_query_adapters.py` modules perform no-row
+derived schema inspection and aggregate-only virtual profile composition
+through the existing clients and budgets. They expose no query-row result.
+
 ## Trino MCP
 
 `src/test_data_agent/mcp_trino_transport.py`

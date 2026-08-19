@@ -27,6 +27,7 @@ from test_data_agent.io import (
     export_postgres_sql_command,
     infer_dataset_spec_command,
     profile_postgres_command,
+    profile_query_command,
     profile_csv_command,
     profile_example_command,
     validate_dataset_artifacts,
@@ -95,6 +96,22 @@ def run_dataset_command(
             purpose="PostgreSQL profiling",
         )
         return profile_postgres_command(args, driver=driver)
+
+    if args.command == "profile-query":
+        adapter = str(args.adapter)
+        extra = "postgres" if adapter == "postgres" else "trino"
+        DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+            "sqlglot",
+            extra=extra,
+            purpose="SQL query source profiling",
+        )
+        driver_module = "psycopg" if adapter == "postgres" else "trino"
+        driver = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+            driver_module,
+            extra=extra,
+            purpose="SQL query source profiling",
+        )
+        return profile_query_command(args, driver=driver)
 
     if args.command == "generate-from-csv":
         return generate_dataset_from_csv_command(

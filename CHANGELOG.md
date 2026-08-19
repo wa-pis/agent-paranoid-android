@@ -16,6 +16,11 @@ All notable changes to this project are documented here.
   deterministic explicit-column snapshots before aggregate work.
 - Add disposable PostgreSQL and Trino wildcard launchers that verify stable
   fields, deterministic generation, validation, and no copied source rows.
+- Add `profile-query` for one reviewed local PostgreSQL or Trino `SELECT`,
+  producing a virtual aggregate-only profile with a query fingerprint and no
+  query rows.
+- Add disposable PostgreSQL and Trino query-source launchers that run the
+  profile, infer, deterministic generation, and validation pipeline.
 
 ### Security
 
@@ -27,6 +32,11 @@ All notable changes to this project are documented here.
   or over-budget wildcard metadata before aggregate profiling. Wildcards never
   authorize projection stars, source rows, preserve-as-is, category literals,
   provider/MCP disclosure, logs, or errors.
+- Reject oversized, malformed, multi-statement, write, join, CTE, subquery,
+  set, window, table-function, volatile-function, unqualified, unauthorized,
+  or over-complex query sources before derived aggregate execution. Query
+  text, literals, backend errors, endpoints, and result rows are never
+  serialized or sent across provider/default-MCP boundaries.
 
 ## [1.2.0] - 2026-08-15
 

@@ -40,6 +40,18 @@ from test_data_agent.postgres_config import PostgresConfig
 from test_data_agent.postgres_profiler import PostgresProfileError, dataset_profile_from_postgres
 from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.safety import assert_profile_safe
+from test_data_agent.sql_query_adapters import (
+    profile_postgres_query_source,
+    profile_trino_query_source,
+)
+from test_data_agent.sql_query_profiling import SqlQueryProfileError
+from test_data_agent.sql_query_source import (
+    SqlQueryAdapter,
+    SqlQueryProfileLimits,
+    SqlQueryProfileRequest,
+    SqlQuerySourceError,
+)
+from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 BusinessRulesApplier = Callable[..., Any | None]
@@ -227,6 +239,45 @@ def profile_postgres_command(args: argparse.Namespace, *, driver: Any) -> int:
             local_category_fields=tuple(getattr(args, "local_category_fields", ())),
         )
     except (PostgresClientError, PostgresProfileError) as exc:
+        raise CliExternalServiceError(str(exc)) from None
+    write_dataset_profile_artifact(profile, args.output)
+    write_profile_summary(args.output)
+    return 0
+
+
+def profile_query_command(args: argparse.Namespace, *, driver: Any) -> int:
+    ensure_file_output_available(
+        args.output,
+        overwrite=getattr(args, "overwrite", False),
+    )
+    adapter = SqlQueryAdapter(args.adapter)
+    request = SqlQueryProfileRequest(
+        adapter=adapter,
+        source_id=args.source_id,
+        entity=args.entity,
+        query_file=args.query,
+        limits=SqlQueryProfileLimits.from_env(),
+    )
+    try:
+        if adapter is SqlQueryAdapter.POSTGRES:
+            profile = profile_postgres_query_source(
+                request,
+                config=PostgresConfig.from_env(),
+                driver=driver,
+                local_category_fields=tuple(
+                    getattr(args, "local_category_fields", ())
+                ),
+            )
+        else:
+            profile = profile_trino_query_source(
+                request,
+                config=TrinoConfig.from_env(),
+                driver=driver,
+                local_category_fields=tuple(
+                    getattr(args, "local_category_fields", ())
+                ),
+            )
+    except (SqlQueryProfileError, SqlQuerySourceError) as exc:
         raise CliExternalServiceError(str(exc)) from None
     write_dataset_profile_artifact(profile, args.output)
     write_profile_summary(args.output)

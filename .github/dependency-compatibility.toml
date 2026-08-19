@@ -32,6 +32,7 @@ upper_major = 2
 [dependencies.sqlglot]
 requirement = "sqlglot"
 extra = "trino"
+extras = ["postgres", "trino"]
 minimum = "30.0.0"
 latest = "30.13.0"
 

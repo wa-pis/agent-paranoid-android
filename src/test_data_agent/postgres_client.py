@@ -30,6 +30,13 @@ class PostgresBudgetExceeded(PostgresClientError):
     """Raised when cumulative PostgreSQL profiling work exceeds its budget."""
 
 
+@dataclass(frozen=True, slots=True)
+class PostgresResultColumn:
+    name: str
+    data_type: str
+    nullable: bool
+
+
 @dataclass(frozen=True)
 class PostgresClient:
     """Create injected-driver sessions with PostgreSQL read-only defaults."""
@@ -165,6 +172,55 @@ class PostgresProfileSession:
                 except Exception:
                     pass
 
+    def describe_no_rows(
+        self,
+        query: PostgresQuery,
+    ) -> tuple[PostgresResultColumn, ...]:
+        """Inspect a trusted zero-row query without retaining source values."""
+
+        if not isinstance(query, PostgresQuery):
+            raise TypeError("PostgreSQL execution requires a trusted PostgresQuery")
+        if self._connection is None:
+            raise PostgresConnectionError("PostgreSQL session is not open")
+        self._check_deadline()
+        if self._statements >= self._config.limits.max_statements:
+            raise PostgresBudgetExceeded("PostgreSQL statement budget exceeded")
+        self._statements += 1
+        cursor: Any = None
+        try:
+            cursor = self._connection.cursor()
+            cursor.execute(query.sql, query.parameters)
+            self._check_deadline()
+            description = tuple(cursor.description or ())
+            next_cells = self._result_cells + len(description)
+            if next_cells > self._config.limits.max_result_cells:
+                raise PostgresBudgetExceeded(
+                    "PostgreSQL result cell budget exceeded"
+                )
+            if cursor.fetchmany(1):
+                raise PostgresQueryError(
+                    "PostgreSQL schema inspection returned an unexpected row"
+                )
+            self._result_cells = next_cells
+            return tuple(
+                PostgresResultColumn(
+                    name=_description_value(item, "name", 0),
+                    data_type=_postgres_type_name(self._connection, item),
+                    nullable=_description_nullable(item),
+                )
+                for item in description
+            )
+        except (PostgresBudgetExceeded, PostgresQueryError):
+            raise
+        except Exception:
+            raise PostgresQueryError("PostgreSQL profiling query failed") from None
+        finally:
+            if cursor is not None:
+                try:
+                    cursor.close()
+                except Exception:
+                    pass
+
     def _resolve_password(self) -> str | None:
         if self._config.password_env is None:
             return None
@@ -178,3 +234,45 @@ class PostgresProfileSession:
     def _check_deadline(self) -> None:
         if self._clock() >= self._deadline:
             raise PostgresBudgetExceeded("PostgreSQL session deadline exceeded")
+
+
+def _description_value(item: Any, attribute: str, index: int) -> str:
+    value = getattr(item, attribute, None)
+    if value is None:
+        try:
+            value = item[index]
+        except (IndexError, TypeError):
+            value = None
+    if not isinstance(value, str) or not value:
+        raise PostgresQueryError("PostgreSQL schema metadata is invalid")
+    return value
+
+
+def _postgres_type_name(connection: Any, item: Any) -> str:
+    type_code = getattr(item, "type_code", None)
+    if type_code is None:
+        try:
+            type_code = item[1]
+        except (IndexError, TypeError):
+            type_code = None
+    name = getattr(type_code, "name", None)
+    if isinstance(name, str) and name:
+        return name
+    try:
+        type_info = connection.adapters.types.get(type_code)
+    except (AttributeError, KeyError, TypeError):
+        type_info = None
+    name = getattr(type_info, "name", None)
+    if not isinstance(name, str) or not name:
+        raise PostgresQueryError("PostgreSQL schema metadata is invalid")
+    return name
+
+
+def _description_nullable(item: Any) -> bool:
+    value = getattr(item, "null_ok", None)
+    if value is None:
+        try:
+            value = item[6]
+        except (IndexError, TypeError):
+            value = None
+    return True if value is None else bool(value)
