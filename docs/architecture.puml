@@ -49,7 +49,6 @@ package "Domain-Agnostic Dataset Flow" {
   package "profiling/" {
     component "csv_profiler.py\nSingle CSV profiling" as CsvProfiler
     component "schema_profiler.py\nCSV folder schema profiling" as SchemaProfiler
-    component "distribution_profiler.py\nSafe distributions" as DistributionProfiler
     component "relationship_profiler.py\nFK inference" as RelationshipProfiler
     component "constraint_miner.py\nFormula, temporal,\nconditional, aggregate inference" as ConstraintMiner
   }
