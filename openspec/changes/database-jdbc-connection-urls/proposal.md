@@ -30,6 +30,8 @@ In scope:
 - Deterministic precedence and fail-closed conflict handling when URL and
   component settings are both supplied.
 - Redacted validation, diagnostics, and tests using placeholder endpoints.
+- Runnable PostgreSQL and Trino examples that reuse the existing disposable
+  synthetic services and complete the normal profile-to-generation workflow.
 
 Out of scope:
 
@@ -60,6 +62,10 @@ Existing component environment variables and Python constructors remain
 supported. JDBC URL support is additive. Supplying both forms with conflicting
 explicit values fails before network access rather than selecting one
 silently. The base package gains no Java or database dependency.
+
+The existing component-based examples remain the default baseline. JDBC
+launchers are additive and must not require real credentials or production
+infrastructure.
 
 ## Release Impact
 

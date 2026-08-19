@@ -47,3 +47,27 @@ initialization behavior, TLS verification downgrades, and unknown properties.
 - **WHEN** configuration is validated
 - **THEN** validation fails before client construction
 - **AND** neither value is disclosed in the error
+
+### Requirement: Runnable JDBC Source Examples
+
+The repository SHALL provide separate PostgreSQL and Trino JDBC launchers that
+reuse disposable synthetic services and exercise the installed public package
+through safe profiling and deterministic generation.
+
+#### Scenario: PostgreSQL JDBC example runs
+
+- **GIVEN** an installed package with the `postgres` extra and local PostgreSQL
+  test tools
+- **WHEN** `examples/local_postgres/run-jdbc.sh` runs with a new output path
+- **THEN** it uses a placeholder JDBC-style endpoint and mandatory exact
+  allowlists to profile, infer, generate, validate, and export SQL
+- **AND** artifacts report synthetic output with no copied source rows
+
+#### Scenario: Trino JDBC example runs
+
+- **GIVEN** an installed package with the `trino` extra and the existing pinned
+  disposable Trino service
+- **WHEN** `examples/local_trino/run-jdbc.sh` runs with a new output path
+- **THEN** it uses a placeholder JDBC-style endpoint and mandatory allowlists
+  to build a safe aggregate profile and deterministic generated output
+- **AND** no JDBC URL, credential, endpoint, or source row appears in artifacts

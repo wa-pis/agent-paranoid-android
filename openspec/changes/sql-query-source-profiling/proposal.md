@@ -46,6 +46,8 @@ In scope:
 - A source-free profile containing a query fingerprint, safe schema metadata,
   aggregates, assumptions, and warnings.
 - The existing `infer-spec`, review, generate, validate, and export stages.
+- Runnable PostgreSQL and Trino query-source examples using checked-in SQL over
+  disposable synthetic sources and the complete deterministic pipeline.
 
 Out of scope:
 
@@ -81,6 +83,10 @@ This is an additive source-profiling surface. Existing CSV, PostgreSQL table,
 Trino, MCP, Python, `DatasetProfile`, `DatasetSpec`, generation, validation,
 and output contracts retain their defaults. Generated data remains synthetic
 and deterministic under an explicit seed.
+
+Existing table-profile examples remain available. Query examples are additive
+and must identify their virtual entity and source fingerprint without storing
+the SQL text in generated artifacts.
 
 ## Release Impact
 

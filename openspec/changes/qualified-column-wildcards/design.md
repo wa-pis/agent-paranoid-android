@@ -46,6 +46,28 @@ Local category preservation continues to use an exact entity-and-field
 selector. A wildcard must never expand a preservation allowlist or authorize
 exact source literals.
 
+## Runnable Examples
+
+Add explicit wildcard launchers beside the current disposable examples:
+
+- `examples/local_postgres/run-wildcard.sh OUTPUT` configures
+  `public.customers.*` and `public.orders.*` while retaining exact schema/table
+  allowlists and the existing narrow budgets.
+- `examples/local_trino/run-wildcard.sh OUTPUT` configures
+  `tpch.tiny.nation.*` while unrestricted mode remains disabled and exact
+  catalog/schema authorization remains mandatory.
+
+Each launcher completes the existing safe profile-to-generation workflow from
+an installed wheel with a fixed seed. It checks the exact expected field set,
+stable field ordering, `source_rows_copied: false` in the synthetic manifest,
+and successful validation. The PostgreSQL example also proves that wildcard
+profiling does not authorize preserve-as-is: exact local-category selection
+remains independently required.
+
+Fake adapter tests capture every generated statement and assert that no
+projection star reaches a query builder or client. The disposable examples use
+only synthetic built-in or checked-in data and follow existing cleanup gates.
+
 ## Failure Modes
 
 - Bare, partially qualified, repeated, or embedded wildcard: reject before
