@@ -174,16 +174,16 @@ The current dependencies after completed extraction increments are:
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | `io/path_policy.py` | descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
-| `trino_config.py` | environment parsing, credential-free JDBC-style endpoint normalization, validated catalog/schema defaults, connection settings, allowlist inputs, and resource budgets |
-| `postgres_config.py` | PostgreSQL source identity, credential-free JDBC-style endpoint normalization, connection settings, mandatory schema/table/column allowlists, secret indirection, and profiling budgets |
+| `trino_config.py` | environment parsing, credential-free JDBC-style endpoint normalization, validated catalog/schema defaults, typed exact/table-wildcard column selectors, connection settings, allowlist inputs, and resource budgets |
+| `postgres_config.py` | PostgreSQL source identity, credential-free JDBC-style endpoint normalization, connection settings, typed mandatory exact/table-wildcard column selectors, secret indirection, and profiling budgets |
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
 | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
-| `postgres_profiler.py` | complete allowlisted PostgreSQL metadata/aggregate normalization into qualified `DatasetProfile` entities and declared relationships |
+| `postgres_profiler.py` | bounded wildcard metadata expansion plus complete allowlisted PostgreSQL aggregate normalization into qualified `DatasetProfile` entities and declared relationships |
 | `postgres_sql_export.py` | deterministic validated PostgreSQL DDL/INSERT rendering and atomic one-file publication without source access |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
 | `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
-| `trino_profiling.py` | allowlisted metadata and aggregate-only profiling orchestration with injected query fetching |
+| `trino_profiling.py` | allowlisted metadata, deterministic wildcard expansion/preflight, and aggregate-only profiling orchestration with injected query fetching |
 | `trino_masking.py` | sensitive-value masking, synthetic category summaries, safe column completion, and opt-in safe-select masking |
 | Trino MCP server | audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory |
 | MCP transport modules | optional FastMCP and audit wrapping around supplied callables |

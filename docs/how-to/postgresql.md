@@ -21,6 +21,19 @@ export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
 export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state
 ```
 
+For an intentionally table-wide aggregate profile, an entry may instead use
+the exact `schema.table.*` form:
+
+```bash
+export POSTGRES_ALLOWED_COLUMNS='public.customers.*,public.orders.*'
+```
+
+The parent tables must still appear exactly in `POSTGRES_ALLOWED_TABLES`.
+Before any aggregate runs, bounded PostgreSQL catalog metadata expands each
+wildcard into a frozen, sorted explicit-column snapshot. Profiling queries
+enumerate quoted column identifiers; they never execute `SELECT *`. Bare,
+schema-wide, table-name, embedded, or over-budget wildcards fail closed.
+
 If a platform portal supplies a JDBC endpoint, replace only the separate host,
 port, database, and TLS settings with a credential-free JDBC-style URL:
 
@@ -80,7 +93,9 @@ test-data-agent profile-postgres \
 
 PII, secrets, identifiers, quasi-identifiers, free text, excessive cardinality,
 and long values fail closed. Original literals are not sent to providers, MCP,
-logs, or errors.
+logs, or errors. A column wildcard is not a local-value policy: exact values
+are considered only when the separate, fully qualified `--local-category`
+selector is present and its content checks pass.
 
 The selector authorizes only the bounded value domain and aggregate counts. It
 does not retain source row order or a mapping that reconstructs source rows.
@@ -116,4 +131,5 @@ example. It creates a SELECT-only role, proves that writes are denied, profiles
 two related tables, validates deterministic generation, executes the exported
 SQL in an empty target database, and removes the cluster. Run
 `examples/local_postgres/run-jdbc.sh OUTPUT` for the same workflow configured by
-a placeholder JDBC-style URL.
+a placeholder JDBC-style URL, or `examples/local_postgres/run-wildcard.sh
+OUTPUT` for bounded table-qualified wildcard expansion.

@@ -71,6 +71,13 @@ The profiler accepts no caller SQL and reads no source rows. Qualified local
 category selectors may retain only values that pass the selective local policy
 above.
 
+PostgreSQL `schema.table.*` and Trino `catalog.schema.table.*` column selectors
+are authorization syntax, not SQL. They are expanded from bounded metadata for
+one exact allowed table into a deterministic explicit-column snapshot before
+aggregates run. They do not authorize source rows, local exact values, category
+literals, caller projection stars, providers, default MCP literals, logs, or
+errors.
+
 PostgreSQL and Trino may accept credential-free JDBC-style endpoint syntax.
 Parsing happens before client construction and rejects userinfo, secrets,
 session-changing or unknown properties, malformed escapes, ambiguous paths,

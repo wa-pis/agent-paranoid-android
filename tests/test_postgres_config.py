@@ -7,7 +7,9 @@ import pytest
 from test_data_agent.postgres_config import (
     PostgresConfig,
     PostgresConfigurationError,
+    parse_postgres_column_selector,
     parse_postgres_jdbc_url,
+    with_resolved_postgres_columns,
 )
 
 
@@ -106,6 +108,52 @@ def test_postgres_config_rejects_scope_escalation(
 
     with pytest.raises(PostgresConfigurationError, match="within allowed tables"):
         PostgresConfig.from_env()
+
+
+def test_postgres_config_accepts_only_table_qualified_column_wildcard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv("POSTGRES_ALLOWED_COLUMNS", "public.employees.*")
+
+    config = PostgresConfig.from_env()
+    selector = parse_postgres_column_selector(next(iter(config.allowed_columns)))
+
+    assert selector.is_wildcard is True
+    assert selector.table_name == "public.employees"
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["*", "public.*", "*.employees.*", "public.*.*", "public.employees.sta*"],
+)
+def test_postgres_config_rejects_unqualified_or_pattern_wildcards(
+    monkeypatch: pytest.MonkeyPatch,
+    value: str,
+) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv("POSTGRES_ALLOWED_COLUMNS", value)
+
+    with pytest.raises(PostgresConfigurationError, match="schema.table.column"):
+        PostgresConfig.from_env()
+
+
+def test_internal_resolved_snapshot_cannot_broaden_exact_selectors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    config = PostgresConfig.from_env()
+
+    with pytest.raises(PostgresConfigurationError, match="exact allowed columns"):
+        with_resolved_postgres_columns(
+            config,
+            frozenset(
+                {
+                    "public.employees.employee_id",
+                    "public.employees.private_note",
+                }
+            ),
+        )
 
 
 def test_postgres_config_validates_direct_scope_input(

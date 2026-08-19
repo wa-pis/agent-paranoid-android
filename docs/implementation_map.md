@@ -127,10 +127,16 @@ Public dataset-oriented commands:
 `src/test_data_agent/postgres_config.py` and
 `src/test_data_agent/trino_config.py` own environment parsing, credential-free
 JDBC-style URL normalization, deterministic component-conflict checks,
-allowlists, and resource budgets. They discard the input URL before returning
+typed exact/table-wildcard column selectors, allowlists, and resource budgets.
+They discard the input URL before returning
 the existing typed Python client configuration. `postgres_client.py` and
 `trino_client.py` remain unaware of JDBC syntax; Trino receives only validated
 allowlisted catalog/schema defaults.
+
+`postgres_profiler.py` and `trino_profiling.py` expand qualified column
+wildcards through bounded table metadata into immutable deterministic explicit
+snapshots. Query builders receive only validated concrete identifiers; local
+value policy remains a separate exact-field boundary.
 
 ## Trino MCP
 

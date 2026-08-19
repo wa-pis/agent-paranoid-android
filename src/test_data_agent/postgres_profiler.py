@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
@@ -14,10 +14,16 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.postgres_client import PostgresClient
-from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.postgres_config import (
+    PostgresConfig,
+    PostgresConfigurationError,
+    parse_postgres_column_selector,
+    with_resolved_postgres_columns,
+)
 from test_data_agent.postgres_query_builders import (
     PostgresQuery,
     build_column_summary_query,
+    build_column_discovery_query,
     build_columns_query,
     build_foreign_keys_query,
     build_list_tables_query,
@@ -50,14 +56,90 @@ class PostgresProfiler:
         categories = tuple(local_category_fields)
         table_rows = self.fetch_query(build_list_tables_query(self.config))
         tables = self._complete_tables(table_rows)
-        entities = [self._profile_table(*table, categories) for table in tables]
-        relationships = self._relationships(entities)
+        profiler = replace(self, config=self._expanded_config(tables))
+        entities = [profiler._profile_table(*table, categories) for table in tables]
+        relationships = profiler._relationships(entities)
         return DatasetProfile(
             source_type="postgres",
             entities=entities,
             relationships=relationships,
             local_category_fields=list(categories),
         )
+
+    def _expanded_config(
+        self,
+        tables: Sequence[tuple[str, str]],
+    ) -> PostgresConfig:
+        selectors = tuple(
+            parse_postgres_column_selector(value)
+            for value in sorted(self.config.allowed_columns)
+        )
+        explicit = {
+            selector.qualified_name
+            for selector in selectors
+            if not selector.is_wildcard
+        }
+        for selector in selectors:
+            if not selector.is_wildcard:
+                continue
+            rows = self.fetch_query(
+                build_column_discovery_query(
+                    self.config,
+                    selector.schema,
+                    selector.table,
+                )
+            )
+            discovered = self._discovered_column_names(
+                selector.schema,
+                selector.table,
+                rows,
+            )
+            explicit.update(
+                f"{selector.schema}.{selector.table}.{column}"
+                for column in discovered
+            )
+        table_names = {f"{schema}.{table}" for schema, table in tables}
+        covered_tables = {
+            ".".join(column.split(".", maxsplit=2)[:2]) for column in explicit
+        }
+        if covered_tables != table_names:
+            raise PostgresProfileError(
+                "PostgreSQL column selectors do not cover every allowed table"
+            )
+        if len(explicit) > self.config.limits.max_columns:
+            raise PostgresProfileError(
+                "PostgreSQL expanded column snapshot exceeds its budget"
+            )
+        return with_resolved_postgres_columns(
+            self.config,
+            frozenset(explicit),
+        )
+
+    def _discovered_column_names(
+        self,
+        schema: str,
+        table: str,
+        rows: Sequence[dict[str, object]],
+    ) -> tuple[str, ...]:
+        names = [_required_text(row, "column_name") for row in rows]
+        if not names or len(names) != len(set(names)):
+            raise PostgresProfileError(
+                "PostgreSQL wildcard column metadata is incomplete"
+            )
+        try:
+            selectors = tuple(
+                parse_postgres_column_selector(f"{schema}.{table}.{name}")
+                for name in names
+            )
+        except PostgresConfigurationError:
+            raise PostgresProfileError(
+                "PostgreSQL wildcard column metadata is invalid"
+            ) from None
+        if len(selectors) > self.config.limits.max_columns:
+            raise PostgresProfileError(
+                "PostgreSQL expanded column snapshot exceeds its budget"
+            )
+        return tuple(sorted(selector.column for selector in selectors if selector.column))
 
     def _complete_tables(
         self, rows: Sequence[dict[str, object]]
@@ -135,7 +217,7 @@ class PostgresProfiler:
     ) -> tuple[dict[str, object], ...]:
         expected = {
             value.split(".", maxsplit=2)[2]
-            for value in self.config.allowed_columns
+            for value in (self.config.resolved_columns or self.config.allowed_columns)
             if value.startswith(f"{schema}.{table}.")
         }
         discovered = [_required_text(row, "column_name") for row in rows]

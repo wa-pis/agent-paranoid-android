@@ -21,9 +21,18 @@ Run the same workflow with a credential-free JDBC-style endpoint:
 examples/local_postgres/run-jdbc.sh /tmp/agent-paranoid-postgres-jdbc-example
 ```
 
+Run it with table-qualified column wildcards that are expanded through bounded
+metadata into explicit columns before aggregate profiling:
+
+```bash
+examples/local_postgres/run-wildcard.sh /tmp/agent-paranoid-postgres-wildcard-example
+```
+
 The second launcher changes only endpoint configuration. It still uses the
 Python Psycopg adapter, mandatory exact allowlists, the same fixed seed, and the
 same disposable synthetic databases; no Java or JDBC driver is involved.
+The wildcard launcher changes only the column authorization syntax. Executed
+profiling SQL still enumerates quoted columns and never uses a projection star.
 
 Requirements are `initdb`, `pg_ctl`, `psql`, and either the installed
 `test-data-agent` command or `TDA_PYTHON=/path/to/python`. Set

@@ -38,6 +38,11 @@ export TRINO_USER=synthetic_example
 export TRINO_ALLOW_INSECURE_HTTP=true
 export TRINO_ALLOWED_CATALOGS=tpch
 export TRINO_ALLOWED_SCHEMAS=tiny
+if [[ "${TRINO_EXAMPLE_USE_WILDCARD:-false}" == "true" ]]; then
+  export TRINO_ALLOWED_TABLE_COLUMNS='tpch.tiny.nation.*'
+else
+  unset TRINO_ALLOWED_TABLE_COLUMNS
+fi
 export TRINO_MAX_RESULT_ROWS=100
 export TRINO_QUERY_MAX_EXECUTION_TIME=30s
 export TRINO_QUERY_MAX_RUN_TIME=45s

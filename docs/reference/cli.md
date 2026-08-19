@@ -76,6 +76,9 @@ schema/table/column allowlists, and follow the
 [PostgreSQL workflow](../how-to/postgresql.md). The command accepts either the
 existing endpoint components or a credential-free `POSTGRES_JDBC_URL`; the URL
 is environment configuration rather than a command-line argument.
+`POSTGRES_ALLOWED_COLUMNS` accepts exact `schema.table.column` entries and the
+bounded table-qualified `schema.table.*` convenience form. The command never
+turns that selector into `SELECT *`.
 
 The complete deterministic path is:
 

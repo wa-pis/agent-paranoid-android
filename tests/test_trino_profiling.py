@@ -132,6 +132,167 @@ def test_profiler_coordinates_aggregate_only_safe_table_profile() -> None:
     assert "trino.internal" not in repr(profile)
 
 
+def test_qualified_wildcard_expands_metadata_in_stable_order() -> None:
+    queries: list[TrinoQuery] = []
+    column_calls: list[str] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "information_schema.columns" in query.sql:
+            return [
+                {
+                    "column_name": "status",
+                    "data_type": "varchar",
+                    "is_nullable": "YES",
+                },
+                {
+                    "column_name": "amount",
+                    "data_type": "double",
+                    "is_nullable": "NO",
+                },
+            ]
+        if query.sql.startswith("SELECT count(*) AS row_count"):
+            return [{"row_count": 12}]
+        raise AssertionError(query.sql)
+
+    config = replace(
+        profiler_config(),
+        allowed_table_columns=frozenset(
+            {"analytics.safe_schema.orders.*"}
+        ),
+    )
+    profile = TrinoProfiler(config=config, fetch_query=fetch_query).profile_table_safe(
+        "analytics",
+        "safe_schema",
+        "orders",
+        max_top_values=20,
+        column_profiler=lambda *_args: {
+            "name": column_calls.append(str(_args[3])) or str(_args[3])
+        },
+    )
+
+    assert column_calls == ["amount", "status"]
+    assert [column["name"] for column in profile["columns"]] == [
+        "amount",
+        "status",
+    ]
+    assert queries[0].sql.startswith("SELECT column_name, data_type, is_nullable")
+    assert all("SELECT *" not in query.sql.upper() for query in queries)
+
+
+def test_exact_trino_selectors_filter_profile_metadata() -> None:
+    profiled: list[str] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        if "information_schema.columns" in query.sql:
+            return [
+                {
+                    "column_name": "private_note",
+                    "data_type": "varchar",
+                    "is_nullable": "YES",
+                },
+                {
+                    "column_name": "status",
+                    "data_type": "varchar",
+                    "is_nullable": "NO",
+                },
+            ]
+        return [{"row_count": 2}]
+
+    config = replace(
+        profiler_config(),
+        allowed_table_columns=frozenset(
+            {"analytics.safe_schema.orders.status"}
+        ),
+    )
+    TrinoProfiler(config=config, fetch_query=fetch_query).profile_table_safe(
+        "analytics",
+        "safe_schema",
+        "orders",
+        max_top_values=20,
+        column_profiler=lambda *_args: {
+            "name": profiled.append(str(_args[3])) or str(_args[3])
+        },
+    )
+
+    assert profiled == ["status"]
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        [],
+        [
+            {"column_name": "status", "data_type": "varchar", "is_nullable": "YES"},
+            {"column_name": "status", "data_type": "varchar", "is_nullable": "YES"},
+        ],
+        [{"column_name": "bad-name", "data_type": "varchar", "is_nullable": "YES"}],
+    ],
+)
+def test_trino_wildcard_rejects_incomplete_or_malformed_metadata(
+    metadata: list[dict[str, Any]],
+) -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "information_schema.columns" in query.sql:
+            return metadata
+        raise AssertionError("aggregate query must not execute")
+
+    config = replace(
+        profiler_config(),
+        allowed_table_columns=frozenset(
+            {"analytics.safe_schema.orders.*"}
+        ),
+    )
+
+    with pytest.raises(AllowlistError, match="metadata"):
+        TrinoProfiler(config=config, fetch_query=fetch_query).profile_table_safe(
+            "analytics",
+            "safe_schema",
+            "orders",
+            max_top_values=20,
+            column_profiler=lambda *_args: {"name": "must-not-run"},
+        )
+
+    assert len(queries) == 1
+
+
+def test_trino_exact_selector_rejects_metadata_mismatch_before_aggregate() -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "information_schema.columns" in query.sql:
+            return [
+                {
+                    "column_name": "amount",
+                    "data_type": "double",
+                    "is_nullable": "NO",
+                }
+            ]
+        raise AssertionError("aggregate query must not execute")
+
+    config = replace(
+        profiler_config(),
+        allowed_table_columns=frozenset(
+            {"analytics.safe_schema.orders.status"}
+        ),
+    )
+
+    with pytest.raises(AllowlistError, match="configured allowlist"):
+        TrinoProfiler(config=config, fetch_query=fetch_query).profile_table_safe(
+            "analytics",
+            "safe_schema",
+            "orders",
+            max_top_values=20,
+            column_profiler=lambda *_args: {"name": "must-not-run"},
+        )
+
+    assert len(queries) == 1
+
+
 def test_nested_table_profile_shares_monotonic_cumulative_budget() -> None:
     columns = [
         {
@@ -189,10 +350,10 @@ def test_nested_table_profile_shares_monotonic_cumulative_budget() -> None:
         invoke()
 
     assert error.value.dimension is QueryWorkDimension.PROFILED_COLUMNS
-    assert len(queries) == 4
-    assert budget.snapshot().profiled_columns == 2
-    assert budget.snapshot().statements == 4
-    assert budget.snapshot().cumulative_estimated_scan_bytes == 40
+    assert len(queries) == 1
+    assert budget.snapshot().profiled_columns == 0
+    assert budget.snapshot().statements == 1
+    assert budget.snapshot().cumulative_estimated_scan_bytes == 10
     assert current_query_work_budget() is None
 
 
@@ -243,8 +404,8 @@ def test_wide_table_profile_stops_before_default_101st_column() -> None:
     assert error.value.dimension is QueryWorkDimension.PROFILED_COLUMNS
     assert error.value.attempted == 101
     assert error.value.limit == 100
-    assert profiled_columns == [f"column_{index}" for index in range(100)]
-    assert budget.snapshot().profiled_columns == 100
+    assert profiled_columns == []
+    assert budget.snapshot().profiled_columns == 0
 
 
 def test_nested_table_profile_stops_before_column_after_shared_deadline() -> None:
@@ -294,7 +455,7 @@ def test_nested_table_profile_stops_before_column_after_shared_deadline() -> Non
     assert error.value.dimension is QueryWorkDimension.INVOCATION_SECONDS
     assert len(queries) == 2
     assert budget.snapshot().statements == 2
-    assert budget.snapshot().profiled_columns == 0
+    assert budget.snapshot().profiled_columns == 1
     assert current_query_work_budget() is None
 
 

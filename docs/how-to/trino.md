@@ -16,9 +16,18 @@ export TRINO_USER=test_data_agent
 export TRINO_HTTP_SCHEME=https
 export TRINO_ALLOWED_CATALOGS=warehouse
 export TRINO_ALLOWED_SCHEMAS=analytics
+export TRINO_ALLOWED_TABLE_COLUMNS='warehouse.analytics.orders.*'
 export TRINO_DEPLOYMENT_PROFILE=shared-hardened
 export TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES=1073741824
 ```
+
+`TRINO_ALLOWED_TABLE_COLUMNS` is optional for compatibility. When set, an
+entry is either one exact `catalog.schema.table.column` or the exact
+`catalog.schema.table.*` form. Wildcards require restricted mode and catalog
+and schema membership in the mandatory allowlists. Bounded
+`information_schema` metadata is validated and sorted before the first table
+aggregate; the complete column budget is charged in preflight. Executed
+profiling SQL still quotes explicit columns and never projects `*`.
 
 The same endpoint and optional request defaults can come from a credential-free
 JDBC-style URL:
@@ -41,6 +50,11 @@ tables, and compute bounded aggregate profiles. They do not return source rows
 or raw category literals. Table and column profiling share cumulative
 statement, column, deadline, response, and optional scan budgets.
 
+A wildcard authorizes aggregate profiling scope only. It does not authorize
+category literals, preserve-as-is, caller SQL stars, row-returning tools,
+provider payloads, default MCP literals, logs, or errors. Exact table-column
+entries retain their existing bounded category-summary policy.
+
 Start the Trino MCP server only after `doctor` reports valid configuration:
 
 ```bash
@@ -62,6 +76,8 @@ examples/local_trino/run.sh /tmp/agent-paranoid-trino-example
 
 Use `examples/local_trino/run-jdbc.sh OUTPUT` to run the identical disposable
 workflow with its endpoint and `tpch/tiny` defaults supplied in JDBC syntax.
+Use `examples/local_trino/run-wildcard.sh OUTPUT` to exercise bounded
+`tpch.tiny.nation.*` expansion and deterministic field ordering.
 
 The example removes its container on success or failure and leaves only the
 safe profile, reviewed spec, generated rows, validation report, manifest, and a

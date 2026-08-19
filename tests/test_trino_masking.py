@@ -202,6 +202,45 @@ def test_masker_profile_column_safe_returns_top_values_for_allowlisted_table_col
     assert any("GROUP BY" in query.sql for query in queries)
 
 
+def test_wildcard_profile_scope_does_not_authorize_category_values() -> None:
+    queries: list[TrinoQuery] = []
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        queries.append(query)
+        if "GROUP BY" in query.sql:
+            raise AssertionError("wildcard must not authorize category values")
+        return [
+            {
+                "row_count": 10,
+                "non_null_count": 10,
+                "approx_distinct_count": 2,
+            }
+        ]
+
+    config = replace(
+        masker_config(),
+        allowed_table_columns=frozenset(
+            {"analytics.safe_schema.customers.*"}
+        ),
+    )
+    profile = TrinoMasker(
+        config=config,
+        fetch_query=fetch_query,
+        fetch_sql=reject_sql,
+    ).profile_column_safe(
+        "analytics",
+        "safe_schema",
+        "customers",
+        "country_code",
+        "varchar",
+        False,
+        20,
+    )
+
+    assert "top_values" not in profile
+    assert len(queries) == 1
+
+
 def test_masker_suppresses_sensitive_numeric_summaries_at_query_boundary() -> None:
     queries: list[TrinoQuery] = []
 

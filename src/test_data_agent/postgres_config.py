@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import re
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from urllib.parse import parse_qsl, unquote, urlsplit
 
 
@@ -24,6 +24,26 @@ class PostgresJdbcEndpoint:
     port: int | None
     database: str
     sslmode: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class PostgresColumnSelector:
+    schema: str
+    table: str
+    column: str | None
+
+    @property
+    def is_wildcard(self) -> bool:
+        return self.column is None
+
+    @property
+    def table_name(self) -> str:
+        return f"{self.schema}.{self.table}"
+
+    @property
+    def qualified_name(self) -> str:
+        column = "*" if self.column is None else self.column
+        return f"{self.table_name}.{column}"
 
 
 @dataclass(frozen=True)
@@ -76,6 +96,12 @@ class PostgresConfig:
     statement_timeout_ms: int = 30_000
     lock_timeout_ms: int = 5_000
     limits: PostgresProfileLimits = field(default_factory=PostgresProfileLimits)
+    resolved_columns: frozenset[str] | None = field(
+        default=None,
+        init=False,
+        repr=False,
+        compare=False,
+    )
 
     @classmethod
     def from_env(cls) -> PostgresConfig:
@@ -107,7 +133,7 @@ class PostgresConfig:
             allow_insecure=_bool_env("POSTGRES_ALLOW_INSECURE"),
             allowed_schemas=_required_allowlist("POSTGRES_ALLOWED_SCHEMAS", 1),
             allowed_tables=_required_allowlist("POSTGRES_ALLOWED_TABLES", 2),
-            allowed_columns=_required_allowlist("POSTGRES_ALLOWED_COLUMNS", 3),
+            allowed_columns=_required_column_allowlist(),
             statement_timeout_ms=_positive_int_env(
                 "POSTGRES_STATEMENT_TIMEOUT_MS", 30_000
             ),
@@ -150,6 +176,13 @@ class PostgresConfig:
             self.allowed_tables,
             self.allowed_columns,
         )
+        if self.resolved_columns is not None:
+            _validate_resolved_columns(
+                self.allowed_tables,
+                self.allowed_columns,
+                self.resolved_columns,
+                self.limits.max_columns,
+            )
 
 
 def parse_postgres_jdbc_url(value: str) -> PostgresJdbcEndpoint:
@@ -197,6 +230,43 @@ def parse_postgres_jdbc_url(value: str) -> PostgresJdbcEndpoint:
     )
 
 
+def parse_postgres_column_selector(value: str) -> PostgresColumnSelector:
+    """Parse one exact column or one table-qualified wildcard."""
+
+    components = value.split(".")
+    if len(components) != 3:
+        raise PostgresConfigurationError(
+            "POSTGRES_ALLOWED_COLUMNS entries must be "
+            "schema.table.column identifiers or a schema.table.* wildcard"
+        )
+    schema, table, column = components
+    if not _IDENTIFIER_RE.fullmatch(schema) or not _IDENTIFIER_RE.fullmatch(table):
+        raise PostgresConfigurationError(
+            "POSTGRES_ALLOWED_COLUMNS entries must be "
+            "schema.table.column identifiers or a schema.table.* wildcard"
+        )
+    if column == "*":
+        return PostgresColumnSelector(schema=schema, table=table, column=None)
+    if not _IDENTIFIER_RE.fullmatch(column):
+        raise PostgresConfigurationError(
+            "POSTGRES_ALLOWED_COLUMNS entries must be "
+            "schema.table.column identifiers or a schema.table.* wildcard"
+        )
+    return PostgresColumnSelector(schema=schema, table=table, column=column)
+
+
+def with_resolved_postgres_columns(
+    config: PostgresConfig,
+    columns: frozenset[str],
+) -> PostgresConfig:
+    """Return an internal immutable config snapshot for trusted query builders."""
+
+    resolved = replace(config)
+    object.__setattr__(resolved, "resolved_columns", columns)
+    resolved.validate()
+    return resolved
+
+
 def _postgres_jdbc_endpoint_from_env() -> PostgresJdbcEndpoint | None:
     value = os.environ.get("POSTGRES_JDBC_URL")
     if value is None:
@@ -223,11 +293,39 @@ def _validate_scope(
                 "POSTGRES_ALLOWED_TABLES must stay within allowed schemas"
             )
     for column in columns:
-        _validate_qualified_identifier(column, 3, "POSTGRES_ALLOWED_COLUMNS")
-        schema, table, _ = column.split(".", maxsplit=2)
-        if f"{schema}.{table}" not in tables:
+        selector = parse_postgres_column_selector(column)
+        if selector.table_name not in tables:
             raise PostgresConfigurationError(
                 "POSTGRES_ALLOWED_COLUMNS must stay within allowed tables"
+            )
+
+
+def _validate_resolved_columns(
+    tables: frozenset[str],
+    configured_columns: frozenset[str],
+    columns: frozenset[str],
+    max_columns: int,
+) -> None:
+    if not columns:
+        raise PostgresConfigurationError(
+            "PostgreSQL resolved column snapshot must not be empty"
+        )
+    if len(columns) > max_columns:
+        raise PostgresConfigurationError(
+            "PostgreSQL resolved column snapshot exceeds its budget"
+        )
+    for column in columns:
+        selector = parse_postgres_column_selector(column)
+        if (
+            selector.is_wildcard
+            or selector.table_name not in tables
+            or (
+                selector.qualified_name not in configured_columns
+                and f"{selector.table_name}.*" not in configured_columns
+            )
+        ):
+            raise PostgresConfigurationError(
+                "PostgreSQL resolved column snapshot must contain exact allowed columns"
             )
 
 
@@ -238,6 +336,17 @@ def _required_allowlist(name: str, parts: int) -> frozenset[str]:
     entries = frozenset(item.strip() for item in value.split(",") if item.strip())
     for entry in entries:
         _validate_qualified_identifier(entry, parts, name)
+    return entries
+
+
+def _required_column_allowlist() -> frozenset[str]:
+    name = "POSTGRES_ALLOWED_COLUMNS"
+    value = os.environ.get(name)
+    if value is None or not value.strip():
+        raise PostgresConfigurationError(f"{name} is required")
+    entries = frozenset(item.strip() for item in value.split(",") if item.strip())
+    for entry in entries:
+        parse_postgres_column_selector(entry)
     return entries
 
 
