@@ -28,6 +28,19 @@ Never permit `INSERT`, `UPDATE`, `DELETE`, `MERGE`, `DROP`, `TRUNCATE`,
 `ALTER`, `CREATE`, `GRANT`, `REVOKE`, unrestricted `SELECT *`, raw-row export,
 or access to secrets, credentials, tokens, or raw PII.
 
+JDBC-style endpoint strings are untrusted configuration, not executable JDBC.
+Bound their bytes and parsed components before constructing a Python client;
+keep credentials, allowlists, and budgets in their existing settings.
+Table-qualified wildcard selectors are authorization shorthand only: expand
+them through bounded metadata into a frozen explicit-column snapshot and never
+emit a projection star.
+
+`profile-query` is separate from normal table profiling and MCP caller SQL. It
+accepts one bounded local file, validates one fully qualified single-table
+`SELECT`, and executes only trusted no-row schema and aggregate wrappers.
+Query text, literals, backend errors, endpoints, and rows must not cross into
+profiles, generated data, logs, providers, or default MCP responses.
+
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.

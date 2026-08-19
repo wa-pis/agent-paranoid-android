@@ -6,6 +6,12 @@ schema inference.
 Treat every input file as potentially sensitive. Profiling may retain only
 metadata and bounded evidence needed to build a generation specification.
 
+SQL query-source files follow the same rule. Parse and authorize the bounded
+file before database access, retain only a source fingerprint, policy version,
+virtual schema, and safe aggregates, and never retain SQL text, literals,
+backend messages, endpoints, or query rows. Database wildcard selectors must
+first resolve to a deterministic explicit-column snapshot.
+
 ## Allowed evidence
 
 - column names and inferred data types;

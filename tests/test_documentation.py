@@ -543,12 +543,63 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         "docs/concepts/safety-model.md",
         "docs/concepts/threat-model.md",
         "docs/operations/resource-budgets.md",
+        "docs/operations/troubleshooting.md",
+        "docs/reference/stability.md",
+        "docs/reference/support-policy.md",
         "docs/reference/application-boundaries.md",
         "CHANGELOG.md",
         "mkdocs build --strict",
         "source_rows_copied: false",
     ):
         assert required in contract
+
+
+def test_database_source_docs_distinguish_stable_and_unreleased_contracts() -> None:
+    availability_pages = (
+        "README.md",
+        "docs/index.md",
+        "docs/getting-started/installation.md",
+        "docs/concepts/choosing-an-approach.md",
+        "docs/concepts/profiles-and-specs.md",
+        "docs/dataset_profile_and_spec.md",
+        "docs/how-to/postgresql.md",
+        "docs/how-to/trino.md",
+        "docs/operations/resource-budgets.md",
+        "docs/operations/troubleshooting.md",
+        "docs/reference/cli.md",
+        "docs/reference/configuration.md",
+        "docs/reference/stability.md",
+        "docs/reference/support-policy.md",
+        "examples/local_postgres/README.md",
+        "examples/local_trino/README.md",
+    )
+    for path in availability_pages:
+        text = " ".join((ROOT / path).read_text().lower().replace(">", " ").split())
+        assert "stable `1.2.0`" in text
+        assert "unreleased `main`" in text
+
+    approach = (ROOT / "docs/concepts/choosing-an-approach.md").read_text()
+    for expected in (
+        "Exact component configuration",
+        "JDBC-style endpoint input",
+        "qualified column wildcard",
+        "`profile-query`",
+    ):
+        assert expected in approach
+
+    budgets = (ROOT / "docs/operations/resource-budgets.md").read_text()
+    for expected in (
+        "4,096 UTF-8 bytes",
+        "1,000 explicit or",
+        "500 AST nodes",
+        "64 KiB",
+    ):
+        assert expected in budgets
+
+    troubleshooting = (ROOT / "docs/operations/troubleshooting.md").read_text()
+    assert "## Qualified Column Wildcard Rejected" in troubleshooting
+    assert "## SQL Query Source Rejected" in troubleshooting
+    assert "Errors intentionally omit SQL text" in troubleshooting
 
 
 def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:

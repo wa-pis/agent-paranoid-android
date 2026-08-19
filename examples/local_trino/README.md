@@ -1,5 +1,9 @@
 # Runnable Local Trino Example
 
+> The baseline `run.sh` workflow is available in stable `1.2.0`.
+> `run-jdbc.sh`, `run-wildcard.sh`, and `run-query.sh` require unreleased
+> `main` until the next feature release candidate is published.
+
 This launcher starts a pinned disposable Trino container with its built-in
 synthetic TPC-H `tiny` catalog, profiles `tpch.tiny.nation` through bounded
 read-only operations, writes a reviewable spec, and generates twelve fresh

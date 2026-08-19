@@ -1,5 +1,11 @@
 # Profile Through Trino
 
+!!! note "Availability"
+    The existing exact allowlist Trino workflow is available in stable
+    `1.2.0`. JDBC-style endpoints, qualified column wildcards, and
+    `profile-query` are implemented only on unreleased `main` until the next
+    feature release candidate is published.
+
 Install the optional Trino client and, when using MCP, the MCP SDK:
 
 ```bash
