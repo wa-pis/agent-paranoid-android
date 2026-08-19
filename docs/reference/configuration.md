@@ -64,6 +64,8 @@ components, `POSTGRES_JDBC_URL` accepts the credential-free
 syntax parsed into the existing Psycopg configuration, not a Java/JDBC runtime.
 Set `POSTGRES_PASSWORD_ENV` to the name of the environment variable containing
 the password; never put a user or password in the URL.
+The URL is limited to 4,096 UTF-8 bytes, its host to 253 characters, and its
+database identifier to 63 characters.
 
 Each `POSTGRES_ALLOWED_COLUMNS` item is either an exact
 `schema.table.column` or a table-qualified `schema.table.*`. Wildcards are
@@ -183,6 +185,8 @@ runtime secret mechanisms; URL credentials, tokens, roles, session properties,
 headers, proxies, unknown properties, and `SSL=false` are rejected. The URL is
 parsed into the existing Python Trino client and does not load Java or a JDBC
 driver.
+The URL is limited to 4,096 UTF-8 bytes, its host to 253 characters, and each
+catalog or schema identifier to 255 characters.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |

@@ -10,6 +10,9 @@ from urllib.parse import parse_qsl, unquote, urlsplit
 
 
 DEFAULT_POSTGRES_PORT = 5432
+MAX_JDBC_URL_BYTES = 4_096
+MAX_JDBC_HOST_CHARS = 253
+MAX_POSTGRES_DATABASE_CHARS = 63
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 _ENV_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
@@ -216,6 +219,11 @@ def parse_postgres_jdbc_url(value: str) -> PostgresJdbcEndpoint:
                 raise ValueError
         _validate_text(host, "POSTGRES_HOST")
         _validate_identifier(database, "POSTGRES_DATABASE")
+        if (
+            len(host) > MAX_JDBC_HOST_CHARS
+            or len(database) > MAX_POSTGRES_DATABASE_CHARS
+        ):
+            raise ValueError
         if port is not None and not 1 <= port <= 65_535:
             raise ValueError
     except (UnicodeError, ValueError):
@@ -397,8 +405,11 @@ def _resolved_text_env(
 
 
 def _validate_jdbc_url_text(value: str) -> None:
-    if not value or value != value.strip() or any(
-        character in value for character in "\r\n\t\\"
+    if (
+        not value
+        or len(value.encode("utf-8")) > MAX_JDBC_URL_BYTES
+        or value != value.strip()
+        or any(character in value for character in "\r\n\t\\")
     ):
         raise ValueError
     index = 0

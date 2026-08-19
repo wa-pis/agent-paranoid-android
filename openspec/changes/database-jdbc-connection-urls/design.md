@@ -46,6 +46,12 @@ facades and documented command/configuration paths. Authentication identity
 and secret material continue to come from their existing fields and runtime
 environment references.
 
+Before parsing, each URL is limited to 4,096 UTF-8 bytes. Parsed hosts are
+limited to 253 characters, PostgreSQL database identifiers to 63 characters,
+and Trino catalog/schema identifiers to 255 characters. Oversized input uses
+the same fixed adapter-specific rejection as malformed input and is never
+included in an error.
+
 If URL and component settings are both present, normalization compares only
 explicitly supplied values. Equal values are accepted; a mismatch is a fixed
 configuration error before client construction. Allowlist and budget settings
@@ -82,6 +88,8 @@ gated.
 - Wrong adapter prefix, missing host/database, invalid port, malformed escape,
   userinfo, fragment, duplicate parameter, or unknown property: reject before
   network access.
+- Oversized URL, host, database, catalog, or schema: reject before client
+  construction without echoing the input.
 - Credential-bearing or session-changing property: reject with a fixed error
   naming only the property class, never its value.
 - Conflicting URL and component fields: reject before network access.

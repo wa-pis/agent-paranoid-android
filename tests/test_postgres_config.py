@@ -301,3 +301,21 @@ def test_postgres_jdbc_url_fails_closed_without_echoing_input(
     assert "secret" not in str(captured.value)
     assert captured.value.__cause__ is None
     assert captured.value.__suppress_context__ is True
+
+
+@pytest.mark.parametrize(
+    "jdbc_url",
+    [
+        "jdbc:postgresql://" + "a" * 4_096 + "/app",
+        "jdbc:postgresql://" + "a" * 254 + "/app",
+        "jdbc:postgresql://postgres.test/" + "a" * 64,
+    ],
+)
+def test_postgres_jdbc_url_rejects_oversized_input(jdbc_url: str) -> None:
+    with pytest.raises(PostgresConfigurationError) as captured:
+        parse_postgres_jdbc_url(jdbc_url)
+
+    assert str(captured.value) == (
+        "POSTGRES_JDBC_URL must be a credential-free PostgreSQL JDBC endpoint"
+    )
+    assert captured.value.__cause__ is None

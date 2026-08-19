@@ -21,6 +21,9 @@ DATA_SIZE_MULTIPLIERS = {"B": 1, "kB": 1_024, "MB": 1_024**2, "GB": 1_024**3}
 MAX_QUERY_EXECUTION_TIME_MS = 3_600_000
 MAX_QUERY_RUN_TIME_MS = 7_200_000
 MAX_QUERY_SCAN_BYTES = 100 * 1_024**3
+MAX_JDBC_URL_BYTES = 4_096
+MAX_JDBC_HOST_CHARS = 253
+MAX_TRINO_IDENTIFIER_CHARS = 255
 TRINO_DEPLOYMENT_PROFILE_ENV = "TRINO_DEPLOYMENT_PROFILE"
 
 
@@ -273,7 +276,11 @@ def parse_trino_jdbc_url(value: str) -> TrinoJdbcEndpoint:
         if ssl_value is not None and ssl_value.lower() != "true":
             raise ValueError
         http_scheme = "https" if ssl_value is not None else None
-        if not host.strip() or any(character in host for character in "\r\n\t"):
+        if (
+            not host.strip()
+            or len(host) > MAX_JDBC_HOST_CHARS
+            or any(character in host for character in "\r\n\t")
+        ):
             raise ValueError
         if port is not None and not 1 <= port <= 65_535:
             raise ValueError
@@ -400,8 +407,11 @@ def _resolved_optional_text_env(name: str, jdbc_value: str | None) -> str | None
 
 
 def _validate_jdbc_url_text(value: str) -> None:
-    if not value or value != value.strip() or any(
-        character in value for character in "\r\n\t\\"
+    if (
+        not value
+        or len(value.encode("utf-8")) > MAX_JDBC_URL_BYTES
+        or value != value.strip()
+        or any(character in value for character in "\r\n\t\\")
     ):
         raise ValueError
     index = 0
@@ -450,7 +460,9 @@ _DATABASE_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 def _validate_database_identifier(value: str, name: str) -> None:
-    if not _DATABASE_IDENTIFIER_RE.fullmatch(value):
+    if len(value) > MAX_TRINO_IDENTIFIER_CHARS or not _DATABASE_IDENTIFIER_RE.fullmatch(
+        value
+    ):
         raise TrinoConfigurationError(f"{name} must be a database identifier")
 
 

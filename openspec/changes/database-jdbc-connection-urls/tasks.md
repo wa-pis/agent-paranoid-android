@@ -5,6 +5,8 @@
 - [x] Add additive CLI/environment inputs and deterministic conflict handling.
 - [x] Reject credentials, unsafe properties, ambiguous URLs, and unverified TLS
   before network access.
+- [x] Bound URL bytes and parsed host/database/catalog/schema components before
+  client construction, with fixed non-reflective errors and no-network tests.
 - [x] Add `examples/local_postgres/run-jdbc.sh` and
   `examples/local_trino/run-jdbc.sh` using the existing disposable synthetic
   services, installed-wheel entry points, placeholder URLs, and fixed seeds.

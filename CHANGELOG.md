@@ -28,6 +28,9 @@ All notable changes to this project are documented here.
   endpoints, unverified Trino TLS selection, non-allowlisted request defaults,
   and conflicting component configuration before database access, using fixed
   errors that do not echo endpoint values.
+- Bound JDBC-style URL bytes and parsed host/database/catalog/schema components
+  before client construction, using the same fixed non-reflective errors for
+  oversized input.
 - Reject unqualified, cross-scope, malformed, duplicate, empty, inconsistent,
   or over-budget wildcard metadata before aggregate profiling. Wildcards never
   authorize projection stars, source rows, preserve-as-is, category literals,

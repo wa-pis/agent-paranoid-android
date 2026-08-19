@@ -304,3 +304,22 @@ def test_trino_jdbc_url_fails_closed_without_echoing_input(jdbc_url: str) -> Non
     assert "secret" not in str(captured.value)
     assert captured.value.__cause__ is None
     assert captured.value.__suppress_context__ is True
+
+
+@pytest.mark.parametrize(
+    "jdbc_url",
+    [
+        "jdbc:trino://" + "a" * 4_096,
+        "jdbc:trino://" + "a" * 254,
+        "jdbc:trino://trino.test/" + "a" * 256,
+        "jdbc:trino://trino.test/catalog/" + "a" * 256,
+    ],
+)
+def test_trino_jdbc_url_rejects_oversized_input(jdbc_url: str) -> None:
+    with pytest.raises(TrinoConfigurationError) as captured:
+        parse_trino_jdbc_url(jdbc_url)
+
+    assert str(captured.value) == (
+        "TRINO_JDBC_URL must be a credential-free Trino JDBC endpoint"
+    )
+    assert captured.value.__cause__ is None
