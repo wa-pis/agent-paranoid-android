@@ -48,6 +48,20 @@ initialization behavior, TLS verification downgrades, and unknown properties.
 - **THEN** validation fails before client construction
 - **AND** neither value is disclosed in the error
 
+### Requirement: JDBC-Style Endpoint Input Is Resource-Bounded
+
+JDBC-style URL parsing SHALL enforce finite URL and component limits before
+client construction and SHALL reject oversized input with a fixed error that
+does not include the rejected value.
+
+#### Scenario: URL or component exceeds its limit
+
+- **GIVEN** a JDBC-style URL whose UTF-8 bytes, host, database, catalog, or
+  schema exceed the documented adapter limit
+- **WHEN** configuration is validated
+- **THEN** validation fails before network access
+- **AND** the URL and oversized component are absent from the error
+
 ### Requirement: Runnable JDBC Source Examples
 
 The repository SHALL provide separate PostgreSQL and Trino JDBC launchers that
