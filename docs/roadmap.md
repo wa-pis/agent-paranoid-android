@@ -1083,9 +1083,14 @@ pull requests:
    treats one validated local `SELECT` as a virtual aggregate-only source for
    the existing profile -> infer -> generate workflow. Query rows and literals
    never enter generation or an external boundary.
+4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-source-documentation-reconciliation/proposal.md)
+   performs the final cross-layer audit after the three runtime changes:
+   discovery, how-to, examples, CLI/Python/configuration reference, safety,
+   architecture, operations, roadmap, changelog, and release evidence.
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
-SQL query source profiling. Each runtime change requires focused synthetic
+SQL query source profiling, followed by documentation reconciliation. Each
+runtime change requires focused synthetic
 regressions, public documentation, full release checks, and release-candidate
 assignment before publication. Each implementation also extends both
 `examples/local_postgres` and `examples/local_trino` with an explicit runnable

@@ -20,3 +20,5 @@
   MkDocs checks.
 - [ ] Run the full release gate before assigning the implementation to a
   release candidate.
+- [ ] Hand the shipped CLI/configuration/example facts to the separate
+  `database-source-documentation-reconciliation` cross-feature audit.

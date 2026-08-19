@@ -312,6 +312,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     assert active == {
         "_template",
         "database-jdbc-connection-urls",
+        "database-source-documentation-reconciliation",
         "qualified-column-wildcards",
         "sql-query-source-profiling",
     }
@@ -409,6 +410,33 @@ def test_database_source_openspecs_require_runnable_examples() -> None:
         assert "examples/local_trino" in contract
         assert launcher in contract
         assert "source_rows_copied: false" in contract
+
+
+def test_database_source_documentation_reconciliation_covers_all_layers() -> None:
+    change = (
+        ROOT
+        / "openspec"
+        / "changes"
+        / "database-source-documentation-reconciliation"
+    )
+    contract = "\n".join(
+        path.read_text() for path in sorted(change.rglob("*.md"))
+    )
+
+    for required in (
+        "README.md",
+        "docs/index.md",
+        "docs/reference/cli.md",
+        "docs/reference/configuration.md",
+        "docs/concepts/safety-model.md",
+        "docs/concepts/threat-model.md",
+        "docs/operations/resource-budgets.md",
+        "docs/reference/application-boundaries.md",
+        "CHANGELOG.md",
+        "mkdocs build --strict",
+        "source_rows_copied: false",
+    ):
+        assert required in contract
 
 
 def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
