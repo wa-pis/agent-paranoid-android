@@ -112,7 +112,7 @@ class TrinoClient:
         if not _TRINO_WORK_SLOTS.acquire(blocking=False):
             raise TrinoCapacityError("Trino request capacity exhausted")
         try:
-            connection = self.driver.dbapi.connect(
+            connection_options: dict[str, Any] = dict(
                 host=self.config.host,
                 port=self.config.port,
                 user=self.config.user,
@@ -124,6 +124,11 @@ class TrinoClient:
                     "query_max_scan_physical_bytes": self.config.query_max_scan_physical_bytes,
                 },
             )
+            if self.config.default_catalog is not None:
+                connection_options["catalog"] = self.config.default_catalog
+            if self.config.default_schema is not None:
+                connection_options["schema"] = self.config.default_schema
+            connection = self.driver.dbapi.connect(**connection_options)
             with closing(connection), closing(connection.cursor()) as cursor:
                 try:
                     cursor.execute(sql, parameters or [])

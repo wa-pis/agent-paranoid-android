@@ -12,6 +12,7 @@ from test_data_agent.trino_config import (
     deployment_profile_from_env,
     parse_data_size_value,
     parse_duration_value,
+    parse_trino_jdbc_url,
     parse_trino_port,
 )
 
@@ -121,3 +122,129 @@ def test_trino_server_keeps_config_compatibility_exports() -> None:
     assert mcp_trino_server.TrinoConfig is TrinoConfig
     assert mcp_trino_server.TrinoConfigurationError is TrinoConfigurationError
     assert mcp_trino_server.parse_trino_port is parse_trino_port
+
+
+def test_trino_config_keeps_existing_optional_positional_order() -> None:
+    config = TrinoConfig(
+        "trino.internal",
+        8443,
+        "synthetic-agent",
+        "https",
+        frozenset({"analytics"}),
+        frozenset({"safe"}),
+        None,
+        12.0,
+    )
+
+    assert config.request_timeout == 12.0
+    assert config.default_catalog is None
+
+
+def test_trino_jdbc_url_normalizes_allowlisted_request_defaults(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    for name in (
+        "TRINO_HOST",
+        "TRINO_PORT",
+        "TRINO_HTTP_SCHEME",
+        "TRINO_CATALOG",
+        "TRINO_SCHEMA",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    jdbc_url = "jdbc:trino://trino.example.test:8443/warehouse/analytics?SSL=true"
+    monkeypatch.setenv("TRINO_JDBC_URL", jdbc_url)
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "warehouse")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "analytics")
+
+    config = TrinoConfig.from_env()
+
+    assert config.host == "trino.example.test"
+    assert config.port == 8443
+    assert config.http_scheme == "https"
+    assert config.default_catalog == "warehouse"
+    assert config.default_schema == "analytics"
+    assert jdbc_url not in repr(config)
+
+
+def test_trino_jdbc_url_rejects_component_conflicts_without_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_JDBC_URL", "jdbc:trino://private.example.test:8443")
+    monkeypatch.setenv("TRINO_HOST", "trino.example.test")
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "warehouse")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "analytics")
+
+    with pytest.raises(TrinoConfigurationError) as captured:
+        TrinoConfig.from_env()
+
+    assert str(captured.value) == (
+        "TRINO_JDBC_URL conflicts with explicit component configuration"
+    )
+    assert "private.example.test" not in str(captured.value)
+
+
+def test_trino_jdbc_url_allows_endpoint_without_request_defaults() -> None:
+    endpoint = parse_trino_jdbc_url("jdbc:trino://trino.example.test")
+
+    assert endpoint.port is None
+    assert endpoint.catalog is None
+    assert endpoint.schema is None
+    assert endpoint.http_scheme is None
+
+
+def test_trino_jdbc_url_detaches_invalid_explicit_port(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_JDBC_URL", "jdbc:trino://trino.example.test")
+    monkeypatch.setenv("TRINO_PORT", "secret-port")
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "warehouse")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "analytics")
+
+    with pytest.raises(TrinoConfigurationError) as captured:
+        TrinoConfig.from_env()
+
+    assert str(captured.value) == "TRINO_PORT must be an integer"
+    assert captured.value.__cause__ is None
+    assert captured.value.__suppress_context__ is True
+
+
+def test_trino_jdbc_url_requires_allowlisted_path_defaults(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv(
+        "TRINO_JDBC_URL",
+        "jdbc:trino://trino.example.test:8443/private/analytics?SSL=true",
+    )
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "warehouse")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "analytics")
+
+    with pytest.raises(TrinoConfigurationError, match="TRINO_ALLOWED_CATALOGS"):
+        TrinoConfig.from_env()
+
+
+@pytest.mark.parametrize(
+    "jdbc_url",
+    [
+        "jdbc:trino://reader:secret@trino.test:8443/warehouse/analytics",
+        "jdbc:trino://trino.test:8443/warehouse/analytics?password=secret",
+        "jdbc:trino://trino.test:8443/warehouse/analytics?SSL=true&SSL=true",
+        "jdbc:trino://trino.test:8443/warehouse/analytics?SSL=true%20",
+        "jdbc:trino://trino.test:8443/warehouse/analytics?sessionProperties=x",
+        "jdbc:trino://trino.test:8443/warehouse/analytics?SSL=false",
+        "jdbc:trino://trino.test:8443/warehouse/analytics#secret",
+        "jdbc:trino://trino.test:secret/warehouse/analytics",
+        "jdbc:trino://trino%0Atest:8443/warehouse/analytics",
+        "jdbc:trino://trino.test:8443/warehouse%ZZ/analytics",
+        "jdbc:trino://trino.test:8443/warehouse/analytics/extra",
+    ],
+)
+def test_trino_jdbc_url_fails_closed_without_echoing_input(jdbc_url: str) -> None:
+    with pytest.raises(TrinoConfigurationError) as captured:
+        parse_trino_jdbc_url(jdbc_url)
+
+    assert str(captured.value) == (
+        "TRINO_JDBC_URL must be a credential-free Trino JDBC endpoint"
+    )
+    assert "secret" not in str(captured.value)
+    assert captured.value.__cause__ is None
+    assert captured.value.__suppress_context__ is True

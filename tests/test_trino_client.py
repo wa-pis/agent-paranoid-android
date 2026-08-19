@@ -128,6 +128,25 @@ def test_client_applies_budgets_and_closes_resources() -> None:
     }
 
 
+def test_client_applies_validated_catalog_and_schema_defaults() -> None:
+    cursor = FakeCursor([(1,)])
+    driver = FakeDriver(cursor)
+    config = replace(
+        client_config(),
+        allowed_catalogs=frozenset({"warehouse"}),
+        allowed_schemas=frozenset({"analytics"}),
+        default_catalog="warehouse",
+        default_schema="analytics",
+    )
+    config.validate_security()
+
+    TrinoClient(config=config, driver=driver).execute_query("SELECT 1")
+
+    assert driver.dbapi.connect_kwargs is not None
+    assert driver.dbapi.connect_kwargs["catalog"] == "warehouse"
+    assert driver.dbapi.connect_kwargs["schema"] == "analytics"
+
+
 def test_client_rejects_oversized_results_and_closes_resources() -> None:
     cursor = FakeCursor([(1, "a"), (2, "b"), (3, "c")])
     driver = FakeDriver(cursor)

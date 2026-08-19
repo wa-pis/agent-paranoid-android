@@ -122,6 +122,16 @@ Public dataset-oriented commands:
 - `profile-csv`
 - `generate-from-csv`
 
+## Database Configuration
+
+`src/test_data_agent/postgres_config.py` and
+`src/test_data_agent/trino_config.py` own environment parsing, credential-free
+JDBC-style URL normalization, deterministic component-conflict checks,
+allowlists, and resource budgets. They discard the input URL before returning
+the existing typed Python client configuration. `postgres_client.py` and
+`trino_client.py` remain unaware of JDBC syntax; Trino receives only validated
+allowlisted catalog/schema defaults.
+
 ## Trino MCP
 
 `src/test_data_agent/mcp_trino_transport.py`

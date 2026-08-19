@@ -21,6 +21,19 @@ export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
 export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state
 ```
 
+If a platform portal supplies a JDBC endpoint, replace only the separate host,
+port, database, and TLS settings with a credential-free JDBC-style URL:
+
+```bash
+export POSTGRES_JDBC_URL='jdbc:postgresql://db.example.internal:5432/analytics?sslmode=verify-full'
+```
+
+Keep `POSTGRES_USER`, `POSTGRES_PASSWORD_ENV`, every allowlist, and every budget
+separate. Userinfo, passwords, unknown query properties, and session-changing
+options in the URL fail before a connection is opened. This syntax is parsed
+into the existing Psycopg adapter; Java and JDBC drivers are not used. If both
+URL and component settings are present, explicitly supplied values must match.
+
 The database role must already be read-only. The client also requests a
 read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
 results. It accepts no arbitrary SQL and never profiles source rows.
@@ -101,4 +114,6 @@ PostgreSQL cluster, run the
 [`examples/local_postgres`](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/local_postgres)
 example. It creates a SELECT-only role, proves that writes are denied, profiles
 two related tables, validates deterministic generation, executes the exported
-SQL in an empty target database, and removes the cluster.
+SQL in an empty target database, and removes the cluster. Run
+`examples/local_postgres/run-jdbc.sh OUTPUT` for the same workflow configured by
+a placeholder JDBC-style URL.

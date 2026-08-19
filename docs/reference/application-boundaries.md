@@ -174,8 +174,8 @@ The current dependencies after completed extraction increments are:
 | `workspace_store.py` | typed workspace paths and transitions, core profile/spec models, bounded artifact I/O |
 | `io/path_policy.py` | descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
-| `trino_config.py` | environment parsing, connection settings, allowlist inputs, and resource budgets |
-| `postgres_config.py` | PostgreSQL source identity, connection settings, mandatory schema/table/column allowlists, secret indirection, and profiling budgets |
+| `trino_config.py` | environment parsing, credential-free JDBC-style endpoint normalization, validated catalog/schema defaults, connection settings, allowlist inputs, and resource budgets |
+| `postgres_config.py` | PostgreSQL source identity, credential-free JDBC-style endpoint normalization, connection settings, mandatory schema/table/column allowlists, secret indirection, and profiling budgets |
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
 | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
 | `postgres_profiler.py` | complete allowlisted PostgreSQL metadata/aggregate normalization into qualified `DatasetProfile` entities and declared relationships |

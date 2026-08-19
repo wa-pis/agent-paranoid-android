@@ -9,6 +9,17 @@ synthetic JSON rows:
 examples/local_trino/run.sh /tmp/agent-paranoid-trino-example
 ```
 
+Run the identical workflow with endpoint/catalog/schema supplied in JDBC
+syntax:
+
+```bash
+examples/local_trino/run-jdbc.sh /tmp/agent-paranoid-trino-jdbc-example
+```
+
+The JDBC-style launcher still uses the Python Trino client and the same
+allowlisted, bounded aggregate operations. It adds no Java runtime or JDBC
+driver.
+
 Docker and an installed `agent-paranoid-android[trino]` environment are
 required. Set `TRINO_EXAMPLE_PORT` when port `18080` is unavailable. The
 container is removed on success or failure.

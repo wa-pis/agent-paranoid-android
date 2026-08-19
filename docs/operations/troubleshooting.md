@@ -43,6 +43,15 @@ structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
 GigaChat. Install stable `1.2.0` with the `gigachat` extra.
 
+## JDBC-Style URL Rejected
+
+Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
+password references, tokens, roles, headers, proxies, session properties,
+allowlists, and budgets in their existing settings. Remove duplicate or
+unknown URL properties. When URL and component fields are both set, make the
+explicit host, port, database/TLS or catalog/schema values identical, or remove
+one representation. Errors intentionally omit the URL and conflicting values.
+
 ## GigaChat Advice Failed
 
 Check the fixed local category first: missing extra, authentication, scope,

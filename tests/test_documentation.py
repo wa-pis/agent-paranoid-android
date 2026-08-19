@@ -412,6 +412,42 @@ def test_database_source_openspecs_require_runnable_examples() -> None:
         assert "source_rows_copied: false" in contract
 
 
+def test_jdbc_examples_and_public_docs_match_runtime_contract() -> None:
+    postgres_launcher = ROOT / "examples/local_postgres/run-jdbc.sh"
+    trino_launcher = ROOT / "examples/local_trino/run-jdbc.sh"
+    assert postgres_launcher.stat().st_mode & 0o111
+    assert trino_launcher.stat().st_mode & 0o111
+    assert "POSTGRES_EXAMPLE_USE_JDBC=true" in postgres_launcher.read_text()
+    assert "TRINO_EXAMPLE_USE_JDBC=true" in trino_launcher.read_text()
+
+    postgres_example = (ROOT / "examples/local_postgres/run.sh").read_text()
+    trino_example = (ROOT / "examples/local_trino/run.sh").read_text()
+    assert "POSTGRES_JDBC_URL=" in postgres_example
+    assert "TRINO_JDBC_URL=" in trino_example
+    assert "--seed 12345" in postgres_example
+    assert "TRINO_ALLOWED_CATALOGS=tpch" in trino_example
+
+    public_docs = "\n".join(
+        (ROOT / path).read_text()
+        for path in (
+            "README.md",
+            "docs/index.md",
+            "docs/how-to/postgresql.md",
+            "docs/how-to/trino.md",
+            "docs/reference/cli.md",
+            "docs/reference/configuration.md",
+            "docs/concepts/safety-model.md",
+            "docs/operations/troubleshooting.md",
+            "docs/implementation_map.md",
+            "docs/reference/application-boundaries.md",
+        )
+    )
+    assert "POSTGRES_JDBC_URL" in public_docs
+    assert "TRINO_JDBC_URL" in public_docs
+    assert "credential-free" in public_docs
+    assert "no Java" in public_docs or "not a Java/JDBC runtime" in public_docs
+
+
 def test_database_source_documentation_reconciliation_covers_all_layers() -> None:
     change = (
         ROOT

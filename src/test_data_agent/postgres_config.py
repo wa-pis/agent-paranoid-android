@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import os
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from urllib.parse import parse_qsl, unquote, urlsplit
 
 
 DEFAULT_POSTGRES_PORT = 5432
@@ -14,6 +16,14 @@ _ENV_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 class PostgresConfigurationError(ValueError):
     """Raised when PostgreSQL access is not explicitly bounded."""
+
+
+@dataclass(frozen=True)
+class PostgresJdbcEndpoint:
+    host: str
+    port: int | None
+    database: str
+    sslmode: str | None
 
 
 @dataclass(frozen=True)
@@ -69,14 +79,31 @@ class PostgresConfig:
 
     @classmethod
     def from_env(cls) -> PostgresConfig:
+        endpoint = _postgres_jdbc_endpoint_from_env()
         config = cls(
             source_id=os.environ.get("POSTGRES_SOURCE_ID", "postgres"),
-            host=os.environ.get("POSTGRES_HOST", "localhost"),
-            port=_postgres_port_from_env(),
-            database=os.environ.get("POSTGRES_DATABASE", "postgres"),
+            host=_resolved_text_env(
+                "POSTGRES_HOST",
+                endpoint.host if endpoint is not None else None,
+                "localhost",
+                case_insensitive=True,
+            ),
+            port=_postgres_port_from_env(
+                endpoint.port if endpoint is not None else None
+            ),
+            database=_resolved_text_env(
+                "POSTGRES_DATABASE",
+                endpoint.database if endpoint is not None else None,
+                "postgres",
+            ),
             user=os.environ.get("POSTGRES_USER", "test_data_agent"),
             password_env=_optional_env_name("POSTGRES_PASSWORD_ENV"),
-            sslmode=os.environ.get("POSTGRES_SSLMODE", "require").strip().lower(),
+            sslmode=_resolved_text_env(
+                "POSTGRES_SSLMODE",
+                endpoint.sslmode if endpoint is not None else None,
+                "require",
+                normalize=str.lower,
+            ),
             allow_insecure=_bool_env("POSTGRES_ALLOW_INSECURE"),
             allowed_schemas=_required_allowlist("POSTGRES_ALLOWED_SCHEMAS", 1),
             allowed_tables=_required_allowlist("POSTGRES_ALLOWED_TABLES", 2),
@@ -125,6 +152,58 @@ class PostgresConfig:
         )
 
 
+def parse_postgres_jdbc_url(value: str) -> PostgresJdbcEndpoint:
+    """Parse a credential-free PostgreSQL JDBC-style endpoint."""
+
+    try:
+        _validate_jdbc_url_text(value)
+        if not value.startswith("jdbc:postgresql://"):
+            raise ValueError
+        parsed = urlsplit(value.removeprefix("jdbc:"))
+        if (
+            parsed.scheme != "postgresql"
+            or parsed.hostname is None
+            or parsed.username is not None
+            or parsed.password is not None
+            or "@" in parsed.netloc
+            or "%" in parsed.netloc
+            or parsed.fragment
+        ):
+            raise ValueError
+        host = parsed.hostname
+        port = parsed.port
+        database = _single_jdbc_path_component(parsed.path)
+        properties = _unique_jdbc_properties(parsed.query)
+        if set(properties) - {"sslmode"}:
+            raise ValueError
+        sslmode = properties.get("sslmode")
+        if sslmode is not None:
+            sslmode = sslmode.lower()
+            if sslmode not in {"require", "verify-ca", "verify-full", "disable"}:
+                raise ValueError
+        _validate_text(host, "POSTGRES_HOST")
+        _validate_identifier(database, "POSTGRES_DATABASE")
+        if port is not None and not 1 <= port <= 65_535:
+            raise ValueError
+    except (UnicodeError, ValueError):
+        raise PostgresConfigurationError(
+            "POSTGRES_JDBC_URL must be a credential-free PostgreSQL JDBC endpoint"
+        ) from None
+    return PostgresJdbcEndpoint(
+        host=host,
+        port=port,
+        database=database,
+        sslmode=sslmode,
+    )
+
+
+def _postgres_jdbc_endpoint_from_env() -> PostgresJdbcEndpoint | None:
+    value = os.environ.get("POSTGRES_JDBC_URL")
+    if value is None:
+        return None
+    return parse_postgres_jdbc_url(value)
+
+
 def _validate_scope(
     schemas: frozenset[str],
     tables: frozenset[str],
@@ -162,11 +241,91 @@ def _required_allowlist(name: str, parts: int) -> frozenset[str]:
     return entries
 
 
-def _postgres_port_from_env() -> int:
-    value = _positive_int_env("POSTGRES_PORT", DEFAULT_POSTGRES_PORT)
+def _postgres_port_from_env(jdbc_port: int | None = None) -> int:
+    raw_value = os.environ.get("POSTGRES_PORT")
+    if raw_value is None:
+        value = jdbc_port if jdbc_port is not None else DEFAULT_POSTGRES_PORT
+    else:
+        try:
+            value = int(raw_value)
+        except ValueError:
+            raise PostgresConfigurationError(
+                "POSTGRES_PORT must be an integer"
+            ) from None
+        if jdbc_port is not None and value != jdbc_port:
+            raise PostgresConfigurationError(
+                "POSTGRES_JDBC_URL conflicts with explicit component configuration"
+            )
     if value > 65_535:
         raise PostgresConfigurationError("POSTGRES_PORT must be between 1 and 65535")
+    if value < 1:
+        raise PostgresConfigurationError("POSTGRES_PORT must be positive")
     return value
+
+
+def _resolved_text_env(
+    name: str,
+    jdbc_value: str | None,
+    default: str,
+    *,
+    normalize: Callable[[str], str] | None = None,
+    case_insensitive: bool = False,
+) -> str:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return jdbc_value if jdbc_value is not None else default
+    value = raw_value.strip()
+    if normalize is not None:
+        value = normalize(value)
+    if jdbc_value is not None:
+        left = value.casefold() if case_insensitive else value
+        right = jdbc_value.casefold() if case_insensitive else jdbc_value
+        if left != right:
+            raise PostgresConfigurationError(
+                "POSTGRES_JDBC_URL conflicts with explicit component configuration"
+            )
+    return value
+
+
+def _validate_jdbc_url_text(value: str) -> None:
+    if not value or value != value.strip() or any(
+        character in value for character in "\r\n\t\\"
+    ):
+        raise ValueError
+    index = 0
+    while index < len(value):
+        if value[index] == "%":
+            if index + 2 >= len(value) or not re.fullmatch(
+                r"[0-9A-Fa-f]{2}", value[index + 1 : index + 3]
+            ):
+                raise ValueError
+            index += 3
+            continue
+        index += 1
+
+
+def _single_jdbc_path_component(path: str) -> str:
+    if not path.startswith("/") or path.count("/") != 1 or len(path) == 1:
+        raise ValueError
+    return unquote(path[1:], errors="strict")
+
+
+def _unique_jdbc_properties(query: str) -> dict[str, str]:
+    if not query:
+        return {}
+    pairs = parse_qsl(
+        query,
+        keep_blank_values=True,
+        strict_parsing=True,
+        encoding="utf-8",
+        errors="strict",
+    )
+    properties: dict[str, str] = {}
+    for name, value in pairs:
+        if name in properties:
+            raise ValueError
+        properties[name] = value
+    return properties
 
 
 def _optional_env_name(name: str) -> str | None:

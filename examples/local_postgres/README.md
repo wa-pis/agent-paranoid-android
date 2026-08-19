@@ -15,6 +15,16 @@ Run it from an installed `agent-paranoid-android[postgres]` environment:
 examples/local_postgres/run.sh /tmp/agent-paranoid-postgres-example
 ```
 
+Run the same workflow with a credential-free JDBC-style endpoint:
+
+```bash
+examples/local_postgres/run-jdbc.sh /tmp/agent-paranoid-postgres-jdbc-example
+```
+
+The second launcher changes only endpoint configuration. It still uses the
+Python Psycopg adapter, mandatory exact allowlists, the same fixed seed, and the
+same disposable synthetic databases; no Java or JDBC driver is involved.
+
 Requirements are `initdb`, `pg_ctl`, `psql`, and either the installed
 `test-data-agent` command or `TDA_PYTHON=/path/to/python`. Set
 `POSTGRES_EXAMPLE_PORT` when port `55432` is unavailable.

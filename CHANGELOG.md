@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Accept credential-free PostgreSQL and Trino JDBC-style endpoint URLs by
+  normalizing them into the existing Python adapters without adding Java or a
+  JDBC driver.
+- Add disposable PostgreSQL and Trino JDBC launchers that reuse the existing
+  synthetic, allowlisted, fixed-seed examples.
+
+### Security
+
+- Reject URL credentials, tokens, unsafe or unknown properties, malformed
+  endpoints, unverified Trino TLS selection, non-allowlisted request defaults,
+  and conflicting component configuration before database access, using fixed
+  errors that do not echo endpoint values.
+
 ## [1.2.0] - 2026-08-15
 
 ### Changed
