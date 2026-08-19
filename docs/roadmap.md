@@ -1065,34 +1065,35 @@ work without reopening the completed 1.0 application-boundary gate:
   external security boundary. Evidence: the signed and publicly verified
   [`v1.1.0rc1` release](release-evidence-1.1.0rc1.md).
 
-### Proposed Database Source Ergonomics
+### Database Source Ergonomics For 1.3.0
 
-These are three independent, reviewable runtime changes followed by one
-documentation audit. They are not part of the published `1.2.0` contract and
-must be delivered in separate implementation pull requests:
+These three independent runtime changes and their documentation audit are
+complete on `main`. They are not part of the published `1.2.0` contract and
+require acceptance through `1.3.0rc1` before stable publication:
 
-1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-jdbc-connection-urls/proposal.md)
+1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-jdbc-connection-urls/proposal.md)
    parse familiar PostgreSQL and Trino endpoint syntax into the existing Python
    adapters without adding Java, accepting URL credentials, or changing the
    read-only policy. Implemented on `main` for assignment to the next feature
    release candidate.
-2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/qualified-column-wildcards/proposal.md)
+2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-qualified-column-wildcards/proposal.md)
    add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
    syntax. Metadata expansion produces a bounded explicit column snapshot;
    executed SQL never contains a projection star. Implemented on `main` for
    assignment to the next feature release candidate.
-3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/sql-query-source-profiling/proposal.md)
+3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-sql-query-source-profiling/proposal.md)
    treats one validated local `SELECT` as a virtual aggregate-only source for
    the existing profile -> infer -> generate workflow. Query rows and literals
    never enter generation or an external boundary. Implemented on `main` for
    assignment to the next feature release candidate.
-4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-source-documentation-reconciliation/proposal.md)
+4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-source-documentation-reconciliation/proposal.md)
    performs the final cross-layer audit after the three runtime changes:
    discovery, how-to, examples, CLI/Python/configuration reference, safety,
    architecture, operations, roadmap, changelog, and release evidence. Public
    layers are reconciled on `main` with an explicit stable-versus-unreleased
-   availability boundary; disposable example evidence, independent SQL-policy
-   review, release assignment, and final OpenSpec archival remain gated.
+   availability boundary. Disposable PostgreSQL/Trino example evidence and the
+   independent SQL-policy review are complete; release publication remains a
+   separate explicit operation.
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling, followed by documentation reconciliation. Each

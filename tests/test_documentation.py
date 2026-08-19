@@ -309,13 +309,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {
-        "_template",
-        "database-jdbc-connection-urls",
-        "database-source-documentation-reconciliation",
-        "qualified-column-wildcards",
-        "sql-query-source-profiling",
-    }
+    assert active == {"_template"}
 
     archived = changes / "archive"
     completed = (
@@ -352,6 +346,17 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     ).read_text()
     assert "- [ ]" not in mcp_malformed_tasks
 
+    for change_id in (
+        "database-jdbc-connection-urls",
+        "database-source-documentation-reconciliation",
+        "qualified-column-wildcards",
+        "sql-query-source-profiling",
+    ):
+        database_tasks = (
+            archived / f"2026-08-19-{change_id}" / "tasks.md"
+        ).read_text()
+        assert "- [ ]" not in database_tasks
+
     superseded = archived / "2026-08-14-1-0-0-postgres-multi-source"
     assert "Status: superseded" in (superseded / "proposal.md").read_text()
     assert "not an active backlog" in (superseded / "tasks.md").read_text()
@@ -386,6 +391,22 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "agent-orchestration": (
             "Relationship Discovery Is Reviewable And Deterministic",
         ),
+        "database-source-configuration": (
+            "JDBC-Style Endpoint Input",
+            "URL Secrets And Session Properties Are Forbidden",
+        ),
+        "database-source-allowlists": (
+            "Table-Qualified Column Wildcard",
+            "Wildcard Scope Does Not Authorize Values",
+        ),
+        "sql-query-source-profiling": (
+            "SQL Query Is A Virtual Aggregate-Only Source",
+            "Query Profiles Feed Synthetic Generation Without Rows",
+        ),
+        "public-documentation": (
+            "Database Source Documentation Matches Shipped Behavior",
+            "Documentation Preserves Database Safety Boundaries",
+        ),
     }
     for capability, headings in requirements.items():
         spec = (ROOT / "openspec" / "specs" / capability / "spec.md").read_text()
@@ -394,11 +415,11 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
 
 
 def test_database_source_openspecs_require_runnable_examples() -> None:
-    changes = ROOT / "openspec" / "changes"
+    changes = ROOT / "openspec" / "changes" / "archive"
     expected = {
-        "database-jdbc-connection-urls": "run-jdbc.sh",
-        "qualified-column-wildcards": "run-wildcard.sh",
-        "sql-query-source-profiling": "run-query.sh",
+        "2026-08-19-database-jdbc-connection-urls": "run-jdbc.sh",
+        "2026-08-19-qualified-column-wildcards": "run-wildcard.sh",
+        "2026-08-19-sql-query-source-profiling": "run-query.sh",
     }
 
     for change_id, launcher in expected.items():
@@ -529,7 +550,8 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         ROOT
         / "openspec"
         / "changes"
-        / "database-source-documentation-reconciliation"
+        / "archive"
+        / "2026-08-19-database-source-documentation-reconciliation"
     )
     contract = "\n".join(
         path.read_text() for path in sorted(change.rglob("*.md"))

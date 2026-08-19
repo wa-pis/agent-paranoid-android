@@ -52,6 +52,9 @@ All notable changes to this project are documented here.
   or over-complex query sources before derived aggregate execution. Query
   text, literals, backend errors, endpoints, and result rows are never
   serialized or sent across provider/default-MCP boundaries.
+- Record an AI-assisted independent review of the exact database-source
+  runtime, with no unresolved Critical, High, or Medium SQL policy or
+  source-to-sink privacy defect.
 
 ## [1.2.0] - 2026-08-15
 
