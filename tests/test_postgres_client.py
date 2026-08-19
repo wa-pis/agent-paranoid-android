@@ -145,8 +145,10 @@ def test_session_forces_read_only_timeouts_and_resolves_password_late() -> None:
 def test_no_row_schema_inspection_returns_only_safe_metadata() -> None:
     cursor = FakeCursor([])
     cursor.description = [
-        FakeDescription("order_id", FakeTypeCode("bigint"), False),
+        FakeDescription("order_id", FakeTypeCode("int8"), False),
         FakeDescription("state", FakeTypeCode("text"), True),
+        FakeDescription("amount", FakeTypeCode("float8"), True),
+        FakeDescription("expedited", FakeTypeCode("bool"), False),
     ]
     connection = FakeConnection([cursor])
     client = PostgresClient(
@@ -156,12 +158,17 @@ def test_no_row_schema_inspection_returns_only_safe_metadata() -> None:
 
     with client.session() as session:
         columns = session.describe_no_rows(
-            query('SELECT "order_id", "state" FROM safe_relation WHERE FALSE')
+            query(
+                'SELECT "order_id", "state", "amount", "expedited" '
+                "FROM safe_relation WHERE FALSE"
+            )
         )
 
     assert [(item.name, item.data_type, item.nullable) for item in columns] == [
         ("order_id", "bigint", False),
         ("state", "text", True),
+        ("amount", "double precision", True),
+        ("expedited", "boolean", False),
     ]
     assert cursor.fetch_sizes == [1]
 

@@ -28,6 +28,12 @@ All notable changes to this project are documented here.
   examples, and support documentation for the database-source additions while
   distinguishing unreleased `main` from the published stable `1.2.0` package.
 
+### Fixed
+
+- Normalize psycopg scalar aliases such as `int8`, `float8`, and `bool` so the
+  checked-in PostgreSQL query-source example accepts its supported live schema
+  while unknown and composite output types still fail closed.
+
 ### Security
 
 - Reject URL credentials, tokens, unsafe or unknown properties, malformed
