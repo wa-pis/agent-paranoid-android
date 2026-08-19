@@ -46,7 +46,8 @@ GigaChat. Install stable `1.2.0` with the `gigachat` extra.
 ## JDBC-Style URL Rejected
 
 JDBC-style endpoint input, qualified column wildcards, and `profile-query` are
-implemented on unreleased `main` and are not in published stable `1.2.0`.
+available in preview `1.3.0rc1` through an explicit version pin and are not in
+published stable `1.2.0`.
 
 Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,

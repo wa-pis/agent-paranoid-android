@@ -17,10 +17,15 @@ changing this matrix are defined in
 The stable release is `1.2.0`; the commands below pin that exact version for
 reproducible installation.
 
-Stable `1.2.0` does not include the database-source additions currently on
-unreleased `main`: JDBC-style endpoint input, qualified column wildcards, and
-`profile-query`. Use the development installation below only when evaluating
-those changes before their next feature release candidate.
+Stable `1.2.0` remains recommended and does not include JDBC-style endpoint
+input, qualified column wildcards, or `profile-query`. To evaluate these
+database-source additions, pin preview `1.3.0rc1` explicitly:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.3.0rc1"
+python3 -m pip install "agent-paranoid-android[postgres]==1.3.0rc1"
+python3 -m pip install "agent-paranoid-android[trino]==1.3.0rc1"
+```
 
 Create an isolated environment:
 

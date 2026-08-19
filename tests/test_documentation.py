@@ -87,8 +87,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
     assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
-    assert PROJECT_VERSION == STABLE_VERSION
-    assert "Preview release:" not in readme
+    assert PROJECT_VERSION == "1.3.0rc1"
+    assert f"Preview `{PROJECT_VERSION}` (explicit opt-in)" in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -576,7 +576,7 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         assert required in contract
 
 
-def test_database_source_docs_distinguish_stable_and_unreleased_contracts() -> None:
+def test_database_source_docs_distinguish_stable_and_preview_contracts() -> None:
     availability_pages = (
         "README.md",
         "docs/index.md",
@@ -598,7 +598,7 @@ def test_database_source_docs_distinguish_stable_and_unreleased_contracts() -> N
     for path in availability_pages:
         text = " ".join((ROOT / path).read_text().lower().replace(">", " ").split())
         assert "stable `1.2.0`" in text
-        assert "unreleased `main`" in text
+        assert "preview `1.3.0rc1`" in text
 
     approach = (ROOT / "docs/concepts/choosing-an-approach.md").read_text()
     for expected in (

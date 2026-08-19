@@ -9,10 +9,9 @@ generated output.
 
 !!! note "Database-source availability"
     Published stable `1.2.0` supports the existing exact component and
-    allowlist workflows. Credential-free JDBC-style endpoints, qualified
-    column wildcards, and `profile-query` are implemented on unreleased `main`
-    for the next feature release candidate. Pages describing them match the
-    current source tree, not the `1.2.0` wheel.
+    allowlist workflows. Preview `1.3.0rc1` adds credential-free JDBC-style
+    endpoints, qualified column wildcards, and `profile-query`; install it only
+    with an explicit version pin while the candidate is being accepted.
 
 ## Choose Your Starting Point
 
@@ -105,7 +104,8 @@ production-adjacent data or an AI client.
 ## Project Status
 
 The current stable release is `1.2.0`, promoted without runtime changes from
-the publicly accepted `1.2.0rc2` candidate.
+the publicly accepted `1.2.0rc2` candidate. Preview `1.3.0rc1` is an explicit
+opt-in while its database-source additions complete candidate acceptance.
 `DatasetSpec` is the generation and validation contract for the CLI and Python
 API.
 

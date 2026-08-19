@@ -4,9 +4,8 @@ The executable is `test-data-agent`.
 
 Published stable `1.2.0` does not include `profile-query`, JDBC-style endpoint
 input, or qualified column wildcards. Those additive database-source contracts
-are implemented on unreleased `main`; this reference follows the current
-source tree. Existing stable commands and exact allowlist behavior are
-unchanged.
+are available in preview `1.3.0rc1` through an explicit version pin. Existing
+stable commands and exact allowlist behavior are unchanged.
 
 Use built-in help as the authoritative option reference:
 
