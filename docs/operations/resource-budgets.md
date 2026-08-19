@@ -36,6 +36,35 @@ operation and input size before changing a budget. Do not raise a ceiling only
 to make a single run pass. Platform-level RSS, disk, cancellation, and failure
 cleanup are covered by separate operational-readiness gates.
 
+## Database Source Budgets
+
+The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
+this section apply to unreleased `main`; these additions are not in published
+stable `1.2.0`.
+
+Database-source configuration and profiling have independent limits before
+generation begins:
+
+- PostgreSQL and Trino JDBC-style URLs are capped at 4,096 UTF-8 bytes and
+  parsed hosts at 253 characters. PostgreSQL database identifiers are capped at
+  63 characters; Trino catalog and schema identifiers at 255 characters.
+- One PostgreSQL profile defaults to 100 tables, 1,000 explicit or
+  metadata-expanded columns, 1,500 statements, 10,000 aggregate/metadata
+  result rows, 100,000 result cells, and a shared 120-second deadline.
+- One Trino invocation defaults to 100 profiled columns, 150 statements, a
+  120-second deadline, and 4 MiB each for database results and the serialized
+  transport response. Shared-hardened deployments additionally require a
+  finite cumulative estimated-scan ceiling.
+- One SQL query source defaults to 64 KiB of UTF-8 SQL, 500 AST nodes, depth
+  32, and 100 projected fields after wildcard expansion. It also consumes the
+  selected adapter's existing statement, result, deadline, and scan budgets.
+
+Qualified wildcards do not bypass these ceilings. Metadata expansion must
+finish as one validated, sorted, explicit-column snapshot before aggregate
+work starts. Exhaustion fails before the next operation and publishes no
+partial profile. Exact environment names, defaults, and absolute caps are in
+[Configuration](../reference/configuration.md).
+
 ## Artifact Persistence Contract
 
 Atomic visibility is not the same as durable persistence. Generated artifacts,

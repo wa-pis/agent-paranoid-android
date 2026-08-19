@@ -1,5 +1,9 @@
 # Runnable Local PostgreSQL Example
 
+> The baseline `run.sh` workflow is available in stable `1.2.0`.
+> `run-jdbc.sh`, `run-wildcard.sh`, and `run-query.sh` require unreleased
+> `main` until the next feature release candidate is published.
+
 This example creates a disposable local PostgreSQL cluster with two related
 synthetic tables, a SELECT-only profiling role, and an empty target database.
 It then runs the complete workflow:

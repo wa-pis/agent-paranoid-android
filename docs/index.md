@@ -7,6 +7,13 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
+!!! note "Database-source availability"
+    Published stable `1.2.0` supports the existing exact component and
+    allowlist workflows. Credential-free JDBC-style endpoints, qualified
+    column wildcards, and `profile-query` are implemented on unreleased `main`
+    for the next feature release candidate. Pages describing them match the
+    current source tree, not the `1.2.0` wheel.
+
 ## Choose Your Starting Point
 
 | I have | Start here |

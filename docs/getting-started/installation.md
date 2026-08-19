@@ -17,6 +17,11 @@ changing this matrix are defined in
 The stable release is `1.2.0`; the commands below pin that exact version for
 reproducible installation.
 
+Stable `1.2.0` does not include the database-source additions currently on
+unreleased `main`: JDBC-style endpoint input, qualified column wildcards, and
+`profile-query`. Use the development installation below only when evaluating
+those changes before their next feature release candidate.
+
 Create an isolated environment:
 
 ### macOS and Linux

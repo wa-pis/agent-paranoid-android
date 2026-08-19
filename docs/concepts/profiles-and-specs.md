@@ -41,6 +41,9 @@ field-scoped labels, and default MCP responses do not receive the exact enum.
 
 ### SQL Query Source
 
+This source type is implemented on unreleased `main` and is not present in the
+published stable `1.2.0` wheel.
+
 One reviewed local query file can shape a PostgreSQL or Trino virtual entity:
 
 ```bash

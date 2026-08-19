@@ -1089,7 +1089,10 @@ must be delivered in separate implementation pull requests:
 4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-source-documentation-reconciliation/proposal.md)
    performs the final cross-layer audit after the three runtime changes:
    discovery, how-to, examples, CLI/Python/configuration reference, safety,
-   architecture, operations, roadmap, changelog, and release evidence.
+   architecture, operations, roadmap, changelog, and release evidence. Public
+   layers are reconciled on `main` with an explicit stable-versus-unreleased
+   availability boundary; disposable example evidence, independent SQL-policy
+   review, release assignment, and final OpenSpec archival remain gated.
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling, followed by documentation reconciliation. Each

@@ -22,6 +22,12 @@ All notable changes to this project are documented here.
 - Add disposable PostgreSQL and Trino query-source launchers that run the
   profile, infer, deterministic generation, and validation pipeline.
 
+### Changed
+
+- Reconcile discovery, how-to, CLI/Python/configuration, safety, operations,
+  examples, and support documentation for the database-source additions while
+  distinguishing unreleased `main` from the published stable `1.2.0` package.
+
 ### Security
 
 - Reject URL credentials, tokens, unsafe or unknown properties, malformed

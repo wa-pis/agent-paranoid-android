@@ -45,12 +45,45 @@ GigaChat. Install stable `1.2.0` with the `gigachat` extra.
 
 ## JDBC-Style URL Rejected
 
+JDBC-style endpoint input, qualified column wildcards, and `profile-query` are
+implemented on unreleased `main` and are not in published stable `1.2.0`.
+
 Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
 allowlists, and budgets in their existing settings. Remove duplicate or
 unknown URL properties. When URL and component fields are both set, make the
 explicit host, port, database/TLS or catalog/schema values identical, or remove
 one representation. Errors intentionally omit the URL and conflicting values.
+
+An endpoint also fails when the URL exceeds 4,096 UTF-8 bytes, its host exceeds
+253 characters, a PostgreSQL database identifier exceeds 63 characters, or a
+Trino catalog/schema identifier exceeds 255 characters. Shorten the local
+configuration; the rejected value is intentionally absent from the error.
+
+## Qualified Column Wildcard Rejected
+
+Use exactly `schema.table.*` for PostgreSQL or
+`catalog.schema.table.*` for Trino. Keep the parent schema/table or
+catalog/schema allowlists present. Trino wildcards require restricted mode.
+Bare `*`, schema-wide forms, embedded stars, empty or duplicated metadata,
+schema drift, and expansion beyond the configured column budget fail before
+aggregate profiling. Replace the wildcard with reviewed exact columns when
+the table is wider than the intended profiling scope.
+
+## SQL Query Source Rejected
+
+Pass one UTF-8 file to `profile-query`; SQL text is not accepted in an option
+or environment variable. The initial policy permits one fully qualified,
+single-table `SELECT` with explicit output aliases, bounded filters, and the
+documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
+window operations, table functions, comments, volatile/unknown functions,
+multiple statements, and unauthorized tables or columns.
+
+The query file, AST, projected fields, and adapter work must remain inside all
+configured budgets. A changed file, unsupported type, malformed backend
+metadata, schema drift, or budget exhaustion fails closed and leaves no
+profile. Errors intentionally omit SQL text, literals, endpoints, and backend
+messages; inspect the local reviewed file and allowlists instead.
 
 ## GigaChat Advice Failed
 
