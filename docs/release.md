@@ -131,6 +131,15 @@ promotion. The signed tag, reviewed promotion, package hashes, signed image
 digests, and successful post-publish checks are recorded in the
 [1.2.0 published release evidence](release-evidence-1.2.0.md).
 
+The database-source ergonomics implemented after `1.2.0` add credential-free
+JDBC-style endpoint syntax, table-qualified column wildcards, and one bounded
+aggregate-only SQL query-source workflow. These change runtime behavior,
+public CLI/Python contracts, and database security boundaries, so their first
+release must be `1.3.0rc1`. Candidate acceptance must bind the exact runtime to
+the component/JDBC/wildcard/query installed-wheel matrices for PostgreSQL and
+Trino plus the public independent SQL source-to-sink review. Preparing or
+archiving documentation does not itself create or publish that candidate.
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash

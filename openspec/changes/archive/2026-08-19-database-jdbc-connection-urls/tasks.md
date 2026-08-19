@@ -14,8 +14,11 @@
   placeholder URLs; keep live disposable runs explicitly gated.
 - [x] Prove URLs and component values cannot enter profiles, logs, errors, MCP,
   provider payloads, or artifacts.
-- [ ] Prove both JDBC examples complete profile, infer, generate, and validate,
+- [x] Prove both JDBC examples complete profile, infer, generate, and validate,
   report `source_rows_copied: false`, and clean up on success or failure.
+  Evidence: the installed-wheel PostgreSQL acceptance matrix passed component,
+  JDBC, wildcard, and query launchers locally; PR #456 passed the equivalent
+  disposable Trino CI matrix, including cleanup assertions.
 - [x] Update README, PostgreSQL/Trino how-to pages, configuration reference,
   changelog, roadmap, and public contract tests.
 - [x] Run focused ruff, mypy, pytest, documentation contracts, and strict

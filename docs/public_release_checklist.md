@@ -87,6 +87,12 @@ Before creating a tag:
   distributions before considering stable `1.2.0`.
 - Promote stable `1.2.0` only through a version- and documentation-only diff
   from the publicly accepted RC2 runtime.
+- Use `1.3.0rc1` for the credential-free JDBC-style endpoint, qualified column
+  wildcard, and aggregate-only SQL query-source additions because they change
+  public runtime behavior, Python/CLI contracts, and database security
+  boundaries. Re-run the component, JDBC, wildcard, and query installed-wheel
+  matrix for both PostgreSQL and Trino, bind the candidate to the independent
+  SQL review, and keep stable `1.2.0` recommended until public acceptance.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source
