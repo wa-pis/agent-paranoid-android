@@ -30,10 +30,6 @@ This is a map of the codebase for the domain-agnostic generator.
   candidates, null ratios, types, sensitivity, distributions, and
   identifier-like columns without keeping the full dataset in memory.
 
-- `distribution_profiler.py`
-  Adds safe distributions. Sensitive fields receive masked patterns instead of
-  raw top values.
-
 - `cache.py`
   Stores and loads safe profile JSON for large local CSV folders. The cache is
   metadata-only and keyed by file names, sizes, and modification times.
