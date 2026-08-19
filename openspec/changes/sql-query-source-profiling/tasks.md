@@ -29,7 +29,13 @@
   changelog, and OpenSpec updates.
 - [x] Run full ruff, mypy, pytest, release checks, strict MkDocs, package build,
   and isolated-wheel smoke before release assignment.
-- [ ] Obtain focused independent review of the SQL policy and source-to-sink
+- [x] Obtain focused independent review of the SQL policy and source-to-sink
   privacy boundary before publishing a candidate.
-- [ ] Hand the shipped CLI/Python/query/example facts to the separate
+  Evidence: [AI-assisted OpenCode review](security-review-evidence.md) of exact
+  commit `d3c2809b6f050c8443aa6b4920afd6aafefa2d10` found no unresolved Critical,
+  High, or Medium defect; the public record is
+  [issue #461](https://github.com/wa-pis/agent-paranoid-android/issues/461).
+- [x] Hand the shipped CLI/Python/query/example facts to the separate
   `database-source-documentation-reconciliation` cross-feature audit.
+  Evidence: PR #454 reconciled README, reference, how-to, example, privacy,
+  roadmap, changelog, and OpenSpec facts before the exact-commit review.
