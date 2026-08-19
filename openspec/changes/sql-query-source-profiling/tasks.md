@@ -29,3 +29,5 @@
   and isolated-wheel smoke before release assignment.
 - [ ] Obtain focused independent review of the SQL policy and source-to-sink
   privacy boundary before publishing a candidate.
+- [ ] Hand the shipped CLI/Python/query/example facts to the separate
+  `database-source-documentation-reconciliation` cross-feature audit.
