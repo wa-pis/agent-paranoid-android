@@ -1065,6 +1065,30 @@ work without reopening the completed 1.0 application-boundary gate:
   external security boundary. Evidence: the signed and publicly verified
   [`v1.1.0rc1` release](release-evidence-1.1.0rc1.md).
 
+### Proposed Database Source Ergonomics
+
+These are three independent, reviewable changes. They are not part of the
+implemented `1.2.0` contract and must be delivered in separate implementation
+pull requests:
+
+1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-jdbc-connection-urls/proposal.md)
+   parse familiar PostgreSQL and Trino endpoint syntax into the existing Python
+   adapters without adding Java, accepting URL credentials, or changing the
+   read-only policy.
+2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/qualified-column-wildcards/proposal.md)
+   add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
+   syntax. Metadata expansion produces a bounded explicit column snapshot;
+   executed SQL never contains a projection star.
+3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/sql-query-source-profiling/proposal.md)
+   treats one validated local `SELECT` as a virtual aggregate-only source for
+   the existing profile -> infer -> generate workflow. Query rows and literals
+   never enter generation or an external boundary.
+
+Implementation order is JDBC URL parsing, qualified wildcard expansion, then
+SQL query source profiling. Each runtime change requires focused synthetic
+regressions, public documentation, full release checks, and release-candidate
+assignment before publication.
+
 ### Required For Every Remaining Release
 
 - `scripts/check_release.sh` and `mkdocs build --strict` pass.

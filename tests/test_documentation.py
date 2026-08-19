@@ -309,7 +309,12 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template"}
+    assert active == {
+        "_template",
+        "database-jdbc-connection-urls",
+        "qualified-column-wildcards",
+        "sql-query-source-profiling",
+    }
 
     archived = changes / "archive"
     completed = (
