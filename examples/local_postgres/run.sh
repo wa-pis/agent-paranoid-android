@@ -68,7 +68,11 @@ else
 fi
 export POSTGRES_ALLOWED_SCHEMAS=public
 export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
-export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.customers.joined_on,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount,public.orders.expedited
+if [[ "${POSTGRES_EXAMPLE_USE_WILDCARD:-false}" == "true" ]]; then
+  export POSTGRES_ALLOWED_COLUMNS='public.customers.*,public.orders.*'
+else
+  export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.customers.joined_on,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount,public.orders.expedited
+fi
 export POSTGRES_MAX_TABLES=2
 export POSTGRES_MAX_COLUMNS=8
 export POSTGRES_MAX_STATEMENTS=100
@@ -98,6 +102,8 @@ profile = json.load(open(sys.argv[1], encoding="utf-8"))
 entities = {entity["name"]: entity for entity in profile["entities"]}
 orders = {field["name"]: field for field in entities["warehouse.public.orders"]["fields"]}
 customers = {field["name"]: field for field in entities["warehouse.public.customers"]["fields"]}
+assert list(orders) == ["order_id", "customer_id", "state", "amount", "expedited"]
+assert list(customers) == ["customer_id", "status", "joined_on"]
 values = {item["value"] for item in orders["state"]["distribution"]["categories"]}
 assert values == {"new", "paid", "shipped"}
 assert customers["status"]["distribution"] == {}

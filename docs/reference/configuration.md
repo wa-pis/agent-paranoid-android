@@ -65,6 +65,11 @@ syntax parsed into the existing Psycopg configuration, not a Java/JDBC runtime.
 Set `POSTGRES_PASSWORD_ENV` to the name of the environment variable containing
 the password; never put a user or password in the URL.
 
+Each `POSTGRES_ALLOWED_COLUMNS` item is either an exact
+`schema.table.column` or a table-qualified `schema.table.*`. Wildcards are
+expanded from bounded metadata into explicit columns before aggregate queries;
+they never become SQL projection stars or local-value permissions.
+
 The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 `POSTGRES_MAX_RESULT_ROWS`, `POSTGRES_MAX_RESULT_CELLS`, and
 `POSTGRES_MAX_SECONDS` limits bound one profile. Statement and lock timeouts use
@@ -84,7 +89,7 @@ The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 | `POSTGRES_ALLOW_INSECURE` | `false` | Required with `POSTGRES_SSLMODE=disable`; local isolated testing only |
 | `POSTGRES_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
 | `POSTGRES_ALLOWED_TABLES` | required | Comma-separated `schema.table` allowlist |
-| `POSTGRES_ALLOWED_COLUMNS` | required | Comma-separated `schema.table.column` allowlist |
+| `POSTGRES_ALLOWED_COLUMNS` | required | Comma-separated exact `schema.table.column` or table-qualified `schema.table.*` profiling selectors |
 | `POSTGRES_STATEMENT_TIMEOUT_MS` | `30000` | Per-statement timeout requested on the read-only session |
 | `POSTGRES_LOCK_TIMEOUT_MS` | `5000` | Lock wait timeout requested on the read-only session |
 | `POSTGRES_MAX_TABLES` | `100` | Maximum profiled tables |
@@ -171,6 +176,7 @@ driver.
 | `TRINO_SCHEMA` | unset | Optional request default; requires `TRINO_CATALOG` and membership in `TRINO_ALLOWED_SCHEMAS` |
 | `TRINO_ALLOWED_CATALOGS` | required | Comma-separated catalog allowlist |
 | `TRINO_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
+| `TRINO_ALLOWED_TABLE_COLUMNS` | unset | Optional exact `catalog.schema.table.column` or restricted table-qualified `catalog.schema.table.*` profile selectors; wildcard does not authorize category literals |
 | `TRINO_REQUEST_TIMEOUT_SECONDS` | `30` | Client request timeout, `0.1` to `300` |
 | `TRINO_MAX_RESULT_ROWS` | `10000` | Client result cap, maximum `100000` |
 | `TRINO_QUERY_MAX_EXECUTION_TIME` | `30s` | Trino execution-time session budget |
@@ -183,6 +189,11 @@ Duration values use `ms`, `s`, `m`, or `h`. Data-size values use `B`, `kB`,
 
 `TRINO_QUERY_MAX_RUN_TIME` must be greater than or equal to
 `TRINO_QUERY_MAX_EXECUTION_TIME`.
+
+When `TRINO_ALLOWED_TABLE_COLUMNS` is set, table profiling uses only its exact
+selectors plus metadata-expanded columns from a matching table wildcard. The
+request fails before aggregate work when metadata is empty, malformed,
+duplicated, inconsistent, or over the invocation column budget.
 
 ## Trino Invocation Limits
 

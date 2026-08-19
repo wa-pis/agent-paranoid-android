@@ -91,8 +91,8 @@ to profile your own input.
 | Validate the workflow with a real development or analytics task | [Product Validation Pilot](https://wa-pis.github.io/agent-paranoid-android/getting-started/product-validation-pilot/) |
 | Generate from one CSV | [First CSV Dataset](https://wa-pis.github.io/agent-paranoid-android/getting-started/first-csv/) |
 | Generate related tables | [Related Tables](https://wa-pis.github.io/agent-paranoid-android/getting-started/related-tables/) |
-| Profile PostgreSQL and export executable SQL | [PostgreSQL workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/postgresql/) · component or JDBC-style endpoint · [Runnable disposable examples](examples/local_postgres/) |
-| Profile through Trino | [Trino workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/trino/) · component or JDBC-style endpoint · [Runnable local examples](examples/local_trino/) |
+| Profile PostgreSQL and export executable SQL | [PostgreSQL workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/postgresql/) · component/JDBC endpoint · exact or qualified-wildcard columns · [Runnable examples](examples/local_postgres/) |
+| Profile through Trino | [Trino workflow](https://wa-pis.github.io/agent-paranoid-android/how-to/trino/) · component/JDBC endpoint · exact or qualified-wildcard columns · [Runnable examples](examples/local_trino/) |
 | Review specs and output | [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/) |
 | Add deterministic business rules | [Business Rules](https://wa-pis.github.io/agent-paranoid-android/how-to/business-rules/) |
 | Use the review-first agent flow | [Agent Design](https://wa-pis.github.io/agent-paranoid-android/agent_design/) |

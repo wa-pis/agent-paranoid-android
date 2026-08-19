@@ -456,12 +456,12 @@ def current_query_work_budget() -> QueryWorkBudget | None:
     return _CURRENT_QUERY_WORK_BUDGET.get()
 
 
-def consume_profiled_column_work() -> None:
-    """Charge one nested column operation to the current invocation."""
+def consume_profiled_column_work(amount: int = 1) -> None:
+    """Charge nested column operations to the current invocation."""
     budget = current_query_work_budget()
     if budget is not None:
         budget.check_invocation_deadline()
-        budget.consume_profiled_columns()
+        budget.consume_profiled_columns(amount)
 
 
 def consume_sql_formula_chars(value: str) -> None:

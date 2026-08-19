@@ -6,7 +6,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_config import (
+    TrinoConfig,
+    TrinoConfigurationError,
+    parse_trino_column_selector,
+)
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
     build_aggregate_mapping_profile_query,
@@ -23,7 +27,11 @@ from test_data_agent.trino_query_builders import (
     build_temporal_ordering_profile_query,
     require_non_negative_float,
 )
-from test_data_agent.trino_sql_policy import check_allowlist
+from test_data_agent.trino_sql_policy import (
+    AllowlistError,
+    check_allowlist,
+    require_identifier,
+)
 from test_data_agent.trino_work_budget import consume_profiled_column_work
 
 MIN_RULE_CONFIDENCE = 0.9
@@ -42,6 +50,13 @@ class SafeColumnProfiler(Protocol):
         nullable: bool,
         max_top_values: int,
     ) -> dict[str, Any]: ...
+
+
+@dataclass(frozen=True, slots=True)
+class TrinoProfileColumn:
+    name: str
+    data_type: str
+    nullable: bool
 
 
 @dataclass(frozen=True)
@@ -114,18 +129,26 @@ class TrinoProfiler:
         """Build a safe table profile through an injected column summarizer."""
         self._check_allowlist(catalog=catalog, schema=schema)
         bounded_top_values = min(max(1, max_top_values), 50)
+        metadata = self.describe_table(catalog, schema, table)
+        selected_columns = self._expanded_profile_columns(
+            catalog,
+            schema,
+            table,
+            metadata,
+        )
+        consume_profiled_column_work(len(selected_columns))
         table_profile = self.profile_table(catalog, schema, table)
         columns: list[dict[str, Any]] = []
-        for column in self.describe_table(catalog, schema, table):
-            consume_profiled_column_work()
+        for column in selected_columns:
+            consume_profiled_column_work(0)
             columns.append(
                 column_profiler(
                     catalog,
                     schema,
                     table,
-                    column["column_name"],
-                    column.get("data_type", "varchar"),
-                    str(column.get("is_nullable", "")).upper() == "YES",
+                    column.name,
+                    column.data_type,
+                    column.nullable,
                     bounded_top_values,
                 )
             )
@@ -135,6 +158,72 @@ class TrinoProfiler:
             "row_count": table_profile["row_count"],
             "columns": columns,
         }
+
+    def _expanded_profile_columns(
+        self,
+        catalog: str,
+        schema: str,
+        table: str,
+        rows: list[dict[str, Any]],
+    ) -> tuple[TrinoProfileColumn, ...]:
+        metadata: dict[str, TrinoProfileColumn] = {}
+        try:
+            for row in rows:
+                name = row.get("column_name")
+                data_type = row.get("data_type")
+                nullable = str(row.get("is_nullable", "")).upper()
+                if (
+                    not isinstance(name, str)
+                    or not isinstance(data_type, str)
+                    or not data_type.strip()
+                    or nullable not in {"YES", "NO"}
+                ):
+                    raise ValueError
+                require_identifier(name, "column")
+                if name in metadata:
+                    raise ValueError
+                metadata[name] = TrinoProfileColumn(
+                    name=name,
+                    data_type=data_type,
+                    nullable=nullable == "YES",
+                )
+        except (TypeError, ValueError):
+            raise AllowlistError("Trino column metadata is invalid") from None
+        if not metadata:
+            raise AllowlistError("Trino column metadata is empty")
+
+        configured = self.config.allowed_table_columns
+        if configured is None:
+            return tuple(metadata.values())
+        else:
+            try:
+                selectors = tuple(
+                    parse_trino_column_selector(value)
+                    for value in sorted(configured)
+                )
+            except TrinoConfigurationError:
+                raise AllowlistError("Trino column selector is invalid") from None
+            table_name = f"{catalog}.{schema}.{table}"
+            table_selectors = tuple(
+                selector
+                for selector in selectors
+                if selector.table_name == table_name
+            )
+            if not table_selectors:
+                raise AllowlistError("Trino table has no allowed profile columns")
+            selected_names = {
+                selector.column
+                for selector in table_selectors
+                if selector.column is not None
+            }
+            if any(selector.is_wildcard for selector in table_selectors):
+                selected_names.update(metadata)
+            if not selected_names.issubset(metadata):
+                raise AllowlistError(
+                    "Trino column metadata does not match the configured allowlist"
+                )
+
+        return tuple(metadata[name] for name in sorted(selected_names))
 
     def profile_foreign_key(
         self,

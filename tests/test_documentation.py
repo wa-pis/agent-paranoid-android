@@ -448,6 +448,43 @@ def test_jdbc_examples_and_public_docs_match_runtime_contract() -> None:
     assert "no Java" in public_docs or "not a Java/JDBC runtime" in public_docs
 
 
+def test_wildcard_examples_and_public_docs_match_runtime_contract() -> None:
+    postgres_launcher = ROOT / "examples/local_postgres/run-wildcard.sh"
+    trino_launcher = ROOT / "examples/local_trino/run-wildcard.sh"
+    assert postgres_launcher.stat().st_mode & 0o111
+    assert trino_launcher.stat().st_mode & 0o111
+    assert "POSTGRES_EXAMPLE_USE_WILDCARD=true" in postgres_launcher.read_text()
+    assert "TRINO_EXAMPLE_USE_WILDCARD=true" in trino_launcher.read_text()
+
+    postgres_example = (ROOT / "examples/local_postgres/run.sh").read_text()
+    trino_example = (ROOT / "examples/local_trino/run.sh").read_text()
+    assert "POSTGRES_ALLOWED_COLUMNS='public.customers.*,public.orders.*'" in (
+        postgres_example
+    )
+    assert "TRINO_ALLOWED_TABLE_COLUMNS='tpch.tiny.nation.*'" in trino_example
+    assert "--seed 12345" in postgres_example
+    assert "source_rows_copied" in (ROOT / "examples/local_trino/run.py").read_text()
+
+    public_docs = "\n".join(
+        (ROOT / path).read_text()
+        for path in (
+            "README.md",
+            "docs/index.md",
+            "docs/how-to/postgresql.md",
+            "docs/how-to/trino.md",
+            "docs/reference/cli.md",
+            "docs/reference/configuration.md",
+            "docs/concepts/safety-model.md",
+            "docs/implementation_map.md",
+            "docs/reference/application-boundaries.md",
+        )
+    )
+    assert "schema.table.*" in public_docs
+    assert "catalog.schema.table.*" in public_docs
+    assert "projection star" in public_docs
+    assert "category literals" in public_docs
+
+
 def test_database_source_documentation_reconciliation_covers_all_layers() -> None:
     change = (
         ROOT

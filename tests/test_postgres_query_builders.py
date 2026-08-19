@@ -6,11 +6,16 @@ from dataclasses import replace
 import pytest
 
 from test_data_agent.core.privacy import LocalCategoryField
-from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
+from test_data_agent.postgres_config import (
+    PostgresConfig,
+    PostgresProfileLimits,
+    with_resolved_postgres_columns,
+)
 from test_data_agent.postgres_query_builders import (
     PostgresScopeError,
     build_check_constraints_query,
     build_column_summary_query,
+    build_column_discovery_query,
     build_columns_query,
     build_foreign_key_coverage_query,
     build_foreign_keys_query,
@@ -69,6 +74,47 @@ def test_columns_query_only_requests_allowed_columns() -> None:
     )
     assert "customer_id" not in query.sql
     assert query.sql.endswith("ORDER BY a.attnum")
+
+
+def test_wildcard_discovery_is_bounded_metadata_only() -> None:
+    config = replace(
+        postgres_config(),
+        allowed_columns=frozenset(
+            {"crm.customers.id", "public.orders.*"}
+        ),
+    )
+
+    query = build_column_discovery_query(config, "public", "orders")
+
+    assert query.parameters == ("public", "orders", 1_001)
+    assert query.sql.startswith("SELECT a.attname AS column_name")
+    assert "SELECT *" not in query.sql.upper()
+    assert query.sql.endswith("ORDER BY a.attname LIMIT %s")
+    with pytest.raises(PostgresScopeError, match="expanded"):
+        build_columns_query(config, "public", "orders")
+
+
+def test_resolved_wildcard_snapshot_keeps_aggregate_builders_explicit() -> None:
+    config = with_resolved_postgres_columns(
+        replace(
+            postgres_config(),
+            allowed_columns=frozenset(
+                {"crm.customers.id", "public.orders.*"}
+            ),
+        ),
+        frozenset(
+            {
+                "crm.customers.id",
+                "public.orders.customer_id",
+                "public.orders.status",
+            }
+        ),
+    )
+
+    query = build_column_summary_query(config, "public", "orders", "status")
+
+    assert 'count("status")' in query.sql
+    assert "SELECT *" not in query.sql.upper()
 
 
 def test_primary_key_query_keeps_key_order_and_column_scope() -> None:

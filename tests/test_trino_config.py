@@ -13,6 +13,7 @@ from test_data_agent.trino_config import (
     parse_data_size_value,
     parse_duration_value,
     parse_trino_jdbc_url,
+    parse_trino_column_selector,
     parse_trino_port,
 )
 
@@ -69,6 +70,61 @@ def test_trino_config_rejects_invalid_table_column_allowlist(
 
     with pytest.raises(TrinoConfigurationError, match="catalog.schema.table.column"):
         TrinoConfig.from_env()
+
+
+def test_trino_config_accepts_restricted_table_qualified_wildcard(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe")
+    monkeypatch.setenv(
+        "TRINO_ALLOWED_TABLE_COLUMNS",
+        "analytics.safe.customers.*",
+    )
+
+    config = TrinoConfig.from_env()
+    selector = parse_trino_column_selector(next(iter(config.allowed_table_columns or ())))
+
+    assert selector.is_wildcard is True
+    assert selector.table_name == "analytics.safe.customers"
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "*",
+        "analytics.safe.*",
+        "analytics.safe.*.*",
+        "analytics.*.customers.*",
+        "analytics.safe.customers.na*",
+    ],
+)
+def test_trino_config_rejects_unqualified_or_pattern_wildcards(
+    monkeypatch: pytest.MonkeyPatch,
+    value: str,
+) -> None:
+    monkeypatch.setenv("TRINO_ALLOWED_CATALOGS", "analytics")
+    monkeypatch.setenv("TRINO_ALLOWED_SCHEMAS", "safe")
+    monkeypatch.setenv("TRINO_ALLOWED_TABLE_COLUMNS", value)
+
+    with pytest.raises(TrinoConfigurationError, match="catalog.schema.table.column"):
+        TrinoConfig.from_env()
+
+
+def test_trino_wildcard_requires_restricted_allowlisted_scope() -> None:
+    config = TrinoConfig(
+        host="trino.internal",
+        port=8443,
+        user="synthetic-agent",
+        http_scheme="https",
+        allowed_catalogs=frozenset({"analytics"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"analytics.safe.customers.*"}),
+        allow_unrestricted=True,
+    )
+
+    with pytest.raises(TrinoConfigurationError, match="restricted mode"):
+        config.validate_security()
 
 
 def test_trino_config_requires_a_known_deployment_profile(

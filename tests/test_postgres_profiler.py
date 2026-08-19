@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import pytest
 
@@ -46,6 +46,11 @@ class SyntheticPostgresResults:
                 {"table_schema": "public", "table_name": "orders"},
             ]
             return rows[:1] if self.omit_orders else rows
+        if sql.startswith("SELECT a.attname AS column_name "):
+            schema, table = query.parameters[:2]
+            if (schema, table) == ("crm", "customers"):
+                return [{"column_name": "tier"}, {"column_name": "id"}]
+            return [{"column_name": "customer_id"}, {"column_name": "amount"}]
         if "pg_catalog.format_type" in sql:
             schema, table = query.parameters[:2]
             if (schema, table) == ("crm", "customers"):
@@ -191,3 +196,135 @@ def test_missing_allowlisted_table_fails_without_partial_profile() -> None:
         PostgresProfiler(postgres_config(), results.fetch).profile()
 
     assert len(results.queries) == 1
+
+
+def test_qualified_wildcards_expand_to_stable_explicit_snapshot() -> None:
+    results = SyntheticPostgresResults()
+    config = replace(
+        postgres_config(),
+        allowed_columns=frozenset({"public.orders.*", "crm.customers.*"}),
+    )
+    category = LocalCategoryField(
+        entity="warehouse.crm.customers",
+        field="tier",
+    )
+
+    profile = PostgresProfiler(config, results.fetch).profile(
+        local_category_fields=[category]
+    )
+
+    assert [field.name for field in profile.entity("warehouse.crm.customers").fields] == [
+        "id",
+        "tier",
+    ]
+    assert [field.name for field in profile.entity("warehouse.public.orders").fields] == [
+        "customer_id",
+        "amount",
+    ]
+    assert profile.entity("warehouse.crm.customers").field("tier").distribution[
+        "kind"
+    ] == "categorical"
+    columns_queries = [
+        query for query in results.queries if "pg_catalog.format_type" in query.sql
+    ]
+    assert columns_queries[0].parameters == ("crm", "customers", "id", "tier")
+    assert columns_queries[1].parameters == (
+        "public",
+        "orders",
+        "amount",
+        "customer_id",
+    )
+    assert all("SELECT *" not in query.sql.upper() for query in results.queries)
+
+
+def test_wildcard_alone_does_not_preserve_local_category_values() -> None:
+    results = SyntheticPostgresResults()
+    config = replace(
+        postgres_config(),
+        allowed_columns=frozenset({"public.orders.*", "crm.customers.*"}),
+    )
+
+    profile = PostgresProfiler(config, results.fetch).profile()
+
+    serialized = profile.model_dump_json()
+    assert "gold" not in serialized
+    assert "silver" not in serialized
+    assert not any(
+        "AS value, count(*) AS count" in query.sql for query in results.queries
+    )
+
+
+def test_wildcard_metadata_failure_publishes_no_partial_profile() -> None:
+    results = SyntheticPostgresResults()
+
+    def duplicate_metadata(query: PostgresQuery) -> list[dict[str, object]]:
+        rows = results.fetch(query)
+        if query.sql.startswith("SELECT a.attname AS column_name "):
+            return [{"column_name": "id"}, {"column_name": "id"}]
+        return rows
+
+    config = replace(
+        postgres_config(),
+        allowed_columns=frozenset({"public.orders.*", "crm.customers.*"}),
+    )
+
+    with pytest.raises(PostgresProfileError, match="metadata is incomplete"):
+        PostgresProfiler(config, duplicate_metadata).profile()
+
+    assert not any(
+        query.sql.startswith("SELECT count(*) AS row_count FROM")
+        for query in results.queries
+    )
+
+
+def test_wildcard_expansion_fails_before_aggregate_when_over_budget() -> None:
+    results = SyntheticPostgresResults()
+    config = replace(
+        postgres_config(),
+        allowed_columns=frozenset({"public.orders.*", "crm.customers.*"}),
+        limits=replace(postgres_config().limits, max_columns=3),
+    )
+
+    with pytest.raises(PostgresProfileError, match="exceeds its budget"):
+        PostgresProfiler(config, results.fetch).profile()
+
+    assert not any(
+        query.sql.startswith("SELECT count(*) AS row_count FROM")
+        for query in results.queries
+    )
+
+
+def test_wildcard_snapshot_rejects_schema_drift_before_aggregate() -> None:
+    queries: list[PostgresQuery] = []
+
+    def fetch(query: PostgresQuery) -> list[dict[str, object]]:
+        queries.append(query)
+        if "table_schema" in query.sql:
+            return [{"table_schema": "public", "table_name": "orders"}]
+        if query.sql.startswith("SELECT a.attname AS column_name "):
+            return [{"column_name": "amount"}, {"column_name": "customer_id"}]
+        if "pg_catalog.format_type" in query.sql:
+            return [
+                {
+                    "column_name": "customer_id",
+                    "data_type": "bigint",
+                    "is_nullable": False,
+                    "ordinal_position": 1,
+                }
+            ]
+        raise AssertionError("aggregate query must not execute")
+
+    config = replace(
+        postgres_config(),
+        allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.*"}),
+    )
+
+    with pytest.raises(PostgresProfileError, match="configured allowlist"):
+        PostgresProfiler(config, fetch).profile()
+
+    assert not any(
+        query.sql.startswith("SELECT count(*) AS row_count FROM")
+        for query in queries
+    )

@@ -5,7 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from test_data_agent.core.privacy import LocalCategoryField, infer_sensitive_from_name
-from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.postgres_config import (
+    PostgresConfig,
+    parse_postgres_column_selector,
+)
 
 
 class PostgresScopeError(ValueError):
@@ -51,6 +54,33 @@ def build_columns_query(
         f"AND a.attname IN ({_scalar_placeholders(len(columns))}) "
         "ORDER BY a.attnum",
         (schema, table, *columns),
+    )
+
+
+def build_column_discovery_query(
+    config: PostgresConfig,
+    schema: str,
+    table: str,
+) -> PostgresQuery:
+    """Discover names only for one explicitly wildcard-authorized table."""
+
+    qualified_table = f"{schema}.{table}"
+    if qualified_table not in config.allowed_tables:
+        raise PostgresScopeError("PostgreSQL table is outside the allowlist")
+    wildcard = f"{qualified_table}.*"
+    if wildcard not in config.allowed_columns:
+        raise PostgresScopeError(
+            "PostgreSQL table does not have a qualified column wildcard"
+        )
+    return PostgresQuery(
+        "SELECT a.attname AS column_name "
+        "FROM pg_catalog.pg_attribute AS a "
+        "JOIN pg_catalog.pg_class AS c ON c.oid = a.attrelid "
+        "JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace "
+        "WHERE n.nspname = %s AND c.relname = %s "
+        "AND c.relkind IN ('r', 'p') AND a.attnum > 0 AND NOT a.attisdropped "
+        "ORDER BY a.attname LIMIT %s",
+        (schema, table, config.limits.max_columns + 1),
     )
 
 
@@ -250,10 +280,22 @@ def _allowed_columns(
     config: PostgresConfig,
 ) -> tuple[tuple[str, str, str], ...]:
     _allowed_tables(config)
+    configured_columns = (
+        config.resolved_columns
+        if config.resolved_columns is not None
+        else config.allowed_columns
+    )
+    selectors = tuple(
+        parse_postgres_column_selector(value) for value in sorted(configured_columns)
+    )
+    if any(selector.is_wildcard for selector in selectors):
+        raise PostgresScopeError(
+            "PostgreSQL column wildcard must be expanded before query construction"
+        )
     columns = tuple(
-        (schema, table, column)
-        for value in sorted(config.allowed_columns)
-        for schema, table, column in (value.split(".", maxsplit=2),)
+        (selector.schema, selector.table, selector.column)
+        for selector in selectors
+        if selector.column is not None
     )
     if len(columns) > config.limits.max_columns:
         raise PostgresScopeError("PostgreSQL column allowlist exceeds its budget")

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -42,6 +43,9 @@ def run_example(output: Path) -> dict[str, object]:
             "nation",
             max_top_values=5,
         )
+        profile_fields = [str(column["name"]) for column in profile["columns"]]
+        if os.environ.get("TRINO_EXAMPLE_USE_WILDCARD") == "true":
+            assert profile_fields == ["comment", "name", "nationkey", "regionkey"]
         profile_path = temporary / "profile.json"
         profile_path.write_text(json.dumps(profile, indent=2, sort_keys=True) + "\n")
         spec_path = temporary / "dataset_spec.yaml"
@@ -79,6 +83,7 @@ def run_example(output: Path) -> dict[str, object]:
             "table_available": "nation" in tables,
             "profile_row_count": profile["row_count"],
             "profile_column_count": len(columns),
+            "profile_fields": profile_fields,
             "generated_row_counts": manifest["row_counts"],
             "seed": manifest["seed"],
             "validation_valid": manifest["validation_valid"],

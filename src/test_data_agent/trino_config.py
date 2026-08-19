@@ -42,6 +42,27 @@ class TrinoJdbcEndpoint:
     http_scheme: str | None
 
 
+@dataclass(frozen=True, slots=True)
+class TrinoColumnSelector:
+    catalog: str
+    schema: str
+    table: str
+    column: str | None
+
+    @property
+    def is_wildcard(self) -> bool:
+        return self.column is None
+
+    @property
+    def table_name(self) -> str:
+        return f"{self.catalog}.{self.schema}.{self.table}"
+
+    @property
+    def qualified_name(self) -> str:
+        column = "*" if self.column is None else self.column
+        return f"{self.table_name}.{column}"
+
+
 @dataclass(frozen=True)
 class TrinoConfig:
     host: str
@@ -161,7 +182,21 @@ class TrinoConfig:
         )
         if self.allowed_table_columns is not None:
             for value in self.allowed_table_columns:
-                validate_fully_qualified_table_column(value)
+                selector = parse_trino_column_selector(value)
+                if selector.is_wildcard and self.allow_unrestricted:
+                    raise TrinoConfigurationError(
+                        "TRINO_ALLOWED_TABLE_COLUMNS wildcards require restricted mode"
+                    )
+                if (
+                    self.allowed_catalogs is None
+                    or selector.catalog not in self.allowed_catalogs
+                    or self.allowed_schemas is None
+                    or selector.schema not in self.allowed_schemas
+                ):
+                    raise TrinoConfigurationError(
+                        "TRINO_ALLOWED_TABLE_COLUMNS must stay within allowed "
+                        "catalogs and schemas"
+                    )
         if self.default_catalog is not None:
             _validate_database_identifier(self.default_catalog, "TRINO_CATALOG")
             if (
@@ -266,18 +301,36 @@ def _trino_jdbc_endpoint_from_env() -> TrinoJdbcEndpoint | None:
     return parse_trino_jdbc_url(value)
 
 
-_TABLE_COLUMN_ALLOWLIST_RE = re.compile(
-    r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_]"
-    r"[A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$"
-)
-
-
 def validate_fully_qualified_table_column(value: str) -> None:
-    if not _TABLE_COLUMN_ALLOWLIST_RE.fullmatch(value):
+    parse_trino_column_selector(value)
+
+
+def parse_trino_column_selector(value: str) -> TrinoColumnSelector:
+    """Parse one exact column or one table-qualified wildcard."""
+
+    components = value.split(".")
+    if len(components) != 4:
         raise TrinoConfigurationError(
             "TRINO_ALLOWED_TABLE_COLUMNS entries must be "
-            "catalog.schema.table.column values"
+            "catalog.schema.table.column or catalog.schema.table.* values"
         )
+    catalog, schema, table, column = components
+    if any(
+        not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", component)
+        for component in (catalog, schema, table)
+    ):
+        raise TrinoConfigurationError(
+            "TRINO_ALLOWED_TABLE_COLUMNS entries must be "
+            "catalog.schema.table.column or catalog.schema.table.* values"
+        )
+    if column == "*":
+        return TrinoColumnSelector(catalog, schema, table, None)
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", column):
+        raise TrinoConfigurationError(
+            "TRINO_ALLOWED_TABLE_COLUMNS entries must be "
+            "catalog.schema.table.column or catalog.schema.table.* values"
+        )
+    return TrinoColumnSelector(catalog, schema, table, column)
 
 
 def parse_env_bool(name: str) -> bool:

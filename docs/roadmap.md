@@ -1079,7 +1079,8 @@ must be delivered in separate implementation pull requests:
 2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/qualified-column-wildcards/proposal.md)
    add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
    syntax. Metadata expansion produces a bounded explicit column snapshot;
-   executed SQL never contains a projection star.
+   executed SQL never contains a projection star. Implemented on `main` for
+   assignment to the next feature release candidate.
 3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/sql-query-source-profiling/proposal.md)
    treats one validated local `SELECT` as a virtual aggregate-only source for
    the existing profile -> infer -> generate workflow. Query rows and literals

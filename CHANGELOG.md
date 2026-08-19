@@ -11,6 +11,11 @@ All notable changes to this project are documented here.
   JDBC driver.
 - Add disposable PostgreSQL and Trino JDBC launchers that reuse the existing
   synthetic, allowlisted, fixed-seed examples.
+- Accept table-qualified PostgreSQL `schema.table.*` and Trino
+  `catalog.schema.table.*` profile selectors, expanding bounded metadata into
+  deterministic explicit-column snapshots before aggregate work.
+- Add disposable PostgreSQL and Trino wildcard launchers that verify stable
+  fields, deterministic generation, validation, and no copied source rows.
 
 ### Security
 
@@ -18,6 +23,10 @@ All notable changes to this project are documented here.
   endpoints, unverified Trino TLS selection, non-allowlisted request defaults,
   and conflicting component configuration before database access, using fixed
   errors that do not echo endpoint values.
+- Reject unqualified, cross-scope, malformed, duplicate, empty, inconsistent,
+  or over-budget wildcard metadata before aggregate profiling. Wildcards never
+  authorize projection stars, source rows, preserve-as-is, category literals,
+  provider/MCP disclosure, logs, or errors.
 
 ## [1.2.0] - 2026-08-15
 
