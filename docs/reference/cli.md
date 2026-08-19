@@ -27,6 +27,7 @@ commands.
 | `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
 | `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
+| `profile-query` | Profile one reviewed PostgreSQL or Trino query as an aggregate-only virtual source | Profile JSON |
 | `export-postgres-sql` | Generate and export one executable PostgreSQL DDL+INSERT file | `.sql` file |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |
@@ -96,6 +97,23 @@ PostgreSQL file containing quoted DDL, foreign keys, INSERT statements, and a
 transaction. Generic `generate --format sql` remains the existing INSERT-only
 dataset format and does not create table DDL. Export itself is available in the
 base package; only direct PostgreSQL profiling needs the optional driver.
+
+For one reviewed query file, keep connection settings and exact physical
+source allowlists in the adapter environment, then run:
+
+```bash
+test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity paid_orders \
+  --output out/query-profile.json
+```
+
+SQL is accepted only from the positional file, never a command-line string.
+The command exposes no query execution or row-return mode. Its profile contains
+one virtual entity plus a fingerprint, not query text, literals, backend
+messages, endpoints, or result rows. Continue with `infer-spec`, `generate`,
+and `validate` exactly as for another safe profile.
 
 For a folder containing one related table per CSV file:
 

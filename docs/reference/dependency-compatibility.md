@@ -15,7 +15,7 @@ range in package metadata alone is not compatibility evidence.
 | PyYAML | YAML spec and business-rule parsing | Base |
 | PyArrow | Parquet reading, writing, and schema conversion | `parquet` |
 | MCP | Generator and Trino transport schemas | `mcp` |
-| sqlglot | Read-only SQL parsing and policy enforcement | `trino` |
+| sqlglot | Read-only SQL parsing and policy enforcement | `postgres`, `trino` |
 | Trino client | Connection construction and bounded query execution | `trino` |
 | OpenAI | Optional advisor-provider request/response transport | `openai` |
 | GigaChat | Optional advisor-provider request/response transport | `gigachat` |
@@ -39,7 +39,7 @@ are the versions in the reviewed `uv.lock` used by the release gate on
 | `trino-minimum` | 3.11 | Base minimum; sqlglot 30.0.0; Trino 0.330.0 |
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `gigachat-minimum` | 3.11 | Base minimum; GigaChat 0.2.3 |
-| `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0 |
+| `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0; sqlglot 30.0.0 |
 | `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 2.50.0; GigaChat 0.2.3; Psycopg 3.3.4 |
 
 MCP 1.0.0 requires Pydantic 2.8.0, so its minimum profile cannot reuse the
@@ -61,7 +61,7 @@ The minimum profiles run focused contracts instead of the full locked suite:
 | `trino-minimum` | SQL policy and Trino client construction | `tests/test_mcp_trino_server.py` |
 | `openai-minimum` | Provider request, response, and error contracts | `tests/test_openai_provider.py` |
 | `gigachat-minimum` | Provider request, response, TLS, authentication, and error contracts | `tests/test_gigachat_provider.py` |
-| `postgres-minimum` | Read-only connection, allowlists, budgets, and profile normalization | `tests/test_postgres_config.py`, `tests/test_postgres_client.py`, `tests/test_postgres_query_builders.py`, `tests/test_postgres_profiler.py` |
+| `postgres-minimum` | Read-only connection, SQL query policy, allowlists, budgets, and profile normalization | `tests/test_postgres_config.py`, `tests/test_postgres_client.py`, `tests/test_postgres_query_builders.py`, `tests/test_postgres_profiler.py`, `tests/test_sql_query_source.py` |
 
 The `latest-all` quality matrix runs the complete test suite on every
 supported Python version. A minimum profile must not be replaced by a resolver

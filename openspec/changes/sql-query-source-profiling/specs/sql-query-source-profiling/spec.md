@@ -28,13 +28,13 @@ aggregate operations and SHALL NOT fetch or return its result rows.
 - **THEN** the request fails before database execution
 - **AND** the error does not echo SQL text or literals
 
-#### Scenario: Query requests a wildcard before authorization support
+#### Scenario: Query requests an authorized wildcard
 
 - **GIVEN** `SELECT *` or `SELECT alias.*`
-- **WHEN** the qualified-column-wildcards contract is not implemented
-- **THEN** the query is rejected before database access
-- **AND** implementing that dependency may only expand the star to explicit
-  authorized columns, never execute a projection star
+- **WHEN** the qualified-column-wildcards contract authorizes the physical
+  table and bounded metadata discovery succeeds
+- **THEN** the star is expanded to sorted explicit authorized columns
+- **AND** the adapter never executes a projection star
 
 ### Requirement: Query Profiles Feed Synthetic Generation Without Rows
 

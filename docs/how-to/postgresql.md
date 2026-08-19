@@ -82,6 +82,63 @@ test-data-agent export-postgres-sql out/dataset-spec.yaml \
 cmp out/generated.sql out/generated-second.sql
 ```
 
+To profile a reviewed derived relation without creating a database view, put
+one fully qualified single-table query in a local file:
+
+```sql
+SELECT o.order_id, o.state, o.amount * 2 AS doubled_amount
+FROM public.orders AS o
+WHERE o.order_id < 999999
+```
+
+Keep the same physical schema/table/column allowlists and run:
+
+```bash
+test-data-agent profile-query query.sql \
+  --adapter postgres \
+  --source-id warehouse \
+  --entity orders_query \
+  --output out/query-profile.json
+test-data-agent infer-spec out/query-profile.json \
+  --output out/query-spec.yaml
+test-data-agent generate out/query-spec.yaml \
+  --seed 12345 --output out/query-generated
+test-data-agent validate out/query-spec.yaml out/query-generated
+```
+
+The query is parsed locally and must stay inside the documented scalar,
+projection, and filter subset. A no-row schema probe and bounded aggregate
+wrappers execute in the forced read-only session. The profile contains a query
+fingerprint but not the SQL text, its literal, backend messages, or query rows.
+
+The equivalent typed Python entry point keeps the query path and database
+configuration explicit:
+
+```python
+from pathlib import Path
+
+import psycopg
+
+from test_data_agent import (
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    profile_postgres_query_source,
+)
+from test_data_agent.postgres_config import PostgresConfig
+
+request = SqlQueryProfileRequest(
+    adapter=SqlQueryAdapter.POSTGRES,
+    source_id="warehouse",
+    entity="orders_query",
+    query_file=Path("query.sql"),
+)
+profile = profile_postgres_query_source(
+    request,
+    config=PostgresConfig.from_env(),
+    driver=psycopg,
+)
+```
+
 Exact values remain disabled by default. A bounded, reviewed, non-sensitive
 business enum can be kept locally with its source-qualified identity:
 
@@ -132,4 +189,5 @@ two related tables, validates deterministic generation, executes the exported
 SQL in an empty target database, and removes the cluster. Run
 `examples/local_postgres/run-jdbc.sh OUTPUT` for the same workflow configured by
 a placeholder JDBC-style URL, or `examples/local_postgres/run-wildcard.sh
-OUTPUT` for bounded table-qualified wildcard expansion.
+OUTPUT` for bounded table-qualified wildcard expansion. Run
+`examples/local_postgres/run-query.sh OUTPUT` for the reviewed query-file path.

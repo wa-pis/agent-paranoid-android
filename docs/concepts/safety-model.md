@@ -17,6 +17,7 @@ Treat all of these as untrusted:
 - business-rule files and inline rule payloads;
 - Trino identifiers, metadata, query results, and environment variables;
 - PostgreSQL and Trino JDBC-style endpoint strings;
+- local PostgreSQL and Trino SQL query-source files;
 - output directories that may contain symlinks or existing files.
 
 ## Defenses
@@ -67,7 +68,12 @@ source-free or anonymous.
 Direct PostgreSQL profiling uses the optional driver through a forced
 read-only session. Schema, table, and column allowlists are mandatory, and one
 shared statement/result/deadline budget bounds metadata and aggregate queries.
-The profiler accepts no caller SQL and reads no source rows. Qualified local
+Normal table profiling accepts no caller SQL and reads no source rows.
+`profile-query` is a separate local-file surface for one strictly parsed,
+single-table, fully allowlisted `SELECT`. Adapter-owned no-row schema and
+aggregate queries profile its virtual relation without fetching result rows.
+The profile stores a SHA-256 fingerprint and policy version, never query text,
+query literals, backend messages, endpoints, or source rows. Qualified local
 category selectors may retain only values that pass the selective local policy
 above.
 

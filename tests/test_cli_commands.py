@@ -48,6 +48,79 @@ def test_postgres_profile_command_loads_optional_driver(
     }
 
 
+@pytest.mark.parametrize(
+    ("adapter", "extra", "driver_module"),
+    [
+        ("postgres", "postgres", "psycopg"),
+        ("trino", "trino", "trino"),
+    ],
+)
+def test_query_profile_command_loads_parser_and_adapter_driver(
+    adapter: str,
+    extra: str,
+    driver_module: str,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    driver = object()
+    captured: dict[str, object] = {"dependencies": []}
+
+    class Resolver:
+        def require_module(
+            self,
+            module_name: str,
+            *,
+            extra: str,
+            purpose: str,
+        ) -> object:
+            dependencies = captured["dependencies"]
+            assert isinstance(dependencies, list)
+            dependencies.append((module_name, extra, purpose))
+            return driver
+
+    def profile_query(args: argparse.Namespace, *, driver: object) -> int:
+        captured["adapter"] = args.adapter
+        captured["query"] = args.query
+        captured["driver"] = driver
+        return 0
+
+    monkeypatch.setattr(
+        cli_commands_module,
+        "DEFAULT_CLI_DEPENDENCY_RESOLVER",
+        Resolver(),
+    )
+    monkeypatch.setattr(
+        cli_commands_module,
+        "profile_query_command",
+        profile_query,
+    )
+    query = tmp_path / "query.sql"
+    arguments = [
+        "profile-query",
+        str(query),
+        "--adapter",
+        adapter,
+        "--source-id",
+        "warehouse",
+        "--entity",
+        "orders_view",
+        "--output",
+        str(tmp_path / "profile.json"),
+    ]
+    args = build_parser(arguments).parse_args(arguments)
+
+    assert run_dataset_command(args) == 0
+    assert captured == {
+        "dependencies": [
+            ("sqlglot", extra, "SQL query source profiling"),
+            (driver_module, extra, "SQL query source profiling"),
+        ],
+        "adapter": adapter,
+        "query": query,
+        "driver": driver,
+    }
+
+
 def test_utility_handler_injects_doctor_boundary(capsys) -> None:
     captured: dict[str, object] = {}
 

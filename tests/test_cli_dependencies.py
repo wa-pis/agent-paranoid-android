@@ -21,13 +21,13 @@ def test_dependency_resolver_reports_missing_extra_modules_in_order() -> None:
 
 def test_dependency_resolver_tracks_postgres_as_optional() -> None:
     def import_without_postgres(name: str) -> ModuleType:
-        if name == "psycopg":
+        if name in {"psycopg", "sqlglot"}:
             raise ImportError("not installed")
         return ModuleType(name)
 
     assert CliDependencyResolver(import_without_postgres).missing_modules(
         "postgres"
-    ) == ("psycopg",)
+    ) == ("psycopg", "sqlglot")
 
 
 def test_dependency_resolver_tracks_gigachat_as_optional() -> None:

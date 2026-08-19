@@ -11,6 +11,7 @@ from scripts.check_installed_package import (
     MAX_WHEEL_SIZE_BYTES,
     group_dependencies_by_extra,
     requirement_extras,
+    verify_install_profile,
     verify_installed_csv_json_quickstart,
     verify_installed_postgres_sql_smoke,
     verify_wheel_size,
@@ -38,6 +39,30 @@ def test_requirement_extras_accepts_combined_markers() -> None:
     requirement = 'mcp<2.0.0,>=1.0.0; extra == "all" or extra == "mcp"'
 
     assert requirement_extras(requirement) == {"all", "mcp"}
+
+
+@pytest.mark.parametrize(
+    ("profile", "available"),
+    [
+        ("postgres", {"psycopg", "sqlglot"}),
+        ("trino", {"sqlglot", "trino"}),
+    ],
+)
+def test_install_profiles_allow_shared_optional_modules(
+    profile: str,
+    available: set[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "scripts.check_installed_package.importlib.util.find_spec",
+        lambda name: object() if name in available else None,
+    )
+    monkeypatch.setattr(
+        "scripts.check_installed_package.distributions",
+        lambda: (),
+    )
+
+    verify_install_profile(profile)
 
 
 def test_wheel_size_budget_accepts_small_wheel(tmp_path: Path) -> None:

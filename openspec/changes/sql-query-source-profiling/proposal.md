@@ -23,11 +23,9 @@ the intended test-data shape.
 
 - JDBC-style URL support is the intended common connection UX but is not a
   prerequisite for the underlying typed Python request.
-- `SELECT *` or `alias.*` support in a query is blocked until the
-  `qualified-column-wildcards` change is implemented. Without that dependency,
-  every projected field must be explicit.
-- Implementation is a separate PR after both lower-level contracts are
-  reviewed; it must not be combined with either parser change.
+- `SELECT *` and `alias.*` reuse the implemented
+  `qualified-column-wildcards` contract and expand only to authorized columns.
+- Implementation remains a separate PR from both lower-level parser changes.
 
 ## Scope
 

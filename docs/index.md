@@ -15,6 +15,7 @@ generated output.
 | A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
 | An allowlisted PostgreSQL database, using components/JDBC endpoint and exact/qualified-wildcard columns | [Profile PostgreSQL](how-to/postgresql.md) |
 | An allowlisted Trino coordinator, using components/JDBC endpoint and exact/qualified-wildcard columns | [Profile Through Trino](how-to/trino.md) |
+| One reviewed PostgreSQL or Trino `SELECT` over an allowlisted table | [SQL query sources](concepts/profiles-and-specs.md#sql-query-source) |
 | A real development or analytics task | [Product Validation Pilot](getting-started/product-validation-pilot.md) |
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
 | Business constraints | [Add Business Rules](how-to/business-rules.md) |

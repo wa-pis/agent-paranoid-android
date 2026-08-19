@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 
 import pytest
 
@@ -45,6 +46,18 @@ class FakeCursor:
 
     def close(self) -> None:
         self.closed = True
+
+
+@dataclass(frozen=True)
+class FakeDescription:
+    name: str
+    type_code: object
+    null_ok: bool | None = None
+
+
+@dataclass(frozen=True)
+class FakeTypeCode:
+    name: str
 
 
 class FakeConnection:
@@ -127,6 +140,43 @@ def test_session_forces_read_only_timeouts_and_resolves_password_late() -> None:
     assert cursor.fetch_sizes == [1, 1]
     assert cursor.closed is True
     assert connection.closed is True
+
+
+def test_no_row_schema_inspection_returns_only_safe_metadata() -> None:
+    cursor = FakeCursor([])
+    cursor.description = [
+        FakeDescription("order_id", FakeTypeCode("bigint"), False),
+        FakeDescription("state", FakeTypeCode("text"), True),
+    ]
+    connection = FakeConnection([cursor])
+    client = PostgresClient(
+        postgres_config(password_env=None),
+        FakeDriver(connection),
+    )
+
+    with client.session() as session:
+        columns = session.describe_no_rows(
+            query('SELECT "order_id", "state" FROM safe_relation WHERE FALSE')
+        )
+
+    assert [(item.name, item.data_type, item.nullable) for item in columns] == [
+        ("order_id", "bigint", False),
+        ("state", "text", True),
+    ]
+    assert cursor.fetch_sizes == [1]
+
+
+def test_no_row_schema_inspection_rejects_unexpected_rows() -> None:
+    cursor = FakeCursor([(123,)])
+    cursor.description = [FakeDescription("order_id", FakeTypeCode("bigint"))]
+    client = PostgresClient(
+        postgres_config(password_env=None),
+        FakeDriver(FakeConnection([cursor])),
+    )
+
+    with client.session() as session:
+        with pytest.raises(PostgresQueryError, match="unexpected row"):
+            session.describe_no_rows(query("SELECT unexpected"))
 
 
 def test_statement_budget_is_cumulative_across_session() -> None:

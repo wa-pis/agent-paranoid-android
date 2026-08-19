@@ -32,7 +32,8 @@ def legacy_profile_to_dataset_profile(
             table_name,
             row_count,
             column,
-            suppress_sensitive_numeric=source_type in {"postgres", "trino"},
+            suppress_sensitive_numeric=source_type
+            in {"postgres", "trino", "postgres_query", "trino_query"},
         )
         for column in profile.get("columns", [])
     ]

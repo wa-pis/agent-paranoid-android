@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from test_data_agent.core.constraint import Constraint
 from test_data_agent.core.entity import EntityProfile, EntitySpec
@@ -34,10 +34,22 @@ class DatasetProfile(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
     source_type: str = "csv_folder"
+    source_fingerprint: str | None = None
+    source_policy_version: str | None = None
     entities: list[EntityProfile] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
     local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
+
+    @field_validator("source_fingerprint")
+    @classmethod
+    def validate_source_fingerprint(cls, value: str | None) -> str | None:
+        if value is not None and (
+            len(value) != 64
+            or any(character not in "0123456789abcdef" for character in value)
+        ):
+            raise ValueError("source fingerprint must be a lowercase SHA-256 digest")
+        return value
 
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetProfile:

@@ -22,7 +22,7 @@ composition root moves internally.
 
 ## Public Python Imports
 
-The exact 61-name `test_data_agent.__all__` baseline is protected by
+The exact 66-name `test_data_agent.__all__` baseline is protected by
 `public-python-api.json`. The exports are grouped below only to show
 ownership; grouping does not change their compatibility status.
 
@@ -33,6 +33,7 @@ Core data, result, error, and version contracts:
 - `DatasetGenerationResult`, `DatasetValidationReport`
 - `CliErrorCode`, `CliErrorDetail`, `CliErrorResponse`, `CliSuccessResponse`
 - `DoctorCheck`, `DoctorResponse`, `DoctorStatus`
+- `SqlQueryAdapter`, `SqlQueryProfileLimits`, `SqlQueryProfileRequest`
 - `__version__`
 
 Agent models and enums:
@@ -67,15 +68,16 @@ Public operations:
 - `generate_dataset_bundle`, `infer_dataset_spec`
 - `inspect_agent_workspace`, `plan_agent_profile`
 - `plan_agent_request`, `recover_agent_workspace`
+- `profile_postgres_query_source`, `profile_trino_query_source`
 - `review_agent_workspace`, `solve_constraints`
 - `validate_advisor_proposal`, `validate_dataset`
 
 ## CLI Surface
 
-`cli-parser-surface.json` freezes these 22 commands:
+`cli-parser-surface.json` freezes these 23 commands:
 
 - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
-  `profile-postgres`
+  `profile-postgres`, `profile-query`
 - `generate-from-csv`, `validate`, `generate-from-example`
 - `demo`, `doctor`, `audit-verify`, `completion`
 - `agent-plan`, `agent-approve`, `agent-recover`
@@ -179,6 +181,9 @@ The current dependencies after completed extraction increments are:
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
 | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
 | `postgres_profiler.py` | bounded wildcard metadata expansion plus complete allowlisted PostgreSQL aggregate normalization into qualified `DatasetProfile` entities and declared relationships |
+| `sql_query_source.py` | bounded local query-file loading, strict PostgreSQL/Trino AST policy, source authorization, wildcard expansion, and source-free fingerprinting |
+| `sql_query_profiling.py` | adapter-neutral no-row schema and aggregate-only virtual-entity normalization without query-row access |
+| `sql_query_adapters.py` | existing PostgreSQL/Trino client/config composition for allowlisted query-source profiling |
 | `postgres_sql_export.py` | deterministic validated PostgreSQL DDL/INSERT rendering and atomic one-file publication without source access |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
