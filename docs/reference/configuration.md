@@ -58,8 +58,12 @@ metadata-only cache.
 `profile-postgres` requires `POSTGRES_ALLOWED_SCHEMAS`,
 `POSTGRES_ALLOWED_TABLES`, and `POSTGRES_ALLOWED_COLUMNS`. Connection settings
 use `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DATABASE`, `POSTGRES_USER`, and
-`POSTGRES_SSLMODE`. Set `POSTGRES_PASSWORD_ENV` to the name of the environment
-variable containing the password; never put the password in configuration.
+`POSTGRES_SSLMODE`. As an alternative to the host, port, database, and TLS
+components, `POSTGRES_JDBC_URL` accepts the credential-free
+`jdbc:postgresql://host:port/database?sslmode=verify-full` shape. This is URL
+syntax parsed into the existing Psycopg configuration, not a Java/JDBC runtime.
+Set `POSTGRES_PASSWORD_ENV` to the name of the environment variable containing
+the password; never put a user or password in the URL.
 
 The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 `POSTGRES_MAX_RESULT_ROWS`, `POSTGRES_MAX_RESULT_CELLS`, and
@@ -70,6 +74,7 @@ The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `POSTGRES_SOURCE_ID` | `postgres` | Stable non-secret source identity used in qualified entity names |
+| `POSTGRES_JDBC_URL` | unset | Credential-free JDBC-style endpoint; conflicts with unequal explicit host, port, database, or TLS components |
 | `POSTGRES_HOST` | `localhost` | PostgreSQL host; never serialized into profile identity |
 | `POSTGRES_PORT` | `5432` | PostgreSQL port |
 | `POSTGRES_DATABASE` | `postgres` | Database name |
@@ -146,12 +151,24 @@ row-returning tools are configured separately:
 
 ## Trino Connection
 
+Use `TRINO_JDBC_URL` as an alternative to separate host and port settings. Its
+supported form is `jdbc:trino://host:port/catalog/schema?SSL=true`. Catalog and
+schema are optional request defaults and are accepted only when each is in the
+mandatory allowlist. Authentication remains in `TRINO_USER` and existing
+runtime secret mechanisms; URL credentials, tokens, roles, session properties,
+headers, proxies, unknown properties, and `SSL=false` are rejected. The URL is
+parsed into the existing Python Trino client and does not load Java or a JDBC
+driver.
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
+| `TRINO_JDBC_URL` | unset | Credential-free JDBC-style endpoint; conflicts with unequal explicit endpoint/default components |
 | `TRINO_HOST` | `localhost` | Trino host name |
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
+| `TRINO_CATALOG` | unset | Optional request default; must be in `TRINO_ALLOWED_CATALOGS` |
+| `TRINO_SCHEMA` | unset | Optional request default; requires `TRINO_CATALOG` and membership in `TRINO_ALLOWED_SCHEMAS` |
 | `TRINO_ALLOWED_CATALOGS` | required | Comma-separated catalog allowlist |
 | `TRINO_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
 | `TRINO_REQUEST_TIMEOUT_SECONDS` | `30` | Client request timeout, `0.1` to `300` |

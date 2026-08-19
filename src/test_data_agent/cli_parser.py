@@ -325,7 +325,8 @@ def register_dataset_commands(
         help="Create a safe profile from an allowlisted PostgreSQL source.",
         description=(
             "Profile PostgreSQL metadata and bounded aggregates through the "
-            "read-only POSTGRES_* configuration."
+            "read-only POSTGRES_* configuration, including optional "
+            "credential-free POSTGRES_JDBC_URL endpoint syntax."
         ),
         epilog=(
             "Example:\n"

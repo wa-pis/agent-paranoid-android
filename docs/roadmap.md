@@ -1067,14 +1067,15 @@ work without reopening the completed 1.0 application-boundary gate:
 
 ### Proposed Database Source Ergonomics
 
-These are three independent, reviewable changes. They are not part of the
-implemented `1.2.0` contract and must be delivered in separate implementation
-pull requests:
+These are three independent, reviewable runtime changes followed by one
+documentation audit. They are not part of the published `1.2.0` contract and
+must be delivered in separate implementation pull requests:
 
 1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-jdbc-connection-urls/proposal.md)
    parse familiar PostgreSQL and Trino endpoint syntax into the existing Python
    adapters without adding Java, accepting URL credentials, or changing the
-   read-only policy.
+   read-only policy. Implemented on `main` for assignment to the next feature
+   release candidate.
 2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/qualified-column-wildcards/proposal.md)
    add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
    syntax. Metadata expansion produces a bounded explicit column snapshot;

@@ -7,6 +7,7 @@ import pytest
 from test_data_agent.postgres_config import (
     PostgresConfig,
     PostgresConfigurationError,
+    parse_postgres_jdbc_url,
 )
 
 
@@ -140,3 +141,115 @@ def test_postgres_config_rejects_unbounded_or_insecure_settings(
 
     with pytest.raises(PostgresConfigurationError, match="ALLOW_INSECURE"):
         replace(config, sslmode="disable").validate()
+
+
+def test_postgres_jdbc_url_normalizes_into_existing_config(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    for name in (
+        "POSTGRES_HOST",
+        "POSTGRES_PORT",
+        "POSTGRES_DATABASE",
+        "POSTGRES_SSLMODE",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    jdbc_url = (
+        "jdbc:postgresql://postgres.example.test:5444/analytics?sslmode=verify-full"
+    )
+    monkeypatch.setenv("POSTGRES_JDBC_URL", jdbc_url)
+
+    config = PostgresConfig.from_env()
+
+    assert config.host == "postgres.example.test"
+    assert config.port == 5444
+    assert config.database == "analytics"
+    assert config.sslmode == "verify-full"
+    assert jdbc_url not in repr(config)
+
+
+def test_postgres_jdbc_url_accepts_equal_explicit_components(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv(
+        "POSTGRES_JDBC_URL",
+        "jdbc:postgresql://postgres.internal:5433/analytics?sslmode=require",
+    )
+
+    config = PostgresConfig.from_env()
+
+    assert config.host == "postgres.internal"
+    assert config.port == 5433
+
+
+def test_postgres_jdbc_url_uses_existing_default_port() -> None:
+    endpoint = parse_postgres_jdbc_url(
+        "jdbc:postgresql://postgres.example.test/analytics"
+    )
+
+    assert endpoint.port is None
+    assert endpoint.database == "analytics"
+
+
+def test_postgres_jdbc_url_rejects_component_conflicts_without_values(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    jdbc_url = "jdbc:postgresql://private.example.test:5433/analytics"
+    monkeypatch.setenv("POSTGRES_JDBC_URL", jdbc_url)
+
+    with pytest.raises(PostgresConfigurationError) as captured:
+        PostgresConfig.from_env()
+
+    assert str(captured.value) == (
+        "POSTGRES_JDBC_URL conflicts with explicit component configuration"
+    )
+    assert "private.example.test" not in str(captured.value)
+
+
+def test_postgres_jdbc_url_detaches_invalid_explicit_port(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.setenv(
+        "POSTGRES_JDBC_URL",
+        "jdbc:postgresql://postgres.internal/analytics",
+    )
+    monkeypatch.setenv("POSTGRES_PORT", "secret-port")
+
+    with pytest.raises(PostgresConfigurationError) as captured:
+        PostgresConfig.from_env()
+
+    assert str(captured.value) == "POSTGRES_PORT must be an integer"
+    assert captured.value.__cause__ is None
+    assert captured.value.__suppress_context__ is True
+
+
+@pytest.mark.parametrize(
+    "jdbc_url",
+    [
+        "jdbc:postgresql://reader:secret@postgres.test:5432/app",
+        "jdbc:postgresql://postgres.test:5432/app?password=secret",
+        "jdbc:postgresql://postgres.test:5432/app?sslmode=require&sslmode=verify-full",
+        "jdbc:postgresql://postgres.test:5432/app?sslmode=require%20",
+        "jdbc:postgresql://postgres.test:5432/app?options=-csearch_path%3Dprivate",
+        "jdbc:postgresql://postgres.test:5432/app#secret",
+        "jdbc:postgresql://postgres.test:secret/app",
+        "jdbc:postgresql://postgres%0Atest:5432/app",
+        "jdbc:postgresql://postgres.test:5432/app%ZZ",
+        "jdbc:postgresql://postgres.test:5432/app/extra",
+    ],
+)
+def test_postgres_jdbc_url_fails_closed_without_echoing_input(
+    jdbc_url: str,
+) -> None:
+    with pytest.raises(PostgresConfigurationError) as captured:
+        parse_postgres_jdbc_url(jdbc_url)
+
+    assert str(captured.value) == (
+        "POSTGRES_JDBC_URL must be a credential-free PostgreSQL JDBC endpoint"
+    )
+    assert "secret" not in str(captured.value)
+    assert captured.value.__cause__ is None
+    assert captured.value.__suppress_context__ is True

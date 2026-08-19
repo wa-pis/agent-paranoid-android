@@ -129,6 +129,7 @@ def test_profiler_coordinates_aggregate_only_safe_table_profile() -> None:
         ("analytics", "safe_schema", "orders", "status", "varchar", True, 50)
     ]
     assert all("SELECT *" not in query.sql.upper() for query in queries)
+    assert "trino.internal" not in repr(profile)
 
 
 def test_nested_table_profile_shares_monotonic_cumulative_budget() -> None:

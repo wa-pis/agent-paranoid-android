@@ -16,6 +16,7 @@ Treat all of these as untrusted:
 - profile payloads supplied by another process;
 - business-rule files and inline rule payloads;
 - Trino identifiers, metadata, query results, and environment variables;
+- PostgreSQL and Trino JDBC-style endpoint strings;
 - output directories that may contain symlinks or existing files.
 
 ## Defenses
@@ -69,6 +70,13 @@ shared statement/result/deadline budget bounds metadata and aggregate queries.
 The profiler accepts no caller SQL and reads no source rows. Qualified local
 category selectors may retain only values that pass the selective local policy
 above.
+
+PostgreSQL and Trino may accept credential-free JDBC-style endpoint syntax.
+Parsing happens before client construction and rejects userinfo, secrets,
+session-changing or unknown properties, malformed escapes, ambiguous paths,
+and conflicting component configuration. The complete URL is discarded after
+normalization and is never written to profiles, manifests, MCP responses,
+provider payloads, logs, or public errors.
 
 ### Resource limits
 

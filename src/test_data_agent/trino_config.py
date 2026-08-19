@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import os
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
+from urllib.parse import parse_qsl, unquote, urlsplit
 
 DEFAULT_MAX_RESULT_ROWS = 10_000
 ABSOLUTE_MAX_RESULT_ROWS = 100_000
@@ -32,6 +34,15 @@ class TrinoConfigurationError(ValueError):
 
 
 @dataclass(frozen=True)
+class TrinoJdbcEndpoint:
+    host: str
+    port: int | None
+    catalog: str | None
+    schema: str | None
+    http_scheme: str | None
+
+
+@dataclass(frozen=True)
 class TrinoConfig:
     host: str
     port: int
@@ -48,18 +59,39 @@ class TrinoConfig:
     allow_unrestricted: bool = False
     allow_insecure_http: bool = False
     deployment_profile: TrinoDeploymentProfile = TrinoDeploymentProfile.TRUSTED_LOCAL
+    default_catalog: str | None = None
+    default_schema: str | None = None
 
     @classmethod
     def from_env(cls) -> TrinoConfig:
+        endpoint = _trino_jdbc_endpoint_from_env()
         config = cls(
-            host=os.environ.get("TRINO_HOST", "localhost"),
-            port=parse_trino_port(),
+            host=_resolved_text_env(
+                "TRINO_HOST",
+                endpoint.host if endpoint is not None else None,
+                "localhost",
+                case_insensitive=True,
+            ),
+            port=parse_trino_port(endpoint.port if endpoint is not None else None),
             user=os.environ.get("TRINO_USER", "test_data_agent"),
-            http_scheme=os.environ.get("TRINO_HTTP_SCHEME", "https"),
+            http_scheme=_resolved_text_env(
+                "TRINO_HTTP_SCHEME",
+                endpoint.http_scheme if endpoint is not None else None,
+                "https",
+                normalize=str.lower,
+            ),
             allowed_catalogs=parse_allowlist(os.environ.get("TRINO_ALLOWED_CATALOGS")),
             allowed_schemas=parse_allowlist(os.environ.get("TRINO_ALLOWED_SCHEMAS")),
             allowed_table_columns=parse_allowlist(
                 os.environ.get("TRINO_ALLOWED_TABLE_COLUMNS")
+            ),
+            default_catalog=_resolved_optional_text_env(
+                "TRINO_CATALOG",
+                endpoint.catalog if endpoint is not None else None,
+            ),
+            default_schema=_resolved_optional_text_env(
+                "TRINO_SCHEMA",
+                endpoint.schema if endpoint is not None else None,
             ),
             request_timeout=parse_request_timeout(),
             max_result_rows=parse_max_result_rows(),
@@ -130,6 +162,28 @@ class TrinoConfig:
         if self.allowed_table_columns is not None:
             for value in self.allowed_table_columns:
                 validate_fully_qualified_table_column(value)
+        if self.default_catalog is not None:
+            _validate_database_identifier(self.default_catalog, "TRINO_CATALOG")
+            if (
+                self.allowed_catalogs is None
+                or self.default_catalog not in self.allowed_catalogs
+            ):
+                raise TrinoConfigurationError(
+                    "TRINO_CATALOG must be present in TRINO_ALLOWED_CATALOGS"
+                )
+        if self.default_schema is not None:
+            _validate_database_identifier(self.default_schema, "TRINO_SCHEMA")
+            if self.default_catalog is None:
+                raise TrinoConfigurationError(
+                    "TRINO_SCHEMA requires a validated TRINO_CATALOG"
+                )
+            if (
+                self.allowed_schemas is None
+                or self.default_schema not in self.allowed_schemas
+            ):
+                raise TrinoConfigurationError(
+                    "TRINO_SCHEMA must be present in TRINO_ALLOWED_SCHEMAS"
+                )
         if run_ms < execution_ms:
             raise TrinoConfigurationError(
                 "TRINO_QUERY_MAX_RUN_TIME must be greater than or equal to "
@@ -154,6 +208,62 @@ def parse_allowlist(value: str | None) -> frozenset[str] | None:
     if value is None or not value.strip():
         return None
     return frozenset(item.strip() for item in value.split(",") if item.strip())
+
+
+def parse_trino_jdbc_url(value: str) -> TrinoJdbcEndpoint:
+    """Parse a credential-free Trino JDBC-style endpoint."""
+
+    try:
+        _validate_jdbc_url_text(value)
+        if not value.startswith("jdbc:trino://"):
+            raise ValueError
+        parsed = urlsplit(value.removeprefix("jdbc:"))
+        if (
+            parsed.scheme != "trino"
+            or parsed.hostname is None
+            or parsed.username is not None
+            or parsed.password is not None
+            or "@" in parsed.netloc
+            or "%" in parsed.netloc
+            or parsed.fragment
+        ):
+            raise ValueError
+        host = parsed.hostname
+        port = parsed.port
+        catalog, schema = _trino_jdbc_path(parsed.path)
+        properties = _unique_jdbc_properties(parsed.query)
+        if set(properties) - {"SSL"}:
+            raise ValueError
+        ssl_value = properties.get("SSL")
+        if ssl_value is not None and ssl_value.lower() != "true":
+            raise ValueError
+        http_scheme = "https" if ssl_value is not None else None
+        if not host.strip() or any(character in host for character in "\r\n\t"):
+            raise ValueError
+        if port is not None and not 1 <= port <= 65_535:
+            raise ValueError
+        if catalog is not None:
+            _validate_database_identifier(catalog, "TRINO_CATALOG")
+        if schema is not None:
+            _validate_database_identifier(schema, "TRINO_SCHEMA")
+    except (UnicodeError, ValueError):
+        raise TrinoConfigurationError(
+            "TRINO_JDBC_URL must be a credential-free Trino JDBC endpoint"
+        ) from None
+    return TrinoJdbcEndpoint(
+        host=host,
+        port=port,
+        catalog=catalog,
+        schema=schema,
+        http_scheme=http_scheme,
+    )
+
+
+def _trino_jdbc_endpoint_from_env() -> TrinoJdbcEndpoint | None:
+    value = os.environ.get("TRINO_JDBC_URL")
+    if value is None:
+        return None
+    return parse_trino_jdbc_url(value)
 
 
 _TABLE_COLUMN_ALLOWLIST_RE = re.compile(
@@ -182,15 +292,113 @@ def parse_env_bool(name: str) -> bool:
     raise TrinoConfigurationError(f"{name} must be a boolean")
 
 
-def parse_trino_port() -> int:
-    raw_value = os.environ.get("TRINO_PORT", "8080")
-    try:
-        value = int(raw_value)
-    except ValueError as exc:
-        raise TrinoConfigurationError("TRINO_PORT must be an integer") from exc
+def parse_trino_port(jdbc_port: int | None = None) -> int:
+    raw_value = os.environ.get("TRINO_PORT")
+    if raw_value is None:
+        value = jdbc_port if jdbc_port is not None else 8080
+    else:
+        try:
+            value = int(raw_value)
+        except ValueError:
+            raise TrinoConfigurationError("TRINO_PORT must be an integer") from None
+        if jdbc_port is not None and value != jdbc_port:
+            raise TrinoConfigurationError(
+                "TRINO_JDBC_URL conflicts with explicit component configuration"
+            )
     if not 1 <= value <= 65_535:
         raise TrinoConfigurationError("TRINO_PORT must be between 1 and 65535")
     return value
+
+
+def _resolved_text_env(
+    name: str,
+    jdbc_value: str | None,
+    default: str,
+    *,
+    normalize: Callable[[str], str] | None = None,
+    case_insensitive: bool = False,
+) -> str:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return jdbc_value if jdbc_value is not None else default
+    value = raw_value.strip()
+    if normalize is not None:
+        value = normalize(value)
+    if jdbc_value is not None:
+        left = value.casefold() if case_insensitive else value
+        right = jdbc_value.casefold() if case_insensitive else jdbc_value
+        if left != right:
+            raise TrinoConfigurationError(
+                "TRINO_JDBC_URL conflicts with explicit component configuration"
+            )
+    return value
+
+
+def _resolved_optional_text_env(name: str, jdbc_value: str | None) -> str | None:
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return jdbc_value
+    value = raw_value.strip()
+    if jdbc_value is not None and value != jdbc_value:
+        raise TrinoConfigurationError(
+            "TRINO_JDBC_URL conflicts with explicit component configuration"
+        )
+    return value
+
+
+def _validate_jdbc_url_text(value: str) -> None:
+    if not value or value != value.strip() or any(
+        character in value for character in "\r\n\t\\"
+    ):
+        raise ValueError
+    index = 0
+    while index < len(value):
+        if value[index] == "%":
+            if index + 2 >= len(value) or not re.fullmatch(
+                r"[0-9A-Fa-f]{2}", value[index + 1 : index + 3]
+            ):
+                raise ValueError
+            index += 3
+            continue
+        index += 1
+
+
+def _trino_jdbc_path(path: str) -> tuple[str | None, str | None]:
+    if path in {"", "/"}:
+        return None, None
+    if not path.startswith("/"):
+        raise ValueError
+    parts = path[1:].split("/")
+    if not 1 <= len(parts) <= 2 or any(not part for part in parts):
+        raise ValueError
+    decoded = [unquote(part, errors="strict") for part in parts]
+    return decoded[0], decoded[1] if len(decoded) == 2 else None
+
+
+def _unique_jdbc_properties(query: str) -> dict[str, str]:
+    if not query:
+        return {}
+    pairs = parse_qsl(
+        query,
+        keep_blank_values=True,
+        strict_parsing=True,
+        encoding="utf-8",
+        errors="strict",
+    )
+    properties: dict[str, str] = {}
+    for name, value in pairs:
+        if name in properties:
+            raise ValueError
+        properties[name] = value
+    return properties
+
+
+_DATABASE_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _validate_database_identifier(value: str, name: str) -> None:
+    if not _DATABASE_IDENTIFIER_RE.fullmatch(value):
+        raise TrinoConfigurationError(f"{name} must be a database identifier")
 
 
 def parse_request_timeout() -> float:

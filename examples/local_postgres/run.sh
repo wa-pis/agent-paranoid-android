@@ -54,12 +54,18 @@ fi
 
 mkdir -p "$OUTPUT"
 export POSTGRES_SOURCE_ID=warehouse
-export POSTGRES_HOST=127.0.0.1
-export POSTGRES_PORT="$PORT"
-export POSTGRES_DATABASE=apa_source
 export POSTGRES_USER=apa_reader
-export POSTGRES_SSLMODE=disable
 export POSTGRES_ALLOW_INSECURE=true
+if [[ "${POSTGRES_EXAMPLE_USE_JDBC:-false}" == "true" ]]; then
+  export POSTGRES_JDBC_URL="jdbc:postgresql://127.0.0.1:$PORT/apa_source?sslmode=disable"
+  unset POSTGRES_HOST POSTGRES_PORT POSTGRES_DATABASE POSTGRES_SSLMODE
+else
+  export POSTGRES_HOST=127.0.0.1
+  export POSTGRES_PORT="$PORT"
+  export POSTGRES_DATABASE=apa_source
+  export POSTGRES_SSLMODE=disable
+  unset POSTGRES_JDBC_URL
+fi
 export POSTGRES_ALLOWED_SCHEMAS=public
 export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
 export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.customers.joined_on,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount,public.orders.expedited

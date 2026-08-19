@@ -73,7 +73,9 @@ test-data-agent generate-from-csv data/customers.csv \
 
 For PostgreSQL profiling, install the `postgres` extra, configure the mandatory
 schema/table/column allowlists, and follow the
-[PostgreSQL workflow](../how-to/postgresql.md).
+[PostgreSQL workflow](../how-to/postgresql.md). The command accepts either the
+existing endpoint components or a credential-free `POSTGRES_JDBC_URL`; the URL
+is environment configuration rather than a command-line argument.
 
 The complete deterministic path is:
 

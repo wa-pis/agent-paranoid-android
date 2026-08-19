@@ -178,6 +178,9 @@ def test_normalizes_bounded_results_into_relational_dataset_profile() -> None:
     assert relationship.parent_entity == "warehouse.crm.customers"
     assert relationship.child_entity == "warehouse.public.orders"
     assert relationship.child_field == "customer_id"
+    serialized = profile.model_dump_json()
+    assert "db.example.test" not in serialized
+    assert '"database":"analytics"' not in serialized
     assert all("SELECT *" not in query.sql.upper() for query in results.queries)
 
 
