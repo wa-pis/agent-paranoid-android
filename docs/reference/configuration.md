@@ -4,9 +4,9 @@ Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 
 Published stable `1.2.0` does not include the JDBC-style endpoint, qualified
-column wildcard, or SQL query source settings documented below. They describe
-unreleased `main` for the next feature release candidate. Existing component
-settings and exact allowlists remain the stable baseline.
+column wildcard, or SQL query source settings documented below. They are
+available in preview `1.3.0rc1` through an explicit version pin. Existing
+component settings and exact allowlists remain the stable baseline.
 
 All byte values are integer bytes unless stated otherwise.
 

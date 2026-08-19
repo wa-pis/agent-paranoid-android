@@ -43,12 +43,12 @@ extra unexpectedly require another is a breaking packaging change. Adding an
 extra or adding an optional dependency inside an existing extra is additive
 when its documented behavior and security boundary remain unchanged.
 
-The database-source additions on unreleased `main` use the existing
-`postgres` and `trino` extras. They add no JVM or JDBC driver. JDBC-style URL
-support is endpoint syntax only, qualified wildcards expand into explicit
-columns, and `profile-query` requires the safe SQL parser bundled with the
-selected database extra. These additions are not part of the published stable
-`1.2.0` support contract until the next feature release candidate is accepted.
+The database-source additions in preview `1.3.0rc1` use the existing `postgres`
+and `trino` extras. They add no JVM or JDBC driver. JDBC-style URL support is
+endpoint syntax only, qualified wildcards expand into explicit columns, and
+`profile-query` requires the safe SQL parser bundled with the selected database
+extra. These additions are not part of the published stable `1.2.0` support
+contract while the candidate is being accepted.
 
 Dependencies within an extra may receive compatible updates between feature
 releases. The lock file, dependency review, vulnerability audit, and isolated

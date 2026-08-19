@@ -3,8 +3,8 @@
 !!! note "Availability"
     The exact component/allowlist PostgreSQL workflow is available in stable
     `1.2.0`. JDBC-style endpoints, qualified column wildcards, and
-    `profile-query` are implemented only on unreleased `main` until the next
-    feature release candidate is published.
+    `profile-query` are available in preview `1.3.0rc1` through an explicit
+    version pin.
 
 Install the optional driver:
 

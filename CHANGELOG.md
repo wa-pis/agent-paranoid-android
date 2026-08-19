@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.0rc1] - 2026-08-19
+
 ### Added
 
 - Accept credential-free PostgreSQL and Trino JDBC-style endpoint URLs by
@@ -926,7 +928,8 @@ All notable changes to this project are documented here.
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0rc1...HEAD
+[1.3.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0...v1.3.0rc1
 [1.2.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0rc2...v1.2.0
 [1.2.0rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0rc1...v1.2.0rc2
 [1.2.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.1.0...v1.2.0rc1

@@ -126,7 +126,7 @@ the compact profile JSON, not a downloaded copy of the source table.
 
 ### SQL Query Source Profile
 
-Unreleased `main` can profile one reviewed PostgreSQL or Trino query as a
+Preview `1.3.0rc1` can profile one reviewed PostgreSQL or Trino query as a
 virtual entity. The resulting `source_type` is `postgres_query` or
 `trino_query`; the profile records a stable `source_fingerprint` and
 `source_policy_version: "1.0"` alongside ordinary safe entity metadata and

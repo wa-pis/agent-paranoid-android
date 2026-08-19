@@ -1068,32 +1068,42 @@ work without reopening the completed 1.0 application-boundary gate:
 ### Database Source Ergonomics For 1.3.0
 
 These three independent runtime changes and their documentation audit are
-complete on `main`. They are not part of the published `1.2.0` contract and
-require acceptance through `1.3.0rc1` before stable publication:
+assigned to preview `1.3.0rc1`. They are not part of the published stable
+`1.2.0` contract and require candidate acceptance before stable publication:
 
 1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-jdbc-connection-urls/proposal.md)
    parse familiar PostgreSQL and Trino endpoint syntax into the existing Python
    adapters without adding Java, accepting URL credentials, or changing the
-   read-only policy. Implemented on `main` for assignment to the next feature
-   release candidate.
+   read-only policy.
 2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-qualified-column-wildcards/proposal.md)
    add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
    syntax. Metadata expansion produces a bounded explicit column snapshot;
-   executed SQL never contains a projection star. Implemented on `main` for
-   assignment to the next feature release candidate.
+   executed SQL never contains a projection star.
 3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-sql-query-source-profiling/proposal.md)
    treats one validated local `SELECT` as a virtual aggregate-only source for
    the existing profile -> infer -> generate workflow. Query rows and literals
-   never enter generation or an external boundary. Implemented on `main` for
-   assignment to the next feature release candidate.
+   never enter generation or an external boundary.
 4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-source-documentation-reconciliation/proposal.md)
    performs the final cross-layer audit after the three runtime changes:
    discovery, how-to, examples, CLI/Python/configuration reference, safety,
    architecture, operations, roadmap, changelog, and release evidence. Public
-   layers are reconciled on `main` with an explicit stable-versus-unreleased
-   availability boundary. Disposable PostgreSQL/Trino example evidence and the
-   independent SQL-policy review are complete; release publication remains a
-   separate explicit operation.
+   layers distinguish stable `1.2.0` from opt-in preview `1.3.0rc1`.
+   Disposable PostgreSQL/Trino example evidence and the independent SQL-policy
+   review are complete; release publication remains a separate explicit
+   operation.
+
+Candidate status:
+
+- [x] Assign all three runtime additions and reconciled documentation to
+  `1.3.0rc1` without changing the accepted runtime tree.
+- [x] Complete synthetic/fake coverage, disposable PostgreSQL/Trino example
+  matrices, and an independent SQL source-to-sink review with no unresolved
+  Critical, High, or Medium finding.
+- [ ] Pass required CI on the exact release-preparation merge commit and record
+  independent exact-commit approval.
+- [ ] Create and verify the signed tag, Python distributions, provenance,
+  checksums, SBOM, containers, and public PyPI artifacts only after a separate
+  explicit publication decision.
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling, followed by documentation reconciliation. Each
