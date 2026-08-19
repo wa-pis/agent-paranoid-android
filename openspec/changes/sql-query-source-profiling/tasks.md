@@ -10,14 +10,21 @@
   safe metadata, aggregates, and bounded warnings.
 - [ ] Connect the profile to existing infer, review, deterministic generation,
   validation, and export without introducing a row-copy path.
+- [ ] Add checked-in safe `query.sql` files and `run-query.sh` launchers under
+  both `examples/local_postgres` and `examples/local_trino`, reusing their
+  disposable synthetic services.
 - [ ] Add fake DB-API/Trino tests for accepted queries and adversarial SQL,
   unauthorized references, volatile functions, wildcard gating, schema drift,
   response shape, cleanup, and every resource budget.
+- [ ] Add installed-wheel example smoke tests for profile, query fingerprint,
+  infer, deterministic generation, validation, non-copying, redaction, and
+  cleanup; keep live database runs explicitly gated.
 - [ ] Prove SQL text, SQL literals, backend errors, endpoints, source values,
   and query rows cannot enter logs, errors, MCP, providers, profiles, manifests,
   or generated fixtures.
-- [ ] Add runnable synthetic PostgreSQL and Trino examples plus README, CLI,
-  Python, configuration, privacy, roadmap, changelog, and OpenSpec updates.
+- [ ] Document all query-source launchers and expected artifacts in their
+  example READMEs plus README, CLI, Python, configuration, privacy, roadmap,
+  changelog, and OpenSpec updates.
 - [ ] Run full ruff, mypy, pytest, release checks, strict MkDocs, package build,
   and isolated-wheel smoke before release assignment.
 - [ ] Obtain focused independent review of the SQL policy and source-to-sink

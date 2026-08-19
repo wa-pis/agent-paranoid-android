@@ -1087,7 +1087,10 @@ pull requests:
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling. Each runtime change requires focused synthetic
 regressions, public documentation, full release checks, and release-candidate
-assignment before publication.
+assignment before publication. Each implementation also extends both
+`examples/local_postgres` and `examples/local_trino` with an explicit runnable
+launcher, installed-wheel smoke coverage, fixed seeds, safe checked-in inputs,
+and assertions that generated artifacts contain no copied source rows.
 
 ### Required For Every Remaining Release
 

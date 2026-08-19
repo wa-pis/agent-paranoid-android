@@ -62,6 +62,31 @@ uses schema and aggregate evidence, not query rows. Local preserve-as-is is
 still exact-field, default-off, and subject to the existing classification,
 content, cardinality, and length checks.
 
+## Runnable Examples
+
+Add one checked-in explicit-projection query and launcher per existing
+disposable database example:
+
+- `examples/local_postgres/query.sql` and
+  `examples/local_postgres/run-query.sh OUTPUT` profile one filtered virtual
+  entity from the checked-in synthetic PostgreSQL source.
+- `examples/local_trino/query.sql` and
+  `examples/local_trino/run-query.sh OUTPUT` profile one filtered virtual entity
+  from the pinned synthetic Trino catalog.
+
+The SQL files contain no credential or production-derived literal and stay
+within the initial single-table subset. Each launcher runs from an installed
+wheel, uses a stable source id, fixed seed, strict allowlists/budgets, and the
+final frozen query-profile CLI contract. It completes profile, infer, generate,
+and validate twice and proves deterministic output.
+
+Example smoke tests assert that the profile contains the query fingerprint but
+not query text or literals, manifests report `synthetic: true` and
+`source_rows_copied: false`, generated rows do not equal the small checked-in
+source rows, and cleanup removes disposable services. Fake/no-network tests
+cover normal CI; live runs remain explicitly gated with the existing local
+database examples.
+
 ## Failure Modes
 
 - Missing, oversized, non-UTF-8, or changed-during-read query file: reject

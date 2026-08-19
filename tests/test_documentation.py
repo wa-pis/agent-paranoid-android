@@ -337,7 +337,6 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         / "tasks.md"
     ).read_text()
     assert "- [ ]" not in json_depth_tasks
-
     mcp_argument_tasks = (
         archived
         / "2026-08-15-1-2-0-mcp-argument-redaction"
@@ -391,6 +390,25 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         spec = (ROOT / "openspec" / "specs" / capability / "spec.md").read_text()
         for heading in headings:
             assert f"### Requirement: {heading}" in spec
+
+
+def test_database_source_openspecs_require_runnable_examples() -> None:
+    changes = ROOT / "openspec" / "changes"
+    expected = {
+        "database-jdbc-connection-urls": "run-jdbc.sh",
+        "qualified-column-wildcards": "run-wildcard.sh",
+        "sql-query-source-profiling": "run-query.sh",
+    }
+
+    for change_id, launcher in expected.items():
+        change = changes / change_id
+        contract = "\n".join(
+            path.read_text() for path in sorted(change.rglob("*.md"))
+        )
+        assert "examples/local_postgres" in contract
+        assert "examples/local_trino" in contract
+        assert launcher in contract
+        assert "source_rows_copied: false" in contract
 
 
 def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:

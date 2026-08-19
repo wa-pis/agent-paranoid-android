@@ -59,3 +59,28 @@ logs, errors, manifests, or output adapters.
 - **WHEN** query-source profiling runs
 - **THEN** the whole operation fails closed and cleans up resources
 - **AND** no partial profile or successful-looking artifact is published
+
+### Requirement: Runnable SQL Query Source Examples
+
+The repository SHALL provide PostgreSQL and Trino query-source launchers with
+checked-in safe SQL over disposable synthetic sources and SHALL verify the
+complete profile-to-generation workflow from an installed package.
+
+#### Scenario: PostgreSQL query-source example runs
+
+- **GIVEN** the checked-in PostgreSQL query, synthetic source, exact allowlists,
+  and bounded local connection
+- **WHEN** `examples/local_postgres/run-query.sh` runs
+- **THEN** it produces a virtual-entity safe profile, reviewed spec,
+  deterministic generated dataset, and successful validation
+- **AND** artifacts contain a query fingerprint but no query text, query
+  literal, backend error, endpoint, or source row
+
+#### Scenario: Trino query-source example runs
+
+- **GIVEN** the checked-in Trino query, pinned synthetic catalog, exact
+  allowlists, and bounded local connection
+- **WHEN** `examples/local_trino/run-query.sh` runs
+- **THEN** it produces a virtual-entity safe profile, reviewed spec,
+  deterministic generated dataset, and successful validation
+- **AND** artifacts report synthetic output with no copied source rows

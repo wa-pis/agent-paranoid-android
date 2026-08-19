@@ -30,6 +30,8 @@ In scope:
 - One invocation-scoped expansion snapshot with existing table, column,
   statement, response, scan, and wall-clock budgets.
 - Explicit quoted columns in every downstream trusted query.
+- Runnable PostgreSQL and Trino examples that select all fields from one
+  explicitly scoped table through qualified wildcard allowlist syntax.
 
 Out of scope:
 
@@ -59,6 +61,10 @@ Existing exact column selectors keep their meaning. Qualified wildcard support
 is additive, and exact plus wildcard entries normalize to the same deterministic
 explicit snapshot. Existing SQL policy continues to reject actual projection
 stars.
+
+Existing exact-column example launchers remain available. Wildcard examples
+are additive and show the difference between authorization syntax and executed
+SQL projection.
 
 ## Release Impact
 

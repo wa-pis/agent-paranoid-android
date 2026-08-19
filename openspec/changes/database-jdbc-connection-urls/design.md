@@ -51,6 +51,32 @@ explicitly supplied values. Equal values are accepted; a mismatch is a fixed
 configuration error before client construction. Allowlist and budget settings
 are never inferred from the URL.
 
+## Runnable Examples
+
+Extend the existing disposable database examples instead of introducing a
+second service setup:
+
+- `examples/local_postgres/run-jdbc.sh OUTPUT` starts the same localhost-only
+  synthetic PostgreSQL cluster as `run.sh`, configures its endpoint with a
+  placeholder JDBC-style URL, and runs profile, infer, generate, validate, and
+  PostgreSQL SQL export.
+- `examples/local_trino/run-jdbc.sh OUTPUT` starts the same pinned synthetic
+  Trino service as `run.sh`, configures its endpoint/catalog/schema with a
+  JDBC-style URL, and runs safe aggregate profiling followed by deterministic
+  generation and validation.
+
+The launchers may share private shell/Python helpers with the current examples,
+but both remain explicit user-facing entry points. They run from an installed
+wheel with the matching optional extra, accept no real credential, use fixed
+seeds, clean up disposable services, and fail if output already exists.
+
+Smoke tests SHALL assert successful artifacts, `synthetic: true`,
+`source_rows_copied: false`, deterministic repeated output, and absence of the
+JDBC URL or endpoint components from profiles, manifests, logs, and errors.
+Normal CI uses fake/no-network configuration tests; disposable live examples
+remain explicitly gated where the existing PostgreSQL and Trino examples are
+gated.
+
 ## Failure Modes
 
 - Wrong adapter prefix, missing host/database, invalid port, malformed escape,

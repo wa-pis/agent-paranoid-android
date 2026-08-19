@@ -54,3 +54,27 @@ errors.
 - **WHEN** expansion is evaluated
 - **THEN** the whole profiling request fails closed
 - **AND** no partial profile is published
+
+### Requirement: Runnable Qualified Wildcard Examples
+
+The repository SHALL provide separate PostgreSQL and Trino launchers that use
+table-qualified wildcard allowlists against disposable synthetic sources and
+exercise the complete safe profile-to-generation workflow.
+
+#### Scenario: PostgreSQL wildcard example runs
+
+- **GIVEN** exact PostgreSQL schema/table allowlists and qualified column
+  wildcards for the checked-in synthetic tables
+- **WHEN** `examples/local_postgres/run-wildcard.sh` runs
+- **THEN** the safe profile contains the deterministic expected explicit field
+  set and generated output validates
+- **AND** no field is preserved as-is without a separate exact field policy
+
+#### Scenario: Trino wildcard example runs
+
+- **GIVEN** exact Trino catalog/schema allowlists, unrestricted mode disabled,
+  and a qualified wildcard for one synthetic table
+- **WHEN** `examples/local_trino/run-wildcard.sh` runs
+- **THEN** the safe profile contains the deterministic expected explicit field
+  set and generated output validates
+- **AND** captured executed SQL contains no projection star

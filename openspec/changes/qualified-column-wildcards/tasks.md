@@ -6,8 +6,13 @@
   explicit-column snapshot.
 - [ ] Keep trusted query builders explicit and prove they never emit projection
   stars.
+- [ ] Add `examples/local_postgres/run-wildcard.sh` and
+  `examples/local_trino/run-wildcard.sh` using the existing disposable
+  synthetic services and installed-wheel entry points.
 - [ ] Add fake DB-API/Trino tests for allow, deny, deterministic ordering,
   schema drift, malformed metadata, and every relevant budget.
+- [ ] Add example contract/smoke tests for expected fields, stable ordering,
+  deterministic generation, validation, cleanup, and source-row-copy denial.
 - [ ] Prove wildcard authorization cannot enable row return, preserve-as-is,
   provider/MCP disclosure, or sensitive-value egress.
 - [ ] Update README, PostgreSQL/Trino how-to pages, configuration reference,
