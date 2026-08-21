@@ -33,10 +33,13 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     metadata = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
 
     assert metadata["name"] == "agent-paranoid-android"
-    assert metadata["description"] == "Safety-first synthetic data generation agent"
+    assert metadata["description"] == (
+        "Reproducible synthetic test data for CSV and database workflows"
+    )
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
-    assert "Development Status :: 4 - Beta" in metadata["classifiers"]
+    assert "Development Status :: 5 - Production/Stable" in metadata["classifiers"]
+    assert "Development Status :: 4 - Beta" not in metadata["classifiers"]
     for version in ("3.11", "3.12", "3.13", "3.14"):
         assert (
             f"Programming Language :: Python :: {version}"
