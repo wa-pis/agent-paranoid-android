@@ -21,7 +21,7 @@ PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"
 ]
 STABLE_VERSION = "1.3.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
-REQUIRED_DOCS = {
+REQUIRED_NAV_DOCS = {
     "index.md",
     "getting-started/installation.md",
     "getting-started/first-csv.md",
@@ -35,8 +35,11 @@ REQUIRED_DOCS = {
     "concepts/dataset-spec-compatibility.md",
     "concepts/profiles-and-specs.md",
     "concepts/relational-synthesis-contract.md",
-    "reference/application-boundaries.md",
     "reference/cli.md",
+    "reference/cli-workflows.md",
+    "reference/cli-automation.md",
+    "reference/cli-errors.md",
+    "reference/shell-completion.md",
     "reference/compatibility.md",
     "reference/dependency-compatibility.md",
     "reference/stability.md",
@@ -46,6 +49,16 @@ REQUIRED_DOCS = {
     "operations/resource-budgets.md",
     "operations/audit-logging.md",
     "operations/containers.md",
+    "known-issues.md",
+    "roadmap.md",
+    "development.md",
+    "release.md",
+    "release-evidence.md",
+    "security-history.md",
+    "openspec-archive.md",
+}
+HISTORICAL_DOCS = {
+    "reference/application-boundaries.md",
     "operations/migrating-to-0.6.md",
     "changelog-policy.md",
     "release-evidence-1.0.0rc1.md",
@@ -61,6 +74,7 @@ REQUIRED_DOCS = {
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
+    "release-history/pre-1.0.md",
 }
 CLI_COMMANDS = {
     "demo",
@@ -87,12 +101,11 @@ def test_readme_is_a_focused_entrypoint() -> None:
         f'python3 -m pip install "agent-paranoid-android=={PROJECT_VERSION}"'
         in readme
     )
-    assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
-    assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
+    assert "agent-paranoid-android[mcp,trino]" not in readme
+    assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
     assert PROJECT_VERSION == STABLE_VERSION
     assert "Preview `" not in readme
     assert "--pre" not in readme
-    assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
     assert "statistical anonymity" in readme
@@ -100,6 +113,13 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert "relationship or business-rule evidence" in readme
     assert "https://wa-pis.github.io/agent-paranoid-android/" in readme
     assert "## Choose A Guide" in readme
+    guide_section = readme.split("## Choose A Guide", 1)[1].split(
+        "## Development", 1
+    )[0]
+    assert sum(line.startswith("- [") for line in guide_section.splitlines()) == 5
+    first_screen = "\n".join(readme.splitlines()[:45])
+    for release_detail in ("JDBC-style", "profile-query", "[openai]", "[gigachat]"):
+        assert release_detail not in first_screen
     assert "## Release Checklist" not in readme
     assert "## Legacy GenerationSpec Compatibility" not in readme
 
@@ -153,9 +173,10 @@ def test_changelog_policy_defines_user_facing_categories_and_guidance() -> None:
 def test_rc_changelog_cleanup_preserves_inventory_evidence() -> None:
     inventory = (ROOT / "docs" / "unreleased-inventory-1.0.0rc1.md").read_text()
     evidence = (ROOT / "docs" / "release-evidence-1.0.0rc1.md").read_text()
-    changelog = (ROOT / "CHANGELOG.md").read_text()
+    changelog = (
+        ROOT / "docs" / "release-history" / "pre-1.0.md"
+    ).read_text()
     changelog = changelog.split("## [1.0.0rc1]", 1)[1]
-    changelog = changelog.split("## [0.12.0]", 1)[0]
 
     assert "89 top-level bullets" in inventory
     assert sum(line.startswith("- ") for line in changelog.splitlines()) == 44
@@ -627,7 +648,6 @@ def test_database_source_docs_publish_stable_contracts() -> None:
         "docs/how-to/trino.md",
         "docs/operations/resource-budgets.md",
         "docs/operations/troubleshooting.md",
-        "docs/reference/cli.md",
         "docs/reference/configuration.md",
         "docs/reference/stability.md",
         "docs/reference/support-policy.md",
@@ -665,6 +685,7 @@ def test_database_source_docs_publish_stable_contracts() -> None:
 
 def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
     known_issues = (ROOT / "docs" / "known-issues.md").read_text()
+    security_history = (ROOT / "docs" / "security-history.md").read_text()
     roadmap = (ROOT / "docs" / "roadmap.md").read_text()
     changelog = (ROOT / "CHANGELOG.md").read_text()
     archives = {
@@ -674,13 +695,14 @@ def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
         "MT-03": "2026-08-15-1-2-0-mcp-malformed-log-redaction",
     }
 
-    assert known_issues.count("**Status:** resolved in stable `1.2.0`.") == len(
-        archives
-    )
+    assert "No currently accepted product-level issues" in known_issues
+    assert security_history.count(
+        "**Status:** resolved in stable `1.2.0`."
+    ) == len(archives)
     for finding, archive in archives.items():
-        assert f"## {finding}:" in known_issues
-        assert archive in known_issues
-        assert archive in roadmap
+        assert f"## {finding}:" in security_history
+        assert archive in security_history
+        assert archive not in roadmap
 
     for expected in (
         "Bound OpenAI advisor response text before application",
@@ -691,7 +713,7 @@ def test_resolved_low_findings_are_reconciled_in_public_docs() -> None:
         assert expected in changelog
 
 
-def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
+def test_application_boundaries_refactor_remains_archived() -> None:
     roadmap = (ROOT / "docs" / "roadmap.md").read_text()
     archive = (
         ROOT
@@ -702,15 +724,12 @@ def test_application_boundaries_refactor_is_archived_for_stable_1_0() -> None:
     )
     proposal = (archive / "proposal.md").read_text()
     tasks = (archive / "tasks.md").read_text()
-    stable_scope = roadmap.split("### 1.0.0: Stable Release", 1)[1].split(
-        "### Post-1.0", 1
-    )[0]
-    post_1_0_scope = roadmap.split("### Post-1.0", 1)[1]
-
     assert "Status: required before the stable 1.0" in proposal
-    assert "2026-08-01-application-boundaries-refactor/proposal.md" in stable_scope
-    assert "promote the verified RC6 baseline" in stable_scope
-    assert "application-boundaries-refactor/proposal.md" not in post_1_0_scope
+    assert "## Now" in roadmap
+    assert "## Next" in roadmap
+    assert "## Later" in roadmap
+    assert "Implemented For" not in roadmap
+    assert "application-boundaries-refactor/proposal.md" not in roadmap
     assert "- [ ]" not in tasks
 
 
@@ -858,9 +877,18 @@ def test_required_user_documentation_exists_and_is_navigable() -> None:
     config = (ROOT / "mkdocs.yml").read_text()
 
     assert "site_url: https://wa-pis.github.io/agent-paranoid-android/" in config
-    for relative_path in REQUIRED_DOCS:
+    for relative_path in REQUIRED_NAV_DOCS:
         assert (ROOT / "docs" / relative_path).is_file(), relative_path
         assert relative_path in config, relative_path
+    for relative_path in HISTORICAL_DOCS:
+        assert (ROOT / "docs" / relative_path).is_file(), relative_path
+    for hidden_from_primary_nav in (
+        "operations/migrating-to-0.6.md",
+        "rc6-acceptance-checklist.md",
+        "release-evidence-1.0.0rc6.md",
+        "security-review-2026-07-31.md",
+    ):
+        assert hidden_from_primary_nav not in config
     assert (ROOT / "examples" / "orders_rules.yaml").is_file()
     assert (ROOT / "examples" / "reference_agent.py").is_file()
 
@@ -986,7 +1014,10 @@ def test_public_mcp_docs_reject_stale_or_broad_privacy_claims() -> None:
     )
 
     for markdown_path in markdown_paths:
-        if markdown_path.name == "roadmap.md":
+        if (
+            markdown_path.name == "roadmap.md"
+            or "release-history" in markdown_path.parts
+        ):
             continue
         content = markdown_path.read_text()
         normalized = " ".join(content.lower().replace("`", "").split())
@@ -1067,7 +1098,7 @@ def test_gigachat_documentation_matches_provider_boundary() -> None:
     configuration = (
         ROOT / "docs" / "reference" / "configuration.md"
     ).read_text()
-    cli = (ROOT / "docs" / "reference" / "cli.md").read_text()
+    cli = (ROOT / "docs" / "reference" / "cli-workflows.md").read_text()
     installation = (
         ROOT / "docs" / "getting-started" / "installation.md"
     ).read_text()
@@ -1087,7 +1118,7 @@ def test_gigachat_documentation_matches_provider_boundary() -> None:
     ):
         assert expected in guide
     assert "--provider gigachat" in cli
-    assert "default remains\n`openai`" in cli
+    assert "OpenAI remains the default provider" in cli
     assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in guide
     assert f'agent-paranoid-android[gigachat]=={STABLE_VERSION}' in installation
     assert "TLS verification cannot be disabled" in configuration

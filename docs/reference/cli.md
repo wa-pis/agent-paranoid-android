@@ -1,406 +1,77 @@
-# CLI Reference
+# CLI Command Index
 
-The executable is `test-data-agent`.
-
-Stable `1.3.0` includes `profile-query`, credential-free JDBC-style endpoint
-input, and qualified column wildcards. Existing commands and exact allowlist
-behavior remain supported.
-
-Use built-in help as the authoritative option reference:
+The executable is `test-data-agent`. Built-in help is the authoritative option
+reference for the installed version:
 
 ```bash
 test-data-agent
 test-data-agent --help
-test-data-agent examples
 test-data-agent COMMAND --help
 test-data-agent --version
 ```
 
-Running `test-data-agent` without a command is not an error. It prints the
-available commands, the safest starting points, and copy-ready quickstart
-commands.
+Running without a command prints the available commands and safe starting
+points, then exits successfully.
 
-## Commands
+Use these focused references for task detail:
+
+- [CLI Workflows](cli-workflows.md)
+- [CLI Automation And JSON](cli-automation.md)
+- [CLI Errors And Exit Codes](cli-errors.md)
+- [Shell Completion](shell-completion.md)
+
+## Generate And Validate
 
 | Command | Purpose | Primary output |
 | --- | --- | --- |
-| `examples` | Show complete examples for common workflows | Terminal guide |
-| `demo` | Run the installed package offline with a bundled fictional fixture | Synthetic CSV bundle |
-| `doctor` | Check installation and run a temporary smoke generation | Terminal report |
-| `completion` | Generate completion for bash, zsh, fish, or PowerShell | Shell script |
-| `audit-verify` | Verify an HMAC-authenticated MCP audit log | Verification summary |
+| `demo` | Run the offline fictional example | Synthetic CSV bundle |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
-| `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
-| `profile-query` | Profile one reviewed PostgreSQL or Trino query as an aggregate-only virtual source | Profile JSON |
-| `export-postgres-sql` | Generate and export one executable PostgreSQL DDL+INSERT file | `.sql` file |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |
 | `generate-from-csv` | Run the complete single-table workflow | Data file and review artifacts |
 | `generate-from-example` | Run the complete related-table workflow | Dataset bundle |
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
-| `validate` | Validate a generated dataset folder against a `DatasetSpec` | Validation report |
-| `agent-plan` | Profile and prepare a spec, then stop for review | Review workspace |
-| `agent-advise` | Ask an installed provider for validated spec changes | Pending workspace status |
-| `agent-advisor-request` | Export safe metadata for an external AI advisor | Request or exchange JSON |
-| `agent-advisor-apply` | Validate and apply an external proposal | Pending workspace status |
-| `agent-status` | Inspect agent phase and next action without changing it | Terminal or JSON status |
-| `agent-review` | Inspect the current spec as a metadata-only approval checklist | Terminal or JSON report |
-| `agent-approve` | Generate from an approved agent workspace | Dataset bundle |
-| `agent-recover` | Revalidate and finish an interrupted approval | Missing completion metadata |
+| `validate` | Validate generated data against a `DatasetSpec` | Validation report |
+
+## Database Sources And SQL
+
+| Command | Purpose | Primary output |
+| --- | --- | --- |
+| `profile-postgres` | Profile an allowlisted read-only PostgreSQL source | Profile JSON |
+| `profile-query` | Profile one reviewed PostgreSQL or Trino query as an aggregate-only virtual source | Profile JSON |
+| `export-postgres-sql` | Generate and export executable PostgreSQL DDL and INSERT statements | `.sql` file |
+
+Database connection, allowlist, JDBC-style endpoint, qualified wildcard, and
+query-source requirements are documented in the
+[PostgreSQL](../how-to/postgresql.md) and [Trino](../how-to/trino.md) guides.
+
+## Review-First Agent Flow
+
+| Command | Purpose |
+| --- | --- |
+| `agent-plan` | Profile and prepare a spec, then stop for review |
+| `agent-review` | Inspect a metadata-only approval checklist |
+| `agent-advise` | Ask an installed provider for validated spec changes |
+| `agent-advisor-request` | Export safe metadata for an external advisor |
+| `agent-advisor-apply` | Validate and apply an external proposal |
+| `agent-status` | Inspect phase and next action without changing state |
+| `agent-approve` | Generate from an exactly approved workspace |
+| `agent-recover` | Revalidate and finish an interrupted approval |
+
+See [CLI Workflows](cli-workflows.md#review-first-agent-flow) for the command
+sequence and [CLI Automation And JSON](cli-automation.md) for stable response
+contracts.
+
+## Utilities
+
+| Command | Purpose |
+| --- | --- |
+| `examples` | Show complete examples for common workflows |
+| `doctor` | Check installation and run a temporary smoke generation |
+| `completion` | Generate completion for bash, zsh, fish, or PowerShell |
+| `audit-verify` | Verify an HMAC-authenticated MCP audit log |
 
 Aliases:
 
 - `profile-csv-folder` is an alias for `profile-example`;
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
-
-## Choose A Workflow
-
-For a first offline run after installation:
-
-```bash
-test-data-agent demo --output out/demo
-```
-
-The destination must not exist. The command uses a bundled fictional fixture,
-seed `20260801`, and no network or optional integration. The output contains
-synthetic CSV rows, a safe profile, the effective spec, a validation report,
-and a generation manifest.
-
-For one CSV file, use the complete workflow:
-
-```bash
-test-data-agent generate-from-csv data/customers.csv \
-  --count 100 \
-  --seed 12345 \
-  --format csv \
-  --output out/customers.csv
-```
-
-For PostgreSQL profiling, install the `postgres` extra, configure the mandatory
-schema/table/column allowlists, and follow the
-[PostgreSQL workflow](../how-to/postgresql.md). The command accepts either the
-existing endpoint components or a credential-free `POSTGRES_JDBC_URL`; the URL
-is environment configuration rather than a command-line argument.
-`POSTGRES_ALLOWED_COLUMNS` accepts exact `schema.table.column` entries and the
-bounded table-qualified `schema.table.*` convenience form. The command never
-turns that selector into `SELECT *`.
-
-The complete deterministic path is:
-
-```bash
-test-data-agent profile-postgres --output out/postgres-profile.json
-test-data-agent infer-spec out/postgres-profile.json --output out/dataset-spec.yaml
-test-data-agent generate out/dataset-spec.yaml --seed 12345 --output out/generated
-test-data-agent validate out/dataset-spec.yaml out/generated
-test-data-agent export-postgres-sql out/dataset-spec.yaml \
-  --seed 12345 --output out/generated.sql
-```
-
-`export-postgres-sql` validates generated records before atomically writing one
-PostgreSQL file containing quoted DDL, foreign keys, INSERT statements, and a
-transaction. Generic `generate --format sql` remains the existing INSERT-only
-dataset format and does not create table DDL. Export itself is available in the
-base package; only direct PostgreSQL profiling needs the optional driver.
-
-For one reviewed query file, keep connection settings and exact physical
-source allowlists in the adapter environment, then run:
-
-```bash
-test-data-agent profile-query query.sql \
-  --adapter postgres \
-  --source-id warehouse \
-  --entity paid_orders \
-  --output out/query-profile.json
-```
-
-SQL is accepted only from the positional file, never a command-line string.
-The command exposes no query execution or row-return mode. Its profile contains
-one virtual entity plus a fingerprint, not query text, literals, backend
-messages, endpoints, or result rows. Continue with `infer-spec`, `generate`,
-and `validate` exactly as for another safe profile.
-
-For a folder containing one related table per CSV file:
-
-```bash
-test-data-agent generate-from-example data/example_dataset \
-  --count 100 \
-  --seed 12345 \
-  --format csv \
-  --output out/generated
-```
-
-For a reviewed `DatasetSpec`, pass the spec as the positional input:
-
-```bash
-test-data-agent generate dataset_spec.yaml \
-  --seed 12345 \
-  --format csv \
-  --output out/generated
-```
-
-For previously reviewed safe profile metadata, use `--profile`:
-
-```bash
-test-data-agent generate --profile profile.json \
-  --count 100 \
-  --seed 12345 \
-  --format csv \
-  --output out/customers.csv
-```
-
-`generate` accepts exactly one of a `DatasetSpec` path or `--profile`. Spec
-generation writes a dataset folder. Single-table profile generation writes one
-data file and requires `--count` and `--seed`.
-
-## Common Generation Options
-
-| Option | Meaning |
-| --- | --- |
-| `--count N` | Number of generated rows per entity or an override |
-| `--seed N` | Non-negative deterministic seed |
-| `--format csv|json|sql|parquet` | Output format |
-| `--mode valid|mixed|negative|edge|load_test` | Generation mode |
-| `--invalid-ratio R` | Invalid share from `0` to `1` for applicable modes |
-| `--business-rules PATH` | Reviewed YAML or JSON rule file |
-| `--output PATH` | Output file or new output directory |
-| `--overwrite` | Replace one existing target file or the same complete manifest-owned single-entity bundle |
-
-Folder bundle generation requires a new or empty output directory. It does not
-silently merge into an existing dataset.
-
-For single-entity generation, the selected format must match the output suffix.
-For example, `--format json` requires `.json`. A complete bundle can be
-overwritten only when its valid manifest owns the same primary output and no
-unrelated file is present. A different format, primary filename, missing or
-invalid manifest, or extra sibling fails before any existing file is changed.
-
-## Profiling Options
-
-| Option | Meaning |
-| --- | --- |
-| `--table NAME` | Override the inferred entity name for one CSV |
-| `--cache-dir PATH` | Safe profile cache location |
-| `--no-cache` | Force fresh folder profiling; caching is enabled by default for review-first planning |
-| `--rule-sample-rows N` | Bound row-level relationship and rule mining |
-| `--local-category ENTITY.FIELD` | Retain one reviewed bounded non-sensitive local enum/constant; repeatable and default-off |
-
-Full-file schema and distribution profiling remains streaming. The rule sample
-limit bounds comparisons that require row-level relationships. Fresh folder
-profiles also fail closed after 120 seconds by default, reject sample requests
-above 1,000,000 rows or cumulative samples beyond that ceiling, and share the
-configured 512 MiB input and 10,000,000-cell limits. Budget failures do not
-publish partial cache metadata.
-
-For PostgreSQL, `ENTITY.FIELD` uses the source-qualified form
-`SOURCE.SCHEMA.TABLE.COLUMN`, for example
-`warehouse.public.orders.status`. The selector does not bypass sensitive-name,
-content, cardinality, value-length, or resource checks. Exact approved values
-remain local and are replaced before external-provider requests.
-
-## Agent Review Flow
-
-```bash
-test-data-agent agent-plan data/example_dataset \
-  --workspace out/agent \
-  --count 25 \
-  --seed 12345 \
-  --format csv
-
-test-data-agent agent-review out/agent
-# Optional; requires agent-paranoid-android[openai].
-test-data-agent agent-advise out/agent --provider openai
-# Or explicitly select the experimental GigaChat adapter:
-# test-data-agent agent-advise out/agent --provider gigachat
-# Advice changes the spec, so review it again.
-test-data-agent agent-review out/agent
-REVIEWED_SPEC_SHA256=replace-with-current-hash-from-review
-test-data-agent agent-approve out/agent \
-  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
-```
-
-`agent-plan` must stop before generation. Review the prepared spec and manifest
-context before running `agent-approve`. Add `--json` to `agent-plan`,
-`agent-review`, `agent-status`, or `agent-approve` for a versioned, row-free
-automation contract. Source type is detected for CSV files, CSV folders, and
-safe-profile JSON; use `--source-type` to override it. Human-facing errors,
-paths, and provider-derived metadata are escaped and bounded before terminal
-output. JSON errors remain structured and bound their text fields before
-serialization.
-
-`agent-advise` is the shortest provider-backed path. Its default remains
-`openai`; `gigachat` is an explicit experimental choice. The selected adapter
-is loaded only when invoked, receives safe metadata through the structured
-advisor contract, and never approves or generates data. Install the matching
-provider extra, configure its secret only in the runtime environment, and use
-`--model` only when the adapter default is unsuitable. Always run
-`agent-review` again after advice. Stable `1.2.0` contains the
-GigaChat extra; see [Use The GigaChat Advisor](../how-to/gigachat.md) for the
-exact installation command and authentication variables.
-
-`agent-review` shows every field's type, nullability, sensitive and identifier
-flags, semantic type, distribution kind, entity row count, primary key,
-relationships, privacy defaults, assumptions, warnings, and the current
-fingerprint. Distribution values and dataset rows are excluded. Human output
-bounds long field lists and points to the complete spec. Entity and field names
-are untrusted input and are escaped before terminal output.
-
-For another provider, use the provider-neutral exchange commands:
-
-```bash
-test-data-agent agent-advisor-request out/agent \
-  --exchange > advisor_exchange.json
-# Use trusted_instructions, request, and response_json_schema separately.
-test-data-agent agent-advisor-apply \
-  out/agent advisor_proposal.json
-test-data-agent agent-review out/agent
-```
-
-The request command is read-only. By default it writes one `AdvisorRequest`
-JSON document. `--exchange` wraps it with package-owned trusted instructions
-and the generated `AdvisorProposal` JSON Schema. The apply command accepts a
-bounded regular JSON file, persists `advisor_review.json`, atomically updates
-`dataset_spec.yaml`, and still stops before generation. Review the changed
-spec and use the new hash reported by `agent-review`; never reuse the hash from
-before advisor apply.
-
-`agent-review` reports the SHA-256 fingerprint of the current effective spec
-and an exact approval command. Record that value only after reviewing
-`dataset_spec.yaml`. Approval recomputes the fingerprint immediately before
-generation and fails if the file changed. Intentional edits are supported:
-edit the spec, run review again, review the new hash, and approve that hash.
-Successful approval writes `approval_receipt.json`.
-
-Use `agent-status` for a short phase/next-action view and for recovery
-instructions after an interrupted approval.
-
-If approval is interrupted after the generated bundle is committed,
-`agent-status` reports `recovery_required` and prints the exact recovery
-command:
-
-```bash
-test-data-agent agent-recover out/agent \
-  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256"
-```
-
-Recovery revalidates the checkpoint, fingerprints, manifest, generated rows,
-validation report, and source-row non-reuse before publishing missing
-completion metadata. It never regenerates rows. Repeating `agent-approve` for
-an already completed matching plan returns the persisted result.
-
-## Machine-Readable Output
-
-Every core command accepts `--json`. Success writes one `CliSuccessResponse`
-to stdout and leaves stderr empty:
-
-```json
-{
-  "schema_version": "1.0",
-  "ok": true,
-  "command": "test-data-agent demo",
-  "exit_code": 0,
-  "status": "succeeded",
-  "artifacts": ["out/demo"],
-  "result": null
-}
-```
-
-Validation failures use the same envelope with exit code `1` and status
-`validation_failed`. Artifact paths are included only after publication.
-Human summaries and progress never share stdout with the JSON document.
-
-`doctor --json` returns typed local statuses including `available`,
-`not_installed`, `failed`, and `skipped`. An installed extra or successful
-local smoke does not claim that credentials are configured or that a remote
-service is reachable.
-
-### Agent JSON Contract
-
-Use JSON output when invoking the review flow from automation or an AI client:
-
-```bash
-test-data-agent agent-plan data/example_dataset \
-  --workspace out/agent --json
-test-data-agent agent-advise out/agent --provider openai --json
-test-data-agent agent-advisor-request out/agent \
-  --exchange > advisor_exchange.json
-test-data-agent agent-advisor-apply \
-  out/agent advisor_proposal.json --json
-test-data-agent agent-review out/agent --json
-test-data-agent agent-status out/agent --json
-test-data-agent agent-approve out/agent \
-  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
-test-data-agent agent-recover out/agent \
-  --reviewed-spec-sha256 "$REVIEWED_SPEC_SHA256" --json
-```
-
-Successful commands write one JSON document to stdout and leave stderr empty.
-Planning and approval return an `AgentResult`; advisor request returns an
-`AdvisorRequest` or `AdvisorExchange`; advisor apply and status return an
-`AgentWorkspaceStatus`; review returns an `AgentReviewReport`. The contracts
-are versioned and never include source or generated rows.
-
-`AgentReviewReport` contains field metadata, relationships, privacy safety
-flags, plan/current fingerprints, and `generation_performed: false`. It omits
-distribution values and is valid only while the workspace awaits approval.
-
-The `review` object contains `plan_id`, profile and planned/current spec
-fingerprints, and `spec_changed_since_plan`. Completed results add an
-`approval_receipt` tied to the exact `current_spec_sha256` supplied during
-approval. Recovery status uses `next_action: "recover"` and includes the same
-reviewed fingerprint without returning rows. Workspaces created before this
-contract remain inspectable but must be replanned before approval.
-
-Known argument, input, and path failures also write one versioned JSON document
-to stdout when `--json` is present:
-
-```json
-{
-  "schema_version": "1.0",
-  "ok": false,
-  "error": {
-    "code": "invalid_arguments",
-    "message": "the following arguments are required: --workspace",
-    "command": "test-data-agent agent-plan",
-    "exit_code": 2,
-    "retryable": false,
-    "help": "test-data-agent agent-plan --help"
-  }
-}
-```
-
-Stable error codes are `invalid_arguments`, `input_not_found`, `invalid_path`,
-`invalid_input`, `configuration`, `missing_dependency`, `external_service`, `io_failure`,
-`internal_error`, and `cancelled`. Messages may become clearer over time;
-clients should branch on `error.code`, not message text.
-
-## Exit Behavior
-
-| Code | Meaning |
-| --- | --- |
-| `0` | The command completed successfully. Running without a command also prints the starting guide and returns `0`. |
-| `1` | The command completed, but dataset validation failed. This can be intentional for negative datasets. |
-| `2` | Arguments, input, paths, safety checks, resources, or configuration prevented completion. |
-| `69` | An optional dependency or external service is unavailable. |
-| `70` | An unexpected internal error occurred. Retry with `--debug` only when technical details are safe to display. |
-| `74` | The operating system could not complete an I/O operation. |
-| `130` | The user cancelled the operation with Ctrl+C; catchable staging and rollback completed first. |
-
-Without `--json`, errors use concise stderr text and an exact recovery command
-when contextual help is available.
-
-## Shell Completion
-
-Generate completion from the installed parser so command aliases and options
-match the exact package version:
-
-```bash
-test-data-agent completion bash > test-data-agent.bash
-test-data-agent completion zsh > _test-data-agent
-test-data-agent completion fish > test-data-agent.fish
-test-data-agent completion powershell > test-data-agent.ps1
-```
-
-Source or install the generated file according to your shell. The command does
-not create or edit shell configuration.
-
-For recovery steps, see [Troubleshooting](../operations/troubleshooting.md).

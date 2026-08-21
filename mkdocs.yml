@@ -1,5 +1,5 @@
 site_name: Agent Paranoid Android
-site_description: Safety-first synthetic test data generation
+site_description: Reproducible synthetic test data for CSV and database workflows
 site_url: https://wa-pis.github.io/agent-paranoid-android/
 repo_url: https://github.com/wa-pis/agent-paranoid-android
 repo_name: wa-pis/agent-paranoid-android
@@ -58,7 +58,11 @@ nav:
       - DatasetSpec Compatibility: concepts/dataset-spec-compatibility.md
       - Dataset Workflow: domain_agnostic_workflow.md
   - Reference:
-      - CLI: reference/cli.md
+      - CLI Command Index: reference/cli.md
+      - CLI Workflows: reference/cli-workflows.md
+      - CLI Automation And JSON: reference/cli-automation.md
+      - CLI Errors And Exit Codes: reference/cli-errors.md
+      - Shell Completion: reference/shell-completion.md
       - Public Stability: reference/stability.md
       - Runtime And Integration Support: reference/support-policy.md
       - Dependency Compatibility: reference/dependency-compatibility.md
@@ -73,28 +77,11 @@ nav:
       - Resource Budgets: operations/resource-budgets.md
       - MCP Audit Logging: operations/audit-logging.md
       - Container Deployment: operations/containers.md
-      - Migrating To 0.6: operations/migrating-to-0.6.md
-      - Release Process: release.md
-      - RC6 Acceptance Checklist: rc6-acceptance-checklist.md
+  - Roadmap: roadmap.md
   - Maintainers:
       - Architecture: agent_design.md
-      - Application Boundary Baseline: reference/application-boundaries.md
-      - Generator MCP Design: mcp_generator_design.md
-      - Changelog Policy: changelog-policy.md
-      - RC Changelog Inventory: unreleased-inventory-1.0.0rc1.md
-      - RC1 Internal Evidence: release-evidence-1.0.0rc1.md
-      - RC2 Published Evidence: release-evidence-1.0.0rc2.md
-      - RC4 Published Evidence: release-evidence-1.0.0rc4.md
-      - RC5 Published Evidence: release-evidence-1.0.0rc5.md
-      - RC6 Published Evidence: release-evidence-1.0.0rc6.md
-      - Stable 1.0 Published Evidence: release-evidence-1.0.0.md
-      - 1.1.0rc1 Published Evidence: release-evidence-1.1.0rc1.md
-      - 1.1.0rc2 Partial Evidence: release-evidence-1.1.0rc2.md
-      - Stable 1.1 Published Evidence: release-evidence-1.1.0.md
-      - 1.2.0rc2 Published Evidence: release-evidence-1.2.0rc2.md
-      - Stable 1.2 Published Evidence: release-evidence-1.2.0.md
-      - 1.3.0rc1 Published Evidence: release-evidence-1.3.0rc1.md
-      - Stable 1.3 Published Evidence: release-evidence-1.3.0.md
-      - RC2 Security Review: security-review-2026-08-01-rc2.md
-      - Pre-RC Security Review: security-review-2026-07-31.md
-      - Roadmap: roadmap.md
+      - Development: development.md
+      - Release Process: release.md
+      - Release Evidence: release-evidence.md
+      - Security Review History: security-history.md
+      - OpenSpec Archive: openspec-archive.md
