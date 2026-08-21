@@ -19,7 +19,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
-STABLE_VERSION = "1.2.0"
+STABLE_VERSION = "1.3.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_DOCS = {
     "index.md",
@@ -56,6 +56,7 @@ REQUIRED_DOCS = {
     "release-evidence-1.0.0.md",
     "release-evidence-1.2.0rc2.md",
     "release-evidence-1.2.0.md",
+    "release-evidence-1.3.0rc1.md",
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
@@ -87,8 +88,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
     assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
-    assert PROJECT_VERSION == "1.3.0rc1"
-    assert f"Preview `{PROJECT_VERSION}` (explicit opt-in)" in readme
+    assert PROJECT_VERSION == STABLE_VERSION
+    assert "Preview `" not in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -273,6 +274,23 @@ def test_stable_1_2_public_evidence_records_immutable_release() -> None:
         "sha256:08f18ce0b253e0710d3c27f3e1b32a037f300a17cdc37880acb01a9a396fbfc8",
         "sha256:ed0f406aaf44d8df5d445fdd720e3a973dbfebf59ef96d66a504f1aa5d7e7f5d",
         "sha256:11f056c3f661903542b810526b3acd9844aa3d64e66a4f4edd40aab708d9a63b",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
+def test_1_3_rc1_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.3.0rc1.md").read_text()
+
+    for expected in (
+        "26ce1ccb54a3a5f336153454ab82e4af5d67b89b",
+        "issues/465",
+        "actions/runs/32287050451",
+        "actions/runs/32413664083",
+        "actions/runs/32413920659",
+        "actions/runs/32416745861",
+        "60b7fdabe785fc25b9fadc4edaba431e1c42c212cbc9ce6beb102baa2d9a1124",
+        "2e48bf7449888aa90b41afbaa692a95cfae159e53051a81bbfa07cde94310ea0",
         "AI-assisted independent review",
     ):
         assert expected in evidence
@@ -576,7 +594,7 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         assert required in contract
 
 
-def test_database_source_docs_distinguish_stable_and_preview_contracts() -> None:
+def test_database_source_docs_publish_stable_contracts() -> None:
     availability_pages = (
         "README.md",
         "docs/index.md",
@@ -597,8 +615,8 @@ def test_database_source_docs_distinguish_stable_and_preview_contracts() -> None
     )
     for path in availability_pages:
         text = " ".join((ROOT / path).read_text().lower().replace(">", " ").split())
-        assert "stable `1.2.0`" in text
-        assert "preview `1.3.0rc1`" in text
+        assert "stable `1.3.0`" in text
+        assert "preview `1.3.0rc1`" not in text
 
     approach = (ROOT / "docs/concepts/choosing-an-approach.md").read_text()
     for expected in (
@@ -1103,7 +1121,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.2.0rc2 HEAD" in release
+    assert "git diff --name-status v1.3.0rc1 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",
