@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import unquote
 
 import pytest
+import yaml
 
 from test_data_agent.cli import main
 from test_data_agent.mcp_generator_server import (
@@ -122,6 +123,72 @@ def test_readme_is_a_focused_entrypoint() -> None:
         assert release_detail not in first_screen
     assert "## Release Checklist" not in readme
     assert "## Legacy GenerationSpec Compatibility" not in readme
+
+
+def test_documentation_homepage_is_a_focused_entrypoint() -> None:
+    homepage = (ROOT / "docs" / "index.md").read_text()
+    starting_points = homepage.split("## Choose Your Starting Point", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    table_lines = [line for line in starting_points.splitlines() if line.startswith("|")]
+
+    assert len(table_lines) == 7  # header, separator, and five user paths
+    for destination in (
+        "First CSV Dataset",
+        "Related Tables",
+        "PostgreSQL Workflow",
+        "Trino Workflow",
+        "Profiles And Specs",
+    ):
+        assert destination in starting_points
+
+    advanced = homepage.split("## Advanced Integrations", 1)[1].split("\n## ", 1)[0]
+    assert advanced.count("](") == 4
+    for destination in ("AI", "MCP", "Containers", "Custom providers"):
+        assert f"[{destination}]" in advanced
+
+    for historical_detail in (
+        "Database-source availability",
+        "1.3.0rc1",
+        "Development is substantially AI-assisted",
+    ):
+        assert historical_detail not in homepage
+
+
+def test_documentation_navigation_leads_with_database_workflows() -> None:
+    config = yaml.safe_load((ROOT / "mkdocs.yml").read_text())
+    navigation = {
+        next(iter(section)): next(iter(section.values())) for section in config["nav"]
+    }
+
+    assert [next(iter(item)) for item in navigation["How-To Guides"]] == [
+        "Add Business Rules",
+        "Profile PostgreSQL",
+        "Profile Through Trino",
+    ]
+    assert [next(iter(item)) for item in navigation["Integrations"]] == [
+        "Connect An MCP Client",
+        "Connect An AI Client",
+        "Use The GigaChat Advisor",
+        "Build A Provider Adapter",
+        "Build A Semantic Provider",
+        "Run The Reference Agent",
+    ]
+
+
+def test_stable_changelog_sections_are_self_contained() -> None:
+    changelog = (ROOT / "CHANGELOG.md").read_text()
+    expected_summaries = {
+        "1.3.0": ("profile", "JDBC-style", "qualified column wildcards"),
+        "1.2.0": ("Sigstore", "provider responses", "MCP messages"),
+        "1.1.0": ("JSON output", "completion", "GigaChat", "output format"),
+    }
+
+    for version, expected in expected_summaries.items():
+        section = changelog.split(f"## [{version}]", 1)[1].split("\n## [", 1)[0]
+        normalized_section = section.casefold()
+        for phrase in expected:
+            assert phrase.casefold() in normalized_section, (version, phrase)
 
 
 def test_active_release_surfaces_match_project_version() -> None:

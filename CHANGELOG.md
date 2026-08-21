@@ -9,8 +9,20 @@ All notable changes to this project are documented here.
 - Simplify product positioning and documentation navigation, split the CLI
   reference by task, and move historical release and security detail out of
   primary user paths without changing runtime behavior.
+- Simplify the documentation homepage and navigation hierarchy, make stable
+  release summaries self-contained, and align package discovery keywords with
+  database testing and fixture generation.
 
 ## [1.3.0] - 2026-08-21
+
+### Added
+
+- Profile one reviewed PostgreSQL or Trino `SELECT` as an aggregate-only source
+  without returning query rows.
+- Accept credential-free JDBC-style PostgreSQL and Trino endpoint configuration
+  without requiring Java or a JDBC driver.
+- Support bounded, qualified column wildcards for allowlisted database
+  profiling.
 
 ### Changed
 
@@ -74,10 +86,22 @@ All notable changes to this project are documented here.
 
 ## [1.2.0] - 2026-08-15
 
+### Added
+
+- Publish checksum-covered Sigstore provenance for stable Python artifacts and
+  verify it during release and post-publish acceptance.
+
 ### Changed
 
 - Promote the accepted RC2 runtime, portable provenance, and security-boundary
   fixes to the stable `1.2.0` feature line without changing runtime behavior.
+
+### Security
+
+- Bound provider responses and nested JSON before application parsing, and
+  replace rejected MCP argument details with fixed redacted errors.
+- Reject malformed MCP messages before SDK dispatch so caller-controlled values
+  cannot enter retained exceptions or local SDK validation logs.
 
 ## [1.2.0rc2] - 2026-08-15
 
@@ -104,10 +128,23 @@ All notable changes to this project are documented here.
 
 ## [1.1.0] - 2026-08-12
 
+### Added
+
+- Add versioned JSON output for core CLI commands and generated completion for
+  bash, zsh, fish, and PowerShell.
+- Add an explicit opt-in GigaChat advisor through the official Python SDK.
+
 ### Changed
 
 - Promote the accepted RC2 runtime and public CLI contracts to the stable
   `1.1.0` feature line without changing runtime behavior.
+- Improve installed help, concise diagnostics, stable process exit codes, and
+  optional-dependency guidance for interactive and automated use.
+
+### Fixed
+
+- Reject output format/suffix mismatches and prevent overwrite from replacing
+  a different, incomplete, or mixed artifact bundle.
 
 ## [1.1.0rc2] - 2026-08-12
 
