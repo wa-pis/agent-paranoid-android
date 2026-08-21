@@ -17,6 +17,13 @@ changing this matrix are defined in
 The stable release is `1.3.0`; the commands below pin that exact version for
 reproducible installation.
 
+Stable `1.3.0` remains the recommended default. To verify the patch candidate
+before promotion, pin preview `1.3.1rc1` explicitly:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.3.1rc1"
+```
+
 Create an isolated environment:
 
 ### macOS and Linux

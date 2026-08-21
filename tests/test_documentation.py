@@ -104,8 +104,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == STABLE_VERSION
-    assert "Preview `" not in readme
+    assert PROJECT_VERSION == "1.3.1rc1"
+    assert f"Preview `{PROJECT_VERSION}` is explicit opt-in" in readme
     assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
@@ -977,6 +977,7 @@ def test_installation_documents_dependency_budgets() -> None:
         )
     assert f"The stable release is `{STABLE_VERSION}`" in installation
     assert f"Stable `{STABLE_VERSION}` remains the recommended default" in installation
+    assert f"preview `{PROJECT_VERSION}` explicitly" in installation
     assert "not the recommended user installation" in installation
 
 

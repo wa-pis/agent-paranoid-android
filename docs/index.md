@@ -93,3 +93,6 @@ production-adjacent data or an AI client.
 
 The current stable `1.3.0` release uses `DatasetSpec` as the generation and
 validation contract for the CLI and Python API.
+Preview `1.3.1rc1` is an explicit opt-in patch candidate for documentation,
+package metadata, build-tool, and workflow maintenance; it adds no application
+runtime behavior.
