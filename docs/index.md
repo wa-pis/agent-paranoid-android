@@ -7,29 +7,21 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
-!!! note "Database-source availability"
-    Stable `1.3.0` supports exact component and allowlist workflows,
-    credential-free JDBC-style endpoints, qualified column wildcards, and the
-    aggregate-only `profile-query` command.
-
 ## Choose Your Starting Point
 
 | I have | Start here |
 | --- | --- |
 | One CSV file | [First CSV Dataset](getting-started/first-csv.md) |
 | A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
-| An allowlisted PostgreSQL database, using components/JDBC endpoint and exact/qualified-wildcard columns | [Profile PostgreSQL](how-to/postgresql.md) |
-| An allowlisted Trino coordinator, using components/JDBC endpoint and exact/qualified-wildcard columns | [Profile Through Trino](how-to/trino.md) |
-| One reviewed PostgreSQL or Trino `SELECT` over an allowlisted table | [SQL query sources](concepts/profiles-and-specs.md#sql-query-source) |
-| A real development or analytics task | [Product Validation Pilot](getting-started/product-validation-pilot.md) |
+| A PostgreSQL database | [PostgreSQL Workflow](how-to/postgresql.md) |
+| A Trino coordinator | [Trino Workflow](how-to/trino.md) |
 | A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
-| Business constraints | [Add Business Rules](how-to/business-rules.md) |
-| Any structured-output AI client | [AI Integration](ai_integration.md) |
-| The experimental GigaChat advisor | [Use The GigaChat Advisor](how-to/gigachat.md) |
-| A custom model provider | [Build A Provider Adapter](how-to/custom-advisor-provider.md) |
-| An MCP-compatible AI client | [Connect An MCP Client](how-to/mcp.md) |
-| An isolated container deployment | [Run In Containers](operations/containers.md) |
-| A failed command | [Troubleshooting](operations/troubleshooting.md) |
+
+## Advanced Integrations
+
+[AI](ai_integration.md), [MCP](how-to/mcp.md),
+[Containers](operations/containers.md), and
+[Custom providers](how-to/custom-advisor-provider.md)
 
 ## The Safe Workflow
 
@@ -78,9 +70,6 @@ Use `--json` on core commands for one versioned automation document, or
 `test-data-agent completion SHELL` to generate completion for bash, zsh, fish,
 or PowerShell from the installed command inventory.
 
-If you are evaluating whether the workflow solves a real team problem, use the
-[Product Validation Pilot](getting-started/product-validation-pilot.md) guide.
-
 ## Safety Boundaries
 
 The project intentionally refuses:
@@ -102,10 +91,5 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable release is `1.3.0`, promoted without runtime changes from
-the publicly accepted `1.3.0rc1` candidate.
-`DatasetSpec` is the generation and validation contract for the CLI and Python
-API.
-
-Development is substantially AI-assisted. Human review, automated tests, and
-the documented security requirements still apply to every change.
+The current stable `1.3.0` release uses `DatasetSpec` as the generation and
+validation contract for the CLI and Python API.

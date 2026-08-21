@@ -10,12 +10,14 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 keywords = [
-    "agent",
     "csv",
-    "mcp",
+    "data-generation",
+    "database-testing",
     "pii",
+    "postgresql",
     "synthetic-data",
     "test-data",
+    "test-fixtures",
     "trino",
 ]
 classifiers = [
