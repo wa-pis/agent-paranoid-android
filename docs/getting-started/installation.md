@@ -18,10 +18,10 @@ The stable release is `1.3.0`; the commands below pin that exact version for
 reproducible installation.
 
 Stable `1.3.0` remains the recommended default. To verify the patch candidate
-before promotion, pin preview `1.3.1rc1` explicitly:
+before promotion, pin preview `1.3.1rc2` explicitly:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.3.1rc1"
+python3 -m pip install "agent-paranoid-android==1.3.1rc2"
 ```
 
 Create an isolated environment:

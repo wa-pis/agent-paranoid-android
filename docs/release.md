@@ -147,17 +147,20 @@ promotion. The signed tag, reviewed promotion, package hashes, signed image
 digests, and successful post-publish checks are recorded in the
 [1.3.0 published release evidence](release-evidence-1.3.0.md).
 
-Patch candidate `1.3.1rc1` packages the post-`1.3.0` documentation and package
+Patch candidate `1.3.1rc1` packaged the post-`1.3.0` documentation and package
 discovery cleanup together with audited build-tool and pinned workflow-action
-maintenance. Application runtime behavior, public APIs, and security
-boundaries are unchanged, but the build dependency and workflow changes
-require candidate acceptance before stable `1.3.1` promotion.
+maintenance. Its release failed closed before GitHub Release or PyPI
+publication because artifact digests generated on macOS differed from the
+Ubuntu release build; container publication was canceled before push. The
+immutable failed tag is superseded by `1.3.1rc2`, which adds a no-publish Ubuntu
+artifact preflight and otherwise retains the same application runtime, public
+APIs, dependencies, and security boundaries.
 
-Review the stable tree directly against that immutable baseline:
+Review the RC2 correction directly against the immutable failed candidate:
 
 ```bash
-git diff --name-status v1.3.0rc1 HEAD
-git diff v1.3.0rc1 HEAD
+git diff --name-status v1.3.1rc1 HEAD
+git diff v1.3.1rc1 HEAD
 ```
 
 A new release candidate is required only when a change affects runtime
@@ -207,10 +210,25 @@ Containers, Documentation, and Security gate result must identify the reviewed
 commit and an HTTPS evidence URL. `artifacts` contains the exact wheel and
 sdist basenames with lowercase SHA-256 digests.
 
-Build the candidate artifacts with `SOURCE_DATE_EPOCH` set to the reviewed
-commit timestamp before recording those digests. The tag-triggered build uses
-the same epoch and fails before attestation or publication if either digest is
-different.
+Before recording candidate digests, run the no-publish Ubuntu artifact
+preflight for the exact reviewed commit:
+
+```bash
+gh workflow run release-preflight.yml \
+  --ref main \
+  --field commit=<reviewed-main-commit>
+gh run download <preflight-run-id> \
+  --name release-preflight-<reviewed-main-commit> \
+  --dir /tmp/release-preflight
+```
+
+The preflight has read-only repository permissions, sets `SOURCE_DATE_EPOCH`
+from the reviewed commit timestamp, and uploads the wheel, source distribution,
+and `ARTIFACT_SHA256` as temporary workflow artifacts. It cannot create a tag,
+release, attestation, package, or container. Copy those Ubuntu-derived digests
+into the signed acceptance manifest. The tag-triggered build uses the same
+runner, Python, uv, lockfile, build command, and epoch and fails before
+attestation or publication if either digest is different.
 
 Run every final release gate, including `scripts/check_release.sh` and
 `mkdocs build --strict`, on the exact stable release commit. Merge only after

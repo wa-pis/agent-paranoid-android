@@ -1,0 +1,82 @@
+name: Release artifact preflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Exact commit to build
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-preflight-${{ inputs.commit }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build candidate artifacts without publication
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact candidate source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact candidate source
+        shell: bash
+        env:
+          CANDIDATE_COMMIT: ${{ inputs.commit }}
+        run: |
+          set -euo pipefail
+          [[ "${CANDIDATE_COMMIT}" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD^{commit})" = "${CANDIDATE_COMMIT}"
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.11.23"
+          enable-cache: true
+          prune-cache: true
+
+      - name: Install locked release environment
+        run: |
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
+
+      - name: Build candidate distributions
+        shell: bash
+        env:
+          CANDIDATE_COMMIT: ${{ inputs.commit }}
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH="$(git show -s --format=%ct "${CANDIDATE_COMMIT}")"
+          export SOURCE_DATE_EPOCH
+          uv build --no-build-isolation
+          sha256sum dist/*.whl dist/*.tar.gz > dist/ARTIFACT_SHA256
+
+      - name: Verify installed wheel
+        run: |
+          uv run --isolated --no-project --with ./dist/*.whl python scripts/check_installed_package.py
+          uv run --isolated --no-project --with ./dist/*.whl test-data-agent doctor --skip-smoke
+
+      - name: Preserve candidate artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-preflight-${{ inputs.commit }}
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/ARTIFACT_SHA256
+          if-no-files-found: error
+          retention-days: 7
