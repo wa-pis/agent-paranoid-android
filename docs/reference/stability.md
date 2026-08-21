@@ -23,14 +23,13 @@ The module paths in the owner column identify maintenance ownership, not
 additional public imports. Import internal modules only when the relevant API
 reference explicitly documents them.
 
-## 1.3.0rc1 Database Source Additions
+## 1.3.0 Database Source Additions
 
 Credential-free JDBC-style endpoint input, qualified column wildcards,
 `profile-query`, and the top-level `SqlQueryProfileRequest` query-profiling
-exports are available in preview `1.3.0rc1` through an explicit version pin.
-They remain outside the published stable `1.2.0` contract while the candidate
-is being accepted. Existing component configuration, exact allowlists,
-PostgreSQL profiling, and Trino safety behavior remain unchanged.
+exports are supported in stable `1.3.0`. Existing component configuration,
+exact allowlists, PostgreSQL profiling, and Trino safety behavior remain
+unchanged.
 
 ## Artifact Persistence Boundary
 
