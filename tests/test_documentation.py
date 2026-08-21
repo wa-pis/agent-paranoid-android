@@ -57,6 +57,7 @@ REQUIRED_DOCS = {
     "release-evidence-1.2.0rc2.md",
     "release-evidence-1.2.0.md",
     "release-evidence-1.3.0rc1.md",
+    "release-evidence-1.3.0.md",
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
@@ -291,6 +292,26 @@ def test_1_3_rc1_public_evidence_records_immutable_release() -> None:
         "actions/runs/32416745861",
         "60b7fdabe785fc25b9fadc4edaba431e1c42c212cbc9ce6beb102baa2d9a1124",
         "2e48bf7449888aa90b41afbaa692a95cfae159e53051a81bbfa07cde94310ea0",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
+def test_stable_1_3_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.3.0.md").read_text()
+
+    for expected in (
+        "99148f6b4ec2f910af5c3fa83dab8c43c46edd90",
+        "issues/467",
+        "actions/runs/32432854513",
+        "actions/runs/32432854514",
+        "actions/runs/32433053417",
+        "actions/runs/32433304639",
+        "65381f8b7f87e4cdab432db97ce403ead57bc5825a187ad333d60dbe9bc7c81f",
+        "7dc687082008e3fa80096ba36817ca7f86cf3f4bd5c9f8ebf22bbcafe176b2be",
+        "sha256:272dfe30643831a8666134bf619e9d1488626c136e1d6c8a5299e203fb701b37",
+        "sha256:ae9f7f90e68afbb35d5783b819a5d33e91e763ed603280bc150a15eb7a04f964",
+        "sha256:4912b1eae16d7c20c6c2d439c24749bbaa89bccf04760e98e1d7e2b169ba2dc6",
         "AI-assisted independent review",
     ):
         assert expected in evidence

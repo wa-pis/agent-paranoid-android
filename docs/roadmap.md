@@ -1116,11 +1116,12 @@ Scope:
 - [x] Limit the promotion diff to version identity, changelog, public
   documentation, roadmap status, release evidence, and generated release
   assertions.
-- [ ] Merge the focused stable-promotion PR with all required checks green.
-- [ ] Publish and verify GitHub, PyPI, and signed multi-platform container
+- [x] Merge the focused stable-promotion PR with all required checks green.
+- [x] Publish and verify GitHub, PyPI, and signed multi-platform container
   artifacts for stable `1.3.0`.
-- [ ] Record exact public artifact hashes, image digests, and post-publish
-  acceptance in immutable stable release evidence.
+- [x] Record exact public artifact hashes, image digests, and post-publish
+  acceptance in the
+  [immutable stable release evidence](release-evidence-1.3.0.md).
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling, followed by documentation reconciliation. Each
