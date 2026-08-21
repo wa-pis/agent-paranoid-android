@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling==1.31.0"]
+requires = ["hatchling==1.32.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -69,7 +69,7 @@ all = [
     "trino>=0.330.0",
 ]
 dev = [
-    "hatchling==1.31.0",
+    "hatchling==1.32.0",
     "hypothesis>=6.100.0",
     "mypy>=2.3.0",
     "pip-audit>=2.7.0",
