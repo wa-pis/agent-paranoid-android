@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.1rc1] - 2026-08-22
+
 ### Changed
 
 - Simplify product positioning and documentation navigation, split the CLI
@@ -12,6 +14,13 @@ All notable changes to this project are documented here.
 - Simplify the documentation homepage and navigation hierarchy, make stable
   release summaries self-contained, and align package discovery keywords with
   database testing and fixture generation.
+- Refresh pinned setup-uv and CodeQL workflow actions while retaining exact
+  commit pins and the existing release gates.
+
+### Fixed
+
+- Update the audited Hatchling build pin and frozen pip lock entry so package
+  builds and dependency checks use the resolved non-vulnerable toolchain.
 
 ## [1.3.0] - 2026-08-21
 
@@ -635,7 +644,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...HEAD
+[1.3.1rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0...v1.3.1rc1
 [1.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0rc1...v1.3.0
 [1.3.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0...v1.3.0rc1
 [1.2.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0rc2...v1.2.0

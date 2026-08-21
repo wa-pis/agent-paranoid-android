@@ -147,6 +147,12 @@ promotion. The signed tag, reviewed promotion, package hashes, signed image
 digests, and successful post-publish checks are recorded in the
 [1.3.0 published release evidence](release-evidence-1.3.0.md).
 
+Patch candidate `1.3.1rc1` packages the post-`1.3.0` documentation and package
+discovery cleanup together with audited build-tool and pinned workflow-action
+maintenance. Application runtime behavior, public APIs, and security
+boundaries are unchanged, but the build dependency and workflow changes
+require candidate acceptance before stable `1.3.1` promotion.
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash

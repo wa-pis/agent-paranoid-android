@@ -10,6 +10,9 @@ Stable `1.3.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
+Preview `1.3.1rc1` is explicit opt-in:
+`python3 -m pip install "agent-paranoid-android==1.3.1rc1"`.
+
 ## Install And Try It
 
 Python 3.11 or newer is required.
