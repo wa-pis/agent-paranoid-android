@@ -1065,34 +1065,63 @@ work without reopening the completed 1.0 application-boundary gate:
   external security boundary. Evidence: the signed and publicly verified
   [`v1.1.0rc1` release](release-evidence-1.1.0rc1.md).
 
-### Proposed Database Source Ergonomics
+### Database Source Ergonomics For 1.3.0
 
-These are three independent, reviewable runtime changes followed by one
-documentation audit. They are not part of the published `1.2.0` contract and
-must be delivered in separate implementation pull requests:
+These three independent runtime changes and their documentation audit shipped
+in `1.3.0rc1` and completed public candidate acceptance before stable
+promotion:
 
-1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-jdbc-connection-urls/proposal.md)
+1. [JDBC-style connection URLs](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-jdbc-connection-urls/proposal.md)
    parse familiar PostgreSQL and Trino endpoint syntax into the existing Python
    adapters without adding Java, accepting URL credentials, or changing the
-   read-only policy. Implemented on `main` for assignment to the next feature
-   release candidate.
-2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/qualified-column-wildcards/proposal.md)
+   read-only policy.
+2. [Qualified column wildcards](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-qualified-column-wildcards/proposal.md)
    add `schema.table.*` and `catalog.schema.table.*` as allowlist convenience
    syntax. Metadata expansion produces a bounded explicit column snapshot;
-   executed SQL never contains a projection star. Implemented on `main` for
-   assignment to the next feature release candidate.
-3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/sql-query-source-profiling/proposal.md)
+   executed SQL never contains a projection star.
+3. [SQL query source profiling](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-sql-query-source-profiling/proposal.md)
    treats one validated local `SELECT` as a virtual aggregate-only source for
    the existing profile -> infer -> generate workflow. Query rows and literals
-   never enter generation or an external boundary. Implemented on `main` for
-   assignment to the next feature release candidate.
-4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/database-source-documentation-reconciliation/proposal.md)
+   never enter generation or an external boundary.
+4. [Database source documentation reconciliation](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/archive/2026-08-19-database-source-documentation-reconciliation/proposal.md)
    performs the final cross-layer audit after the three runtime changes:
    discovery, how-to, examples, CLI/Python/configuration reference, safety,
    architecture, operations, roadmap, changelog, and release evidence. Public
-   layers are reconciled on `main` with an explicit stable-versus-unreleased
-   availability boundary; disposable example evidence, independent SQL-policy
-   review, release assignment, and final OpenSpec archival remain gated.
+   layers distinguish the accepted candidate from the previous stable line.
+   Disposable PostgreSQL/Trino example evidence and the independent SQL-policy
+   review are complete.
+
+Candidate status:
+
+- [x] Assign all three runtime additions and reconciled documentation to
+  `1.3.0rc1` without changing the accepted runtime tree.
+- [x] Complete synthetic/fake coverage, disposable PostgreSQL/Trino example
+  matrices, and an independent SQL source-to-sink review with no unresolved
+  Critical, High, or Medium finding.
+- [x] Pass required CI on the exact release-preparation merge commit and record
+  independent exact-commit approval.
+- [x] Create and verify the signed tag, Python distributions, provenance,
+  checksums, SBOM, containers, and public PyPI artifacts after a separate
+  explicit publication decision; see the
+  [immutable RC1 evidence](release-evidence-1.3.0rc1.md).
+
+### 1.3.0: Stable Promotion
+
+**Goal:** promote the publicly accepted RC1 database-source runtime without
+changing runtime behavior, public APIs, dependencies, workflows, containers,
+or security boundaries.
+
+Scope:
+
+- [x] Limit the promotion diff to version identity, changelog, public
+  documentation, roadmap status, release evidence, and generated release
+  assertions.
+- [x] Merge the focused stable-promotion PR with all required checks green.
+- [x] Publish and verify GitHub, PyPI, and signed multi-platform container
+  artifacts for stable `1.3.0`.
+- [x] Record exact public artifact hashes, image digests, and post-publish
+  acceptance in the
+  [immutable stable release evidence](release-evidence-1.3.0.md).
 
 Implementation order is JDBC URL parsing, qualified wildcard expansion, then
 SQL query source profiling, followed by documentation reconciliation. Each

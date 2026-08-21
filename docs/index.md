@@ -8,11 +8,9 @@ and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
 !!! note "Database-source availability"
-    Published stable `1.2.0` supports the existing exact component and
-    allowlist workflows. Credential-free JDBC-style endpoints, qualified
-    column wildcards, and `profile-query` are implemented on unreleased `main`
-    for the next feature release candidate. Pages describing them match the
-    current source tree, not the `1.2.0` wheel.
+    Stable `1.3.0` supports exact component and allowlist workflows,
+    credential-free JDBC-style endpoints, qualified column wildcards, and the
+    aggregate-only `profile-query` command.
 
 ## Choose Your Starting Point
 
@@ -61,7 +59,7 @@ introduced.
 Install the exact stable release and run the self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.2.0"
+python3 -m pip install "agent-paranoid-android==1.3.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -104,8 +102,8 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable release is `1.2.0`, promoted without runtime changes from
-the publicly accepted `1.2.0rc2` candidate.
+The current stable release is `1.3.0`, promoted without runtime changes from
+the publicly accepted `1.3.0rc1` candidate.
 `DatasetSpec` is the generation and validation contract for the CLI and Python
 API.
 

@@ -19,7 +19,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
-STABLE_VERSION = "1.2.0"
+STABLE_VERSION = "1.3.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_DOCS = {
     "index.md",
@@ -56,6 +56,8 @@ REQUIRED_DOCS = {
     "release-evidence-1.0.0.md",
     "release-evidence-1.2.0rc2.md",
     "release-evidence-1.2.0.md",
+    "release-evidence-1.3.0rc1.md",
+    "release-evidence-1.3.0.md",
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
@@ -88,7 +90,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert f'"agent-paranoid-android[mcp,trino]=={STABLE_VERSION}"' in readme
     assert f"Stable release: `{STABLE_VERSION}` (recommended)." in readme
     assert PROJECT_VERSION == STABLE_VERSION
-    assert "Preview release:" not in readme
+    assert "Preview `" not in readme
     assert "--pre" not in readme
     assert "test-data-agent doctor" in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -278,6 +280,43 @@ def test_stable_1_2_public_evidence_records_immutable_release() -> None:
         assert expected in evidence
 
 
+def test_1_3_rc1_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.3.0rc1.md").read_text()
+
+    for expected in (
+        "26ce1ccb54a3a5f336153454ab82e4af5d67b89b",
+        "issues/465",
+        "actions/runs/32287050451",
+        "actions/runs/32413664083",
+        "actions/runs/32413920659",
+        "actions/runs/32416745861",
+        "60b7fdabe785fc25b9fadc4edaba431e1c42c212cbc9ce6beb102baa2d9a1124",
+        "2e48bf7449888aa90b41afbaa692a95cfae159e53051a81bbfa07cde94310ea0",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
+def test_stable_1_3_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.3.0.md").read_text()
+
+    for expected in (
+        "99148f6b4ec2f910af5c3fa83dab8c43c46edd90",
+        "issues/467",
+        "actions/runs/32432854513",
+        "actions/runs/32432854514",
+        "actions/runs/32433053417",
+        "actions/runs/32433304639",
+        "65381f8b7f87e4cdab432db97ce403ead57bc5825a187ad333d60dbe9bc7c81f",
+        "7dc687082008e3fa80096ba36817ca7f86cf3f4bd5c9f8ebf22bbcafe176b2be",
+        "sha256:272dfe30643831a8666134bf619e9d1488626c136e1d6c8a5299e203fb701b37",
+        "sha256:ae9f7f90e68afbb35d5783b819a5d33e91e763ed603280bc150a15eb7a04f964",
+        "sha256:4912b1eae16d7c20c6c2d439c24749bbaa89bccf04760e98e1d7e2b169ba2dc6",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
 def test_rc2_security_review_records_exact_disposition() -> None:
     review = (ROOT / "docs" / "security-review-2026-08-01-rc2.md").read_text()
 
@@ -309,13 +348,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {
-        "_template",
-        "database-jdbc-connection-urls",
-        "database-source-documentation-reconciliation",
-        "qualified-column-wildcards",
-        "sql-query-source-profiling",
-    }
+    assert active == {"_template"}
 
     archived = changes / "archive"
     completed = (
@@ -352,6 +385,17 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     ).read_text()
     assert "- [ ]" not in mcp_malformed_tasks
 
+    for change_id in (
+        "database-jdbc-connection-urls",
+        "database-source-documentation-reconciliation",
+        "qualified-column-wildcards",
+        "sql-query-source-profiling",
+    ):
+        database_tasks = (
+            archived / f"2026-08-19-{change_id}" / "tasks.md"
+        ).read_text()
+        assert "- [ ]" not in database_tasks
+
     superseded = archived / "2026-08-14-1-0-0-postgres-multi-source"
     assert "Status: superseded" in (superseded / "proposal.md").read_text()
     assert "not an active backlog" in (superseded / "tasks.md").read_text()
@@ -386,6 +430,22 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "agent-orchestration": (
             "Relationship Discovery Is Reviewable And Deterministic",
         ),
+        "database-source-configuration": (
+            "JDBC-Style Endpoint Input",
+            "URL Secrets And Session Properties Are Forbidden",
+        ),
+        "database-source-allowlists": (
+            "Table-Qualified Column Wildcard",
+            "Wildcard Scope Does Not Authorize Values",
+        ),
+        "sql-query-source-profiling": (
+            "SQL Query Is A Virtual Aggregate-Only Source",
+            "Query Profiles Feed Synthetic Generation Without Rows",
+        ),
+        "public-documentation": (
+            "Database Source Documentation Matches Shipped Behavior",
+            "Documentation Preserves Database Safety Boundaries",
+        ),
     }
     for capability, headings in requirements.items():
         spec = (ROOT / "openspec" / "specs" / capability / "spec.md").read_text()
@@ -394,11 +454,11 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
 
 
 def test_database_source_openspecs_require_runnable_examples() -> None:
-    changes = ROOT / "openspec" / "changes"
+    changes = ROOT / "openspec" / "changes" / "archive"
     expected = {
-        "database-jdbc-connection-urls": "run-jdbc.sh",
-        "qualified-column-wildcards": "run-wildcard.sh",
-        "sql-query-source-profiling": "run-query.sh",
+        "2026-08-19-database-jdbc-connection-urls": "run-jdbc.sh",
+        "2026-08-19-qualified-column-wildcards": "run-wildcard.sh",
+        "2026-08-19-sql-query-source-profiling": "run-query.sh",
     }
 
     for change_id, launcher in expected.items():
@@ -529,7 +589,8 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         ROOT
         / "openspec"
         / "changes"
-        / "database-source-documentation-reconciliation"
+        / "archive"
+        / "2026-08-19-database-source-documentation-reconciliation"
     )
     contract = "\n".join(
         path.read_text() for path in sorted(change.rglob("*.md"))
@@ -554,7 +615,7 @@ def test_database_source_documentation_reconciliation_covers_all_layers() -> Non
         assert required in contract
 
 
-def test_database_source_docs_distinguish_stable_and_unreleased_contracts() -> None:
+def test_database_source_docs_publish_stable_contracts() -> None:
     availability_pages = (
         "README.md",
         "docs/index.md",
@@ -575,8 +636,8 @@ def test_database_source_docs_distinguish_stable_and_unreleased_contracts() -> N
     )
     for path in availability_pages:
         text = " ".join((ROOT / path).read_text().lower().replace(">", " ").split())
-        assert "stable `1.2.0`" in text
-        assert "unreleased `main`" in text
+        assert "stable `1.3.0`" in text
+        assert "preview `1.3.0rc1`" not in text
 
     approach = (ROOT / "docs/concepts/choosing-an-approach.md").read_text()
     for expected in (
@@ -1081,7 +1142,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.2.0rc2 HEAD" in release
+    assert "git diff --name-status v1.3.0rc1 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",

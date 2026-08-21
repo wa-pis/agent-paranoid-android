@@ -126,7 +126,7 @@ the compact profile JSON, not a downloaded copy of the source table.
 
 ### SQL Query Source Profile
 
-Unreleased `main` can profile one reviewed PostgreSQL or Trino query as a
+Stable `1.3.0` can profile one reviewed PostgreSQL or Trino query as a
 virtual entity. The resulting `source_type` is `postgres_query` or
 `trino_query`; the profile records a stable `source_fingerprint` and
 `source_policy_version: "1.0"` alongside ordinary safe entity metadata and
@@ -135,8 +135,7 @@ aggregates.
 The fingerprint identifies the validated query shape without serializing the
 SQL. Query text, literals, physical endpoints, backend messages, and query
 result rows are excluded. Generation reads the reviewed inferred
-`DatasetSpec`, never query rows. This profile type is not present in the
-published stable `1.2.0` wheel.
+`DatasetSpec`, never query rows.
 
 ### Relationship Profile
 

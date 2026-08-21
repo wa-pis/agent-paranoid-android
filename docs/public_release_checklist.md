@@ -87,6 +87,10 @@ Before creating a tag:
   distributions before considering stable `1.2.0`.
 - Promote stable `1.2.0` only through a version- and documentation-only diff
   from the publicly accepted RC2 runtime.
+- Promote stable `1.3.0` only through a version- and documentation-only diff
+  from the publicly accepted RC1 runtime. Preserve the accepted component,
+  JDBC, wildcard, and query installed-wheel evidence for PostgreSQL and Trino
+  and bind the promotion commit to a separate exact-commit review.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

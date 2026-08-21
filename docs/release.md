@@ -131,11 +131,27 @@ promotion. The signed tag, reviewed promotion, package hashes, signed image
 digests, and successful post-publish checks are recorded in the
 [1.2.0 published release evidence](release-evidence-1.2.0.md).
 
+The database-source ergonomics implemented after `1.2.0` add credential-free
+JDBC-style endpoint syntax, table-qualified column wildcards, and one bounded
+aggregate-only SQL query-source workflow. These change runtime behavior,
+public CLI/Python contracts, and database security boundaries, so they are
+assigned to `1.3.0rc1`. The candidate completed exact-commit review, the
+component/JDBC/wildcard/query installed-wheel matrices for PostgreSQL and
+Trino, and public artifact verification. Its immutable results are recorded in
+the [1.3.0rc1 published release evidence](release-evidence-1.3.0rc1.md).
+
+Stable `1.3.0` promotes that accepted RC1 runtime through the permitted
+version- and documentation-only diff. No application runtime, public API,
+dependency, workflow, container, or security-boundary change belongs in the
+promotion. The signed tag, reviewed promotion, package hashes, signed image
+digests, and successful post-publish checks are recorded in the
+[1.3.0 published release evidence](release-evidence-1.3.0.md).
+
 Review the stable tree directly against that immutable baseline:
 
 ```bash
-git diff --name-status v1.2.0rc2 HEAD
-git diff v1.2.0rc2 HEAD
+git diff --name-status v1.3.0rc1 HEAD
+git diff v1.3.0rc1 HEAD
 ```
 
 A new release candidate is required only when a change affects runtime

@@ -1,10 +1,9 @@
 # Profile PostgreSQL
 
 !!! note "Availability"
-    The exact component/allowlist PostgreSQL workflow is available in stable
-    `1.2.0`. JDBC-style endpoints, qualified column wildcards, and
-    `profile-query` are implemented only on unreleased `main` until the next
-    feature release candidate is published.
+    Stable `1.3.0` includes the exact component/allowlist PostgreSQL workflow,
+    credential-free JDBC-style endpoints, qualified column wildcards, and the
+    aggregate-only `profile-query` command.
 
 Install the optional driver:
 

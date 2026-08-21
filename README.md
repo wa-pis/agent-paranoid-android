@@ -4,7 +4,7 @@
 Safety-first, deterministic synthetic test data generation from CSV structure, safe profiles, reviewed `DatasetSpec` files, and allowlisted PostgreSQL or Trino metadata. The CLI and Python library are primary; PostgreSQL, MCP, Trino, and AI providers are optional integrations. The base package supports CSV/JSON workflows without installing a database client, SQL parser, or MCP SDK. Source rows are profiled, never shuffled or copied into generated output.
 
 **[Read the documentation](https://wa-pis.github.io/agent-paranoid-android/)** for tutorials, concepts, configuration, MCP setup, and troubleshooting.
-Stable release: `1.2.0` (recommended). Package: `agent-paranoid-android`; CLI: `test-data-agent`. Published stable `1.2.0` supports exact component/allowlist database workflows; JDBC-style endpoints, qualified column wildcards, and `profile-query` are implemented on unreleased `main` for the next feature release candidate, so those sections describe the source tree rather than the `1.2.0` wheel.
+Stable release: `1.3.0` (recommended). Package: `agent-paranoid-android`; CLI: `test-data-agent`. Stable `1.3.0` includes credential-free JDBC-style endpoints, qualified column wildcards, and aggregate-only `profile-query` alongside the exact component/allowlist database workflows.
 
 ## What It Preserves
 
@@ -27,20 +27,20 @@ the recorded package, dependency, locale, and serializer environment.
 Python 3.11 or newer is required. CI tests CPython 3.11 through 3.14. Most users should install the stable release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.2.0"
+python3 -m pip install "agent-paranoid-android==1.3.0"
 test-data-agent doctor
 ```
 
 Install only the stable optional features you use:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.2.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.2.0"
-python3 -m pip install "agent-paranoid-android[trino]==1.2.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.2.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.2.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.2.0"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.2.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.3.0"
+python3 -m pip install "agent-paranoid-android[mcp]==1.3.0"
+python3 -m pip install "agent-paranoid-android[trino]==1.3.0"
+python3 -m pip install "agent-paranoid-android[postgres]==1.3.0"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.3.0"
+python3 -m pip install "agent-paranoid-android[openai]==1.3.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.3.0"
 ```
 
 The `postgres` extra provides the Psycopg driver for direct read-only PostgreSQL profiling. The `trino` extra contains the Trino client and safe SQL

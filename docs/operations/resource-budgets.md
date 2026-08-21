@@ -39,8 +39,7 @@ cleanup are covered by separate operational-readiness gates.
 ## Database Source Budgets
 
 The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
-this section apply to unreleased `main`; these additions are not in published
-stable `1.2.0`.
+this section apply to stable `1.3.0`.
 
 Database-source configuration and profiling have independent limits before
 generation begins:
