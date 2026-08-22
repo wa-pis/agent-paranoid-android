@@ -83,6 +83,7 @@ nav:
       - Architecture: agent_design.md
       - Development: development.md
       - Release Process: release.md
+      - Manual Release Runbook: manual-release-runbook.md
       - Release Evidence: release-evidence.md
       - Security Review History: security-history.md
       - OpenSpec Archive: openspec-archive.md
