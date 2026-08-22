@@ -26,6 +26,7 @@ jobs:
         with:
           ref: ${{ inputs.commit }}
           fetch-depth: 0
+          fetch-tags: true
           persist-credentials: false
 
       - name: Verify exact candidate source
@@ -54,6 +55,9 @@ jobs:
           uv sync --frozen --all-extras --python python --no-install-project
           uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
 
+      - name: Run release gate
+        run: uv run --no-sync scripts/check_release.sh
+
       - name: Build candidate distributions
         shell: bash
         env:
@@ -79,4 +83,4 @@ jobs:
             dist/*.tar.gz
             dist/ARTIFACT_SHA256
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14

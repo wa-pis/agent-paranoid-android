@@ -222,13 +222,14 @@ gh run download <preflight-run-id> \
   --dir /tmp/release-preflight
 ```
 
-The preflight has read-only repository permissions, sets `SOURCE_DATE_EPOCH`
-from the reviewed commit timestamp, and uploads the wheel, source distribution,
-and `ARTIFACT_SHA256` as temporary workflow artifacts. It cannot create a tag,
-release, attestation, package, or container. Copy those Ubuntu-derived digests
-into the signed acceptance manifest. The tag-triggered build uses the same
-runner, Python, uv, lockfile, build command, and epoch and fails before
-attestation or publication if either digest is different.
+The preflight has read-only repository permissions, runs the full release gate,
+sets `SOURCE_DATE_EPOCH` from the reviewed commit timestamp, and uploads the
+wheel, source distribution, and `ARTIFACT_SHA256` as temporary workflow
+artifacts. It cannot create a tag, release, attestation, package, or container.
+Copy those Ubuntu-derived digests into the signed acceptance manifest. The
+tag-triggered build uses the same runner, checkout depth and tags, Python, uv,
+lockfile, release gate, build command, and epoch and fails before attestation or
+publication if either digest is different.
 
 Run every final release gate, including `scripts/check_release.sh` and
 `mkdocs build --strict`, on the exact stable release commit. Merge only after
