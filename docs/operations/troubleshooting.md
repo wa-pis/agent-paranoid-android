@@ -41,12 +41,12 @@ or contact the provider. On failure, reinstall
 `doctor --require-extra gigachat` uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
-GigaChat. Install stable `1.3.0` with the `gigachat` extra.
+GigaChat. Install stable `1.3.1` with the `gigachat` extra.
 
 ## JDBC-Style URL Rejected
 
 JDBC-style endpoint input, qualified column wildcards, and `profile-query` are
-available in stable `1.3.0`.
+available in stable `1.3.1`.
 
 Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,

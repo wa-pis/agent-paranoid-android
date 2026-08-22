@@ -14,15 +14,8 @@ changing this matrix are defined in
 
 ## Install From PyPI
 
-The stable release is `1.3.0`; the commands below pin that exact version for
+The stable release is `1.3.1`; the commands below pin that exact version for
 reproducible installation.
-
-Stable `1.3.0` remains the recommended default. To verify the patch candidate
-before promotion, pin preview `1.3.1rc2` explicitly:
-
-```bash
-python3 -m pip install "agent-paranoid-android==1.3.1rc2"
-```
 
 Create an isolated environment:
 
@@ -32,19 +25,19 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.3.0"
+python3 -m pip install "agent-paranoid-android==1.3.1"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.3.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.3.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.3.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.3.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.3.0"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.3.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.3.1"
+python3 -m pip install "agent-paranoid-android[mcp]==1.3.1"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.3.1"
+python3 -m pip install "agent-paranoid-android[postgres]==1.3.1"
+python3 -m pip install "agent-paranoid-android[openai]==1.3.1"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.3.1"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -68,7 +61,7 @@ The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 `test-data-agent doctor --require-extra all` to verify that full environment.
 
-The experimental GigaChat adapter is included in `1.3.0` through its
+The experimental GigaChat adapter is included in `1.3.1` through its
 explicit `gigachat` extra. Follow
 [Use The GigaChat Advisor](../how-to/gigachat.md) for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
@@ -76,9 +69,10 @@ OpenAI.
 
 ## Accepted Candidate Baseline
 
-Stable `1.3.0` remains the recommended default and includes the database-source
-additions accepted in `1.3.0rc1` without additional runtime changes. Add an
-optional extra to the same exact stable pin only when needed.
+Stable `1.3.1` is the recommended default. It promotes accepted `1.3.1rc2`
+maintenance without changing application runtime behavior and retains the
+database-source additions accepted in `1.3.0rc1`. Add an optional extra to the
+same exact stable pin only when needed.
 
 ### Windows PowerShell
 
@@ -86,7 +80,7 @@ optional extra to the same exact stable pin only when needed.
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.3.0"
+python -m pip install "agent-paranoid-android==1.3.1"
 ```
 
 Run the self-contained environment check:

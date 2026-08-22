@@ -1,6 +1,6 @@
 # Runnable Local PostgreSQL Example
 
-> Stable `1.3.0` includes the baseline `run.sh` workflow plus `run-jdbc.sh`,
+> Stable `1.3.1` includes the baseline `run.sh` workflow plus `run-jdbc.sh`,
 > `run-wildcard.sh`, and `run-query.sh`.
 
 This example creates a disposable local PostgreSQL cluster with two related

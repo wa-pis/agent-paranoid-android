@@ -3,7 +3,7 @@
 Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 
-Stable `1.3.0` includes the JDBC-style endpoint, qualified column wildcard,
+Stable `1.3.1` includes the JDBC-style endpoint, qualified column wildcard,
 and SQL query source settings documented below. Existing component settings
 and exact allowlists remain supported.
 

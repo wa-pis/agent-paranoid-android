@@ -43,7 +43,7 @@ extra unexpectedly require another is a breaking packaging change. Adding an
 extra or adding an optional dependency inside an existing extra is additive
 when its documented behavior and security boundary remain unchanged.
 
-The database-source additions in stable `1.3.0` use the existing `postgres`
+The database-source additions in stable `1.3.1` use the existing `postgres`
 and `trino` extras. They add no JVM or JDBC driver. JDBC-style URL support is
 endpoint syntax only, qualified wildcards expand into explicit columns, and
 `profile-query` requires the safe SQL parser bundled with the selected database

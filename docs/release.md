@@ -154,13 +154,21 @@ publication because artifact digests generated on macOS differed from the
 Ubuntu release build; container publication was canceled before push. The
 immutable failed tag is superseded by `1.3.1rc2`, which adds a no-publish Ubuntu
 artifact preflight and otherwise retains the same application runtime, public
-APIs, dependencies, and security boundaries.
+APIs, dependencies, and security boundaries. RC2 completed exact-commit gates,
+independent review, GitHub and PyPI publication, multi-platform signed container
+publication, and public-artifact verification. Its immutable results are
+recorded in the
+[1.3.1rc2 published release evidence](release-evidence-1.3.1rc2.md).
 
-Review the RC2 correction directly against the immutable failed candidate:
+Stable `1.3.1` promotes that accepted RC2 tree through the permitted version-
+and documentation-only diff. It introduces no application runtime, public API,
+dependency, packaging, workflow, container, or security-boundary change.
+
+Review the stable promotion directly against the accepted candidate:
 
 ```bash
-git diff --name-status v1.3.1rc1 HEAD
-git diff v1.3.1rc1 HEAD
+git diff --name-status v1.3.1rc2 HEAD
+git diff v1.3.1rc2 HEAD
 ```
 
 A new release candidate is required only when a change affects runtime

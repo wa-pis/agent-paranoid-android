@@ -51,7 +51,7 @@ introduced.
 Install the exact stable release and run the self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.3.0"
+python3 -m pip install "agent-paranoid-android==1.3.1"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -91,8 +91,7 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable `1.3.0` release uses `DatasetSpec` as the generation and
-validation contract for the CLI and Python API.
-Preview `1.3.1rc2` is an explicit opt-in patch candidate for documentation,
-package metadata, build-tool, and workflow maintenance; it adds no application
-runtime behavior.
+The current stable `1.3.1` release uses `DatasetSpec` as the generation and
+validation contract for the CLI and Python API. It promotes the accepted RC2
+documentation, package metadata, build-tool, and workflow maintenance without
+changing application runtime behavior.
