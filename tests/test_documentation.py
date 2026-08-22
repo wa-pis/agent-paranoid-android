@@ -104,7 +104,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == "1.3.1rc1"
+    assert PROJECT_VERSION == "1.3.1rc2"
     assert f"Preview `{PROJECT_VERSION}` is explicit opt-in" in readme
     assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
@@ -1241,7 +1241,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.3.0rc1 HEAD" in release
+    assert "git diff --name-status v1.3.1rc1 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",

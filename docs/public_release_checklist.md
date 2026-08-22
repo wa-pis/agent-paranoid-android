@@ -66,6 +66,10 @@ Enable or verify these repository settings after publishing:
 Before creating a tag:
 
 - Move relevant `CHANGELOG.md` entries from `Unreleased` to the release version.
+- Run `release-preflight.yml` for the exact accepted commit, download its
+  temporary artifact, and record the Ubuntu-derived wheel and source-
+  distribution digests from `ARTIFACT_SHA256` in the signed acceptance
+  manifest. Confirm the preflight has no publication or write permissions.
 - Mention safety guarantees and known limitations.
 - Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
   change.

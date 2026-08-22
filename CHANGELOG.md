@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.1rc2] - 2026-08-22
+
+### Fixed
+
+- Add a no-publish Ubuntu artifact preflight that records exact candidate wheel
+  and source-distribution digests before tag creation.
+- Supersede failed `v1.3.1rc1`, whose release workflow stopped before GitHub
+  Release or PyPI publication when locally generated macOS digests differed
+  from the Ubuntu runner build; container publication was canceled before push.
+
 ## [1.3.1rc1] - 2026-08-22
 
 ### Changed
@@ -644,7 +654,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...HEAD
+[1.3.1rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...v1.3.1rc2
 [1.3.1rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0...v1.3.1rc1
 [1.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0rc1...v1.3.0
 [1.3.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.2.0...v1.3.0rc1
