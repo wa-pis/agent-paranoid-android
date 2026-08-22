@@ -319,6 +319,20 @@ def test_container_release_uses_oidc_and_no_stored_signing_key() -> None:
     assert "COSIGN_PASSWORD" not in workflow
 
 
+def test_exact_commit_gates_can_be_dispatched_without_container_publication() -> None:
+    ci_workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text()
+    container_workflow = (
+        ROOT / ".github" / "workflows" / "containers.yml"
+    ).read_text()
+
+    assert "workflow_dispatch:" in ci_workflow
+    assert "workflow_dispatch:" in container_workflow
+    assert "permissions:\n  contents: read" in ci_workflow
+    assert "permissions:\n  contents: read" in container_workflow
+    publish_job = container_workflow.split("\n  publish:\n", maxsplit=1)[1]
+    assert "if: startsWith(github.ref, 'refs/tags/')" in publish_job
+
+
 def test_container_validation_blocks_fixable_high_severity_vulnerabilities() -> None:
     workflow = (ROOT / ".github" / "workflows" / "containers.yml").read_text()
 

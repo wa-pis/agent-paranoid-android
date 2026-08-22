@@ -237,6 +237,12 @@ the required pipeline is green and conflict-free. Create the stable tag only
 from the verified merge commit in `main`; tagging and post-publish checks are
 separate explicit steps.
 
+If a `main` push event does not create an expected gate run, dispatch CI,
+Containers, Documentation, and Security manually with `--ref main` while the
+reviewed commit is still the exact `main` tip. Manual container dispatch runs
+validation only; image publication remains restricted to accepted signed
+version tags. Record all four exact-commit run URLs in the acceptance manifest.
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.
