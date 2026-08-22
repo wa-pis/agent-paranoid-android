@@ -4,6 +4,23 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.1] - 2026-08-22
+
+### Changed
+
+- Promote the publicly accepted RC2 documentation, package-discovery,
+  build-tool, and workflow maintenance to stable `1.3.1` without changing
+  application behavior, public APIs, dependencies, packaging, containers, or
+  security boundaries.
+- Simplify product onboarding and documentation navigation while retaining the
+  complete CLI, database, provider, privacy, and release references.
+
+### Fixed
+
+- Use the audited Hatchling build pin and frozen lock entry included in RC2.
+- Run the full release gate in a no-publish Ubuntu artifact preflight so the
+  accepted wheel and source-distribution digests match the publishing platform.
+
 ## [1.3.1rc2] - 2026-08-22
 
 ### Fixed
@@ -656,7 +673,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...v1.3.1
 [1.3.1rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...v1.3.1rc2
 [1.3.1rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0...v1.3.1rc1
 [1.3.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0rc1...v1.3.0

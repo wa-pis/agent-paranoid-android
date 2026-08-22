@@ -1,7 +1,7 @@
 # Profile PostgreSQL
 
 !!! note "Availability"
-    Stable `1.3.0` includes the exact component/allowlist PostgreSQL workflow,
+    Stable `1.3.1` includes the exact component/allowlist PostgreSQL workflow,
     credential-free JDBC-style endpoints, qualified column wildcards, and the
     aggregate-only `profile-query` command.
 

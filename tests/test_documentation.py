@@ -20,7 +20,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
-STABLE_VERSION = "1.3.0"
+STABLE_VERSION = "1.3.1"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_NAV_DOCS = {
     "index.md",
@@ -72,6 +72,7 @@ HISTORICAL_DOCS = {
     "release-evidence-1.2.0.md",
     "release-evidence-1.3.0rc1.md",
     "release-evidence-1.3.0.md",
+    "release-evidence-1.3.1rc2.md",
     "rc6-acceptance-checklist.md",
     "security-review-2026-08-01-rc2.md",
     "unreleased-inventory-1.0.0rc1.md",
@@ -104,8 +105,8 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == "1.3.1rc2"
-    assert f"Preview `{PROJECT_VERSION}` is explicit opt-in" in readme
+    assert PROJECT_VERSION == STABLE_VERSION
+    assert "Preview `" not in readme
     assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
@@ -179,6 +180,7 @@ def test_documentation_navigation_leads_with_database_workflows() -> None:
 def test_stable_changelog_sections_are_self_contained() -> None:
     changelog = (ROOT / "CHANGELOG.md").read_text()
     expected_summaries = {
+        "1.3.1": ("documentation", "package-discovery", "Ubuntu artifact preflight"),
         "1.3.0": ("profile", "JDBC-style", "qualified column wildcards"),
         "1.2.0": ("Sigstore", "provider responses", "MCP messages"),
         "1.1.0": ("JSON output", "completion", "GigaChat", "output format"),
@@ -400,6 +402,26 @@ def test_stable_1_3_public_evidence_records_immutable_release() -> None:
         "sha256:272dfe30643831a8666134bf619e9d1488626c136e1d6c8a5299e203fb701b37",
         "sha256:ae9f7f90e68afbb35d5783b819a5d33e91e763ed603280bc150a15eb7a04f964",
         "sha256:4912b1eae16d7c20c6c2d439c24749bbaa89bccf04760e98e1d7e2b169ba2dc6",
+        "AI-assisted independent review",
+    ):
+        assert expected in evidence
+
+
+def test_1_3_1_rc2_public_evidence_records_immutable_release() -> None:
+    evidence = (ROOT / "docs" / "release-evidence-1.3.1rc2.md").read_text()
+
+    for expected in (
+        "78948516451591fd9774ddfacaf788cb67a9426e",
+        "issues/477",
+        "actions/runs/32540742325",
+        "actions/runs/32541306733",
+        "actions/runs/32541448260",
+        "actions/runs/32541659661",
+        "238cca7424af53cf3af13ebce2df1d71c7598ab3b4b0d2f6afaa702563467fc9",
+        "f217907bd4737906508b202cf6ad28f062855e41b613a1b630feb2ddf2188cac",
+        "sha256:439ba7b6ae1ca11315b1cc21930ed80868ed038659b775c984c17430a5846aed",
+        "sha256:6f266e6a999de5def9dc45f74634280f12fe7906583486e8286beaeb08e26a96",
+        "sha256:843800ff1e9a3fc868b9bf2fed66fd07e9468890aa0462ee8159db81277a762b",
         "AI-assisted independent review",
     ):
         assert expected in evidence
@@ -723,7 +745,7 @@ def test_database_source_docs_publish_stable_contracts() -> None:
     )
     for path in availability_pages:
         text = " ".join((ROOT / path).read_text().lower().replace(">", " ").split())
-        assert "stable `1.3.0`" in text
+        assert f"stable `{STABLE_VERSION}`" in text
         assert "preview `1.3.0rc1`" not in text
 
     approach = (ROOT / "docs/concepts/choosing-an-approach.md").read_text()
@@ -976,8 +998,8 @@ def test_installation_documents_dependency_budgets() -> None:
             in installation
         )
     assert f"The stable release is `{STABLE_VERSION}`" in installation
-    assert f"Stable `{STABLE_VERSION}` remains the recommended default" in installation
-    assert f"preview `{PROJECT_VERSION}` explicitly" in installation
+    assert f"Stable `{STABLE_VERSION}` is the recommended default" in installation
+    assert "preview `" not in installation.casefold()
     assert "not the recommended user installation" in installation
 
 
@@ -1241,7 +1263,7 @@ def test_stable_promotion_contract_is_metadata_only() -> None:
     ).read_text()
 
     assert "## RC6 To Stable Promotion" in release
-    assert "git diff --name-status v1.3.1rc1 HEAD" in release
+    assert "git diff --name-status v1.3.1rc2 HEAD" in release
     for path in (
         "pyproject.toml",
         "src/test_data_agent/version.py",

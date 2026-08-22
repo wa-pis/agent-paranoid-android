@@ -1,6 +1,6 @@
 # Runnable Local Trino Example
 
-> Stable `1.3.0` includes the baseline `run.sh` workflow plus `run-jdbc.sh`,
+> Stable `1.3.1` includes the baseline `run.sh` workflow plus `run-jdbc.sh`,
 > `run-wildcard.sh`, and `run-query.sh`.
 
 This launcher starts a pinned disposable Trino container with its built-in

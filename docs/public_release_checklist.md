@@ -99,6 +99,10 @@ Before creating a tag:
   from the publicly accepted RC1 runtime. Preserve the accepted component,
   JDBC, wildcard, and query installed-wheel evidence for PostgreSQL and Trino
   and bind the promotion commit to a separate exact-commit review.
+- Promote stable `1.3.1` only through a version- and documentation-only diff
+  from the publicly accepted RC2 tree. Preserve the accepted Ubuntu artifact
+  preflight and public package/container evidence, and bind the promotion commit
+  to a separate exact-commit review.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

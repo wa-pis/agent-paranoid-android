@@ -9,7 +9,7 @@ LangChain are not required for this single structured request.
 
 !!! note "Release status"
 
-    The adapter is included in stable `1.3.0` through the explicit `gigachat`
+    The adapter is included in stable `1.3.1` through the explicit `gigachat`
     extra.
 
 ## Install The Stable Release
@@ -20,7 +20,7 @@ Create an isolated environment and pin the exact stable release:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android[gigachat]==1.3.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.3.1"
 test-data-agent doctor --require-extra gigachat
 ```
 

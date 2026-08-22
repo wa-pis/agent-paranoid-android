@@ -1,11 +1,12 @@
 # Release Evidence
 
 Release evidence records exact commits, CI gates, published artifacts, and
-post-publication verification. The current stable release appears first;
-historical candidates remain available without occupying the main navigation.
+post-publication verification. The most recent accepted release appears first;
+historical releases remain available without occupying the main navigation.
 
 | Version | Evidence |
 | --- | --- |
+| `1.3.1rc2` | [Release candidate](release-evidence-1.3.1rc2.md) |
 | `1.3.0` | [Stable](release-evidence-1.3.0.md) |
 | `1.3.0rc1` | [Release candidate](release-evidence-1.3.0rc1.md) |
 | `1.2.0` | [Stable](release-evidence-1.2.0.md) |
