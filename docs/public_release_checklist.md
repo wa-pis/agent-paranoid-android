@@ -71,6 +71,9 @@ Before creating a tag:
   distribution digests from `ARTIFACT_SHA256` in the signed acceptance
   manifest. Confirm its full release gate passed and the preflight has no
   publication or write permissions.
+- Confirm CI, Containers, Documentation, and Security have successful runs for
+  the exact accepted commit. If a push run is absent, dispatch the gate manually
+  from the unchanged `main` tip; manual container runs must not publish images.
 - Mention safety guarantees and known limitations.
 - Include upgrade or migration notes when CLI, MCP, schema, or artifact formats
   change.

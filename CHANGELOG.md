@@ -10,7 +10,8 @@ All notable changes to this project are documented here.
 
 - Add a no-publish Ubuntu artifact preflight that runs the full release gate and
   records exact candidate wheel and source-distribution digests before tag
-  creation.
+  creation, plus manual CI and container validation dispatches for exact-commit
+  evidence when a push event is unavailable.
 - Supersede failed `v1.3.1rc1`, whose release workflow stopped before GitHub
   Release or PyPI publication when locally generated macOS digests differed
   from the Ubuntu runner build; container publication was canceled before push.
