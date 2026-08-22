@@ -248,14 +248,19 @@ def test_release_preflight_builds_exact_artifacts_without_publish_permissions() 
     assert "workflow_dispatch:" in workflow
     assert "permissions:\n  contents: read" in workflow
     assert "CANDIDATE_COMMIT: ${{ inputs.commit }}" in workflow
+    assert "fetch-tags: true" in workflow
     assert '[[ "${CANDIDATE_COMMIT}" =~ ^[0-9a-f]{40}$ ]]' in workflow
     assert 'test "$(git rev-parse HEAD^{commit})" = "${CANDIDATE_COMMIT}"' in workflow
+    assert "uv run --no-sync scripts/check_release.sh" in workflow
     assert "SOURCE_DATE_EPOCH" in workflow
     assert "uv build --no-build-isolation" in workflow
+    assert workflow.index("scripts/check_release.sh") < workflow.index(
+        "uv build --no-build-isolation"
+    )
     assert "sha256sum dist/*.whl dist/*.tar.gz > dist/ARTIFACT_SHA256" in workflow
     assert "scripts/check_installed_package.py" in workflow
     assert "name: release-preflight-${{ inputs.commit }}" in workflow
-    assert "retention-days: 7" in workflow
+    assert "retention-days: 14" in workflow
     for forbidden in (
         "contents: write",
         "id-token: write",
