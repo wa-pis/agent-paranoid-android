@@ -458,7 +458,16 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template"}
+    assert active == {"_template", "stable-release-classifier"}
+
+    classifier_change = changes / "stable-release-classifier"
+    classifier_tasks = (classifier_change / "tasks.md").read_text()
+    assert "- [ ]" in classifier_tasks
+    assert (classifier_change / "proposal.md").is_file()
+    assert (classifier_change / "design.md").is_file()
+    assert (
+        classifier_change / "specs" / "release-supply-chain" / "spec.md"
+    ).is_file()
 
     archived = changes / "archive"
     completed = (
