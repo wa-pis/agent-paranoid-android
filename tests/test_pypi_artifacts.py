@@ -12,7 +12,10 @@ import pytest
 
 from scripts.check_pypi_artifacts import (
     ArtifactValidationError,
+    BETA_CLASSIFIER,
+    STABLE_CLASSIFIER,
     check_pypi_artifacts,
+    maturity_classifier_for_version,
 )
 from scripts.verify_pypi_release import (
     PublishedReleaseValidationError,
@@ -27,23 +30,34 @@ def write_distributions(
     *,
     name: str = "agent-paranoid-android",
     version: str = "0.5.0",
+    wheel_classifier: str = STABLE_CLASSIFIER,
+    sdist_classifier: str | None = None,
 ) -> None:
     normalized = name.replace("-", "_")
     wheel = directory / f"{normalized}-{version}-py3-none-any.whl"
-    metadata = (
-        "Metadata-Version: 2.4\n"
-        f"Name: {name}\n"
-        f"Version: {version}\n"
-        "\n"
-    ).encode()
+    sdist_classifier = sdist_classifier or wheel_classifier
+
+    def metadata(classifier: str) -> bytes:
+        return (
+            "Metadata-Version: 2.4\n"
+            f"Name: {name}\n"
+            f"Version: {version}\n"
+            f"Classifier: {classifier}\n"
+            "\n"
+        ).encode()
+
     with zipfile.ZipFile(wheel, mode="w") as archive:
-        archive.writestr(f"{normalized}-{version}.dist-info/METADATA", metadata)
+        archive.writestr(
+            f"{normalized}-{version}.dist-info/METADATA",
+            metadata(wheel_classifier),
+        )
 
     sdist = directory / f"{normalized}-{version}.tar.gz"
+    sdist_metadata = metadata(sdist_classifier)
     with tarfile.open(sdist, mode="w:gz") as archive:
         member = tarfile.TarInfo(f"{normalized}-{version}/PKG-INFO")
-        member.size = len(metadata)
-        archive.addfile(member, io.BytesIO(metadata))
+        member.size = len(sdist_metadata)
+        archive.addfile(member, io.BytesIO(sdist_metadata))
 
 
 def published_metadata(directory: Path, *, version: str = "0.5.0") -> dict:
@@ -75,6 +89,62 @@ def test_check_pypi_artifacts_accepts_matching_distributions(
     write_distributions(tmp_path)
 
     check_pypi_artifacts("v0.5.0", tmp_path)
+
+
+def test_check_pypi_artifacts_accepts_prerelease_beta(
+    tmp_path: Path,
+) -> None:
+    write_distributions(
+        tmp_path,
+        version="0.5.0rc1",
+        wheel_classifier=BETA_CLASSIFIER,
+    )
+
+    check_pypi_artifacts("v0.5.0rc1", tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("version", "wheel_classifier", "sdist_classifier"),
+    [
+        ("0.5.0", BETA_CLASSIFIER, STABLE_CLASSIFIER),
+        ("0.5.0", STABLE_CLASSIFIER, BETA_CLASSIFIER),
+        ("0.5.0rc1", STABLE_CLASSIFIER, BETA_CLASSIFIER),
+    ],
+)
+def test_check_pypi_artifacts_rejects_maturity_mismatch(
+    tmp_path: Path,
+    version: str,
+    wheel_classifier: str,
+    sdist_classifier: str,
+) -> None:
+    write_distributions(
+        tmp_path,
+        version=version,
+        wheel_classifier=wheel_classifier,
+        sdist_classifier=sdist_classifier,
+    )
+
+    with pytest.raises(ArtifactValidationError, match="maturity classifier"):
+        check_pypi_artifacts(f"v{version}", tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("version", "expected"),
+    [
+        ("1.0.0a1", BETA_CLASSIFIER),
+        ("1.0.0b2", BETA_CLASSIFIER),
+        ("1.0.0rc3", BETA_CLASSIFIER),
+        ("1.0.0.dev4", BETA_CLASSIFIER),
+        ("1.0.0", STABLE_CLASSIFIER),
+        ("1.0.0.post1", STABLE_CLASSIFIER),
+        ("1.0.0+local", STABLE_CLASSIFIER),
+    ],
+)
+def test_maturity_classifier_follows_pep_440_phase(
+    version: str,
+    expected: str,
+) -> None:
+    assert maturity_classifier_for_version(version) == expected
 
 
 def test_check_pypi_artifacts_rejects_mismatched_version(

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from scripts.check_pypi_artifacts import maturity_classifier_for_version
 from scripts.check_release_tag import check_release_tag
 from test_data_agent.core.dataset import DATASET_SPEC_SCHEMA_VERSION, DatasetSpec
 
@@ -38,8 +39,12 @@ def test_project_metadata_uses_public_name_and_stable_cli() -> None:
     )
     assert metadata["license"] == "MIT"
     assert "License :: OSI Approved :: MIT License" in metadata["classifiers"]
-    assert "Development Status :: 4 - Beta" in metadata["classifiers"]
-    assert "Development Status :: 5 - Production/Stable" not in metadata["classifiers"]
+    maturity_classifiers = [
+        classifier
+        for classifier in metadata["classifiers"]
+        if classifier.startswith("Development Status :: ")
+    ]
+    assert maturity_classifiers == [maturity_classifier_for_version(PROJECT_VERSION)]
     assert {
         "data-generation",
         "database-testing",

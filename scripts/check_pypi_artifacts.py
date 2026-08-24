@@ -12,14 +12,25 @@ from pathlib import Path
 
 
 DISTRIBUTION_NAME = "agent-paranoid-android"
+BETA_CLASSIFIER = "Development Status :: 4 - Beta"
+STABLE_CLASSIFIER = "Development Status :: 5 - Production/Stable"
 MAX_ARTIFACT_BYTES = 512 * 1024 * 1024
 MAX_ARCHIVE_MEMBERS = 10_000
 MAX_METADATA_BYTES = 1024 * 1024
 TAG_PATTERN = re.compile(r"^v([0-9]+\.[0-9]+\.[0-9]+[A-Za-z0-9.+-]*)$")
+PRERELEASE_PATTERN = re.compile(r"(?:a|b|rc)[0-9]+|(?:^|\.)dev[0-9]+", re.IGNORECASE)
 
 
 class ArtifactValidationError(ValueError):
     """Raised when release distributions cannot be trusted for publication."""
+
+
+def maturity_classifier_for_version(version: str) -> str:
+    """Return the required maturity classifier for a normalized PEP 440 version."""
+    public_version = version.partition("+")[0]
+    if PRERELEASE_PATTERN.search(public_version):
+        return BETA_CLASSIFIER
+    return STABLE_CLASSIFIER
 
 
 def check_pypi_artifacts(tag: str, directory: Path) -> None:
@@ -113,6 +124,17 @@ def _check_metadata(metadata: Message, version: str, path: Path) -> None:
     if versions != [version]:
         raise ArtifactValidationError(
             f"distribution version does not match {version}: {path.name}"
+        )
+    expected_classifier = maturity_classifier_for_version(version)
+    maturity_classifiers = [
+        classifier
+        for classifier in metadata.get_all("Classifier", [])
+        if classifier.startswith("Development Status :: ")
+    ]
+    if maturity_classifiers != [expected_classifier]:
+        raise ArtifactValidationError(
+            "distribution maturity classifier does not match "
+            f"{version}: {path.name}"
         )
 
 

@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Align Python package maturity metadata with the release phase: stable builds
+  declare `Production/Stable`, prereleases declare `Beta`, and wheel plus
+  source-distribution validation rejects mismatches before PyPI publication.
+
 ## [1.3.1] - 2026-08-22
 
 ### Changed
