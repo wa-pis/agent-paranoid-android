@@ -458,7 +458,16 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template"}
+    assert active == {"_template", "openai-3-sdk-compatibility"}
+
+    openai_change = changes / "openai-3-sdk-compatibility"
+    openai_tasks = (openai_change / "tasks.md").read_text()
+    assert "- [ ]" in openai_tasks
+    assert (openai_change / "proposal.md").is_file()
+    assert (openai_change / "design.md").is_file()
+    assert (
+        openai_change / "specs" / "operational-readiness" / "spec.md"
+    ).is_file()
 
     classifier_change = changes / "archive" / "2026-08-24-stable-release-classifier"
     classifier_tasks = (classifier_change / "tasks.md").read_text()
