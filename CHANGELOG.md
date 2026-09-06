@@ -6,9 +6,27 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Evaluate dependent formulas in dependency order and exclude rejected rules
+  and relationships from generation and validation.
+- Preserve nullable foreign keys, reject missing required identifiers, and
+  honor the complete configured string length.
+- Reject unsatisfied valid-mode generation contracts before publishing output,
+  including failures introduced by business rules and disabled report sections.
 - Align Python package maturity metadata with the release phase: stable builds
   declare `Production/Stable`, prereleases declare `Beta`, and wheel plus
   source-distribution validation rejects mismatches before PyPI publication.
+
+### Security
+
+- Check row privacy during standalone validation and after business-rule
+  application, using the same synthetic-value policy as generation.
+
+### Migration
+
+- Regenerate affected fixtures after upgrading: formula order, nullable keys,
+  and string lengths can change seeded values. Valid-mode output that previously
+  carried a failed report is now rejected before publication. See
+  [generation contract migration](docs/reference/generation-contract-migration.md).
 
 ## [1.3.1] - 2026-08-22
 

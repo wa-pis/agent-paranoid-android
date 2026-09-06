@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.distribution import StringPatternDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.csv_profiler import parse_bool, parse_date_value, parse_datetime_value, parse_float, parse_int
 
@@ -45,9 +46,16 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
             for field in entity.fields:
                 value = row.get(field.name)
                 if value in (None, ""):
-                    if not field.nullable and not field.is_identifier:
+                    if not field.nullable:
                         errors.append(f"{entity.name}[{row_index}].{field.name} is required")
                     continue
+                distribution = field.typed_distribution
+                if (
+                    isinstance(value, str)
+                    and isinstance(distribution, StringPatternDistribution)
+                    and not distribution.min_length <= len(value) <= distribution.max_length
+                ):
+                    errors.append(f"{entity.name}[{row_index}].{field.name} has wrong length")
                 if not value_matches_type(value, field.data_type):
                     errors.append(f"{entity.name}[{row_index}].{field.name} has wrong type")
     return errors

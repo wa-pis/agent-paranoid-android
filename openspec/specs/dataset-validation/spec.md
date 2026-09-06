@@ -7,6 +7,24 @@ expectations do not depend on free-form LLM reasoning.
 
 ## Requirements
 
+### Requirement: Row-Aware Privacy Revalidation
+
+The enabled privacy section SHALL inspect supplied row values as well as spec
+safety, using the same policy as generation and without exposing failing values.
+Declared numeric CSV representations SHALL be classified as numeric values.
+
+#### Scenario: A generated artifact has been modified
+
+- **WHEN** a supplied string violates the synthetic sensitive-value policy
+- **THEN** privacy validation fails without echoing its contents.
+
+### Requirement: Rejected Rules And Nullable References
+
+Rejected relationships and constraints SHALL not be validated. Null references
+SHALL pass only for nullable child fields. Required identifiers SHALL reject null
+or empty values even when they are not the primary key. String-pattern bounds
+SHALL be checked against the complete supplied value.
+
 ### Requirement: Schema Validation
 
 Dataset validation SHALL check generated rows against the effective

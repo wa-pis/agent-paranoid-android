@@ -53,6 +53,7 @@ from test_data_agent.safety import (
     assert_profile_safe,
 )
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
+from test_data_agent.validation.reconciliation import GenerationValidationError, assert_generated_dataset_valid
 
 
 BusinessRulesApplier = Callable[..., Any | None]
@@ -113,6 +114,8 @@ def generate_dataset_bundle(
         else None
     )
     budget.check("business rule application")
+    assert_generated_dataset_valid(rows_by_entity, effective_spec)
+    assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
@@ -246,6 +249,8 @@ def generate_single_entity_profile_artifacts(
         budget=budget,
     )
     budget.check("dataset generation")
+    assert_generated_dataset_valid(rows_by_entity, spec)
+    assert_business_report_valid(business_report, spec.generation_settings.mode)
     report = validate_dataset(rows_by_entity, spec)
     budget.check("dataset validation")
     if output_path is None:
@@ -446,6 +451,11 @@ def generate_dataset_review_artifacts(
         cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
     return 0 if report.valid else 1
+
+
+def assert_business_report_valid(report: Any | None, mode: GenerationMode) -> None:
+    if mode not in {GenerationMode.MIXED, GenerationMode.NEGATIVE} and not business_report_is_valid(report, mode):
+        raise GenerationValidationError("generated dataset failed business validation")
 
 
 def business_report_is_valid(report: Any | None, mode: GenerationMode) -> bool:
