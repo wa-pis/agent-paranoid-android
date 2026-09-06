@@ -307,6 +307,11 @@ The final `1.4.0` main commit still requires all exact-commit gates, independent
 approval, Ubuntu preflight hashes, a signed acceptance manifest and successful
 public-artifact verification. Prior approval is not reused for the new commit.
 
+Stable `1.4.0` completed these requirements at exact commit
+`5bcaef2cd991e63098de4d1601f8ae2a8207bd14`; see the
+[1.4.0 published evidence](release-evidence-1.4.0.md) for hashes, signed images,
+approval and public verification, including the successful Parquet retry.
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.
