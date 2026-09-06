@@ -26,5 +26,9 @@ Two additional correctness findings from the parent review were corrected:
 nullable one-to-one CSV empty strings are excluded from duplicate counting, and
 an active aggregate cannot silently use a rejected or absent relationship.
 
-The final release candidate still requires exact-commit independent approval,
-all CI gates, and Ubuntu artifact-preflight hashes before signing its tag.
+RC1, RC2 and stable subsequently completed exact-commit independent review,
+all required gates, Ubuntu preflight hashes, signed publication and public
+verification. Final stable approval is recorded in
+[acceptance #497](https://github.com/wa-pis/agent-paranoid-android/issues/497);
+[stable evidence](../../../../docs/release-evidence-1.3.2.md) records immutable
+artifact identities.
