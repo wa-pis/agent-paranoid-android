@@ -11,7 +11,7 @@ from test_data_agent.core.constraint import Constraint
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec
-from test_data_agent.core.relationship import Relationship
+from test_data_agent.core.relationship import Relationship, RelationshipType
 from test_data_agent.core.settings import (
     GenerationMode,
     OutputFormat,
@@ -131,7 +131,7 @@ def test_nullable_relationships_preserve_nulls(identifier: bool, ratio: float) -
 
 def test_nullable_one_to_one_counts_only_present_children() -> None:
     spec = relationship_spec()
-    spec.relationships[0].relationship_type = "one_to_one"
+    spec.relationships[0].relationship_type = RelationshipType.ONE_TO_ONE
     spec.entities[1].fields[0].null_ratio = 1
     rows = generate_dataset(spec, seed=1)
     assert validate_dataset(rows, spec).valid
@@ -340,7 +340,7 @@ def test_numeric_csv_roundtrip_and_nullable_one_to_one(tmp_path: Path) -> None:
     from test_data_agent.io.commands import validate_dataset_artifacts
 
     spec = relationship_spec(identifier=True)
-    spec.relationships[0].relationship_type = "one_to_one"
+    spec.relationships[0].relationship_type = RelationshipType.ONE_TO_ONE
     spec.entities[1].fields[0].null_ratio = 1
     output = tmp_path / "output"
     generate_dataset_bundle(
