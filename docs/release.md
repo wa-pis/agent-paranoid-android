@@ -282,6 +282,11 @@ git diff v1.3.2rc2 HEAD
 Exact-main gates, independent approval, Ubuntu preflight, signed manifest and
 public verification remain mandatory for stable.
 
+Stable `1.3.2` completed these gates and public acceptance from exact commit
+`28d1176867d3ba155a420a5dfae0f6944597470d`. Its signed identity, approvals,
+package hashes and image digests are recorded in
+[the stable release evidence](release-evidence-1.3.2.md).
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.

@@ -24,3 +24,10 @@ controlled-invalid reports. Inferred rules in an explicitly supplied spec remain
 executable for compatibility; rejected rules and relationships do not execute.
 Changed seeded values and newly rejected invalid bundles require migration notes.
 Release through 1.3.2rc1 acceptance before a metadata-only 1.3.2 promotion.
+
+## Completed Release Sequence
+
+Published RC1 contained the corrective runtime. A pre-existing malformed SQL
+property-test input surfaced during stable preparation, so the safety-test
+correction passed a new RC2 acceptance cycle. Stable 1.3.2 promotes accepted
+RC2 with metadata/documentation changes only; public verification passed.
