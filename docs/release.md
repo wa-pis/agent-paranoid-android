@@ -264,9 +264,23 @@ allowlist rejection. Production behavior remained fail-closed. The corrected
 test prefixes unquoted generated names with `outside_` and retains quoted-name
 coverage and strict `AllowlistError` assertions. Explicit examples retain the
 regression. Since safety-test changes are excluded from stable promotion,
-`1.3.2rc2` must complete the entire acceptance process before stable `1.3.2`.
+`1.3.2rc2` repeated and passed the entire acceptance process before stable `1.3.2`.
 No production code, dependency, schema, fixture, workflow, or container behavior
-changes from RC1. Compare stable promotion against accepted `v1.3.2rc2`.
+changes from RC1. The accepted RC2 commit is
+`1b32c24fce2ba13916ee5e2a800de8aaa5176c8a`; its hashes, independent approval,
+signed images and public checks are recorded in
+[the RC2 evidence](release-evidence-1.3.2rc2.md).
+
+Stable `1.3.2` promotes this runtime through version and documentation changes
+only. Review every changed hunk against the accepted candidate:
+
+```bash
+git diff --name-status v1.3.2rc2 HEAD
+git diff v1.3.2rc2 HEAD
+```
+
+Exact-main gates, independent approval, Ubuntu preflight, signed manifest and
+public verification remain mandatory for stable.
 
 ## Version And Tag
 

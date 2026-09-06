@@ -27,9 +27,11 @@
 - [x] Publish RC1 and verify public Python, container, and documentation artifacts.
 - [x] Correct malformed unquoted SQL property-test names discovered during
   stable preparation; keep strict rejection assertions and add explicit examples.
-- [ ] Prepare and accept 1.3.2rc2 with unchanged production runtime, repeating
+- [x] Prepare and accept 1.3.2rc2 with unchanged production runtime, repeating
   exact-commit review, all gates, Ubuntu hashes and public verification.
 - [ ] Promote accepted RC2 through metadata-only 1.3.2 diff and repeat release gates.
 - [ ] Publish and verify stable release; record evidence and archive this change.
 
 RC1 public acceptance: [evidence](../../../docs/release-evidence-1.3.2rc1.md).
+
+RC2 public acceptance: [evidence](../../../docs/release-evidence-1.3.2rc2.md).
