@@ -7,6 +7,10 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
+Candidate `1.3.2rc1` tightens generation and validation contracts. Review the
+[migration notes](reference/generation-contract-migration.md) before testing
+this prerelease; stable `1.3.1` remains the recommended installation.
+
 ## Choose Your Starting Point
 
 | I have | Start here |

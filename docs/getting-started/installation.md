@@ -12,6 +12,16 @@ existing environments to upgrade. The notice and release-gate rules for
 changing this matrix are defined in
 [Runtime And Integration Support](../reference/support-policy.md).
 
+Candidate `1.3.2rc1` contains generation-contract corrections. Read the
+[migration notes](../reference/generation-contract-migration.md) before
+evaluating this prerelease.
+
+After publication, install the candidate explicitly with:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.3.2rc1"
+```
+
 ## Install From PyPI
 
 The stable release is `1.3.1`; the commands below pin that exact version for
