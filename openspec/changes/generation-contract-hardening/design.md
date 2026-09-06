@@ -31,3 +31,13 @@ than publishing a falsely valid dataset.
 Do not add an iterative solver or a new dependency. Ordering formula dependencies
 and rejecting remaining unsatisfied contracts is bounded and reviewable. Do not
 rename existing validation sections; make the privacy section check its input.
+
+## Release-validation correction
+
+Stable preparation after accepted RC1 generated the reserved SQL keyword `AS`
+as an unquoted catalog in an existing property test. SQL parsing correctly
+rejected it before allowlist checking; the test expected only AllowlistError.
+RC2 prefixes unquoted generated identifiers with `outside_`, retains arbitrary
+quoted identifiers, and explicitly exercises the failing example. Production
+SQL enforcement and the strict allowlist-error assertion are unchanged. This
+safety-test correction requires a new RC under the release contract.

@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.2rc2] - 2026-09-07
+
+### Changed
+
+- Reissue the corrective candidate after a release-validation test correction;
+  application behavior, public contracts and dependencies are unchanged from
+  `1.3.2rc1`.
+
 ## [1.3.2rc1] - 2026-09-06
 
 ### Fixed
@@ -699,7 +707,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc2...HEAD
+[1.3.2rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...v1.3.2rc2
 [1.3.2rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...v1.3.2rc1
 [1.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...v1.3.1
 [1.3.1rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...v1.3.1rc2
