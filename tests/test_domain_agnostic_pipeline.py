@@ -404,7 +404,7 @@ def test_generation_uses_typed_distribution_models() -> None:
     assert all(10 <= row["amount"] <= 20 for row in rows)
     assert all(row["is_active"] is True for row in rows)
     assert all("2024-01-01" <= row["event_date"] <= "2024-01-03" for row in rows)
-    assert all(len(row["code"]) == 8 for row in rows)
+    assert all(len(row["code"]) == 4 for row in rows)
 
 
 def test_cli_profile_infer_generate_validate_and_generate_from_example(tmp_path) -> None:

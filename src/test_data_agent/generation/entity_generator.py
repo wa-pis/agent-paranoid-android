@@ -23,7 +23,6 @@ from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
 from test_data_agent.core.privacy import (
-    infer_sensitive_value_type,
     is_sensitive_field,
 )
 from test_data_agent.core.settings import GenerationMode
@@ -34,7 +33,7 @@ from test_data_agent.generation.semantic_provider import (
     request_semantic_value,
 )
 from test_data_agent.safety import assert_spec_safe
-from test_data_agent.validation.schema_validator import validate_schema
+from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
 
 
 def generate_dataset(
@@ -74,49 +73,8 @@ def generate_dataset(
     budget.check("constraint solving")
     solve_constraints(rows_by_entity, spec, seed=seed)
     budget.check("constraint solving")
-    _assert_post_solve_safe(rows_by_entity, spec)
+    assert_generated_dataset_valid(rows_by_entity, spec)
     return rows_by_entity
-
-
-def _assert_post_solve_safe(
-    rows_by_entity: dict[str, list[dict[str, Any]]],
-    spec: DatasetSpec,
-) -> None:
-    if spec.generation_settings.mode == GenerationMode.VALID and validate_schema(
-        rows_by_entity,
-        spec,
-    ):
-        raise ValueError("generated dataset failed post-solve type validation")
-    for entity in spec.entities:
-        for row in rows_by_entity.get(entity.name, []):
-            for field in entity.fields:
-                value = row.get(field.name)
-                detected = infer_sensitive_value_type(value)
-                sensitive = field.sensitive or is_sensitive_field(
-                    field.name,
-                    field.semantic_type,
-                )
-                if isinstance(value, str) and (
-                    sensitive or detected is not None
-                ) and not _is_synthetic_sensitive_value(
-                    value,
-                    field.semantic_type or detected,
-                ):
-                    raise ValueError(
-                        "generated dataset failed post-solve privacy validation"
-                    )
-
-
-def _is_synthetic_sensitive_value(value: Any, value_type: str | None) -> bool:
-    if not isinstance(value, str):
-        return False
-    if value_type == "email":
-        return value.endswith("@example.test")
-    if value_type == "phone":
-        return value.startswith("+1-202-555-")
-    if value_type == "ssn":
-        return value.startswith("000-00-")
-    return value.startswith("synthetic_")
 
 
 def create_faker(locale: str | None) -> Faker:
@@ -148,6 +106,7 @@ def generate_row(
             mode=mode,
             invalid_ratio=invalid_ratio,
             semantic_provider=semantic_provider,
+            allow_null=field.name != entity.primary_key,
         )
         for field in entity.fields
     }
@@ -164,8 +123,9 @@ def generate_field_value(
     mode: GenerationMode,
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
+    allow_null: bool = True,
 ) -> Any:
-    if field.nullable and not field.is_identifier and rng.random() < field.null_ratio:
+    if allow_null and field.nullable and rng.random() < field.null_ratio:
         return None
     if should_generate_invalid_value(field, rng, mode=mode, invalid_ratio=invalid_ratio):
         return invalid_value_for_type(field.data_type)
@@ -331,8 +291,13 @@ def synthetic_string(field: FieldSpec, typed_distribution: StringPatternDistribu
     else:
         min_length = int(distribution.get("min_length", 6))
         max_length = int(distribution.get("max_length", max(min_length, 12)))
-    length = rng.randint(max(1, min_length), max(1, max_length))
-    return "syn_" + "".join(rng.choice(string.ascii_lowercase) for _ in range(length))
+    if max_length == 0:
+        if field.nullable:
+            return ""
+        raise ValueError("required string field cannot have zero maximum length")
+    length = rng.randint(max(1, min_length), max_length)
+    prefix = "syn_" if length > 4 else ""
+    return prefix + "".join(rng.choice(string.ascii_lowercase) for _ in range(length - len(prefix)))
 
 
 def should_generate_invalid_value(

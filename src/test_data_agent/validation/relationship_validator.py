@@ -11,6 +11,9 @@ from test_data_agent.core.relationship import RelationshipType
 def validate_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> list[str]:
     errors: list[str] = []
     for relationship in spec.relationships:
+        if relationship.status == "rejected":
+            continue
+        child_field = spec.entity(relationship.child_entity).field(relationship.child_field)
         parent_values = {
             row.get(relationship.parent_field)
             for row in rows_by_entity.get(relationship.parent_entity, [])
@@ -18,6 +21,8 @@ def validate_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec
         }
         for index, row in enumerate(rows_by_entity.get(relationship.child_entity, [])):
             value = row.get(relationship.child_field)
+            if value in (None, "") and child_field.nullable:
+                continue
             if value not in parent_values:
                 errors.append(f"{relationship.child_entity}[{index}].{relationship.child_field} has no parent")
         if relationship.relationship_type == RelationshipType.ONE_TO_ONE:

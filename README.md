@@ -62,6 +62,10 @@ database, Parquet, MCP, or AI support only when you need it; see
 The project does not certify statistical anonymity, protection from every
 re-identification attack, or cross-environment byte identity.
 
+The upcoming corrective release tightens generation and validation contracts;
+see [migration notes](docs/reference/generation-contract-migration.md) before
+regenerating existing fixtures.
+
 ## Choose A Guide
 
 - [Review The Output](https://wa-pis.github.io/agent-paranoid-android/getting-started/review-output/)
