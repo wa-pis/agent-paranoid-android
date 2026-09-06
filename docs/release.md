@@ -251,6 +251,21 @@ reviewed commit is still the exact `main` tip. Manual container dispatch runs
 validation only; image publication remains restricted to accepted signed
 version tags. Record all four exact-commit run URLs in the acceptance manifest.
 
+## Generation Contract Corrective Release
+
+The generation and validation corrections in PR #490 change runtime and
+privacy enforcement and therefore require `1.3.2rc1` before stable `1.3.2`.
+The candidate must complete exact-main-commit CI, Containers, Documentation,
+Security, independent review, Ubuntu artifact preflight, signed publication,
+and public-artifact verification. Stable promotion must compare directly
+against accepted `v1.3.2rc1` and contain only the permitted metadata and
+documentation changes described above.
+
+The implementation received an
+[independent AI-assisted approval](https://github.com/wa-pis/agent-paranoid-android/pull/490#issuecomment-5561792783)
+for `2c7e7432868863f6f0c88a5ae2371b377cdb2bb5`; final candidate approval
+must separately identify the exact release commit.
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.

@@ -18,7 +18,8 @@
   10 live-service skips; 90.34% coverage).
 - [x] Complete security review of the immutable implementation diff; correct
   the discovered numeric-string regression and rerun the full gate.
-- [ ] Commit signed changes, obtain independent review, and merge green PR.
+- [x] Commit signed changes, obtain independent review, and merge green PR
+  [#490](https://github.com/wa-pis/agent-paranoid-android/pull/490).
 
 ## Stage 4 — Release
 - [ ] Prepare 1.3.2rc1 and collect exact-commit gates and independent approval.

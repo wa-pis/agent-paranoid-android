@@ -105,7 +105,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == STABLE_VERSION
+    assert PROJECT_VERSION == "1.3.2rc1"
     assert "Preview `" not in readme
     assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
