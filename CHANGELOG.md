@@ -4,6 +4,16 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.4.0] - 2026-09-07
+
+### Changed
+
+- Publish the accepted `1.3.2` generation and validation runtime under the
+  requested minor version `1.4.0`. This is a version- and documentation-only
+  release; it adds no new application behavior, public API, or dependencies.
+- Retain the generation-contract corrections and migration guidance introduced
+  in `1.3.2`; upgrades from that release require no additional contract migration.
+
 ## [1.3.2] - 2026-09-07
 
 ### Fixed
@@ -735,7 +745,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc2...v1.3.2
 [1.3.2rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...v1.3.2rc2
 [1.3.2rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...v1.3.2rc1
