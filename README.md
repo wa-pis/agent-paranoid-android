@@ -62,14 +62,14 @@ database, Parquet, MCP, or AI support only when you need it; see
 The project does not certify statistical anonymity, protection from every
 re-identification attack, or cross-environment byte identity.
 
-Candidate `1.3.2rc1` tightens generation and validation contracts;
+Candidate `1.3.2rc2` tightens generation and validation contracts;
 see [migration notes](docs/reference/generation-contract-migration.md) before
 regenerating existing fixtures.
 
 To evaluate the candidate after publication:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.3.2rc1"
+python3 -m pip install "agent-paranoid-android==1.3.2rc2"
 ```
 
 ## Choose A Guide

@@ -253,18 +253,20 @@ version tags. Record all four exact-commit run URLs in the acceptance manifest.
 
 ## Generation Contract Corrective Release
 
-The generation and validation corrections in PR #490 change runtime and
-privacy enforcement and therefore require `1.3.2rc1` before stable `1.3.2`.
-The candidate must complete exact-main-commit CI, Containers, Documentation,
-Security, independent review, Ubuntu artifact preflight, signed publication,
-and public-artifact verification. Stable promotion must compare directly
-against accepted `v1.3.2rc1` and contain only the permitted metadata and
-documentation changes described above.
+The generation and validation corrections in PR #490 completed public
+acceptance in `1.3.2rc1` at exact commit
+`5eb29ce4af94049e27c32462211725e5f896d9b6`; see
+[the immutable RC1 evidence](release-evidence-1.3.2rc1.md).
 
-The implementation received an
-[independent AI-assisted approval](https://github.com/wa-pis/agent-paranoid-android/pull/490#issuecomment-5561792783)
-for `2c7e7432868863f6f0c88a5ae2371b377cdb2bb5`; final candidate approval
-must separately identify the exact release commit.
+Stable preparation then exposed a pre-existing randomized safety-test defect:
+unquoted catalog `AS` was rejected as invalid SQL before the test's expected
+allowlist rejection. Production behavior remained fail-closed. The corrected
+test prefixes unquoted generated names with `outside_` and retains quoted-name
+coverage and strict `AllowlistError` assertions. Explicit examples retain the
+regression. Since safety-test changes are excluded from stable promotion,
+`1.3.2rc2` must complete the entire acceptance process before stable `1.3.2`.
+No production code, dependency, schema, fixture, workflow, or container behavior
+changes from RC1. Compare stable promotion against accepted `v1.3.2rc2`.
 
 ## Version And Tag
 
