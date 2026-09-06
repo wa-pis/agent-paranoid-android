@@ -7,9 +7,9 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
-Candidate `1.3.2rc2` tightens generation and validation contracts. Review the
-[migration notes](reference/generation-contract-migration.md) before testing
-this prerelease; stable `1.3.1` remains the recommended installation.
+Stable `1.3.2` tightens generation and validation contracts. Review the
+[migration notes](reference/generation-contract-migration.md) before regenerating
+existing fixtures.
 
 ## Choose Your Starting Point
 
@@ -55,7 +55,7 @@ introduced.
 Install the exact stable release and run the self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.3.1"
+python3 -m pip install "agent-paranoid-android==1.3.2"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -95,7 +95,7 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable `1.3.1` release uses `DatasetSpec` as the generation and
+The current stable `1.3.2` release uses `DatasetSpec` as the generation and
 validation contract for the CLI and Python API. It promotes the accepted RC2
 documentation, package metadata, build-tool, and workflow maintenance without
 changing application runtime behavior.
