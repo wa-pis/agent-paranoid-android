@@ -4,6 +4,33 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.3.2] - 2026-09-07
+
+### Fixed
+
+- Apply formulas in dependency order and ignore rejected rules and relationships.
+- Preserve nullable foreign keys, reject missing required identifiers, and
+  respect complete string length bounds.
+- Stop valid-mode generation before publication when constraints or business
+  rules fail, including when report sections are disabled.
+
+### Security
+
+- Validate actual row privacy during revalidation and after business-rule
+  mutation; generated numeric strings cannot bypass the privacy gate.
+
+### Changed
+
+- Promote the publicly accepted `1.3.2rc1` corrections with version and
+  documentation changes only. Application code and dependencies are unchanged
+  from the accepted candidate.
+
+### Migration
+
+- Regenerate affected seeded fixtures and review the
+  [generation contract migration](docs/reference/generation-contract-migration.md)
+  for stricter valid-mode acceptance and changed formula, key, and string values.
+
 ## [1.3.2rc1] - 2026-09-06
 
 ### Fixed
@@ -699,7 +726,8 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...v1.3.2
 [1.3.2rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...v1.3.2rc1
 [1.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...v1.3.1
 [1.3.1rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...v1.3.1rc2

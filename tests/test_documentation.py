@@ -20,7 +20,7 @@ ROOT = Path(__file__).parent.parent
 PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
     "version"
 ]
-STABLE_VERSION = "1.3.1"
+STABLE_VERSION = "1.3.2"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_NAV_DOCS = {
     "index.md",
@@ -105,7 +105,7 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == "1.3.2rc1"
+    assert PROJECT_VERSION == STABLE_VERSION
     assert "Preview `" not in readme
     assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme

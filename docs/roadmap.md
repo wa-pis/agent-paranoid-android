@@ -5,9 +5,8 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
-- Complete generation-contract corrections and their RC acceptance: rule
-  selection, formula dependencies, nullable keys, field bounds, row privacy,
-  and fail-closed publication.
+- Complete stable promotion of the publicly accepted generation-contract
+  corrections in `1.3.2rc1`, then monitor migration feedback.
 - Run product-validation pilots against real development and analytics tasks.
 - Fix onboarding friction reported by external users.
 - Address confirmed `1.3.x` defects and routine dependency maintenance.

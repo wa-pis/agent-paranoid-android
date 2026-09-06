@@ -253,18 +253,22 @@ version tags. Record all four exact-commit run URLs in the acceptance manifest.
 
 ## Generation Contract Corrective Release
 
-The generation and validation corrections in PR #490 change runtime and
-privacy enforcement and therefore require `1.3.2rc1` before stable `1.3.2`.
-The candidate must complete exact-main-commit CI, Containers, Documentation,
-Security, independent review, Ubuntu artifact preflight, signed publication,
-and public-artifact verification. Stable promotion must compare directly
-against accepted `v1.3.2rc1` and contain only the permitted metadata and
-documentation changes described above.
+The generation and validation corrections in PR #490 were published and
+accepted in `1.3.2rc1` from exact commit
+`5eb29ce4af94049e27c32462211725e5f896d9b6`. Independent exact-commit approval,
+Ubuntu artifact hashes, signed publication, and public-artifact verification
+are recorded in [the candidate evidence](release-evidence-1.3.2rc1.md).
 
-The implementation received an
-[independent AI-assisted approval](https://github.com/wa-pis/agent-paranoid-android/pull/490#issuecomment-5561792783)
-for `2c7e7432868863f6f0c88a5ae2371b377cdb2bb5`; final candidate approval
-must separately identify the exact release commit.
+Stable `1.3.2` promotes that accepted runtime with version and documentation
+changes only. Review every changed hunk against the accepted candidate:
+
+```bash
+git diff --name-status v1.3.2rc1 HEAD
+git diff v1.3.2rc1 HEAD
+```
+
+All exact-main gates, Ubuntu preflight, independent approval, signed manifest,
+and post-publication verification remain mandatory for stable.
 
 ## Version And Tag
 

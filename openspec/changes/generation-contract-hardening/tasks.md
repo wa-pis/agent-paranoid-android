@@ -22,8 +22,10 @@
   [#490](https://github.com/wa-pis/agent-paranoid-android/pull/490).
 
 ## Stage 4 — Release
-- [ ] Prepare 1.3.2rc1 and collect exact-commit gates and independent approval.
-- [ ] Obtain Ubuntu preflight artifact hashes and signed acceptance manifest.
-- [ ] Publish RC and verify public Python, container, and documentation artifacts.
+- [x] Prepare 1.3.2rc1 and collect exact-commit gates and independent approval.
+- [x] Obtain Ubuntu preflight artifact hashes and signed acceptance manifest.
+- [x] Publish RC and verify public Python, container, and documentation artifacts.
 - [ ] Promote accepted RC through metadata-only 1.3.2 diff and repeat release gates.
 - [ ] Publish and verify stable release; record evidence and archive this change.
+
+RC acceptance: [immutable evidence](../../../docs/release-evidence-1.3.2rc1.md).
