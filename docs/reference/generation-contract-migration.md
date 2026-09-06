@@ -11,6 +11,8 @@ existing stable release for the published installation instructions.
 - Constraints and relationships marked `rejected` are ignored by generation and
   validation. Existing `inferred` rules in an explicitly supplied specification
   remain executable; the agent workflow still requires fingerprint approval.
+  Remove or revise active aggregate mappings that depend on a rejected link;
+  they fail validation instead of being silently skipped.
 - Nullable foreign keys preserve generated nulls. One-to-one capacity counts
   only non-null child references. Required identifiers cannot be empty or null.
 - String-pattern lengths describe the entire string, including any synthetic
@@ -34,6 +36,8 @@ with validation evidence. Row privacy remains mandatory in every mode.
 Standalone `validate` now inspects row values when its privacy section is
 enabled, in addition to checking specification safety. CSV numeric values are
 interpreted using their declared numeric type before privacy classification.
+This decoding exception applies to revalidation only; generated formula and
+business-rule strings retain the strict pre-export privacy check.
 
 These checks detect recognizable sensitive strings using the existing synthetic
 namespace policy. They do not certify anonymity or prove that data has never

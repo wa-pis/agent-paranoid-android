@@ -79,7 +79,9 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
         ),
         None,
     )
-    if relationship is None or not constraint.fields:
+    if relationship is None:
+        return ["aggregate mapping requires an active relationship"]
+    if not constraint.fields:
         return []
     if constraint.aggregate != "count" and not constraint.target_field:
         return []

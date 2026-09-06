@@ -29,7 +29,7 @@ def validate_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec
             child_values = [
                 row.get(relationship.child_field)
                 for row in rows_by_entity.get(relationship.child_entity, [])
-                if row.get(relationship.child_field) is not None
+                if row.get(relationship.child_field) not in (None, "")
             ]
             duplicates = len(child_values) - len(set(child_values))
             errors.extend(

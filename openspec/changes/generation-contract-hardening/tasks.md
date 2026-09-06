@@ -14,9 +14,10 @@
 ## Stage 3 — Acceptance
 - [x] Add regression tests, including interacting rules and adapter failures.
 - [x] Update canonical specs, user documentation, migration notes, and changelog.
-- [x] Run full release gate and strict documentation build (1277 passed,
-  10 live-service skips; 90.33% coverage).
-- [ ] Complete security review of the immutable implementation diff.
+- [x] Run full release gate and strict documentation build (1289 passed,
+  10 live-service skips; 90.34% coverage).
+- [x] Complete security review of the immutable implementation diff; correct
+  the discovered numeric-string regression and rerun the full gate.
 - [ ] Commit signed changes, obtain independent review, and merge green PR.
 
 ## Stage 4 — Release

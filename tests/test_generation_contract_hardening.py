@@ -301,3 +301,68 @@ def test_cli_and_mcp_reject_cycle_before_publishing(
         mcp_generate(spec_path="spec.json", output_folder="mcp")
     assert not (tmp_path / "cli").exists()
     assert not (tmp_path / "mcp").exists()
+
+
+@pytest.mark.parametrize("mode", list(GenerationMode))
+@pytest.mark.parametrize("data_type", ["integer", "float"])
+def test_numeric_string_formula_cannot_bypass_generation_privacy(
+    tmp_path: Path,
+    mode: GenerationMode,
+    data_type: str,
+) -> None:
+    spec = DatasetSpec(
+        entities=[
+            EntitySpec(
+                name="items",
+                row_count=1,
+                fields=[FieldSpec(name="value", data_type=data_type)],
+            )
+        ],
+        constraints=[
+            Constraint(
+                type="formula",
+                entity="items",
+                fields=["value"],
+                expression=repr("12025550100"),
+                confidence=1,
+                status="confirmed",
+            )
+        ],
+    )
+    spec.generation_settings.mode = mode
+    spec.validation_settings.validate_privacy = False
+    with pytest.raises(ValueError, match="privacy validation"):
+        generate_dataset_bundle(spec, output_folder=tmp_path / "output")
+    assert not (tmp_path / "output").exists()
+
+
+def test_numeric_csv_roundtrip_and_nullable_one_to_one(tmp_path: Path) -> None:
+    from test_data_agent.io.commands import validate_dataset_artifacts
+
+    spec = relationship_spec(identifier=True)
+    spec.relationships[0].relationship_type = "one_to_one"
+    spec.entities[1].fields[0].null_ratio = 1
+    output = tmp_path / "output"
+    generate_dataset_bundle(
+        spec, output_folder=output, output_format=OutputFormat.CSV, seed=41
+    )
+    assert validate_dataset_artifacts(output / "dataset_spec.yaml", output).valid
+
+
+def test_active_aggregate_cannot_use_rejected_relationship(tmp_path: Path) -> None:
+    spec = relationship_spec()
+    spec.relationships[0].status = "rejected"
+    spec.entities[0].fields.append(FieldSpec(name="child_count", data_type="integer"))
+    spec.constraints = [
+        Constraint(
+            type="aggregate_mapping",
+            entity="parents",
+            fields=["child_count"],
+            target_entity="children",
+            aggregate="count",
+            confidence=1,
+        )
+    ]
+    with pytest.raises(ValueError, match="constraint validation"):
+        generate_dataset_bundle(spec, output_folder=tmp_path / "output")
+    assert not (tmp_path / "output").exists()

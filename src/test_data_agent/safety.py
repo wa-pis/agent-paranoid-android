@@ -265,6 +265,8 @@ def _row_signature(row: Mapping[str, Any], field_names: list[str]) -> str:
 def validate_generated_row_privacy(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     spec: DatasetSpec,
+    *,
+    parse_numeric_strings: bool = False,
 ) -> list[str]:
     """Check row values with the same synthetic namespace policy as generation."""
     for entity in spec.entities:
@@ -279,7 +281,7 @@ def validate_generated_row_privacy(
                     return ["row privacy validation requires scalar fields"]
                 # CSV encodes numeric synthetic values as strings. Classify their
                 # declared numeric representation, not those digits as a phone.
-                if isinstance(value, str) and (
+                if parse_numeric_strings and isinstance(value, str) and (
                     field.data_type == FieldType.INTEGER and parse_int(value) is not None
                     or field.data_type == FieldType.FLOAT and parse_float(value) is not None
                 ):

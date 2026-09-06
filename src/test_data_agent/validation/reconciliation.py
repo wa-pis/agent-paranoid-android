@@ -42,7 +42,7 @@ def validate_dataset(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Data
             settings.validate_constraints,
             lambda: validate_constraints(rows_by_entity, spec),
         ),
-        ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec)),
+        ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
     ]
     sections: list[ValidationSection] = []
     for name, enabled, validator in validators:

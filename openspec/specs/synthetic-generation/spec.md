@@ -344,6 +344,9 @@ Non-negative generation SHALL validate all schema, relationship, and constraint
 invariants regardless of report toggles, before returning or publishing rows.
 Row privacy SHALL be checked in every mode and after business-rule mutation.
 Standalone validation with privacy enabled SHALL inspect the supplied rows.
+Numeric CSV decoding SHALL NOT weaken the strict classification of strings
+returned by generation formulas or business-rule callbacks. An active aggregate
+mapping without an active relationship SHALL fail validation.
 
 #### Scenario: A rule mutation invalidates an earlier invariant
 - **WHEN** final rows fail a required invariant in valid mode
