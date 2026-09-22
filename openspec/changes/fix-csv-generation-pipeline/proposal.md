@@ -14,8 +14,10 @@ Reviewed local categories and timestamps with spaced offsets lose information.
   of the 1,000 raw-value frequency budget. At the cap report a conservative
   lower bound that cannot certify uniqueness.
 - Use categorical evidence for repeated bounded string ID fields.
-- Exclude plain decimal amounts from the permissive phone content heuristic;
-  preserve explicit name checks, integer PII checks, and single-secret detection.
+- Exclude only negative fixed-point amounts with a nonzero fractional part from
+  the permissive phone heuristic. Normalize bounded integral decimal/exponent
+  spellings for phone/card detection, and omit ranges for every sensitive field.
+  Preserve explicit name checks and single-secret detection.
 - Match the short `cc` name marker as a token, avoiding `ccy` false positives.
 - Preserve explicitly reviewed CSV string enums only after existing local
   category safety validation; default profiles still use synthetic labels.

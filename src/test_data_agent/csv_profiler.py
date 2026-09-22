@@ -14,22 +14,24 @@ from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
 from test_data_agent.core.limits import (
+    InputLimitError,
     configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
     enforce_input_row_count,
+    max_input_cell_chars,
 )
 from test_data_agent.core.privacy import (
     LocalCategoryField,
     infer_sensitive_from_name,
-    infer_sensitive_type_from_values,
     infer_sensitive_value_type,
     mask_pattern,
     semantic_type_is_sensitive,
@@ -47,6 +49,32 @@ MAX_TRACKED_DISTINCT_VALUES = 1_000
 MAX_DISTINCT_DIGESTS = 100_000
 MAX_NUMERIC_SAMPLE_VALUES = 10_000
 CSV_SAMPLE_BYTES = 8192
+
+
+def _csv_sensitive_value_type(value: str) -> str | None:
+    if len(value) > max_input_cell_chars():
+        raise InputLimitError("CSV cell exceeds character limit")
+    detected = infer_sensitive_value_type(value)
+    if detected not in {None, "phone"}:
+        return detected
+    try:
+        number = Decimal(value)
+    except InvalidOperation:
+        return detected
+    if not number.is_finite():
+        return detected
+    # Bound magnitude before expanding scientific or decimal notation.
+    if 6 <= number.adjusted() <= 18 and number == number.to_integral_value():
+        canonical = format(number.copy_abs().to_integral_value(), "f")
+        return infer_sensitive_value_type(canonical) or detected
+    # Only negative fractional measures are unambiguous here. Positive dotted
+    # numbers and integral decimal identifiers remain potentially sensitive.
+    if (
+        detected == "phone" and re.fullmatch(r"-\d+\.\d+", value)
+        and number != number.to_integral_value()
+    ):
+        return None
+    return detected
 
 
 @dataclass(frozen=True, slots=True)
@@ -232,11 +260,7 @@ class CSVColumnAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < 100:
             self.semantic_sample.append(value)
-        detected_type = infer_sensitive_value_type(value)
-        # Decimal amounts match the permissive phone pattern. Integer-like
-        # identifiers and explicit sensitive names still retain their checks.
-        if detected_type == "phone" and re.fullmatch(r"-?\d+\.\d+", value):
-            detected_type = None
+        detected_type = _csv_sensitive_value_type(value)
         if detected_type == "secret" or self.content_sensitive_type is None:
             self.content_sensitive_type = detected_type
         self.add_count(value)
@@ -284,12 +308,6 @@ class CSVColumnAccumulator:
     def to_profile(self, row_count: int, *, preserve_categories: bool = False) -> CSVColumnProfile:
         null_count = row_count - self.non_null_count
         semantic_type = infer_semantic_type(self.name, self.semantic_sample)
-        if (
-            semantic_type == "phone" and "phone" not in self.name.lower()
-            and self.all_float and not self.all_int
-            and self.content_sensitive_type is None
-        ):
-            semantic_type = None
         if self.content_sensitive_type == "secret" or semantic_type is None:
             semantic_type = self.content_sensitive_type or semantic_type
         base_type = self.infer_data_type(semantic_type)
@@ -303,7 +321,7 @@ class CSVColumnAccumulator:
         if sensitive:
             pattern_counts: Counter[str] = Counter()
             for value, count in self.counts.items():
-                value_type = infer_sensitive_value_type(value) or semantic_type
+                value_type = _csv_sensitive_value_type(value) or semantic_type
                 pattern_counts[mask_pattern(value, value_type)] += count
             masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
         elif (
@@ -334,7 +352,7 @@ class CSVColumnAccumulator:
             semantic_type=semantic_type,
             top_values=top_values,
             masked_patterns=masked_patterns,
-            **self.range_stats(base_type),
+            **({} if sensitive else self.range_stats(base_type)),
         )
 
     def infer_data_type(self, semantic_type: str | None) -> ProfileDataType:
@@ -377,7 +395,11 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
     non_null = [value.strip() for value in values if value is not None and value.strip() != ""]
     null_count = row_count - len(non_null)
     semantic_type = infer_semantic_type(name, non_null)
-    content_sensitive_type = infer_sensitive_type_from_values(non_null)
+    content_sensitive_type = None
+    for value in non_null:
+        detected = _csv_sensitive_value_type(value)
+        if detected == "secret" or content_sensitive_type is None:
+            content_sensitive_type = detected
     if content_sensitive_type == "secret" or semantic_type is None:
         semantic_type = content_sensitive_type or semantic_type
     base_type = infer_data_type(name, non_null, semantic_type)
@@ -394,7 +416,7 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
         masked_patterns = [
             {"pattern": pattern, "count": count}
             for pattern, count in Counter(
-                mask_pattern(value, infer_sensitive_value_type(value) or semantic_type)
+                mask_pattern(value, _csv_sensitive_value_type(value) or semantic_type)
                 for value in non_null
             ).most_common(10)
         ]
@@ -403,7 +425,7 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
             count for _, count in counts.most_common(MAX_ENUM_VALUES)
         )
 
-    stats = range_stats(non_null, base_type)
+    stats = {} if sensitive else range_stats(non_null, base_type)
     return CSVColumnProfile(
         name=name,
         data_type=base_type.value,
@@ -433,7 +455,7 @@ def infer_semantic_type(name: str, values: list[str]) -> str | None:
     if sample and sum(bool(SSN_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
         return "ssn"
     if sample and sum(
-        infer_sensitive_value_type(value) == "phone" for value in sample
+        _csv_sensitive_value_type(value) == "phone" for value in sample
     ) / len(sample) >= 0.8:
         return "phone"
     return None

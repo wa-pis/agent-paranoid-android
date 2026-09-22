@@ -123,13 +123,17 @@ duplicates even beyond 1,000 categories. At the limit it reports a conservative
 lower bound and does not certify a primary key. Review inferred keys for larger
 files. Fingerprints are internal and are not written to the profile.
 
-Decimal amounts no longer acquire phone semantics solely from digits and a
-decimal point. Explicit sensitive field names, integer-like PII and detected
-secrets still trigger protection. Integer-only financial columns can remain
-ambiguous and require review; local category permission is not declassification.
+Negative decimal amounts with a nonzero fractional part do not acquire phone
+semantics solely from punctuation. Positive phone-shaped decimals and integral
+decimal/exponent identifiers remain potentially sensitive, regardless of an
+amount-like column name. Explicit sensitive names and secrets retain protection;
+sensitive profiles omit ranges as well as source categories. Ambiguous financial
+columns require review; local category permission is not declassification.
 
 Generated string identifiers use the `synthetic_` prefix. This changes exact
 seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.
+Short string patterns reserve random suffix space instead of filling the entire
+requested length with a prefix.
 
 Next, read [Review The Output](review-output.md).

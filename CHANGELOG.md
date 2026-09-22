@@ -15,6 +15,7 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Preserve random suffix space in short synthetic string patterns.
 - Repair CSV generation for long entity names, repeated string identifiers,
   decimal amounts and timestamps with spaced timezone offsets. Preserve
   explicitly reviewed, validated local CSV categories.
@@ -23,6 +24,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Keep decimal/exponent-formatted identifiers sensitive and omit ranges for
+  sensitive CSV fields. Only negative non-integral fixed-point values are
+  exempted from the permissive phone pattern.
 - Detach unexpected MCP 2 tool exceptions before SDK logging and return a
   fixed tool error. Retain argument-validation redaction and transport limits.
 - Install the fixed Bookworm PCRE2 runtime package in all three container

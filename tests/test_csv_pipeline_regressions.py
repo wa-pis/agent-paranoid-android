@@ -11,7 +11,7 @@ from test_data_agent.cli import main
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.csv_profiler import profile_csv
+from test_data_agent.csv_profiler import _csv_sensitive_value_type, profile_column, profile_csv
 from test_data_agent.generation import generate_dataset
 from test_data_agent.validation import validate_dataset
 
@@ -87,6 +87,56 @@ def test_one_secret_among_amounts_is_still_sensitive(tmp_path: Path) -> None:
     assert "sk_live_51ABCDEF" not in profile.model_dump_json()
 
 
+@pytest.mark.parametrize("value", [
+    "12025550101.0", "12025550101.000000", "+12025550101.00",
+    "-12025550101.0", "1.2025550101e10", "-1.2025550101e10",
+    "4111111111111111.0", "4.111111111111111e15", "120255501.01",
+])
+@pytest.mark.parametrize("field", ["contact", "ssn", "amount"])
+def test_numeric_identifiers_do_not_escape_through_ranges(
+    tmp_path: Path, value: str, field: str,
+) -> None:
+    path = source(tmp_path, "items", [field], [[value]])
+    profile = profile_csv(path)
+    for column in (profile.columns[0], profile_column(field, [value], 1)):
+        assert column.sensitive
+        assert column.top_values == []
+        assert column.masked_patterns
+        assert all(getattr(column, name) is None for name in (
+            "min_value", "max_value", "p05", "p95", "min_date", "max_date",
+            "min_timestamp", "max_timestamp",
+        ))
+        assert value not in column.model_dump_json()
+    spec = csv_profile_to_dataset_spec(profile, seed=7, count=10)
+    for payload in (profile.model_dump_json(), spec.model_dump_json()):
+        assert "120255501" not in payload
+        assert "4111111111111111" not in payload
+
+
+def test_late_numeric_identifier_suppresses_preceding_amount_bounds(tmp_path: Path) -> None:
+    values = ["-358377000000.25"] * 200 + ["12025550101.000000"]
+    profile = profile_csv(source(tmp_path, "items", ["amount"], [[v] for v in values]))
+    for column in (profile.columns[0], profile_column("amount", values, len(values))):
+        assert column.sensitive
+        assert column.min_value is None
+        assert column.max_value is None
+        assert "12025550101" not in column.model_dump_json()
+
+
+@pytest.mark.parametrize("value", ["1e1000000000", "1e-1000000000", "NaN", "Infinity"])
+def test_numeric_identifier_classification_does_not_expand_extreme_numbers(value: str) -> None:
+    assert _csv_sensitive_value_type(value) is None
+
+
+def test_negative_fractional_amounts_remain_numeric_in_both_paths(tmp_path: Path) -> None:
+    values = ["-358377000000.25", "-358377000001.25"]
+    profile = profile_csv(source(tmp_path, "items", ["amount"], [[v] for v in values]))
+    for column in (profile.columns[0], profile_column("amount", values, len(values))):
+        assert not column.sensitive
+        assert column.data_type == "float"
+        assert column.min_value == -358377000001.25
+
+
 def test_distinct_budget_cannot_claim_uniqueness(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("test_data_agent.csv_profiler.MAX_DISTINCT_DIGESTS", 10)
     path = source(tmp_path, "items", ["id"], [[i] for i in range(10)])
@@ -105,6 +155,23 @@ def test_sensitive_string_identifier_passes_final_privacy_validation() -> None:
         }]}],
     })
     rows = generate_dataset(spec, seed=7)
+    assert validate_dataset(rows, spec).valid
+
+
+@pytest.mark.parametrize("length", [9, 10, 11, 12, 15, 16])
+def test_short_string_patterns_keep_random_suffix(length: int) -> None:
+    spec = DatasetSpec.model_validate({
+        "entities": [{"name": "items", "row_count": 100, "fields": [{
+            "name": "label", "data_type": "string",
+            "distribution": {"kind": "string_pattern", "min_length": length,
+                             "max_length": length},
+        }]}],
+    })
+    rows = generate_dataset(spec, seed=1)
+    values = [row["label"] for row in rows["items"]]
+    assert all(len(value) == length for value in values)
+    assert len(set(values)) == 100
+    assert rows == generate_dataset(spec, seed=1)
     assert validate_dataset(rows, spec).valid
 
 
