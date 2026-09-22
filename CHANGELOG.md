@@ -14,6 +14,24 @@ All notable changes to this project are documented here.
 - Detach unexpected MCP 2 tool exceptions before SDK logging and return a
   fixed tool error. Retain argument-validation redaction and transport limits.
 
+### Fixed
+
+- Repair CSV generation for long entity names, repeated string identifiers,
+  decimal amounts and timestamps with spaced timezone offsets. Preserve
+  explicitly reviewed, validated local CSV categories.
+- Track bounded distinct fingerprints beyond the CSV frequency sample;
+  exhausted tracking budgets do not certify primary-key uniqueness.
+
+### Security
+
+- Install the fixed Bookworm PCRE2 runtime package in all three container
+  targets; retain blocking vulnerability scans.
+
+### Migration
+
+- Regenerate seeded string fixtures to adopt the `synthetic_` prefix. Profile
+  and specification schemas remain unchanged.
+
 ## [1.4.0] - 2026-09-07
 
 ### Changed

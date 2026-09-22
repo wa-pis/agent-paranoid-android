@@ -23,6 +23,7 @@ from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
 from test_data_agent.core.privacy import (
+    SYNTHETIC_PREFIX,
     is_sensitive_field,
 )
 from test_data_agent.core.settings import GenerationMode
@@ -177,7 +178,7 @@ def generate_field_value(
 def synthetic_identifier(entity_name: str, field: FieldSpec, row_index: int, seed: int) -> Any:
     if field.data_type == FieldType.INTEGER:
         return seed * 1_000_000 + row_index + 1
-    return f"syn_{entity_name}_{row_index + 1:08d}"
+    return f"{SYNTHETIC_PREFIX}{entity_name}_{row_index + 1:08d}"
 
 
 def synthetic_sensitive_value(field: FieldSpec, faker: Faker) -> str:
@@ -187,7 +188,7 @@ def synthetic_sensitive_value(field: FieldSpec, faker: Faker) -> str:
         return f"+1-202-555-{faker.random_int(min=100, max=199):04d}"
     if field.semantic_type == "ssn":
         return f"000-00-{faker.random_int(min=0, max=9999):04d}"
-    return f"synthetic_{faker.uuid4()[:12]}"
+    return f"{SYNTHETIC_PREFIX}{faker.uuid4()[:12]}"
 
 
 def weighted_choice(categories: list[Any], rng: random.Random) -> Any:
@@ -296,7 +297,7 @@ def synthetic_string(field: FieldSpec, typed_distribution: StringPatternDistribu
             return ""
         raise ValueError("required string field cannot have zero maximum length")
     length = rng.randint(max(1, min_length), max_length)
-    prefix = "syn_" if length > 4 else ""
+    prefix = SYNTHETIC_PREFIX if length >= len(SYNTHETIC_PREFIX) else ("syn_" if length > 4 else "")
     return prefix + "".join(rng.choice(string.ascii_lowercase) for _ in range(length - len(prefix)))
 
 

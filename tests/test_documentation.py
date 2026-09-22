@@ -458,7 +458,10 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility"}
+    assert active == {
+        "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
+        "fix-csv-generation-pipeline",
+    }
 
     openai_change = changes / "openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()
