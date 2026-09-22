@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.5.0] - 2026-09-23
+
+### Changed
+
+- Promote the accepted `1.5.0rc1` runtime with no further behavior or dependency
+  changes: CSV generation fixes, MCP 2 and OpenAI 3 compatibility, and privacy
+  corrections verified during candidate review.
+
+### Migration
+
+- Upgrade the MCP extra to `mcp>=1.28.1,<3.0.0` and regenerate seeded string
+  fixtures. Review conservative classification of positive phone-shaped numeric
+  values; the complete compatibility and security notes remain under `1.5.0rc1`.
+
 ## [1.5.0rc1] - 2026-09-23
 
 ### Changed
@@ -781,7 +795,9 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.5.0rc1...v1.5.0
+[1.5.0rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.4.0...v1.5.0rc1
 [1.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc2...v1.3.2
 [1.3.2rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...v1.3.2rc2

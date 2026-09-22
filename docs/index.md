@@ -7,7 +7,7 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
-Stable `1.4.0` retains the generation and validation corrections from `1.3.2`. Review the
+Stable `1.5.0` retains the generation and validation corrections from `1.3.2`. Review the
 [migration notes](reference/generation-contract-migration.md) before regenerating
 existing fixtures.
 
@@ -52,10 +52,10 @@ introduced.
 
 ## Five-Minute Check
 
-Test candidate `1.5.0rc1` with the self-contained smoke test; use `1.4.0` for stable:
+Install the exact stable release and run the self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.5.0rc1"
+python3 -m pip install "agent-paranoid-android==1.5.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -95,7 +95,8 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable `1.4.0` release uses `DatasetSpec` as the generation and
-validation contract for the CLI and Python API. It promotes the accepted RC2
-documentation, package metadata, build-tool, and workflow maintenance without
-changing application runtime behavior.
+The current stable `1.5.0` release uses `DatasetSpec` as the generation and
+validation contract for the CLI and Python API. It promotes the accepted
+`1.5.0rc1` runtime, including CSV generation corrections, MCP 2 and OpenAI 3
+compatibility, and container hardening. The stable promotion itself changes
+only version and documentation metadata.
