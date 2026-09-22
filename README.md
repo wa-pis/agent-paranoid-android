@@ -14,8 +14,10 @@ workflows and configuration.
 
 Python 3.11 or newer is required.
 
+The commands below test release candidate `1.5.0rc1`; use `1.4.0` for stable.
+
 ```bash
-python3 -m pip install "agent-paranoid-android==1.4.0"
+python3 -m pip install "agent-paranoid-android==1.5.0rc1"
 test-data-agent demo --output out/demo
 ```
 
