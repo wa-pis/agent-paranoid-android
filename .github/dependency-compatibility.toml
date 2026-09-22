@@ -46,8 +46,8 @@ latest = "0.338.0"
 requirement = "openai"
 extra = "openai"
 minimum = "2.46.0"
-latest = "2.50.0"
-upper_major = 3
+latest = "3.18.0"
+upper_major = 4
 
 [dependencies.gigachat]
 requirement = "gigachat"
