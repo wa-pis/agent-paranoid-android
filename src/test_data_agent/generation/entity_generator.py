@@ -297,7 +297,8 @@ def synthetic_string(field: FieldSpec, typed_distribution: StringPatternDistribu
             return ""
         raise ValueError("required string field cannot have zero maximum length")
     length = rng.randint(max(1, min_length), max_length)
-    prefix = SYNTHETIC_PREFIX if length >= len(SYNTHETIC_PREFIX) else ("syn_" if length > 4 else "")
+    # Keep at least six random characters when the requested length permits.
+    prefix = SYNTHETIC_PREFIX if length >= len(SYNTHETIC_PREFIX) + 6 else ("syn_" if length >= 10 else "")
     return prefix + "".join(rng.choice(string.ascii_lowercase) for _ in range(length - len(prefix)))
 
 
