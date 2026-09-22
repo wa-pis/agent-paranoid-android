@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 from threading import Barrier
 import traceback
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from openai import OpenAIError
@@ -37,6 +37,46 @@ from test_data_agent.relationship_discovery import rank_relationship_candidates
 
 class ProviderSecretMarkerError(RuntimeError):
     pass
+
+
+@pytest.mark.parametrize("status", [200, 500])
+def test_real_sdk_http_transport_preserves_contract(status: int) -> None:
+    from openai import OpenAI
+    from importlib.metadata import version
+
+    if int(version("openai").split(".")[0]) >= 3:
+        import httpx2 as http
+    else:
+        import httpx as http
+
+    exchange = safe_exchange()
+    captured: list[dict[str, Any]] = []
+
+    def respond(request: Any) -> Any:
+        captured.append(json.loads(request.content))
+        if status != 200:
+            return http.Response(status, json={"error": {"message": "synthetic-provider-secret"}})
+        return http.Response(200, json={
+            "id": "resp_synthetic", "object": "response", "created_at": 0,
+            "status": "completed", "model": "test-model",
+            "output": [{"id": "msg_synthetic", "type": "message", "role": "assistant",
+                        "status": "completed", "content": [{"type": "output_text",
+                        "text": proposal_for(exchange).model_dump_json(), "annotations": []}]}],
+        })
+
+    with OpenAI(api_key="synthetic-test-key", max_retries=0,
+                http_client=http.Client(transport=http.MockTransport(respond))) as sdk:
+        advisor = OpenAIAdvisorClient(client=cast(Any, sdk), model="test-model")
+        if status == 200:
+            assert advisor.complete_with_metadata(exchange).value.profile_sha256 == exchange.request.profile_sha256
+        else:
+            with pytest.raises(OpenAIAdvisorCallError) as caught:
+                advisor.complete_with_metadata(exchange)
+            assert "synthetic-provider-secret" not in "".join(traceback.format_exception(caught.value))
+    assert len(captured) == 1
+    assert captured[0]["store"] is False
+    assert captured[0]["max_output_tokens"] == 4096
+    assert captured[0]["text"]["format"]["type"] == "json_schema"
 
 
 def safe_exchange(count: int | None = None):

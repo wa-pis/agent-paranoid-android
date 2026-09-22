@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Support OpenAI SDK 3.x for the optional advisor, with 3.18.0 locked and
+  offline request/response and redaction coverage; retain the 2.46.0 minimum.
+
 ### Fixed
 
 - Repair CSV generation for long entity names, repeated string identifiers,

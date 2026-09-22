@@ -40,7 +40,7 @@ are the versions in the reviewed `uv.lock` used by the release gate on
 | `openai-minimum` | 3.11 | Base minimum; OpenAI 2.46.0 |
 | `gigachat-minimum` | 3.11 | Base minimum; GigaChat 0.2.3 |
 | `postgres-minimum` | 3.11 | Base minimum; Psycopg 3.2.0; sqlglot 30.0.0 |
-| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 2.50.0; GigaChat 0.2.3; Psycopg 3.3.4 |
+| `latest-all` | 3.11–3.14 | Faker 40.35.0; Pydantic 2.13.4; PyYAML 6.0.3; PyArrow 25.0.0; MCP 1.28.1; sqlglot 30.13.0; Trino 0.338.0; OpenAI 3.18.0; GigaChat 0.2.3; Psycopg 3.3.4 |
 
 MCP 1.0.0 requires Pydantic 2.8.0, so its minimum profile cannot reuse the
 base Pydantic 2.7.0 candidate. The minimum profiles otherwise isolate one
@@ -91,8 +91,8 @@ lowercase distribution names and includes installed optional integrations;
 - A dependency update that changes parsing, generation, SQL policy, or
   validation semantics requires review, compatibility evidence, and a package
   release.
-- Existing `<2` MCP and `<3` OpenAI bounds remain because those major versions
-  are untested. No new upper major bound is implied for Faker, Pydantic, PyYAML,
+- The `<2` MCP bound remains pending transport migration. OpenAI accepts `<4`
+  with 2.46.0 minimum and 3.18.0 latest contract coverage. No new upper major bound is implied for Faker, Pydantic, PyYAML,
   PyArrow, sqlglot, or Trino until minimum/latest matrix evidence justifies it.
 - GigaChat remains on `>=0.2.3,<0.2.4` because its SDK changed the chat API
   between 0.2.1 and 0.2.3; each later release needs a compatibility review.
@@ -113,7 +113,7 @@ hashed dependency evidence in a generated manifest.
 | Dependency | Decision | Evidence |
 | --- | --- | --- |
 | MCP | Retain `<2.0.0` | The transport contract is tested only on MCP 1.x. |
-| OpenAI | Retain `<3.0.0` | The structured provider adapter is tested only on OpenAI 2.x. |
+| OpenAI | Accept `<4.0.0` | OpenAI 3.18.0 evaluated with offline real-SDK HTTP transport, provider privacy contracts and doctor checks; 2.46.0 minimum retained. |
 | GigaChat | Retain `<0.2.4` | The adapter is tested against the current 0.2.3 `chat.create` contract; earlier 0.2.x releases use an incompatible call shape. |
 | Faker, Pydantic, PyYAML, PyArrow, sqlglot, Trino, Psycopg | Add no upper bound | The minimum/latest profiles prove the documented candidates, but do not prove that a future major is incompatible. |
 
