@@ -28,3 +28,12 @@ distribution prefix fields remain accepted; arbitrary prefix execution and
 general declassification are not introduced. Integer-only amounts remain
 subject to conservative PII detection. Monthly date granularity is deferred.
 Treat these privacy-adjacent changes as release-candidate work.
+
+## Container acceptance prerequisite
+
+PR container scanning found release-blocking PCRE2 vulnerabilities inherited
+from the pinned Python Bookworm base. All three runtime targets install the
+fixed Debian package `libpcre2-8-0=10.42-1+deb12u1` and verify its version at
+build time. Trivy remains enabled without exclusions. APT indexes are removed
+in the same layer. Container CI must build, smoke-test and scan this change
+before acceptance; no published image or release is changed by this PR.
