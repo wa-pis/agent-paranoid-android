@@ -52,10 +52,10 @@ introduced.
 
 ## Five-Minute Check
 
-Install the exact stable release and run the self-contained smoke test:
+Test candidate `1.5.0rc1` with the self-contained smoke test; use `1.4.0` for stable:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.4.0"
+python3 -m pip install "agent-paranoid-android==1.5.0rc1"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```

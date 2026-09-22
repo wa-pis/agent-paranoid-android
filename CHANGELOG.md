@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.5.0rc1] - 2026-09-23
+
 ### Changed
 
 - Support MCP SDK 2.x alongside 1.x, using the locked 2.2.0 server and JSON-RPC

@@ -18,8 +18,9 @@ regenerating existing fixtures.
 
 ## Install From PyPI
 
-The stable release is `1.4.0`; the commands below pin that exact version for
-reproducible installation.
+The stable release is `1.4.0`. The base install below tests candidate
+`1.5.0rc1`; optional-extra examples retain stable pins. To test those extras
+against the candidate, use the exact `1.5.0rc1` version instead.
 
 Create an isolated environment:
 
@@ -29,7 +30,7 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.4.0"
+python3 -m pip install "agent-paranoid-android==1.5.0rc1"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.

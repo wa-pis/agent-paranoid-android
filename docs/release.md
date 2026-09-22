@@ -314,6 +314,19 @@ approval and public verification, including the successful Parquet retry.
 
 ## Version And Tag
 
+### 1.5.0 Candidate
+
+`1.5.0rc1` includes CSV generation corrections, OpenAI 3 compatibility,
+MCP 2 compatibility with a corrected 1.28.1 minimum, and runtime container
+hardening. These are runtime and dependency changes, not a version-only
+promotion. The quickstart pin targets this candidate for acceptance; stable
+`1.4.0` remains the recommended release until public RC acceptance completes.
+Independent AI-assisted exact-commit review follows the explicitly labelled
+process recorded for 1.4.0; it must not be presented as human approval.
+Run all exact-commit gates and Ubuntu artifact preflight before the signed tag.
+Promote to `1.5.0` only after public package and container acceptance, with
+version/documentation changes only and renewed exact-commit approval.
+
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.
 2. Review every `Unreleased` entry using the
    [changelog policy](changelog-policy.md), then move the classified categories
