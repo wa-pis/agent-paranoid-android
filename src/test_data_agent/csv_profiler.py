@@ -63,17 +63,31 @@ def _csv_sensitive_value_type(value: str) -> str | None:
         return detected
     if not number.is_finite():
         return detected
-    # Bound magnitude before expanding scientific or decimal notation.
-    if 6 <= number.adjusted() <= 18 and number == number.to_integral_value():
-        canonical = format(number.copy_abs().to_integral_value(), "f")
-        return infer_sensitive_value_type(canonical) or detected
+    # Statistics retain binary floats. Inspect that representation as well as
+    # the exact decimal; rounding must not turn an unclassified value into PII.
+    # Bound magnitude before conversion or expansion of exponent notation.
+    if not -64 <= number.adjusted() <= 18:
+        return detected
+    retained = Decimal(str(float(number)))
     # Only negative fractional measures are unambiguous here. Positive dotted
     # numbers and integral decimal identifiers remain potentially sensitive.
     if (
         detected == "phone" and re.fullmatch(r"-\d+\.\d+", value)
         and number != number.to_integral_value()
+        and retained != retained.to_integral_value()
     ):
         return None
+    for candidate in (number, retained):
+        exponent = candidate.as_tuple().exponent
+        if not isinstance(exponent, int) or exponent < -64:
+            continue
+        canonical = format(candidate.copy_abs(), "f")
+        if "." in canonical:
+            canonical = canonical.rstrip("0").rstrip(".")
+        normalized_type = infer_sensitive_value_type(canonical)
+        if normalized_type == "secret":
+            return normalized_type
+        detected = detected or normalized_type
     return detected
 
 

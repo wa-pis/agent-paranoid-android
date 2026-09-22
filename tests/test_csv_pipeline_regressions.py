@@ -91,6 +91,8 @@ def test_one_secret_among_amounts_is_still_sensitive(tmp_path: Path) -> None:
     "12025550101.0", "12025550101.000000", "+12025550101.00",
     "-12025550101.0", "1.2025550101e10", "-1.2025550101e10",
     "4111111111111111.0", "4.111111111111111e15", "120255501.01",
+    "1.2025550101e8", "12025550101.0000000001", "4111111111111111.1",
+    "-12025550101.0000000001", "-4111111111111111.1",
 ])
 @pytest.mark.parametrize("field", ["contact", "ssn", "amount"])
 def test_numeric_identifiers_do_not_escape_through_ranges(
@@ -113,8 +115,9 @@ def test_numeric_identifiers_do_not_escape_through_ranges(
         assert "4111111111111111" not in payload
 
 
-def test_late_numeric_identifier_suppresses_preceding_amount_bounds(tmp_path: Path) -> None:
-    values = ["-358377000000.25"] * 200 + ["12025550101.000000"]
+@pytest.mark.parametrize("value", ["12025550101.000000", "12025550101.0000000001", "1.2025550101e8"])
+def test_late_numeric_identifier_suppresses_preceding_amount_bounds(tmp_path: Path, value: str) -> None:
+    values = ["-358377000000.25"] * 200 + [value]
     profile = profile_csv(source(tmp_path, "items", ["amount"], [[v] for v in values]))
     for column in (profile.columns[0], profile_column("amount", values, len(values))):
         assert column.sensitive

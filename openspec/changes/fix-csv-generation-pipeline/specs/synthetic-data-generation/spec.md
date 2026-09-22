@@ -16,6 +16,8 @@ for bounded categorical IDs, decimal amounts and long entity names.
 - **THEN** both CSV profiling paths classify them conservatively
 - **AND** sensitive profiles omit all numeric and temporal range statistics
 - **AND** bounded canonicalization never expands extreme exponents
+- **AND** classification checks both exact decimals and the float representation
+  retained in statistics, including fractional exponents and rounding to integers
 
 #### Scenario: Short string patterns retain variation
 - **WHEN** requested lengths are near the length of the synthetic prefix
