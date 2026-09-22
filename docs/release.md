@@ -327,6 +327,11 @@ Ubuntu hashes and signed-tag verification remain required before publication.
 The RC completed public acceptance; hashes, signed images and successful checks
 are recorded in the [candidate evidence](release-evidence-1.5.0rc1.md).
 
+Stable `1.5.0` completed publication and public acceptance at exact commit
+`dee79d4980934cf444a1f5d57ed05ec21d41ea2b`. Signed identity, independent
+approval, package hashes, image digests and the successful public-index retry
+are recorded in the [stable release evidence](release-evidence-1.5.0.md).
+
 ### 1.5.0 Candidate
 
 `1.5.0rc1` includes CSV generation corrections, OpenAI 3 compatibility,
