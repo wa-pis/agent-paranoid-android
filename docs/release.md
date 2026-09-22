@@ -314,6 +314,19 @@ approval and public verification, including the successful Parquet retry.
 
 ## Version And Tag
 
+### 1.5.0 Stable Promotion
+
+Stable `1.5.0` promotes candidate `1.5.0rc1` at
+`f303a3ad054ebf2fd1dba666e7fb9294132f13d3`. The runtime includes the
+numeric-identifier privacy and short-string diversity corrections identified
+by independent AI review before candidate publication. No further runtime,
+dependency, workflow, container, schema or safety-test changes are included.
+Compare the complete promotion diff with `git diff v1.5.0rc1 HEAD`.
+Public RC acceptance, renewed independent exact-main approval, all four gates,
+Ubuntu hashes and signed-tag verification remain required before publication.
+The RC completed public acceptance; hashes, signed images and successful checks
+are recorded in the [candidate evidence](release-evidence-1.5.0rc1.md).
+
 ### 1.5.0 Candidate
 
 `1.5.0rc1` includes CSV generation corrections, OpenAI 3 compatibility,
