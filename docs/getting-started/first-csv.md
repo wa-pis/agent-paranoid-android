@@ -112,4 +112,24 @@ The request fails closed if the field contains PII, secrets, identifiers,
 quasi-identifiers, free text, excessive cardinality, or long values. The option
 does not authorize any other field or any external-provider destination.
 
+CSV opt-in preservation currently accepts string enums with at most 20 values,
+each at most 64 characters, after the same content checks used for other local
+category sources. Repeated non-sensitive string ID fields use synthetic
+categories by default; their source identifiers are not preserved.
+
+Distinct counting retains at most 100,000 SHA-256 fingerprints per column,
+separately from the bounded raw frequency sample. Below that limit it detects
+duplicates even beyond 1,000 categories. At the limit it reports a conservative
+lower bound and does not certify a primary key. Review inferred keys for larger
+files. Fingerprints are internal and are not written to the profile.
+
+Decimal amounts no longer acquire phone semantics solely from digits and a
+decimal point. Explicit sensitive field names, integer-like PII and detected
+secrets still trigger protection. Integer-only financial columns can remain
+ambiguous and require review; local category permission is not declassification.
+
+Generated string identifiers use the `synthetic_` prefix. This changes exact
+seeded identifier output relative to earlier releases, without changing the
+profile or specification schema version.
+
 Next, read [Review The Output](review-output.md).

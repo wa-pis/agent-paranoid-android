@@ -13,6 +13,8 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator
 
 
+SYNTHETIC_PREFIX = "synthetic_"
+
 SENSITIVE_NAME_PARTS = {
     "address",
     "birth",
@@ -184,7 +186,10 @@ def normalize_field_name(name: str) -> str:
 def infer_sensitive_from_name(name: str) -> bool:
     """Conservatively mark likely PII/secrets as sensitive by default."""
     normalized = normalize_field_name(name)
-    return any(part in normalized for part in SENSITIVE_NAME_PARTS)
+    return any(
+        part in normalized if part != "cc" else part in normalized.split("_")
+        for part in SENSITIVE_NAME_PARTS
+    )
 
 
 def semantic_type_is_sensitive(semantic_type: str | None) -> bool:

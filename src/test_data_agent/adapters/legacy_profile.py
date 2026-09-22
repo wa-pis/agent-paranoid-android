@@ -86,7 +86,9 @@ def _field_profile_from_column(
 ) -> FieldProfile:
     name = str(column.get("name", "column"))
     unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
-    is_identifier = _is_identifier(name, unique_ratio)
+    is_identifier = _is_identifier(name, unique_ratio) and not (
+        column.get("top_values") and unique_ratio < 1.0
+    )
     semantic_type = _optional_string(column.get("semantic_type"))
     top_values = column.get("top_values") or []
     content_sensitive_type = infer_sensitive_type_from_values(
