@@ -22,7 +22,7 @@ def test_dependency_compatibility_policy_matches_repository() -> None:
 
     assert reviewed["faker"] == "40.35.0"
     assert reviewed["mcp"] == "2.2.0"
-    assert reviewed["openai"] == "2.50.0"
+    assert reviewed["openai"] == "3.18.0"
     assert reviewed["psycopg"] == "3.3.4"
 
 

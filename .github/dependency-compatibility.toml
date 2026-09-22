@@ -25,7 +25,7 @@ latest = "25.0.0"
 [dependencies.mcp]
 requirement = "mcp"
 extra = "mcp"
-minimum = "1.0.0"
+minimum = "1.28.1"
 latest = "2.2.0"
 upper_major = 3
 
@@ -46,8 +46,8 @@ latest = "0.338.0"
 requirement = "openai"
 extra = "openai"
 minimum = "2.46.0"
-latest = "2.50.0"
-upper_major = 3
+latest = "3.18.0"
+upper_major = 4
 
 [dependencies.gigachat]
 requirement = "gigachat"
@@ -70,7 +70,7 @@ constraint = ".github/constraints/dependency-minimum.txt"
 
 [minimum_profiles.mcp]
 constraint = ".github/constraints/dependency-minimum-mcp.txt"
-pydantic = "2.8.0"
+pydantic = "2.11.0"
 
 [minimum_profiles.trino]
 constraint = ".github/constraints/dependency-minimum.txt"

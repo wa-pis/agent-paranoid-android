@@ -1,5 +1,10 @@
 # MCP 2 SDK compatibility
 
+The supported minimum is MCP 1.28.1, with Pydantic 2.11.0 in its Python 3.11
+minimum profile. MCP 1.0.0 lacks required server/context APIs and is no longer
+advertised as supported. The minimum profile must pass the real stdio test,
+not skip it. Existing older MCP installations must upgrade the optional extra.
+
 Support the optional MCP SDK 2.2.0 alongside 1.x, without changing tool schemas
 or making MCP a base dependency. A dependency range bump alone is insufficient:
 the SDK replaces FastMCP, request models, context propagation and error handling.

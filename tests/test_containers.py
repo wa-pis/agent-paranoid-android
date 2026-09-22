@@ -163,7 +163,7 @@ def test_container_workflow_uses_node24_docker_actions() -> None:
         == 3
     )
     assert (
-        "docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0"
+        "docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0"
         in workflow
     )
     assert (

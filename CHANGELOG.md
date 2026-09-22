@@ -8,6 +8,8 @@ All notable changes to this project are documented here.
 
 - Support MCP SDK 2.x alongside 1.x, using the locked 2.2.0 server and JSON-RPC
   interfaces while retaining the bounded stdio transport and per-request budgets.
+- Support OpenAI SDK 3.x for the optional advisor, with 3.18.0 locked and
+  offline request/response and redaction coverage; retain the 2.46.0 minimum.
 
 ### Fixed
 
@@ -26,6 +28,9 @@ All notable changes to this project are documented here.
 
 ### Migration
 
+- MCP installs now require `mcp>=1.28.1,<3.0.0`. The former 1.0.0 lower
+  bound lacked FastMCP and request metadata required by bounded stdio.
+  Upgrade the MCP extra; do not disable transport budgets for older SDKs.
 - Regenerate seeded string fixtures to adopt the `synthetic_` prefix. Profile
   and specification schemas remain unchanged.
 
