@@ -31,6 +31,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM ${PYTHON_IMAGE} AS runtime-base
 
+# The pinned base predates the Bookworm PCRE2 security update. Fail the
+# build if the fixed package cannot be installed; keep the scanner enabled.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --only-upgrade libpcre2-8-0=10.42-1+deb12u1 \
+    && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libpcre2-8-0)" ge 10.42-1+deb12u1 \
+    && rm -rf /var/lib/apt/lists/*
+
 ARG APP_VERSION
 ARG VCS_REF=unknown
 ARG SOURCE_URL=https://github.com/wa-pis/agent-paranoid-android
