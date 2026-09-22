@@ -6,6 +6,7 @@ from dataclasses import replace
 from typing import Any
 
 import pytest
+from tests.mcp_sdk_helpers import call_tool_handler
 
 import test_data_agent.mcp_generator_transport as transport
 import test_data_agent.mcp_trino_transport as shared_transport
@@ -160,9 +161,7 @@ def test_generator_fastmcp_argument_validation_is_fixed_and_source_free() -> Non
             arguments={"limit": source_literal},
         ),
     )
-    handler = mcp._mcp_server.request_handlers[types.CallToolRequest]
-
-    result = anyio.run(handler, request)
+    result = anyio.run(call_tool_handler, mcp, request)
     payload = result.root.model_dump_json()
 
     assert result.root.isError is True

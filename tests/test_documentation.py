@@ -458,7 +458,10 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template", "openai-3-sdk-compatibility", "fix-csv-generation-pipeline"}
+    assert active == {
+        "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
+        "fix-csv-generation-pipeline",
+    }
 
     openai_change = changes / "openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()
@@ -1385,7 +1388,7 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
     assert "Same package version" in compatibility
     assert "Cross-version" in compatibility
     assert "byte_identical_across_versions: false" in compatibility
-    assert "Retain `<2.0.0`" in compatibility
+    assert "Accept `<3.0.0`" in compatibility
     assert "Accept `<4.0.0`" in compatibility
     assert "Add no upper bound" in compatibility
     assert "user-facing changelog entry" in compatibility
@@ -1398,7 +1401,7 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
         "pydantic==2.7.0",
         "PyYAML==6.0.0",
         "pyarrow==15.0.0",
-        "mcp==1.0.0",
+        "mcp==1.28.1",
         "sqlglot==30.0.0",
         "trino==0.330.0",
         "openai==2.46.0",
@@ -1408,8 +1411,8 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
     mcp_constraints = (
         ROOT / ".github" / "constraints" / "dependency-minimum-mcp.txt"
     ).read_text()
-    assert "mcp==1.0.0" in mcp_constraints
-    assert "pydantic==2.8.0" in mcp_constraints
+    assert "mcp==1.28.1" in mcp_constraints
+    assert "pydantic==2.11.0" in mcp_constraints
 
 
 def test_documented_business_rules_workflow_succeeds(tmp_path: Path) -> None:

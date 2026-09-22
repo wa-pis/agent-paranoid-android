@@ -4,18 +4,23 @@ from __future__ import annotations
 
 import json
 import sys
+from importlib import import_module
 from collections.abc import AsyncIterator, Callable, Sequence
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from functools import partial
 from typing import Any
 
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 try:  # pragma: no cover - exercised when the MCP dependency is installed.
-    from mcp.server.fastmcp import FastMCP
+    FastMCP: Any = import_module("mcp.server.fastmcp").FastMCP
 except ImportError:  # pragma: no cover
-    FastMCP = None  # type: ignore[misc, assignment]
+    try:
+        FastMCP = import_module("mcp.server.mcpserver").MCPServer
+    except ImportError:
+        FastMCP = None
 
 from test_data_agent.audit import audited_mcp_tool
 from test_data_agent.trino_work_budget import (
@@ -85,24 +90,55 @@ class ActiveRequestCapacityError(RuntimeError):
     """Raised when the process-wide MCP request cap is exhausted."""
 
 
+def _message_root(message: Any) -> Any:
+    return getattr(message, "root", message)
+
+
+def _parse_jsonrpc(payload: bytes | str) -> Any:
+    import mcp.types as types
+    return TypeAdapter(types.JSONRPCMessage).validate_json(payload)
+
+
 def _create_redacted_fast_mcp(name: str, fast_mcp_type: type[Any]) -> Any:
     """Create FastMCP with source-free argument validation failures."""
+    active_context: ContextVar[Any] = ContextVar(f"{name}-tool-context")
 
     class RedactedFastMCP(fast_mcp_type):  # type: ignore[misc]
+        def get_context(self) -> Any:
+            legacy_context = getattr(super(), "get_context", None)
+            if legacy_context is not None:
+                return legacy_context()
+            context = active_context.get()
+            if context is None:
+                raise LookupError("MCP tool has no active request context")
+            return context
+
         async def call_tool(
             self,
             tool_name: str,
             arguments: dict[str, Any],
+            *args: Any,
+            **kwargs: Any,
         ) -> Any:
-            from mcp.server.fastmcp.exceptions import ToolError
+            try:
+                ToolError = import_module("mcp.server.fastmcp.exceptions").ToolError
+            except ImportError:
+                ToolError = import_module("mcp.server.mcpserver.exceptions").ToolError
             from pydantic import ValidationError
 
+            token = active_context.set(args[0] if args else kwargs.get("context"))
             try:
-                return await super().call_tool(tool_name, arguments)
+                return await super().call_tool(tool_name, arguments, *args, **kwargs)
             except ToolError as exc:
                 if isinstance(exc.__cause__, ValidationError):
                     raise ToolError(_INVALID_TOOL_ARGUMENTS_MESSAGE) from None
+                if type(exc).__name__ == "UnexpectedToolError":
+                    # MCP 2 logs the cause traceback for unexpected errors.
+                    # Detach it before SDK logging can expose tool inputs.
+                    raise ToolError("Tool execution failed") from None
                 raise
+            finally:
+                active_context.reset(token)
 
     return RedactedFastMCP(name)
 
@@ -124,7 +160,7 @@ class _RequestBudgetRegistry:
     def register_incoming_request(self, session_message: Any) -> None:
         import mcp.types as types
 
-        root = session_message.message.root
+        root = _message_root(session_message.message)
         if not isinstance(root, types.JSONRPCRequest):
             if hasattr(root, "id"):
                 raise ValueError("JSON-RPC request ID must be a string or integer")
@@ -145,7 +181,7 @@ class _RequestBudgetRegistry:
     def resolve_outgoing(self, session_message: Any) -> QueryWorkBudget | None:
         import mcp.types as types
 
-        root = session_message.message.root
+        root = _message_root(session_message.message)
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
             try:
                 return self._budgets[_jsonrpc_request_id_key(root.id)]
@@ -166,7 +202,7 @@ class _RequestBudgetRegistry:
     def complete_outgoing(self, session_message: Any) -> None:
         import mcp.types as types
 
-        root = session_message.message.root
+        root = _message_root(session_message.message)
         if isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
             self._budgets.pop(_jsonrpc_request_id_key(root.id), None)
 
@@ -245,7 +281,7 @@ async def _write_bounded_session_message(
             except QueryWorkBudgetExceeded:
                 import mcp.types as types
 
-                root = session_message.message.root
+                root = _message_root(session_message.message)
                 if not isinstance(root, (types.JSONRPCResponse, types.JSONRPCError)):
                     raise
                 payload = _transport_overflow_error_payload(root.id)
@@ -318,7 +354,7 @@ def _bounded_session_message(
     from mcp.shared.message import ServerMessageMetadata, SessionMessage
 
     try:
-        message = types.JSONRPCMessage.model_validate_json(raw_payload)
+        message = _parse_jsonrpc(raw_payload)
     except ValidationError:
         request_id = raw_message.get("id") if isinstance(raw_message, dict) else None
         try:
@@ -330,14 +366,14 @@ def _bounded_session_message(
             budget=request_context,
             respond=True,
         )
-    root = message.root
+    root = _message_root(message)
     try:
         if isinstance(root, types.JSONRPCRequest):
-            types.ClientRequest.model_validate(
+            TypeAdapter(types.ClientRequest).validate_python(
                 root.model_dump(by_alias=True, mode="json", exclude_none=True)
             )
         elif isinstance(root, types.JSONRPCNotification):
-            types.ClientNotification.model_validate(
+            TypeAdapter(types.ClientNotification).validate_python(
                 root.model_dump(by_alias=True, mode="json", exclude_none=True)
             )
     except ValidationError:
@@ -477,7 +513,7 @@ async def bounded_stdio_server(
                             continue
                         budget_registry.register_incoming_request(message)
                     except ActiveRequestCapacityError:
-                        root = message.message.root
+                        root = _message_root(message.message)
                         payload = _transport_capacity_error_payload(root.id)
                         budget = message.metadata.request_context
                         budget.consume_terminal_error_bytes(len(payload))
@@ -524,7 +560,7 @@ async def _run_bounded_stdio(
         max_payload_bytes=max_payload_bytes,
         request_context_factory=request_context_factory,
     ) as (read_stream, write_stream):
-        low_level_server = mcp._mcp_server
+        low_level_server = getattr(mcp, "_mcp_server", None) or mcp._lowlevel_server
         await low_level_server.run(
             read_stream,
             write_stream,

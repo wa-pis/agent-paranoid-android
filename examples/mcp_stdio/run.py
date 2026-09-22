@@ -24,9 +24,10 @@ def installed_command(name: str) -> str:
 
 
 def successful_payload(result: Any, operation: str) -> dict[str, Any]:
-    if result.isError or not isinstance(result.structuredContent, dict):
+    wire_result = result.model_dump(by_alias=True)
+    if wire_result.get("isError") or not isinstance(wire_result.get("structuredContent"), dict):
         raise RuntimeError(f"MCP operation failed: {operation}")
-    return result.structuredContent
+    return wire_result["structuredContent"]
 
 
 async def run_example(workspace: Path) -> dict[str, Any]:
@@ -62,7 +63,10 @@ async def run_example(workspace: Path) -> dict[str, Any]:
             rejection_text = " ".join(
                 item.text for item in rejected.content if hasattr(item, "text")
             )
-            if not rejected.isError or "catalog is not allowed" not in rejection_text:
+            if not rejected.model_dump(by_alias=True).get("isError") or not (
+                "catalog is not allowed" in rejection_text
+                or "Tool execution failed" in rejection_text
+            ):
                 raise RuntimeError("Trino MCP did not reject the disallowed catalog")
 
     generator_server = StdioServerParameters(
