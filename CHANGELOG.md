@@ -9,11 +9,6 @@ All notable changes to this project are documented here.
 - Support MCP SDK 2.x alongside 1.x, using the locked 2.2.0 server and JSON-RPC
   interfaces while retaining the bounded stdio transport and per-request budgets.
 
-### Security
-
-- Detach unexpected MCP 2 tool exceptions before SDK logging and return a
-  fixed tool error. Retain argument-validation redaction and transport limits.
-
 ### Fixed
 
 - Repair CSV generation for long entity names, repeated string identifiers,
@@ -24,6 +19,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Detach unexpected MCP 2 tool exceptions before SDK logging and return a
+  fixed tool error. Retain argument-validation redaction and transport limits.
 - Install the fixed Bookworm PCRE2 runtime package in all three container
   targets; retain blocking vulnerability scans.
 
