@@ -251,6 +251,67 @@ reviewed commit is still the exact `main` tip. Manual container dispatch runs
 validation only; image publication remains restricted to accepted signed
 version tags. Record all four exact-commit run URLs in the acceptance manifest.
 
+## Generation Contract Corrective Release
+
+The generation and validation corrections in PR #490 completed public
+acceptance in `1.3.2rc1` at exact commit
+`5eb29ce4af94049e27c32462211725e5f896d9b6`; see
+[the immutable RC1 evidence](release-evidence-1.3.2rc1.md).
+
+Stable preparation then exposed a pre-existing randomized safety-test defect:
+unquoted catalog `AS` was rejected as invalid SQL before the test's expected
+allowlist rejection. Production behavior remained fail-closed. The corrected
+test prefixes unquoted generated names with `outside_` and retains quoted-name
+coverage and strict `AllowlistError` assertions. Explicit examples retain the
+regression. Since safety-test changes are excluded from stable promotion,
+`1.3.2rc2` repeated and passed the entire acceptance process before stable `1.3.2`.
+No production code, dependency, schema, fixture, workflow, or container behavior
+changes from RC1. The accepted RC2 commit is
+`1b32c24fce2ba13916ee5e2a800de8aaa5176c8a`; its hashes, independent approval,
+signed images and public checks are recorded in
+[the RC2 evidence](release-evidence-1.3.2rc2.md).
+
+Stable `1.3.2` promotes this runtime through version and documentation changes
+only. Review every changed hunk against the accepted candidate:
+
+```bash
+git diff --name-status v1.3.2rc2 HEAD
+git diff v1.3.2rc2 HEAD
+```
+
+Exact-main gates, independent approval, Ubuntu preflight, signed manifest and
+public verification remain mandatory for stable.
+
+Stable `1.3.2` completed these gates and public acceptance from exact commit
+`28d1176867d3ba155a420a5dfae0f6944597470d`. Its signed identity, approvals,
+package hashes and image digests are recorded in
+[the stable release evidence](release-evidence-1.3.2.md).
+
+## 1.4.0 Minor Version Release
+
+The requested minor version `1.4.0` retains the publicly accepted `1.3.2`
+runtime at `28d1176867d3ba155a420a5dfae0f6944597470d`, itself promoted
+from accepted `1.3.2rc2`. Since only version and documentation metadata change,
+the existing version-only exception applies: a new RC is not required. No new
+feature, runtime behavior, API, dependency or safety-test change is included.
+The [1.3.2 evidence](release-evidence-1.3.2.md) remains the runtime baseline.
+
+Review every hunk directly against the accepted stable source:
+
+```bash
+git diff --name-status v1.3.2 HEAD
+git diff v1.3.2 HEAD
+```
+
+The final `1.4.0` main commit still requires all exact-commit gates, independent
+approval, Ubuntu preflight hashes, a signed acceptance manifest and successful
+public-artifact verification. Prior approval is not reused for the new commit.
+
+Stable `1.4.0` completed these requirements at exact commit
+`5bcaef2cd991e63098de4d1601f8ae2a8207bd14`; see the
+[1.4.0 published evidence](release-evidence-1.4.0.md) for hashes, signed images,
+approval and public verification, including the successful Parquet retry.
+
 ## Version And Tag
 
 1. Bump `pyproject.toml` and `src/test_data_agent/version.py` together.

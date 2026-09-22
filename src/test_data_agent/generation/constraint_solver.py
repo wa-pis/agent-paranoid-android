@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from graphlib import CycleError, TopologicalSorter
 from typing import Any
 
-from test_data_agent.core.constraint import ConstraintType
+from test_data_agent.core.constraint import Constraint, ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.distribution import (
     CategoricalDistribution,
@@ -17,7 +18,7 @@ from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.relationship import RelationshipType
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
-from test_data_agent.rules.expressions import parse_datetime, safe_eval
+from test_data_agent.rules.expressions import expression_references, parse_datetime, safe_eval
 
 
 def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec, seed: int) -> None:
@@ -30,11 +31,18 @@ def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Dat
 
 def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
     for relationship in spec.relationships:
+        if relationship.status == "rejected":
+            continue
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])
         child_rows = rows_by_entity.get(relationship.child_entity, [])
         parent_values = [row.get(relationship.parent_field) for row in parent_rows if row.get(relationship.parent_field) is not None]
         if not parent_values:
             continue
+        child_field = spec.entity(relationship.child_entity).field(relationship.child_field)
+        child_rows = [
+            row for row in child_rows
+            if not (child_field.nullable and row.get(relationship.child_field) is None)
+        ]
         if relationship.relationship_type == RelationshipType.ONE_TO_ONE and len(child_rows) > len(parent_values):
             raise ValueError(
                 f"one_to_one relationship has more child rows than parent rows: "
@@ -47,11 +55,36 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
                 child_row[relationship.child_field] = parent_values[index % len(parent_values)]
 
 
+def ordered_formula_constraints(spec: DatasetSpec) -> list[Constraint]:
+    formulas: dict[tuple[str, str], Constraint] = {}
+    for constraint in spec.constraints:
+        if constraint.type != ConstraintType.FORMULA or constraint.status == ConstraintStatus.REJECTED:
+            continue
+        key = (constraint.entity, constraint.fields[0])
+        if key in formulas:
+            raise ValueError("duplicate formula target")
+        formulas[key] = constraint
+    dependencies: dict[tuple[str, str], list[tuple[str, str]]] = {}
+    for key, constraint in formulas.items():
+        try:
+            names, _, _ = expression_references(constraint.expression or "")
+        except ValueError:
+            raise ValueError("formula expression is invalid") from None
+        dependencies[key] = sorted(
+            (constraint.entity, name) for name in names
+            if (constraint.entity, name) in formulas
+        )
+    try:
+        order = list(TopologicalSorter(dependencies).static_order())
+    except CycleError:
+        raise ValueError("cyclic formula dependencies") from None
+    return [formulas[key] for key in order]
+
+
 def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
     allow_invalid_values = spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
-    for constraint in spec.constraints:
-        if constraint.type != ConstraintType.FORMULA or not constraint.expression or not constraint.fields:
-            continue
+    for constraint in ordered_formula_constraints(spec):
+        assert constraint.expression is not None
         target = constraint.fields[0]
         for row in rows_by_entity.get(constraint.entity, []):
             failed = False
@@ -67,6 +100,8 @@ def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], s
 
 def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
     for constraint in spec.constraints:
+        if constraint.status == ConstraintStatus.REJECTED:
+            continue
         if constraint.type != ConstraintType.TEMPORAL or len(constraint.fields) < 2:
             continue
         start_field, end_field = constraint.fields[:2]
@@ -79,6 +114,8 @@ def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], 
 
 def apply_conditional_required_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
     for constraint in spec.constraints:
+        if constraint.status == ConstraintStatus.REJECTED:
+            continue
         if constraint.type != ConstraintType.CONDITIONAL_REQUIRED or not constraint.condition:
             continue
         condition = Condition(**constraint.condition)
@@ -91,12 +128,14 @@ def apply_conditional_required_constraints(rows_by_entity: dict[str, list[dict[s
 
 def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
     for constraint in spec.constraints:
+        if constraint.status == ConstraintStatus.REJECTED:
+            continue
         if constraint.type != ConstraintType.AGGREGATE_MAPPING or not constraint.target_entity:
             continue
         relationship = next(
             (
                 item for item in spec.relationships
-                if item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
+                if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
             ),
             None,
         )

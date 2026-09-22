@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import example, given, strategies as st
 
 import test_data_agent.mcp_trino_transport as mcp_transport
 import test_data_agent.cli as cli_module
@@ -69,11 +69,18 @@ def test_safe_select_rejects_statement_injection_tails(keyword: str, name: str) 
     outside=OUTSIDE_ALLOWLIST,
     quote_parts=st.booleans(),
 )
+@example(boundary="catalog", outside="AS", quote_parts=False)
+@example(boundary="schema", outside="AS", quote_parts=False)
+@example(boundary="catalog", outside="AS", quote_parts=True)
+@example(boundary="schema", outside="AS", quote_parts=True)
 def test_safe_select_rejects_every_catalog_or_schema_allowlist_mismatch(
     boundary: str,
     outside: str,
     quote_parts: bool,
 ) -> None:
+    if not quote_parts:
+        # Unquoted names must not turn into reserved SQL keywords.
+        outside = f"outside_{outside}"
     catalog = outside if boundary == "catalog" else "analytics"
     schema = outside if boundary == "schema" else "safe"
     config = TrinoConfig(

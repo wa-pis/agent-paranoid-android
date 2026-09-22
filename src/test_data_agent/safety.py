@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
     configure_csv_field_limit,
     enforce_input_cell_count,
@@ -21,11 +22,14 @@ from test_data_agent.core.privacy import (
     PrivacyClassification,
     SENSITIVE_SEMANTIC_TYPES,
     infer_sensitive_type_from_values,
+    infer_sensitive_value_type,
     is_sensitive_field,
 )
 from test_data_agent.csv_profiler import (
     CSVSourceRowDigests,
     csv_row_digest,
+    parse_int,
+    parse_float,
     detect_csv_dialect,
     detect_csv_encoding,
     validate_csv_headers,
@@ -256,3 +260,54 @@ def _validate_masked_patterns(
 def _row_signature(row: Mapping[str, Any], field_names: list[str]) -> str:
     values = ["" if row.get(name) is None else str(row.get(name)) for name in field_names]
     return json.dumps(values, ensure_ascii=True, separators=(",", ":"))
+
+
+def validate_generated_row_privacy(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    parse_numeric_strings: bool = False,
+) -> list[str]:
+    """Check row values with the same synthetic namespace policy as generation."""
+    for entity in spec.entities:
+        for row in rows_by_entity.get(entity.name, []):
+            if not isinstance(row, Mapping):
+                return ["row privacy validation requires object rows"]
+            for field in entity.fields:
+                value = row.get(field.name)
+                if value in (None, ""):
+                    continue
+                if isinstance(value, (dict, list, tuple)):
+                    return ["row privacy validation requires scalar fields"]
+                # CSV encodes numeric synthetic values as strings. Classify their
+                # declared numeric representation, not those digits as a phone.
+                if parse_numeric_strings and isinstance(value, str) and (
+                    field.data_type == FieldType.INTEGER and parse_int(value) is not None
+                    or field.data_type == FieldType.FLOAT and parse_float(value) is not None
+                ):
+                    continue
+                detected = infer_sensitive_value_type(value)
+                sensitive = field.sensitive or is_sensitive_field(
+                    field.name,
+                    field.semantic_type,
+                )
+                if isinstance(value, str) and (
+                    sensitive or detected is not None
+                ) and not _is_synthetic_sensitive_value(
+                    value,
+                    field.semantic_type or detected,
+                ):
+                    return ["generated dataset failed post-solve privacy validation"]
+    return []
+
+
+def _is_synthetic_sensitive_value(value: Any, value_type: str | None) -> bool:
+    if not isinstance(value, str):
+        return False
+    if value_type == "email":
+        return value.endswith("@example.test")
+    if value_type == "phone":
+        return value.startswith("+1-202-555-")
+    if value_type == "ssn":
+        return value.startswith("000-00-")
+    return value.startswith("synthetic_")

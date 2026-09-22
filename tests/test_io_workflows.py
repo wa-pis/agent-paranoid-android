@@ -10,7 +10,7 @@ from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec
 from test_data_agent.core.limits import GenerationLimitError
-from test_data_agent.core.settings import OutputFormat
+from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact_atomic
 from test_data_agent.io.commands import write_generation_summary
 from test_data_agent.io.workflows import (
@@ -454,6 +454,7 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
         def model_dump_json(self, indent: int) -> str:
             return '{"valid": false}'
 
+    spec.generation_settings.mode = GenerationMode.MIXED
     result = generate_dataset_bundle(
         spec,
         output_folder=tmp_path / "generated",
@@ -462,7 +463,7 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
 
     manifest = json.loads((tmp_path / "generated" / "generation_manifest.json").read_text())
     assert result.business_validation is not None
-    assert manifest["validation_valid"] is False
+    assert manifest["validation_valid"] is True
     assert manifest["business_validation"] == {
         "rules_sha256": "a" * 64,
         "rule_count": 2,
@@ -478,7 +479,7 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
     }
     assert manifest["effective_rules"] == {
         "spec_sha256": manifest["spec_sha256"],
-        "generation_mode": "valid",
+        "generation_mode": "mixed",
         "invalid_ratio": 0.0,
         "locale": "en_US",
         "validation_settings": {

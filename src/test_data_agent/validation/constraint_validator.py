@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
-from test_data_agent.core.constraint import ConstraintType
+from test_data_agent.core.constraint import ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.expressions import parse_datetime, safe_eval
@@ -14,6 +14,8 @@ from test_data_agent.rules.expressions import parse_datetime, safe_eval
 def validate_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> list[str]:
     errors: list[str] = []
     for constraint in spec.constraints:
+        if constraint.status == ConstraintStatus.REJECTED:
+            continue
         if constraint.type == ConstraintType.FORMULA:
             errors.extend(validate_formula(rows_by_entity, constraint))
         elif constraint.type == ConstraintType.TEMPORAL:
@@ -73,11 +75,13 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
     relationship = next(
         (
             item for item in spec.relationships
-            if item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
+            if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
         ),
         None,
     )
-    if relationship is None or not constraint.fields:
+    if relationship is None:
+        return ["aggregate mapping requires an active relationship"]
+    if not constraint.fields:
         return []
     if constraint.aggregate != "count" and not constraint.target_field:
         return []

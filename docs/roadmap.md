@@ -5,6 +5,8 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
+- Monitor migration feedback for the generation-contract corrections released
+  in stable `1.3.2`.
 - Run product-validation pilots against real development and analytics tasks.
 - Fix onboarding friction reported by external users.
 - Address confirmed `1.3.x` defects and routine dependency maintenance.

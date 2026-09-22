@@ -4,11 +4,77 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.4.0] - 2026-09-07
+
+### Changed
+
+- Publish the accepted `1.3.2` generation and validation runtime under the
+  requested minor version `1.4.0`. This is a version- and documentation-only
+  release; it adds no new application behavior, public API, or dependencies.
+- Retain the generation-contract corrections and migration guidance introduced
+  in `1.3.2`; upgrades from that release require no additional contract migration.
+
+## [1.3.2] - 2026-09-07
+
 ### Fixed
 
+- Apply formulas in dependency order and ignore rejected rules and relationships.
+- Preserve nullable foreign keys, reject missing required identifiers, and
+  respect complete string length bounds.
+- Stop valid-mode generation before publication when constraints or business
+  rules fail, including when report sections are disabled.
+
+### Security
+
+- Validate actual row privacy during revalidation and after business-rule
+  mutation; generated numeric strings cannot bypass the privacy gate.
+
+### Changed
+
+- Promote the publicly accepted `1.3.2rc2` corrections with version and
+  documentation changes only. Application code and dependencies are unchanged
+  from the accepted candidate.
+
+### Migration
+
+- Regenerate affected seeded fixtures and review the
+  [generation contract migration](docs/reference/generation-contract-migration.md)
+  for stricter valid-mode acceptance and changed formula, key, and string values.
+
+
+## [1.3.2rc2] - 2026-09-07
+
+### Changed
+
+- Reissue the corrective candidate after a release-validation test correction;
+  application behavior, public contracts and dependencies are unchanged from
+  `1.3.2rc1`.
+
+## [1.3.2rc1] - 2026-09-06
+
+### Fixed
+
+- Evaluate dependent formulas in dependency order and exclude rejected rules
+  and relationships from generation and validation.
+- Preserve nullable foreign keys, reject missing required identifiers, and
+  honor the complete configured string length.
+- Reject unsatisfied valid-mode generation contracts before publishing output,
+  including failures introduced by business rules and disabled report sections.
 - Align Python package maturity metadata with the release phase: stable builds
   declare `Production/Stable`, prereleases declare `Beta`, and wheel plus
   source-distribution validation rejects mismatches before PyPI publication.
+
+### Security
+
+- Check row privacy during standalone validation and after business-rule
+  application, using the same synthetic-value policy as generation.
+
+### Migration
+
+- Regenerate affected fixtures after upgrading: formula order, nullable keys,
+  and string lengths can change seeded values. Valid-mode output that previously
+  carried a failed report is now rejected before publication. See
+  [generation contract migration](docs/reference/generation-contract-migration.md).
 
 ## [1.3.1] - 2026-08-22
 
@@ -679,7 +745,11 @@ Detailed notes for `1.0.0rc1` through `1.0.0rc6` are retained in the
 - Compatibility adapters and deprecation warnings for legacy
   `GenerationSpec` workflows.
 
-[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2...v1.4.0
+[1.3.2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc2...v1.3.2
+[1.3.2rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.2rc1...v1.3.2rc2
+[1.3.2rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1...v1.3.2rc1
 [1.3.1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc2...v1.3.1
 [1.3.1rc2]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.1rc1...v1.3.1rc2
 [1.3.1rc1]: https://github.com/wa-pis/agent-paranoid-android/compare/v1.3.0...v1.3.1rc1

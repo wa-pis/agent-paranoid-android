@@ -103,6 +103,9 @@ Before creating a tag:
   from the publicly accepted RC2 tree. Preserve the accepted Ubuntu artifact
   preflight and public package/container evidence, and bind the promotion commit
   to a separate exact-commit review.
+- Promote stable `1.3.2` only through a version- and documentation-only diff
+  from publicly accepted `1.3.2rc2`. Retain generation-contract migration notes
+  and bind final approval and Ubuntu hashes to the exact stable main commit.
 - Avoid publishing exploit details before fixes are available.
 - Sign the version tag and verify it locally before pushing.
 - Confirm the tag-triggered release workflow publishes wheel, source

@@ -8,8 +8,8 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.settings import ValidationSettings
-from test_data_agent.safety import SpecSafetyError, assert_spec_safe
+from test_data_agent.core.settings import GenerationMode, ValidationSettings
+from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.constraint_validator import validate_constraints
 from test_data_agent.validation.relationship_validator import validate_relationships
 from test_data_agent.validation.schema_validator import validate_schema
@@ -42,7 +42,7 @@ def validate_dataset(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Data
             settings.validate_constraints,
             lambda: validate_constraints(rows_by_entity, spec),
         ),
-        ("privacy", settings.validate_privacy, lambda: validate_privacy(spec)),
+        ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
     ]
     sections: list[ValidationSection] = []
     for name, enabled, validator in validators:
@@ -69,3 +69,22 @@ def validate_privacy(spec: DatasetSpec) -> list[str]:
 
 def section(name: str, errors: list[str]) -> ValidationSection:
     return ValidationSection(name=name, passed=0 if errors else 1, failed=len(errors), errors=errors)
+
+
+class GenerationValidationError(ValueError):
+    """Raised when final rows cannot satisfy the requested generation contract."""
+
+
+def assert_generated_dataset_valid(
+    rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec,
+) -> None:
+    """Enforce invariants independently of optional validation report settings."""
+    assert_spec_safe(spec)
+    if validate_generated_row_privacy(rows_by_entity, spec):
+        raise GenerationValidationError("generated dataset failed post-solve privacy validation")
+    if spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}:
+        return
+    if validate_schema(rows_by_entity, spec):
+        raise GenerationValidationError("generated dataset failed post-solve type validation")
+    if validate_relationships(rows_by_entity, spec) or validate_constraints(rows_by_entity, spec):
+        raise GenerationValidationError("generated dataset failed post-solve constraint validation")
