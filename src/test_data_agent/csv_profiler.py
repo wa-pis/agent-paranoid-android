@@ -34,6 +34,7 @@ from test_data_agent.core.privacy import (
     mask_pattern,
     semantic_type_is_sensitive,
     synthetic_category_distribution,
+    validate_local_category_values,
 )
 from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
 
@@ -43,6 +44,7 @@ PHONE_RE = re.compile(r"^\+?[\d\s().-]{7,}$")
 SSN_RE = re.compile(r"^\d{3}-?\d{2}-?\d{4}$")
 MAX_ENUM_VALUES = 20
 MAX_TRACKED_DISTINCT_VALUES = 1_000
+MAX_DISTINCT_DIGESTS = 100_000
 MAX_NUMERIC_SAMPLE_VALUES = 10_000
 CSV_SAMPLE_BYTES = 8192
 
@@ -154,10 +156,12 @@ def _profile_csv(
                 accumulators[name].add(row.get(name, ""))
             if row_digests is not None:
                 row_digests.add(csv_row_digest(row, fieldnames))
+    allowed = {item.field for item in local_category_fields if item.entity == (table_name or path.stem)}
     return CSVProfile(
         table=table_name or path.stem,
         row_count=row_count,
-        columns=[accumulator.to_profile(row_count) for accumulator in accumulators.values()],
+        columns=[accumulator.to_profile(row_count, preserve_categories=name in allowed)
+                 for name, accumulator in accumulators.items()],
         local_category_fields=list(local_category_fields),
     )
 
@@ -210,6 +214,7 @@ class CSVColumnAccumulator:
         self.content_sensitive_type: str | None = None
         self.counts: Counter[str] = Counter()
         self.distinct_overflow = False
+        self.distinct_digests: set[bytes] = set()
         self.integer_values: list[int] = []
         self.float_values: list[float] = []
         self.date_values: list[date] = []
@@ -228,12 +233,18 @@ class CSVColumnAccumulator:
         if len(self.semantic_sample) < 100:
             self.semantic_sample.append(value)
         detected_type = infer_sensitive_value_type(value)
+        # Decimal amounts match the permissive phone pattern. Integer-like
+        # identifiers and explicit sensitive names still retain their checks.
+        if detected_type == "phone" and re.fullmatch(r"-?\d+\.\d+", value):
+            detected_type = None
         if detected_type == "secret" or self.content_sensitive_type is None:
             self.content_sensitive_type = detected_type
         self.add_count(value)
         self.add_typed_samples(value)
 
     def add_count(self, value: str) -> None:
+        if len(self.distinct_digests) < MAX_DISTINCT_DIGESTS:
+            self.distinct_digests.add(hashlib.sha256(value.encode()).digest())
         if value in self.counts:
             self.counts[value] += 1
             return
@@ -270,9 +281,15 @@ class CSVColumnAccumulator:
         elif len(self.date_values) < MAX_NUMERIC_SAMPLE_VALUES:
             self.date_values.append(parsed_date)
 
-    def to_profile(self, row_count: int) -> CSVColumnProfile:
+    def to_profile(self, row_count: int, *, preserve_categories: bool = False) -> CSVColumnProfile:
         null_count = row_count - self.non_null_count
         semantic_type = infer_semantic_type(self.name, self.semantic_sample)
+        if (
+            semantic_type == "phone" and "phone" not in self.name.lower()
+            and self.all_float and not self.all_int
+            and self.content_sensitive_type is None
+        ):
+            semantic_type = None
         if self.content_sensitive_type == "secret" or semantic_type is None:
             semantic_type = self.content_sensitive_type or semantic_type
         base_type = self.infer_data_type(semantic_type)
@@ -297,13 +314,22 @@ class CSVColumnAccumulator:
             top_values = synthetic_category_distribution(
                 count for _, count in self.counts.most_common(MAX_ENUM_VALUES)
             )
+        if preserve_categories:
+            validate_local_category_values(
+                field_name=self.name, semantic_type=semantic_type, sensitive=sensitive,
+                values=self.counts, max_categories=MAX_ENUM_VALUES,
+            )
+            if self.distinct_overflow or base_type != ProfileDataType.STRING:
+                raise ValueError("local CSV categories require a bounded string enum")
+            top_values = [{"value": value, "count": count} for value, count in self.counts.most_common()]
         return CSVColumnProfile(
             name=self.name,
             data_type=base_type.value,
             nullable=null_count > 0,
             null_count=null_count,
             null_ratio=round(null_count / row_count, 6) if row_count else 0.0,
-            approx_distinct_count=MAX_TRACKED_DISTINCT_VALUES + 1 if self.distinct_overflow else len(self.counts),
+            # A capped lower bound must never certify uniqueness at the cap.
+            approx_distinct_count=min(len(self.distinct_digests), MAX_DISTINCT_DIGESTS - 1),
             sensitive=sensitive,
             semantic_type=semantic_type,
             top_values=top_values,
@@ -518,6 +544,7 @@ def parse_datetime_value(value: str) -> datetime | None:
     if "T" not in value and " " not in value:
         return None
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        normalized = re.sub(r"\s+([+-]\d{2}:?\d{2})$", r"\1", value)
+        return datetime.fromisoformat(normalized.replace("Z", "+00:00"))
     except ValueError:
         return None

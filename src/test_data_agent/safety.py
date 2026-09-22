@@ -21,6 +21,7 @@ from test_data_agent.core.limits import (
 from test_data_agent.core.privacy import (
     PrivacyClassification,
     SENSITIVE_SEMANTIC_TYPES,
+    SYNTHETIC_PREFIX,
     infer_sensitive_type_from_values,
     infer_sensitive_value_type,
     is_sensitive_field,
@@ -310,4 +311,4 @@ def _is_synthetic_sensitive_value(value: Any, value_type: str | None) -> bool:
         return value.startswith("+1-202-555-")
     if value_type == "ssn":
         return value.startswith("000-00-")
-    return value.startswith("synthetic_")
+    return value.startswith(SYNTHETIC_PREFIX)

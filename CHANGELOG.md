@@ -9,6 +9,24 @@ All notable changes to this project are documented here.
 - Support OpenAI SDK 3.x for the optional advisor, with 3.18.0 locked and
   offline request/response and redaction coverage; retain the 2.46.0 minimum.
 
+### Fixed
+
+- Repair CSV generation for long entity names, repeated string identifiers,
+  decimal amounts and timestamps with spaced timezone offsets. Preserve
+  explicitly reviewed, validated local CSV categories.
+- Track bounded distinct fingerprints beyond the CSV frequency sample;
+  exhausted tracking budgets do not certify primary-key uniqueness.
+
+### Security
+
+- Install the fixed Bookworm PCRE2 runtime package in all three container
+  targets; retain blocking vulnerability scans.
+
+### Migration
+
+- Regenerate seeded string fixtures to adopt the `synthetic_` prefix. Profile
+  and specification schemas remain unchanged.
+
 ## [1.4.0] - 2026-09-07
 
 ### Changed
