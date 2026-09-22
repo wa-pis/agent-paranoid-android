@@ -294,9 +294,9 @@ def _mcp_tool_contract(server: Any | None) -> list[dict[str, Any]]:
     return [
         {
             "description": tool.description,
-            "input_schema": tool.inputSchema,
+            "input_schema": tool.model_dump(by_alias=True)["inputSchema"],
             "name": tool.name,
-            "output_schema": tool.outputSchema,
+            "output_schema": tool.model_dump(by_alias=True).get("outputSchema"),
         }
         for tool in sorted(tools, key=lambda item: item.name)
     ]

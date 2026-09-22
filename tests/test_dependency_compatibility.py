@@ -21,7 +21,7 @@ def test_dependency_compatibility_policy_matches_repository() -> None:
     reviewed = check_repository(ROOT)
 
     assert reviewed["faker"] == "40.35.0"
-    assert reviewed["mcp"] == "1.28.1"
+    assert reviewed["mcp"] == "2.2.0"
     assert reviewed["openai"] == "2.50.0"
     assert reviewed["psycopg"] == "3.3.4"
 

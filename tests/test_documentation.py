@@ -458,7 +458,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         for path in changes.iterdir()
         if path.is_dir() and path.name != "archive"
     }
-    assert active == {"_template", "openai-3-sdk-compatibility"}
+    assert active == {"_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility"}
 
     openai_change = changes / "openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()
@@ -1385,7 +1385,7 @@ def test_dependency_compatibility_defines_semantic_profiles() -> None:
     assert "Same package version" in compatibility
     assert "Cross-version" in compatibility
     assert "byte_identical_across_versions: false" in compatibility
-    assert "Retain `<2.0.0`" in compatibility
+    assert "Accept `<3.0.0`" in compatibility
     assert "Retain `<3.0.0`" in compatibility
     assert "Add no upper bound" in compatibility
     assert "user-facing changelog entry" in compatibility

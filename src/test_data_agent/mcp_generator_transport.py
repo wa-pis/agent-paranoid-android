@@ -5,13 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from typing import Any
 
-try:  # pragma: no cover - exercised when the MCP dependency is installed.
-    from mcp.server.fastmcp import FastMCP
-except ImportError:  # pragma: no cover
-    FastMCP = None  # type: ignore[misc, assignment]
-
 from test_data_agent.audit import audited_mcp_tool
 from test_data_agent.mcp_trino_transport import (
+    FastMCP,
     _create_redacted_fast_mcp,
     run_bounded_mcp,
 )

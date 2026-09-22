@@ -26,8 +26,8 @@ latest = "25.0.0"
 requirement = "mcp"
 extra = "mcp"
 minimum = "1.0.0"
-latest = "1.28.1"
-upper_major = 2
+latest = "2.2.0"
+upper_major = 3
 
 [dependencies.sqlglot]
 requirement = "sqlglot"
