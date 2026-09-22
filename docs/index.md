@@ -96,6 +96,7 @@ production-adjacent data or an AI client.
 ## Project Status
 
 The current stable `1.5.0` release uses `DatasetSpec` as the generation and
-validation contract for the CLI and Python API. It promotes the accepted RC2
-documentation, package metadata, build-tool, and workflow maintenance without
-changing application runtime behavior.
+validation contract for the CLI and Python API. It promotes the accepted
+`1.5.0rc1` runtime, including CSV generation corrections, MCP 2 and OpenAI 3
+compatibility, and container hardening. The stable promotion itself changes
+only version and documentation metadata.

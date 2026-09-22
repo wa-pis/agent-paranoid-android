@@ -332,8 +332,9 @@ are recorded in the [candidate evidence](release-evidence-1.5.0rc1.md).
 `1.5.0rc1` includes CSV generation corrections, OpenAI 3 compatibility,
 MCP 2 compatibility with a corrected 1.28.1 minimum, and runtime container
 hardening. These are runtime and dependency changes, not a version-only
-promotion. The quickstart pin targets this candidate for acceptance; stable
-`1.4.0` remains the recommended release until public RC acceptance completes.
+promotion. During candidate acceptance the quickstart pin targeted this
+candidate and `1.4.0` remained the recommended stable release. Public candidate
+acceptance is now complete; the stable promotion updates the pin to `1.5.0`.
 Independent AI-assisted exact-commit review follows the explicitly labelled
 process recorded for 1.4.0; it must not be presented as human approval.
 Run all exact-commit gates and Ubuntu artifact preflight before the signed tag.
