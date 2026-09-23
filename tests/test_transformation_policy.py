@@ -1,4 +1,5 @@
 import copy
+import warnings
 
 import pytest
 
@@ -177,3 +178,23 @@ def test_schema_binding_detects_column_drift_not_statistics(change):
         return
     with pytest.raises(BehaviorPolicyError):
         validate_policy_profile(decision, profile)
+
+
+@pytest.mark.parametrize("warning_mode", ["always", "error"])
+@pytest.mark.parametrize("helper", ["coverage", "fingerprint"])
+def test_malformed_profile_does_not_emit_private_serialization_warnings(warning_mode, helper):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string"}]}]})
+    field = profile.entities[0].fields[0]
+    profile.entities[0].fields[0] = field.model_copy(update={"name": ["fictional-private-marker"]})
+    decision = parse_behavior_policy(policy({"action": "drop"}))
+    with warnings.catch_warnings(record=True) as recorded:
+        warnings.simplefilter(warning_mode)
+        with pytest.raises(BehaviorPolicyError) as error:
+            if helper == "coverage":
+                validate_policy_field_coverage(decision, profile)
+            else:
+                transformation_schema_fingerprint(profile)
+    assert not recorded
+    assert "fictional-private-marker" not in str(error.value)
+    assert error.value.__context__ is None

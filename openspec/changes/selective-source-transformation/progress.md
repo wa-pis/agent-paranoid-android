@@ -302,3 +302,12 @@ Broader transformation remains unfinished.
   46 focused tests, Ruff, mypy and whitespace checks pass.
 - Next: signed commit/PR and independent review of this column-binding slice.
   Mapping type checks, formula semantics and snapshot-bound approval remain pending.
+- Signed 9b816d4bdb76c3be6a6c1b2b5f1f5ed25dd34867 pushed; PR #522:
+  https://github.com/wa-pis/agent-paranoid-android/pull/522
+  Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) independently reviewing this
+  exact SHA against e2e4194. Next: findings disposition and CI; no duplicate review.
+- Curie found P2 private-value leakage through Pydantic serialization warnings
+  for malformed nested profile values, including warnings-as-errors. Disabled
+  serialization warnings at both private reparsing boundaries, retaining full
+  validation. Four regressions cover both helpers and warning modes.
+  50 focused tests, Ruff and mypy pass. Prior CI green; follow-up needs re-review.

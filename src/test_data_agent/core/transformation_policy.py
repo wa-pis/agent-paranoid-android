@@ -125,7 +125,7 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
     # source-derived Pydantic errors at this private boundary.
     valid = False
     try:
-        profile = DatasetProfile.model_validate(profile.model_dump())
+        profile = DatasetProfile.model_validate(profile.model_dump(warnings=False))
         source_fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
         expected = set(source_fields)
         actual = {(decision.entity, decision.field) for decision in policy.fields}
@@ -163,7 +163,7 @@ def transformation_schema_fingerprint(profile: DatasetProfile) -> str:
     """Private ordered column-schema identity; never source-content identity."""
     valid = False
     try:
-        profile = DatasetProfile.model_validate(profile.model_dump())
+        profile = DatasetProfile.model_validate(profile.model_dump(warnings=False))
         valid = True
     except ValidationError:
         pass
