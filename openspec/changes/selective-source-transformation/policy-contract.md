@@ -166,3 +166,17 @@ observed distributions does not. This is column-schema identity only: constraint
 relationships, sensitivity evidence and source contents are not covered by that
 hash and must be bound separately in execution approval. Mapping value types,
 formula semantics and referenced generation-policy validation remain pending.
+
+`validate_inline_mapping_shape` checks a caller-declared tuple width and rejects
+exact duplicate source tuples, including repeated nulls. Scalar kind participates
+in equality, so booleans, integers and floats are not conflated before schema
+normalization. This shape check does not establish type compatibility or detect
+duplicates introduced by normalization. Many-to-one output tuples remain subject
+to later declared uniqueness/relationship checks; no execution is authorized.
+
+`validate_inline_scalar_mapping` currently handles already-typed string, integer,
+float and boolean tuples plus explicit nullability. It does not coerce text or
+integers into floats; empty string remains a string, not null. Temporal/decimal
+types fail closed in this helper until their explicit normalization contracts are
+implemented. This limited internal helper is not the CSV loader or full typed
+mapping preflight. Duplicate detection is exact because no normalization occurs.
