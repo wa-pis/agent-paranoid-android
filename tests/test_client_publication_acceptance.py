@@ -24,7 +24,7 @@ def test_client_publication_contract(tmp_path: Path, state: str, overwrite: bool
         "TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT",
         str(Path(__file__).resolve().parents[1] / "src"),
     )).resolve(strict=True)
-    env = {**os.environ, "PYTHONPATH": str(package_root)}
+    env = {**os.environ, "PYTHONPATH": str(package_root), "PYTHONDONTWRITEBYTECODE": "1"}
     probe = subprocess.run(
         [sys.executable, "-c", "import test_data_agent; print(test_data_agent.__file__)"],
         cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30,

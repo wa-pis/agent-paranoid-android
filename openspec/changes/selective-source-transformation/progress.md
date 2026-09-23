@@ -171,5 +171,10 @@ Broader transformation remains unfinished.
   installed publication candidate: 5 passed. Existing candidate target is publication SHA
   c3f1308, not latest identifier changes; do not mislabel it final 1.6 acceptance.
 - Pending product questions do not block this independent acceptance work.
-- Next: signed acceptance-test commit, independent review and focused PR;
-  no runtime or policy changes in this slice.
+- Signed 3217b3dbefcb15e234cc42f8e72ee4bac57b6219 pushed; PR #518:
+  https://github.com/wa-pis/agent-paranoid-android/pull/518
+- Independent AI reviewer Darwin (01a0d027-9fee-7422-b0a1-05eec800b579) found
+  no blockers on 3217b3d; P3 bytecode writes outside temp directories. Set
+  PYTHONDONTWRITEBYTECODE=1 for both subprocesses; five tests and Ruff passed.
+  Prior CI green. Request final-SHA confirmation after push; no runtime/policy
+  changes in this slice.
