@@ -27,6 +27,16 @@ def _file_version(value: os.stat_result) -> tuple[PathIdentity, int, int]:
     return _identity(value), value.st_ctime_ns, value.st_size
 
 
+def _publication_version(
+    value: os.stat_result | None,
+) -> PathIdentity | tuple[PathIdentity, int, int] | None:
+    if value is None:
+        return None
+    # Reading a directory can change its timestamps, not its identity.
+    # Files retain content-change detection without comparing access time.
+    return _identity(value) if stat.S_ISDIR(value.st_mode) else _file_version(value)
+
+
 def _flags(*, directory: bool = False) -> int:
     flags = os.O_RDONLY | os.O_NOFOLLOW
     if hasattr(os, "O_CLOEXEC"):
@@ -191,9 +201,9 @@ def publish_directory(source: Path, destination: Path) -> PathIdentity:
                     raise ValueError("output path changed during publication")
             finally:
                 os.close(output_descriptor)
-        if _stat_at(parent, source_name) != source_stat:
+        if _publication_version(_stat_at(parent, source_name)) != _publication_version(source_stat):
             raise ValueError("staging path changed during publication")
-        if _stat_at(parent, destination_name) != destination_stat:
+        if _publication_version(_stat_at(parent, destination_name)) != _publication_version(destination_stat):
             raise ValueError("output path changed during publication")
         os.replace(source_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
         published = _stat_at(parent, destination_name)
@@ -215,9 +225,9 @@ def replace_path(source: Path, destination: Path) -> None:
                 raise ValueError("source path is not safe to publish")
             if destination_stat is not None and stat.S_ISLNK(destination_stat.st_mode):
                 raise ValueError("output path must not be a symbolic link")
-            if _stat_at(source_parent, source_name) != source_stat:
+            if _publication_version(_stat_at(source_parent, source_name)) != _publication_version(source_stat):
                 raise ValueError("source path changed during publication")
-            if _stat_at(destination_parent, destination_name) != destination_stat:
+            if _publication_version(_stat_at(destination_parent, destination_name)) != _publication_version(destination_stat):
                 raise ValueError("output path changed during publication")
             os.replace(
                 source_name,

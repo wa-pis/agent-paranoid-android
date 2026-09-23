@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Publish generated datasets into existing empty directories even when directory
+  reads update access timestamps; retain path-replacement checks and file-change
+  detection during publication and rollback.
+
 ## [1.5.0] - 2026-09-23
 
 ### Changed
