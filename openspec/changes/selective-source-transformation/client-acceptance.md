@@ -61,6 +61,21 @@ Do not hard-code the old package version as proof of the tested version.
 
 ## Mandatory Local Candidate Replay
 
+The reviewed publication adaptation lives in
+`tests/test_client_publication_acceptance.py`. Run it with the normal pytest
+environment. For an isolated wheel installed with `pip --target`, set
+`TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT` to that installation directory before
+running the same test. It verifies the subprocess import path, five original
+directory/overwrite cases, exit codes, CSV row/schema contents and preservation
+of existing files. Subprocesses have 30-second timeouts and write only under
+pytest temporary directories. It does not monkeypatch product code.
+
+This adaptation complements—not replaces—the unchanged supplied script replay
+and deterministic access-time/path-swap tests. Dependencies still come from the
+test interpreter; this is not clean-environment release acceptance. Record the
+wheel hash, metadata version and source SHA separately; a version label alone
+cannot identify an unreleased candidate built before the version bump.
+
 Before recommending a release candidate, build/install the candidate branch
 package into an isolated local environment and run the reviewed client scripts
 against that exact interpreter and CLI. Run the same self-contained scenarios
