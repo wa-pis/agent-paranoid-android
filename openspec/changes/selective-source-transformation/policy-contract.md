@@ -143,3 +143,26 @@ an authorization reference; neither the classification nor the reference is
 verified authorization. The schema fingerprint is structurally checked only.
 No schema binding, source access, expression evaluation or transformation occurs.
 These models remain private draft structures, not a supported public API.
+
+`validate_policy_field_coverage` checks the exact `(entity, field)` set against
+an existing `DatasetProfile`, reparsing mutable nested profile contents and policy
+instances. Duplicate, missing and unknown fields fail with a fixed detached error.
+It also checks declared derive dependencies as exact field names within the same
+entity: missing, dropped, repeated or cyclic dependencies fail. Cross-entity
+dependency syntax is not implemented; expression/declaration agreement is still
+pending formula validation. No expression is evaluated by this check.
+Observed `sensitive` fields cannot use preservation or unmatched-preserve, even
+when the decision declares them non-sensitive. This check does not authenticate
+the supplied profile, resolve heuristic conflicts or grant preservation authority.
+This is only part of schema binding: it does not verify the fingerprint, types
+or authorization.
+It neither reads source data nor returns an executable/approved policy.
+
+`validate_policy_profile` additionally compares `schema_fingerprint` with
+`transformation_schema_fingerprint`: SHA-256 of canonical UTF-8 JSON containing
+version `0.1`, ordered entity names, and ordered field names/types/nullability.
+Changing column order or type invalidates this binding; changing row counts or
+observed distributions does not. This is column-schema identity only: constraints,
+relationships, sensitivity evidence and source contents are not covered by that
+hash and must be bound separately in execution approval. Mapping value types,
+formula semantics and referenced generation-policy validation remain pending.

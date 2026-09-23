@@ -1,9 +1,13 @@
 """Internal private behavior-policy structure, not execution authorization."""
 
+import hashlib
+import json
+from graphlib import CycleError, TopologicalSorter
 from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
 
+from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
@@ -112,3 +116,78 @@ def parse_behavior_policy(payload: object) -> BehaviorPolicy:
     except BehaviorPolicyError as error:
         error.__context__ = None
         raise
+
+
+def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfile) -> None:
+    """Check coverage, local dependencies and preservation conflicts, not approval."""
+    policy = parse_behavior_policy(policy)
+    # Reparse mutable profile models, including nested instances, without retaining
+    # source-derived Pydantic errors at this private boundary.
+    valid = False
+    try:
+        profile = DatasetProfile.model_validate(profile.model_dump())
+        source_fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        expected = set(source_fields)
+        actual = {(decision.entity, decision.field) for decision in policy.fields}
+        valid = expected == actual
+        decisions = {(item.entity, item.field): item for item in policy.fields}
+        graph: dict[tuple[str, str], set[tuple[str, str]]] = {}
+        for identity, decision in decisions.items():
+            graph[identity] = set()
+            behavior = decision.behavior
+            preserves = isinstance(behavior, PreserveAction) or (
+                isinstance(behavior, SubstituteAction) and isinstance(behavior.unmatched, PreserveAction)
+            )
+            if preserves and identity in source_fields and source_fields[identity].sensitive:
+                valid = False
+            if isinstance(behavior, DeriveAction):
+                dependencies = {(decision.entity, name) for name in behavior.dependencies}
+                if len(dependencies) != len(behavior.dependencies):
+                    valid = False
+                for dependency in dependencies:
+                    if dependency not in decisions or isinstance(decisions[dependency].behavior, DropAction):
+                        valid = False
+                graph[identity] = dependencies
+        tuple(TopologicalSorter(graph).static_order())
+    except (ValidationError, CycleError):
+        valid = False
+    if not valid:
+        try:
+            raise BehaviorPolicyError("invalid policy field coverage")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+
+
+def transformation_schema_fingerprint(profile: DatasetProfile) -> str:
+    """Private ordered column-schema identity; never source-content identity."""
+    valid = False
+    try:
+        profile = DatasetProfile.model_validate(profile.model_dump())
+        valid = True
+    except ValidationError:
+        pass
+    if not valid:
+        try:
+            raise BehaviorPolicyError("invalid source schema")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+    schema = [{"entity": entity.name, "fields": [
+        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable}
+        for field in entity.fields]} for entity in profile.entities]
+    canonical = json.dumps({"version": "0.1", "entities": schema},
+                           sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def validate_policy_profile(policy: BehaviorPolicy, profile: DatasetProfile) -> None:
+    """Validate column-schema binding; not mapping types, formulas or approval."""
+    policy = parse_behavior_policy(policy)
+    validate_policy_field_coverage(policy, profile)
+    if policy.schema_fingerprint != transformation_schema_fingerprint(profile):
+        try:
+            raise BehaviorPolicyError("source schema mismatch")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
