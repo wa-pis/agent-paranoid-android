@@ -105,7 +105,7 @@ def test_inline_shape_preserves_typed_keys_and_allows_many_to_one():
     ("", FieldType.STRING, False, True),
     (None, FieldType.STRING, True, True),
     (None, FieldType.STRING, False, False),
-    ("2025-04-30", FieldType.DATE, False, False),
+    ("2025-04-30", FieldType.DATE, False, True),
 ])
 def test_typed_mapping_never_coerces_or_conflates_null(value, kind, allows_null, accepted):
     payload = {"kind": "inline", "entries": [{"original": [value], "replacement": [value]}]}
@@ -114,3 +114,22 @@ def test_typed_mapping_never_coerces_or_conflates_null(value, kind, allows_null,
     else:
         with pytest.raises(MappingDeclarationError, match="^invalid typed inline mapping$"):
             validate_inline_scalar_mapping(payload, data_types=(kind,), nullable=(allows_null,))
+
+
+@pytest.mark.parametrize("value", ["2025-02-29", "20250430", "2025-W18-3",
+    "2025-04-30T00:00:00", "2025-04-30T00:00:00Z", " 2025-04-30", "", 20250430])
+@pytest.mark.parametrize("side", ["original", "replacement"])
+def test_date_mapping_rejects_noncanonical_dates_on_both_sides(value, side):
+    entry = {"original": ["2025-04-30"], "replacement": ["2026-09-23"]}
+    entry[side] = [value]
+    with pytest.raises(MappingDeclarationError, match="^invalid typed inline mapping$") as caught:
+        validate_inline_scalar_mapping({"kind": "inline", "entries": [entry]},
+                                      data_types=(FieldType.DATE,), nullable=(False,))
+    assert caught.value.__context__ is None
+
+
+def test_date_mapping_keeps_explicit_substitution_and_leap_date():
+    entry = {"original": ["2024-02-29"], "replacement": ["2026-09-23"]}
+    result = validate_inline_scalar_mapping({"kind": "inline", "entries": [entry]},
+                                          data_types=(FieldType.DATE,), nullable=(False,))
+    assert result.model_dump(mode="json")["entries"] == [entry]

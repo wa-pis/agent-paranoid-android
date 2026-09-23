@@ -334,3 +334,19 @@ Broader transformation remains unfinished.
   Ruff and mypy passed. No source or mapping-file I/O enabled.
 - Next: review this primitive preflight slice and its explicit limitations;
   temporal/decimal normalization and CSV parsing require subsequent implementation.
+- Signed 60e49e10b5c78982c77f2c8f3816ee1745815bf5 pushed; PR #523:
+  https://github.com/wa-pis/agent-paranoid-android/pull/523
+  Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing exact SHA against
+  9e7661f. Next: review disposition and CI; do not duplicate active review.
+- Completed: PR #523 merged as 7f828554e46ff5654a24b65d36c25b24437185c9.
+  Curie found no issues at 60e49e1; 65 tests and 20 additional probes passed;
+  all CI green. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/523#issuecomment-5804763752
+- Next: strict date mapping support (no timestamp truncation or timezone coercion),
+  then bounded local mapping-file loading. Decimal remains an end-to-end type
+  contract, not a float conversion shortcut. No active reviewer; preserve notes.
+- Started codex/1-6-date-mappings from 7f82855. Added DATE tuple validation using
+  stdlib date.fromisoformat plus exact ISO round-trip. Rejects invalid calendar
+  dates, compact/week dates, timestamps and whitespace on both mapping sides.
+  Strings stay unchanged; DATETIME/Decimal still unsupported, no coercion/I/O.
+  82 focused tests, Ruff and mypy passed; next signed commit and independent review.

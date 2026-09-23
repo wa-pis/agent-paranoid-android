@@ -4,6 +4,7 @@ No file reads or type coercion are performed here. Dumps contain private mapping
 values and must never be used as public summaries or provider inputs.
 """
 
+from datetime import date
 from typing import Annotated, Literal, TypeAlias
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, TypeAdapter, ValidationError
@@ -101,10 +102,10 @@ def validate_inline_mapping_shape(payload: object, *, key_width: int) -> InlineM
 def validate_inline_scalar_mapping(
     payload: object, *, data_types: tuple[FieldType, ...], nullable: tuple[bool, ...],
 ) -> InlineMapping:
-    """Validate already-typed primitive tuples; no text coercion or temporal support."""
+    """Validate primitives and canonical ISO dates, without coercion."""
     declaration = validate_inline_mapping_shape(payload, key_width=len(data_types))
     scalar_types = {FieldType.STRING: str, FieldType.INTEGER: int,
-                    FieldType.FLOAT: float, FieldType.BOOLEAN: bool}
+                    FieldType.FLOAT: float, FieldType.BOOLEAN: bool, FieldType.DATE: str}
     valid = len(nullable) == len(data_types) and all(type(flag) is bool for flag in nullable)
     valid = valid and all(type(kind) is FieldType and kind in scalar_types for kind in data_types)
     if valid:
@@ -115,6 +116,12 @@ def validate_inline_scalar_mapping(
                         value is not None and type(value) is not scalar_types[kind]
                     ):
                         valid = False
+                    if value is not None and kind == FieldType.DATE:
+                        try:
+                            if not isinstance(value, str) or date.fromisoformat(value).isoformat() != value:
+                                valid = False
+                        except ValueError:
+                            valid = False
     if valid:
         return declaration
     try:
