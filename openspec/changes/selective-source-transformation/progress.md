@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-client-publication-acceptance, based on main 40fd4d0.
+- Branch: codex/1-6-transformation-contract, based on main 5aaa201.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -178,3 +178,37 @@ Broader transformation remains unfinished.
   PYTHONDONTWRITEBYTECODE=1 for both subprocesses; five tests and Ruff passed.
   Prior CI green. Request final-SHA confirmation after push; no runtime/policy
   changes in this slice.
+- Follow-up afd6beb signed/pushed; Darwin final-SHA confirmation requested.
+  Wait for fresh CI and review before merge; do not start duplicate review.
+- Completed: Darwin confirmed no outstanding findings on afd6beb; all CI green.
+  PR #518 merged as 5aaa2013cea4b21884bc78ff003d0edaa915a976.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/518#issuecomment-5803308782
+- Next independent slice: finalize typed transformation policy/mapping contract
+  from approved design, with validation-only tests before any source-preserving
+  execution. Pending scaling/semantic-policy questions remain unanswered; do
+  not infer approval or silently alter existing source-free guarantees.
+- Added policy-contract.md review draft: separate evidence/decisions,
+  discriminated actions, private typed mapping pairs, schema binding and staged
+  validation. No executable model or source-preserving path added yet. Model
+  names/approval transport remain review items, not existing API promises.
+- Next: independent design review of this draft against approved requirements;
+  then implement structural validation only. Do not enable runtime preservation
+  before the separately reviewed safety amendment.
+- Draft signed/pushed as 224490386f96caa62287cb6dc4210c34ef39b7c7; PR #519:
+  https://github.com/wa-pis/agent-paranoid-android/pull/519
+  Independent design reviewer Rawls (01a0d039-9c2a-70b3-b12f-604b25add65a)
+  running on exact SHA against 5aaa201. No duplicate review.
+- Parser investigation: existing parse_dataset_spec_payload echoes unsupported
+  version values and returns Pydantic validation errors. Do not route restricted
+  inline mappings through it unchanged; private policy errors need bounded,
+  value-free output and detached validation exception chains. Reuse model/version
+  patterns, not this public aggregate-only error behavior.
+- Rawls design review requested revisions: shared/composite mapping domains,
+  content-bound approval for referenced inputs and full financial replacement
+  semantics. Added explicit sections referencing the already approved design;
+  no runtime permission or behavior change. Re-review pending on updated SHA.
+- Signed a404c24 pushed; strict OpenSpec and diff checks passed. Rawls re-review
+  requested on this SHA; do not duplicate. Next: disposition/CI then merge draft.
+- Rawls re-review closed financial/identity gaps, found domain-reference option
+  missing from action table/structural checks. Corrected exactly-one-of inline,
+  CSV or domain reference; domain owns one concrete inline/CSV source. No runtime.
