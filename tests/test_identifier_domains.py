@@ -39,3 +39,52 @@ def test_identifier_domains_are_distinct_and_declared_links_still_work(data_type
     linked = generate_dataset(spec, seed=seed)
     assert {row["ref_id"] for row in linked["orders"]} == domains[0]
     assert validate_dataset(linked, spec).valid
+
+
+@pytest.mark.parametrize("data_type", ["integer", "string"])
+def test_reversed_foreign_key_chain_uses_final_parent_keys(data_type):
+    spec = DatasetSpec(entities=[
+        EntitySpec(name=name, row_count=4, primary_key="id", fields=[
+            FieldSpec(name="id", data_type=data_type, is_identifier=True)
+        ]) for name in ("a", "b", "c")
+    ], relationships=[
+        Relationship(parent_entity=parent, parent_field="id", child_entity=child,
+                     child_field="id", confidence=1, status="confirmed")
+        for parent, child in (("b", "c"), ("a", "b"))
+    ])
+    rows = generate_dataset(spec, seed=7)
+    assert rows["a"] == rows["b"] == rows["c"]
+    assert validate_dataset(rows, spec).valid
+
+
+def test_nullable_identifier_domains_are_disjoint_where_present():
+    spec = DatasetSpec(entities=[EntitySpec(name="items", row_count=10, fields=[
+        FieldSpec(name=name, data_type="integer", is_identifier=True,
+                  nullable=True, null_ratio=0.5)
+        for name in ("left_id", "right_id")
+    ])])
+    rows = generate_dataset(spec, seed=7)
+    assert rows == generate_dataset(spec, seed=7)
+    for reverse in (False, True):
+        if reverse:
+            spec.entities[0].fields.reverse()
+        rows = generate_dataset(spec, seed=7)["items"]
+        values = [{row[name] for row in rows if row[name] is not None}
+                  for name in ("left_id", "right_id")]
+        assert values[0] and values[1] and values[0].isdisjoint(values[1])
+
+
+def test_relationship_dependency_cycle_fails_closed():
+    spec = DatasetSpec(entities=[
+        EntitySpec(name=name, row_count=2, fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True)
+        ]) for name in ("a", "b")
+    ], relationships=[
+        Relationship(parent_entity=parent, parent_field="id", child_entity=child,
+                     child_field="id", confidence=1, status="confirmed")
+        for parent, child in (("a", "b"), ("b", "a"))
+    ])
+    with pytest.raises(ValueError, match="cyclic relationship dependencies"):
+        generate_dataset(spec, seed=7)
+    spec.relationships[1].status = "rejected"
+    assert validate_dataset(generate_dataset(spec, seed=7), spec).valid

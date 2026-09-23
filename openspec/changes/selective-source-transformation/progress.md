@@ -93,7 +93,9 @@
 
 ## Next Action
 
-Identifier-domain fix now local, not committed: sorted entity/field domains,
+Identifier-domain fix signed and pushed as 74e8671ec123c6bc92e94564e12cd88828268cb4:
+PR https://github.com/wa-pis/agent-paranoid-android/pull/517.
+Sorted entity/field domains,
 disjoint integer residue classes, synthetic-prefixed string encoding. No new
 dependency or privacy bypass. Two baseline regression failures reproduced;
 127 focused tests now pass (domains, generation contracts, pipeline, dataset
@@ -101,6 +103,12 @@ spec, safety), including negative/zero/positive seeds, reordered fields/entities
 and declared FKs. Mypy passed for the changed generator. Changelog and relational
 contract document fixture compatibility and lack of cross-spec mapping stability.
 
-Next: independent review of a signed identifier-domain commit, focused docs/lint
-checks and PR. Complete installed 1.5.0 baseline replay separately. Broader
-transformation remains unfinished.
+Documentation checks: 49 passed; focused Ruff passed. Independent AI reviewer
+Ohm (01a0d003-3a99-7522-bfb1-09dec23d3067) reviewed exact 74e8671 against
+4d6310a and found P1 reversed FK-chain regression plus P2 nullable reorder
+documentation mismatch. Merge blocked. Added regressions (two failed before fix),
+ordered relationship writes by exact parent-field dependencies using stdlib
+TopologicalSorter, narrowed nullable replay wording. Focused 81 tests, Ruff and
+mypy passed before adding a cycle/rejected-edge regression. Re-review required
+on amended head. Complete installed 1.5.0 baseline replay
+separately. Broader transformation remains unfinished.

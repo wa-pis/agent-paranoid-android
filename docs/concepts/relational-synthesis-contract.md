@@ -9,8 +9,12 @@ Within one dataset specification, identifier fields have separate deterministic
 domains, assigned by sorted entity/field names. Integer domains use disjoint
 sequences; strings encode the same generated sequence with a synthetic prefix,
 not source identifiers or entity labels. Declared relationships subsequently
-assign generated parent keys to child fields. Reordering entities or fields
-does not change these identifier assignments.
+assign generated parent keys to child fields in dependency order. Cyclic
+relationship dependencies are rejected rather than resolved by input order.
+Reordering entities or fields does not change domain numbering or non-null
+identifier values at a given row position. Nullable-field masks still consume
+order-dependent randomness: changing field/entity order may change which rows
+are null. Exact replay requires the same ordered specification.
 
 Replay requires the same specification, seed and algorithm version. Adding or
 removing identifier fields can change the domain numbering and generated values.

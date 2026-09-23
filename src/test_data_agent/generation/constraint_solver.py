@@ -30,9 +30,22 @@ def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Dat
 
 
 def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    for relationship in spec.relationships:
-        if relationship.status == "rejected":
-            continue
+    relationships = [r for r in spec.relationships if r.status != "rejected"]
+    writers: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, relationship in enumerate(relationships):
+        writers[relationship.child_entity, relationship.child_field].append(index)
+    dependencies = {
+        index: [writer for writer in writers.get(
+            (relationship.parent_entity, relationship.parent_field), []
+        ) if writer != index]
+        for index, relationship in enumerate(relationships)
+    }
+    try:
+        order = list(TopologicalSorter(dependencies).static_order())
+    except CycleError:
+        raise ValueError("cyclic relationship dependencies") from None
+    for index in order:
+        relationship = relationships[index]
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])
         child_rows = rows_by_entity.get(relationship.child_entity, [])
         parent_values = [row.get(relationship.parent_field) for row in parent_rows if row.get(relationship.parent_field) is not None]
