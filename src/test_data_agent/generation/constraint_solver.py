@@ -40,12 +40,24 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
         ) if writer != index]
         for index, relationship in enumerate(relationships)
     }
-    try:
-        order = list(TopologicalSorter(dependencies).static_order())
-    except CycleError:
-        # Retain legacy handling for cyclic inferred graphs; final validation
-        # still rejects any unresolved relationship rather than publishing it.
-        order = list(range(len(relationships)))
+    groups = {index: index for index in dependencies}
+    while True:
+        graph: dict[int, set[int]] = {group: set() for group in groups.values()}
+        for index, parents in dependencies.items():
+            graph[groups[index]].update(
+                groups[parent] for parent in parents if groups[parent] != groups[index]
+            )
+        try:
+            group_order = list(TopologicalSorter(graph).static_order())
+            break
+        except CycleError as exc:
+            # Collapse only cyclic components; preserve external dependencies.
+            cycle = set(exc.args[1])
+            representative = min(cycle)
+            groups = {index: representative if group in cycle else group
+                      for index, group in groups.items()}
+    # Inside a cycle retain legacy input order and unconditional final validation.
+    order = [index for group in group_order for index in groups if groups[index] == group]
     for index in order:
         relationship = relationships[index]
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])

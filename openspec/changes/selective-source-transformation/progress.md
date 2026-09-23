@@ -118,5 +118,16 @@ for cyclic graphs with unchanged final validation; acyclic chains remain ordered
 Do not merge a2868b4. Reviewer notified; updated-SHA review needed after fix.
 Public baseline 1.5.0 installed successfully in temporary baseline-1.5.0 target;
 actual script replay against that target remains pending.
+Follow-up ad81e3a signed/pushed: 98 domain/CLI/solver tests passed, Ruff clean.
+Ohm requested to review newest head (same reviewer, no duplicate agent).
+Ohm blocked ad81e3a despite green CI: unrelated cycles disabled chain ordering;
+nullable-FK final values also excluded from reorder guarantees. Reproduced the
+mixed graph failure. Follow-up collapses cyclic components only, topologically
+orders component dependencies, retains legacy order inside components. Docs now
+limit identifier stability to initial generation before relationship assignment.
+Public 1.5.0 baseline replay completed with verified import/version: 40 cases,
+same outcome as candidate publication replay (24 successes; 16 intended nonempty
+directory rejections). No timing failure reproduced; deterministic atime tests
+remain regression evidence. Private inputs and full clean acceptance still pending.
 Complete installed 1.5.0 baseline replay
 separately. Broader transformation remains unfinished.

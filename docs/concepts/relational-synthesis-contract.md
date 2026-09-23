@@ -10,10 +10,12 @@ domains, assigned by sorted entity/field names. Integer domains use disjoint
 sequences; strings encode the same generated sequence with a synthetic prefix,
 not source identifiers or entity labels. Declared relationships subsequently
 assign generated parent keys to child fields in dependency order for acyclic
-graphs. Cyclic graphs retain legacy input-order reconciliation; all resulting
+graphs. Cyclic components retain legacy input-order reconciliation; all resulting
 relationships must pass validation before publication.
-Reordering entities or fields does not change domain numbering or non-null
-identifier values at a given row position. Nullable-field masks still consume
+Reordering entities or fields does not change domain numbering or initial
+non-null identifier values at a given row position, before relationships and
+constraints are applied. Final FK assignments may change with null masks.
+Nullable-field masks still consume
 order-dependent randomness: changing field/entity order may change which rows
 are null. Exact replay requires the same ordered specification.
 

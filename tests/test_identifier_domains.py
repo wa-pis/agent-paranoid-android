@@ -85,5 +85,20 @@ def test_existing_relationship_cycle_remains_validated():
         for parent, child in (("a", "b"), ("b", "a"))
     ])
     assert validate_dataset(generate_dataset(spec, seed=7), spec).valid
+
+
+def test_unrelated_cycle_does_not_disable_parent_first_chain():
+    spec = DatasetSpec(entities=[
+        EntitySpec(name=name, row_count=4, primary_key="id", fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True)
+        ]) for name in ("a", "b", "c", "x", "y")
+    ], relationships=[
+        Relationship(parent_entity=parent, parent_field="id", child_entity=child,
+                     child_field="id", confidence=1, status="confirmed")
+        for parent, child in (("b", "c"), ("a", "b"), ("x", "y"), ("y", "x"))
+    ])
+    rows = generate_dataset(spec, seed=7)
+    assert rows["a"] == rows["b"] == rows["c"]
+    assert validate_dataset(rows, spec).valid
     spec.relationships[1].status = "rejected"
     assert validate_dataset(generate_dataset(spec, seed=7), spec).valid
