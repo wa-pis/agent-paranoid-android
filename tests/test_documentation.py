@@ -461,7 +461,16 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     assert active == {
         "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
         "fix-csv-generation-pipeline",
+        "selective-source-transformation",
     }
+
+    transformation = changes / "selective-source-transformation"
+    assert "- [ ]" in (transformation / "tasks.md").read_text()
+    for filename in ("proposal.md", "design.md", "plan.md", "client-acceptance.md"):
+        assert (transformation / filename).is_file()
+    assert (
+        transformation / "specs" / "selective-source-transformation" / "spec.md"
+    ).is_file()
 
     openai_change = changes / "openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()
