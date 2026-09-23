@@ -207,3 +207,8 @@ Broader transformation remains unfinished.
   content-bound approval for referenced inputs and full financial replacement
   semantics. Added explicit sections referencing the already approved design;
   no runtime permission or behavior change. Re-review pending on updated SHA.
+- Signed a404c24 pushed; strict OpenSpec and diff checks passed. Rawls re-review
+  requested on this SHA; do not duplicate. Next: disposition/CI then merge draft.
+- Rawls re-review closed financial/identity gaps, found domain-reference option
+  missing from action table/structural checks. Corrected exactly-one-of inline,
+  CSV or domain reference; domain owns one concrete inline/CSV source. No runtime.

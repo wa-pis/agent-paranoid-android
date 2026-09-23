@@ -25,7 +25,7 @@ Use a discriminated union rather than a bag of optional, ignored settings:
 | --- | --- | --- |
 | preserve | Explicit user authorization and non-sensitive declaration | Mapping, generator or formula settings; unresolved sensitivity conflict |
 | synthesize | Reviewed generation policy reference | Preservation or mapping settings |
-| substitute | Exactly one inline mapping or local CSV reference; unmatched policy | Generator settings unless unmatched synthesis is explicitly configured |
+| substitute | Exactly one inline mapping, local CSV reference or named domain reference; unmatched policy | Generator settings unless unmatched synthesis is explicitly configured |
 | derive | Supported formula and declared dependencies | Mapping or preservation settings |
 | drop | No execution settings | Mapping, formula or generator settings |
 
@@ -64,7 +64,8 @@ Private save/load must preserve mappings; public summaries must omit entries.
 
 ## Shared Domains And Relationships
 
-Named mapping domains own a single mapping definition. Linked field decisions
+Named mapping domains own exactly one concrete inline or local CSV mapping
+definition; domain-to-domain indirection is not supported. Linked field decisions
 reference that domain rather than duplicating independent dictionaries. Domain
 members declare input/entity/field identity and compatible types; composite keys
 declare ordered field tuples and map the whole tuple, not each part independently.
@@ -103,7 +104,9 @@ implementation is deferred, not this requirement.
 ## Validation Layers And Tests
 
 1. Structural parsing: reject unknown versions/actions/keys, conflicting action
-   settings, duplicate field decisions and both/neither mapping sources.
+   settings, duplicate field decisions and multiple/missing mapping sources.
+   A substitute action selects one of inline, CSV or domain reference; each
+   domain definition selects one concrete inline or CSV source.
 2. Schema binding: require every field decision, matching types and exact source
    identity; do not infer authorization from evidence.
 3. Semantic preflight: check sensitivity, mapping types/duplicates, null policy,
