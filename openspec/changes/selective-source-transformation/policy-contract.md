@@ -62,6 +62,44 @@ repr, validation exception chains and machine-readable errors must not expose
 their contents. Safe summaries contain action counts and opaque references only.
 Private save/load must preserve mappings; public summaries must omit entries.
 
+## Shared Domains And Relationships
+
+Named mapping domains own a single mapping definition. Linked field decisions
+reference that domain rather than duplicating independent dictionaries. Domain
+members declare input/entity/field identity and compatible types; composite keys
+declare ordered field tuples and map the whole tuple, not each part independently.
+Relationship declarations bind parent and child tuples to compatible domains.
+Reject conflicting domain definitions, incompatible membership/types, ambiguous
+tuple ordering and uniqueness-breaking mappings before execution. Domain state
+is local, bounded and private; independent runs share it only by explicit policy.
+
+## Replacement Semantics
+
+The Financial Values And Dependencies section of design.md is normative for
+synthesis and unmatched-value synthesis fallback: declared magnitude/range,
+sign, null, zero, precision/scale, rounding and overflow rules must all apply.
+Binary float conversion cannot establish exact financial precision. Prohibited
+replacement values remain prohibited in inline, CSV and synthesized outputs.
+Non-null synthesized values must differ from originals except the approved zero
+and declared-rounding coincidences; those exceptions never skip generation or
+authorize wholesale copying. Derived totals must be recomputed and validated.
+If no permissible replacement satisfies the policy and constraints, fail with a
+bounded value-free error rather than retaining the input or relaxing constraints.
+
+## Approval Identity Binding
+
+A schema fingerprint detects structural drift, not changes to source contents.
+Approval must bind the reviewed behavior policy and immutable identities of the
+source snapshot, referenced CSV mappings and referenced generation policies,
+including transitively referenced policy inputs. Paths and opaque names alone
+are insufficient. Execution must verify those identities and consume the same
+bounded snapshot/bytes that were verified, preventing check-then-reopen races.
+Any changed or unverifiable input invalidates approval. Database inputs require
+an explicitly supported fixed-snapshot/replay contract; a schema or query hash
+alone cannot prove unchanged rows. Identity evidence itself remains restricted
+where it could reveal source-derived information. Runtime approval/snapshot
+implementation is deferred, not this requirement.
+
 ## Validation Layers And Tests
 
 1. Structural parsing: reject unknown versions/actions/keys, conflicting action

@@ -194,3 +194,16 @@ Broader transformation remains unfinished.
 - Next: independent design review of this draft against approved requirements;
   then implement structural validation only. Do not enable runtime preservation
   before the separately reviewed safety amendment.
+- Draft signed/pushed as 224490386f96caa62287cb6dc4210c34ef39b7c7; PR #519:
+  https://github.com/wa-pis/agent-paranoid-android/pull/519
+  Independent design reviewer Rawls (01a0d039-9c2a-70b3-b12f-604b25add65a)
+  running on exact SHA against 5aaa201. No duplicate review.
+- Parser investigation: existing parse_dataset_spec_payload echoes unsupported
+  version values and returns Pydantic validation errors. Do not route restricted
+  inline mappings through it unchanged; private policy errors need bounded,
+  value-free output and detached validation exception chains. Reuse model/version
+  patterns, not this public aggregate-only error behavior.
+- Rawls design review requested revisions: shared/composite mapping domains,
+  content-bound approval for referenced inputs and full financial replacement
+  semantics. Added explicit sections referencing the already approved design;
+  no runtime permission or behavior change. Re-review pending on updated SHA.
