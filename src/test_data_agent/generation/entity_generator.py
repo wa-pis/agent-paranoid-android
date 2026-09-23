@@ -51,6 +51,13 @@ def generate_dataset(
     faker.seed_instance(seed)
     mode = spec.generation_settings.mode
     invalid_ratio = spec.generation_settings.invalid_ratio
+    identifier_domains = {
+        key: index for index, key in enumerate(sorted(
+            (entity.name, field.name)
+            for entity in spec.entities for field in entity.fields
+            if field.is_identifier
+        ))
+    }
     for entity_index, entity in enumerate(spec.entities):
         budget.check(f"entity {entity.name!r} setup")
         enforce_row_count_limit(entity.row_count)
@@ -68,6 +75,7 @@ def generate_dataset(
                     mode=mode,
                     invalid_ratio=invalid_ratio,
                     semantic_provider=semantic_provider,
+                    identifier_domains=identifier_domains,
                 )
             )
         rows_by_entity[entity.name] = rows
@@ -95,6 +103,7 @@ def generate_row(
     mode: GenerationMode,
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
+    identifier_domains: dict[tuple[str, str], int] | None = None,
 ) -> dict[str, Any]:
     return {
         field.name: generate_field_value(
@@ -108,6 +117,8 @@ def generate_row(
             invalid_ratio=invalid_ratio,
             semantic_provider=semantic_provider,
             allow_null=field.name != entity.primary_key,
+            identifier_domain=(identifier_domains or {}).get((entity.name, field.name), 0),
+            identifier_domain_count=max(1, len(identifier_domains or {})),
         )
         for field in entity.fields
     }
@@ -125,13 +136,18 @@ def generate_field_value(
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
     allow_null: bool = True,
+    identifier_domain: int = 0,
+    identifier_domain_count: int = 1,
 ) -> Any:
     if allow_null and field.nullable and rng.random() < field.null_ratio:
         return None
     if should_generate_invalid_value(field, rng, mode=mode, invalid_ratio=invalid_ratio):
         return invalid_value_for_type(field.data_type)
     if field.is_identifier:
-        return synthetic_identifier(entity_name, field, row_index, seed)
+        return synthetic_identifier(
+            entity_name, field, row_index, seed,
+            domain=identifier_domain, domain_count=identifier_domain_count,
+        )
     if field.sensitive and field.data_type == FieldType.STRING:
         return synthetic_sensitive_value(field, faker)
     if (
@@ -175,10 +191,15 @@ def generate_field_value(
     return synthetic_string(field, string_distribution, rng)
 
 
-def synthetic_identifier(entity_name: str, field: FieldSpec, row_index: int, seed: int) -> Any:
+def synthetic_identifier(
+    entity_name: str, field: FieldSpec, row_index: int, seed: int,
+    *, domain: int = 0, domain_count: int = 1,
+) -> Any:
+    # Disjoint residue classes avoid hash collisions and fixed-size row blocks.
+    value = (seed * 1_000_000 + row_index) * domain_count + domain + 1
     if field.data_type == FieldType.INTEGER:
-        return seed * 1_000_000 + row_index + 1
-    return f"{SYNTHETIC_PREFIX}{entity_name}_{row_index + 1:08d}"
+        return value
+    return f"{SYNTHETIC_PREFIX}{value}"
 
 
 def synthetic_sensitive_value(field: FieldSpec, faker: Faker) -> str:
