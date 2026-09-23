@@ -175,8 +175,10 @@ duplicates introduced by normalization. Many-to-one output tuples remain subject
 to later declared uniqueness/relationship checks; no execution is authorized.
 
 `validate_inline_scalar_mapping` currently handles already-typed string, integer,
-float and boolean tuples plus explicit nullability. It does not coerce text or
-integers into floats; empty string remains a string, not null. Temporal/decimal
-types fail closed in this helper until their explicit normalization contracts are
+float, boolean and canonical ISO date tuples plus explicit nullability. It does not coerce text or
+integers into floats; empty string remains a string, not null. Dates must be exact
+`YYYY-MM-DD` strings accepted by the standard calendar parser; compact/week dates,
+timestamps and whitespace are rejected, never truncated or converted. Date strings
+remain unchanged. Datetime/decimal types fail closed until their contracts are
 implemented. This limited internal helper is not the CSV loader or full typed
 mapping preflight. Duplicate detection is exact because no normalization occurs.
