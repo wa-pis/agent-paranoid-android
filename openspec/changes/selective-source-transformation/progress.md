@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-identifier-domains, based on main 4d6310a.
+- Branch: codex/1-6-client-publication-acceptance, based on main 40fd4d0.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -125,9 +125,56 @@ nullable-FK final values also excluded from reorder guarantees. Reproduced the
 mixed graph failure. Follow-up collapses cyclic components only, topologically
 orders component dependencies, retains legacy order inside components. Docs now
 limit identifier stability to initial generation before relationship assignment.
+Signed 3add995 pushed; 139 focused tests, mypy and Ruff passed. Ohm re-review
+requested on this head; do not duplicate or merge before disposition and CI.
 Public 1.5.0 baseline replay completed with verified import/version: 40 cases,
 same outcome as candidate publication replay (24 successes; 16 intended nonempty
 directory rejections). No timing failure reproduced; deterministic atime tests
 remain regression evidence. Private inputs and full clean acceptance still pending.
-Complete installed 1.5.0 baseline replay
-separately. Broader transformation remains unfinished.
+PR #517 merged as 40fd4d0c252bfafa397538a85b71b3605c1adbd9 after all CI passed
+on 3add995 and Ohm independent AI re-review found no outstanding issues.
+Review evidence: https://github.com/wa-pis/agent-paranoid-android/pull/517#issuecomment-5802899834
+Independent checks: 269 tests, 1,200 graph probes, 48 mixed graph permutations.
+Next: repeated identifier profiling (client finding 8), inspect cardinality
+evidence and preserve safe synthetic repeats rather than inventing uniqueness.
+Confirmed adapter-to-generator repro with fictional aggregate profile: events,
+100 rows, integer run_id, approx_distinct_count=4, no top_values. Adapter marks
+is_identifier=True and synthetic_identifier distribution; generation emits 100
+distinct keys. No source rows involved. Root path: legacy_profile adapter ->
+infer_dataset_spec -> synthetic_identifier; metadata currently lacks repeat pool.
+Asked product choice for count scaling: retain four distinct synthetic keys or
+scale distinct ratio (40 keys for 1000 rows). Await answer before choosing that
+new default; one-to-one transformation is unaffected. No runtime changes yet.
+Broader transformation remains unfinished.
+
+## Pending User Decisions (Do Not Re-ask Every Heartbeat)
+
+- Repeated-key scaling: fixed distinct pool vs proportional distinct count;
+  asynchronous question sent, no answer yet. Do not invent the default.
+- Identifier/semantic conflict: confirmed synthetic string identifiers with
+  phone, email and ssn semantics all fail post-solve privacy validation. Asked
+  approval for a narrowly anchored synthetic_<integer> namespace for identifier
+  fields regardless of semantic format, retaining sensitivity and source checks.
+  This is a safety-contract change; no implementation before answer, executable
+  regression tests, OpenSpec/docs and independent review. Alternative is genuine
+  reserved semantic-format output with uniqueness/capacity constraints.
+- Other independent work remains available: full script acceptance adaptations,
+  type-contract specification, documentation and untouched client findings.
+
+## Publication Acceptance Adaptation
+
+- Added tests/test_client_publication_acceptance.py to the existing pytest suite,
+  preserving all five directory/overwrite cases. Verifies subprocess import root,
+  exit codes, ten-row CSV schema/content and existing-file preservation; bounded
+  subprocesses, temporary fictional fixtures, no product monkeypatches.
+- Source checkout: 5 passed; Ruff passed. Installed 1.5.0 baseline: 5 passed;
+  installed publication candidate: 5 passed. Existing candidate target is publication SHA
+  c3f1308, not latest identifier changes; do not mislabel it final 1.6 acceptance.
+- Pending product questions do not block this independent acceptance work.
+- Signed 3217b3dbefcb15e234cc42f8e72ee4bac57b6219 pushed; PR #518:
+  https://github.com/wa-pis/agent-paranoid-android/pull/518
+- Independent AI reviewer Darwin (01a0d027-9fee-7422-b0a1-05eec800b579) found
+  no blockers on 3217b3d; P3 bytecode writes outside temp directories. Set
+  PYTHONDONTWRITEBYTECODE=1 for both subprocesses; five tests and Ruff passed.
+  Prior CI green. Request final-SHA confirmation after push; no runtime/policy
+  changes in this slice.
