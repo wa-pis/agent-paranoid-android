@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-transformation-contract, based on main 5aaa201.
+- Branch: codex/1-6-policy-models, based on main 0c87702.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -212,3 +212,31 @@ Broader transformation remains unfinished.
 - Rawls re-review closed financial/identity gaps, found domain-reference option
   missing from action table/structural checks. Corrected exactly-one-of inline,
   CSV or domain reference; domain owns one concrete inline/CSV source. No runtime.
+- Signed 2969e67 pushed; Rawls final delta confirmation requested. Strict
+  OpenSpec/diff checks pass; wait for CI/review, no duplicate reviewer.
+- Completed: PR #519 merged as 0c87702b21c4117af80f9f2a4064eaa934eee63b,
+  final CI green and Rawls closed all design findings at 2969e67.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/519#issuecomment-5803650103
+  Approval is for a design draft only, not runtime preservation/safety amendment.
+- Next on codex/1-6-policy-models: implement internal structural models and
+  value-free parser failures, focused fictional tests. No CSV/database reads,
+  execution hooks, public CLI/MCP surface or preservation activation in this slice.
+- Local first structural slice: core/transformation_mapping.py models inline
+  tuple-pairs, CSV declarations and domain references as a discriminated union.
+  Rejects unknown/conflicting variant fields, non-finite numbers and nested
+  scalar values; preserves scalar kinds/null and private JSON round-trip. Repr
+  excludes entries/paths/names. Parser raises fixed value-free error outside
+  Pydantic exception context. No loading, binding, semantic validation or approval.
+- Ten fictional focused tests passed; Ruff passed. Initial mypy required an
+  explicit TypeAdapter annotation; corrected, mypy and diff checks now passed.
+- Remaining for this slice: mapping shape/duplicate semantic checks belong to
+  schema-bound preflight; do not call structural acceptance safe-to-execute.
+- Added forged-model revalidation case; 11 tests, Ruff and mypy pass. Signed
+  5a37288679d8bc8b500d6bcc036a87489af8125a pushed; PR #520:
+  https://github.com/wa-pis/agent-paranoid-android/pull/520
+- Independent AI reviewer Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing
+  exact SHA against 0c87702. Next: CI/review; no duplicate reviewer or merge yet.
+- Curie found Decimal->float coercion and retained ambient exception context.
+  Both reproduced as failing regressions. Added exact builtin-scalar guard before
+  union validation and explicit context detachment on the bounded error; no
+  changes to public execution or policy. Latest follow-up awaits checks/re-review.
