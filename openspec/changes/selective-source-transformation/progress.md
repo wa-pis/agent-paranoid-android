@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-transformation-rc, based on main d89dc4d.
+- Branch: codex/1-6-identifier-domains, based on main 4d6310a.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -21,12 +21,61 @@
 - Path-swap tests cover source/destination directory and symlink replacements.
 - Signed commits ed4a672 (plan) and 2569c3a (fix) pushed; PR #516 opened:
   https://github.com/wa-pis/agent-paranoid-android/pull/516
-- Independent review and CI remain pending. Do not merge without both.
+- PR #516 merged as 4d6310ad3ccae5abad8dec39e59dc2b17e52791d after green
+  CI, Security, Containers, Documentation and independent AI review.
 - Documentation inventory initially rejected the new active proposal; updated
   its explicit inventory and checks for the unfinished transformation plan.
 - Documentation tests: 49 passed; Ruff and strict OpenSpec validation passed.
+- 2026-09-24 heartbeat: current PR head c3f1308; documentation CI passed.
+  CI/Security/Containers queued behind earlier runs; do not restart or push
+  progress-only commits while those checks are pending.
+- User explicitly authorized separate AI-reviewer subagents for PRs and final
+  RC/release SHA reviews; automation updated. Stable remains unauthorized.
+- Independent read-only reviewer Nietzsche (01a0cff7-6e28-7c72-8bb0-4a54f99bebfe)
+  completed PR #516 exact c3f130896c0485b95c792dc8936affa5d0836d8e against
+  d89dc4dd573c4e764cddd8eb1e053eb78aa42acb: no blocking findings; 71 checks
+  passed. AI review, not human approval. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/516#issuecomment-5802473268
+- Next defect confirmed on unpatched generator with fictional data: two distinct
+  identifier fields produce equal row-wise values for both integer and string
+  types (three rows, seed 7). synthetic_identifier ignores field identity;
+  integer identifiers also ignore entity identity. No generator change yet.
+- Repro explicitly uses PYTHONPATH=src (entity items). An initial standalone
+  probe resolved the installed package instead and failed privacy validation
+  for the longer fictional_items entity name; that run is not candidate proof.
+  Pytest already sets pythonpath=[src, .], so prior pytest results are unaffected.
 
 ## Remaining Decisions And Work
+
+### Local Publication Replay (2026-09-24)
+
+- PR #516 c3f1308: CI Python 3.11–3.14, wheel checks, Security and container
+  validation passed; independent review still pending. No merge performed.
+- Built candidate wheel from c3f1308 using uv build --wheel --no-build-isolation;
+  version intentionally remains 1.5.0 until release preparation. Installed with
+  --no-deps into /private/tmp/apa-client-acceptance.xrueHB/candidate, reusing the
+  development interpreter dependencies. This is not a clean dependency acceptance.
+- Verified import resolves to that installed candidate path via PYTHONPATH.
+- Reviewed original probe_output_contract.py before extracting it into isolated
+  replay/baseline-replay directories below the same temporary root. No product
+  monkeypatches. Replaced missing spec with identical fictional deal/id/amount
+  fixtures, ten rows. Original script itself unchanged.
+- Original probe: installed comparison package and candidate each ran 40 fresh CLI
+  processes. Both: absent/empty/empty-overwrite 8 successes each; filled and
+  filled-overwrite 8 exit-2 rejections each. Timing-dependent defect did not
+  reproduce in this nondeterministic replay; deterministic unit regression is
+  the before/after evidence, not these identical original-probe results.
+- Metadata verification found the pre-existing installed package is 1.4.0,
+  NOT 1.5.0. The script's hard-coded 1.5.0 banner is misleading. Therefore the
+  comparison run is diagnostic only; required affected-baseline 1.5.0 replay
+  remains pending in a separately installed target. Do not call it accepted.
+- Candidate wheel SHA256: 77a15df3854f2f18b1917f21169fd8d65d10ad34037774754513cf849b1f96a3.
+  Original probe SHA256: 33dafc8ac55f4e0cb230e399aa206da2bc2fd2fbe2c22270cb37171208399f71.
+- Supplementary candidate checks explicitly asserted exit code, CSV shape and
+  ten rows for successes; rejections preserve old.csv and create no deal.csv.
+  All five cases passed, subprocess timeout 30 seconds. The original probe's
+  artifact-only success accounting remains insufficient on its own.
+- No private client data tested. Full installed-candidate acceptance pending.
 
 - Transformation runtime not implemented. Safety-policy exception must be scoped
   explicitly and independently reviewed with tests; existing generation stays
@@ -44,5 +93,41 @@
 
 ## Next Action
 
-Check PR #516 CI and obtain independent path-publication review; merge only
-after green gates and review. Keep the broader proposal explicitly unfinished.
+Identifier-domain fix signed and pushed as 74e8671ec123c6bc92e94564e12cd88828268cb4:
+PR https://github.com/wa-pis/agent-paranoid-android/pull/517.
+Sorted entity/field domains,
+disjoint integer residue classes, synthetic-prefixed string encoding. No new
+dependency or privacy bypass. Two baseline regression failures reproduced;
+127 focused tests now pass (domains, generation contracts, pipeline, dataset
+spec, safety), including negative/zero/positive seeds, reordered fields/entities
+and declared FKs. Mypy passed for the changed generator. Changelog and relational
+contract document fixture compatibility and lack of cross-spec mapping stability.
+
+Documentation checks: 49 passed; focused Ruff passed. Independent AI reviewer
+Ohm (01a0d003-3a99-7522-bfb1-09dec23d3067) reviewed exact 74e8671 against
+4d6310a and found P1 reversed FK-chain regression plus P2 nullable reorder
+documentation mismatch. Merge blocked. Added regressions (two failed before fix),
+ordered relationship writes by exact parent-field dependencies using stdlib
+TopologicalSorter, narrowed nullable replay wording. Focused 81 tests, Ruff and
+mypy passed before adding a cycle/rejected-edge regression. Re-review required
+on amended head. Signed a2868b4 pushed; Ohm re-review requested, do not duplicate.
+Final domain/documentation tests: 59 passed (includes cycle/rejected-edge case).
+CI on a2868b4 failed doctor and wheel smokes: existing inferred cyclic graphs
+were incorrectly rejected. Local follow-up restores legacy input-order handling
+for cyclic graphs with unchanged final validation; acyclic chains remain ordered.
+Do not merge a2868b4. Reviewer notified; updated-SHA review needed after fix.
+Public baseline 1.5.0 installed successfully in temporary baseline-1.5.0 target;
+actual script replay against that target remains pending.
+Follow-up ad81e3a signed/pushed: 98 domain/CLI/solver tests passed, Ruff clean.
+Ohm requested to review newest head (same reviewer, no duplicate agent).
+Ohm blocked ad81e3a despite green CI: unrelated cycles disabled chain ordering;
+nullable-FK final values also excluded from reorder guarantees. Reproduced the
+mixed graph failure. Follow-up collapses cyclic components only, topologically
+orders component dependencies, retains legacy order inside components. Docs now
+limit identifier stability to initial generation before relationship assignment.
+Public 1.5.0 baseline replay completed with verified import/version: 40 cases,
+same outcome as candidate publication replay (24 successes; 16 intended nonempty
+directory rejections). No timing failure reproduced; deterministic atime tests
+remain regression evidence. Private inputs and full clean acceptance still pending.
+Complete installed 1.5.0 baseline replay
+separately. Broader transformation remains unfinished.

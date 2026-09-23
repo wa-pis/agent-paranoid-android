@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Separate generated identifier domains across entities and fields, while
+  retaining declared foreign-key assignments and seeded replay. Regenerate
+  identifier fixtures: seeded values and string identifier format have changed.
 - Publish generated datasets into existing empty directories even when directory
   reads update access timestamps; retain path-replacement checks and file-change
   detection during publication and rollback.

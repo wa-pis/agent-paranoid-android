@@ -30,9 +30,36 @@ def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Dat
 
 
 def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    for relationship in spec.relationships:
-        if relationship.status == "rejected":
-            continue
+    relationships = [r for r in spec.relationships if r.status != "rejected"]
+    writers: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, relationship in enumerate(relationships):
+        writers[relationship.child_entity, relationship.child_field].append(index)
+    dependencies = {
+        index: [writer for writer in writers.get(
+            (relationship.parent_entity, relationship.parent_field), []
+        ) if writer != index]
+        for index, relationship in enumerate(relationships)
+    }
+    groups = {index: index for index in dependencies}
+    while True:
+        graph: dict[int, set[int]] = {group: set() for group in groups.values()}
+        for index, parents in dependencies.items():
+            graph[groups[index]].update(
+                groups[parent] for parent in parents if groups[parent] != groups[index]
+            )
+        try:
+            group_order = list(TopologicalSorter(graph).static_order())
+            break
+        except CycleError as exc:
+            # Collapse only cyclic components; preserve external dependencies.
+            cycle = set(exc.args[1])
+            representative = min(cycle)
+            groups = {index: representative if group in cycle else group
+                      for index, group in groups.items()}
+    # Inside a cycle retain legacy input order and unconditional final validation.
+    order = [index for group in group_order for index in groups if groups[index] == group]
+    for index in order:
+        relationship = relationships[index]
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])
         child_rows = rows_by_entity.get(relationship.child_entity, [])
         parent_values = [row.get(relationship.parent_field) for row in parent_rows if row.get(relationship.parent_field) is not None]

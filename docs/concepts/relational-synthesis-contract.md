@@ -3,6 +3,28 @@
 Relational synthesis preserves reviewed, executable structure. It does not
 reconstruct source rows, identifiers, totals, or rare values.
 
+## Generated Identifier Domains
+
+Within one dataset specification, identifier fields have separate deterministic
+domains, assigned by sorted entity/field names. Integer domains use disjoint
+sequences; strings encode the same generated sequence with a synthetic prefix,
+not source identifiers or entity labels. Declared relationships subsequently
+assign generated parent keys to child fields in dependency order for acyclic
+graphs. Cyclic components retain legacy input-order reconciliation; all resulting
+relationships must pass validation before publication.
+Reordering entities or fields does not change domain numbering or initial
+non-null identifier values at a given row position, before relationships and
+constraints are applied. Final FK assignments may change with null masks.
+Nullable-field masks still consume
+order-dependent randomness: changing field/entity order may change which rows
+are null. Exact replay requires the same ordered specification.
+
+Replay requires the same specification, seed and algorithm version. Adding or
+removing identifier fields can change the domain numbering and generated values.
+This is not a persistent mapping across independently generated datasets.
+The upcoming 1.6 candidate changes identifier values and their string format;
+regenerate fixtures rather than relying on the old row-counter equality.
+
 ## Evidence-Bounded Synthesis
 
 The system does not magically discover the complete domain model from a schema
