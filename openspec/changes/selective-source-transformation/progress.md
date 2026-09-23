@@ -110,5 +110,13 @@ documentation mismatch. Merge blocked. Added regressions (two failed before fix)
 ordered relationship writes by exact parent-field dependencies using stdlib
 TopologicalSorter, narrowed nullable replay wording. Focused 81 tests, Ruff and
 mypy passed before adding a cycle/rejected-edge regression. Re-review required
-on amended head. Complete installed 1.5.0 baseline replay
+on amended head. Signed a2868b4 pushed; Ohm re-review requested, do not duplicate.
+Final domain/documentation tests: 59 passed (includes cycle/rejected-edge case).
+CI on a2868b4 failed doctor and wheel smokes: existing inferred cyclic graphs
+were incorrectly rejected. Local follow-up restores legacy input-order handling
+for cyclic graphs with unchanged final validation; acyclic chains remain ordered.
+Do not merge a2868b4. Reviewer notified; updated-SHA review needed after fix.
+Public baseline 1.5.0 installed successfully in temporary baseline-1.5.0 target;
+actual script replay against that target remains pending.
+Complete installed 1.5.0 baseline replay
 separately. Broader transformation remains unfinished.

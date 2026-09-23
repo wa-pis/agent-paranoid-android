@@ -43,7 +43,9 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
     try:
         order = list(TopologicalSorter(dependencies).static_order())
     except CycleError:
-        raise ValueError("cyclic relationship dependencies") from None
+        # Retain legacy handling for cyclic inferred graphs; final validation
+        # still rejects any unresolved relationship rather than publishing it.
+        order = list(range(len(relationships)))
     for index in order:
         relationship = relationships[index]
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])

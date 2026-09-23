@@ -74,7 +74,7 @@ def test_nullable_identifier_domains_are_disjoint_where_present():
         assert values[0] and values[1] and values[0].isdisjoint(values[1])
 
 
-def test_relationship_dependency_cycle_fails_closed():
+def test_existing_relationship_cycle_remains_validated():
     spec = DatasetSpec(entities=[
         EntitySpec(name=name, row_count=2, fields=[
             FieldSpec(name="id", data_type="integer", is_identifier=True)
@@ -84,7 +84,6 @@ def test_relationship_dependency_cycle_fails_closed():
                      child_field="id", confidence=1, status="confirmed")
         for parent, child in (("a", "b"), ("b", "a"))
     ])
-    with pytest.raises(ValueError, match="cyclic relationship dependencies"):
-        generate_dataset(spec, seed=7)
+    assert validate_dataset(generate_dataset(spec, seed=7), spec).valid
     spec.relationships[1].status = "rejected"
     assert validate_dataset(generate_dataset(spec, seed=7), spec).valid
