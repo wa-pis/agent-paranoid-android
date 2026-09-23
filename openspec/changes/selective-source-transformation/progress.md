@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-policy-models, based on main 0c87702.
+- Branch: codex/1-6-field-policies, based on main a4d404b.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -240,3 +240,20 @@ Broader transformation remains unfinished.
   Both reproduced as failing regressions. Added exact builtin-scalar guard before
   union validation and explicit context detachment on the bounded error; no
   changes to public execution or policy. Latest follow-up awaits checks/re-review.
+- Signed 4abd9d0 pushed; 13 tests, Ruff, mypy passed. Curie re-review requested
+  on newest SHA; wait for CI and disposition before merge, no duplicate reviewer.
+- Completed: PR #520 merged as a4d404be183a00476dfb48640e96b4ae82aac109;
+  Curie confirmed both findings resolved at 4abd9d0 and all CI green.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/520#issuecomment-5803898439
+- Next: internal field-action union and versioned behavior-policy structural
+  envelope, reuse mapping declarations and detached error boundary. No execution
+  approval, file reads or source-preserving runtime enabled by parsing.
+- Local field-policy slice implemented: five discriminated actions, explicit
+  sensitivity declarations, unmatched reject/preserve/synthesize, versioned private
+  envelope and named-domain resolution. Preservation declarations are not verified
+  authorization; no schema binding, I/O or execution added. Contract note updated.
+- Focused mapping/policy tests: 28 passed; Ruff, mypy and diff checks passed.
+  Added missing-version, duplicate-domain and unmatched-preserve sensitivity cases.
+  GitHub confirms no existing PR for codex/1-6-field-policies.
+- Next: signed commit and independent exact-SHA review of this structural slice,
+  then PR/CI. Do not mark execution or full behavior-profile support complete.

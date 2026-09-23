@@ -134,3 +134,12 @@ budgets, configured per-invocation limits, scalar lengths, CSV path authorizatio
 column uniqueness/tuple arity, typed normalization, duplicate-key checking,
 domain resolution and approval are still preflight/loader work. Do not expose
 this structural parser as a completed safety boundary or claim executable support.
+
+The next internal slice, `core/transformation_policy.py`, adds draft version
+`0.1`, field-action declarations, unmatched-value policy and concrete named
+domains. It rejects duplicate decisions/domains and unresolved domain references.
+Preservation declarations require an explicit non-sensitive classification and
+an authorization reference; neither the classification nor the reference is
+verified authorization. The schema fingerprint is structurally checked only.
+No schema binding, source access, expression evaluation or transformation occurs.
+These models remain private draft structures, not a supported public API.
