@@ -1,3 +1,6 @@
+from decimal import Decimal
+import traceback
+
 import pytest
 
 from test_data_agent.core.transformation_mapping import (
@@ -48,3 +51,21 @@ def test_preconstructed_models_cannot_skip_structural_validation():
     invalid = DomainMapping.model_construct(kind="domain", name=123)
     with pytest.raises(MappingDeclarationError):
         parse_mapping_declaration(invalid)
+
+
+def test_decimal_cannot_silently_become_binary_float():
+    with pytest.raises(MappingDeclarationError):
+        parse_mapping_declaration({"kind": "inline", "entries": [{
+            "original": [Decimal("1.234567890123456789")], "replacement": ["1.00"],
+        }]})
+
+
+def test_ambient_exception_is_not_retained_or_printed():
+    try:
+        raise ValueError("fictional-private-marker")
+    except ValueError:
+        with pytest.raises(MappingDeclarationError) as caught:
+            parse_mapping_declaration({"kind": "invalid"})
+    assert caught.value.__context__ is None
+    assert caught.value.__cause__ is None
+    assert "fictional-private-marker" not in "".join(traceback.format_exception(caught.value))

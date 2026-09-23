@@ -6,12 +6,21 @@ values and must never be used as public summaries or provider inputs.
 
 from typing import Annotated, Literal, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, TypeAdapter, ValidationError
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, TypeAdapter, ValidationError
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_ROWS
 
 
-Scalar: TypeAlias = StrictStr | StrictInt | StrictFloat | StrictBool | None
+def _scalar_without_coercion(value: object) -> object:
+    if type(value) not in (str, int, float, bool, type(None)):
+        raise ValueError("unsupported mapping scalar type")
+    return value
+
+
+Scalar: TypeAlias = Annotated[
+    StrictStr | StrictInt | StrictFloat | StrictBool | None,
+    BeforeValidator(_scalar_without_coercion),
+]
 Key: TypeAlias = Annotated[tuple[Scalar, ...], Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS)]
 
 
@@ -56,5 +65,9 @@ def parse_mapping_declaration(payload: object) -> MappingSource:
         return _MAPPING.validate_python(payload)
     except ValidationError:
         pass
-    # Raise outside except: even exception.__context__ must not retain values.
-    raise MappingDeclarationError("invalid mapping declaration")
+    # Also detach an ambient caller exception, not just Pydantic's context.
+    try:
+        raise MappingDeclarationError("invalid mapping declaration")
+    except MappingDeclarationError as error:
+        error.__context__ = None
+        raise

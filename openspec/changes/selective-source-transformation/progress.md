@@ -231,3 +231,12 @@ Broader transformation remains unfinished.
   explicit TypeAdapter annotation; corrected, mypy and diff checks now passed.
 - Remaining for this slice: mapping shape/duplicate semantic checks belong to
   schema-bound preflight; do not call structural acceptance safe-to-execute.
+- Added forged-model revalidation case; 11 tests, Ruff and mypy pass. Signed
+  5a37288679d8bc8b500d6bcc036a87489af8125a pushed; PR #520:
+  https://github.com/wa-pis/agent-paranoid-android/pull/520
+- Independent AI reviewer Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing
+  exact SHA against 0c87702. Next: CI/review; no duplicate reviewer or merge yet.
+- Curie found Decimal->float coercion and retained ambient exception context.
+  Both reproduced as failing regressions. Added exact builtin-scalar guard before
+  union validation and explicit context detachment on the bounded error; no
+  changes to public execution or policy. Latest follow-up awaits checks/re-review.
