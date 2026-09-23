@@ -6,7 +6,7 @@
   after CI/CD and independent review, and 1.6.0rc1 publication. No stable release.
 - GitHub CLI checked: authenticated; repository ADMIN access. Homebrew git
   required because system git invokes unaccepted Xcode license.
-- Branch: codex/1-6-client-publication-acceptance, based on main 40fd4d0.
+- Branch: codex/1-6-transformation-contract, based on main 5aaa201.
 - Heartbeat automation active every five minutes; no duplicate/overlapping work.
 - Use Caveman and Ponytail. Read this file first; do not rerun unchanged gates.
 
@@ -178,3 +178,19 @@ Broader transformation remains unfinished.
   PYTHONDONTWRITEBYTECODE=1 for both subprocesses; five tests and Ruff passed.
   Prior CI green. Request final-SHA confirmation after push; no runtime/policy
   changes in this slice.
+- Follow-up afd6beb signed/pushed; Darwin final-SHA confirmation requested.
+  Wait for fresh CI and review before merge; do not start duplicate review.
+- Completed: Darwin confirmed no outstanding findings on afd6beb; all CI green.
+  PR #518 merged as 5aaa2013cea4b21884bc78ff003d0edaa915a976.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/518#issuecomment-5803308782
+- Next independent slice: finalize typed transformation policy/mapping contract
+  from approved design, with validation-only tests before any source-preserving
+  execution. Pending scaling/semantic-policy questions remain unanswered; do
+  not infer approval or silently alter existing source-free guarantees.
+- Added policy-contract.md review draft: separate evidence/decisions,
+  discriminated actions, private typed mapping pairs, schema binding and staged
+  validation. No executable model or source-preserving path added yet. Model
+  names/approval transport remain review items, not existing API promises.
+- Next: independent design review of this draft against approved requirements;
+  then implement structural validation only. Do not enable runtime preservation
+  before the separately reviewed safety amendment.
