@@ -9,6 +9,7 @@ from typing import Annotated, Literal, TypeAlias
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, TypeAdapter, ValidationError
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_ROWS
+from test_data_agent.core.field import FieldType
 
 
 def _scalar_without_coercion(value: object) -> object:
@@ -68,6 +69,56 @@ def parse_mapping_declaration(payload: object) -> MappingSource:
     # Also detach an ambient caller exception, not just Pydantic's context.
     try:
         raise MappingDeclarationError("invalid mapping declaration")
+    except MappingDeclarationError as error:
+        error.__context__ = None
+        raise
+
+
+def validate_inline_mapping_shape(payload: object, *, key_width: int) -> InlineMapping:
+    """Check tuple widths and exact typed duplicates; no schema normalization."""
+    declaration = parse_mapping_declaration(payload)
+    valid = type(key_width) is int and 1 <= key_width <= DEFAULT_MAX_INPUT_COLUMNS
+    if isinstance(declaration, InlineMapping) and valid:
+        seen: set[tuple[tuple[type, object], ...]] = set()
+        for entry in declaration.entries:
+            if len(entry.original) != key_width or len(entry.replacement) != key_width:
+                valid = False
+                break
+            key = tuple((type(value), value) for value in entry.original)
+            if key in seen:
+                valid = False
+                break
+            seen.add(key)
+        if valid:
+            return declaration
+    try:
+        raise MappingDeclarationError("invalid inline mapping shape")
+    except MappingDeclarationError as error:
+        error.__context__ = None
+        raise
+
+
+def validate_inline_scalar_mapping(
+    payload: object, *, data_types: tuple[FieldType, ...], nullable: tuple[bool, ...],
+) -> InlineMapping:
+    """Validate already-typed primitive tuples; no text coercion or temporal support."""
+    declaration = validate_inline_mapping_shape(payload, key_width=len(data_types))
+    scalar_types = {FieldType.STRING: str, FieldType.INTEGER: int,
+                    FieldType.FLOAT: float, FieldType.BOOLEAN: bool}
+    valid = len(nullable) == len(data_types) and all(type(flag) is bool for flag in nullable)
+    valid = valid and all(type(kind) is FieldType and kind in scalar_types for kind in data_types)
+    if valid:
+        for entry in declaration.entries:
+            for values in (entry.original, entry.replacement):
+                for value, kind, allows_null in zip(values, data_types, nullable, strict=True):
+                    if (value is None and not allows_null) or (
+                        value is not None and type(value) is not scalar_types[kind]
+                    ):
+                        valid = False
+    if valid:
+        return declaration
+    try:
+        raise MappingDeclarationError("invalid typed inline mapping")
     except MappingDeclarationError as error:
         error.__context__ = None
         raise

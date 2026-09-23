@@ -311,3 +311,26 @@ Broader transformation remains unfinished.
   serialization warnings at both private reparsing boundaries, retaining full
   validation. Four regressions cover both helpers and warning modes.
   50 focused tests, Ruff and mypy pass. Prior CI green; follow-up needs re-review.
+- Signed 7a0255557875dacc4f1abab44c7f2dc6b343f294 pushed; Curie follow-up
+  review requested. Wait for new CI and finding disposition before merge.
+- Completed: PR #522 merged as 9e7661f1d0e2517e8f9a07321a0d0737f545006c.
+  Curie confirmed P2 resolved with no new findings at 7a02555; final CI green.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/522#issuecomment-5804500374
+- Next: typed mapping preflight (tuple arity, duplicate source keys and scalar
+  compatibility) on a new branch from main. No active review; preserve local notes.
+  This must remain separate from loading/source access and execution approval.
+- Started codex/1-6-mapping-preflight from 9e7661f, preserving notes.
+  Added inline tuple-width and exact typed duplicate-key checks. bool/int/float/
+  string/null remain distinct before schema normalization; repeated null keys
+  rejected. Many-to-one replacements are not rejected at this shape-only layer.
+  56 focused tests, Ruff and mypy pass. No reads or runtime transformation.
+- Next: schema-type compatibility and normalized duplicate checking before this
+  slice is ready for commit/review; shape acceptance alone is not semantic approval.
+- Existing schema validator uses permissive text coercion and date truncation;
+  not suitable for explicit mapping semantics. Added strict primitive inline
+  type/nullability checking without coercion. Null and empty string distinct.
+  Temporal/decimal inputs fail closed here; their normalization remains pending,
+  not silently borrowed from permissive profiling parsers. 65 focused tests,
+  Ruff and mypy passed. No source or mapping-file I/O enabled.
+- Next: review this primitive preflight slice and its explicit limitations;
+  temporal/decimal normalization and CSV parsing require subsequent implementation.

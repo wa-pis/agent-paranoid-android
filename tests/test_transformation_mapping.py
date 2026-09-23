@@ -7,7 +7,10 @@ from test_data_agent.core.transformation_mapping import (
     DomainMapping,
     MappingDeclarationError,
     parse_mapping_declaration,
+    validate_inline_mapping_shape,
+    validate_inline_scalar_mapping,
 )
+from test_data_agent.core.field import FieldType
 
 
 @pytest.mark.parametrize("payload", [
@@ -69,3 +72,45 @@ def test_ambient_exception_is_not_retained_or_printed():
     assert caught.value.__context__ is None
     assert caught.value.__cause__ is None
     assert "fictional-private-marker" not in "".join(traceback.format_exception(caught.value))
+
+
+@pytest.mark.parametrize("entries,width", [
+    ([{"original": [1], "replacement": [2, 3]}], 1),
+    ([{"original": [1, 2], "replacement": [3]}], 2),
+    ([{"original": [1], "replacement": [2]}] * 2, 1),
+    ([{"original": [None], "replacement": [2]}] * 2, 1),
+    ([{"original": [1], "replacement": [2]}], True),
+])
+def test_inline_shape_rejects_width_and_duplicate_errors(entries, width):
+    with pytest.raises(MappingDeclarationError, match="^invalid inline mapping shape$"):
+        validate_inline_mapping_shape({"kind": "inline", "entries": entries}, key_width=width)
+
+
+def test_inline_shape_preserves_typed_keys_and_allows_many_to_one():
+    values = [True, 1, 1.0, "1", None, ""]
+    payload = {"kind": "inline", "entries": [
+        {"original": [value], "replacement": ["same"]} for value in values]}
+    assert len(validate_inline_mapping_shape(payload, key_width=1).entries) == len(values)
+    composite = {"kind": "inline", "entries": [
+        {"original": [1, "a"], "replacement": [2, "b"]}]}
+    assert validate_inline_mapping_shape(composite, key_width=2).entries[0].replacement == (2, "b")
+
+
+@pytest.mark.parametrize("value,kind,allows_null,accepted", [
+    (1, FieldType.INTEGER, False, True),
+    (True, FieldType.INTEGER, False, False),
+    ("1", FieldType.INTEGER, False, False),
+    (1.0, FieldType.FLOAT, False, True),
+    (1, FieldType.FLOAT, False, False),
+    ("", FieldType.STRING, False, True),
+    (None, FieldType.STRING, True, True),
+    (None, FieldType.STRING, False, False),
+    ("2025-04-30", FieldType.DATE, False, False),
+])
+def test_typed_mapping_never_coerces_or_conflates_null(value, kind, allows_null, accepted):
+    payload = {"kind": "inline", "entries": [{"original": [value], "replacement": [value]}]}
+    if accepted:
+        assert validate_inline_scalar_mapping(payload, data_types=(kind,), nullable=(allows_null,))
+    else:
+        with pytest.raises(MappingDeclarationError, match="^invalid typed inline mapping$"):
+            validate_inline_scalar_mapping(payload, data_types=(kind,), nullable=(allows_null,))
