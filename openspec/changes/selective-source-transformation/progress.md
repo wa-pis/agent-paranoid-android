@@ -19,7 +19,9 @@
 - Focused tests: 90 passed across path policy, I/O workflows/commands, workspace.
 - Ruff passed; full production mypy passed (109 files).
 - Path-swap tests cover source/destination directory and symlink replacements.
-- Changes not yet committed/reviewed/pushed. Independent review remains pending.
+- Signed commits ed4a672 (plan) and 2569c3a (fix) pushed; PR #516 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/516
+- Independent review and CI remain pending. Do not merge without both.
 - Documentation inventory initially rejected the new active proposal; updated
   its explicit inventory and checks for the unfinished transformation plan.
 - Documentation tests: 49 passed; Ruff and strict OpenSpec validation passed.
@@ -42,5 +44,5 @@
 
 ## Next Action
 
-Complete path-publication slice tests/review and open a focused signed PR; merge
-only after green gates. Keep the broader proposal explicitly unfinished.
+Check PR #516 CI and obtain independent path-publication review; merge only
+after green gates and review. Keep the broader proposal explicitly unfinished.
