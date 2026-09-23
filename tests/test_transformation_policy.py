@@ -1,8 +1,12 @@
 import copy
+import warnings
 
 import pytest
 
 from test_data_agent.core.transformation_policy import BehaviorPolicyError, parse_behavior_policy
+from test_data_agent.core.transformation_policy import validate_policy_field_coverage
+from test_data_agent.core.transformation_policy import transformation_schema_fingerprint, validate_policy_profile
+from test_data_agent.core.dataset import DatasetProfile
 
 
 def policy(behavior):
@@ -83,3 +87,114 @@ def test_required_version_and_unique_domains():
     payload["domains"] = [domain, copy.deepcopy(domain)]
     with pytest.raises(BehaviorPolicyError):
         parse_behavior_policy(payload)
+
+
+@pytest.mark.parametrize("field_names", [["value"], ["other"], ["value", "extra"], []])
+def test_exact_field_coverage(field_names):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": name, "data_type": "string"} for name in field_names]}]})
+    decision = parse_behavior_policy(policy({"action": "drop"}))
+    if field_names == ["value"]:
+        assert validate_policy_field_coverage(decision, profile) is None
+    else:
+        with pytest.raises(BehaviorPolicyError, match="^invalid policy field coverage$"):
+            validate_policy_field_coverage(decision, profile)
+
+
+@pytest.mark.parametrize("mutation", ["duplicate_field", "duplicate_entity", "rename_entity"])
+def test_coverage_revalidates_mutated_profiles_without_leaking_errors(mutation):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string"}]}]})
+    if mutation == "duplicate_field":
+        profile.entities[0].fields.append(profile.entities[0].fields[0])
+    elif mutation == "duplicate_entity":
+        profile.entities.append(profile.entities[0])
+    else:
+        profile.entities[0].name = "fictional-private-marker"
+    decision = parse_behavior_policy(policy({"action": "drop"}))
+    try:
+        raise ValueError("fictional-private-marker")
+    except ValueError:
+        with pytest.raises(BehaviorPolicyError) as error:
+            validate_policy_field_coverage(decision, profile)
+    assert str(error.value) == "invalid policy field coverage"
+    assert error.value.__context__ is None
+    assert error.value.__cause__ is None
+
+
+def test_coverage_rejects_forged_policy():
+    decision = parse_behavior_policy(policy({"action": "drop"}))
+    forged = decision.model_copy(update={"fields": ()})
+    with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$"):
+        validate_policy_field_coverage(forged, DatasetProfile())
+
+
+@pytest.mark.parametrize("dependencies", [["input"], ["missing"], ["value"], ["input", "input"]])
+def test_derived_dependencies(dependencies):
+    payload = policy({"action": "derive", "expression": "input + 1", "dependencies": dependencies})
+    payload["fields"].append({"entity": "items", "field": "input", "sensitivity": "unknown",
+                              "behavior": {"action": "synthesize", "generation_policy_ref": "rule"}})
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": name, "data_type": "integer"} for name in ["value", "input"]]}]})
+    if dependencies == ["input"]:
+        validate_policy_field_coverage(parse_behavior_policy(payload), profile)
+        payload["fields"][1]["behavior"] = {"action": "drop"}
+    with pytest.raises(BehaviorPolicyError):
+        validate_policy_field_coverage(parse_behavior_policy(payload), profile)
+
+
+@pytest.mark.parametrize("fallback", [False, True])
+def test_observed_sensitivity_blocks_preservation(fallback):
+    behavior = {"action": "preserve", "authorization_ref": "review"}
+    if fallback:
+        behavior = {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+            {"original": ["fictional-a"], "replacement": ["fictional-b"]}]}, "unmatched": behavior}
+    decision = parse_behavior_policy(policy(behavior))
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string", "sensitive": True}]}]})
+    with pytest.raises(BehaviorPolicyError):
+        validate_policy_field_coverage(decision, profile)
+
+
+@pytest.mark.parametrize("change", ["type", "nullable", "name", "statistics"])
+def test_schema_binding_detects_column_drift_not_statistics(change):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string"}]}]})
+    payload = policy({"action": "drop"})
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    decision = parse_behavior_policy(payload)
+    validate_policy_profile(decision, profile)
+    field = profile.entities[0].fields[0]
+    if change == "type":
+        field.data_type = "integer"
+    elif change == "nullable":
+        field.nullable = True
+    elif change == "name":
+        field.name = "renamed"
+    else:
+        profile.entities[0].row_count = 10
+        field.unique_ratio = 0.5
+        validate_policy_profile(decision, profile)
+        return
+    with pytest.raises(BehaviorPolicyError):
+        validate_policy_profile(decision, profile)
+
+
+@pytest.mark.parametrize("warning_mode", ["always", "error"])
+@pytest.mark.parametrize("helper", ["coverage", "fingerprint"])
+def test_malformed_profile_does_not_emit_private_serialization_warnings(warning_mode, helper):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string"}]}]})
+    field = profile.entities[0].fields[0]
+    profile.entities[0].fields[0] = field.model_copy(update={"name": ["fictional-private-marker"]})
+    decision = parse_behavior_policy(policy({"action": "drop"}))
+    with warnings.catch_warnings(record=True) as recorded:
+        warnings.simplefilter(warning_mode)
+        with pytest.raises(BehaviorPolicyError) as error:
+            if helper == "coverage":
+                validate_policy_field_coverage(decision, profile)
+            else:
+                transformation_schema_fingerprint(profile)
+    assert not recorded
+    assert "fictional-private-marker" not in str(error.value)
+    assert error.value.__context__ is None

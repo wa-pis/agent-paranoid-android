@@ -257,3 +257,57 @@ Broader transformation remains unfinished.
   GitHub confirms no existing PR for codex/1-6-field-policies.
 - Next: signed commit and independent exact-SHA review of this structural slice,
   then PR/CI. Do not mark execution or full behavior-profile support complete.
+- Signed 16483bd2b14fdfaa99f53f8dacea39532ed270ca pushed; PR #521:
+  https://github.com/wa-pis/agent-paranoid-android/pull/521
+  Independent AI reviewer Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d)
+  reviewing exact SHA against a4d404b. Await review and CI; no duplicate review.
+- Completed: PR #521 merged as e2e4194f678fa3ade149a9bbec2012cdb4b3bffe.
+  Curie found no issues at 16483bd; 28 tests and additional invalid/forged,
+  error-chain and round-trip probes passed. All CI complete and green.
+  Evidence: https://github.com/wa-pis/agent-paranoid-android/pull/521#issuecomment-5804067734
+- Next: schema-bound validation of complete field coverage and references;
+  keep source reads, verified authorization and execution separate. Carry these
+  uncommitted progress notes into the next focused branch without discarding them.
+- Started codex/1-6-policy-binding from merged main e2e4194, preserving notes.
+  Added local exact field-coverage check against existing DatasetProfile, with
+  private bounded errors and reparsing of mutable profile contents. No new schema
+  model or source reads. 32 focused tests, Ruff and mypy passed.
+- This is only coverage validation, not complete schema binding: fingerprint,
+  types, dependency references and sensitivity evidence still require work.
+  Next: focused mutation/error-chain tests and remaining binding contract before
+  commit/review. No PR yet; do not treat this partial helper as execution approval.
+- Added mutation regressions for duplicate fields/entities, renamed entities,
+  forged policies and ambient exception chains. 36 focused tests, Ruff, mypy and
+  diff checks pass. Contract explicitly labels coverage as partial binding only.
+- Next: finish schema identity/reference validation before publishing this branch;
+  coverage checks alone do not justify a complete schema-binding claim.
+- Added local derive-reference validation using stdlib TopologicalSorter:
+  missing/dropped/repeated dependencies and cycles fail closed; no formula eval.
+  Contract documents same-entity exact names and deferred formula agreement.
+  40 focused tests, Ruff and mypy passed. Still uncommitted on policy-binding.
+- Next: schema fingerprint/type-drift validation and sensitivity-evidence conflict
+  checks, then independent review. Existing fingerprint utility lives in
+  io/artifacts.py and hashes full profiles; do not confuse statistics/content
+  identity with a schema-only fingerprint or import I/O into core.
+- Preservation and unmatched-preserve now reject observed sensitive fields even
+  when the policy declares non-sensitive. Two fictional regressions added;
+  42 focused tests, Ruff, mypy and whitespace checks pass. Docs clarify profile
+  trust and authorization remain separate. No execution path enabled.
+- Next remains schema fingerprint/type drift, followed by review of the complete
+  local binding slice. No active reviewer or PR for this uncommitted branch.
+- Added versioned ordered column-schema fingerprint and validate_policy_profile;
+  detects column name/type/nullability drift without hashing distributions or rows.
+  Explicitly not identity of constraints, relationships, evidence or source data.
+  Tests cover unchanged profiles, changed columns and statistics independence.
+  46 focused tests, Ruff, mypy and whitespace checks pass.
+- Next: signed commit/PR and independent review of this column-binding slice.
+  Mapping type checks, formula semantics and snapshot-bound approval remain pending.
+- Signed 9b816d4bdb76c3be6a6c1b2b5f1f5ed25dd34867 pushed; PR #522:
+  https://github.com/wa-pis/agent-paranoid-android/pull/522
+  Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) independently reviewing this
+  exact SHA against e2e4194. Next: findings disposition and CI; no duplicate review.
+- Curie found P2 private-value leakage through Pydantic serialization warnings
+  for malformed nested profile values, including warnings-as-errors. Disabled
+  serialization warnings at both private reparsing boundaries, retaining full
+  validation. Four regressions cover both helpers and warning modes.
+  50 focused tests, Ruff and mypy pass. Prior CI green; follow-up needs re-review.
