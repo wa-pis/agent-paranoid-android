@@ -119,3 +119,18 @@ implementation is deferred, not this requirement.
 Initial implementation tests should exercise layers 1–2 without file reads or
 generation, plus private round-trip and redacted failure behavior. Do not mark
 layers 3–5 implemented merely because a policy parses or serializes successfully.
+
+## First Internal Implementation Slice
+
+`core/transformation_mapping.py` only parses inline scalar tuples, CSV-reference
+declarations and named-domain references. It is not a behavior profile, loader,
+schema-bound mapping validator or execution API. Its bounded fixed error detaches
+Pydantic validation errors; repr omits private entries and references. Model dumps
+are explicitly private round-trip payloads, never public summaries. Even existing
+model instances are revalidated at the parsing boundary.
+
+Collection ceilings reuse existing input row/column defaults. Total byte/cell
+budgets, configured per-invocation limits, scalar lengths, CSV path authorization,
+column uniqueness/tuple arity, typed normalization, duplicate-key checking,
+domain resolution and approval are still preflight/loader work. Do not expose
+this structural parser as a completed safety boundary or claim executable support.
