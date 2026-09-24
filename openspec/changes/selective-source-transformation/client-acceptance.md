@@ -32,7 +32,7 @@ historical, not overwritten by the new document's measurements.
 | 15 | Test category limits and early validation before unnecessary reads; settle configurable budgets explicitly. |
 | 16 | Improve actionable safe SQL diagnostics; JOIN/CTE expansion remains a separate decision, not an assumed fix. |
 | 17 | Measure query count and scan budgets; assess bounded aggregate batching. Temporary table writes are outside the read-only contract. |
-| 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. |
+| 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. A fictional unsupported-function expression previously echoed its literal through the AST error, and malformed syntax retained the input-bearing `SyntaxError` as exception context. Both are fixed locally with value-free, detached errors; this does not add `ROUND` support or establish derived-finance acceptance. |
 | 19 | Reproduce atime-only publication failures; preserve path-swap protection. Define directory overwrite behavior explicitly and test rollback. |
 | 20 | Reproduce doctor capability/publication failures with installed extras; preserve checks and safe causes without misleading reinstall advice or raw exception disclosure. |
 | 21 | Plan Trino authentication with explicit method/secret-source decision; prove propagation, preflight, TLS/redaction using isolated drivers. Live client measurements remain unverified. |

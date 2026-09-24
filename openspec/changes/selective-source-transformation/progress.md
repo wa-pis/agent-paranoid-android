@@ -1284,3 +1284,12 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding 18 diagnostic slice: two fictional regressions first failed because
+  unsupported formula errors echoed an input literal via `ast.dump`, while
+  malformed syntax kept an input-bearing `SyntaxError` in exception context.
+  Rejections now use fixed, detached messages without changing the permitted
+  expression grammar. Twenty-seven focused business-rule tests passed.
+  `ROUND` execution, exact DECIMAL/null/rounding semantics and private client
+  formula acceptance remain unimplemented/unverified. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Next: retain a signed local commit,
+  then queue after the earlier draft PR; no ordinary AI review.
