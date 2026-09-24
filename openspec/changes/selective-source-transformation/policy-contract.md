@@ -184,6 +184,16 @@ under distinct labels. A changed part invalidates the identity. Callers still
 must prove the snapshots were loaded safely and consume the same bytes at
 execution; neither helper creates a receipt or enables preservation.
 
+Private approval-material preparation parses bounded policy/profile bytes,
+builds that value-free review and requires exact external CSV mapping and
+generation-policy references before binding source bytes. The separate local
+receipt helper opens `/dev/tty`, requires a fresh `APPROVE` line, writes only
+the identity to an owner-only atomic file, and verifies it against the same
+in-memory snapshots. A caller-supplied authorization reference alone never
+creates a receipt. These helpers are not a public CLI command or execution
+grant: source snapshot loading/reprofiling, complete semantic checks, the
+scoped safety amendment and end-to-end no-reopen execution still remain.
+
 `validate_inline_mapping_shape` checks a caller-declared tuple width and rejects
 exact duplicate source tuples, including repeated nulls. Scalar kind participates
 in equality, so booleans, integers and floats are not conflated before schema

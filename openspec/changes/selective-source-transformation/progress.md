@@ -1103,3 +1103,46 @@ Broader transformation remains unfinished.
   exists yet. Next: test local TTY-only confirmation and restricted receipt
   storage/verification against the same snapshots, then complete the scoped
   safety amendment before any source-bearing execution.
+- PR #545 at signed `0ec342bc7c9be54a1fb0f702c0b22526355fb574` passed
+  all 37 applicable checks (four intentional skips) and merged normally as
+  `190905f27538f7b674f46161d259876024c130c7`. GitHub verified signature;
+  no ordinary AI review ran. The first merge request was stopped by the local
+  approval guard because `reviewDecision` was empty. Read-only ruleset #19376395
+  confirmed zero required approving reviews and no required reviewers; the
+  unchanged normal merge then succeeded. No protection setting was changed or
+  bypassed. New branch `codex/1-6-local-receipt` starts at that main SHA.
+  Next: implement and test terminal-only confirmation plus owner-only receipt
+  over the existing private snapshot identity, with no execution/public agent
+  path until the safety amendment and independent review are complete.
+- On `codex/1-6-local-receipt`, added private approval-material preparation
+  from bounded policy/profile bytes plus exact source/mapping/generation-policy
+  snapshots. Unreferenced or missing external parts fail; review is generated
+  from parsed actions, not a caller-supplied summary. Added local TTY-only
+  confirmation, owner-only atomic receipt and same-snapshot verification;
+  rejected input publishes nothing. Initial PTY test hung because its reader
+  did not handle child exit; stopped only that pytest process and replaced the
+  test with a bounded `pty.openpty` channel check, without product monkeypatch.
+  No public CLI/agent endpoint or source-preserving execution is connected.
+  Focused 55 tests passed, including missing/stale receipt, owner-only mode,
+  rejected answer, non-TTY input and omitted/extra references. Targeted Ruff,
+  mypy, strict OpenSpec and diff checks passed. Next: signed PR/CI for these
+  private helpers, then source-snapshot/reprofile integration and scoped safety
+  amendment before any runtime activation.
+- Signed `d24adc3` pushed and PR #546 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/546
+  Await GitHub CI/protection; do not repeat unchanged local checks or start
+  overlapping work. No ordinary per-PR AI review requested. After merge,
+  next small step is safe source snapshot loading and evidence revalidation
+  against the same bytes before the safety amendment.
+- PR #546 CI completed except for a separate GitHub Advanced Security CodeQL
+  gate: it flagged the test's intentionally world-readable `chmod(0o644)`
+  fixture, not the receipt implementation. Changed the negative fixture to
+  group-readable `0o640`, which still violates the owner-only contract;
+  focused receipt tests: 4 passed. Next: push this test-only correction,
+  require the new exact head's green checks, then merge normally.
+- Signed `5f9e0df` pushed to #546. CodeQL also flags group-readable
+  `chmod(0o640)` in the negative test. Removed unsafe fixture chmod and
+  extracted the same owner/mode predicate for pure tests against metadata
+  values; receipt behavior unchanged. Focused receipt tests: 5 passed;
+  targeted Ruff and mypy passed. Next: push this correction; wait for all
+  checks on the new exact head before normal merge.
