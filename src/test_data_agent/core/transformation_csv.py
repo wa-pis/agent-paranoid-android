@@ -2,7 +2,9 @@
 
 import csv
 import io
+import math
 import re
+from decimal import Decimal
 
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
@@ -77,11 +79,14 @@ def parse_csv_mapping_bytes(
         raise
 
 
+_CSV_FLOAT = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
+
+
 def normalize_csv_mapping(
     mapping: InlineMapping, *, data_types: tuple[FieldType, ...],
     nullable: tuple[bool, ...], budget: GenerationBudget,
 ) -> InlineMapping:
-    """Normalize declared CSV integers; preserve other text for strict validation."""
+    """Normalize declared CSV integers/floats; reject ambiguous numeric text."""
     try:
         mapping = validate_inline_mapping_shape(mapping, key_width=len(data_types))
         entries: list[dict[str, list[object]]] = []
@@ -97,6 +102,13 @@ def normalize_csv_mapping(
                         if not isinstance(value, str) or not re.fullmatch(r"[+-]?[0-9]+", value):
                             raise ValueError
                         converted[side].append(int(value))
+                    elif value is not None and kind == FieldType.FLOAT:
+                        if not _CSV_FLOAT.fullmatch(value):
+                            raise ValueError
+                        number = float(value)
+                        if not math.isfinite(number) or (number == 0.0 and Decimal(value) != 0):
+                            raise ValueError
+                        converted[side].append(number)
                     else:
                         converted[side].append(value)
             entries.append(converted)

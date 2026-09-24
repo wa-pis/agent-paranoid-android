@@ -88,6 +88,31 @@ def test_integer_normalization_preserves_composite_strings_and_null():
     assert result.entries[0].replacement == (None, "002")
 
 
+def test_float_normalization_is_approximate_and_catches_converted_duplicates():
+    mapping = parse_mapping_declaration({"kind": "inline", "entries": [
+        {"original": ["+1.25e2"], "replacement": ["-0.5"]}]})
+    result = normalize_csv_mapping(mapping, data_types=(FieldType.FLOAT,),
+                                   nullable=(False,), budget=GenerationBudget())
+    assert result.entries[0].original == (125.0,)
+    assert result.entries[0].replacement == (-0.5,)
+
+    duplicates = parse_mapping_declaration({"kind": "inline", "entries": [
+        {"original": ["1.0"], "replacement": ["2.0"]},
+        {"original": ["1e0"], "replacement": ["3.0"]}]})
+    with pytest.raises(MappingDeclarationError, match="^invalid typed CSV mapping$"):
+        normalize_csv_mapping(duplicates, data_types=(FieldType.FLOAT,),
+                              nullable=(False,), budget=GenerationBudget())
+
+
+@pytest.mark.parametrize("value", ["nan", "Infinity", "1e9999", "1e-9999", " 1", "1_000", "0x10"])
+def test_float_normalization_rejects_nonfinite_or_ambiguous_text(value):
+    mapping = parse_mapping_declaration({"kind": "inline", "entries": [
+        {"original": [value], "replacement": ["1.0"]}]})
+    with pytest.raises(MappingDeclarationError, match="^invalid typed CSV mapping$"):
+        normalize_csv_mapping(mapping, data_types=(FieldType.FLOAT,),
+                              nullable=(False,), budget=GenerationBudget())
+
+
 @pytest.mark.parametrize("case", ["nullability", "expired", "already_typed", "invalid_type"])
 def test_normalization_failures_are_detached(case):
     mapping = parse_mapping_declaration({"kind": "inline", "entries": [

@@ -243,9 +243,11 @@ and separately reviewed permissions still need binding at the execution boundary
 inline validator without reopening the source path. It passes explicit limits
 and the same invocation budget through all stages. The private result retains
 the validated mapping and hash of the bytes parsed, both excluded from repr.
-String/date/integer CSV mappings work; float text conversion, DATETIME and Decimal
-remain unfinished. This adapter is not exposed through CLI/MCP and grants no
-permission to preserve source data or execute transformations.
+String/date/integer and approximate FLOAT CSV mappings work. FLOAT accepts only
+ASCII decimal/exponent syntax and rejects non-finite values, overflow, underflow
+to zero and duplicate source keys after conversion. It is not exact DECIMAL;
+DATETIME and Decimal remain unfinished. This adapter is not exposed through
+CLI/MCP and grants no permission to preserve source data or execute transformations.
 
 CSV integer normalization accepts only an optional ASCII sign followed by ASCII
 digits. It converts directly to Python int, never through float; whitespace,
