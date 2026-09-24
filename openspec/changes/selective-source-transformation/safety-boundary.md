@@ -1,4 +1,4 @@
-# Selective Transformation Safety Boundary — Review Draft
+# Selective Transformation Safety Boundary — Local Operator Decision
 
 This document proposes a scoped amendment, not an active exception to AGENTS.md.
 Do not enable source-preserving execution until this boundary, matching baseline
@@ -16,11 +16,11 @@ one-to-one transformed dataset, never a certified anonymous or fully synthetic o
 On 2026-09-24 the user approved the product requirement that the human personally
 confirms concrete columns and the exact plan before execution; the agent cannot
 grant itself permission, and sensitive or disputed columns remain blocked.
-This approves the requirement, not an implemented transport or a claim that a
-local prompt proves human identity. The deployment alternatives below still
-need to satisfy that requirement; do not silently assume equal-privilege agents
-are excluded from the threat model. No source-bearing dataset was approved by
-this conversation.
+The user subsequently selected trust in the local CLI operator as the deployment
+boundary. This is not a cryptographic proof of human identity: a process with
+the same local filesystem and terminal privileges can impersonate the operator.
+That equal-privilege impersonation is explicitly outside this deployment's
+protection claim. No source-bearing dataset was approved by this conversation.
 
 Every input field requires an explicit action. Only fields explicitly declared
 non-sensitive and authorized for preservation may carry original logical values.
@@ -30,31 +30,40 @@ heuristic output, arbitrary authorization-reference strings and bulk acceptance
 cannot grant or expand this authority. Sensitive fields require replacement or
 exclusion; merely relabeling them does not declassify them.
 
-The execution boundary must independently verify the local user's approval of
-the exact reviewed plan. The transport and verifiable representation of that
-approval still require specification; no current internal model implements it.
-This is a release blocker, not permission to trust a boolean or opaque reference.
+The execution boundary must verify approval of the exact reviewed plan and
+fixed input snapshots. No current internal model implements that transport;
+the selection below is not permission to trust a boolean or opaque reference.
 
-### Approval Transport Decision Pending
+### Selected Approval Transport: Trusted Local Operator
 
-The existing agent approval service checks a caller-supplied reviewed spec hash.
-That establishes which plan the caller selected, not whether the caller is a
-human. A local agent with the same shell/filesystem rights can invoke the same
-CLI or edit the same approval files. Interactive prompts or local secrets do not
-establish a separate human authority under that threat model.
+The existing `agent-approve` spec hash selects a source-free generation plan; it
+is not transformation approval. The new, separate local CLI approval must:
 
-Two possible deployment contracts require an explicit product decision:
+- present a bounded, value-free review of the exact effective plan in the local
+  terminal: input/plan identity, every field action including unmatched-preserve
+  fallbacks, the proposed preserved columns, and each column's reviewed
+  sensitivity/conflict status. A digest alone is not sufficient for confirmation;
+- require a fresh explicit interactive terminal confirmation, not a CLI flag,
+  environment variable, piped stdin, or caller-supplied `authorization_ref`;
+- bind the resulting restricted receipt to that displayed review, its immutable
+  sensitivity/classification evidence, the reviewed policy, fixed source bytes
+  and all referenced mapping/generation-policy bytes. Revalidate the evidence
+  against those same snapshots and consume them at execution; a changed input
+  or classification requires review and approval again;
+- keep default MCP and agent planning/advice unable to create or broaden that
+  receipt. No agent/MCP transformation-approval endpoint may mint a receipt.
+  Noninteractive/agent execution may only consume an existing matching receipt,
+  never replace local approval;
+- keep sensitive, unknown and conflicting preservation prohibited regardless
+  of operator confirmation.
 
-1. Trust the local operator/environment. Explicit CLI approval binds exact inputs;
-   default MCP cannot create preservation approval. Clearly exclude protection
-   against an agent/process with equivalent local privileges. Sensitive/conflicting
-   preservation stays prohibited, regardless of approval.
-2. Require approval from a separately controlled authority whose signing rights
-   are unavailable to the executing agent. This adds external authorization/key
-   management and integration scope; do not implement it implicitly.
-
-Neither option is selected here. Implementation/release authorization in this
-conversation does not authorize preservation of a future user's source dataset.
+The receipt is an exact-input integrity record, not a signature or proof of
+personhood. Owner-only local storage and an interactive prompt prevent accidental
+or remote approval through supported interfaces; they do not protect against an
+agent/process with equivalent local privileges. A separately controlled signing
+authority is not selected or implemented. This boundary must receive matching
+AGENTS.md/baseline-spec amendments, executable tests and independent safety
+review before source-preserving execution is enabled.
 
 ## Identity And Execution
 

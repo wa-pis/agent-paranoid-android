@@ -1037,3 +1037,48 @@ Broader transformation remains unfinished.
   passed. This is not live scan-cost evidence and authorizes no SQL expansion.
   Next: resolve 25's mode and intentional-invalid publication contract; then
   implement it once across generator, business rules, manifest and exit status.
+- PR #543 (`c422d1b`) passed 37 GitHub checks with four intentional skips,
+  signed-commit verification and CLEAN merge state; merged normally as
+  `c31b62d3156523513e2156f534b380f75c484a24`. No ordinary AI review or
+  branch-protection bypass. The query-count test and refreshed harness/evidence
+  register are on main; finding 17 live scan cost remains unverified.
+- Inspected remaining finding-10 query-source path. A validated SQL projection
+  may alias a sensitive source column to a benign output name; the current
+  validated plan stores output fields but no source-field lineage. Adding
+  temporal min/max based only on output names could disclose sensitive bounds.
+  No query, policy or runtime change made. The preservation approval transport
+  remains the release-critical decision; mode precedence, intentional-invalid
+  exit/publication and heterogeneous Parquet choices are also unanswered.
+  Next: obtain explicit decisions, then implement with executable safety tests
+  and independent safety-policy review where the boundary changes. Automation
+  remains paused; no RC tag or publication exists.
+- The user selected trusted local CLI operator confirmation for preservation.
+  Recorded the exact-plan/column prompt, fixed-byte receipt, default-agent
+  exclusion and equal-privilege limitation in the safety boundary, policy
+  contract, proposed spec, tasks and milestone plan. This is a product decision,
+  not approval of any dataset or an enabled runtime exception. No source rows,
+  private data, database or external API were used. GitHub PR listing was
+  temporarily unavailable; local branch `codex/1-6-local-approval` starts from
+  merged main `c31b62d` and contains only the documented decision plus this
+  progress note. Next: strict OpenSpec/diff validation, then implement the
+  interactive approval and exact-input verification with fictional executable
+  tests before the scoped AGENTS.md/baseline amendment and independent safety
+  review. Automation stays paused; no release tag or publication exists.
+- PR #544 opened for signed `dee0bb84582784df42b133f8627bd239ad5453d8`;
+  documentation-only checks passed (Python 3.11–3.14 and documentation, with
+  expected skips). Independent read-only AI reviewer Codex (agent nickname Jason)
+  (`01a0d4ff-6054-7643-a81f-9b81ec008d95`), 2026-09-24 19:59 UTC, found
+  three contract ambiguities: digest-only review could hide effective actions,
+  sensitivity evidence was not explicitly receipt-bound, and agent approval
+  parity could imply receipt minting. Amended only the affected proposed
+  contract to show value-free effective actions/fallbacks/status, bind reviewed
+  evidence and exclude agent/MCP minting. These corrections require checks and
+  same-reviewer re-review on the new exact SHA before merge. This is AI review,
+  not human approval; no source-preserving execution is enabled.
+- Same AI reviewer re-reviewed the corrected contract at exact
+  `2bd910eea5f896f2d84c5916cd687b1afb842562` on 2026-09-24 20:02 UTC:
+  all three findings resolved at proposal level; no new material safety issue.
+  Read-only diff/ancestor/whitespace checks passed. This is not human approval
+  and does not complete the runtime safety amendment or executable gates.
+  Next: merge #544 only after the corrected head's green CI and GitHub
+  protection checks; then implement local approval with fictional tests.

@@ -15,6 +15,9 @@ models, column coverage/identity checks, strict inline primitives/dates, bounded
 CSV snapshots/parsing and integer normalization have landed through PR #528.
 The safety amendment and execution approval remain unimplemented. Review
 [the boundary draft](safety-boundary.md) before enabling the CSV vertical slice.
+The user selected trusted local CLI operator approval; equal-privilege agent
+impersonation is outside that deployment boundary. This selects transport, not
+approval of any dataset or completion of the safety amendment below.
 
 See [milestones](plan.md) for the approved order and release scope. Safety-policy
 amendments still require scoped review and executable checks before activation.
@@ -68,8 +71,9 @@ All items below remain unverified until reproduced against the current candidate
   keep external script/API execution an unapproved future TODO.
 
 - [ ] Implement bounded local CSV transformation with explicit field actions.
-- [ ] Implement review/validate/approve/execute parity for supported agent
-  interfaces with bounded structured responses and no source-row disclosure.
+- [ ] Implement review/validate/execute parity for supported agent interfaces
+  with bounded structured responses and no source-row disclosure; only the
+  interactive local CLI may mint preservation approval receipts.
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
 - [ ] Implement consistent key mapping and declared derived-value computation.
