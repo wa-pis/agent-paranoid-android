@@ -211,3 +211,11 @@ The private immutable result contains bytes and their SHA-256, omitted from repr
 Consumers must parse those returned bytes, not reopen the path. This is not an
 atomic filesystem snapshot guarantee or execution approval; same-byte identity
 and separately reviewed permissions still need binding at the execution boundary.
+
+`io/mapping_loader.py` composes the snapshot reader, CSV-byte parser and typed
+inline validator without reopening the source path. It passes explicit limits
+and the same invocation budget through all stages. The private result retains
+the validated mapping and hash of the bytes parsed, both excluded from repr.
+String/date CSV mappings work; numeric text conversion, DATETIME and Decimal
+remain unfinished. This adapter is not exposed through CLI/MCP and grants no
+permission to preserve source data or execute transformations.
