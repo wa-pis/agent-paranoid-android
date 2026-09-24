@@ -27,7 +27,7 @@ def test_loaded_dates_and_hash_match_same_snapshot(tmp_path):
 
 
 @pytest.mark.parametrize("kind,payload", [
-    (FieldType.INTEGER, b"old,new\n1,2\n"),
+    (FieldType.INTEGER, b"old,new\n1.5,2\n"),
     (FieldType.DATE, b"old,new\n2025-04-30T00:00:00,2026-09-23\n"),
     (FieldType.STRING, b"old,new\na,b\na,c\n"),
 ])
@@ -78,3 +78,18 @@ def test_loader_does_not_reset_deadline_after_snapshot(tmp_path):
         load(tmp_path.resolve(), FieldType.STRING,
              budget=GenerationBudget(max_seconds=1, clock=clock))
     assert caught.value.__context__ is None
+
+
+def test_integer_csv_normalization_is_exact(tmp_path):
+    (tmp_path / "map.csv").write_bytes(b"old,new\n+001,9007199254740993\n")
+    result = load(tmp_path.resolve(), FieldType.INTEGER)
+    assert result.mapping.entries[0].original == (1,)
+    assert result.mapping.entries[0].replacement == (9007199254740993,)
+
+
+@pytest.mark.parametrize("rows", [b"1,2\n+001,3\n", b"-0,2\n0,3\n", b" 1,2\n",
+                                 b"1e2,2\n", b"1_000,2\n", b"true,2\n"])
+def test_integer_csv_rejects_ambiguity_and_converted_duplicates(tmp_path, rows):
+    (tmp_path / "map.csv").write_bytes(b"old,new\n" + rows)
+    with pytest.raises(MappingDeclarationError, match="^invalid typed CSV mapping$"):
+        load(tmp_path.resolve(), FieldType.INTEGER)

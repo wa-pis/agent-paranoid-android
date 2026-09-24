@@ -5,10 +5,9 @@ from pathlib import Path
 
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import GenerationBudget
-from test_data_agent.core.transformation_csv import parse_csv_mapping_bytes
+from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, InlineMapping, MappingDeclarationError, parse_mapping_declaration,
-    validate_inline_scalar_mapping,
 )
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
 
@@ -25,7 +24,7 @@ def load_csv_mapping(
     max_bytes: int, max_rows: int, max_cells: int, max_columns: int,
     max_cell_chars: int, budget: GenerationBudget,
 ) -> LoadedCsvMapping:
-    """Load private string/date mappings; no numeric coercion or approval."""
+    """Load private typed mappings; no inference or execution approval."""
     parsed = parse_mapping_declaration(declaration)
     if not isinstance(parsed, CsvMapping):
         try:
@@ -39,7 +38,7 @@ def load_csv_mapping(
         null_token=null_token, budget=budget, max_bytes=max_bytes, max_rows=max_rows,
         max_cells=max_cells, max_columns=max_columns, max_cell_chars=max_cell_chars,
     )
-    validated = validate_inline_scalar_mapping(mapping, data_types=data_types, nullable=nullable)
+    validated = normalize_csv_mapping(mapping, data_types=data_types, nullable=nullable, budget=budget)
     # Reuse the invocation deadline even after the final typed validation pass.
     try:
         budget.check("CSV mapping")

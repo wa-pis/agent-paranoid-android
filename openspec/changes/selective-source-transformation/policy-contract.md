@@ -216,6 +216,15 @@ and separately reviewed permissions still need binding at the execution boundary
 inline validator without reopening the source path. It passes explicit limits
 and the same invocation budget through all stages. The private result retains
 the validated mapping and hash of the bytes parsed, both excluded from repr.
-String/date CSV mappings work; numeric text conversion, DATETIME and Decimal
+String/date/integer CSV mappings work; float text conversion, DATETIME and Decimal
 remain unfinished. This adapter is not exposed through CLI/MCP and grants no
 permission to preserve source data or execute transformations.
+
+CSV integer normalization accepts only an optional ASCII sign followed by ASCII
+digits. It converts directly to Python int, never through float; whitespace,
+exponents, underscores and boolean text are rejected. Leading zeros/sign variants
+normalize, so duplicate source keys are checked again after conversion. Composite
+string columns retain leading zeros; nullability is explicit on both sides.
+The same budget covers normalization. This CSV-specific step does not weaken
+strict inline mapping types; oversized integers may hit Python's safe digit limit
+and fail with the same bounded error. No global integer limit is changed.
