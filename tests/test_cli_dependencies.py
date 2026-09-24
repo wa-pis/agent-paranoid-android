@@ -11,7 +11,7 @@ from test_data_agent.version import __version__
 def test_dependency_resolver_reports_missing_extra_modules_in_order() -> None:
     def import_without_trino(name: str) -> ModuleType:
         if name in {"sqlglot", "trino"}:
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return ModuleType(name)
 
     resolver = CliDependencyResolver(import_without_trino)
@@ -22,7 +22,7 @@ def test_dependency_resolver_reports_missing_extra_modules_in_order() -> None:
 def test_dependency_resolver_tracks_postgres_as_optional() -> None:
     def import_without_postgres(name: str) -> ModuleType:
         if name in {"psycopg", "sqlglot"}:
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return ModuleType(name)
 
     assert CliDependencyResolver(import_without_postgres).missing_modules(
@@ -33,7 +33,7 @@ def test_dependency_resolver_tracks_postgres_as_optional() -> None:
 def test_dependency_resolver_tracks_gigachat_as_optional() -> None:
     def import_without_gigachat(name: str) -> ModuleType:
         if name == "gigachat":
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return ModuleType(name)
 
     assert CliDependencyResolver(import_without_gigachat).missing_modules(
@@ -65,6 +65,19 @@ def test_dependency_resolver_normalizes_required_extra_error() -> None:
         f'python -m pip install "agent-paranoid-android[openai]=={__version__}"'
         in str(exc_info.value)
     )
+
+
+def test_installed_extra_import_failure_is_not_reported_as_missing() -> None:
+    def broken_import(name: str) -> ModuleType:
+        if name == "pyarrow":
+            raise ImportError("secret-import-detail")
+        return ModuleType(name)
+
+    with pytest.raises(CliDependencyError, match="optional dependency import failed") as caught:
+        CliDependencyResolver(broken_import).missing_modules("parquet")
+    assert "secret-import-detail" not in str(caught.value)
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
 
 
 def test_dependency_resolver_rejects_unknown_extra() -> None:

@@ -17,6 +17,7 @@ from test_data_agent.cli_dependencies import (
     CORE_DEPENDENCY_MODULES,
     DEFAULT_CLI_DEPENDENCY_RESOLVER,
     OPTIONAL_EXTRA_MODULES,
+    CliDependencyError,
     CliDependencyResolver,
     ModuleImporter as ModuleImporter,
     install_extra_command,
@@ -89,13 +90,19 @@ class CliDoctorService:
         for module_name in CORE_DEPENDENCY_MODULES:
             try:
                 self.import_module(module_name)
-            except ImportError as exc:
-                failures.append(f"dependency {module_name}: missing ({exc})")
+            except Exception as exc:
+                is_missing = isinstance(exc, ModuleNotFoundError) and exc.name == module_name
+                failures.append(
+                    f"dependency {module_name}: {'missing' if is_missing else 'import failed'}"
+                )
                 states[f"dependency:{module_name}"] = DoctorCheck(
                     name=f"dependency:{module_name}",
-                    status=DoctorStatus.NOT_INSTALLED,
-                    detail="required dependency is missing",
-                    remediation="reinstall agent-paranoid-android",
+                    status=DoctorStatus.NOT_INSTALLED if is_missing else DoctorStatus.FAILED,
+                    detail=(
+                        "required dependency is missing"
+                        if is_missing else "required dependency import failed"
+                    ),
+                    remediation="reinstall agent-paranoid-android" if is_missing else None,
                 )
             else:
                 checks.append(f"dependency {module_name}: ok")
@@ -107,7 +114,16 @@ class CliDoctorService:
 
         dependencies = CliDependencyResolver(self.import_module)
         for extra in OPTIONAL_EXTRA_MODULES:
-            missing = dependencies.missing_modules(extra)
+            try:
+                missing = dependencies.missing_modules(extra)
+            except CliDependencyError:
+                failures.append(f"extra {extra}: import failed")
+                states[f"extra:{extra}"] = DoctorCheck(
+                    name=f"extra:{extra}",
+                    status=DoctorStatus.FAILED,
+                    detail="installed dependency import failed",
+                )
+                continue
             if missing and extra in required:
                 failures.append(
                     f"extra {extra}: missing {', '.join(missing)} "
@@ -136,44 +152,53 @@ class CliDoctorService:
                 )
 
         if not skip_smoke and not failures:
-            with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
-                root = Path(tmp).resolve(strict=True)
-                fixture = root / "example_dataset"
-                output = root / "generated"
-                cache_dir = root / "cache"
-                write_doctor_fixture(fixture)
-                generate_dataset_from_example_artifacts(
-                    fixture,
-                    output_folder=output,
-                    seed=12345,
-                    count=3,
-                    output_format=OutputFormat.CSV,
-                    cache_dir=cache_dir,
-                    use_cache=False,
-                )
-                manifest = json.loads((output / "generation_manifest.json").read_text())
-                if (
-                    manifest.get("synthetic") is True
-                    and manifest.get("source_rows_copied") is False
-                    and manifest.get("validation_valid") is True
-                ):
-                    checks.append("quickstart smoke: ok")
-                    states["quickstart"] = DoctorCheck(
-                        name="quickstart",
-                        status=DoctorStatus.AVAILABLE,
-                        detail="offline synthetic generation passed",
+            try:
+                with tempfile.TemporaryDirectory(prefix="test-data-agent-doctor-") as tmp:
+                    root = Path(tmp).resolve(strict=True)
+                    fixture = root / "example_dataset"
+                    output = root / "generated"
+                    cache_dir = root / "cache"
+                    write_doctor_fixture(fixture)
+                    generate_dataset_from_example_artifacts(
+                        fixture,
+                        output_folder=output,
+                        seed=12345,
+                        count=3,
+                        output_format=OutputFormat.CSV,
+                        cache_dir=cache_dir,
+                        use_cache=False,
                     )
-                else:
-                    failures.append(
-                        "quickstart smoke: manifest safety flags are not valid"
+                    manifest = json.loads((output / "generation_manifest.json").read_text())
+                    if (
+                        manifest.get("synthetic") is True
+                        and manifest.get("source_rows_copied") is False
+                        and manifest.get("validation_valid") is True
+                    ):
+                        checks.append("quickstart smoke: ok")
+                        states["quickstart"] = DoctorCheck(
+                            name="quickstart",
+                            status=DoctorStatus.AVAILABLE,
+                            detail="offline synthetic generation passed",
+                        )
+                    else:
+                        failures.append(
+                            "quickstart smoke: manifest safety flags are not valid"
+                        )
+                        states["quickstart"] = DoctorCheck(
+                            name="quickstart",
+                            status=DoctorStatus.FAILED,
+                            detail="manifest safety flags are not valid",
+                        )
+                    self._run_capability_smokes(
+                        required, fixture, root, checks, failures, states
                     )
-                    states["quickstart"] = DoctorCheck(
-                        name="quickstart",
-                        status=DoctorStatus.FAILED,
-                        detail="manifest safety flags are not valid",
-                    )
-                self._run_capability_smokes(
-                    required, fixture, root, checks, failures, states
+            except Exception:
+                failures.append("quickstart smoke: local generation failed")
+                states["quickstart"] = DoctorCheck(
+                    name="quickstart",
+                    status=DoctorStatus.FAILED,
+                    detail="local generation failed",
+                    remediation="check local output permissions and rerun doctor",
                 )
         elif skip_smoke:
             states["quickstart"] = DoctorCheck(
@@ -214,16 +239,12 @@ class CliDoctorService:
                 status = self.trino_status() if extra == "trino" else None
                 smoke()
             except Exception:
-                failures.append(
-                    f"capability {extra}: failed "
-                    f"(reinstall agent-paranoid-android[{extra}] with: "
-                    f"{install_extra_command(extra)})"
-                )
+                failures.append(f"capability {extra}: failed (local smoke)")
                 states[f"capability:{extra}"] = DoctorCheck(
                     name=f"capability:{extra}",
                     status=DoctorStatus.FAILED,
                     detail="local capability smoke failed",
-                    remediation=install_extra_command(extra),
+                    remediation="check local capability setup and rerun doctor",
                 )
             else:
                 suffix = f" ({status})" if status is not None else ""

@@ -52,8 +52,15 @@ class CliDependencyResolver:
         for module_name in module_names:
             try:
                 self.import_module(module_name)
-            except ImportError:
-                missing.append(module_name)
+            except ModuleNotFoundError as exc:
+                if exc.name == module_name:
+                    missing.append(module_name)
+                    continue
+            except Exception:
+                pass
+            else:
+                continue
+            raise CliDependencyError("optional dependency import failed")
         return tuple(missing)
 
     def require_module(
