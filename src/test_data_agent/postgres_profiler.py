@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
+from datetime import date, datetime
 
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.privacy import (
     LocalCategoryField,
+    infer_sensitive_from_name,
     validate_local_category_values,
 )
 from test_data_agent.core.relationship import Relationship
@@ -241,9 +243,16 @@ class PostgresProfiler:
     ) -> dict[str, object]:
         name = _required_text(column, "column_name")
         data_type = _required_text(column, "data_type")
+        profile_type = coerce_profile_type(data_type)
+        temporal_bounds = (
+            profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
+            and not infer_sensitive_from_name(name)
+        )
         summary = _single_row(
             self.fetch_query(
-                build_column_summary_query(self.config, schema, table, name)
+                build_column_summary_query(
+                    self.config, schema, table, name, temporal_bounds=temporal_bounds,
+                )
             ),
             "column summary",
         )
@@ -267,6 +276,20 @@ class PostgresProfiler:
             "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
             "approx_distinct_count": distinct_count,
         }
+        if temporal_bounds and non_null_count:
+            lower, upper = summary.get("min_temporal"), summary.get("max_temporal")
+            expected_type = datetime if profile_type == ProfileDataType.DATETIME else date
+            if type(lower) is not expected_type or type(upper) is not expected_type:
+                raise PostgresProfileError("PostgreSQL temporal bounds are invalid")
+            assert isinstance(lower, date) and isinstance(upper, date)
+            if isinstance(lower, datetime) and isinstance(upper, datetime):
+                if (lower.utcoffset() is None) != (upper.utcoffset() is None):
+                    raise PostgresProfileError("PostgreSQL temporal bounds have inconsistent timezone metadata")
+            if lower > upper:
+                raise PostgresProfileError("PostgreSQL temporal bounds are reversed")
+            suffix = "timestamp" if profile_type == ProfileDataType.DATETIME else "date"
+            result[f"min_{suffix}"] = lower.isoformat()
+            result[f"max_{suffix}"] = upper.isoformat()
         if coerce_profile_type(data_type) in {
             ProfileDataType.INTEGER,
             ProfileDataType.FLOAT,
