@@ -173,6 +173,17 @@ relationships, sensitivity evidence and source contents are not covered by that
 hash and must be bound separately in execution approval. Mapping value types,
 formula semantics and referenced generation-policy validation remain pending.
 
+The private `render_policy_review` helper validates coverage and schema, then
+renders every effective action, unmatched behavior and declared/observed
+sensitivity status as bounded ASCII JSON. It excludes mapping values,
+authorization references and expression literals; escaped identifiers cannot
+inject terminal control lines. This is review material, not approval. The
+private `snapshot_identity` helper hashes exact bounded review, policy,
+classification-evidence, source and optional mapping/generation-policy bytes
+under distinct labels. A changed part invalidates the identity. Callers still
+must prove the snapshots were loaded safely and consume the same bytes at
+execution; neither helper creates a receipt or enables preservation.
+
 `validate_inline_mapping_shape` checks a caller-declared tuple width and rejects
 exact duplicate source tuples, including repeated nulls. Scalar kind participates
 in equality, so booleans, integers and floats are not conflated before schema

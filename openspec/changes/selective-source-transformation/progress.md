@@ -1082,3 +1082,24 @@ Broader transformation remains unfinished.
   and does not complete the runtime safety amendment or executable gates.
   Next: merge #544 only after the corrected head's green CI and GitHub
   protection checks; then implement local approval with fictional tests.
+- PR #544 finished with 8 successful checks and 14 intentional documentation-
+  only skips on head `201b3c3426bfe8a54a683b7f6d479c25aca11501`; GitHub
+  verified the commit signature. Independent AI review evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/544#issuecomment-5821355214
+  The PR merged normally as `62dde02113a1746ebc998a657613227648828ad0`.
+  New branch `codex/1-6-local-approval-gate` starts from that main SHA, with no
+  runtime edit yet. Next small step: design and test a bounded exact-byte
+  approval request/receipt with value-free CLI display; do not publish a
+  source-preserving execution path until the AGENTS.md/baseline amendment,
+  executable safety tests and independent review are complete.
+- Started private approval-material groundwork on the new branch: bounded,
+  labeled exact-byte snapshot identity for review/policy/classification/source/
+  mapping/generation-policy parts; deterministic order, duplicate/missing-part
+  rejection and stale-byte comparison. Added a value-free bounded review
+  renderer covering every field action, unmatched fallback and declared/
+  observed sensitivity; mapping values and authorization references are absent.
+  Fictional focused tests: 45 passed; targeted Ruff and mypy clean. No receipt,
+  interactive CLI command, source read, execution hook or preservation path
+  exists yet. Next: test local TTY-only confirmation and restricted receipt
+  storage/verification against the same snapshots, then complete the scoped
+  safety amendment before any source-bearing execution.

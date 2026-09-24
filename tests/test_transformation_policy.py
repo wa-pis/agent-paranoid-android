@@ -6,6 +6,7 @@ import pytest
 from test_data_agent.core.transformation_policy import BehaviorPolicyError, parse_behavior_policy
 from test_data_agent.core.transformation_policy import validate_policy_field_coverage
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint, validate_policy_profile
+from test_data_agent.core.transformation_policy import render_policy_review
 from test_data_agent.core.dataset import DatasetProfile
 
 
@@ -127,6 +128,27 @@ def test_coverage_rejects_forged_policy():
     forged = decision.model_copy(update={"fields": ()})
     with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$"):
         validate_policy_field_coverage(forged, DatasetProfile())
+
+
+def test_review_shows_every_action_without_mapping_values_or_control_codes():
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value\nnext", "data_type": "string", "sensitive": False}]}]})
+    payload = policy({"action": "substitute", "mapping": {"kind": "inline", "entries": [
+        {"original": ["fictional-private-marker"], "replacement": ["fictional-output-marker"]}]},
+        "unmatched": {"action": "preserve", "authorization_ref": "fictional-secret-ref"}})
+    payload["fields"][0]["field"] = "value\nnext"
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    review = render_policy_review(parse_behavior_policy(payload), profile, max_bytes=4096)
+    assert b'"action": "substitute"' in review
+    assert b'"unmatched": "preserve"' in review
+    assert b'"preserves_original": true' in review
+    assert b'"observed_sensitive": false' in review
+    assert b'value\\nnext' in review
+    assert b'fictional-private-marker' not in review
+    assert b'fictional-output-marker' not in review
+    assert b'fictional-secret-ref' not in review
+    with pytest.raises(BehaviorPolicyError, match="^invalid policy review$"):
+        render_policy_review(parse_behavior_policy(payload), profile, max_bytes=1)
 
 
 @pytest.mark.parametrize("dependencies", [["input"], ["missing"], ["value"], ["input", "input"]])
