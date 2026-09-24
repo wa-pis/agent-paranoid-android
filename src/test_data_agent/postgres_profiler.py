@@ -54,9 +54,11 @@ class PostgresProfiler:
     ) -> DatasetProfile:
         self.config.validate()
         categories = tuple(local_category_fields)
+        _validate_explicit_categories(self.config, categories)
         table_rows = self.fetch_query(build_list_tables_query(self.config))
         tables = self._complete_tables(table_rows)
         profiler = replace(self, config=self._expanded_config(tables))
+        _validate_explicit_categories(profiler.config, categories)
         entities = [profiler._profile_table(*table, categories) for table in tables]
         relationships = profiler._relationships(entities)
         return DatasetProfile(
@@ -365,11 +367,23 @@ def dataset_profile_from_postgres(
 ) -> DatasetProfile:
     """Profile one PostgreSQL source through its bounded read-only session."""
 
+    client.config.validate()
+    _validate_explicit_categories(client.config, local_category_fields)
     with client.session() as session:
         return PostgresProfiler(
             config=client.config,
             fetch_query=session.fetch_aggregate_dicts,
         ).profile(local_category_fields=local_category_fields)
+
+
+def _validate_explicit_categories(
+    config: PostgresConfig, categories: Sequence[LocalCategoryField],
+) -> None:
+    columns = config.resolved_columns if config.resolved_columns is not None else config.allowed_columns
+    if any(parse_postgres_column_selector(column).is_wildcard for column in columns):
+        return  # Metadata expansion must precede validation against a fixed snapshot.
+    for category in categories:
+        build_local_category_candidates_query(config, category)
 
 
 def _single_row(

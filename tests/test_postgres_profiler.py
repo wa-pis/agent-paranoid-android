@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from types import SimpleNamespace
 
 import pytest
 
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
-from test_data_agent.postgres_profiler import PostgresProfileError, PostgresProfiler
+from test_data_agent.postgres_profiler import (
+    PostgresProfileError, PostgresProfiler, dataset_profile_from_postgres,
+)
 from test_data_agent.postgres_query_builders import PostgresQuery
+from test_data_agent.postgres_query_builders import PostgresScopeError
 
 
 def postgres_config() -> PostgresConfig:
@@ -196,6 +200,43 @@ def test_missing_allowlisted_table_fails_without_partial_profile() -> None:
         PostgresProfiler(postgres_config(), results.fetch).profile()
 
     assert len(results.queries) == 1
+
+
+@pytest.mark.parametrize("entity,column", [
+    ("warehouse.crm.customers", "missing"),
+    ("warehouse.private.records", "tier"),
+])
+def test_invalid_category_scope_rejected_before_any_query(entity, column):
+    results = SyntheticPostgresResults()
+    with pytest.raises(PostgresScopeError):
+        PostgresProfiler(postgres_config(), results.fetch).profile(
+            local_category_fields=[LocalCategoryField(entity=entity, field=column)]
+        )
+    assert results.queries == []
+
+
+def test_invalid_category_scope_rejected_before_connection():
+    client = SimpleNamespace(
+        config=postgres_config(),
+        session=lambda: pytest.fail("invalid category must not open a session"),
+    )
+    with pytest.raises(PostgresScopeError):
+        dataset_profile_from_postgres(client, local_category_fields=[
+            LocalCategoryField(entity="warehouse.crm.customers", field="missing")
+        ])
+
+
+def test_invalid_wildcard_category_rejected_before_aggregates():
+    results = SyntheticPostgresResults()
+    config = replace(postgres_config(), allowed_columns=frozenset({
+        "public.orders.*", "crm.customers.*",
+    }))
+    with pytest.raises(PostgresScopeError):
+        PostgresProfiler(config, results.fetch).profile(local_category_fields=[
+            LocalCategoryField(entity="warehouse.crm.customers", field="missing")
+        ])
+    assert len(results.queries) == 3  # Table list and two bounded column snapshots.
+    assert not any("count(*)" in query.sql for query in results.queries)
 
 
 def test_qualified_wildcards_expand_to_stable_explicit_snapshot() -> None:
