@@ -382,6 +382,12 @@ def model_fingerprint(model: BaseModel) -> str:
         payload = dict(payload)
         if payload.get("local_category_fields", None) == []:
             payload.pop("local_category_fields", None)
+    if isinstance(model, DatasetProfile):
+        # Unspecified carries no new evidence; preserve pre-metadata plan hashes.
+        for entity in payload["entities"]:
+            for field in entity["fields"]:
+                if field.get("unique_ratio_kind") == "unspecified":
+                    field.pop("unique_ratio_kind")
 
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
         "utf-8"

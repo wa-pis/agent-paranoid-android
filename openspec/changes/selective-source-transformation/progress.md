@@ -693,3 +693,15 @@ Broader transformation remains unfinished.
   Profiling guide and design updated. No source-preserving runtime enabled.
   Next: independent exact-SHA review, then signed PR/CI; do not release this
   unreviewed working tree. Other existing dirty requirements notes retained.
+- Signed commit 4fdf1f5fc256b9909056ceacbd97d16532a6952f created with
+  normal configured Git hooks. Independent AI reviewer Curie assigned read-only
+  review against dc68e44; review active, no duplicate. Next: resolve findings,
+  record exact-SHA evidence, then push/PR and applicable CI before merge.
+- Curie AI review of 4fdf1f5 (2026-09-24) found two P2 upgrade defects:
+  additive unspecified metadata changed persisted-plan hashes; cache format 2
+  could reuse stale false uniqueness/PK evidence. Disposition: fixed canonical
+  profile hashing to omit only unspecified metadata; bumped folder cache to 3.
+  Explicit measurement metadata remains fingerprint-bound. Added fictional
+  persisted-profile hash and old-cache reprofile/round-trip regressions.
+  Focused checks: 13 tests passed (overflow + agent review); Ruff clean.
+  Next: signed correction and repeat independent review on current exact SHA.
