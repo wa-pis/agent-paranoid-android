@@ -66,7 +66,7 @@ def test_local_tty_issues_owner_only_receipt_and_stale_bytes_fail(tmp_path):
     assert verify(prepared, path) == prepared.parts
     with pytest.raises(LocalReceiptError):
         verify(request(source=b"code\nfictional-b\n"), path)
-    os.chmod(path, 0o644)
+    os.chmod(path, 0o640)
     with pytest.raises(LocalReceiptError):
         verify(prepared, path)
 

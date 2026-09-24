@@ -1128,3 +1128,15 @@ Broader transformation remains unfinished.
   mypy, strict OpenSpec and diff checks passed. Next: signed PR/CI for these
   private helpers, then source-snapshot/reprofile integration and scoped safety
   amendment before any runtime activation.
+- Signed `d24adc3` pushed and PR #546 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/546
+  Await GitHub CI/protection; do not repeat unchanged local checks or start
+  overlapping work. No ordinary per-PR AI review requested. After merge,
+  next small step is safe source snapshot loading and evidence revalidation
+  against the same bytes before the safety amendment.
+- PR #546 CI completed except for a separate GitHub Advanced Security CodeQL
+  gate: it flagged the test's intentionally world-readable `chmod(0o644)`
+  fixture, not the receipt implementation. Changed the negative fixture to
+  group-readable `0o640`, which still violates the owner-only contract;
+  focused receipt tests: 4 passed. Next: push this test-only correction,
+  require the new exact head's green checks, then merge normally.
