@@ -14,7 +14,8 @@ from test_data_agent.core.transformation_approval import prepare_approval_reques
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_receipt import (
-    LocalReceiptError, _canonical_request, _confirm_tty_fd, _issue_to_tty_fd, verify_local_receipt,
+    LocalReceiptError, _canonical_request, _confirm_tty_fd, _issue_to_tty_fd, _owner_only,
+    verify_local_receipt,
 )
 
 
@@ -66,9 +67,13 @@ def test_local_tty_issues_owner_only_receipt_and_stale_bytes_fail(tmp_path):
     assert verify(prepared, path) == prepared.parts
     with pytest.raises(LocalReceiptError):
         verify(request(source=b"code\nfictional-b\n"), path)
-    os.chmod(path, 0o640)
-    with pytest.raises(LocalReceiptError):
-        verify(prepared, path)
+
+
+def test_receipt_rejects_group_or_world_readable_modes():
+    assert _owner_only(os.geteuid(), 0o600)
+    assert not _owner_only(os.geteuid(), 0o640)
+    assert not _owner_only(os.geteuid(), 0o604)
+    assert not _owner_only(os.geteuid() + 1, 0o600)
 
 
 def test_non_tty_cannot_confirm(tmp_path):

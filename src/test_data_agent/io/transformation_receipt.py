@@ -71,6 +71,10 @@ def _issue_to_tty_fd(canonical: ApprovalRequest, path: Path, fd: int, budget: Ge
     atomic_write_bytes(path, payload)
 
 
+def _owner_only(owner: int, mode: int) -> bool:
+    return owner == os.geteuid() and stat.S_IMODE(mode) & 0o077 == 0
+
+
 def issue_local_receipt(
     request: ApprovalRequest, path: Path, *, max_total_bytes: int,
     max_review_bytes: int, budget: GenerationBudget,
@@ -107,7 +111,7 @@ def verify_local_receipt(
                                        max_review_bytes=max_review_bytes, budget=budget)
         with open_regular_file(path) as handle:
             metadata = os.fstat(handle.fileno())
-            if metadata.st_uid != os.geteuid() or stat.S_IMODE(metadata.st_mode) & 0o077:
+            if not _owner_only(metadata.st_uid, metadata.st_mode):
                 raise ValueError
             payload = handle.read(256)
             if len(payload) >= 256:

@@ -1140,3 +1140,9 @@ Broader transformation remains unfinished.
   group-readable `0o640`, which still violates the owner-only contract;
   focused receipt tests: 4 passed. Next: push this test-only correction,
   require the new exact head's green checks, then merge normally.
+- Signed `5f9e0df` pushed to #546. CodeQL also flags group-readable
+  `chmod(0o640)` in the negative test. Removed unsafe fixture chmod and
+  extracted the same owner/mode predicate for pure tests against metadata
+  values; receipt behavior unchanged. Focused receipt tests: 5 passed;
+  targeted Ruff and mypy passed. Next: push this correction; wait for all
+  checks on the new exact head before normal merge.
