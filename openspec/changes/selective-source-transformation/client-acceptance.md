@@ -99,6 +99,14 @@ Do not claim complete client acceptance from the script's exit code alone.
 
 ## New Agreed Scenarios
 
+Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
+saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
+empty/null values, integers above binary-float exact range and calendar dates.
+Both routes reject forbidden nulls and invalid dates under the declared types.
+These tests cover private policy persistence and typed mapping validation only;
+they do not establish transformation execution, wizard parity, approval,
+financial Decimal support or acceptance of missing private client inputs.
+
 Add one-to-one preserved reference combinations; changed amounts with zero and
 rounding exceptions; explicit formulas; consistent key domains; exact date
 substitution in selected fields; inline YAML/file CSV equivalence; profile
