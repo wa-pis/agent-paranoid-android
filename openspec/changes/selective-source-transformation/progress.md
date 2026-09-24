@@ -471,3 +471,31 @@ Broader transformation remains unfinished.
   47 CSV/loader tests, Ruff and mypy pass. Contract documents ASCII integer syntax,
   post-conversion duplicates, Python digit ceiling and unchanged inline semantics.
   Next: commit, independent review and PR; no public execution enabled.
+- Signed local 79f5b0e868ef7248012807c214310b69dcc8abf1 created. Curie
+  (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing against a925879.
+  Next: push/PR, review disposition and CI. No duplicate reviewer.
+- Pushed 79f5b0e; PR #528 opened with full independent AI review evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/528
+  Curie found no issues; 138 tests and additional syntax/integer/duplicate/budget
+  probes passed. Next: CI then merge if green; review complete.
+- Completed: PR #528 merged as e540c2ad41919e37e4eb4e8ae79298f191776eba;
+  CI green on independently reviewed 79f5b0e. Integer CSV mappings integrated.
+- Next: reconcile remaining type work with plan/tasks before adding more helpers:
+  Decimal financial contract, explicit float/boolean CSV parsing, DATETIME policy,
+  private behavior-profile serialization and actual transformation safety approval.
+  No active review; candidate release is not yet ready.
+- Reconciled plan/tasks: helper PRs do not complete milestone 1 or CSV vertical
+  slice. Started codex/1-6-transformation-safety-contract from e540c2a; added
+  safety-boundary.md draft and explicit groundwork/status note in tasks.md.
+  Draft scopes mixed-origin output, trusted user authority, snapshot binding,
+  default-surface isolation and required executable evidence; AGENTS unchanged.
+- Next: specify verifiable approval transport for review (opaque references are
+  not authority), then independent boundary review before enabling preservation.
+  No runtime changes or tests rerun in this documentation-only reconciliation.
+- Inspected agent_approval.py: current reviewed-spec hash proves plan selection,
+  not human identity. Same-privilege local agents can invoke identical CLI/files.
+  Added explicit pending approval-transport decision to safety-boundary.md:
+  trusted local operator (document same-privilege exclusion) versus separately
+  controlled signing authority. Ask user before choosing this security boundary.
+  No preservation execution or safety amendment activated. Other type/docs work
+  remains possible; this blocks approval design, not all implementation.

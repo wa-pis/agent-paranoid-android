@@ -10,6 +10,12 @@
 
 ## Before Implementation
 
+Internal groundwork (not end-to-end feature acceptance): private action/mapping
+models, column coverage/identity checks, strict inline primitives/dates, bounded
+CSV snapshots/parsing and integer normalization have landed through PR #528.
+The safety amendment and execution approval remain unimplemented. Review
+[the boundary draft](safety-boundary.md) before enabling the CSV vertical slice.
+
 See [milestones](plan.md) for the approved order and release scope. Safety-policy
 amendments still require scoped review and executable checks before activation.
 
