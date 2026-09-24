@@ -82,7 +82,12 @@ unchanged. Finding 10 table-profile date/timestamp bounds are corrected locally:
 37 focused checks cover aggregate -> inference -> generation, sensitive/all-null
 exclusions and invalid/timezone-inconsistent endpoints. PR #539 merged as
 `4550f22` with green CI. Installed-RC replay remains pending; query-source
-bounds are not covered.
+bounds are not covered by PR #539. A later local query-source follow-up uses
+fictional PostgreSQL and Trino aggregate-to-spec-to-generation tests for date
+and timezone-aware timestamp bounds. The existing column-summary query carries
+min/max for non-sensitive outputs; sensitive-name fields omit them, all-null
+fields claim no observed bounds, and malformed endpoints fail without exposing
+values. No live database, client input or installed-RC replay was used.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 

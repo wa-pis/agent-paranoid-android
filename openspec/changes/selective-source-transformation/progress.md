@@ -1284,3 +1284,12 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding-10 query-source follow-up on `codex/1-6-query-temporal`: reproduced
+  missing date/timestamp bounds on both PostgreSQL and Trino fictional query
+  profiles (four aggregate-to-generation cases failed on baseline). Added
+  non-sensitive min/max to the existing column summary, no extra statement or
+  source-row read; sensitive-name, all-null, malformed and timezone-mismatch
+  controls fail closed or omit unsupported evidence. Seventy-three focused
+  tests, Ruff, targeted mypy, strict OpenSpec, strict MkDocs and diff check
+  passed. Next: save signed local commit, then submit PR after #552 closes;
+  no live DB or final installed-candidate evidence.

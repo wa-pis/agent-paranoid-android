@@ -78,6 +78,9 @@ are environment configuration, never command-line secrets. Qualified column
 wildcards expand only against allowlisted metadata and never become a
 projection star. Reviewed query files use `profile-query`; query rows, SQL text,
 literals, endpoints, and backend messages are excluded from the profile.
+Non-sensitive date/timestamp query outputs include observed min/max bounds when
+the aggregate source supplies valid endpoints; all-null or sensitive-name
+fields do not claim them.
 
 Follow the source-specific walkthrough instead of assembling commands from this
 reference:
