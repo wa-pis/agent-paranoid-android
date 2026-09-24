@@ -756,3 +756,47 @@ Broader transformation remains unfinished.
   controls; all 7 date disclosure tests passed, Ruff/diff checks clean.
   No generation semantics or safety-policy changes. Next: signed PR and CI;
   final installed replay and broader output utility reporting still pending.
+- Signed ddc6b94 pushed; PR #535 opened for date fallback plan disclosure:
+  https://github.com/wa-pis/agent-paranoid-android/pull/535
+  No ordinary AI review launched. Next: green applicable CI and normal merge.
+- PR #535 merged as 1da23ad12146309e3f7f6435215864e7ddb89cd7: all 41
+  reported checks completed with success or intentional skip, none failed.
+  Normal exact-head merge; no protection bypass. Date fallback disclosure in
+  review-first planning landed; no claim of complete finding 10 acceptance.
+  Next: continue CSV transformation contract/remaining client evidence; resolve
+  preservation authority transport before activating any source-preserving path.
+- Started codex/1-6-csv-key-acceptance from 1da23ad, preserving dirty progress.
+  Finding 4 fictional actual CSV -> profile -> spec -> generation probe:
+  100 rows/four integer run_id values => zero top values, identifier=true,
+  100 generated distinct keys; text equivalents => four synthetic top values,
+  identifier=false, four generated categories. Source code unpatched; seed 7;
+  PYTHONPATH=src .venv/bin/python /private/tmp/apa_repeated_csv_probe.py.
+  Temporary fixture directories isolated and automatically cleaned; output only
+  aggregate counts. This confirms numeric branch of finding 4 and disproves
+  blanket missing CSV top_values; shares finding 8's unresolved scaling choice.
+  Updated acceptance register; no runtime fix or private-client pass claimed.
+  Next: executable regression once repeated-key scaling is selected; continue
+  independent agreed work without silently choosing fixed/proportional defaults.
+- User approved fixed distinct-key cardinality: four source keys remain a pool
+  of four synthetic keys when output grows. Implementation in progress; no
+  proportional scaling default. User also required automation to stop on blockers.
+  Paused heartbeat automation because preservation approval transport remains
+  unresolved; prompt now requires PAUSED plus actionable blocker notification,
+  resumption only on user request. Direct work on approved repeated-key fix may
+  continue; this does not enable source-preserving execution.
+- Implemented the approved fixed repeated-identifier pool in CSV/folder/aggregate
+  inference and the shared generator. No source literals or row mappings retained;
+  existing disjoint identifier domains remain. Reject undersized explicit PK pools,
+  exclude repeated folder keys from PK nomination, ignore censored CSV counts and
+  invalidate stale folder caches (format 4). Old no-pool serialization unchanged.
+  Focused pool/domain/overflow/contract tests: 43 passed. Targeted mypy (6 files),
+  Ruff and diff check passed after correcting a serializer return annotation.
+  Tests cover 2/100/1000 rows, deterministic keys, nulls, integer/string domains,
+  near-unique repeated keys, censored counts, strict pool validation and roundtrip.
+  Documentation/OpenSpec/acceptance updated; no private-input or installed-RC pass.
+  Next: signed commit, ordinary PR/CI; no per-PR AI review. Source-preservation
+  authority remains a separate unresolved gate. User now permits autonomous
+  heartbeat resumption when its blocker is resolved and useful work is available;
+  automation remains PAUSED, with the updated resumption rule saved.
+- Additional existing CSV/domain-agnostic/generation-contract regressions:
+  132 passed. Combined focused coverage this change: 175 tests passed.

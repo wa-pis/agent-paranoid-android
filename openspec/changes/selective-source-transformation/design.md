@@ -190,3 +190,16 @@ Before runtime work, settle the explicit safety-policy amendment, versioned
 contract and CLI surface, SQL snapshot/order semantics, key-mapping lifecycle,
 financial tolerance configuration and safe utility-report disclosure.
 These are implementation decisions, not claims of existing support.
+
+### Approved repeated-key cardinality (2026-09-24)
+
+For source-free generation, an observed repeated identifier cardinality defines
+a fixed synthetic pool, not a ratio scaled with output rows. Four keys remain
+four when generating more rows. Carry only the count, never identifier literals
+or source-to-output row mappings. `synthetic_identifier.pool_size` is an optional
+positive integer; omission retains the existing per-row behavior. Censored CSV
+counts and overflowing folder trackers must not nominate a pool or primary key.
+Nulls and undersized output may leave pool members unused; declared relationships
+remain authoritative. Aggregate estimates define a requested pool, not an exact
+source-fidelity claim. This does not enable the source-preserving transformation
+path or resolve its separate approval-authority gate.
