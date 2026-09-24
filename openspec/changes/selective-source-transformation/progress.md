@@ -1284,3 +1284,16 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding 17 independent PostgreSQL table-cost slice: fictional two-table,
+  four-column profile (three numeric) made 15 aggregate/metadata statements
+  before the change, 16 with one explicitly allowlisted category. Numeric
+  shape queries already returned row/non-null/distinct counts, so the profiler
+  now uses that same bounded query as the summary instead of querying again.
+  Counts fall to 12/13 respectively; logical table-aggregate requests fall
+  from nine to six without a category. No raw rows, new SQL permissions,
+  budget increases, live connection or source values. Baseline regression
+  failed at 15/16 versus the asserted 12/13; after the change 39 focused
+  PostgreSQL profiler/query/temporal tests passed. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Next: retain a signed local commit,
+  then queue this independent slice after the earlier draft PR. Actual scanned bytes,
+  latency, Trino table costs and final installed-RC behavior remain unverified.
