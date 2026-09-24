@@ -21,7 +21,9 @@ def test_private_yaml_roundtrip_preserves_mapping_scalar_kinds():
 
 @pytest.mark.parametrize("payload", [b"schema_version: '0.1'\nschema_version: '0.2'\n",
     b"!!python/object/apply:os.system ['fictional']", b"a: [", b"\xff",
-    b"a: &a {x: 1}\nb: {<<: *a}", b"1: value", b"a: &a [*a]"])
+    b"a: &a {x: 1}\nb: {<<: *a}", b"1: value", b"a: &a [*a]",
+    b"!!bool fictional-private-marker", b"!!timestamp fictional-private-marker",
+    b"!!map [fictional-private-marker]", b"!!set [fictional-private-marker]"])
 def test_invalid_private_yaml_is_detached(payload):
     try:
         raise ValueError("fictional-private-marker")

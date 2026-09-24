@@ -532,3 +532,11 @@ Broader transformation remains unfinished.
   dump regressions with detached errors. Thirteen YAML tests, Ruff, mypy and
   whitespace checks pass. Docs clarify restricted output and post-materialization
   size checking. Next: signed commit, independent review and PR.
+- Signed local fa934608e671292ebc56175712ddf45097bad046 created; Curie
+  (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing against 8bb1eac.
+  Next: review disposition and push/PR; no duplicate reviewer.
+- Curie found P2: malformed standard YAML tags leaked constructor KeyError/
+  AttributeError/TypeError instead of bounded errors. Added mapping-node shape
+  guard and normalized those safe-loader constructor failures at load boundary.
+  Four malicious-tag regressions; 17 YAML tests, Ruff and mypy pass.
+  Next: follow-up exact-SHA review before publication/merge.

@@ -12,6 +12,8 @@ from test_data_agent.core.transformation_policy import BehaviorPolicy, BehaviorP
 
 class _PolicyLoader(LimitedSafeLoader):
     def construct_mapping(self, node: Any, deep: bool = False) -> dict[Hashable, Any]:
+        if not isinstance(node, yaml.MappingNode):
+            raise ValueError("invalid policy mapping")
         result: dict[Hashable, Any] = {}
         for key_node, value_node in node.value:
             key = self.construct_object(key_node, deep=deep)
@@ -35,7 +37,7 @@ def load_behavior_policy_yaml(payload: bytes, *, max_bytes: int, budget: Generat
         result = parse_behavior_policy(raw)
         budget.check("policy YAML")
         return result
-    except (ValueError, yaml.YAMLError):
+    except (ValueError, yaml.YAMLError, KeyError, AttributeError, TypeError):
         pass
     try:
         raise BehaviorPolicyError("invalid private policy YAML")
