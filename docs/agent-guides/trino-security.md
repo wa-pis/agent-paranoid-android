@@ -57,6 +57,14 @@ first resolve bounded metadata into a fixed column snapshot; category validation
 then runs before aggregate queries. Category count, value-content and disclosure
 checks still apply, and these preflight checks do not grant preservation rights.
 
+PostgreSQL table profiling includes date/timestamp minima and maxima in the same
+column-summary aggregate for non-sensitive temporal columns. No extra query or
+row sample is needed. Sensitive-name columns do not request or retain these
+bounds. Nonempty temporal aggregates must have correctly typed, ordered endpoints
+with compatible timezone metadata; malformed endpoints fail closed. All-null
+columns have no observed bounds. This describes table profiling, not SQL-query
+source profiling, and does not certify source-period utility for missing bounds.
+
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.

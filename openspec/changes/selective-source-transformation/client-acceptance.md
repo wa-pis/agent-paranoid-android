@@ -62,6 +62,15 @@ safe JOIN/CTE-specific rejection hints for PostgreSQL and Trino; no SQL-policy
 expansion. Focused diagnostic/adapter/spec tests passed (56), and PostgreSQL
 client/profiler/SQL-policy tests passed (52). CI and installed-RC replay pending.
 
+Subsequent evidence: diagnostics merged in PR #537 (`3caa3ac`) with green CI.
+Finding 15 explicit-category scope preflight merged in PR #538 (`70ee64d`) with
+green CI: invalid explicit scopes fail before session creation; wildcard scopes
+validate after bounded metadata and before aggregates. Category-limit policy is
+unchanged. Finding 10 table-profile date/timestamp bounds are corrected locally:
+37 focused checks cover aggregate -> inference -> generation, sensitive/all-null
+exclusions and invalid/timezone-inconsistent endpoints. Temporal-bounds CI and
+installed-RC replay remain pending; query-source bounds are not covered.
+
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash
 are recorded in progress. The initial installed 1.4.0 comparison was diagnostic

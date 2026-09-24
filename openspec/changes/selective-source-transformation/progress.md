@@ -862,3 +862,30 @@ Broader transformation remains unfinished.
   37 successful checks and 4 intentional skips. Exact-head normal merge.
   Category preflight carried to codex/1-6-category-preflight from that main SHA;
   existing local changes preserved. Next: signed preflight fix PR and CI.
+- Signed 03f493c pushed; PR #538 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/538
+  Next: CI, normal merge, then remaining client/CSV requirements. No full-scope
+  acceptance or RC readiness claimed; preservation authority remains unresolved.
+- Finding 10 table-profile root cause reproduced with fictional injected
+  PostgreSQL aggregates through real profile -> spec -> generation: DATE and
+  TIMESTAMPTZ discarded provided endpoints. First harness attempt misrouted a
+  metadata query; corrected the fixture, then both regressions failed on absent
+  range distributions. Added min/max to the existing column-summary query only
+  for non-sensitive temporal columns; typed/order/timezone validation before
+  retention, no extra query, no sample or real DB. Sensitive-name bounds blocked
+  in profiler and builder; all-null columns retain no claimed bounds.
+  Profiler/builders/initial temporal tests: 30 passed; expanded temporal suite:
+  8 passed (36 distinct checks total). Mypy/Ruff/diff checks clean. Work local
+  pending #538 CI; latest observed 33 successes, 4 skips, 4 running.
+  Next: finish negative timezone checks and documentation/acceptance; merge #538
+  when green before a sequential temporal-bounds PR. Query-source date profiling
+  and final installed-RC acceptance remain separate, unverified requirements.
+- Added and passed mismatched naive/aware timestamp rejection; temporal suite
+  now has 9 cases, 37 distinct focused checks for this change. #538 has one
+  remaining running check, 36 successes and 4 intentional skips. No CI rerun.
+- PR #538 merged as 70ee64d023cbf2d5ed60401bda4ac11771886546 after
+  37 successful checks and 4 intentional skips; exact-head normal merge.
+  Temporal-bounds work moved intact to codex/1-6-postgres-date-bounds from main.
+  User PostgreSQL guide now distinguishes observed table bounds, sensitive/all-null
+  exclusions, invalid-bound failure and still-unverified query-source support.
+  Next: signed temporal-bounds PR and CI; no source-preservation authority assumed.

@@ -172,11 +172,18 @@ def build_column_summary_query(
     schema: str,
     table: str,
     column: str,
+    *,
+    temporal_bounds: bool = False,
 ) -> PostgresQuery:
     safe_table, safe_column = _qualified_column(config, schema, table, column)
+    temporal_sql = ""
+    if temporal_bounds:
+        if infer_sensitive_from_name(column):
+            raise PostgresScopeError("PostgreSQL temporal bounds require a non-sensitive field")
+        temporal_sql = f", min({safe_column}) AS min_temporal, max({safe_column}) AS max_temporal"
     return PostgresQuery(
         f"SELECT count(*) AS row_count, count({safe_column}) AS non_null_count, "
-        f"count(DISTINCT {safe_column}) AS distinct_count FROM {safe_table}"
+        f"count(DISTINCT {safe_column}) AS distinct_count{temporal_sql} FROM {safe_table}"
     )
 
 

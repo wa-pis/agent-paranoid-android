@@ -56,6 +56,14 @@ The database role must already be read-only. The client also requests a
 read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
 results. It accepts no arbitrary SQL and never profiles source rows.
 
+Table profiling retains observed minimum/maximum bounds for non-sensitive
+`date` and `timestamp` columns in the existing column-summary query. Inferred
+generation uses those ranges; timestamp offsets are retained. Sensitive-name
+columns do not expose date bounds, and all-null columns have none. Invalid or
+inconsistently typed bounds fail profiling rather than silently inventing a
+period. Missing bounds elsewhere still require review; this table-profile
+behavior does not imply date-bound support for `profile-query`.
+
 Create a safe profile, review a generation specification, generate, and
 validate. Output paths must not already exist unless the command explicitly
 supports `--overwrite`:
