@@ -1244,3 +1244,22 @@ Broader transformation remains unfinished.
   is 262114 bytes. Focused mapping tests: 56 passed; Ruff and mypy passed.
   Next: signed correction on the same PR, then require its fresh green CI;
   do not merge the failing head or request ordinary AI review.
+- PR #549 corrected head `426e3084e4c3803d7d18f4fe2ef85f98c05db388`
+  passed all 37 applicable CI/Documentation/Security/Containers checks;
+  four release/docs-deploy-only checks skipped. All four Python wheel
+  compatibility jobs and wheel smoke passed under the unchanged 256 KiB
+  budget; GitHub verified the SSH signature and reported normal merge clean.
+  No ordinary AI review was run. PR merged normally on 2026-09-24 as
+  `1e366102d99ab0f76c44421327f59af7ca259a1c`; no tag or publication.
+  Next: advance approved client and transformation work; Parquet unknown
+  metadata public-schema choice and scoped preservation safety amendment
+  still await explicit owner decisions. Existing 256 KiB wheel budget leaves
+  only 30 bytes for this local build, so future feature work must either
+  reduce packaged weight or obtain an explicit budget revision, not silently
+  raise the limit.
+- User approved revisiting the project wheel-size ceiling. Set the compressed
+  wheel regression ceiling to 512 KiB, with an exact-boundary test; retain the
+  separate optional dependency ceilings unchanged. This is a packaging budget
+  adjustment, not a data-safety or runtime-budget change. Focused installed-
+  package tests: 8 passed; Ruff, strict OpenSpec and `git diff --check` passed.
+  Next: submit the signed change through ordinary PR/CI.
