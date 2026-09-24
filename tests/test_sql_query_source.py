@@ -36,6 +36,22 @@ def write_query(tmp_path: Path, text: str) -> Path:
     return path
 
 
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("sql,hint", [
+    ("WITH private_marker AS (SELECT id FROM public.private_table) "
+     "SELECT id FROM private_marker", "CTE/WITH is not supported"),
+    ("SELECT a.id FROM public.private_table a "
+     "JOIN public.other_table b ON a.id = b.id", "JOIN is not supported"),
+])
+def test_structural_rejections_have_safe_recovery_hint(tmp_path, adapter, sql, hint):
+    path = write_query(tmp_path, sql)
+    with pytest.raises(SqlQuerySourceError) as caught:
+        inspect_query_source(request(path, adapter=adapter))
+    assert hint in str(caught.value)
+    assert "private" not in str(caught.value)
+    assert "other_table" not in str(caught.value)
+
+
 def columns() -> tuple[QuerySourceColumn, ...]:
     return (
         QuerySourceColumn("amount", "numeric", False),

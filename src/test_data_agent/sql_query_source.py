@@ -201,6 +201,16 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
     if any(getattr(node, "comments", None) for node in nodes):
         raise SqlQuerySourceError("SQL query comments are not allowed")
     if any(type(node).__name__ not in _ALLOWED_NODE_NAMES for node in nodes):
+        if any(isinstance(node, exp.With) for node in nodes):
+            raise SqlQuerySourceError(
+                "SQL query contains a forbidden operation: CTE/WITH is not supported; "
+                "use one fully qualified single-table SELECT"
+            )
+        if any(isinstance(node, exp.Join) for node in nodes):
+            raise SqlQuerySourceError(
+                "SQL query contains a forbidden operation: JOIN is not supported; "
+                "profile permitted tables separately"
+            )
         raise SqlQuerySourceError("SQL query contains a forbidden operation")
     for node in nodes:
         if isinstance(node, exp.Func) and node.sql_name().upper() not in _ALLOWED_FUNCTIONS:
