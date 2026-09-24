@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import json
 import re
 from collections import Counter
@@ -21,6 +22,8 @@ from typing import Any
 from pydantic import BaseModel, Field, model_validator
 
 from test_data_agent.core.limits import (
+    DEFAULT_MAX_INPUT_FILE_BYTES,
+    GenerationBudget,
     InputLimitError,
     configure_csv_field_limit,
     enforce_input_cell_count,
@@ -152,6 +155,27 @@ def profile_csv(
     )
 
 
+def profile_csv_bytes(
+    payload: bytes, table_name: str, *, budget: GenerationBudget,
+    max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
+) -> CSVProfile:
+    """Profile a fixed, bounded CSV snapshot without reopening its source path."""
+    budget.check("CSV snapshot profiling")
+    if (type(payload) is not bytes or type(table_name) is not str or not table_name
+            or type(max_bytes) is not int or max_bytes < 1 or len(payload) > max_bytes):
+        raise ValueError("invalid CSV snapshot")
+    configure_csv_field_limit(csv)
+    encoding = "utf-8-sig"
+    try:
+        payload[:CSV_SAMPLE_BYTES].decode(encoding)
+    except UnicodeDecodeError:
+        encoding = "latin-1"
+    text = payload.decode(encoding)
+    dialect = detect_csv_dialect(payload[:CSV_SAMPLE_BYTES].decode(encoding, errors="replace"))
+    reader = csv.DictReader(io.StringIO(text, newline=""), dialect=dialect)
+    return _profile_csv_rows(reader, table_name, (), None, budget)
+
+
 def profile_csv_with_row_digests(
     path: Path,
     table_name: str | None = None,
@@ -185,25 +209,43 @@ def _profile_csv(
     dialect = detect_csv_dialect(sample)
     with path.open(newline="", encoding=encoding) as handle:
         reader = csv.DictReader(handle, dialect=dialect)
-        fieldnames = validate_csv_headers(reader.fieldnames)
-        enforce_input_column_count(len(fieldnames), label="CSV")
-        reader.fieldnames = fieldnames
-        accumulators = {name: CSVColumnAccumulator(name) for name in fieldnames}
-        row_count = 0
-        for row in reader:
-            row_count += 1
-            enforce_input_row_count(row_count, label="CSV")
-            enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
-            for name in fieldnames:
-                accumulators[name].add(row.get(name, ""))
-            if row_digests is not None:
-                row_digests.add(csv_row_digest(row, fieldnames))
-    allowed = {item.field for item in local_category_fields if item.entity == (table_name or path.stem)}
+        return _profile_csv_rows(reader, table_name or path.stem, local_category_fields, row_digests, None)
+
+
+def _profile_csv_rows(
+    reader: csv.DictReader[str], table_name: str,
+    local_category_fields: Sequence[LocalCategoryField], row_digests: set[bytes] | None,
+    budget: GenerationBudget | None,
+) -> CSVProfile:
+    fieldnames = validate_csv_headers(reader.fieldnames)
+    enforce_input_column_count(len(fieldnames), label="CSV")
+    reader.fieldnames = fieldnames
+    accumulators = {name: CSVColumnAccumulator(name) for name in fieldnames}
+    row_count = 0
+    for row in reader:
+        if budget is not None:
+            budget.check("CSV snapshot profiling")
+        row_count += 1
+        enforce_input_row_count(row_count, label="CSV")
+        enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
+        for name in fieldnames:
+            if budget is not None:
+                budget.check("CSV snapshot profiling")
+            accumulators[name].add(row.get(name, ""))
+        if row_digests is not None:
+            row_digests.add(csv_row_digest(row, fieldnames))
+    allowed = {item.field for item in local_category_fields if item.entity == table_name}
+    columns = []
+    for name, accumulator in accumulators.items():
+        if budget is not None:
+            budget.check("CSV snapshot profiling")
+        columns.append(accumulator.to_profile(row_count, preserve_categories=name in allowed))
+    if budget is not None:
+        budget.check("CSV snapshot profiling")
     return CSVProfile(
-        table=table_name or path.stem,
+        table=table_name,
         row_count=row_count,
-        columns=[accumulator.to_profile(row_count, preserve_categories=name in allowed)
-                 for name, accumulator in accumulators.items()],
+        columns=columns,
         local_category_fields=list(local_category_fields),
     )
 
