@@ -508,3 +508,27 @@ Broader transformation remains unfinished.
   computed equal values. Draft now explicitly retains approved zero/rounding and
   coincident derived-value exceptions without copy/skip fallback, with evidence
   requirement. Strict OpenSpec/diff checks pass. Approval options still unselected.
+- Signed follow-up 7bccfc7b89d249dd0acc75a4d199b6e8940be6fe created; Curie
+  delta confirmation requested. Next: publish draft PR and review evidence; no
+  runtime enablement or decision on pending approval transport.
+- Pushed 7bccfc7; PR #529 opened with independent draft-review evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/529
+  Curie closed clarification, no new issues. Next: CI, then documentation-only
+  merge if green. Neither approval option is selected; user answer still pending.
+- Completed: docs-only PR #529 merged as 8bb1eac395b59d336670487219b87bc374549012;
+  CI green on independently reviewed 7bccfc7. Safety boundary remains a draft,
+  AGENTS/runtime unchanged; approval-transport decision still awaits user.
+- Next independent work: private behavior-policy YAML serialization/round-trip,
+  with bounded safe loading and detached errors. Do not implement or infer the
+  pending preservation authority. No active reviewer; preserve local notes.
+- Started codex/1-6-private-policy-yaml from 8bb1eac. Added restricted UTF-8
+  policy load/dump reusing LimitedSafeLoader depth/alias bounds, duplicate/non-string
+  key and YAML merge rejection, byte ceiling and shared budget; detached fixed
+  errors. No file writes or approval enabled. Nine tests/Ruff passed; corrected
+  loader override return annotation, mypy now passes.
+- Next: output byte/deadline and nested-duplicate tests, documentation, independent
+  review. Approval-transport user choice remains pending and is not inferred.
+- Added nested duplicate-key, output ceiling, expired budget and forged policy
+  dump regressions with detached errors. Thirteen YAML tests, Ruff, mypy and
+  whitespace checks pass. Docs clarify restricted output and post-materialization
+  size checking. Next: signed commit, independent review and PR.
