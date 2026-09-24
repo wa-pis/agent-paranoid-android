@@ -566,3 +566,31 @@ Broader transformation remains unfinished.
   fsync limitation; no approval or preservation runtime enabled.
   No existing PR for this branch. Next: signed commit and exact-SHA independent
   AI review before push/PR; approval-transport choice still pending.
+- Signed a09664426c495e0aec352e331e6b4e900d21e65f created. Independent AI
+  reviewer Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) assigned read-only
+  file-persistence scope against 39d1023. Next: review disposition, then push/PR.
+  Review active; do not launch a duplicate.
+- Curie completed independent AI review of a096644 on 2026-09-24: no findings
+  within scope; 56 tests and seven synthetic path/error probes passed. Pushed
+  reviewed SHA and opened PR #531; full review evidence recorded in PR body:
+  https://github.com/wa-pis/agent-paranoid-android/pull/531
+  Next: CI, then merge if green and permitted by branch protection. No active
+  reviewer; pending authority decision unchanged. No release tag created.
+- Completed: PR #531 merged as bd76cb4bf74d29500fcf2f06387986b51e643a85;
+  CI, documentation, container and security checks green on reviewed a096644.
+  No branch-protection bypass. Private policy persistence integrated, no public
+  transformation execution enabled. Next: reconcile remaining CSV scalar/type
+  work with the approved contract before the next focused implementation slice.
+  Approval transport remains an unresolved user decision; RC not ready.
+- Started codex/1-6-policy-roundtrip-acceptance from bd76cb4. Reconciled plan,
+  tasks and client acceptance: do not invent float/Decimal/timestamp conversion
+  rules while their contract remains incomplete. Added four integrated fictional
+  saved-policy inline-YAML/CSV parity cases: leading-zero string, empty/null,
+  integer above binary-float exact range and leap date. Four tests, Ruff and
+  diff check passed. Runtime unchanged; this is internal mapping acceptance,
+  not execution/wizard/client-private acceptance. Next: negative parity cases,
+  document scope and independent exact-SHA review. No active reviewer.
+- Extended parity matrix to nullable/nonnullable fields and invalid leap dates:
+  10 integrated tests pass; Ruff/diff checks pass. Client acceptance document
+  explicitly limits evidence to private persistence and typed mapping validation.
+  No product changes. Next: signed commit and independent exact-SHA AI review.
