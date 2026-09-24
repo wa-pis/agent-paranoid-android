@@ -18,6 +18,7 @@ from test_data_agent.core.distribution import (
     NumericDistribution,
     NumericShapeDistribution,
     StringPatternDistribution,
+    SyntheticIdentifierDistribution,
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
@@ -196,6 +197,9 @@ def synthetic_identifier(
     *, domain: int = 0, domain_count: int = 1,
 ) -> Any:
     # Disjoint residue classes avoid hash collisions and fixed-size row blocks.
+    distribution = field.typed_distribution
+    if isinstance(distribution, SyntheticIdentifierDistribution) and distribution.pool_size is not None:
+        row_index %= distribution.pool_size
     value = (seed * 1_000_000 + row_index) * domain_count + domain + 1
     if field.data_type == FieldType.INTEGER:
         return value

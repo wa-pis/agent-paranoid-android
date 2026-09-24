@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Annotated, Any, Literal, TypeAlias
 
-from pydantic import BaseModel, Field, TypeAdapter, model_validator
+from pydantic import BaseModel, Field, TypeAdapter, model_serializer, model_validator
 
 
 class CategoryWeight(BaseModel):
@@ -22,6 +22,14 @@ class MaskedPattern(BaseModel):
 class SyntheticIdentifierDistribution(BaseModel):
     kind: Literal["synthetic_identifier"] = "synthetic_identifier"
     prefix: str | None = None
+    pool_size: int | None = Field(default=None, strict=True, ge=1)
+
+    @model_serializer(mode="wrap")
+    def serialize(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if self.pool_size is None:
+            payload.pop("pool_size", None)
+        return payload
 
 
 class MaskedPatternsDistribution(BaseModel):

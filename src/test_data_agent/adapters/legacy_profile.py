@@ -18,6 +18,7 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.profile_types import ProfileDataType, coerce_profile_type
+from test_data_agent.csv_profiler import MAX_DISTINCT_DIGESTS
 
 
 def legacy_profile_to_dataset_profile(
@@ -37,6 +38,17 @@ def legacy_profile_to_dataset_profile(
         )
         for column in profile.get("columns", [])
     ]
+
+    for field, column in zip(field_profiles, profile.get("columns", []), strict=True):
+        distinct = column.get("approx_distinct_count")
+        non_null_rows = row_count * (1 - field.null_ratio)
+        if (
+            field.is_identifier and type(distinct) is int
+            and 0 < distinct < non_null_rows
+            # CSV digest counts at the cap are censored, not a measured pool.
+            and not (source_type == "csv" and distinct >= MAX_DISTINCT_DIGESTS - 1)
+        ):
+            field.distribution = {**field.distribution, "pool_size": distinct}
 
     primary_key_candidates = [
         field.name

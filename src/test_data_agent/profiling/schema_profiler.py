@@ -226,6 +226,7 @@ def _profile_schema_with_sample(
             field.name for field in fields
             if field.is_identifier and field.unique_ratio >= 0.98
             and field.unique_ratio_kind != "lower_bound"
+            and "pool_size" not in field.distribution
         ]
         entities.append(
             EntityProfile(
@@ -425,6 +426,8 @@ class FieldAccumulator:
 
     def distribution(self, profile: FieldProfile) -> dict[str, Any]:
         if profile.is_identifier:
+            if not self.distinct_overflow and 0 < len(self.distinct_values) < self.non_null_count:
+                return {"kind": "synthetic_identifier", "pool_size": len(self.distinct_values)}
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
             patterns = Counter(

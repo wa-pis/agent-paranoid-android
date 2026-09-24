@@ -42,3 +42,18 @@ uses 2020-01-01 for a missing minimum and 2025-01-01 for a missing maximum.
 These are fallback assumptions, not observed source bounds or measured fidelity.
 Set explicit bounds in the reviewed specification when a particular period is
 required. This warning does not change generation or certify source-period utility.
+
+Repeated identifier fields inferred from CSV profiles use a fixed synthetic key
+pool: four distinct source keys yield four synthetic keys even when output grows.
+Only the count is carried forward, never source identifiers or row mappings.
+The typed `synthetic_identifier` distribution accepts positive integer `pool_size`;
+without it, identifiers retain their existing per-row generation behavior.
+Pools cycle deterministically and unrelated identifier domains remain disjoint.
+Fewer output rows or nulls can leave some pool members unused. Source frequencies
+are not reproduced, and declared relationship constraints still take precedence.
+Repeated-key pools are not nominated as primary keys; an explicit primary key
+cannot have a pool smaller than its requested row count.
+Folder overflow and censored single-CSV counts cannot infer a fixed pool.
+Other aggregate profiles may supply approximate counts: these define the requested
+synthetic pool, not proof of exact source cardinality. Reprofile older artifacts
+to obtain pool metadata; no source-preservation permission is implied.
