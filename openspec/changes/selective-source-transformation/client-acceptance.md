@@ -94,6 +94,20 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
 | 17 | Focused fake-driver statement-count regression for both PostgreSQL and Trino query profiling measures one no-row schema request, one row count, three column summaries and two numeric-shape aggregates: seven requests for three fields; one explicitly allowlisted category adds one request, while default makes no category/raw-row request. This is query-count evidence, not a live scan-cost or latency measurement, batching fix, or final-RC acceptance. |
 
+Later finding-25 installed-CLI A/B used a new fictional 12-row integer spec,
+explicit `--mode negative --invalid-ratio 1`, and verified each package import
+root. Public 1.5.0 failed the all-invalid-row assertion: output amounts stayed
+integers. A separately installed wheel from source commit `76b2806` passed:
+amounts were intentionally invalid strings, manifest effective settings were
+`negative/1`, report validity was false, and the input spec stayed unchanged.
+The probe did not lock down exit-code policy. Wheel SHA-256:
+`07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+probe SHA-256: `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+This wheel still labels itself 1.5.0 and shares development dependencies; it
+is not clean-environment or final 1.6.0rc1 acceptance. Saved-valid precedence,
+controlled-invalid status semantics and intentionally invalid Parquet remain
+separate decisions.
+
 Additional finding-20 Parquet capability replay (not final RC acceptance):
 an isolated `sitecustomize.py` shim replaced only `pyarrow.parquet.read_table`
 with a fictional failure; no product code was patched. Verified installed

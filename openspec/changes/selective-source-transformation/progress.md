@@ -1318,3 +1318,15 @@ Broader transformation remains unfinished.
   evidence. This narrows finding 20; no real fault or final RC was tested.
   Next: preserve the regression/evidence for final installed-RC replay; do not
   rerun unchanged baseline/candidate checks.
+- Finding-25 installed-CLI A/B: new fictional test verified the actual import
+  root, 12 generated rows, invalid integer-cell types, manifest effective
+  `negative/1` settings, invalid report and unchanged input spec. Public 1.5.0
+  failed because amounts remained integers; separately installed wheel from
+  `76b2806` passed. Source-tree test passed. Wheel SHA-256
+  `07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+  probe SHA-256 `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+  The test deliberately does not assert the unresolved controlled-invalid
+  exit-code policy. Shared dependencies and a 1.5.0 version label mean this
+  is interim candidate evidence, not a clean install or final RC. Ruff,
+  strict OpenSpec and diff checks passed. Next: signed local commit; keep
+  saved-valid precedence and invalid Parquet decisions pending owner input.
