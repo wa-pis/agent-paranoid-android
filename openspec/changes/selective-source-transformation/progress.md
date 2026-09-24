@@ -1160,3 +1160,24 @@ Broader transformation remains unfinished.
   independent review before any preservation execution is connected.
   After adding per-field/finalization deadline checks, 91 focused CSV tests,
   targeted Ruff and mypy passed.
+- Signed `0887cc4` pushed and PR #547 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/547
+  Await the exact head's CI and GitHub protection. Do not rerun unchanged
+  local checks or start overlapping work. No ordinary per-PR AI review.
+- PR #547 head `0887cc4855c7eb8ef207f32846292ceacaf6ded2` was verified
+  signed by GitHub; all 37 applicable checks passed, four intentionally
+  skipped. Merged normally on 2026-09-24 as
+  `a8d8c73c4b8bfba4aa5b5341ec3de65dd84b1948`. New branch
+  `codex/1-6-safety-amendment` starts there; no policy edit or runtime
+  preservation path yet. Next: agree the exact scoped AGENTS.md/SECURITY.md
+  and baseline-spec amendment, add executable boundary tests, obtain
+  independent AI safety review of the final safety-change SHA before merge.
+- Finding 22 was already fixed and merged through PR #541; no duplicate SQL
+  work was started. On `codex/1-6-csv-approval-binding`, the private receipt
+  boundary now reprofiles the exact source bytes in its approval request and
+  requires exact reviewed evidence before either local issuance or receipt
+  verification. It rejects multiple sources until explicitly supported;
+  no public approval path or source-preserving execution exists. Fictional
+  source/evidence-conflict and stale-byte tests: 16 passed; targeted Ruff and
+  mypy passed. Next: signed PR/CI for this private guard, then continue other
+  approved work while the scoped policy wording awaits user confirmation.

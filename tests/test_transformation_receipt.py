@@ -8,11 +8,12 @@ from dataclasses import replace
 import pytest
 import yaml
 
-from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_approval import prepare_approval_request
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
+from test_data_agent.csv_profiler import profile_csv_bytes
 from test_data_agent.io.transformation_receipt import (
     LocalReceiptError, _canonical_request, _confirm_tty_fd, _issue_to_tty_fd, _owner_only,
     verify_local_receipt,
@@ -20,13 +21,12 @@ from test_data_agent.io.transformation_receipt import (
 
 
 def request(*, source: bytes = b"code\nfictional-a\n"):
-    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
-        "fields": [{"name": "code", "data_type": "string", "sensitive": False}]}]})
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(source, "items", budget=GenerationBudget(5)))
     policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
               "seed": 7, "fields": [{"entity": "items", "field": "code", "sensitivity": "non_sensitive",
               "behavior": {"action": "preserve", "authorization_ref": "fictional-ref"}}]}
     return prepare_approval_request(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(),
-        (SnapshotPart("source", "items.csv", source),), max_total_bytes=8192,
+        (SnapshotPart("source", "items", source),), max_total_bytes=8192,
         max_review_bytes=4096, budget=GenerationBudget(5))
 
 
@@ -46,6 +46,20 @@ def test_missing_receipt_and_forged_request_fail_value_free(tmp_path):
     forged = replace(prepared, review=b"hidden plan")
     with pytest.raises(LocalReceiptError):
         verify(forged, path)
+
+
+def test_receipt_boundary_rejects_source_conflicting_with_reviewed_evidence():
+    prepared = request()
+    policy = next(part.payload for part in prepared.parts if part.kind == "policy")
+    evidence = next(part.payload for part in prepared.parts if part.kind == "evidence")
+    forged = prepare_approval_request(
+        policy, evidence, (SnapshotPart("source", "items", b"code\nprivate@example.test\n"),),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    with pytest.raises(ValueError) as error:
+        _canonical_request(forged, max_total_bytes=8192, max_review_bytes=4096,
+                           budget=GenerationBudget(5))
+    assert "private@example.test" not in str(error.value)
 
 
 def test_local_tty_issues_owner_only_receipt_and_stale_bytes_fail(tmp_path):
