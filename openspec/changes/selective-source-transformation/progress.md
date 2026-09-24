@@ -1284,3 +1284,37 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Independent finding-25 fractional-ratio evidence on isolated main worktree:
+  fictional 200-row spec with two eligible fields at `mixed/0.25`, seed 31,
+  produced 54 intentionally invalid integer cells and 50 intentionally
+  invalid boolean cells out of 400 eligible cells. Two bundle runs wrote
+  identical rows and effective manifest settings; the input spec stayed
+  unchanged. A fictional direct-CSV source at the same ratio/seed likewise
+  reproduced its rows and effective settings. Focused tests: 2 passed, Ruff
+  passed. This does not prove an exact 25% quota: generation is per-field
+  probabilistic. Existing tests expose exit inconsistency: spec-based
+  mixed/negative returns 1 for intentional schema-invalid output, while
+  direct CSV/profile paths return 0. Do not claim finding-25 closure or
+  silently change exit semantics without expected-versus-unexpected failure
+  accounting. Next: settle/report controlled-invalid status semantics and
+  replay installed candidate; retain the separate saved-valid precedence
+  decision.
+- Finding-20 Parquet doctor JSON regression on the same isolated worktree:
+  an injected fictional capability failure after successful imports and
+  quickstart retains the dependency, extra and quickstart checks, returns
+  `ok=false`/exit 1, and reports a bounded capability failure without secret
+  text or reinstall advice. Three focused tests (this case plus both
+  fractional-ratio cases) and Ruff passed. This is local dependency-injection
+  evidence, not a fresh installed-package or real Parquet failure replay.
+  Next: carry the focused regression with the next substantive client-fix PR;
+  keep PR #552 draft until the invalid Parquet publication policy is chosen.
+- Installed finding-20 capability replay used an inspected, isolated shim
+  (SHA-256 `524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`)
+  that fails only `pyarrow.parquet.read_table`, never product code. Verified
+  public 1.5.0 and interim typed-Parquet candidate import roots both returned
+  structured JSON with quickstart/extra available, Parquet capability failed,
+  `ok=false`/exit 1, no fictional token and no reinstall advice. The earlier
+  output-budget attempt failed before quickstart and is not capability
+  evidence. This narrows finding 20; no real fault or final RC was tested.
+  Next: preserve the regression/evidence for final installed-RC replay; do not
+  rerun unchanged baseline/candidate checks.
