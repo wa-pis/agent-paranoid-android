@@ -4,6 +4,63 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Existing permitted SQL connectors remain usable
+
+The system SHALL consistently enforce already-permitted boolean expressions
+across supported SQL profiling adapters without widening source authorization,
+function allowlists or resource budgets.
+
+#### Scenario: Compound predicate without new SQL capabilities
+
+- **GIVEN** an allowlisted single-table query with supported predicates
+- **WHEN** predicates are combined using AND, OR and supported negation
+- **THEN** connector/function classification does not reject permitted syntax,
+  while forbidden functions, unauthorized columns and exceeded budgets still fail.
+
+### Requirement: Effective generation settings are truthful
+
+The system SHALL apply documented setting precedence consistently across
+generation entrances and SHALL record settings actually used by generation.
+Intentional invalid-data modes SHALL NOT bypass privacy enforcement.
+
+#### Scenario: Explicit mode differs from a saved specification
+
+- **GIVEN** a saved specification and an explicit mode/ratio selection
+- **WHEN** generation resolves that selection under the documented contract
+- **THEN** output behavior, effective specification and manifest agree, or the
+  conflicting request is rejected explicitly rather than silently ignored.
+- **AND** validation status, publication behavior and JSON/exit semantics follow
+  the documented distinction between controlled negatives and failed valid runs.
+
+### Requirement: Typed artifacts and unknown evidence are honest
+
+Supported exact financial types SHALL retain precision/scale without float
+intermediates. Typed Parquet output SHALL preserve declared supported logical
+types; unsupported or intentionally invalid values SHALL follow an explicit
+contract rather than silently converting a whole column. Profiling SHALL NOT
+present unmeasured statistics or sensitivity as observed zero or established safety.
+
+#### Scenario: Typed output is read back
+
+- **GIVEN** a supported specification containing dates, timestamps, nullable
+  fields and exact decimal values
+- **WHEN** a valid dataset is published as Parquet and read back
+- **THEN** physical logical types and decimal precision/scale remain consistent
+  with the specification, and unavailable profiling evidence stays unavailable.
+
+### Requirement: Diagnostic recovery preserves confidentiality
+
+Diagnostics SHALL distinguish missing dependencies from known local capability
+failures and retain completed checks when a smoke test fails. Recovery guidance
+SHALL use bounded safe categories rather than source data or backend exceptions.
+
+#### Scenario: Installed optional capability fails publication
+
+- **GIVEN** the required optional dependency is installed
+- **WHEN** a local capability smoke fails during publication
+- **THEN** doctor reports the failed check and an appropriate safe cause, does
+  not mislabel the dependency as absent, and exposes no credentials or source values.
+
 ### Requirement: Scoped typed substitution dictionaries
 
 The system SHALL support explicit local replacement dictionaries scoped to

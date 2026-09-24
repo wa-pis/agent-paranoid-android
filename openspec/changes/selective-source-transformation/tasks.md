@@ -30,6 +30,34 @@ amendments still require scoped review and executable checks before activation.
 
 ## Implementation And Acceptance
 
+### Refreshed client intake (2026-09-24)
+
+Details, ordering and decisions: [feedback v2](feedback-2026-09-24-v2.md).
+All items below remain unverified until reproduced against the current candidate.
+
+- [ ] Inspect new/changed harnesses; record package/version/SHA or wheel hash,
+  extras, probe hashes and safe isolated baseline/candidate execution plans.
+- [ ] Reproduce/fix 22: allowed AND/OR/nested predicates on both SQL adapters;
+  retain forbidden-function, authorization and budget negative controls.
+- [ ] Reproduce/fix 25: all generation entrances honor documented explicit/omitted
+  mode and ratio precedence; effective spec/manifest/report/exit reflect execution.
+- [ ] Reproduce/fix 20: doctor retains failed checks, distinguishes missing extras
+  from capability failures and gives safe recovery hints without backend text.
+- [ ] Decide 21 auth methods/secret indirection, then implement shared Trino
+  propagation, pre-connect requirements, TLS and redaction tests; no live access.
+- [ ] Integrate 23 into exact-decimal contract and carry precision/scale through
+  profile/spec/generation/formulas/exports without float intermediates.
+- [ ] Reproduce/fix 24 with declared Parquet schemas and physical/readback checks;
+  settle intentional-invalid mixed-type behavior with 25 before implementation.
+- [ ] Reproduce/fix 26 unknown-versus-measured Parquet metadata and bounded
+  sensitivity profiling; decide CLI exposure/export compatibility explicitly.
+- [ ] Reconcile refreshed 1–19 evidence: missing date bounds, SQL diagnostics and
+  scan costs, formula dependencies, publication/overwrite and utility boundaries.
+- [ ] Extend candidate matrix to findings 1–26 and section E safeguards; record
+  unavailable private/live cases honestly. Full scope and final RC gates unchanged.
+
+### Existing transformation and release requirements
+
 - [ ] Reconcile every client finding against [client acceptance](client-acceptance.md),
   with disposition and executable evidence; do not treat supplied fix prompts
   or monkeypatches as approved implementation instructions.
