@@ -191,3 +191,31 @@ def validate_policy_profile(policy: BehaviorPolicy, profile: DatasetProfile) -> 
         except BehaviorPolicyError as error:
             error.__context__ = None
             raise
+
+
+def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max_bytes: int) -> bytes:
+    """Value-free local review; bind these bytes with full policy/evidence bytes."""
+    policy = parse_behavior_policy(policy)
+    profile = profile.model_copy(deep=True)
+    validate_policy_profile(policy, profile)
+    if type(max_bytes) is not int or max_bytes < 1:
+        raise BehaviorPolicyError("invalid policy review") from None
+    observed = {(entity.name, field.name): field.sensitive
+                for entity in profile.entities for field in entity.fields}
+    fields = []
+    for decision in policy.fields:
+        behavior = decision.behavior
+        unmatched = behavior.unmatched.action if isinstance(behavior, SubstituteAction) else None
+        fields.append({
+            "entity": decision.entity,
+            "field": decision.field,
+            "action": behavior.action,
+            "unmatched": unmatched,
+            "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
+            "declared_sensitivity": decision.sensitivity,
+            "observed_sensitive": observed[(decision.entity, decision.field)],
+        })
+    payload = json.dumps({"version": 1, "fields": fields}, ensure_ascii=True, indent=2).encode("ascii")
+    if len(payload) > max_bytes:
+        raise BehaviorPolicyError("invalid policy review") from None
+    return payload
