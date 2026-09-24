@@ -1066,7 +1066,7 @@ Broader transformation remains unfinished.
   review. Automation stays paused; no release tag or publication exists.
 - PR #544 opened for signed `dee0bb84582784df42b133f8627bd239ad5453d8`;
   documentation-only checks passed (Python 3.11–3.14 and documentation, with
-  expected skips). Independent read-only AI reviewer Jason
+  expected skips). Independent read-only AI reviewer Codex (agent nickname Jason)
   (`01a0d4ff-6054-7643-a81f-9b81ec008d95`), 2026-09-24 19:59 UTC, found
   three contract ambiguities: digest-only review could hide effective actions,
   sensitivity evidence was not explicitly receipt-bound, and agent approval
@@ -1075,3 +1075,10 @@ Broader transformation remains unfinished.
   evidence and exclude agent/MCP minting. These corrections require checks and
   same-reviewer re-review on the new exact SHA before merge. This is AI review,
   not human approval; no source-preserving execution is enabled.
+- Same AI reviewer re-reviewed the corrected contract at exact
+  `2bd910eea5f896f2d84c5916cd687b1afb842562` on 2026-09-24 20:02 UTC:
+  all three findings resolved at proposal level; no new material safety issue.
+  Read-only diff/ancestor/whitespace checks passed. This is not human approval
+  and does not complete the runtime safety amendment or executable gates.
+  Next: merge #544 only after the corrected head's green CI and GitHub
+  protection checks; then implement local approval with fictional tests.
