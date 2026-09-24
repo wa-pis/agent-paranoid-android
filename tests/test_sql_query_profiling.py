@@ -149,6 +149,30 @@ def test_default_profile_does_not_query_or_store_category_literals() -> None:
     assert all("GROUP BY" not in query.sql for query in results.queries)
 
 
+@pytest.mark.parametrize("adapter", [SqlQueryAdapter.POSTGRES, SqlQueryAdapter.TRINO])
+@pytest.mark.parametrize("preserve_category", [False, True])
+def test_query_profile_statement_count_scales_with_fields(
+    adapter: SqlQueryAdapter,
+    preserve_category: bool,
+) -> None:
+    results = FakeResults()
+    profile_validated_query(
+        plan(adapter=adapter),
+        describe_query=results.describe,
+        fetch_query=results.fetch,
+        local_category_fields=(
+            (LocalCategoryField(entity="warehouse.paid_orders", field="state"),)
+            if preserve_category
+            else ()
+        ),
+    )
+
+    # One no-row schema request, one row count, three column summaries, and
+    # two numeric-shape aggregates; only an explicit local category adds one.
+    assert len(results.queries) == 7 + preserve_category
+    assert sum("GROUP BY" in query.sql for query in results.queries) == preserve_category
+
+
 def test_trino_builders_use_explicit_outer_projection() -> None:
     query_plan = plan(adapter=SqlQueryAdapter.TRINO)
 

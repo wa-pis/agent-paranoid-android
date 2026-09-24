@@ -84,6 +84,21 @@ exclusions and invalid/timezone-inconsistent endpoints. PR #539 merged as
 `4550f22` with green CI. Installed-RC replay remains pending; query-source
 bounds are not covered.
 
+Refreshed finding evidence (2026-09-24, not final RC acceptance):
+
+| Finding | Reproduced result and remaining boundary |
+| --- | --- |
+| 20 | Safe doctor reporting fix merged in PR #542 (`47a1eb8`); 29 focused checks covered missing/broken imports, retained quickstart failure report and redacted errors. Separately installed 1.5.0 baseline and interim candidate both repeated healthy `doctor --json` and `--require-extra parquet --json` with exit 0 and identical structured reports (11/12 checks). Installed failure-path and clean-environment replay remain unverified; client probe was not run. |
+| 22 | AND/OR classification reproduced with sqlglot 30.13.0 and corrected in PR #541 (`b43005e`). Focused PostgreSQL/Trino predicate and fake-driver profile-to-spec checks passed, including forbidden-function controls; no live DB or final installed-RC replay. |
+| 24 | The client's fictional spec was extracted as data, not executed as a script. Installed public 1.5.0 baseline and interim `47a1eb8` candidate both wrote `created_at` physically as Parquet `string` although spec declares `date`; integer remained `int64`. Declared-schema/readback correction, nullable/timestamp/decimal cases and final RC replay remain pending. |
+| 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
+| 17 | Focused fake-driver statement-count regression for both PostgreSQL and Trino query profiling measures one no-row schema request, one row count, three column summaries and two numeric-shape aggregates: seven requests for three fields; one explicitly allowlisted category adds one request, while default makes no category/raw-row request. This is query-count evidence, not a live scan-cost or latency measurement, batching fix, or final-RC acceptance. |
+
+These probes used fictional data, selected each installed CLI and verified its
+package import root. Subprocesses had 30-second timeouts and bounded captures;
+temporary output lived under canonical `/private/tmp` to satisfy no-follow
+publication. No product monkeypatch, private input, database or API was used.
+
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash
 are recorded in progress. The initial installed 1.4.0 comparison was diagnostic

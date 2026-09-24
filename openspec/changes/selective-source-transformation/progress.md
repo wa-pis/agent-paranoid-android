@@ -953,3 +953,87 @@ Broader transformation remains unfinished.
   OpenSpec validation passed; next: signed PR/CI. Fresh-process installed-wheel
   doctor replay and full
   finding-20 acceptance remain pending.
+- PR #542 completed 37 successful checks and 4 intentional skips, then merged
+  normally as 47a1eb83d028713d8f3d3dc2e3d768bc9643f16b. No ordinary AI
+  review or branch-protection bypass. Main was clean at that SHA.
+- Built an offline wheel from 47a1eb83d028713d8f3d3dc2e3d768bc9643f16b
+  using the existing hatchling environment (uv's default cache was sandbox-
+  inaccessible). Wheel SHA-256:
+  e356fff2dcb87ab1a03971991d7be10a10e7249c8b57c3467677201d348326e8.
+  Installed it with `pip --target --no-deps` under a new private temporary
+  directory; asserted package import resolved to that target, not the checkout.
+  Two fresh-process wheel `doctor --json` calls returned exit 0 with identical
+  11-state reports; one `doctor --require-extra parquet --json` returned exit 0
+  and available capability. Dependencies came from the existing venv, so this
+  is neither clean-environment nor final 1.6.0rc1 evidence. Wheel metadata still
+  says 1.5.0; the source SHA and hash identify this interim build. No network,
+  database, external API or production data used.
+- Fully read supplied `probe_doctor_parquet.py` and `probe_parquet_types_ab.py`
+  without execution. The former's fixed arm monkeypatches product code, emits
+  raw exception text, lacks subprocess timeout and returns zero after failed
+  iterations. The latter removes a fixed archive-relative output directory,
+  selects CLI from PATH, lacks timeouts and can return zero without an artifact.
+  Neither is approved as-is for candidate acceptance. Next: prepare bounded
+  fictional, unpatched baseline/candidate adaptations; keep private/live cases
+  unverified. A new sequential evidence branch holds this note only.
+- Ran a bounded, unpatched fresh-process doctor adaptation against separately
+  installed public 1.5.0 baseline and interim candidate at merge SHA 47a1eb8.
+  Each subprocess import was proven to resolve inside its own installed target;
+  both repeated `doctor --json` calls and both repeated
+  `doctor --require-extra parquet --json` calls returned exit 0, structured JSON
+  and identical reports (11 and 12 checks respectively). Each process had a
+  30-second timeout and bounded captured output. This confirms only the healthy
+  installed-wheel path with the shared development dependencies, not the
+  injected failure path, clean-environment behavior, final RC, or original
+  client probe (which was not executed). No DB, API or private data was used.
+  Next: characterize finding 24 with a bounded fictional Parquet baseline/
+  candidate probe, then settle the mode/type policy before implementation.
+- Characterized findings 24/25 using the supplied Parquet probe's fictional
+  spec extracted as data (the script itself was not run). With explicitly
+  selected installed CLIs, proven import roots, 30-second subprocess timeouts,
+  bounded output and an isolated no-symlink `/private/tmp` work folder, public
+  1.5.0 baseline and interim candidate produced the same result: successful
+  Parquet artifacts, `created_at` physically `string` despite declared `date`,
+  `amount` `int64`; explicit `--mode negative --invalid-ratio 1.0` still reported
+  effective `valid/0.0` in both manifests. The first attempt used the system
+  temporary path, whose symlinked ancestor was correctly rejected by the
+  product's no-follow filesystem policy; rerun used the canonical path.
+  No client script, monkeypatch, live integration or private data was used.
+  Next: implement the confirmed spec-input mode override after the pending
+  precedence choice; design typed Parquet handling without silently coercing
+  invalid heterogeneous values.
+- Reconciled reproduced 20/22/24/25 evidence into `client-acceptance.md` with
+  exact installed-package scope and explicit remaining gaps; no finding was
+  marked finally accepted from a healthy-path or interim-wheel probe. Inspected
+  all Parquet publication callers and confirmed a declared-schema fix must
+  carry the reviewed DatasetSpec through both CLI and agent writers; direct
+  row-only writer cannot infer all-null/date types reliably. No runtime or
+  safety-policy change. OpenSpec strict validation and git diff check passed.
+  Next: settle mode precedence and invalid heterogeneous Parquet policy, then
+  make one focused schema/override implementation with physical-type tests.
+- Completed static inspection of remaining refreshed `rc_anchor_check.py` and
+  changed `probe_fix_ab.py` plus its runner before any execution. The fix arm
+  monkeypatches product publication, recursively removes fixed output and lacks
+  timeouts; anchor script returns zero despite drift. Original scripts not run.
+  A read-only AST adaptation inventoried all 61 anchor tuples, then compared
+  exact installed public 1.5.0 and interim `47a1eb8` package trees: 61/61
+  same-line at baseline; candidate 41 same-line, 14 moved, 6 absent. This is
+  navigation evidence only, not functional or final-RC acceptance. Added
+  SHA-256 for all six new/changed probes and inspection boundaries to the v2
+  intake. Next: re-anchor claims only on final installed RC; use existing
+  unpatched, bounded publication acceptance instead of the monkeypatched
+  `probe_fix_ab.py` arm. Continue independent client work while mode/Parquet
+  product choices remain unanswered.
+- Traced finding 25 end to end before editing: spec-input CLI defaults erase
+  explicit-versus-omitted flag provenance; spec generation ignores mode/ratio,
+  while business-rule adapter reads CLI defaults. Forwarding `negative` alone
+  would expose the existing publish-with-exit-1 path for intentionally invalid
+  rows. Kept that public contract unchanged pending the already-requested
+  precedence/Parquet publication decisions. Independently measured finding 17
+  with a fake-driver regression for PostgreSQL and Trino: three fields (two
+  numeric) issue seven bounded schema/aggregate requests; one explicitly
+  reviewed category adds one, default sends no category/raw-row request.
+  `tests/test_sql_query_profiling.py`: 14 passed; targeted Ruff and diff check
+  passed. This is not live scan-cost evidence and authorizes no SQL expansion.
+  Next: resolve 25's mode and intentional-invalid publication contract; then
+  implement it once across generator, business rules, manifest and exit status.
