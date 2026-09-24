@@ -1146,3 +1146,17 @@ Broader transformation remains unfinished.
   values; receipt behavior unchanged. Focused receipt tests: 5 passed;
   targeted Ruff and mypy passed. Next: push this correction; wait for all
   checks on the new exact head before normal merge.
+- PR #546 head `88eb4cc9f17eec32bb78f5a47a7a5a2ca6e01b77` was verified
+  signed by GitHub; 37 applicable checks passed, four intentionally skipped,
+  including both CodeQL gates green. Merged normally on 2026-09-24 as
+  `468a701beeed841a0e0db96f2cf91a6f135a7e01`. New branch
+  `codex/1-6-source-snapshot` starts from that merge. Added private bounded
+  regular-file CSV snapshot loading and same-byte profiling using the existing
+  CSV accumulator; revalidation requires exact DatasetProfile evidence match.
+  No source-preserving execution or public entry point. Fictional focused CSV
+  and snapshot tests: 21 passed; affected pipeline/approval/receipt tests:
+  82 passed; targeted Ruff and mypy passed. Next: review source/evidence
+  binding in the approval flow, finish scoped safety amendment and its
+  independent review before any preservation execution is connected.
+  After adding per-field/finalization deadline checks, 91 focused CSV tests,
+  targeted Ruff and mypy passed.
