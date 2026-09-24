@@ -88,6 +88,19 @@ and timezone-aware timestamp bounds. The existing column-summary query carries
 min/max for non-sensitive outputs; sensitive-name fields omit them, all-null
 fields claim no observed bounds, and malformed endpoints fail without exposing
 values. No live database, client input or installed-RC replay was used.
+Installed-package A/B on fictional aggregates: public 1.5.0 baseline
+(`/private/tmp/apa-client-acceptance.xrueHB/baseline-1.5.0`) returned no
+date-range distribution, no temporal-bound SQL and generated values outside
+the requested bounds for both PostgreSQL/Trino date/timestamp cases. An offline
+wheel from exact local commit `6776395` (SHA-256
+`0071d5f87cdd33c95b36689ae75811beb4b093da2d6e923777bf078e59e37da6`)
+installed separately under `/private/tmp/apa-query-temporal-ab.74PHgQ/candidate`
+returned typed ranges, in-bound seeded generation and bound SQL for all four;
+both packages issued three fake requests per case. Import roots and version
+labels were checked, and the inspected probe SHA-256 is
+`0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`.
+The interim wheel still says 1.5.0 and shares interpreter dependencies: not a
+clean install, live database or final 1.6.0rc1 acceptance.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 
