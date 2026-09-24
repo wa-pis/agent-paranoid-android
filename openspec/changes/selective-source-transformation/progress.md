@@ -705,3 +705,18 @@ Broader transformation remains unfinished.
   persisted-profile hash and old-cache reprofile/round-trip regressions.
   Focused checks: 13 tests passed (overflow + agent review); Ruff clean.
   Next: signed correction and repeat independent review on current exact SHA.
+- Signed correction 00d7aa797a2911f1cdaa59005f71b0982f04c305; mypy clean
+  for both changed source modules. Curie repeat AI review active on this SHA,
+  focused on both P2 dispositions and regression risk. No PR/push yet.
+- Curie repeat independent AI review completed 2026-09-24 on 00d7aa7:
+  both P2 resolved, no new delta findings; 90 tests and independent legacy-hash,
+  evidence-binding/nonmutation probes passed. Not human approval. Reviewed SHA
+  pushed; PR #534 records identity, exact SHAs, scope, findings/disposition and
+  evidence: https://github.com/wa-pis/agent-paranoid-android/pull/534
+  No active reviewer. Next: applicable CI and protection-compliant merge.
+- PR #534 CI blocked on public-contract fixture drift across Python versions:
+  advisor-exchange.json lacked three additive unique_ratio_kind=unspecified
+  entries. Python 3.11: 1 failed, 1580 passed, 10 skipped. No runtime failure
+  inferred from that snapshot mismatch. Updated only those three fixture fields;
+  focused contract tests: 3 passed, diff check clean. Next: signed fixture fix,
+  independent delta review on updated SHA, push and green CI before merge.
