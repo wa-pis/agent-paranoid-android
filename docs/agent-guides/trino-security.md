@@ -40,6 +40,16 @@ accepts one bounded local file, validates one fully qualified single-table
 `SELECT`, and executes only trusted no-row schema and aggregate wrappers.
 Query text, literals, backend errors, endpoints, and rows must not cross into
 profiles, generated data, logs, providers, or default MCP responses.
+Unsupported JOIN and CTE/WITH shapes receive fixed recovery hints without table
+names, query text or literals. This does not broaden the permitted SQL subset.
+
+PostgreSQL connection failures expose only fixed categories when identifiable
+from typed network/TLS exceptions or allowlisted SQLSTATE codes: timeout,
+connection refused, name resolution, TLS, authentication/authorization, database
+configuration or permissions. Unknown failures remain generic. Driver text is
+never parsed for clues or returned; sanitized connection errors are detached
+from the original exception context. Some drivers wrap network failures in a
+generic exception, so a specific category is not guaranteed.
 
 ## Enforcement
 

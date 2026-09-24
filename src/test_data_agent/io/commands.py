@@ -207,7 +207,15 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
     ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
-        raise SystemExit("infer-spec expects a dataset profile, not a dataset spec")
+        raise SystemExit(
+            "infer-spec expects a dataset profile, not a dataset spec. "
+            "JSON spec-only keys (schema_version, privacy_rules, privacy_settings, "
+            "generation_settings, validation_settings) select spec parsing, even "
+            "when profile fields are present. Use an unmodified profile-csv or "
+            "other profiling-command artifact for inference; pass an existing "
+            "spec to generate. Do not remove privacy settings merely to force "
+            "profile parsing."
+        )
     spec = infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
     print(
         "Wrote dataset spec: "

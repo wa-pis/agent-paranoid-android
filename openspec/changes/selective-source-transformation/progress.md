@@ -800,3 +800,48 @@ Broader transformation remains unfinished.
   automation remains PAUSED, with the updated resumption rule saved.
 - Additional existing CSV/domain-agnostic/generation-contract regressions:
   132 passed. Combined focused coverage this change: 175 tests passed.
+- Signed c28ac5a4d9046e513b3f3799f9ac830dbca8b804 pushed; PR #536 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/536
+  GitHub confirms documentation running and remaining jobs queued on that SHA.
+  Next: inspect CI results, fix any regression, then normal exact-head merge.
+  No duplicate tests or ordinary AI review launched. RC remains incomplete.
+- Finding 7 timestamp subcase independently replayed through CSV profiling,
+  inference and generation using an inspected fictional-only isolated probe:
+  /private/tmp/apa_timestamp_acceptance.py (SHA-256
+  22006c561a0ae2e48bfb62ccfcb2e008c8b6dc79c404a18ca33d66b4efb2ddab).
+  Current c28ac5a and saved baseline 1.5.0 both retained time, +03:00 offset and
+  bounds across 20 rows. Baseline import path and distribution version verified.
+  Initial baseline/bin/python invocation failed because this is a target package
+  directory, not a virtualenv; corrected PYTHONPATH with existing interpreter.
+  No product monkeypatch, source/private input or external connection used.
+  This is already-fixed timestamp evidence, not closure of monthly-date semantics
+  or mixed profile/spec routing. PR #536 CI last observed 33 success, 4 skipped,
+  4 running; no failures. Next: finish CI/merge, then address remaining subcases.
+- PR #536 merged as ca6cb1233b6863d86bbc67a6f820ef9e28c76405 after
+  all 41 checks completed: 37 success, 4 intentional skips. Exact-head normal
+  merge; no GitHub protection bypass or ordinary AI review. Fixed-key cardinality
+  is now on main. Source-preserving CSV execution remains gated by approval
+  authority choice; sent the user the two concrete deployment options. Heartbeat
+  remains paused. Next: remaining client routing/diagnostic cases while awaiting
+  that decision; do not silently select a weaker authorization contract.
+- Reproduced finding 7 mixed JSON routing through the real CLI with fictional
+  profile-shaped inputs plus schema_version/privacy_settings/generation_settings.
+  All three baseline checks failed on missing recovery guidance (exit 2 and no
+  publication already correct). Added bounded static diagnostic explaining
+  spec-key precedence, original profile artifacts and direct spec generation;
+  explicitly warns against deleting privacy settings to force profile parsing.
+  No routing behavior or safety policy changed. Focused diagnostics/adapters/spec
+  contracts: 56 passed; Ruff/diff check clean. Automatic reinterpretation remains
+  unresolved, not claimed fixed. Next: batch remaining safe diagnostics and
+  acceptance evidence before the next PR; avoid another diagnostic-only micro-PR.
+- Batched client diagnostics 11/16 with the mixed-JSON recovery hint. PostgreSQL
+  connection errors now return only fixed typed-network/TLS or allowlisted
+  SQLSTATE categories; unknown/wrapped errors remain generic. No backend text
+  parsing, endpoint/credential disclosure, or exception-context retention.
+  Verified SQLSTATE names against installed psycopg/errors.py. SQL JOIN/CTE
+  rejections provide fixed shape-specific hints; accepted query policy unchanged.
+  Injected fictional driver and local SQL tests only; no live databases or API.
+  PostgreSQL client/profiler and SQL policy: 52 tests passed; targeted mypy/Ruff
+  and diff check passed. JSON diagnostics/adapters/spec contracts: 56 passed
+  in prior step. Documentation updated. Next: signed batch PR and CI; final
+  installed-RC and real-driver connection behavior are not claimed verified.

@@ -36,6 +36,13 @@ business-rule guidance.
 
 ## Reviewed DatasetSpec
 
+`infer-spec` expects a profiling-command artifact, not an existing DatasetSpec.
+JSON keys `schema_version`, `privacy_rules`, `privacy_settings`,
+`generation_settings` and `validation_settings` select spec parsing even if
+profile fields are also present. Use the original profiling artifact for
+inference, or pass a reviewed spec directly to `generate`. Do not delete privacy
+settings to force a mixed JSON document to be interpreted as a profile.
+
 ```bash
 test-data-agent generate dataset_spec.yaml \
   --seed 12345 \
