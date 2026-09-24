@@ -210,6 +210,30 @@ def test_doctor_json_reports_explicit_local_states(capsys) -> None:
     assert states["quickstart"] == "skipped"
 
 
+def test_doctor_json_retains_checks_when_quickstart_fails(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def fail_quickstart(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("secret-local-path")
+
+    monkeypatch.setattr(
+        "test_data_agent.cli_doctor.generate_dataset_from_example_artifacts",
+        fail_quickstart,
+    )
+
+    assert main(["doctor", "--json"]) == 1
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    states = {check["name"]: check["status"] for check in payload["checks"]}
+    assert payload["ok"] is False
+    assert payload["exit_code"] == 1
+    assert states["python"] == "available"
+    assert states["dependency:pydantic"] == "available"
+    assert states["quickstart"] == "failed"
+    assert "secret-local-path" not in captured.out + captured.err
+
+
 def test_doctor_allows_missing_optional_extra(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
@@ -218,7 +242,7 @@ def test_doctor_allows_missing_optional_extra(
 
     def import_without_pyarrow(name: str):
         if name == "pyarrow":
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return real_import(name)
 
     monkeypatch.setattr(cli_module.importlib, "import_module", import_without_pyarrow)
@@ -235,7 +259,7 @@ def test_doctor_fails_when_required_extra_is_missing(
 
     def import_without_pyarrow(name: str):
         if name == "pyarrow":
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return real_import(name)
 
     monkeypatch.setattr(cli_module.importlib, "import_module", import_without_pyarrow)
@@ -268,7 +292,7 @@ def test_doctor_redacts_parquet_capability_failure(
     assert main(["doctor", "--require-extra", "parquet"]) == 1
     captured = capsys.readouterr()
     assert "capability parquet: failed" in captured.err
-    assert "reinstall agent-paranoid-android[parquet]" in captured.err
+    assert "reinstall agent-paranoid-android[parquet]" not in captured.err
     assert "secret-provider-token" not in captured.err
 
 
@@ -293,7 +317,7 @@ def test_doctor_redacts_mcp_capability_failure(
     assert main(["doctor", "--require-extra", "mcp"]) == 1
     captured = capsys.readouterr()
     assert "capability mcp: failed" in captured.err
-    assert "reinstall agent-paranoid-android[mcp]" in captured.err
+    assert "reinstall agent-paranoid-android[mcp]" not in captured.err
     assert "secret-audit-key" not in captured.err
 
 
@@ -318,7 +342,7 @@ def test_doctor_redacts_trino_capability_failure(
     assert main(["doctor", "--require-extra", "trino"]) == 1
     captured = capsys.readouterr()
     assert "capability trino: failed" in captured.err
-    assert "reinstall agent-paranoid-android[trino]" in captured.err
+    assert "reinstall agent-paranoid-android[trino]" not in captured.err
     assert "secret-trino-password" not in captured.err
 
 
@@ -343,7 +367,7 @@ def test_doctor_redacts_openai_capability_failure(
     assert main(["doctor", "--require-extra", "openai"]) == 1
     captured = capsys.readouterr()
     assert "capability openai: failed" in captured.err
-    assert "reinstall agent-paranoid-android[openai]" in captured.err
+    assert "reinstall agent-paranoid-android[openai]" not in captured.err
     assert "secret-provider-token" not in captured.err
 
 

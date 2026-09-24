@@ -935,3 +935,21 @@ Broader transformation remains unfinished.
   focused Ruff/mypy/diff checks and strict OpenSpec validation passed. Next:
   commit/publish the finished connector fix, then mode parity after precedence
   is settled. Preservation authority remains separately unresolved.
+- PR #541 passed 37 checks with 4 intentional skips and merged normally as
+  b43005ee15bc47820cef8ad829fadd7b51df1f73. No ordinary AI review or
+  protection bypass. Exact-head SQL fix is on main; branch
+  codex/1-6-doctor-reporting began clean from that merge.
+- Finding 20 confirmed in the current doctor service on fictional injected
+  failures: installed-extra smoke wrongly advised reinstall, quickstart raised
+  before returning any report, and a core import error echoed its raw message.
+  Local fix distinguishes absent module from broken import, retains completed
+  checks and structured JSON/exit 1 on quickstart failure, and gives fixed
+  local-capability recovery guidance without exception text. Missing extras
+  still retain pinned install guidance. Doctor/dependency focused checks:
+  29 passed; targeted Ruff, mypy and diff checks passed after correction.
+  Two fresh-process checkout-venv `doctor --json` runs returned exit 0 and
+  identical 11-state reports; this is not installed-wheel evidence. No supplied
+  client harness or real external service was run. Final diff and strict
+  OpenSpec validation passed; next: signed PR/CI. Fresh-process installed-wheel
+  doctor replay and full
+  finding-20 acceptance remain pending.
