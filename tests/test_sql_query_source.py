@@ -77,6 +77,48 @@ def test_explicit_query_is_canonicalized_and_fingerprinted(tmp_path: Path) -> No
     assert str(path) not in repr(request(path))
 
 
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize(
+    "condition",
+    [
+        "status = 'pending' AND amount > 0",
+        "status = 'pending' OR status = 'settled'",
+        "(status IN ('pending', 'settled') AND amount BETWEEN 1 AND 9) "
+        "OR status IS NULL",
+        "NOT (status IS NULL OR amount < 0)",
+    ],
+)
+def test_allowed_boolean_predicates_are_not_classified_as_functions(
+    tmp_path: Path, adapter: SqlQueryAdapter, condition: str
+) -> None:
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    path = write_query(
+        tmp_path,
+        f"SELECT order_id FROM {table} WHERE {condition}",
+    )
+
+    plan = authorize_query_source(inspect_query_source(request(path, adapter=adapter)), columns())
+
+    assert plan.output_fields == ("order_id",)
+    assert " WHERE " in plan.sql
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_boolean_predicate_does_not_allow_unknown_functions(
+    tmp_path: Path, adapter: SqlQueryAdapter
+) -> None:
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    path = write_query(
+        tmp_path,
+        f"SELECT order_id FROM {table} WHERE status = 'pending' AND random() > 0",
+    )
+
+    with pytest.raises(SqlQuerySourceError) as caught:
+        inspect_query_source(request(path, adapter=adapter))
+
+    assert "pending" not in str(caught.value)
+
+
 def test_wildcard_expands_to_sorted_explicit_columns(tmp_path: Path) -> None:
     path = write_query(tmp_path, "SELECT o.* FROM public.orders AS o")
 

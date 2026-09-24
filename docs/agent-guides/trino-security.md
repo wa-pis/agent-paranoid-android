@@ -42,6 +42,9 @@ Query text, literals, backend errors, endpoints, and rows must not cross into
 profiles, generated data, logs, providers, or default MCP responses.
 Unsupported JOIN and CTE/WITH shapes receive fixed recovery hints without table
 names, query text or literals. This does not broaden the permitted SQL subset.
+Boolean AND/OR predicates are permitted within that existing single-table
+subset; they do not authorize additional functions, tables, query shapes or
+larger work budgets.
 
 PostgreSQL connection failures expose only fixed categories when identifiable
 from typed network/TLS exceptions or allowlisted SQLSTATE codes: timeout,

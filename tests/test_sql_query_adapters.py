@@ -8,6 +8,7 @@ import pytest
 import test_data_agent.sql_query_adapters as adapters_module
 from test_data_agent.postgres_client import PostgresResultColumn
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
+from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.sql_query_adapters import (
     profile_postgres_query_source,
     profile_trino_query_source,
@@ -145,7 +146,7 @@ def test_postgres_query_source_uses_metadata_then_aggregates(
     query = tmp_path / "query.sql"
     query.write_text(
         "SELECT order_id, state, amount FROM public.orders "
-        "WHERE state = 'source-only'",
+        "WHERE state = 'source-only' AND amount > 0",
         encoding="utf-8",
     )
     session = FakePostgresSession()
@@ -167,6 +168,7 @@ def test_postgres_query_source_uses_metadata_then_aggregates(
 
     assert profile.source_type == "postgres_query"
     assert profile.entities[0].name == "warehouse.orders_view"
+    assert infer_dataset_spec(profile).entities[0].row_count == 3
     assert "source-only" not in profile.model_dump_json()
     assert all("SELECT *" not in sql.upper() for sql in session.sql)
 
@@ -208,7 +210,8 @@ def test_trino_query_source_requires_and_uses_table_column_allowlist(
 ) -> None:
     query = tmp_path / "query.sql"
     query.write_text(
-        "SELECT order_id, state, amount FROM lake.safe.orders",
+        "SELECT order_id, state, amount FROM lake.safe.orders "
+        "WHERE order_id > 0 OR state IS NULL",
         encoding="utf-8",
     )
     monkeypatch.setattr(adapters_module, "TrinoClient", FakeTrinoClient)
@@ -221,6 +224,7 @@ def test_trino_query_source_requires_and_uses_table_column_allowlist(
 
     assert profile.source_type == "trino_query"
     assert profile.entities[0].row_count == 3
+    assert infer_dataset_spec(profile).entities[0].row_count == 3
     assert all("SELECT *" not in sql.upper() for sql in FakeTrinoClient.sql)
 
 
