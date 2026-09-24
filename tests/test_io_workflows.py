@@ -26,6 +26,28 @@ from test_data_agent.io.workflows import (
 from test_data_agent.safety import SourceRowReuseError
 
 
+def test_bundle_mode_override_uses_copy_of_spec(tmp_path: Path) -> None:
+    spec = DatasetSpec(
+        entities=[EntitySpec(
+            name="orders", row_count=2,
+            fields=[FieldSpec(name="amount", data_type="integer")],
+        )]
+    )
+    output = tmp_path / "generated"
+
+    result = generate_dataset_bundle(
+        spec, output_folder=output, mode="negative", invalid_ratio=1.0,
+    )
+
+    manifest = json.loads((output / "generation_manifest.json").read_text())
+    assert result.mode == GenerationMode.NEGATIVE
+    assert all(row["amount"] == "not-a-number" for row in json.loads((output / "orders.json").read_text()))
+    assert manifest["effective_rules"]["generation_mode"] == "negative"
+    assert manifest["effective_rules"]["invalid_ratio"] == 1.0
+    assert spec.generation_settings.mode == GenerationMode.VALID
+    assert spec.generation_settings.invalid_ratio == 0.0
+
+
 def test_atomic_json_artifact_does_not_follow_target_symlink(tmp_path) -> None:
     outside = tmp_path / "outside.json"
     outside.write_text("unchanged")

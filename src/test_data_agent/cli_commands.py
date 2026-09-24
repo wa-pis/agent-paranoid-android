@@ -192,8 +192,11 @@ def apply_business_rules_from_args(
         rows_by_table,
         getattr(args, "business_rules", None),
         seed=seed,
-        mode=args.mode,
-        invalid_ratio=args.invalid_ratio,
+        mode=spec.generation_settings.mode.value if spec is not None else args.mode or "valid",
+        invalid_ratio=(
+            spec.generation_settings.invalid_ratio
+            if spec is not None else args.invalid_ratio or 0.0
+        ),
         field_defaults=field_defaults,
         spec=spec,
     )
