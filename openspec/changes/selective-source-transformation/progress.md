@@ -1103,3 +1103,28 @@ Broader transformation remains unfinished.
   exists yet. Next: test local TTY-only confirmation and restricted receipt
   storage/verification against the same snapshots, then complete the scoped
   safety amendment before any source-bearing execution.
+- PR #545 at signed `0ec342bc7c9be54a1fb0f702c0b22526355fb574` passed
+  all 37 applicable checks (four intentional skips) and merged normally as
+  `190905f27538f7b674f46161d259876024c130c7`. GitHub verified signature;
+  no ordinary AI review ran. The first merge request was stopped by the local
+  approval guard because `reviewDecision` was empty. Read-only ruleset #19376395
+  confirmed zero required approving reviews and no required reviewers; the
+  unchanged normal merge then succeeded. No protection setting was changed or
+  bypassed. New branch `codex/1-6-local-receipt` starts at that main SHA.
+  Next: implement and test terminal-only confirmation plus owner-only receipt
+  over the existing private snapshot identity, with no execution/public agent
+  path until the safety amendment and independent review are complete.
+- On `codex/1-6-local-receipt`, added private approval-material preparation
+  from bounded policy/profile bytes plus exact source/mapping/generation-policy
+  snapshots. Unreferenced or missing external parts fail; review is generated
+  from parsed actions, not a caller-supplied summary. Added local TTY-only
+  confirmation, owner-only atomic receipt and same-snapshot verification;
+  rejected input publishes nothing. Initial PTY test hung because its reader
+  did not handle child exit; stopped only that pytest process and replaced the
+  test with a bounded `pty.openpty` channel check, without product monkeypatch.
+  No public CLI/agent endpoint or source-preserving execution is connected.
+  Focused 55 tests passed, including missing/stale receipt, owner-only mode,
+  rejected answer, non-TTY input and omitted/extra references. Targeted Ruff,
+  mypy, strict OpenSpec and diff checks passed. Next: signed PR/CI for these
+  private helpers, then source-snapshot/reprofile integration and scoped safety
+  amendment before any runtime activation.
