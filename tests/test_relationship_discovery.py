@@ -72,6 +72,19 @@ def test_mining_is_deterministic_and_excludes_profile_values() -> None:
     assert first[0].raw_values_included is False
 
 
+def test_lower_bound_parent_cannot_supply_key_evidence() -> None:
+    profile = _profile()
+    profile.entities[0].fields[0].unique_ratio_kind = "lower_bound"
+    assert mine_relationship_candidates(profile) == []
+
+
+def test_lower_bound_child_is_not_reported_as_distinct_ratio() -> None:
+    profile = _profile()
+    profile.entities[1].fields[0].unique_ratio_kind = "lower_bound"
+    candidate = mine_relationship_candidates(profile)[0]
+    assert "child_distinct_ratio" not in {item.metric for item in candidate.evidence}
+
+
 def test_ranking_uses_copy_and_requires_human_review() -> None:
     candidates = mine_relationship_candidates(_profile())
 

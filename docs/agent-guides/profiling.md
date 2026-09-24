@@ -24,6 +24,17 @@ first resolve to a deterministic explicit-column snapshot.
 - masked patterns; and
 - synthetic examples that were not copied from the input.
 
+Folder CSV profiles label `unique_ratio_kind` as `exact` (rounded to six decimal
+places) or `lower_bound` when the 10,000-value distinct tracker overflows.
+For `lower_bound`, display “at least X%”, not exact uniqueness. The ratio uses
+non-null normalized values and is truncated downward to six decimal places.
+Overflow evidence cannot nominate a primary key, even when its lower bound
+exceeds the usual threshold. Relationship discovery excludes lower-bound parent
+keys and omits lower-bound child distinct ratios from numeric evidence. Older
+profiles and other producers default to `unspecified`, not proven exact; reprofile
+old folder artifacts to obtain the new uncertainty metadata. This statistic is
+unrelated to the planned percentage of unchanged values after transformation.
+
 ## Forbidden behavior
 
 - copying or shuffling source rows;

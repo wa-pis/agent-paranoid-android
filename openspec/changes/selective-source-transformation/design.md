@@ -117,6 +117,13 @@ repair or recreation of their source frequency is promised.
 
 ## Validation And Artifacts
 
+On 2026-09-24 the user approved explicit distinct uncertainty: capped folder
+profiling reports a lower bound (“at least X%”), never an exact uniqueness claim,
+and cannot automatically nominate a primary key from overflow evidence.
+Uncapped measurements retain their existing six-decimal precision. Profiles
+without measurement-kind metadata remain unspecified rather than retroactively
+certified exact. This is separate from unchanged-source-value reporting below.
+
 Validate row correspondence, preserved combinations, replacement policies,
 types, declared key mappings, formulas and privacy boundaries.
 
@@ -135,6 +142,24 @@ Output provenance must state transformed/mixed origin and which fields were
 authorized for preservation. Do not emit the existing unconditional claims
 that all output is synthetic or that no source rows/values were copied.
 A restricted output is not automatically safe for redistribution.
+
+### Unchanged Source Values Percentage (Approved Requirement)
+
+The user approved a transformation-report indicator on 2026-09-24:
+“Сохранено исходных значений: X%” (source values left unchanged).
+This measures actual unchanged values at corresponding input/output positions,
+not the percentage of fields configured with the preserve action, uniqueness,
+utility, or privacy assurance. Report the comparison scope and denominator;
+do not claim a measured percentage when no comparison was performed.
+The executable contract must define typed equality, nulls, dropped/derived
+fields and empty inputs before implementation and acceptance.
+
+Expose only permitted aggregate results, never source values or comparison
+pairs. Existing aggregate disclosure controls still apply; a withheld or
+unavailable result must not be rendered as 0%. This requirement grants no
+preservation authority and does not change source-free generation or resolve
+the separate capped-distinct uncertainty decision. Runtime reporting remains
+unimplemented.
 
 ## Failure Modes
 

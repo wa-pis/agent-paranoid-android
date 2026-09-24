@@ -56,6 +56,11 @@ amendments still require scoped review and executable checks before activation.
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
 - [ ] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
+- [ ] Implement the approved “Сохранено исходных значений: X%” transformation
+  report indicator: actual unchanged values, explicit comparison scope and
+  denominator, typed equality/null/drop/derive/empty-input tests, and safe
+  aggregate disclosure. Unavailable is not zero; this is not uniqueness or
+  permission to preserve source data.
 - [ ] Add an end-to-end fictional finance fixture: preserved product/segment/
   bank combinations, replaced amounts, recalculated totals, mapped identifiers.
 - [ ] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping

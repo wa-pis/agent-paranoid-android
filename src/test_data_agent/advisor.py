@@ -890,6 +890,9 @@ def _candidate_profile(
                         unique_ratio=source_entities[entity.name]
                         .field(field.name)
                         .unique_ratio,
+                        unique_ratio_kind=source_entities[entity.name]
+                        .field(field.name)
+                        .unique_ratio_kind,
                         sensitive=field.sensitive,
                         semantic_type=field.semantic_type,
                         is_identifier=field.is_identifier,

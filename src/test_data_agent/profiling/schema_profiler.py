@@ -222,7 +222,11 @@ def _profile_schema_with_sample(
         for accumulator in accumulators.values():
             budget.check_deadline("field finalization")
             fields.append(accumulator.to_profile(row_count))
-        primary_key_candidates = [field.name for field in fields if field.is_identifier and field.unique_ratio >= 0.98]
+        primary_key_candidates = [
+            field.name for field in fields
+            if field.is_identifier and field.unique_ratio >= 0.98
+            and field.unique_ratio_kind != "lower_bound"
+        ]
         entities.append(
             EntityProfile(
                 name=entity_name,
@@ -253,6 +257,7 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
         nullable=len(non_null) < row_count,
         null_ratio=round((row_count - len(non_null)) / row_count, 6) if row_count else 0.0,
         unique_ratio=round(unique_ratio, 6),
+        unique_ratio_kind="exact",
         sensitive=sensitive,
         semantic_type=semantic_type,
         is_identifier=is_identifier,
@@ -371,7 +376,9 @@ class FieldAccumulator:
             semantic_type = self.content_sensitive_type or semantic_type
         data_type = self.infer_field_type(semantic_type)
         unique_ratio = self.estimate_unique_ratio()
-        is_identifier = is_identifier_name(self.name) or (unique_ratio >= 0.98 and "id" in self.name.lower())
+        is_identifier = is_identifier_name(self.name) or (
+            not self.distinct_overflow and unique_ratio >= 0.98 and "id" in self.name.lower()
+        )
         sensitive = (
             infer_sensitive_from_name(self.name)
             or semantic_type_is_sensitive(semantic_type)
@@ -383,6 +390,7 @@ class FieldAccumulator:
             nullable=self.null_count > 0,
             null_ratio=round(self.null_count / table_row_count, 6) if table_row_count else 0.0,
             unique_ratio=round(unique_ratio, 6),
+            unique_ratio_kind="lower_bound" if self.distinct_overflow else "exact",
             sensitive=sensitive,
             semantic_type=semantic_type,
             is_identifier=is_identifier,
@@ -410,8 +418,9 @@ class FieldAccumulator:
     def estimate_unique_ratio(self) -> float:
         if self.non_null_count == 0:
             return 0.0
-        if self.distinct_overflow and not self.duplicate_seen:
-            return 1.0
+        if self.distinct_overflow:
+            # Truncate rather than round upward: this is a guaranteed lower bound.
+            return (len(self.distinct_values) * 1_000_000 // self.non_null_count) / 1_000_000
         return len(self.distinct_values) / self.non_null_count
 
     def distribution(self, profile: FieldProfile) -> dict[str, Any]:
