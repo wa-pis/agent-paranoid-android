@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -36,6 +36,7 @@ class FieldProfile(BaseModel):
     nullable: bool = False
     null_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
     unique_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
+    unique_ratio_kind: Literal["unspecified", "exact", "lower_bound"] = "unspecified"
     sensitive: bool = False
     semantic_type: str | None = None
     is_identifier: bool = False

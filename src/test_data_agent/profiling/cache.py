@@ -17,7 +17,7 @@ from test_data_agent.io.path_policy import atomic_write_bytes
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
 DEFAULT_RULE_SAMPLE_ROWS = 50_000
-PROFILE_CACHE_FORMAT_VERSION = 2
+PROFILE_CACHE_FORMAT_VERSION = 3
 
 
 def csv_folder_fingerprint(

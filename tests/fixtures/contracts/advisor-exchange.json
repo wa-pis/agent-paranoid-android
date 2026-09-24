@@ -114,7 +114,8 @@
               "nullable": false,
               "semantic_type": null,
               "sensitive": false,
-              "unique_ratio": 1.0
+              "unique_ratio": 1.0,
+              "unique_ratio_kind": "unspecified"
             },
             {
               "data_type": "string",
@@ -137,7 +138,8 @@
               "nullable": false,
               "semantic_type": null,
               "sensitive": false,
-              "unique_ratio": 0.16666666666666666
+              "unique_ratio": 0.16666666666666666,
+              "unique_ratio_kind": "unspecified"
             },
             {
               "data_type": "string",
@@ -156,7 +158,8 @@
               "nullable": false,
               "semantic_type": "email",
               "sensitive": true,
-              "unique_ratio": 0.0
+              "unique_ratio": 0.0,
+              "unique_ratio_kind": "unspecified"
             }
           ],
           "name": "orders",

@@ -636,3 +636,87 @@ Broader transformation remains unfinished.
   Each test verified subprocess import root; no monkeypatches/private inputs.
   Documented source-free adaptation and compatibility-only outcome. Next: signed
   commit and independent review of the test/register; original full replay pending.
+- Signed 2e176d33802d09665ccede75ff162655b9f03435 created. Independent AI
+  reviewer Curie assigned read-only CSV acceptance/evidence scope against 6a435db.
+  Review active; no duplicate reviewer. Next: disposition, then push/PR and CI.
+- Curie completed independent AI review of 2e176d3 on 2026-09-24: no findings
+  in narrow scope. Adaptation passed checkout and both installed targets; hashes
+  matched. Original script read, not executed; historical dispositions not
+  independently re-proven. Pushed reviewed SHA, PR #533 contains review evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/533
+  Next: CI then merge if green and branch protections permit. No active reviewer.
+- Completed: PR #533 merged as dc68e44d5ef8711714e6abdbf5be29e86c0fc79c;
+  all applicable CI/container/documentation/security checks passed on reviewed
+  2e176d3. No protection bypass. Fictional source-free CSV acceptance integrated.
+  Next: inspect untouched client finding 2 (distinct-cap uncertainty) and its
+  existing focused tests before selecting a reproduction. No active reviewer;
+  preservation authority and other pending product choices remain unresolved.
+- Inspected finding 2 without rerunning existing tests: legacy CSV digest path
+  has cap regressions, but folder schema FieldAccumulator returns unique_ratio
+  1.0 after its 10,000-value cap if repeats occur only among untracked values.
+  Unpatched fictional repro via PYTHONPATH=src, actual add/to_profile path:
+  11,001 rows, 10,001 distinct, reported ratio 1.0 versus actual ~0.9091;
+  overflow true, duplicate_seen false. No product monkeypatch or external input.
+  This can nominate a false primary-key candidate (threshold 0.98).
+  Next: deterministic folder regression and inspect consumers before choosing
+  conservative uncertainty representation; preserve budgets and source-free mode.
+- Started codex/1-6-distinct-overflow from dc68e44. Added real folder-path
+  regression tests/test_schema_distinct_overflow.py; baseline fails as expected
+  (unique_ratio 1.0). No production edits. Consumers include primary-key
+  nomination and relationship-discovery evidence/confidence. FieldProfile has
+  only a numeric unique_ratio, no uncertainty marker; silently replacing it
+  with zero or a lower bound would mislabel evidence. Request product approval
+  for explicit exact/lower-bound metadata and no automatic PK nomination from
+  overflow evidence. Next: approved representation, focused fix/tests/docs and
+  independent review. Current regression deliberately red, do not merge/release.
+- User approved a separate transformation-report requirement on 2026-09-24:
+  “Сохранено исходных значений: X%”, measuring actual unchanged source values.
+  Recorded in design.md and tasks.md as unimplemented, with comparison-scope,
+  denominator and disclosure requirements. This approval does not authorize
+  preservation or resolve distinct-overflow uncertainty. No runtime changes;
+  existing red regression and unrelated progress notes preserved. Validation:
+  documentation-only diff whitespace check; no unchanged tests rerun.
+  Next: settle the metric's executable comparison contract as part of the
+  authorized transformation reporting slice; preservation authority remains
+  a prerequisite to enabling execution.
+- User explicitly approved both proposed requirements on 2026-09-24: personal
+  human confirmation of concrete preservation columns/exact plan (no agent
+  self-approval; sensitive/disputed columns blocked), and lower-bound uniqueness
+  with no automatic primary-key nomination on distinct overflow. The approval
+  transport still must meet the human-authority requirement; no silent adoption
+  of the equal-local-privilege threat exclusion and no active safety exception.
+- Implemented capped folder uniqueness fix in the working tree: additive
+  unique_ratio_kind metadata (legacy default unspecified), downward-truncated
+  lower bound, overflow excluded from PK/ratio-based identifier inference,
+  relationship parent guard/child evidence omission and advisor propagation.
+  Fictional focused tests: 17 passed; Ruff clean; mypy clean (4 source files).
+  Profiling guide and design updated. No source-preserving runtime enabled.
+  Next: independent exact-SHA review, then signed PR/CI; do not release this
+  unreviewed working tree. Other existing dirty requirements notes retained.
+- Signed commit 4fdf1f5fc256b9909056ceacbd97d16532a6952f created with
+  normal configured Git hooks. Independent AI reviewer Curie assigned read-only
+  review against dc68e44; review active, no duplicate. Next: resolve findings,
+  record exact-SHA evidence, then push/PR and applicable CI before merge.
+- Curie AI review of 4fdf1f5 (2026-09-24) found two P2 upgrade defects:
+  additive unspecified metadata changed persisted-plan hashes; cache format 2
+  could reuse stale false uniqueness/PK evidence. Disposition: fixed canonical
+  profile hashing to omit only unspecified metadata; bumped folder cache to 3.
+  Explicit measurement metadata remains fingerprint-bound. Added fictional
+  persisted-profile hash and old-cache reprofile/round-trip regressions.
+  Focused checks: 13 tests passed (overflow + agent review); Ruff clean.
+  Next: signed correction and repeat independent review on current exact SHA.
+- Signed correction 00d7aa797a2911f1cdaa59005f71b0982f04c305; mypy clean
+  for both changed source modules. Curie repeat AI review active on this SHA,
+  focused on both P2 dispositions and regression risk. No PR/push yet.
+- Curie repeat independent AI review completed 2026-09-24 on 00d7aa7:
+  both P2 resolved, no new delta findings; 90 tests and independent legacy-hash,
+  evidence-binding/nonmutation probes passed. Not human approval. Reviewed SHA
+  pushed; PR #534 records identity, exact SHAs, scope, findings/disposition and
+  evidence: https://github.com/wa-pis/agent-paranoid-android/pull/534
+  No active reviewer. Next: applicable CI and protection-compliant merge.
+- PR #534 CI blocked on public-contract fixture drift across Python versions:
+  advisor-exchange.json lacked three additive unique_ratio_kind=unspecified
+  entries. Python 3.11: 1 failed, 1580 passed, 10 skipped. No runtime failure
+  inferred from that snapshot mismatch. Updated only those three fixture fields;
+  focused contract tests: 3 passed, diff check clean. Next: signed fixture fix,
+  independent delta review on updated SHA, push and green CI before merge.

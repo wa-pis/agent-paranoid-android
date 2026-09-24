@@ -13,6 +13,15 @@ one-to-one transformed dataset, never a certified anonymous or fully synthetic o
 
 ## Preservation Authority
 
+On 2026-09-24 the user approved the product requirement that the human personally
+confirms concrete columns and the exact plan before execution; the agent cannot
+grant itself permission, and sensitive or disputed columns remain blocked.
+This approves the requirement, not an implemented transport or a claim that a
+local prompt proves human identity. The deployment alternatives below still
+need to satisfy that requirement; do not silently assume equal-privilege agents
+are excluded from the threat model. No source-bearing dataset was approved by
+this conversation.
+
 Every input field requires an explicit action. Only fields explicitly declared
 non-sensitive and authorized for preservation may carry original logical values.
 Unresolved sensitive/unknown classifications or conflicting profiling evidence
