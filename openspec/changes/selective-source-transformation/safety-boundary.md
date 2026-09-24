@@ -39,17 +39,21 @@ the selection below is not permission to trust a boolean or opaque reference.
 The existing `agent-approve` spec hash selects a source-free generation plan; it
 is not transformation approval. The new, separate local CLI approval must:
 
-- present the exact input/plan identity and every proposed preserved column to
-  the operator in the local terminal before requesting confirmation;
+- present a bounded, value-free review of the exact effective plan in the local
+  terminal: input/plan identity, every field action including unmatched-preserve
+  fallbacks, the proposed preserved columns, and each column's reviewed
+  sensitivity/conflict status. A digest alone is not sufficient for confirmation;
 - require a fresh explicit interactive terminal confirmation, not a CLI flag,
   environment variable, piped stdin, or caller-supplied `authorization_ref`;
-- bind the resulting restricted receipt to the reviewed policy, fixed source
-  bytes and all referenced mapping/generation-policy bytes, then verify and
-  consume those same snapshots at execution; a changed input requires review
-  and approval again;
+- bind the resulting restricted receipt to that displayed review, its immutable
+  sensitivity/classification evidence, the reviewed policy, fixed source bytes
+  and all referenced mapping/generation-policy bytes. Revalidate the evidence
+  against those same snapshots and consume them at execution; a changed input
+  or classification requires review and approval again;
 - keep default MCP and agent planning/advice unable to create or broaden that
-  receipt. Noninteractive/agent execution may only consume an existing matching
-  receipt, never replace local approval;
+  receipt. No agent/MCP transformation-approval endpoint may mint a receipt.
+  Noninteractive/agent execution may only consume an existing matching receipt,
+  never replace local approval;
 - keep sensitive, unknown and conflicting preservation prohibited regardless
   of operator confirmation.
 

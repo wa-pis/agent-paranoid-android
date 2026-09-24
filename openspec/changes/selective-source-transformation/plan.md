@@ -33,9 +33,10 @@ repair instructions, live integrations or a weaker safety boundary.
    edits or bulk acceptance of reviewed decisions and save a replayable policy.
    High cardinality alone is not a semantic rejection reason: enforce resource
    budgets separately and disclose uncertainty rather than invent uniqueness.
-   Expose the same review, policy validation, approval and execution flow to
-   noninteractive CLI/Python and explicitly scoped MCP operations; return safe
-   structured summaries, not source rows. Agents cannot self-declassify data.
+   Expose review, policy validation and execution to noninteractive CLI/Python
+   and explicitly scoped MCP operations; they may consume a matching local
+   operator receipt but cannot create one. Return safe structured summaries,
+   not source rows. Agents cannot self-declassify data.
 5. **PostgreSQL and approved SQL inputs.** Reuse transformation semantics with
    bounded read-only access, fixed-input replay and cross-input mapping domains.
    Complex query support and additional adapters require scoped decisions.

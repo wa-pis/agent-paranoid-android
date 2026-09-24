@@ -153,9 +153,11 @@ tests before this proposed exception can become operational.
 - **GIVEN** a complete reviewed transformation plan and fixed local input snapshots
 - **WHEN** the operator confirms the exact plan and preserved columns through
   the interactive local CLI
-- **THEN** a restricted receipt binds that plan and those input bytes; execution
-  rejects a changed policy, source or referenced mapping, and default MCP/agent
-  advice cannot create an approval receipt.
+- **THEN** the terminal displays every effective field action, preservation
+  fallback and reviewed sensitivity status without source values, and a
+  restricted receipt binds that displayed review, its classification evidence,
+  the plan and input bytes; execution rejects changed policy, source, evidence
+  or referenced mapping. Default MCP/agent advice cannot create a receipt.
 - **AND** a caller-supplied reference or noninteractive flag alone does not
   authorize preservation; the local trust model does not claim resistance to a
   process with the same terminal and filesystem privileges as the operator.
