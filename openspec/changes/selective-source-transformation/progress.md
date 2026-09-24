@@ -594,3 +594,45 @@ Broader transformation remains unfinished.
   10 integrated tests pass; Ruff/diff checks pass. Client acceptance document
   explicitly limits evidence to private persistence and typed mapping validation.
   No product changes. Next: signed commit and independent exact-SHA AI review.
+- Signed 756d394733fc1307ce71d1c77af3cb523d5ee510 created; independent AI
+  reviewer Curie assigned read-only test/documentation scope against bd76cb4.
+  Review active; no duplicate. Next: review disposition and push/PR.
+- Curie completed independent AI review of 756d394 on 2026-09-24: no findings
+  within scope, 10 tests passed, diff check clean. Pushed reviewed SHA; PR #532
+  contains full review evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/532
+  Next: CI then merge if green and allowed by branch protection. No active
+  reviewer; no runtime or security-policy changes, RC not ready.
+- Completed: PR #532 merged as 6a435db938e8ff43113e3f6f434fdd98f4363f42;
+  all applicable CI/container/documentation/security checks passed on reviewed
+  756d394. No protection bypass. Saved mapping parity evidence integrated.
+  Next: address remaining client-finding dispositions using existing evidence
+  before adding further helpers; unresolved authority/type decisions are not
+  permission to enable transformation. No active review or release tag.
+- Started codex/1-6-client-evidence-register from 6a435db. Consolidated existing
+  client evidence for findings 1/8/9/19 and explicitly retained unverified status
+  for the others. Distinguished deterministic regression proof from identical
+  original-probe outcomes and historical installed candidate from final RC.
+  Documentation-only; diff check passed, no unchanged tests rerun. Next: review
+  register wording and inspect the original golden_run.py for a bounded fictional
+  acceptance adaptation. Pending user choices remain unresolved.
+- Read entire original golden_run.py from supplied archive before any execution.
+  Found PATH-selected CLI, no subprocess timeouts, unconditional zero exit and
+  recursive deletion of its existing work folder. Original not executed here.
+  Added bounded fictional CSV profile/infer/generate subprocess adaptation with
+  import-root verification, source-free category assertions, row/key/date/amount
+  and validation-report checks. One checkout test and Ruff passed. Explicitly
+  differs from original source-category-copy expectation; does not close that
+  requirement or missing private snapshot/pair cases. Next: isolated installed
+  baseline/candidate replay, document adaptation, then independent review.
+- New golden CSV subset passed separately against installed public baseline
+  /private/tmp/apa-client-acceptance.xrueHB/baseline-1.5.0 and freshly built
+  /private/tmp/apa-golden-acceptance.P9Co9L/candidate. Production source unchanged
+  at 6a435db938e8ff43113e3f6f434fdd98f4363f42; wheel label remains 1.5.0.
+  Built via uv build --wheel --no-build-isolation, installed --no-deps --target;
+  shared development dependencies, not clean-environment RC acceptance.
+  Wheel SHA256 f4ec99405d10d9021f54b1909d55499f67ce9c92537d7648cf7ad900e8f31f14.
+  Test SHA256 5fbdbc2eaf9352bf9e2003e15b9cf5674cbe06ae3c88c10c994f6c4a2d20036a.
+  Each test verified subprocess import root; no monkeypatches/private inputs.
+  Documented source-free adaptation and compatibility-only outcome. Next: signed
+  commit and independent review of the test/register; original full replay pending.
