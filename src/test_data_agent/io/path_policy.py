@@ -158,7 +158,8 @@ def atomic_write_bytes(path: Path, payload: bytes) -> None:
 @contextmanager
 def open_regular_file(path: Path) -> Iterator[BinaryIO]:
     with _parent_descriptor(path) as (parent, name):
-        descriptor = os.open(name, _flags(), dir_fd=parent)
+        # Reject FIFOs after fstat without waiting for a writer during open.
+        descriptor = os.open(name, _flags() | os.O_NONBLOCK, dir_fd=parent)
         value = os.fstat(descriptor)
         if not stat.S_ISREG(value.st_mode):
             os.close(descriptor)

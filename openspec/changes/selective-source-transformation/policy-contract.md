@@ -201,3 +201,13 @@ field-size ceiling; this helper never changes process-global settings.
 Results are private string/null tuples requiring typed preflight; numeric text
 is not silently converted. Errors are fixed and detached. File access, snapshot
 approval and cumulative multi-file budgeting remain adapter responsibilities.
+
+`io/mapping_snapshot.py` reads a relative local path beneath an explicit absolute
+root using existing descriptor-relative no-follow traversal. Absolute input paths,
+parent traversal and symlink components fail. Regular-file opening is nonblocking
+so a FIFO cannot stall before its type is rejected. Reads are byte-bounded and
+reuse the caller deadline; descriptor size/mtime/ctime changes fail closed.
+The private immutable result contains bytes and their SHA-256, omitted from repr.
+Consumers must parse those returned bytes, not reopen the path. This is not an
+atomic filesystem snapshot guarantee or execution approval; same-byte identity
+and separately reviewed permissions still need binding at the execution boundary.
