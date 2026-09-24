@@ -422,3 +422,27 @@ Broader transformation remains unfinished.
   using the explicit clock dependency (no product monkeypatch). 30 focused tests,
   Ruff, mypy and whitespace checks passed; contract documents exact guarantees.
   Next: signed commit, independent read-only review and PR/CI before merge.
+- Signed local 50c282f6de547f6e34094bf246768d5231ef9a21 created. Curie
+  (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing against d567516.
+  Next: push/create PR, review disposition and CI. Do not duplicate active review.
+- Pushed 50c282f; PR #526 opened with independent AI review evidence in body:
+  https://github.com/wa-pis/agent-paranoid-android/pull/526
+  Curie found no issues; 71 tests plus 160 boundary/failure probes passed with
+  stable descriptor count. Review complete. Next: CI then merge if green.
+- Completed: PR #526 merged as dd3b4f11d77b4533dcf0e5c2401742a5ef834d79;
+  CI green on independently reviewed 50c282f. Snapshot adapter and nonblocking
+  regular-file opening landed; transformation execution remains disabled.
+- Next: connect snapshot bytes to CSV mapping parser with explicit settings,
+  retain exact snapshot hash and enforce typed preflight without reopening.
+  Numeric CSV conversion, Decimal and DATETIME remain explicit unfinished scope.
+- Started codex/1-6-csv-mapping-loader from dd3b4f1. Added private orchestration:
+  revalidate CSV declaration, read one bounded snapshot, parse its bytes, enforce
+  typed mapping checks, retain snapshot hash in repr-hidden result. Limits and
+  invocation budget explicitly passed; no path reopening or numeric coercion.
+  Four integration tests, Ruff and mypy pass. No public CLI/MCP/execution wiring.
+- Next: prove no reopen on path mutation plus shared-deadline/limit tests, docs,
+  then signed commit and independent review. Current changes uncommitted.
+- Added source-path mutation after snapshot capture, every explicit limit and
+  deadline expiry between snapshot/parser tests via injected clock. Eleven loader
+  tests, Ruff, mypy and whitespace checks passed. Docs record private/limited scope.
+  Next: signed commit and independent review; no public execution enabled.
