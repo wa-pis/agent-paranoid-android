@@ -243,3 +243,13 @@ it is not a streaming memory cap. Output includes private inline mappings and
 must never be used as a public summary or provider/MCP payload. Filesystem
 permissions/atomic writes, authorization and execution remain separate work.
 Failures use detached fixed errors, not YAML snippets or validation payloads.
+
+`io/behavior_policy_files.py` adds explicit root-relative local load/save using
+the existing snapshot reader and atomic writer. Saving explicitly replaces the
+destination with an owner-only file; it is not version history. Existing contents
+survive failures before publication, with temporary files cleaned up. A failure
+after the underlying atomic rename (for example directory fsync failure) may
+leave the new file published; callers must not assume rollback in that case.
+Deadlines are checked before publication, not inside filesystem syscalls.
+Load/save errors remain fixed and detached. These operations grant no approval
+to execute a policy or preserve source values.

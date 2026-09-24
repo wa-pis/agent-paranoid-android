@@ -540,3 +540,29 @@ Broader transformation remains unfinished.
   guard and normalized those safe-loader constructor failures at load boundary.
   Four malicious-tag regressions; 17 YAML tests, Ruff and mypy pass.
   Next: follow-up exact-SHA review before publication/merge.
+- Signed 61f74ef3a9f875513a3bb980ca728e8a191bd2fa created; Curie follow-up
+  requested. No PR yet; next review disposition and push/PR. No duplicate review.
+- Pushed 61f74ef; PR #530 opened with independent review evidence in body:
+  https://github.com/wa-pis/agent-paranoid-android/pull/530
+  Curie confirmed P2 resolved, no new issues; 17 tests/eight extra probes pass.
+  Next: CI then merge if green. Authority decision remains pending.
+- Completed: PR #530 merged as 39d10232a705f03f07880a2e434e244545635276;
+  CI green on independently reviewed 61f74ef. Private YAML bytes round-trip landed,
+  not file publication or execution approval. No active reviewer.
+- Next: private policy file load/save using existing no-follow snapshot and atomic
+  writer, owner-only permissions and source-free error wrapping. Keep pending
+  authority choice unresolved; no preservation runtime activation.
+- Started codex/1-6-private-policy-files from 39d1023. Added restricted root-relative
+  policy load/save reusing bounded snapshot, YAML parser and atomic_binary_writer.
+  Output owner-only mode; safe fixed errors, shared budget checked before publish.
+  Five round-trip/permissions/failed-save tests, Ruff and mypy pass. No approval
+  or public CLI/MCP activation. Changes uncommitted.
+- Next: in-write deadline rollback and malformed-load/private-error tests, docs,
+  then independent review. Save is an explicit replacement operation; old contents
+  survive pre-publication failure, not an archival/version-history mechanism.
+- Added pre-publication deadline rollback and missing/malformed/symlink load
+  regressions, including detached errors under ambient exceptions. Nine focused
+  tests, Ruff, mypy and diff checks pass. File contract documents post-rename
+  fsync limitation; no approval or preservation runtime enabled.
+  No existing PR for this branch. Next: signed commit and exact-SHA independent
+  AI review before push/PR; approval-transport choice still pending.
