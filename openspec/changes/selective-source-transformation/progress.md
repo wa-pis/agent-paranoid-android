@@ -350,3 +350,43 @@ Broader transformation remains unfinished.
   dates, compact/week dates, timestamps and whitespace on both mapping sides.
   Strings stay unchanged; DATETIME/Decimal still unsupported, no coercion/I/O.
   82 focused tests, Ruff and mypy passed; next signed commit and independent review.
+- Signed 30b5c1223bec1c4bf609db3f0868361a184d4731 pushed; PR #524:
+  https://github.com/wa-pis/agent-paranoid-android/pull/524
+  Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing exact SHA against
+  7f82855. Next: review disposition/CI; no duplicate review or merge yet.
+- Completed: PR #524 merged as 462f9cafb8c35f5603301584de86f46079bcb081.
+  Curie found no issues at 30b5c12; 82 tests and 50 additional probes passed;
+  all CI green. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/524#issuecomment-5804898754
+- Next: inspect existing bounded file/profile readers and implement private CSV
+  mapping loading with explicit encoding/null tokens and strict header/row checks.
+  Keep external paths/APIs unsupported and errors value-free. No active review.
+- Reader investigation complete: io/path_policy.open_regular_file provides
+  descriptor-relative no-follow traversal; core/limits exposes byte/row/column/
+  cell ceilings. Existing io/readers.load_dataset_rows detects dialect/encoding,
+  emits named errors and accepts loose DictReader rows, so cannot be reused as
+  the private strict mapping loader unchanged.
+- Next implementation: first a bounded CSV-bytes parser with explicit encoding,
+  delimiter/null token, exact unique headers and row widths; then safe file adapter
+  supplying one immutable byte snapshot. Reuse path controls, not public reader
+  diagnostics. Check special-file opening before adapter integration: current
+  open_regular_file opens before fstat and may block on a FIFO. No source files
+  read or checks rerun during this investigation; working notes only.
+- Started codex/1-6-csv-mapping-parser from 462f9ca. Added private bytes-only
+  CSV parser: explicit UTF-8/BOM choice, delimiter/null token; exact unique headers,
+  row widths, duplicate keys and byte/row/cell/field ceilings. Empty remains string;
+  null token maps to None. Output restricted string/null pairs, no type inference.
+  No filesystem access or execution path. Twelve fictional tests and Ruff passed;
+  mypy initially requested entries annotation, corrected and mypy now passes.
+- Next: deadline/column ceilings and dialect/configuration edge cases, contract
+  documentation and independent review before connecting any filesystem adapter.
+- CSV parser now requires the caller's existing GenerationBudget (no reset) and
+  checks it before parsing, after header, per row and after mapping validation.
+  Added explicit column ceiling. Fourteen CSV tests, Ruff and mypy pass.
+  Deadline is cooperative around bounded decode/CSV/validation operations, not
+  an interruptible hard timeout. Next: configuration/BOM/null/dialect edge tests,
+  docs, commit and independent review. No file I/O adapter yet.
+- Added BOM/delimiter/multiline/null-disabled and invalid configuration tests.
+  24 CSV tests, Ruff, mypy and whitespace checks passed. Contract documents
+  private byte-only scope, cooperative deadline, process CSV field ceiling and
+  deferred typed numeric conversion/file adapter. Ready for independent review.

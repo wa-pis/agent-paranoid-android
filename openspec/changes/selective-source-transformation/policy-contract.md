@@ -182,3 +182,22 @@ timestamps and whitespace are rejected, never truncated or converted. Date strin
 remain unchanged. Datetime/decimal types fail closed until their contracts are
 implemented. This limited internal helper is not the CSV loader or full typed
 mapping preflight. Duplicate detection is exact because no normalization occurs.
+
+## Internal CSV Byte Parser
+
+`core/transformation_csv.py` accepts an already bounded byte snapshot, never a
+path. The declaration path is not opened. Encoding (`utf-8` or `utf-8-sig`),
+delimiter (comma, semicolon, tab or pipe), and null token are explicit. A null
+token must be nonempty; `None` disables conversion. Quoting does not escape the
+null token. Empty strings remain strings. No encoding/dialect/type inference.
+
+Headers must be unique, nonempty and exactly the union of declared source and
+replacement columns. Row widths must match; duplicate source tuples fail.
+Limits cover bytes, rows, columns, cells and cell characters. The required caller
+budget is reused, with cooperative checks around parsing and validation; it is
+not an interruptible timeout. The standard CSV parser may impose a lower process
+field-size ceiling; this helper never changes process-global settings.
+
+Results are private string/null tuples requiring typed preflight; numeric text
+is not silently converted. Errors are fixed and detached. File access, snapshot
+approval and cumulative multi-file budgeting remain adapter responsibilities.
