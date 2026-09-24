@@ -64,6 +64,8 @@ def generate_dataset_from_spec_path(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    mode: str | None = None,
+    invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     spec = load_dataset_spec(spec_path)
@@ -73,6 +75,8 @@ def generate_dataset_from_spec_path(
         output_format=output_format,
         seed=seed,
         count=count,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
     )
     write_generation_summary(output_folder)
@@ -93,6 +97,8 @@ def generate_dataset_command(
         output_format=output_format,
         seed=args.seed,
         count=args.count,
+        mode=getattr(args, "mode", None),
+        invalid_ratio=getattr(args, "invalid_ratio", None),
         business_rules_applier=business_rules_applier,
     )
 
@@ -155,14 +161,14 @@ def generate_dataset_from_profile_command(
             seed=args.seed,
             output_path=args.output,
             output_format=None if args.output_format is None else OutputFormat(args.output_format),
-            mode=args.mode,
-            invalid_ratio=args.invalid_ratio,
+            mode=args.mode or "valid",
+            invalid_ratio=0.0 if args.invalid_ratio is None else args.invalid_ratio,
             business_rules_applier=business_rules_applier,
             overwrite=getattr(args, "overwrite", False),
         )
     except ValueError as exc:
         raise SystemExit(str(exc)) from exc
-    if should_fail_generation(report, business_report, args.mode):
+    if should_fail_generation(report, business_report, args.mode or "valid"):
         write_generation_errors(report, business_report)
         return 1
     write_generation_summary(args.output.parent if args.output is not None else Path.cwd())

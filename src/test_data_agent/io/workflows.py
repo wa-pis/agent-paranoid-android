@@ -77,9 +77,20 @@ def generate_dataset_bundle(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    mode: str | None = None,
+    invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> DatasetGenerationResult:
     effective_spec = spec.model_copy(deep=True)
+    if mode is not None or invalid_ratio is not None:
+        apply_dataset_mode_options(
+            effective_spec,
+            mode=mode or effective_spec.generation_settings.mode.value,
+            invalid_ratio=(
+                effective_spec.generation_settings.invalid_ratio
+                if invalid_ratio is None else invalid_ratio
+            ),
+        )
     if not effective_spec.entities:
         raise ValueError("dataset spec must contain at least one entity")
     effective_output_format = output_format or effective_spec.generation_settings.output_format
@@ -165,6 +176,8 @@ def generate_dataset_artifacts(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    mode: str | None = None,
+    invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     result = generate_dataset_bundle(
@@ -173,6 +186,8 @@ def generate_dataset_artifacts(
         output_format=output_format,
         seed=seed,
         count=count,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
     )
     return 0 if result_is_valid(result) else 1
@@ -501,6 +516,7 @@ def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: f
         raise ValueError("--invalid-ratio requires --mode mixed or --mode negative")
     else:
         spec.generation_settings.mode = GenerationMode(mode)
+        spec.generation_settings.invalid_ratio = 0.0
 
 
 def max_generation_count() -> int:

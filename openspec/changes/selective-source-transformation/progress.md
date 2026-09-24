@@ -1263,3 +1263,24 @@ Broader transformation remains unfinished.
   adjustment, not a data-safety or runtime-budget change. Focused installed-
   package tests: 8 passed; Ruff, strict OpenSpec and `git diff --check` passed.
   Next: submit the signed change through ordinary PR/CI.
+- Signed `595ee991ecd1dcc3d538498e032eafa4f5ed36cc` became PR #550;
+  GitHub verified its signature, all 37 applicable checks passed (four
+  publication-only checks skipped), and normal merge completed on 2026-09-24
+  as `c03ae676e3b160bb2f68cefc44aaed5ef20ab803`. No release tag or
+  publication. Next: continue the approved client/transformation scope from
+  merged main; retain this outcome as acceptance evidence without a
+  progress-only PR.
+- Finding 25 next slice: traced saved-spec `generate` flags through CLI,
+  Python bundle, generation, business rules, output spec and manifest.
+  The CLI previously parsed mode/ratio then omitted both on the spec path;
+  omitted flags now retain saved settings, explicit negative/mixed and
+  ratio overrides reach the effective spec, and profile/CSV defaults remain
+  valid/0. A saved nonzero ratio with explicit valid/edge/load_test and no
+  ratio override currently fails closed pending the owner's precedence
+  answer; supplying `--invalid-ratio 0` works. Fictional tests cover five
+  modes, ratios 0/1, rows, spec, manifest, report, exit and Python copy
+  isolation. This is not yet final finding-25 acceptance: fractional ratios,
+  deterministic replay, intentionally invalid Parquet and installed-RC
+  before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
+  Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
+  PR, then settle remaining precedence without changing the safety boundary.

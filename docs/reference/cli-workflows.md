@@ -50,6 +50,12 @@ test-data-agent generate dataset_spec.yaml \
   --output out/generated
 ```
 
+For a reviewed DatasetSpec, omitted `--mode` and `--invalid-ratio` retain its
+saved settings. Explicit options override the effective spec, generated rows,
+saved output spec and manifest together. A nonzero ratio requires `mixed` or
+`negative`; specify `--invalid-ratio 0` when explicitly changing a saved mixed
+spec to `valid`. Profile and direct-CSV generation still default to `valid/0`.
+
 For previously reviewed safe profile metadata, use `--profile`:
 
 ```bash
