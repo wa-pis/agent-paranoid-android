@@ -228,3 +228,18 @@ string columns retain leading zeros; nullability is explicit on both sides.
 The same budget covers normalization. This CSV-specific step does not weaken
 strict inline mapping types; oversized integers may hit Python's safe digit limit
 and fail with the same bounded error. No global integer limit is changed.
+
+## Private Behavior Policy YAML
+
+`core/transformation_yaml.py` loads/saves UTF-8 bytes without filesystem access.
+The existing safe loader supplies depth/alias limits; policy loading additionally
+rejects duplicate/non-string keys and YAML merge keys. Model validation is repeated
+on load and before dump. Date-like strings must stay quoted; dump preserves their
+string type rather than relying on YAML implicit timestamp conversion.
+
+Caller byte ceilings and the same cooperative invocation budget apply to both
+directions. Serialization checks the byte ceiling after materializing output;
+it is not a streaming memory cap. Output includes private inline mappings and
+must never be used as a public summary or provider/MCP payload. Filesystem
+permissions/atomic writes, authorization and execution remain separate work.
+Failures use detached fixed errors, not YAML snippets or validation payloads.
