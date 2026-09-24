@@ -1181,3 +1181,66 @@ Broader transformation remains unfinished.
   source/evidence-conflict and stale-byte tests: 16 passed; targeted Ruff and
   mypy passed. Next: signed PR/CI for this private guard, then continue other
   approved work while the scoped policy wording awaits user confirmation.
+- Signed `0af394e` pushed and PR #548 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/548
+  Await exact-head CI/protection; do not rerun unchanged local checks or start
+  overlapping work. No ordinary per-PR AI review.
+- PR #548 exact head `0af394eb0a78df384a0515c2e7f5561f6c88bfbf` was
+  verified signed by GitHub; all 37 applicable checks passed, four intentionally
+  skipped. Merged normally on 2026-09-24 as
+  `e87eeedd99b8c21205f0a58b20ab20b6d74a5c72`. The receipt-bound CSV
+  evidence guard is on main; source-preserving execution remains disconnected.
+  Next: finish the explicit scoped safety-policy amendment and independent
+  safety review, or advance another unblocked client requirement while owner
+  approval of exact policy wording is pending.
+- Offline installed-package A/B for finding 22 used only the reviewed current
+  `tests/test_sql_query_source.py` boolean/forbidden-function selections and
+  fictional temporary SQL; no product monkeypatch, DB, API or private data.
+  Baseline installed public 1.5.0 (query-source module SHA-256
+  `8489b216e11405b8e15949b624b88eb6e9d97a286e08d7e85146aef14066500a`)
+  failed all eight permitted PostgreSQL/Trino boolean cases and passed both
+  forbidden-function controls. Offline wheel built from exact candidate source
+  `0af394eb0a78df384a0515c2e7f5561f6c88bfbf` (wheel SHA-256
+  `7bb8aab4a47bf793bd637be53cde14e9092c69188375f4d17d8f6c7c5e54de8a`)
+  passed all ten. Both imports resolved to separate installed targets; shared
+  development dependencies included sqlglot 30.13.0. Wheel metadata still
+  says 1.5.0; this is interim installed-wheel parser evidence, not clean-env,
+  database integration or final 1.6.0rc1 acceptance. Next: retain this
+  result for the final candidate matrix; do not rerun unchanged checks.
+- Finding 20 installed-package quickstart failure replay used the public
+  `TEST_DATA_AGENT_MAX_INPUT_ROWS=1` limit on the doctor's fictional two-row
+  fixture, without product monkeypatch, external services or private data.
+  Verified separate import roots: public 1.5.0 baseline at
+  `/private/tmp/apa-client-acceptance.xrueHB/baseline-1.5.0` returned generic
+  `invalid_input` and exit 2; interim candidate wheel from exact source
+  `0af394eb0a78df384a0515c2e7f5561f6c88bfbf` at
+  `/private/tmp/apa-sql-ab.EEQv6D/candidate` returned structured doctor JSON,
+  ten available Python/dependency/extra checks, `quickstart=failed`, bounded
+  `local generation failed`, and exit 1. This is local quickstart-failure
+  evidence only, not a Parquet-capability failure, clean dependency install,
+  client-probe execution or final 1.6.0rc1 acceptance. Next: obtain a safe
+  isolated Parquet-capability failure replay, or advance another approved
+  requirement; retain this A/B for the final candidate matrix.
+- `TEST_DATA_AGENT_MAX_OUTPUT_BYTES` at 4096 and 16384 also failed the
+  quickstart, so it cannot isolate the Parquet capability in this fixture;
+  neither run is claimed as capability evidence. The acceptance-note edit
+  passed `openspec validate selective-source-transformation --strict` and
+  `git diff --check`. No runtime code changed or repeated gate suite ran.
+- Private CSV mapping slice: declared approximate FLOAT text now
+  normalizes through the same snapshotted mapping loader, rejects
+  non-finite/overflow/underflow/ambiguous text, and detects source-key
+  collisions after conversion. Exact financial DECIMAL still has no coercion
+  path; no public execution or preservation permission was added. Fictional
+  focused tests: 56 passed across mapping parser/loader; Ruff, targeted mypy
+  and strict OpenSpec passed. Next: push a focused signed PR when GitHub is
+  reachable; keep separate Parquet unknown-metadata compatibility choice
+  pending user answer. No per-commit AI review.
+- Signed `7648ead` pushed as PR #549, focused approximate-FLOAT CSV mapping
+  and accumulated finding 20/22 acceptance evidence. Initial exact-head CI
+  wheel checks failed the unchanged 256 KiB wheel budget: 262214 bytes versus
+  262144 allowed (all four Python compatibility jobs and wheel smoke). No
+  budget was raised. Removed redundant type checking and shortened private
+  parser docstrings without changing numeric acceptance; local rebuilt wheel
+  is 262114 bytes. Focused mapping tests: 56 passed; Ruff and mypy passed.
+  Next: signed correction on the same PR, then require its fresh green CI;
+  do not merge the failing head or request ordinary AI review.

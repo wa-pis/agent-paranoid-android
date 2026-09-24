@@ -87,6 +87,15 @@ def test_integer_csv_normalization_is_exact(tmp_path):
     assert result.mapping.entries[0].replacement == (9007199254740993,)
 
 
+def test_approximate_float_csv_uses_same_snapshot(tmp_path):
+    payload = b"old,new\n+1.25e2,-0.5\n"
+    (tmp_path / "map.csv").write_bytes(payload)
+    result = load(tmp_path.resolve(), FieldType.FLOAT)
+    assert result.mapping.entries[0].original == (125.0,)
+    assert result.mapping.entries[0].replacement == (-0.5,)
+    assert result.source_sha256 == hashlib.sha256(payload).hexdigest()
+
+
 @pytest.mark.parametrize("rows", [b"1,2\n+001,3\n", b"-0,2\n0,3\n", b" 1,2\n",
                                  b"1e2,2\n", b"1_000,2\n", b"true,2\n"])
 def test_integer_csv_rejects_ambiguity_and_converted_duplicates(tmp_path, rows):

@@ -88,7 +88,7 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 
 | Finding | Reproduced result and remaining boundary |
 | --- | --- |
-| 20 | Safe doctor reporting fix merged in PR #542 (`47a1eb8`); 29 focused checks covered missing/broken imports, retained quickstart failure report and redacted errors. Separately installed 1.5.0 baseline and interim candidate both repeated healthy `doctor --json` and `--require-extra parquet --json` with exit 0 and identical structured reports (11/12 checks). Installed failure-path and clean-environment replay remain unverified; client probe was not run. |
+| 20 | Safe doctor reporting fix merged in PR #542 (`47a1eb8`); 29 focused checks covered missing/broken imports, retained quickstart failure report and redacted errors. Separately installed 1.5.0 baseline and interim candidate both repeated healthy `doctor --json` and `--require-extra parquet --json` with exit 0 and identical structured reports (11/12 checks). An isolated, fictional installed-package failure replay with `TEST_DATA_AGENT_MAX_INPUT_ROWS=1` made the baseline return generic `invalid_input`/exit 2, while the interim candidate returned structured `doctor` checks, retained dependency/extra successes, `quickstart=failed` and exit 1 without raw exception text. Parquet-capability failure, clean-environment replay and final-RC replay remain unverified; client probe was not run. |
 | 22 | AND/OR classification reproduced with sqlglot 30.13.0 and corrected in PR #541 (`b43005e`). Focused PostgreSQL/Trino predicate and fake-driver profile-to-spec checks passed, including forbidden-function controls; no live DB or final installed-RC replay. |
 | 24 | The client's fictional spec was extracted as data, not executed as a script. Installed public 1.5.0 baseline and interim `47a1eb8` candidate both wrote `created_at` physically as Parquet `string` although spec declares `date`; integer remained `int64`. Declared-schema/readback correction, nullable/timestamp/decimal cases and final RC replay remain pending. |
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
@@ -188,6 +188,10 @@ Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
 saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
 empty/null values, integers above binary-float exact range and calendar dates.
 Both routes reject forbidden nulls and invalid dates under the declared types.
+Private CSV mapping normalization also handles explicitly approximate FLOAT
+fields with finite ASCII numeric syntax, post-conversion duplicate checks and
+overflow/underflow rejection. This is not exact financial DECIMAL support or
+public transformation execution.
 These tests cover private policy persistence and typed mapping validation only;
 they do not establish transformation execution, wizard parity, approval,
 financial Decimal support or acceptance of missing private client inputs.
