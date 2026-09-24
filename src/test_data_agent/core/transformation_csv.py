@@ -2,7 +2,9 @@
 
 import csv
 import io
+import re
 
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_CELL_CHARS, DEFAULT_MAX_INPUT_CELLS,
     DEFAULT_MAX_INPUT_FILE_BYTES, DEFAULT_MAX_INPUT_ROWS, DEFAULT_MAX_INPUT_COLUMNS,
@@ -10,7 +12,7 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, InlineMapping, MappingDeclarationError, parse_mapping_declaration,
-    validate_inline_mapping_shape,
+    validate_inline_mapping_shape, validate_inline_scalar_mapping,
 )
 
 
@@ -70,6 +72,43 @@ def parse_csv_mapping_bytes(
         pass
     try:
         raise MappingDeclarationError("invalid CSV mapping")
+    except MappingDeclarationError as error:
+        error.__context__ = None
+        raise
+
+
+def normalize_csv_mapping(
+    mapping: InlineMapping, *, data_types: tuple[FieldType, ...],
+    nullable: tuple[bool, ...], budget: GenerationBudget,
+) -> InlineMapping:
+    """Normalize declared CSV integers; preserve other text for strict validation."""
+    try:
+        mapping = validate_inline_mapping_shape(mapping, key_width=len(data_types))
+        entries: list[dict[str, list[object]]] = []
+        for entry in mapping.entries:
+            budget.check("CSV mapping normalization")
+            converted: dict[str, list[object]] = {}
+            for side, values in (("original", entry.original), ("replacement", entry.replacement)):
+                converted[side] = []
+                for value, kind in zip(values, data_types, strict=True):
+                    if value is not None and type(value) is not str:
+                        raise ValueError
+                    if value is not None and kind == FieldType.INTEGER:
+                        if not isinstance(value, str) or not re.fullmatch(r"[+-]?[0-9]+", value):
+                            raise ValueError
+                        converted[side].append(int(value))
+                    else:
+                        converted[side].append(value)
+            entries.append(converted)
+        result = validate_inline_scalar_mapping(
+            {"kind": "inline", "entries": entries}, data_types=data_types, nullable=nullable,
+        )
+        budget.check("CSV mapping normalization")
+        return result
+    except ValueError:
+        pass
+    try:
+        raise MappingDeclarationError("invalid typed CSV mapping")
     except MappingDeclarationError as error:
         error.__context__ = None
         raise

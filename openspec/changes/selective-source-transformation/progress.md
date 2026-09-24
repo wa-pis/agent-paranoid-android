@@ -446,3 +446,28 @@ Broader transformation remains unfinished.
   deadline expiry between snapshot/parser tests via injected clock. Eleven loader
   tests, Ruff, mypy and whitespace checks passed. Docs record private/limited scope.
   Next: signed commit and independent review; no public execution enabled.
+- Signed local c3e4a75e29ae7b8b3316c2263eceaefcda79d50c created; Curie
+  (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) reviewing against dd3b4f1.
+  Next: push/PR and review disposition; do not duplicate active review.
+- Pushed c3e4a75; PR #527 opened with full AI review evidence in body:
+  https://github.com/wa-pis/agent-paranoid-android/pull/527
+  Curie found no issues; 126 tests plus additional composition/error/deadline
+  probes passed. Next: CI then merge if green; no active review to duplicate.
+- Completed: PR #527 merged as a92587932c77a6f56797b850f3039f054d0d3e44;
+  CI green on independently reviewed c3e4a75. Private string/date CSV loader
+  integrated, no public transformation runtime or approval boundary enabled.
+- Next: numeric CSV normalization contract/implementation, preserving strict
+  inline semantics and detecting duplicate keys after conversion. Decimal must
+  remain exact; no accidental binary-float financial path. No active reviewer.
+- Started codex/1-6-csv-integer-mappings from a925879. Added explicit INTEGER
+  CSV normalization: optional sign + ASCII digits, exact Python int, no float
+  conversion. Reject whitespace, exponents, underscores and bool text. Re-run
+  typed duplicate checks after conversion (+001/1 and -0/0 collide and fail).
+  Loader wired to normalization; inline strictness unchanged. 42 focused CSV/
+  loader tests, Ruff and mypy pass. Changes uncommitted, no reviewer active.
+- Next: configuration/null/composite and deadline tests, contract documentation,
+  then independent review/PR. Float, Decimal and DATETIME remain unfinished.
+- Added composite string/integer/null and detached configuration/deadline tests.
+  47 CSV/loader tests, Ruff and mypy pass. Contract documents ASCII integer syntax,
+  post-conversion duplicates, Python digit ceiling and unchanged inline semantics.
+  Next: commit, independent review and PR; no public execution enabled.

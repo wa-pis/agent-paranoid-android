@@ -1,6 +1,8 @@
 import pytest
 
-from test_data_agent.core.transformation_csv import parse_csv_mapping_bytes
+from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
+from test_data_agent.core.field import FieldType
+from test_data_agent.core.transformation_mapping import parse_mapping_declaration
 from test_data_agent.core.transformation_mapping import CsvMapping, MappingDeclarationError
 from test_data_agent.core.limits import GenerationBudget
 
@@ -75,3 +77,30 @@ def test_invalid_configuration_is_value_free(overrides):
                "budget": GenerationBudget(), **overrides}
     with pytest.raises(MappingDeclarationError, match="^invalid CSV mapping$"):
         parse_csv_mapping_bytes(b"old,new\na,b\n", declaration, **options)
+
+
+def test_integer_normalization_preserves_composite_strings_and_null():
+    mapping = parse_mapping_declaration({"kind": "inline", "entries": [
+        {"original": ["01", "001"], "replacement": [None, "002"]}]})
+    result = normalize_csv_mapping(mapping, data_types=(FieldType.INTEGER, FieldType.STRING),
+                                   nullable=(True, False), budget=GenerationBudget())
+    assert result.entries[0].original == (1, "001")
+    assert result.entries[0].replacement == (None, "002")
+
+
+@pytest.mark.parametrize("case", ["nullability", "expired", "already_typed", "invalid_type"])
+def test_normalization_failures_are_detached(case):
+    mapping = parse_mapping_declaration({"kind": "inline", "entries": [
+        {"original": [1 if case == "already_typed" else "1"], "replacement": [None]}]})
+    tick = [0.0]
+    budget = GenerationBudget(max_seconds=1, clock=lambda: tick[0])
+    if case == "expired":
+        tick[0] = 2.0
+    try:
+        raise ValueError("fictional-private-marker")
+    except ValueError:
+        with pytest.raises(MappingDeclarationError) as caught:
+            normalize_csv_mapping(mapping, data_types=("integer" if case == "invalid_type" else FieldType.INTEGER,),
+                                  nullable=(case != "nullability",), budget=budget)
+    assert str(caught.value) == "invalid typed CSV mapping"
+    assert caught.value.__context__ is None
