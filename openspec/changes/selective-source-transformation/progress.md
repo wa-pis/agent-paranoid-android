@@ -390,3 +390,35 @@ Broader transformation remains unfinished.
   24 CSV tests, Ruff, mypy and whitespace checks passed. Contract documents
   private byte-only scope, cooperative deadline, process CSV field ceiling and
   deferred typed numeric conversion/file adapter. Ready for independent review.
+- Signed local commit 6984a1b4918239331742e3279c40545ac828a993 created.
+  Curie (01a0d051-3e2c-77b0-89b5-dd90445dfd2d) review requested against
+  462f9ca. Next: push/create PR while review runs; do not duplicate review.
+- Pushed 6984a1b; PR #525 opened. Curie independent AI review found no issues;
+  106 focused tests and 20 additional probes passed. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/525#issuecomment-5805152050
+  Next: wait for CI, then merge if green. Review complete; no duplicate reviewer.
+- Completed: PR #525 merged as d5675160d66c7790418906cc7d1046a0b254e7c0;
+  all CI green at reviewed 6984a1b. Bytes-only CSV parsing is implemented, not
+  filesystem loading, numeric conversion or transformation execution.
+- Next: safe bounded file snapshot adapter. First resolve blocking special-file
+  opens in existing open_regular_file; keep all parent-component no-follow
+  protections. Add synthetic FIFO/symlink/byte-ceiling/error-chain regressions.
+- Started codex/1-6-mapping-file-snapshot from d567516. Shared regular-file reader
+  now opens O_NONBLOCK before fstat: a FIFO without a writer cannot hang opening.
+  No-follow path checks unchanged. Traced callers in agent_planning/io.artifacts.
+  Added isolated subprocess FIFO test with 5s timeout plus regular/symlink checks.
+  21 path-policy tests, Ruff and mypy pass. No mapping-file adapter wired yet.
+- Next: bounded private snapshot adapter and byte/error tests; review shared-reader
+  change alongside it before merge. Preserve uncommitted notes and current changes.
+- Added io/mapping_snapshot.py: explicit absolute root + relative path only,
+  existing descriptor-relative no-follow opening, bounded chunk reads, shared
+  deadline, pre/post descriptor metadata check, hash of returned immutable bytes.
+  Restricted dataclass repr omits payload/hash; fixed detached errors.
+  Six synthetic snapshot cases plus path-policy suite: 27 passed; Ruff/mypy pass.
+- Next: deadline/mutation/parent-symlink tests and contract note, then independent
+  review. Snapshot is not execution approval or an atomic database/file snapshot
+  guarantee; caller must parse/use these returned bytes, never reopen by path.
+- Added parent-symlink, expired-budget and real file mutation during read tests
+  using the explicit clock dependency (no product monkeypatch). 30 focused tests,
+  Ruff, mypy and whitespace checks passed; contract documents exact guarantees.
+  Next: signed commit, independent read-only review and PR/CI before merge.

@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 from collections.abc import Callable
 from pathlib import Path
 
@@ -15,6 +17,39 @@ from test_data_agent.io.path_policy import (
     replace_path,
     remove_tree_if_identity,
 )
+
+
+def test_regular_file_reader_rejects_fifo_without_blocking(tmp_path: Path) -> None:
+    fifo = tmp_path / "fictional.fifo"
+    os.mkfifo(fifo)
+    program = """
+import sys
+from pathlib import Path
+from test_data_agent.io.path_policy import open_regular_file
+try:
+    with open_regular_file(Path(sys.argv[1])):
+        raise AssertionError('FIFO accepted')
+except ValueError as error:
+    assert str(error) == 'filesystem input must be a regular file'
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", program, str(fifo)], timeout=5, capture_output=True,
+        env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src"),
+             "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+    assert result.returncode == 0, result.stderr.decode()
+
+
+def test_regular_file_reader_keeps_regular_and_symlink_behavior(tmp_path: Path) -> None:
+    source = tmp_path / "fictional.csv"
+    source.write_bytes(b"old,new\na,b\n")
+    with path_policy.open_regular_file(source) as handle:
+        assert handle.read() == b"old,new\na,b\n"
+    linked = tmp_path / "linked.csv"
+    linked.symlink_to(source)
+    with pytest.raises(ValueError, match="unsafe filesystem path"):
+        with path_policy.open_regular_file(linked):
+            pytest.fail("symlink accepted")
 
 
 def test_atomic_write_rejects_symlinked_parent(tmp_path: Path) -> None:
