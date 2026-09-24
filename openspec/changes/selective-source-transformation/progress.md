@@ -720,3 +720,39 @@ Broader transformation remains unfinished.
   inferred from that snapshot mismatch. Updated only those three fixture fields;
   focused contract tests: 3 passed, diff check clean. Next: signed fixture fix,
   independent delta review on updated SHA, push and green CI before merge.
+- Signed fixture correction ead682bd86a0e24a120f4c86a431f17009342359;
+  Curie independent read-only delta review active. No duplicate reviewer.
+- User clarified review scope: no AI review for every ordinary commit/PR;
+  independent AI review only for final release-candidate SHA, plus separately
+  required safety-policy review. GitHub protections still apply. Updated the
+  heartbeat prompt accordingly and sent Curie a stop instruction for the
+  unnecessary fixture delta review. Pushed ead682b to PR #534 for CI.
+  Next: green CI/protection-compliant merge; do not add ordinary AI review gates.
+- PR #534 merged as 0b7556ec29359d409d7aef55e977fe4711f482da after all
+  applicable CI, Python 3.11–3.14, containers, documentation and security checks
+  passed on ead682b. Normal merge with exact-head guard; no protection bypass.
+  Client finding 2 capped-folder uncertainty corrected, upgrade regressions
+  covered. Next: update client acceptance disposition and continue remaining
+  confirmed client findings/CSV slice without ordinary per-PR AI review.
+- Started codex/1-6-client-followup from merged 0b7556e, carrying existing
+  progress notes unchanged. Updated client finding 2 disposition with scoped
+  regression/CI evidence and explicit old-profile/private-input/RC limitations.
+  Inspected finding 10: legacy date adapter retains missing min_date/max_date;
+  ranged_datetime defaults missing endpoints to 2020-01-01/2025-01-01. This is
+  code inspection, not a completed client reproduction or a new test pass.
+  Next: trace planning/report disclosure and reproduce missing-bound behavior
+  on fictional metadata before choosing the smallest corrective change.
+- Finding 10 reproduced on unmodified 0b7556e via legacy fictional metadata,
+  inference, real generation and plan warnings: DATE/DATETIME each generated
+  three rows in the default period without date-fallback disclosure. New focused
+  regressions failed twice on missing warning; complete-bound control passed.
+  Added bounded generic review-plan warning (no source values/names), preserving
+  generator behavior. Generation guide updated. Scope is review-first planning,
+  not full output-report utility disclosure or final client acceptance.
+  Next: focused checks, partial-bound/category controls, then ordinary PR/CI.
+- Focused date-fallback/agent-review/public-contract checks: 10 passed;
+  Ruff and targeted mypy clean; diff check clean. Working change not yet committed.
+- Added partial-min/partial-max, categorical-date and identifier-path warning
+  controls; all 7 date disclosure tests passed, Ruff/diff checks clean.
+  No generation semantics or safety-policy changes. Next: signed PR and CI;
+  final installed replay and broader output utility reporting still pending.
