@@ -45,11 +45,12 @@ names, query text or literals. This does not broaden the permitted SQL subset.
 Boolean AND/OR predicates are permitted within that existing single-table
 subset; they do not authorize additional functions, tables, query shapes or
 larger work budgets.
-Non-sensitive date/timestamp outputs include validated min/max aggregates in
-their existing column-summary query. Sensitive-name fields do not request
-temporal bounds. Missing or malformed nonempty bounds fail closed; all-null
-fields make no observed-period claim. No query rows or extra aggregate round
-trips are added.
+Direct non-sensitive date/timestamp projections include validated min/max
+aggregates in their existing column-summary query. Any sensitive source field
+in the query, a sensitive output name, or a derived expression suppresses these
+bounds; renaming a sensitive source cannot declassify it. Missing or malformed
+nonempty bounds fail closed; all-null fields make no observed-period claim. No
+query rows or extra aggregate round trips are added.
 
 PostgreSQL connection failures expose only fixed categories when identifiable
 from typed network/TLS exceptions or allowlisted SQLSTATE codes: timeout,

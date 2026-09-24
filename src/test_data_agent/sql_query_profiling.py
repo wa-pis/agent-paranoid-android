@@ -212,6 +212,7 @@ def _profile_column(
     temporal_bounds = (
         profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
         and not infer_sensitive_from_name(column.name)
+        and column.name in plan.safe_temporal_output_fields
     )
     summary = _single_row(
         fetch_query(build_query_column_summary_query(plan, column.name, temporal_bounds=temporal_bounds))

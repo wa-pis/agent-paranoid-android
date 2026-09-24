@@ -1303,3 +1303,13 @@ Broader transformation remains unfinished.
   interim 1.5.0 metadata limit the claim; no real DB or final RC acceptance.
   Next: preserve this evidence in a docs commit; submit a PR only after #552
   closes, then run exact-head CI without repeating unchanged local tests.
+- Safety follow-up before push: the first local query-bound implementation
+  checked output names only. A real authorization-path regression proved
+  `birth_date AS event_day` requested and retained the sensitive minimum and
+  maximum on both adapters. No PR or publication used that SHA. The local
+  correction tracks only direct projections from non-sensitive source fields;
+  any sensitive query source, sensitive output or derived expression suppresses
+  bounds. Eighty-one affected tests, Ruff and targeted mypy pass. Previous
+  installed candidate-wheel evidence is historical, not safe acceptance.
+  Next: signed correction, rebuild exact wheel, replay alias-negative and
+  ordinary date/timestamp cases before opening any PR.

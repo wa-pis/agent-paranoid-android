@@ -10,7 +10,14 @@ from test_data_agent.sql_query_profiling import (
     SqlQueryProfileError,
     profile_validated_query,
 )
-from test_data_agent.sql_query_source import SqlQueryAdapter, ValidatedSqlQuery
+from test_data_agent.sql_query_source import (
+    QuerySourceColumn,
+    SqlQueryAdapter,
+    SqlQueryProfileRequest,
+    ValidatedSqlQuery,
+    authorize_query_source,
+    inspect_query_source,
+)
 
 
 def _plan(adapter: SqlQueryAdapter, name: str) -> ValidatedSqlQuery:
@@ -19,6 +26,7 @@ def _plan(adapter: SqlQueryAdapter, name: str) -> ValidatedSqlQuery:
         table_parts=("public", "events"), output_fields=(name,),
         fingerprint="a" * 64,
         sql=f'SELECT "{name}" FROM "public"."events"',
+        safe_temporal_output_fields=frozenset((name,)),
     )
 
 
@@ -126,3 +134,70 @@ def test_query_timestamp_timezone_mismatch_fails_closed():
             describe_query=lambda query: (QueryResultColumn("created_at", "timestamp with time zone"),),
             fetch_query=fetch,
         )
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("source,output,allowed", [
+    ("birth_date", "event_day", False),
+    ("event_day", "birth_date", False),
+    ("event_day", "public_day", True),
+])
+def test_temporal_bounds_follow_physical_source_not_alias(
+    tmp_path, adapter, source, output, allowed,
+):
+    table = "public.events" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.events"
+    query_file = tmp_path / "query.sql"
+    query_file.write_text(f'SELECT "{source}" AS "{output}" FROM {table}')
+    draft = inspect_query_source(SqlQueryProfileRequest(
+        adapter=adapter, source_id="fixture", entity="events", query_file=query_file,
+    ))
+    plan = authorize_query_source(draft, (
+        QuerySourceColumn("birth_date", "date", False),
+        QuerySourceColumn("event_day", "date", False),
+    ))
+    queries = []
+
+    def fetch(query):
+        queries.append(query.sql)
+        if "non_null_count" in query.sql:
+            return [{"row_count": 2, "non_null_count": 2, "distinct_count": 2,
+                     "min_temporal": date(2031, 1, 2),
+                     "max_temporal": date(2031, 1, 8)}]
+        return [{"row_count": 2}]
+
+    profile = profile_validated_query(
+        plan,
+        describe_query=lambda query: (QueryResultColumn(output, "date"),),
+        fetch_query=fetch,
+    )
+    assert ("AS min_temporal" in queries[-1]) is allowed
+    assert (profile.entities[0].field(output).distribution.get("kind") == "date_range") is allowed
+
+
+def test_sensitive_predicate_cannot_gate_temporal_bounds(tmp_path):
+    query_file = tmp_path / "query.sql"
+    query_file.write_text(
+        'SELECT "event_day" FROM public.events WHERE "birth_date" IS NOT NULL'
+    )
+    draft = inspect_query_source(SqlQueryProfileRequest(
+        adapter=SqlQueryAdapter.POSTGRES, source_id="fixture", entity="events",
+        query_file=query_file,
+    ))
+    plan = authorize_query_source(draft, (
+        QuerySourceColumn("birth_date", "date", True),
+        QuerySourceColumn("event_day", "date", False),
+    ))
+    assert plan.safe_temporal_output_fields == frozenset()
+
+
+def test_derived_temporal_expression_has_no_source_bound_permission(tmp_path):
+    query_file = tmp_path / "query.sql"
+    query_file.write_text('SELECT CAST("event_day" AS date) AS "day" FROM public.events')
+    draft = inspect_query_source(SqlQueryProfileRequest(
+        adapter=SqlQueryAdapter.POSTGRES, source_id="fixture", entity="events",
+        query_file=query_file,
+    ))
+    plan = authorize_query_source(draft, (
+        QuerySourceColumn("event_day", "date", False),
+    ))
+    assert plan.safe_temporal_output_fields == frozenset()

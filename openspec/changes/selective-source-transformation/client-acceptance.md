@@ -99,8 +99,12 @@ returned typed ranges, in-bound seeded generation and bound SQL for all four;
 both packages issued three fake requests per case. Import roots and version
 labels were checked, and the inspected probe SHA-256 is
 `0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`.
-The interim wheel still says 1.5.0 and shares interpreter dependencies: not a
-clean install, live database or final 1.6.0rc1 acceptance.
+This first interim wheel was superseded before PR: it used only output names
+for sensitivity, so a `birth_date AS event_day` projection could expose bounds.
+The unpushed correction now requires a direct projection with no sensitive
+source field or output name; an exact corrected installed-wheel replay remains
+pending. Neither interim wheel is a clean install, live database or final
+1.6.0rc1 acceptance.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 
