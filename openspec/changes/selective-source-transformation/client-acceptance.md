@@ -94,6 +94,18 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
 | 17 | Focused fake-driver statement-count regression for both PostgreSQL and Trino query profiling measures one no-row schema request, one row count, three column summaries and two numeric-shape aggregates: seven requests for three fields; one explicitly allowlisted category adds one request, while default makes no category/raw-row request. This is query-count evidence, not a live scan-cost or latency measurement, batching fix, or final-RC acceptance. |
 
+Additional finding-20 Parquet capability replay (not final RC acceptance):
+an isolated `sitecustomize.py` shim replaced only `pyarrow.parquet.read_table`
+with a fictional failure; no product code was patched. Verified installed
+public 1.5.0 and interim typed-Parquet candidate import roots each returned
+`doctor --require-extra parquet --json` with `ok=false`/exit 1,
+`quickstart=available`, `extra:parquet=available`, and
+`capability:parquet=failed`. Neither response contained the fictional token
+or reinstall advice. Shim SHA-256:
+`524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`.
+This proves the installed dependency-failure presentation path for these
+versions, not a real Parquet fault, clean environment, or final RC replay.
+
 These probes used fictional data, selected each installed CLI and verified its
 package import root. Subprocesses had 30-second timeouts and bounded captures;
 temporary output lived under canonical `/private/tmp` to satisfy no-follow
