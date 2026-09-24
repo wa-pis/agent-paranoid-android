@@ -1235,3 +1235,12 @@ Broader transformation remains unfinished.
   and strict OpenSpec passed. Next: push a focused signed PR when GitHub is
   reachable; keep separate Parquet unknown-metadata compatibility choice
   pending user answer. No per-commit AI review.
+- Signed `7648ead` pushed as PR #549, focused approximate-FLOAT CSV mapping
+  and accumulated finding 20/22 acceptance evidence. Initial exact-head CI
+  wheel checks failed the unchanged 256 KiB wheel budget: 262214 bytes versus
+  262144 allowed (all four Python compatibility jobs and wheel smoke). No
+  budget was raised. Removed redundant type checking and shortened private
+  parser docstrings without changing numeric acceptance; local rebuilt wheel
+  is 262114 bytes. Focused mapping tests: 56 passed; Ruff and mypy passed.
+  Next: signed correction on the same PR, then require its fresh green CI;
+  do not merge the failing head or request ordinary AI review.
