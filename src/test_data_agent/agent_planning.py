@@ -413,6 +413,18 @@ def plan_warnings(spec: DatasetSpec) -> list[str]:
         )
     if len(spec.entities) > 1 and not spec.relationships:
         warnings.append("No cross-entity relationships were inferred.")
+    if any(
+        field.data_type in {"date", "datetime"}
+        and not field.is_identifier
+        and not field.distribution.get("categories")
+        and (field.distribution.get("min") is None or field.distribution.get("max") is None)
+        for entity in spec.entities for field in entity.fields
+    ):
+        warnings.append(
+            "Some date/time fields have missing bounds. Default generation uses "
+            "2020-01-01 for a missing minimum and 2025-01-01 for a missing maximum; "
+            "source-period fidelity is unmeasured. Review explicit bounds before approval."
+        )
     confidence = minimum_inference_confidence(spec)
     if confidence is not None and confidence < 1.0:
         warnings.append(

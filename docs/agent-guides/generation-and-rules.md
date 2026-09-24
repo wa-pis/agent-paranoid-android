@@ -36,3 +36,9 @@ explicit local seeded random source. Do not introduce source-row reuse,
 identity preservation, or implicit real-value dictionaries as a shortcut.
 Entity names reserved for generated control artifacts are rejected by the
 dataset specification and writer before any output file is created.
+
+Review-first plans warn when date/time ranges lack endpoints: default generation
+uses 2020-01-01 for a missing minimum and 2025-01-01 for a missing maximum.
+These are fallback assumptions, not observed source bounds or measured fidelity.
+Set explicit bounds in the reviewed specification when a particular period is
+required. This warning does not change generation or certify source-period utility.
