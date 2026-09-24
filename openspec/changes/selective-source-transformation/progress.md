@@ -499,3 +499,12 @@ Broader transformation remains unfinished.
   controlled signing authority. Ask user before choosing this security boundary.
   No preservation execution or safety amendment activated. Other type/docs work
   remains possible; this blocks approval design, not all implementation.
+- Strict OpenSpec validation and diff checks passed. Signed draft-only commit
+  ff0f56f85470a29d39d2edb37d142413a0fd9a21 created; Curie independent design
+  review requested (01a0d051-3e2c-77b0-89b5-dd90445dfd2d), no option selected.
+  Next: review disposition and publish draft PR; user approval-transport answer
+  still pending. This draft must not be treated as active policy authorization.
+- Curie requested one clarification: copied originals versus independently
+  computed equal values. Draft now explicitly retains approved zero/rounding and
+  coincident derived-value exceptions without copy/skip fallback, with evidence
+  requirement. Strict OpenSpec/diff checks pass. Approval options still unselected.

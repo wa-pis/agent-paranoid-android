@@ -55,7 +55,11 @@ alone is insufficient. Validate and consume the same snapshots; changed inputs
 require renewed review. Budgets apply across the invocation, not per helper.
 SQL reads remain separately authorized, read-only, allowlisted and bounded.
 
-Original values may enter only explicitly permitted preserved output fields.
+Copying original values is allowed only in explicitly permitted preserved output
+fields. This does not prohibit independently synthesized equality for approved
+zero/declared-rounding cases or independently recomputed derived values that
+coincide with originals. Those cases never permit skipping replacement/computation
+or falling back to copying; the financial replacement contract still applies.
 Mappings may contain private originals locally; mapping output values must still
 pass applicable privacy/type/constraint checks. One-to-one row correspondence is
 internal and must not become an exported original-to-replacement lookup table.
@@ -83,6 +87,8 @@ successful validation does not prove anonymity.
   prevent publication and preserve existing destination artifacts.
 - Fictional end-to-end finance data retains authorized reference combinations,
   changes amounts, recomputes totals and preserves declared key relationships.
+- Zero/declared-rounding equality and coincident computed totals are accepted only
+  through the declared synthesis/derivation path, never a copy/skip fallback.
 
 The existing helper tests cover only parts of these requirements. No task above
 is considered passed merely because isolated parsers or loaders passed review.
