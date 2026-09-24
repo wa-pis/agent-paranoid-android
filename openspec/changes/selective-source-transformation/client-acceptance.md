@@ -36,6 +36,26 @@ omissions; proposals outside the agreed scope remain explicit decisions.
 
 ## Supplied Scripts
 
+### Evidence checkpoint: 2026-09-24
+
+This checkpoint consolidates existing evidence; it is not a new test run or
+final candidate acceptance. Detailed chronology and commands remain in
+[progress](progress.md). Status applies only to the stated reproduced case.
+
+| Finding | Current disposition and remaining evidence |
+| --- | --- |
+| 1 | Synthetic string identifiers with phone/email/ssn semantics reproduced as rejected. Product/security choice pending; no blanket privacy exemption implemented. Short-string reachability remains unverified. |
+| 8 | Reproduced from fictional aggregate metadata: 100 rows, four distinct keys generates 100 distinct identifiers. Fixed-pool versus proportional scaling awaits user decision; not fixed. |
+| 9 | Independent identifier-domain collision fixed in [PR #517](https://github.com/wa-pis/agent-paranoid-android/pull/517). `tests/test_identifier_domains.py` covers independent fields and declared links; relationship-order follow-ups reviewed on `3add995`. This does not prove general relationship inference or cross-run mapping stability. |
+| 19 | Deterministic access-time regression fixed in [PR #516](https://github.com/wa-pis/agent-paranoid-android/pull/516): two baseline failures, focused candidate checks passed. `tests/test_io_path_policy.py` retains presence/path-swap guards. Original script did not reproduce the timing failure: verified public 1.5.0 and publication candidate each yielded 24 successes/16 intended rejections. Five adapted subprocess scenarios passed both; not evidence that baseline contained no bug. |
+| 2–7, 10–18 | No final disposition established by this checkpoint. Preserve the finding-specific verification plans above; existing implementation or tests alone do not establish client-case acceptance. Finding 13 is not closed by the narrower declared-link fix under finding 9. |
+
+The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
+not the current branch or final 1.6.0rc1. Its wheel hash and original script hash
+are recorded in progress. The initial installed 1.4.0 comparison was diagnostic
+only and was superseded by verified public 1.5.0 replay. Missing private inputs
+remain unverified. No original monkeypatched A/B arm is acceptance evidence.
+
 - golden_run.py: adapt the profile-to-spec-to-output flow into assertions against
   the actual candidate CLI. Replace missing internal snapshot/pair inputs with
   fictional equivalents. Missing optional client data is SKIP, not product FAIL;
@@ -98,6 +118,22 @@ client-side confirmation where only their private input can establish the result
 Do not claim complete client acceptance from the script's exit code alone.
 
 ## New Agreed Scenarios
+
+Reviewed source-free CSV subset of `golden_run.py` is implemented in
+`tests/test_client_golden_csv_acceptance.py`. It invokes profile/infer/generate
+in bounded subprocesses, verifies the package import root, row/key counts,
+date/amount bounds and validation report. It uses the same isolated-install
+environment variable as the publication adaptation above. Unlike the original,
+it asserts synthetic profile categories rather than source-category copying:
+this explicitly tests the current source-free contract, not fulfillment of
+finding 5. Private snapshot/pair cases and the rest of the original script are
+not covered. A passing fictional subset does not close those requirements.
+
+On 2026-09-24 this subset passed both verified public 1.5.0 and an isolated wheel
+built from unchanged production code at `6a435db938e8ff43113e3f6f434fdd98f4363f42`.
+Both used development-interpreter dependencies; neither is clean-environment
+RC acceptance. Identical passing outcomes are compatibility evidence, not a
+newly fixed regression. Wheel and adaptation hashes are recorded in progress.
 
 Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
 saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
