@@ -889,3 +889,30 @@ Broader transformation remains unfinished.
   User PostgreSQL guide now distinguishes observed table bounds, sensitive/all-null
   exclusions, invalid-bound failure and still-unverified query-source support.
   Next: signed temporal-bounds PR and CI; no source-preservation authority assumed.
+- Signed de9724e pushed; PR #539 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/539
+  Next: CI and normal merge if green, then remaining query-source/client evidence.
+- User supplied refreshed handover archive and requested OpenSpec planning only.
+  Recorded SHA-256 and intake in feedback-2026-09-24-v2.md; read new findings
+  20–26, refreshed SQL/formula evidence and RC section E. Compared script hashes:
+  golden/output-contract/fix-runner unchanged; fix-ab changed; five new scripts.
+  No supplied scripts executed, private data imported, network/DB connected or
+  runtime implementation changed in this planning turn. Current-code inspection
+  recorded as leads, not reproduction evidence. Added work packages/dependencies,
+  decision gates, 1–26 acceptance tracking and proposed specification scenarios;
+  linked proposal/plan/tasks. Existing scope and source-preservation gate retained.
+  Next: validate this OpenSpec plan, then fully inspect new harnesses and reproduce
+  22/25 first; authentication, wider SQL and invalid-Parquet decisions stay gated.
+- Planning validation passed: `openspec validate selective-source-transformation
+  --strict`; git diff whitespace check clean. Runtime tests intentionally not
+  repeated for this documentation-only intake. Plan remains local; no PR/merge
+  or candidate release was performed as part of the new planning request.
+- In the following goal continuation, PR #539 was verified green (37 success,
+  4 intentional skips) and merged normally as
+  4550f225263071dd51db728ee248d629ad798bb8. A subsequent `gh pr view`
+  failed through the system git/Xcode license path; explicit Homebrew-git PATH
+  confirmed GitHub state MERGED and exact merge SHA. The uncommitted v2 OpenSpec
+  plan was preserved on codex/1-6-feedback-v2-plan from that main commit.
+  Next: commit/publish the validated plan, then inspect the changed client
+  harnesses and reproduce findings 22/25. Heartbeat stays paused while its
+  preservation-authority blocker remains unresolved.

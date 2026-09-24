@@ -6,6 +6,11 @@ not executable instructions. No client dataset or source-derived profile is
 to be committed or sent to a provider. This register is not a claim that all
 reported findings have been independently reproduced or fixed.
 
+The refreshed archive received 2026-09-24 extends this register to 26 findings.
+See [v2 intake, work packages and evidence rules](feedback-2026-09-24-v2.md).
+New claims are client-reported until reproduced; old baseline evidence remains
+historical, not overwritten by the new document's measurements.
+
 ## Finding Dispositions To Verify
 
 | Finding | Plan / acceptance boundary |
@@ -29,6 +34,13 @@ reported findings have been independently reproduced or fixed.
 | 17 | Measure query count and scan budgets; assess bounded aggregate batching. Temporary table writes are outside the read-only contract. |
 | 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. |
 | 19 | Reproduce atime-only publication failures; preserve path-swap protection. Define directory overwrite behavior explicitly and test rollback. |
+| 20 | Reproduce doctor capability/publication failures with installed extras; preserve checks and safe causes without misleading reinstall advice or raw exception disclosure. |
+| 21 | Plan Trino authentication with explicit method/secret-source decision; prove propagation, preflight, TLS/redaction using isolated drivers. Live client measurements remain unverified. |
+| 22 | Reproduce permitted SQL connector/function classification on both adapters; fix without extending SQL policy, and retain allowlist/budget/forbidden-function controls. |
+| 23 | Exact DECIMAL precision/scale across profile, spec, generation, formulas and export; link to financial contract and distinguish approximate inputs. |
+| 24 | Declared Parquet physical types and readback; no silent date/decimal or mixed-column coercion. Resolve invalid-mode publication semantics explicitly. |
+| 25 | Mode/invalid-ratio precedence and parity across spec/profile/CSV; verify actual output, effective settings, validation, publication and JSON/exit consistency. |
+| 26 | Honest bounded Parquet input metadata: unknown is not zero/safe; test nulls, distinctness, sensitivity and type round trips; decide CLI/API compatibility. |
 
 Before candidate acceptance, give every row a final confirmed/fixed, intentional,
 deferred or not-reproduced disposition with rationale and evidence. No silent
@@ -68,8 +80,9 @@ green CI: invalid explicit scopes fail before session creation; wildcard scopes
 validate after bounded metadata and before aggregates. Category-limit policy is
 unchanged. Finding 10 table-profile date/timestamp bounds are corrected locally:
 37 focused checks cover aggregate -> inference -> generation, sensitive/all-null
-exclusions and invalid/timezone-inconsistent endpoints. Temporal-bounds CI and
-installed-RC replay remain pending; query-source bounds are not covered.
+exclusions and invalid/timezone-inconsistent endpoints. PR #539 merged as
+`4550f22` with green CI. Installed-RC replay remains pending; query-source
+bounds are not covered.
 
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash

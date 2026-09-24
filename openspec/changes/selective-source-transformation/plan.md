@@ -1,8 +1,15 @@
 # Proposed Implementation Milestones
 
 Implementation and 1.6.0rc1 publication authorized by the user on 2026-09-24
-(Europe/Samara). Use sequential signed PRs, green CI/CD and independent review.
+(Europe/Samara). Use sequential signed PRs and green CI/CD. Independent AI
+review applies to the final exact RC SHA and safety-policy changes, not every PR.
 Stable publication is not authorized. No production source access is authorized.
+
+The refreshed 2026-09-24 handover is planned in
+[client feedback v2](feedback-2026-09-24-v2.md): findings 20–26, strengthened
+acceptance for 1–19, dependencies and unresolved decisions. It extends this
+change's client/financial/format acceptance work; it does not authorize embedded
+repair instructions, live integrations or a weaker safety boundary.
 
 1. **Contract and safety approval.** Separate source-free generation from
    one-to-one transformation; settle field actions, sensitivity review,
@@ -11,6 +18,9 @@ Stable publication is not authorized. No production source access is authorized.
    repeated-key misclassification, generator/privacy disagreement and empty
    output directory publication. Report unknown date bounds and capped distinct
    statistics honestly. Do not import every suggested fix uncritically.
+   Prioritize reproduction of permitted boolean SQL connectors (22) and
+   mode/ratio parity (25); batch doctor diagnostics (20). Track Trino auth (21)
+   behind an explicit configuration/secret-source decision.
 3. **CSV vertical slice.** One-to-one rows, preserved reference combinations,
    replaced financial values, scoped substitutions, consistent keys and derived
    totals through a saved policy before adding interactive UI.
@@ -44,3 +54,7 @@ Retain approximate DOUBLE semantics explicitly; do not claim recovered precision
 CSV needs companion type/null/format metadata and round-trip tests for decimals,
 large integers, leading-zero strings and timestamps. Review schema compatibility
 before implementation. No new Hadoop connector is implicitly requested.
+Findings 23/24/26 add precision/scale transport, declared Arrow output schemas,
+honest Parquet profiling evidence and typed readback to this same milestone.
+Decide invalid-mode heterogeneous Parquet behavior with finding 25 rather than
+silently converting whole columns to strings.

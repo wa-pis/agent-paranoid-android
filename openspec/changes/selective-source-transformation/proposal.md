@@ -44,6 +44,10 @@ In scope:
 - Explicit financial scale, precision, sign, null and equality policies.
 - Local bounded processing, honest provenance and separate validation outcomes.
 - CSV and approved SQL-result contracts; staged adapter delivery is permitted.
+- Refreshed client findings 20–26: safe doctor diagnostics, existing SQL boolean
+  semantics, generation-mode parity, planned Trino authentication, exact decimal
+  transport and typed/honest Parquet round trips. See
+  [feedback v2](feedback-2026-09-24-v2.md) for dependencies and decision gates.
 
 Out of scope:
 
