@@ -101,10 +101,22 @@ labels were checked, and the inspected probe SHA-256 is
 `0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`.
 This first interim wheel was superseded before PR: it used only output names
 for sensitivity, so a `birth_date AS event_day` projection could expose bounds.
-The unpushed correction now requires a direct projection with no sensitive
-source field or output name; an exact corrected installed-wheel replay remains
-pending. Neither interim wheel is a clean install, live database or final
+The local correction requires a direct projection with no sensitive source
+field or output name. The first wheel is not safe acceptance; its corrected
+replay follows. Neither replay is a clean install, live database or final
 1.6.0rc1 acceptance.
+Corrected installed-wheel A/B on exact local code SHA
+`39b27fee0af980aacb3e77dc9e392350c98ef817` used wheel SHA-256
+`496e766f4d788dc0bc8ed00fec5f2006fafd4d36e1b379d5b70d32300d072b40`
+and inspected probe SHA-256
+`5b46ed269b90317ca3bec1c75607f374f6fdc4a1441de1560cf70ba9d08b032c`.
+Separate installed roots were verified. Four ordinary PostgreSQL/Trino
+date/timestamp cases retained typed bounds and in-period seeded output with
+three fake calls each. Four `birth_date` alias/filter cases issued no min/max
+aggregate and retained no range; the superseded wheel incorrectly did both.
+Public baseline 1.5.0 issued no min/max in any case. This is still shared-
+dependency, fake-driver evidence under a 1.5.0-labelled interim wheel, not
+client/private data, live database or final RC acceptance.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 

@@ -1313,3 +1313,14 @@ Broader transformation remains unfinished.
   installed candidate-wheel evidence is historical, not safe acceptance.
   Next: signed correction, rebuild exact wheel, replay alias-negative and
   ordinary date/timestamp cases before opening any PR.
+- Signed correction `39b27fee0af980aacb3e77dc9e392350c98ef817` passed
+  81 focused tests, Ruff, targeted mypy, strict OpenSpec and strict MkDocs.
+  Installed-wheel replay with inspected probe SHA-256
+  `5b46ed269b90317ca3bec1c75607f374f6fdc4a1441de1560cf70ba9d08b032c`:
+  public 1.5.0 had no ranges; superseded local wheel exposed ranges for four
+  sensitive alias/filter cases; corrected wheel SHA-256
+  `496e766f4d788dc0bc8ed00fec5f2006fafd4d36e1b379d5b70d32300d072b40`
+  retained four ordinary date/timestamp ranges but suppressed all four
+  sensitive cases. All used three fake calls, verified separate import roots,
+  no live DB. Next: retain this evidence in a signed docs commit; hold PR
+  until #552 closes. Exact RC package and private acceptance remain unverified.
