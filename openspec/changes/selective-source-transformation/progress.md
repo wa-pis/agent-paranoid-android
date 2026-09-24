@@ -1037,3 +1037,30 @@ Broader transformation remains unfinished.
   passed. This is not live scan-cost evidence and authorizes no SQL expansion.
   Next: resolve 25's mode and intentional-invalid publication contract; then
   implement it once across generator, business rules, manifest and exit status.
+- PR #543 (`c422d1b`) passed 37 GitHub checks with four intentional skips,
+  signed-commit verification and CLEAN merge state; merged normally as
+  `c31b62d3156523513e2156f534b380f75c484a24`. No ordinary AI review or
+  branch-protection bypass. The query-count test and refreshed harness/evidence
+  register are on main; finding 17 live scan cost remains unverified.
+- Inspected remaining finding-10 query-source path. A validated SQL projection
+  may alias a sensitive source column to a benign output name; the current
+  validated plan stores output fields but no source-field lineage. Adding
+  temporal min/max based only on output names could disclose sensitive bounds.
+  No query, policy or runtime change made. The preservation approval transport
+  remains the release-critical decision; mode precedence, intentional-invalid
+  exit/publication and heterogeneous Parquet choices are also unanswered.
+  Next: obtain explicit decisions, then implement with executable safety tests
+  and independent safety-policy review where the boundary changes. Automation
+  remains paused; no RC tag or publication exists.
+- The user selected trusted local CLI operator confirmation for preservation.
+  Recorded the exact-plan/column prompt, fixed-byte receipt, default-agent
+  exclusion and equal-privilege limitation in the safety boundary, policy
+  contract, proposed spec, tasks and milestone plan. This is a product decision,
+  not approval of any dataset or an enabled runtime exception. No source rows,
+  private data, database or external API were used. GitHub PR listing was
+  temporarily unavailable; local branch `codex/1-6-local-approval` starts from
+  merged main `c31b62d` and contains only the documented decision plus this
+  progress note. Next: strict OpenSpec/diff validation, then implement the
+  interactive approval and exact-input verification with fictional executable
+  tests before the scoped AGENTS.md/baseline amendment and independent safety
+  review. Automation stays paused; no release tag or publication exists.

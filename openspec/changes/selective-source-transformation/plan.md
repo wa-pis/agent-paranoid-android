@@ -14,6 +14,11 @@ repair instructions, live integrations or a weaker safety boundary.
 1. **Contract and safety approval.** Separate source-free generation from
    one-to-one transformation; settle field actions, sensitivity review,
    preservation authority, dependencies and typed substitution dictionaries.
+   The selected authority is the trusted local CLI operator: interactive
+   confirmation of the exact plan and preserved columns, with a receipt bound
+   to fixed input bytes. Equal-privilege local impersonation is outside this
+   deployment claim. This choice does not activate preservation; the scoped
+   safety amendment, executable checks and independent safety review still gate it.
 2. **Confirmed client defects.** Reproduce and correct identifier collisions,
    repeated-key misclassification, generator/privacy disagreement and empty
    output directory publication. Report unknown date bounds and capped distinct

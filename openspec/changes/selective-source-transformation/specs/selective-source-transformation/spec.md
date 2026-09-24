@@ -148,6 +148,18 @@ tests before this proposed exception can become operational.
 - **WHEN** generation runs
 - **THEN** existing source-free guarantees remain enforced.
 
+#### Scenario: Trusted local operator approval
+
+- **GIVEN** a complete reviewed transformation plan and fixed local input snapshots
+- **WHEN** the operator confirms the exact plan and preserved columns through
+  the interactive local CLI
+- **THEN** a restricted receipt binds that plan and those input bytes; execution
+  rejects a changed policy, source or referenced mapping, and default MCP/agent
+  advice cannot create an approval receipt.
+- **AND** a caller-supplied reference or noninteractive flag alone does not
+  authorize preservation; the local trust model does not claim resistance to a
+  process with the same terminal and filesystem privileges as the operator.
+
 ### Requirement: Exhaustive field policy and sensitivity
 
 Every input field SHALL have an explicit preserve, synthesize, substitute, derive or drop

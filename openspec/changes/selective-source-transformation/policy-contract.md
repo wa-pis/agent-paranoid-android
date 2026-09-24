@@ -111,8 +111,12 @@ implementation is deferred, not this requirement.
    identity; do not infer authorization from evidence.
 3. Semantic preflight: check sensitivity, mapping types/duplicates, null policy,
    dependency cycles, financial precision, declared uniqueness and budgets.
-4. Execution approval: bind reviewed policy and fixed source identity; mutation
-   invalidates approval. Approval transport and authority need separate review.
+4. Execution approval: trusted local operator confirms the exact reviewed plan
+   and preserved columns in an interactive CLI; a restricted receipt binds
+   reviewed policy and fixed source/mapping identities. Mutation invalidates
+   approval. Default MCP and agent advice cannot create the receipt. The
+   selected local trust model does not resist equal-privilege impersonation;
+   implementation and independent safety review remain pending.
 5. Post-execution validation: one-to-one rows, source-free fields, permitted
    preserved combinations, formulas and privacy; publish atomically only on pass.
 
