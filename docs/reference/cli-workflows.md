@@ -129,6 +129,13 @@ and trust-channel guidance.
 | `--output PATH` | Output file or new output directory |
 | `--overwrite` | Replace one valid manifest-owned target |
 
+Parquet output from a reviewed specification uses declared integer, float,
+boolean, string, date and timestamp Arrow types, including nullable fields.
+Timestamp offsets are preserved when one consistent offset is available.
+Rows that cannot fit the declared type, including intentionally invalid mixed
+values, fail before publication; they are never silently converted into an
+all-string column. Exact DECIMAL typing remains planned for 1.6.0rc1.
+
 Folder generation requires a new or empty destination. Single-entity output
 suffixes must match the selected format. Overwrite fails closed when ownership,
 manifest, format, or sibling-file checks do not match.

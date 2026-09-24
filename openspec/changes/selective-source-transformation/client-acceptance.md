@@ -99,6 +99,18 @@ package import root. Subprocesses had 30-second timeouts and bounded captures;
 temporary output lived under canonical `/private/tmp` to satisfy no-follow
 publication. No product monkeypatch, private input, database or API was used.
 
+Later finding-24 probe (interim installed-candidate evidence): a new fictional
+`tests/test_client_parquet_acceptance.py` invokes the unmodified CLI, checks
+the selected import root, and reads physical Arrow types. Installed public
+1.5.0 baseline wrote declared `date` as `string` and failed the date32
+assertion. An offline wheel built from main `cc734a9` plus the current
+worktree changes (SHA-256 `631c32e3c02e7a079bf09e7b94a72eeb560d12977e2db26073b500e187a1f7da`)
+was installed under a separate `/private/tmp` root; the same CLI probe passed
+date32 and timestamp[us] physical readback. That wheel still labels itself
+1.5.0 and shares test-interpreter dependencies; it is not a committed exact
+candidate, clean install or final RC acceptance. Intentionally invalid mixed
+Parquet, DECIMAL and final-RC cases remain open.
+
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash
 are recorded in progress. The initial installed 1.4.0 comparison was diagnostic

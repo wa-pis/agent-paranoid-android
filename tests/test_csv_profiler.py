@@ -178,22 +178,19 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     json_output = tmp_path / "out_json" / "customers.json"
     parquet_output = tmp_path / "out_parquet" / "customers.parquet"
 
-    common_args = [
+    base_args = [
         "generate-from-csv",
         str(FIXTURE_CSV),
         "--count",
         "20",
-        "--mode",
-        "mixed",
-        "--invalid-ratio",
-        "0.1",
         "--seed",
         "123",
     ]
+    mixed_args = [*base_args, "--mode", "mixed", "--invalid-ratio", "0.1"]
 
-    assert main([*common_args, "--format", "csv", "--output", str(csv_output)]) == 0
-    assert main([*common_args, "--format", "json", "--output", str(json_output)]) == 0
-    assert main([*common_args, "--format", "parquet", "--output", str(parquet_output)]) == 0
+    assert main([*mixed_args, "--format", "csv", "--output", str(csv_output)]) == 0
+    assert main([*mixed_args, "--format", "json", "--output", str(json_output)]) == 0
+    assert main([*base_args, "--format", "parquet", "--output", str(parquet_output)]) == 0
 
     with csv_output.open() as handle:
         csv_rows = list(csv.DictReader(handle))
@@ -206,6 +203,7 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     assert len(csv_rows) == 20
     assert len(json_rows) == 20
     assert len(parquet_rows) == 20
+    assert str(pq.read_schema(parquet_output).field("created_at").type) == "timestamp[us]"
     assert report["valid"] is False
     assert any(section["failed"] > 0 for section in report["sections"])
     assert spec["generation_settings"]["seed"] == 123
@@ -217,6 +215,11 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     assert profile["source_type"] == "csv"
     assert profile["entities"][0]["name"] == "customers"
     assert "alice@example.com" not in (csv_output.parent / "csv_profile.json").read_text()
+
+    invalid_parquet = tmp_path / "invalid_parquet" / "customers.parquet"
+    assert main([*mixed_args, "--format", "parquet", "--output", str(invalid_parquet)]) == 2
+    assert not invalid_parquet.exists()
+    assert not (invalid_parquet.parent / "generation_manifest.json").exists()
 
 
 def test_parquet_preserves_homogeneous_scalar_types(tmp_path: Path) -> None:

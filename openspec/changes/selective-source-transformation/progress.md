@@ -1284,3 +1284,44 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Signed `74fc41d90a7853907e87d91ae81369d93ee4db2e` became PR #551.
+  GitHub verified its signature; all 37 applicable checks passed, four
+  publication-only checks skipped. Normal merge completed on 2026-09-24 as
+  `cc734a940fa16eb14c834a286fd8e734428254b6`. No tag/publication and
+  no ordinary AI review. Next: resolve the explicit-valid/saved-ratio choice,
+  complete finding-25 fractional/negative publication parity and isolated
+  candidate replay; carry this progress note with the next substantive PR.
+- Finding 24 typed Parquet work in progress: spec-backed bundle, single-file
+  and agent writers now receive declared field types. Dates/timestamps are
+  converted to Arrow temporal types; consistent timezone offsets, nullable
+  and all-null/empty fields preserve physical schema. Mismatched types or
+  mixed offsets fail before publication with bounded errors; the old
+  untyped writer no longer silently stringifies mixed columns. Exact DECIMAL
+  and the final intentional-invalid Parquet mode policy remain separate work.
+  Affected writer/workflow/agent/CLI/docs tests: 233 passed; Ruff, targeted
+  mypy, strict OpenSpec and diff check passed. A new fictional installed-CLI
+  probe checks physical Arrow schema and typed readback. Public installed
+  1.5.0 baseline failed only its `created_on` physical-type assertion
+  (`string`, expected `date32[day]`); current source tree passed. Offline wheel
+  built from main `cc734a940fa16eb14c834a286fd8e734428254b6` plus this
+  worktree's edits (wheel SHA-256
+  `631c32e3c02e7a079bf09e7b94a72eeb560d12977e2db26073b500e187a1f7da`)
+  installed under `/private/tmp/apa-parquet-ab.hznvEt/candidate`; the same
+  fictional CLI probe passed with a verified separate import root. This is
+  shared-dependency interim wheel evidence, still version-labelled 1.5.0,
+  not a clean-env or final-RC acceptance. Intentionally invalid Parquet
+  policy approval and exact DECIMAL remain pending. After an added existing-
+  artifact rollback case, 119 affected writer/workflow/CSV/client/docs tests
+  passed; Ruff, targeted mypy, strict OpenSpec and diff check passed. Next:
+  preserve the signed change as a draft PR for exact-head CI, but do not
+  merge before the invalid-mode policy choice; do not claim full finding-24
+  closure.
+- Milestone local offline gates for the uncommitted Parquet candidate:
+  `pytest -m 'not integration'` initially returned 1704 passed, 10
+  deselected and two release-test subprocess failures because macOS system
+  Git requires an unaccepted Xcode licence. Both failing tests passed when
+  rerun with `/opt/homebrew/bin` first on PATH; no product change was needed.
+  Full Ruff, package mypy (118 source files), strict MkDocs build, strict
+  OpenSpec and diff check passed. This is not exact-commit CI or final RC
+  acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
+  policy choice before merge; do not repeat local gates unchanged.

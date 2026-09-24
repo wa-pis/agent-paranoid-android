@@ -2,6 +2,7 @@ import csv
 import errno
 import hashlib
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,29 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.safety import SourceRowReuseError
+
+
+def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path) -> None:
+    pq = pytest.importorskip("pyarrow.parquet")
+    spec = DatasetSpec(
+        entities=[EntitySpec(
+            name="orders", row_count=2,
+            fields=[
+                FieldSpec(name="created_on", data_type="date"),
+                FieldSpec(name="created_at", data_type="datetime"),
+            ],
+        )]
+    )
+    spec.generation_settings.output_format = OutputFormat.PARQUET
+    output = tmp_path / "generated"
+
+    result = generate_dataset_bundle(spec, output_folder=output, seed=7)
+
+    schema = pq.read_schema(output / "orders.parquet")
+    assert result.validation.valid
+    assert str(schema.field("created_on").type) == "date32[day]"
+    assert str(schema.field("created_at").type) == "timestamp[us]"
+    assert all(isinstance(row["created_on"], date) for row in pq.read_table(output / "orders.parquet").to_pylist())
 
 
 def test_bundle_mode_override_uses_copy_of_spec(tmp_path: Path) -> None:
@@ -864,11 +888,11 @@ def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
         count=1,
     )
 
-    def exhaust_folder(rows, output_format, output_folder: Path) -> None:
+    def exhaust_folder(rows, output_format, output_folder: Path, *, spec) -> None:
         (output_folder / "partial.tmp").write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 
-    def exhaust_single(rows, output_format, output_path: Path) -> None:
+    def exhaust_single(rows, output_format, output_path: Path, *, spec) -> None:
         output_path.write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 
