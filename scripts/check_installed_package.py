@@ -73,7 +73,7 @@ MAX_DISTRIBUTIONS = {
     "trino": 25,
 }
 BOOTSTRAP_DISTRIBUTIONS = {"pip", "setuptools", "uv", "wheel"}
-MAX_WHEEL_SIZE_BYTES = 256 * 1024
+MAX_WHEEL_SIZE_BYTES = 512 * 1024
 
 
 def main(argv: list[str] | None = None) -> None:

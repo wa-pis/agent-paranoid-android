@@ -55,6 +55,8 @@ CI and tagged releases also build the wheel and install it in an isolated
 environment. That smoke check verifies package version metadata, the PEP 561
 `py.typed` marker, console entry points, and `test-data-agent doctor
 --skip-smoke` before release attestations are created.
+The compressed project wheel has a 512 KiB regression ceiling; optional
+dependency-count budgets are checked separately.
 
 For a candidate containing GigaChat, the release matrix additionally requires
 isolated base, `gigachat`, and `all` wheel checks on Python 3.11 through 3.14,

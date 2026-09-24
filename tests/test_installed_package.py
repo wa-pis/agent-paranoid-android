@@ -65,9 +65,10 @@ def test_install_profiles_allow_shared_optional_modules(
     verify_install_profile(profile)
 
 
-def test_wheel_size_budget_accepts_small_wheel(tmp_path: Path) -> None:
+def test_wheel_size_budget_accepts_limit(tmp_path: Path) -> None:
     wheel = tmp_path / "package.whl"
-    wheel.write_bytes(b"synthetic wheel")
+    assert MAX_WHEEL_SIZE_BYTES == 512 * 1024
+    wheel.write_bytes(b"x" * MAX_WHEEL_SIZE_BYTES)
 
     verify_wheel_size(wheel)
 
