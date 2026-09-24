@@ -916,3 +916,22 @@ Broader transformation remains unfinished.
   Next: commit/publish the validated plan, then inspect the changed client
   harnesses and reproduce findings 22/25. Heartbeat stays paused while its
   preservation-authority blocker remains unresolved.
+- PR #540 (new-feedback OpenSpec planning only) passed 8 checks with 14
+  intentional skips and merged normally as
+  ae105fa55d55a6e890d37314b02ce7eb8d963597. No runtime behavior changed.
+  New branch codex/1-6-query-connectors began clean from that main SHA.
+- Finding 22 reproduced on fictional SQL with installed sqlglot 30.13.0:
+  AND/OR are `exp.Func` subclasses and eight PostgreSQL/Trino predicate cases
+  failed as forbidden functions; two forbidden-function controls passed. Excluded
+  only exact And/Or types from function check, retaining AST node allowlist,
+  function allowlist and budgets. Parser/adapter focused suite: 37 passed,
+  including fake-driver profile -> spec paths for both adapters. No real DB.
+  Candidate dependency-lower-bound and installed-RC evidence remain outstanding.
+- Finding 25 reproduced with the unmodified spec-input CLI on fictional fixture:
+  explicit `--mode mixed --invalid-ratio 1` returned success while saved spec
+  remained valid/0; manifest effective_rules matched that wrong execution.
+  Asked user how explicit valid mode should treat a saved mixed ratio; no policy
+  or publication-semantics change made pending that decision. SQL scope guide,
+  focused Ruff/mypy/diff checks and strict OpenSpec validation passed. Next:
+  commit/publish the finished connector fix, then mode parity after precedence
+  is settled. Preservation authority remains separately unresolved.

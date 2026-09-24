@@ -213,7 +213,11 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
             )
         raise SqlQuerySourceError("SQL query contains a forbidden operation")
     for node in nodes:
-        if isinstance(node, exp.Func) and node.sql_name().upper() not in _ALLOWED_FUNCTIONS:
+        if (
+            isinstance(node, exp.Func)
+            and type(node) not in (exp.And, exp.Or)
+            and node.sql_name().upper() not in _ALLOWED_FUNCTIONS
+        ):
             raise SqlQuerySourceError("SQL query contains a forbidden function")
     tables = tuple(statement.find_all(exp.Table))
     if len(tables) != 1:
