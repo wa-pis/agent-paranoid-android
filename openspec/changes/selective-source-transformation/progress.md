@@ -845,3 +845,20 @@ Broader transformation remains unfinished.
   and diff check passed. JSON diagnostics/adapters/spec contracts: 56 passed
   in prior step. Documentation updated. Next: signed batch PR and CI; final
   installed-RC and real-driver connection behavior are not claimed verified.
+- Signed 5cbe409 pushed; consolidated diagnostic PR #537 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/537
+  Next: observe CI on this SHA and normal merge if green; no ordinary AI review.
+- Finding 15 early-validation subcase reproduced: two fictional invalid category
+  scopes reached PostgreSQL queries before failing. Reused the existing category
+  query builder for preflight against explicit scopes before connection/query;
+  wildcard scopes validate after bounded metadata expansion and before aggregates.
+  No new allowlist permission, category limit, query execution or policy bypass.
+  Existing profiler/query-builder suite plus two new boundary checks: 28 distinct
+  tests passed (26 initial, then all 11 profiler tests after two added checks).
+  Targeted mypy/Ruff and diff checks passed. No live DB used. Work remains local
+  while PR #537 CI finishes (last observed 34 success, 4 skips, 3 running).
+  Next: merge #537 if green, then carry this checked fix into the next branch/PR.
+- PR #537 merged as 3caa3acc4b33251aa2997ab5e51f5c27d6241f34 after
+  37 successful checks and 4 intentional skips. Exact-head normal merge.
+  Category preflight carried to codex/1-6-category-preflight from that main SHA;
+  existing local changes preserved. Next: signed preflight fix PR and CI.

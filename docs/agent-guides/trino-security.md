@@ -51,6 +51,12 @@ never parsed for clues or returned; sanitized connection errors are detached
 from the original exception context. Some drivers wrap network failures in a
 generic exception, so a specific category is not guaranteed.
 
+PostgreSQL local-category requests are checked against explicit column allowlists
+before opening the profiling session or issuing queries. Wildcard configurations
+first resolve bounded metadata into a fixed column snapshot; category validation
+then runs before aggregate queries. Category count, value-content and disclosure
+checks still apply, and these preflight checks do not grant preservation rights.
+
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.
