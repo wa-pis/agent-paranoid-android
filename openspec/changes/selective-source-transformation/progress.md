@@ -1764,3 +1764,13 @@ Broader transformation remains unfinished.
   strict OpenSpec passed. Next: sign/push the integration, require exact-head
   CI, and keep the PR draft until the numeric-content exception is settled and
   the changed safety scope independently reviewed. No final RC acceptance.
+- Draft PR #564 exact head `2883d95f73f264fd315f0c8c53c249b56adba31a`
+  passed 37 applicable GitHub checks. A new fictional installed-root-aware CLI
+  CSV regression verifies DECIMAL(20,2) text beyond binary FLOAT precision,
+  nullable DECIMAL(38,16) empty cells, saved `dataset_spec.yaml` precision/
+  scale/nullability and manifest version/format. The existing bundle already
+  carries this companion spec; no new public format or runtime code was needed.
+  Sixteen focused DECIMAL tests, Ruff, strict OpenSpec, strict MkDocs and diff
+  checks passed. Next: submit this test/documentation delta to the same draft
+  PR; retain the numeric-content
+  choice and safety review gates. No private data or final RC acceptance.

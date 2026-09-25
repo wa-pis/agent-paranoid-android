@@ -142,6 +142,10 @@ all-string column. A reviewed `DatasetSpec` version `1.1` may declare a
 `precision` (1–38), `scale` (0–precision), and exact plain-text `min`/`max`
 bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
 text, PostgreSQL SQL uses `NUMERIC(p,s)`, and Parquet uses `decimal128(p,s)`.
+CSV is not self-describing: the generated directory's `dataset_spec.yaml`
+records the DECIMAL precision, scale and nullability, while null cells are
+empty in CSV. Keep that companion specification when reusing the export;
+the manifest binds it by fingerprint.
 Version `1.0` remains readable but cannot declare `decimal`. Parquet and
 declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
 and scale; they do not infer a runnable exact range. Financial formulas and

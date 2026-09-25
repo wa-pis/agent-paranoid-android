@@ -12,6 +12,7 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
+import yaml
 
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.constraint import Constraint, ConstraintType
@@ -261,3 +262,60 @@ def test_fictional_cli_writes_exact_decimal_parquet(tmp_path: Path):
         "amount_small": Decimal("9007199254740993.25"),
         "amount_wide": Decimal("9007199254740993.1234567890123456"),
     }] * 2
+
+
+def test_fictional_cli_csv_keeps_decimal_schema_and_nulls(tmp_path: Path):
+    spec = tmp_path / "fictional-spec.json"
+    spec.write_text(json.dumps({
+        "schema_version": "1.1", "entities": [{
+            "name": "fictional_items", "row_count": 2, "fields": [
+                {"name": "amount", "data_type": "decimal", "distribution": {
+                    "kind": "decimal_range", "precision": 20, "scale": 2,
+                    "min": "9007199254740993.25", "max": "9007199254740993.25",
+                }},
+                {"name": "optional_amount", "data_type": "decimal", "nullable": True,
+                 "null_ratio": 1.0, "distribution": {
+                     "kind": "decimal_range", "precision": 38, "scale": 16,
+                     "min": "9007199254740993.1234567890123456",
+                     "max": "9007199254740993.1234567890123456",
+                 }},
+            ],
+        }], "generation_settings": {"seed": 17, "output_format": "csv"},
+    }), encoding="utf-8")
+    package_root = Path(os.environ.get(
+        "TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT",
+        str(Path(__file__).resolve().parents[1] / "src"),
+    )).resolve(strict=True)
+    env = {**os.environ, "PYTHONPATH": str(package_root), "PYTHONDONTWRITEBYTECODE": "1"}
+    probe = subprocess.run(
+        [sys.executable, "-c", "import test_data_agent; print(test_data_agent.__file__)"],
+        cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30,
+    )
+    assert probe.returncode == 0
+    assert Path(probe.stdout.strip()).resolve().is_relative_to(package_root)
+    output = tmp_path / "generated"
+    result = subprocess.run(
+        [sys.executable, "-m", "test_data_agent.cli", "generate", str(spec),
+         "--output", str(output)],
+        cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, "fictional exact DECIMAL CSV generation failed"
+    with (output / "fictional_items.csv").open(newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    assert rows == [{"amount": "9007199254740993.25", "optional_amount": ""}] * 2
+    saved = yaml.safe_load((output / "dataset_spec.yaml").read_text())
+    amount, optional = saved["entities"][0]["fields"]
+    assert (saved["schema_version"], amount["data_type"],
+            amount["distribution"]["precision"], amount["distribution"]["scale"]) == (
+                "1.1", "decimal", 20, 2,
+            )
+    assert (optional["data_type"], optional["nullable"], optional["null_ratio"],
+            optional["distribution"]["precision"], optional["distribution"]["scale"]) == (
+                "decimal", True, 1.0, 38, 16,
+            )
+    assert amount["distribution"]["min"] == "9007199254740993.25"
+    assert optional["distribution"]["max"] == "9007199254740993.1234567890123456"
+    manifest = json.loads((output / "generation_manifest.json").read_text())
+    assert manifest["dataset_spec_schema_version"] == "1.1"
+    assert manifest["output_format"] == "csv"
+    assert manifest["validation_valid"] is True
