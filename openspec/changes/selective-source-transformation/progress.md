@@ -1526,3 +1526,10 @@ Broader transformation remains unfinished.
   passed. No source-preserving execution or timezone conversion was enabled.
   Next: submit this validation-only slice through signed PR/CI; leave semantic
   timezone equivalence and execution policy for the approved preflight design.
+- PR #566 merged the private DATETIME mapping validation on 2026-09-25 as
+  `6d3d8e82ce15a0ff674073d981b4940df73d84fe` after applicable green CI.
+  The current implementation map now identifies the merged private policy,
+  mapping, source-snapshot and receipt boundaries, explicitly without claiming
+  a public source-preserving execution path. Strict MkDocs, strict OpenSpec and
+  diff check passed. Next: submit this focused map correction; keep #552/#564 draft pending their
+  separate publication and privacy decisions. No release tag or publication.
