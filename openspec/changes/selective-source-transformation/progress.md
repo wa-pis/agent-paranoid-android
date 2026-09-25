@@ -1284,6 +1284,52 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Independent finding-25 fractional-ratio evidence on isolated main worktree:
+  fictional 200-row spec with two eligible fields at `mixed/0.25`, seed 31,
+  produced 54 intentionally invalid integer cells and 50 intentionally
+  invalid boolean cells out of 400 eligible cells. Two bundle runs wrote
+  identical rows and effective manifest settings; the input spec stayed
+  unchanged. A fictional direct-CSV source at the same ratio/seed likewise
+  reproduced its rows and effective settings. Focused tests: 2 passed, Ruff
+  passed. This does not prove an exact 25% quota: generation is per-field
+  probabilistic. Existing tests expose exit inconsistency: spec-based
+  mixed/negative returns 1 for intentional schema-invalid output, while
+  direct CSV/profile paths return 0. Do not claim finding-25 closure or
+  silently change exit semantics without expected-versus-unexpected failure
+  accounting. Next: settle/report controlled-invalid status semantics and
+  replay installed candidate; retain the separate saved-valid precedence
+  decision.
+- Finding-20 Parquet doctor JSON regression on the same isolated worktree:
+  an injected fictional capability failure after successful imports and
+  quickstart retains the dependency, extra and quickstart checks, returns
+  `ok=false`/exit 1, and reports a bounded capability failure without secret
+  text or reinstall advice. Three focused tests (this case plus both
+  fractional-ratio cases) and Ruff passed. This is local dependency-injection
+  evidence, not a fresh installed-package or real Parquet failure replay.
+  Next: carry the focused regression with the next substantive client-fix PR;
+  keep PR #552 draft until the invalid Parquet publication policy is chosen.
+- Installed finding-20 capability replay used an inspected, isolated shim
+  (SHA-256 `524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`)
+  that fails only `pyarrow.parquet.read_table`, never product code. Verified
+  public 1.5.0 and interim typed-Parquet candidate import roots both returned
+  structured JSON with quickstart/extra available, Parquet capability failed,
+  `ok=false`/exit 1, no fictional token and no reinstall advice. The earlier
+  output-budget attempt failed before quickstart and is not capability
+  evidence. This narrows finding 20; no real fault or final RC was tested.
+  Next: preserve the regression/evidence for final installed-RC replay; do not
+  rerun unchanged baseline/candidate checks.
+- Finding-25 installed-CLI A/B: new fictional test verified the actual import
+  root, 12 generated rows, invalid integer-cell types, manifest effective
+  `negative/1` settings, invalid report and unchanged input spec. Public 1.5.0
+  failed because amounts remained integers; separately installed wheel from
+  `76b2806` passed. Source-tree test passed. Wheel SHA-256
+  `07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+  probe SHA-256 `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+  The test deliberately does not assert the unresolved controlled-invalid
+  exit-code policy. Shared dependencies and a 1.5.0 version label mean this
+  is interim candidate evidence, not a clean install or final RC. Ruff,
+  strict OpenSpec and diff checks passed. Next: signed local commit; keep
+  saved-valid precedence and invalid Parquet decisions pending owner input.
 - Finding 17 independent PostgreSQL table-cost slice: fictional two-table,
   four-column profile (three numeric) made 15 aggregate/metadata statements
   before the change, 16 with one explicitly allowlisted category. Numeric
@@ -1340,3 +1386,9 @@ Broader transformation remains unfinished.
   Trino query-builder tests: 85 passed; changed-file Ruff, targeted mypy,
   strict OpenSpec and diff check passed. Next: signed merge commit, then one
   SQL-cost PR with exact-head CI. No live scan-cost or RC acceptance claimed.
+- PR #556 merged its bounded SQL-cost reuse through normal green CI on
+  2026-09-25 as `aebb40a734032060c14e9a4965be46ae2c247d23`. This
+  finding-25 test branch has now integrated that main state; its fractional
+  and installed-CLI evidence above remains separate from the unresolved
+  controlled-invalid exit policy and Parquet publication decision. Next:
+  focused checks on this integration, then a small signed test-only PR.

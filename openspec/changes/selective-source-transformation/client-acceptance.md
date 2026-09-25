@@ -95,6 +95,32 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
 | 17 | Fake-driver query-source profiling for both PostgreSQL and Trino measured seven requests for three fields (two numeric) before numeric-summary consolidation, five after: one no-row schema request, one row count and one aggregate per field. One explicitly allowlisted category adds one request; default makes no category/raw-row request. PostgreSQL table profiling separately fell from 15 to 12 statements for two tables/four columns (three numeric), or 16 to 13 with one category. Neither test measures live scan bytes/latency or proves final-RC acceptance. No SQL permissions, statement/scan budgets or temporary-table writes changed. |
 
+Later finding-25 installed-CLI A/B used a new fictional 12-row integer spec,
+explicit `--mode negative --invalid-ratio 1`, and verified each package import
+root. Public 1.5.0 failed the all-invalid-row assertion: output amounts stayed
+integers. A separately installed wheel from source commit `76b2806` passed:
+amounts were intentionally invalid strings, manifest effective settings were
+`negative/1`, report validity was false, and the input spec stayed unchanged.
+The probe did not lock down exit-code policy. Wheel SHA-256:
+`07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+probe SHA-256: `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+This wheel still labels itself 1.5.0 and shares development dependencies; it
+is not clean-environment or final 1.6.0rc1 acceptance. Saved-valid precedence,
+controlled-invalid status semantics and intentionally invalid Parquet remain
+separate decisions.
+
+Additional finding-20 Parquet capability replay (not final RC acceptance):
+an isolated `sitecustomize.py` shim replaced only `pyarrow.parquet.read_table`
+with a fictional failure; no product code was patched. Verified installed
+public 1.5.0 and interim typed-Parquet candidate import roots each returned
+`doctor --require-extra parquet --json` with `ok=false`/exit 1,
+`quickstart=available`, `extra:parquet=available`, and
+`capability:parquet=failed`. Neither response contained the fictional token
+or reinstall advice. Shim SHA-256:
+`524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`.
+This proves the installed dependency-failure presentation path for these
+versions, not a real Parquet fault, clean environment, or final RC replay.
+
 These probes used fictional data, selected each installed CLI and verified its
 package import root. Subprocesses had 30-second timeouts and bounded captures;
 temporary output lived under canonical `/private/tmp` to satisfy no-follow
