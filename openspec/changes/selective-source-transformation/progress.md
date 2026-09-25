@@ -1627,3 +1627,14 @@ Broader transformation remains unfinished.
   agent-runtime/MCP cases are in client-acceptance.md. Next: keep this evidence
   with a focused documentation PR; test distinct agent runtimes against the
   exact installed RC once the reviewed interfaces exist.
+- PR #570 merged the offline skill-checkpoint documentation on 2026-09-25 as
+  `cd8410aa25bb93fe5df8feb22e7599dee755d6c4` after applicable green CI.
+  It is partial installed-wheel evidence, not agent-runtime or RC acceptance.
+- Finding 26: a fictional two-row-group Parquet fixture reproduced false
+  `null_ratio=0.0` for two nulls in four rows. The metadata-only adapter now
+  sums complete, consistent row-group null counts and reports `0.5`; missing
+  statistics remain unmeasured in its private helper. The focused regression
+  failed before and passed after the change; 55 adapter/spec tests, Ruff and
+  targeted mypy passed. This is not full finding-26 closure: public unknown
+  representation, sensitivity and installed-RC replay remain. Next: agree a
+  versioned unknown/measured contract before changing that public surface.
