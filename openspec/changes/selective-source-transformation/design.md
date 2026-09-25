@@ -195,6 +195,17 @@ do not claim a measured percentage when no comparison was performed.
 The executable contract must define typed equality, nulls, dropped/derived
 fields and empty inputs before implementation and acceptance.
 
+For the first CSV implementation, the comparison scope is every policy field
+that has a corresponding output cell; fields with `drop` are excluded from the
+denominator, while `derive` fields remain included because they replace the
+source cell at the same row/column position. Rows must retain one-to-one order
+and count or reporting fails. Values are unchanged only when they have the same
+runtime scalar type and compare equal; therefore `true`, `1`, `"1"` and
+`"001"` remain distinct. Two nulls are equal. Non-finite numbers are invalid
+comparison input. The percentage is `unchanged / compared * 100`, rounded
+half-up to two decimal places and accompanied by both counts. A completed
+comparison with zero comparable cells reports `unavailable`, never `0%`.
+
 Expose only permitted aggregate results, never source values or comparison
 pairs. Existing aggregate disclosure controls still apply; a withheld or
 unavailable result must not be rendered as 0%. This requirement grants no

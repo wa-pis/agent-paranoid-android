@@ -70,6 +70,9 @@ per-field behavior decisions and field coverage. `transformation_mapping.py`,
 `transformation_csv.py`, and `transformation_yaml.py` validate inline/CSV
 mapping declarations and restricted policy serialization. These parsers do not
 authorize source-value preservation or transform rows.
+`transformation_report.py` computes only a bounded, value-free unchanged-cell
+aggregate from already corresponding source/output rows. It does not transform,
+publish, retain, or expose those rows and is not yet connected to execution.
 
 `src/test_data_agent/io/mapping_snapshot.py`, `mapping_loader.py`,
 `behavior_policy_files.py`, and `transformation_source.py` read bounded local
