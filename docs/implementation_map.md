@@ -78,6 +78,10 @@ mapping, policy, and CSV-source byte snapshots. The core
 bytes and reviewed material. `io/transformation_receipt.py` handles a private
 local interactive confirmation receipt; a receipt alone is not execution
 permission. There is no public CLI/MCP source-preserving execution path yet.
+The private `prepare_csv_review_request` entry derives profile evidence from
+the same fixed CSV bytes included in its approval request; callers cannot
+provide an alternate profile to that entry. Receipt issue/verification still
+reprofiles those bytes. No public transformation command uses this yet.
 
 ## Validation
 

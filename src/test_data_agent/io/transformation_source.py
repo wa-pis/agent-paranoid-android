@@ -2,11 +2,15 @@
 
 import csv
 import os
+from collections.abc import Sequence
 from pathlib import Path
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
-from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
+from test_data_agent.core.limits import (
+    DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget,
+)
+from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.csv_profiler import profile_csv_bytes
 from test_data_agent.io.path_policy import open_regular_file
@@ -14,6 +18,34 @@ from test_data_agent.io.path_policy import open_regular_file
 
 class TransformationSourceError(ValueError):
     """Invalid source snapshot or stale profile; never echo source values."""
+
+
+def prepare_csv_review_request(
+    policy_yaml: bytes, source: SnapshotPart, referenced_parts: Sequence[SnapshotPart], *,
+    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
+) -> ApprovalRequest:
+    """Derive review evidence from the same fixed CSV bytes bound to approval."""
+    try:
+        budget.check("transformation source review")
+        if (not isinstance(source, SnapshotPart) or source.kind != "source"
+                or type(source.name) is not str or not source.name
+                or type(source.payload) is not bytes
+                or len(referenced_parts) > 3 * DEFAULT_MAX_INPUT_COLUMNS
+                or any(not isinstance(part, SnapshotPart)
+                       or part.kind not in {"mapping", "generation_policy"}
+                       for part in referenced_parts)):
+            raise ValueError
+        profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+            source.payload, source.name, budget=budget,
+            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, max_total_bytes),
+        ))
+        evidence_json = profile.model_dump_json().encode("utf-8")
+        return prepare_approval_request(
+            policy_yaml, evidence_json, (source, *referenced_parts),
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget,
+        )
+    except (OSError, ValueError, TypeError, AttributeError, csv.Error):
+        raise TransformationSourceError("invalid transformation source review") from None
 
 
 def load_csv_source_snapshot(

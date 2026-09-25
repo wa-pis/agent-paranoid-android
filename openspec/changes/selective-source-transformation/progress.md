@@ -2047,6 +2047,22 @@ Broader transformation remains unfinished.
   prove source attestation on any future direct policy or execution route; the
   unresolved review gate remains. Next: retain this regression, then specify
   one canonical approval/execution entry that cannot bypass byte revalidation.
+- Draft #568 `3f81d7558238c00815ff1e8e435c0214e2e9dd84` completed 37
+  applicable GitHub checks successfully; four release-only jobs skipped.
+  Only this draft PR and three unrelated Dependabot PRs remain open. The
+  exact-text file/column overlap rule awaits the owner's decision; the
+  existing fail-closed conflict remains. Next: bind a future local review and
+  execution entrance to `_canonical_request`/fixed source bytes, then prove
+  that no direct policy path can bypass revalidation before enabling output.
+- Added a private CSV review-preparation entry that derives profile evidence
+  from the exact bounded source SnapshotPart it binds into the approval
+  request; callers of this entry cannot submit a relabelled profile. Existing
+  receipt issue/verification independently reprofile the same bytes. Fictional
+  same-source, wrong-source and changed-mapping tests pass with the receipt
+  tests (18 total),
+  Ruff and targeted mypy pass. No public CLI, receipt issuance or output path
+  was enabled by this entry. Next: connect a local read-only review command to
+  this entry, then test source/mapping mutation and value-free failure paths.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
