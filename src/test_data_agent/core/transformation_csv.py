@@ -255,6 +255,22 @@ def parse_csv_mapping_bytes(
 _CSV_FLOAT = re.compile(r"[+-]?(?:[0-9]+\.?[0-9]*|\.[0-9]+)(?:[eE][+-]?[0-9]+)?")
 
 
+def normalize_csv_scalar(value: str, kind: FieldType) -> str | int | float:
+    """Use identical numeric keys for CSV mappings and source cells."""
+    if kind == FieldType.INTEGER:
+        if not re.fullmatch(r"[+-]?[0-9]+", value):
+            raise ValueError("invalid CSV number")
+        return int(value)
+    if kind == FieldType.FLOAT:
+        if not _CSV_FLOAT.fullmatch(value):
+            raise ValueError("invalid CSV number")
+        number = float(value)
+        if not math.isfinite(number) or (number == 0.0 and Decimal(value) != 0):
+            raise ValueError("invalid CSV number")
+        return number
+    return value
+
+
 def normalize_csv_mapping(
     mapping: InlineMapping, *, data_types: tuple[FieldType, ...],
     nullable: tuple[bool, ...], budget: GenerationBudget,
@@ -271,19 +287,7 @@ def normalize_csv_mapping(
                 for value, kind in zip(values, data_types, strict=True):
                     if value is not None and type(value) is not str:
                         raise ValueError
-                    if value is not None and kind == FieldType.INTEGER:
-                        if not re.fullmatch(r"[+-]?[0-9]+", value):
-                            raise ValueError
-                        converted[side].append(int(value))
-                    elif value is not None and kind == FieldType.FLOAT:
-                        if not _CSV_FLOAT.fullmatch(value):
-                            raise ValueError
-                        number = float(value)
-                        if not math.isfinite(number) or (number == 0.0 and Decimal(value) != 0):
-                            raise ValueError
-                        converted[side].append(number)
-                    else:
-                        converted[side].append(value)
+                    converted[side].append(None if value is None else normalize_csv_scalar(value, kind))
             entries.append(converted)
         result = validate_inline_scalar_mapping(
             {"kind": "inline", "entries": entries}, data_types=data_types, nullable=nullable,

@@ -7,7 +7,6 @@ receipt minting or external access.
 
 import csv
 import io
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
@@ -18,7 +17,8 @@ from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import looks_sensitive_value
 from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_csv import (
-    compile_text_replacement_table, match_scoped_text, normalize_csv_mapping, parse_csv_mapping_bytes,
+    compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
+    normalize_csv_scalar, parse_csv_mapping_bytes,
 )
 from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
@@ -64,7 +64,7 @@ def replace_csv_snapshot(
             mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
         ) if policy.file_text_mapping is not None else None)
         column_tables = {}
-        substitutions: dict[str, dict[tuple[str | int, ...], str]] = {}
+        substitutions: dict[str, dict[tuple[str | int | float, ...], str]] = {}
         substitution_columns: dict[str, tuple[str, ...]] = {}
         domains = {domain.name: domain.mapping for domain in policy.domains}
         dropped = set()
@@ -81,7 +81,7 @@ def replace_csv_snapshot(
                 needs_receipt = True
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.DATE) or not isinstance(
+                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
@@ -96,7 +96,7 @@ def replace_csv_snapshot(
                         and isinstance(item.behavior.mapping, DomainMapping)
                         and item.behavior.mapping.name == declaration.name)
                     source_columns = tuple(name for _, name in members)
-                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.DATE) for name in source_columns):
+                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE) for name in source_columns):
                         raise ValueError
                     declaration = domains[declaration.name]
                 if isinstance(declaration, CsvMapping):
@@ -106,12 +106,12 @@ def replace_csv_snapshot(
                         nullable=tuple(False for _ in source_columns), budget=budget)
                 if not isinstance(declaration, InlineMapping):
                     raise ValueError
-                pairs: dict[tuple[str | int, ...], str] = {}
+                pairs: dict[tuple[str | int | float, ...], str] = {}
                 for entry in declaration.entries:
                     budget.check("CSV substitution")
-                    if any(type(value) not in (str, int) for value in (*entry.original, *entry.replacement)):
+                    if any(type(value) not in (str, int, float) for value in (*entry.original, *entry.replacement)):
                         raise ValueError
-                    pairs[cast(tuple[str | int, ...], entry.original)] = str(entry.replacement[component])
+                    pairs[cast(tuple[str | int | float, ...], entry.original)] = str(entry.replacement[component])
                 substitutions[decision.field] = pairs
                 substitution_columns[decision.field] = source_columns
                 continue
@@ -160,16 +160,8 @@ def replace_csv_snapshot(
                     values.append(row[name])
                     continue
                 if isinstance(action, SubstituteAction):
-                    key_values: list[str | int] = []
-                    for column in substitution_columns[name]:
-                        value = row[column]
-                        if field_types[column] == FieldType.INTEGER:
-                            if not re.fullmatch(r"[+-]?[0-9]+", value):
-                                raise ValueError
-                            key_values.append(int(value))
-                        else:
-                            key_values.append(value)
-                    key = tuple(key_values)
+                    key = tuple(normalize_csv_scalar(row[column], field_types[column])
+                                for column in substitution_columns[name])
                     if key in substitutions[name]:
                         values.append(substitutions[name][key])
                     elif isinstance(action.unmatched, PreserveAction):

@@ -2542,3 +2542,17 @@ Broader transformation remains unfinished.
   cases pass after simplifying fixture parameters; both direct DATE cases
   passed separately. No DATETIME execution enabled. Commit this bounded DATE
   implementation and evidence without claiming remaining temporal semantics.
+- Added approximate FLOAT substitution in the closed engine. TDD reproduced
+  two failures (inline/CSV), then reused one scalar normalizer for source keys
+  and mapping numbers instead of duplicating parsing. All 104 engine/CSV tests
+  pass, including existing malformed/nonfinite numeric controls; Ruff and mypy
+  pass for changed modules. No public activation or DECIMAL semantics changed.
+  Published head e444c61537a2b2d72d147d663bd5e838d5f8cc5e remains draft #578;
+  GitHub checks completed successfully (CI run 36176213788). FLOAT work is local,
+  uncommitted. Next: extend mixed-domain FLOAT coverage, then commit/push this
+  batch; remaining execution, interfaces and release acceptance stay open.
+- Completed the mixed FLOAT/STRING domain controls: inline/CSV success and
+  missing-tuple rejection. The 16-case composite matrix passes; Ruff and diff
+  checks pass. Preparing the FLOAT batch for signed commit and push to #578.
+  Next execution work remains synthesize/derive, null/temporal/decimal contracts,
+  publication and public interfaces; this batch is not release completion.

@@ -268,11 +268,12 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
 
 @pytest.mark.parametrize("missing", [False, True])
 @pytest.mark.parametrize("kind", ["inline", "csv"])
-@pytest.mark.parametrize("scalar", ["string", "integer", "date"])
+@pytest.mark.parametrize("scalar", ["string", "integer", "float", "date"])
 def test_composite_domain_matches_whole_original_tuple(missing, kind, scalar):
     before, after = {
         "string": (("north", "south"), ("west", "east")),
         "integer": ((1, 2), (11, 22)),
+        "float": ((1.25, 2.75), (3.125, 4.5)),
         "date": (("2025-01-01", "2025-01-02"), ("2026-01-01", "2026-01-02")),
     }[scalar]
     source = SnapshotPart("source", "items",
@@ -312,24 +313,27 @@ def test_composite_domain_matches_whole_original_tuple(missing, kind, scalar):
 
 
 @pytest.mark.parametrize("kind", ["inline", "csv"])
-def test_integer_substitute_is_exact_without_float(kind):
-    original = request(source_bytes=b"flag,code\ntrue,1\nfalse,2\n")
+@pytest.mark.parametrize("floating", [False, True])
+def test_numeric_substitute_preserves_declared_numeric_contract(kind, floating):
+    before = (1.25, 2.75) if floating else (1, 2)
+    after = (2.5, 3.125) if floating else (9007199254740993, 9007199254740995)
+    original = request(source_bytes=f"flag,code\ntrue,{before[0]}\nfalse,{before[1]}\n".encode())
     source = next(part for part in original.parts if part.kind == "source")
     policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
     mapping = {"kind": "inline", "entries": [
-        {"original": [1], "replacement": [9007199254740993]},
-        {"original": [2], "replacement": [9007199254740995]}]}
+        {"original": [old], "replacement": [new]} for old, new in zip(before, after)]}
     parts = [part for part in original.parts if part.kind == "mapping" and part.name == "all.csv"]
     if kind == "csv":
         mapping = {"kind": "csv", "path": "ints.csv", "source_columns": ["old"],
                    "replacement_columns": ["new"]}
-        parts.append(SnapshotPart("mapping", "ints.csv",
-            b"old,new\n001,9007199254740993\n002,9007199254740995\n"))
+        text = (f"old,new\n1.25e0,{after[0]}\n2.75,{after[1]}\n" if floating else
+                f"old,new\n001,{after[0]}\n002,{after[1]}\n")
+        parts.append(SnapshotPart("mapping", "ints.csv", text.encode()))
     policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": mapping}
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, tuple(parts),
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
-        ["flag", "code"], ["no", "9007199254740993"], ["yes", "9007199254740995"]]
+        ["flag", "code"], ["no", str(after[0])], ["yes", str(after[1])]]
 
 
 @pytest.mark.parametrize("kind", ["inline", "csv"])
