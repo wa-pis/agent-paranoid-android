@@ -325,12 +325,17 @@ def register_dataset_commands(
         help="Review a CSV transformation policy without executing it.",
         description=("Read one fixed CSV snapshot and a local behavior policy. "
                      "Show value-free field decisions and a snapshot digest; "
-                     "do not approve or transform source data."),
+                     "do not approve or transform source data. "
+                     "With --decide, interactively edit and save sensitivity decisions."),
         formatter_class=PublicHelpFormatter,
     )
     transform_review_parser.add_argument("source", type=Path, help="Local source CSV file.")
     transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
     transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
+    transform_review_parser.add_argument(
+        "--decide", action="store_true",
+        help="Interactively edit each sensitivity decision and explicitly save the policy in place; not approval.",
+    )
     transform_review_parser.add_argument(
         "--trace", action="store_true",
         help="Include bounded, value-free exact-text match ordinals and counts.",

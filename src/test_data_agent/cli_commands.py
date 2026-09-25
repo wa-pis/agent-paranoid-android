@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Callable
 from dataclasses import asdict
 from typing import Any, Protocol
@@ -42,6 +43,7 @@ from test_data_agent.rules.business_config import apply_and_validate_business_ru
 from test_data_agent.io.transformation_source import (
     prepare_csv_review_from_paths, trace_csv_review_request,
 )
+from test_data_agent.io.transformation_decisions import edit_csv_policy_decisions
 
 BusinessRulesApplier = Callable[
     [dict[str, list[dict[str, Any]]], argparse.Namespace, int, DatasetSpec | None],
@@ -98,14 +100,25 @@ def run_dataset_command(
         return profile_csv_command(args)
 
     if args.command == "transform-review":
-        request = prepare_csv_review_from_paths(
-            args.source, args.table or args.source.stem,
-            args.policy.parent.absolute(), args.policy.name,
-            max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
-            max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
-            budget=GenerationBudget(),
-        )
-        result = {"status": "review_only", "snapshot_sha256": request.snapshot_sha256,
+        if args.decide and args.trace:
+            raise ValueError("use --trace separately after saving decisions")
+        if args.decide:
+            request = edit_csv_policy_decisions(
+                args.source, args.table or args.source.stem, args.policy,
+                input_stream=sys.stdin, output_stream=sys.stderr,
+                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget(),
+            )
+        else:
+            request = prepare_csv_review_from_paths(
+                args.source, args.table or args.source.stem,
+                args.policy.parent.absolute(), args.policy.name,
+                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+                budget=GenerationBudget(),
+            )
+        result = {"status": "policy_saved" if args.decide else "review_only",
+                  "snapshot_sha256": request.snapshot_sha256,
                   "review": json.loads(request.review)}
         if args.trace:
             result["trace"] = asdict(trace_csv_review_request(

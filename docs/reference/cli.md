@@ -33,7 +33,7 @@ Use these focused references for task detail:
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate generated data against a `DatasetSpec` | Validation report |
 
-## Selective Transformation (Review Only)
+## Selective Transformation (Review And Policy Decisions)
 
 `transform-review SOURCE.csv POLICY.yaml` reads a fixed local CSV snapshot and
 the policy's referenced local mapping files, then prints value-free field
@@ -56,6 +56,29 @@ not copied. This is debugging metadata, not a preview of output or approval.
 No source-preserving transformation command is available yet. The separate
 local approval and execution gates in the active OpenSpec are not satisfied by
 this read-only review.
+
+### Edit Field Decisions Locally
+
+`transform-review SOURCE.csv POLICY.yaml --decide` edits an existing valid
+policy in place. For every column it displays the value-free system comment,
+observed sensitivity and current action, then requires an explicit
+`sensitive`, `non_sensitive`, or `unknown` answer. There is no accept-all or
+default answer. Actions, mapping references, unmatched behavior and operator
+comments are retained unchanged; serialization may normalize YAML formatting.
+
+The wizard displays the revised review and requires `SAVE` before atomically
+replacing the owner-only policy file. Invalid answers, conflicts, timeouts,
+or source/policy/mapping changes observed before saving leave the policy
+untouched. Each answer has a 60-second timeout, within the command's overall
+work budget. Input and prompt output must be terminals; piped answers are
+rejected. With `--json`, prompts remain on terminal stderr and the final
+`policy_saved` result is emitted on stdout. Run `--trace` separately afterward.
+
+This is policy editing, not data approval: no receipt is issued, no rows are
+transformed, and a `non_sensitive` answer cannot override conflicting evidence
+or enable preservation. A future approval must revalidate and bind all exact
+snapshots again. The wizard currently requires a reviewable policy; it does not
+create missing field actions or repair an invalid input policy.
 
 ## Database Sources And SQL
 

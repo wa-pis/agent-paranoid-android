@@ -102,6 +102,10 @@ All items below remain unverified until reproduced against the current candidate
   round trips, conflict rejection and separation from observed evidence.
 - [ ] Add a profile-review wizard that saves explicit field decisions; bulk
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
+  - [x] Existing valid-policy sensitivity editor: per-column prompts with system
+    comments, no default/bulk answer, unchanged actions/mappings, snapshot drift
+    rejection and atomic in-place save; no approval or execution.
+  - [ ] Complete action selection and saved-policy parity with executable paths.
 - [ ] Add a bounded, value-free system comment for each reviewed field: likely
   data meaning, sensitivity rationale and uncertainty from safe profile
   evidence. Display it with the suggestion and explicit operator decision in

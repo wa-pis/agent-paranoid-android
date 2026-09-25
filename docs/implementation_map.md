@@ -81,6 +81,9 @@ mapping, policy, and CSV-source byte snapshots. The core
 bytes and reviewed material. `io/transformation_receipt.py` handles a private
 local interactive confirmation receipt; a receipt alone is not execution
 permission. There is no public CLI/MCP source-preserving execution path yet.
+`io/transformation_decisions.py` implements the local `transform-review --decide`
+wizard: explicit per-column sensitivity answers, unchanged actions/mappings,
+fixed-snapshot validation and atomic policy save. It creates no approval receipt.
 The private `prepare_csv_review_request` entry derives profile evidence from
 the same fixed CSV bytes included in its approval request; callers cannot
 provide an alternate profile to that entry. Receipt issue/verification still

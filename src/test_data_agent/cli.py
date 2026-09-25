@@ -8,7 +8,7 @@ import io
 import json
 import sys
 import traceback
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import nullcontext, redirect_stderr, redirect_stdout
 from pathlib import Path
 from typing import Any, Literal
 
@@ -366,7 +366,8 @@ def run_json_command(args: argparse.Namespace) -> int:
     """Run a human presenter behind one stable machine-readable envelope."""
     stdout = io.StringIO()
     stderr = io.StringIO()
-    with redirect_stdout(stdout), redirect_stderr(stderr):
+    interactive_decisions = args.command == "transform-review" and getattr(args, "decide", False)
+    with redirect_stdout(stdout), (nullcontext() if interactive_decisions else redirect_stderr(stderr)):
         exit_code = run_command(args)
     if exit_code not in {0, 1}:
         return exit_code

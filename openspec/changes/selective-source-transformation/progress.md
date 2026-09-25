@@ -2324,3 +2324,23 @@ Broader transformation remains unfinished.
   targeted mypy, strict OpenSpec and diff check passed. Next: commit/publish
   this isolated report primitive, require CI, then integrate it only when the
   reviewed transformation execution path exists.
+- PR #572 exact `cb7382e1f0d2cdd8a935e69d485d3054b2c9403b` passed all
+  37 applicable GitHub checks with four release-only skips and was squash-
+  merged as `6829c66f2b70d15f8de1ba570379b98142ddec55` on 2026-09-25.
+  No ordinary AI review was run: this was neither a safety-policy amendment
+  nor the final RC SHA. The aggregate remains deliberately disconnected from
+  source-output execution. Next branch `codex/1-6-policy-wizard` starts from
+  that merge; next small step is the explicit per-field sensitivity-decision
+  wizard over the existing value-free review, without approval or execution.
+- Implemented `transform-review --decide` for existing reviewable policies:
+  terminal-only per-field decisions with system comments/evidence, no default
+  or bulk answer, unchanged actions/mappings, explicit SAVE and owner-only
+  atomic in-place persistence. Revalidates revised decisions against fixed
+  bytes and rejects source/mapping/policy drift before saving. No receipt or
+  output execution. TDD exposed the missing CLI option, JSON stderr capture
+  of interactive prompts (fixed), and normalized YAML defaults in the test
+  expectation. Eight real-subprocess/PTY scenarios pass, plus 20 adjacent
+  review/persistence/parser tests, 19 JSON CLI tests and 49 documentation tests.
+  Changed-file Ruff, mypy (four modules), strict OpenSpec and diff check pass.
+  Next: signed PR and required CI; action selection and executable-policy
+  parity remain open, as does the separately blocked output-engine path.
