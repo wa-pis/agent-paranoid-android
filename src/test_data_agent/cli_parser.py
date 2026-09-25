@@ -331,6 +331,10 @@ def register_dataset_commands(
     transform_review_parser.add_argument("source", type=Path, help="Local source CSV file.")
     transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
     transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
+    transform_review_parser.add_argument(
+        "--trace", action="store_true",
+        help="Include bounded, value-free exact-text match ordinals and counts.",
+    )
 
     profile_postgres_parser = subparsers.add_parser(
         "profile-postgres",

@@ -2263,3 +2263,16 @@ Broader transformation remains unfinished.
   The inactive AGENTS.md/baseline guard is ready for signed commit and narrow
   independent AI safety review; executable end-to-end transformation gates
   remain open.
+- Signed inactive safety-boundary commit `ee8ea0c7388b9db00e9a8e91f88fd801b3db7e5b`
+  was pushed to draft PR #568; its 37 applicable GitHub checks succeeded
+  (four release-only skips). Raman was resumed for a narrow read-only AI
+  safety-policy review on that exact SHA; do not duplicate. No execution
+  permission follows from this commit or its CI.
+- Added opt-in `transform-review --trace` against the same fixed reviewed
+  snapshot: up to 50 value-free events and 10,000 replacement cells; rows,
+  columns, scopes and rule ordinals only. It reuses the private one-pass matcher,
+  fails closed on overflow and does not issue a receipt or write output.
+  Seventy-three focused fictional source/CSV/CLI tests, changed-file Ruff and
+  mypy, strict MkDocs, strict OpenSpec and diff check passed locally. Next:
+  commit/push this read-only trace slice, require its exact-head CI, disposition
+  the pending safety review, then continue separately gated CSV execution.

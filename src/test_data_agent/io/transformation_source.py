@@ -2,16 +2,20 @@
 
 import csv
 import os
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from pathlib import Path
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import (
-    DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget,
+    DEFAULT_MAX_INPUT_CELLS, DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
+    GenerationBudget,
 )
 from test_data_agent.core.privacy import is_sensitive_field
-from test_data_agent.core.transformation_csv import compile_text_replacement_table, match_scoped_text
+from test_data_agent.core.transformation_csv import (
+    TextTraceEvent, TextTraceSummary, compile_text_replacement_table, match_scoped_text,
+    summarize_text_trace, text_trace_event,
+)
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_mapping import CsvMapping
 from test_data_agent.core.transformation_policy import ReplaceTextAction, SubstituteAction, SynthesizeAction
@@ -108,6 +112,59 @@ def prepare_csv_review_from_paths(
         )
     except (OSError, ValueError, TypeError, AttributeError):
         raise TransformationSourceError("invalid transformation source review") from None
+
+
+def trace_csv_review_request(
+    request: ApprovalRequest, *, max_events: int, max_cells: int,
+    budget: GenerationBudget,
+) -> TextTraceSummary:
+    """Trace replacement matches from reviewed bytes, without exposing values."""
+    try:
+        parts = {(part.kind, part.name): part.payload for part in request.parts}
+        policy_yaml = parts[("policy", "behavior.yaml")]
+        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=len(policy_yaml), budget=budget)
+        source_parts = [part for part in request.parts if part.kind == "source"]
+        if len(source_parts) != 1 or len(parts) != len(request.parts):
+            raise ValueError
+        source = source_parts[0]
+        mapping_bytes = {part.name: part.payload for part in request.parts if part.kind == "mapping"}
+        file_table = (compile_text_replacement_table(
+            mapping_bytes[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
+        ) if policy.file_text_mapping is not None else None)
+        column_tables = {}
+        selected = set()
+        for decision in policy.fields:
+            if decision.entity != source.name:
+                raise ValueError
+            if isinstance(decision.behavior, ReplaceTextAction):
+                selected.add(decision.field)
+                if decision.behavior.mapping is not None:
+                    column_tables[decision.field] = compile_text_replacement_table(
+                        mapping_bytes[decision.behavior.mapping.path], decision.behavior.mapping,
+                        budget=budget,
+                    )
+        reader = _csv_reader_from_snapshot(source.payload)
+        names = validate_csv_headers(reader.fieldnames)
+        if set(names) != {decision.field for decision in policy.fields}:
+            raise ValueError
+        reader.fieldnames = names
+
+        def events() -> Iterator[TextTraceEvent]:
+            for row_ordinal, row in enumerate(reader, start=1):
+                budget.check("text trace")
+                if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+                    raise ValueError
+                for column_ordinal, column in enumerate(names, start=1):
+                    if column in selected:
+                        match = match_scoped_text(row[column], column, file_table, column_tables)
+                        yield text_trace_event(row_ordinal, column_ordinal, match)
+
+        return summarize_text_trace(
+            events(), max_events=max_events, max_cells=min(max_cells, DEFAULT_MAX_INPUT_CELLS),
+            max_rule_counts=DEFAULT_MAX_INPUT_COLUMNS * 2, budget=budget,
+        )
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, csv.Error):
+        raise TransformationSourceError("invalid transformation trace") from None
 
 
 def reject_sensitive_text_reuse(

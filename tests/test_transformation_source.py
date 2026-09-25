@@ -15,7 +15,7 @@ from test_data_agent.io.transformation_receipt import _canonical_request
 from test_data_agent.io.transformation_source import (
     TransformationSourceError, load_csv_source_snapshot, prepare_csv_review_from_paths,
     prepare_csv_review_request,
-    revalidate_csv_evidence,
+    revalidate_csv_evidence, trace_csv_review_request,
 )
 
 
@@ -83,6 +83,41 @@ def test_csv_review_binds_referenced_mapping_bytes():
     changed_request = prepare_csv_review_request(policy, source, (changed,), max_total_bytes=8192,
                                                  max_review_bytes=4096, budget=GenerationBudget(5))
     assert changed_request.snapshot_sha256 != request.snapshot_sha256
+
+
+def test_csv_review_trace_combines_file_and_column_rules_without_values():
+    source = SnapshotPart("source", "items", b"a,b,c\none,two,private-marker\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5),
+    ))
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "file_text_mapping": {"kind": "csv", "path": "all.csv",
+        "source_columns": ["old"], "replacement_columns": ["new"]},
+        "fields": [
+            {"entity": "items", "field": "a", "sensitivity": "non_sensitive",
+             "behavior": {"action": "replace_text"}},
+            {"entity": "items", "field": "b", "sensitivity": "non_sensitive",
+             "behavior": {"action": "replace_text", "mapping": {"kind": "csv",
+             "path": "b.csv", "source_columns": ["old"], "replacement_columns": ["new"]}}},
+            {"entity": "items", "field": "c", "sensitivity": "unknown",
+             "behavior": {"action": "drop"}},
+        ],
+    }).encode()
+    request = prepare_csv_review_request(policy, source, (
+        SnapshotPart("mapping", "all.csv", b"old,new\none,global\n"),
+        SnapshotPart("mapping", "b.csv", b"old,new\ntwo,local\n"),
+    ), max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    summary = trace_csv_review_request(
+        request, max_events=1, max_cells=2, budget=GenerationBudget(5),
+    )
+    assert (summary.matched_cells, summary.unmatched_cells, summary.truncated) == (2, 0, True)
+    assert summary.rule_counts == ((1, "file", 1, 1), (2, "column", 1, 1))
+    assert "private-marker" not in repr(summary)
+    assert "global" not in repr(summary)
+    with pytest.raises(TransformationSourceError, match="^invalid transformation trace$") as error:
+        trace_csv_review_request(request, max_events=1, max_cells=1, budget=GenerationBudget(5))
+    assert "private-marker" not in str(error.value)
 
 
 @pytest.mark.parametrize("source_bytes,sensitivity,field,blocked", [

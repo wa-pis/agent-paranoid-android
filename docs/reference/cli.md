@@ -47,6 +47,12 @@ The review reports configured scopes but never shows mapping literals;
 overlapping file/field keys are rejected. These declarations do not enable
 replacement output.
 
+Add `--trace` to the same read-only command for up to 50 row/column/rule
+ordinal events plus match counts. It reads only the fixed snapshot (at most
+10,000 replacement cells), returns no source or replacement literals or
+value hashes, and fails closed above the limit. Unmatched cells are counted,
+not copied. This is debugging metadata, not a preview of output or approval.
+
 No source-preserving transformation command is available yet. The separate
 local approval and execution gates in the active OpenSpec are not satisfied by
 this read-only review.

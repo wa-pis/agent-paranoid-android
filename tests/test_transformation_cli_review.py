@@ -66,12 +66,15 @@ def test_transform_review_reports_global_and_column_text_scopes_without_values(t
     (tmp_path / "all.csv").write_bytes(b"old,new\ntrue,false\nfalse,true\n001,1\n")
     (tmp_path / "code.csv").write_bytes(b"old,new\nlocal,mapped\n")
 
-    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) == 0
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"),
+                 "--trace", "--json"]) == 0
     output = capsys.readouterr()
     result = json.loads(output.out)["result"]
     assert result["status"] == "review_only"
     assert [(field["file_text_rules"], field["column_text_rules"])
             for field in result["review"]["fields"]] == [(True, False), (True, True)]
+    assert (result["trace"]["matched_cells"], result["trace"]["unmatched_cells"]) == (4, 0)
+    assert {event["scope"] for event in result["trace"]["events"]} == {"file", "column"}
     assert "mapped" not in output.out
     assert "001" not in output.out
     assert not (tmp_path / "approval.json").exists()
