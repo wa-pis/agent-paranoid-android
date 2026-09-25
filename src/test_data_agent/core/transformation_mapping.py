@@ -115,14 +115,18 @@ def validate_inline_scalar_mapping(
             shapes = decimal_shapes or tuple(None for _ in data_types)
             if len(shapes) != len(data_types):
                 raise ValueError
+            for kind, shape in zip(data_types, shapes, strict=True):
+                if (kind == FieldType.DECIMAL) != (shape is not None):
+                    raise ValueError
+                if shape is not None:
+                    precision, scale = shape
+                    decimal_from_units(0, precision=precision, scale=scale)
             entries = []
             for entry in declaration.entries:
                 converted: dict[str, list[object]] = {}
                 for side, values in (("original", entry.original), ("replacement", entry.replacement)):
                     converted[side] = []
                     for value, kind, shape in zip(values, data_types, shapes, strict=True):
-                        if (kind == FieldType.DECIMAL) != (shape is not None):
-                            raise ValueError
                         if shape is not None and value is not None:
                             if not isinstance(value, str):
                                 raise ValueError

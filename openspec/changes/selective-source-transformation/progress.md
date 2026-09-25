@@ -2773,3 +2773,17 @@ Broader transformation remains unfinished.
   successfully (normal release-only skips excluded). Publish synthesis and
   mapping commits together to draft #578. Null/temporal execution, financial
   coincidence policy, public adapters and full client/release acceptance remain.
+- Found a shared-normalizer edge case: invalid DECIMAL precision/scale was
+  not checked when all mapped values were null. Four tests reproduced it;
+  moved shape validation before value iteration. All 72 mapping tests and
+  Ruff pass. Public policy models already reject these shapes, but the shared
+  helper now enforces the same rule independently. DATETIME execution still
+  awaits an explicit offset/equivalence decision requested from the owner;
+  other implementation work remains available, so this is not a goal blocker.
+- Fixed engine retention reporting to compare supported numeric types rather
+  than CSV formatting. Test reproduced 1.0 -> 1.00 reported as changed; now
+  counts unchanged. Updated four old text-equality assertions: observed INTEGER
+  001 -> 1 also counts unchanged. Arbitrary numeric-to-text replace remains
+  supported and counts changed. All 120 engine/report tests and targeted mypy
+  pass. Reporting changes do not grant preservation permission or alter gates;
+  DATETIME/null comparison contracts remain pending.

@@ -258,7 +258,12 @@ The private result carries restricted UTF-8 comma CSV bytes (omitted from repr)
 and a value-free retention summary. Input decoding/dialect is shared with
 profiling; output columns follow source order minus drops, and row order is
 unchanged. Retention compares corresponding output cells, excludes dropped
-cells, and reports unavailable for an empty comparison scope. The percentage
+cells, and reports unavailable for an empty comparison scope. INTEGER, FLOAT
+and explicitly declared DECIMAL compare numeric values, so formatting alone
+does not count as transformation. FLOAT remains approximate; DECIMAL stays
+exact. Unconditional replacement with nonnumeric text counts as changed.
+STRING fields retain literal comparison, including leading zeros. This report
+does not authorize any preservation or change execution checks. The percentage
 does not authorize preservation or certify anonymity. No filesystem publication
 or mixed-origin manifest is implemented by this in-memory prototype.
 

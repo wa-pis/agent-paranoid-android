@@ -345,7 +345,13 @@ def replace_csv_snapshot(
                                                    for field in spec.entities[0].fields})
             compared += len(output_names)
             dropped_cells += len(dropped)
-            unchanged += sum(row[name] == value for name, value in zip(output_names, replaced, strict=True))
+            for name, value in zip(output_names, replaced, strict=True):
+                try:
+                    same = scalar(name, row[name]) == scalar(name, value)
+                except ValueError:
+                    # Unconditional text replacement may change a numeric field to text.
+                    same = row[name] == value
+                unchanged += int(same)
         budget.check("CSV replacement")
         for reference, spec in generation_specs.items():
             assert_generated_dataset_valid({source.name: final_generated[reference]}, spec)

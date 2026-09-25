@@ -58,6 +58,21 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+def test_engine_retention_counts_numeric_formatting_as_unchanged():
+    material = request(source_bytes=b"flag,code\ntrue,1.0\nfalse,2.0\n")
+    policy = next(part.payload for part in material.parts if part.kind == "policy")
+    source = next(part for part in material.parts if part.kind == "source")
+    parts = tuple(replace(part, payload=b"old,new\n1.0,1.00\n2.0,2.00\n")
+                  if part.name == "code.csv" else part for part in material.parts if part.kind == "mapping")
+    material = prepare_csv_review_request(policy, source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.replace_csv_snapshot(material, max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert result.retention.unchanged_cells == 2
+    assert result.retention.unchanged_percent == "50.00"
+
+
 def test_decimal_declaration_is_reviewed_and_never_silently_ignored():
     material = request()
     policy = yaml.safe_load(next(part.payload for part in material.parts if part.kind == "policy"))
@@ -370,7 +385,8 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
                       "substitute": ("done", "waiting")}[action]
     assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
         ["flag", "code"], [expected_flags[0], "1"], [expected_flags[1], "second"]]
-    assert output.retention.unchanged_percent == ("50.00" if action == "preserve" else "25.00")
+    # Profile identifies code as INTEGER: 001 -> 1 also retains its numeric value.
+    assert output.retention.unchanged_percent == ("75.00" if action == "preserve" else "50.00")
     assert output.retention.compared_cells == 4
     assert "second" not in repr(output)
     changed = request(target="changed", complete=False, behavior=behavior, source_bytes=source_bytes)
@@ -411,7 +427,7 @@ def test_engine_retention_excludes_dropped_cells():
         budget=GenerationBudget(5))
     assert result.retention.compared_cells == 2
     assert result.retention.excluded_dropped_cells == 2
-    assert result.retention.unchanged_percent == "0.00"
+    assert result.retention.unchanged_percent == "50.00"
 
 
 def test_all_dropped_columns_have_no_retention_measurement():
