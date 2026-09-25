@@ -11,11 +11,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
+from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import looks_sensitive_value
 from test_data_agent.core.transformation_approval import ApprovalRequest
-from test_data_agent.core.transformation_csv import compile_text_replacement_table, match_scoped_text
+from test_data_agent.core.transformation_csv import (
+    compile_text_replacement_table, match_scoped_text, parse_csv_mapping_bytes,
+)
+from test_data_agent.core.transformation_mapping import CsvMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
-    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction,
+    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction,
 )
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
@@ -50,10 +55,14 @@ def replace_csv_snapshot(
         policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes, budget=budget)
         source = next(part for part in canonical.parts if part.kind == "source")
         mappings = {part.name: part.payload for part in canonical.parts if part.kind == "mapping"}
+        profile = DatasetProfile.model_validate_json(
+            next(part.payload for part in canonical.parts if part.kind == "evidence"))
+        field_types = {field.name: field.data_type for entity in profile.entities for field in entity.fields}
         file_table = (compile_text_replacement_table(
             mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
         ) if policy.file_text_mapping is not None else None)
         column_tables = {}
+        substitutions: dict[str, dict[str, str]] = {}
         dropped = set()
         needs_receipt = False
         actions = {decision.field: decision.behavior for decision in policy.fields}
@@ -66,6 +75,23 @@ def replace_csv_snapshot(
                 continue
             if isinstance(action, PreserveAction):
                 needs_receipt = True
+                continue
+            if isinstance(action, SubstituteAction):
+                if field_types[decision.field] != FieldType.STRING or not isinstance(action.unmatched, RejectUnmatched):
+                    raise ValueError
+                declaration = action.mapping
+                if isinstance(declaration, CsvMapping):
+                    declaration = parse_csv_mapping_bytes(mappings[declaration.path], declaration, budget=budget)
+                if not isinstance(declaration, InlineMapping):
+                    raise ValueError
+                pairs: dict[str, str] = {}
+                for entry in declaration.entries:
+                    budget.check("CSV substitution")
+                    before, after = entry.original[0], entry.replacement[0]
+                    if type(before) is not str or type(after) is not str:
+                        raise ValueError
+                    pairs[before] = after
+                substitutions[decision.field] = pairs
                 continue
             if (not isinstance(action, ReplaceTextAction)
                     or not isinstance(action.unmatched, (RejectUnmatched, PreserveAction))):
@@ -110,6 +136,9 @@ def replace_csv_snapshot(
                 action = actions[name]
                 if isinstance(action, PreserveAction):
                     values.append(row[name])
+                    continue
+                if isinstance(action, SubstituteAction):
+                    values.append(substitutions[name][row[name]])
                     continue
                 match = match_scoped_text(row[name], name, file_table, column_tables)
                 if match is not None:

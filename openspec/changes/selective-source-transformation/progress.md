@@ -2490,3 +2490,16 @@ Broader transformation remains unfinished.
   execution-status documentation together. Earlier successful checks were not
   rerun unchanged; the next CI run covers the new test/documentation SHA.
   PR remains draft; no activation, merge or RC acceptance claimed.
+- Began substitute execution with direct non-null STRING inline/CSV pairs and
+  reject-on-unmatched, reusing canonical typed preflight and bounded CSV parser.
+  Two failing execution tests now pass; all 31 engine tests, Ruff and mypy pass.
+  Other scalar types, nulls, shared/composite domains and substitute fallbacks
+  remain unfinished and explicitly reject; no silent text coercion or claim
+  of complete typed-substitution support. Local change not yet published;
+  expand negative controls before the next consolidated push.
+- Six inline/CSV substitution scenarios pass: valid equality of results,
+  unmapped rejection even when a global replace table contains that key, and
+  recognizable PII replacement rejection with detached value-free errors.
+  Ruff passes. CI at published `613cb10` still runs Python 3.11–3.14 with no
+  failures; local substitution changes are committed separately and not pushed
+  over that running check set. No public activation or full typed support claim.

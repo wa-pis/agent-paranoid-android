@@ -222,3 +222,38 @@ def test_execution_uses_profile_dialect_and_source_column_order(delimiter, bom):
     output = execute(request(source_bytes=source))
     assert list(csv.reader(io.StringIO(output.decode()))) == [
         ["code", "flag"], ["1", "no"], ["second", "yes"]]
+
+
+@pytest.mark.parametrize("kind", ["inline", "csv"])
+@pytest.mark.parametrize("case", ["valid", "unmatched", "pii"])
+def test_string_substitute_inline_and_csv_have_same_result(kind, case):
+    original = request(source_bytes=b"flag,code\ntrue,alpha\nfalse,beta\n")
+    source = next(part for part in original.parts if part.kind == "source")
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    target = "fictional@example.com" if case == "pii" else "second"
+    pairs = [("alpha", "first")]
+    if case != "unmatched":
+        pairs.append(("beta", target))
+    mapping = {"kind": "inline", "entries": [
+        {"original": [before], "replacement": [after]} for before, after in pairs]}
+    parts = [part for part in original.parts if part.kind == "mapping" and part.name == "all.csv"]
+    # A global replace rule must not cover a missing substitute key.
+    parts[0] = replace(parts[0], payload=parts[0].payload + b"beta,global-fallback\n")
+    if kind == "csv":
+        mapping = {"kind": "csv", "path": "pairs.csv", "source_columns": ["old"],
+                   "replacement_columns": ["new"]}
+        payload = io.StringIO(newline="")
+        csv.writer(payload).writerows([("old", "new"), *pairs])
+        parts.append(SnapshotPart("mapping", "pairs.csv", payload.getvalue().encode()))
+    policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": mapping}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, tuple(parts),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if case != "valid":
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError) as caught:
+            execute(material)
+        assert str(caught.value) == "invalid CSV replacement"
+        assert caught.value.__context__ is None
+        return
+    assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
+        ["flag", "code"], ["no", "first"], ["yes", "second"]]
