@@ -2403,3 +2403,34 @@ Broader transformation remains unfinished.
   sensitive replacement controls; 125 relevant tests, changed-file Ruff,
   strict OpenSpec and diff checks pass. No output engine/activation added.
   Next: signed PR and required CI, then closed fictional-data engine work.
+- PR #577 remains open at `46ffa17c2be9778516830ef299b9bc90489f08c1`;
+  last verified CI has no failures, Python 3.11/3.12/3.13 still running.
+  No merge or duplicate CI run requested. Dependent private development is
+  isolated in `/private/tmp/apa-private-csv-engine` and not added to #577.
+- Closed replacement-only CSV prototype now returns bytes from revalidated
+  fixed snapshots, with column precedence, no cascade, bounded output and
+  value-free failures. Rejects unsupported actions/fallbacks; no preservation,
+  filesystem publication, public wiring or receipt issuance. Five fictional
+  tests first failed for the missing module and now pass (exact output,
+  unmatched cell, forged source, output budget, recognizable PII replacement).
+  Changed-file Ruff, one-module mypy and diff check pass. This is development
+  evidence only, not end-to-end acceptance or permission for user-data runs.
+  Next: expand negative/CSV-format tests, integrate required actions and
+  approval-bound preservation before exact-SHA safety review and activation.
+- PR #577 merged as `e40aa02a35b0d313fed5f65f833e4ff9a3f8ce8f`
+  after all CI completed without failure and GitHub reported CLEAN. Normal
+  non-admin merge, no ordinary AI review and no protection bypass.
+- Expanded closed-engine checks: 17 pass, including quoted/multiline/Unicode
+  and empty replacements, exact UTF-8 byte limits, invalid limits, expired
+  invocation deadline and rejection of preserve/fallback/unsupported actions.
+  Ruff passes. Initial architecture test invocation used a nonexistent path
+  (no tests ran); corrected to `tests/test_application_architecture.py`.
+  These are still replacement-only prototype tests, not full CSV acceptance.
+- Added private `drop` execution: failing test first, then projected output
+  columns while retaining source row order/count. The engine accepts only
+  replace_text/reject and drop; preservation and all other actions remain
+  unsupported here. Current 17 engine tests, Ruff and mypy pass; the earlier
+  corrected architecture suite passed all 33 tests. No public API wiring.
+  Next: integrate approval-bound preservation and other declared actions,
+  retain isolated fictional tests, then review exact completed engine SHA
+  before activation. Replacement/drop alone does not complete the release scope.
