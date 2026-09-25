@@ -81,7 +81,7 @@ def replace_csv_snapshot(
                 needs_receipt = True
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER) or not isinstance(
+                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.DATE) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
@@ -96,7 +96,7 @@ def replace_csv_snapshot(
                         and isinstance(item.behavior.mapping, DomainMapping)
                         and item.behavior.mapping.name == declaration.name)
                     source_columns = tuple(name for _, name in members)
-                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER) for name in source_columns):
+                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.DATE) for name in source_columns):
                         raise ValueError
                     declaration = domains[declaration.name]
                 if isinstance(declaration, CsvMapping):

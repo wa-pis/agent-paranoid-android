@@ -169,13 +169,15 @@ bounded value-free error rather than retaining the input or relaxing constraints
 
 The private `io/transformation_execute.py` prototype supports `replace_text`,
 `drop`, `preserve` and unmatched-preserve. It is not connected to public
-CLI/Python/MCP execution and is not release acceptance. Direct non-null STRING/INTEGER
+CLI/Python/MCP execution and is not release acceptance. Direct non-null STRING/INTEGER/DATE
 `substitute` pairs support inline/CSV mappings with reject-on-unmatched or
 receipt-bound preserve fallback.
-Single-file non-null STRING/INTEGER domains match complete ordered original tuples,
+Single-file non-null STRING/INTEGER/DATE domains match complete ordered original tuples,
 using the preflight-validated component positions, independent of policy order.
 INTEGER keys use strict ASCII signed decimal parsing, with no float intermediate;
 CSV mappings reuse typed normalization and replacements use decimal integer text.
+DATE matches canonical ISO text without conversion. DATETIME remains closed
+pending the explicit execution-timezone/equivalence contract below.
 Cross-input relationships and other typed substitutions, `synthesize` and
 `derive` remain unsupported;
 they fail rather than silently

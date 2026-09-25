@@ -268,17 +268,20 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
 
 @pytest.mark.parametrize("missing", [False, True])
 @pytest.mark.parametrize("kind", ["inline", "csv"])
-@pytest.mark.parametrize("integer", [False, True])
-def test_composite_domain_matches_whole_original_tuple(missing, kind, integer):
-    source = SnapshotPart("source", "items", b"region,code\n1,A001\n2,A001\n" if integer
-                          else b"region,code\nnorth,alpha\nsouth,alpha\n")
+@pytest.mark.parametrize("scalar", ["string", "integer", "date"])
+def test_composite_domain_matches_whole_original_tuple(missing, kind, scalar):
+    before, after = {
+        "string": (("north", "south"), ("west", "east")),
+        "integer": ((1, 2), (11, 22)),
+        "date": (("2025-01-01", "2025-01-02"), ("2026-01-01", "2026-01-02")),
+    }[scalar]
+    source = SnapshotPart("source", "items",
+                          f"region,code\n{before[0]},A001\n{before[1]},A001\n".encode())
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
         source.payload, source.name, budget=GenerationBudget(5)))
-    entries = [{"original": [1, "A001"], "replacement": [11, "first"]} if integer else
-               {"original": ["north", "alpha"], "replacement": ["west", "first"]}]
+    entries = [{"original": [before[0], "A001"], "replacement": [after[0], "first"]}]
     if not missing:
-        entries.append({"original": [2, "A001"], "replacement": [22, "second"]} if integer else
-                       {"original": ["south", "alpha"], "replacement": ["east", "second"]})
+        entries.append({"original": [before[1], "A001"], "replacement": [after[1], "second"]})
     mapping = {"kind": "inline", "entries": entries}
     parts = ()
     if kind == "csv":
@@ -305,8 +308,7 @@ def test_composite_domain_matches_whole_original_tuple(missing, kind, integer):
             execute(material)
     else:
         assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
-            ["region", "code"], ["11" if integer else "west", "first"],
-            ["22" if integer else "east", "second"]]
+            ["region", "code"], [str(after[0]), "first"], [str(after[1]), "second"]]
 
 
 @pytest.mark.parametrize("kind", ["inline", "csv"])
@@ -328,3 +330,25 @@ def test_integer_substitute_is_exact_without_float(kind):
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
         ["flag", "code"], ["no", "9007199254740993"], ["yes", "9007199254740995"]]
+
+
+@pytest.mark.parametrize("kind", ["inline", "csv"])
+def test_date_substitute_keeps_canonical_iso_text(kind):
+    before = ["2025-01-02", "2025-01-03"]
+    after = ["2026-02-04", "2026-02-05"]
+    original = request(source_bytes=f"flag,code\ntrue,{before[0]}\nfalse,{before[1]}\n".encode())
+    source = next(part for part in original.parts if part.kind == "source")
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    mapping = {"kind": "inline", "entries": [
+        {"original": [old], "replacement": [new]} for old, new in zip(before, after)]}
+    parts = [part for part in original.parts if part.kind == "mapping" and part.name == "all.csv"]
+    if kind == "csv":
+        mapping = {"kind": "csv", "path": "dates.csv", "source_columns": ["old"],
+                   "replacement_columns": ["new"]}
+        parts.append(SnapshotPart("mapping", "dates.csv",
+            ("old,new\n" + "".join(f"{old},{new}\n" for old, new in zip(before, after))).encode()))
+    policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": mapping}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, tuple(parts),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
+        ["flag", "code"], ["no", after[0]], ["yes", after[1]]]

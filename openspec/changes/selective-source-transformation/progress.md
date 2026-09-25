@@ -2531,3 +2531,14 @@ Broader transformation remains unfinished.
   tuple controls (eight focused scenarios). Integer normalization does not
   convert the adjacent alphanumeric string key. Ruff passes. Ready to commit
   exact-integer execution plus its direct/composite regression coverage.
+- Added canonical DATE substitution, reusing existing preflight validators and
+  CSV normalization. Initial DATE/DATETIME probes failed unsupported execution;
+  closer contract reading confirms DATETIME execution timezone/equivalence is
+  still undecided, so only DATE was enabled in this closed prototype. Two DATE
+  inline/CSV cases pass; Ruff/mypy pass. DATETIME, null and decimal behavior were
+  not inferred from parsing support. Changes remain local pending batch push.
+- Extended composite-domain matrix to DATE/STRING as well as INTEGER/STRING
+  and STRING/STRING, inline and CSV, complete and missing tuples. All 12 matrix
+  cases pass after simplifying fixture parameters; both direct DATE cases
+  passed separately. No DATETIME execution enabled. Commit this bounded DATE
+  implementation and evidence without claiming remaining temporal semantics.
