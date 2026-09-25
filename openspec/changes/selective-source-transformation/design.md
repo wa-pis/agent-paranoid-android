@@ -98,11 +98,13 @@ reuse or a universal multiplier. Financial arithmetic must honor declared
 precision. Sign, nulls, zero handling and acceptable magnitude tolerances must
 be declared; no silent defaults may claim source fidelity.
 
-The proposed RC exact DECIMAL precision ceiling is 38 base-ten digits, with
+The RC exact DECIMAL precision ceiling is 38 base-ten digits, with
 scale from 0 through precision. Parquet uses Arrow decimal128, not decimal256.
 Higher precision is rejected with a value-free error; it is never downcast to
-FLOAT or silently rounded. Owner confirmation of this ceiling and the final
-numeric-content policy is pending. The rounding policy for formulas is a separate
+FLOAT or silently rounded. This boundary covers the requested DECIMAL(20,2)
+and DECIMAL(38,16) cases; decimal256/76-digit support is deferred rather than
+partially implemented. The final numeric-content policy remains under review.
+The rounding policy for formulas is a separate
 decision, and this ceiling alone does not enable exact-decimal execution.
 DatasetSpec 1.1 carries a `decimal_range` distribution with precision, scale
 and exact textual inclusive bounds. Only reviewed source-free generation uses

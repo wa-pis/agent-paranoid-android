@@ -1325,7 +1325,7 @@ Broader transformation remains unfinished.
   OpenSpec and diff check passed. This is not exact-commit CI or final RC
   acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
   policy choice before merge; do not repeat local gates unchanged.
-- Proposed exact DECIMAL ceiling for 1.6.0rc1, pending owner confirmation:
+- Exact DECIMAL ceiling selected for 1.6.0rc1 by owner-delegated decision:
   38 base-ten digits with scale
   0..precision, matching Arrow decimal128 and required fictional DECIMAL(20,2)
   and DECIMAL(38,16) examples. decimal256/76-digit support is deferred; values
@@ -1413,3 +1413,22 @@ Broader transformation remains unfinished.
   diff check passed.
   Next: sign/push this correction, require fresh exact-head CI and independent
   AI safety re-review; no release or merge claim.
+- Signed draft PR #564 head `aed538ab397c915ecd10b578fdc80da36bca4e56`
+  passed 37 applicable checks (four publication-only skips). Independent
+  read-only AI reviewer Euclid (self-reported Kepler), 2026-09-25, found no new
+  issue in the corrected DECIMAL safety scope. This is AI evidence, not human
+  approval; full review chronology and disposition:
+  https://github.com/wa-pis/agent-paranoid-android/pull/564#issuecomment-5826458339.
+  Local exact-head gate: 1740 passed, 10 deselected; Ruff, mypy (119 files),
+  strict OpenSpec and MkDocs passed. Draft PR remains unmerged and depends on
+  draft #552 and its intentionally-invalid Parquet decision.
+- Owner delegated the RC precision-ceiling choice on 2026-09-25. Decision:
+  retain 38 base-ten digits/Arrow decimal128, scale 0..precision. Requested
+  DECIMAL(20,2) and DECIMAL(38,16) cases are covered; 76-digit/decimal256
+  support is deferred. Above-cap input rejects without FLOAT conversion,
+  implicit rounding or publication. This resolves only the precision-cap
+  question, not numeric-content/privacy policy or formula rounding.
+  OpenSpec plan, design and requirement now record the decision; no runtime
+  code or safety boundary changed. Next: settle the separate numeric-content
+  decision and #552 Parquet policy before merging #564; continue independent
+  source-free work meanwhile. Do not repeat unchanged full gates.
