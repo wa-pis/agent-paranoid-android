@@ -44,6 +44,15 @@ amendments, executable end-to-end safety tests, and independent safety review
 are complete. A policy declaration or private receipt helper is not execution
 authority. Do not route this behavior through source-free generation.
 
+Development and activation are separate gates. Private implementation and
+isolated tests using only fictional inputs may be written and exercised before
+the final safety review; otherwise end-to-end evidence cannot be produced.
+Keep that implementation unavailable through public CLI/Python/MCP execution
+surfaces. Test outputs stay in bounded temporary test locations, never user
+destinations. This permits no real data access or dataset approval. Passing
+end-to-end tests and independent review of the implementation are prerequisites
+for activation, not prerequisites for writing the implementation and its tests.
+
 ## Engineering contract
 
 - Target Python 3.11+ and use typed Pydantic or dataclass models at module

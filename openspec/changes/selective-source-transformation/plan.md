@@ -22,6 +22,10 @@ repair instructions, live integrations or a weaker safety boundary.
    to fixed input bytes. Equal-privilege local impersonation is outside this
    deployment claim. This choice does not activate preservation; the scoped
    safety amendment, executable checks and independent safety review still gate it.
+   These are activation gates: closed implementation and isolated fictional-data
+   tests come first, followed by end-to-end evidence and independent review of
+   the exact implementation SHA. No public execution or user-data access is
+   enabled merely by developing that code; see the safety boundary.
 2. **Confirmed client defects.** Reproduce and correct identifier collisions,
    repeated-key misclassification, generator/privacy disagreement and empty
    output directory publication. Report unknown date bounds and capped distinct
@@ -36,7 +40,9 @@ repair instructions, live integrations or a weaker safety boundary.
    pairs (`true` -> `false`, `001` -> `1`): no inferred source/target type or
    numeric conversion. Support file-wide and per-column tables together in
    one file, not as mutually exclusive modes; apply each match once, never
-   cascade. Keep reviewed
+   cascade. A matching per-column key overrides the same file-wide key;
+   otherwise use the file-wide match, then the declared unmatched policy.
+   Reject duplicate keys within each table. Keep reviewed
    field-action and preservation gates around this primitive. Add bounded
    local value-free trace/dry-run output for row/column/rule matches and
    unmatched cells.

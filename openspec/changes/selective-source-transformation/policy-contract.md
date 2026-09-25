@@ -83,10 +83,12 @@ files. A column-scoped rule
 applies only to its declared column; a file-wide rule applies to every
 `replace_text` column in that file, not to columns with other actions. Both
 levels remain subject to field decisions and sensitivity/preservation gates.
-The precedence when both levels match the same cell is awaiting an explicit
-owner decision. The internal draft matcher rejects such overlap until that
-decision; private approval-material preflight rejects overlapping keys for a
-field before any receipt. The value-free review reports whether file and
+The owner-approved target precedence is a matching per-column key first, then
+a file-wide match, then the declared unmatched policy. Match the original cell
+once; never feed replacement text into another rule. Duplicate keys within a
+single table still reject. Current matcher and private approval-material
+preflight still reject cross-scope overlap; changing both and their trace/tests
+is pending implementation, not delivered behavior. The value-free review reports whether file and
 column rules are configured, without showing their literals. No cascade or
 implicit two-step replacement is permitted.
 For a field declared sensitive or unknown, or with positive sensitivity
