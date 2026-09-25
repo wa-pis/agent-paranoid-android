@@ -49,7 +49,7 @@ def request(target="second", complete=True, behavior=None):
 def execute(material, limit=8192):
     module = import_module("test_data_agent.io.transformation_execute")
     return module.replace_csv_snapshot(material, max_total_bytes=8192,
-        max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5))
+        max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)).csv_bytes
 
 
 def test_closed_csv_exact_text_override_no_cascade():
@@ -148,8 +148,11 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, fallback):
         os.close(slave)
     output = module.replace_csv_snapshot(material, receipt_path=path,
                                          budget=GenerationBudget(5), **kwargs)
-    assert list(csv.reader(io.StringIO(output.decode()))) == [
+    assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
         ["flag", "code"], ["no" if fallback else "true", "1"], ["false", "second"]]
+    assert output.retention.unchanged_percent == ("25.00" if fallback else "50.00")
+    assert output.retention.compared_cells == 4
+    assert "second" not in repr(output)
     changed = request(target="changed", complete=False, behavior=behavior)
     with pytest.raises(module.TransformationExecutionError):
         module.replace_csv_snapshot(changed, receipt_path=path, budget=GenerationBudget(5), **kwargs)
@@ -179,3 +182,13 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, fallback):
     with pytest.raises(module.TransformationExecutionError):
         module.replace_csv_snapshot(material, receipt_path=link,
                                      budget=GenerationBudget(5), **kwargs)
+
+
+def test_engine_retention_excludes_dropped_cells():
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.replace_csv_snapshot(request(behavior={"action": "drop"}),
+        max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+        budget=GenerationBudget(5))
+    assert result.retention.compared_cells == 2
+    assert result.retention.excluded_dropped_cells == 2
+    assert result.retention.unchanged_percent == "0.00"

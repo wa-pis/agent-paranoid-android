@@ -7,6 +7,7 @@ receipt minting or external access.
 
 import csv
 import io
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
@@ -17,6 +18,7 @@ from test_data_agent.core.transformation_policy import (
     DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction,
 )
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
 
@@ -25,10 +27,18 @@ class TransformationExecutionError(ValueError):
     """Value-free replacement failure; no partial output is returned."""
 
 
+@dataclass(frozen=True, slots=True)
+class CsvTransformationResult:
+    """Restricted output bytes plus a value-free summary; not a public artifact."""
+
+    csv_bytes: bytes = field(repr=False)
+    retention: SourceRetentionSummary
+
+
 def replace_csv_snapshot(
     request: ApprovalRequest, *, max_total_bytes: int, max_review_bytes: int,
     max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
-) -> bytes:
+) -> CsvTransformationResult:
     """Apply reviewed actions to fixed bytes; preservation needs a bound receipt."""
     try:
         if type(max_output_bytes) is not int or max_output_bytes < 1:
@@ -89,6 +99,7 @@ def replace_csv_snapshot(
         if any(looks_sensitive_value(name) for name in output_names):
             raise ValueError
         append_row(output_names)
+        unchanged = compared = dropped_cells = 0
         for row in reader:
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
@@ -113,8 +124,12 @@ def replace_csv_snapshot(
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError
             append_row(replaced)
+            compared += len(output_names)
+            dropped_cells += len(dropped)
+            unchanged += sum(row[name] == value for name, value in zip(output_names, replaced, strict=True))
         budget.check("CSV replacement")
-        return output.getvalue()
+        return CsvTransformationResult(
+            output.getvalue(), retention_summary_from_counts(unchanged, compared, dropped_cells))
     except (OSError, ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
         pass
     try:

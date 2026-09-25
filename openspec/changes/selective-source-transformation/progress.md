@@ -2452,3 +2452,13 @@ Broader transformation remains unfinished.
   with detached value-free errors. All 19 engine tests pass; Ruff/diff checks
   pass. Shared verifier and real fictional PTY remain unpatched. This completes
   these negative controls only, not all actions, public execution or RC gates.
+- Integrated actual engine retention counts into a private typed result:
+  restricted CSV bytes (excluded from repr) plus value-free summary. Counts
+  accumulate during execution without retaining an extra copy of source rows;
+  shared count finalizer keeps percentage rounding consistent with existing
+  report code. Dropped cells are excluded from the denominator; no comparison
+  scope means unavailable, not zero. This metric grants no retention authority.
+  TDD reproduced missing summary, then 27 engine/report tests passed, including
+  50% preserve, 25% unmatched preserve and dropped-cell exclusion. Ruff and
+  two-module mypy pass. Private return type changed before public activation.
+  Remaining actions, full safety evidence and RC acceptance are still pending.
