@@ -31,7 +31,7 @@ def test_saved_inline_and_csv_policies_have_equal_typed_mappings(
     mappings = [
         {"kind": "inline", "entries": [{"original": [original], "replacement": [replacement]}]},
         {"kind": "csv", "path": "mapping.csv", "source_columns": ["old"],
-         "replacement_columns": ["new"]},
+         "replacement_columns": ["new"], "null_token": "NULL"},
     ]
     results = []
     rejected = (replacement is None and not nullable) or original in {
@@ -54,8 +54,7 @@ def test_saved_inline_and_csv_policies_have_equal_typed_mappings(
                 result = validate_inline_scalar_mapping(declared, data_types=(kind,), nullable=(nullable,))
             else:
                 result = load_csv_mapping(
-                    root, declared, data_types=(kind,), nullable=(nullable,), encoding="utf-8",
-                    delimiter=",", null_token="NULL", max_bytes=1000, max_rows=10,
+                    root, declared, data_types=(kind,), nullable=(nullable,), max_bytes=1000, max_rows=10,
                     max_cells=20, max_columns=2, max_cell_chars=100, budget=budget,
                 ).mapping
             results.append(result)
@@ -65,3 +64,26 @@ def test_saved_inline_and_csv_policies_have_equal_typed_mappings(
     assert results[0] == results[1]
     assert results[0].entries[0].original == (original,)
     assert results[0].entries[0].replacement == (replacement,)
+
+
+def test_saved_csv_dialect_and_null_token_control_reloaded_mapping(tmp_path):
+    root = tmp_path.resolve()
+    (root / "mapping.csv").write_bytes(b"old;new\nfictional-a;NULL\n")
+    payload = {"schema_version": "0.1", "schema_fingerprint": "a" * 64, "seed": 7,
+               "fields": [{"entity": "fictional", "field": "value", "sensitivity": "unknown",
+                           "behavior": {"action": "substitute", "mapping": {
+                               "kind": "csv", "path": "mapping.csv",
+                               "source_columns": ["old"], "replacement_columns": ["new"],
+                               "delimiter": ";", "null_token": "NULL"}}}]}
+    policy = parse_behavior_policy(payload)
+    save_behavior_policy_file(root, "policy.yaml", policy, max_bytes=10000, budget=GenerationBudget())
+    restored = load_behavior_policy_file(root, "policy.yaml", max_bytes=10000, budget=GenerationBudget())
+    assert restored == policy
+    declared = restored.fields[0].behavior.mapping
+    result = load_csv_mapping(
+        root, declared, data_types=(FieldType.STRING,), nullable=(True,),
+        max_bytes=1000, max_rows=10, max_cells=20, max_columns=2,
+        max_cell_chars=100, budget=GenerationBudget(),
+    ).mapping
+    assert result.entries[0].original == ("fictional-a",)
+    assert result.entries[0].replacement == (None,)

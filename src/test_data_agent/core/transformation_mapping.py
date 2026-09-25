@@ -46,6 +46,9 @@ class CsvMapping(_PrivateModel):
     path: StrictStr = Field(min_length=1, repr=False)
     source_columns: tuple[StrictStr, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     replacement_columns: tuple[StrictStr, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    encoding: Literal["utf-8", "utf-8-sig"] = Field(default="utf-8", repr=False)
+    delimiter: Literal[",", ";", "\t", "|"] = Field(default=",", repr=False)
+    null_token: StrictStr | None = Field(default=None, min_length=1, repr=False)
 
 
 class DomainMapping(_PrivateModel):

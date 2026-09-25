@@ -9,9 +9,8 @@ from test_data_agent.core.limits import GenerationBudget
 
 def parse(payload, **limits):
     declaration = CsvMapping(kind="csv", path="not-opened.csv",
-                             source_columns=("old",), replacement_columns=("new",))
-    return parse_csv_mapping_bytes(payload, declaration, encoding="utf-8",
-                                   delimiter=",", null_token="NULL",
+                             source_columns=("old",), replacement_columns=("new",), null_token="NULL")
+    return parse_csv_mapping_bytes(payload, declaration,
                                    budget=limits.pop("budget", GenerationBudget()), **limits)
 
 
@@ -58,25 +57,29 @@ def test_csv_reuses_invocation_deadline():
 @pytest.mark.parametrize("delimiter", [",", ";", "\t", "|"])
 def test_explicit_dialect_bom_and_no_null_conversion(delimiter):
     declaration = CsvMapping(kind="csv", path="not-opened.csv",
-                             source_columns=("old",), replacement_columns=("new",))
+                             source_columns=("old",), replacement_columns=("new",),
+                             encoding="utf-8-sig", delimiter=delimiter)
     payload = ("\ufeffold" + delimiter + "new\r\nNULL" + delimiter + '"two\nlines"\r\n').encode()
-    result = parse_csv_mapping_bytes(payload, declaration, encoding="utf-8-sig",
-                                    delimiter=delimiter, null_token=None, budget=GenerationBudget())
+    result = parse_csv_mapping_bytes(payload, declaration, budget=GenerationBudget())
     assert result.entries[0].original == ("NULL",)
     assert result.entries[0].replacement == ("two\nlines",)
 
 
 @pytest.mark.parametrize("overrides", [
     {"encoding": "latin-1"}, {"delimiter": "::"}, {"null_token": ""},
-    {"null_token": 3}, {"max_rows": True}, {"max_columns": 0},
+    {"null_token": 3},
 ])
 def test_invalid_configuration_is_value_free(overrides):
-    declaration = CsvMapping(kind="csv", path="not-opened.csv",
-                             source_columns=("old",), replacement_columns=("new",))
-    options = {"encoding": "utf-8", "delimiter": ",", "null_token": None,
-               "budget": GenerationBudget(), **overrides}
+    payload = {"kind": "csv", "path": "not-opened.csv", "source_columns": ["old"],
+               "replacement_columns": ["new"], **overrides}
+    with pytest.raises(MappingDeclarationError, match="^invalid mapping declaration$"):
+        parse_mapping_declaration(payload)
+
+
+@pytest.mark.parametrize("limits", [{"max_rows": True}, {"max_columns": 0}])
+def test_invalid_limits_are_value_free(limits):
     with pytest.raises(MappingDeclarationError, match="^invalid CSV mapping$"):
-        parse_csv_mapping_bytes(b"old,new\na,b\n", declaration, **options)
+        parse(b"old,new\na,b\n", **limits)
 
 
 def test_integer_normalization_preserves_composite_strings_and_null():

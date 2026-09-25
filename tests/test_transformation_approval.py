@@ -24,7 +24,7 @@ def material(*, sensitive: bool = False):
         yaml.safe_dump(policy).encode(),
         profile.model_dump_json().encode(),
         (SnapshotPart("source", "items.csv", b"code\nfictional-a\n"),
-         SnapshotPart("mapping", "code-map.csv", b"fictional-a,synthetic-1\n")),
+         SnapshotPart("mapping", "code-map.csv", b"original,replacement\nfictional-a,synthetic-1\n")),
     )
 
 
@@ -43,6 +43,70 @@ def test_request_binds_rendered_review_and_referenced_bytes():
     changed = list(request.parts)
     changed[-1] = replace(changed[-1], payload=changed[-1].payload + b"!")
     assert snapshot_identity(changed, max_total_bytes=8192) != request.snapshot_sha256
+
+
+@pytest.mark.parametrize("mapping_kind", ["inline", "csv", "domain"])
+@pytest.mark.parametrize("replacement", ["fictional-a", "synthetic-b"])
+def test_sensitive_identity_substitution_fails_before_receipt(mapping_kind, replacement):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string", "sensitive": True}]}]})
+    inline = {"kind": "inline", "entries": [{"original": ["fictional-a"],
+              "replacement": [replacement]}]}
+    csv_mapping = {"kind": "csv", "path": "mapping.csv", "source_columns": ["old"],
+                   "replacement_columns": ["new"]}
+    mapping = (inline if mapping_kind == "inline" else csv_mapping if mapping_kind == "csv"
+               else {"kind": "domain", "name": "shared"})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "fields": [{"entity": "items", "field": "value", "sensitivity": "sensitive",
+              "behavior": {"action": "substitute", "mapping": mapping}}]}
+    if mapping_kind == "domain":
+        policy["domains"] = [{"name": "shared", "mapping": inline}]
+    parts = [SnapshotPart("source", "items", b"value\nfictional-a\n")]
+    if mapping_kind == "csv":
+        parts.append(SnapshotPart("mapping", "mapping.csv",
+                                  f"old,new\nfictional-a,{replacement}\n".encode()))
+    payload = yaml.safe_dump(policy).encode()
+    evidence = profile.model_dump_json().encode()
+    if replacement == "fictional-a":
+        with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$") as error:
+            prepare(payload, evidence, tuple(parts))
+        assert error.value.__context__ is None
+        assert "fictional-a" not in str(error.value)
+    else:
+        assert prepare(payload, evidence, tuple(parts)).snapshot_sha256
+
+
+def test_composite_mapping_has_no_field_binding_and_cannot_be_approved():
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string", "sensitive": True}]}]})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "fields": [{"entity": "items", "field": "value", "sensitivity": "sensitive",
+              "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+                  {"original": ["fictional-a", "fictional-b"],
+                   "replacement": ["synthetic-a", "fictional-b"]}]}}}]}
+    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
+        prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(),
+                (SnapshotPart("source", "items", b"value\nfictional-a\n"),))
+
+
+@pytest.mark.parametrize("original,replacement,rejected", [
+    ("+001", "1", True), ("+001", "2", False), ("NULL", "NULL", False),
+])
+def test_sensitive_csv_identity_uses_normalized_types_and_allows_null(original, replacement, rejected):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "integer", "nullable": True, "sensitive": True}]}]})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "fields": [{"entity": "items", "field": "value", "sensitivity": "sensitive",
+              "behavior": {"action": "substitute", "mapping": {"kind": "csv", "path": "mapping.csv",
+                  "source_columns": ["old"], "replacement_columns": ["new"],
+                  "null_token": "NULL"}}}]}
+    parts = (SnapshotPart("source", "items", b"value\n1\n"),
+             SnapshotPart("mapping", "mapping.csv", f"old,new\n{original},{replacement}\n".encode()))
+    if rejected:
+        with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
+            prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), parts)
+    else:
+        assert prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), parts).snapshot_sha256
 
 
 @pytest.mark.parametrize("change", ["missing_map", "extra_map", "sensitive", "invalid_evidence", "small_budget"])

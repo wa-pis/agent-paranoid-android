@@ -28,6 +28,9 @@ may declare mapping entries inline or reference a separate local CSV mapping
 file. Both forms have equivalent typed semantics. Profiles with inline source
 values become restricted source-bearing inputs, not shareable aggregate profiles.
 Shared/exported profiles must omit entries and use opaque references instead.
+The private CSV declaration carries its encoding, delimiter and explicit null
+token (or no null token); these parser settings are part of the saved policy
+bytes bound to any future local approval receipt, not ambient execution flags.
 
 The proposed versioned policy describes:
 

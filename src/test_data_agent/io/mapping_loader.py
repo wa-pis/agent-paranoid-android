@@ -20,7 +20,7 @@ class LoadedCsvMapping:
 
 def load_csv_mapping(
     root: Path, declaration: CsvMapping, *, data_types: tuple[FieldType, ...],
-    nullable: tuple[bool, ...], encoding: str, delimiter: str, null_token: str | None,
+    nullable: tuple[bool, ...],
     max_bytes: int, max_rows: int, max_cells: int, max_columns: int,
     max_cell_chars: int, budget: GenerationBudget,
 ) -> LoadedCsvMapping:
@@ -34,8 +34,7 @@ def load_csv_mapping(
             raise
     snapshot = read_mapping_snapshot(root, parsed.path, max_bytes=max_bytes, budget=budget)
     mapping = parse_csv_mapping_bytes(
-        snapshot.payload, parsed, encoding=encoding, delimiter=delimiter,
-        null_token=null_token, budget=budget, max_bytes=max_bytes, max_rows=max_rows,
+        snapshot.payload, parsed, budget=budget, max_bytes=max_bytes, max_rows=max_rows,
         max_cells=max_cells, max_columns=max_columns, max_cell_chars=max_cell_chars,
     )
     validated = normalize_csv_mapping(mapping, data_types=data_types, nullable=nullable, budget=budget)

@@ -20,7 +20,7 @@ from test_data_agent.core.field import FieldType
 ])
 def test_private_mapping_roundtrip(payload):
     declaration = parse_mapping_declaration(payload)
-    assert declaration.model_dump(mode="json") == payload
+    assert declaration.model_dump(mode="json", exclude_defaults=True) == payload
     assert parse_mapping_declaration(declaration.model_dump(mode="json")) == declaration
     assert repr(declaration) == f"{type(declaration).__name__}(kind={payload['kind']!r})"
 

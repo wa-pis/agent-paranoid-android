@@ -1533,3 +1533,37 @@ Broader transformation remains unfinished.
   a public source-preserving execution path. Strict MkDocs, strict OpenSpec and
   diff check passed. Next: submit this focused map correction; keep #552/#564 draft pending their
   separate publication and privacy decisions. No release tag or publication.
+- PR #567 merged the private implementation map on 2026-09-25 as
+  `f03c7f435d473ef5547a06db9c7d85a204f0276d` after applicable green CI.
+  New fictional preflight probe on merged main: `validate_policy_profile`
+  accepted a sensitive field's inline `substitute` entry with identical
+  original/replacement values and `unmatched=reject`. There is no public
+  source-preserving execution path, so this is a confirmed pre-activation
+  safety gap, not observed output leakage. Next: resolve exact typed mapping
+  bytes across inline/CSV/domain, reject disguised preservation and test
+  value-free errors before enabling any approval/execution route. Do not
+  patch inline alone or treat a receipt as sufficient permission.
+- Private CSV mapping parser options previously lived outside the saved policy,
+  so identical mapping bytes could be interpreted with different delimiters or
+  null tokens under the same policy identity. The draft 0.1 CSV declaration now
+  carries encoding, delimiter and null token with the previous defaults; both
+  in-memory parsing and local loading use only those declared settings. A
+  fictional save/load/parse test covers non-default semicolon/null-token replay.
+  Focused tests: 153 passed; Ruff, targeted mypy, strict OpenSpec and diff
+  check passed.
+  This binds parsing semantics to policy bytes but does **not** close the
+  sensitive identity-substitution gap above or enable execution. Next: add a
+  common typed preflight over resolved inline/CSV/domain mappings and test
+  identity, partial composite and null cases before safety review.
+- The private approval-material boundary now resolves inline, exact-byte CSV
+  and shared-domain scalar mappings against the reviewed field type before a
+  local receipt can be prepared. A sensitive non-null source value mapped to
+  itself is rejected with a detached, value-free error; CSV `+001` to `1`
+  rejects after integer normalization, while null-to-null remains allowed.
+  Composite mappings fail closed at this scalar boundary until component-to-
+  field bindings are designed; this is not composite-key support. The combined
+  policy/mapping/receipt slice passed 163 focused fictional tests, Ruff,
+  targeted mypy, strict OpenSpec and diff check. No source-preserving execution
+  or public interface was enabled. Next: resolve composite bindings, then add
+  full cross-field identity and relationship tests before independent safety
+  review and any safety-policy amendment/activation.

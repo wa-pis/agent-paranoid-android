@@ -79,6 +79,9 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement consistent key mapping and declared derived-value computation.
 - [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
   one-pass semantics, collision checks and restricted local mapping handling.
+- [ ] Reject sensitive-value retention disguised as substitution across inline,
+  local CSV and shared-domain mappings before approval/execution; cover typed
+  identity, null and composite entries with value-free failures.
 - [ ] Expose substitution as a specification-level action separate from synthesis;
   test saved wizard-policy parity with noninteractive CLI and Python execution.
 - [ ] Expose substitution, mapping references and unmatched-value handling in

@@ -5,7 +5,11 @@ from dataclasses import dataclass, field
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
-from test_data_agent.core.transformation_mapping import CsvMapping
+from test_data_agent.core.privacy import is_sensitive_field
+from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
+from test_data_agent.core.transformation_mapping import (
+    CsvMapping, DomainMapping, InlineMapping, validate_inline_scalar_mapping,
+)
 from test_data_agent.core.transformation_policy import (
     SubstituteAction,
     SynthesizeAction,
@@ -44,6 +48,9 @@ def prepare_approval_request(
             or type(max_review_bytes) is not int or max_review_bytes < 1
             or len(policy_yaml) + len(evidence_json) > max_total_bytes
             or len(external_parts) > 3 * DEFAULT_MAX_INPUT_COLUMNS
+            or any(not isinstance(part, SnapshotPart) or type(part.payload) is not bytes
+                   for part in external_parts)
+            or sum(len(part.payload) for part in external_parts) > max_total_bytes - len(policy_yaml) - len(evidence_json)
         ):
             raise ValueError
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
@@ -67,6 +74,33 @@ def prepare_approval_request(
         actual_generation = {part.name for part in external_parts if part.kind == "generation_policy"}
         if mapping_refs != actual_mappings or generation_refs != actual_generation:
             raise ValueError
+        fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        domains = {domain.name: domain.mapping for domain in policy.domains}
+        mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
+        for decision in policy.fields:
+            action = decision.behavior
+            if not isinstance(action, SubstituteAction):
+                continue
+            field = fields[(decision.entity, decision.field)]
+            mapping = domains[action.mapping.name] if isinstance(action.mapping, DomainMapping) else action.mapping
+            if isinstance(mapping, InlineMapping):
+                typed = validate_inline_scalar_mapping(
+                    mapping, data_types=(field.data_type,), nullable=(field.nullable,),
+                )
+            elif isinstance(mapping, CsvMapping):
+                parsed = parse_csv_mapping_bytes(
+                    mapping_bytes[mapping.path], mapping, budget=budget, max_bytes=max_total_bytes,
+                )
+                typed = normalize_csv_mapping(
+                    parsed, data_types=(field.data_type,), nullable=(field.nullable,), budget=budget,
+                )
+            else:
+                raise ValueError
+            sensitive = (decision.sensitivity != "non_sensitive" or field.sensitive
+                         or is_sensitive_field(field.name, field.semantic_type))
+            if sensitive and any(entry.original[0] is not None and entry.original == entry.replacement
+                                 for entry in typed.entries):
+                raise ValueError
         parts = (
             SnapshotPart("review", "display", review),
             SnapshotPart("policy", "behavior.yaml", policy_yaml),

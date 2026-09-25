@@ -153,7 +153,7 @@ def test_receipt_binds_mapping_and_evidence_exact_bytes(tmp_path):
         os.close(slave)
     assert verify(approved, path) == approved.parts
 
-    changed_map = request(mapping=b"original,replacement\nfictional-a,synthetic-one\n\n")
+    changed_map = request(mapping=b"original,replacement\nfictional-a,synthetic-two\n")
     policy = next(part.payload for part in approved.parts if part.kind == "policy")
     evidence = next(part.payload for part in approved.parts if part.kind == "evidence")
     same_evidence_new_bytes = json.dumps(json.loads(evidence), indent=2).encode()

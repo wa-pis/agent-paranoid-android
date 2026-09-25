@@ -19,8 +19,8 @@ from test_data_agent.core.transformation_mapping import (
 
 
 def parse_csv_mapping_bytes(
-    payload: bytes, declaration: CsvMapping, *, encoding: str, delimiter: str,
-    null_token: str | None, budget: GenerationBudget, max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
+    payload: bytes, declaration: CsvMapping, *, budget: GenerationBudget,
+    max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
     max_rows: int = DEFAULT_MAX_INPUT_ROWS, max_cells: int = DEFAULT_MAX_INPUT_CELLS,
     max_cell_chars: int = DEFAULT_MAX_INPUT_CELL_CHARS, max_columns: int = DEFAULT_MAX_INPUT_COLUMNS,
 ) -> InlineMapping:
@@ -35,14 +35,11 @@ def parse_csv_mapping_bytes(
             raise ValueError
         if type(payload) is not bytes or len(payload) > max_bytes:
             raise ValueError
-        if encoding not in ("utf-8", "utf-8-sig") or delimiter not in (",", ";", "\t", "|"):
-            raise ValueError
-        if null_token is not None and (type(null_token) is not str or not null_token):
-            raise ValueError
         sources, targets = parsed.source_columns, parsed.replacement_columns
         if len(sources) != len(targets) or len(set(sources)) != len(sources) or len(set(targets)) != len(targets):
             raise ValueError
-        reader = csv.reader(io.StringIO(payload.decode(encoding), newline=""), delimiter=delimiter, strict=True)
+        reader = csv.reader(io.StringIO(payload.decode(parsed.encoding), newline=""),
+                            delimiter=parsed.delimiter, strict=True)
         header = next(reader, [])
         budget.check("CSV mapping")
         if len(header) > max_columns:
@@ -64,7 +61,7 @@ def parse_csv_mapping_bytes(
                 raise ValueError
             if any(len(value) > max_cell_chars for value in row):
                 raise ValueError
-            values = [None if value == null_token else value for value in row]
+            values = [None if parsed.null_token is not None and value == parsed.null_token else value for value in row]
             entries.append({"original": [values[index] for index in source_indices],
                             "replacement": [values[index] for index in target_indices]})
         result = validate_inline_mapping_shape({"kind": "inline", "entries": entries}, key_width=len(sources))
