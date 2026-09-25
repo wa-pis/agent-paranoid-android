@@ -337,6 +337,10 @@ def register_dataset_commands(
         help="Interactively edit each sensitivity decision and explicitly save the policy in place; not approval.",
     )
     transform_review_parser.add_argument(
+        "--edit-actions", action="store_true",
+        help="With --decide, also choose field actions, mapping declarations and unmatched behavior.",
+    )
+    transform_review_parser.add_argument(
         "--trace", action="store_true",
         help="Include bounded, value-free exact-text match ordinals and counts.",
     )

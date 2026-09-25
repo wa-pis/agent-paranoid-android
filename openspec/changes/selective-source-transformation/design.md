@@ -273,5 +273,15 @@ JSON results use stdout while prompts use stderr. Each answer is limited to
 32 bytes and 60 seconds within the overall command budget. `--trace` is a
 separate operation after editing. Editing creates no receipt or execution
 authority; eventual approval must bind fresh exact evidence/review bytes.
-Invalid input-policy repair, action selection and execution parity remain
-separate unfinished wizard work.
+Optional `--edit-actions` asks for an explicit existing action per field:
+keep, drop, preserve, synthesize, substitute, replace_text or derive. Guided
+private inputs populate the same action models, including inline/CSV/domain
+mapping declarations and explicit unmatched behavior. POSIX echo suppression
+keeps comments, expressions and mapping literals out of terminal transcripts;
+each private input is a bounded single UTF-8 line below 4096 bytes and subject
+to terminal line limits. Existing domain definitions and file-wide tables are
+retained, not silently pruned. A null replace_text mapping selects the existing
+file-wide table. Newly referenced files use the same restricted loader/budgets
+and must still match their reviewed bytes at save time. This edits declarations;
+it does not certify executable formulas/generators or issue preservation authority.
+Invalid input-policy repair and execution parity remain unfinished wizard work.

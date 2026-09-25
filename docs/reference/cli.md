@@ -78,7 +78,38 @@ This is policy editing, not data approval: no receipt is issued, no rows are
 transformed, and a `non_sensitive` answer cannot override conflicting evidence
 or enable preservation. A future approval must revalidate and bind all exact
 snapshots again. The wizard currently requires a reviewable policy; it does not
-create missing field actions or repair an invalid input policy.
+repair an invalid input policy.
+
+Add `--edit-actions` with `--decide` to choose each field's action as well:
+`keep` retains its existing configuration; `drop`, `preserve`, `synthesize`,
+`substitute`, `replace_text`, and `derive` request the corresponding versioned
+policy action. There is no implicit choice. Preservation asks for a reference
+and rationale, synthesis for a local generation-policy reference, derivation
+for an expression and a JSON array of dependency names. These declarations
+are not proof of executable formula/generator validity or permission to retain
+source data.
+
+Substitution/replacement asks for mapping JSON using the policy's existing
+schema. For example, a local exact-text CSV table uses:
+
+```json
+{"kind":"csv","path":"status.csv","source_columns":["old"],"replacement_columns":["new"]}
+```
+
+`substitute` also accepts inline entries or a reference to an existing shared
+domain. For `replace_text`, JSON `null` selects only the policy's existing
+file-wide table; a CSV mapping adds column rules. Existing top-level domains
+and file-wide declarations are not silently removed or edited. The wizard
+then asks for unmatched behavior: `reject`, `preserve`, or `synthesize`.
+
+Private configuration prompts disable terminal echo on POSIX terminals and
+accept a bounded single line (less than 4096 UTF-8 bytes, also subject to the
+terminal's line-length limit). Use local CSV tables for larger dictionaries.
+No private configuration is included in the displayed review or JSON result.
+Newly referenced files are read under the same restricted policy directory
+and byte budgets, validated, and checked again before saving. Changed or
+invalid references abort without replacing the policy. `--edit-actions`
+without `--decide` is rejected.
 
 ## Database Sources And SQL
 

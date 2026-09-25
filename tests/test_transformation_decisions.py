@@ -123,10 +123,104 @@ def test_decision_wizard_roundtrip_or_atomic_failure(tmp_path, failure):
         os.close(master)
 
 
-def test_decisions_reject_piped_input_without_changing_policy(tmp_path):
+@pytest.mark.parametrize("extra", [[], ["--edit-actions"], ["--trace"]])
+def test_decisions_reject_piped_input_without_changing_policy(tmp_path, extra):
     source, path, _ = draft(tmp_path)
     before = path.read_bytes()
-    result = subprocess.run(command(source, path), input=b"non_sensitive\nsensitive\nSAVE\n",
+    result = subprocess.run(command(source, path) + extra, input=b"non_sensitive\nsensitive\nSAVE\n",
                             capture_output=True, env=environment(), timeout=10)
     assert result.returncode != 0
     assert path.read_bytes() == before
+
+
+def test_action_editor_requires_decision_wizard(tmp_path):
+    source, path, _ = draft(tmp_path)
+    before = path.read_bytes()
+    args = [arg for arg in command(source, path) if arg != "--decide"]
+    result = subprocess.run(args + ["--edit-actions"], capture_output=True,
+                            env=environment(), timeout=10)
+    assert result.returncode != 0
+    assert path.read_bytes() == before
+
+
+@pytest.mark.parametrize(("action", "mapping_kind", "fallback"), [
+    (action, "csv", "reject") for action in
+    ["keep", "drop", "preserve", "synthesize", "derive", "substitute", "replace_text"]
+] + [("substitute", "inline", "preserve"), ("substitute", "inline", "synthesize"),
+     ("replace_text", "global", "reject"), ("replace_text", "drift", "reject")])
+def test_action_selection_saves_same_versioned_policy(tmp_path, action, mapping_kind, fallback):
+    source, path, original = draft(tmp_path)
+    (tmp_path / "status.csv").write_bytes(b"old,new\nready,fictional-new-status\n")
+    (tmp_path / "generator.yaml").write_text("version: '1.0'\nentities: []\n")
+    mapping = {"kind": "csv", "path": "status.csv", "source_columns": ["old"],
+               "replacement_columns": ["new"]}
+    if mapping_kind == "inline":
+        mapping = {"kind": "inline", "entries": [
+            {"original": ["ready"], "replacement": ["fictional-new-status"]},
+        ]}
+    elif mapping_kind == "global":
+        original["file_text_mapping"] = mapping
+        path.write_text(yaml.safe_dump(original))
+        mapping = None
+    before = path.read_bytes()
+    expected = {"action": "drop" if action == "keep" else action}
+    answers = []
+    if action == "preserve":
+        expected.update(authorization_ref="fictional-auth", comment="fictional-private-comment")
+        answers = [(b"Authorization reference (hidden): ", b"fictional-auth"),
+                   (b"Preservation comment (hidden): ", b"fictional-private-comment")]
+    elif action == "synthesize":
+        expected["generation_policy_ref"] = "generator.yaml"
+        answers = [(b"Generation policy path (hidden): ", b"generator.yaml")]
+    elif action == "derive":
+        expected.update(expression="code", dependencies=["code"])
+        answers = [(b"Expression (hidden): ", b"code"),
+                   (b"Dependency names JSON (hidden): ", b'["code"]')]
+    elif action in {"substitute", "replace_text"}:
+        unmatched = {"action": fallback}
+        expected.update(mapping=mapping, unmatched=unmatched)
+        answers = [(b"Mapping JSON (hidden): ", json.dumps(mapping).encode()),
+                   (b"Unmatched [reject/preserve/synthesize]: ", fallback.encode())]
+        if fallback == "preserve":
+            unmatched.update(authorization_ref="fictional-auth", comment="fictional-private-comment")
+            answers.extend([(b"Authorization reference (hidden): ", b"fictional-auth"),
+                            (b"Preservation comment (hidden): ", b"fictional-private-comment")])
+        elif fallback == "synthesize":
+            unmatched["generation_policy_ref"] = "generator.yaml"
+            answers.append((b"Generation policy path (hidden): ", b"generator.yaml"))
+    master, slave = pty.openpty()
+    process = subprocess.Popen(command(source, path) + ["--edit-actions"], stdin=slave,
+                               stderr=slave, stdout=subprocess.PIPE, env=environment())
+    os.close(slave)
+    transcript = b""
+    try:
+        for marker, answer in [
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"non_sensitive"),
+            (b"Action [keep/drop/preserve/synthesize/substitute/replace_text/derive]: ", action.encode()),
+            *answers,
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"sensitive"),
+            (b"Action [keep/drop/preserve/synthesize/substitute/replace_text/derive]: ", b"keep"),
+            (b"Type SAVE to replace the policy (not approval): ", b"SAVE"),
+        ]:
+            transcript += read_until(master, marker)
+            if mapping_kind == "drift" and answer == b"SAVE":
+                (tmp_path / "status.csv").write_bytes(b"old,new\nready,other-value\n")
+            os.write(master, answer + b"\n")
+        stdout, _ = process.communicate(timeout=10)
+        if mapping_kind == "drift":
+            assert process.returncode != 0
+            assert path.read_bytes() == before
+            return
+        assert process.returncode == 0, stdout
+        original["fields"][0].update(sensitivity="non_sensitive", behavior=expected)
+        original["fields"][1]["sensitivity"] = "sensitive"
+        assert parse_behavior_policy(yaml.safe_load(path.read_bytes())) == parse_behavior_policy(original)
+        assert b"fictional-private-comment" not in transcript + stdout
+        assert b"fictional-auth" not in transcript + stdout
+        assert b"fictional-new-status" not in transcript + stdout
+        assert b"fictional-A" not in transcript + stdout
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        os.close(master)

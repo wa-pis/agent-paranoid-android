@@ -2344,3 +2344,16 @@ Broader transformation remains unfinished.
   Changed-file Ruff, mypy (four modules), strict OpenSpec and diff check pass.
   Next: signed PR and required CI; action selection and executable-policy
   parity remain open, as does the separately blocked output-engine path.
+- PR #573 merged as `572b32c5264694c98490e828ea1afd7da0008e97` after 37
+  successful checks and four intentional release-only skips. GitHub verified
+  head `9110c8397f6ec6753aa31ad086dd4acccc90d933` signature. No ordinary AI
+  review or protection bypass. Started `codex/1-6-policy-actions` from this merge.
+- Added optional `--decide --edit-actions`: existing action models, explicit
+  fallback selection, hidden private input, unchanged top-level domains/file
+  table, and restricted newly referenced files with pre-save byte revalidation.
+  All 22 wizard subprocess/PTY scenarios pass, including inline/CSV/global
+  tables, both non-reject fallbacks, new mapping drift and invalid flag/pipe
+  combinations. Another 138 shared-loader/review/receipt/persistence/parser/docs
+  checks passed; changed-file Ruff, four-module mypy, strict OpenSpec and diff
+  checks passed. No execution or approval receipt is introduced. Next: signed
+  sequential PR and required CI; executable parity remains unfinished.
