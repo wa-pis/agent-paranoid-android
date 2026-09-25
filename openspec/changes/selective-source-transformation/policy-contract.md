@@ -211,8 +211,13 @@ decimal/exponent parser for source keys and CSV mappings; non-finite values,
 overflow and nonzero underflow to zero reject. It is not exact DECIMAL arithmetic.
 DATE matches canonical ISO text without conversion. DATETIME remains closed
 pending the explicit execution-timezone/equivalence contract below.
-Cross-input relationships and other typed substitutions, `synthesize` and
-`derive` remain unsupported;
+Direct `synthesize` and synthesis fallback for substitute/replace_text reuse
+the existing generator with bound DatasetSpec 1.1, policy seed and source row
+count. Each reference is generated once; final transformed projections are
+validated against its spec regardless of optional reporting settings. Current
+execution requires one matching entity, valid mode and non-null generated
+cells. Unchanged generated text rejects; numeric coincidence exceptions remain
+unfinished. Cross-input relationships, other typed substitutions and `derive` remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and
 activation gates still apply.

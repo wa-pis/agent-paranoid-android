@@ -2659,3 +2659,33 @@ Broader transformation remains unfinished.
   correctly rejected by DatasetSpec 1.1 preflight. Replaced only the fictional
   fixture with a valid 1.1 items.status specification. All 11 action-selection
   scenarios pass locally; Ruff passes. No runtime validation weakened.
+- Integration checkpoint after synthesis preflight and exact arithmetic:
+  all 429 transformation tests pass in 19.23s, including real-PTY wizard tests.
+  Published SHA 0b9bf99f218f7d1d142107902b8ec0c836020652 has documentation
+  success; CI run 36181263340 is queued, Containers 36181263337 in progress,
+  Security 36181263354 queued. Do not restart those runs. Next remains actual
+  synthesis/derive execution and final mixed-row validation, not another
+  unchanged local gate or a release-completion claim.
+- Connected direct synthesize to the closed CSV engine via existing
+  generate_dataset and final validation. Exact bound DatasetSpec bytes, policy
+  seed and profiled source row count drive generation; each reference is
+  generated once. Final transformed projections are revalidated against each
+  referenced spec before bytes return. TDD first failed unsupported execution,
+  then deterministic replay and source-count checks pass; Ruff/mypy pass.
+  Initial execution supports one source entity and valid generation mode;
+  null output encoding and synthesize fallbacks remain pending, not silently
+  coerced. Broader financial/relation acceptance and public activation remain
+  unfinished. Next add negative final-row and fallback execution cases.
+- Added direct/fallback synthesis matrix and connected both substitute and
+  replace_text unmatched synthesis to the same generator/result validation.
+  Two positive fallback tests first failed, then all 76 engine tests passed.
+  Tests prove final schema failures reject even with reporting flags disabled,
+  negative generation mode and unencoded nulls reject, matched rules retain
+  precedence, and deterministic source-row-count output. Ruff/mypy pass.
+  Policy-contract development status updated; public activation remains off.
+- Found and fixed numeric identity by formatting in direct and fallback
+  synthesis: 1.00 -> 1.0 is unchanged under the FLOAT contract and now rejects
+  through shared scalar normalization. Corrected the test fixture's numeric
+  bound keys to min_value/max_value before reproducing all three failures;
+  all 79 engine tests now pass, Ruff passes. Approved zero/rounding coincidence
+  exceptions remain unimplemented; this check does not claim their acceptance.

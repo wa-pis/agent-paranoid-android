@@ -58,6 +58,58 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+@pytest.mark.parametrize("case", ["valid", "final_schema", "negative_mode", "null", "numeric_identity"])
+@pytest.mark.parametrize("action_kind", ["synthesize", "replace_text", "substitute"])
+def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action_kind):
+    original = request(source_bytes=(b"flag,code\ntrue,1.00\nfalse,2.00\n"
+                       if case == "numeric_identity" else b"flag,code\ntrue,alpha\nfalse,beta\n"))
+    source = next(part for part in original.parts if part.kind == "source")
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    policy["fields"][1]["behavior"] = {"action": "synthesize", "generation_policy_ref": "gen.yaml"}
+    if action_kind != "synthesize":
+        fallback = policy["fields"][1]["behavior"]
+        policy["fields"][1]["behavior"] = {"action": action_kind, "unmatched": fallback}
+        if action_kind == "substitute":
+            policy["fields"][1]["behavior"]["mapping"] = {"kind": "inline", "entries": [
+                {"original": [3.0], "replacement": [4.0]} if case == "numeric_identity" else
+                {"original": ["alpha"], "replacement": ["manual"]}]}
+    spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 999,
+        "fields": [{"name": "code", "data_type": "string"}]}],
+        "generation_settings": {"seed": 999}}
+    if case == "final_schema":
+        spec["entities"][0]["fields"].append({"name": "flag", "data_type": "string",
+            "distribution": {"kind": "string_pattern", "min_length": 8, "max_length": 8}})
+        spec["validation_settings"] = {"validate_schema": False, "validate_privacy": False,
+                                       "validate_relationships": False, "validate_constraints": False}
+    elif case == "negative_mode":
+        spec["generation_settings"]["mode"] = "negative"
+    elif case == "null":
+        spec["entities"][0]["fields"][0].update(nullable=True, null_ratio=1.0)
+    elif case == "numeric_identity":
+        spec["entities"][0]["fields"][0].update(data_type="float",
+            distribution={"kind": "numeric", "min_value": 1.0, "max_value": 1.0})
+    parts = tuple(part for part in original.parts if part.kind == "mapping" and part.name == "all.csv")
+    if action_kind == "replace_text":
+        parts = (replace(parts[0], payload=parts[0].payload + b"alpha,manual\n"),)
+    parts += (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if case != "valid":
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError) as caught:
+            execute(material)
+        assert caught.value.__context__ is None
+        return
+    first = execute(material)
+    assert execute(material) == first
+    rows = list(csv.DictReader(io.StringIO(first.decode())))
+    assert len(rows) == 2
+    assert [row["flag"] for row in rows] == ["no", "yes"]
+    assert all(row["code"] not in {"alpha", "beta"} for row in rows)
+    if action_kind != "synthesize":
+        assert rows[0]["code"] == "manual"
+
+
 def test_closed_csv_trace_reports_unmatched_without_values():
     module = import_module("test_data_agent.io.transformation_execute")
     result = module.trace_csv_replacements(request(complete=False), max_total_bytes=8192,

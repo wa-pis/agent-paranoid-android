@@ -10,10 +10,12 @@ import io
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
+from typing import Any
 from collections.abc import Iterator
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
-from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.settings import GenerationMode
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import looks_sensitive_value
 from test_data_agent.core.transformation_approval import ApprovalRequest
@@ -24,9 +26,11 @@ from test_data_agent.core.transformation_csv import (
 )
 from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
-    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction,
+    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction, SynthesizeAction,
 )
-from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
+from test_data_agent.generation.entity_generator import generate_dataset
+from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
@@ -120,6 +124,10 @@ def replace_csv_snapshot(
         dropped = set()
         needs_receipt = False
         actions = {decision.field: decision.behavior for decision in policy.fields}
+        generation_specs: dict[str, DatasetSpec] = {}
+        generated: dict[str, list[dict[str, Any]]] = {}
+        final_generated: dict[str, list[dict[str, Any]]] = {}
+        generation_bytes = {part.name: part.payload for part in canonical.parts if part.kind == "generation_policy"}
         for decision in policy.fields:
             action = decision.behavior
             if decision.entity != source.name:
@@ -130,9 +138,29 @@ def replace_csv_snapshot(
             if isinstance(action, PreserveAction):
                 needs_receipt = True
                 continue
+            synthesis = (action if isinstance(action, SynthesizeAction) else
+                         action.unmatched if isinstance(action, (ReplaceTextAction, SubstituteAction)) else None)
+            if isinstance(synthesis, SynthesizeAction):
+                reference = synthesis.generation_policy_ref
+                if reference not in generation_specs:
+                    spec = load_generation_policy_yaml(generation_bytes[reference],
+                        max_bytes=max_total_bytes, budget=budget)
+                    if (len(spec.entities) != 1 or spec.entities[0].name != source.name
+                            or spec.generation_settings.mode != GenerationMode.VALID):
+                        raise ValueError
+                    spec.entities[0].row_count = next(entity.row_count for entity in profile.entities
+                                                     if entity.name == source.name)
+                    if any(field.name not in actions or isinstance(actions[field.name], DropAction)
+                           for field in spec.entities[0].fields):
+                        raise ValueError
+                    generation_specs[reference] = spec
+                    generated[reference] = generate_dataset(spec, policy.seed, budget=budget)[source.name]
+                    final_generated[reference] = []
+            if isinstance(action, SynthesizeAction):
+                continue
             if isinstance(action, SubstituteAction):
                 if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE) or not isinstance(
-                        action.unmatched, (RejectUnmatched, PreserveAction)):
+                        action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
                 declaration = action.mapping
@@ -166,7 +194,7 @@ def replace_csv_snapshot(
                 substitution_columns[decision.field] = source_columns
                 continue
             if (not isinstance(action, ReplaceTextAction)
-                    or not isinstance(action.unmatched, (RejectUnmatched, PreserveAction))):
+                    or not isinstance(action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction))):
                 raise ValueError
             needs_receipt |= isinstance(action.unmatched, PreserveAction)
             if action.mapping is not None:
@@ -197,8 +225,17 @@ def replace_csv_snapshot(
         if any(looks_sensitive_value(name) for name in output_names):
             raise ValueError
         append_row(output_names)
+        def synthesized(action: SynthesizeAction, row_index: int, name: str, original: str) -> str:
+            value = generated[action.generation_policy_ref][row_index][name]
+            if value is None:
+                raise ValueError  # CSV null encoding remains an explicit pending contract.
+            rendered = str(value)
+            if normalize_csv_scalar(rendered, field_types[name]) == normalize_csv_scalar(original, field_types[name]):
+                raise ValueError
+            return rendered
+
         unchanged = compared = dropped_cells = 0
-        for row in reader:
+        for row_index, row in enumerate(reader):
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
                 raise ValueError
@@ -209,6 +246,9 @@ def replace_csv_snapshot(
                 if isinstance(action, PreserveAction):
                     values.append(row[name])
                     continue
+                if isinstance(action, SynthesizeAction):
+                    values.append(synthesized(action, row_index, name, row[name]))
+                    continue
                 if isinstance(action, SubstituteAction):
                     key = tuple(normalize_csv_scalar(row[column], field_types[column])
                                 for column in substitution_columns[name])
@@ -216,6 +256,8 @@ def replace_csv_snapshot(
                         values.append(substitutions[name][key])
                     elif isinstance(action.unmatched, PreserveAction):
                         values.append(row[name])
+                    elif isinstance(action.unmatched, SynthesizeAction):
+                        values.append(synthesized(action.unmatched, row_index, name, row[name]))
                     else:
                         raise ValueError
                     continue
@@ -224,6 +266,8 @@ def replace_csv_snapshot(
                     values.append(match.replacement)
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
                     values.append(row[name])
+                elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, SynthesizeAction):
+                    values.append(synthesized(action.unmatched, row_index, name, row[name]))
                 else:
                     raise ValueError
             replaced = tuple(values)
@@ -232,13 +276,20 @@ def replace_csv_snapshot(
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError
             append_row(replaced)
+            final_row = dict(zip(output_names, replaced, strict=True))
+            for reference, spec in generation_specs.items():
+                final_generated[reference].append({field.name: final_row[field.name]
+                                                   for field in spec.entities[0].fields})
             compared += len(output_names)
             dropped_cells += len(dropped)
             unchanged += sum(row[name] == value for name, value in zip(output_names, replaced, strict=True))
         budget.check("CSV replacement")
+        for reference, spec in generation_specs.items():
+            assert_generated_dataset_valid({source.name: final_generated[reference]}, spec)
+            budget.check("CSV synthesis final validation")
         return CsvTransformationResult(
             output.getvalue(), retention_summary_from_counts(unchanged, compared, dropped_cells))
-    except (OSError, ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:
         raise TransformationExecutionError("invalid CSV replacement")
