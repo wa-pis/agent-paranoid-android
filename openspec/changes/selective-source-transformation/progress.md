@@ -2031,6 +2031,22 @@ Broader transformation remains unfinished.
   targeted mypy pass. This is not a CLI dry-run or source-row execution.
   Next: wire the local debug surface to a fixed approved snapshot after the
   overlap precedence and preservation-policy gates are resolved.
+- Draft #568 `3b5cf28040cfb5bce8358de6f1272dee711b55e0` completed 37
+  applicable GitHub checks successfully (four release-only skips). The
+  subsequent signed trace-summary commit `8f606768653d428c5724210d2db572fc58dea33c`
+  was fast-forward pushed to the same draft; its own CI is pending. No AI
+  review was requested for this ordinary incremental commit. Next: inspect
+  exact-head CI, then continue local CLI debug integration only after the
+  matching and preservation contracts are settled.
+- Draft #568 `8f606768653d428c5724210d2db572fc58dea33c` completed 37
+  applicable GitHub checks successfully (four release-only skips). Focused
+  fictional regression confirms the existing local receipt boundary rejects
+  a relabelled numeric CSV profile even when policy fingerprint is recomputed
+  over the forged profile: `_canonical_request` reprofiles the same source
+  bytes and fails value-free. Eleven receipt tests and Ruff pass. This does not
+  prove source attestation on any future direct policy or execution route; the
+  unresolved review gate remains. Next: retain this regression, then specify
+  one canonical approval/execution entry that cannot bypass byte revalidation.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
