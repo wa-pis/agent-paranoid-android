@@ -10,6 +10,8 @@ read `openspec/changes/selective-source-transformation/progress.md`, then the
 relevant section of `plan.md`, `tasks.md`, `policy-contract.md`, or
 `client-acceptance.md`. Check the current branch and diff; a proposal or private
 parser is not an executable public feature.
+If only the installed package is available, do not infer feature status from
+this bundled skill: obtain the current OpenSpec checkout before planning work.
 
 - Keep the shipped synthetic path source-free. Never route source rows through
   generation, examples, logs, MCP responses, or an external model.

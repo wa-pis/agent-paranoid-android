@@ -1533,3 +1533,10 @@ Broader transformation remains unfinished.
   a public source-preserving execution path. Strict MkDocs, strict OpenSpec and
   diff check passed. Next: submit this focused map correction; keep #552/#564 draft pending their
   separate publication and privacy decisions. No release tag or publication.
+- Agent-use documentation PR #569 adds two portable `SKILL.md` files. Both are
+  also included in the wheel from the same repository sources; package install
+  does not silently register them with an agent. The transformation skill keeps
+  unfinished preservation explicitly disabled. Local wheel and sdist contain
+  both skills; installed-wheel bytes match source. Skill validation, focused
+  installed-package tests (8), Ruff and diff check passed. Next: require fresh
+  exact-head CI for the packaging update before normal merge; no RC claim.

@@ -9,6 +9,8 @@ Use this skill when an agent must choose how to operate this repository or guide
 another agent through a supported workflow. Treat `AGENTS.md` as the safety
 authority. Check the installed version and `test-data-agent COMMAND --help`
 before suggesting exact flags; the installed package may lag the checkout.
+Without a checkout, use the published documentation at
+https://wa-pis.github.io/agent-paranoid-android/ for the references below.
 
 | Goal | Entry point | Read only as needed |
 | --- | --- | --- |
