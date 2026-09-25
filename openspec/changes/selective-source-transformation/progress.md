@@ -1500,3 +1500,19 @@ Broader transformation remains unfinished.
   Ruff, strict OpenSpec and diff check passed. Next: submit a focused PR and
   require exact-head CI. Private C.2, preservation fidelity and final installed
   RC acceptance remain unverified.
+- PR #563 merged the fictional linked-pair CLI test as
+  `6b9c37b2c8fd2d02d465eba64a8acabf899b934f` after green applicable CI.
+  A separate finding-25 fractional `mixed/0.25` CLI acceptance test now covers
+  saved spec, safe profile and direct CSV in two deterministic runs each.
+  Public installed 1.5.0 fails the spec route (`valid/0` effective settings),
+  while an isolated wheel from current main `6b9c37b` passes all three routes
+  (four focused tests total). Candidate wheel SHA-256:
+  `311619294ca9970e9f600dd3d1582f5bd13835e48796a3888431e0e830fb2403`.
+  This wheel is still version-labelled 1.5.0 and uses shared development
+  dependencies; not clean/final-RC or private acceptance. New public-contract
+  discrepancy: deliberately invalid output exits 1 from spec, 0 from profile
+  and CSV, despite all reports being invalid. Asked owner to choose one uniform
+  status/exit semantics; no runtime behavior changed. Next: submit the focused
+  acceptance test/evidence PR, then implement the chosen exit contract with
+  executable parity tests. Do not merge #552/#564 while their separate owner
+  decisions remain pending.
