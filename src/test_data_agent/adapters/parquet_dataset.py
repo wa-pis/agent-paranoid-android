@@ -67,6 +67,8 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
         columns.append(CSVColumnProfile(
             name=field.name,
             data_type=_csv_data_type_from_arrow(field.type),
+            decimal_precision=field.type.precision if str(field.type).startswith("decimal") else None,
+            decimal_scale=field.type.scale if str(field.type).startswith("decimal") else None,
             nullable=field.nullable,
             null_count=null_count if null_count is not None else 0,
             null_ratio=round(null_count / row_count, 6) if null_count is not None and row_count else 0.0,
@@ -103,9 +105,11 @@ def _parquet_null_count(metadata: Any, index: int, field_name: str) -> int | Non
 
 def _csv_data_type_from_arrow(arrow_type: object) -> str:
     name = str(arrow_type).lower()
+    if name.startswith("decimal"):
+        return "decimal"
     if any(part in name for part in ("int", "uint")):
         return "integer"
-    if any(part in name for part in ("float", "double", "decimal")):
+    if any(part in name for part in ("float", "double")):
         return "float"
     if name == "bool":
         return "boolean"

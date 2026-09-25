@@ -75,6 +75,11 @@ columns have no observed bounds. Query-source profiling applies the same
 temporal-bound guard to its derived output. Neither path certifies source-period
 utility when bounds are missing.
 
+Declared `numeric(p,s)` in PostgreSQL or allowed query metadata carries only
+precision/scale into the profile; it does not authorize exact source extrema,
+raw values, a wider SQL subset or a larger scan budget. Unbounded `numeric`
+remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
+
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.

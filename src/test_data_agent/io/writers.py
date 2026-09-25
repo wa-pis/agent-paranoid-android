@@ -9,6 +9,7 @@ import os
 import re
 from collections import defaultdict
 from datetime import date, datetime
+from decimal import Decimal
 from numbers import Number
 from io import StringIO
 from pathlib import Path
@@ -17,6 +18,8 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import RESERVED_ENTITY_ARTIFACT_BASENAMES, DatasetSpec
+from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
+from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import (
     enforce_output_folder_size,
@@ -35,6 +38,12 @@ def dataset_spec_to_yaml(spec: DatasetSpec) -> str:
 
 def dataset_spec_to_json(spec: DatasetSpec) -> str:
     return spec.model_dump_json(indent=2)
+
+
+def json_decimal(value: Any) -> str:
+    if isinstance(value, Decimal) and value.is_finite():
+        return format(value, "f")
+    raise TypeError("JSON output contains unsupported value")
 
 
 def rows_to_csv(rows: list[dict[str, Any]]) -> str:
@@ -105,6 +114,10 @@ def sql_literal(value: Any) -> str:
         if not math.isfinite(value):
             raise ValueError("SQL output does not support non-finite floats")
         return repr(value)
+    if isinstance(value, Decimal):
+        if not value.is_finite():
+            raise ValueError("SQL output does not support non-finite decimals")
+        return format(value, "f")
     escaped = str(value).replace("'", "''")
     return f"'{escaped}'"
 
@@ -164,6 +177,23 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                     raise TypeError("timestamp field has incompatible value")
             elif value is not None and field.data_type == FieldType.INTEGER and type(value) is not int:
                 raise TypeError("integer field has incompatible value")
+            elif value is not None and field.data_type == FieldType.DECIMAL:
+                distribution = field.typed_distribution
+                if not isinstance(distribution, DecimalRangeDistribution) or type(value) not in {Decimal, str}:
+                    raise TypeError("decimal field has incompatible value")
+                units = decimal_to_units(
+                    format(value, "f") if isinstance(value, Decimal) else value,
+                    precision=distribution.precision, scale=distribution.scale,
+                )
+                if not (
+                    decimal_to_units(distribution.min, precision=distribution.precision, scale=distribution.scale)
+                    <= units <=
+                    decimal_to_units(distribution.max, precision=distribution.precision, scale=distribution.scale)
+                ):
+                    raise ValueError("decimal field is outside declared range")
+                value = decimal_from_units(
+                    units, precision=distribution.precision, scale=distribution.scale,
+                )
             elif value is not None and field.data_type == FieldType.FLOAT and type(value) not in {int, float}:
                 raise TypeError("float field has incompatible value")
             elif value is not None and field.data_type == FieldType.BOOLEAN and type(value) is not bool:
@@ -193,6 +223,11 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                 raise ValueError("unsupported timestamp timezone")
             tz = None if offset is None else f"{offset[:3]}:{offset[3:]}"
             arrow_type = pa.timestamp("us", tz=tz)
+        elif field.data_type == FieldType.DECIMAL:
+            distribution = field.typed_distribution
+            if not isinstance(distribution, DecimalRangeDistribution):
+                raise ValueError("decimal field requires exact range")
+            arrow_type = pa.decimal128(distribution.precision, distribution.scale)
         else:
             arrow_type = arrow_types[field.data_type]
         schema_fields.append(pa.field(field.name, arrow_type, nullable=field.nullable))
@@ -238,7 +273,7 @@ def write_dataset_rows(
             )
         elif output_format == DatasetOutputFormat.JSON:
             write_bounded_text(
-                json.dumps(rows, indent=2, sort_keys=True),
+                json.dumps(rows, indent=2, sort_keys=True, default=json_decimal),
                 safe_entity_artifact_path(root, entity_name, ".json"),
             )
         elif output_format == DatasetOutputFormat.SQL:
@@ -291,7 +326,7 @@ def write_single_entity_rows(
             return
         write_bounded_text(text, output)
     elif output_format == DatasetOutputFormat.JSON:
-        text = json.dumps(rows, indent=2, sort_keys=True)
+        text = json.dumps(rows, indent=2, sort_keys=True, default=json_decimal)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
             print(text)

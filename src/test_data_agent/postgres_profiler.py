@@ -244,7 +244,9 @@ class PostgresProfiler:
         name = _required_text(column, "column_name")
         data_type = _required_text(column, "data_type")
         profile_type = coerce_profile_type(data_type)
-        numeric_shape = profile_type in {ProfileDataType.INTEGER, ProfileDataType.FLOAT}
+        numeric_shape = profile_type in {
+            ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
+        }
         temporal_bounds = (
             profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
             and not infer_sensitive_from_name(name)

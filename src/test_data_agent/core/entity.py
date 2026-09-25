@@ -34,7 +34,7 @@ class EntityProfile(BaseModel):
 
 
 class EntitySpec(BaseModel):
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(validate_assignment=True, hide_input_in_errors=True)
 
     name: str = Field(min_length=1)
     row_count: int = Field(gt=0)

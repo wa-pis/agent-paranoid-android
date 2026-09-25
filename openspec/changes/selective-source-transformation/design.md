@@ -115,6 +115,30 @@ reuse or a universal multiplier. Financial arithmetic must honor declared
 precision. Sign, nulls, zero handling and acceptable magnitude tolerances must
 be declared; no silent defaults may claim source fidelity.
 
+The RC exact DECIMAL precision ceiling is 38 base-ten digits, with
+scale from 0 through precision. Parquet uses Arrow decimal128, not decimal256.
+Higher precision is rejected with a value-free error; it is never downcast to
+FLOAT or silently rounded. This boundary covers the requested DECIMAL(20,2)
+and DECIMAL(38,16) cases; decimal256/76-digit support is deferred rather than
+partially implemented. The final numeric-content policy remains under review.
+The rounding policy for formulas is a separate
+decision, and this ceiling alone does not enable exact-decimal execution.
+DatasetSpec 1.1 carries a `decimal_range` distribution with precision, scale
+and exact textual inclusive bounds. Only reviewed source-free generation uses
+these bounds; sensitive ranges and active constraints on DECIMAL entities fail
+closed until source-safe profiling and exact formula semantics are implemented.
+Generated CSV/JSON use decimal text, PostgreSQL uses NUMERIC(p,s), and Parquet
+uses decimal128(p,s). Legacy DatasetSpec 1.0 cannot declare DECIMAL.
+Parquet and declared PostgreSQL/query `numeric(p,s)` may carry precision and
+scale as schema-only profile evidence; they never supply source-derived exact
+value bounds. A reviewed `decimal_range` remains required before generation.
+Bare SQL `numeric` without declared precision/scale retains explicitly
+approximate FLOAT behavior for compatibility, not an exact-financial claim.
+Recognizable sensitive-looking DECIMAL bounds and generated values fail closed,
+including native values and canonical CSV text. Optional validation-report
+settings cannot disable this publication guard; any field-scoped exception
+requires a separate approved safety policy and executable tests.
+
 The user permits equality for source zeros and coincidences after declared
 rounding. This is not permission to copy all rounded values: the replacement
 process still runs. Other synthesized non-null values must differ from their

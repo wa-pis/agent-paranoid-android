@@ -9,9 +9,13 @@ the Python package version.
 | Schema version | Status | First package release |
 |---|---|---|
 | `1.0` | Supported | `0.3.0` |
+| `1.1` | Supported in candidate branch | Planned `1.6.0rc1` |
 
 Files without `schema_version` are interpreted as `1.0` for compatibility with
 early project artifacts. New files always include the field.
+Newly constructed specifications default to `1.1`; `1.0` remains readable.
+Exact `decimal` fields require `1.1` and a declared `decimal_range`;
+they cannot be silently downgraded to `float` when read by older releases.
 
 Readers fail closed on every version that is not explicitly supported. They do
 not guess how to interpret a newer contract or silently downgrade it.
