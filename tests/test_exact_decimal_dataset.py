@@ -132,13 +132,15 @@ def test_sensitive_decimal_range_does_not_bypass_source_free_policy():
         assert_spec_safe(spec)
 
 
-@pytest.mark.parametrize("value", ["2025550147", "4242424242424242"])
+@pytest.mark.parametrize("value", [
+    "2025550147", "4242424242424242", "4242424242424242.00",
+])
 def test_decimal_bounds_reject_sensitive_looking_values(value):
     spec = DatasetSpec(schema_version="1.1", entities=[EntitySpec(
         name="fictional_items", row_count=1, fields=[FieldSpec(
             name="amount", data_type="decimal",
             distribution={"kind": "decimal_range", "precision": 20,
-                          "scale": 0, "min": value, "max": value},
+                          "scale": 2, "min": value, "max": value},
         )],
     )])
     with pytest.raises(SpecSafetyError, match="sensitive-looking") as error:
@@ -170,6 +172,27 @@ def test_decimal_rows_reject_card_like_value_inside_safe_bounds():
         spec.validation_settings.validate_privacy = True
     safe_rows = {"fictional_items": [{"amount": Decimal("4242424242424201")}]}
     assert validate_generated_row_privacy(safe_rows, spec) == []
+
+
+def test_decimal_scientific_notation_cannot_hide_card_digits():
+    spec = DatasetSpec(schema_version="1.1", entities=[EntitySpec(
+        name="fictional_items", row_count=1, fields=[FieldSpec(
+            name="amount", data_type="decimal",
+            distribution={"kind": "decimal_range", "precision": 20,
+                          "scale": 0, "min": "4242424242424199", "max": "4242424242424201"},
+        )],
+    )])
+    assert_spec_safe(spec)
+    for value in (
+        Decimal("4.2424242424242E+15"), "4.2424242424242E+15",
+        Decimal("1E+1000000000"), "1E+1000000000",
+    ):
+        rows = {"fictional_items": [{"amount": value}]}
+        assert validate_generated_row_privacy(rows, spec) == [
+            "generated dataset failed post-solve privacy validation"
+        ]
+        with pytest.raises(PostgresSqlExportError, match="requires a safe dataset"):
+            render_postgres_sql(spec, rows)
 
 
 def test_exact_decimal_formula_is_rejected_before_float_arithmetic():

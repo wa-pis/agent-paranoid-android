@@ -6,12 +6,13 @@ import csv
 import json
 import re
 from collections.abc import Iterable, Mapping
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.constraint import ConstraintStatus
+from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
@@ -58,6 +59,32 @@ _SAFE_SENSITIVE_DISTRIBUTIONS = frozenset(
 _TEXT_LENGTH_PATTERN = re.compile(r"text_len_\d+")
 
 
+def _decimal_sensitive_value_type(value: Any) -> str | None:
+    if isinstance(value, str):
+        if len(value) > MAX_DECIMAL_DIGITS + 2:
+            return "secret"
+        try:
+            value = Decimal(value)
+        except InvalidOperation:
+            return infer_sensitive_value_type(value)
+    if not isinstance(value, Decimal):
+        return infer_sensitive_value_type(value)
+    exponent = value.as_tuple().exponent
+    if not value.is_finite() or (
+        value.adjusted() >= MAX_DECIMAL_DIGITS
+        or not isinstance(exponent, int)
+        or exponent < -MAX_DECIMAL_DIGITS
+    ):
+        return "secret"
+    text = format(value, "f")
+    whole, _, fraction = text.removeprefix("-").partition(".")
+    for candidate in (text, whole, fraction, whole + fraction):
+        detected = infer_sensitive_value_type(candidate)
+        if detected is not None:
+            return detected
+    return None
+
+
 def assert_spec_safe(spec: DatasetSpec) -> None:
     """Reject unsafe distributions before generation or artifact publication."""
 
@@ -89,7 +116,7 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
             if kind == "decimal_range" and isinstance(
                 field.typed_distribution, DecimalRangeDistribution
             ) and any(
-                infer_sensitive_value_type(bound) is not None
+                _decimal_sensitive_value_type(bound) is not None
                 for bound in (field.typed_distribution.min, field.typed_distribution.max)
             ):
                 raise SpecSafetyError("exact decimal bounds contain sensitive-looking values")
@@ -308,20 +335,21 @@ def validate_generated_row_privacy(
                     or field.data_type == FieldType.FLOAT and parse_float(value) is not None
                 ):
                     continue
-                privacy_value = (
-                    str(value)
-                    if field.data_type == FieldType.DECIMAL and isinstance(value, Decimal)
-                    else value
+                detected = (
+                    _decimal_sensitive_value_type(value)
+                    if field.data_type == FieldType.DECIMAL
+                    else infer_sensitive_value_type(value)
                 )
-                detected = infer_sensitive_value_type(privacy_value)
                 sensitive = field.sensitive or is_sensitive_field(
                     field.name,
                     field.semantic_type,
                 )
-                if isinstance(privacy_value, str) and (
+                if field.data_type == FieldType.DECIMAL and isinstance(value, Decimal) and detected:
+                    return ["generated dataset failed post-solve privacy validation"]
+                if isinstance(value, str) and (
                     sensitive or detected is not None
                 ) and not _is_synthetic_sensitive_value(
-                    privacy_value,
+                    value,
                     field.semantic_type or detected,
                 ):
                     return ["generated dataset failed post-solve privacy validation"]

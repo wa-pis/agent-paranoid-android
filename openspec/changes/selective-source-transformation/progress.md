@@ -1401,3 +1401,15 @@ Broader transformation remains unfinished.
   files), strict MkDocs, strict OpenSpec and diff check passed. Next: sign and
   push safety correction, rerun exact-head CI and independent AI review of
   changed scope; do not merge #564 until #552 and owner decisions resolve.
+- Independent AI re-review by Sagan (self-reported “Moth”), 2026-09-25, of
+  exact SHA `e36b4ffd05a353234d3d4537c21b57a64398c31d` found the prior
+  finding only partially fixed: decimal-point and scientific-notation forms
+  could hide recognizable card digits. This remains AI evidence, not human
+  approval. A further local correction canonicalizes bounded DECIMAL values
+  before checking whole/fraction/combined digits, rejects excessive exponents
+  without expanding them, and adds `.00` and scientific-form negative tests.
+  Thirty-five affected tests, then a full 1740-passed/10-deselected
+  non-integration gate, package mypy (119 files), Ruff, strict OpenSpec and
+  diff check passed.
+  Next: sign/push this correction, require fresh exact-head CI and independent
+  AI safety re-review; no release or merge claim.
