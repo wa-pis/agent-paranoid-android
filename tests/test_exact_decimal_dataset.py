@@ -99,10 +99,26 @@ def test_decimal_parquet_rejects_mismatched_value_without_publication(tmp_path):
     assert output.read_bytes() == b"previous fictional artifact"
 
 
+def test_decimal_exports_reject_value_outside_declared_range(tmp_path):
+    pytest.importorskip("pyarrow.parquet")
+    spec = _spec(precision=20, scale=2)
+    rows = {"fictional_items": [{"synthetic_amount": Decimal("9.00")}] * 3}
+    assert validate_schema(rows, spec) == [
+        f"fictional_items[{index}].synthetic_amount has wrong type" for index in range(3)
+    ]
+    with pytest.raises(PostgresSqlExportError, match="requires a valid dataset"):
+        render_postgres_sql(spec, rows)
+    output = tmp_path / "rows.parquet"
+    output.write_bytes(b"previous fictional artifact")
+    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
+        write_parquet(rows["fictional_items"], output, fields=spec.entities[0].fields)
+    assert output.read_bytes() == b"previous fictional artifact"
+
+
 def test_decimal_parquet_accepts_canonical_csv_text(tmp_path):
     pq = pytest.importorskip("pyarrow.parquet")
     output = tmp_path / "rows.parquet"
-    value = "9007199254740993.1234567890123456"
+    value = "9007199254740993.1111111111111111"
     write_parquet([{"synthetic_amount": value}], output, fields=_spec().entities[0].fields)
     assert pq.read_table(output).to_pylist()[0]["synthetic_amount"] == Decimal(value)
 

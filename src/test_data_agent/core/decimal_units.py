@@ -61,7 +61,9 @@ def sample_decimal(
     )
 
 
-def value_matches_decimal(value: Any, *, precision: int, scale: int) -> bool:
+def value_matches_decimal(
+    value: Any, *, precision: int, scale: int, low: str | None = None, high: str | None = None,
+) -> bool:
     if isinstance(value, Decimal):
         text = format(value, "f")
     elif isinstance(value, str):
@@ -69,7 +71,11 @@ def value_matches_decimal(value: Any, *, precision: int, scale: int) -> bool:
     else:
         return False
     try:
-        decimal_to_units(text, precision=precision, scale=scale)
+        units = decimal_to_units(text, precision=precision, scale=scale)
+        if low is not None and units < decimal_to_units(low, precision=precision, scale=scale):
+            return False
+        if high is not None and units > decimal_to_units(high, precision=precision, scale=scale):
+            return False
     except ExactDecimalError:
         return False
     return True

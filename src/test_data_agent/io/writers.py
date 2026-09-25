@@ -185,6 +185,12 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                     format(value, "f") if isinstance(value, Decimal) else value,
                     precision=distribution.precision, scale=distribution.scale,
                 )
+                if not (
+                    decimal_to_units(distribution.min, precision=distribution.precision, scale=distribution.scale)
+                    <= units <=
+                    decimal_to_units(distribution.max, precision=distribution.precision, scale=distribution.scale)
+                ):
+                    raise ValueError("decimal field is outside declared range")
                 value = decimal_from_units(
                     units, precision=distribution.precision, scale=distribution.scale,
                 )

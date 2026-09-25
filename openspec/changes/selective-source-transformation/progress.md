@@ -1377,3 +1377,12 @@ Broader transformation remains unfinished.
   allowlist/no-SELECT-star checks remain in place. Next: cover CSV companion
   type/null/format metadata and decide exact formula rounding before claiming
   finding 23; no installed-RC, private or live-DB acceptance yet.
+- Exact DECIMAL range enforcement: schema validation and typed Parquet now
+  reject well-formed values outside reviewed inclusive `decimal_range` bounds;
+  PostgreSQL SQL export inherits the schema check. Direct Parquet rejection
+  preserves an existing artifact. Fictional focused checks: 61 passed across
+  decimal, writers, SQL export, safety and Parquet acceptance; Ruff and focused
+  mypy passed. `uv run` could not initialize its user cache in this sandbox,
+  so checks used the existing project venv directly. Next: complete CSV
+  companion type/null/format metadata; formula rounding remains a separate
+  product decision. Do not infer preservation authority or final acceptance.

@@ -61,6 +61,7 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
                     exact = field.typed_distribution
                     if not isinstance(exact, DecimalRangeDistribution) or not value_matches_decimal(
                         value, precision=exact.precision, scale=exact.scale,
+                        low=exact.min, high=exact.max,
                     ):
                         errors.append(f"{entity.name}[{row_index}].{field.name} has wrong type")
                 elif not value_matches_type(value, field.data_type):
