@@ -167,6 +167,15 @@ bounded value-free error rather than retaining the input or relaxing constraints
 
 ## Closed CSV Execution Development Status
 
+The private `trace_csv_replacements` dry-run binds to the same canonical request
+and source snapshot as execution and uses `match_scoped_text` for identical rule
+precedence. It reports only replace-text actions, with original source row/column
+ordinals, rule scope/ordinal and aggregate counts. Event display truncates at an
+explicit limit; total traced cells and distinct rule counters have rejecting
+limits. Unmatched rules are reported without executing fallback actions. Dropped
+columns do not renumber source ordinals. No cells, mappings, receipt or output
+dataset are returned; this is not a public CLI/MCP surface or an execution approval.
+
 The private `io/transformation_execute.py` prototype supports `replace_text`,
 `drop`, `preserve` and unmatched-preserve. It is not connected to public
 CLI/Python/MCP execution and is not release acceptance. Direct non-null STRING/INTEGER/FLOAT/DATE

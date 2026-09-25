@@ -58,6 +58,43 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+def test_closed_csv_trace_reports_unmatched_without_values():
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.trace_csv_replacements(request(complete=False), max_total_bytes=8192,
+        max_review_bytes=4096, max_events=2, max_cells=4, max_rule_counts=4,
+        budget=GenerationBudget(5))
+    assert result.matched_cells == 3
+    assert result.unmatched_cells == 1
+    assert result.truncated and len(result.events) == 2
+    assert result.rule_counts == ((1, "file", 1, 1), (2, "column", 1, 1), (2, "file", 2, 1))
+    assert all(value not in repr(result) for value in ("001", "002", "second", "cascade"))
+
+
+@pytest.mark.parametrize("case", ["events", "cells", "rules", "tampered"])
+def test_closed_csv_trace_rejects_limits_and_tampering(case):
+    module = import_module("test_data_agent.io.transformation_execute")
+    material = request()
+    if case == "tampered":
+        material = replace(material, parts=tuple(
+            replace(part, payload=part.payload + b"true,003\n") if part.kind == "source" else part
+            for part in material.parts))
+    with pytest.raises(module.TransformationExecutionError) as caught:
+        module.trace_csv_replacements(material, max_total_bytes=8192, max_review_bytes=4096,
+            max_events=0 if case == "events" else 4, max_cells=3 if case == "cells" else 4,
+            max_rule_counts=1 if case == "rules" else 4, budget=GenerationBudget(5))
+    assert str(caught.value) == "invalid CSV replacement trace"
+    assert caught.value.__context__ is None
+
+
+def test_closed_csv_trace_keeps_source_column_ordinals_after_drop():
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.trace_csv_replacements(request(behavior={"action": "drop"}),
+        max_total_bytes=8192, max_review_bytes=4096, max_events=4, max_cells=4,
+        max_rule_counts=4, budget=GenerationBudget(5))
+    assert [(event.row_ordinal, event.column_ordinal, event.scope) for event in result.events] == [
+        (1, 2, "file"), (2, 2, "column")]
+
+
 @pytest.mark.parametrize("case", ["unmatched", "tampered", "budget", "pii"])
 def test_closed_csv_fails_without_returning_partial_output(case):
     material = request(target="fictional@example.com" if case == "pii" else "second",

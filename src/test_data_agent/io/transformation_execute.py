@@ -10,6 +10,7 @@ import io
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
+from collections.abc import Iterator
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
 from test_data_agent.core.dataset import DatasetProfile
@@ -19,6 +20,7 @@ from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
     normalize_csv_scalar, parse_csv_mapping_bytes,
+    summarize_text_trace, text_trace_event, TextTraceEvent, TextTraceSummary,
 )
 from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
@@ -40,6 +42,54 @@ class CsvTransformationResult:
 
     csv_bytes: bytes = field(repr=False)
     retention: SourceRetentionSummary
+
+
+def trace_csv_replacements(
+    request: ApprovalRequest, *, max_total_bytes: int, max_review_bytes: int,
+    max_events: int, max_cells: int, max_rule_counts: int, budget: GenerationBudget,
+) -> TextTraceSummary:
+    """Private local dry-run of replace rules; never return cells or execute actions."""
+    try:
+        canonical = _canonical_request(request, max_total_bytes=max_total_bytes,
+                                       max_review_bytes=max_review_bytes, budget=budget)
+        policy = load_behavior_policy_yaml(
+            next(part.payload for part in canonical.parts if part.kind == "policy"),
+            max_bytes=max_total_bytes, budget=budget)
+        source = next(part for part in canonical.parts if part.kind == "source")
+        mappings = {part.name: part.payload for part in canonical.parts if part.kind == "mapping"}
+        file_table = (compile_text_replacement_table(
+            mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
+        ) if policy.file_text_mapping is not None else None)
+        actions = {item.field: item.behavior for item in policy.fields}
+        column_tables = {
+            name: compile_text_replacement_table(mappings[action.mapping.path], action.mapping, budget=budget)
+            for name, action in actions.items()
+            if isinstance(action, ReplaceTextAction) and action.mapping is not None
+        }
+        reader = _csv_reader_from_snapshot(source.payload)
+        names = tuple(validate_csv_headers(reader.fieldnames))
+        reader.fieldnames = list(names)
+
+        def events() -> Iterator[TextTraceEvent]:
+            for row_number, row in enumerate(reader, 1):
+                budget.check("CSV replacement trace")
+                if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+                    raise ValueError
+                for column_number, name in enumerate(names, 1):
+                    budget.check("CSV replacement trace cell")
+                    if isinstance(actions[name], ReplaceTextAction):
+                        yield text_trace_event(row_number, column_number,
+                            match_scoped_text(row[name], name, file_table, column_tables))
+
+        return summarize_text_trace(events(), max_events=max_events, max_cells=max_cells,
+                                    max_rule_counts=max_rule_counts, budget=budget)
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
+        pass
+    try:
+        raise TransformationExecutionError("invalid CSV replacement trace")
+    except TransformationExecutionError as error:
+        error.__context__ = None
+        raise
 
 
 def replace_csv_snapshot(

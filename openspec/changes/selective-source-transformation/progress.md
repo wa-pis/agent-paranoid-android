@@ -2556,3 +2556,12 @@ Broader transformation remains unfinished.
   checks pass. Preparing the FLOAT batch for signed commit and push to #578.
   Next execution work remains synthesize/derive, null/temporal/decimal contracts,
   publication and public interfaces; this batch is not release completion.
+- FLOAT batch signed and pushed as 5be6c22 to draft #578. Continued with the
+  agreed debuggability requirement: private snapshot-bound replacement dry-run
+  now uses the same matcher as execution and the existing bounded trace summary.
+  TDD first failed on the absent entrypoint; all 64 engine tests now pass,
+  including unmatched reporting, display truncation, source-column ordinals
+  after drop, tampered source and event/cell/rule limits. Ruff and targeted mypy
+  pass. No literals, row output, fallback execution or receipt minting added.
+  Trace changes remain local; next commit/push after current CI observation,
+  then continue the remaining execution/interface scope and pending contracts.
