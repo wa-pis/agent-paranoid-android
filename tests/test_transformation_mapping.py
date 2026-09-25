@@ -106,6 +106,9 @@ def test_inline_shape_preserves_typed_keys_and_allows_many_to_one():
     (None, FieldType.STRING, True, True),
     (None, FieldType.STRING, False, False),
     ("2025-04-30", FieldType.DATE, False, True),
+    ("2025-04-30T12:34:56+03:00", FieldType.DATETIME, False, True),
+    ("2025-04-30T09:34:56Z", FieldType.DATETIME, False, True),
+    ("2025-04-30T12:34:56", FieldType.DATETIME, False, True),
 ])
 def test_typed_mapping_never_coerces_or_conflates_null(value, kind, allows_null, accepted):
     payload = {"kind": "inline", "entries": [{"original": [value], "replacement": [value]}]}
@@ -133,3 +136,19 @@ def test_date_mapping_keeps_explicit_substitution_and_leap_date():
     result = validate_inline_scalar_mapping({"kind": "inline", "entries": [entry]},
                                           data_types=(FieldType.DATE,), nullable=(False,))
     assert result.model_dump(mode="json")["entries"] == [entry]
+
+
+@pytest.mark.parametrize("value", [
+    "2025-02-29T12:00:00Z", "2025-04-30", "20250430T123456",
+    "2025-04-30 12:34:56+03:00", "2025-04-30T12:34:56+0300",
+    "2025-04-30T12:34:56z", " 2025-04-30T12:34:56Z", "", 123,
+])
+@pytest.mark.parametrize("side", ["original", "replacement"])
+def test_datetime_mapping_rejects_noncanonical_text_on_both_sides(value, side):
+    entry = {"original": ["2025-04-30T12:34:56+03:00"],
+             "replacement": ["2026-09-23T09:34:56Z"]}
+    entry[side] = [value]
+    with pytest.raises(MappingDeclarationError, match="^invalid typed inline mapping$") as caught:
+        validate_inline_scalar_mapping({"kind": "inline", "entries": [entry]},
+                                      data_types=(FieldType.DATETIME,), nullable=(False,))
+    assert caught.value.__context__ is None

@@ -1516,3 +1516,13 @@ Broader transformation remains unfinished.
   acceptance test/evidence PR, then implement the chosen exit contract with
   executable parity tests. Do not merge #552/#564 while their separate owner
   decisions remain pending.
+- PR #565 merged as `8c0d45126e9c256d48bd20394bfc1f2f0de52b0f` after
+  37 applicable checks passed; no ordinary AI review or runtime change.
+  Independent private mapping follow-up validates canonical DATETIME strings
+  in both inline YAML and local CSV through the shared scalar validator.
+  Offset, `Z` and naive strings retain their exact spelling; noncanonical
+  forms reject on either mapping side. Fictional focused mapping/CSV tests:
+  118 passed including saved-policy round trips; Ruff and focused mypy
+  passed. No source-preserving execution or timezone conversion was enabled.
+  Next: submit this validation-only slice through signed PR/CI; leave semantic
+  timezone equivalence and execution policy for the approved preflight design.

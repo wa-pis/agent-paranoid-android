@@ -260,6 +260,9 @@ Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
 saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
 empty/null values, integers above binary-float exact range and calendar dates.
 Both routes reject forbidden nulls and invalid dates under the declared types.
+They now also compare canonical DATETIME text with explicit offsets/`Z` and
+reject noncanonical timestamp text without timezone conversion. This is
+validation-only: executable timezone policy remains separate.
 Private CSV mapping normalization also handles explicitly approximate FLOAT
 fields with finite ASCII numeric syntax, post-conversion duplicate checks and
 overflow/underflow rejection. This is not exact financial DECIMAL support or
