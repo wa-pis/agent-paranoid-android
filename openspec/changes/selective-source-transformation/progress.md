@@ -2689,3 +2689,23 @@ Broader transformation remains unfinished.
   bound keys to min_value/max_value before reproducing all three failures;
   all 79 engine tests now pass, Ruff passes. Approved zero/rounding coincidence
   exceptions remain unimplemented; this check does not claim their acceptance.
+- CI 36181263340 and the other three workflows for 0b9bf99 succeeded;
+  pushed synthesis execution commit f1048e2 to draft #578. Derive integration
+  inspection confirms existing field dependency validation uses a topological
+  graph, but execution must evaluate against transformed dependencies, not raw
+  input cells. DECIMAL precision/scale live in profile metadata; CSV inference
+  alone must not invent them or treat approximate FLOAT as exact DECIMAL.
+  Next implement dependency-ordered evaluation with declared output typing.
+- Added dependency-ordered derive execution for the existing approximate FLOAT
+  contract, using transformed INTEGER/FLOAT dependencies and restoring source
+  column order in output. A reverse-column-order, two-formula chain first
+  failed then passed; all 80 engine tests pass. Nonfinite/arithmetic errors
+  reject before output returns. INTEGER/DECIMAL result execution remains
+  pending rather than silently rounding integers or claiming exact FLOAT.
+  Fixed mypy narrowing/list annotations after the initial type-check failure.
+- Added derive failure cases for zero division, nonfinite literals and bool
+  arithmetic. The bool case exposed implicit Python numeric coercion; fixed by
+  rejecting nonnumeric/nonfinite constants before evaluation, also preventing
+  string-repetition expressions from allocating output before type checking.
+  Added a large string-repetition rejection regression without executing it
+  before the guard. Updated the explicit approximate-FLOAT development status.

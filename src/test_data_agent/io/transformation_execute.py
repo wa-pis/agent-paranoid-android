@@ -7,6 +7,8 @@ receipt minting or external access.
 
 import csv
 import io
+import math
+from graphlib import TopologicalSorter
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import cast
@@ -26,11 +28,12 @@ from test_data_agent.core.transformation_csv import (
 )
 from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
-    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction, SynthesizeAction,
+    DeriveAction, DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction, SynthesizeAction,
 )
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
+from test_data_agent.rules.expressions import expression_constants, safe_eval
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
@@ -138,6 +141,15 @@ def replace_csv_snapshot(
             if isinstance(action, PreserveAction):
                 needs_receipt = True
                 continue
+            if isinstance(action, DeriveAction):
+                if (field_types[decision.field] != FieldType.FLOAT or any(
+                        field_types[name] not in (FieldType.INTEGER, FieldType.FLOAT)
+                        for name in action.dependencies)):
+                    raise ValueError
+                if any(type(value) not in (int, float) or not math.isfinite(value)
+                       for value in expression_constants(action.expression)):
+                    raise ValueError
+                continue
             synthesis = (action if isinstance(action, SynthesizeAction) else
                          action.unmatched if isinstance(action, (ReplaceTextAction, SubstituteAction)) else None)
             if isinstance(synthesis, SynthesizeAction):
@@ -211,6 +223,10 @@ def replace_csv_snapshot(
             raise ValueError
         reader.fieldnames = list(names)
         output_names = tuple(name for name in names if name not in dropped)
+        execution_names = tuple(TopologicalSorter({
+            name: set(action.dependencies) if isinstance(action := actions[name], DeriveAction) else set()
+            for name in output_names
+        }).static_order())
         output = io.BytesIO()
 
         def append_row(values: tuple[str, ...]) -> None:
@@ -239,10 +255,19 @@ def replace_csv_snapshot(
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
                 raise ValueError
-            values = []
-            for name in output_names:
+            values: list[str] = []
+            for name in execution_names:
                 budget.check("CSV replacement cell")
                 action = actions[name]
+                if isinstance(action, DeriveAction):
+                    transformed = dict(zip(execution_names, values))
+                    result = safe_eval(action.expression, {
+                        dependency: normalize_csv_scalar(transformed[dependency], field_types[dependency])
+                        for dependency in action.dependencies})
+                    if type(result) not in (int, float) or not math.isfinite(result):
+                        raise ValueError
+                    values.append(str(float(result)))
+                    continue
                 if isinstance(action, PreserveAction):
                     values.append(row[name])
                     continue
@@ -270,7 +295,8 @@ def replace_csv_snapshot(
                     values.append(synthesized(action.unmatched, row_index, name, row[name]))
                 else:
                     raise ValueError
-            replaced = tuple(values)
+            transformed = dict(zip(execution_names, values, strict=True))
+            replaced = tuple(transformed[name] for name in output_names)
             if output_names == names and replaced == tuple(row[name] for name in names):
                 raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):
@@ -289,7 +315,7 @@ def replace_csv_snapshot(
             budget.check("CSV synthesis final validation")
         return CsvTransformationResult(
             output.getvalue(), retention_summary_from_counts(unchanged, compared, dropped_cells))
-    except (OSError, ValueError, TypeError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
+    except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:
         raise TransformationExecutionError("invalid CSV replacement")

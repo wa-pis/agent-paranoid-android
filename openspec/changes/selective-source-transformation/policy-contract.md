@@ -217,7 +217,11 @@ count. Each reference is generated once; final transformed projections are
 validated against its spec regardless of optional reporting settings. Current
 execution requires one matching entity, valid mode and non-null generated
 cells. Unchanged generated text rejects; numeric coincidence exceptions remain
-unfinished. Cross-input relationships, other typed substitutions and `derive` remain unsupported;
+unfinished. Approximate FLOAT `derive` executes in dependency order using
+transformed INTEGER/FLOAT inputs, not original cells. Only finite numeric
+literals are allowed; arithmetic/nonfinite results reject, and CSV column
+order is preserved. INTEGER/DECIMAL derive result integration remains pending.
+Cross-input relationships and other typed substitutions remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and
 activation gates still apply.
