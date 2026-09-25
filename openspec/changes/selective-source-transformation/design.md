@@ -27,7 +27,24 @@ without a versioned compatibility plan. A private local YAML behavior profile
 may declare mapping entries inline or reference a separate local CSV mapping
 file. Both forms have equivalent typed semantics. Profiles with inline source
 values become restricted source-bearing inputs, not shareable aggregate profiles.
+
+The per-field review must also show a system-authored comment about the likely
+meaning of the column and why sensitivity is suggested or uncertain (for
+example, a name/pattern suggests a phone number). Build it from bounded safe
+metadata or aggregates, never raw examples, rare values or provider-supplied
+source rows. The comment is advisory evidence, not a behavior instruction or
+permission to preserve. Keep the system observation distinct from the user's
+explicit sensitive/non-sensitive decision; absent, unknown or conflicting
+evidence must not become `false` merely because no detector fired. An approved
+non-sensitive decision can select preservation only through the separate local
+operator confirmation of the exact plan. Sensitive decisions select a
+transforming action, not an implicit copy or a blanket privacy bypass. The
+comment, suggestion and final decision must be shown together and bound to
+the approval snapshot so stale evidence requires a new review.
 Shared/exported profiles must omit entries and use opaque references instead.
+The private CSV declaration carries its encoding, delimiter and explicit null
+token (or no null token); these parser settings are part of the saved policy
+bytes bound to any future local approval receipt, not ambient execution flags.
 
 The proposed versioned policy describes:
 

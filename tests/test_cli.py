@@ -149,6 +149,17 @@ def test_generate_rejects_two_input_sources_with_help(capsys) -> None:
     assert "test-data-agent generate --help" in captured.err
 
 
+def test_generate_does_not_accept_transformation_approval(capsys) -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main(["generate", "dataset_spec.yaml", "--output", "out",
+              "--transformation-policy", "policy.yaml", "--receipt", "approval.json"])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 2
+    assert "unrecognized arguments" in captured.err
+    assert "test-data-agent --help" in captured.err
+
+
 def test_generate_missing_output_has_recovery_hint(capsys) -> None:
     exit_code = main(["generate", "dataset_spec.yaml"])
 

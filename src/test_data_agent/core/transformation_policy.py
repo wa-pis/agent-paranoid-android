@@ -8,8 +8,9 @@ from typing import Annotated, Literal, TypeAlias
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
 
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
-from test_data_agent.core.privacy import is_sensitive_field
+from test_data_agent.core.privacy import is_sensitive_field, normalize_field_name
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
 )
@@ -21,6 +22,13 @@ Reference: TypeAlias = Annotated[StrictStr, Field(min_length=1, max_length=256)]
 class PreserveAction(_PrivateModel):
     action: Literal["preserve"]
     authorization_ref: Reference = Field(repr=False)
+    comment: StrictStr = Field(min_length=1, max_length=256, repr=False)
+
+    @model_validator(mode="after")
+    def require_meaningful_comment(self) -> "PreserveAction":
+        if not self.comment.strip():
+            raise ValueError("preservation comment is required")
+        return self
 
 
 class SynthesizeAction(_PrivateModel):
@@ -43,6 +51,12 @@ class SubstituteAction(_PrivateModel):
     unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
 
 
+class ReplaceTextAction(_PrivateModel):
+    action: Literal["replace_text"]
+    mapping: CsvMapping | None = Field(default=None, repr=False)
+    unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
+
+
 class DeriveAction(_PrivateModel):
     action: Literal["derive"]
     expression: StrictStr = Field(min_length=1, repr=False)
@@ -54,7 +68,7 @@ class DropAction(_PrivateModel):
 
 
 FieldAction: TypeAlias = Annotated[
-    PreserveAction | SynthesizeAction | SubstituteAction | DeriveAction | DropAction,
+    PreserveAction | SynthesizeAction | SubstituteAction | ReplaceTextAction | DeriveAction | DropAction,
     Field(discriminator="action"),
 ]
 
@@ -68,7 +82,7 @@ class FieldDecision(_PrivateModel):
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
         preserve = isinstance(self.behavior, PreserveAction) or (
-            isinstance(self.behavior, SubstituteAction)
+            isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
             and isinstance(self.behavior.unmatched, PreserveAction)
         )
         if preserve and self.sensitivity != "non_sensitive":
@@ -87,6 +101,7 @@ class BehaviorPolicy(_PrivateModel):
     seed: StrictInt = Field(repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    file_text_mapping: CsvMapping | None = Field(default=None, repr=False)
 
     @model_validator(mode="after")
     def require_unique_resolved_decisions(self) -> "BehaviorPolicy":
@@ -99,6 +114,14 @@ class BehaviorPolicy(_PrivateModel):
                 mapping = item.behavior.mapping
                 if isinstance(mapping, DomainMapping) and mapping.name not in names:
                     raise ValueError("unresolved mapping domain")
+            if isinstance(item.behavior, ReplaceTextAction):
+                if item.behavior.mapping is None and self.file_text_mapping is None:
+                    raise ValueError("missing text replacement table")
+        if self.file_text_mapping is not None and not any(
+                isinstance(item.behavior, ReplaceTextAction) for item in self.fields):
+            raise ValueError("unused text replacement table")
+        if self.file_text_mapping is not None and len({item.entity for item in self.fields}) != 1:
+            raise ValueError("file text table requires one entity")
         return self
 
 
@@ -137,11 +160,13 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
             graph[identity] = set()
             behavior = decision.behavior
             preserves = isinstance(behavior, PreserveAction) or (
-                isinstance(behavior, SubstituteAction) and isinstance(behavior.unmatched, PreserveAction)
+                isinstance(behavior, (SubstituteAction, ReplaceTextAction))
+                and isinstance(behavior.unmatched, PreserveAction)
             )
             if preserves and identity in source_fields:
                 field = source_fields[identity]
-                if field.sensitive or is_sensitive_field(field.name, field.semantic_type):
+                if (field.data_type == FieldType.DECIMAL or field.sensitive
+                        or is_sensitive_field(field.name, field.semantic_type)):
                     valid = False
             if isinstance(behavior, DeriveAction):
                 dependencies = {(decision.entity, name) for name in behavior.dependencies}
@@ -177,7 +202,9 @@ def transformation_schema_fingerprint(profile: DatasetProfile) -> str:
             error.__context__ = None
             raise
     schema = [{"entity": entity.name, "fields": [
-        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable}
+        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable,
+         **({"precision": field.decimal_precision, "scale": field.decimal_scale}
+            if field.data_type == FieldType.DECIMAL else {})}
         for field in entity.fields]} for entity in profile.entities]
     canonical = json.dumps({"version": "0.1", "entities": schema},
                            sort_keys=True, separators=(",", ":"), ensure_ascii=True)
@@ -196,6 +223,26 @@ def validate_policy_profile(policy: BehaviorPolicy, profile: DatasetProfile) -> 
             raise
 
 
+def _system_field_comment(field: FieldProfile) -> str:
+    """Fixed, value-free hint from metadata; never a preservation decision."""
+    name = normalize_field_name(field.name)
+    semantic = (field.semantic_type or "").lower()
+    for markers, meaning in (
+        (("token", "password", "secret", "credential", "card", "ssn"), "credential or private identifier"),
+        (("email", "mail"), "email or contact"),
+        (("phone",), "phone or contact"),
+        (("address",), "address"),
+        (("name",), "personal name"),
+    ):
+        if any(marker in name or marker == semantic for marker in markers):
+            return f"Possible {meaning} field from metadata; treat as potentially sensitive."
+    if field.sensitive:
+        return "Profile flags possible sensitive data; field meaning unverified."
+    if field.is_identifier:
+        return "Likely identifier from profile metadata; sensitivity unverified."
+    return f"Likely {field.data_type.value} field; meaning and sensitivity unverified."
+
+
 def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max_bytes: int) -> bytes:
     """Value-free local review; bind these bytes with full policy/evidence bytes."""
     policy = parse_behavior_policy(policy)
@@ -203,21 +250,33 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
     validate_policy_profile(policy, profile)
     if type(max_bytes) is not int or max_bytes < 1:
         raise BehaviorPolicyError("invalid policy review") from None
-    observed = {(entity.name, field.name):
-                field.sensitive or is_sensitive_field(field.name, field.semantic_type)
+    observed = {(entity.name, field.name): field
                 for entity in profile.entities for field in entity.fields}
+    domain_numbers = {domain.name: index for index, domain in enumerate(policy.domains, start=1)}
     fields = []
     for decision in policy.fields:
         behavior = decision.behavior
-        unmatched = behavior.unmatched.action if isinstance(behavior, SubstituteAction) else None
+        unmatched = behavior.unmatched.action if isinstance(behavior, (SubstituteAction, ReplaceTextAction)) else None
+        domain_ref = behavior.mapping if isinstance(behavior, SubstituteAction) and isinstance(
+            behavior.mapping, DomainMapping
+        ) else None
+        field = observed[(decision.entity, decision.field)]
         fields.append({
             "entity": decision.entity,
             "field": decision.field,
             "action": behavior.action,
             "unmatched": unmatched,
+            "mapping_domain": domain_numbers[domain_ref.name] if domain_ref is not None else None,
+            "mapping_component": domain_ref.component if domain_ref is not None else None,
+            "file_text_rules": isinstance(behavior, ReplaceTextAction) and policy.file_text_mapping is not None,
+            "column_text_rules": isinstance(behavior, ReplaceTextAction) and behavior.mapping is not None,
             "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
             "declared_sensitivity": decision.sensitivity,
-            "observed_sensitive": observed[(decision.entity, decision.field)],
+            "observed_sensitivity": (
+                "sensitive" if field.sensitive or is_sensitive_field(field.name, field.semantic_type)
+                else "unknown"
+            ),
+            "system_comment": _system_field_comment(field),
         })
     payload = json.dumps({"version": 1, "fields": fields}, ensure_ascii=True, indent=2).encode("ascii")
     if len(payload) > max_bytes:

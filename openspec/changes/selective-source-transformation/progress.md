@@ -1695,6 +1695,132 @@ Broader transformation remains unfinished.
   a public source-preserving execution path. Strict MkDocs, strict OpenSpec and
   diff check passed. Next: submit this focused map correction; keep #552/#564 draft pending their
   separate publication and privacy decisions. No release tag or publication.
+- PR #567 merged the private implementation map on 2026-09-25 as
+  `f03c7f435d473ef5547a06db9c7d85a204f0276d` after applicable green CI.
+  New fictional preflight probe on merged main: `validate_policy_profile`
+  accepted a sensitive field's inline `substitute` entry with identical
+  original/replacement values and `unmatched=reject`. There is no public
+  source-preserving execution path, so this is a confirmed pre-activation
+  safety gap, not observed output leakage. Next: resolve exact typed mapping
+  bytes across inline/CSV/domain, reject disguised preservation and test
+  value-free errors before enabling any approval/execution route. Do not
+  patch inline alone or treat a receipt as sufficient permission.
+- Private CSV mapping parser options previously lived outside the saved policy,
+  so identical mapping bytes could be interpreted with different delimiters or
+  null tokens under the same policy identity. The draft 0.1 CSV declaration now
+  carries encoding, delimiter and null token with the previous defaults; both
+  in-memory parsing and local loading use only those declared settings. A
+  fictional save/load/parse test covers non-default semicolon/null-token replay.
+  Focused tests: 153 passed; Ruff, targeted mypy, strict OpenSpec and diff
+  check passed.
+  This binds parsing semantics to policy bytes but does **not** close the
+  sensitive identity-substitution gap above or enable execution. Next: add a
+  common typed preflight over resolved inline/CSV/domain mappings and test
+  identity, partial composite and null cases before safety review.
+- The private approval-material boundary now resolves inline, exact-byte CSV
+  and shared-domain scalar mappings against the reviewed field type before a
+  local receipt can be prepared. A sensitive non-null source value mapped to
+  itself is rejected with a detached, value-free error; CSV `+001` to `1`
+  rejects after integer normalization, while null-to-null remains allowed.
+  Composite mappings fail closed at this scalar boundary until component-to-
+  field bindings are designed; this is not composite-key support. The combined
+  policy/mapping/receipt slice passed 163 focused fictional tests, Ruff,
+  targeted mypy, strict OpenSpec and diff check. No source-preserving execution
+  or public interface was enabled. Next: resolve composite bindings, then add
+  full cross-field identity and relationship tests before independent safety
+  review and any safety-policy amendment/activation.
+- Draft PR #568 opened at signed head `f36b758be4907462113ec1ac803f2fbc799af709`;
+  its first exact-head CI was still running at last observation. A local
+  follow-up found that even a non-sensitive identity substitution hides
+  preservation from the value-free review (`preserves_original=false`). The
+  same scalar preflight now rejects every non-null identity mapping, including
+  fields otherwise eligible for a separate explicit preserve action; inline,
+  CSV and domain cases are covered. The combined 169 focused tests, Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. Next: finish the first head's CI,
+  send this correction as a new signed head, then require fresh exact-head CI.
+  Composite binding and full transformation execution remain unresolved.
+- PR #568 corrected exact head `2cd7c975fc83602514b29225947794f80eec24df`
+  passed applicable CI and remains draft/open. Independent read-only **AI**
+  safety reviewer (tool pseudonym Cicero; self-reported Sentinel) examined this
+  exact SHA on 2026-09-25 UTC; this was not a human/GitHub approval. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/568#issuecomment-5827180377
+  Two P2 findings remain open: a different but recognizable sensitive literal
+  can pass the identity-only substitution preflight; differently offset
+  DATETIME strings can represent the same instant. Neither source-preserving
+  execution nor public approval is enabled. Do not merge #568 or silently
+  decide the sensitive replacement/timezone policy. Next: settle the pending
+  component-binding and replacement-safety choices, specify datetime matching,
+  add focused executable regressions, then re-review the changed safety scope
+  on its new exact SHA and require fresh CI before merge.
+- Checked duplicate external mapping labels in the same private approval path:
+  `snapshot_identity` already rejects them before returning any receipt, so no
+  production change was needed. Added a fictional value-free regression;
+  23 focused approval tests, Ruff and diff check passed. `uv run` could not
+  initialize its user cache in this sandbox; the existing project virtualenv
+  ran the same focused tests successfully. Next: carry this test with the
+  substantive safety correction; do not push a test-only revision merely to
+  restart CI. The client's monthly-date category suggestion also needs a
+  preservation/granularity policy choice; it is not an automatic source-free
+  bug fix.
+- Inspected and replayed the supplied fictional finding-25 mode probe
+  unmodified in separate temporary baseline/source roots (script SHA-256
+  `8a860dd6fd9aa515ec192538013bf4702651e3ba4ff93f9d305c5e4e7ecb8653`).
+  Verified baseline 1.5.0 and current-source import roots. Baseline lost all
+  spec-input mode overrides; current source applied `mixed/1` and `negative/1`
+  with different output and matching manifest. The probe mistakes intentional
+  exit 1 for absent output and passes invalid ratios to `edge`/`load_test`.
+  Supplemental correct invocations passed and recorded `edge/0` and
+  `load_test/0`; same CSV bytes as `valid` are not a mode failure here. See
+  client-acceptance.md for bounds. Next: include this evidence in final
+  installed-RC replay after the controlled-invalid exit and Parquet policy
+  choices; do not claim five distinct hashes or private acceptance.
+- Inspected and replayed the supplied fictional finding-24/26 Parquet probe
+  unmodified in separate installed baseline/interim-candidate roots (script
+  SHA-256 `3cd0adfc3832706522b82025b348e7d1a7d46568253eff7c484a465611b47c6e`).
+  Public 1.5.0 lost the declared `date` physical type and ignored negative
+  mode; the earlier typed-Parquet wheel (SHA-256
+  `631c32e3c02e7a079bf09e7b94a72eeb560d12977e2db26073b500e187a1f7da`)
+  wrote/read `date32[day]` but rejected negative mixed types without
+  publication. The probe returns zero despite printed losses and its all-zero
+  null fixture cannot establish honest unknown metadata. See
+  client-acceptance.md. Next: resolve intentional-invalid Parquet publication
+  and unknown-metadata public compatibility, then replay the final installed
+  1.6.0rc1; do not merge draft #552 or claim finding 26 closed.
+- Reviewed the remaining supplied doctor/Trino probes without execution.
+  Doctor `--fixed` monkeypatches publication and base repeats unchanged
+  completed checks; Trino ladder reads a separate analytics query by default,
+  copies SQL, prints exception text and always monkeypatches an allowlist arm.
+  Neither is safe new acceptance evidence. Next: use only fictional,
+  unpatched local tests after the pending auth/SQL product decisions; do not
+  connect to a real database or treat these supplied scripts as passed.
+- User clarified the intended review workflow: a field marked sensitive is
+  transformed; a field explicitly reviewed as non-sensitive may be kept, but
+  the data profile must include a system comment explaining the likely meaning
+  of each column so the person can make that decision. Planned the bounded,
+  value-free comment and its approval-snapshot binding in plan/design/tasks/
+  policy-contract; no runtime preservation or declassification was enabled.
+  Existing `FieldProfile.sensitive` defaults to false and the Parquet adapter
+  can set false without content evidence, so it cannot be treated as automatic
+  consent. User decided: `sensitive=false` is a person's explicit decision for
+  that column, not a negative detector result; no finding stays unknown. This
+  decision is sufficient to proceed with the review contract, not permission
+  to override positive/conflicting evidence or to execute preservation. The
+  requirement and draft policy contract now state this explicitly. No runtime
+  change or check rerun; current worktree retains unrelated in-progress edits.
+  Next: implement the bounded review comment and explicit decision separation
+  with focused redaction/round-trip tests, then complete the safety-policy
+  amendment and independent review before any preservation path is enabled.
+- Private review projection now separates `observed_sensitivity=sensitive` from
+  `unknown` when no detector fires; the explicit human field decision remains
+  `declared_sensitivity`. A bounded, fixed-phrase system comment gives likely
+  field meaning from metadata without echoing source values or arbitrary
+  semantic labels. Changed evidence/comment bytes alter the approval-material
+  snapshot; this is still no local receipt or execution path. Focused policy/
+  approval tests: 68 passed; Ruff and targeted mypy passed. Next: implement
+  the versioned behavior-profile persistence and wizard display/round trip;
+  retain the independent safety review and policy amendment gate before any
+  source-preserving execution. PR #568 remains draft with earlier P2 safety
+  findings open; do not merge on these review-only checks.
 - Agent-use documentation PR #569 adds two portable `SKILL.md` files. Both are
   also included in the wheel from the same repository sources; package install
   does not silently register them with an agent. The transformation skill keeps
@@ -1724,6 +1850,51 @@ Broader transformation remains unfinished.
   Parquet type; older pending-decision notes above are historical. Next:
   run focused checks on the integrated tree, push the signed merge, require
   fresh exact-head CI, then consider normal merge.
+- PR #568 integrated merged `main` in a separate clean worktree; the original
+  checkout's unfinished fictional client-acceptance edit was not changed.
+  Both progress histories were retained. The merged tree passed 172 focused
+  transformation tests, Ruff, targeted mypy, strict OpenSpec and diff checks.
+  This is a draft safety-review surface only: the earlier P2 mapping findings
+  remain open; no source-preserving execution or receipt
+  is enabled. Next: push the signed integration commit and inspect exact-head
+  CI; do not merge until the safety questions are resolved and independently
+  re-reviewed.
+- Draft PR #568 composite-domain preflight now binds each participating field
+  to an explicit zero-based tuple component. Every entity using the domain must
+  cover the tuple exactly once; mismatched shared types, omitted/duplicate
+  positions and any unchanged non-null component reject before approval
+  material is prepared. The review shows an opaque domain ordinal and component
+  index, not mapping values or private domain names. Fictional inline/CSV and
+  cross-entity regressions: 183 focused tests passed; Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. This is locally committed validation-only
+  work in the isolated mapping worktree; no execution, receipt or preservation
+  authority is enabled. Next: finish integration with latest main, obtain exact-head CI
+  and resolve the outstanding replacement/timezone safety findings before
+  another independent safety review or merging this draft.
+- Owner's latest DECIMAL comment indicates a possible documented human
+  exception for preserving original values, but does not decide whether an
+  explicit `sensitive=false` plus rationale may override positive card/phone
+  evidence. The current fail-closed rule remains in force until that exact
+  safety choice is confirmed, specified, tested and independently reviewed.
+- PR #568 exact head `8e5a97e4ba89627f221f0dc1a7c1d7b4ad9c8a5b`
+  completed all 37 applicable GitHub checks successfully; four publication-
+  only jobs were skipped and none failed. The PR stays draft. This does not
+  dispose of the two earlier P2 AI safety-review findings or authorize source
+  preservation. Next: settle the field-level DECIMAL override and replacement/
+  timezone semantics, then add executable safety regressions and request one
+  independent review of the changed safety scope on its exact head.
+- Private policy preflight now requires a bounded, nonblank operator comment
+  for direct and unmatched-value preserve actions. The system's value-free
+  meaning/sensitivity hint remains separate; the operator comment is private,
+  omitted from review/error output, and exact comment bytes are snapshot/receipt
+  bound. Missing/blank comments reject before approval material. Fictional
+  policy/approval/receipt/mapping/CSV tests: 195 passed; changed-file Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. This strengthens a
+  private draft only; positive sensitivity evidence still blocks preservation
+  and no source-preserving execution is enabled. Next: sign/push this combined
+  draft update, require exact-head CI; defer renewed independent safety review
+  until the outstanding replacement/timezone/numeric policy findings have a
+  complete proposed resolution, avoiding review of every intermediate commit.
 - PR #552 merged normally as `d00eee2f0cdfb355c91f87dc1f3dfece8f4fe66d`
   after 37 green applicable checks and the owner-selected whole-export
   Parquet rejection contract. The dependent #564 branch now integrates that
@@ -1756,6 +1927,303 @@ Broader transformation remains unfinished.
   targeted mypy passed. This is not full finding-26 closure: public unknown
   representation, sensitivity and installed-RC replay remain. Next: agree a
   versioned unknown/measured contract before changing that public surface.
+- PR #564 exact DECIMAL head `09e05ae317991ddc96e278aa7bdf9239d4530344`
+  passed all applicable CI and merged through GitHub as
+  `f545d1ef40297893a30134ab30f95bc3fc46eca6` on 2026-09-25. Its
+  source-free numeric privacy guard is unchanged since the completed AI safety
+  review at `aed538a`; later integration added only an exact CSV companion
+  regression. This does not approve source preservation or private acceptance.
+  Draft #568 locally merged that mainline with both progress histories retained;
+  165 focused policy/approval/mapping/DECIMAL tests passed. Two new executable
+  negative tests confirm positive DECIMAL profile sensitivity still rejects
+  direct and unmatched fallback preservation. Next: inspect independent read-only
+  review of the proposed narrow exception, then amend AGENTS.md/baseline specs
+  only with explicit evidence provenance and tests. No preservation execution.
+- Independent read-only AI proposal review by Nash (“Boundary Sentinel”),
+  2026-09-25, pre-merge `cd38d44`, found that a DECIMAL field with a negative
+  profile flag could pass direct/fallback preserve, the schema fingerprint
+  omitted precision/scale, and current evidence lacks signal provenance.
+  The first two findings reproduced as four and two failing fictional tests,
+  respectively. Local draft now rejects DECIMAL preservation by default and
+  binds declared precision/scale into the private schema fingerprint; 169
+  focused policy/approval/mapping/DECIMAL tests, Ruff and diff check pass.
+  Reviewer made no writes or GitHub approval. Next: push integrated draft for
+  fresh CI, obtain exact-head safety review of this hardening, then design
+  typed evidence provenance before attempting the authorized policy exception.
+  AGENTS.md amendment and source-preserving execution remain disabled.
+- Exact-SHA independent read-only AI safety re-review by Nash (“Boundary
+  Sentinel”), 2026-09-25, of draft #568 `158b7287061cee5f3c31267215cd335ad111a658`
+  found no new changed-scope issue in the DECIMAL default deny or shape binding.
+  Reviewer ran 52 policy and 42 approval/snapshot tests and fictional forged/
+  mutated-profile probes; this is not full-PR or human approval. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/568#issuecomment-5831533019.
+  Residual High execution gate: structural policy checks cannot attest source
+  type against fixed source bytes. Prior P2 replacement/timezone findings also
+  remain open. GitHub CI on this exact head had 36 successes, four release-only
+  skips and one running at last check; do not merge or call it green yet.
+  Next: wait for exact-head CI without restarting it, design provenance-bound
+  classification and resolve prior P2 findings before enabling an exception.
+- Draft #568 exact head `158b7287061cee5f3c31267215cd335ad111a658`
+  completed 37 applicable CI checks successfully; four publication-only jobs
+  skipped. It remains draft. The two older P2 mapping findings were reproduced
+  with fictional inline/CSV/domain tests: distinct email-like replacement
+  literals and DATETIME strings denoting the same instant passed preflight.
+  Owner rejected treating replacement syntax alone as proof of source copying:
+  explicit mappings supply replacement literals; no brute-force inference is
+  intended. The proposed blanket email-like preflight ban was removed before
+  commit. Shared approval preflight now rejects equal offset-aware instants
+  before any receipt; no execution path was added. Distinct-sensitive-literal
+  P2 still needs disposition consistent with the no-real-PII guarantee.
+  Owner initially discussed a simple CSV value-replacement first execution
+  slice, still subject to explicit per-field decisions and the existing local
+  approval/source-snapshot boundary. Next: run affected mapping/CSV/receipt checks,
+  commit/push the timezone correction, get fresh CI and one independent changed-
+  scope safety review. AGENTS.md amendment and source-preserving execution
+  remain gated on typed evidence and executable end-to-end safety tests.
+- Owner rejected the proposed same-type-only CSV `replace` and then clarified
+  the intended primitive is an unconditional exact-text replacement table,
+  not a typed output-column conversion. `"001" -> "1"` writes literal `1`;
+  no FLOAT/DECIMAL parsing, guessed type, cascade or brute-force lookup is
+  part of the replacement operation. Whether the table applies globally to
+  every CSV cell or only selected columns is awaiting the owner's answer.
+  Unmatched-value preservation still requires the separate reviewed safety
+  boundary; do not implement or publish a same-type-only path as acceptance.
+- Owner further clarified that the input is a table of unconditional text
+  substitutions (`true -> false`), not a request for source/target types.
+  OpenSpec plan, policy contract and task list now describe literal one-pass
+  matching, no implicit coercion, and opt-in bounded local debug output of
+  row/column/rule ordinals and match status without values or hashes.
+  The owner subsequently chose both separate rules per column and file-wide
+  rules. Their conflict precedence is awaiting confirmation. This planning
+  update does not enable source-preserving execution. Next: bind the exact-text
+  matcher to explicit column decisions and shared trace on fictional fixtures
+  under the separately reviewed preservation boundary.
+- Added an internal, non-executing exact-text CSV replacement table compiler:
+  one left/right text pair per mapping row, duplicate-key and null-pair
+  rejection, one lookup returning replacement plus rule ordinal, and `None`
+  for unmatched input. It performs no source-row I/O, fallback copy, type
+  conversion, output publication or approval. Fictional `true -> false` and
+  `001 -> 1` tests: 41 CSV tests pass; Ruff and targeted mypy pass. Next:
+  bind each table to its declared scope, then share this matcher with a
+  bounded value-free local trace and reviewed CSV execution path.
+- Added internal scoped text matching over the compiled tables. A column rule
+  affects only its named column; a file-wide rule can match other columns.
+  A matching replacement is applied only once, so a replacement equal to a
+  different rule's source is not cascaded. Until the owner decides precedence,
+  overlap on one cell raises a fixed value-free conflict instead of silently
+  choosing a rule. The private match result hides replacement text in repr and
+  carries scope plus rule ordinal for future trace. Fictional CSV tests: 43
+  passed; Ruff, targeted mypy and diff check passed. A value-free event helper
+  now derives row/column ordinals, scope, rule ordinal and matched status from
+  the same match result, with no literal passed to the event constructor.
+  This is not yet a bounded CLI dry-run or source-row execution. Next: record
+  chosen precedence, add bounded CLI trace and reviewed CSV execution behind
+  the safety amendment.
+- Rechecked the local exact-text slice after the owner's explicit file-wide
+  requirement: file-wide and per-column lookup tests pass (43 CSV tests), Ruff,
+  targeted mypy and strict OpenSpec validation pass. No output path or source
+  preservation was enabled. Next: settle overlapping-scope precedence, then
+  implement a bounded value-free local trace using the same matcher.
+- Added a private bounded trace summary over the same value-free match events:
+  capped event list, total matched/unmatched cells, per-column/scope/rule counts,
+  explicit truncation and cell/rule-bucket limits. Forged metadata and limit
+  overflow fail with fixed messages. Forty-five focused CSV tests, Ruff and
+  targeted mypy pass. This is not a CLI dry-run or source-row execution.
+  Next: wire the local debug surface to a fixed approved snapshot after the
+  overlap precedence and preservation-policy gates are resolved.
+- Draft #568 `3b5cf28040cfb5bce8358de6f1272dee711b55e0` completed 37
+  applicable GitHub checks successfully (four release-only skips). The
+  subsequent signed trace-summary commit `8f606768653d428c5724210d2db572fc58dea33c`
+  was fast-forward pushed to the same draft; its own CI is pending. No AI
+  review was requested for this ordinary incremental commit. Next: inspect
+  exact-head CI, then continue local CLI debug integration only after the
+  matching and preservation contracts are settled.
+- Draft #568 `8f606768653d428c5724210d2db572fc58dea33c` completed 37
+  applicable GitHub checks successfully (four release-only skips). Focused
+  fictional regression confirms the existing local receipt boundary rejects
+  a relabelled numeric CSV profile even when policy fingerprint is recomputed
+  over the forged profile: `_canonical_request` reprofiles the same source
+  bytes and fails value-free. Eleven receipt tests and Ruff pass. This does not
+  prove source attestation on any future direct policy or execution route; the
+  unresolved review gate remains. Next: retain this regression, then specify
+  one canonical approval/execution entry that cannot bypass byte revalidation.
+- Draft #568 `3f81d7558238c00815ff1e8e435c0214e2e9dd84` completed 37
+  applicable GitHub checks successfully; four release-only jobs skipped.
+  Only this draft PR and three unrelated Dependabot PRs remain open. The
+  exact-text file/column overlap rule awaits the owner's decision; the
+  existing fail-closed conflict remains. Next: bind a future local review and
+  execution entrance to `_canonical_request`/fixed source bytes, then prove
+  that no direct policy path can bypass revalidation before enabling output.
+- Added a private CSV review-preparation entry that derives profile evidence
+  from the exact bounded source SnapshotPart it binds into the approval
+  request; callers of this entry cannot submit a relabelled profile. Existing
+  receipt issue/verification independently reprofile the same bytes. Fictional
+  same-source, wrong-source and changed-mapping tests pass with the receipt
+  tests (18 total),
+  Ruff and targeted mypy pass. No public CLI, receipt issuance or output path
+  was enabled by this entry. Next: connect a local read-only review command to
+  this entry, then test source/mapping mutation and value-free failure paths.
+- Added public `transform-review SOURCE.csv POLICY.yaml` as a read-only local
+  CLI entrance over that fixed-byte review preparation. It snapshots policy,
+  source and referenced local CSV mappings once, derives evidence from source
+  bytes, emits only the bounded field review and digest, and neither mints a
+  receipt nor publishes transformed rows. The installed CLI contract fixture,
+  command index and architecture map now label it review-only. Fictional CLI
+  success/failure and changed-mapping tests pass: 20 focused tests, Ruff,
+  targeted mypy, strict OpenSpec and strict MkDocs pass. Next: check the new
+  exact-head CI, run an isolated installed-wheel CLI smoke, then add the
+  local confirmation step only after the safety amendment and review.
+- Built the current source tree as a local wheel and installed it under a
+  separate import root, without network/dependencies. The installed package
+  resolved from that root; `transform-review --help` exited 0 and both
+  fictional installed-wheel CLI review tests passed. This is partial local
+  acceptance of the read-only command, not final RC or preservation acceptance.
+  Next: require exact-head CI for this public CLI addition, then review the
+  remaining approval/trace gates before enabling any output route.
+- Corrected the OpenSpec policy contract locally to name the read-only
+  `transform-review` behavior and separate it from private receipt helpers;
+  strict OpenSpec validation and diff check pass. This documentation delta
+  remains uncommitted while the public CLI head's CI is in progress. Next:
+  include it with the next substantive draft update after exact-head CI,
+  without restarting CI solely for this documentation correction.
+- Updated the packaged transformation skill's offline routing: an installed
+  `transform-review` is explicitly review-only, not evidence that approval or
+  execution exists. Skill frontmatter validation passed. The change remains
+  local alongside the policy-contract correction while exact-head CI for the
+  CLI commit runs. Next: check package inclusion and a fictional offline
+  agent-route after the reviewed execution surface exists; do not present
+  review-only capability as finished transformation.
+- Tightened the public read-only review loader's cumulative input budget:
+  each policy-referenced mapping now receives only the remaining bytes before
+  it is read, and the source snapshot receives the remainder. A fictional
+  policy+mapping+source one-byte-over-limit case fails with a fixed value-free
+  error. Ten focused source/CLI tests, Ruff and targeted mypy pass. This
+  changed scope is local while `d0c0880` CI completes. Next: verify exact-head
+  CI, then push this budget fix with the OpenSpec and skill correction.
+- The current source wheel contains both portable user skills. The updated
+  transformation `SKILL.md` in that wheel has the same SHA-256 as the repository
+  source (`00d411d1a4c9fc0af93e74a94702a9f66111d68e21875a89db7d4e47fb84f2b0`);
+  this is a packaging-byte check, not an independent agent-runtime acceptance.
+  Draft #568 `d0c0880f73b4b1c4e6e24b63f43736b5d1fd4437` completed 37
+  applicable GitHub checks successfully with four release-only skips. Next:
+  sign and push the bounded-loader/skill/OpenSpec correction, then require
+  fresh exact-head CI without an ordinary per-commit AI review.
+- Draft #568 `40322e84421cae73016021483ca0677a9df19b24` completed 37
+  applicable GitHub checks successfully with four release-only skips. The
+  cumulative-budget fix, OpenSpec review-only contract and packaged-skill
+  wording are now green on the exact pushed SHA. The PR remains draft because
+  transformation execution and the scoped safety-policy amendment/review are
+  unfinished. Next: settle global/column overlap precedence and complete the
+  safety-gated CSV execution path; do not merge solely on this read-only CI.
+- File-wide and per-column exact-text rules can now be applied together by a
+  private pure row primitive. It rejects every unmapped cell, overlapping
+  matches and exact identity pairs; it never falls back to source text, reads
+  files, writes output or issues approval. Forty-nine fictional CSV tests,
+  changed-file Ruff and targeted mypy pass. OpenSpec clarifies that both scopes
+  coexist. Signed commit `276c950` was fast-forward pushed to draft #568;
+  GitHub API PR state could not be refreshed because api.github.com was
+  unreachable. No release was attempted. Next: require exact-head CI, choose
+  overlap precedence, then bind bounded value-free local trace
+  and safety-reviewed execution; keep draft #568 gated.
+- Read-only row tracing now reuses the exact same file-wide/per-column matcher
+  as private row replacement. Events carry row/column/scope/rule ordinals and
+  match status only; unmatched cells remain visible as metadata but execution
+  still rejects them, and competing rules reject in both paths. Fifty focused
+  fictional CSV tests, Ruff and targeted mypy pass. No public trace, receipt,
+  output, or source preservation was enabled. Draft #568 `276c950` completed
+  37 applicable GitHub checks successfully with four release-only skips.
+  Signed trace commit `cc1509534827086b9f780ed12b2f258d705c0232` was
+  fast-forward pushed to draft #568. Fresh exact-head CI is pending; no
+  ordinary per-commit AI review was requested. Only #568 and three unrelated
+  Dependabot PRs are open. Next: require this SHA's CI, then continue
+  fixed-snapshot CLI trace and policy amendment.
+- Draft #568 `cc1509534827086b9f780ed12b2f258d705c0232` completed 37
+  applicable GitHub checks successfully with four release-only skips. Added
+  private `replace_text` field decisions with optional per-column CSV table
+  and one optional file-wide table, limited to a single-entity CSV policy.
+  The local review loader snapshots both referenced files, approval preflight
+  compiles exact-text rules, rejects identity and overlapping keys before a
+  receipt, and the value-free review shows only which scopes are configured.
+  Existing typed `substitute` remains separate. One hundred fifty-seven
+  focused fictional tests, changed-file Ruff/mypy, strict OpenSpec and diff
+  check pass. No source output, receipt issuance, preservation activation or
+  public execution path was added. Signed commit `b01c2fd` was fast-forward
+  pushed to draft #568. Next: require exact-head CI, then complete the safety
+  amendment with executable tests and independent review before
+  fixed-snapshot local CLI trace/execution.
+- Independent AI safety reviewer Raman (`01a0d8a5-3f93-7f80-9a6b-52bc41dc3c4c`,
+  report self-label "Sentinel") reviewed exact `b01c2fd2b48d8985697135b743a65c191179e447`
+  on 2026-09-25 UTC, read-only. One Medium future-execution gate remains:
+  sensitive `A→B, B→A` can emit a different source value; no current public
+  output path exists. Reviewer ran 98 focused tests and diff check. Identity,
+  scope overlap and snapshot reference checks had no other confirmed finding.
+  Full scope, disposition and evidence:
+  [AI safety review](reviews/b01c2fd-ai-safety.md). Do not treat as human
+  approval. Next: bound sensitive-value reuse to the fixed source snapshot
+  before output, with executable tests and changed-scope independent review.
+- Added a public CLI regression on fictional CSV for both text-rule scopes:
+  `transform-review` reports only scope flags/digest, rejects overlapping
+  rules, emits no mapping literals or receipt. Three focused CLI tests and
+  Ruff pass; strict MkDocs build passes after updating the CLI reference.
+  Signed evidence/test commit `3aec952` was fast-forward pushed to draft #568;
+  its exact-head CI completed 37 applicable checks successfully with four
+  release-only skips. No normal-PR AI review was requested.
+- Local changed-scope follow-up to Raman's finding: CSV profiling and local
+  review now share the exact fixed-byte decoder/dialect. For sensitive or
+  unknown fields (including positive profile evidence), review and receipt
+  canonicalization compare only reachable replacement literals against
+  original values in sensitive/unknown columns of the same snapshot, without
+  retaining raw source values in artifacts. Explicitly reviewed non-sensitive
+  `A→B, B→A` remains allowed; an unreachable rule does not spuriously block.
+  Fictional same-column, cross-sensitive-column, semicolon CSV, unknown and
+  detected-positive regressions pass: 49 focused source/receipt/profiler/CLI
+  tests, Ruff and targeted mypy pass. This is not an execution license or
+  full output privacy validation. Next: verify exact-head CI for `3aec952`,
+  sign/push the follow-up, repeat independent AI review on the changed safety
+  scope, and retain the AGENTS.md amendment/executable output gates.
+- `3aec952` completed 37 applicable CI checks successfully with four
+  release-only skips. Signed safety follow-up
+  `4672f7a2760b9a1e50b92dbf0210f2e976657fc3` was fast-forward pushed to
+  draft #568. Raman, the original independent read-only AI reviewer, was
+  resumed for changed-scope re-review of this exact SHA; do not duplicate it.
+  Fresh CI and review are pending. Next: disposition the review finding, then
+  continue explicit safety-policy amendment and full output-path tests before
+  any source-preserving execution.
+- Raman's independent changed-scope AI re-review on exact `4672f7a2760b9a1e50b92dbf0210f2e976657fc3`
+  (2026-09-25 UTC) closed the sensitive `A→B, B→A` finding at local review
+  and receipt canonicalization; no new safety bypass found. A low-severity
+  fail-closed compatibility issue remained: padded CSV headers were normalized
+  in profiling but not assigned to the guard reader. Evidence and scope:
+  [AI safety re-review](reviews/4672f7a-ai-safety.md). This is AI evidence,
+  not human approval or permission to execute.
+- Local follow-up assigns the same normalized header names on both guard
+  passes; fictional ` status ` regression now succeeds without weakening the
+  sensitive source-value check. Fifty affected source/receipt/profiler/CLI
+  tests, Ruff and targeted mypy pass. `4672f7a` completed 37 applicable CI
+  checks successfully with four release-only skips. Next: sign/push this
+  compatibility fix and request narrow changed-scope AI
+  confirmation, then tackle the AGENTS.md/baseline safety amendment.
+- Signed padded-header fix `081a63035f1f28999eea88de87c99ad3758f7fbb`
+  was fast-forward pushed to draft #568. Fresh exact-head CI is pending;
+  Raman was resumed for narrow read-only AI confirmation on this SHA, no
+  duplicate reviewer. No source-preserving execution or stable release.
+  Next: record CI/review disposition, then implement the separately required
+  AGENTS.md/baseline safety amendment with executable end-to-end tests.
+- Raman's read-only AI confirmation on exact `081a63035f1f28999eea88de87c99ad3758f7fbb`
+  (2026-09-25 UTC) found no new issue in the padded-header delta. Nine focused
+  tests and independent fictional probes covered allowed/blocked cases at
+  local review and receipt; prior compatibility finding is closed and
+  sensitive reuse remains blocked. Evidence:
+  [AI safety confirmation](reviews/081a630-ai-safety.md). Not human approval;
+  source-preserving execution remains off. Exact-head `081a630` CI completed
+  37 applicable checks successfully with four release-only skips. Next: explicit
+  safety-policy amendment and end-to-end execution tests.
+- OpenSpec delta now specifies the separate exact-text `replace_text` action,
+  file-wide plus per-column coexistence, one-pass/no-copy behavior, value-free
+  trace and sensitive fixed-snapshot reuse rejection. Strict OpenSpec and diff
+  checks pass. This is a requirement update, not an AGENTS.md exception or
+  public execution path. Next: carry it with the AI review evidence, then
+  complete the safety amendment and executable end-to-end implementation.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
@@ -1774,3 +2242,67 @@ Broader transformation remains unfinished.
   checks passed. Next: submit this test/documentation delta to the same draft
   PR; retain the numeric-content
   choice and safety review gates. No private data or final RC acceptance.
+- The owner reconfirmed that exact-text replacement needs a file-wide table
+  **as well as** per-column tables in the same CSV run. This is already in
+  the OpenSpec and the private row matcher; it is not yet a public execution
+  path. The current contract applies the file-wide table to columns explicitly
+  assigned `replace_text`, never silently overriding another field action.
+  File/column key overlap still fails closed pending a precedence decision.
+- At this local check, gated AGENTS.md and baseline generation-spec amendments
+  were uncommitted and inactive (they were subsequently committed as
+  `ee8ea0c`). A new negative CLI regression confirms normal
+  `generate` rejects transformation-policy/receipt flags (2 focused tests
+  passed); changed-file Ruff, strict OpenSpec and diff check pass. This is
+  partial source-free evidence, not the required end-to-end execution safety
+  suite. Next: finish that suite and obtain independent safety review of the
+  exact policy-amendment SHA before enabling any source-preserving output.
+- The existing fictional CLI golden path still generates disjoint synthetic
+  rows and a source-free manifest (1 focused test passed). One generator-MCP
+  workflow test passed; its transport validation companion skipped because
+  optional FastMCP is unavailable in this local environment. These checks
+  establish only unchanged default behavior, not transformation execution.
+  The inactive AGENTS.md/baseline guard was then signed as `ee8ea0c` and
+  sent for narrow independent AI safety review; executable end-to-end
+  transformation gates remain open.
+- Signed inactive safety-boundary commit `ee8ea0c7388b9db00e9a8e91f88fd801b3db7e5b`
+  was pushed to draft PR #568; its 37 applicable GitHub checks succeeded
+  (four release-only skips). Raman was resumed for a narrow read-only AI
+  safety-policy review on that exact SHA; do not duplicate. No execution
+  permission follows from this commit or its CI.
+- Added opt-in `transform-review --trace` against the same fixed reviewed
+  snapshot: up to 50 value-free events and 10,000 replacement cells; rows,
+  columns, scopes and rule ordinals only. It reuses the private one-pass matcher,
+  fails closed on overflow and does not issue a receipt or write output.
+  Seventy-three focused fictional source/CSV/CLI tests, changed-file Ruff and
+  mypy, strict MkDocs, strict OpenSpec and diff check passed locally. Next:
+  commit/push this read-only trace slice, require its exact-head CI, disposition
+  the pending safety review, then continue separately gated CSV execution.
+- Raman/Sentinel completed independent read-only AI safety-policy review of
+  exact `ee8ea0c7388b9db00e9a8e91f88fd801b3db7e5b` on 2026-09-25 UTC:
+  no safety finding in the narrow AGENTS.md/baseline/negative-test scope.
+  One low documentation-accuracy finding (stale progress wording) is corrected
+  in the next change. Two narrow CLI tests and committed diff check passed.
+  [Review evidence](reviews/ee8ea0c-ai-safety.md). This is AI, not human
+  approval, and it does not authorize source-preserving execution. The
+  read-only trace was separately signed/pushed as `ec0eacc`; require its
+  exact-head CI before merging the draft PR.
+- Attempted next private replace-only CSV output engine after the inactive
+  policy amendment. Workspace auto-review rejected the edit because it would
+  return source-derived CSV before executable end-to-end safety tests and an
+  independent review of that execution path. No engine file was created and
+  no public execution command was enabled; do not retry through another path.
+  PR #568 `ec0eacc` had three checks running at this observation; they later
+  completed with 37 applicable successes and four release-only skips. The
+  heartbeat automation is already PAUSED. Next: record CI and AI evidence,
+  then obtain explicit permission for a test-first, private execution slice
+  before any output-capable implementation. Continue independent read-only
+  work meanwhile.
+- Read-only trace accepted a forged in-memory `ApprovalRequest` whose source
+  bytes changed after review; a fictional regression reproduced the bypass
+  before the fix. Trace now re-runs the existing fixed-snapshot review and
+  rejects any noncanonical source, mapping, policy, evidence or review bytes
+  before counting matches. A second regression covers altered mapping bytes.
+  Thirty-four focused source/CLI/receipt tests, changed-file Ruff/mypy and
+  diff check pass. No output engine or approval issuance was added. Next:
+  sign/push this trace hardening to draft #568, require exact-head CI, and
+  continue test-first execution only after the pending approval decision.

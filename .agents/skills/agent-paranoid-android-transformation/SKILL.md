@@ -11,6 +11,9 @@ Check the installed CLI help or MCP tool list for an explicit transformation
 interface. If none exists, say it is unavailable in this installation; do
 not approximate it with `generate`, a custom script, or unrestricted SQL.
 This skill works offline and does not activate a proposed feature.
+If `transform-review` is installed, it can display a value-free local review
+and snapshot digest only. Its presence does not imply approval or an executable
+transformation command; check those capabilities separately before proceeding.
 
 When an explicit interface is available:
 

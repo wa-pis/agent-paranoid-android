@@ -9,8 +9,7 @@ from test_data_agent.io.mapping_loader import load_csv_mapping
 
 
 def load(root, kind, **overrides):
-    options = dict(data_types=(kind,), nullable=(False,), encoding="utf-8",
-                   delimiter=",", null_token=None, max_bytes=1000, max_rows=10,
+    options = dict(data_types=(kind,), nullable=(False,), max_bytes=1000, max_rows=10,
                    max_cells=20, max_columns=2, max_cell_chars=100, budget=GenerationBudget())
     options.update(overrides)
     return load_csv_mapping(root, CsvMapping(kind="csv", path="map.csv",

@@ -71,6 +71,13 @@ All items below remain unverified until reproduced against the current candidate
   keep external script/API execution an unapproved future TODO.
 
 - [ ] Implement bounded local CSV transformation with explicit field actions.
+- [ ] Make the first CSV replacement primitive unconditional exact-text
+  file-wide and per-column lookup tables (`true -> false`, `001 -> 1`) with
+  one-pass matching, duplicate-key rejection and no type inference. Resolve
+  competing-scope precedence explicitly. Keep preservation/unknown-value gates.
+  Add opt-in bounded local dry-run/trace with row, column, scope, rule ordinal and
+  status, plus counts, but no literals or value hashes; test trace/execution
+  consistency and value-free errors on fictional data.
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.
@@ -85,6 +92,9 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement consistent key mapping and declared derived-value computation.
 - [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
   one-pass semantics, collision checks and restricted local mapping handling.
+- [ ] Reject source-value retention disguised as substitution across inline,
+  local CSV and shared-domain mappings before approval/execution; cover typed
+  identity, null and composite entries with value-free failures.
 - [ ] Expose substitution as a specification-level action separate from synthesis;
   test saved wizard-policy parity with noninteractive CLI and Python execution.
 - [ ] Expose substitution, mapping references and unmatched-value handling in
@@ -92,6 +102,13 @@ All items below remain unverified until reproduced against the current candidate
   round trips, conflict rejection and separation from observed evidence.
 - [ ] Add a profile-review wizard that saves explicit field decisions; bulk
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
+- [ ] Add a bounded, value-free system comment for each reviewed field: likely
+  data meaning, sensitivity rationale and uncertainty from safe profile
+  evidence. Display it with the suggestion and explicit operator decision in
+  the wizard and local CLI; never turn default `sensitive=false` into automatic
+  preservation. Save and bind the exact reviewed comment/evidence to approval;
+  test unknown/conflicting cases, redaction, stale snapshots and save/load
+  parity with the noninteractive policy.
 - [ ] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
 - [ ] Implement the approved “Сохранено исходных значений: X%” transformation

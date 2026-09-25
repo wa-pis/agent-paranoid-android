@@ -46,11 +46,15 @@ class CsvMapping(_PrivateModel):
     path: StrictStr = Field(min_length=1, repr=False)
     source_columns: tuple[StrictStr, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     replacement_columns: tuple[StrictStr, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    encoding: Literal["utf-8", "utf-8-sig"] = Field(default="utf-8", repr=False)
+    delimiter: Literal[",", ";", "\t", "|"] = Field(default=",", repr=False)
+    null_token: StrictStr | None = Field(default=None, min_length=1, repr=False)
 
 
 class DomainMapping(_PrivateModel):
     kind: Literal["domain"]
     name: StrictStr = Field(min_length=1, repr=False)
+    component: StrictInt | None = Field(default=None, ge=0, lt=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
 
 
 MappingSource: TypeAlias = Annotated[InlineMapping | CsvMapping | DomainMapping, Field(discriminator="kind")]

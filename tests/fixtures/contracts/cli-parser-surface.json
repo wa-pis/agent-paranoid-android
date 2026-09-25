@@ -21,6 +21,7 @@
     "profile-example",
     "infer-spec",
     "profile-csv",
+    "transform-review",
     "profile-postgres",
     "profile-query",
     "generate-from-csv",

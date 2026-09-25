@@ -10,6 +10,8 @@ import pytest
 import yaml
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
+from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_approval import prepare_approval_request
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
@@ -22,9 +24,9 @@ from test_data_agent.io.transformation_receipt import (
 
 
 def request(*, source: bytes = b"code\nfictional-a\n", authorization_ref: str = "fictional-ref",
-            mapping: bytes | None = None):
+            mapping: bytes | None = None, comment: str = "Reviewed fictional business code"):
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(source, "items", budget=GenerationBudget(5)))
-    behavior = {"action": "preserve", "authorization_ref": authorization_ref}
+    behavior = {"action": "preserve", "authorization_ref": authorization_ref, "comment": comment}
     parts = [SnapshotPart("source", "items", source)]
     if mapping is not None:
         behavior = {"action": "substitute", "mapping": {"kind": "csv", "path": "code-map.csv",
@@ -69,6 +71,26 @@ def test_receipt_boundary_rejects_source_conflicting_with_reviewed_evidence():
         _canonical_request(forged, max_total_bytes=8192, max_review_bytes=4096,
                            budget=GenerationBudget(5))
     assert "private@example.test" not in str(error.value)
+
+
+def test_receipt_rejects_relabelled_numeric_profile_on_same_source_bytes():
+    prepared = request(source=b"code\n123.45\n456.78\n")
+    source = next(part for part in prepared.parts if part.kind == "source")
+    evidence = DatasetProfile.model_validate_json(
+        next(part.payload for part in prepared.parts if part.kind == "evidence")
+    )
+    assert evidence.entities[0].fields[0].data_type == FieldType.FLOAT
+    evidence.entities[0].fields[0].data_type = FieldType.STRING
+    policy = yaml.safe_load(next(part.payload for part in prepared.parts if part.kind == "policy"))
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(evidence)
+    forged = prepare_approval_request(
+        yaml.safe_dump(policy).encode(), evidence.model_dump_json().encode(), (source,),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    with pytest.raises(ValueError) as error:
+        _canonical_request(forged, max_total_bytes=8192, max_review_bytes=4096,
+                           budget=GenerationBudget(5))
+    assert "123.45" not in str(error.value)
 
 
 def test_local_tty_issues_owner_only_receipt_and_stale_bytes_fail(tmp_path):
@@ -141,6 +163,24 @@ def test_receipt_does_not_authorize_changed_policy(tmp_path):
     assert verify(approved, path) == approved.parts
 
 
+def test_receipt_binds_private_preservation_comment_without_displaying_it(tmp_path):
+    approved = request(comment="Reviewed fictional business code")
+    changed = request(comment="Different fictional business rationale")
+    assert b"Reviewed fictional business code" not in approved.review
+    assert approved.snapshot_sha256 != changed.snapshot_sha256
+    path = tmp_path / "approval.json"
+    master, slave = pty.openpty()
+    try:
+        os.write(master, b"APPROVE\n")
+        _issue_to_tty_fd(approved, path, slave, GenerationBudget(5))
+    finally:
+        os.close(master)
+        os.close(slave)
+    assert verify(approved, path) == approved.parts
+    with pytest.raises(LocalReceiptError):
+        verify(changed, path)
+
+
 def test_receipt_binds_mapping_and_evidence_exact_bytes(tmp_path):
     approved = request(mapping=b"original,replacement\nfictional-a,synthetic-one\n")
     path = tmp_path / "approval.json"
@@ -153,7 +193,7 @@ def test_receipt_binds_mapping_and_evidence_exact_bytes(tmp_path):
         os.close(slave)
     assert verify(approved, path) == approved.parts
 
-    changed_map = request(mapping=b"original,replacement\nfictional-a,synthetic-one\n\n")
+    changed_map = request(mapping=b"original,replacement\nfictional-a,synthetic-two\n")
     policy = next(part.payload for part in approved.parts if part.kind == "policy")
     evidence = next(part.payload for part in approved.parts if part.kind == "evidence")
     same_evidence_new_bytes = json.dumps(json.loads(evidence), indent=2).encode()

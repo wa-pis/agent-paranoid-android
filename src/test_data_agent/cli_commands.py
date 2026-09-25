@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import json
 from collections.abc import Callable
+from dataclasses import asdict
 from typing import Any, Protocol
 
 from test_data_agent.audit import verify_audit_log_from_env
@@ -17,6 +19,9 @@ from test_data_agent.cli_presenter import (
     write_validation_result,
 )
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import (
+    DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, DEFAULT_MAX_TOTAL_INPUT_BYTES, GenerationBudget,
+)
 from test_data_agent.demo import run_demo
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
@@ -34,6 +39,9 @@ from test_data_agent.io import (
     write_generation_summary,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
+from test_data_agent.io.transformation_source import (
+    prepare_csv_review_from_paths, trace_csv_review_request,
+)
 
 BusinessRulesApplier = Callable[
     [dict[str, list[dict[str, Any]]], argparse.Namespace, int, DatasetSpec | None],
@@ -88,6 +96,26 @@ def run_dataset_command(
 
     if args.command == "profile-csv":
         return profile_csv_command(args)
+
+    if args.command == "transform-review":
+        request = prepare_csv_review_from_paths(
+            args.source, args.table or args.source.stem,
+            args.policy.parent.absolute(), args.policy.name,
+            max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+            max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+            budget=GenerationBudget(),
+        )
+        result = {"status": "review_only", "snapshot_sha256": request.snapshot_sha256,
+                  "review": json.loads(request.review)}
+        if args.trace:
+            result["trace"] = asdict(trace_csv_review_request(
+                request, max_events=50, max_cells=10_000,
+                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+                budget=GenerationBudget(),
+            ))
+        print(json.dumps(result, ensure_ascii=True, indent=2))
+        return 0
 
     if args.command == "profile-postgres":
         driver = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(

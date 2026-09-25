@@ -1,7 +1,7 @@
 # Behavior Policy Contract — Review Draft
 
-Internal design for implementation; not a supported CLI/API or permission to
-execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
+Internal execution design with a read-only local CLI review step; not permission
+to execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
 schemas and source-free generation remain unchanged.
 
 ## Separate Evidence And Decisions
@@ -11,6 +11,28 @@ contains one explicit decision per `(entity, field)`. Profiling observations
 remain evidence, not mutable declarations of permission. Duplicate decisions,
 unknown fields, missing fields and schema drift fail preflight. Postponed wizard
 decisions are incomplete and cannot produce an executable specification.
+Each field's review evidence includes a bounded system comment describing its
+likely data meaning and the basis/uncertainty of the sensitivity suggestion.
+The comment is value-free and advisory; it cannot supply a missing user
+decision. In particular, a profile's default `sensitive=false` is not a
+reviewed non-sensitive declaration or preservation authority. Only a person's
+explicit per-field `sensitive=false` decision records non-sensitive status;
+absence of a finding remains unknown. Positive evidence or a conflicting
+classification still blocks preservation rather than being silently overridden.
+Every direct or unmatched-value preserve action also requires a separate,
+bounded operator comment explaining the requested retention. This private
+comment is not an authorization reference and is never copied into the
+value-free review, logs or transport errors. Exact policy bytes, including
+the comment, are bound to the approval snapshot; changing it invalidates the
+receipt. A comment alone cannot override positive sensitivity evidence or
+enable execution. The displayed system comment and final sensitivity decision
+are bound with classification evidence
+to the local approval snapshot; changes require renewed review.
+The private value-free review renders a positive metadata/profile signal as
+`observed_sensitivity=sensitive` and no positive signal as `unknown`, never as
+observed non-sensitive. Its comment uses fixed phrases derived from bounded
+metadata; arbitrary semantic labels and source values are not echoed. This
+review projection does not yet create the versioned behavior profile or wizard.
 
 The shared core parses and validates decisions without reading a source, opening
 a mapping file, executing a formula or generating data. CLI, wizard and agent
@@ -23,9 +45,10 @@ Use a discriminated union rather than a bag of optional, ignored settings:
 
 | Action | Required configuration | Reject |
 | --- | --- | --- |
-| preserve | Explicit user authorization and non-sensitive declaration | Mapping, generator or formula settings; unresolved sensitivity conflict |
+| preserve | Explicit user authorization, non-sensitive declaration and bounded operator comment | Mapping, generator or formula settings; unresolved sensitivity conflict |
 | synthesize | Reviewed generation policy reference | Preservation or mapping settings |
 | substitute | Exactly one inline mapping, local CSV reference or named domain reference; unmatched policy | Generator settings unless unmatched synthesis is explicitly configured |
+| replace_text | A file-wide exact-text CSV table and/or a field-scoped exact-text CSV table; unmatched policy defaults to reject | No table, inline/domain mapping, implicit type conversion or copying unmatched cells |
 | derive | Supported formula and declared dependencies | Mapping or preservation settings |
 | drop | No execution settings | Mapping, formula or generator settings |
 
@@ -43,6 +66,45 @@ references name source/replacement columns and use the field's declared type.
 Both inputs normalize through one type-aware validator. Duplicate source keys
 are rejected, including duplicates with identical replacements; ambiguous
 configuration is not resolved by first/last-wins ordering.
+
+The first executable CSV replacement primitive is a separate exact-text table:
+each decoded source CSV cell is matched to a literal left-hand cell and, on a
+match, replaced with the literal right-hand cell. `true -> false` and
+`001 -> 1` mean text substitution, not Boolean or numeric conversion. No
+trim, case fold, type inference, cascade or brute-force lookup is involved.
+Duplicate left-hand strings reject. This primitive does not by itself grant
+permission to retain unmatched source values; reviewed per-field actions and
+the local approval/snapshot boundary still apply. The owner requires both
+file-wide and per-column tables. The private policy declares one optional
+file-wide CSV table plus an optional CSV table on each `replace_text` field
+decision; at least one must apply to every such decision. A file-wide table is
+valid only for a single-entity CSV policy, so it cannot silently span multiple
+files. A column-scoped rule
+applies only to its declared column; a file-wide rule applies to every
+`replace_text` column in that file, not to columns with other actions. Both
+levels remain subject to field decisions and sensitivity/preservation gates.
+The precedence when both levels match the same cell is awaiting an explicit
+owner decision. The internal draft matcher rejects such overlap until that
+decision; private approval-material preflight rejects overlapping keys for a
+field before any receipt. The value-free review reports whether file and
+column rules are configured, without showing their literals. No cascade or
+implicit two-step replacement is permitted.
+For a field declared sensitive or unknown, or with positive sensitivity
+evidence, local CSV review and receipt verification check only replacements
+reachable from the fixed source bytes. A reachable right-hand literal must
+not equal an original value in any sensitive/unknown column of that same
+snapshot. This comparison uses the same CSV decoding/dialect as profiling,
+does not persist raw source values, and fails with a value-free error. An
+explicitly reviewed non-sensitive column is not blanket-banned from ordinary
+text substitutions, though execution still needs its separate safety gate.
+
+Debugging is local and opt-in. A bounded dry-run/trace may report source row
+ordinal, column ordinal, rule scope (file or column), mapping-rule ordinal
+and matched/unmatched outcome,
+plus per-rule counts. It must not include source/replacement literals, hashes
+of them, raw row fragments or unbounded event output; default agent/MCP
+summaries remain aggregate and value-free. Trace generation and ordinary
+execution must share the same matching code and fixed input snapshot.
 
 Null is distinct from empty string. Exact decimal values are text plus declared
 precision/scale; never parse them through binary float. Dates and timestamps are
@@ -74,6 +136,17 @@ Reject conflicting domain definitions, incompatible membership/types, ambiguous
 tuple ordering and uniqueness-breaking mappings before execution. Domain state
 is local, bounded and private; independent runs share it only by explicit policy.
 
+In the private draft preflight, each field's domain reference carries an
+explicit zero-based `component` for a composite key. Every entity using that
+domain must bind exactly one field to every component in the mapping tuple;
+missing, duplicate or out-of-range positions fail. Scalar domains may omit
+the component. Field types must agree across entities sharing a domain, and
+every component is typed against its own field before approval material is
+prepared. The value-free review shows an opaque domain ordinal and component
+position, never private domain names or mapping entries. This establishes only
+ordered field binding; relationship execution and full composite-key
+validation remain pending.
+
 ## Replacement Semantics
 
 The Financial Values And Dependencies section of design.md is normative for
@@ -81,6 +154,9 @@ synthesis and unmatched-value synthesis fallback: declared magnitude/range,
 sign, null, zero, precision/scale, rounding and overflow rules must all apply.
 Binary float conversion cannot establish exact financial precision. Prohibited
 replacement values remain prohibited in inline, CSV and synthesized outputs.
+For canonical offset-aware DATETIME mapping values, different text denoting the
+same instant is also an identity replacement and is rejected. This does not
+convert timezones or define the execution timezone policy.
 Non-null synthesized values must differ from originals except the approved zero
 and declared-rounding coincidences; those exceptions never skip generation or
 authorize wholesale copying. Derived totals must be recomputed and validated.
@@ -192,9 +268,14 @@ generation-policy references before binding source bytes. The separate local
 receipt helper opens `/dev/tty`, requires a fresh `APPROVE` line, writes only
 the identity to an owner-only atomic file, and verifies it against the same
 in-memory snapshots. A caller-supplied authorization reference alone never
-creates a receipt. These helpers are not a public CLI command or execution
-grant: source snapshot loading/reprofiling, complete semantic checks, the
-scoped safety amendment and end-to-end no-reopen execution still remain.
+creates a receipt. The public `transform-review SOURCE.csv POLICY.yaml` CLI
+uses a fixed bounded CSV snapshot, derives classification evidence from those
+same bytes, and includes referenced local mapping/generation-policy bytes
+resolved relative to the policy file. It emits only the value-free field review
+and snapshot digest; `--json` uses the normal versioned CLI envelope. It never
+mints a receipt, writes transformed rows or treats a valid review as approval.
+The receipt helpers remain private; complete semantic checks, the scoped
+safety amendment and end-to-end no-reopen execution still remain.
 
 `validate_inline_mapping_shape` checks a caller-declared tuple width and rejects
 exact duplicate source tuples, including repeated nulls. Scalar kind participates

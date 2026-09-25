@@ -30,6 +30,15 @@ heuristic output, arbitrary authorization-reference strings and bulk acceptance
 cannot grant or expand this authority. Sensitive fields require replacement or
 exclusion; merely relabeling them does not declassify them.
 
+DECIMAL preservation is blocked by default, including an unmatched-value
+preserve fallback, even when the profile has no positive sensitivity flag.
+The proposed narrow human exception is not active: current profile evidence
+does not identify whether a positive numeric signal came solely from a
+false-positive shape or from card/phone/semantic evidence. No exception may
+be enabled until that provenance is typed, snapshot-bound, tested and
+independently reviewed. Source-free DECIMAL generation keeps its existing
+privacy checks.
+
 The execution boundary must verify approval of the exact reviewed plan and
 fixed input snapshots. No current internal model implements that transport;
 the selection below is not permission to trust a boolean or opaque reference.

@@ -103,6 +103,45 @@ remain outside logs, reports, external providers and default MCP responses.
 - **WHEN** transformation is validated
 - **THEN** publication fails without exposing the original/replacement values.
 
+#### Scenario: Substitution cannot disguise preservation
+
+- **GIVEN** an inline, local CSV, or shared-domain mapping whose replacement
+  would retain a non-null original value in a field
+- **WHEN** the exact mapping and policy are validated before approval or execution
+- **THEN** validation rejects the mapping without reporting either value;
+  naming the action `substitute` does not grant preservation authority, even
+  for a field otherwise eligible for explicit preservation.
+
+### Requirement: Exact-text CSV replacement scopes
+
+The separate `replace_text` action SHALL support an exact-text CSV table for
+the whole single-file policy and optional tables for individual columns at
+the same time. Matching SHALL use original decoded cell text once, without
+type inference, coercion, trimming or cascade. File-wide rules SHALL apply
+only to fields explicitly assigned `replace_text`, not override other field
+actions. An unmapped cell SHALL fail unless a separately authorized fallback
+is declared. Overlapping file/column keys SHALL fail until an explicit
+precedence policy is approved. Local trace SHALL be bounded and value-free.
+
+#### Scenario: Combined global and column rules
+
+- **GIVEN** a file-wide `true → false` rule and a distinct column-scoped
+  `001 → 1` rule on a fictional CSV
+- **WHEN** a reviewed transformation is evaluated
+- **THEN** both scopes are considered in one pass over original cell text,
+  unchanged input is not silently copied and no replacement is cascaded.
+- **AND** local debugging reports only row/column/scope/rule ordinals, match
+  status and bounded counts, never either literal or its hash.
+
+#### Scenario: Sensitive source-value reuse
+
+- **GIVEN** a sensitive field and a reachable replacement equal to an original
+  value in a sensitive or unresolved field of the same fixed CSV snapshot
+- **WHEN** local review or receipt verification runs
+- **THEN** the plan is rejected with a value-free error before any output.
+- **AND** a distinct explicitly reviewed non-sensitive field is not blocked
+  merely because its ordinary mapping values also occur in the source.
+
 ### Requirement: Behavior profile retains substitution decisions
 
 The editable data behavior profile SHALL support explicit per-field substitution,
@@ -201,10 +240,24 @@ tests before this proposed exception can become operational.
 
 ### Requirement: Exhaustive field policy and sensitivity
 
-Every input field SHALL have an explicit preserve, synthesize, substitute, derive or drop
+Every input field SHALL have an explicit preserve, synthesize, substitute,
+replace_text, derive or drop
 action. Preservation SHALL require explicit authorization for non-sensitive
 reference data. User sensitivity declarations SHALL be authoritative additions
-to protection, not optional hints. AI SHALL NOT authorize declassification.
+to protection, not optional hints. `sensitive: false` SHALL mean an explicit
+per-column human non-sensitive decision, never an automatic interpretation of
+no detector finding or a default profile value. Missing or uncertain evidence
+remains unknown; positive sensitivity evidence or a conflict fails closed for
+preservation. AI SHALL NOT authorize declassification. Even an explicit
+non-sensitive decision does not itself authorize preservation: the exact plan
+and preserved columns still require separate local interactive confirmation.
+
+#### Scenario: No sensitivity finding is not a non-sensitive decision
+
+- **GIVEN** a field with no positive detector finding or a profile default of
+  `sensitive: false`, but no explicit human decision for that field
+- **WHEN** preservation is requested
+- **THEN** preflight rejects it as unresolved without exposing source values.
 
 #### Scenario: New or sensitive column
 

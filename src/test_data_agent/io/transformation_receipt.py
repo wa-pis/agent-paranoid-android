@@ -12,7 +12,7 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.path_policy import atomic_write_bytes, open_regular_file
-from test_data_agent.io.transformation_source import revalidate_csv_evidence
+from test_data_agent.io.transformation_source import reject_sensitive_text_reuse, revalidate_csv_evidence
 
 
 class LocalReceiptError(ValueError):
@@ -34,7 +34,8 @@ def _canonical_request(
     sources = [part for part in canonical.parts if part.kind == "source"]
     if len(sources) != 1:
         raise ValueError
-    revalidate_csv_evidence(sources[0], evidence, budget=budget, max_bytes=max_total_bytes)
+    profile = revalidate_csv_evidence(sources[0], evidence, budget=budget, max_bytes=max_total_bytes)
+    reject_sensitive_text_reuse(policy, profile, sources[0], external, budget=budget)
     return canonical
 
 
