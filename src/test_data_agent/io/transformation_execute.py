@@ -26,7 +26,7 @@ from test_data_agent.core.transformation_csv import (
     normalize_csv_scalar, parse_csv_mapping_bytes,
     summarize_text_trace, text_trace_event, TextTraceEvent, TextTraceSummary,
 )
-from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
+from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping, validate_inline_scalar_mapping
 from test_data_agent.core.transformation_policy import (
     DeriveAction, DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction, SynthesizeAction,
 )
@@ -144,8 +144,6 @@ def replace_csv_snapshot(
         generation_bytes = {part.name: part.payload for part in canonical.parts if part.kind == "generation_policy"}
         for decision in policy.fields:
             action = decision.behavior
-            if decision.field in decimal_types and isinstance(action, SubstituteAction):
-                raise ValueError  # Typed mappings need declared-schema binding too.
             if decision.entity != source.name:
                 raise ValueError
             if isinstance(action, DropAction):
@@ -189,7 +187,7 @@ def replace_csv_snapshot(
             if isinstance(action, SynthesizeAction):
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE) or not isinstance(
+                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
@@ -204,14 +202,20 @@ def replace_csv_snapshot(
                         and isinstance(item.behavior.mapping, DomainMapping)
                         and item.behavior.mapping.name == declaration.name)
                     source_columns = tuple(name for _, name in members)
-                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE) for name in source_columns):
+                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL) for name in source_columns):
                         raise ValueError
                     declaration = domains[declaration.name]
+                shapes = tuple((decimal_types[name].precision, decimal_types[name].scale)
+                               if name in decimal_types else None for name in source_columns)
                 if isinstance(declaration, CsvMapping):
                     parsed = parse_csv_mapping_bytes(mappings[declaration.path], declaration, budget=budget)
                     declaration = normalize_csv_mapping(parsed,
                         data_types=tuple(field_types[name] for name in source_columns),
-                        nullable=tuple(False for _ in source_columns), budget=budget)
+                        nullable=tuple(False for _ in source_columns), budget=budget, decimal_shapes=shapes)
+                else:
+                    declaration = validate_inline_scalar_mapping(declaration,
+                        data_types=tuple(field_types[name] for name in source_columns),
+                        nullable=tuple(False for _ in source_columns), decimal_shapes=shapes)
                 if not isinstance(declaration, InlineMapping):
                     raise ValueError
                 pairs: dict[tuple[str | int | float, ...], str] = {}
@@ -304,7 +308,8 @@ def replace_csv_snapshot(
                     values.append(synthesized(action, row_index, name, row[name]))
                     continue
                 if isinstance(action, SubstituteAction):
-                    key = tuple(normalize_csv_scalar(row[column], field_types[column])
+                    key = tuple(format(scalar(column, row[column]), "f") if column in decimal_types
+                                else normalize_csv_scalar(row[column], field_types[column])
                                 for column in substitution_columns[name])
                     if key in substitutions[name]:
                         values.append(substitutions[name][key])

@@ -34,6 +34,26 @@ def prepare(policy: bytes, evidence: bytes, parts: tuple[SnapshotPart, ...]):
                                     max_review_bytes=4096, budget=GenerationBudget(5))
 
 
+@pytest.mark.parametrize("child_shape", [(20, 2), (19, 2), (20, 3)])
+def test_decimal_domain_requires_same_shape_across_entities(child_shape):
+    profile = DatasetProfile.model_validate({"entities": [
+        {"name": entity, "row_count": 1, "fields": [{"name": "amount", "data_type": "float"}]}
+        for entity in ("parent", "child")]})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "domains": [{"name": "amounts", "mapping": {"kind": "inline", "entries": [
+            {"original": ["1"], "replacement": ["2"]}]}}], "fields": [
+            {"entity": entity, "field": "amount", "sensitivity": "non_sensitive",
+             "decimal_type": {"precision": shape[0], "scale": shape[1]},
+             "behavior": {"action": "substitute", "mapping": {"kind": "domain", "name": "amounts"}}}
+            for entity, shape in (("parent", (20, 2)), ("child", child_shape))]}
+    parts = tuple(SnapshotPart("source", entity, b"amount\n1.00\n") for entity in ("parent", "child"))
+    if child_shape == (20, 2):
+        assert prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), parts).snapshot_sha256
+    else:
+        with pytest.raises(ApprovalMaterialError):
+            prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), parts)
+
+
 def test_request_binds_rendered_review_and_referenced_bytes():
     request = prepare(*material())
     assert b'"unmatched": "preserve"' in request.review

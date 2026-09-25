@@ -2754,3 +2754,22 @@ Broader transformation remains unfinished.
   all 16 direct/fallback/identity/shape combinations pass. Existing de18b9d CI
   has four Python matrix jobs in progress; remaining observed checks succeeded
   or are normal release-only skips. Do not restart the running workflow.
+- Extended the existing typed mapping validator with explicit DECIMAL shapes.
+  Exact base-ten normalization keeps mapping values as canonical strings and
+  reuses existing duplicate-key validation: 1.0 and 1.00 collide. TDD first
+  failed for the missing argument; all 68 mapping tests then passed. Fixed
+  two mypy annotations/narrowing issues; targeted mypy now passes. This shared
+  primitive is not yet wired into CSV approval/execution; that is the next step.
+- Connected typed DECIMAL mappings through approval and CSV execution, using
+  one normalizer for inline YAML and CSV. Source keys use exact fixed-scale
+  strings; declaration overlays are private copies, not changes to observed
+  classification. Domain bindings also compare precision/scale. Both new
+  end-to-end cases first failed then passed; 281 engine/approval/mapping/CSV
+  tests pass and targeted mypy passes. Broader domain regression and full
+  transformation milestone checks follow before publishing this batch.
+- DECIMAL mapping milestone: added cross-entity domain shape regression;
+  all 492 transformation tests pass in 19.47s. Changed-file Ruff, four-module
+  mypy and strict OpenSpec validation pass. PR checks at de18b9d finished
+  successfully (normal release-only skips excluded). Publish synthesis and
+  mapping commits together to draft #578. Null/temporal execution, financial
+  coincidence policy, public adapters and full client/release acceptance remain.

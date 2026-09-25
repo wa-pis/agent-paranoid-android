@@ -214,6 +214,25 @@ def test_decimal_synthesis_binds_declared_shape(scale, precision, fallback, gene
             assert execute(material) == b"flag,code\nno,3.00\nyes,3.00\n"
 
 
+@pytest.mark.parametrize("csv_mapping", [False, True])
+def test_declared_decimal_substitution_matches_numeric_text(csv_mapping):
+    original = request(source_bytes=b"flag,code\ntrue,1.0\nfalse,2.00\n")
+    source = next(part for part in original.parts if part.kind == "source")
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    mapping = {"kind": "inline", "entries": [
+        {"original": ["1.00"], "replacement": ["3"]},
+        {"original": ["2"], "replacement": ["4.5"]}]}
+    parts = tuple(part for part in original.parts if part.kind == "mapping" and part.name == "all.csv")
+    if csv_mapping:
+        mapping = {"kind": "csv", "path": "d.csv", "source_columns": ["old"], "replacement_columns": ["new"]}
+        parts += (SnapshotPart("mapping", "d.csv", b"old,new\n1.00,3\n2,4.5\n"),)
+    policy["fields"][1].update(decimal_type={"precision": 20, "scale": 2},
+        behavior={"action": "substitute", "mapping": mapping})
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert execute(material) == b"flag,code\nno,3.00\nyes,4.50\n"
+
+
 def test_closed_csv_trace_reports_unmatched_without_values():
     module = import_module("test_data_agent.io.transformation_execute")
     result = module.trace_csv_replacements(request(complete=False), max_total_bytes=8192,

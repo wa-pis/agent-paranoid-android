@@ -97,6 +97,17 @@ def prepare_approval_request(
         if mapping_refs != actual_mappings or generation_refs != actual_generation:
             raise ValueError
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        for decision in policy.fields:
+            if decision.decimal_type is not None:
+                identity = (decision.entity, decision.field)
+                fields[identity] = fields[identity].model_copy(update={
+                    "data_type": FieldType.DECIMAL, "decimal_precision": decision.decimal_type.precision,
+                    "decimal_scale": decision.decimal_type.scale})
+
+        def shapes(ordered: Sequence[FieldProfile]) -> tuple[tuple[int, int] | None, ...]:
+            return tuple((field.decimal_precision, field.decimal_scale)
+                         if field.decimal_precision is not None and field.decimal_scale is not None
+                         else None for field in ordered)
         generation_specs = {
             part.name: load_generation_policy_yaml(part.payload, max_bytes=max_total_bytes, budget=budget)
             for part in external_parts if part.kind == "generation_policy"
@@ -151,6 +162,7 @@ def prepare_approval_request(
             if isinstance(mapping, InlineMapping):
                 typed = validate_inline_scalar_mapping(
                     mapping, data_types=(field.data_type,), nullable=(field.nullable,),
+                    decimal_shapes=shapes((field,)),
                 )
             elif isinstance(mapping, CsvMapping):
                 parsed = parse_csv_mapping_bytes(
@@ -158,6 +170,7 @@ def prepare_approval_request(
                 )
                 typed = normalize_csv_mapping(
                     parsed, data_types=(field.data_type,), nullable=(field.nullable,), budget=budget,
+                    decimal_shapes=shapes((field,)),
                 )
             else:
                 raise ValueError
@@ -172,6 +185,7 @@ def prepare_approval_request(
                 mapping_bytes[mapping.path], mapping, budget=budget, max_bytes=max_total_bytes,
             ))
             shared_types: tuple[FieldType, ...] | None = None
+            shared_shapes: tuple[tuple[int, int] | None, ...] | None = None
             for members in groups.values():
                 if set(members) != expected or (width > 1 and any(not explicit for _, explicit in members.values())):
                     raise ValueError
@@ -180,10 +194,15 @@ def prepare_approval_request(
                 nullable = tuple(field.nullable for field in ordered)
                 if shared_types is not None and data_types != shared_types:
                     raise ValueError
+                if shared_shapes is not None and shapes(ordered) != shared_shapes:
+                    raise ValueError
                 shared_types = data_types
-                typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable)
+                shared_shapes = shapes(ordered)
+                typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable,
+                                                       decimal_shapes=shapes(ordered))
                          if isinstance(mapping, InlineMapping) else
-                         normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget))
+                         normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget,
+                                               decimal_shapes=shapes(ordered)))
                 _reject_identity_components(typed, data_types)
         parts = (
             SnapshotPart("review", "display", review),

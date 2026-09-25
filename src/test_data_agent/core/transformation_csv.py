@@ -274,6 +274,7 @@ def normalize_csv_scalar(value: str, kind: FieldType) -> str | int | float:
 def normalize_csv_mapping(
     mapping: InlineMapping, *, data_types: tuple[FieldType, ...],
     nullable: tuple[bool, ...], budget: GenerationBudget,
+    decimal_shapes: tuple[tuple[int, int] | None, ...] | None = None,
 ) -> InlineMapping:
     """Normalize declared CSV numbers."""
     try:
@@ -291,6 +292,7 @@ def normalize_csv_mapping(
             entries.append(converted)
         result = validate_inline_scalar_mapping(
             {"kind": "inline", "entries": entries}, data_types=data_types, nullable=nullable,
+            decimal_shapes=decimal_shapes,
         )
         budget.check("CSV mapping normalization")
         return result
