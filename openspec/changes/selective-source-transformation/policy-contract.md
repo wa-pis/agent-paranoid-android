@@ -89,6 +89,14 @@ decision; private approval-material preflight rejects overlapping keys for a
 field before any receipt. The value-free review reports whether file and
 column rules are configured, without showing their literals. No cascade or
 implicit two-step replacement is permitted.
+For a field declared sensitive or unknown, or with positive sensitivity
+evidence, local CSV review and receipt verification check only replacements
+reachable from the fixed source bytes. A reachable right-hand literal must
+not equal an original value in any sensitive/unknown column of that same
+snapshot. This comparison uses the same CSV decoding/dialect as profiling,
+does not persist raw source values, and fails with a value-free error. An
+explicitly reviewed non-sensitive column is not blanket-banned from ordinary
+text substitutions, though execution still needs its separate safety gate.
 
 Debugging is local and opt-in. A bounded dry-run/trace may report source row
 ordinal, column ordinal, rule scope (file or column), mapping-rule ordinal

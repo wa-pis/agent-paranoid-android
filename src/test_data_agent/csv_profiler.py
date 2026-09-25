@@ -166,6 +166,11 @@ def profile_csv_bytes(
     if (type(payload) is not bytes or type(table_name) is not str or not table_name
             or type(max_bytes) is not int or max_bytes < 1 or len(payload) > max_bytes):
         raise ValueError("invalid CSV snapshot")
+    return _profile_csv_rows(_csv_reader_from_snapshot(payload), table_name, (), None, budget)
+
+
+def _csv_reader_from_snapshot(payload: bytes) -> csv.DictReader[str]:
+    """Use identical decoding and dialect for profiling and local review."""
     configure_csv_field_limit(csv)
     encoding = "utf-8-sig"
     try:
@@ -174,8 +179,7 @@ def profile_csv_bytes(
         encoding = "latin-1"
     text = payload.decode(encoding)
     dialect = detect_csv_dialect(payload[:CSV_SAMPLE_BYTES].decode(encoding, errors="replace"))
-    reader = csv.DictReader(io.StringIO(text, newline=""), dialect=dialect)
-    return _profile_csv_rows(reader, table_name, (), None, budget)
+    return csv.DictReader(io.StringIO(text, newline=""), dialect=dialect)
 
 
 def profile_csv_with_row_digests(

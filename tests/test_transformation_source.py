@@ -7,6 +7,7 @@ import yaml
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_approval import prepare_approval_request
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.csv_profiler import profile_csv, profile_csv_bytes
@@ -82,6 +83,73 @@ def test_csv_review_binds_referenced_mapping_bytes():
     changed_request = prepare_csv_review_request(policy, source, (changed,), max_total_bytes=8192,
                                                  max_review_bytes=4096, budget=GenerationBudget(5))
     assert changed_request.snapshot_sha256 != request.snapshot_sha256
+
+
+@pytest.mark.parametrize("source_bytes,sensitivity,field,blocked", [
+    (b"status\nA\nB\n", "sensitive", "status", True),
+    (b"status\nA\nB\n", "unknown", "status", True),
+    (b"status\nA\nB\n", "non_sensitive", "status", False),
+    (b"status\nA\n", "sensitive", "status", False),
+    (b"status;other\nA;x\nB;y\n", "sensitive", "status", True),
+    (b"email\nA\nB\n", "non_sensitive", "email", True),
+])
+def test_sensitive_text_review_rejects_only_reachable_source_value_reuse(
+    source_bytes, sensitivity, field, blocked,
+):
+    source = SnapshotPart("source", "items", source_bytes)
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5),
+    ))
+    names = tuple(column.name for column in profile.entities[0].fields)
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "file_text_mapping": {"kind": "csv", "path": "all.csv",
+        "source_columns": ["old"], "replacement_columns": ["new"]},
+        "fields": [{"entity": "items", "field": name,
+                    "sensitivity": sensitivity if name == field else "non_sensitive",
+                    "behavior": {"action": "replace_text"} if name == field else {"action": "drop"}}
+                   for name in names],
+    }).encode()
+    mapping = SnapshotPart("mapping", "all.csv", b"old,new\nA,B\nB,A\n")
+    evidence = profile.model_dump_json().encode()
+    request = prepare_approval_request(policy, evidence, (source, mapping),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if blocked:
+        with pytest.raises(TransformationSourceError, match="^invalid transformation source review$") as error:
+            prepare_csv_review_request(policy, source, (mapping,), max_total_bytes=8192,
+                                       max_review_bytes=4096, budget=GenerationBudget(5))
+        assert "A" not in str(error.value)
+        with pytest.raises(TransformationSourceError, match="^invalid sensitive text replacement$"):
+            _canonical_request(request, max_total_bytes=8192, max_review_bytes=4096,
+                               budget=GenerationBudget(5))
+    else:
+        assert prepare_csv_review_request(policy, source, (mapping,), max_total_bytes=8192,
+                                          max_review_bytes=4096, budget=GenerationBudget(5)) == request
+
+
+@pytest.mark.parametrize("other_sensitivity,blocked", [("sensitive", True), ("non_sensitive", False)])
+def test_sensitive_text_review_checks_other_sensitive_source_columns(other_sensitivity, blocked):
+    source = SnapshotPart("source", "items", b"status,other\nA,X\nB,Y\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5),
+    ))
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "file_text_mapping": {"kind": "csv", "path": "all.csv",
+        "source_columns": ["old"], "replacement_columns": ["new"]},
+        "fields": [{"entity": "items", "field": "status", "sensitivity": "sensitive",
+                    "behavior": {"action": "replace_text"}},
+                   {"entity": "items", "field": "other", "sensitivity": other_sensitivity,
+                    "behavior": {"action": "drop"}}],
+    }).encode()
+    mapping = SnapshotPart("mapping", "all.csv", b"old,new\nA,X\nB,Z\n")
+    if blocked:
+        with pytest.raises(TransformationSourceError, match="^invalid transformation source review$"):
+            prepare_csv_review_request(policy, source, (mapping,), max_total_bytes=8192,
+                                       max_review_bytes=4096, budget=GenerationBudget(5))
+    else:
+        assert prepare_csv_review_request(policy, source, (mapping,), max_total_bytes=8192,
+                                          max_review_bytes=4096, budget=GenerationBudget(5)).snapshot_sha256
 
 
 def test_csv_review_reads_policy_source_and_mapping_from_fixed_local_paths(tmp_path):

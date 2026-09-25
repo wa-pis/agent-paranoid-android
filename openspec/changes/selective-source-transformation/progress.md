@@ -2165,6 +2165,22 @@ Broader transformation remains unfinished.
   `transform-review` reports only scope flags/digest, rejects overlapping
   rules, emits no mapping literals or receipt. Three focused CLI tests and
   Ruff pass; strict MkDocs build passes after updating the CLI reference.
+  Signed evidence/test commit `3aec952` was fast-forward pushed to draft #568;
+  its exact-head CI completed 37 applicable checks successfully with four
+  release-only skips. No normal-PR AI review was requested.
+- Local changed-scope follow-up to Raman's finding: CSV profiling and local
+  review now share the exact fixed-byte decoder/dialect. For sensitive or
+  unknown fields (including positive profile evidence), review and receipt
+  canonicalization compare only reachable replacement literals against
+  original values in sensitive/unknown columns of the same snapshot, without
+  retaining raw source values in artifacts. Explicitly reviewed non-sensitive
+  `A→B, B→A` remains allowed; an unreachable rule does not spuriously block.
+  Fictional same-column, cross-sensitive-column, semicolon CSV, unknown and
+  detected-positive regressions pass: 49 focused source/receipt/profiler/CLI
+  tests, Ruff and targeted mypy pass. This is not an execution license or
+  full output privacy validation. Next: verify exact-head CI for `3aec952`,
+  sign/push the follow-up, repeat independent AI review on the changed safety
+  scope, and retain the AGENTS.md amendment/executable output gates.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
