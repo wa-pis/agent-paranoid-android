@@ -1284,6 +1284,29 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding 17 independent PostgreSQL table-cost slice: fictional two-table,
+  four-column profile (three numeric) made 15 aggregate/metadata statements
+  before the change, 16 with one explicitly allowlisted category. Numeric
+  shape queries already returned row/non-null/distinct counts, so the profiler
+  now uses that same bounded query as the summary instead of querying again.
+  Counts fall to 12/13 respectively; logical table-aggregate requests fall
+  from nine to six without a category. No raw rows, new SQL permissions,
+  budget increases, live connection or source values. Baseline regression
+  failed at 15/16 versus the asserted 12/13; after the change 39 focused
+  PostgreSQL profiler/query/temporal tests passed. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Signed local commit `547bfd5`
+  retained for sequential PR after the earlier draft. Actual scanned bytes,
+  latency, Trino table costs and final installed-RC behavior remain unverified.
+- Same finding-17 query-source path (PostgreSQL and Trino): two numeric columns
+  redundantly ran summary and shape aggregates. Their shape query already
+  returns row/non-null/distinct counts, so the profiler now consumes it once.
+  The fictional three-field regression failed on the old 7/8 statement counts
+  and passes at 5/6 without/with one explicitly authorized category. Source
+  allowlists, SQL shape, result validation and statement/scan budgets are
+  unchanged; no row samples or live connections. Fifty-one focused query
+  source/adapter/profile tests passed. Ruff, targeted mypy, strict OpenSpec
+  and diff checks passed. Next: signed local commit for a later sequential PR;
+  final installed-RC and live cost remain unverified.
 - Finding 13 isolated CSV inference fix: fictional 4-parent/100-child input
   with all children linked previously selected an unrelated same-table key on
   an equal-confidence tie. Exact field-name match now wins that tie. The same
@@ -1309,3 +1332,11 @@ Broader transformation remains unfinished.
   policy/approval/receipt tests: 55 passed; Ruff, targeted mypy, strict
   OpenSpec and diff check passed. Next: independent read-only safety review of
   the exact signed head, then PR/CI; policy amendment remains a separate gate.
+- The independently reviewed safety fix merged through PR #555 on 2026-09-25
+  as `ba2f9d20916e2fc836a0233f6628b53da4a289d6`; its AI review is
+  [recorded on that PR](https://github.com/wa-pis/agent-paranoid-android/pull/555#issuecomment-5825635065)
+  and is not human approval. This SQL-cost branch integrated main without
+  changing its two profiler fixes. Combined focused PostgreSQL/query-source/
+  Trino query-builder tests: 85 passed; changed-file Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. Next: signed merge commit, then one
+  SQL-cost PR with exact-head CI. No live scan-cost or RC acceptance claimed.
