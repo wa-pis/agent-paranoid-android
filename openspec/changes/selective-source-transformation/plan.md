@@ -14,6 +14,9 @@ repair instructions, live integrations or a weaker safety boundary.
 1. **Contract and safety approval.** Separate source-free generation from
    one-to-one transformation; settle field actions, sensitivity review,
    preservation authority, dependencies and typed substitution dictionaries.
+   The review profile gives each field a bounded system comment explaining
+   its inferred meaning, sensitivity suggestion and uncertainty before the
+   operator decides; an unreviewed `sensitive=false` is not preserve consent.
    The selected authority is the trusted local CLI operator: interactive
    confirmation of the exact plan and preserved columns, with a receipt bound
    to fixed input bytes. Equal-privilege local impersonation is outside this
@@ -31,6 +34,8 @@ repair instructions, live integrations or a weaker safety boundary.
    totals through a saved policy before adding interactive UI.
 4. **Review wizard and agent parity.** Present per-field evidence and proposed actions; allow
    edits or bulk acceptance of reviewed decisions and save a replayable policy.
+   Show the system comment next to each explicit sensitivity decision; a bulk
+   action cannot silently resolve unknown or conflicting classifications.
    High cardinality alone is not a semantic rejection reason: enforce resource
    budgets separately and disclose uncertainty rather than invent uniqueness.
    Expose review, policy validation and execution to noninteractive CLI/Python

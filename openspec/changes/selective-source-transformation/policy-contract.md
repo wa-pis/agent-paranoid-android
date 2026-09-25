@@ -11,6 +11,22 @@ contains one explicit decision per `(entity, field)`. Profiling observations
 remain evidence, not mutable declarations of permission. Duplicate decisions,
 unknown fields, missing fields and schema drift fail preflight. Postponed wizard
 decisions are incomplete and cannot produce an executable specification.
+Each field's review evidence includes a bounded system comment describing its
+likely data meaning and the basis/uncertainty of the sensitivity suggestion.
+The comment is value-free and advisory; it cannot supply a missing user
+decision. In particular, a profile's default `sensitive=false` is not a
+reviewed non-sensitive declaration or preservation authority. Only a person's
+explicit per-field `sensitive=false` decision records non-sensitive status;
+absence of a finding remains unknown. Positive evidence or a conflicting
+classification still blocks preservation rather than being silently overridden.
+The displayed
+comment and final sensitivity decision are bound with classification evidence
+to the local approval snapshot; changes require renewed review.
+The private value-free review renders a positive metadata/profile signal as
+`observed_sensitivity=sensitive` and no positive signal as `unknown`, never as
+observed non-sensitive. Its comment uses fixed phrases derived from bounded
+metadata; arbitrary semantic labels and source values are not echoed. This
+review projection does not yet create the versioned behavior profile or wizard.
 
 The shared core parses and validates decisions without reading a source, opening
 a mapping file, executing a formula or generating data. CLI, wizard and agent

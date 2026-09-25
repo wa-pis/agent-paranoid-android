@@ -8,8 +8,9 @@ from typing import Annotated, Literal, TypeAlias
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
 
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldProfile
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
-from test_data_agent.core.privacy import is_sensitive_field
+from test_data_agent.core.privacy import is_sensitive_field, normalize_field_name
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
 )
@@ -196,6 +197,26 @@ def validate_policy_profile(policy: BehaviorPolicy, profile: DatasetProfile) -> 
             raise
 
 
+def _system_field_comment(field: FieldProfile) -> str:
+    """Fixed, value-free hint from metadata; never a preservation decision."""
+    name = normalize_field_name(field.name)
+    semantic = (field.semantic_type or "").lower()
+    for markers, meaning in (
+        (("token", "password", "secret", "credential", "card", "ssn"), "credential or private identifier"),
+        (("email", "mail"), "email or contact"),
+        (("phone",), "phone or contact"),
+        (("address",), "address"),
+        (("name",), "personal name"),
+    ):
+        if any(marker in name or marker == semantic for marker in markers):
+            return f"Possible {meaning} field from metadata; treat as potentially sensitive."
+    if field.sensitive:
+        return "Profile flags possible sensitive data; field meaning unverified."
+    if field.is_identifier:
+        return "Likely identifier from profile metadata; sensitivity unverified."
+    return f"Likely {field.data_type.value} field; meaning and sensitivity unverified."
+
+
 def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max_bytes: int) -> bytes:
     """Value-free local review; bind these bytes with full policy/evidence bytes."""
     policy = parse_behavior_policy(policy)
@@ -203,13 +224,13 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
     validate_policy_profile(policy, profile)
     if type(max_bytes) is not int or max_bytes < 1:
         raise BehaviorPolicyError("invalid policy review") from None
-    observed = {(entity.name, field.name):
-                field.sensitive or is_sensitive_field(field.name, field.semantic_type)
+    observed = {(entity.name, field.name): field
                 for entity in profile.entities for field in entity.fields}
     fields = []
     for decision in policy.fields:
         behavior = decision.behavior
         unmatched = behavior.unmatched.action if isinstance(behavior, SubstituteAction) else None
+        field = observed[(decision.entity, decision.field)]
         fields.append({
             "entity": decision.entity,
             "field": decision.field,
@@ -217,7 +238,11 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "unmatched": unmatched,
             "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
             "declared_sensitivity": decision.sensitivity,
-            "observed_sensitive": observed[(decision.entity, decision.field)],
+            "observed_sensitivity": (
+                "sensitive" if field.sensitive or is_sensitive_field(field.name, field.semantic_type)
+                else "unknown"
+            ),
+            "system_comment": _system_field_comment(field),
         })
     payload = json.dumps({"version": 1, "fields": fields}, ensure_ascii=True, indent=2).encode("ascii")
     if len(payload) > max_bytes:

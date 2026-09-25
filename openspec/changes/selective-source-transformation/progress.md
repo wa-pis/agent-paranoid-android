@@ -1577,3 +1577,85 @@ Broader transformation remains unfinished.
   targeted mypy, strict OpenSpec and diff check passed. Next: finish the first head's CI,
   send this correction as a new signed head, then require fresh exact-head CI.
   Composite binding and full transformation execution remain unresolved.
+- PR #568 corrected exact head `2cd7c975fc83602514b29225947794f80eec24df`
+  passed applicable CI and remains draft/open. Independent read-only **AI**
+  safety reviewer (tool pseudonym Cicero; self-reported Sentinel) examined this
+  exact SHA on 2026-09-25 UTC; this was not a human/GitHub approval. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/568#issuecomment-5827180377
+  Two P2 findings remain open: a different but recognizable sensitive literal
+  can pass the identity-only substitution preflight; differently offset
+  DATETIME strings can represent the same instant. Neither source-preserving
+  execution nor public approval is enabled. Do not merge #568 or silently
+  decide the sensitive replacement/timezone policy. Next: settle the pending
+  component-binding and replacement-safety choices, specify datetime matching,
+  add focused executable regressions, then re-review the changed safety scope
+  on its new exact SHA and require fresh CI before merge.
+- Checked duplicate external mapping labels in the same private approval path:
+  `snapshot_identity` already rejects them before returning any receipt, so no
+  production change was needed. Added a fictional value-free regression;
+  23 focused approval tests, Ruff and diff check passed. `uv run` could not
+  initialize its user cache in this sandbox; the existing project virtualenv
+  ran the same focused tests successfully. Next: carry this test with the
+  substantive safety correction; do not push a test-only revision merely to
+  restart CI. The client's monthly-date category suggestion also needs a
+  preservation/granularity policy choice; it is not an automatic source-free
+  bug fix.
+- Inspected and replayed the supplied fictional finding-25 mode probe
+  unmodified in separate temporary baseline/source roots (script SHA-256
+  `8a860dd6fd9aa515ec192538013bf4702651e3ba4ff93f9d305c5e4e7ecb8653`).
+  Verified baseline 1.5.0 and current-source import roots. Baseline lost all
+  spec-input mode overrides; current source applied `mixed/1` and `negative/1`
+  with different output and matching manifest. The probe mistakes intentional
+  exit 1 for absent output and passes invalid ratios to `edge`/`load_test`.
+  Supplemental correct invocations passed and recorded `edge/0` and
+  `load_test/0`; same CSV bytes as `valid` are not a mode failure here. See
+  client-acceptance.md for bounds. Next: include this evidence in final
+  installed-RC replay after the controlled-invalid exit and Parquet policy
+  choices; do not claim five distinct hashes or private acceptance.
+- Inspected and replayed the supplied fictional finding-24/26 Parquet probe
+  unmodified in separate installed baseline/interim-candidate roots (script
+  SHA-256 `3cd0adfc3832706522b82025b348e7d1a7d46568253eff7c484a465611b47c6e`).
+  Public 1.5.0 lost the declared `date` physical type and ignored negative
+  mode; the earlier typed-Parquet wheel (SHA-256
+  `631c32e3c02e7a079bf09e7b94a72eeb560d12977e2db26073b500e187a1f7da`)
+  wrote/read `date32[day]` but rejected negative mixed types without
+  publication. The probe returns zero despite printed losses and its all-zero
+  null fixture cannot establish honest unknown metadata. See
+  client-acceptance.md. Next: resolve intentional-invalid Parquet publication
+  and unknown-metadata public compatibility, then replay the final installed
+  1.6.0rc1; do not merge draft #552 or claim finding 26 closed.
+- Reviewed the remaining supplied doctor/Trino probes without execution.
+  Doctor `--fixed` monkeypatches publication and base repeats unchanged
+  completed checks; Trino ladder reads a separate analytics query by default,
+  copies SQL, prints exception text and always monkeypatches an allowlist arm.
+  Neither is safe new acceptance evidence. Next: use only fictional,
+  unpatched local tests after the pending auth/SQL product decisions; do not
+  connect to a real database or treat these supplied scripts as passed.
+- User clarified the intended review workflow: a field marked sensitive is
+  transformed; a field explicitly reviewed as non-sensitive may be kept, but
+  the data profile must include a system comment explaining the likely meaning
+  of each column so the person can make that decision. Planned the bounded,
+  value-free comment and its approval-snapshot binding in plan/design/tasks/
+  policy-contract; no runtime preservation or declassification was enabled.
+  Existing `FieldProfile.sensitive` defaults to false and the Parquet adapter
+  can set false without content evidence, so it cannot be treated as automatic
+  consent. User decided: `sensitive=false` is a person's explicit decision for
+  that column, not a negative detector result; no finding stays unknown. This
+  decision is sufficient to proceed with the review contract, not permission
+  to override positive/conflicting evidence or to execute preservation. The
+  requirement and draft policy contract now state this explicitly. No runtime
+  change or check rerun; current worktree retains unrelated in-progress edits.
+  Next: implement the bounded review comment and explicit decision separation
+  with focused redaction/round-trip tests, then complete the safety-policy
+  amendment and independent review before any preservation path is enabled.
+- Private review projection now separates `observed_sensitivity=sensitive` from
+  `unknown` when no detector fires; the explicit human field decision remains
+  `declared_sensitivity`. A bounded, fixed-phrase system comment gives likely
+  field meaning from metadata without echoing source values or arbitrary
+  semantic labels. Changed evidence/comment bytes alter the approval-material
+  snapshot; this is still no local receipt or execution path. Focused policy/
+  approval tests: 68 passed; Ruff and targeted mypy passed. Next: implement
+  the versioned behavior-profile persistence and wizard display/round trip;
+  retain the independent safety review and policy amendment gate before any
+  source-preserving execution. PR #568 remains draft with earlier P2 safety
+  findings open; do not merge on these review-only checks.

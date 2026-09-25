@@ -89,6 +89,13 @@ All items below remain unverified until reproduced against the current candidate
   round trips, conflict rejection and separation from observed evidence.
 - [ ] Add a profile-review wizard that saves explicit field decisions; bulk
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
+- [ ] Add a bounded, value-free system comment for each reviewed field: likely
+  data meaning, sensitivity rationale and uncertainty from safe profile
+  evidence. Display it with the suggestion and explicit operator decision in
+  the wizard and local CLI; never turn default `sensitive=false` into automatic
+  preservation. Save and bind the exact reviewed comment/evidence to approval;
+  test unknown/conflicting cases, redaction, stale snapshots and save/load
+  parity with the noninteractive policy.
 - [ ] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
 - [ ] Implement the approved “Сохранено исходных значений: X%” transformation

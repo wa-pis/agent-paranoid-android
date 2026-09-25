@@ -45,6 +45,16 @@ def test_request_binds_rendered_review_and_referenced_bytes():
     assert snapshot_identity(changed, max_total_bytes=8192) != request.snapshot_sha256
 
 
+def test_review_comment_and_profile_evidence_are_snapshot_bound():
+    policy, evidence, parts = material()
+    original = prepare(policy, evidence, parts)
+    profile = DatasetProfile.model_validate_json(evidence)
+    profile.entities[0].fields[0].is_identifier = True
+    changed = prepare(policy, profile.model_dump_json().encode(), parts)
+    assert changed.review != original.review
+    assert changed.snapshot_sha256 != original.snapshot_sha256
+
+
 @pytest.mark.parametrize("mapping_kind", ["inline", "csv", "domain"])
 @pytest.mark.parametrize("replacement", ["fictional-a", "synthetic-b"])
 @pytest.mark.parametrize("sensitive", [False, True])
@@ -111,13 +121,15 @@ def test_sensitive_csv_identity_uses_normalized_types_and_allows_null(original, 
         assert prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), parts).snapshot_sha256
 
 
-@pytest.mark.parametrize("change", ["missing_map", "extra_map", "sensitive", "invalid_evidence", "small_budget"])
+@pytest.mark.parametrize("change", ["missing_map", "extra_map", "duplicate_map", "sensitive", "invalid_evidence", "small_budget"])
 def test_incomplete_or_unsafe_request_is_value_free(change):
     policy, evidence, parts = material(sensitive=change == "sensitive")
     if change == "missing_map":
         parts = parts[:1]
     elif change == "extra_map":
         parts += (SnapshotPart("mapping", "unreferenced.csv", b"x"),)
+    elif change == "duplicate_map":
+        parts += (SnapshotPart("mapping", "code-map.csv", b"original,replacement\nfictional-a,synthetic-2\n"),)
     elif change == "invalid_evidence":
         evidence = b'{"private":"fictional-private-marker"}'
     try:

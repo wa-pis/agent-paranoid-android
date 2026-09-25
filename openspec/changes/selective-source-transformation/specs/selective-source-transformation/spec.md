@@ -176,7 +176,20 @@ tests before this proposed exception can become operational.
 Every input field SHALL have an explicit preserve, synthesize, substitute, derive or drop
 action. Preservation SHALL require explicit authorization for non-sensitive
 reference data. User sensitivity declarations SHALL be authoritative additions
-to protection, not optional hints. AI SHALL NOT authorize declassification.
+to protection, not optional hints. `sensitive: false` SHALL mean an explicit
+per-column human non-sensitive decision, never an automatic interpretation of
+no detector finding or a default profile value. Missing or uncertain evidence
+remains unknown; positive sensitivity evidence or a conflict fails closed for
+preservation. AI SHALL NOT authorize declassification. Even an explicit
+non-sensitive decision does not itself authorize preservation: the exact plan
+and preserved columns still require separate local interactive confirmation.
+
+#### Scenario: No sensitivity finding is not a non-sensitive decision
+
+- **GIVEN** a field with no positive detector finding or a profile default of
+  `sensitive: false`, but no explicit human decision for that field
+- **WHEN** preservation is requested
+- **THEN** preflight rejects it as unresolved without exposing source values.
 
 #### Scenario: New or sensitive column
 

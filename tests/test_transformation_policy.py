@@ -142,7 +142,9 @@ def test_review_shows_every_action_without_mapping_values_or_control_codes():
     assert b'"action": "substitute"' in review
     assert b'"unmatched": "preserve"' in review
     assert b'"preserves_original": true' in review
-    assert b'"observed_sensitive": false' in review
+    assert b'"declared_sensitivity": "non_sensitive"' in review
+    assert b'"observed_sensitivity": "unknown"' in review
+    assert b'"system_comment": "Likely string field; meaning and sensitivity unverified."' in review
     assert b'value\\nnext' in review
     assert b'fictional-private-marker' not in review
     assert b'fictional-output-marker' not in review
@@ -208,7 +210,19 @@ def test_review_labels_sensitive_name_without_observed_flag():
     payload["fields"][0]["field"] = "customer_email"
     payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
     review = render_policy_review(parse_behavior_policy(payload), profile, max_bytes=4096)
-    assert b'"observed_sensitive": true' in review
+    assert b'"observed_sensitivity": "sensitive"' in review
+    assert b'"system_comment": "Possible email or contact field from metadata; treat as potentially sensitive."' in review
+
+
+def test_review_comment_does_not_echo_untrusted_semantic_type():
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "value", "data_type": "string",
+                    "semantic_type": "fictional-private-marker"}]}]})
+    payload = policy({"action": "drop"})
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    review = render_policy_review(parse_behavior_policy(payload), profile, max_bytes=4096)
+    assert b'"observed_sensitivity": "unknown"' in review
+    assert b"fictional-private-marker" not in review
 
 
 @pytest.mark.parametrize("change", ["type", "nullable", "name", "statistics"])
