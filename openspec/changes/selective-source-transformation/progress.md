@@ -2508,3 +2508,14 @@ Broader transformation remains unfinished.
   tests passed, including missing/stale/tampered receipts and a 25% retention
   report. Ruff/mypy pass. No new authorization mechanism or public entrypoint.
   Synthesize fallback, non-string scalar substitution and domains remain open.
+- Implemented single-file non-null STRING domain execution using complete
+  original ordered tuples and validated component positions. TDD exposed the
+  missing successful path; a repeated component in two different tuple keys
+  now maps to the appropriate distinct pair, even with reversed policy order.
+  Missing full tuple rejects. All 38 engine tests and Ruff pass; corrected a
+  tuple annotation after mypy failure, then mypy/diff check pass. No cross-input
+  relationship acceptance, non-string/null mapping or public activation claim.
+- Composite STRING domain scenarios now cover both inline and CSV: four
+  focused cases pass, including missing-tuple rejection for each representation.
+  Ruff/diff checks pass. CI of published `aacd730` still runs four Python jobs
+  without failures; domain work is committed locally without restarting them.

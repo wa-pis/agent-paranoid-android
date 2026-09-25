@@ -172,7 +172,10 @@ The private `io/transformation_execute.py` prototype supports `replace_text`,
 CLI/Python/MCP execution and is not release acceptance. Direct non-null string
 `substitute` pairs support inline/CSV mappings with reject-on-unmatched or
 receipt-bound preserve fallback.
-Other typed/domain substitutions, `synthesize` and `derive` remain unsupported;
+Single-file non-null STRING domains match complete ordered original tuples,
+using the preflight-validated component positions, independent of policy order.
+Cross-input relationships and other typed substitutions, `synthesize` and
+`derive` remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and
 activation gates still apply.

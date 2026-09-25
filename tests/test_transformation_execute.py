@@ -264,3 +264,41 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
         return
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
         ["flag", "code"], ["no", "first"], ["yes", "second"]]
+
+
+@pytest.mark.parametrize("missing", [False, True])
+@pytest.mark.parametrize("kind", ["inline", "csv"])
+def test_composite_domain_matches_whole_original_tuple(missing, kind):
+    source = SnapshotPart("source", "items", b"region,code\nnorth,alpha\nsouth,alpha\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5)))
+    entries = [{"original": ["north", "alpha"], "replacement": ["west", "first"]}]
+    if not missing:
+        entries.append({"original": ["south", "alpha"], "replacement": ["east", "second"]})
+    mapping = {"kind": "inline", "entries": entries}
+    parts = ()
+    if kind == "csv":
+        mapping = {"kind": "csv", "path": "pairs.csv", "source_columns": ["old_region", "old_code"],
+                   "replacement_columns": ["new_region", "new_code"]}
+        payload = io.StringIO(newline="")
+        csv.writer(payload).writerows([
+            ("old_region", "old_code", "new_region", "new_code"),
+            *(tuple(entry["original"] + entry["replacement"]) for entry in entries)])
+        parts = (SnapshotPart("mapping", "pairs.csv", payload.getvalue().encode()),)
+    policy = yaml.safe_dump({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "domains": [{"name": "pair", "mapping": mapping}],
+        "fields": [{"entity": "items", "field": name, "sensitivity": "non_sensitive",
+                    "behavior": {"action": "substitute", "mapping": {
+                        "kind": "domain", "name": "pair", "component": component}}}
+                   for component, name in reversed(list(enumerate(("region", "code"))))],
+    }).encode()
+    material = prepare_csv_review_request(policy, source, parts, max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5))
+    if missing:
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError):
+            execute(material)
+    else:
+        assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
+            ["region", "code"], ["west", "first"], ["east", "second"]]

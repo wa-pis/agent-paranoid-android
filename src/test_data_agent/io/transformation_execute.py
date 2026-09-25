@@ -9,6 +9,7 @@ import csv
 import io
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import cast
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
 from test_data_agent.core.dataset import DatasetProfile
@@ -18,7 +19,7 @@ from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, match_scoped_text, parse_csv_mapping_bytes,
 )
-from test_data_agent.core.transformation_mapping import CsvMapping, InlineMapping
+from test_data_agent.core.transformation_mapping import CsvMapping, DomainMapping, InlineMapping
 from test_data_agent.core.transformation_policy import (
     DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction, SubstituteAction,
 )
@@ -62,7 +63,9 @@ def replace_csv_snapshot(
             mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
         ) if policy.file_text_mapping is not None else None)
         column_tables = {}
-        substitutions: dict[str, dict[str, str]] = {}
+        substitutions: dict[str, dict[tuple[str, ...], str]] = {}
+        substitution_columns: dict[str, tuple[str, ...]] = {}
+        domains = {domain.name: domain.mapping for domain in policy.domains}
         dropped = set()
         needs_receipt = False
         actions = {decision.field: decision.behavior for decision in policy.fields}
@@ -82,18 +85,31 @@ def replace_csv_snapshot(
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
                 declaration = action.mapping
+                component = 0
+                source_columns: tuple[str, ...] = (decision.field,)
+                if isinstance(declaration, DomainMapping):
+                    component = declaration.component or 0
+                    members = sorted(
+                        (item.behavior.mapping.component or 0, item.field)
+                        for item in policy.fields if isinstance(item.behavior, SubstituteAction)
+                        and isinstance(item.behavior.mapping, DomainMapping)
+                        and item.behavior.mapping.name == declaration.name)
+                    source_columns = tuple(name for _, name in members)
+                    if any(field_types[name] != FieldType.STRING for name in source_columns):
+                        raise ValueError
+                    declaration = domains[declaration.name]
                 if isinstance(declaration, CsvMapping):
                     declaration = parse_csv_mapping_bytes(mappings[declaration.path], declaration, budget=budget)
                 if not isinstance(declaration, InlineMapping):
                     raise ValueError
-                pairs: dict[str, str] = {}
+                pairs: dict[tuple[str, ...], str] = {}
                 for entry in declaration.entries:
                     budget.check("CSV substitution")
-                    before, after = entry.original[0], entry.replacement[0]
-                    if type(before) is not str or type(after) is not str:
+                    if any(type(value) is not str for value in (*entry.original, *entry.replacement)):
                         raise ValueError
-                    pairs[before] = after
+                    pairs[cast(tuple[str, ...], entry.original)] = cast(str, entry.replacement[component])
                 substitutions[decision.field] = pairs
+                substitution_columns[decision.field] = source_columns
                 continue
             if (not isinstance(action, ReplaceTextAction)
                     or not isinstance(action.unmatched, (RejectUnmatched, PreserveAction))):
@@ -140,8 +156,9 @@ def replace_csv_snapshot(
                     values.append(row[name])
                     continue
                 if isinstance(action, SubstituteAction):
-                    if row[name] in substitutions[name]:
-                        values.append(substitutions[name][row[name]])
+                    key = tuple(row[column] for column in substitution_columns[name])
+                    if key in substitutions[name]:
+                        values.append(substitutions[name][key])
                     elif isinstance(action.unmatched, PreserveAction):
                         values.append(row[name])
                     else:
