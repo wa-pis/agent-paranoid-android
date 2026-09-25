@@ -1545,3 +1545,8 @@ Broader transformation remains unfinished.
   container context and shared builder now include only those skill files;
   focused container regression checks cover the copy and ignore rules. Next:
   rerun affected tests and exact-head CI; merge remains blocked until green.
+- Owner added RC scope for further skill-guided agent use. OpenSpec now records
+  version-aware workflow selection and fictional offline acceptance, explicitly
+  pending implementation. Bundling both skills is not that acceptance. Next:
+  validate this planning change, finish #569 exact-head CI, then triage the
+  remaining draft PRs in dependency order; no new agent runtime work yet.

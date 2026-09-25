@@ -135,6 +135,31 @@ claims. Historical release evidence SHALL remain identifiable as historical.
 - **THEN** documented workflows run on fictional fixtures, documentation checks
   pass, and current help, guides and artifact descriptions agree with behavior.
 
+### Requirement: Skill-guided agent use is version-accurate
+
+For the release candidate, an agent integration SHALL be able to locate both
+packaged project skills, use their workflow map to select an interface supported
+by the installed version, and produce a bounded, value-free plan before any
+state-changing operation. Loading a skill SHALL NOT register it automatically
+in every agent runtime, activate an unfinished transformation path, grant data
+preservation authority, or bypass existing review and approval boundaries.
+
+#### Scenario: Installed package lacks transformation execution
+
+- **GIVEN** an installed package containing both skills but no approved
+  transformation execution interface
+- **WHEN** an agent is asked to preserve source values
+- **THEN** it reports that execution is unavailable and routes to the current
+  review/specification workflow without copying values or inventing approval.
+
+#### Scenario: Supported synthetic workflow
+
+- **GIVEN** a fictional source and an installed version with documented
+  source-free generation commands
+- **WHEN** the agent chooses a workflow using the packaged skill
+- **THEN** it proposes only supported profiling, review and generation steps,
+  using existing CLI/Python/MCP permissions and value-free responses.
+
 ### Requirement: Explicit, isolated transformation mode
 
 The system SHALL require a distinct opt-in transformation policy and SHALL NOT
