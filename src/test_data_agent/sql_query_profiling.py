@@ -202,8 +202,14 @@ def _profile_column(
     fetch_query: QueryFetcher,
     local_category_field: LocalCategoryField | None,
 ) -> dict[str, object]:
+    numeric_shape = coerce_profile_type(column.data_type) in {
+        ProfileDataType.INTEGER, ProfileDataType.FLOAT,
+    }
     summary = _single_row(
-        fetch_query(build_query_column_summary_query(plan, column.name))
+        fetch_query(
+            build_query_numeric_shape_query(plan, column.name)
+            if numeric_shape else build_query_column_summary_query(plan, column.name)
+        )
     )
     summary_row_count = _non_negative_int(summary.get("row_count"), "row count")
     non_null_count = _non_negative_int(
@@ -225,29 +231,10 @@ def _profile_column(
         "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
         "approx_distinct_count": distinct_count,
     }
-    if coerce_profile_type(column.data_type) in {
-        ProfileDataType.INTEGER,
-        ProfileDataType.FLOAT,
-    }:
-        shape = _single_row(
-            fetch_query(build_query_numeric_shape_query(plan, column.name))
-        )
-        if (
-            _non_negative_int(shape.get("row_count"), "numeric row count")
-            != row_count
-            or _non_negative_int(
-                shape.get("non_null_count"), "numeric non-null count"
-            )
-            != non_null_count
-            or _non_negative_int(
-                shape.get("distinct_count"), "numeric distinct count"
-            )
-            != distinct_count
-        ):
-            raise SqlQueryProfileError("SQL query numeric aggregates are invalid")
-        has_negative = _as_bool(shape.get("has_negative"))
-        has_positive = _as_bool(shape.get("has_positive"))
-        magnitude = shape.get("max_abs_magnitude")
+    if numeric_shape:
+        has_negative = _as_bool(summary.get("has_negative"))
+        has_positive = _as_bool(summary.get("has_positive"))
+        magnitude = summary.get("max_abs_magnitude")
         if magnitude is not None and (has_negative or has_positive):
             result["numeric_shape"] = {
                 "max_abs_magnitude": _bounded_magnitude(magnitude),

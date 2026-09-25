@@ -9,6 +9,7 @@ from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validat
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
+from test_data_agent.core.privacy import is_sensitive_field
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
 )
@@ -138,8 +139,10 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
             preserves = isinstance(behavior, PreserveAction) or (
                 isinstance(behavior, SubstituteAction) and isinstance(behavior.unmatched, PreserveAction)
             )
-            if preserves and identity in source_fields and source_fields[identity].sensitive:
-                valid = False
+            if preserves and identity in source_fields:
+                field = source_fields[identity]
+                if field.sensitive or is_sensitive_field(field.name, field.semantic_type):
+                    valid = False
             if isinstance(behavior, DeriveAction):
                 dependencies = {(decision.entity, name) for name in behavior.dependencies}
                 if len(dependencies) != len(behavior.dependencies):
@@ -200,7 +203,8 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
     validate_policy_profile(policy, profile)
     if type(max_bytes) is not int or max_bytes < 1:
         raise BehaviorPolicyError("invalid policy review") from None
-    observed = {(entity.name, field.name): field.sensitive
+    observed = {(entity.name, field.name):
+                field.sensitive or is_sensitive_field(field.name, field.semantic_type)
                 for entity in profile.entities for field in entity.fields}
     fields = []
     for decision in policy.fields:

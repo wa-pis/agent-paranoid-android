@@ -178,6 +178,39 @@ def test_observed_sensitivity_blocks_preservation(fallback):
         validate_policy_field_coverage(decision, profile)
 
 
+@pytest.mark.parametrize("field_name,semantic_type", [
+    ("customer_email", None), ("value", "phone"),
+])
+@pytest.mark.parametrize("fallback", [False, True])
+def test_name_or_semantic_sensitivity_blocks_preservation(field_name, semantic_type, fallback):
+    behavior = {"action": "preserve", "authorization_ref": "review"}
+    if fallback:
+        behavior = {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+            {"original": ["fictional-a"], "replacement": ["fictional-b"]}]},
+            "unmatched": behavior}
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": field_name, "data_type": "string", "sensitive": False,
+                    "semantic_type": semantic_type}]}]})
+    payload = policy(behavior)
+    payload["fields"][0]["field"] = field_name
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    decision = parse_behavior_policy(payload)
+    with pytest.raises(BehaviorPolicyError, match="^invalid policy field coverage$"):
+        validate_policy_profile(decision, profile)
+    with pytest.raises(BehaviorPolicyError, match="^invalid policy field coverage$"):
+        render_policy_review(decision, profile, max_bytes=4096)
+
+
+def test_review_labels_sensitive_name_without_observed_flag():
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "customer_email", "data_type": "string", "sensitive": False}]}]})
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["field"] = "customer_email"
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    review = render_policy_review(parse_behavior_policy(payload), profile, max_bytes=4096)
+    assert b'"observed_sensitive": true' in review
+
+
 @pytest.mark.parametrize("change", ["type", "nullable", "name", "statistics"])
 def test_schema_binding_detects_column_drift_not_statistics(change):
     profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,

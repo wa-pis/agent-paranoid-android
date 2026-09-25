@@ -61,6 +61,7 @@ final candidate acceptance. Detailed chronology and commands remain in
 | 8 | User approved fixed cardinality: four keys remain four as output grows. Correction merged in [PR #536](https://github.com/wa-pis/agent-paranoid-android/pull/536), `ca6cb12`, with green CI. Fictional CSV/folder/aggregate routes pass at 2, 100 and 1000 output rows (`tests/test_identifier_pool.py`): counts only, synthetic keys, deterministic pools. Nulls/small outputs may use fewer members; approximate input counts do not prove exact source fidelity. Installed-RC acceptance pending. |
 | 4 | Fictional single-CSV probe on `1da23ad`: 100 rows/four repeated integer `run_id` values produced no top values and 100 generated identifiers; text equivalents produced four synthetic top values and four generated categories. Blanket absence of CSV top values is disproved. Numeric repeated-key case corrected in PR #536 using finding 8's approved fixed pool; focused regression and CI passed. No private-input or installed-RC acceptance claimed. |
 | 9 | Independent identifier-domain collision fixed in [PR #517](https://github.com/wa-pis/agent-paranoid-android/pull/517). `tests/test_identifier_domains.py` covers independent fields and declared links; relationship-order follow-ups reviewed on `3add995`. This does not prove general relationship inference or cross-run mapping stability. |
+| 13 | A fictional folder-CSV regression exposed inference choosing an unrelated same-table key on equal overlap. The local fix prefers an exact field-name match on a confidence tie: 4 parents/100 linked children infer the parent link; with 75 linked children no parent link is inferred (`tests/test_domain_agnostic_pipeline.py`). Separately, a declared-link regression confirms 4 parent and 100 child output rows with no orphans; without the declaration, identifier domains stay disjoint (`tests/test_identifier_domains.py`). Source orphan-rate fidelity and installed-RC behavior remain unverified. |
 | 19 | Deterministic access-time regression fixed in [PR #516](https://github.com/wa-pis/agent-paranoid-android/pull/516): two baseline failures, focused candidate checks passed. `tests/test_io_path_policy.py` retains presence/path-swap guards. Original script did not reproduce the timing failure: verified public 1.5.0 and publication candidate each yielded 24 successes/16 intended rejections. Five adapted subprocess scenarios passed both; not evidence that baseline contained no bug. |
 | 7 | Timestamp subcase already corrected in baseline 1.5.0: isolated fictional CSV -> profile -> spec -> generation yields 20 timezone-aware values within observed bounds on baseline and `c28ac5a`. Time and +03:00 offset retained; not a new fix. Monthly-date granularity and mixed profile/spec routing remain separate unresolved subcases. No private-input or final installed-RC claim. |
 | 3, 5–6, 10–18 | No final disposition established by this checkpoint. Preserve the finding-specific verification plans above; existing implementation or tests alone do not establish client-case acceptance. Finding 13 is not closed by the narrower declared-link fix under finding 9. |
@@ -92,7 +93,33 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 | 22 | AND/OR classification reproduced with sqlglot 30.13.0 and corrected in PR #541 (`b43005e`). Focused PostgreSQL/Trino predicate and fake-driver profile-to-spec checks passed, including forbidden-function controls; no live DB or final installed-RC replay. |
 | 24 | The client's fictional spec was extracted as data, not executed as a script. Installed public 1.5.0 baseline and interim `47a1eb8` candidate both wrote `created_at` physically as Parquet `string` although spec declares `date`; integer remained `int64`. Declared-schema/readback correction, nullable/timestamp/decimal cases and final RC replay remain pending. |
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
-| 17 | Focused fake-driver statement-count regression for both PostgreSQL and Trino query profiling measures one no-row schema request, one row count, three column summaries and two numeric-shape aggregates: seven requests for three fields; one explicitly allowlisted category adds one request, while default makes no category/raw-row request. This is query-count evidence, not a live scan-cost or latency measurement, batching fix, or final-RC acceptance. |
+| 17 | Fake-driver query-source profiling for both PostgreSQL and Trino measured seven requests for three fields (two numeric) before numeric-summary consolidation, five after: one no-row schema request, one row count and one aggregate per field. One explicitly allowlisted category adds one request; default makes no category/raw-row request. PostgreSQL table profiling separately fell from 15 to 12 statements for two tables/four columns (three numeric), or 16 to 13 with one category. Neither test measures live scan bytes/latency or proves final-RC acceptance. No SQL permissions, statement/scan budgets or temporary-table writes changed. |
+
+Later finding-25 installed-CLI A/B used a new fictional 12-row integer spec,
+explicit `--mode negative --invalid-ratio 1`, and verified each package import
+root. Public 1.5.0 failed the all-invalid-row assertion: output amounts stayed
+integers. A separately installed wheel from source commit `76b2806` passed:
+amounts were intentionally invalid strings, manifest effective settings were
+`negative/1`, report validity was false, and the input spec stayed unchanged.
+The probe did not lock down exit-code policy. Wheel SHA-256:
+`07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+probe SHA-256: `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+This wheel still labels itself 1.5.0 and shares development dependencies; it
+is not clean-environment or final 1.6.0rc1 acceptance. Saved-valid precedence,
+controlled-invalid status semantics and intentionally invalid Parquet remain
+separate decisions.
+
+Additional finding-20 Parquet capability replay (not final RC acceptance):
+an isolated `sitecustomize.py` shim replaced only `pyarrow.parquet.read_table`
+with a fictional failure; no product code was patched. Verified installed
+public 1.5.0 and interim typed-Parquet candidate import roots each returned
+`doctor --require-extra parquet --json` with `ok=false`/exit 1,
+`quickstart=available`, `extra:parquet=available`, and
+`capability:parquet=failed`. Neither response contained the fictional token
+or reinstall advice. Shim SHA-256:
+`524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`.
+This proves the installed dependency-failure presentation path for these
+versions, not a real Parquet fault, clean environment, or final RC replay.
 
 These probes used fictional data, selected each installed CLI and verified its
 package import root. Subprocesses had 30-second timeouts and bounded captures;
