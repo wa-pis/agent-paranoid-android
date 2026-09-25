@@ -230,21 +230,31 @@ Do not claim complete client acceptance from the script's exit code alone.
 
 ## New Agreed Scenarios
 
-Reviewed source-free CSV subset of `golden_run.py` is implemented in
-`tests/test_client_golden_csv_acceptance.py`. It invokes profile/infer/generate
-in bounded subprocesses, verifies the package import root, row/key counts,
-date/amount bounds and validation report. It uses the same isolated-install
-environment variable as the publication adaptation above. Unlike the original,
-it asserts synthetic profile categories rather than source-category copying:
-this explicitly tests the current source-free contract, not fulfillment of
-finding 5. Private snapshot/pair cases and the rest of the original script are
-not covered. A passing fictional subset does not close those requirements.
+Reviewed source-free CSV subsets of `golden_run.py` are implemented in
+`tests/test_client_golden_csv_acceptance.py`. C.1 invokes profile/infer/generate;
+C.2 generates a separate fictional linked pair from a declared spec. Bounded
+subprocesses verify the package import root, row/key counts, FK membership,
+distinct key domains, synthetic repeated-key pool, date/amount bounds and
+validation report as applicable. Both use the isolated-install environment
+variable from the publication adaptation above. Unlike the original, C.1
+asserts synthetic profile categories rather than source-category copying:
+this tests the current source-free contract, not fulfillment of finding 5.
+Private snapshot/pair inputs and the rest of the original script are not
+covered. Passing fictional subsets do not close those requirements.
 
 On 2026-09-24 this subset passed both verified public 1.5.0 and an isolated wheel
 built from unchanged production code at `6a435db938e8ff43113e3f6f434fdd98f4363f42`.
 Both used development-interpreter dependencies; neither is clean-environment
 RC acceptance. Identical passing outcomes are compatibility evidence, not a
 newly fixed regression. Wheel and adaptation hashes are recorded in progress.
+
+The separate fictional C.2 test failed on installed public 1.5.0: twenty
+`run_id` values were distinct despite a declared four-value synthetic pool.
+It passed against the installed interim corrected wheel also used for the SQL
+query-temporal A/B replay (version-labelled 1.5.0 with shared dependencies).
+This establishes an affected-baseline difference for repeated synthetic keys,
+not acceptance of the private pair, source-value fidelity, a clean install or
+the final 1.6.0rc1 artifact.
 
 Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
 saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
