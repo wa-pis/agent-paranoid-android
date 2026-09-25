@@ -2024,6 +2024,13 @@ Broader transformation remains unfinished.
   targeted mypy and strict OpenSpec validation pass. No output path or source
   preservation was enabled. Next: settle overlapping-scope precedence, then
   implement a bounded value-free local trace using the same matcher.
+- Added a private bounded trace summary over the same value-free match events:
+  capped event list, total matched/unmatched cells, per-column/scope/rule counts,
+  explicit truncation and cell/rule-bucket limits. Forged metadata and limit
+  overflow fail with fixed messages. Forty-five focused CSV tests, Ruff and
+  targeted mypy pass. This is not a CLI dry-run or source-row execution.
+  Next: wire the local debug surface to a fixed approved snapshot after the
+  overlap precedence and preservation-policy gates are resolved.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

@@ -4,7 +4,7 @@ import csv
 import io
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from decimal import Decimal
 from types import MappingProxyType
@@ -48,6 +48,55 @@ class TextTraceEvent:
     matched: bool
     scope: Literal["file", "column"] | None
     rule_ordinal: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class TextTraceSummary:
+    events: tuple[TextTraceEvent, ...]
+    matched_cells: int
+    unmatched_cells: int
+    rule_counts: tuple[tuple[int, Literal["file", "column"], int, int], ...]
+    truncated: bool
+
+
+def summarize_text_trace(
+    events: Iterable[TextTraceEvent], *, max_events: int, max_cells: int,
+    max_rule_counts: int, budget: GenerationBudget,
+) -> TextTraceSummary:
+    """Summarize bounded, value-free local match events only."""
+    if (type(max_events) is not int or max_events < 1 or type(max_cells) is not int
+            or max_cells < 1 or type(max_rule_counts) is not int or max_rule_counts < 1):
+        raise MappingDeclarationError("invalid text trace limits") from None
+    shown: list[TextTraceEvent] = []
+    counts: dict[tuple[int, Literal["file", "column"], int], int] = {}
+    matched = unmatched = total = 0
+    for event in events:
+        budget.check("text trace")
+        if (not isinstance(event, TextTraceEvent) or total >= max_cells
+                or type(event.row_ordinal) is not int or event.row_ordinal < 1
+                or type(event.column_ordinal) is not int or event.column_ordinal < 1
+                or type(event.matched) is not bool):
+            raise MappingDeclarationError("invalid text trace event") from None
+        total += 1
+        if len(shown) < max_events:
+            shown.append(event)
+        if event.matched:
+            if (event.scope not in ("file", "column")
+                    or type(event.rule_ordinal) is not int or event.rule_ordinal < 1):
+                raise MappingDeclarationError("invalid text trace event") from None
+            key = (event.column_ordinal, event.scope, event.rule_ordinal)
+            if key not in counts and len(counts) >= max_rule_counts:
+                raise MappingDeclarationError("text trace rule limit exceeded") from None
+            counts[key] = counts.get(key, 0) + 1
+            matched += 1
+        else:
+            if event.scope is not None or event.rule_ordinal is not None:
+                raise MappingDeclarationError("invalid text trace event") from None
+            unmatched += 1
+    budget.check("text trace")
+    return TextTraceSummary(tuple(shown), matched, unmatched,
+                            tuple((*key, count) for key, count in sorted(counts.items())),
+                            total > max_events)
 
 
 def text_trace_event(row_ordinal: int, column_ordinal: int, match: TextMatch | None) -> TextTraceEvent:

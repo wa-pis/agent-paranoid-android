@@ -5,7 +5,7 @@ import pytest
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
     parse_csv_mapping_bytes,
-    text_trace_event,
+    summarize_text_trace, text_trace_event, TextTraceEvent,
 )
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.transformation_mapping import parse_mapping_declaration
@@ -82,6 +82,39 @@ def test_overlapping_file_and_column_rules_reject_without_values():
         match_scoped_text("true", "flag", file_table, {"flag": column_table})
     assert str(error.value) == "conflicting text replacement scopes"
     assert "true" not in repr(error.value)
+
+
+def test_text_trace_counts_all_cells_but_limits_local_events():
+    events = [
+        text_trace_event(1, 1, match_scoped_text("true", "flag", None, {
+            "flag": compile_text_replacement_table(
+                b"old,new\ntrue,false\n", CsvMapping(kind="csv", path="not-opened.csv",
+                source_columns=("old",), replacement_columns=("new",)), budget=GenerationBudget(),
+            ),
+        })),
+        text_trace_event(1, 2, None),
+        text_trace_event(2, 1, None),
+    ]
+    summary = summarize_text_trace(events, max_events=1, max_cells=3,
+                                   max_rule_counts=1, budget=GenerationBudget())
+    assert summary.events == (events[0],)
+    assert (summary.matched_cells, summary.unmatched_cells, summary.truncated) == (1, 2, True)
+    assert summary.rule_counts == ((1, "column", 1, 1),)
+    assert "true" not in repr(summary)
+    assert "false" not in repr(summary)
+
+
+def test_text_trace_rejects_forged_values_and_rule_bucket_overflow():
+    forged = TextTraceEvent("fictional-private-marker", 1, False, None, None)
+    with pytest.raises(MappingDeclarationError, match="^invalid text trace event$") as error:
+        summarize_text_trace([forged], max_events=1, max_cells=2,
+                             max_rule_counts=1, budget=GenerationBudget())
+    assert "fictional-private-marker" not in str(error.value)
+    events = [TextTraceEvent(1, 1, True, "file", 1),
+              TextTraceEvent(1, 2, True, "file", 1)]
+    with pytest.raises(MappingDeclarationError, match="^text trace rule limit exceeded$"):
+        summarize_text_trace(events, max_events=1, max_cells=2,
+                             max_rule_counts=1, budget=GenerationBudget())
 
 
 def test_private_csv_pairs_preserve_empty_and_explicit_null():
