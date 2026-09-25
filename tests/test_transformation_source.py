@@ -90,6 +90,7 @@ def test_csv_review_binds_referenced_mapping_bytes():
     (b"status\nA\nB\n", "unknown", "status", True),
     (b"status\nA\nB\n", "non_sensitive", "status", False),
     (b"status\nA\n", "sensitive", "status", False),
+    (b" status \nA\n", "sensitive", "status", False),
     (b"status;other\nA;x\nB;y\n", "sensitive", "status", True),
     (b"email\nA\nB\n", "non_sensitive", "email", True),
 ])

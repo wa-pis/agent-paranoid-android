@@ -148,8 +148,10 @@ def reject_sensitive_text_reuse(
         names = tuple(fields)
         active: dict[str, set[str]] = {item.field: set() for item in sensitive}
         reader = _csv_reader_from_snapshot(source.payload)
-        if tuple(validate_csv_headers(reader.fieldnames)) != names:
+        normalized = validate_csv_headers(reader.fieldnames)
+        if tuple(normalized) != names:
             raise ValueError
+        reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
@@ -162,8 +164,10 @@ def reject_sensitive_text_reuse(
             return
         active_replacements = {value for replacements in active.values() for value in replacements}
         reader = _csv_reader_from_snapshot(source.payload)
-        if tuple(validate_csv_headers(reader.fieldnames)) != names:
+        normalized = validate_csv_headers(reader.fieldnames)
+        if tuple(normalized) != names:
             raise ValueError
+        reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):

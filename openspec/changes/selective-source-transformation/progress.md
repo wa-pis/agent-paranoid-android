@@ -2181,6 +2181,28 @@ Broader transformation remains unfinished.
   full output privacy validation. Next: verify exact-head CI for `3aec952`,
   sign/push the follow-up, repeat independent AI review on the changed safety
   scope, and retain the AGENTS.md amendment/executable output gates.
+- `3aec952` completed 37 applicable CI checks successfully with four
+  release-only skips. Signed safety follow-up
+  `4672f7a2760b9a1e50b92dbf0210f2e976657fc3` was fast-forward pushed to
+  draft #568. Raman, the original independent read-only AI reviewer, was
+  resumed for changed-scope re-review of this exact SHA; do not duplicate it.
+  Fresh CI and review are pending. Next: disposition the review finding, then
+  continue explicit safety-policy amendment and full output-path tests before
+  any source-preserving execution.
+- Raman's independent changed-scope AI re-review on exact `4672f7a2760b9a1e50b92dbf0210f2e976657fc3`
+  (2026-09-25 UTC) closed the sensitive `A→B, B→A` finding at local review
+  and receipt canonicalization; no new safety bypass found. A low-severity
+  fail-closed compatibility issue remained: padded CSV headers were normalized
+  in profiling but not assigned to the guard reader. Evidence and scope:
+  [AI safety re-review](reviews/4672f7a-ai-safety.md). This is AI evidence,
+  not human approval or permission to execute.
+- Local follow-up assigns the same normalized header names on both guard
+  passes; fictional ` status ` regression now succeeds without weakening the
+  sensitive source-value check. Fifty affected source/receipt/profiler/CLI
+  tests, Ruff and targeted mypy pass. `4672f7a` completed 37 applicable CI
+  checks successfully with four release-only skips. Next: sign/push this
+  compatibility fix and request narrow changed-scope AI
+  confirmation, then tackle the AGENTS.md/baseline safety amendment.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
