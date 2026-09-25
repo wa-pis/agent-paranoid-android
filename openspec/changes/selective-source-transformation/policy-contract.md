@@ -165,6 +165,29 @@ authorize wholesale copying. Derived totals must be recomputed and validated.
 If no permissible replacement satisfies the policy and constraints, fail with a
 bounded value-free error rather than retaining the input or relaxing constraints.
 
+## Closed CSV Execution Development Status
+
+The private `io/transformation_execute.py` prototype supports `replace_text`,
+`drop`, `preserve` and unmatched-preserve. It is not connected to public
+CLI/Python/MCP execution and is not release acceptance. `synthesize`, typed
+`substitute` and `derive` remain unsupported; they fail rather than silently
+falling back to another action. Final independent implementation review and
+activation gates still apply.
+
+Execution consumes revalidated fixed input bytes, never reopened source paths.
+Preservation requires the existing local receipt verifier, including exact-byte
+binding and owner-only regular-file checks; a policy authorization reference
+alone is insufficient. The engine does not mint receipts. Whole-row copying
+and recognizable sensitive output remain rejected.
+
+The private result carries restricted UTF-8 comma CSV bytes (omitted from repr)
+and a value-free retention summary. Input decoding/dialect is shared with
+profiling; output columns follow source order minus drops, and row order is
+unchanged. Retention compares corresponding output cells, excludes dropped
+cells, and reports unavailable for an empty comparison scope. The percentage
+does not authorize preservation or certify anonymity. No filesystem publication
+or mixed-origin manifest is implemented by this in-memory prototype.
+
 ## Approval Identity Binding
 
 A schema fingerprint detects structural drift, not changes to source contents.

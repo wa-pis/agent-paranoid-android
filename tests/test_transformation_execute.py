@@ -20,8 +20,9 @@ from test_data_agent.csv_profiler import profile_csv_bytes
 from test_data_agent.io.transformation_source import prepare_csv_review_request
 
 
-def request(target="second", complete=True, behavior=None):
-    source = SnapshotPart("source", "items", b"flag,code\ntrue,001\nfalse,002\n")
+def request(target="second", complete=True, behavior=None,
+            source_bytes=b"flag,code\ntrue,001\nfalse,002\n"):
+    source = SnapshotPart("source", "items", source_bytes)
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
         source.payload, source.name, budget=GenerationBudget(5)))
     def table(path):
@@ -211,3 +212,13 @@ def test_all_dropped_columns_have_no_retention_measurement():
     assert result.retention.unchanged_percent is None
     assert result.retention.compared_cells == 0
     assert result.retention.excluded_dropped_cells == 4
+
+
+@pytest.mark.parametrize("delimiter", [",", ";", "\t", "|"])
+@pytest.mark.parametrize("bom", [b"", b"\xef\xbb\xbf"])
+def test_execution_uses_profile_dialect_and_source_column_order(delimiter, bom):
+    source = bom + (f"code{delimiter}flag\r\n001{delimiter}true\r\n"
+                    f"002{delimiter}false\r\n").encode()
+    output = execute(request(source_bytes=source))
+    assert list(csv.reader(io.StringIO(output.decode()))) == [
+        ["code", "flag"], ["1", "no"], ["second", "yes"]]

@@ -2477,3 +2477,16 @@ Broader transformation remains unfinished.
   for the closed engine, without public activation or an ordinary AI review.
   Supported private actions are replace_text, drop, preserve and preserve
   fallback; synthesize, typed substitute and derive are not implemented here.
+- Draft PR #578 published at `9d3395108e92e003a0c116b350a09a640d1d7c0c`;
+  CI verified running with no failures, not restarted. Added eight local
+  dialect/order regressions: comma/semicolon/tab/pipe, with/without UTF-8 BOM,
+  reordered source columns independent of policy order. All eight pass and
+  Ruff passes. Engine consumes the same dialect/decoding as source profiling;
+  output remains UTF-8 comma CSV. Local tests remain unpushed while existing
+  CI runs. Pending owner decisions are unchanged and were not re-requested.
+- CI for draft #578 at `9d3395108e92e003a0c116b350a09a640d1d7c0c`
+  completed without failures (run 36173663526 and PR check rollup verified).
+  Publishing the accumulated eight dialect/order regressions and private
+  execution-status documentation together. Earlier successful checks were not
+  rerun unchanged; the next CI run covers the new test/documentation SHA.
+  PR remains draft; no activation, merge or RC acceptance claimed.
