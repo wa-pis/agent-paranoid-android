@@ -6,6 +6,13 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.rules import expressions
 
 
+def test_exact_integer_formula_retains_large_units_and_rejects_fractions():
+    assert expressions.eval_exact_integer("amount / 3 * 3 + 2", {"amount": 9007199254740993},
+        budget=GenerationBudget()) == 9007199254740995
+    with pytest.raises(ValueError):
+        expressions.eval_exact_integer("amount / 2", {"amount": 3}, budget=GenerationBudget())
+
+
 @pytest.mark.parametrize("formula, expected", [
     ("amount + 0.005", "1.01"),
     ("-(amount + 0.005)", "-1.01"),

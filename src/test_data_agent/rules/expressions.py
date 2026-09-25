@@ -64,13 +64,9 @@ def safe_eval(expression: str, row: dict[str, Any]) -> Any:
     return eval_node(parse_safe_expression(expression), row)
 
 
-def eval_exact_decimal(
-    expression: str, row: dict[str, Any], *, precision: int, scale: int,
-    budget: GenerationBudget,
-) -> Decimal:
-    """Bounded exact arithmetic with one final HALF_UP rounding, no binary floats."""
+def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> Fraction:
+    """Bounded rational arithmetic shared by integer and decimal results."""
     try:
-        decimal_from_units(0, precision=precision, scale=scale)
         budget.check("exact expression")
         tree = parse_safe_expression(expression)
 
@@ -108,6 +104,33 @@ def eval_exact_decimal(
             return result
 
         result = evaluate(tree)
+        budget.check("exact expression result")
+        return result
+    except (ValueError, TypeError, KeyError, ArithmeticError, DecimalException):
+        pass
+    try:
+        raise ValueError("invalid exact decimal expression")
+    except ValueError as error:
+        error.__context__ = None
+        raise
+
+
+def eval_exact_integer(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> int:
+    """Require an integral exact result; never truncate or round a fraction."""
+    result = _eval_exact_fraction(expression, row, budget=budget)
+    if result.denominator != 1:
+        raise ValueError("invalid exact integer expression") from None
+    return result.numerator
+
+
+def eval_exact_decimal(
+    expression: str, row: dict[str, Any], *, precision: int, scale: int,
+    budget: GenerationBudget,
+) -> Decimal:
+    """Apply HALF_UP once, after exact arithmetic, with declared-width checks."""
+    try:
+        decimal_from_units(0, precision=precision, scale=scale)
+        result = _eval_exact_fraction(expression, row, budget=budget)
         units, remainder = divmod(abs(result.numerator) * 10**scale, result.denominator)
         units += int(2 * remainder >= result.denominator)
         budget.check("exact expression result")

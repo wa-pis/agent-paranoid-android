@@ -60,8 +60,10 @@ def test_closed_csv_exact_text_override_no_cascade():
 
 @pytest.mark.parametrize("formula", ["amount * 2", "amount / 0", "amount * 1e309", "amount + True",
     "amount + 'fictional' * 999999999999999999999999999999"])
-def test_derive_uses_transformed_dependencies_in_topological_order(formula):
-    source = SnapshotPart("source", "items", b"grand,total,amount\n9.5,4.5,1.5\n")
+@pytest.mark.parametrize("integer", [False, True])
+def test_derive_uses_transformed_dependencies_in_topological_order(formula, integer):
+    source = SnapshotPart("source", "items", b"grand,total,amount\n9,4,2\n" if integer else
+                          b"grand,total,amount\n9.5,4.5,1.5\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(source.payload, "items", budget=GenerationBudget()))
     policy = {"schema_version": "0.1", "seed": 7,
         "schema_fingerprint": transformation_schema_fingerprint(profile), "fields": [
@@ -71,12 +73,13 @@ def test_derive_uses_transformed_dependencies_in_topological_order(formula):
              "behavior": {"action": "derive", "expression": formula, "dependencies": ["amount"]}},
             {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
              "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
-                 {"original": [1.5], "replacement": [3.5]}]}}},
+                 {"original": [2 if integer else 1.5], "replacement": [3 if integer else 3.5]}]}}},
         ]}
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, (),
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     if formula == "amount * 2":
-        assert execute(material) == b"grand,total,amount\n10.5,7.0,3.5\n"
+        assert execute(material) == (b"grand,total,amount\n9,6,3\n" if integer else
+                                     b"grand,total,amount\n10.5,7.0,3.5\n")
     else:
         module = import_module("test_data_agent.io.transformation_execute")
         with pytest.raises(module.TransformationExecutionError) as caught:

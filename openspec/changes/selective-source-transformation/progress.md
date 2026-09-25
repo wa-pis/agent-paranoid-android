@@ -2709,3 +2709,14 @@ Broader transformation remains unfinished.
   string-repetition expressions from allocating output before type checking.
   Added a large string-repetition rejection regression without executing it
   before the guard. Updated the explicit approximate-FLOAT development status.
+- Factored exact rational evaluation for INTEGER and DECIMAL results, then
+  wired INTEGER derive with INTEGER dependencies into the same topological
+  executor. Integer results reject fractions, preserve values beyond 2**53
+  and do not inherit the 38-digit DECIMAL width. Fourteen exact evaluator tests
+  and ten FLOAT/INTEGER engine chain/error tests pass; targeted mypy passes.
+  DECIMAL source/output schema binding and execution remain pending.
+- INTEGER integration checkpoint: all 103 engine and exact-formula tests pass;
+  Ruff and targeted mypy pass. Existing CI run 36182035127 at f1048e2
+  completed successfully. Publish the checked INTEGER/FLOAT derive work to
+  the existing draft PR; next remains declared DECIMAL schema binding, not
+  public activation or release readiness.

@@ -220,7 +220,9 @@ cells. Unchanged generated text rejects; numeric coincidence exceptions remain
 unfinished. Approximate FLOAT `derive` executes in dependency order using
 transformed INTEGER/FLOAT inputs, not original cells. Only finite numeric
 literals are allowed; arithmetic/nonfinite results reject, and CSV column
-order is preserved. INTEGER/DECIMAL derive result integration remains pending.
+order is preserved. INTEGER derive uses the shared exact rational evaluator
+with INTEGER dependencies, rejects fractional final results and never rounds
+through float. DECIMAL derive result integration remains pending.
 Cross-input relationships and other typed substitutions remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and

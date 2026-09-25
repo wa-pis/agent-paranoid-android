@@ -33,7 +33,7 @@ from test_data_agent.core.transformation_policy import (
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
-from test_data_agent.rules.expressions import expression_constants, safe_eval
+from test_data_agent.rules.expressions import eval_exact_integer, expression_constants, safe_eval
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
@@ -142,9 +142,12 @@ def replace_csv_snapshot(
                 needs_receipt = True
                 continue
             if isinstance(action, DeriveAction):
-                if (field_types[decision.field] != FieldType.FLOAT or any(
+                if (field_types[decision.field] not in (FieldType.INTEGER, FieldType.FLOAT) or any(
                         field_types[name] not in (FieldType.INTEGER, FieldType.FLOAT)
                         for name in action.dependencies)):
+                    raise ValueError
+                if field_types[decision.field] == FieldType.INTEGER and any(
+                        field_types[name] != FieldType.INTEGER for name in action.dependencies):
                     raise ValueError
                 if any(type(value) not in (int, float) or not math.isfinite(value)
                        for value in expression_constants(action.expression)):
@@ -261,9 +264,13 @@ def replace_csv_snapshot(
                 action = actions[name]
                 if isinstance(action, DeriveAction):
                     transformed = dict(zip(execution_names, values))
-                    result = safe_eval(action.expression, {
+                    operands = {
                         dependency: normalize_csv_scalar(transformed[dependency], field_types[dependency])
-                        for dependency in action.dependencies})
+                        for dependency in action.dependencies}
+                    if field_types[name] == FieldType.INTEGER:
+                        values.append(str(eval_exact_integer(action.expression, operands, budget=budget)))
+                        continue
+                    result = safe_eval(action.expression, operands)
                     if type(result) not in (int, float) or not math.isfinite(result):
                         raise ValueError
                     values.append(str(float(result)))
