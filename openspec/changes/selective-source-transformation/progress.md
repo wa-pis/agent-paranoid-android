@@ -1284,3 +1284,10 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding 13 isolated CSV inference fix: fictional 4-parent/100-child input
+  with all children linked previously selected an unrelated same-table key on
+  an equal-confidence tie. Exact field-name match now wins that tie. The same
+  fixture with 75 linked children yields no inferred parent link. This does
+  not preserve source orphan rates or alter privacy policy. Focused checks:
+  35 tests, changed-file Ruff and strict OpenSpec passed. Next: signed PR and
+  exact-head CI, then final installed-RC replay.
