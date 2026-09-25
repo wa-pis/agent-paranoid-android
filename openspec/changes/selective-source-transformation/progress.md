@@ -1325,3 +1325,13 @@ Broader transformation remains unfinished.
   OpenSpec and diff check passed. This is not exact-commit CI or final RC
   acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
   policy choice before merge; do not repeat local gates unchanged.
+- Exact DECIMAL ceiling decision for 1.6.0rc1: 38 base-ten digits with scale
+  0..precision, matching Arrow decimal128 and required fictional DECIMAL(20,2)
+  and DECIMAL(38,16) examples. decimal256/76-digit support is deferred; values
+  beyond this ceiling fail closed without FLOAT conversion or implicit rounding.
+  A private exact integer-units parser/constructor and fictional boundary tests
+  are staged in a dependent worktree; this does not yet provide end-to-end
+  profile/generation/formula/export support or preservation authority. Twelve
+  focused tests, Ruff, focused mypy, strict OpenSpec and diff checks passed. Next: carry
+  precision/scale through a typed field contract and deterministic generation,
+  then test Arrow readback; leave formula rounding as a separate decision.
