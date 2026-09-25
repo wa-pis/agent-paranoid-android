@@ -89,6 +89,14 @@ for an expression and a JSON array of dependency names. These declarations
 are not proof of executable formula/generator validity or permission to retain
 source data.
 
+For `derive`, review parses the existing bounded arithmetic syntax (1024
+characters, 128 AST nodes) without evaluation. Referenced column names must
+exactly match the declared dependencies; missing, extra, dropped or cyclic
+dependencies reject. Aggregate calls, attribute access and unsupported syntax
+are not row-local formulas and reject. Columns literally named `sum` or
+`count` still count as ordinary dependencies when used without a function call.
+This preflight does not establish result types, null handling or DECIMAL rounding.
+
 Substitution/replacement asks for mapping JSON using the policy's existing
 schema. For example, a local exact-text CSV table uses:
 

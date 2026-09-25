@@ -837,3 +837,11 @@ def test_business_validation_bounds_total_report_errors() -> None:
     assert sum(len(result.errors) for result in report.results) == 1_000
     assert report.results[-1].errors == []
     assert report.results[-1].errors_truncated is True
+
+
+def test_expression_references_distinguishes_function_calls_from_same_named_fields():
+    from test_data_agent.rules.expressions import expression_references
+
+    assert expression_references("sum + sum('input') + count + count()") == (
+        {"sum", "count"}, {"input"}, {"sum", "count"},
+    )

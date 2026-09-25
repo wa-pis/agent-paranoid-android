@@ -224,3 +224,34 @@ def test_action_selection_saves_same_versioned_policy(tmp_path, action, mapping_
             process.kill()
             process.wait()
         os.close(master)
+@pytest.mark.parametrize("expression", ["missing + 1", "count()", "evil('fictional-private-expression')"])
+def test_action_editor_rejects_invalid_derived_expression_without_saving(tmp_path, expression):
+    source, path, _ = draft(tmp_path)
+    before = path.read_bytes()
+    master, slave = pty.openpty()
+    process = subprocess.Popen(command(source, path) + ["--edit-actions"], stdin=slave,
+                               stderr=slave, stdout=subprocess.PIPE, env=environment())
+    os.close(slave)
+    transcript = b""
+    try:
+        for marker, answer in [
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"non_sensitive"),
+            (b"Action [keep/drop/preserve/synthesize/substitute/replace_text/derive]: ", b"derive"),
+            (b"Expression (hidden): ", expression.encode()),
+            (b"Dependency names JSON (hidden): ", b'["code"]'),
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"sensitive"),
+            (b"Action [keep/drop/preserve/synthesize/substitute/replace_text/derive]: ", b"keep"),
+        ]:
+            transcript += read_until(master, marker)
+            os.write(master, answer + b"\n")
+        stdout, _ = process.communicate(timeout=10)
+        assert process.returncode != 0
+        assert path.read_bytes() == before
+        assert b"fictional-private-expression" not in transcript + stdout
+        assert b"fictional-A" not in transcript + stdout
+        assert b"Type SAVE" not in transcript
+    finally:
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        os.close(master)

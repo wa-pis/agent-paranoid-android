@@ -70,6 +70,9 @@ per-field behavior decisions and field coverage. `transformation_mapping.py`,
 `transformation_csv.py`, and `transformation_yaml.py` validate inline/CSV
 mapping declarations and restricted policy serialization. These parsers do not
 authorize source-value preservation or transform rows.
+Derived-field coverage reuses `rules.expressions.expression_references` to
+parse bounded row-local arithmetic and require exact declared dependencies;
+it does not evaluate formulas or establish financial/null/result-type semantics.
 `transformation_report.py` computes only a bounded, value-free unchanged-cell
 aggregate from already corresponding source/output rows. It does not transform,
 publish, retain, or expose those rows and is not yet connected to execution.
