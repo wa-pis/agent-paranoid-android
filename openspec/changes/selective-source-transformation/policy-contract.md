@@ -231,8 +231,14 @@ an existing `DatasetProfile`, reparsing mutable nested profile contents and poli
 instances. Duplicate, missing and unknown fields fail with a fixed detached error.
 It also checks declared derive dependencies as exact field names within the same
 entity: missing, dropped, repeated or cyclic dependencies fail. Cross-entity
-dependency syntax is not implemented; expression/declaration agreement is still
-pending formula validation. No expression is evaluated by this check.
+dependency syntax is not implemented. Expression/declaration agreement uses
+the shared bounded arithmetic parser (1024 characters, 128 AST nodes): the
+exact set of ordinary field references must equal the declared dependencies,
+and aggregate calls are rejected for this row-local action. Bare `sum`/`count`
+column names remain field references rather than implicit function calls.
+Malformed or unsupported expressions return a value-free detached policy error.
+No expression is evaluated by this check; result types, null semantics and
+financial rounding still require executable formula validation.
 Observed `sensitive` fields, sensitive names and sensitive semantic types cannot
 use preservation or unmatched-preserve, even when the decision declares them
 non-sensitive. The value-free review reports this effective sensitivity, not

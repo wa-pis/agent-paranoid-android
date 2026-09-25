@@ -229,6 +229,45 @@ def test_derived_dependencies(dependencies):
         validate_policy_field_coverage(parse_behavior_policy(payload), profile)
 
 
+@pytest.mark.parametrize(("expression", "dependencies"), [
+    ("hidden + 1", ["input"]),
+    ("input + 1", ["input", "other"]),
+    ("sum('input')", ["input"]),
+    ("count()", ["input"]),
+    ("input.real", ["input"]),
+    ("(input", ["input"]),
+    ("evil('fictional-private-marker')", ["input"]),
+    ("input " + " " * 1024, ["input"]),
+    (" + ".join(["input"] * 50), ["input"]),
+])
+def test_derive_preflight_rejects_expression_dependency_disagreement(expression, dependencies):
+    payload = policy({"action": "derive", "expression": expression, "dependencies": dependencies})
+    payload["fields"].extend({"entity": "items", "field": name, "sensitivity": "unknown",
+                              "behavior": {"action": "synthesize", "generation_policy_ref": "rule"}}
+                             for name in ["input", "other"])
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": name, "data_type": "integer"} for name in ["value", "input", "other"]]}]})
+    with pytest.raises(BehaviorPolicyError, match="^invalid policy field coverage$") as caught:
+        validate_policy_field_coverage(parse_behavior_policy(payload), profile)
+    assert caught.value.__context__ is None
+    assert caught.value.__cause__ is None
+
+
+@pytest.mark.parametrize(("expression", "dependencies"), [
+    ("input + input", ["input"]),
+    ("-(input * other) / 2", ["other", "input"]),
+    ("sum + count", ["sum", "count"]),
+])
+def test_derive_preflight_accepts_exact_field_references_without_evaluation(expression, dependencies):
+    payload = policy({"action": "derive", "expression": expression, "dependencies": dependencies})
+    payload["fields"].extend({"entity": "items", "field": name, "sensitivity": "unknown",
+                              "behavior": {"action": "synthesize", "generation_policy_ref": "rule"}}
+                             for name in dependencies)
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 0,
+        "fields": [{"name": name, "data_type": "integer"} for name in ["value", *dependencies]]}]})
+    validate_policy_field_coverage(parse_behavior_policy(payload), profile)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_observed_sensitivity_blocks_preservation(fallback):
     behavior = {"action": "preserve", "authorization_ref": "review",

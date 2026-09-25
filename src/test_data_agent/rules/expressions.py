@@ -98,6 +98,7 @@ def validate_expression_node(node: ast.AST) -> None:
 
 def expression_references(expression: str) -> tuple[set[str], set[str], set[str]]:
     node = parse_safe_expression(expression)
+    call_names = {child.func for child in ast.walk(node) if isinstance(child, ast.Call)}
     names: set[str] = set()
     aggregate_fields: set[str] = set()
     functions: set[str] = set()
@@ -106,7 +107,7 @@ def expression_references(expression: str) -> tuple[set[str], set[str], set[str]
             functions.add(child.func.id)
             if child.func.id == "sum":
                 aggregate_fields.add(expect_field_name(child.args[0]))
-        elif isinstance(child, ast.Name) and child.id not in {"sum", "count"}:
+        elif isinstance(child, ast.Name) and child not in call_names:
             names.add(child.id)
     return names, aggregate_fields, functions
 

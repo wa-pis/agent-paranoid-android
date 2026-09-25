@@ -2357,3 +2357,18 @@ Broader transformation remains unfinished.
   checks passed; changed-file Ruff, four-module mypy, strict OpenSpec and diff
   checks passed. No execution or approval receipt is introduced. Next: signed
   sequential PR and required CI; executable parity remains unfinished.
+- PR #574 merged on 2026-09-25 as `8da21c6ccca87c2e61ff227bdb7c7b5c519d5989`
+  after 37 successful checks and four intentional release-only skips; head
+  `4dd4f65234320e1a973971c498d4568dc02cb2c0` had a GitHub-verified signature.
+  Started `codex/1-6-derive-preflight` from that merge.
+- TDD reproduced nine accepted-invalid derive cases (dependency disagreement,
+  aggregates, unsupported/malformed syntax and parser limits), plus a shared
+  parser defect that omitted bare columns named sum/count. Shared bounded
+  parsing now distinguishes call nodes from field-name nodes and requires
+  exact row-local declared dependencies at policy review, without evaluation.
+  Initial focused policy/business-rule/solver/validator/advisor/architecture
+  checks: 190 passed; another 132 wizard/approval/source/documentation checks
+  passed, including three real CLI rejection/redaction/rollback cases. Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. Next: signed PR and CI.
+  Result typing, null semantics, DECIMAL rounding,
+  source-output execution and full RC acceptance remain unfinished.

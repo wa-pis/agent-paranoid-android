@@ -90,6 +90,8 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
 - [ ] Implement consistent key mapping and declared derived-value computation.
+  - [x] Reject malformed/aggregate derive expressions and dependency disagreement
+    through bounded shared parsing before review/save; no evaluation yet.
 - [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
   one-pass semantics, collision checks and restricted local mapping handling.
 - [ ] Reject source-value retention disguised as substitution across inline,

@@ -2,7 +2,7 @@
 
 import hashlib
 import json
-from graphlib import CycleError, TopologicalSorter
+from graphlib import TopologicalSorter
 from typing import Annotated, Literal, TypeAlias
 
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
@@ -14,6 +14,7 @@ from test_data_agent.core.privacy import is_sensitive_field, normalize_field_nam
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
 )
+from test_data_agent.rules.expressions import expression_references
 
 
 Reference: TypeAlias = Annotated[StrictStr, Field(min_length=1, max_length=256)]
@@ -169,6 +170,9 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
                         or is_sensitive_field(field.name, field.semantic_type)):
                     valid = False
             if isinstance(behavior, DeriveAction):
+                names, aggregate_fields, functions = expression_references(behavior.expression)
+                if names != set(behavior.dependencies) or aggregate_fields or functions:
+                    valid = False
                 dependencies = {(decision.entity, name) for name in behavior.dependencies}
                 if len(dependencies) != len(behavior.dependencies):
                     valid = False
@@ -177,7 +181,7 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
                         valid = False
                 graph[identity] = dependencies
         tuple(TopologicalSorter(graph).static_order())
-    except (ValidationError, CycleError):
+    except ValueError:
         valid = False
     if not valid:
         try:
