@@ -1299,3 +1299,13 @@ Broader transformation remains unfinished.
   orphan-rate fidelity. Focused identifier/pipeline tests: 36 passed; Ruff,
   strict OpenSpec and diff check passed. Next: signed PR/CI for this acceptance
   check, then final installed-RC replay.
+- The declared-link check merged through PR #554 after green applicable CI on
+  2026-09-25 as `548ec31810c5392dbc07dc3c867f0c082fbed51a`; no release.
+  Preparatory safety fix on current main: five fictional tests reproduced direct
+  and unmatched-preserve acceptance for fields with sensitive name/semantic type
+  but `sensitive=false`, plus false review display. The shared validator now
+  rejects both preservation paths and the review shows effective sensitivity.
+  No source-preserving execution or policy exception was enabled. Focused
+  policy/approval/receipt tests: 55 passed; Ruff, targeted mypy, strict
+  OpenSpec and diff check passed. Next: independent read-only safety review of
+  the exact signed head, then PR/CI; policy amendment remains a separate gate.
