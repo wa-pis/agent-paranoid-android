@@ -1291,3 +1291,11 @@ Broader transformation remains unfinished.
   not preserve source orphan rates or alter privacy policy. Focused checks:
   35 tests, changed-file Ruff and strict OpenSpec passed. Next: signed PR and
   exact-head CI, then final installed-RC replay.
+- The inference fix passed all applicable PR #553 checks and merged normally
+  on 2026-09-25 as `b737bbf4f79e386af4ac79458e6a1e7cf8a42b1e`; no AI
+  review, release tag or publication. A separate fictional regression now
+  checks declared 4-parent/100-child generation, stable row counts and zero
+  orphan keys; undeclared domains remain separate. This does not prove source
+  orphan-rate fidelity. Focused identifier/pipeline tests: 36 passed; Ruff,
+  strict OpenSpec and diff check passed. Next: signed PR/CI for this acceptance
+  check, then final installed-RC replay.
