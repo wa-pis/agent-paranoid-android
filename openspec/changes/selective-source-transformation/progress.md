@@ -2372,3 +2372,22 @@ Broader transformation remains unfinished.
   targeted mypy, strict OpenSpec and diff check passed. Next: signed PR and CI.
   Result typing, null semantics, DECIMAL rounding,
   source-output execution and full RC acceptance remain unfinished.
+
+### 2026-09-25 — Development/activation clarification
+
+- PR #575 merged as `a46d57a25c197570391283c07d4893623de55302` after
+  37 successful checks and four intentional skips. This branch starts there;
+  earlier dirty worktree notes and untracked engine tests are preserved.
+- Owner accepted two decisions: private implementation and isolated fictional
+  tests precede final implementation safety review; activation remains gated
+  by passing end-to-end evidence and independent review. Column-specific
+  exact-text matches override file-wide matches, once, without cascading.
+- Updated AGENTS.md, baseline and change specifications consistently. Current
+  runtime still rejects cross-scope overlap; engine/public execution remain
+  unavailable. No dataset permission, real-data access or tool-rejection bypass
+  is implied. This is a plan correction, not completed CSV/RC acceptance.
+- Strict OpenSpec and diff checks pass; documentation and narrow source-free
+  boundary checks: 50 passed, one optional MCP transport check skipped.
+  These are not engine end-to-end evidence. Next: independent AI review of
+  this safety clarification at its exact signed SHA.
+  Automation remains paused; no duplicate engine or review job was launched.

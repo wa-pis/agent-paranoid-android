@@ -31,6 +31,11 @@ row count, mode, and output format.
 Synthetic generation SHALL NOT copy, shuffle, duplicate, or export source rows.
 The presence of a separate selective-transformation policy or local approval
 receipt SHALL NOT change this rule for existing generation entrances.
+Private selective-transformation development and isolated fictional-input tests
+SHALL NOT enable source reuse in these entrances. Such development may precede
+final implementation review; public transformation activation SHALL remain
+gated by matching amendments, passing end-to-end safety tests and independent
+review. No user-data approval is implied by permission to develop or test.
 
 #### Scenario: CSV-derived profile drives generation
 

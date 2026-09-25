@@ -4,6 +4,24 @@ This document proposes a scoped amendment, not an active exception to AGENTS.md.
 Do not enable source-preserving execution until this boundary, matching baseline
 specifications and executable safety checks have received independent review.
 
+## Development Before Activation
+
+The owner approved separating development from activation on 2026-09-25.
+Private implementation and isolated executable tests on fictional inputs may
+precede the final implementation safety review. Use bounded temporary test
+outputs, no user destinations, real databases, production data or external APIs.
+Keep public CLI/Python/MCP execution unavailable. Tests must exercise the actual
+private implementation, not monkeypatch product safeguards to obtain a pass.
+
+The sequence is implementation with failing/passing tests, end-to-end safety
+evidence, independent review of the exact implementation SHA, then separately
+gated activation and release. Existing preservation, classification, receipt,
+snapshot, privacy and publication requirements still govern the implementation.
+No dataset is authorized by this development permission. Documentation changes
+do not override workspace/tool restrictions or establish that prior tool
+rejections have been lifted; a remaining tool restriction must be reported,
+not bypassed through another path.
+
 ## Separate Surface
 
 Existing generate/profile/advisor/MCP workflows remain source-free as documented.
@@ -40,8 +58,9 @@ independently reviewed. Source-free DECIMAL generation keeps its existing
 privacy checks.
 
 The execution boundary must verify approval of the exact reviewed plan and
-fixed input snapshots. No current internal model implements that transport;
-the selection below is not permission to trust a boolean or opaque reference.
+fixed input snapshots. Private receipt helpers are not a completed execution
+boundary; the selection below is not permission to trust a boolean or opaque
+reference.
 
 ### Selected Approval Transport: Trusted Local Operator
 

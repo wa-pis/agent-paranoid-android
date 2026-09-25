@@ -120,8 +120,18 @@ the same time. Matching SHALL use original decoded cell text once, without
 type inference, coercion, trimming or cascade. File-wide rules SHALL apply
 only to fields explicitly assigned `replace_text`, not override other field
 actions. An unmapped cell SHALL fail unless a separately authorized fallback
-is declared. Overlapping file/column keys SHALL fail until an explicit
-precedence policy is approved. Local trace SHALL be bounded and value-free.
+is declared. A matching column key SHALL take precedence over a matching
+file-wide key; otherwise the file-wide match, then declared fallback SHALL
+apply. Duplicate keys within one table SHALL fail. Local trace SHALL be bounded
+and value-free and report the same selected rule as execution.
+
+#### Scenario: Column override does not cascade
+
+- **GIVEN** fictional rules `a → b` file-wide and `a → c` for one column,
+  and an additional file-wide `c → d` rule
+- **WHEN** the original cell in that column is `a`
+- **THEN** the result is `c`, not `b` or `d`, using the column rule once.
+- **AND** another `replace_text` column without that override uses `b`.
 
 #### Scenario: Combined global and column rules
 

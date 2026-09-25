@@ -13,8 +13,11 @@
 Internal groundwork (not end-to-end feature acceptance): private action/mapping
 models, column coverage/identity checks, strict inline primitives/dates, bounded
 CSV snapshots/parsing and integer normalization have landed through PR #528.
-The safety amendment and execution approval remain unimplemented. Review
-[the boundary draft](safety-boundary.md) before enabling the CSV vertical slice.
+An inactive safety amendment and private receipt helpers have landed; public
+execution remains unavailable. Review [the boundary](safety-boundary.md) before
+enabling the CSV vertical slice. Private implementation and isolated fictional
+tests precede final implementation review; activation follows passing end-to-end
+safety tests and independent review, not the reverse.
 The user selected trusted local CLI operator approval; equal-privilege agent
 impersonation is outside that deployment boundary. This selects transport, not
 approval of any dataset or completion of the safety amendment below.
@@ -24,6 +27,8 @@ amendments still require scoped review and executable checks before activation.
 
 - [ ] Review the new trust boundary and approve a scoped amendment to
   AGENTS.md, project safety policy and affected baseline specifications.
+  - [x] Record owner decision separating closed development/tests from activation.
+  - [ ] Independently review this development/activation clarification.
 - [ ] Finalize versioned field policy, CLI/API and mixed-origin artifact schema.
 - [ ] Specify exact decimals, precision/scale/rounding/overflow, approximate
   DOUBLE conversion and CSV round trips; preserve existing schema compatibility.
@@ -73,11 +78,15 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement bounded local CSV transformation with explicit field actions.
 - [ ] Make the first CSV replacement primitive unconditional exact-text
   file-wide and per-column lookup tables (`true -> false`, `001 -> 1`) with
-  one-pass matching, duplicate-key rejection and no type inference. Resolve
-  competing-scope precedence explicitly. Keep preservation/unknown-value gates.
+  one-pass matching, duplicate-key rejection within each table and no type
+  inference. Apply column match before file-wide match, then declared fallback.
+  Keep preservation/unknown-value gates.
   Add opt-in bounded local dry-run/trace with row, column, scope, rule ordinal and
   status, plus counts, but no literals or value hashes; test trace/execution
   consistency and value-free errors on fictional data.
+  - [x] Record column-over-global precedence; no cascade (owner decision).
+  - [ ] Replace current overlap rejection consistently in matcher, preflight and
+    trace; add focused tests before claiming the new behavior is available.
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.
