@@ -11,8 +11,12 @@ from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget,
 )
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
+from test_data_agent.core.transformation_mapping import CsvMapping
+from test_data_agent.core.transformation_policy import SubstituteAction, SynthesizeAction
 from test_data_agent.core.transformation_snapshot import SnapshotPart
+from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import profile_csv_bytes
+from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
 from test_data_agent.io.path_policy import open_regular_file
 
 
@@ -45,6 +49,49 @@ def prepare_csv_review_request(
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget,
         )
     except (OSError, ValueError, TypeError, AttributeError, csv.Error):
+        raise TransformationSourceError("invalid transformation source review") from None
+
+
+def prepare_csv_review_from_paths(
+    source_path: Path, table_name: str, policy_root: Path, policy_path: str, *,
+    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
+) -> ApprovalRequest:
+    """Read private inputs once and prepare a value-free local CSV review."""
+    try:
+        policy_yaml = read_mapping_snapshot(
+            policy_root, policy_path, max_bytes=max_total_bytes, budget=budget,
+        ).payload
+        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
+        mapping_paths = {domain.mapping.path for domain in policy.domains
+                         if isinstance(domain.mapping, CsvMapping)}
+        generation_paths: set[str] = set()
+        for decision in policy.fields:
+            action = decision.behavior
+            if isinstance(action, SynthesizeAction):
+                generation_paths.add(action.generation_policy_ref)
+            elif isinstance(action, SubstituteAction):
+                if isinstance(action.mapping, CsvMapping):
+                    mapping_paths.add(action.mapping.path)
+                if isinstance(action.unmatched, SynthesizeAction):
+                    generation_paths.add(action.unmatched.generation_policy_ref)
+        if len(mapping_paths) + len(generation_paths) > 3 * DEFAULT_MAX_INPUT_COLUMNS:
+            raise ValueError
+        referenced = tuple(
+            SnapshotPart(kind, path, read_mapping_snapshot(
+                policy_root, path, max_bytes=max_total_bytes, budget=budget,
+            ).payload)
+            for kind, paths in (("mapping", mapping_paths), ("generation_policy", generation_paths))
+            for path in sorted(paths)
+        )
+        source = load_csv_source_snapshot(
+            source_path, table_name, budget=budget,
+            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, max_total_bytes),
+        )
+        return prepare_csv_review_request(
+            policy_yaml, source, referenced, max_total_bytes=max_total_bytes,
+            max_review_bytes=max_review_bytes, budget=budget,
+        )
+    except (OSError, ValueError, TypeError, AttributeError):
         raise TransformationSourceError("invalid transformation source review") from None
 
 

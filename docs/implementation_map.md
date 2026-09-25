@@ -81,7 +81,8 @@ permission. There is no public CLI/MCP source-preserving execution path yet.
 The private `prepare_csv_review_request` entry derives profile evidence from
 the same fixed CSV bytes included in its approval request; callers cannot
 provide an alternate profile to that entry. Receipt issue/verification still
-reprofiles those bytes. No public transformation command uses this yet.
+reprofiles those bytes. The public `transform-review` CLI uses this path only
+to display value-free decisions; it neither mints a receipt nor writes output.
 
 ## Validation
 
@@ -136,6 +137,7 @@ Public dataset-oriented commands:
 - `agent-approve`
 
 - `profile-csv`
+- `transform-review` (read-only)
 - `generate-from-csv`
 
 ## Database Configuration

@@ -12,7 +12,8 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.csv_profiler import profile_csv, profile_csv_bytes
 from test_data_agent.io.transformation_receipt import _canonical_request
 from test_data_agent.io.transformation_source import (
-    TransformationSourceError, load_csv_source_snapshot, prepare_csv_review_request,
+    TransformationSourceError, load_csv_source_snapshot, prepare_csv_review_from_paths,
+    prepare_csv_review_request,
     revalidate_csv_evidence,
 )
 
@@ -81,6 +82,36 @@ def test_csv_review_binds_referenced_mapping_bytes():
     changed_request = prepare_csv_review_request(policy, source, (changed,), max_total_bytes=8192,
                                                  max_review_bytes=4096, budget=GenerationBudget(5))
     assert changed_request.snapshot_sha256 != request.snapshot_sha256
+
+
+def test_csv_review_reads_policy_source_and_mapping_from_fixed_local_paths(tmp_path):
+    source = tmp_path / "items.csv"
+    source.write_bytes(b"status\nready\nwaiting\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.read_bytes(), "items", budget=GenerationBudget(5),
+    ))
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "fields": [{"entity": "items", "field": "status",
+        "sensitivity": "non_sensitive", "behavior": {"action": "substitute", "mapping": {
+        "kind": "csv", "path": "status-map.csv", "source_columns": ["old"],
+        "replacement_columns": ["new"]}}}],
+    }).encode()
+    (tmp_path / "policy.yaml").write_bytes(policy)
+    (tmp_path / "status-map.csv").write_bytes(b"old,new\nready,done\nwaiting,pending\n")
+    request = prepare_csv_review_from_paths(
+        source, "items", tmp_path, "policy.yaml", max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    assert {part.kind for part in request.parts} == {"review", "policy", "evidence", "source", "mapping"}
+    assert b"ready" not in request.review
+    assert b"done" not in request.review
+    (tmp_path / "status-map.csv").write_bytes(b"old,new\nready,other\nwaiting,pending\n")
+    changed = prepare_csv_review_from_paths(
+        source, "items", tmp_path, "policy.yaml", max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    assert changed.snapshot_sha256 != request.snapshot_sha256
 
 
 def test_fixed_bytes_reprofile_without_reopening_path(tmp_path):

@@ -2063,6 +2063,23 @@ Broader transformation remains unfinished.
   Ruff and targeted mypy pass. No public CLI, receipt issuance or output path
   was enabled by this entry. Next: connect a local read-only review command to
   this entry, then test source/mapping mutation and value-free failure paths.
+- Added public `transform-review SOURCE.csv POLICY.yaml` as a read-only local
+  CLI entrance over that fixed-byte review preparation. It snapshots policy,
+  source and referenced local CSV mappings once, derives evidence from source
+  bytes, emits only the bounded field review and digest, and neither mints a
+  receipt nor publishes transformed rows. The installed CLI contract fixture,
+  command index and architecture map now label it review-only. Fictional CLI
+  success/failure and changed-mapping tests pass: 20 focused tests, Ruff,
+  targeted mypy, strict OpenSpec and strict MkDocs pass. Next: check the new
+  exact-head CI, run an isolated installed-wheel CLI smoke, then add the
+  local confirmation step only after the safety amendment and review.
+- Built the current source tree as a local wheel and installed it under a
+  separate import root, without network/dependencies. The installed package
+  resolved from that root; `transform-review --help` exited 0 and both
+  fictional installed-wheel CLI review tests passed. This is partial local
+  acceptance of the read-only command, not final RC or preservation acceptance.
+  Next: require exact-head CI for this public CLI addition, then review the
+  remaining approval/trace gates before enabling any output route.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

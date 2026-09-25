@@ -320,6 +320,18 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
 
+    transform_review_parser = subparsers.add_parser(
+        "transform-review",
+        help="Review a CSV transformation policy without executing it.",
+        description=("Read one fixed CSV snapshot and a local behavior policy. "
+                     "Show value-free field decisions and a snapshot digest; "
+                     "do not approve or transform source data."),
+        formatter_class=PublicHelpFormatter,
+    )
+    transform_review_parser.add_argument("source", type=Path, help="Local source CSV file.")
+    transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
+    transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
+
     profile_postgres_parser = subparsers.add_parser(
         "profile-postgres",
         help="Create a safe profile from an allowlisted PostgreSQL source.",

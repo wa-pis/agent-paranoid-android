@@ -74,9 +74,12 @@ Public operations:
 
 ## CLI Surface
 
-`cli-parser-surface.json` freezes these 23 commands:
+`cli-parser-surface.json` tracks these 24 commands; the read-only
+`transform-review` entry was added for the 1.6 candidate after the original
+1.0 baseline:
 
 - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
+  `transform-review`,
   `profile-postgres`, `profile-query`
 - `generate-from-csv`, `validate`, `generate-from-example`
 - `demo`, `doctor`, `audit-verify`, `completion`

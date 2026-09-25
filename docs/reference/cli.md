@@ -33,6 +33,19 @@ Use these focused references for task detail:
 | `generate` | Generate from a spec or safe profile | Data file or dataset bundle |
 | `validate` | Validate generated data against a `DatasetSpec` | Validation report |
 
+## Selective Transformation (Review Only)
+
+`transform-review SOURCE.csv POLICY.yaml` reads a fixed local CSV snapshot and
+the policy's referenced local mapping files, then prints value-free field
+decisions and a snapshot digest. It does not approve, transform, or export
+source rows. Mapping paths in the policy are relative to the policy file's
+directory. Use `--table NAME` when the entity name differs from the source
+filename stem; `--json` wraps the same review in the standard CLI response.
+
+No source-preserving transformation command is available yet. The separate
+local approval and execution gates in the active OpenSpec are not satisfied by
+this read-only review.
+
 ## Database Sources And SQL
 
 | Command | Purpose | Primary output |
