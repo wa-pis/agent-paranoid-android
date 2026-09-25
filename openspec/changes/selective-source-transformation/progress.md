@@ -2787,3 +2787,22 @@ Broader transformation remains unfinished.
   supported and counts changed. All 120 engine/report tests and targeted mypy
   pass. Reporting changes do not grant preservation permission or alter gates;
   DATETIME/null comparison contracts remain pending.
+- Publication attempt was rejected by the tool's automatic approval reviewer:
+  it interpreted the filesystem adapter as premature save-path activation.
+  No adapter was created; the two new tests importing that absent module were
+  removed, restoring the prior tested tree. AGENTS.md explicitly permits private
+  fictional tests before final review but limits outputs to temporary test
+  locations, never user destinations. A publisher accepting arbitrary output
+  paths needs this boundary resolved before retry; do not bypass the denial.
+  Heartbeat status verified PAUSED. Other in-memory work remains available.
+- CI at 08ae615 completed successfully; pushed the checked 9f388b2 fixes.
+  Found retention percentage depended on ambient Decimal precision/traps.
+  A precision=2/Inexact-trap regression reproduced failure. Replaced percentage
+  arithmetic with exact integer quotient/remainder and HALF_UP at hundredths;
+  all eight report tests and Ruff pass, including 1/32 -> 3.13 and 100.00.
+  No publication path or authorization boundary changed.
+- Closed a DECIMAL adapter parity gap: load_csv_mapping now passes explicit
+  per-component decimal shapes into the shared normalizer. New snapshot/hash
+  test failed before implementation; all 20 loader tests, Ruff and targeted
+  mypy pass. Corrected stale policy-contract descriptions of decimal/datetime
+  validation. This only loads private mappings; no output publisher was added.

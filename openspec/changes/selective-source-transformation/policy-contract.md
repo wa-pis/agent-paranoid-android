@@ -399,9 +399,10 @@ float, boolean and canonical ISO date tuples plus explicit nullability. It does 
 integers into floats; empty string remains a string, not null. Dates must be exact
 `YYYY-MM-DD` strings accepted by the standard calendar parser; compact/week dates,
 timestamps and whitespace are rejected, never truncated or converted. Date strings
-remain unchanged. Datetime/decimal types fail closed until their contracts are
-implemented. This limited internal helper is not the CSV loader or full typed
-mapping preflight. Duplicate detection is exact because no normalization occurs.
+remain unchanged. Canonical ISO DATETIME text is accepted without timezone
+conversion. DECIMAL requires explicit per-component precision/scale and exact
+text, normalizes to fixed scale and rechecks duplicate source keys. This internal
+helper is not the CSV loader or full execution authorization.
 
 ## Internal CSV Byte Parser
 
@@ -439,7 +440,8 @@ the validated mapping and hash of the bytes parsed, both excluded from repr.
 String/date/DATETIME/integer and approximate FLOAT CSV mappings work. FLOAT accepts only
 ASCII decimal/exponent syntax and rejects non-finite values, overflow, underflow
 to zero and duplicate source keys after conversion. It is not exact DECIMAL;
-Decimal remains unfinished. DATETIME validation accepts canonical ISO text with
+Exact DECIMAL CSV loading requires explicit per-component precision/scale and
+uses the shared exact normalizer. DATETIME validation accepts canonical ISO text with
 an explicit numeric offset, `Z`, or no timezone; it retains the exact text and
 never converts offsets. An execution timezone policy and equivalence/collision
 preflight remain unfinished. This adapter is not exposed through

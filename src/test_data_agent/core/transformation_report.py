@@ -4,7 +4,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from typing import Literal
 
 from test_data_agent.core.limits import GenerationBudget
@@ -45,11 +45,11 @@ def retention_summary_from_counts(
     if compared == 0:
         return SourceRetentionSummary(
             "unavailable", "corresponding_output_cells", None, 0, dropped, None)
-    percentage = (Decimal(unchanged) * 100 / Decimal(compared)).quantize(
-        Decimal("0.01"), rounding=ROUND_HALF_UP)
+    hundredths, remainder = divmod(unchanged * 10000, compared)
+    hundredths += int(2 * remainder >= compared)
     return SourceRetentionSummary(
         "measured", "corresponding_output_cells", unchanged, compared, dropped,
-        format(percentage, ".2f"))
+        f"{hundredths // 100}.{hundredths % 100:02d}")
 
 
 def summarize_source_retention(
