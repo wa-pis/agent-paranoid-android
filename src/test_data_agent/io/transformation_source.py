@@ -18,7 +18,9 @@ from test_data_agent.core.transformation_csv import (
 )
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_mapping import CsvMapping
-from test_data_agent.core.transformation_policy import ReplaceTextAction, SubstituteAction, SynthesizeAction
+from test_data_agent.core.transformation_policy import (
+    BehaviorPolicy, ReplaceTextAction, SubstituteAction, SynthesizeAction, parse_behavior_policy,
+)
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, profile_csv_bytes, validate_csv_headers
@@ -60,19 +62,15 @@ def prepare_csv_review_request(
         raise TransformationSourceError("invalid transformation source review") from None
 
 
-def prepare_csv_review_from_paths(
-    source_path: Path, table_name: str, policy_root: Path, policy_path: str, *,
-    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
-) -> ApprovalRequest:
-    """Read private inputs once and prepare a value-free local CSV review."""
+def load_policy_references(
+    policy: BehaviorPolicy, policy_root: Path, *, max_bytes: int, budget: GenerationBudget,
+) -> tuple[SnapshotPart, ...]:
+    """Load the exact restricted mapping/generation references of a draft."""
     try:
-        if type(max_total_bytes) is not int or max_total_bytes < 1:
+        if type(max_bytes) is not int or max_bytes < 1:
             raise ValueError
-        policy_yaml = read_mapping_snapshot(
-            policy_root, policy_path, max_bytes=max_total_bytes, budget=budget,
-        ).payload
-        remaining = max_total_bytes - len(policy_yaml)
-        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
+        policy = parse_behavior_policy(policy)
+        remaining = max_bytes
         mapping_paths = {domain.mapping.path for domain in policy.domains
                          if isinstance(domain.mapping, CsvMapping)}
         if policy.file_text_mapping is not None:
@@ -102,6 +100,26 @@ def prepare_csv_review_from_paths(
                 )
                 remaining -= len(snapshot.payload)
                 referenced_parts.append(SnapshotPart(kind, path, snapshot.payload))
+        return tuple(referenced_parts)
+    except (OSError, ValueError, TypeError, AttributeError):
+        raise TransformationSourceError("invalid transformation references") from None
+
+
+def prepare_csv_review_from_paths(
+    source_path: Path, table_name: str, policy_root: Path, policy_path: str, *,
+    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
+) -> ApprovalRequest:
+    """Read private inputs once and prepare a value-free local CSV review."""
+    try:
+        if type(max_total_bytes) is not int or max_total_bytes < 1:
+            raise ValueError
+        policy_yaml = read_mapping_snapshot(
+            policy_root, policy_path, max_bytes=max_total_bytes, budget=budget,
+        ).payload
+        remaining = max_total_bytes - len(policy_yaml)
+        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
+        referenced_parts = load_policy_references(policy, policy_root, max_bytes=remaining, budget=budget)
+        remaining -= sum(len(part.payload) for part in referenced_parts)
         source = load_csv_source_snapshot(
             source_path, table_name, budget=budget,
             max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, remaining),

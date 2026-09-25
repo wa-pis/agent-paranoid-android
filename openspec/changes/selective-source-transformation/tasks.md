@@ -105,7 +105,9 @@ All items below remain unverified until reproduced against the current candidate
   - [x] Existing valid-policy sensitivity editor: per-column prompts with system
     comments, no default/bulk answer, unchanged actions/mappings, snapshot drift
     rejection and atomic in-place save; no approval or execution.
-  - [ ] Complete action selection and saved-policy parity with executable paths.
+  - [x] Add explicit selection/configuration of existing field actions, including
+    inline/CSV/domain mappings and unmatched behavior; revalidate new references.
+  - [ ] Complete saved-policy parity with executable paths.
 - [ ] Add a bounded, value-free system comment for each reviewed field: likely
   data meaning, sensitivity rationale and uncertainty from safe profile
   evidence. Display it with the suggestion and explicit operator decision in
