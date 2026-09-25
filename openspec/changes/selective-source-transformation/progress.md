@@ -1284,6 +1284,15 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding 18 diagnostic slice: two fictional regressions first failed because
+  unsupported formula errors echoed an input literal via `ast.dump`, while
+  malformed syntax kept an input-bearing `SyntaxError` in exception context.
+  Rejections now use fixed, detached messages without changing the permitted
+  expression grammar. Twenty-seven focused business-rule tests passed.
+  `ROUND` execution, exact DECIMAL/null/rounding semantics and private client
+  formula acceptance remain unimplemented/unverified. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Next: retain a signed local commit,
+  then queue after the earlier draft PR; no ordinary AI review.
 - Independent finding-25 fractional-ratio evidence on isolated main worktree:
   fictional 200-row spec with two eligible fields at `mixed/0.25`, seed 31,
   produced 54 intentionally invalid integer cells and 50 intentionally
@@ -1392,3 +1401,9 @@ Broader transformation remains unfinished.
   and installed-CLI evidence above remains separate from the unresolved
   controlled-invalid exit policy and Parquet publication decision. Next:
   focused checks on this integration, then a small signed test-only PR.
+- PR #557 merged the fractional-mode and installed-doctor acceptance tests
+  after 37 applicable green checks on 2026-09-25 as
+  `29bf7074ad8a4b5cc8bb1ba7c496aa10b3a82c13`; four publication-only
+  checks were skipped. No runtime policy or release changed. This formula
+  diagnostic branch integrated that main state; next: focused checks, then a
+  signed PR for the fixed error-boundary regression.
