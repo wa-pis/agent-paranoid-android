@@ -1335,3 +1335,9 @@ Broader transformation remains unfinished.
   focused tests, Ruff, focused mypy, strict OpenSpec and diff checks passed. Next: carry
   precision/scale through a typed field contract and deterministic generation,
   then test Arrow readback; leave formula rounding as a separate decision.
+- Added private exact seeded DECIMAL sampling from explicit inclusive textual
+  bounds using integer units and Random.randrange; no float, source-row input,
+  public field type or transformation execution. Rejects inexact/reversed
+  bounds with value-free errors. Fifteen fictional focused tests, Ruff and
+  focused mypy passed. Next: connect the exact representation to a complete
+  typed field/generator/validator/writer path before exposing DECIMAL publicly.

@@ -1,11 +1,12 @@
 """Fictional exact-decimal bounds; no source data or publication."""
 
 from decimal import localcontext
+from random import Random
 
 import pytest
 
 from test_data_agent.core.decimal_units import (
-    ExactDecimalError, decimal_from_units, decimal_to_units,
+    ExactDecimalError, decimal_from_units, decimal_to_units, sample_decimal,
 )
 
 
@@ -47,3 +48,29 @@ def test_decimal_38_digit_boundary():
     units = decimal_to_units(value, precision=38, scale=16)
     assert units == 10**38 - 1
     assert format(decimal_from_units(units, precision=38, scale=16), "f") == value
+
+
+def test_decimal_sampling_is_seeded_and_exact():
+    options = [
+        sample_decimal(Random(seed), low="-0.02", high="0.02", precision=20, scale=2)
+        for seed in range(8)
+    ]
+    assert [str(value) for value in options] == [
+        "0.01", "-0.01", "-0.02", "-0.01", "-0.01", "0.02", "0.02", "0.00",
+    ]
+    assert all(-2 <= decimal_to_units(format(value, "f"), precision=20, scale=2) <= 2 for value in options)
+    assert all(value.as_tuple().exponent == -2 for value in options)
+
+
+def test_decimal_sampling_uses_all_38_digits_without_float():
+    maximum = "9" * 22 + "." + "9" * 16
+    value = sample_decimal(Random(17), low=maximum, high=maximum, precision=38, scale=16)
+    assert format(value, "f") == maximum
+
+
+def test_decimal_sampling_rejects_reversed_or_inexact_bounds_without_echoing_values():
+    for low, high in [("1.01", "1.00"), ("1.001", "2.00")]:
+        with pytest.raises(ExactDecimalError) as error:
+            sample_decimal(Random(1), low=low, high=high, precision=20, scale=2)
+        assert low not in str(error.value)
+        assert high not in str(error.value)

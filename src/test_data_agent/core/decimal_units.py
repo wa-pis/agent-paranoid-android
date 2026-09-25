@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from decimal import Decimal
+from random import Random
 
 
 MAX_DECIMAL_DIGITS = 38  # Arrow decimal128; decimal256 is outside this RC.
@@ -44,3 +45,16 @@ def decimal_from_units(units: int, *, precision: int, scale: int) -> Decimal:
         raise ExactDecimalError("invalid decimal value")
     digits = tuple(int(character) for character in str(abs(units)))
     return Decimal((int(units < 0), digits, -scale))
+
+
+def sample_decimal(
+    rng: Random, *, low: str, high: str, precision: int, scale: int,
+) -> Decimal:
+    """Generate an exact synthetic value from explicit inclusive text bounds."""
+    low_units = decimal_to_units(low, precision=precision, scale=scale)
+    high_units = decimal_to_units(high, precision=precision, scale=scale)
+    if low_units > high_units:
+        raise ExactDecimalError("invalid decimal range")
+    return decimal_from_units(
+        rng.randrange(low_units, high_units + 1), precision=precision, scale=scale,
+    )
