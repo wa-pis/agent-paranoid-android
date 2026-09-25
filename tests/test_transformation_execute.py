@@ -2,6 +2,10 @@
 
 import csv
 import io
+import os
+import pty
+import select
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from importlib import import_module
 
@@ -113,3 +117,65 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
     material = request(complete=False, behavior={"action": "drop"})
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
         ["code"], ["1"], ["second"]]
+
+
+@pytest.mark.parametrize("fallback", [False, True])
+def test_closed_preservation_requires_exact_local_receipt(tmp_path, fallback):
+    from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
+
+    preserve = {"action": "preserve", "authorization_ref": "fictional-ref",
+                "comment": "Reviewed fictional flag"}
+    behavior = {"action": "replace_text", "unmatched": preserve} if fallback else preserve
+    material = request(complete=False, behavior=behavior)
+    module = import_module("test_data_agent.io.transformation_execute")
+    path = tmp_path / "approval.json"
+    kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192)
+    with pytest.raises(module.TransformationExecutionError):
+        module.replace_csv_snapshot(material, receipt_path=path, budget=GenerationBudget(5), **kwargs)
+    master, slave = pty.openpty()
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            issued = pool.submit(_issue_to_tty_fd, material, path, slave, GenerationBudget(5))
+            prompt = bytearray()
+            while b"Type APPROVE" not in prompt:
+                assert select.select([master], [], [], 5)[0]
+                prompt.extend(os.read(master, 4096))
+            os.write(master, b"APPROVE\n")
+            issued.result(timeout=5)
+        assert b"second" not in prompt
+    finally:
+        os.close(master)
+        os.close(slave)
+    output = module.replace_csv_snapshot(material, receipt_path=path,
+                                         budget=GenerationBudget(5), **kwargs)
+    assert list(csv.reader(io.StringIO(output.decode()))) == [
+        ["flag", "code"], ["no" if fallback else "true", "1"], ["false", "second"]]
+    changed = request(target="changed", complete=False, behavior=behavior)
+    with pytest.raises(module.TransformationExecutionError):
+        module.replace_csv_snapshot(changed, receipt_path=path, budget=GenerationBudget(5), **kwargs)
+    for kind in ("source", "policy", "evidence", "review"):
+        tampered = replace(material, parts=tuple(
+            replace(part, payload=part.payload + b" ") if part.kind == kind else part
+            for part in material.parts))
+        with pytest.raises(module.TransformationExecutionError) as caught:
+            module.replace_csv_snapshot(tampered, receipt_path=path,
+                                         budget=GenerationBudget(5), **kwargs)
+        assert str(caught.value) == "invalid CSV replacement"
+        assert caught.value.__context__ is None
+    original_receipt = path.read_bytes()
+    for mode, payload in ((0o644, original_receipt), (0o600, b"not-json"),
+                          (0o600, b'{"version":1,"snapshot_sha256":"wrong"}')):
+        path.write_bytes(payload)
+        path.chmod(mode)
+        with pytest.raises(module.TransformationExecutionError) as caught:
+            module.replace_csv_snapshot(material, receipt_path=path,
+                                         budget=GenerationBudget(5), **kwargs)
+        assert str(caught.value) == "invalid CSV replacement"
+        assert caught.value.__context__ is None
+    path.write_bytes(original_receipt)
+    path.chmod(0o600)
+    link = tmp_path / "approval-link.json"
+    link.symlink_to(path)
+    with pytest.raises(module.TransformationExecutionError):
+        module.replace_csv_snapshot(material, receipt_path=link,
+                                     budget=GenerationBudget(5), **kwargs)

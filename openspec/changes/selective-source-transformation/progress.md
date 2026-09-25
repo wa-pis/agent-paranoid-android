@@ -2434,3 +2434,21 @@ Broader transformation remains unfinished.
   Next: integrate approval-bound preservation and other declared actions,
   retain isolated fictional tests, then review exact completed engine SHA
   before activation. Replacement/drop alone does not complete the release scope.
+- Closed engine now supports preserve and unmatched-preserve only with an
+  existing exact-input local receipt verified by the shared verifier. Reuses
+  canonical classification/snapshot checks, rejects whole-row copying and
+  recognizable sensitive output; no receipt minting or public execution added.
+  Two TDD tests failed for the missing receipt argument, then passed through
+  real fictional PTY confirmations; missing receipts and changed mapping bytes
+  fail. A test initially blocked writing a two-column review to an undrained
+  PTY (interrupted at receipt writer); test now drains the real terminal prompt
+  concurrently before answering, without monkeypatching product safeguards.
+  Engine plus receipt tests: 30 passed; Ruff and mypy pass. Next: expand
+  negative approval controls and implement remaining declared actions before
+  independent exact-SHA engine safety review and any public activation.
+- Added engine-level negative controls for both preserve and preserve fallback:
+  changed source/policy/evidence/review snapshots, stale mapping receipt,
+  malformed/wrong receipt, group/world-readable receipt and symlink reject
+  with detached value-free errors. All 19 engine tests pass; Ruff/diff checks
+  pass. Shared verifier and real fictional PTY remain unpatched. This completes
+  these negative controls only, not all actions, public execution or RC gates.

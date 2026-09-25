@@ -1,20 +1,24 @@
 """Closed CSV replacement prototype; not wired to public execution surfaces.
 
 Development/tests only pending end-to-end safety review and activation gates.
-No preservation, filesystem publication, receipt minting or external access.
+Preservation requires an existing local receipt. No filesystem publication,
+receipt minting or external access.
 """
 
 import csv
 import io
+from pathlib import Path
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
 from test_data_agent.core.privacy import looks_sensitive_value
 from test_data_agent.core.transformation_approval import ApprovalRequest
-from test_data_agent.core.transformation_csv import compile_text_replacement_table, replace_text_row
-from test_data_agent.core.transformation_policy import DropAction, RejectUnmatched, ReplaceTextAction
+from test_data_agent.core.transformation_csv import compile_text_replacement_table, match_scoped_text
+from test_data_agent.core.transformation_policy import (
+    DropAction, PreserveAction, RejectUnmatched, ReplaceTextAction,
+)
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
-from test_data_agent.io.transformation_receipt import _canonical_request
+from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
 
 
 class TransformationExecutionError(ValueError):
@@ -23,9 +27,9 @@ class TransformationExecutionError(ValueError):
 
 def replace_csv_snapshot(
     request: ApprovalRequest, *, max_total_bytes: int, max_review_bytes: int,
-    max_output_bytes: int, budget: GenerationBudget,
+    max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
 ) -> bytes:
-    """Apply replacement/drop policy to revalidated fixed bytes in memory."""
+    """Apply reviewed actions to fixed bytes; preservation needs a bound receipt."""
     try:
         if type(max_output_bytes) is not int or max_output_bytes < 1:
             raise ValueError
@@ -41,6 +45,8 @@ def replace_csv_snapshot(
         ) if policy.file_text_mapping is not None else None)
         column_tables = {}
         dropped = set()
+        needs_receipt = False
+        actions = {decision.field: decision.behavior for decision in policy.fields}
         for decision in policy.fields:
             action = decision.behavior
             if decision.entity != source.name:
@@ -48,12 +54,21 @@ def replace_csv_snapshot(
             if isinstance(action, DropAction):
                 dropped.add(decision.field)
                 continue
+            if isinstance(action, PreserveAction):
+                needs_receipt = True
+                continue
             if (not isinstance(action, ReplaceTextAction)
-                    or not isinstance(action.unmatched, RejectUnmatched)):
+                    or not isinstance(action.unmatched, (RejectUnmatched, PreserveAction))):
                 raise ValueError
+            needs_receipt |= isinstance(action.unmatched, PreserveAction)
             if action.mapping is not None:
                 column_tables[decision.field] = compile_text_replacement_table(
                     mappings[action.mapping.path], action.mapping, budget=budget)
+        if needs_receipt:
+            if receipt_path is None:
+                raise ValueError
+            verify_local_receipt(canonical, receipt_path, max_total_bytes=max_total_bytes,
+                                 max_review_bytes=max_review_bytes, budget=budget)
         reader = _csv_reader_from_snapshot(source.payload)
         names = tuple(validate_csv_headers(reader.fieldnames))
         if set(names) != {decision.field for decision in policy.fields}:
@@ -78,14 +93,29 @@ def replace_csv_snapshot(
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
                 raise ValueError
-            replaced = (replace_text_row(tuple(row[name] for name in output_names), output_names,
-                                         file_table, column_tables) if output_names else ())
+            values = []
+            for name in output_names:
+                budget.check("CSV replacement cell")
+                action = actions[name]
+                if isinstance(action, PreserveAction):
+                    values.append(row[name])
+                    continue
+                match = match_scoped_text(row[name], name, file_table, column_tables)
+                if match is not None:
+                    values.append(match.replacement)
+                elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
+                    values.append(row[name])
+                else:
+                    raise ValueError
+            replaced = tuple(values)
+            if output_names == names and replaced == tuple(row[name] for name in names):
+                raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError
             append_row(replaced)
         budget.check("CSV replacement")
         return output.getvalue()
-    except (ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
         pass
     try:
         raise TransformationExecutionError("invalid CSV replacement")
