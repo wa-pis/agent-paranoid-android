@@ -2503,3 +2503,8 @@ Broader transformation remains unfinished.
   Ruff passes. CI at published `613cb10` still runs Python 3.11–3.14 with no
   failures; local substitution changes are committed separately and not pushed
   over that running check set. No public activation or full typed support claim.
+- Added approved preserve fallback to direct STRING substitute through the same
+  receipt verifier. TDD first failed the real-PTY case, then all 36 engine
+  tests passed, including missing/stale/tampered receipts and a 25% retention
+  report. Ruff/mypy pass. No new authorization mechanism or public entrypoint.
+  Synthesize fallback, non-string scalar substitution and domains remain open.

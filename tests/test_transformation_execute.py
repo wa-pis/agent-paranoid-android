@@ -120,14 +120,19 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("fallback", [False, True])
-def test_closed_preservation_requires_exact_local_receipt(tmp_path, fallback):
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute"])
+def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
 
     preserve = {"action": "preserve", "authorization_ref": "fictional-ref",
                 "comment": "Reviewed fictional flag"}
-    behavior = {"action": "replace_text", "unmatched": preserve} if fallback else preserve
-    material = request(complete=False, behavior=behavior)
+    behavior = {"action": action, "unmatched": preserve} if action != "preserve" else preserve
+    source_bytes = b"flag,code\ntrue,001\nfalse,002\n"
+    if action == "substitute":
+        source_bytes = b"flag,code\nready,001\nwaiting,002\n"
+        behavior["mapping"] = {"kind": "inline", "entries": [
+            {"original": ["ready"], "replacement": ["done"]}]}
+    material = request(complete=False, behavior=behavior, source_bytes=source_bytes)
     module = import_module("test_data_agent.io.transformation_execute")
     path = tmp_path / "approval.json"
     kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192)
@@ -149,12 +154,14 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, fallback):
         os.close(slave)
     output = module.replace_csv_snapshot(material, receipt_path=path,
                                          budget=GenerationBudget(5), **kwargs)
+    expected_flags = {"preserve": ("true", "false"), "replace_text": ("no", "false"),
+                      "substitute": ("done", "waiting")}[action]
     assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
-        ["flag", "code"], ["no" if fallback else "true", "1"], ["false", "second"]]
-    assert output.retention.unchanged_percent == ("25.00" if fallback else "50.00")
+        ["flag", "code"], [expected_flags[0], "1"], [expected_flags[1], "second"]]
+    assert output.retention.unchanged_percent == ("50.00" if action == "preserve" else "25.00")
     assert output.retention.compared_cells == 4
     assert "second" not in repr(output)
-    changed = request(target="changed", complete=False, behavior=behavior)
+    changed = request(target="changed", complete=False, behavior=behavior, source_bytes=source_bytes)
     with pytest.raises(module.TransformationExecutionError):
         module.replace_csv_snapshot(changed, receipt_path=path, budget=GenerationBudget(5), **kwargs)
     for kind in ("source", "policy", "evidence", "review"):

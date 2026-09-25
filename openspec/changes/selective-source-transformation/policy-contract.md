@@ -170,7 +170,8 @@ bounded value-free error rather than retaining the input or relaxing constraints
 The private `io/transformation_execute.py` prototype supports `replace_text`,
 `drop`, `preserve` and unmatched-preserve. It is not connected to public
 CLI/Python/MCP execution and is not release acceptance. Direct non-null string
-`substitute` pairs support inline/CSV mappings with reject-on-unmatched only.
+`substitute` pairs support inline/CSV mappings with reject-on-unmatched or
+receipt-bound preserve fallback.
 Other typed/domain substitutions, `synthesize` and `derive` remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and

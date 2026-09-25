@@ -77,8 +77,10 @@ def replace_csv_snapshot(
                 needs_receipt = True
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] != FieldType.STRING or not isinstance(action.unmatched, RejectUnmatched):
+                if field_types[decision.field] != FieldType.STRING or not isinstance(
+                        action.unmatched, (RejectUnmatched, PreserveAction)):
                     raise ValueError
+                needs_receipt |= isinstance(action.unmatched, PreserveAction)
                 declaration = action.mapping
                 if isinstance(declaration, CsvMapping):
                     declaration = parse_csv_mapping_bytes(mappings[declaration.path], declaration, budget=budget)
@@ -138,7 +140,12 @@ def replace_csv_snapshot(
                     values.append(row[name])
                     continue
                 if isinstance(action, SubstituteAction):
-                    values.append(substitutions[name][row[name]])
+                    if row[name] in substitutions[name]:
+                        values.append(substitutions[name][row[name]])
+                    elif isinstance(action.unmatched, PreserveAction):
+                        values.append(row[name])
+                    else:
+                        raise ValueError
                     continue
                 match = match_scoped_text(row[name], name, file_table, column_tables)
                 if match is not None:
