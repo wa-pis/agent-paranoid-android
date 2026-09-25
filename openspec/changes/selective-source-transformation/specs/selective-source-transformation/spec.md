@@ -92,13 +92,14 @@ remain outside logs, reports, external providers and default MCP responses.
 - **WHEN** transformation is validated
 - **THEN** publication fails without exposing the original/replacement values.
 
-#### Scenario: Substitution cannot disguise sensitive preservation
+#### Scenario: Substitution cannot disguise preservation
 
-- **GIVEN** a sensitive source field and an inline, local CSV, or shared-domain
-  mapping whose replacement would retain a non-null original value in that field
+- **GIVEN** an inline, local CSV, or shared-domain mapping whose replacement
+  would retain a non-null original value in a field
 - **WHEN** the exact mapping and policy are validated before approval or execution
 - **THEN** validation rejects the mapping without reporting either value;
-  naming the action `substitute` does not grant preservation authority.
+  naming the action `substitute` does not grant preservation authority, even
+  for a field otherwise eligible for explicit preservation.
 
 ### Requirement: Behavior profile retains substitution decisions
 

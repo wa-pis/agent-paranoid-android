@@ -47,9 +47,10 @@ def test_request_binds_rendered_review_and_referenced_bytes():
 
 @pytest.mark.parametrize("mapping_kind", ["inline", "csv", "domain"])
 @pytest.mark.parametrize("replacement", ["fictional-a", "synthetic-b"])
-def test_sensitive_identity_substitution_fails_before_receipt(mapping_kind, replacement):
+@pytest.mark.parametrize("sensitive", [False, True])
+def test_identity_substitution_fails_before_receipt(mapping_kind, replacement, sensitive):
     profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
-        "fields": [{"name": "value", "data_type": "string", "sensitive": True}]}]})
+        "fields": [{"name": "value", "data_type": "string", "sensitive": sensitive}]}]})
     inline = {"kind": "inline", "entries": [{"original": ["fictional-a"],
               "replacement": [replacement]}]}
     csv_mapping = {"kind": "csv", "path": "mapping.csv", "source_columns": ["old"],
@@ -57,7 +58,8 @@ def test_sensitive_identity_substitution_fails_before_receipt(mapping_kind, repl
     mapping = (inline if mapping_kind == "inline" else csv_mapping if mapping_kind == "csv"
                else {"kind": "domain", "name": "shared"})
     policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
-              "seed": 7, "fields": [{"entity": "items", "field": "value", "sensitivity": "sensitive",
+              "seed": 7, "fields": [{"entity": "items", "field": "value",
+              "sensitivity": "sensitive" if sensitive else "non_sensitive",
               "behavior": {"action": "substitute", "mapping": mapping}}]}
     if mapping_kind == "domain":
         policy["domains"] = [{"name": "shared", "mapping": inline}]

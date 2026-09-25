@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
-from test_data_agent.core.privacy import is_sensitive_field
 from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, validate_inline_scalar_mapping,
@@ -96,10 +95,8 @@ def prepare_approval_request(
                 )
             else:
                 raise ValueError
-            sensitive = (decision.sensitivity != "non_sensitive" or field.sensitive
-                         or is_sensitive_field(field.name, field.semantic_type))
-            if sensitive and any(entry.original[0] is not None and entry.original == entry.replacement
-                                 for entry in typed.entries):
+            if any(entry.original[0] is not None and entry.original == entry.replacement
+                   for entry in typed.entries):
                 raise ValueError
         parts = (
             SnapshotPart("review", "display", review),

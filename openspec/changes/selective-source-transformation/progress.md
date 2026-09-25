@@ -1567,3 +1567,13 @@ Broader transformation remains unfinished.
   or public interface was enabled. Next: resolve composite bindings, then add
   full cross-field identity and relationship tests before independent safety
   review and any safety-policy amendment/activation.
+- Draft PR #568 opened at signed head `f36b758be4907462113ec1ac803f2fbc799af709`;
+  its first exact-head CI was still running at last observation. A local
+  follow-up found that even a non-sensitive identity substitution hides
+  preservation from the value-free review (`preserves_original=false`). The
+  same scalar preflight now rejects every non-null identity mapping, including
+  fields otherwise eligible for a separate explicit preserve action; inline,
+  CSV and domain cases are covered. The combined 169 focused tests, Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. Next: finish the first head's CI,
+  send this correction as a new signed head, then require fresh exact-head CI.
+  Composite binding and full transformation execution remain unresolved.
