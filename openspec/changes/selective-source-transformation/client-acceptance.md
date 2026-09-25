@@ -124,6 +124,11 @@ interim --no-deps wheel (SHA-256
 with verified import root. It still reports package version 1.5.0 and shares
 the development interpreter dependencies, so this is not final 1.6.0rc1
 clean-environment or private-client acceptance.
+Additional local profile tests confirm declared Parquet decimal128 and
+PostgreSQL/query numeric(p,s) expose precision/scale without source values or
+exact extrema. Direct infer-spec fails until reviewed exact bounds are supplied;
+unbounded SQL numeric remains approximate. These are fictional metadata tests,
+not live database or client-private acceptance.
 
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash

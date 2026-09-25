@@ -109,6 +109,11 @@ these bounds; sensitive ranges and active constraints on DECIMAL entities fail
 closed until source-safe profiling and exact formula semantics are implemented.
 Generated CSV/JSON use decimal text, PostgreSQL uses NUMERIC(p,s), and Parquet
 uses decimal128(p,s). Legacy DatasetSpec 1.0 cannot declare DECIMAL.
+Parquet and declared PostgreSQL/query `numeric(p,s)` may carry precision and
+scale as schema-only profile evidence; they never supply source-derived exact
+value bounds. A reviewed `decimal_range` remains required before generation.
+Bare SQL `numeric` without declared precision/scale retains explicitly
+approximate FLOAT behavior for compatibility, not an exact-financial claim.
 
 The user permits equality for source zeros and coincidences after declared
 rounding. This is not permission to copy all rounded values: the replacement

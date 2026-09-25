@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
 from test_data_agent.postgres_profiler import (
@@ -175,6 +176,8 @@ def test_normalizes_bounded_results_into_relational_dataset_profile() -> None:
         ],
     }
     assert orders.field("amount").nullable is True
+    assert orders.field("amount").data_type == FieldType.DECIMAL
+    assert (orders.field("amount").decimal_precision, orders.field("amount").decimal_scale) == (12, 2)
     assert orders.field("amount").null_ratio == pytest.approx(1 / 3)
     assert orders.field("amount").distribution == {
         "kind": "numeric_shape",

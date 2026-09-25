@@ -228,6 +228,7 @@ def _profile_column(
     if coerce_profile_type(column.data_type) in {
         ProfileDataType.INTEGER,
         ProfileDataType.FLOAT,
+        ProfileDataType.DECIMAL,
     }:
         shape = _single_row(
             fetch_query(build_query_numeric_shape_query(plan, column.name))

@@ -139,9 +139,11 @@ all-string column. A reviewed `DatasetSpec` version `1.1` may declare a
 `precision` (1–38), `scale` (0–precision), and exact plain-text `min`/`max`
 bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
 text, PostgreSQL SQL uses `NUMERIC(p,s)`, and Parquet uses `decimal128(p,s)`.
-Version `1.0` remains readable but cannot declare `decimal`. Automatic exact
-decimal profiling, financial formulas and source-preserving transformations
-remain unsupported; do not infer exactness from an approximate FLOAT profile.
+Version `1.0` remains readable but cannot declare `decimal`. Parquet and
+declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
+and scale; they do not infer a runnable exact range. Financial formulas and
+source-preserving transformations remain unsupported. Bare SQL `numeric`
+without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
 Sensitive DECIMAL ranges and formula constraints are rejected before generation.
 
 Folder generation requires a new or empty destination. Single-entity output

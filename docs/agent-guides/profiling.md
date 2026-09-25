@@ -24,6 +24,14 @@ first resolve to a deterministic explicit-column snapshot.
 - masked patterns; and
 - synthetic examples that were not copied from the input.
 
+Parquet `decimal128(p,s)` and declared PostgreSQL/allowed-query
+`numeric(p,s)` retain schema-only precision and scale (up to 38 digits) in
+`DatasetProfile`; no decimal source values or extrema are retained. A profile
+cannot supply exact generation bounds on its own: infer-spec requires a human
+to provide a reviewed `decimal_range` in DatasetSpec 1.1. Higher declared
+precision fails closed. Unbounded SQL `numeric` retains its legacy approximate
+FLOAT path and must not be presented as exact financial evidence.
+
 Folder CSV profiles label `unique_ratio_kind` as `exact` (rounded to six decimal
 places) or `lower_bound` when the 10,000-value distinct tracker overflows.
 For `lower_bound`, display “at least X%”, not exact uniqueness. The ratio uses

@@ -68,6 +68,11 @@ with compatible timezone metadata; malformed endpoints fail closed. All-null
 columns have no observed bounds. This describes table profiling, not SQL-query
 source profiling, and does not certify source-period utility for missing bounds.
 
+Declared `numeric(p,s)` in PostgreSQL or allowed query metadata carries only
+precision/scale into the profile; it does not authorize exact source extrema,
+raw values, a wider SQL subset or a larger scan budget. Unbounded `numeric`
+remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
+
 ## Enforcement
 
 - Validate identifiers and enforce table/column allowlists before execution.

@@ -224,7 +224,11 @@ def test_trino_query_source_requires_and_uses_table_column_allowlist(
 
     assert profile.source_type == "trino_query"
     assert profile.entities[0].row_count == 3
-    assert infer_dataset_spec(profile).entities[0].row_count == 3
+    amount = profile.entities[0].field("amount")
+    assert amount.decimal_precision == 12
+    assert amount.decimal_scale == 2
+    with pytest.raises(ValueError, match="decimal_range distribution"):
+        infer_dataset_spec(profile)
     assert all("SELECT *" not in sql.upper() for sql in FakeTrinoClient.sql)
 
 

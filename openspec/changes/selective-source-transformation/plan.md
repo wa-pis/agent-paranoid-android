@@ -69,5 +69,8 @@ The dependent source-free slice adds DatasetSpec 1.1 `decimal_range` with exact
 seeded generation and CSV/JSON/SQL/Parquet export. Existing 1.0 readers retain
 their meaning; missing-version files remain 1.0. This is not completion of
 exact profiling, financial formulas, transformation, or final RC acceptance.
+Declared Parquet/SQL precision and scale are profile metadata only; reviewed
+generation bounds must still be supplied. Unbounded SQL `numeric` keeps the
+pre-existing approximate FLOAT path and cannot satisfy exact financial review.
 Decide invalid-mode heterogeneous Parquet behavior with finding 25 rather than
 silently converting whole columns to strings.

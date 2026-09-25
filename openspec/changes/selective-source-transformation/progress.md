@@ -1364,3 +1364,16 @@ Broader transformation remains unfinished.
   affected tests, focused mypy and Ruff passed; the wheel and installed CLI
   probe above were rebuilt/replayed after this change. The 1730-test full gate
   preceded only this focused writer change and test additions.
+- Declared-type profile slice: Parquet decimal128 and PostgreSQL/allowed-query
+  numeric(p,s) now retain metadata-only precision/scale; no source values,
+  exact extrema, added SQL permissions, or new DB calls. Direct inference of a
+  runnable DECIMAL spec fails until the operator supplies reviewed exact bounds.
+  Bare SQL numeric remains the existing approximate FLOAT path and is named as
+  such in docs. Fictional Parquet, fake-driver PostgreSQL/Trino-query and
+  contract focused tests: 92 passed. Full local non-integration gate: 1734
+  passed, 10 deselected; Ruff, package mypy, strict MkDocs, strict OpenSpec
+  and diff checks passed. A Trino query fixture with declared decimal(12,2)
+  now correctly requires reviewed bounds instead of implicit FLOAT; its
+  allowlist/no-SELECT-star checks remain in place. Next: cover CSV companion
+  type/null/format metadata and decide exact formula rounding before claiming
+  finding 23; no installed-RC, private or live-DB acceptance yet.

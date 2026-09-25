@@ -293,6 +293,7 @@ class PostgresProfiler:
         if coerce_profile_type(data_type) in {
             ProfileDataType.INTEGER,
             ProfileDataType.FLOAT,
+            ProfileDataType.DECIMAL,
         }:
             shape = _single_row(
                 self.fetch_query(

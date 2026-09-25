@@ -64,6 +64,8 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
         CSVColumnProfile(
             name=field.name,
             data_type=_csv_data_type_from_arrow(field.type),
+            decimal_precision=field.type.precision if str(field.type).startswith("decimal") else None,
+            decimal_scale=field.type.scale if str(field.type).startswith("decimal") else None,
             nullable=field.nullable,
             null_count=0,
             null_ratio=0.0,
@@ -82,9 +84,11 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
 
 def _csv_data_type_from_arrow(arrow_type: object) -> str:
     name = str(arrow_type).lower()
+    if name.startswith("decimal"):
+        return "decimal"
     if any(part in name for part in ("int", "uint")):
         return "integer"
-    if any(part in name for part in ("float", "double", "decimal")):
+    if any(part in name for part in ("float", "double")):
         return "float"
     if name == "bool":
         return "boolean"
