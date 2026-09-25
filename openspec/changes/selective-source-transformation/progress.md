@@ -2654,3 +2654,8 @@ Broader transformation remains unfinished.
   exact-formula and rounding tests pass; Ruff and targeted mypy pass. The
   existing safe_eval route is unchanged. Commit the evaluator and documented
   resource bounds together, retaining pending engine integration explicitly.
+- CI 36180595769 at 5e609ce failed two real-PTY action-selection tests: their
+  obsolete generator fixture was an empty `version: 1.0` placeholder, now
+  correctly rejected by DatasetSpec 1.1 preflight. Replaced only the fictional
+  fixture with a valid 1.1 items.status specification. All 11 action-selection
+  scenarios pass locally; Ruff passes. No runtime validation weakened.
