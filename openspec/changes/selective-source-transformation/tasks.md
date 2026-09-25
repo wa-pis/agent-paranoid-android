@@ -74,6 +74,12 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.
+- [ ] Add RC acceptance for skill-guided agents: discover both packaged
+  `SKILL.md` files through a documented, runtime-neutral path; choose only
+  capabilities present in the installed version; propose a safe workflow and
+  use existing reviewed CLI/Python/MCP boundaries. Test fictional offline
+  routes and unavailable-transformation rejection. Do not auto-register skills,
+  add execution authority or mark this complete from packaging alone.
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
 - [ ] Implement consistent key mapping and declared derived-value computation.

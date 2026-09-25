@@ -37,6 +37,11 @@ repair instructions, live integrations or a weaker safety boundary.
    and explicitly scoped MCP operations; they may consume a matching local
    operator receipt but cannot create one. Return safe structured summaries,
    not source rows. Agents cannot self-declassify data.
+   Before the RC, specify and verify skill-guided agent use: discover both
+   packaged skills, distinguish capabilities of the installed version from
+   proposed transformation steps, and route to existing reviewed interfaces.
+   This is a pending agent-integration task, not permission to execute a skill
+   or register it silently with every agent runtime.
 5. **PostgreSQL and approved SQL inputs.** Reuse transformation semantics with
    bounded read-only access, fixed-input replay and cross-input mapping domains.
    Complex query support and additional adapters require scoped decisions.

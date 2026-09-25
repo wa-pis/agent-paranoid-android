@@ -7,3 +7,6 @@
 !uv.lock
 !src
 !src/**
+!.agents
+!.agents/skills
+!.agents/skills/**

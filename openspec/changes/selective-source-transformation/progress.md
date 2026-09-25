@@ -1533,3 +1533,26 @@ Broader transformation remains unfinished.
   a public source-preserving execution path. Strict MkDocs, strict OpenSpec and
   diff check passed. Next: submit this focused map correction; keep #552/#564 draft pending their
   separate publication and privacy decisions. No release tag or publication.
+- Agent-use documentation PR #569 adds two portable `SKILL.md` files. Both are
+  also included in the wheel from the same repository sources; package install
+  does not silently register them with an agent. The transformation skill keeps
+  unfinished preservation explicitly disabled. Local wheel and sdist contain
+  both skills; installed-wheel bytes match source. Skill validation, focused
+  installed-package tests (8), Ruff and diff check passed. Next: require fresh
+  exact-head CI for the packaging update before normal merge; no RC claim.
+- Exact-head PR #569 container jobs exposed a missing Docker build-context copy:
+  Hatch could not find the forced-included `.agents/skills` directory. The
+  container context and shared builder now include only those skill files;
+  focused container regression checks cover the copy and ignore rules. Next:
+  rerun affected tests and exact-head CI; merge remains blocked until green.
+- Owner added RC scope for further skill-guided agent use. OpenSpec now records
+  version-aware workflow selection and fictional offline acceptance, explicitly
+  pending implementation. Bundling both skills is not that acceptance. Next:
+  validate this planning change, finish #569 exact-head CI, then triage the
+  remaining draft PRs in dependency order; no new agent runtime work yet.
+- Owner clarified that both skills target package users, not release operators;
+  source-module development is relevant only when a user explicitly requests
+  extension. The skills now contain their user workflows and safety boundary
+  offline, using installed `--help`/MCP metadata instead of requiring web docs.
+  Rebuilt wheel contains both revised files. Next: validate skill format and
+  exact-head CI; no transform execution was added.

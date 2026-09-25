@@ -19,6 +19,7 @@ ROOT = Path(__file__).parent.parent
 
 def test_dockerfile_uses_digest_pinned_minimal_targets() -> None:
     dockerfile = (ROOT / "Dockerfile").read_text()
+    dockerignore = (ROOT / ".dockerignore").read_text()
 
     assert dockerfile.startswith(
         "# syntax=docker/dockerfile:1.7@sha256:"
@@ -42,6 +43,8 @@ def test_dockerfile_uses_digest_pinned_minimal_targets() -> None:
     assert dockerfile.count("HEALTHCHECK ") == 3
     assert "PATH=/app/.venv/bin" in dockerfile
     assert dockerfile.count("/app/.venv /app/.venv") == 3
+    assert "COPY .agents/skills ./.agents/skills" in dockerfile
+    assert "!.agents/skills/**" in dockerignore
     assert "/app/.venv /opt/venv" not in dockerfile
     assert "ARG APP_VERSION\n" in dockerfile
     assert "ARG APP_VERSION=" not in dockerfile

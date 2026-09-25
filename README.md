@@ -96,3 +96,17 @@ and source distributions, checksums, SBOMs, and GitHub attestations.
 AI-assisted changes require human review and tests; never send production data,
 raw PII, credentials, or tokens to AI. The name nods to Radiohead's "Paranoid
 Android"; this project is unaffiliated.
+
+Agents can use the portable [project workflow map](.agents/skills/agent-paranoid-android-usage/SKILL.md)
+and [selective-transformation guide](.agents/skills/agent-paranoid-android-transformation/SKILL.md).
+These skills work offline with installed command help; they do not grant
+permissions or enable unfinished features. Agents that do not discover `.agents/skills`
+automatically can load either `SKILL.md` directly. Both are also included in
+the installed wheel under `test_data_agent/skills`; find that directory with:
+
+```bash
+python -c 'from importlib.resources import files; print(files("test_data_agent").joinpath("skills"))'
+```
+
+Point the agent at the selected skill directory using its own configuration;
+installing this package does not silently register skills with other agents.
