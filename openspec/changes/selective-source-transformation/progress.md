@@ -1324,3 +1324,134 @@ Broader transformation remains unfinished.
   sensitive cases. All used three fake calls, verified separate import roots,
   no live DB. Next: retain this evidence in a signed docs commit; hold PR
   until #552 closes. Exact RC package and private acceptance remain unverified.
+- Finding 18 diagnostic slice: two fictional regressions first failed because
+  unsupported formula errors echoed an input literal via `ast.dump`, while
+  malformed syntax kept an input-bearing `SyntaxError` in exception context.
+  Rejections now use fixed, detached messages without changing the permitted
+  expression grammar. Twenty-seven focused business-rule tests passed.
+  `ROUND` execution, exact DECIMAL/null/rounding semantics and private client
+  formula acceptance remain unimplemented/unverified. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Next: retain a signed local commit,
+  then queue after the earlier draft PR; no ordinary AI review.
+- Independent finding-25 fractional-ratio evidence on isolated main worktree:
+  fictional 200-row spec with two eligible fields at `mixed/0.25`, seed 31,
+  produced 54 intentionally invalid integer cells and 50 intentionally
+  invalid boolean cells out of 400 eligible cells. Two bundle runs wrote
+  identical rows and effective manifest settings; the input spec stayed
+  unchanged. A fictional direct-CSV source at the same ratio/seed likewise
+  reproduced its rows and effective settings. Focused tests: 2 passed, Ruff
+  passed. This does not prove an exact 25% quota: generation is per-field
+  probabilistic. Existing tests expose exit inconsistency: spec-based
+  mixed/negative returns 1 for intentional schema-invalid output, while
+  direct CSV/profile paths return 0. Do not claim finding-25 closure or
+  silently change exit semantics without expected-versus-unexpected failure
+  accounting. Next: settle/report controlled-invalid status semantics and
+  replay installed candidate; retain the separate saved-valid precedence
+  decision.
+- Finding-20 Parquet doctor JSON regression on the same isolated worktree:
+  an injected fictional capability failure after successful imports and
+  quickstart retains the dependency, extra and quickstart checks, returns
+  `ok=false`/exit 1, and reports a bounded capability failure without secret
+  text or reinstall advice. Three focused tests (this case plus both
+  fractional-ratio cases) and Ruff passed. This is local dependency-injection
+  evidence, not a fresh installed-package or real Parquet failure replay.
+  Next: carry the focused regression with the next substantive client-fix PR;
+  keep PR #552 draft until the invalid Parquet publication policy is chosen.
+- Installed finding-20 capability replay used an inspected, isolated shim
+  (SHA-256 `524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`)
+  that fails only `pyarrow.parquet.read_table`, never product code. Verified
+  public 1.5.0 and interim typed-Parquet candidate import roots both returned
+  structured JSON with quickstart/extra available, Parquet capability failed,
+  `ok=false`/exit 1, no fictional token and no reinstall advice. The earlier
+  output-budget attempt failed before quickstart and is not capability
+  evidence. This narrows finding 20; no real fault or final RC was tested.
+  Next: preserve the regression/evidence for final installed-RC replay; do not
+  rerun unchanged baseline/candidate checks.
+- Finding-25 installed-CLI A/B: new fictional test verified the actual import
+  root, 12 generated rows, invalid integer-cell types, manifest effective
+  `negative/1` settings, invalid report and unchanged input spec. Public 1.5.0
+  failed because amounts remained integers; separately installed wheel from
+  `76b2806` passed. Source-tree test passed. Wheel SHA-256
+  `07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+  probe SHA-256 `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+  The test deliberately does not assert the unresolved controlled-invalid
+  exit-code policy. Shared dependencies and a 1.5.0 version label mean this
+  is interim candidate evidence, not a clean install or final RC. Ruff,
+  strict OpenSpec and diff checks passed. Next: signed local commit; keep
+  saved-valid precedence and invalid Parquet decisions pending owner input.
+- Finding 17 independent PostgreSQL table-cost slice: fictional two-table,
+  four-column profile (three numeric) made 15 aggregate/metadata statements
+  before the change, 16 with one explicitly allowlisted category. Numeric
+  shape queries already returned row/non-null/distinct counts, so the profiler
+  now uses that same bounded query as the summary instead of querying again.
+  Counts fall to 12/13 respectively; logical table-aggregate requests fall
+  from nine to six without a category. No raw rows, new SQL permissions,
+  budget increases, live connection or source values. Baseline regression
+  failed at 15/16 versus the asserted 12/13; after the change 39 focused
+  PostgreSQL profiler/query/temporal tests passed. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Signed local commit `547bfd5`
+  retained for sequential PR after the earlier draft. Actual scanned bytes,
+  latency, Trino table costs and final installed-RC behavior remain unverified.
+- Same finding-17 query-source path (PostgreSQL and Trino): two numeric columns
+  redundantly ran summary and shape aggregates. Their shape query already
+  returns row/non-null/distinct counts, so the profiler now consumes it once.
+  The fictional three-field regression failed on the old 7/8 statement counts
+  and passes at 5/6 without/with one explicitly authorized category. Source
+  allowlists, SQL shape, result validation and statement/scan budgets are
+  unchanged; no row samples or live connections. Fifty-one focused query
+  source/adapter/profile tests passed. Ruff, targeted mypy, strict OpenSpec
+  and diff checks passed. Next: signed local commit for a later sequential PR;
+  final installed-RC and live cost remain unverified.
+- Finding 13 isolated CSV inference fix: fictional 4-parent/100-child input
+  with all children linked previously selected an unrelated same-table key on
+  an equal-confidence tie. Exact field-name match now wins that tie. The same
+  fixture with 75 linked children yields no inferred parent link. This does
+  not preserve source orphan rates or alter privacy policy. Focused checks:
+  35 tests, changed-file Ruff and strict OpenSpec passed. Next: signed PR and
+  exact-head CI, then final installed-RC replay.
+- The inference fix passed all applicable PR #553 checks and merged normally
+  on 2026-09-25 as `b737bbf4f79e386af4ac79458e6a1e7cf8a42b1e`; no AI
+  review, release tag or publication. A separate fictional regression now
+  checks declared 4-parent/100-child generation, stable row counts and zero
+  orphan keys; undeclared domains remain separate. This does not prove source
+  orphan-rate fidelity. Focused identifier/pipeline tests: 36 passed; Ruff,
+  strict OpenSpec and diff check passed. Next: signed PR/CI for this acceptance
+  check, then final installed-RC replay.
+- The declared-link check merged through PR #554 after green applicable CI on
+  2026-09-25 as `548ec31810c5392dbc07dc3c867f0c082fbed51a`; no release.
+  Preparatory safety fix on current main: five fictional tests reproduced direct
+  and unmatched-preserve acceptance for fields with sensitive name/semantic type
+  but `sensitive=false`, plus false review display. The shared validator now
+  rejects both preservation paths and the review shows effective sensitivity.
+  No source-preserving execution or policy exception was enabled. Focused
+  policy/approval/receipt tests: 55 passed; Ruff, targeted mypy, strict
+  OpenSpec and diff check passed. Next: independent read-only safety review of
+  the exact signed head, then PR/CI; policy amendment remains a separate gate.
+- The independently reviewed safety fix merged through PR #555 on 2026-09-25
+  as `ba2f9d20916e2fc836a0233f6628b53da4a289d6`; its AI review is
+  [recorded on that PR](https://github.com/wa-pis/agent-paranoid-android/pull/555#issuecomment-5825635065)
+  and is not human approval. This SQL-cost branch integrated main without
+  changing its two profiler fixes. Combined focused PostgreSQL/query-source/
+  Trino query-builder tests: 85 passed; changed-file Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. Next: signed merge commit, then one
+  SQL-cost PR with exact-head CI. No live scan-cost or RC acceptance claimed.
+- PR #556 merged its bounded SQL-cost reuse through normal green CI on
+  2026-09-25 as `aebb40a734032060c14e9a4965be46ae2c247d23`. This
+  finding-25 test branch has now integrated that main state; its fractional
+  and installed-CLI evidence above remains separate from the unresolved
+  controlled-invalid exit policy and Parquet publication decision. Next:
+  focused checks on this integration, then a small signed test-only PR.
+- PR #557 merged the fractional-mode and installed-doctor acceptance tests
+  after 37 applicable green checks on 2026-09-25 as
+  `29bf7074ad8a4b5cc8bb1ba7c496aa10b3a82c13`; four publication-only
+  checks were skipped. No runtime policy or release changed. This formula
+  diagnostic branch integrated that main state; next: focused checks, then a
+  signed PR for the fixed error-boundary regression.
+- PR #558 merged the formula-error redaction regression after 37 applicable
+  green checks on 2026-09-25 as `8abe16f7de0627fd9189ceaceeef1004e057b577`;
+  four publication-only checks were skipped. The query-temporal branch has
+  integrated this main state and retained both the temporal-bound safety
+  guard and the bounded numeric-query reuse. Eighty focused temporal/query-
+  source/adapter/builder tests, Ruff, targeted mypy, strict OpenSpec and diff
+  check passed. Next: sign the integration commit; keep its PR held while #552
+  awaits the invalid-Parquet decision. No final-RC or live-DB claim.

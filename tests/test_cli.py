@@ -296,6 +296,33 @@ def test_doctor_redacts_parquet_capability_failure(
     assert "secret-provider-token" not in captured.err
 
 
+def test_doctor_parquet_capability_failure_retains_json_checks(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def fail_parquet_smoke(_fixture: Path, _output: Path) -> None:
+        raise RuntimeError("secret-provider-token")
+
+    monkeypatch.setattr(cli_module, "run_parquet_doctor_smoke", fail_parquet_smoke)
+
+    assert main(["doctor", "--require-extra", "parquet", "--json"]) == 1
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    checks = {check["name"]: check for check in payload["checks"]}
+    assert captured.err == ""
+    assert payload["ok"] is False
+    assert payload["exit_code"] == 1
+    assert checks["dependency:pydantic"]["status"] == "available"
+    assert checks["extra:parquet"]["status"] == "available"
+    assert checks["quickstart"]["status"] == "available"
+    assert checks["capability:parquet"]["status"] == "failed"
+    assert checks["capability:parquet"]["remediation"] == (
+        "check local capability setup and rerun doctor"
+    )
+    assert "secret-provider-token" not in captured.out
+    assert "reinstall" not in captured.out
+
+
 def test_doctor_runs_required_mcp_capability_smoke(capsys) -> None:
     assert main(["doctor", "--require-extra", "mcp"]) == 0
 

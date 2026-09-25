@@ -41,6 +41,31 @@ def test_identifier_domains_are_distinct_and_declared_links_still_work(data_type
     assert validate_dataset(linked, spec).valid
 
 
+def test_declared_fk_retains_requested_row_counts_without_orphans():
+    spec = DatasetSpec(entities=[
+        EntitySpec(name="parents", row_count=4, primary_key="id", fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True)
+        ]),
+        EntitySpec(name="children", row_count=100, fields=[
+            FieldSpec(name="parent_id", data_type="integer", is_identifier=True)
+        ]),
+    ])
+    unlinked = generate_dataset(spec, seed=17)
+    parents = {row["id"] for row in unlinked["parents"]}
+    assert len(unlinked["children"]) == 100
+    assert parents.isdisjoint({row["parent_id"] for row in unlinked["children"]})
+
+    spec.relationships.append(Relationship(
+        parent_entity="parents", parent_field="id", child_entity="children",
+        child_field="parent_id", confidence=1, status="confirmed",
+    ))
+    linked = generate_dataset(spec, seed=17)
+    assert len(linked["parents"]) == 4
+    assert len(linked["children"]) == 100
+    assert {row["parent_id"] for row in linked["children"]} == parents
+    assert validate_dataset(linked, spec).valid
+
+
 @pytest.mark.parametrize("data_type", ["integer", "string"])
 def test_reversed_foreign_key_chain_uses_final_parent_keys(data_type):
     spec = DatasetSpec(entities=[

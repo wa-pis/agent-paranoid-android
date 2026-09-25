@@ -214,8 +214,16 @@ def _profile_column(
         and not infer_sensitive_from_name(column.name)
         and column.name in plan.safe_temporal_output_fields
     )
+    numeric_shape = profile_type in {
+        ProfileDataType.INTEGER, ProfileDataType.FLOAT,
+    }
     summary = _single_row(
-        fetch_query(build_query_column_summary_query(plan, column.name, temporal_bounds=temporal_bounds))
+        fetch_query(
+            build_query_numeric_shape_query(plan, column.name)
+            if numeric_shape else build_query_column_summary_query(
+                plan, column.name, temporal_bounds=temporal_bounds
+            )
+        )
     )
     summary_row_count = _non_negative_int(summary.get("row_count"), "row count")
     non_null_count = _non_negative_int(
@@ -253,29 +261,10 @@ def _profile_column(
             result[f"max_{suffix}"] = upper.isoformat()
         elif lower is not None or upper is not None:
             raise SqlQueryProfileError("SQL query empty temporal bounds are invalid")
-    if profile_type in {
-        ProfileDataType.INTEGER,
-        ProfileDataType.FLOAT,
-    }:
-        shape = _single_row(
-            fetch_query(build_query_numeric_shape_query(plan, column.name))
-        )
-        if (
-            _non_negative_int(shape.get("row_count"), "numeric row count")
-            != row_count
-            or _non_negative_int(
-                shape.get("non_null_count"), "numeric non-null count"
-            )
-            != non_null_count
-            or _non_negative_int(
-                shape.get("distinct_count"), "numeric distinct count"
-            )
-            != distinct_count
-        ):
-            raise SqlQueryProfileError("SQL query numeric aggregates are invalid")
-        has_negative = _as_bool(shape.get("has_negative"))
-        has_positive = _as_bool(shape.get("has_positive"))
-        magnitude = shape.get("max_abs_magnitude")
+    if numeric_shape:
+        has_negative = _as_bool(summary.get("has_negative"))
+        has_positive = _as_bool(summary.get("has_positive"))
+        magnitude = summary.get("max_abs_magnitude")
         if magnitude is not None and (has_negative or has_positive):
             result["numeric_shape"] = {
                 "max_abs_magnitude": _bounded_magnitude(magnitude),
