@@ -2627,3 +2627,19 @@ Broader transformation remains unfinished.
   generated subset must not substitute for validation of final transformed
   rows and declared relationships. Preparing the approved contract/preflight
   batch as one commit before execution wiring.
+- All four CI workflows at 0e1e806 succeeded; pushed approved synthesis
+  contract/preflight commit 5e609ce. Added the agreed exact DECIMAL result
+  rounding primitive using an explicit decimal Context and existing precision/
+  scale validators, with no float conversion. Eleven TDD cases first failed,
+  then passed: positive/negative ties, ordinary rounding, zero, overflow after
+  rounding, nonfinite/type rejection and hostile ambient decimal context.
+  Ruff/mypy pass. This is result quantization only, not formula evaluation or
+  completed derive execution; wire it into the exact evaluator next.
+- Rounding boundary coverage now includes DECIMAL(38,16) low digits and invalid
+  precision/scale, with 17 focused tests passing and Ruff/diff checks clean.
+  Inspected rules/expressions.py: the current evaluator returns Python AST
+  numeric constants directly (fractional constants become float), and ordinary
+  Decimal arithmetic would inherit ambient precision. Therefore do not wire
+  exact financial derive through safe_eval unchanged. Reuse its bounded syntax
+  parser, but preserve decimal literal text and exact intermediate arithmetic
+  before applying the approved final rounding. No existing evaluator changed.
