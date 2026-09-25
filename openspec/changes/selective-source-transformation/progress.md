@@ -2519,3 +2519,15 @@ Broader transformation remains unfinished.
   focused cases pass, including missing-tuple rejection for each representation.
   Ruff/diff checks pass. CI of published `aacd730` still runs four Python jobs
   without failures; domain work is committed locally without restarting them.
+- Added INTEGER substitution using exact int keys, shared CSV mapping
+  normalization and integer decimal output, without float conversion. Initial
+  tests exposed unsupported execution and a fixture mismatch: source 001/002
+  profiles as FLOAT. Corrected source to 1/2 while retaining zero-padded CSV
+  mapping keys; inline/CSV outputs above 2**53 remain exact. All 42 engine tests
+  pass; Ruff/mypy previously passed the changed implementation and diff passes.
+  No change to profiling inference or FLOAT/DECIMAL semantics. Numeric nulls,
+  further scalar types and full cross-input relationships remain pending.
+- Mixed INTEGER/STRING composite domains pass inline/CSV success and missing
+  tuple controls (eight focused scenarios). Integer normalization does not
+  convert the adjacent alphanumeric string key. Ruff passes. Ready to commit
+  exact-integer execution plus its direct/composite regression coverage.
