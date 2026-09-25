@@ -5,7 +5,7 @@ import pytest
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
     parse_csv_mapping_bytes, replace_text_row,
-    summarize_text_trace, text_trace_event, TextTraceEvent,
+    summarize_text_trace, text_trace_event, trace_text_row, TextTraceEvent,
 )
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.transformation_mapping import parse_mapping_declaration
@@ -83,6 +83,8 @@ def test_overlapping_file_and_column_rules_reject_without_values():
         match_scoped_text("true", "flag", file_table, {"flag": column_table})
     assert str(error.value) == "conflicting text replacement scopes"
     assert "true" not in repr(error.value)
+    with pytest.raises(MappingDeclarationError, match="^conflicting text replacement scopes$"):
+        trace_text_row(1, ("true",), ("flag",), file_table, {"flag": column_table})
 
 
 def test_file_wide_and_column_rules_replace_entire_row_once():
@@ -122,6 +124,28 @@ def test_text_row_rejects_unmapped_and_overlapping_cells_without_values():
 def test_text_row_rejects_duplicate_columns():
     with pytest.raises(MappingDeclarationError, match="^invalid text replacement row$"):
         replace_text_row(("true", "false"), ("flag", "flag"), None, {})
+
+
+def test_row_trace_uses_same_file_and_column_matcher_without_values():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    file_table = compile_text_replacement_table(
+        b"old,new\ntrue,false\n", declaration, budget=GenerationBudget(),
+    )
+    column_table = compile_text_replacement_table(
+        b"old,new\nlocal,column-result\n", declaration, budget=GenerationBudget(),
+    )
+    events = trace_text_row(7, ("true", "local", "private-marker"),
+                            ("a", "b", "c"), file_table, {"b": column_table})
+    assert events == (
+        TextTraceEvent(7, 1, True, "file", 1),
+        TextTraceEvent(7, 2, True, "column", 1),
+        TextTraceEvent(7, 3, False, None, None),
+    )
+    assert "private-marker" not in repr(events)
+    with pytest.raises(MappingDeclarationError, match="^unmapped text replacement$"):
+        replace_text_row(("true", "local", "private-marker"), ("a", "b", "c"),
+                         file_table, {"b": column_table})
 
 
 def test_text_trace_counts_all_cells_but_limits_local_events():

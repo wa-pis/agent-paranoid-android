@@ -132,24 +132,44 @@ def match_scoped_text(
     return None
 
 
+def match_text_row(
+    values: tuple[str, ...], columns: tuple[str, ...],
+    file_table: TextReplacementTable | None,
+    column_tables: Mapping[str, TextReplacementTable],
+) -> tuple[TextMatch | None, ...]:
+    """Match one row once for replacement and value-free tracing."""
+    if (type(values) is not tuple or type(columns) is not tuple or not values
+            or len(values) != len(columns)
+            or any(type(column) is not str or not column for column in columns)
+            or len(set(columns)) != len(columns)):
+        raise MappingDeclarationError("invalid text replacement row") from None
+    return tuple(match_scoped_text(value, column, file_table, column_tables)
+                 for column, value in zip(columns, values, strict=True))
+
+
 def replace_text_row(
     values: tuple[str, ...], columns: tuple[str, ...],
     file_table: TextReplacementTable | None,
     column_tables: Mapping[str, TextReplacementTable],
 ) -> tuple[str, ...]:
     """Apply explicit text rules once; reject any uncovered source cell."""
-    if (type(values) is not tuple or type(columns) is not tuple or not values
-            or len(values) != len(columns)
-            or any(type(column) is not str or not column for column in columns)
-            or len(set(columns)) != len(columns)):
-        raise MappingDeclarationError("invalid text replacement row") from None
-    replaced: list[str] = []
-    for column, value in zip(columns, values, strict=True):
-        match = match_scoped_text(value, column, file_table, column_tables)
-        if match is None:
-            raise MappingDeclarationError("unmapped text replacement") from None
-        replaced.append(match.replacement)
-    return tuple(replaced)
+    matches = match_text_row(values, columns, file_table, column_tables)
+    if any(match is None for match in matches):
+        raise MappingDeclarationError("unmapped text replacement") from None
+    return tuple(match.replacement for match in matches if match is not None)
+
+
+def trace_text_row(
+    row_ordinal: int, values: tuple[str, ...], columns: tuple[str, ...],
+    file_table: TextReplacementTable | None,
+    column_tables: Mapping[str, TextReplacementTable],
+) -> tuple[TextTraceEvent, ...]:
+    """Report only ordinals and match outcomes from the shared row matcher."""
+    if type(row_ordinal) is not int or row_ordinal < 1:
+        raise MappingDeclarationError("invalid text trace event") from None
+    matches = match_text_row(values, columns, file_table, column_tables)
+    return tuple(text_trace_event(row_ordinal, ordinal, match)
+                 for ordinal, match in enumerate(matches, start=1))
 
 
 def compile_text_replacement_table(

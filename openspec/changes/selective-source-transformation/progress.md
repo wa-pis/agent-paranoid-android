@@ -2120,10 +2120,20 @@ Broader transformation remains unfinished.
   matches and exact identity pairs; it never falls back to source text, reads
   files, writes output or issues approval. Forty-nine fictional CSV tests,
   changed-file Ruff and targeted mypy pass. OpenSpec clarifies that both scopes
-  coexist. GitHub PR state could not be refreshed in this local run because
-  api.github.com was unreachable; no remote change or release was attempted.
-  Next: choose overlap precedence, then bind bounded value-free local trace
+  coexist. Signed commit `276c950` was fast-forward pushed to draft #568;
+  GitHub API PR state could not be refreshed because api.github.com was
+  unreachable. No release was attempted. Next: require exact-head CI, choose
+  overlap precedence, then bind bounded value-free local trace
   and safety-reviewed execution; keep draft #568 gated.
+- Read-only row tracing now reuses the exact same file-wide/per-column matcher
+  as private row replacement. Events carry row/column/scope/rule ordinals and
+  match status only; unmatched cells remain visible as metadata but execution
+  still rejects them, and competing rules reject in both paths. Fifty focused
+  fictional CSV tests, Ruff and targeted mypy pass. No public trace, receipt,
+  output, or source preservation was enabled. Draft #568 `276c950` completed
+  37 applicable GitHub checks successfully with four release-only skips.
+  Next: sign/push this trace slice, require its exact-head CI, then continue
+  fixed-snapshot CLI trace and policy amendment.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
