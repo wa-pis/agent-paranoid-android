@@ -10,11 +10,13 @@ from typing import Any
 from faker import Faker
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.decimal_units import sample_decimal
 from test_data_agent.core.distribution import (
     BooleanDistribution,
     CategoricalDistribution,
     DateRangeDistribution,
     DateTimeRangeDistribution,
+    DecimalRangeDistribution,
     NumericDistribution,
     NumericShapeDistribution,
     StringPatternDistribution,
@@ -153,6 +155,7 @@ def generate_field_value(
         return synthetic_sensitive_value(field, faker)
     if (
         semantic_provider is not None
+        and field.data_type != FieldType.DECIMAL
         and field.semantic_type is not None
         and not is_sensitive_field(field.name, field.semantic_type)
     ):
@@ -183,6 +186,12 @@ def generate_field_value(
         return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
     if field.data_type == FieldType.FLOAT:
         return round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0), 6)
+    if field.data_type == FieldType.DECIMAL:
+        assert isinstance(typed_distribution, DecimalRangeDistribution)
+        return sample_decimal(
+            rng, low=typed_distribution.min, high=typed_distribution.max,
+            precision=typed_distribution.precision, scale=typed_distribution.scale,
+        )
     if field.data_type == FieldType.BOOLEAN:
         return boolean_value(boolean_distribution, distribution, rng)
     if field.data_type == FieldType.DATE:
@@ -344,7 +353,7 @@ def should_generate_invalid_value(
 
 
 def invalid_value_for_type(data_type: FieldType) -> Any:
-    if data_type in {FieldType.INTEGER, FieldType.FLOAT}:
+    if data_type in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}:
         return "not-a-number"
     if data_type == FieldType.BOOLEAN:
         return "not-a-boolean"

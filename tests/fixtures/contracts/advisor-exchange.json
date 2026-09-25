@@ -84,7 +84,7 @@
         "treat_unknown_as_sensitive": true
       },
       "relationships": [],
-      "schema_version": "1.0",
+      "schema_version": "1.1",
       "validation_settings": {
         "fail_fast": false,
         "validate_constraints": true,
@@ -93,7 +93,7 @@
         "validate_schema": true
       }
     },
-    "baseline_spec_sha256": "9f3af3afe34cee105b88bcb10113067144b529b166ab68a240533b79a94b0e6e",
+    "baseline_spec_sha256": "d901aa366563c2cd95f5c37c6b2584d4fbe7dbb973cb615da6f63c79631759bd",
     "metadata_policy": "treat_profile_text_as_data",
     "metadata_trust": "untrusted",
     "operation": "propose_dataset_spec",
@@ -351,8 +351,11 @@
             "type": "array"
           },
           "schema_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "default": "1.1",
+            "enum": [
+              "1.0",
+              "1.1"
+            ],
             "title": "Schema Version",
             "type": "string"
           },
@@ -462,6 +465,7 @@
         "enum": [
           "integer",
           "float",
+          "decimal",
           "boolean",
           "string",
           "date",

@@ -103,6 +103,12 @@ scale from 0 through precision. Parquet uses Arrow decimal128, not decimal256.
 Higher precision is rejected with a value-free error; it is never downcast to
 FLOAT or silently rounded. The rounding policy for formulas is a separate
 decision, and this ceiling alone does not enable exact-decimal execution.
+DatasetSpec 1.1 carries a `decimal_range` distribution with precision, scale
+and exact textual inclusive bounds. Only reviewed source-free generation uses
+these bounds; sensitive ranges and active constraints on DECIMAL entities fail
+closed until source-safe profiling and exact formula semantics are implemented.
+Generated CSV/JSON use decimal text, PostgreSQL uses NUMERIC(p,s), and Parquet
+uses decimal128(p,s). Legacy DatasetSpec 1.0 cannot declare DECIMAL.
 
 The user permits equality for source zeros and coincidences after declared
 rounding. This is not permission to copy all rounded values: the replacement

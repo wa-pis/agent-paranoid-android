@@ -1341,3 +1341,26 @@ Broader transformation remains unfinished.
   bounds with value-free errors. Fifteen fictional focused tests, Ruff and
   focused mypy passed. Next: connect the exact representation to a complete
   typed field/generator/validator/writer path before exposing DECIMAL publicly.
+- Dependent exact-DECIMAL slice now threads an explicit `decimal_range` through
+  DatasetSpec 1.1, deterministic generation, schema validation, CSV/JSON,
+  PostgreSQL NUMERIC and Arrow decimal128 exports. Versionless/1.0 specs retain
+  legacy semantics. Fictional CLI proves DECIMAL(20,2) and DECIMAL(38,16)
+  physical Parquet types and exact readback without float. Sensitive range and
+  active constraints on DECIMAL entities fail closed; source profiling,
+  financial formulas, preservation, clean-wheel and private acceptance remain
+  unfinished. Full source-tree non-integration gate: 1730 passed, 10 deselected
+  after updating two explicit schema-version assertions. Ruff, package mypy,
+  strict MkDocs, strict OpenSpec and diff checks passed. Generated JSON Schema
+  and contract fixtures were refreshed using the source checkout. An interim
+  wheel built from this uncommitted worktree is 265978 bytes (<512 KiB), SHA-256
+  `c9f5d4e4ea4bde7472fa55bed9313de0f299038a9cc18ff3df990cd8bd15c320`;
+  separate --no-deps install passed the fictional CLI Parquet exact-readback
+  probe with verified import root. Wheel still advertises 1.5.0 and uses shared
+  development dependencies: not final 1.6.0rc1 clean acceptance. Next: finish
+  direct exact-profile evidence and formula rounding, then arrange a PR after
+  draft #552 resolves; do not rerun unchanged gates or claim finding 23 closed.
+  Subsequent writer parity change accepts canonical exact decimal CSV text for
+  PostgreSQL/Parquet export, rejecting injection and excess scale. Its 28
+  affected tests, focused mypy and Ruff passed; the wheel and installed CLI
+  probe above were rebuilt/replayed after this change. The 1730-test full gate
+  preceded only this focused writer change and test additions.

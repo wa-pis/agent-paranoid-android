@@ -1,7 +1,7 @@
 {
   "approval_required": true,
   "constraint_count": 0,
-  "current_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+  "current_spec_sha256": "1c4eb794266d6a4af0271ee15c0b1ae99e2b592176afa55d676d1b941d81a99e",
   "entities": [
     {
       "field_count": 3,
@@ -13,7 +13,7 @@
   "output_format": "json",
   "plan_id": "00000000000000000000000000000000",
   "plan_path": "agent/orders/agent_plan.json",
-  "planned_spec_sha256": "afc371d9aeca74cecf2089279389dcb96cc76cc050283a3116aa16ee11fc1edb",
+  "planned_spec_sha256": "1c4eb794266d6a4af0271ee15c0b1ae99e2b592176afa55d676d1b941d81a99e",
   "profile_path": "agent/orders/profile.json",
   "profile_sha256": "bec8784c31d68122e3dfbb176bf11318e56d5adf241aa145066dc086a9b1d6c3",
   "relationship_count": 0,

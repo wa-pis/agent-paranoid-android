@@ -5,11 +5,14 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_units
 from test_data_agent.core.entity import EntitySpec
+from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import enforce_output_payload_size
 from test_data_agent.csv_profiler import (
@@ -70,7 +73,10 @@ def quote_postgres_identifier(value: str) -> str:
     return f'"{value.replace(chr(34), chr(34) * 2)}"'
 
 
-def postgres_literal(value: Any, field_type: FieldType) -> str:
+def postgres_literal(
+    value: Any, field_type: FieldType, *, precision: int | None = None,
+    scale: int | None = None,
+) -> str:
     if value is None:
         return "NULL"
     if field_type == FieldType.INTEGER:
@@ -95,6 +101,15 @@ def postgres_literal(value: Any, field_type: FieldType) -> str:
         if parsed_float is None or not math.isfinite(parsed_float):
             raise PostgresSqlExportError("PostgreSQL float value is invalid")
         return repr(parsed_float)
+    if field_type == FieldType.DECIMAL:
+        if type(value) not in {Decimal, str} or precision is None or scale is None:
+            raise PostgresSqlExportError("PostgreSQL decimal value is invalid")
+        text = format(value, "f") if isinstance(value, Decimal) else value
+        try:
+            decimal_to_units(text, precision=precision, scale=scale)
+        except ExactDecimalError:
+            raise PostgresSqlExportError("PostgreSQL decimal value is invalid") from None
+        return text
     if field_type == FieldType.BOOLEAN:
         parsed_bool = (
             value
@@ -153,6 +168,11 @@ def _create_table(entity: EntitySpec) -> str:
 
 
 def _postgres_type(field: FieldSpec) -> str:
+    if field.data_type == FieldType.DECIMAL:
+        distribution = field.typed_distribution
+        if not isinstance(distribution, DecimalRangeDistribution):
+            raise PostgresSqlExportError("PostgreSQL decimal declaration is invalid")
+        return f"NUMERIC({distribution.precision}, {distribution.scale})"
     return {
         FieldType.INTEGER: "BIGINT",
         FieldType.FLOAT: "DOUBLE PRECISION",
@@ -213,13 +233,23 @@ def _insert_statements(
     statements: list[str] = []
     for row in rows:
         values = ", ".join(
-            postgres_literal(row[field.name], field.data_type) for field in entity.fields
+            _field_literal(row[field.name], field) for field in entity.fields
         )
         statements.append(
             f"INSERT INTO {quote_postgres_identifier(entity.name)} "
             f"({columns}) VALUES ({values});"
         )
     return statements
+
+
+def _field_literal(value: Any, field: FieldSpec) -> str:
+    distribution = field.typed_distribution
+    if isinstance(distribution, DecimalRangeDistribution):
+        return postgres_literal(
+            value, field.data_type, precision=distribution.precision,
+            scale=distribution.scale,
+        )
+    return postgres_literal(value, field.data_type)
 
 
 def _dependency_order(spec: DatasetSpec) -> list[str]:

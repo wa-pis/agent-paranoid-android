@@ -65,6 +65,9 @@ honest Parquet profiling evidence and typed readback to this same milestone.
 For 1.6.0rc1, declared exact DECIMAL precision is capped at 38 digits and
 uses Arrow decimal128 for Parquet. This covers DECIMAL(20,2) and DECIMAL(38,16)
 without introducing decimal256 compatibility; higher precision fails closed.
-This ceiling is not a promise that the unfinished end-to-end DECIMAL path works.
+The dependent source-free slice adds DatasetSpec 1.1 `decimal_range` with exact
+seeded generation and CSV/JSON/SQL/Parquet export. Existing 1.0 readers retain
+their meaning; missing-version files remain 1.0. This is not completion of
+exact profiling, financial formulas, transformation, or final RC acceptance.
 Decide invalid-mode heterogeneous Parquet behavior with finding 25 rather than
 silently converting whole columns to strings.

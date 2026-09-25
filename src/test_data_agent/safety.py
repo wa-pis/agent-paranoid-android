@@ -10,6 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.constraint import ConstraintStatus
+from test_data_agent.core.decimal_units import value_matches_decimal
+from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
     configure_csv_field_limit,
@@ -60,6 +63,17 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
 
     if spec.privacy_settings.allow_raw_sensitive_values:
         raise SpecSafetyError("dataset spec cannot allow raw sensitive values")
+
+    decimal_entities = {
+        entity.name for entity in spec.entities
+        if any(field.data_type == FieldType.DECIMAL for field in entity.fields)
+    }
+    if any(
+        constraint.status != ConstraintStatus.REJECTED
+        and (constraint.entity in decimal_entities or constraint.target_entity in decimal_entities)
+        for constraint in spec.constraints
+    ):
+        raise SpecSafetyError("exact decimal constraints are not yet supported")
 
     for entity in spec.entities:
         for field in entity.fields:
@@ -285,6 +299,12 @@ def validate_generated_row_privacy(
                 if parse_numeric_strings and isinstance(value, str) and (
                     field.data_type == FieldType.INTEGER and parse_int(value) is not None
                     or field.data_type == FieldType.FLOAT and parse_float(value) is not None
+                    or field.data_type == FieldType.DECIMAL
+                    and isinstance(field.typed_distribution, DecimalRangeDistribution)
+                    and value_matches_decimal(
+                        value, precision=field.typed_distribution.precision,
+                        scale=field.typed_distribution.scale,
+                    )
                 ):
                     continue
                 detected = infer_sensitive_value_type(value)

@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from decimal import Decimal
 from random import Random
+from typing import Any
 
 
 MAX_DECIMAL_DIGITS = 38  # Arrow decimal128; decimal256 is outside this RC.
@@ -58,3 +59,17 @@ def sample_decimal(
     return decimal_from_units(
         rng.randrange(low_units, high_units + 1), precision=precision, scale=scale,
     )
+
+
+def value_matches_decimal(value: Any, *, precision: int, scale: int) -> bool:
+    if isinstance(value, Decimal):
+        text = format(value, "f")
+    elif isinstance(value, str):
+        text = value
+    else:
+        return False
+    try:
+        decimal_to_units(text, precision=precision, scale=scale)
+    except ExactDecimalError:
+        return False
+    return True

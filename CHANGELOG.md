@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add DatasetSpec `1.1` for explicitly reviewed source-free DECIMAL ranges up to
+  precision 38, with exact seeded generation and CSV/JSON/SQL/Parquet output.
+  Legacy `1.0` remains readable; exact profile inference and decimal formulas
+  remain unavailable.
+
 ### Fixed
 
 - Separate generated identifier domains across entities and fields, while
