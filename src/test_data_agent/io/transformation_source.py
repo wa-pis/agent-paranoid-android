@@ -12,7 +12,7 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_mapping import CsvMapping
-from test_data_agent.core.transformation_policy import SubstituteAction, SynthesizeAction
+from test_data_agent.core.transformation_policy import ReplaceTextAction, SubstituteAction, SynthesizeAction
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import profile_csv_bytes
@@ -67,6 +67,8 @@ def prepare_csv_review_from_paths(
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
         mapping_paths = {domain.mapping.path for domain in policy.domains
                          if isinstance(domain.mapping, CsvMapping)}
+        if policy.file_text_mapping is not None:
+            mapping_paths.add(policy.file_text_mapping.path)
         generation_paths: set[str] = set()
         for decision in policy.fields:
             action = decision.behavior
@@ -74,6 +76,11 @@ def prepare_csv_review_from_paths(
                 generation_paths.add(action.generation_policy_ref)
             elif isinstance(action, SubstituteAction):
                 if isinstance(action.mapping, CsvMapping):
+                    mapping_paths.add(action.mapping.path)
+                if isinstance(action.unmatched, SynthesizeAction):
+                    generation_paths.add(action.unmatched.generation_policy_ref)
+            elif isinstance(action, ReplaceTextAction):
+                if action.mapping is not None:
                     mapping_paths.add(action.mapping.path)
                 if isinstance(action.unmatched, SynthesizeAction):
                     generation_paths.add(action.unmatched.generation_policy_ref)

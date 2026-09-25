@@ -48,6 +48,7 @@ Use a discriminated union rather than a bag of optional, ignored settings:
 | preserve | Explicit user authorization, non-sensitive declaration and bounded operator comment | Mapping, generator or formula settings; unresolved sensitivity conflict |
 | synthesize | Reviewed generation policy reference | Preservation or mapping settings |
 | substitute | Exactly one inline mapping, local CSV reference or named domain reference; unmatched policy | Generator settings unless unmatched synthesis is explicitly configured |
+| replace_text | A file-wide exact-text CSV table and/or a field-scoped exact-text CSV table; unmatched policy defaults to reject | No table, inline/domain mapping, implicit type conversion or copying unmatched cells |
 | derive | Supported formula and declared dependencies | Mapping or preservation settings |
 | drop | No execution settings | Mapping, formula or generator settings |
 
@@ -74,12 +75,20 @@ trim, case fold, type inference, cascade or brute-force lookup is involved.
 Duplicate left-hand strings reject. This primitive does not by itself grant
 permission to retain unmatched source values; reviewed per-field actions and
 the local approval/snapshot boundary still apply. The owner requires both
-file-wide and per-column tables. A column-scoped rule applies only to its
-declared column; a file-wide rule may apply to any column in that file. Both
+file-wide and per-column tables. The private policy declares one optional
+file-wide CSV table plus an optional CSV table on each `replace_text` field
+decision; at least one must apply to every such decision. A file-wide table is
+valid only for a single-entity CSV policy, so it cannot silently span multiple
+files. A column-scoped rule
+applies only to its declared column; a file-wide rule applies to every
+`replace_text` column in that file, not to columns with other actions. Both
 levels remain subject to field decisions and sensitivity/preservation gates.
 The precedence when both levels match the same cell is awaiting an explicit
 owner decision. The internal draft matcher rejects such overlap until that
-decision; no cascade or implicit two-step replacement is permitted.
+decision; private approval-material preflight rejects overlapping keys for a
+field before any receipt. The value-free review reports whether file and
+column rules are configured, without showing their literals. No cascade or
+implicit two-step replacement is permitted.
 
 Debugging is local and opt-in. A bounded dry-run/trace may report source row
 ordinal, column ordinal, rule scope (file or column), mapping-rule ordinal

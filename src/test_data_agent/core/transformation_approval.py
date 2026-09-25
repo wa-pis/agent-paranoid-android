@@ -7,11 +7,14 @@ from datetime import datetime
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
-from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
+from test_data_agent.core.transformation_csv import (
+    compile_text_replacement_table, normalize_csv_mapping, parse_csv_mapping_bytes,
+)
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, validate_inline_scalar_mapping,
 )
 from test_data_agent.core.transformation_policy import (
+    ReplaceTextAction,
     SubstituteAction,
     SynthesizeAction,
     render_policy_review,
@@ -72,12 +75,19 @@ def prepare_approval_request(
         for domain in policy.domains:
             if isinstance(domain.mapping, CsvMapping):
                 mapping_refs.add(domain.mapping.path)
+        if policy.file_text_mapping is not None:
+            mapping_refs.add(policy.file_text_mapping.path)
         for decision in policy.fields:
             action = decision.behavior
             if isinstance(action, SynthesizeAction):
                 generation_refs.add(action.generation_policy_ref)
             elif isinstance(action, SubstituteAction):
                 if isinstance(action.mapping, CsvMapping):
+                    mapping_refs.add(action.mapping.path)
+                if isinstance(action.unmatched, SynthesizeAction):
+                    generation_refs.add(action.unmatched.generation_policy_ref)
+            elif isinstance(action, ReplaceTextAction):
+                if action.mapping is not None:
                     mapping_refs.add(action.mapping.path)
                 if isinstance(action.unmatched, SynthesizeAction):
                     generation_refs.add(action.unmatched.generation_policy_ref)
@@ -88,9 +98,24 @@ def prepare_approval_request(
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
         domains = {domain.name: domain.mapping for domain in policy.domains}
         mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
+        file_text_table = None
+        if policy.file_text_mapping is not None:
+            file_text_table = compile_text_replacement_table(
+                mapping_bytes[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
+            )
         domain_members: dict[str, dict[str, dict[int, tuple[FieldProfile, bool]]]] = {}
         for decision in policy.fields:
             action = decision.behavior
+            if isinstance(action, ReplaceTextAction):
+                if action.mapping is not None:
+                    column_text_table = compile_text_replacement_table(
+                        mapping_bytes[action.mapping.path], action.mapping, budget=budget,
+                    )
+                    if file_text_table is not None and any(
+                            file_text_table.lookup(source) is not None
+                            for source in column_text_table._by_source):
+                        raise ValueError
+                continue
             if not isinstance(action, SubstituteAction):
                 continue
             field = fields[(decision.entity, decision.field)]

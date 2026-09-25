@@ -56,6 +56,40 @@ def test_review_comment_and_profile_evidence_are_snapshot_bound():
     assert changed.snapshot_sha256 != original.snapshot_sha256
 
 
+def test_exact_text_review_binds_global_and_column_tables_without_literals():
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 2,
+        "fields": [{"name": "status", "data_type": "string"}]}]})
+    def table(path):
+        return {"kind": "csv", "path": path, "source_columns": ["old"],
+                "replacement_columns": ["new"]}
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "file_text_mapping": table("all.csv"), "fields": [{
+                  "entity": "items", "field": "status", "sensitivity": "non_sensitive",
+                  "behavior": {"action": "replace_text", "mapping": table("status.csv")},
+              }]}
+    parts = (SnapshotPart("source", "items", b"status\ntrue\nlocal\n"),
+             SnapshotPart("mapping", "all.csv", b"old,new\ntrue,false\n"),
+             SnapshotPart("mapping", "status.csv", b"old,new\nlocal,column-result\n"))
+    policy_yaml = yaml.safe_dump(policy).encode()
+    evidence = profile.model_dump_json().encode()
+    request = prepare(policy_yaml, evidence, parts)
+    assert b'"file_text_rules": true' in request.review
+    assert b'"column_text_rules": true' in request.review
+    assert b"column-result" not in request.review
+    assert b"local" not in request.review
+    changed = list(parts)
+    changed[1] = replace(changed[1], payload=b"old,new\ntrue,other\n")
+    assert prepare(policy_yaml, evidence, tuple(changed)).snapshot_sha256 != request.snapshot_sha256
+    overlapping = list(parts)
+    overlapping[2] = replace(overlapping[2], payload=b"old,new\ntrue,column-result\n")
+    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
+        prepare(policy_yaml, evidence, tuple(overlapping))
+    identity = list(parts)
+    identity[1] = replace(identity[1], payload=b"old,new\ntrue,true\n")
+    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
+        prepare(policy_yaml, evidence, tuple(identity))
+
+
 @pytest.mark.parametrize("mapping_kind", ["inline", "csv", "domain"])
 @pytest.mark.parametrize("replacement", ["fictional-a", "synthetic-b"])
 @pytest.mark.parametrize("sensitive", [False, True])

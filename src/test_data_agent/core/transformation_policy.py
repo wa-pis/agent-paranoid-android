@@ -51,6 +51,12 @@ class SubstituteAction(_PrivateModel):
     unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
 
 
+class ReplaceTextAction(_PrivateModel):
+    action: Literal["replace_text"]
+    mapping: CsvMapping | None = Field(default=None, repr=False)
+    unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
+
+
 class DeriveAction(_PrivateModel):
     action: Literal["derive"]
     expression: StrictStr = Field(min_length=1, repr=False)
@@ -62,7 +68,7 @@ class DropAction(_PrivateModel):
 
 
 FieldAction: TypeAlias = Annotated[
-    PreserveAction | SynthesizeAction | SubstituteAction | DeriveAction | DropAction,
+    PreserveAction | SynthesizeAction | SubstituteAction | ReplaceTextAction | DeriveAction | DropAction,
     Field(discriminator="action"),
 ]
 
@@ -76,7 +82,7 @@ class FieldDecision(_PrivateModel):
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
         preserve = isinstance(self.behavior, PreserveAction) or (
-            isinstance(self.behavior, SubstituteAction)
+            isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
             and isinstance(self.behavior.unmatched, PreserveAction)
         )
         if preserve and self.sensitivity != "non_sensitive":
@@ -95,6 +101,7 @@ class BehaviorPolicy(_PrivateModel):
     seed: StrictInt = Field(repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    file_text_mapping: CsvMapping | None = Field(default=None, repr=False)
 
     @model_validator(mode="after")
     def require_unique_resolved_decisions(self) -> "BehaviorPolicy":
@@ -107,6 +114,14 @@ class BehaviorPolicy(_PrivateModel):
                 mapping = item.behavior.mapping
                 if isinstance(mapping, DomainMapping) and mapping.name not in names:
                     raise ValueError("unresolved mapping domain")
+            if isinstance(item.behavior, ReplaceTextAction):
+                if item.behavior.mapping is None and self.file_text_mapping is None:
+                    raise ValueError("missing text replacement table")
+        if self.file_text_mapping is not None and not any(
+                isinstance(item.behavior, ReplaceTextAction) for item in self.fields):
+            raise ValueError("unused text replacement table")
+        if self.file_text_mapping is not None and len({item.entity for item in self.fields}) != 1:
+            raise ValueError("file text table requires one entity")
         return self
 
 
@@ -145,7 +160,8 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
             graph[identity] = set()
             behavior = decision.behavior
             preserves = isinstance(behavior, PreserveAction) or (
-                isinstance(behavior, SubstituteAction) and isinstance(behavior.unmatched, PreserveAction)
+                isinstance(behavior, (SubstituteAction, ReplaceTextAction))
+                and isinstance(behavior.unmatched, PreserveAction)
             )
             if preserves and identity in source_fields:
                 field = source_fields[identity]
@@ -240,7 +256,7 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
     fields = []
     for decision in policy.fields:
         behavior = decision.behavior
-        unmatched = behavior.unmatched.action if isinstance(behavior, SubstituteAction) else None
+        unmatched = behavior.unmatched.action if isinstance(behavior, (SubstituteAction, ReplaceTextAction)) else None
         domain_ref = behavior.mapping if isinstance(behavior, SubstituteAction) and isinstance(
             behavior.mapping, DomainMapping
         ) else None
@@ -252,6 +268,8 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "unmatched": unmatched,
             "mapping_domain": domain_numbers[domain_ref.name] if domain_ref is not None else None,
             "mapping_component": domain_ref.component if domain_ref is not None else None,
+            "file_text_rules": isinstance(behavior, ReplaceTextAction) and policy.file_text_mapping is not None,
+            "column_text_rules": isinstance(behavior, ReplaceTextAction) and behavior.mapping is not None,
             "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
             "declared_sensitivity": decision.sensitivity,
             "observed_sensitivity": (

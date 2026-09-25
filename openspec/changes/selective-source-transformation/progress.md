@@ -2132,8 +2132,24 @@ Broader transformation remains unfinished.
   fictional CSV tests, Ruff and targeted mypy pass. No public trace, receipt,
   output, or source preservation was enabled. Draft #568 `276c950` completed
   37 applicable GitHub checks successfully with four release-only skips.
-  Next: sign/push this trace slice, require its exact-head CI, then continue
+  Signed trace commit `cc1509534827086b9f780ed12b2f258d705c0232` was
+  fast-forward pushed to draft #568. Fresh exact-head CI is pending; no
+  ordinary per-commit AI review was requested. Only #568 and three unrelated
+  Dependabot PRs are open. Next: require this SHA's CI, then continue
   fixed-snapshot CLI trace and policy amendment.
+- Draft #568 `cc1509534827086b9f780ed12b2f258d705c0232` completed 37
+  applicable GitHub checks successfully with four release-only skips. Added
+  private `replace_text` field decisions with optional per-column CSV table
+  and one optional file-wide table, limited to a single-entity CSV policy.
+  The local review loader snapshots both referenced files, approval preflight
+  compiles exact-text rules, rejects identity and overlapping keys before a
+  receipt, and the value-free review shows only which scopes are configured.
+  Existing typed `substitute` remains separate. One hundred fifty-seven
+  focused fictional tests, changed-file Ruff/mypy, strict OpenSpec and diff
+  check pass. No source output, receipt issuance, preservation activation or
+  public execution path was added. Next: sign/push this structural slice,
+  require exact-head CI, then complete the reviewed safety amendment and
+  fixed-snapshot local CLI trace/execution.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

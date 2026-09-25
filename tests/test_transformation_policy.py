@@ -70,6 +70,59 @@ def test_domain_reference_must_resolve_and_cannot_chain():
         parse_behavior_policy(payload)
 
 
+def test_exact_text_policy_accepts_global_and_column_rules_together():
+    file_mapping = {"kind": "csv", "path": "all.csv", "source_columns": ["old"],
+                    "replacement_columns": ["new"]}
+    column_mapping = {"kind": "csv", "path": "status.csv", "source_columns": ["old"],
+                      "replacement_columns": ["new"]}
+    payload = policy({"action": "replace_text", "mapping": column_mapping})
+    payload["file_text_mapping"] = file_mapping
+    parsed = parse_behavior_policy(payload)
+    assert parsed.file_text_mapping.path == "all.csv"
+    assert parsed.fields[0].behavior.mapping.path == "status.csv"
+    assert parse_behavior_policy(parsed.model_dump(mode="json")) == parsed
+    global_only = policy({"action": "replace_text"})
+    global_only["file_text_mapping"] = file_mapping
+    assert parse_behavior_policy(global_only).fields[0].behavior.mapping is None
+
+
+def test_exact_text_preserve_fallback_still_requires_explicit_non_sensitive_decision():
+    payload = policy({"action": "replace_text", "unmatched": {
+        "action": "preserve", "authorization_ref": "fictional-review",
+        "comment": "Reviewed fictional business code",
+    }})
+    payload["file_text_mapping"] = {"kind": "csv", "path": "all.csv",
+                                    "source_columns": ["old"], "replacement_columns": ["new"]}
+    assert parse_behavior_policy(payload).fields[0].behavior.unmatched.action == "preserve"
+    payload["fields"][0]["sensitivity"] = "sensitive"
+    with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$"):
+        parse_behavior_policy(payload)
+
+
+@pytest.mark.parametrize("mutation", ["no_table", "unused_global", "inline_column",
+                                       "domain_column", "global_across_files"])
+def test_exact_text_policy_rejects_incomplete_or_wrong_scope_without_values(mutation):
+    payload = policy({"action": "replace_text"})
+    if mutation == "unused_global":
+        payload["fields"][0]["behavior"] = {"action": "drop"}
+        payload["file_text_mapping"] = {"kind": "csv", "path": "private-marker.csv",
+                                        "source_columns": ["old"], "replacement_columns": ["new"]}
+    elif mutation == "inline_column":
+        payload["fields"][0]["behavior"]["mapping"] = {
+            "kind": "inline", "entries": [{"original": ["private-marker"], "replacement": ["x"]}],
+        }
+    elif mutation == "domain_column":
+        payload["fields"][0]["behavior"]["mapping"] = {"kind": "domain", "name": "private-marker"}
+    elif mutation == "global_across_files":
+        payload["file_text_mapping"] = {"kind": "csv", "path": "private-marker.csv",
+                                        "source_columns": ["old"], "replacement_columns": ["new"]}
+        payload["fields"].append({"entity": "another_file", "field": "value",
+                                  "sensitivity": "non_sensitive", "behavior": {"action": "drop"}})
+    with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$") as error:
+        parse_behavior_policy(payload)
+    assert "private-marker" not in str(error.value)
+
+
 @pytest.mark.parametrize("sensitivity", ["non_sensitive", "sensitive", "unknown"])
 def test_unmatched_preserve_requires_non_sensitive_declaration(sensitivity):
     payload = policy({"action": "substitute", "mapping": {"kind": "csv",

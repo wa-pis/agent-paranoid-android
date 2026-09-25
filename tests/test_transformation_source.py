@@ -122,6 +122,41 @@ def test_csv_review_reads_policy_source_and_mapping_from_fixed_local_paths(tmp_p
     assert "ready" not in str(error.value)
 
 
+def test_csv_review_reads_global_and_column_text_tables_once(tmp_path):
+    source = tmp_path / "items.csv"
+    source.write_bytes(b"status\ntrue\nlocal\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.read_bytes(), "items", budget=GenerationBudget(5),
+    ))
+    def table(path):
+        return {"kind": "csv", "path": path, "source_columns": ["old"],
+                "replacement_columns": ["new"]}
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "file_text_mapping": table("all.csv"), "fields": [{
+            "entity": "items", "field": "status", "sensitivity": "non_sensitive",
+            "behavior": {"action": "replace_text", "mapping": table("status.csv")},
+        }],
+    }).encode()
+    (tmp_path / "policy.yaml").write_bytes(policy)
+    (tmp_path / "all.csv").write_bytes(b"old,new\ntrue,false\n")
+    (tmp_path / "status.csv").write_bytes(b"old,new\nlocal,column-result\n")
+    request = prepare_csv_review_from_paths(
+        source, "items", tmp_path, "policy.yaml", max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    assert sorted(part.name for part in request.parts if part.kind == "mapping") == ["all.csv", "status.csv"]
+    assert b"column-result" not in request.review
+    assert _canonical_request(request, max_total_bytes=8192, max_review_bytes=4096,
+                              budget=GenerationBudget(5)) == request
+    (tmp_path / "all.csv").write_bytes(b"old,new\ntrue,other\n")
+    changed = prepare_csv_review_from_paths(
+        source, "items", tmp_path, "policy.yaml", max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    assert changed.snapshot_sha256 != request.snapshot_sha256
+
+
 def test_fixed_bytes_reprofile_without_reopening_path(tmp_path):
     path = tmp_path / "items.csv"
     path.write_bytes(b"status,amount\nfictional-a,7\nfictional-b,8\n")
