@@ -116,7 +116,7 @@ def prepare_csv_review_from_paths(
 
 def trace_csv_review_request(
     request: ApprovalRequest, *, max_events: int, max_cells: int,
-    budget: GenerationBudget,
+    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
 ) -> TextTraceSummary:
     """Trace replacement matches from reviewed bytes, without exposing values."""
     try:
@@ -127,6 +127,14 @@ def trace_csv_review_request(
         if len(source_parts) != 1 or len(parts) != len(request.parts):
             raise ValueError
         source = source_parts[0]
+        referenced = tuple(part for part in request.parts
+                           if part.kind in {"mapping", "generation_policy"})
+        canonical = prepare_csv_review_request(
+            policy_yaml, source, referenced, max_total_bytes=max_total_bytes,
+            max_review_bytes=max_review_bytes, budget=budget,
+        )
+        if canonical != request:
+            raise ValueError
         mapping_bytes = {part.name: part.payload for part in request.parts if part.kind == "mapping"}
         file_table = (compile_text_replacement_table(
             mapping_bytes[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,

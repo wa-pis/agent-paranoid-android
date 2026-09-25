@@ -2297,3 +2297,12 @@ Broader transformation remains unfinished.
   then obtain explicit permission for a test-first, private execution slice
   before any output-capable implementation. Continue independent read-only
   work meanwhile.
+- Read-only trace accepted a forged in-memory `ApprovalRequest` whose source
+  bytes changed after review; a fictional regression reproduced the bypass
+  before the fix. Trace now re-runs the existing fixed-snapshot review and
+  rejects any noncanonical source, mapping, policy, evidence or review bytes
+  before counting matches. A second regression covers altered mapping bytes.
+  Thirty-four focused source/CLI/receipt tests, changed-file Ruff/mypy and
+  diff check pass. No output engine or approval issuance was added. Next:
+  sign/push this trace hardening to draft #568, require exact-head CI, and
+  continue test-first execution only after the pending approval decision.

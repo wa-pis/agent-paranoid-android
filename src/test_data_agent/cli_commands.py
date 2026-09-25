@@ -109,7 +109,10 @@ def run_dataset_command(
                   "review": json.loads(request.review)}
         if args.trace:
             result["trace"] = asdict(trace_csv_review_request(
-                request, max_events=50, max_cells=10_000, budget=GenerationBudget(),
+                request, max_events=50, max_cells=10_000,
+                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+                budget=GenerationBudget(),
             ))
         print(json.dumps(result, ensure_ascii=True, indent=2))
         return 0

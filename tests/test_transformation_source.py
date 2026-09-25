@@ -7,7 +7,7 @@ import yaml
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.limits import GenerationBudget
-from test_data_agent.core.transformation_approval import prepare_approval_request
+from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.csv_profiler import profile_csv, profile_csv_bytes
@@ -109,14 +109,31 @@ def test_csv_review_trace_combines_file_and_column_rules_without_values():
         SnapshotPart("mapping", "b.csv", b"old,new\ntwo,local\n"),
     ), max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     summary = trace_csv_review_request(
-        request, max_events=1, max_cells=2, budget=GenerationBudget(5),
+        request, max_events=1, max_cells=2, max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
     )
     assert (summary.matched_cells, summary.unmatched_cells, summary.truncated) == (2, 0, True)
     assert summary.rule_counts == ((1, "file", 1, 1), (2, "column", 1, 1))
     assert "private-marker" not in repr(summary)
     assert "global" not in repr(summary)
+    for kind, name, payload in (
+        ("source", "items", b"a,b,c\none,two,other-marker\n"),
+        ("mapping", "all.csv", b"old,new\none,other-replacement\n"),
+    ):
+        forged_parts = tuple(
+            SnapshotPart(part.kind, part.name, payload)
+            if (part.kind, part.name) == (kind, name) else part
+            for part in request.parts
+        )
+        forged = ApprovalRequest(request.review, forged_parts, request.snapshot_sha256)
+        with pytest.raises(TransformationSourceError, match="^invalid transformation trace$"):
+            trace_csv_review_request(forged, max_events=1, max_cells=2,
+                                     max_total_bytes=8192, max_review_bytes=4096,
+                                     budget=GenerationBudget(5))
     with pytest.raises(TransformationSourceError, match="^invalid transformation trace$") as error:
-        trace_csv_review_request(request, max_events=1, max_cells=1, budget=GenerationBudget(5))
+        trace_csv_review_request(request, max_events=1, max_cells=1,
+                                 max_total_bytes=8192, max_review_bytes=4096,
+                                 budget=GenerationBudget(5))
     assert "private-marker" not in str(error.value)
 
 
