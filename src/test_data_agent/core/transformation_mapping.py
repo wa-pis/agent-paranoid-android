@@ -4,7 +4,7 @@ No file reads or type coercion are performed here. Dumps contain private mapping
 values and must never be used as public summaries or provider inputs.
 """
 
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated, Literal, TypeAlias
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, TypeAdapter, ValidationError
@@ -105,7 +105,8 @@ def validate_inline_scalar_mapping(
     """Validate primitives and canonical ISO dates, without coercion."""
     declaration = validate_inline_mapping_shape(payload, key_width=len(data_types))
     scalar_types = {FieldType.STRING: str, FieldType.INTEGER: int,
-                    FieldType.FLOAT: float, FieldType.BOOLEAN: bool, FieldType.DATE: str}
+                    FieldType.FLOAT: float, FieldType.BOOLEAN: bool,
+                    FieldType.DATE: str, FieldType.DATETIME: str}
     valid = len(nullable) == len(data_types) and all(type(flag) is bool for flag in nullable)
     valid = valid and all(type(kind) is FieldType and kind in scalar_types for kind in data_types)
     if valid:
@@ -122,6 +123,18 @@ def validate_inline_scalar_mapping(
                                 valid = False
                         except ValueError:
                             valid = False
+                    if value is not None and kind == FieldType.DATETIME:
+                        if not isinstance(value, str):
+                            valid = False
+                        else:
+                            try:
+                                canonical = datetime.fromisoformat(value).isoformat()
+                                if value.endswith("Z") and canonical.endswith("+00:00"):
+                                    canonical = canonical[:-6] + "Z"
+                                if canonical != value:
+                                    valid = False
+                            except ValueError:
+                                valid = False
     if valid:
         return declaration
     try:

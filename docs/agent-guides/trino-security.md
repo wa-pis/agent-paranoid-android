@@ -45,6 +45,12 @@ names, query text or literals. This does not broaden the permitted SQL subset.
 Boolean AND/OR predicates are permitted within that existing single-table
 subset; they do not authorize additional functions, tables, query shapes or
 larger work budgets.
+Direct non-sensitive date/timestamp projections include validated min/max
+aggregates in their existing column-summary query. Any sensitive source field
+in the query, a sensitive output name, or a derived expression suppresses these
+bounds; renaming a sensitive source cannot declassify it. Missing or malformed
+nonempty bounds fail closed; all-null fields make no observed-period claim. No
+query rows or extra aggregate round trips are added.
 
 PostgreSQL connection failures expose only fixed categories when identifiable
 from typed network/TLS exceptions or allowlisted SQLSTATE codes: timeout,
@@ -65,8 +71,9 @@ column-summary aggregate for non-sensitive temporal columns. No extra query or
 row sample is needed. Sensitive-name columns do not request or retain these
 bounds. Nonempty temporal aggregates must have correctly typed, ordered endpoints
 with compatible timezone metadata; malformed endpoints fail closed. All-null
-columns have no observed bounds. This describes table profiling, not SQL-query
-source profiling, and does not certify source-period utility for missing bounds.
+columns have no observed bounds. Query-source profiling applies the same
+temporal-bound guard to its derived output. Neither path certifies source-period
+utility when bounds are missing.
 
 ## Enforcement
 

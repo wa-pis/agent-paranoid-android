@@ -1,5 +1,6 @@
 """Fictional local approval transport checks; no transformation execution."""
 
+import json
 import os
 import pty
 import select
@@ -20,13 +21,21 @@ from test_data_agent.io.transformation_receipt import (
 )
 
 
-def request(*, source: bytes = b"code\nfictional-a\n"):
+def request(*, source: bytes = b"code\nfictional-a\n", authorization_ref: str = "fictional-ref",
+            mapping: bytes | None = None):
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(source, "items", budget=GenerationBudget(5)))
+    behavior = {"action": "preserve", "authorization_ref": authorization_ref}
+    parts = [SnapshotPart("source", "items", source)]
+    if mapping is not None:
+        behavior = {"action": "substitute", "mapping": {"kind": "csv", "path": "code-map.csv",
+                    "source_columns": ["original"], "replacement_columns": ["replacement"]},
+                    "unmatched": behavior}
+        parts.append(SnapshotPart("mapping", "code-map.csv", mapping))
     policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
               "seed": 7, "fields": [{"entity": "items", "field": "code", "sensitivity": "non_sensitive",
-              "behavior": {"action": "preserve", "authorization_ref": "fictional-ref"}}]}
+              "behavior": behavior}]}
     return prepare_approval_request(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(),
-        (SnapshotPart("source", "items", source),), max_total_bytes=8192,
+        tuple(parts), max_total_bytes=8192,
         max_review_bytes=4096, budget=GenerationBudget(5))
 
 
@@ -112,3 +121,70 @@ def test_rejected_answer_does_not_publish_receipt(tmp_path):
     finally:
         os.close(master)
         os.close(slave)
+
+
+def test_receipt_does_not_authorize_changed_policy(tmp_path):
+    approved = request()
+    changed = request(authorization_ref="different-fictional-ref")
+    path = tmp_path / "approval.json"
+    master, slave = pty.openpty()
+    try:
+        os.write(master, b"APPROVE\n")
+        _issue_to_tty_fd(approved, path, slave, GenerationBudget(5))
+    finally:
+        os.close(master)
+        os.close(slave)
+    assert verify(approved, path) == approved.parts
+    with pytest.raises(LocalReceiptError, match="^local transformation approval failed$") as error:
+        verify(changed, path)
+    assert error.value.__context__ is None
+    assert verify(approved, path) == approved.parts
+
+
+def test_receipt_binds_mapping_and_evidence_exact_bytes(tmp_path):
+    approved = request(mapping=b"original,replacement\nfictional-a,synthetic-one\n")
+    path = tmp_path / "approval.json"
+    master, slave = pty.openpty()
+    try:
+        os.write(master, b"APPROVE\n")
+        _issue_to_tty_fd(approved, path, slave, GenerationBudget(5))
+    finally:
+        os.close(master)
+        os.close(slave)
+    assert verify(approved, path) == approved.parts
+
+    changed_map = request(mapping=b"original,replacement\nfictional-a,synthetic-one\n\n")
+    policy = next(part.payload for part in approved.parts if part.kind == "policy")
+    evidence = next(part.payload for part in approved.parts if part.kind == "evidence")
+    same_evidence_new_bytes = json.dumps(json.loads(evidence), indent=2).encode()
+    external = tuple(part for part in approved.parts if part.kind in {"source", "mapping"})
+    changed_evidence = prepare_approval_request(
+        policy, same_evidence_new_bytes, external, max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    changed_policy_bytes = prepare_approval_request(
+        policy + b"\n", evidence, external, max_total_bytes=8192,
+        max_review_bytes=4096, budget=GenerationBudget(5),
+    )
+    for changed in (changed_map, changed_evidence, changed_policy_bytes):
+        with pytest.raises(LocalReceiptError, match="^local transformation approval failed$") as error:
+            verify(changed, path)
+        assert error.value.__context__ is None
+    assert verify(approved, path) == approved.parts
+
+
+def test_corrupt_receipt_rejects_without_reflecting_content(tmp_path):
+    approved = request()
+    path = tmp_path / "approval.json"
+    master, slave = pty.openpty()
+    try:
+        os.write(master, b"APPROVE\n")
+        _issue_to_tty_fd(approved, path, slave, GenerationBudget(5))
+    finally:
+        os.close(master)
+        os.close(slave)
+    path.write_bytes(b'{"version": 1, "snapshot_sha256": "fictional-secret"}')
+    with pytest.raises(LocalReceiptError, match="^local transformation approval failed$") as error:
+        verify(approved, path)
+    assert "fictional-secret" not in str(error.value)
+    assert error.value.__context__ is None

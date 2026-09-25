@@ -32,7 +32,7 @@ historical, not overwritten by the new document's measurements.
 | 15 | Test category limits and early validation before unnecessary reads; settle configurable budgets explicitly. |
 | 16 | Improve actionable safe SQL diagnostics; JOIN/CTE expansion remains a separate decision, not an assumed fix. |
 | 17 | Measure query count and scan budgets; assess bounded aggregate batching. Temporary table writes are outside the read-only contract. |
-| 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. |
+| 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. A fictional unsupported-function expression previously echoed its literal through the AST error, and malformed syntax retained the input-bearing `SyntaxError` as exception context. Both are fixed locally with value-free, detached errors; this does not add `ROUND` support or establish derived-finance acceptance. |
 | 19 | Reproduce atime-only publication failures; preserve path-swap protection. Define directory overwrite behavior explicitly and test rollback. |
 | 20 | Reproduce doctor capability/publication failures with installed extras; preserve checks and safe causes without misleading reinstall advice or raw exception disclosure. |
 | 21 | Plan Trino authentication with explicit method/secret-source decision; prove propagation, preflight, TLS/redaction using isolated drivers. Live client measurements remain unverified. |
@@ -56,14 +56,16 @@ final candidate acceptance. Detailed chronology and commands remain in
 
 | Finding | Current disposition and remaining evidence |
 | --- | --- |
-| 1 | Synthetic string identifiers with phone/email/ssn semantics reproduced as rejected. Product/security choice pending; no blanket privacy exemption implemented. Short-string reachability remains unverified. |
+| 1 | Synthetic string identifiers with phone/email/ssn semantics reproduced as rejected. Product/security choice pending; no blanket privacy exemption implemented. The generic short-string branch is reachable: fictional 7–16-character `string_pattern` fields generate 100 distinct values, replay deterministically and pass final validation (`tests/test_csv_pipeline_regressions.py`); this does not resolve the sensitive-identifier mismatch. |
+| 3 | Current-main fictional classifier probe returns `phone` for a positive fractional amount-shaped value, but not its negative counterpart; phone-shaped integer identifiers and a Luhn-valid card-shaped secret remain protected. This confirms an ambiguous numeric false positive, not permission for a blanket numeric exemption. Field-scoped exception policy awaits explicit owner choice; no classifier change or private-input acceptance claimed. |
 | 2 | Confirmed capped-folder case fixed in [PR #534](https://github.com/wa-pis/agent-paranoid-android/pull/534), merged as `0b7556e`. Fictional baseline returned 1.0 for 10,001 distinct values across 11,001 rows; `tests/test_schema_distinct_overflow.py` now verifies lower-bound metadata, cap boundary, no overflow PK nomination, legacy fingerprints and stale-cache reprofile. Relationship evidence tests and Python 3.11–3.14 CI passed. Standalone old profiles require reprofile; private client inputs and final installed RC replay remain unverified. |
 | 8 | User approved fixed cardinality: four keys remain four as output grows. Correction merged in [PR #536](https://github.com/wa-pis/agent-paranoid-android/pull/536), `ca6cb12`, with green CI. Fictional CSV/folder/aggregate routes pass at 2, 100 and 1000 output rows (`tests/test_identifier_pool.py`): counts only, synthetic keys, deterministic pools. Nulls/small outputs may use fewer members; approximate input counts do not prove exact source fidelity. Installed-RC acceptance pending. |
 | 4 | Fictional single-CSV probe on `1da23ad`: 100 rows/four repeated integer `run_id` values produced no top values and 100 generated identifiers; text equivalents produced four synthetic top values and four generated categories. Blanket absence of CSV top values is disproved. Numeric repeated-key case corrected in PR #536 using finding 8's approved fixed pool; focused regression and CI passed. No private-input or installed-RC acceptance claimed. |
 | 9 | Independent identifier-domain collision fixed in [PR #517](https://github.com/wa-pis/agent-paranoid-android/pull/517). `tests/test_identifier_domains.py` covers independent fields and declared links; relationship-order follow-ups reviewed on `3add995`. This does not prove general relationship inference or cross-run mapping stability. |
+| 13 | A fictional folder-CSV regression exposed inference choosing an unrelated same-table key on equal overlap. The local fix prefers an exact field-name match on a confidence tie: 4 parents/100 linked children infer the parent link; with 75 linked children no parent link is inferred (`tests/test_domain_agnostic_pipeline.py`). Separately, a declared-link regression confirms 4 parent and 100 child output rows with no orphans; without the declaration, identifier domains stay disjoint (`tests/test_identifier_domains.py`). Source orphan-rate fidelity and installed-RC behavior remain unverified. |
 | 19 | Deterministic access-time regression fixed in [PR #516](https://github.com/wa-pis/agent-paranoid-android/pull/516): two baseline failures, focused candidate checks passed. `tests/test_io_path_policy.py` retains presence/path-swap guards. Original script did not reproduce the timing failure: verified public 1.5.0 and publication candidate each yielded 24 successes/16 intended rejections. Five adapted subprocess scenarios passed both; not evidence that baseline contained no bug. |
 | 7 | Timestamp subcase already corrected in baseline 1.5.0: isolated fictional CSV -> profile -> spec -> generation yields 20 timezone-aware values within observed bounds on baseline and `c28ac5a`. Time and +03:00 offset retained; not a new fix. Monthly-date granularity and mixed profile/spec routing remain separate unresolved subcases. No private-input or final installed-RC claim. |
-| 3, 5–6, 10–18 | No final disposition established by this checkpoint. Preserve the finding-specific verification plans above; existing implementation or tests alone do not establish client-case acceptance. Finding 13 is not closed by the narrower declared-link fix under finding 9. |
+| 5–6, 10–18 | No final disposition established by this checkpoint. Preserve the finding-specific verification plans above; existing implementation or tests alone do not establish client-case acceptance. Finding 13 is not closed by the narrower declared-link fix under finding 9. |
 
 Working-tree diagnostic follow-up (not final acceptance): finding 7 now explains
 spec-key precedence and recovery without dropping privacy settings; automatic
@@ -82,7 +84,41 @@ unchanged. Finding 10 table-profile date/timestamp bounds are corrected locally:
 37 focused checks cover aggregate -> inference -> generation, sensitive/all-null
 exclusions and invalid/timezone-inconsistent endpoints. PR #539 merged as
 `4550f22` with green CI. Installed-RC replay remains pending; query-source
-bounds are not covered.
+bounds are not covered by PR #539. A later local query-source follow-up uses
+fictional PostgreSQL and Trino aggregate-to-spec-to-generation tests for date
+and timezone-aware timestamp bounds. The existing column-summary query carries
+min/max for non-sensitive outputs; sensitive-name fields omit them, all-null
+fields claim no observed bounds, and malformed endpoints fail without exposing
+values. No live database, client input or installed-RC replay was used.
+Installed-package A/B on fictional aggregates: public 1.5.0 baseline
+(`/private/tmp/apa-client-acceptance.xrueHB/baseline-1.5.0`) returned no
+date-range distribution, no temporal-bound SQL and generated values outside
+the requested bounds for both PostgreSQL/Trino date/timestamp cases. An offline
+wheel from exact local commit `6776395` (SHA-256
+`0071d5f87cdd33c95b36689ae75811beb4b093da2d6e923777bf078e59e37da6`)
+installed separately under `/private/tmp/apa-query-temporal-ab.74PHgQ/candidate`
+returned typed ranges, in-bound seeded generation and bound SQL for all four;
+both packages issued three fake requests per case. Import roots and version
+labels were checked, and the inspected probe SHA-256 is
+`0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`.
+This first interim wheel was superseded before PR: it used only output names
+for sensitivity, so a `birth_date AS event_day` projection could expose bounds.
+The local correction requires a direct projection with no sensitive source
+field or output name. The first wheel is not safe acceptance; its corrected
+replay follows. Neither replay is a clean install, live database or final
+1.6.0rc1 acceptance.
+Corrected installed-wheel A/B on exact local code SHA
+`39b27fee0af980aacb3e77dc9e392350c98ef817` used wheel SHA-256
+`496e766f4d788dc0bc8ed00fec5f2006fafd4d36e1b379d5b70d32300d072b40`
+and inspected probe SHA-256
+`5b46ed269b90317ca3bec1c75607f374f6fdc4a1441de1560cf70ba9d08b032c`.
+Separate installed roots were verified. Four ordinary PostgreSQL/Trino
+date/timestamp cases retained typed bounds and in-period seeded output with
+three fake calls each. Four `birth_date` alias/filter cases issued no min/max
+aggregate and retained no range; the superseded wheel incorrectly did both.
+Public baseline 1.5.0 issued no min/max in any case. This is still shared-
+dependency, fake-driver evidence under a 1.5.0-labelled interim wheel, not
+client/private data, live database or final RC acceptance.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 
@@ -92,7 +128,33 @@ Refreshed finding evidence (2026-09-24, not final RC acceptance):
 | 22 | AND/OR classification reproduced with sqlglot 30.13.0 and corrected in PR #541 (`b43005e`). Focused PostgreSQL/Trino predicate and fake-driver profile-to-spec checks passed, including forbidden-function controls; no live DB or final installed-RC replay. |
 | 24 | The client's fictional spec was extracted as data, not executed as a script. Installed public 1.5.0 baseline and interim `47a1eb8` candidate both wrote `created_at` physically as Parquet `string` although spec declares `date`; integer remained `int64`. Declared-schema/readback correction, nullable/timestamp/decimal cases and final RC replay remain pending. |
 | 25 | On both installed packages, explicit spec-input `--mode negative --invalid-ratio 1.0` returned success and manifest effective settings `valid/0.0`. Precedence when an explicit valid mode meets a saved mixed ratio remains a user decision; all-mode behavior, invalid-field evidence and exit/publication parity remain pending. |
-| 17 | Focused fake-driver statement-count regression for both PostgreSQL and Trino query profiling measures one no-row schema request, one row count, three column summaries and two numeric-shape aggregates: seven requests for three fields; one explicitly allowlisted category adds one request, while default makes no category/raw-row request. This is query-count evidence, not a live scan-cost or latency measurement, batching fix, or final-RC acceptance. |
+| 17 | Fake-driver query-source profiling for both PostgreSQL and Trino measured seven requests for three fields (two numeric) before numeric-summary consolidation, five after: one no-row schema request, one row count and one aggregate per field. One explicitly allowlisted category adds one request; default makes no category/raw-row request. PostgreSQL table profiling separately fell from 15 to 12 statements for two tables/four columns (three numeric), or 16 to 13 with one category. Neither test measures live scan bytes/latency or proves final-RC acceptance. No SQL permissions, statement/scan budgets or temporary-table writes changed. |
+
+Later finding-25 installed-CLI A/B used a new fictional 12-row integer spec,
+explicit `--mode negative --invalid-ratio 1`, and verified each package import
+root. Public 1.5.0 failed the all-invalid-row assertion: output amounts stayed
+integers. A separately installed wheel from source commit `76b2806` passed:
+amounts were intentionally invalid strings, manifest effective settings were
+`negative/1`, report validity was false, and the input spec stayed unchanged.
+The probe did not lock down exit-code policy. Wheel SHA-256:
+`07c1e6747273070d4d545de1f1c99f97803eee5d95773b66996d57ebaa6e04d7`;
+probe SHA-256: `e54817f6d4a6ad1aabe97d3315f18e060983810b3c3232db145e9bcfa852cf1d`.
+This wheel still labels itself 1.5.0 and shares development dependencies; it
+is not clean-environment or final 1.6.0rc1 acceptance. Saved-valid precedence,
+controlled-invalid status semantics and intentionally invalid Parquet remain
+separate decisions.
+
+Additional finding-20 Parquet capability replay (not final RC acceptance):
+an isolated `sitecustomize.py` shim replaced only `pyarrow.parquet.read_table`
+with a fictional failure; no product code was patched. Verified installed
+public 1.5.0 and interim typed-Parquet candidate import roots each returned
+`doctor --require-extra parquet --json` with `ok=false`/exit 1,
+`quickstart=available`, `extra:parquet=available`, and
+`capability:parquet=failed`. Neither response contained the fictional token
+or reinstall advice. Shim SHA-256:
+`524de7c6bcf69b0245d045927ed87f0bf8bec00412cacc7445ebcf97d8797dc2`.
+This proves the installed dependency-failure presentation path for these
+versions, not a real Parquet fault, clean environment, or final RC replay.
 
 These probes used fictional data, selected each installed CLI and verified its
 package import root. Subprocesses had 30-second timeouts and bounded captures;
@@ -180,15 +242,17 @@ Do not claim complete client acceptance from the script's exit code alone.
 
 ## New Agreed Scenarios
 
-Reviewed source-free CSV subset of `golden_run.py` is implemented in
-`tests/test_client_golden_csv_acceptance.py`. It invokes profile/infer/generate
-in bounded subprocesses, verifies the package import root, row/key counts,
-date/amount bounds and validation report. It uses the same isolated-install
-environment variable as the publication adaptation above. Unlike the original,
-it asserts synthetic profile categories rather than source-category copying:
-this explicitly tests the current source-free contract, not fulfillment of
-finding 5. Private snapshot/pair cases and the rest of the original script are
-not covered. A passing fictional subset does not close those requirements.
+Reviewed source-free CSV subsets of `golden_run.py` are implemented in
+`tests/test_client_golden_csv_acceptance.py`. C.1 invokes profile/infer/generate;
+C.2 generates a separate fictional linked pair from a declared spec. Bounded
+subprocesses verify the package import root, row/key counts, FK membership,
+distinct key domains, synthetic repeated-key pool, date/amount bounds and
+validation report as applicable. Both use the isolated-install environment
+variable from the publication adaptation above. Unlike the original, C.1
+asserts synthetic profile categories rather than source-category copying:
+this tests the current source-free contract, not fulfillment of finding 5.
+Private snapshot/pair inputs and the rest of the original script are not
+covered. Passing fictional subsets do not close those requirements.
 
 On 2026-09-24 this subset passed both verified public 1.5.0 and an isolated wheel
 built from unchanged production code at `6a435db938e8ff43113e3f6f434fdd98f4363f42`.
@@ -196,10 +260,21 @@ Both used development-interpreter dependencies; neither is clean-environment
 RC acceptance. Identical passing outcomes are compatibility evidence, not a
 newly fixed regression. Wheel and adaptation hashes are recorded in progress.
 
+The separate fictional C.2 test failed on installed public 1.5.0: twenty
+`run_id` values were distinct despite a declared four-value synthetic pool.
+It passed against the installed interim corrected wheel also used for the SQL
+query-temporal A/B replay (version-labelled 1.5.0 with shared dependencies).
+This establishes an affected-baseline difference for repeated synthetic keys,
+not acceptance of the private pair, source-value fidelity, a clean install or
+the final 1.6.0rc1 artifact.
+
 Internal groundwork evidence: `tests/test_policy_mapping_roundtrip.py` compares
 saved/reloaded inline YAML and local CSV mappings for leading-zero strings,
 empty/null values, integers above binary-float exact range and calendar dates.
 Both routes reject forbidden nulls and invalid dates under the declared types.
+They now also compare canonical DATETIME text with explicit offsets/`Z` and
+reject noncanonical timestamp text without timezone conversion. This is
+validation-only: executable timezone policy remains separate.
 Private CSV mapping normalization also handles explicitly approximate FLOAT
 fields with finite ASCII numeric syntax, post-conversion duplicate checks and
 overflow/underflow rejection. This is not exact financial DECIMAL support or
@@ -207,6 +282,23 @@ public transformation execution.
 These tests cover private policy persistence and typed mapping validation only;
 they do not establish transformation execution, wizard parity, approval,
 financial Decimal support or acceptance of missing private client inputs.
+
+Finding 25 fractional CLI replay on fictional data: a reviewed three-route
+subprocess check runs `mixed/0.25` twice each from a saved spec, safe CSV profile
+and direct CSV. Public installed 1.5.0 failed the spec route by reporting
+effective `valid/0` while profile/CSV routes passed. A separately installed
+wheel from current main `6b9c37b` passed all three: deterministic rows,
+nonzero but not all invalid integer values, effective manifest settings,
+invalid validation reports and matching JSON-envelope/exit values. The
+candidate wheel SHA-256 is
+`311619294ca9970e9f600dd3d1582f5bd13835e48796a3888431e0e830fb2403`;
+the adapted test SHA-256 is
+`b6cdd5c48eac4b1fba50e41192eae3b557d6d316ce5050ebbf6afc0803ed3587`.
+The installed candidate still advertises 1.5.0 and reuses development
+dependencies, so this is not clean or final-RC acceptance. One public contract
+gap remains: with intentionally invalid rows, spec CLI exits 1/status
+`validation_failed`, but profile/CSV exit 0/status `succeeded`; the owner has
+been asked to choose the uniform semantics before a runtime change.
 
 Add one-to-one preserved reference combinations; changed amounts with zero and
 rounding exceptions; explicit formulas; consistent key domains; exact date

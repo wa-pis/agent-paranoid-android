@@ -157,8 +157,10 @@ It also checks declared derive dependencies as exact field names within the same
 entity: missing, dropped, repeated or cyclic dependencies fail. Cross-entity
 dependency syntax is not implemented; expression/declaration agreement is still
 pending formula validation. No expression is evaluated by this check.
-Observed `sensitive` fields cannot use preservation or unmatched-preserve, even
-when the decision declares them non-sensitive. This check does not authenticate
+Observed `sensitive` fields, sensitive names and sensitive semantic types cannot
+use preservation or unmatched-preserve, even when the decision declares them
+non-sensitive. The value-free review reports this effective sensitivity, not
+only the profile's boolean flag. This check does not authenticate
 the supplied profile, resolve heuristic conflicts or grant preservation authority.
 This is only part of schema binding: it does not verify the fingerprint, types
 or authorization.
@@ -243,10 +245,13 @@ and separately reviewed permissions still need binding at the execution boundary
 inline validator without reopening the source path. It passes explicit limits
 and the same invocation budget through all stages. The private result retains
 the validated mapping and hash of the bytes parsed, both excluded from repr.
-String/date/integer and approximate FLOAT CSV mappings work. FLOAT accepts only
+String/date/DATETIME/integer and approximate FLOAT CSV mappings work. FLOAT accepts only
 ASCII decimal/exponent syntax and rejects non-finite values, overflow, underflow
 to zero and duplicate source keys after conversion. It is not exact DECIMAL;
-DATETIME and Decimal remain unfinished. This adapter is not exposed through
+Decimal remains unfinished. DATETIME validation accepts canonical ISO text with
+an explicit numeric offset, `Z`, or no timezone; it retains the exact text and
+never converts offsets. An execution timezone policy and equivalence/collision
+preflight remain unfinished. This adapter is not exposed through
 CLI/MCP and grants no permission to preserve source data or execute transformations.
 
 CSV integer normalization accepts only an optional ASCII sign followed by ASCII

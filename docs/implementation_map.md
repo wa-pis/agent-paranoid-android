@@ -63,6 +63,22 @@ This is a map of the codebase for the domain-agnostic generator.
   foreign keys, formulas, temporal ordering, conditional required fields, and
   aggregate mappings.
 
+## Selective Transformation Preparation (Private)
+
+`src/test_data_agent/core/transformation_policy.py` validates reviewable
+per-field behavior decisions and field coverage. `transformation_mapping.py`,
+`transformation_csv.py`, and `transformation_yaml.py` validate inline/CSV
+mapping declarations and restricted policy serialization. These parsers do not
+authorize source-value preservation or transform rows.
+
+`src/test_data_agent/io/mapping_snapshot.py`, `mapping_loader.py`,
+`behavior_policy_files.py`, and `transformation_source.py` read bounded local
+mapping, policy, and CSV-source byte snapshots. The core
+`transformation_snapshot.py` and `transformation_approval.py` bind those exact
+bytes and reviewed material. `io/transformation_receipt.py` handles a private
+local interactive confirmation receipt; a receipt alone is not execution
+permission. There is no public CLI/MCP source-preserving execution path yet.
+
 ## Validation
 
 `src/test_data_agent/validation/`
