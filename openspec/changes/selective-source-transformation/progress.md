@@ -1748,7 +1748,7 @@ Broader transformation remains unfinished.
   Both progress histories were retained. The merged tree passed 172 focused
   transformation tests, Ruff, targeted mypy, strict OpenSpec and diff checks.
   This is a draft safety-review surface only: the earlier P2 mapping findings
-  and composite binding remain open; no source-preserving execution or receipt
+  remain open; no source-preserving execution or receipt
   is enabled. Next: push the signed integration commit and inspect exact-head
   CI; do not merge until the safety questions are resolved and independently
   re-reviewed.
@@ -1759,9 +1759,9 @@ Broader transformation remains unfinished.
   material is prepared. The review shows an opaque domain ordinal and component
   index, not mapping values or private domain names. Fictional inline/CSV and
   cross-entity regressions: 183 focused tests passed; Ruff, targeted mypy,
-  strict OpenSpec and diff check passed. This is uncommitted validation-only
+  strict OpenSpec and diff check passed. This is locally committed validation-only
   work in the isolated mapping worktree; no execution, receipt or preservation
-  authority is enabled. Next: integrate the latest main, obtain exact-head CI
+  authority is enabled. Next: finish integration with latest main, obtain exact-head CI
   and resolve the outstanding replacement/timezone safety findings before
   another independent safety review or merging this draft.
 - Owner's latest DECIMAL comment indicates a possible documented human
@@ -1769,3 +1769,24 @@ Broader transformation remains unfinished.
   explicit `sensitive=false` plus rationale may override positive card/phone
   evidence. The current fail-closed rule remains in force until that exact
   safety choice is confirmed, specified, tested and independently reviewed.
+- User-skill offline checkpoint on merged main `d00eee2`: wheel SHA-256
+  `2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`
+  was installed under a separate import root without network access. Both
+  packaged `SKILL.md` files were discoverable. The fictional demo/profile/
+  infer/generate/validate CLI route passed with seed 42; `transform --help`
+  exited 2 because no transformation command exists. This is partial offline
+  acceptance only, not an AI-agent run or final RC proof; details and remaining
+  agent-runtime/MCP cases are in client-acceptance.md. Next: keep this evidence
+  with a focused documentation PR; test distinct agent runtimes against the
+  exact installed RC once the reviewed interfaces exist.
+- PR #570 merged the offline skill-checkpoint documentation on 2026-09-25 as
+  `cd8410aa25bb93fe5df8feb22e7599dee755d6c4` after applicable green CI.
+  It is partial installed-wheel evidence, not agent-runtime or RC acceptance.
+- Finding 26: a fictional two-row-group Parquet fixture reproduced false
+  `null_ratio=0.0` for two nulls in four rows. The metadata-only adapter now
+  sums complete, consistent row-group null counts and reports `0.5`; missing
+  statistics remain unmeasured in its private helper. The focused regression
+  failed before and passed after the change; 55 adapter/spec tests, Ruff and
+  targeted mypy passed. This is not full finding-26 closure: public unknown
+  representation, sensitivity and installed-RC replay remain. Next: agree a
+  versioned unknown/measured contract before changing that public surface.
