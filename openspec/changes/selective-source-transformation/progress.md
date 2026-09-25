@@ -1487,3 +1487,16 @@ Broader transformation remains unfinished.
   safety-policy amendment or new approval authority was enabled. Next: submit
   this focused test-only PR, require exact-head CI, then continue approved
   transformation work; keep draft Parquet #552 separate pending its decision.
+- PR #562 merged the receipt-binding regressions on 2026-09-25 as
+  `18301a9a8947684c8bb08d0aff5441bae9419981`; GitHub verified the signed
+  head and all 37 applicable checks passed (four publication-only skips).
+  The fictional C.2 linked-pair local-CLI acceptance test now checks an
+  installed package's import root, row counts, FK membership, disjoint key
+  domains, four repeated synthetic keys, date bounds and validation. Its
+  reviewed source hash remains
+  `827e1cd4314b65d2bdf0283f240cebdb3f2ec8755e7f0f536c6c879fbf7ffe44`;
+  previous public-1.5.0/interim-wheel A/B is retained as historical evidence,
+  not rerun unchanged. Current source: both fictional golden tests passed;
+  Ruff, strict OpenSpec and diff check passed. Next: submit a focused PR and
+  require exact-head CI. Private C.2, preservation fidelity and final installed
+  RC acceptance remain unverified.
