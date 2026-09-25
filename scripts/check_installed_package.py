@@ -117,6 +117,12 @@ def main(argv: list[str] | None = None) -> None:
     )
     if not demo_fixture.is_file():
         raise SystemExit("installed wheel is missing the bundled demo fixture")
+    for skill in (
+        "agent-paranoid-android-usage",
+        "agent-paranoid-android-transformation",
+    ):
+        if not files("test_data_agent").joinpath("skills", skill, "SKILL.md").is_file():
+            raise SystemExit(f"installed wheel is missing bundled skill: {skill}")
 
     scripts = {
         entry.name: entry.value

@@ -2,6 +2,7 @@ import csv
 import errno
 import hashlib
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,57 @@ from test_data_agent.io.workflows import (
     write_csv_profile_artifact,
 )
 from test_data_agent.safety import SourceRowReuseError
+
+
+def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path) -> None:
+    pq = pytest.importorskip("pyarrow.parquet")
+    spec = DatasetSpec(
+        entities=[EntitySpec(
+            name="orders", row_count=2,
+            fields=[
+                FieldSpec(name="created_on", data_type="date"),
+                FieldSpec(name="created_at", data_type="datetime"),
+            ],
+        )]
+    )
+    spec.generation_settings.output_format = OutputFormat.PARQUET
+    output = tmp_path / "generated"
+
+    result = generate_dataset_bundle(spec, output_folder=output, seed=7)
+
+    schema = pq.read_schema(output / "orders.parquet")
+    assert result.validation.valid
+    assert str(schema.field("created_on").type) == "date32[day]"
+    assert str(schema.field("created_at").type) == "timestamp[us]"
+    assert all(isinstance(row["created_on"], date) for row in pq.read_table(output / "orders.parquet").to_pylist())
+
+
+@pytest.mark.parametrize("mode", ["mixed", "negative"])
+def test_invalid_parquet_rejects_entire_dataset_without_replacing_output(
+    tmp_path: Path, mode: str,
+) -> None:
+    pytest.importorskip("pyarrow.parquet")
+    spec = DatasetSpec(entities=[
+        EntitySpec(name="accounts", row_count=2, fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True),
+        ]),
+        EntitySpec(name="orders", row_count=2, fields=[
+            FieldSpec(name="amount", data_type="integer"),
+        ]),
+    ])
+    output = tmp_path / "generated"
+    output.mkdir()
+    (output / "previous.txt").write_text("fictional previous artifact")
+
+    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
+        generate_dataset_bundle(
+            spec, output_folder=output, output_format=OutputFormat.PARQUET,
+            mode=mode, invalid_ratio=1.0, seed=7,
+        )
+
+    assert {path.name for path in output.iterdir()} == {"previous.txt"}
+    assert (output / "previous.txt").read_text() == "fictional previous artifact"
+    assert not list(tmp_path.glob(".generated.*"))
 
 
 def test_fractional_invalid_ratio_replays_spec_rows_and_effective_rules(tmp_path: Path) -> None:
@@ -928,11 +980,11 @@ def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
         count=1,
     )
 
-    def exhaust_folder(rows, output_format, output_folder: Path) -> None:
+    def exhaust_folder(rows, output_format, output_folder: Path, *, spec) -> None:
         (output_folder / "partial.tmp").write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 
-    def exhaust_single(rows, output_format, output_path: Path) -> None:
+    def exhaust_single(rows, output_format, output_path: Path, *, spec) -> None:
         output_path.write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 

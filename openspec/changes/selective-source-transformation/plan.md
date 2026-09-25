@@ -42,6 +42,11 @@ repair instructions, live integrations or a weaker safety boundary.
    and explicitly scoped MCP operations; they may consume a matching local
    operator receipt but cannot create one. Return safe structured summaries,
    not source rows. Agents cannot self-declassify data.
+   Before the RC, specify and verify skill-guided agent use: discover both
+   packaged skills, distinguish capabilities of the installed version from
+   proposed transformation steps, and route to existing reviewed interfaces.
+   This is a pending agent-integration task, not permission to execute a skill
+   or register it silently with every agent runtime.
 5. **PostgreSQL and approved SQL inputs.** Reuse transformation semantics with
    bounded read-only access, fixed-input replay and cross-input mapping domains.
    Complex query support and additional adapters require scoped decisions.
@@ -67,5 +72,6 @@ large integers, leading-zero strings and timestamps. Review schema compatibility
 before implementation. No new Hadoop connector is implicitly requested.
 Findings 23/24/26 add precision/scale transport, declared Arrow output schemas,
 honest Parquet profiling evidence and typed readback to this same milestone.
-Decide invalid-mode heterogeneous Parquet behavior with finding 25 rather than
-silently converting whole columns to strings.
+For finding 25, reject the entire mixed/negative Parquet export when an
+intentionally invalid value is incompatible with its declared physical type;
+never stringify a whole column or publish a partial artifact.
