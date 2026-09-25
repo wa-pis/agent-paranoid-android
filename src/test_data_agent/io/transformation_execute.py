@@ -144,10 +144,8 @@ def replace_csv_snapshot(
         generation_bytes = {part.name: part.payload for part in canonical.parts if part.kind == "generation_policy"}
         for decision in policy.fields:
             action = decision.behavior
-            if decision.field in decimal_types and (
-                    isinstance(action, (SubstituteAction, SynthesizeAction)) or
-                    isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, SynthesizeAction)):
-                raise ValueError  # Typed mappings/generation need declared-schema binding too.
+            if decision.field in decimal_types and isinstance(action, SubstituteAction):
+                raise ValueError  # Typed mappings need declared-schema binding too.
             if decision.entity != source.name:
                 raise ValueError
             if isinstance(action, DropAction):
@@ -266,7 +264,7 @@ def replace_csv_snapshot(
             if value is None:
                 raise ValueError  # CSV null encoding remains an explicit pending contract.
             rendered = str(value)
-            if normalize_csv_scalar(rendered, field_types[name]) == normalize_csv_scalar(original, field_types[name]):
+            if scalar(name, rendered) == scalar(name, original):
                 raise ValueError
             return rendered
 

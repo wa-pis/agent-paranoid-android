@@ -2743,3 +2743,14 @@ Broader transformation remains unfinished.
   checks at 8f2c62a are green (release-only jobs skipped normally).
   Decimal declaration and initial exact execution are ready to commit together;
   remaining typed decimal mapping/synthesis are not marked complete.
+- Connected declared DECIMAL direct synthesis and replace_text unmatched
+  synthesis to the existing DatasetSpec generator. Preflight checks exact
+  precision/scale equality; identity comparison uses exact scalar normalization.
+  Corrected test bounds to decimal_range min/max, reproduced preflight failure,
+  then passed direct/fallback, mismatch and identity cases. Engine+approval:
+  153 tests pass; Ruff and targeted mypy pass. Typed DECIMAL substitution and
+  broader null/financial coincidence acceptance remain unfinished.
+- Expanded synthesis binding regression to both precision and scale mismatch:
+  all 16 direct/fallback/identity/shape combinations pass. Existing de18b9d CI
+  has four Python matrix jobs in progress; remaining observed checks succeeded
+  or are normal release-only skips. Do not restart the running workflow.

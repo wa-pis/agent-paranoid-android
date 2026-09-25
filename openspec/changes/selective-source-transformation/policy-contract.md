@@ -117,7 +117,10 @@ The closed CSV executor validates declared decimal source and output text with
 the existing exact base-ten parser. Decimal derive uses transformed INTEGER or
 declared DECIMAL dependencies, exact rational arithmetic and final HALF_UP.
 Approximate FLOAT dependencies are not implicitly promoted. Typed substitution
-and synthesis for declared CSV decimals still require schema binding and reject;
+for declared CSV decimals still requires schema binding and rejects. Direct
+synthesis and replace_text synthesis fallback require DatasetSpec decimal_range
+precision/scale to match the declaration exactly; decimal identity comparisons
+use exact values rather than textual formatting;
 exact text replacement and existing receipt-gated preservation retain their
 existing authorization checks. Declarations never authorize preservation.
 
