@@ -2643,3 +2643,14 @@ Broader transformation remains unfinished.
   exact financial derive through safe_eval unchanged. Reuse its bounded syntax
   parser, but preserve decimal literal text and exact intermediate arithmetic
   before applying the approved final rounding. No existing evaluator changed.
+- Added a separate exact row-formula evaluator using the existing bounded AST
+  parser and stdlib Fraction. Decimal literals come from original syntax, not
+  float AST values; all intermediate arithmetic stays rational and final
+  HALF_UP uses integer quotient/remainder. Ordinary safe_eval is unchanged.
+  Initial 11 tests failed before implementation; 28 formula/rounding tests
+  then passed with Ruff/mypy. Added explicit resource/overflow controls and
+  documented limits; derive execution wiring remains pending.
+- Exact evaluator regression checkpoint: 91 business-rule, architecture,
+  exact-formula and rounding tests pass; Ruff and targeted mypy pass. The
+  existing safe_eval route is unchanged. Commit the evaluator and documented
+  resource bounds together, retaining pending engine integration explicitly.

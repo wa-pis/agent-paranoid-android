@@ -164,6 +164,14 @@ Owner-approved DECIMAL formula rounding is ROUND_HALF_UP at declared scale;
 precision overflow rejects. Exact arithmetic must not pass through binary
 FLOAT. Tests and implementation of this contract remain required.
 
+The private exact row-formula evaluator reuses the bounded arithmetic syntax
+parser and evaluates decimal literal text and integer/Decimal operands as
+rational numbers, rounding only the final result. It rejects aggregate calls,
+missing/null/bool/float operands and division by zero. Resource limits are 1024
+literal coefficient digits/exponent magnitude and 16384 bits for intermediate
+numerators/denominators, alongside the existing expression and runtime budgets.
+This helper alone does not activate derive or settle nullable formula semantics.
+
 The Financial Values And Dependencies section of design.md is normative for
 synthesis and unmatched-value synthesis fallback: declared magnitude/range,
 sign, null, zero, precision/scale, rounding and overflow rules must all apply.
