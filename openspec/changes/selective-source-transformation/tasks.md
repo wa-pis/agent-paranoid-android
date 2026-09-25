@@ -71,6 +71,13 @@ All items below remain unverified until reproduced against the current candidate
   keep external script/API execution an unapproved future TODO.
 
 - [ ] Implement bounded local CSV transformation with explicit field actions.
+- [ ] Make the first CSV replacement primitive unconditional exact-text
+  file-wide and per-column lookup tables (`true -> false`, `001 -> 1`) with
+  one-pass matching, duplicate-key rejection and no type inference. Resolve
+  competing-scope precedence explicitly. Keep preservation/unknown-value gates.
+  Add opt-in bounded local dry-run/trace with row, column, scope, rule ordinal and
+  status, plus counts, but no literals or value hashes; test trace/execution
+  consistency and value-free errors on fictional data.
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.

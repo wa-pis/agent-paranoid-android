@@ -1974,12 +1974,56 @@ Broader transformation remains unfinished.
   commit. Shared approval preflight now rejects equal offset-aware instants
   before any receipt; no execution path was added. Distinct-sensitive-literal
   P2 still needs disposition consistent with the no-real-PII guarantee.
-  Owner chose a simple CSV value-replacement first execution slice, still
-  subject to explicit per-field decisions and the existing local approval/
-  source-snapshot boundary. Next: run affected mapping/CSV/receipt checks,
+  Owner initially discussed a simple CSV value-replacement first execution
+  slice, still subject to explicit per-field decisions and the existing local
+  approval/source-snapshot boundary. Next: run affected mapping/CSV/receipt checks,
   commit/push the timezone correction, get fresh CI and one independent changed-
   scope safety review. AGENTS.md amendment and source-preserving execution
   remain gated on typed evidence and executable end-to-end safety tests.
+- Owner rejected the proposed same-type-only CSV `replace` and then clarified
+  the intended primitive is an unconditional exact-text replacement table,
+  not a typed output-column conversion. `"001" -> "1"` writes literal `1`;
+  no FLOAT/DECIMAL parsing, guessed type, cascade or brute-force lookup is
+  part of the replacement operation. Whether the table applies globally to
+  every CSV cell or only selected columns is awaiting the owner's answer.
+  Unmatched-value preservation still requires the separate reviewed safety
+  boundary; do not implement or publish a same-type-only path as acceptance.
+- Owner further clarified that the input is a table of unconditional text
+  substitutions (`true -> false`), not a request for source/target types.
+  OpenSpec plan, policy contract and task list now describe literal one-pass
+  matching, no implicit coercion, and opt-in bounded local debug output of
+  row/column/rule ordinals and match status without values or hashes.
+  The owner subsequently chose both separate rules per column and file-wide
+  rules. Their conflict precedence is awaiting confirmation. This planning
+  update does not enable source-preserving execution. Next: bind the exact-text
+  matcher to explicit column decisions and shared trace on fictional fixtures
+  under the separately reviewed preservation boundary.
+- Added an internal, non-executing exact-text CSV replacement table compiler:
+  one left/right text pair per mapping row, duplicate-key and null-pair
+  rejection, one lookup returning replacement plus rule ordinal, and `None`
+  for unmatched input. It performs no source-row I/O, fallback copy, type
+  conversion, output publication or approval. Fictional `true -> false` and
+  `001 -> 1` tests: 41 CSV tests pass; Ruff and targeted mypy pass. Next:
+  bind each table to its declared scope, then share this matcher with a
+  bounded value-free local trace and reviewed CSV execution path.
+- Added internal scoped text matching over the compiled tables. A column rule
+  affects only its named column; a file-wide rule can match other columns.
+  A matching replacement is applied only once, so a replacement equal to a
+  different rule's source is not cascaded. Until the owner decides precedence,
+  overlap on one cell raises a fixed value-free conflict instead of silently
+  choosing a rule. The private match result hides replacement text in repr and
+  carries scope plus rule ordinal for future trace. Fictional CSV tests: 43
+  passed; Ruff, targeted mypy and diff check passed. A value-free event helper
+  now derives row/column ordinals, scope, rule ordinal and matched status from
+  the same match result, with no literal passed to the event constructor.
+  This is not yet a bounded CLI dry-run or source-row execution. Next: record
+  chosen precedence, add bounded CLI trace and reviewed CSV execution behind
+  the safety amendment.
+- Rechecked the local exact-text slice after the owner's explicit file-wide
+  requirement: file-wide and per-column lookup tests pass (43 CSV tests), Ruff,
+  targeted mypy and strict OpenSpec validation pass. No output path or source
+  preservation was enabled. Next: settle overlapping-scope precedence, then
+  implement a bounded value-free local trace using the same matcher.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

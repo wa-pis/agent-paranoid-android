@@ -66,6 +66,29 @@ Both inputs normalize through one type-aware validator. Duplicate source keys
 are rejected, including duplicates with identical replacements; ambiguous
 configuration is not resolved by first/last-wins ordering.
 
+The first executable CSV replacement primitive is a separate exact-text table:
+each decoded source CSV cell is matched to a literal left-hand cell and, on a
+match, replaced with the literal right-hand cell. `true -> false` and
+`001 -> 1` mean text substitution, not Boolean or numeric conversion. No
+trim, case fold, type inference, cascade or brute-force lookup is involved.
+Duplicate left-hand strings reject. This primitive does not by itself grant
+permission to retain unmatched source values; reviewed per-field actions and
+the local approval/snapshot boundary still apply. The owner requires both
+file-wide and per-column tables. A column-scoped rule applies only to its
+declared column; a file-wide rule may apply to any column in that file. Both
+levels remain subject to field decisions and sensitivity/preservation gates.
+The precedence when both levels match the same cell is awaiting an explicit
+owner decision. The internal draft matcher rejects such overlap until that
+decision; no cascade or implicit two-step replacement is permitted.
+
+Debugging is local and opt-in. A bounded dry-run/trace may report source row
+ordinal, column ordinal, rule scope (file or column), mapping-rule ordinal
+and matched/unmatched outcome,
+plus per-rule counts. It must not include source/replacement literals, hashes
+of them, raw row fragments or unbounded event output; default agent/MCP
+summaries remain aggregate and value-free. Trace generation and ordinary
+execution must share the same matching code and fixed input snapshot.
+
 Null is distinct from empty string. Exact decimal values are text plus declared
 precision/scale; never parse them through binary float. Dates and timestamps are
 distinct types; no implicit timezone conversion or timestamp truncation. Actual

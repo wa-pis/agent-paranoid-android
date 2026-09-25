@@ -31,7 +31,14 @@ repair instructions, live integrations or a weaker safety boundary.
    behind an explicit configuration/secret-source decision.
 3. **CSV vertical slice.** One-to-one rows, preserved reference combinations,
    replaced financial values, scoped substitutions, consistent keys and derived
-   totals through a saved policy before adding interactive UI.
+   totals through a saved policy before adding interactive UI. The first
+   executable replacement primitive is a table of unconditional exact-text
+   pairs (`true` -> `false`, `001` -> `1`): no inferred source/target type or
+   numeric conversion. Support both file-wide and per-column tables; apply
+   each match once, never cascade. Keep reviewed
+   field-action and preservation gates around this primitive. Add bounded
+   local value-free trace/dry-run output for row/column/rule matches and
+   unmatched cells.
 4. **Review wizard and agent parity.** Present per-field evidence and proposed actions; allow
    edits or bulk acceptance of reviewed decisions and save a replayable policy.
    Show the system comment next to each explicit sensitivity decision; a bulk

@@ -1,6 +1,12 @@
+from dataclasses import asdict
+
 import pytest
 
-from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
+from test_data_agent.core.transformation_csv import (
+    compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
+    parse_csv_mapping_bytes,
+    text_trace_event,
+)
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.transformation_mapping import parse_mapping_declaration
 from test_data_agent.core.transformation_mapping import CsvMapping, MappingDeclarationError
@@ -12,6 +18,70 @@ def parse(payload, **limits):
                              source_columns=("old",), replacement_columns=("new",), null_token="NULL")
     return parse_csv_mapping_bytes(payload, declaration,
                                    budget=limits.pop("budget", GenerationBudget()), **limits)
+
+
+def test_text_replacement_table_is_exact_and_one_pass():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    table = compile_text_replacement_table(
+        b"old,new\ntrue,false\n001,1\nfalse,true\n", declaration, budget=GenerationBudget(),
+    )
+    assert table.lookup("true") == ("false", 1)
+    assert table.lookup("001") == ("1", 2)
+    assert table.lookup("false") == ("true", 3)
+    assert table.lookup("1") is None
+    assert "true" not in repr(table)
+
+
+@pytest.mark.parametrize("payload", [
+    b"old,new\na,b\na,c\n",
+    b"old,new\na,NULL\n",
+])
+def test_text_replacement_table_rejects_ambiguous_or_null_pairs(payload):
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",), null_token="NULL")
+    with pytest.raises(MappingDeclarationError):
+        compile_text_replacement_table(payload, declaration, budget=GenerationBudget())
+
+
+def test_file_and_column_text_rules_match_without_cascade():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    file_table = compile_text_replacement_table(
+        b"old,new\nfalse,global-next\n", declaration, budget=GenerationBudget(),
+    )
+    column_table = compile_text_replacement_table(
+        b"old,new\ntrue,false\n", declaration, budget=GenerationBudget(),
+    )
+    matched = match_scoped_text("true", "flag", file_table, {"flag": column_table})
+    assert matched is not None
+    assert (matched.replacement, matched.scope, matched.rule_ordinal) == ("false", "column", 1)
+    assert "false" not in repr(matched)
+    assert match_scoped_text("false", "status", file_table, {"flag": column_table}).scope == "file"
+    assert match_scoped_text("unmapped", "flag", file_table, {"flag": column_table}) is None
+    assert asdict(text_trace_event(2, 1, matched)) == {
+        "row_ordinal": 2, "column_ordinal": 1, "matched": True,
+        "scope": "column", "rule_ordinal": 1,
+    }
+    assert asdict(text_trace_event(3, 1, None)) == {
+        "row_ordinal": 3, "column_ordinal": 1, "matched": False,
+        "scope": None, "rule_ordinal": None,
+    }
+
+
+def test_overlapping_file_and_column_rules_reject_without_values():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    file_table = compile_text_replacement_table(
+        b"old,new\ntrue,global-false\n", declaration, budget=GenerationBudget(),
+    )
+    column_table = compile_text_replacement_table(
+        b"old,new\ntrue,local-false\n", declaration, budget=GenerationBudget(),
+    )
+    with pytest.raises(MappingDeclarationError) as error:
+        match_scoped_text("true", "flag", file_table, {"flag": column_table})
+    assert str(error.value) == "conflicting text replacement scopes"
+    assert "true" not in repr(error.value)
 
 
 def test_private_csv_pairs_preserve_empty_and_explicit_null():

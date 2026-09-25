@@ -4,7 +4,11 @@ import csv
 import io
 import math
 import re
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from decimal import Decimal
+from types import MappingProxyType
+from typing import Literal
 
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
@@ -16,6 +20,91 @@ from test_data_agent.core.transformation_mapping import (
     CsvMapping, InlineMapping, MappingDeclarationError, parse_mapping_declaration,
     validate_inline_mapping_shape, validate_inline_scalar_mapping,
 )
+
+
+@dataclass(frozen=True, slots=True, repr=False)
+class TextReplacementTable:
+    """Private exact-text lookup; no source-row fallback or execution authority."""
+
+    _by_source: Mapping[str, tuple[str, int]] = field(repr=False)
+
+    def lookup(self, value: str) -> tuple[str, int] | None:
+        if type(value) is not str:
+            raise MappingDeclarationError("invalid text replacement lookup") from None
+        return self._by_source.get(value)
+
+
+@dataclass(frozen=True, slots=True)
+class TextMatch:
+    replacement: str = field(repr=False)
+    scope: Literal["file", "column"]
+    rule_ordinal: int
+
+
+@dataclass(frozen=True, slots=True)
+class TextTraceEvent:
+    row_ordinal: int
+    column_ordinal: int
+    matched: bool
+    scope: Literal["file", "column"] | None
+    rule_ordinal: int | None
+
+
+def text_trace_event(row_ordinal: int, column_ordinal: int, match: TextMatch | None) -> TextTraceEvent:
+    """Build value-free local trace metadata from a private match result."""
+    if (type(row_ordinal) is not int or row_ordinal < 1 or type(column_ordinal) is not int
+            or column_ordinal < 1 or (match is not None and not isinstance(match, TextMatch))):
+        raise MappingDeclarationError("invalid text trace event") from None
+    return TextTraceEvent(row_ordinal, column_ordinal, match is not None,
+                          match.scope if match is not None else None,
+                          match.rule_ordinal if match is not None else None)
+
+
+def match_scoped_text(
+    value: str, column: str, file_table: TextReplacementTable | None,
+    column_tables: Mapping[str, TextReplacementTable],
+) -> TextMatch | None:
+    """Match original text once; overlap rejects until precedence is decided."""
+    if type(value) is not str or type(column) is not str or not isinstance(column_tables, Mapping):
+        raise MappingDeclarationError("invalid text replacement lookup") from None
+    local_table = column_tables.get(column)
+    if local_table is not None and not isinstance(local_table, TextReplacementTable):
+        raise MappingDeclarationError("invalid text replacement lookup") from None
+    if file_table is not None and not isinstance(file_table, TextReplacementTable):
+        raise MappingDeclarationError("invalid text replacement lookup") from None
+    local = local_table.lookup(value) if local_table is not None else None
+    global_match = file_table.lookup(value) if file_table is not None else None
+    if local is not None and global_match is not None:
+        raise MappingDeclarationError("conflicting text replacement scopes") from None
+    if local is not None:
+        return TextMatch(local[0], "column", local[1])
+    if global_match is not None:
+        return TextMatch(global_match[0], "file", global_match[1])
+    return None
+
+
+def compile_text_replacement_table(
+    payload: bytes, declaration: CsvMapping, *, budget: GenerationBudget,
+) -> TextReplacementTable:
+    """Compile one-column CSV pairs without type inference or cascading."""
+    try:
+        if len(declaration.source_columns) != 1 or len(declaration.replacement_columns) != 1:
+            raise ValueError
+        mapping = parse_csv_mapping_bytes(payload, declaration, budget=budget)
+        by_source: dict[str, tuple[str, int]] = {}
+        for ordinal, entry in enumerate(mapping.entries, start=1):
+            original, replacement = entry.original[0], entry.replacement[0]
+            if type(original) is not str or type(replacement) is not str:
+                raise ValueError
+            by_source[original] = (replacement, ordinal)
+        return TextReplacementTable(MappingProxyType(by_source))
+    except (ValueError, TypeError, AttributeError):
+        pass
+    try:
+        raise MappingDeclarationError("invalid text replacement table")
+    except MappingDeclarationError as error:
+        error.__context__ = None
+        raise
 
 
 def parse_csv_mapping_bytes(
