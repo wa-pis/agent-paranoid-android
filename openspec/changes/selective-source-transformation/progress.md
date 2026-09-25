@@ -1464,3 +1464,18 @@ Broader transformation remains unfinished.
   hold was sequencing, not a technical dependency. Next: rerun focused checks
   on the integrated head and submit its own signed PR; keep #552 draft until
   the invalid-Parquet publication decision. No source-row or live-DB claim.
+- PR #560 merged the safe SQL query-date bounds after 37 applicable green
+  checks on 2026-09-25 as `b50885a95e76aa118a8efbef33523f8846b2eb94`;
+  publication-only checks were skipped. Finding 1 short-string follow-up adds
+  fictional lengths 7 and 8 to the existing deterministic `string_pattern`
+  regression, covering the generic branch without a synthetic prefix. This
+  tests reachability, not the separate sensitive phone/email/SSN mismatch.
+  Nine focused short-string/privacy checks, changed-file Ruff, strict OpenSpec
+  and diff check passed. Next: submit the evidence through ordinary CI; await
+  the safety-policy choice before changing the sensitive-identifier rule.
+- Finding 3 current-main fictional classifier probe: positive fractional
+  amount-shaped text classified as `phone`, negative counterpart unclassified;
+  phone-shaped integer and Luhn-valid card-shaped secret remained protected.
+  This is a local reproduction of numeric ambiguity, not a fix or a blanket
+  declassification rule. Next: wait for the explicit field-exception decision
+  before changing classifier policy; retain identifier/secret controls.
