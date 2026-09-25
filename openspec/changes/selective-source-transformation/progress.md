@@ -2403,3 +2403,410 @@ Broader transformation remains unfinished.
   sensitive replacement controls; 125 relevant tests, changed-file Ruff,
   strict OpenSpec and diff checks pass. No output engine/activation added.
   Next: signed PR and required CI, then closed fictional-data engine work.
+- PR #577 remains open at `46ffa17c2be9778516830ef299b9bc90489f08c1`;
+  last verified CI has no failures, Python 3.11/3.12/3.13 still running.
+  No merge or duplicate CI run requested. Dependent private development is
+  isolated in `/private/tmp/apa-private-csv-engine` and not added to #577.
+- Closed replacement-only CSV prototype now returns bytes from revalidated
+  fixed snapshots, with column precedence, no cascade, bounded output and
+  value-free failures. Rejects unsupported actions/fallbacks; no preservation,
+  filesystem publication, public wiring or receipt issuance. Five fictional
+  tests first failed for the missing module and now pass (exact output,
+  unmatched cell, forged source, output budget, recognizable PII replacement).
+  Changed-file Ruff, one-module mypy and diff check pass. This is development
+  evidence only, not end-to-end acceptance or permission for user-data runs.
+  Next: expand negative/CSV-format tests, integrate required actions and
+  approval-bound preservation before exact-SHA safety review and activation.
+- PR #577 merged as `e40aa02a35b0d313fed5f65f833e4ff9a3f8ce8f`
+  after all CI completed without failure and GitHub reported CLEAN. Normal
+  non-admin merge, no ordinary AI review and no protection bypass.
+- Expanded closed-engine checks: 17 pass, including quoted/multiline/Unicode
+  and empty replacements, exact UTF-8 byte limits, invalid limits, expired
+  invocation deadline and rejection of preserve/fallback/unsupported actions.
+  Ruff passes. Initial architecture test invocation used a nonexistent path
+  (no tests ran); corrected to `tests/test_application_architecture.py`.
+  These are still replacement-only prototype tests, not full CSV acceptance.
+- Added private `drop` execution: failing test first, then projected output
+  columns while retaining source row order/count. The engine accepts only
+  replace_text/reject and drop; preservation and all other actions remain
+  unsupported here. Current 17 engine tests, Ruff and mypy pass; the earlier
+  corrected architecture suite passed all 33 tests. No public API wiring.
+  Next: integrate approval-bound preservation and other declared actions,
+  retain isolated fictional tests, then review exact completed engine SHA
+  before activation. Replacement/drop alone does not complete the release scope.
+- Closed engine now supports preserve and unmatched-preserve only with an
+  existing exact-input local receipt verified by the shared verifier. Reuses
+  canonical classification/snapshot checks, rejects whole-row copying and
+  recognizable sensitive output; no receipt minting or public execution added.
+  Two TDD tests failed for the missing receipt argument, then passed through
+  real fictional PTY confirmations; missing receipts and changed mapping bytes
+  fail. A test initially blocked writing a two-column review to an undrained
+  PTY (interrupted at receipt writer); test now drains the real terminal prompt
+  concurrently before answering, without monkeypatching product safeguards.
+  Engine plus receipt tests: 30 passed; Ruff and mypy pass. Next: expand
+  negative approval controls and implement remaining declared actions before
+  independent exact-SHA engine safety review and any public activation.
+- Added engine-level negative controls for both preserve and preserve fallback:
+  changed source/policy/evidence/review snapshots, stale mapping receipt,
+  malformed/wrong receipt, group/world-readable receipt and symlink reject
+  with detached value-free errors. All 19 engine tests pass; Ruff/diff checks
+  pass. Shared verifier and real fictional PTY remain unpatched. This completes
+  these negative controls only, not all actions, public execution or RC gates.
+- Integrated actual engine retention counts into a private typed result:
+  restricted CSV bytes (excluded from repr) plus value-free summary. Counts
+  accumulate during execution without retaining an extra copy of source rows;
+  shared count finalizer keeps percentage rounding consistent with existing
+  report code. Dropped cells are excluded from the denominator; no comparison
+  scope means unavailable, not zero. This metric grants no retention authority.
+  TDD reproduced missing summary, then 27 engine/report tests passed, including
+  50% preserve, 25% unmatched preserve and dropped-cell exclusion. Ruff and
+  two-module mypy pass. Private return type changed before public activation.
+  Remaining actions, full safety evidence and RC acceptance are still pending.
+- Next-action contract inspection: `design.md` Financial Values And Dependencies
+  explicitly leaves formula rounding undecided; `policy-contract.md` defines
+  synthesize only as a reviewed generation-policy reference, with no executable
+  payload contract. Requested owner choices asynchronously: HALF_UP versus
+  HALF_EVEN/reject-rounding, and reusing DatasetSpec 1.1 versus a separate
+  generation-policy format. Neither proposal is accepted or implemented yet.
+  These choices gate those actions, not the existing replace/drop/preserve
+  implementation. Other safe work remains; the full goal is not declared blocked
+  or complete, and heartbeat remains paused.
+- Verified all-drop closed-engine edge: zero compared cells reports unavailable
+  (not zero percent), four dropped cells counted, source row count retained as
+  empty CSV records; focused test passed. Preparing one draft implementation PR
+  for the closed engine, without public activation or an ordinary AI review.
+  Supported private actions are replace_text, drop, preserve and preserve
+  fallback; synthesize, typed substitute and derive are not implemented here.
+- Draft PR #578 published at `9d3395108e92e003a0c116b350a09a640d1d7c0c`;
+  CI verified running with no failures, not restarted. Added eight local
+  dialect/order regressions: comma/semicolon/tab/pipe, with/without UTF-8 BOM,
+  reordered source columns independent of policy order. All eight pass and
+  Ruff passes. Engine consumes the same dialect/decoding as source profiling;
+  output remains UTF-8 comma CSV. Local tests remain unpushed while existing
+  CI runs. Pending owner decisions are unchanged and were not re-requested.
+- CI for draft #578 at `9d3395108e92e003a0c116b350a09a640d1d7c0c`
+  completed without failures (run 36173663526 and PR check rollup verified).
+  Publishing the accumulated eight dialect/order regressions and private
+  execution-status documentation together. Earlier successful checks were not
+  rerun unchanged; the next CI run covers the new test/documentation SHA.
+  PR remains draft; no activation, merge or RC acceptance claimed.
+- Began substitute execution with direct non-null STRING inline/CSV pairs and
+  reject-on-unmatched, reusing canonical typed preflight and bounded CSV parser.
+  Two failing execution tests now pass; all 31 engine tests, Ruff and mypy pass.
+  Other scalar types, nulls, shared/composite domains and substitute fallbacks
+  remain unfinished and explicitly reject; no silent text coercion or claim
+  of complete typed-substitution support. Local change not yet published;
+  expand negative controls before the next consolidated push.
+- Six inline/CSV substitution scenarios pass: valid equality of results,
+  unmapped rejection even when a global replace table contains that key, and
+  recognizable PII replacement rejection with detached value-free errors.
+  Ruff passes. CI at published `613cb10` still runs Python 3.11–3.14 with no
+  failures; local substitution changes are committed separately and not pushed
+  over that running check set. No public activation or full typed support claim.
+- Added approved preserve fallback to direct STRING substitute through the same
+  receipt verifier. TDD first failed the real-PTY case, then all 36 engine
+  tests passed, including missing/stale/tampered receipts and a 25% retention
+  report. Ruff/mypy pass. No new authorization mechanism or public entrypoint.
+  Synthesize fallback, non-string scalar substitution and domains remain open.
+- Implemented single-file non-null STRING domain execution using complete
+  original ordered tuples and validated component positions. TDD exposed the
+  missing successful path; a repeated component in two different tuple keys
+  now maps to the appropriate distinct pair, even with reversed policy order.
+  Missing full tuple rejects. All 38 engine tests and Ruff pass; corrected a
+  tuple annotation after mypy failure, then mypy/diff check pass. No cross-input
+  relationship acceptance, non-string/null mapping or public activation claim.
+- Composite STRING domain scenarios now cover both inline and CSV: four
+  focused cases pass, including missing-tuple rejection for each representation.
+  Ruff/diff checks pass. CI of published `aacd730` still runs four Python jobs
+  without failures; domain work is committed locally without restarting them.
+- Added INTEGER substitution using exact int keys, shared CSV mapping
+  normalization and integer decimal output, without float conversion. Initial
+  tests exposed unsupported execution and a fixture mismatch: source 001/002
+  profiles as FLOAT. Corrected source to 1/2 while retaining zero-padded CSV
+  mapping keys; inline/CSV outputs above 2**53 remain exact. All 42 engine tests
+  pass; Ruff/mypy previously passed the changed implementation and diff passes.
+  No change to profiling inference or FLOAT/DECIMAL semantics. Numeric nulls,
+  further scalar types and full cross-input relationships remain pending.
+- Mixed INTEGER/STRING composite domains pass inline/CSV success and missing
+  tuple controls (eight focused scenarios). Integer normalization does not
+  convert the adjacent alphanumeric string key. Ruff passes. Ready to commit
+  exact-integer execution plus its direct/composite regression coverage.
+- Added canonical DATE substitution, reusing existing preflight validators and
+  CSV normalization. Initial DATE/DATETIME probes failed unsupported execution;
+  closer contract reading confirms DATETIME execution timezone/equivalence is
+  still undecided, so only DATE was enabled in this closed prototype. Two DATE
+  inline/CSV cases pass; Ruff/mypy pass. DATETIME, null and decimal behavior were
+  not inferred from parsing support. Changes remain local pending batch push.
+- Extended composite-domain matrix to DATE/STRING as well as INTEGER/STRING
+  and STRING/STRING, inline and CSV, complete and missing tuples. All 12 matrix
+  cases pass after simplifying fixture parameters; both direct DATE cases
+  passed separately. No DATETIME execution enabled. Commit this bounded DATE
+  implementation and evidence without claiming remaining temporal semantics.
+- Added approximate FLOAT substitution in the closed engine. TDD reproduced
+  two failures (inline/CSV), then reused one scalar normalizer for source keys
+  and mapping numbers instead of duplicating parsing. All 104 engine/CSV tests
+  pass, including existing malformed/nonfinite numeric controls; Ruff and mypy
+  pass for changed modules. No public activation or DECIMAL semantics changed.
+  Published head e444c61537a2b2d72d147d663bd5e838d5f8cc5e remains draft #578;
+  GitHub checks completed successfully (CI run 36176213788). FLOAT work is local,
+  uncommitted. Next: extend mixed-domain FLOAT coverage, then commit/push this
+  batch; remaining execution, interfaces and release acceptance stay open.
+- Completed the mixed FLOAT/STRING domain controls: inline/CSV success and
+  missing-tuple rejection. The 16-case composite matrix passes; Ruff and diff
+  checks pass. Preparing the FLOAT batch for signed commit and push to #578.
+  Next execution work remains synthesize/derive, null/temporal/decimal contracts,
+  publication and public interfaces; this batch is not release completion.
+- FLOAT batch signed and pushed as 5be6c22 to draft #578. Continued with the
+  agreed debuggability requirement: private snapshot-bound replacement dry-run
+  now uses the same matcher as execution and the existing bounded trace summary.
+  TDD first failed on the absent entrypoint; all 64 engine tests now pass,
+  including unmatched reporting, display truncation, source-column ordinals
+  after drop, tampered source and event/cell/rule limits. Ruff and targeted mypy
+  pass. No literals, row output, fallback execution or receipt minting added.
+  Trace changes remain local; next commit/push after current CI observation,
+  then continue the remaining execution/interface scope and pending contracts.
+- CI run 36176884948 for FLOAT head 5be6c22 completed successfully; pushed
+  signed trace commit d3473eb3a6e295d0f516ecaac4aae183c32c151e to draft #578.
+  Inspected offline skill acceptance next: installed-wheel smoke currently
+  checks both packaged SKILL.md resources exist, but does not establish a
+  skill-guided offline workflow or unavailable-transformation behavior.
+  Keep that acceptance task unchecked. Synthesis payload and financial
+  rounding proposals still await owner answers; no implicit defaults adopted.
+- Extended installed-package smoke with the skills' offline capability-discovery
+  route: version/help, profile-csv/infer-spec/generate/validate help and separate
+  transform-review discovery. At this closed-engine stage transform-execute
+  must remain unavailable (parser exit 2); update this explicit stage assertion
+  only with reviewed public activation. Three harness tests pass; Ruff passes.
+  Real CLI subprocess discovery also passes against this worktree via explicit
+  PYTHONPATH, without network calls or product monkeypatches. This is source-tree
+  evidence, not an installed-RC claim or complete skill-guided acceptance.
+  Next: run the extended smoke on the built candidate wheel via CI, then finish
+  end-to-end offline workflows alongside public execution activation.
+- Built an intermediate wheel from d3473eb product code (version label still
+  1.5.0, not RC) with hatchling, installed using --no-index --no-deps into
+  /private/tmp/apa-skill-wheel.hS9zDy/installed and verified its import root.
+  Wheel SHA-256: 82509d53a964e8564ccf188f2bab64decb793d734c7e0a9dd1676b83f0a5e87e.
+  Both skill resources exist; real offline discovery and unavailable-execution
+  checks pass. Installed fictional CSV/JSON quickstart also passes. Initial
+  quickstart invocation used a positional argument for a keyword-only helper;
+  corrected the harness invocation, not the product. Dependencies came from the
+  existing environment, so this is not clean-install/final-RC acceptance.
+- Closed-engine integration checkpoint: all 382 tests/test_transformation*.py
+  tests pass in 19.51s, covering the current policy/snapshot/receipt/report and
+  execution modules together. This does not prove unimplemented actions or
+  release acceptance. CI 36177372810 for d3473eb completed successfully;
+  pushed offline package-smoke commit 0e1e806 to draft #578. Next substantive
+  execution work depends on the pending synthesis-payload and formula-rounding
+  decisions; remaining null/temporal/decimal, relationships and public-interface
+  requirements are still tracked, not implicitly removed from RC scope.
+- Owner explicitly confirmed DatasetSpec 1.1 as the synthesize payload and
+  HALF_UP for DECIMAL formulas. These two decision blockers are resolved;
+  historical pending entries above are superseded. Recorded the choices in
+  design.md and policy-contract.md without activating execution. Existing
+  snapshot machinery already binds generation_policy parts by exact bytes.
+  Next: validate the referenced DatasetSpec bytes and entity/field binding,
+  then connect deterministic generation and formula execution with tests.
+- Implemented bounded private DatasetSpec 1.1 synthesis-payload loading with
+  the existing restricted YAML loader and DatasetSpec validator. Five TDD cases
+  first failed on the absent helper; all 22 YAML tests now pass. Legacy version,
+  duplicate keys, unsafe tags and malformed YAML fail with detached value-free
+  errors. Targeted mypy passes; corrected import placement after Ruff E402.
+  This loader is not yet wired into review/execution; next bind referenced
+  entity/field types before connecting generation. Changes remain local.
+- Wired DatasetSpec 1.1 loading into approval-material preparation for direct
+  synthesis and substitution/replacement synthesis fallbacks. Referenced bytes
+  must parse and contain the exact target entity/field with matching data type.
+  TDD exposed ten previously accepted invalid-reference cases; all 73 approval
+  and YAML tests now pass, plus Ruff/mypy. Execution is still not enabled:
+  generation settings, final row validation and synthesis constraints must be
+  enforced when connecting the generator. No source path reopening added.
+- Follow-up integration check: 32 source-review/receipt tests pass with the
+  stricter generation payload preflight. Inspected the existing deterministic
+  generate_dataset path: it applies spec safety, row budgets, constraint solving
+  and final generated-data validation. Reuse that path; validation of its
+  generated subset must not substitute for validation of final transformed
+  rows and declared relationships. Preparing the approved contract/preflight
+  batch as one commit before execution wiring.
+- All four CI workflows at 0e1e806 succeeded; pushed approved synthesis
+  contract/preflight commit 5e609ce. Added the agreed exact DECIMAL result
+  rounding primitive using an explicit decimal Context and existing precision/
+  scale validators, with no float conversion. Eleven TDD cases first failed,
+  then passed: positive/negative ties, ordinary rounding, zero, overflow after
+  rounding, nonfinite/type rejection and hostile ambient decimal context.
+  Ruff/mypy pass. This is result quantization only, not formula evaluation or
+  completed derive execution; wire it into the exact evaluator next.
+- Rounding boundary coverage now includes DECIMAL(38,16) low digits and invalid
+  precision/scale, with 17 focused tests passing and Ruff/diff checks clean.
+  Inspected rules/expressions.py: the current evaluator returns Python AST
+  numeric constants directly (fractional constants become float), and ordinary
+  Decimal arithmetic would inherit ambient precision. Therefore do not wire
+  exact financial derive through safe_eval unchanged. Reuse its bounded syntax
+  parser, but preserve decimal literal text and exact intermediate arithmetic
+  before applying the approved final rounding. No existing evaluator changed.
+- Added a separate exact row-formula evaluator using the existing bounded AST
+  parser and stdlib Fraction. Decimal literals come from original syntax, not
+  float AST values; all intermediate arithmetic stays rational and final
+  HALF_UP uses integer quotient/remainder. Ordinary safe_eval is unchanged.
+  Initial 11 tests failed before implementation; 28 formula/rounding tests
+  then passed with Ruff/mypy. Added explicit resource/overflow controls and
+  documented limits; derive execution wiring remains pending.
+- Exact evaluator regression checkpoint: 91 business-rule, architecture,
+  exact-formula and rounding tests pass; Ruff and targeted mypy pass. The
+  existing safe_eval route is unchanged. Commit the evaluator and documented
+  resource bounds together, retaining pending engine integration explicitly.
+- CI 36180595769 at 5e609ce failed two real-PTY action-selection tests: their
+  obsolete generator fixture was an empty `version: 1.0` placeholder, now
+  correctly rejected by DatasetSpec 1.1 preflight. Replaced only the fictional
+  fixture with a valid 1.1 items.status specification. All 11 action-selection
+  scenarios pass locally; Ruff passes. No runtime validation weakened.
+- Integration checkpoint after synthesis preflight and exact arithmetic:
+  all 429 transformation tests pass in 19.23s, including real-PTY wizard tests.
+  Published SHA 0b9bf99f218f7d1d142107902b8ec0c836020652 has documentation
+  success; CI run 36181263340 is queued, Containers 36181263337 in progress,
+  Security 36181263354 queued. Do not restart those runs. Next remains actual
+  synthesis/derive execution and final mixed-row validation, not another
+  unchanged local gate or a release-completion claim.
+- Connected direct synthesize to the closed CSV engine via existing
+  generate_dataset and final validation. Exact bound DatasetSpec bytes, policy
+  seed and profiled source row count drive generation; each reference is
+  generated once. Final transformed projections are revalidated against each
+  referenced spec before bytes return. TDD first failed unsupported execution,
+  then deterministic replay and source-count checks pass; Ruff/mypy pass.
+  Initial execution supports one source entity and valid generation mode;
+  null output encoding and synthesize fallbacks remain pending, not silently
+  coerced. Broader financial/relation acceptance and public activation remain
+  unfinished. Next add negative final-row and fallback execution cases.
+- Added direct/fallback synthesis matrix and connected both substitute and
+  replace_text unmatched synthesis to the same generator/result validation.
+  Two positive fallback tests first failed, then all 76 engine tests passed.
+  Tests prove final schema failures reject even with reporting flags disabled,
+  negative generation mode and unencoded nulls reject, matched rules retain
+  precedence, and deterministic source-row-count output. Ruff/mypy pass.
+  Policy-contract development status updated; public activation remains off.
+- Found and fixed numeric identity by formatting in direct and fallback
+  synthesis: 1.00 -> 1.0 is unchanged under the FLOAT contract and now rejects
+  through shared scalar normalization. Corrected the test fixture's numeric
+  bound keys to min_value/max_value before reproducing all three failures;
+  all 79 engine tests now pass, Ruff passes. Approved zero/rounding coincidence
+  exceptions remain unimplemented; this check does not claim their acceptance.
+- CI 36181263340 and the other three workflows for 0b9bf99 succeeded;
+  pushed synthesis execution commit f1048e2 to draft #578. Derive integration
+  inspection confirms existing field dependency validation uses a topological
+  graph, but execution must evaluate against transformed dependencies, not raw
+  input cells. DECIMAL precision/scale live in profile metadata; CSV inference
+  alone must not invent them or treat approximate FLOAT as exact DECIMAL.
+  Next implement dependency-ordered evaluation with declared output typing.
+- Added dependency-ordered derive execution for the existing approximate FLOAT
+  contract, using transformed INTEGER/FLOAT dependencies and restoring source
+  column order in output. A reverse-column-order, two-formula chain first
+  failed then passed; all 80 engine tests pass. Nonfinite/arithmetic errors
+  reject before output returns. INTEGER/DECIMAL result execution remains
+  pending rather than silently rounding integers or claiming exact FLOAT.
+  Fixed mypy narrowing/list annotations after the initial type-check failure.
+- Added derive failure cases for zero division, nonfinite literals and bool
+  arithmetic. The bool case exposed implicit Python numeric coercion; fixed by
+  rejecting nonnumeric/nonfinite constants before evaluation, also preventing
+  string-repetition expressions from allocating output before type checking.
+  Added a large string-repetition rejection regression without executing it
+  before the guard. Updated the explicit approximate-FLOAT development status.
+- Factored exact rational evaluation for INTEGER and DECIMAL results, then
+  wired INTEGER derive with INTEGER dependencies into the same topological
+  executor. Integer results reject fractions, preserve values beyond 2**53
+  and do not inherit the 38-digit DECIMAL width. Fourteen exact evaluator tests
+  and ten FLOAT/INTEGER engine chain/error tests pass; targeted mypy passes.
+  DECIMAL source/output schema binding and execution remain pending.
+- INTEGER integration checkpoint: all 103 engine and exact-formula tests pass;
+  Ruff and targeted mypy pass. Existing CI run 36182035127 at f1048e2
+  completed successfully. Publish the checked INTEGER/FLOAT derive work to
+  the existing draft PR; next remains declared DECIMAL schema binding, not
+  public activation or release readiness.
+- Added explicit private field decimal_type (strict precision 1..38 and
+  scale 0..precision), retaining observed profile/fingerprint and sensitivity.
+  TDD reproduced rejection of a valid declaration before implementation;
+  policy/YAML/engine checks pass (191 tests plus the new review/closed-execution
+  regression), targeted mypy and Ruff pass. Review displays precision/scale;
+  the executor rejects declarations until exact CSV parsing/output validation
+  is connected, rather than ignoring them. This is schema preparation only,
+  not completed DECIMAL execution. Next connect the existing decimal unit
+  parser and exact evaluator without replacing observed classification.
+- Connected declared CSV DECIMAL parsing and derive execution using existing
+  decimal units and rational evaluator. Both source and final output obey the
+  declaration; transformed dependencies are INTEGER or declared DECIMAL, never
+  implicit FLOAT. Positive/negative HALF_UP cases pass, excess source/output
+  scale and invalid decimal text reject. Typed substitution/synthesis remain
+  pending declared-schema binding and reject explicitly. Policy/engine suite:
+  174 passed before strengthening formula examples to explicit HALF_UP ties;
+  targeted Ruff/mypy pass. Public activation remains off.
+- Schema integration milestone: all 469 transformation tests pass in 19.62s,
+  including local TTY, approval binding and source evidence regressions.
+  Changed-file Ruff and strict OpenSpec validation pass. Existing PR #578
+  checks at 8f2c62a are green (release-only jobs skipped normally).
+  Decimal declaration and initial exact execution are ready to commit together;
+  remaining typed decimal mapping/synthesis are not marked complete.
+- Connected declared DECIMAL direct synthesis and replace_text unmatched
+  synthesis to the existing DatasetSpec generator. Preflight checks exact
+  precision/scale equality; identity comparison uses exact scalar normalization.
+  Corrected test bounds to decimal_range min/max, reproduced preflight failure,
+  then passed direct/fallback, mismatch and identity cases. Engine+approval:
+  153 tests pass; Ruff and targeted mypy pass. Typed DECIMAL substitution and
+  broader null/financial coincidence acceptance remain unfinished.
+- Expanded synthesis binding regression to both precision and scale mismatch:
+  all 16 direct/fallback/identity/shape combinations pass. Existing de18b9d CI
+  has four Python matrix jobs in progress; remaining observed checks succeeded
+  or are normal release-only skips. Do not restart the running workflow.
+- Extended the existing typed mapping validator with explicit DECIMAL shapes.
+  Exact base-ten normalization keeps mapping values as canonical strings and
+  reuses existing duplicate-key validation: 1.0 and 1.00 collide. TDD first
+  failed for the missing argument; all 68 mapping tests then passed. Fixed
+  two mypy annotations/narrowing issues; targeted mypy now passes. This shared
+  primitive is not yet wired into CSV approval/execution; that is the next step.
+- Connected typed DECIMAL mappings through approval and CSV execution, using
+  one normalizer for inline YAML and CSV. Source keys use exact fixed-scale
+  strings; declaration overlays are private copies, not changes to observed
+  classification. Domain bindings also compare precision/scale. Both new
+  end-to-end cases first failed then passed; 281 engine/approval/mapping/CSV
+  tests pass and targeted mypy passes. Broader domain regression and full
+  transformation milestone checks follow before publishing this batch.
+- DECIMAL mapping milestone: added cross-entity domain shape regression;
+  all 492 transformation tests pass in 19.47s. Changed-file Ruff, four-module
+  mypy and strict OpenSpec validation pass. PR checks at de18b9d finished
+  successfully (normal release-only skips excluded). Publish synthesis and
+  mapping commits together to draft #578. Null/temporal execution, financial
+  coincidence policy, public adapters and full client/release acceptance remain.
+- Found a shared-normalizer edge case: invalid DECIMAL precision/scale was
+  not checked when all mapped values were null. Four tests reproduced it;
+  moved shape validation before value iteration. All 72 mapping tests and
+  Ruff pass. Public policy models already reject these shapes, but the shared
+  helper now enforces the same rule independently. DATETIME execution still
+  awaits an explicit offset/equivalence decision requested from the owner;
+  other implementation work remains available, so this is not a goal blocker.
+- Fixed engine retention reporting to compare supported numeric types rather
+  than CSV formatting. Test reproduced 1.0 -> 1.00 reported as changed; now
+  counts unchanged. Updated four old text-equality assertions: observed INTEGER
+  001 -> 1 also counts unchanged. Arbitrary numeric-to-text replace remains
+  supported and counts changed. All 120 engine/report tests and targeted mypy
+  pass. Reporting changes do not grant preservation permission or alter gates;
+  DATETIME/null comparison contracts remain pending.
+- Publication attempt was rejected by the tool's automatic approval reviewer:
+  it interpreted the filesystem adapter as premature save-path activation.
+  No adapter was created; the two new tests importing that absent module were
+  removed, restoring the prior tested tree. AGENTS.md explicitly permits private
+  fictional tests before final review but limits outputs to temporary test
+  locations, never user destinations. A publisher accepting arbitrary output
+  paths needs this boundary resolved before retry; do not bypass the denial.
+  Heartbeat status verified PAUSED. Other in-memory work remains available.
+- CI at 08ae615 completed successfully; pushed the checked 9f388b2 fixes.
+  Found retention percentage depended on ambient Decimal precision/traps.
+  A precision=2/Inexact-trap regression reproduced failure. Replaced percentage
+  arithmetic with exact integer quotient/remainder and HALF_UP at hundredths;
+  all eight report tests and Ruff pass, including 1/32 -> 3.13 and 100.00.
+  No publication path or authorization boundary changed.
+- Closed a DECIMAL adapter parity gap: load_csv_mapping now passes explicit
+  per-component decimal shapes into the shared normalizer. New snapshot/hash
+  test failed before implementation; all 20 loader tests, Ruff and targeted
+  mypy pass. Corrected stale policy-contract descriptions of decimal/datetime
+  validation. This only loads private mappings; no output publisher was added.
+- Updated finding-23 client-acceptance evidence at exact published 7bd752c:
+  distinguishes completed private DECIMAL formula/mapping/synthesis tests from
+  remaining null/coincidence, full finance/relationship, public and RC gates.
+  This is evidence reconciliation, not a new test run or final acceptance.

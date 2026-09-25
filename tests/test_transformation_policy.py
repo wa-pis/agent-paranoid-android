@@ -16,6 +16,30 @@ def policy(behavior):
                         "behavior": behavior}]}
 
 
+def test_declared_decimal_type_roundtrips_without_changing_sensitivity():
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["decimal_type"] = {"precision": 38, "scale": 16}
+    payload["fields"][0]["sensitivity"] = "unknown"
+    result = parse_behavior_policy(payload)
+    assert result.fields[0].decimal_type.precision == 38
+    assert result.fields[0].decimal_type.scale == 16
+    assert result.fields[0].sensitivity == "unknown"
+    assert parse_behavior_policy(result.model_dump(mode="json")) == result
+
+
+@pytest.mark.parametrize("declaration", [
+    {"precision": 39, "scale": 2}, {"precision": 0, "scale": 0},
+    {"precision": 3, "scale": 4}, {"precision": 3, "scale": -1},
+    {"precision": True, "scale": 0}, {"precision": "3", "scale": 0},
+    {"precision": 3}, {"precision": 3, "scale": 0, "rounding": "DOWN"},
+])
+def test_invalid_decimal_declarations_reject(declaration):
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["decimal_type"] = declaration
+    with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$"):
+        parse_behavior_policy(payload)
+
+
 @pytest.mark.parametrize("behavior", [
     {"action": "preserve", "authorization_ref": "user-review", "comment": "Reviewed business code"},
     {"action": "synthesize", "generation_policy_ref": "amount-rule"},

@@ -108,6 +108,25 @@ of them, raw row fragments or unbounded event output; default agent/MCP
 summaries remain aggregate and value-free. Trace generation and ordinary
 execution must share the same matching code and fixed input snapshot.
 
+Private field decisions may declare `decimal_type: {precision: 20, scale: 2}`.
+Precision and scale are strict integers, with precision 1..38 and scale
+0..precision. This declaration is included in local review and exact policy
+snapshot bytes; it does not overwrite observed profile evidence or sensitivity.
+The schema fingerprint continues to identify the observed source schema.
+The closed CSV executor validates declared decimal source and output text with
+the existing exact base-ten parser. Decimal derive uses transformed INTEGER or
+declared DECIMAL dependencies, exact rational arithmetic and final HALF_UP.
+Approximate FLOAT dependencies are not implicitly promoted. Typed substitution
+for declared CSV decimals accepts exact text in inline YAML and CSV mappings;
+keys and replacements are normalized to declared scale without rounding.
+Numerically duplicate keys and identity replacements reject during preflight.
+Shared domains require matching precision/scale across participating entities. Direct
+synthesis and replace_text synthesis fallback require DatasetSpec decimal_range
+precision/scale to match the declaration exactly; decimal identity comparisons
+use exact values rather than textual formatting;
+exact text replacement and existing receipt-gated preservation retain their
+existing authorization checks. Declarations never authorize preservation.
+
 Null is distinct from empty string. Exact decimal values are text plus declared
 precision/scale; never parse them through binary float. Dates and timestamps are
 distinct types; no implicit timezone conversion or timestamp truncation. Actual
@@ -151,6 +170,27 @@ validation remain pending.
 
 ## Replacement Semantics
 
+Owner-approved synthesis payload: `generation_policy_ref` identifies a bounded
+local DatasetSpec 1.1 document, not a new generation format. Its exact bytes are
+part of the reviewed snapshot as `generation_policy`; execution must consume
+those bytes, never reopen an unbound path. Reuse DatasetSpec validation and the
+existing deterministic generation contract. Referenced entity/field identity
+and output type must agree with the transformation policy. The transformation
+seed and one-to-one row count govern execution, not an unrelated requested
+dataset size. This does not enable source-value reuse or public execution.
+
+Owner-approved DECIMAL formula rounding is ROUND_HALF_UP at declared scale;
+precision overflow rejects. Exact arithmetic must not pass through binary
+FLOAT. Tests and implementation of this contract remain required.
+
+The private exact row-formula evaluator reuses the bounded arithmetic syntax
+parser and evaluates decimal literal text and integer/Decimal operands as
+rational numbers, rounding only the final result. It rejects aggregate calls,
+missing/null/bool/float operands and division by zero. Resource limits are 1024
+literal coefficient digits/exponent magnitude and 16384 bits for intermediate
+numerators/denominators, alongside the existing expression and runtime budgets.
+This helper alone does not activate derive or settle nullable formula semantics.
+
 The Financial Values And Dependencies section of design.md is normative for
 synthesis and unmatched-value synthesis fallback: declared magnitude/range,
 sign, null, zero, precision/scale, rounding and overflow rules must all apply.
@@ -164,6 +204,68 @@ and declared-rounding coincidences; those exceptions never skip generation or
 authorize wholesale copying. Derived totals must be recomputed and validated.
 If no permissible replacement satisfies the policy and constraints, fail with a
 bounded value-free error rather than retaining the input or relaxing constraints.
+
+## Closed CSV Execution Development Status
+
+The private `trace_csv_replacements` dry-run binds to the same canonical request
+and source snapshot as execution and uses `match_scoped_text` for identical rule
+precedence. It reports only replace-text actions, with original source row/column
+ordinals, rule scope/ordinal and aggregate counts. Event display truncates at an
+explicit limit; total traced cells and distinct rule counters have rejecting
+limits. Unmatched rules are reported without executing fallback actions. Dropped
+columns do not renumber source ordinals. No cells, mappings, receipt or output
+dataset are returned; this is not a public CLI/MCP surface or an execution approval.
+
+The private `io/transformation_execute.py` prototype supports `replace_text`,
+`drop`, `preserve` and unmatched-preserve. It is not connected to public
+CLI/Python/MCP execution and is not release acceptance. Direct non-null STRING/INTEGER/FLOAT/DATE
+`substitute` pairs support inline/CSV mappings with reject-on-unmatched or
+receipt-bound preserve fallback.
+Single-file non-null STRING/INTEGER/FLOAT/DATE domains match complete ordered original tuples,
+using the preflight-validated component positions, independent of policy order.
+INTEGER keys use strict ASCII signed decimal parsing, with no float intermediate;
+CSV mappings reuse typed normalization and replacements use decimal integer text.
+FLOAT uses the existing approximate numeric contract and the same ASCII
+decimal/exponent parser for source keys and CSV mappings; non-finite values,
+overflow and nonzero underflow to zero reject. It is not exact DECIMAL arithmetic.
+DATE matches canonical ISO text without conversion. DATETIME remains closed
+pending the explicit execution-timezone/equivalence contract below.
+Direct `synthesize` and synthesis fallback for substitute/replace_text reuse
+the existing generator with bound DatasetSpec 1.1, policy seed and source row
+count. Each reference is generated once; final transformed projections are
+validated against its spec regardless of optional reporting settings. Current
+execution requires one matching entity, valid mode and non-null generated
+cells. Unchanged generated text rejects; numeric coincidence exceptions remain
+unfinished. Approximate FLOAT `derive` executes in dependency order using
+transformed INTEGER/FLOAT inputs, not original cells. Only finite numeric
+literals are allowed; arithmetic/nonfinite results reject, and CSV column
+order is preserved. INTEGER derive uses the shared exact rational evaluator
+with INTEGER dependencies, rejects fractional final results and never rounds
+through float. Declared CSV DECIMAL derive uses exact INTEGER/DECIMAL inputs
+and final HALF_UP at the declared scale; source and output widths are checked.
+Cross-input relationships and other typed substitutions remain unsupported;
+they fail rather than silently
+falling back to another action. Final independent implementation review and
+activation gates still apply.
+
+Execution consumes revalidated fixed input bytes, never reopened source paths.
+Preservation requires the existing local receipt verifier, including exact-byte
+binding and owner-only regular-file checks; a policy authorization reference
+alone is insufficient. The engine does not mint receipts. Whole-row copying
+and recognizable sensitive output remain rejected.
+
+The private result carries restricted UTF-8 comma CSV bytes (omitted from repr)
+and a value-free retention summary. Input decoding/dialect is shared with
+profiling; output columns follow source order minus drops, and row order is
+unchanged. Retention compares corresponding output cells, excludes dropped
+cells, and reports unavailable for an empty comparison scope. INTEGER, FLOAT
+and explicitly declared DECIMAL compare numeric values, so formatting alone
+does not count as transformation. FLOAT remains approximate; DECIMAL stays
+exact. Unconditional replacement with nonnumeric text counts as changed.
+STRING fields retain literal comparison, including leading zeros. This report
+does not authorize any preservation or change execution checks. The percentage
+does not authorize preservation or certify anonymity. No filesystem publication
+or mixed-origin manifest is implemented by this in-memory prototype.
 
 ## Approval Identity Binding
 
@@ -297,9 +399,10 @@ float, boolean and canonical ISO date tuples plus explicit nullability. It does 
 integers into floats; empty string remains a string, not null. Dates must be exact
 `YYYY-MM-DD` strings accepted by the standard calendar parser; compact/week dates,
 timestamps and whitespace are rejected, never truncated or converted. Date strings
-remain unchanged. Datetime/decimal types fail closed until their contracts are
-implemented. This limited internal helper is not the CSV loader or full typed
-mapping preflight. Duplicate detection is exact because no normalization occurs.
+remain unchanged. Canonical ISO DATETIME text is accepted without timezone
+conversion. DECIMAL requires explicit per-component precision/scale and exact
+text, normalizes to fixed scale and rechecks duplicate source keys. This internal
+helper is not the CSV loader or full execution authorization.
 
 ## Internal CSV Byte Parser
 
@@ -337,7 +440,8 @@ the validated mapping and hash of the bytes parsed, both excluded from repr.
 String/date/DATETIME/integer and approximate FLOAT CSV mappings work. FLOAT accepts only
 ASCII decimal/exponent syntax and rejects non-finite values, overflow, underflow
 to zero and duplicate source keys after conversion. It is not exact DECIMAL;
-Decimal remains unfinished. DATETIME validation accepts canonical ISO text with
+Exact DECIMAL CSV loading requires explicit per-component precision/scale and
+uses the shared exact normalizer. DATETIME validation accepts canonical ISO text with
 an explicit numeric offset, `Z`, or no timezone; it retains the exact text and
 never converts offsets. An execution timezone policy and equivalence/collision
 preflight remain unfinished. This adapter is not exposed through

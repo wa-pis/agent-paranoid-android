@@ -151,7 +151,10 @@ def test_action_editor_requires_decision_wizard(tmp_path):
 def test_action_selection_saves_same_versioned_policy(tmp_path, action, mapping_kind, fallback):
     source, path, original = draft(tmp_path)
     (tmp_path / "status.csv").write_bytes(b"old,new\nready,fictional-new-status\n")
-    (tmp_path / "generator.yaml").write_text("version: '1.0'\nentities: []\n")
+    (tmp_path / "generator.yaml").write_text(yaml.safe_dump({
+        "schema_version": "1.1", "entities": [{"name": "items", "row_count": 1,
+            "fields": [{"name": "status", "data_type": "string"}]}],
+    }))
     mapping = {"kind": "csv", "path": "status.csv", "source_columns": ["old"],
                "replacement_columns": ["new"]}
     if mapping_kind == "inline":

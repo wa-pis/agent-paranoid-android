@@ -11,6 +11,7 @@ from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StrictBool, 
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_ROWS
 from test_data_agent.core.field import FieldType
+from test_data_agent.core.decimal_units import decimal_to_units, decimal_from_units
 
 
 def _scalar_without_coercion(value: object) -> object:
@@ -105,9 +106,45 @@ def validate_inline_mapping_shape(payload: object, *, key_width: int) -> InlineM
 
 def validate_inline_scalar_mapping(
     payload: object, *, data_types: tuple[FieldType, ...], nullable: tuple[bool, ...],
+    decimal_shapes: tuple[tuple[int, int] | None, ...] | None = None,
 ) -> InlineMapping:
     """Validate primitives and canonical ISO dates, without coercion."""
     declaration = validate_inline_mapping_shape(payload, key_width=len(data_types))
+    if FieldType.DECIMAL in data_types or decimal_shapes is not None:
+        try:
+            shapes = decimal_shapes or tuple(None for _ in data_types)
+            if len(shapes) != len(data_types):
+                raise ValueError
+            for kind, shape in zip(data_types, shapes, strict=True):
+                if (kind == FieldType.DECIMAL) != (shape is not None):
+                    raise ValueError
+                if shape is not None:
+                    precision, scale = shape
+                    decimal_from_units(0, precision=precision, scale=scale)
+            entries = []
+            for entry in declaration.entries:
+                converted: dict[str, list[object]] = {}
+                for side, values in (("original", entry.original), ("replacement", entry.replacement)):
+                    converted[side] = []
+                    for value, kind, shape in zip(values, data_types, shapes, strict=True):
+                        if shape is not None and value is not None:
+                            if not isinstance(value, str):
+                                raise ValueError
+                            precision, scale = shape
+                            units = decimal_to_units(value, precision=precision, scale=scale)
+                            value = format(decimal_from_units(units, precision=precision, scale=scale), "f")
+                        converted[side].append(value)
+                entries.append(converted)
+            return validate_inline_scalar_mapping({"kind": "inline", "entries": entries},
+                data_types=tuple(FieldType.STRING if kind == FieldType.DECIMAL else kind for kind in data_types),
+                nullable=nullable)
+        except (ValueError, TypeError):
+            pass
+        try:
+            raise MappingDeclarationError("invalid typed inline mapping")
+        except MappingDeclarationError as error:
+            error.__context__ = None
+            raise
     scalar_types = {FieldType.STRING: str, FieldType.INTEGER: int,
                     FieldType.FLOAT: float, FieldType.BOOLEAN: bool,
                     FieldType.DATE: str, FieldType.DATETIME: str}

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from decimal import Decimal
+from decimal import Context, Decimal, DecimalException, ROUND_HALF_UP
 from random import Random
 from typing import Any
 
@@ -46,6 +46,21 @@ def decimal_from_units(units: int, *, precision: int, scale: int) -> Decimal:
         raise ExactDecimalError("invalid decimal value")
     digits = tuple(int(character) for character in str(abs(units)))
     return Decimal((int(units < 0), digits, -scale))
+
+
+def round_decimal_result(value: Decimal, *, precision: int, scale: int) -> Decimal:
+    """Round an exact formula result HALF_UP; reject declared-width overflow."""
+    _check_shape(precision, scale)
+    if type(value) is not Decimal or not value.is_finite():
+        raise ExactDecimalError("invalid decimal formula result")
+    try:
+        rounded = value.quantize(Decimal((0, (1,), -scale)),
+                                 context=Context(prec=MAX_DECIMAL_DIGITS, rounding=ROUND_HALF_UP))
+        units = decimal_to_units(format(rounded, "f"), precision=precision, scale=scale)
+        return decimal_from_units(units, precision=precision, scale=scale)
+    except (DecimalException, ExactDecimalError):
+        pass
+    raise ExactDecimalError("invalid decimal formula result") from None
 
 
 def sample_decimal(

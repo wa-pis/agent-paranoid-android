@@ -23,6 +23,7 @@ def load_csv_mapping(
     nullable: tuple[bool, ...],
     max_bytes: int, max_rows: int, max_cells: int, max_columns: int,
     max_cell_chars: int, budget: GenerationBudget,
+    decimal_shapes: tuple[tuple[int, int] | None, ...] | None = None,
 ) -> LoadedCsvMapping:
     """Load private typed mappings; no inference or execution approval."""
     parsed = parse_mapping_declaration(declaration)
@@ -37,7 +38,8 @@ def load_csv_mapping(
         snapshot.payload, parsed, budget=budget, max_bytes=max_bytes, max_rows=max_rows,
         max_cells=max_cells, max_columns=max_columns, max_cell_chars=max_cell_chars,
     )
-    validated = normalize_csv_mapping(mapping, data_types=data_types, nullable=nullable, budget=budget)
+    validated = normalize_csv_mapping(mapping, data_types=data_types, nullable=nullable, budget=budget,
+                                     decimal_shapes=decimal_shapes)
     # Reuse the invocation deadline even after the final typed validation pass.
     try:
         budget.check("CSV mapping")
