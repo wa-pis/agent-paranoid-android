@@ -99,8 +99,8 @@ Android"; this project is unaffiliated.
 
 Agents can use the portable [project workflow map](.agents/skills/agent-paranoid-android-usage/SKILL.md)
 and [selective-transformation guide](.agents/skills/agent-paranoid-android-transformation/SKILL.md).
-These skills route to the current documentation; they do not grant permissions
-or enable unfinished features. Agents that do not discover `.agents/skills`
+These skills work offline with installed command help; they do not grant
+permissions or enable unfinished features. Agents that do not discover `.agents/skills`
 automatically can load either `SKILL.md` directly. Both are also included in
 the installed wheel under `test_data_agent/skills`; find that directory with:
 

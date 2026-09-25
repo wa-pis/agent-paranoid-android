@@ -1550,3 +1550,9 @@ Broader transformation remains unfinished.
   pending implementation. Bundling both skills is not that acceptance. Next:
   validate this planning change, finish #569 exact-head CI, then triage the
   remaining draft PRs in dependency order; no new agent runtime work yet.
+- Owner clarified that both skills target package users, not release operators;
+  source-module development is relevant only when a user explicitly requests
+  extension. The skills now contain their user workflows and safety boundary
+  offline, using installed `--help`/MCP metadata instead of requiring web docs.
+  Rebuilt wheel contains both revised files. Next: validate skill format and
+  exact-head CI; no transform execution was added.

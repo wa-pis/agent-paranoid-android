@@ -138,9 +138,10 @@ claims. Historical release evidence SHALL remain identifiable as historical.
 ### Requirement: Skill-guided agent use is version-accurate
 
 For the release candidate, an agent integration SHALL be able to locate both
-packaged project skills, use their workflow map to select an interface supported
-by the installed version, and produce a bounded, value-free plan before any
-state-changing operation. Loading a skill SHALL NOT register it automatically
+packaged project skills without network access, use installed command/tool
+metadata to select an interface supported by that version, and produce a
+bounded, value-free plan before any state-changing operation. Loading a skill
+SHALL NOT register it automatically
 in every agent runtime, activate an unfinished transformation path, grant data
 preservation authority, or bypass existing review and approval boundaries.
 
