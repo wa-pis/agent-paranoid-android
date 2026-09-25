@@ -83,7 +83,41 @@ unchanged. Finding 10 table-profile date/timestamp bounds are corrected locally:
 37 focused checks cover aggregate -> inference -> generation, sensitive/all-null
 exclusions and invalid/timezone-inconsistent endpoints. PR #539 merged as
 `4550f22` with green CI. Installed-RC replay remains pending; query-source
-bounds are not covered.
+bounds are not covered by PR #539. A later local query-source follow-up uses
+fictional PostgreSQL and Trino aggregate-to-spec-to-generation tests for date
+and timezone-aware timestamp bounds. The existing column-summary query carries
+min/max for non-sensitive outputs; sensitive-name fields omit them, all-null
+fields claim no observed bounds, and malformed endpoints fail without exposing
+values. No live database, client input or installed-RC replay was used.
+Installed-package A/B on fictional aggregates: public 1.5.0 baseline
+(`/private/tmp/apa-client-acceptance.xrueHB/baseline-1.5.0`) returned no
+date-range distribution, no temporal-bound SQL and generated values outside
+the requested bounds for both PostgreSQL/Trino date/timestamp cases. An offline
+wheel from exact local commit `6776395` (SHA-256
+`0071d5f87cdd33c95b36689ae75811beb4b093da2d6e923777bf078e59e37da6`)
+installed separately under `/private/tmp/apa-query-temporal-ab.74PHgQ/candidate`
+returned typed ranges, in-bound seeded generation and bound SQL for all four;
+both packages issued three fake requests per case. Import roots and version
+labels were checked, and the inspected probe SHA-256 is
+`0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`.
+This first interim wheel was superseded before PR: it used only output names
+for sensitivity, so a `birth_date AS event_day` projection could expose bounds.
+The local correction requires a direct projection with no sensitive source
+field or output name. The first wheel is not safe acceptance; its corrected
+replay follows. Neither replay is a clean install, live database or final
+1.6.0rc1 acceptance.
+Corrected installed-wheel A/B on exact local code SHA
+`39b27fee0af980aacb3e77dc9e392350c98ef817` used wheel SHA-256
+`496e766f4d788dc0bc8ed00fec5f2006fafd4d36e1b379d5b70d32300d072b40`
+and inspected probe SHA-256
+`5b46ed269b90317ca3bec1c75607f374f6fdc4a1441de1560cf70ba9d08b032c`.
+Separate installed roots were verified. Four ordinary PostgreSQL/Trino
+date/timestamp cases retained typed bounds and in-period seeded output with
+three fake calls each. Four `birth_date` alias/filter cases issued no min/max
+aggregate and retained no range; the superseded wheel incorrectly did both.
+Public baseline 1.5.0 issued no min/max in any case. This is still shared-
+dependency, fake-driver evidence under a 1.5.0-labelled interim wheel, not
+client/private data, live database or final RC acceptance.
 
 Refreshed finding evidence (2026-09-24, not final RC acceptance):
 

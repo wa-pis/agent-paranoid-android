@@ -1284,6 +1284,46 @@ Broader transformation remains unfinished.
   before/after remain. Focused CLI/workflow/rule/docs tests: 231 passed;
   Ruff, targeted mypy, strict OpenSpec and diff check passed. Next: sign a
   PR, then settle remaining precedence without changing the safety boundary.
+- Finding-10 query-source follow-up on `codex/1-6-query-temporal`: reproduced
+  missing date/timestamp bounds on both PostgreSQL and Trino fictional query
+  profiles (four aggregate-to-generation cases failed on baseline). Added
+  non-sensitive min/max to the existing column summary, no extra statement or
+  source-row read; sensitive-name, all-null, malformed and timezone-mismatch
+  controls fail closed or omit unsupported evidence. Seventy-three focused
+  tests, Ruff, targeted mypy, strict OpenSpec, strict MkDocs and diff check
+  passed. Next: save signed local commit, then submit PR after #552 closes;
+  no live DB or final installed-candidate evidence.
+- Signed local `6776395` contains the query temporal fix. An inspected offline
+  probe (SHA-256 `0759bd53c29ab1e04cbe17922d31be7b6660e3bf529ad8fcd894ad89d771ab3c`)
+  ran against separately installed public 1.5.0 and a wheel from this commit
+  (SHA-256 `0071d5f87cdd33c95b36689ae75811beb4b093da2d6e923777bf078e59e37da6`).
+  Baseline: four date/timestamp cases without ranges, bounds or in-period
+  output; candidate: four typed ranges and in-period seeded output. Both:
+  three fake calls per case. Import roots verified. Shared dependencies and
+  interim 1.5.0 metadata limit the claim; no real DB or final RC acceptance.
+  Next: preserve this evidence in a docs commit; submit a PR only after #552
+  closes, then run exact-head CI without repeating unchanged local tests.
+- Safety follow-up before push: the first local query-bound implementation
+  checked output names only. A real authorization-path regression proved
+  `birth_date AS event_day` requested and retained the sensitive minimum and
+  maximum on both adapters. No PR or publication used that SHA. The local
+  correction tracks only direct projections from non-sensitive source fields;
+  any sensitive query source, sensitive output or derived expression suppresses
+  bounds. Eighty-one affected tests, Ruff and targeted mypy pass. Previous
+  installed candidate-wheel evidence is historical, not safe acceptance.
+  Next: signed correction, rebuild exact wheel, replay alias-negative and
+  ordinary date/timestamp cases before opening any PR.
+- Signed correction `39b27fee0af980aacb3e77dc9e392350c98ef817` passed
+  81 focused tests, Ruff, targeted mypy, strict OpenSpec and strict MkDocs.
+  Installed-wheel replay with inspected probe SHA-256
+  `5b46ed269b90317ca3bec1c75607f374f6fdc4a1441de1560cf70ba9d08b032c`:
+  public 1.5.0 had no ranges; superseded local wheel exposed ranges for four
+  sensitive alias/filter cases; corrected wheel SHA-256
+  `496e766f4d788dc0bc8ed00fec5f2006fafd4d36e1b379d5b70d32300d072b40`
+  retained four ordinary date/timestamp ranges but suppressed all four
+  sensitive cases. All used three fake calls, verified separate import roots,
+  no live DB. Next: retain this evidence in a signed docs commit; hold PR
+  until #552 closes. Exact RC package and private acceptance remain unverified.
 - Finding 18 diagnostic slice: two fictional regressions first failed because
   unsupported formula errors echoed an input literal via `ast.dump`, while
   malformed syntax kept an input-bearing `SyntaxError` in exception context.
@@ -1409,12 +1449,18 @@ Broader transformation remains unfinished.
   signed PR for the fixed error-boundary regression.
 - PR #558 merged the formula-error redaction regression after 37 applicable
   green checks on 2026-09-25 as `8abe16f7de0627fd9189ceaceeef1004e057b577`;
-  four publication-only checks were skipped. A narrow active-docs audit found
+  four publication-only checks were skipped. The query-temporal branch has
+  integrated this main state and retained both the temporal-bound safety
+  guard and the bounded numeric-query reuse. Eighty focused temporal/query-
+  source/adapter/builder tests, Ruff, targeted mypy, strict OpenSpec and diff
+  check passed. No final-RC or live-DB claim.
+- PR #559 merged the narrow active-docs audit on 2026-09-25 as
+  `4b2733744c14c837a65e548f3b4256f8fd83c9e8`. It found
   two stale claims calling historical 1.0.0rc6 current; the pilot now names
   stable 1.5.0, and release guidance labels RC6 historical. A planned-only
   1.6.0rc1 section records safety/review gates without claiming readiness or
-  authorizing stable 1.6.0. This is not the full documentation audit. Strict
-  MkDocs and OpenSpec validation,
-  diff check, and active-docs stale-RC6 search passed. Next: submit a signed
-  docs PR through ordinary CI; keep planned transformation features explicitly
-  unshipped until their safety gates are complete.
+  authorizing stable 1.6.0. Strict MkDocs and OpenSpec validation passed.
+  The query-temporal branch has no code overlap with draft PR #552; its earlier
+  hold was sequencing, not a technical dependency. Next: rerun focused checks
+  on the integrated head and submit its own signed PR; keep #552 draft until
+  the invalid-Parquet publication decision. No source-row or live-DB claim.
