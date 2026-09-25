@@ -2306,3 +2306,21 @@ Broader transformation remains unfinished.
   diff check pass. No output engine or approval issuance was added. Next:
   sign/push this trace hardening to draft #568, require exact-head CI, and
   continue test-first execution only after the pending approval decision.
+- PR #568 exact `546f6e8a96c02ebb1e3652c2d8e1e56f0b619bc4` completed
+  37 applicable checks successfully with four release-only skips and was
+  squash-merged as `754646aa923b74d71d56851fbb441ad0cf75c054` on
+  2026-09-25. No feature PR remains open; only unrelated Dependabot PRs
+  #513-#515 remain. The rejected output-engine edit and its local red tests
+  were not included.
+- On fresh branch `codex/1-6-client-intake-next`, defined and implemented the
+  approved value-free unchanged-source indicator core. Scope is corresponding
+  output cells; dropped fields are excluded, derived fields included, null-null
+  is equal, runtime scalar types must match (`true`, `1`, `"1"`, `"001"` differ),
+  non-finite values reject, and an empty comparison reports unavailable rather
+  than 0%. Result contains only counts, a two-decimal percentage and scope; no
+  values, pairs or hashes. The module is not connected to execution/publication.
+  TDD exposed and fixed a missing fictional authorization reference and retained
+  exception context. Validation: 264 focused transformation tests passed; Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. Next: commit/publish
+  this isolated report primitive, require CI, then integrate it only when the
+  reviewed transformation execution path exists.
