@@ -89,6 +89,33 @@ def test_identity_substitution_fails_before_receipt(mapping_kind, replacement, s
         assert prepare(payload, evidence, tuple(parts)).snapshot_sha256
 
 
+@pytest.mark.parametrize("mapping_kind", ["inline", "csv", "domain"])
+def test_same_datetime_instant_rejected_before_approval(mapping_kind):
+    original = "2025-04-30T12:34:56+03:00"
+    replacement = "2025-04-30T09:34:56Z"
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "event_at", "data_type": "datetime"}]}]})
+    inline = {"kind": "inline", "entries": [{"original": [original],
+              "replacement": [replacement]}]}
+    csv_mapping = {"kind": "csv", "path": "mapping.csv", "source_columns": ["old"],
+                   "replacement_columns": ["new"]}
+    mapping = (inline if mapping_kind == "inline" else csv_mapping if mapping_kind == "csv"
+               else {"kind": "domain", "name": "shared"})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "fields": [{"entity": "items", "field": "event_at",
+              "sensitivity": "non_sensitive", "behavior": {"action": "substitute", "mapping": mapping}}]}
+    if mapping_kind == "domain":
+        policy["domains"] = [{"name": "shared", "mapping": inline}]
+    parts = [SnapshotPart("source", "items", b"event_at\n2025-04-30T12:34:56+03:00\n")]
+    if mapping_kind == "csv":
+        parts.append(SnapshotPart("mapping", "mapping.csv",
+                                  f"old,new\n{original},{replacement}\n".encode()))
+    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$") as error:
+        prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), tuple(parts))
+    assert error.value.__context__ is None
+    assert replacement not in str(error.value)
+
+
 def test_composite_mapping_has_no_field_binding_and_cannot_be_approved():
     profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
         "fields": [{"name": "value", "data_type": "string", "sensitive": True}]}]})

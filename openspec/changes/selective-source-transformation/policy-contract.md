@@ -114,6 +114,9 @@ synthesis and unmatched-value synthesis fallback: declared magnitude/range,
 sign, null, zero, precision/scale, rounding and overflow rules must all apply.
 Binary float conversion cannot establish exact financial precision. Prohibited
 replacement values remain prohibited in inline, CSV and synthesized outputs.
+For canonical offset-aware DATETIME mapping values, different text denoting the
+same instant is also an identity replacement and is rejected. This does not
+convert timezones or define the execution timezone policy.
 Non-null synthesized values must differ from originals except the approved zero
 and declared-rounding coincidences; those exceptions never skip generation or
 authorize wholesale copying. Derived totals must be recomputed and validated.

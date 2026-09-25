@@ -2,6 +2,7 @@
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
@@ -30,11 +31,14 @@ class ApprovalRequest:
     snapshot_sha256: str = field(repr=False)
 
 
-def _reject_identity_components(mapping: InlineMapping) -> None:
+def _reject_identity_components(mapping: InlineMapping, data_types: tuple[FieldType, ...]) -> None:
     for entry in mapping.entries:
-        if any(original is not None and original == replacement
-               for original, replacement in zip(entry.original, entry.replacement, strict=True)):
-            raise ValueError
+        for original, replacement, kind in zip(entry.original, entry.replacement, data_types, strict=True):
+            if original is not None and original == replacement:
+                raise ValueError
+            if (kind == FieldType.DATETIME and isinstance(original, str) and isinstance(replacement, str)
+                    and datetime.fromisoformat(original) == datetime.fromisoformat(replacement)):
+                raise ValueError
 
 
 def prepare_approval_request(
@@ -112,7 +116,7 @@ def prepare_approval_request(
                 )
             else:
                 raise ValueError
-            _reject_identity_components(typed)
+            _reject_identity_components(typed, (field.data_type,))
         for name, mapping in domains.items():
             groups = domain_members.get(name)
             if not groups:
@@ -135,7 +139,7 @@ def prepare_approval_request(
                 typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable)
                          if isinstance(mapping, InlineMapping) else
                          normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget))
-                _reject_identity_components(typed)
+                _reject_identity_components(typed, data_types)
         parts = (
             SnapshotPart("review", "display", review),
             SnapshotPart("policy", "behavior.yaml", policy_yaml),

@@ -1951,6 +1951,35 @@ Broader transformation remains unfinished.
   fresh CI, obtain exact-head safety review of this hardening, then design
   typed evidence provenance before attempting the authorized policy exception.
   AGENTS.md amendment and source-preserving execution remain disabled.
+- Exact-SHA independent read-only AI safety re-review by Nash (“Boundary
+  Sentinel”), 2026-09-25, of draft #568 `158b7287061cee5f3c31267215cd335ad111a658`
+  found no new changed-scope issue in the DECIMAL default deny or shape binding.
+  Reviewer ran 52 policy and 42 approval/snapshot tests and fictional forged/
+  mutated-profile probes; this is not full-PR or human approval. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/568#issuecomment-5831533019.
+  Residual High execution gate: structural policy checks cannot attest source
+  type against fixed source bytes. Prior P2 replacement/timezone findings also
+  remain open. GitHub CI on this exact head had 36 successes, four release-only
+  skips and one running at last check; do not merge or call it green yet.
+  Next: wait for exact-head CI without restarting it, design provenance-bound
+  classification and resolve prior P2 findings before enabling an exception.
+- Draft #568 exact head `158b7287061cee5f3c31267215cd335ad111a658`
+  completed 37 applicable CI checks successfully; four publication-only jobs
+  skipped. It remains draft. The two older P2 mapping findings were reproduced
+  with fictional inline/CSV/domain tests: distinct email-like replacement
+  literals and DATETIME strings denoting the same instant passed preflight.
+  Owner rejected treating replacement syntax alone as proof of source copying:
+  explicit mappings supply replacement literals; no brute-force inference is
+  intended. The proposed blanket email-like preflight ban was removed before
+  commit. Shared approval preflight now rejects equal offset-aware instants
+  before any receipt; no execution path was added. Distinct-sensitive-literal
+  P2 still needs disposition consistent with the no-real-PII guarantee.
+  Owner chose a simple CSV value-replacement first execution slice, still
+  subject to explicit per-field decisions and the existing local approval/
+  source-snapshot boundary. Next: run affected mapping/CSV/receipt checks,
+  commit/push the timezone correction, get fresh CI and one independent changed-
+  scope safety review. AGENTS.md amendment and source-preserving execution
+  remain gated on typed evidence and executable end-to-end safety tests.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
