@@ -1294,6 +1294,16 @@ Broader transformation remains unfinished.
   budget increases, live connection or source values. Baseline regression
   failed at 15/16 versus the asserted 12/13; after the change 39 focused
   PostgreSQL profiler/query/temporal tests passed. Ruff, targeted mypy,
-  strict OpenSpec and diff checks passed. Next: retain a signed local commit,
-  then queue this independent slice after the earlier draft PR. Actual scanned bytes,
+  strict OpenSpec and diff checks passed. Signed local commit `547bfd5`
+  retained for sequential PR after the earlier draft. Actual scanned bytes,
   latency, Trino table costs and final installed-RC behavior remain unverified.
+- Same finding-17 query-source path (PostgreSQL and Trino): two numeric columns
+  redundantly ran summary and shape aggregates. Their shape query already
+  returns row/non-null/distinct counts, so the profiler now consumes it once.
+  The fictional three-field regression failed on the old 7/8 statement counts
+  and passes at 5/6 without/with one explicitly authorized category. Source
+  allowlists, SQL shape, result validation and statement/scan budgets are
+  unchanged; no row samples or live connections. Fifty-one focused query
+  source/adapter/profile tests passed. Ruff, targeted mypy, strict OpenSpec
+  and diff checks passed. Next: signed local commit for a later sequential PR;
+  final installed-RC and live cost remain unverified.

@@ -167,9 +167,11 @@ def test_query_profile_statement_count_scales_with_fields(
         ),
     )
 
-    # One no-row schema request, one row count, three column summaries, and
-    # two numeric-shape aggregates; only an explicit local category adds one.
-    assert len(results.queries) == 7 + preserve_category
+    # One no-row schema request, one row count, and one aggregate per column;
+    # only an explicit local category adds one.
+    assert len(results.queries) == 5 + preserve_category
+    assert sum("AS distinct_count" in query.sql for query in results.queries) == 3
+    assert sum("AS max_abs_magnitude" in query.sql for query in results.queries) == 2
     assert sum("GROUP BY" in query.sql for query in results.queries) == preserve_category
 
 
