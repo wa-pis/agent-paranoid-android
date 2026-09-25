@@ -67,5 +67,6 @@ large integers, leading-zero strings and timestamps. Review schema compatibility
 before implementation. No new Hadoop connector is implicitly requested.
 Findings 23/24/26 add precision/scale transport, declared Arrow output schemas,
 honest Parquet profiling evidence and typed readback to this same milestone.
-Decide invalid-mode heterogeneous Parquet behavior with finding 25 rather than
-silently converting whole columns to strings.
+For finding 25, reject the entire mixed/negative Parquet export when an
+intentionally invalid value is incompatible with its declared physical type;
+never stringify a whole column or publish a partial artifact.

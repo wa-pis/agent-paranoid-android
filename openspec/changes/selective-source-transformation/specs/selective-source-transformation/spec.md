@@ -48,6 +48,14 @@ present unmeasured statistics or sensitivity as observed zero or established saf
 - **THEN** physical logical types and decimal precision/scale remain consistent
   with the specification, and unavailable profiling evidence stays unavailable.
 
+#### Scenario: Intentionally invalid values cannot enter typed Parquet
+
+- **GIVEN** mixed or negative generation produces a value incompatible with a
+  declared Parquet field type, even after another entity has been staged
+- **WHEN** the dataset is exported
+- **THEN** the entire export fails without a partial dataset or manifest, and
+  any previously published output remains unchanged.
+
 ### Requirement: Diagnostic recovery preserves confidentiality
 
 Diagnostics SHALL distinguish missing dependencies from known local capability

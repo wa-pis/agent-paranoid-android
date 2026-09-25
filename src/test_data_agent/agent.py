@@ -201,7 +201,7 @@ def generate_agent_dataset(
             rows_by_entity,
             source_sha256=review.source_sha256,
         )
-        write_dataset_rows(rows_by_entity, request.output_format, temp_folder)
+        write_dataset_rows(rows_by_entity, request.output_format, temp_folder, spec=spec)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, spec)
         budget.check("dataset validation")

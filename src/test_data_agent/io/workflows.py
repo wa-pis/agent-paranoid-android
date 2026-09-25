@@ -130,7 +130,7 @@ def generate_dataset_bundle(
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
-        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder)
+        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec)
         budget.check("dataset validation")
@@ -269,7 +269,7 @@ def generate_single_entity_profile_artifacts(
     report = validate_dataset(rows_by_entity, spec)
     budget.check("dataset validation")
     if output_path is None:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -286,7 +286,7 @@ def generate_single_entity_profile_artifacts(
     temp_identity = path_identity(temp_folder)
     temp_output_path = temp_folder / output_path.name
     try:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -446,7 +446,7 @@ def generate_dataset_review_artifacts(
     try:
         if source_folder is not None:
             assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
-        write_dataset_rows(rows_by_entity, output_format, temp_folder)
+        write_dataset_rows(rows_by_entity, output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec)
         budget.check("dataset validation")

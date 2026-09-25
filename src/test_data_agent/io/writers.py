@@ -8,6 +8,7 @@ import math
 import os
 import re
 from collections import defaultdict
+from datetime import date, datetime
 from numbers import Number
 from io import StringIO
 from pathlib import Path
@@ -16,6 +17,7 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import RESERVED_ENTITY_ARTIFACT_BASENAMES, DatasetSpec
+from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import (
     enforce_output_folder_size,
     enforce_output_payload_size,
@@ -107,7 +109,9 @@ def sql_literal(value: Any) -> str:
     return f"'{escaped}'"
 
 
-def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
+def write_parquet(
+    rows: list[dict[str, Any]], output: Path, *, fields: list[FieldSpec] | None = None,
+) -> None:
     try:
         import pyarrow as pa
         import pyarrow.parquet as pq
@@ -116,8 +120,20 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
             "Parquet output requires agent-paranoid-android[parquet]"
         ) from exc
 
+    if fields is None:
+        untyped_rows = parquet_rows(rows)
+        try:
+            table = pa.Table.from_pylist(untyped_rows)
+        except (ValueError, TypeError, OverflowError, pa.ArrowException):
+            raise ValueError("Parquet rows have incompatible field types") from None
+    else:
+        try:
+            table = typed_parquet_table(rows, fields, pa)
+        except (ValueError, TypeError, OverflowError, pa.ArrowException):
+            raise ValueError("Parquet rows do not match declared field types") from None
+
     with atomic_binary_writer(output) as handle:
-        pq.write_table(pa.Table.from_pylist(parquet_rows(rows)), handle)
+        pq.write_table(table, handle)
         handle.flush()
         enforce_output_payload_size(
             os.fstat(handle.fileno()).st_size,
@@ -125,8 +141,66 @@ def write_parquet(rows: list[dict[str, Any]], output: Path) -> None:
         )
 
 
+def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa: Any) -> Any:
+    names = {field.name for field in fields}
+    if len(names) != len(fields) or any(set(row) != names for row in rows):
+        raise ValueError("Parquet row schema differs from declared fields")
+    converted: list[dict[str, Any]] = []
+    for row in rows:
+        values: dict[str, Any] = {}
+        for field in fields:
+            value = row[field.name]
+            if value is None and not field.nullable:
+                raise ValueError("non-nullable Parquet field is null")
+            if value is not None and field.data_type == FieldType.DATE:
+                if isinstance(value, str):
+                    value = date.fromisoformat(value)
+                elif not isinstance(value, date) or isinstance(value, datetime):
+                    raise TypeError("date field has incompatible value")
+            elif value is not None and field.data_type == FieldType.DATETIME:
+                if isinstance(value, str):
+                    value = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                elif not isinstance(value, datetime):
+                    raise TypeError("timestamp field has incompatible value")
+            elif value is not None and field.data_type == FieldType.INTEGER and type(value) is not int:
+                raise TypeError("integer field has incompatible value")
+            elif value is not None and field.data_type == FieldType.FLOAT and type(value) not in {int, float}:
+                raise TypeError("float field has incompatible value")
+            elif value is not None and field.data_type == FieldType.BOOLEAN and type(value) is not bool:
+                raise TypeError("boolean field has incompatible value")
+            elif value is not None and field.data_type == FieldType.STRING and not isinstance(value, str):
+                raise TypeError("string field has incompatible value")
+            values[field.name] = value
+        converted.append(values)
+    arrow_types = {
+        FieldType.INTEGER: pa.int64(),
+        FieldType.FLOAT: pa.float64(),
+        FieldType.BOOLEAN: pa.bool_(),
+        FieldType.STRING: pa.string(),
+        FieldType.DATE: pa.date32(),
+    }
+    schema_fields = []
+    for field in fields:
+        if field.data_type == FieldType.DATETIME:
+            offsets = {
+                value.strftime("%z") if value.tzinfo is not None else None
+                for row in converted if (value := row[field.name]) is not None
+            }
+            if len(offsets) > 1:
+                raise ValueError("mixed timestamp timezones")
+            offset = next(iter(offsets), None)
+            if offset is not None and len(offset) != 5:
+                raise ValueError("unsupported timestamp timezone")
+            tz = None if offset is None else f"{offset[:3]}:{offset[3:]}"
+            arrow_type = pa.timestamp("us", tz=tz)
+        else:
+            arrow_type = arrow_types[field.data_type]
+        schema_fields.append(pa.field(field.name, arrow_type, nullable=field.nullable))
+    return pa.Table.from_pylist(converted, schema=pa.schema(schema_fields))
+
+
 def parquet_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Preserve homogeneous column types while supporting mixed invalid data."""
+    """Reject mixed inferred types instead of silently stringifying a column."""
     if not rows:
         return rows
     families: dict[str, set[str]] = defaultdict(set)
@@ -141,24 +215,17 @@ def parquet_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             else:
                 family = type(value).__name__
             families[key].add(family)
-    string_columns = {key for key, types in families.items() if len(types) > 1}
-    if not string_columns:
-        return rows
-    return [
-        {
-            key: None if value is None else str(value)
-            if key in string_columns
-            else value
-            for key, value in row.items()
-        }
-        for row in rows
-    ]
+    if any(len(types) > 1 for types in families.values()):
+        raise ValueError("Parquet rows have mixed field types")
+    return rows
 
 
 def write_dataset_rows(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     output_format: DatasetOutputFormat,
     output_folder: Path,
+    *,
+    spec: DatasetSpec | None = None,
 ) -> None:
     root = output_folder.absolute()
     if any(name in RESERVED_ENTITY_ARTIFACT_BASENAMES for name in rows_by_entity):
@@ -180,7 +247,12 @@ def write_dataset_rows(
                 safe_entity_artifact_path(root, entity_name, ".sql"),
             )
         elif output_format == DatasetOutputFormat.PARQUET:
-            write_parquet(rows, safe_entity_artifact_path(root, entity_name, ".parquet"))
+            entity = spec.entity(entity_name) if spec is not None else None
+            write_parquet(
+                rows,
+                safe_entity_artifact_path(root, entity_name, ".parquet"),
+                fields=entity.fields if entity is not None else None,
+            )
         enforce_output_folder_size(root)
 
 
@@ -205,6 +277,8 @@ def write_single_entity_rows(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     output_format: DatasetOutputFormat,
     output: Path | None,
+    *,
+    spec: DatasetSpec | None = None,
 ) -> None:
     if len(rows_by_entity) != 1:
         raise SystemExit("single-entity output requires exactly one generated entity")
@@ -234,4 +308,5 @@ def write_single_entity_rows(
     elif output_format == DatasetOutputFormat.PARQUET:
         if output is None:
             raise SystemExit("Parquet output requires --output")
-        write_parquet(rows, output)
+        fields = spec.entities[0].fields if spec is not None else None
+        write_parquet(rows, output, fields=fields)
