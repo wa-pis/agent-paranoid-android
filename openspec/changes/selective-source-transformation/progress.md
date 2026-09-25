@@ -2565,3 +2565,29 @@ Broader transformation remains unfinished.
   pass. No literals, row output, fallback execution or receipt minting added.
   Trace changes remain local; next commit/push after current CI observation,
   then continue the remaining execution/interface scope and pending contracts.
+- CI run 36176884948 for FLOAT head 5be6c22 completed successfully; pushed
+  signed trace commit d3473eb3a6e295d0f516ecaac4aae183c32c151e to draft #578.
+  Inspected offline skill acceptance next: installed-wheel smoke currently
+  checks both packaged SKILL.md resources exist, but does not establish a
+  skill-guided offline workflow or unavailable-transformation behavior.
+  Keep that acceptance task unchecked. Synthesis payload and financial
+  rounding proposals still await owner answers; no implicit defaults adopted.
+- Extended installed-package smoke with the skills' offline capability-discovery
+  route: version/help, profile-csv/infer-spec/generate/validate help and separate
+  transform-review discovery. At this closed-engine stage transform-execute
+  must remain unavailable (parser exit 2); update this explicit stage assertion
+  only with reviewed public activation. Three harness tests pass; Ruff passes.
+  Real CLI subprocess discovery also passes against this worktree via explicit
+  PYTHONPATH, without network calls or product monkeypatches. This is source-tree
+  evidence, not an installed-RC claim or complete skill-guided acceptance.
+  Next: run the extended smoke on the built candidate wheel via CI, then finish
+  end-to-end offline workflows alongside public execution activation.
+- Built an intermediate wheel from d3473eb product code (version label still
+  1.5.0, not RC) with hatchling, installed using --no-index --no-deps into
+  /private/tmp/apa-skill-wheel.hS9zDy/installed and verified its import root.
+  Wheel SHA-256: 82509d53a964e8564ccf188f2bab64decb793d734c7e0a9dd1676b83f0a5e87e.
+  Both skill resources exist; real offline discovery and unavailable-execution
+  checks pass. Installed fictional CSV/JSON quickstart also passes. Initial
+  quickstart invocation used a positional argument for a keyword-only helper;
+  corrected the harness invocation, not the product. Dependencies came from the
+  existing environment, so this is not clean-install/final-RC acceptance.

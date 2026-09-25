@@ -13,9 +13,31 @@ from scripts.check_installed_package import (
     requirement_extras,
     verify_install_profile,
     verify_installed_csv_json_quickstart,
+    verify_installed_skill_discovery,
     verify_installed_postgres_sql_smoke,
     verify_wheel_size,
 )
+
+
+@pytest.mark.parametrize("failure", [None, "discovery", "execution"])
+def test_skill_discovery_checks_help_and_closed_execution(monkeypatch, failure):
+    calls = []
+
+    def run(command, **kwargs):
+        calls.append(command[1:])
+        assert kwargs["timeout"] == 30
+        execute = command[1] == "transform-execute"
+        code = (0 if failure == "execution" else 2) if execute else (1 if failure == "discovery" else 0)
+        return subprocess.CompletedProcess(command, code, "fictional help", "")
+
+    monkeypatch.setattr("scripts.check_installed_package.subprocess.run", run)
+    if failure:
+        with pytest.raises(SystemExit):
+            verify_installed_skill_discovery(Path("fictional-cli"))
+    else:
+        verify_installed_skill_discovery(Path("fictional-cli"))
+        assert ["profile-csv", "--help"] in calls
+        assert calls[-1] == ["transform-execute", "--help"]
 
 
 def test_requirements_are_grouped_by_runtime_extra() -> None:
