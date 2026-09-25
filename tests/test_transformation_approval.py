@@ -101,6 +101,74 @@ def test_composite_mapping_has_no_field_binding_and_cannot_be_approved():
                 (SnapshotPart("source", "items", b"value\nfictional-a\n"),))
 
 
+@pytest.mark.parametrize("mapping_kind", ["inline", "csv"])
+@pytest.mark.parametrize("partial_identity", [False, True])
+@pytest.mark.parametrize("child_account_type", ["string", "integer"])
+def test_composite_domain_binds_ordered_fields_in_both_entities(mapping_kind, partial_identity, child_account_type):
+    profile = DatasetProfile.model_validate({"entities": [
+        {"name": entity, "row_count": 1, "fields": [
+            {"name": "region", "data_type": "string"},
+            {"name": "account", "data_type": child_account_type if entity == "child" else "string",
+             "sensitive": True},
+        ]} for entity in ("parent", "child")
+    ]})
+    replacement = "fictional-b" if partial_identity else "synthetic-b"
+    mapping = ({"kind": "inline", "entries": [{
+        "original": ["fictional-a", "fictional-b"],
+        "replacement": ["synthetic-a", replacement],
+    }]} if mapping_kind == "inline" else {
+        "kind": "csv", "path": "pair.csv",
+        "source_columns": ["old_region", "old_account"],
+        "replacement_columns": ["new_region", "new_account"],
+    })
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "domains": [{"name": "pair", "mapping": mapping}], "fields": [
+                  {"entity": entity, "field": field, "sensitivity": sensitivity,
+                   "behavior": {"action": "substitute", "mapping": {
+                       "kind": "domain", "name": "pair", "component": component,
+                   }}}
+                  for entity in ("parent", "child")
+                  for component, field, sensitivity in ((0, "region", "non_sensitive"),
+                                                       (1, "account", "sensitive"))
+              ]}
+    parts = [SnapshotPart("source", "parent.csv", b"region,account\nfictional-a,fictional-b\n"),
+             SnapshotPart("source", "child.csv", b"region,account\nfictional-a,fictional-b\n")]
+    if mapping_kind == "csv":
+        parts.append(SnapshotPart("mapping", "pair.csv", (
+            f"old_region,old_account,new_region,new_account\nfictional-a,fictional-b,synthetic-a,{replacement}\n"
+        ).encode()))
+    if partial_identity or child_account_type != "string":
+        with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$") as error:
+            prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), tuple(parts))
+        assert error.value.__context__ is None
+        assert "fictional-b" not in str(error.value)
+    else:
+        request = prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(), tuple(parts))
+        assert request.snapshot_sha256
+        assert request.review.count(b'"mapping_domain": 1') == 4
+        assert request.review.count(b'"mapping_component": 0') == 2
+        assert request.review.count(b'"mapping_component": 1') == 2
+        assert b"fictional-a" not in request.review
+        assert b'"pair"' not in request.review
+
+
+@pytest.mark.parametrize("components", [[None, 1], [0, 0], [0, 2]])
+def test_composite_domain_rejects_missing_or_ambiguous_field_positions(components):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "left", "data_type": "string"}, {"name": "right", "data_type": "string"}]}]})
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "domains": [{"name": "pair", "mapping": {"kind": "inline", "entries": [{
+                  "original": ["fictional-a", "fictional-b"],
+                  "replacement": ["synthetic-a", "synthetic-b"],
+              }]}}], "fields": [{"entity": "items", "field": field,
+                  "sensitivity": "non_sensitive", "behavior": {"action": "substitute", "mapping": {
+                      "kind": "domain", "name": "pair", **({} if component is None else {"component": component}),
+                  }}} for field, component in zip(("left", "right"), components, strict=True)]}
+    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
+        prepare(yaml.safe_dump(policy).encode(), profile.model_dump_json().encode(),
+                (SnapshotPart("source", "items.csv", b"left,right\nfictional-a,fictional-b\n"),))
+
+
 @pytest.mark.parametrize("original,replacement,rejected", [
     ("+001", "1", True), ("+001", "2", False), ("NULL", "NULL", False),
 ])

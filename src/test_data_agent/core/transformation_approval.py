@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
 from test_data_agent.core.transformation_csv import normalize_csv_mapping, parse_csv_mapping_bytes
 from test_data_agent.core.transformation_mapping import (
@@ -27,6 +28,13 @@ class ApprovalRequest:
     review: bytes = field(repr=False)
     parts: tuple[SnapshotPart, ...] = field(repr=False)
     snapshot_sha256: str = field(repr=False)
+
+
+def _reject_identity_components(mapping: InlineMapping) -> None:
+    for entry in mapping.entries:
+        if any(original is not None and original == replacement
+               for original, replacement in zip(entry.original, entry.replacement, strict=True)):
+            raise ValueError
 
 
 def prepare_approval_request(
@@ -76,12 +84,21 @@ def prepare_approval_request(
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
         domains = {domain.name: domain.mapping for domain in policy.domains}
         mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
+        domain_members: dict[str, dict[str, dict[int, tuple[FieldProfile, bool]]]] = {}
         for decision in policy.fields:
             action = decision.behavior
             if not isinstance(action, SubstituteAction):
                 continue
             field = fields[(decision.entity, decision.field)]
-            mapping = domains[action.mapping.name] if isinstance(action.mapping, DomainMapping) else action.mapping
+            if isinstance(action.mapping, DomainMapping):
+                component = action.mapping.component
+                members = domain_members.setdefault(action.mapping.name, {}).setdefault(decision.entity, {})
+                position = component if component is not None else 0
+                if position in members:
+                    raise ValueError
+                members[position] = (field, component is not None)
+                continue
+            mapping = action.mapping
             if isinstance(mapping, InlineMapping):
                 typed = validate_inline_scalar_mapping(
                     mapping, data_types=(field.data_type,), nullable=(field.nullable,),
@@ -95,9 +112,30 @@ def prepare_approval_request(
                 )
             else:
                 raise ValueError
-            if any(entry.original[0] is not None and entry.original == entry.replacement
-                   for entry in typed.entries):
+            _reject_identity_components(typed)
+        for name, mapping in domains.items():
+            groups = domain_members.get(name)
+            if not groups:
                 raise ValueError
+            width = len(mapping.entries[0].original) if isinstance(mapping, InlineMapping) else len(mapping.source_columns)
+            expected = set(range(width))
+            parsed = (mapping if isinstance(mapping, InlineMapping) else parse_csv_mapping_bytes(
+                mapping_bytes[mapping.path], mapping, budget=budget, max_bytes=max_total_bytes,
+            ))
+            shared_types: tuple[FieldType, ...] | None = None
+            for members in groups.values():
+                if set(members) != expected or (width > 1 and any(not explicit for _, explicit in members.values())):
+                    raise ValueError
+                ordered = [members[index][0] for index in range(width)]
+                data_types = tuple(field.data_type for field in ordered)
+                nullable = tuple(field.nullable for field in ordered)
+                if shared_types is not None and data_types != shared_types:
+                    raise ValueError
+                shared_types = data_types
+                typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable)
+                         if isinstance(mapping, InlineMapping) else
+                         normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget))
+                _reject_identity_components(typed)
         parts = (
             SnapshotPart("review", "display", review),
             SnapshotPart("policy", "behavior.yaml", policy_yaml),

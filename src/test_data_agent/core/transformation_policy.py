@@ -226,16 +226,22 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
         raise BehaviorPolicyError("invalid policy review") from None
     observed = {(entity.name, field.name): field
                 for entity in profile.entities for field in entity.fields}
+    domain_numbers = {domain.name: index for index, domain in enumerate(policy.domains, start=1)}
     fields = []
     for decision in policy.fields:
         behavior = decision.behavior
         unmatched = behavior.unmatched.action if isinstance(behavior, SubstituteAction) else None
+        domain_ref = behavior.mapping if isinstance(behavior, SubstituteAction) and isinstance(
+            behavior.mapping, DomainMapping
+        ) else None
         field = observed[(decision.entity, decision.field)]
         fields.append({
             "entity": decision.entity,
             "field": decision.field,
             "action": behavior.action,
             "unmatched": unmatched,
+            "mapping_domain": domain_numbers[domain_ref.name] if domain_ref is not None else None,
+            "mapping_component": domain_ref.component if domain_ref is not None else None,
             "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
             "declared_sensitivity": decision.sensitivity,
             "observed_sensitivity": (

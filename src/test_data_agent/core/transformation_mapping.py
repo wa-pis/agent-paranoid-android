@@ -54,6 +54,7 @@ class CsvMapping(_PrivateModel):
 class DomainMapping(_PrivateModel):
     kind: Literal["domain"]
     name: StrictStr = Field(min_length=1, repr=False)
+    component: StrictInt | None = Field(default=None, ge=0, lt=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
 
 
 MappingSource: TypeAlias = Annotated[InlineMapping | CsvMapping | DomainMapping, Field(discriminator="kind")]

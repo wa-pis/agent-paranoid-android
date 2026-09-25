@@ -1752,3 +1752,20 @@ Broader transformation remains unfinished.
   is enabled. Next: push the signed integration commit and inspect exact-head
   CI; do not merge until the safety questions are resolved and independently
   re-reviewed.
+- Draft PR #568 composite-domain preflight now binds each participating field
+  to an explicit zero-based tuple component. Every entity using the domain must
+  cover the tuple exactly once; mismatched shared types, omitted/duplicate
+  positions and any unchanged non-null component reject before approval
+  material is prepared. The review shows an opaque domain ordinal and component
+  index, not mapping values or private domain names. Fictional inline/CSV and
+  cross-entity regressions: 183 focused tests passed; Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. This is uncommitted validation-only
+  work in the isolated mapping worktree; no execution, receipt or preservation
+  authority is enabled. Next: integrate the latest main, obtain exact-head CI
+  and resolve the outstanding replacement/timezone safety findings before
+  another independent safety review or merging this draft.
+- Owner's latest DECIMAL comment indicates a possible documented human
+  exception for preserving original values, but does not decide whether an
+  explicit `sensitive=false` plus rationale may override positive card/phone
+  evidence. The current fail-closed rule remains in force until that exact
+  safety choice is confirmed, specified, tested and independently reviewed.

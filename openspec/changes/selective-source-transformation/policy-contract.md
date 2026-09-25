@@ -90,6 +90,17 @@ Reject conflicting domain definitions, incompatible membership/types, ambiguous
 tuple ordering and uniqueness-breaking mappings before execution. Domain state
 is local, bounded and private; independent runs share it only by explicit policy.
 
+In the private draft preflight, each field's domain reference carries an
+explicit zero-based `component` for a composite key. Every entity using that
+domain must bind exactly one field to every component in the mapping tuple;
+missing, duplicate or out-of-range positions fail. Scalar domains may omit
+the component. Field types must agree across entities sharing a domain, and
+every component is typed against its own field before approval material is
+prepared. The value-free review shows an opaque domain ordinal and component
+position, never private domain names or mapping entries. This establishes only
+ordered field binding; relationship execution and full composite-key
+validation remain pending.
+
 ## Replacement Semantics
 
 The Financial Values And Dependencies section of design.md is normative for
