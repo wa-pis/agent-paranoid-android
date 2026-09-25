@@ -46,6 +46,31 @@ def test_request_binds_rendered_review_and_referenced_bytes():
     assert snapshot_identity(changed, max_total_bytes=8192) != request.snapshot_sha256
 
 
+@pytest.mark.parametrize("fallback", [False, True])
+@pytest.mark.parametrize("case", ["valid", "entity", "field", "type", "version", "malformed"])
+def test_generation_reference_is_validated_against_target(fallback, case):
+    policy_bytes, evidence, parts = material()
+    policy = yaml.safe_load(policy_bytes)
+    action = {"action": "synthesize", "generation_policy_ref": "generation.yaml"}
+    if fallback:
+        policy["fields"][0]["behavior"]["unmatched"] = action
+    else:
+        policy["fields"][0]["behavior"] = action
+        parts = parts[:1]
+    spec = {"schema_version": "1.0" if case == "version" else "1.1", "entities": [{
+        "name": "other" if case == "entity" else "items", "row_count": 1, "fields": [{
+            "name": "other" if case == "field" else "code",
+            "data_type": "integer" if case == "type" else "string"}]}]}
+    payload = b"fictional: [" if case == "malformed" else yaml.safe_dump(spec).encode()
+    parts += (SnapshotPart("generation_policy", "generation.yaml", payload),)
+    if case == "valid":
+        assert prepare(yaml.safe_dump(policy).encode(), evidence, parts).snapshot_sha256
+    else:
+        with pytest.raises(ApprovalMaterialError) as caught:
+            prepare(yaml.safe_dump(policy).encode(), evidence, parts)
+        assert caught.value.__context__ is None
+
+
 def test_review_comment_and_profile_evidence_are_snapshot_bound():
     policy, evidence, parts = material()
     original = prepare(policy, evidence, parts)

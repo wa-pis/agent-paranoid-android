@@ -2591,3 +2591,39 @@ Broader transformation remains unfinished.
   quickstart invocation used a positional argument for a keyword-only helper;
   corrected the harness invocation, not the product. Dependencies came from the
   existing environment, so this is not clean-install/final-RC acceptance.
+- Closed-engine integration checkpoint: all 382 tests/test_transformation*.py
+  tests pass in 19.51s, covering the current policy/snapshot/receipt/report and
+  execution modules together. This does not prove unimplemented actions or
+  release acceptance. CI 36177372810 for d3473eb completed successfully;
+  pushed offline package-smoke commit 0e1e806 to draft #578. Next substantive
+  execution work depends on the pending synthesis-payload and formula-rounding
+  decisions; remaining null/temporal/decimal, relationships and public-interface
+  requirements are still tracked, not implicitly removed from RC scope.
+- Owner explicitly confirmed DatasetSpec 1.1 as the synthesize payload and
+  HALF_UP for DECIMAL formulas. These two decision blockers are resolved;
+  historical pending entries above are superseded. Recorded the choices in
+  design.md and policy-contract.md without activating execution. Existing
+  snapshot machinery already binds generation_policy parts by exact bytes.
+  Next: validate the referenced DatasetSpec bytes and entity/field binding,
+  then connect deterministic generation and formula execution with tests.
+- Implemented bounded private DatasetSpec 1.1 synthesis-payload loading with
+  the existing restricted YAML loader and DatasetSpec validator. Five TDD cases
+  first failed on the absent helper; all 22 YAML tests now pass. Legacy version,
+  duplicate keys, unsafe tags and malformed YAML fail with detached value-free
+  errors. Targeted mypy passes; corrected import placement after Ruff E402.
+  This loader is not yet wired into review/execution; next bind referenced
+  entity/field types before connecting generation. Changes remain local.
+- Wired DatasetSpec 1.1 loading into approval-material preparation for direct
+  synthesis and substitution/replacement synthesis fallbacks. Referenced bytes
+  must parse and contain the exact target entity/field with matching data type.
+  TDD exposed ten previously accepted invalid-reference cases; all 73 approval
+  and YAML tests now pass, plus Ruff/mypy. Execution is still not enabled:
+  generation settings, final row validation and synthesis constraints must be
+  enforced when connecting the generator. No source path reopening added.
+- Follow-up integration check: 32 source-review/receipt tests pass with the
+  stricter generation payload preflight. Inspected the existing deterministic
+  generate_dataset path: it applies spec safety, row budgets, constraint solving
+  and final generated-data validation. Reuse that path; validation of its
+  generated subset must not substitute for validation of final transformed
+  rows and declared relationships. Preparing the approved contract/preflight
+  batch as one commit before execution wiring.

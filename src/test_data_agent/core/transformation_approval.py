@@ -20,7 +20,7 @@ from test_data_agent.core.transformation_policy import (
     render_policy_review,
 )
 from test_data_agent.core.transformation_snapshot import SnapshotPart, snapshot_identity
-from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
 
 
 class ApprovalMaterialError(ValueError):
@@ -96,6 +96,23 @@ def prepare_approval_request(
         if mapping_refs != actual_mappings or generation_refs != actual_generation:
             raise ValueError
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        generation_specs = {
+            part.name: load_generation_policy_yaml(part.payload, max_bytes=max_total_bytes, budget=budget)
+            for part in external_parts if part.kind == "generation_policy"
+        }
+        for decision in policy.fields:
+            action = decision.behavior
+            synthesis = (action if isinstance(action, SynthesizeAction) else
+                         action.unmatched if isinstance(action, (SubstituteAction, ReplaceTextAction)) else None)
+            if not isinstance(synthesis, SynthesizeAction):
+                continue
+            budget.check("generation policy binding")
+            spec = generation_specs[synthesis.generation_policy_ref]
+            targets = [field for entity in spec.entities if entity.name == decision.entity
+                       for field in entity.fields if field.name == decision.field]
+            source_field = fields[(decision.entity, decision.field)]
+            if len(targets) != 1 or targets[0].data_type != source_field.data_type:
+                raise ValueError
         domains = {domain.name: domain.mapping for domain in policy.domains}
         mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
         if policy.file_text_mapping is not None:

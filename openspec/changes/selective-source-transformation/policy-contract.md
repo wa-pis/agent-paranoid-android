@@ -151,6 +151,19 @@ validation remain pending.
 
 ## Replacement Semantics
 
+Owner-approved synthesis payload: `generation_policy_ref` identifies a bounded
+local DatasetSpec 1.1 document, not a new generation format. Its exact bytes are
+part of the reviewed snapshot as `generation_policy`; execution must consume
+those bytes, never reopen an unbound path. Reuse DatasetSpec validation and the
+existing deterministic generation contract. Referenced entity/field identity
+and output type must agree with the transformation policy. The transformation
+seed and one-to-one row count govern execution, not an unrelated requested
+dataset size. This does not enable source-value reuse or public execution.
+
+Owner-approved DECIMAL formula rounding is ROUND_HALF_UP at declared scale;
+precision overflow rejects. Exact arithmetic must not pass through binary
+FLOAT. Tests and implementation of this contract remain required.
+
 The Financial Values And Dependencies section of design.md is normative for
 synthesis and unmatched-value synthesis fallback: declared magnitude/range,
 sign, null, zero, precision/scale, rounding and overflow rules must all apply.
