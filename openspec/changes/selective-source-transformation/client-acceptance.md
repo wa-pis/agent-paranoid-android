@@ -42,6 +42,17 @@ historical, not overwritten by the new document's measurements.
 | 25 | Mode/invalid-ratio precedence and parity across spec/profile/CSV; verify actual output, effective settings, validation, publication and JSON/exit consistency. |
 | 26 | Honest bounded Parquet input metadata: unknown is not zero/safe; test nulls, distinctness, sensitivity and type round trips; decide CLI/API compatibility. |
 
+Fictional finding-26 follow-up on main snapshot `cd8410a` (2026-09-25):
+four rows in two Parquet row groups contained two null `amount` values.
+The adapter reported `null_ratio=0.0` before the focused correction; the
+row-group metadata supports the measured result `0.5`, now covered by
+`tests/test_source_adapters.py`. The same test keeps distinctness
+`unspecified`; a separate check treats missing null statistics as unmeasured.
+This does not fix the public unknown-versus-zero representation when statistics
+are absent, content sensitivity, or final installed-RC acceptance. No client
+input, database, external API or source-row output was used. Next: decide the
+public unknown/measured profile contract and test missing/conflicting stats.
+
 Before candidate acceptance, give every row a final confirmed/fixed, intentional,
 deferred or not-reproduced disposition with rationale and evidence. No silent
 omissions; proposals outside the agreed scope remain explicit decisions.

@@ -196,6 +196,30 @@ def test_parquet_adapter_uses_schema_metadata(tmp_path) -> None:
     assert customers.field("score").data_type == "float"
 
 
+def test_parquet_adapter_uses_complete_row_group_null_statistics(tmp_path: Path) -> None:
+    path = tmp_path / "fictional.parquet"
+    pq.write_table(
+        pa.table({"amount": [1, None, 2, None], "code": [1, 1, 2, 2]}),
+        path,
+        row_group_size=2,
+    )
+
+    profile = dataset_profile_from_parquet(path).entity("fictional")
+
+    assert profile.field("amount").null_ratio == 0.5
+    assert profile.field("code").null_ratio == 0.0
+    assert profile.field("amount").unique_ratio_kind == "unspecified"
+
+
+def test_parquet_adapter_does_not_treat_missing_statistics_as_measured(tmp_path: Path) -> None:
+    from test_data_agent.adapters.parquet_dataset import _parquet_null_count
+
+    path = tmp_path / "fictional-no-stats.parquet"
+    pq.write_table(pa.table({"amount": [1, None]}), path, write_statistics=False)
+
+    assert _parquet_null_count(pq.ParquetFile(path).metadata, 0, "amount") is None
+
+
 def test_parquet_adapter_rejects_row_count_before_reading_data(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
