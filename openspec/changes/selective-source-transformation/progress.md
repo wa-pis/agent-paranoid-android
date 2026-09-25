@@ -1325,3 +1325,17 @@ Broader transformation remains unfinished.
   OpenSpec and diff check passed. This is not exact-commit CI or final RC
   acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
   policy choice before merge; do not repeat local gates unchanged.
+- Signed `2d8a793b45935cb8cc2a4e22f8d0387ca7d00b1e` pushed as draft
+  PR #552; GitHub verified the signature. Its exact head passed all 37
+  applicable checks; four publication-only checks skipped. PR remains draft
+  and unmerged because the intentional-invalid mixed/negative Parquet
+  publication choice is pending. No ordinary AI review, tag or publication.
+  Next: apply the owner's choice to this PR, rerun changed-scope checks and
+  exact-head CI, then consider normal merge; do not restart unchanged gates.
+- User selected full rejection for intentionally invalid mixed/negative
+  Parquet values rather than a separate invalid-row file. The existing typed
+  writer already rejects incompatible values before atomic publication; a
+  new two-entity regression covers both modes, prior-output preservation and
+  cleanup of partial staging. Documentation records the Parquet-specific
+  exception to controlled-invalid publication. Next: run focused checks,
+  submit a signed #552 update, then require its fresh CI before merge.

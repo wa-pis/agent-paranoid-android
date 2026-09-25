@@ -50,6 +50,34 @@ def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path
     assert all(isinstance(row["created_on"], date) for row in pq.read_table(output / "orders.parquet").to_pylist())
 
 
+@pytest.mark.parametrize("mode", ["mixed", "negative"])
+def test_invalid_parquet_rejects_entire_dataset_without_replacing_output(
+    tmp_path: Path, mode: str,
+) -> None:
+    pytest.importorskip("pyarrow.parquet")
+    spec = DatasetSpec(entities=[
+        EntitySpec(name="accounts", row_count=2, fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True),
+        ]),
+        EntitySpec(name="orders", row_count=2, fields=[
+            FieldSpec(name="amount", data_type="integer"),
+        ]),
+    ])
+    output = tmp_path / "generated"
+    output.mkdir()
+    (output / "previous.txt").write_text("fictional previous artifact")
+
+    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
+        generate_dataset_bundle(
+            spec, output_folder=output, output_format=OutputFormat.PARQUET,
+            mode=mode, invalid_ratio=1.0, seed=7,
+        )
+
+    assert {path.name for path in output.iterdir()} == {"previous.txt"}
+    assert (output / "previous.txt").read_text() == "fictional previous artifact"
+    assert not list(tmp_path.glob(".generated.*"))
+
+
 def test_bundle_mode_override_uses_copy_of_spec(tmp_path: Path) -> None:
     spec = DatasetSpec(
         entities=[EntitySpec(
