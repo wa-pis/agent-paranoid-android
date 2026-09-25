@@ -1735,3 +1735,32 @@ Broader transformation remains unfinished.
   targeted mypy, strict OpenSpec and diff check passed. Next: push a signed
   draft-PR merge and require fresh exact-head CI; numeric-content/privacy
   choice and safety re-review remain prerequisites to #564 merge.
+- User-skill offline checkpoint on merged main `d00eee2`: wheel SHA-256
+  `2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`
+  was installed under a separate import root without network access. Both
+  packaged `SKILL.md` files were discoverable. The fictional demo/profile/
+  infer/generate/validate CLI route passed with seed 42; `transform --help`
+  exited 2 because no transformation command exists. This is partial offline
+  acceptance only, not an AI-agent run or final RC proof; details and remaining
+  agent-runtime/MCP cases are in client-acceptance.md. Next: keep this evidence
+  with a focused documentation PR; test distinct agent runtimes against the
+  exact installed RC once the reviewed interfaces exist.
+- PR #570 merged the offline skill-checkpoint documentation on 2026-09-25 as
+  `cd8410aa25bb93fe5df8feb22e7599dee755d6c4` after applicable green CI.
+  It is partial installed-wheel evidence, not agent-runtime or RC acceptance.
+- Finding 26: a fictional two-row-group Parquet fixture reproduced false
+  `null_ratio=0.0` for two nulls in four rows. The metadata-only adapter now
+  sums complete, consistent row-group null counts and reports `0.5`; missing
+  statistics remain unmeasured in its private helper. The focused regression
+  failed before and passed after the change; 55 adapter/spec tests, Ruff and
+  targeted mypy passed. This is not full finding-26 closure: public unknown
+  representation, sensitivity and installed-RC replay remain. Next: agree a
+  versioned unknown/measured contract before changing that public surface.
+- Draft PR #564 integrated main through `46cd9cd` without changing the
+  source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
+  and the newly merged row-group null-statistics path coexist in the same
+  metadata adapter. Ninety-one focused fictional adapter, DECIMAL, SQL-source
+  and installed-CLI test cases passed; changed-file Ruff, targeted mypy and
+  strict OpenSpec passed. Next: sign/push the integration, require exact-head
+  CI, and keep the PR draft until the numeric-content exception is settled and
+  the changed safety scope independently reviewed. No final RC acceptance.
