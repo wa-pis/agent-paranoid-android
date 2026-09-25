@@ -66,7 +66,7 @@ call is optional manual evidence and must use only the fictional fixture.
 
 ## RC6 To Stable Promotion
 
-The active RC6 baseline is the exact commit named by the annotated
+The historical 1.0.0 RC6 baseline is the exact commit named by the annotated
 `v1.0.0rc6` tag after the public-package, documentation, container,
 attestation, signature, integration, invocation-hardening, and
 clean-environment acceptance checks have all passed. RC5 remains historical
@@ -315,6 +315,18 @@ Stable `1.4.0` completed these requirements at exact commit
 approval and public verification, including the successful Parquet retry.
 
 ## Version And Tag
+
+### 1.6.0rc1 Candidate (planned)
+
+The `selective-source-transformation` OpenSpec change plans `1.6.0rc1` only;
+stable `1.6.0` is not authorized. Do not bump the version, tag, or publish while
+its safety-policy amendment, client acceptance, documentation audit, or release
+gates remain open. Keep source-preserving execution disabled until the scoped
+amendment, executable safety checks, and independent safety review are complete.
+Review the final exact candidate SHA independently as AI evidence, not as a
+substitute for GitHub-required approval. Then follow the generic version, tag,
+artifact, and public-verification steps below. Use fictional data only; live
+database and external-provider checks are not implied by release approval.
 
 ### 1.5.0 Stable Promotion
 

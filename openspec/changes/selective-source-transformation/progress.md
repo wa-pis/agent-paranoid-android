@@ -1453,5 +1453,14 @@ Broader transformation remains unfinished.
   integrated this main state and retained both the temporal-bound safety
   guard and the bounded numeric-query reuse. Eighty focused temporal/query-
   source/adapter/builder tests, Ruff, targeted mypy, strict OpenSpec and diff
-  check passed. Next: sign the integration commit; keep its PR held while #552
-  awaits the invalid-Parquet decision. No final-RC or live-DB claim.
+  check passed. No final-RC or live-DB claim.
+- PR #559 merged the narrow active-docs audit on 2026-09-25 as
+  `4b2733744c14c837a65e548f3b4256f8fd83c9e8`. It found
+  two stale claims calling historical 1.0.0rc6 current; the pilot now names
+  stable 1.5.0, and release guidance labels RC6 historical. A planned-only
+  1.6.0rc1 section records safety/review gates without claiming readiness or
+  authorizing stable 1.6.0. Strict MkDocs and OpenSpec validation passed.
+  The query-temporal branch has no code overlap with draft PR #552; its earlier
+  hold was sequencing, not a technical dependency. Next: rerun focused checks
+  on the integrated head and submit its own signed PR; keep #552 draft until
+  the invalid-Parquet publication decision. No source-row or live-DB claim.
