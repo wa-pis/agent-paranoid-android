@@ -1307,3 +1307,36 @@ Broader transformation remains unfinished.
   source/adapter/profile tests passed. Ruff, targeted mypy, strict OpenSpec
   and diff checks passed. Next: signed local commit for a later sequential PR;
   final installed-RC and live cost remain unverified.
+- Finding 13 isolated CSV inference fix: fictional 4-parent/100-child input
+  with all children linked previously selected an unrelated same-table key on
+  an equal-confidence tie. Exact field-name match now wins that tie. The same
+  fixture with 75 linked children yields no inferred parent link. This does
+  not preserve source orphan rates or alter privacy policy. Focused checks:
+  35 tests, changed-file Ruff and strict OpenSpec passed. Next: signed PR and
+  exact-head CI, then final installed-RC replay.
+- The inference fix passed all applicable PR #553 checks and merged normally
+  on 2026-09-25 as `b737bbf4f79e386af4ac79458e6a1e7cf8a42b1e`; no AI
+  review, release tag or publication. A separate fictional regression now
+  checks declared 4-parent/100-child generation, stable row counts and zero
+  orphan keys; undeclared domains remain separate. This does not prove source
+  orphan-rate fidelity. Focused identifier/pipeline tests: 36 passed; Ruff,
+  strict OpenSpec and diff check passed. Next: signed PR/CI for this acceptance
+  check, then final installed-RC replay.
+- The declared-link check merged through PR #554 after green applicable CI on
+  2026-09-25 as `548ec31810c5392dbc07dc3c867f0c082fbed51a`; no release.
+  Preparatory safety fix on current main: five fictional tests reproduced direct
+  and unmatched-preserve acceptance for fields with sensitive name/semantic type
+  but `sensitive=false`, plus false review display. The shared validator now
+  rejects both preservation paths and the review shows effective sensitivity.
+  No source-preserving execution or policy exception was enabled. Focused
+  policy/approval/receipt tests: 55 passed; Ruff, targeted mypy, strict
+  OpenSpec and diff check passed. Next: independent read-only safety review of
+  the exact signed head, then PR/CI; policy amendment remains a separate gate.
+- The independently reviewed safety fix merged through PR #555 on 2026-09-25
+  as `ba2f9d20916e2fc836a0233f6628b53da4a289d6`; its AI review is
+  [recorded on that PR](https://github.com/wa-pis/agent-paranoid-android/pull/555#issuecomment-5825635065)
+  and is not human approval. This SQL-cost branch integrated main without
+  changing its two profiler fixes. Combined focused PostgreSQL/query-source/
+  Trino query-builder tests: 85 passed; changed-file Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. Next: signed merge commit, then one
+  SQL-cost PR with exact-head CI. No live scan-cost or RC acceptance claimed.
