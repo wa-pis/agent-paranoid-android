@@ -192,3 +192,22 @@ def test_engine_retention_excludes_dropped_cells():
     assert result.retention.compared_cells == 2
     assert result.retention.excluded_dropped_cells == 2
     assert result.retention.unchanged_percent == "0.00"
+
+
+def test_all_dropped_columns_have_no_retention_measurement():
+    original = request()
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    policy.pop("file_text_mapping")
+    for decision in policy["fields"]:
+        decision["behavior"] = {"action": "drop"}
+    source = next(part for part in original.parts if part.kind == "source")
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, (),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.replace_csv_snapshot(material, max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert list(csv.reader(io.StringIO(result.csv_bytes.decode()))) == [[], [], []]
+    assert result.retention.status == "unavailable"
+    assert result.retention.unchanged_percent is None
+    assert result.retention.compared_cells == 0
+    assert result.retention.excluded_dropped_cells == 4

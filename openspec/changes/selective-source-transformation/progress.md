@@ -2462,3 +2462,18 @@ Broader transformation remains unfinished.
   50% preserve, 25% unmatched preserve and dropped-cell exclusion. Ruff and
   two-module mypy pass. Private return type changed before public activation.
   Remaining actions, full safety evidence and RC acceptance are still pending.
+- Next-action contract inspection: `design.md` Financial Values And Dependencies
+  explicitly leaves formula rounding undecided; `policy-contract.md` defines
+  synthesize only as a reviewed generation-policy reference, with no executable
+  payload contract. Requested owner choices asynchronously: HALF_UP versus
+  HALF_EVEN/reject-rounding, and reusing DatasetSpec 1.1 versus a separate
+  generation-policy format. Neither proposal is accepted or implemented yet.
+  These choices gate those actions, not the existing replace/drop/preserve
+  implementation. Other safe work remains; the full goal is not declared blocked
+  or complete, and heartbeat remains paused.
+- Verified all-drop closed-engine edge: zero compared cells reports unavailable
+  (not zero percent), four dropped cells counted, source row count retained as
+  empty CSV records; focused test passed. Preparing one draft implementation PR
+  for the closed engine, without public activation or an ordinary AI review.
+  Supported private actions are replace_text, drop, preserve and preserve
+  fallback; synthesize, typed substitute and derive are not implemented here.
