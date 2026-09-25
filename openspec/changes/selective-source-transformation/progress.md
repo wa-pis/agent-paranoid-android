@@ -1540,3 +1540,8 @@ Broader transformation remains unfinished.
   both skills; installed-wheel bytes match source. Skill validation, focused
   installed-package tests (8), Ruff and diff check passed. Next: require fresh
   exact-head CI for the packaging update before normal merge; no RC claim.
+- Exact-head PR #569 container jobs exposed a missing Docker build-context copy:
+  Hatch could not find the forced-included `.agents/skills` directory. The
+  container context and shared builder now include only those skill files;
+  focused container regression checks cover the copy and ignore rules. Next:
+  rerun affected tests and exact-head CI; merge remains blocked until green.
