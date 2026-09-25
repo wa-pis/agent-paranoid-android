@@ -106,6 +106,9 @@ class SyntheticPostgresResults:
             if '"amount"' in sql:
                 return [
                     {
+                        "row_count": 3,
+                        "non_null_count": 2,
+                        "distinct_count": 2,
                         "max_abs_magnitude": 2,
                         "has_negative": False,
                         "has_positive": True,
@@ -113,6 +116,9 @@ class SyntheticPostgresResults:
                 ]
             return [
                 {
+                    "row_count": 2 if '"customers"' in sql else 3,
+                    "non_null_count": 2 if '"customers"' in sql else 3,
+                    "distinct_count": 2 if '"customers"' in sql else 3,
                     "max_abs_magnitude": 0,
                     "has_negative": False,
                     "has_positive": True,
@@ -194,6 +200,24 @@ def test_normalizes_bounded_results_into_relational_dataset_profile() -> None:
     assert "db.example.test" not in serialized
     assert '"database":"analytics"' not in serialized
     assert all("SELECT *" not in query.sql.upper() for query in results.queries)
+
+
+@pytest.mark.parametrize("with_category,expected_queries", [(False, 12), (True, 13)])
+def test_numeric_summary_uses_one_aggregate_per_column(
+    with_category: bool, expected_queries: int,
+) -> None:
+    results = SyntheticPostgresResults()
+    categories = (
+        [LocalCategoryField(entity="warehouse.crm.customers", field="tier")]
+        if with_category else []
+    )
+    PostgresProfiler(postgres_config(), results.fetch).profile(
+        local_category_fields=categories,
+    )
+
+    assert len(results.queries) == expected_queries
+    assert sum("AS distinct_count" in query.sql for query in results.queries) == 4
+    assert sum("AS max_abs_magnitude" in query.sql for query in results.queries) == 3
 
 
 def test_missing_allowlisted_table_fails_without_partial_profile() -> None:

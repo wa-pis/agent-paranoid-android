@@ -50,6 +50,98 @@ def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path
     assert all(isinstance(row["created_on"], date) for row in pq.read_table(output / "orders.parquet").to_pylist())
 
 
+@pytest.mark.parametrize("mode", ["mixed", "negative"])
+def test_invalid_parquet_rejects_entire_dataset_without_replacing_output(
+    tmp_path: Path, mode: str,
+) -> None:
+    pytest.importorskip("pyarrow.parquet")
+    spec = DatasetSpec(entities=[
+        EntitySpec(name="accounts", row_count=2, fields=[
+            FieldSpec(name="id", data_type="integer", is_identifier=True),
+        ]),
+        EntitySpec(name="orders", row_count=2, fields=[
+            FieldSpec(name="amount", data_type="integer"),
+        ]),
+    ])
+    output = tmp_path / "generated"
+    output.mkdir()
+    (output / "previous.txt").write_text("fictional previous artifact")
+
+    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
+        generate_dataset_bundle(
+            spec, output_folder=output, output_format=OutputFormat.PARQUET,
+            mode=mode, invalid_ratio=1.0, seed=7,
+        )
+
+    assert {path.name for path in output.iterdir()} == {"previous.txt"}
+    assert (output / "previous.txt").read_text() == "fictional previous artifact"
+    assert not list(tmp_path.glob(".generated.*"))
+
+
+def test_fractional_invalid_ratio_replays_spec_rows_and_effective_rules(tmp_path: Path) -> None:
+    spec = DatasetSpec(
+        entities=[EntitySpec(
+            name="orders", row_count=200,
+            fields=[
+                FieldSpec(name="amount", data_type="integer"),
+                FieldSpec(name="active", data_type="boolean"),
+            ],
+        )]
+    )
+    outputs = [tmp_path / "first", tmp_path / "second"]
+
+    for output in outputs:
+        result = generate_dataset_bundle(
+            spec, output_folder=output, seed=31, mode="mixed", invalid_ratio=0.25,
+        )
+        assert result.mode == GenerationMode.MIXED
+        assert result.validation.valid is False
+        manifest = json.loads((output / "generation_manifest.json").read_text())
+        assert manifest["effective_rules"]["generation_mode"] == "mixed"
+        assert manifest["effective_rules"]["invalid_ratio"] == 0.25
+
+    first = json.loads((outputs[0] / "orders.json").read_text())
+    second = json.loads((outputs[1] / "orders.json").read_text())
+    assert first == second
+    amount_invalid = sum(row["amount"] == "not-a-number" for row in first)
+    boolean_invalid = sum(row["active"] == "not-a-boolean" for row in first)
+    assert 0 < amount_invalid < len(first)
+    assert 0 < boolean_invalid < len(first)
+    assert all(type(row["amount"]) is int or row["amount"] == "not-a-number" for row in first)
+    assert all(type(row["active"]) is bool or row["active"] == "not-a-boolean" for row in first)
+    assert spec.generation_settings.mode == GenerationMode.VALID
+    assert spec.generation_settings.invalid_ratio == 0.0
+
+
+def test_fractional_invalid_ratio_replays_direct_csv_rows(tmp_path: Path) -> None:
+    source = tmp_path / "fictional.csv"
+    source.write_text("reference,amount\nalpha,10\nbeta,20\n", encoding="utf-8")
+    outputs = [tmp_path / "first" / "orders.json", tmp_path / "second" / "orders.json"]
+
+    for output in outputs:
+        report, business_report = generate_dataset_from_csv_artifacts(
+            source,
+            count=200,
+            seed=31,
+            output_path=output,
+            output_format=OutputFormat.JSON,
+            mode="mixed",
+            invalid_ratio=0.25,
+        )
+        assert report.valid is False
+        assert business_report is None
+        manifest = json.loads((output.parent / "generation_manifest.json").read_text())
+        assert manifest["effective_rules"]["generation_mode"] == "mixed"
+        assert manifest["effective_rules"]["invalid_ratio"] == 0.25
+
+    first = json.loads(outputs[0].read_text())
+    second = json.loads(outputs[1].read_text())
+    assert first == second
+    invalid_amounts = sum(row["amount"] == "not-a-number" for row in first)
+    assert 0 < invalid_amounts < len(first)
+    assert all(type(row["amount"]) is int or row["amount"] == "not-a-number" for row in first)
+
+
 def test_bundle_mode_override_uses_copy_of_spec(tmp_path: Path) -> None:
     spec = DatasetSpec(
         entities=[EntitySpec(

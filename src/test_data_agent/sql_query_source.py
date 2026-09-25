@@ -11,6 +11,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from test_data_agent.core.privacy import infer_sensitive_from_name
+
 try:  # pragma: no cover - optional database extra.
     import sqlglot
     from sqlglot import exp
@@ -122,6 +124,7 @@ class ValidatedSqlQuery:
     output_fields: tuple[str, ...]
     fingerprint: str
     sql: str = field(repr=False, compare=False)
+    safe_temporal_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
 
 
 _ALLOWED_NODE_NAMES = frozenset(
@@ -286,6 +289,18 @@ def authorize_query_source(
     output_fields = tuple(_projection_name(item) for item in statement.expressions)
     if len(output_fields) != len(set(output_fields)):
         raise SqlQuerySourceError("SQL query output field names must be unique")
+    source_fields_are_non_sensitive = all(
+        not infer_sensitive_from_name(column.name)
+        for column in statement.find_all(exp.Column)
+    )
+    safe_temporal_output_fields = frozenset(
+        output
+        for projection, output in zip(statement.expressions, output_fields, strict=True)
+        if source_fields_are_non_sensitive
+        and (source := _direct_source_field(projection)) is not None
+        and not infer_sensitive_from_name(source)
+        and not infer_sensitive_from_name(output)
+    )
     dialect = "postgres" if draft.request.adapter is SqlQueryAdapter.POSTGRES else "trino"
     canonical_sql = statement.sql(dialect=dialect, pretty=False)
     fingerprint = hashlib.sha256(
@@ -302,7 +317,13 @@ def authorize_query_source(
         output_fields=output_fields,
         fingerprint=fingerprint,
         sql=canonical_sql,
+        safe_temporal_output_fields=safe_temporal_output_fields,
     )
+
+
+def _direct_source_field(projection: Any) -> str | None:
+    source = projection.this if isinstance(projection, exp.Alias) else projection
+    return source.name if isinstance(source, exp.Column) else None
 
 
 def _read_stable_query_file(path: Path, *, max_bytes: int) -> str:

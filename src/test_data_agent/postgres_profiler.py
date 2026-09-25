@@ -244,14 +244,21 @@ class PostgresProfiler:
         name = _required_text(column, "column_name")
         data_type = _required_text(column, "data_type")
         profile_type = coerce_profile_type(data_type)
+        numeric_shape = profile_type in {
+            ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
+        }
         temporal_bounds = (
             profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
             and not infer_sensitive_from_name(name)
         )
         summary = _single_row(
             self.fetch_query(
-                build_column_summary_query(
-                    self.config, schema, table, name, temporal_bounds=temporal_bounds,
+                (
+                    build_numeric_shape_query(self.config, schema, table, name)
+                    if numeric_shape else build_column_summary_query(
+                        self.config, schema, table, name,
+                        temporal_bounds=temporal_bounds,
+                    )
                 )
             ),
             "column summary",
@@ -290,20 +297,10 @@ class PostgresProfiler:
             suffix = "timestamp" if profile_type == ProfileDataType.DATETIME else "date"
             result[f"min_{suffix}"] = lower.isoformat()
             result[f"max_{suffix}"] = upper.isoformat()
-        if coerce_profile_type(data_type) in {
-            ProfileDataType.INTEGER,
-            ProfileDataType.FLOAT,
-            ProfileDataType.DECIMAL,
-        }:
-            shape = _single_row(
-                self.fetch_query(
-                    build_numeric_shape_query(self.config, schema, table, name)
-                ),
-                "numeric shape",
-            )
-            has_negative = _as_bool(shape.get("has_negative"))
-            has_positive = _as_bool(shape.get("has_positive"))
-            magnitude = shape.get("max_abs_magnitude")
+        if numeric_shape:
+            has_negative = _as_bool(summary.get("has_negative"))
+            has_positive = _as_bool(summary.get("has_positive"))
+            magnitude = summary.get("max_abs_magnitude")
             if magnitude is not None and (has_negative or has_positive):
                 result["numeric_shape"] = {
                     "max_abs_magnitude": _bounded_magnitude(magnitude),

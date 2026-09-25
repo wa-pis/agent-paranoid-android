@@ -88,6 +88,19 @@ def test_integer_normalization_preserves_composite_strings_and_null():
     assert result.entries[0].replacement == (None, "002")
 
 
+def test_datetime_csv_uses_same_canonical_validation_without_timezone_conversion():
+    mapping = parse(b"old,new\n2025-04-30T12:34:56+03:00,2026-09-23T09:34:56Z\n")
+    result = normalize_csv_mapping(mapping, data_types=(FieldType.DATETIME,),
+                                   nullable=(False,), budget=GenerationBudget())
+    assert result.entries[0].original == ("2025-04-30T12:34:56+03:00",)
+    assert result.entries[0].replacement == ("2026-09-23T09:34:56Z",)
+
+    invalid = parse(b"old,new\n2025-04-30 12:34:56+03:00,2026-09-23T09:34:56Z\n")
+    with pytest.raises(MappingDeclarationError, match="^invalid typed CSV mapping$"):
+        normalize_csv_mapping(invalid, data_types=(FieldType.DATETIME,),
+                              nullable=(False,), budget=GenerationBudget())
+
+
 def test_float_normalization_is_approximate_and_catches_converted_duplicates():
     mapping = parse_mapping_declaration({"kind": "inline", "entries": [
         {"original": ["+1.25e2"], "replacement": ["-0.5"]}]})

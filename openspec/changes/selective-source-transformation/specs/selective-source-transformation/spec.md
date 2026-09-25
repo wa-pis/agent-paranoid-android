@@ -51,6 +51,14 @@ implicit rounding or decimal256 output.
 - **THEN** physical logical types and decimal precision/scale remain consistent
   with the specification, and unavailable profiling evidence stays unavailable.
 
+#### Scenario: Intentionally invalid values cannot enter typed Parquet
+
+- **GIVEN** mixed or negative generation produces a value incompatible with a
+  declared Parquet field type, even after another entity has been staged
+- **WHEN** the dataset is exported
+- **THEN** the entire export fails without a partial dataset or manifest, and
+  any previously published output remains unchanged.
+
 ### Requirement: Diagnostic recovery preserves confidentiality
 
 Diagnostics SHALL distinguish missing dependencies from known local capability
@@ -137,6 +145,32 @@ claims. Historical release evidence SHALL remain identifiable as historical.
 - **WHEN** release readiness is assessed
 - **THEN** documented workflows run on fictional fixtures, documentation checks
   pass, and current help, guides and artifact descriptions agree with behavior.
+
+### Requirement: Skill-guided agent use is version-accurate
+
+For the release candidate, an agent integration SHALL be able to locate both
+packaged project skills without network access, use installed command/tool
+metadata to select an interface supported by that version, and produce a
+bounded, value-free plan before any state-changing operation. Loading a skill
+SHALL NOT register it automatically
+in every agent runtime, activate an unfinished transformation path, grant data
+preservation authority, or bypass existing review and approval boundaries.
+
+#### Scenario: Installed package lacks transformation execution
+
+- **GIVEN** an installed package containing both skills but no approved
+  transformation execution interface
+- **WHEN** an agent is asked to preserve source values
+- **THEN** it reports that execution is unavailable and routes to the current
+  review/specification workflow without copying values or inventing approval.
+
+#### Scenario: Supported synthetic workflow
+
+- **GIVEN** a fictional source and an installed version with documented
+  source-free generation commands
+- **WHEN** the agent chooses a workflow using the packaged skill
+- **THEN** it proposes only supported profiling, review and generation steps,
+  using existing CLI/Python/MCP permissions and value-free responses.
 
 ### Requirement: Explicit, isolated transformation mode
 

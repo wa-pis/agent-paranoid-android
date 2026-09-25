@@ -32,7 +32,11 @@ rule mutations are checked again before publication. Failures preserve existing
 output and do not publish a new successful bundle.
 
 Explicit mixed and negative generation still publish controlled-invalid data
-with validation evidence. Row privacy remains mandatory in every mode.
+with validation evidence for formats that can represent those rows. Parquet
+rejects the entire export when an intentionally invalid value is incompatible
+with its declared physical type; no partial dataset or manifest is published,
+and an existing output remains unchanged. Row privacy remains mandatory in
+every mode.
 Standalone `validate` now inspects row values when its privacy section is
 enabled, in addition to checking specification safety. CSV numeric values are
 interpreted using their declared numeric type before privacy classification.

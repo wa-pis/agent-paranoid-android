@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from datetime import date, datetime
 
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
@@ -109,11 +110,16 @@ def build_query_row_count_query(plan: ValidatedSqlQuery) -> TrustedProfileQuery:
 def build_query_column_summary_query(
     plan: ValidatedSqlQuery,
     column: str,
+    *,
+    temporal_bounds: bool = False,
 ) -> TrustedProfileQuery:
     safe = _allowed_output_column(plan, column)
+    if temporal_bounds and infer_sensitive_from_name(column):
+        raise SqlQueryProfileError("SQL query temporal bounds require a non-sensitive field")
+    temporal_sql = f", min({safe}) AS min_temporal, max({safe}) AS max_temporal" if temporal_bounds else ""
     return TrustedProfileQuery(
         f"SELECT count(*) AS row_count, count({safe}) AS non_null_count, "
-        f"count(DISTINCT {safe}) AS distinct_count "
+        f"count(DISTINCT {safe}) AS distinct_count{temporal_sql} "
         f"FROM ({plan.sql}) AS \"__apa_source\""
     )
 
@@ -202,8 +208,22 @@ def _profile_column(
     fetch_query: QueryFetcher,
     local_category_field: LocalCategoryField | None,
 ) -> dict[str, object]:
+    profile_type = coerce_profile_type(column.data_type)
+    temporal_bounds = (
+        profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
+        and not infer_sensitive_from_name(column.name)
+        and column.name in plan.safe_temporal_output_fields
+    )
+    numeric_shape = profile_type in {
+        ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
+    }
     summary = _single_row(
-        fetch_query(build_query_column_summary_query(plan, column.name))
+        fetch_query(
+            build_query_numeric_shape_query(plan, column.name)
+            if numeric_shape else build_query_column_summary_query(
+                plan, column.name, temporal_bounds=temporal_bounds
+            )
+        )
     )
     summary_row_count = _non_negative_int(summary.get("row_count"), "row count")
     non_null_count = _non_negative_int(
@@ -225,30 +245,26 @@ def _profile_column(
         "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
         "approx_distinct_count": distinct_count,
     }
-    if coerce_profile_type(column.data_type) in {
-        ProfileDataType.INTEGER,
-        ProfileDataType.FLOAT,
-        ProfileDataType.DECIMAL,
-    }:
-        shape = _single_row(
-            fetch_query(build_query_numeric_shape_query(plan, column.name))
-        )
-        if (
-            _non_negative_int(shape.get("row_count"), "numeric row count")
-            != row_count
-            or _non_negative_int(
-                shape.get("non_null_count"), "numeric non-null count"
-            )
-            != non_null_count
-            or _non_negative_int(
-                shape.get("distinct_count"), "numeric distinct count"
-            )
-            != distinct_count
-        ):
-            raise SqlQueryProfileError("SQL query numeric aggregates are invalid")
-        has_negative = _as_bool(shape.get("has_negative"))
-        has_positive = _as_bool(shape.get("has_positive"))
-        magnitude = shape.get("max_abs_magnitude")
+    if temporal_bounds:
+        lower, upper = summary.get("min_temporal"), summary.get("max_temporal")
+        if non_null_count:
+            expected = datetime if profile_type == ProfileDataType.DATETIME else date
+            if type(lower) is not expected or type(upper) is not expected:
+                raise SqlQueryProfileError("SQL query temporal bounds are invalid")
+            if isinstance(lower, datetime) and isinstance(upper, datetime):
+                if (lower.utcoffset() is None) != (upper.utcoffset() is None):
+                    raise SqlQueryProfileError("SQL query temporal timezone metadata is inconsistent")
+            if lower > upper:
+                raise SqlQueryProfileError("SQL query temporal bounds are reversed")
+            suffix = "timestamp" if profile_type == ProfileDataType.DATETIME else "date"
+            result[f"min_{suffix}"] = lower.isoformat()
+            result[f"max_{suffix}"] = upper.isoformat()
+        elif lower is not None or upper is not None:
+            raise SqlQueryProfileError("SQL query empty temporal bounds are invalid")
+    if numeric_shape:
+        has_negative = _as_bool(summary.get("has_negative"))
+        has_positive = _as_bool(summary.get("has_positive"))
+        magnitude = summary.get("max_abs_magnitude")
         if magnitude is not None and (has_negative or has_positive):
             result["numeric_shape"] = {
                 "max_abs_magnitude": _bounded_magnitude(magnitude),

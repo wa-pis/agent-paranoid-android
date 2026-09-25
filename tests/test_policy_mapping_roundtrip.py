@@ -18,6 +18,10 @@ from test_data_agent.io.mapping_loader import load_csv_mapping
      "9007199254740993,9007199254740995"),
     (FieldType.DATE, "2024-02-29", "2025-03-01", "2024-02-29,2025-03-01"),
     (FieldType.DATE, "2025-02-29", "2025-03-01", "2025-02-29,2025-03-01"),
+    (FieldType.DATETIME, "2025-04-30T12:34:56+03:00", "2026-09-23T09:34:56Z",
+     "2025-04-30T12:34:56+03:00,2026-09-23T09:34:56Z"),
+    (FieldType.DATETIME, "2025-04-30 12:34:56+03:00", "2026-09-23T09:34:56Z",
+     "2025-04-30 12:34:56+03:00,2026-09-23T09:34:56Z"),
 ])
 def test_saved_inline_and_csv_policies_have_equal_typed_mappings(
     tmp_path, kind, original, replacement, csv_row, nullable,
@@ -30,7 +34,9 @@ def test_saved_inline_and_csv_policies_have_equal_typed_mappings(
          "replacement_columns": ["new"]},
     ]
     results = []
-    rejected = (replacement is None and not nullable) or original == "2025-02-29"
+    rejected = (replacement is None and not nullable) or original in {
+        "2025-02-29", "2025-04-30 12:34:56+03:00",
+    }
     budget = GenerationBudget()
     for index, mapping in enumerate(mappings):
         policy = parse_behavior_policy({

@@ -65,8 +65,10 @@ def parse_safe_expression(expression: str) -> ast.AST:
         )
     try:
         parsed = ast.parse(expression, mode="eval")
-    except SyntaxError as exc:
-        raise ValueError("expression must be valid arithmetic syntax") from exc
+    except SyntaxError:
+        parsed = None
+    if parsed is None:
+        raise ValueError("expression must be valid arithmetic syntax")
     if sum(1 for _ in ast.walk(parsed)) > MAX_EXPRESSION_NODES:
         raise ValueError(f"expression must contain <= {MAX_EXPRESSION_NODES} nodes")
     validate_expression_node(parsed.body)
@@ -91,7 +93,7 @@ def validate_expression_node(node: ast.AST) -> None:
             return
         if node.func.id == "count" and not node.args:
             return
-    raise ValueError(f"unsupported expression: {ast.dump(node)}")
+    raise ValueError("unsupported expression")
 
 
 def expression_references(expression: str) -> tuple[set[str], set[str], set[str]]:
@@ -139,7 +141,7 @@ def eval_node(node: ast.AST, row: dict[str, Any]) -> Any:
             return aggregate(field, row.get("rows", []))
         if node.func.id == "count":
             return float(len(row.get("rows", [])))
-    raise ValueError(f"unsupported expression: {ast.dump(node)}")
+    raise ValueError("unsupported expression")
 
 
 def expect_field_name(node: ast.AST) -> str:
