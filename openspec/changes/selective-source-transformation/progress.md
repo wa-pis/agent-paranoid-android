@@ -2108,6 +2108,22 @@ Broader transformation remains unfinished.
   applicable GitHub checks successfully with four release-only skips. Next:
   sign and push the bounded-loader/skill/OpenSpec correction, then require
   fresh exact-head CI without an ordinary per-commit AI review.
+- Draft #568 `40322e84421cae73016021483ca0677a9df19b24` completed 37
+  applicable GitHub checks successfully with four release-only skips. The
+  cumulative-budget fix, OpenSpec review-only contract and packaged-skill
+  wording are now green on the exact pushed SHA. The PR remains draft because
+  transformation execution and the scoped safety-policy amendment/review are
+  unfinished. Next: settle global/column overlap precedence and complete the
+  safety-gated CSV execution path; do not merge solely on this read-only CI.
+- File-wide and per-column exact-text rules can now be applied together by a
+  private pure row primitive. It rejects every unmapped cell, overlapping
+  matches and exact identity pairs; it never falls back to source text, reads
+  files, writes output or issues approval. Forty-nine fictional CSV tests,
+  changed-file Ruff and targeted mypy pass. OpenSpec clarifies that both scopes
+  coexist. GitHub PR state could not be refreshed in this local run because
+  api.github.com was unreachable; no remote change or release was attempted.
+  Next: choose overlap precedence, then bind bounded value-free local trace
+  and safety-reviewed execution; keep draft #568 gated.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

@@ -34,8 +34,9 @@ repair instructions, live integrations or a weaker safety boundary.
    totals through a saved policy before adding interactive UI. The first
    executable replacement primitive is a table of unconditional exact-text
    pairs (`true` -> `false`, `001` -> `1`): no inferred source/target type or
-   numeric conversion. Support both file-wide and per-column tables; apply
-   each match once, never cascade. Keep reviewed
+   numeric conversion. Support file-wide and per-column tables together in
+   one file, not as mutually exclusive modes; apply each match once, never
+   cascade. Keep reviewed
    field-action and preservation gates around this primitive. Add bounded
    local value-free trace/dry-run output for row/column/rule matches and
    unmatched cells.

@@ -132,6 +132,26 @@ def match_scoped_text(
     return None
 
 
+def replace_text_row(
+    values: tuple[str, ...], columns: tuple[str, ...],
+    file_table: TextReplacementTable | None,
+    column_tables: Mapping[str, TextReplacementTable],
+) -> tuple[str, ...]:
+    """Apply explicit text rules once; reject any uncovered source cell."""
+    if (type(values) is not tuple or type(columns) is not tuple or not values
+            or len(values) != len(columns)
+            or any(type(column) is not str or not column for column in columns)
+            or len(set(columns)) != len(columns)):
+        raise MappingDeclarationError("invalid text replacement row") from None
+    replaced: list[str] = []
+    for column, value in zip(columns, values, strict=True):
+        match = match_scoped_text(value, column, file_table, column_tables)
+        if match is None:
+            raise MappingDeclarationError("unmapped text replacement") from None
+        replaced.append(match.replacement)
+    return tuple(replaced)
+
+
 def compile_text_replacement_table(
     payload: bytes, declaration: CsvMapping, *, budget: GenerationBudget,
 ) -> TextReplacementTable:
@@ -143,7 +163,7 @@ def compile_text_replacement_table(
         by_source: dict[str, tuple[str, int]] = {}
         for ordinal, entry in enumerate(mapping.entries, start=1):
             original, replacement = entry.original[0], entry.replacement[0]
-            if type(original) is not str or type(replacement) is not str:
+            if type(original) is not str or type(replacement) is not str or original == replacement:
                 raise ValueError
             by_source[original] = (replacement, ordinal)
         return TextReplacementTable(MappingProxyType(by_source))

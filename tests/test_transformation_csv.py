@@ -4,7 +4,7 @@ import pytest
 
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, match_scoped_text, normalize_csv_mapping,
-    parse_csv_mapping_bytes,
+    parse_csv_mapping_bytes, replace_text_row,
     summarize_text_trace, text_trace_event, TextTraceEvent,
 )
 from test_data_agent.core.field import FieldType
@@ -36,6 +36,7 @@ def test_text_replacement_table_is_exact_and_one_pass():
 @pytest.mark.parametrize("payload", [
     b"old,new\na,b\na,c\n",
     b"old,new\na,NULL\n",
+    b"old,new\na,a\n",
 ])
 def test_text_replacement_table_rejects_ambiguous_or_null_pairs(payload):
     declaration = CsvMapping(kind="csv", path="not-opened.csv",
@@ -82,6 +83,45 @@ def test_overlapping_file_and_column_rules_reject_without_values():
         match_scoped_text("true", "flag", file_table, {"flag": column_table})
     assert str(error.value) == "conflicting text replacement scopes"
     assert "true" not in repr(error.value)
+
+
+def test_file_wide_and_column_rules_replace_entire_row_once():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    file_table = compile_text_replacement_table(
+        b"old,new\ntrue,false\nfalse,next\n001,1\n", declaration, budget=GenerationBudget(),
+    )
+    column_table = compile_text_replacement_table(
+        b"old,new\nlocal,column-result\n", declaration, budget=GenerationBudget(),
+    )
+    assert replace_text_row(
+        ("true", "local", "001"), ("a", "b", "c"), file_table, {"b": column_table},
+    ) == ("false", "column-result", "1")
+    assert replace_text_row(("false",), ("a",), file_table, {}) == ("next",)
+
+
+def test_text_row_rejects_unmapped_and_overlapping_cells_without_values():
+    declaration = CsvMapping(kind="csv", path="not-opened.csv",
+                             source_columns=("old",), replacement_columns=("new",))
+    file_table = compile_text_replacement_table(
+        b"old,new\ntrue,false\n", declaration, budget=GenerationBudget(),
+    )
+    column_table = compile_text_replacement_table(
+        b"old,new\ntrue,column-result\n", declaration, budget=GenerationBudget(),
+    )
+    for values, columns, column_tables, message in (
+        (("true", "private-marker"), ("a", "b"), {}, "unmapped text replacement"),
+        (("true",), ("a",), {"a": column_table}, "conflicting text replacement scopes"),
+    ):
+        with pytest.raises(MappingDeclarationError) as error:
+            replace_text_row(values, columns, file_table, column_tables)
+        assert str(error.value) == message
+        assert "private-marker" not in str(error.value)
+
+
+def test_text_row_rejects_duplicate_columns():
+    with pytest.raises(MappingDeclarationError, match="^invalid text replacement row$"):
+        replace_text_row(("true", "false"), ("flag", "flag"), None, {})
 
 
 def test_text_trace_counts_all_cells_but_limits_local_events():
