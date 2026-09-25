@@ -2147,9 +2147,24 @@ Broader transformation remains unfinished.
   Existing typed `substitute` remains separate. One hundred fifty-seven
   focused fictional tests, changed-file Ruff/mypy, strict OpenSpec and diff
   check pass. No source output, receipt issuance, preservation activation or
-  public execution path was added. Next: sign/push this structural slice,
-  require exact-head CI, then complete the reviewed safety amendment and
+  public execution path was added. Signed commit `b01c2fd` was fast-forward
+  pushed to draft #568. Next: require exact-head CI, then complete the safety
+  amendment with executable tests and independent review before
   fixed-snapshot local CLI trace/execution.
+- Independent AI safety reviewer Raman (`01a0d8a5-3f93-7f80-9a6b-52bc41dc3c4c`,
+  report self-label "Sentinel") reviewed exact `b01c2fd2b48d8985697135b743a65c191179e447`
+  on 2026-09-25 UTC, read-only. One Medium future-execution gate remains:
+  sensitive `A→B, B→A` can emit a different source value; no current public
+  output path exists. Reviewer ran 98 focused tests and diff check. Identity,
+  scope overlap and snapshot reference checks had no other confirmed finding.
+  Full scope, disposition and evidence:
+  [AI safety review](reviews/b01c2fd-ai-safety.md). Do not treat as human
+  approval. Next: bound sensitive-value reuse to the fixed source snapshot
+  before output, with executable tests and changed-scope independent review.
+- Added a public CLI regression on fictional CSV for both text-rule scopes:
+  `transform-review` reports only scope flags/digest, rejects overlapping
+  rules, emits no mapping literals or receipt. Three focused CLI tests and
+  Ruff pass; strict MkDocs build passes after updating the CLI reference.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

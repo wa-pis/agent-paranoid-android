@@ -41,6 +41,11 @@ decisions and a snapshot digest. It does not approve, transform, or export
 source rows. Mapping paths in the policy are relative to the policy file's
 directory. Use `--table NAME` when the entity name differs from the source
 filename stem; `--json` wraps the same review in the standard CLI response.
+For review-only exact-text plans, a single-file policy may declare a top-level
+`file_text_mapping` and optional CSV `mapping` on each `replace_text` field.
+The review reports configured scopes but never shows mapping literals;
+overlapping file/field keys are rejected. These declarations do not enable
+replacement output.
 
 No source-preserving transformation command is available yet. The separate
 local approval and execution gates in the active OpenSpec are not satisfied by

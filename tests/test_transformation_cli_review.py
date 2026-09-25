@@ -44,3 +44,39 @@ def test_transform_review_rejects_wrong_policy_without_source_values(tmp_path, c
     assert main(["transform-review", str(source), str(tmp_path / "policy.yaml")]) != 0
     output = capsys.readouterr()
     assert "fictional-private-marker" not in output.out + output.err
+
+
+def test_transform_review_reports_global_and_column_text_scopes_without_values(tmp_path, capsys):
+    source = tmp_path / "items.csv"
+    source.write_bytes(b"status,code\ntrue,local\nfalse,001\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.read_bytes(), "items", budget=GenerationBudget(5),
+    ))
+    def table(path):
+        return {"kind": "csv", "path": path, "source_columns": ["old"],
+                "replacement_columns": ["new"]}
+    policy = {"schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+              "seed": 7, "file_text_mapping": table("all.csv"), "fields": [
+                  {"entity": "items", "field": "status", "sensitivity": "non_sensitive",
+                   "behavior": {"action": "replace_text"}},
+                  {"entity": "items", "field": "code", "sensitivity": "non_sensitive",
+                   "behavior": {"action": "replace_text", "mapping": table("code.csv")}},
+              ]}
+    (tmp_path / "policy.yaml").write_text(yaml.safe_dump(policy))
+    (tmp_path / "all.csv").write_bytes(b"old,new\ntrue,false\nfalse,true\n001,1\n")
+    (tmp_path / "code.csv").write_bytes(b"old,new\nlocal,mapped\n")
+
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) == 0
+    output = capsys.readouterr()
+    result = json.loads(output.out)["result"]
+    assert result["status"] == "review_only"
+    assert [(field["file_text_rules"], field["column_text_rules"])
+            for field in result["review"]["fields"]] == [(True, False), (True, True)]
+    assert "mapped" not in output.out
+    assert "001" not in output.out
+    assert not (tmp_path / "approval.json").exists()
+
+    (tmp_path / "code.csv").write_bytes(b"old,new\ntrue,mapped\n")
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) != 0
+    rejected = capsys.readouterr()
+    assert "mapped" not in rejected.out + rejected.err
