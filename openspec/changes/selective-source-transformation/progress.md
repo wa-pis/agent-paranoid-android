@@ -1330,3 +1330,65 @@ Broader transformation remains unfinished.
   is interim candidate evidence, not a clean install or final RC. Ruff,
   strict OpenSpec and diff checks passed. Next: signed local commit; keep
   saved-valid precedence and invalid Parquet decisions pending owner input.
+- Finding 17 independent PostgreSQL table-cost slice: fictional two-table,
+  four-column profile (three numeric) made 15 aggregate/metadata statements
+  before the change, 16 with one explicitly allowlisted category. Numeric
+  shape queries already returned row/non-null/distinct counts, so the profiler
+  now uses that same bounded query as the summary instead of querying again.
+  Counts fall to 12/13 respectively; logical table-aggregate requests fall
+  from nine to six without a category. No raw rows, new SQL permissions,
+  budget increases, live connection or source values. Baseline regression
+  failed at 15/16 versus the asserted 12/13; after the change 39 focused
+  PostgreSQL profiler/query/temporal tests passed. Ruff, targeted mypy,
+  strict OpenSpec and diff checks passed. Signed local commit `547bfd5`
+  retained for sequential PR after the earlier draft. Actual scanned bytes,
+  latency, Trino table costs and final installed-RC behavior remain unverified.
+- Same finding-17 query-source path (PostgreSQL and Trino): two numeric columns
+  redundantly ran summary and shape aggregates. Their shape query already
+  returns row/non-null/distinct counts, so the profiler now consumes it once.
+  The fictional three-field regression failed on the old 7/8 statement counts
+  and passes at 5/6 without/with one explicitly authorized category. Source
+  allowlists, SQL shape, result validation and statement/scan budgets are
+  unchanged; no row samples or live connections. Fifty-one focused query
+  source/adapter/profile tests passed. Ruff, targeted mypy, strict OpenSpec
+  and diff checks passed. Next: signed local commit for a later sequential PR;
+  final installed-RC and live cost remain unverified.
+- Finding 13 isolated CSV inference fix: fictional 4-parent/100-child input
+  with all children linked previously selected an unrelated same-table key on
+  an equal-confidence tie. Exact field-name match now wins that tie. The same
+  fixture with 75 linked children yields no inferred parent link. This does
+  not preserve source orphan rates or alter privacy policy. Focused checks:
+  35 tests, changed-file Ruff and strict OpenSpec passed. Next: signed PR and
+  exact-head CI, then final installed-RC replay.
+- The inference fix passed all applicable PR #553 checks and merged normally
+  on 2026-09-25 as `b737bbf4f79e386af4ac79458e6a1e7cf8a42b1e`; no AI
+  review, release tag or publication. A separate fictional regression now
+  checks declared 4-parent/100-child generation, stable row counts and zero
+  orphan keys; undeclared domains remain separate. This does not prove source
+  orphan-rate fidelity. Focused identifier/pipeline tests: 36 passed; Ruff,
+  strict OpenSpec and diff check passed. Next: signed PR/CI for this acceptance
+  check, then final installed-RC replay.
+- The declared-link check merged through PR #554 after green applicable CI on
+  2026-09-25 as `548ec31810c5392dbc07dc3c867f0c082fbed51a`; no release.
+  Preparatory safety fix on current main: five fictional tests reproduced direct
+  and unmatched-preserve acceptance for fields with sensitive name/semantic type
+  but `sensitive=false`, plus false review display. The shared validator now
+  rejects both preservation paths and the review shows effective sensitivity.
+  No source-preserving execution or policy exception was enabled. Focused
+  policy/approval/receipt tests: 55 passed; Ruff, targeted mypy, strict
+  OpenSpec and diff check passed. Next: independent read-only safety review of
+  the exact signed head, then PR/CI; policy amendment remains a separate gate.
+- The independently reviewed safety fix merged through PR #555 on 2026-09-25
+  as `ba2f9d20916e2fc836a0233f6628b53da4a289d6`; its AI review is
+  [recorded on that PR](https://github.com/wa-pis/agent-paranoid-android/pull/555#issuecomment-5825635065)
+  and is not human approval. This SQL-cost branch integrated main without
+  changing its two profiler fixes. Combined focused PostgreSQL/query-source/
+  Trino query-builder tests: 85 passed; changed-file Ruff, targeted mypy,
+  strict OpenSpec and diff check passed. Next: signed merge commit, then one
+  SQL-cost PR with exact-head CI. No live scan-cost or RC acceptance claimed.
+- PR #556 merged its bounded SQL-cost reuse through normal green CI on
+  2026-09-25 as `aebb40a734032060c14e9a4965be46ae2c247d23`. This
+  finding-25 test branch has now integrated that main state; its fractional
+  and installed-CLI evidence above remains separate from the unresolved
+  controlled-invalid exit policy and Parquet publication decision. Next:
+  focused checks on this integration, then a small signed test-only PR.

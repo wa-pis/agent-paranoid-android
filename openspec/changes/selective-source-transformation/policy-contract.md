@@ -157,8 +157,10 @@ It also checks declared derive dependencies as exact field names within the same
 entity: missing, dropped, repeated or cyclic dependencies fail. Cross-entity
 dependency syntax is not implemented; expression/declaration agreement is still
 pending formula validation. No expression is evaluated by this check.
-Observed `sensitive` fields cannot use preservation or unmatched-preserve, even
-when the decision declares them non-sensitive. This check does not authenticate
+Observed `sensitive` fields, sensitive names and sensitive semantic types cannot
+use preservation or unmatched-preserve, even when the decision declares them
+non-sensitive. The value-free review reports this effective sensitivity, not
+only the profile's boolean flag. This check does not authenticate
 the supplied profile, resolve heuristic conflicts or grant preservation authority.
 This is only part of schema binding: it does not verify the fingerprint, types
 or authorization.
