@@ -2203,6 +2203,27 @@ Broader transformation remains unfinished.
   checks successfully with four release-only skips. Next: sign/push this
   compatibility fix and request narrow changed-scope AI
   confirmation, then tackle the AGENTS.md/baseline safety amendment.
+- Signed padded-header fix `081a63035f1f28999eea88de87c99ad3758f7fbb`
+  was fast-forward pushed to draft #568. Fresh exact-head CI is pending;
+  Raman was resumed for narrow read-only AI confirmation on this SHA, no
+  duplicate reviewer. No source-preserving execution or stable release.
+  Next: record CI/review disposition, then implement the separately required
+  AGENTS.md/baseline safety amendment with executable end-to-end tests.
+- Raman's read-only AI confirmation on exact `081a63035f1f28999eea88de87c99ad3758f7fbb`
+  (2026-09-25 UTC) found no new issue in the padded-header delta. Nine focused
+  tests and independent fictional probes covered allowed/blocked cases at
+  local review and receipt; prior compatibility finding is closed and
+  sensitive reuse remains blocked. Evidence:
+  [AI safety confirmation](reviews/081a630-ai-safety.md). Not human approval;
+  source-preserving execution remains off. Exact-head `081a630` CI completed
+  37 applicable checks successfully with four release-only skips. Next: explicit
+  safety-policy amendment and end-to-end execution tests.
+- OpenSpec delta now specifies the separate exact-text `replace_text` action,
+  file-wide plus per-column coexistence, one-pass/no-copy behavior, value-free
+  trace and sensitive fixed-snapshot reuse rejection. Strict OpenSpec and diff
+  checks pass. This is a requirement update, not an AGENTS.md exception or
+  public execution path. Next: carry it with the AI review evidence, then
+  complete the safety amendment and executable end-to-end implementation.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same
