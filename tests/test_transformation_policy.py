@@ -17,7 +17,7 @@ def policy(behavior):
 
 
 @pytest.mark.parametrize("behavior", [
-    {"action": "preserve", "authorization_ref": "user-review"},
+    {"action": "preserve", "authorization_ref": "user-review", "comment": "Reviewed business code"},
     {"action": "synthesize", "generation_policy_ref": "amount-rule"},
     {"action": "substitute", "mapping": {"kind": "inline", "entries": [
         {"original": ["fictional-a"], "replacement": ["fictional-b"]}]}},
@@ -30,9 +30,11 @@ def test_all_actions_roundtrip_privately(behavior):
     assert repr(result) == "BehaviorPolicy(schema_version='0.1')"
 
 
-@pytest.mark.parametrize("change", ["version", "extra", "duplicate", "sensitivity", "missing_auth"])
+@pytest.mark.parametrize("change", ["version", "extra", "duplicate", "sensitivity", "missing_auth",
+                                    "missing_comment", "blank_comment"])
 def test_invalid_policy_is_value_free(change):
-    payload = policy({"action": "preserve", "authorization_ref": "fictional-private-marker"})
+    payload = policy({"action": "preserve", "authorization_ref": "fictional-private-marker",
+                      "comment": "Reviewed fictional business code"})
     if change == "version":
         payload["schema_version"] = "fictional-private-marker"
     elif change == "extra":
@@ -41,8 +43,12 @@ def test_invalid_policy_is_value_free(change):
         payload["fields"].append(copy.deepcopy(payload["fields"][0]))
     elif change == "sensitivity":
         payload["fields"][0]["sensitivity"] = "sensitive"
-    else:
+    elif change == "missing_auth":
         del payload["fields"][0]["behavior"]["authorization_ref"]
+    elif change == "missing_comment":
+        del payload["fields"][0]["behavior"]["comment"]
+    else:
+        payload["fields"][0]["behavior"]["comment"] = "  \t  "
     try:
         raise ValueError("fictional-private-marker")
     except ValueError:
@@ -68,7 +74,8 @@ def test_domain_reference_must_resolve_and_cannot_chain():
 def test_unmatched_preserve_requires_non_sensitive_declaration(sensitivity):
     payload = policy({"action": "substitute", "mapping": {"kind": "csv",
         "path": "fictional.csv", "source_columns": ["old"], "replacement_columns": ["new"]},
-        "unmatched": {"action": "preserve", "authorization_ref": "review"}})
+        "unmatched": {"action": "preserve", "authorization_ref": "review",
+                      "comment": "Reviewed unmatched business code"}})
     payload["fields"][0]["sensitivity"] = sensitivity
     if sensitivity == "non_sensitive":
         assert parse_behavior_policy(payload).fields[0].behavior.unmatched.action == "preserve"
@@ -135,7 +142,8 @@ def test_review_shows_every_action_without_mapping_values_or_control_codes():
         "fields": [{"name": "value\nnext", "data_type": "string", "sensitive": False}]}]})
     payload = policy({"action": "substitute", "mapping": {"kind": "inline", "entries": [
         {"original": ["fictional-private-marker"], "replacement": ["fictional-output-marker"]}]},
-        "unmatched": {"action": "preserve", "authorization_ref": "fictional-secret-ref"}})
+        "unmatched": {"action": "preserve", "authorization_ref": "fictional-secret-ref",
+                      "comment": "fictional-private-comment"}})
     payload["fields"][0]["field"] = "value\nnext"
     payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
     review = render_policy_review(parse_behavior_policy(payload), profile, max_bytes=4096)
@@ -149,6 +157,7 @@ def test_review_shows_every_action_without_mapping_values_or_control_codes():
     assert b'fictional-private-marker' not in review
     assert b'fictional-output-marker' not in review
     assert b'fictional-secret-ref' not in review
+    assert b'fictional-private-comment' not in review
     with pytest.raises(BehaviorPolicyError, match="^invalid policy review$"):
         render_policy_review(parse_behavior_policy(payload), profile, max_bytes=1)
 
@@ -169,7 +178,8 @@ def test_derived_dependencies(dependencies):
 
 @pytest.mark.parametrize("fallback", [False, True])
 def test_observed_sensitivity_blocks_preservation(fallback):
-    behavior = {"action": "preserve", "authorization_ref": "review"}
+    behavior = {"action": "preserve", "authorization_ref": "review",
+                "comment": "Reviewed fictional business code"}
     if fallback:
         behavior = {"action": "substitute", "mapping": {"kind": "inline", "entries": [
             {"original": ["fictional-a"], "replacement": ["fictional-b"]}]}, "unmatched": behavior}
@@ -185,7 +195,8 @@ def test_observed_sensitivity_blocks_preservation(fallback):
 ])
 @pytest.mark.parametrize("fallback", [False, True])
 def test_name_or_semantic_sensitivity_blocks_preservation(field_name, semantic_type, fallback):
-    behavior = {"action": "preserve", "authorization_ref": "review"}
+    behavior = {"action": "preserve", "authorization_ref": "review",
+                "comment": "Reviewed fictional business code"}
     if fallback:
         behavior = {"action": "substitute", "mapping": {"kind": "inline", "entries": [
             {"original": ["fictional-a"], "replacement": ["fictional-b"]}]},

@@ -22,9 +22,9 @@ from test_data_agent.io.transformation_receipt import (
 
 
 def request(*, source: bytes = b"code\nfictional-a\n", authorization_ref: str = "fictional-ref",
-            mapping: bytes | None = None):
+            mapping: bytes | None = None, comment: str = "Reviewed fictional business code"):
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(source, "items", budget=GenerationBudget(5)))
-    behavior = {"action": "preserve", "authorization_ref": authorization_ref}
+    behavior = {"action": "preserve", "authorization_ref": authorization_ref, "comment": comment}
     parts = [SnapshotPart("source", "items", source)]
     if mapping is not None:
         behavior = {"action": "substitute", "mapping": {"kind": "csv", "path": "code-map.csv",
@@ -139,6 +139,24 @@ def test_receipt_does_not_authorize_changed_policy(tmp_path):
         verify(changed, path)
     assert error.value.__context__ is None
     assert verify(approved, path) == approved.parts
+
+
+def test_receipt_binds_private_preservation_comment_without_displaying_it(tmp_path):
+    approved = request(comment="Reviewed fictional business code")
+    changed = request(comment="Different fictional business rationale")
+    assert b"Reviewed fictional business code" not in approved.review
+    assert approved.snapshot_sha256 != changed.snapshot_sha256
+    path = tmp_path / "approval.json"
+    master, slave = pty.openpty()
+    try:
+        os.write(master, b"APPROVE\n")
+        _issue_to_tty_fd(approved, path, slave, GenerationBudget(5))
+    finally:
+        os.close(master)
+        os.close(slave)
+    assert verify(approved, path) == approved.parts
+    with pytest.raises(LocalReceiptError):
+        verify(changed, path)
 
 
 def test_receipt_binds_mapping_and_evidence_exact_bytes(tmp_path):

@@ -1769,6 +1769,25 @@ Broader transformation remains unfinished.
   explicit `sensitive=false` plus rationale may override positive card/phone
   evidence. The current fail-closed rule remains in force until that exact
   safety choice is confirmed, specified, tested and independently reviewed.
+- PR #568 exact head `8e5a97e4ba89627f221f0dc1a7c1d7b4ad9c8a5b`
+  completed all 37 applicable GitHub checks successfully; four publication-
+  only jobs were skipped and none failed. The PR stays draft. This does not
+  dispose of the two earlier P2 AI safety-review findings or authorize source
+  preservation. Next: settle the field-level DECIMAL override and replacement/
+  timezone semantics, then add executable safety regressions and request one
+  independent review of the changed safety scope on its exact head.
+- Private policy preflight now requires a bounded, nonblank operator comment
+  for direct and unmatched-value preserve actions. The system's value-free
+  meaning/sensitivity hint remains separate; the operator comment is private,
+  omitted from review/error output, and exact comment bytes are snapshot/receipt
+  bound. Missing/blank comments reject before approval material. Fictional
+  policy/approval/receipt/mapping/CSV tests: 195 passed; changed-file Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. This strengthens a
+  private draft only; positive sensitivity evidence still blocks preservation
+  and no source-preserving execution is enabled. Next: sign/push this combined
+  draft update, require exact-head CI; defer renewed independent safety review
+  until the outstanding replacement/timezone/numeric policy findings have a
+  complete proposed resolution, avoiding review of every intermediate commit.
 - User-skill offline checkpoint on merged main `d00eee2`: wheel SHA-256
   `2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`
   was installed under a separate import root without network access. Both

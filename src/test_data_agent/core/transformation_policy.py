@@ -22,6 +22,13 @@ Reference: TypeAlias = Annotated[StrictStr, Field(min_length=1, max_length=256)]
 class PreserveAction(_PrivateModel):
     action: Literal["preserve"]
     authorization_ref: Reference = Field(repr=False)
+    comment: StrictStr = Field(min_length=1, max_length=256, repr=False)
+
+    @model_validator(mode="after")
+    def require_meaningful_comment(self) -> "PreserveAction":
+        if not self.comment.strip():
+            raise ValueError("preservation comment is required")
+        return self
 
 
 class SynthesizeAction(_PrivateModel):

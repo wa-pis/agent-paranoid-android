@@ -19,8 +19,14 @@ reviewed non-sensitive declaration or preservation authority. Only a person's
 explicit per-field `sensitive=false` decision records non-sensitive status;
 absence of a finding remains unknown. Positive evidence or a conflicting
 classification still blocks preservation rather than being silently overridden.
-The displayed
-comment and final sensitivity decision are bound with classification evidence
+Every direct or unmatched-value preserve action also requires a separate,
+bounded operator comment explaining the requested retention. This private
+comment is not an authorization reference and is never copied into the
+value-free review, logs or transport errors. Exact policy bytes, including
+the comment, are bound to the approval snapshot; changing it invalidates the
+receipt. A comment alone cannot override positive sensitivity evidence or
+enable execution. The displayed system comment and final sensitivity decision
+are bound with classification evidence
 to the local approval snapshot; changes require renewed review.
 The private value-free review renders a positive metadata/profile signal as
 `observed_sensitivity=sensitive` and no positive signal as `unknown`, never as
@@ -39,7 +45,7 @@ Use a discriminated union rather than a bag of optional, ignored settings:
 
 | Action | Required configuration | Reject |
 | --- | --- | --- |
-| preserve | Explicit user authorization and non-sensitive declaration | Mapping, generator or formula settings; unresolved sensitivity conflict |
+| preserve | Explicit user authorization, non-sensitive declaration and bounded operator comment | Mapping, generator or formula settings; unresolved sensitivity conflict |
 | synthesize | Reviewed generation policy reference | Preservation or mapping settings |
 | substitute | Exactly one inline mapping, local CSV reference or named domain reference; unmatched policy | Generator settings unless unmatched synthesis is explicitly configured |
 | derive | Supported formula and declared dependencies | Mapping or preservation settings |

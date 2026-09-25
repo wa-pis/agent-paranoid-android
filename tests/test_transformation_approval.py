@@ -19,7 +19,8 @@ def material(*, sensitive: bool = False):
               "seed": 7, "fields": [{"entity": "items", "field": "code", "sensitivity": "non_sensitive",
               "behavior": {"action": "substitute", "mapping": {"kind": "csv", "path": "code-map.csv",
                   "source_columns": ["original"], "replacement_columns": ["replacement"]},
-                  "unmatched": {"action": "preserve", "authorization_ref": "fictional-private-ref"}}}]}
+                  "unmatched": {"action": "preserve", "authorization_ref": "fictional-private-ref",
+                                "comment": "Reviewed fictional business code"}}}]}
     return (
         yaml.safe_dump(policy).encode(),
         profile.model_dump_json().encode(),
