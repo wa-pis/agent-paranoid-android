@@ -255,3 +255,23 @@ Nulls and undersized output may leave pool members unused; declared relationship
 remain authoritative. Aggregate estimates define a requested pool, not an exact
 source-fidelity claim. This does not enable the source-preserving transformation
 path or resolve its separate approval-authority gate.
+
+## Local sensitivity-decision wizard
+
+The initial wizard is `transform-review SOURCE.csv POLICY.yaml --decide` over
+an existing reviewable policy. It displays each field's value-free system
+comment, observed evidence and current action, requests an explicit sensitivity
+decision without defaults or bulk acceptance, then validates the complete
+revised policy against the same source and mapping snapshots. Actions, mapping
+references, fallback behavior and operator comments remain unchanged.
+
+`SAVE` explicitly replaces the policy in place using owner-only atomic policy
+persistence; the original source, policy and references are reread and compared
+before publication. Conflict, changed snapshots, cancellation or bounded-input
+failure publishes nothing. Both input and prompt streams must be terminals;
+JSON results use stdout while prompts use stderr. Each answer is limited to
+32 bytes and 60 seconds within the overall command budget. `--trace` is a
+separate operation after editing. Editing creates no receipt or execution
+authority; eventual approval must bind fresh exact evidence/review bytes.
+Invalid input-policy repair, action selection and execution parity remain
+separate unfinished wizard work.
