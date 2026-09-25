@@ -1325,7 +1325,8 @@ Broader transformation remains unfinished.
   OpenSpec and diff check passed. This is not exact-commit CI or final RC
   acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
   policy choice before merge; do not repeat local gates unchanged.
-- Exact DECIMAL ceiling decision for 1.6.0rc1: 38 base-ten digits with scale
+- Proposed exact DECIMAL ceiling for 1.6.0rc1, pending owner confirmation:
+  38 base-ten digits with scale
   0..precision, matching Arrow decimal128 and required fictional DECIMAL(20,2)
   and DECIMAL(38,16) examples. decimal256/76-digit support is deferred; values
   beyond this ceiling fail closed without FLOAT conversion or implicit rounding.
@@ -1386,3 +1387,17 @@ Broader transformation remains unfinished.
   so checks used the existing project venv directly. Next: complete CSV
   companion type/null/format metadata; formula rounding remains a separate
   product decision. Do not infer preservation authority or final acceptance.
+- Dependent draft PR #564 targets draft #552; its original exact SHA
+  `c2c2911b4cc78e934ba47dfec49b4d5f0e037f1c` passed all 37 applicable
+  CI checks (four publication-only skips). Independent AI safety reviewer
+  Schrodinger, 2026-09-25, read-only scope `safety.py` DECIMAL paths and focused
+  call sites/tests, found a high-severity numeric-string privacy bypass on that
+  SHA: fictional phone/card-like fixed DECIMAL bounds and values could reach
+  output. This is AI review, not human approval; evidence is on PR #564.
+  Local follow-up rejects sensitive-looking bounds and native/CSV DECIMAL
+  values, including SQL export with optional privacy reporting disabled. New
+  fictional negative tests plus control passed (33 affected tests); full
+  non-integration gate 1738 passed, 10 deselected; Ruff, package mypy (119
+  files), strict MkDocs, strict OpenSpec and diff check passed. Next: sign and
+  push safety correction, rerun exact-head CI and independent AI review of
+  changed scope; do not merge #564 until #552 and owner decisions resolve.

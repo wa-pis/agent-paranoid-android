@@ -62,8 +62,9 @@ large integers, leading-zero strings and timestamps. Review schema compatibility
 before implementation. No new Hadoop connector is implicitly requested.
 Findings 23/24/26 add precision/scale transport, declared Arrow output schemas,
 honest Parquet profiling evidence and typed readback to this same milestone.
-For 1.6.0rc1, declared exact DECIMAL precision is capped at 38 digits and
-uses Arrow decimal128 for Parquet. This covers DECIMAL(20,2) and DECIMAL(38,16)
+The proposed 1.6.0rc1 declared exact DECIMAL precision cap is 38 digits,
+pending owner confirmation. It uses Arrow decimal128 for Parquet. This covers
+DECIMAL(20,2) and DECIMAL(38,16)
 without introducing decimal256 compatibility; higher precision fails closed.
 The dependent source-free slice adds DatasetSpec 1.1 `decimal_range` with exact
 seeded generation and CSV/JSON/SQL/Parquet export. Existing 1.0 readers retain

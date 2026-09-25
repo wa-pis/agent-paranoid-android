@@ -98,10 +98,11 @@ reuse or a universal multiplier. Financial arithmetic must honor declared
 precision. Sign, nulls, zero handling and acceptable magnitude tolerances must
 be declared; no silent defaults may claim source fidelity.
 
-For this RC, the exact DECIMAL precision ceiling is 38 base-ten digits, with
+The proposed RC exact DECIMAL precision ceiling is 38 base-ten digits, with
 scale from 0 through precision. Parquet uses Arrow decimal128, not decimal256.
 Higher precision is rejected with a value-free error; it is never downcast to
-FLOAT or silently rounded. The rounding policy for formulas is a separate
+FLOAT or silently rounded. Owner confirmation of this ceiling and the final
+numeric-content policy is pending. The rounding policy for formulas is a separate
 decision, and this ceiling alone does not enable exact-decimal execution.
 DatasetSpec 1.1 carries a `decimal_range` distribution with precision, scale
 and exact textual inclusive bounds. Only reviewed source-free generation uses
@@ -114,6 +115,10 @@ scale as schema-only profile evidence; they never supply source-derived exact
 value bounds. A reviewed `decimal_range` remains required before generation.
 Bare SQL `numeric` without declared precision/scale retains explicitly
 approximate FLOAT behavior for compatibility, not an exact-financial claim.
+Recognizable sensitive-looking DECIMAL bounds and generated values fail closed,
+including native values and canonical CSV text. Optional validation-report
+settings cannot disable this publication guard; any field-scoped exception
+requires a separate approved safety policy and executable tests.
 
 The user permits equality for source zeros and coincidences after declared
 rounding. This is not permission to copy all rounded values: the replacement

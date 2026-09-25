@@ -6,12 +6,12 @@ import csv
 import json
 import re
 from collections.abc import Iterable, Mapping
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.constraint import ConstraintStatus
-from test_data_agent.core.decimal_units import value_matches_decimal
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
@@ -86,6 +86,13 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
                 continue
 
             kind = str(field.distribution.get("kind", ""))
+            if kind == "decimal_range" and isinstance(
+                field.typed_distribution, DecimalRangeDistribution
+            ) and any(
+                infer_sensitive_value_type(bound) is not None
+                for bound in (field.typed_distribution.min, field.typed_distribution.max)
+            ):
+                raise SpecSafetyError("exact decimal bounds contain sensitive-looking values")
             if sensitive and kind not in _SAFE_SENSITIVE_DISTRIBUTIONS:
                 raise SpecSafetyError(
                     f"sensitive dataset spec field {entity.name!r}.{field.name!r} "
@@ -299,23 +306,22 @@ def validate_generated_row_privacy(
                 if parse_numeric_strings and isinstance(value, str) and (
                     field.data_type == FieldType.INTEGER and parse_int(value) is not None
                     or field.data_type == FieldType.FLOAT and parse_float(value) is not None
-                    or field.data_type == FieldType.DECIMAL
-                    and isinstance(field.typed_distribution, DecimalRangeDistribution)
-                    and value_matches_decimal(
-                        value, precision=field.typed_distribution.precision,
-                        scale=field.typed_distribution.scale,
-                    )
                 ):
                     continue
-                detected = infer_sensitive_value_type(value)
+                privacy_value = (
+                    str(value)
+                    if field.data_type == FieldType.DECIMAL and isinstance(value, Decimal)
+                    else value
+                )
+                detected = infer_sensitive_value_type(privacy_value)
                 sensitive = field.sensitive or is_sensitive_field(
                     field.name,
                     field.semantic_type,
                 )
-                if isinstance(value, str) and (
+                if isinstance(privacy_value, str) and (
                     sensitive or detected is not None
                 ) and not _is_synthetic_sensitive_value(
-                    value,
+                    privacy_value,
                     field.semantic_type or detected,
                 ):
                     return ["generated dataset failed post-solve privacy validation"]

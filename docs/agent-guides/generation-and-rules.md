@@ -30,6 +30,10 @@ integer units and exports Parquet `decimal128`, never binary FLOAT. It does not
 make automatic profiling or formulas exact: active constraints on entities
 containing DECIMAL currently fail closed pending a separately tested formula
 rounding contract. Sensitive DECIMAL ranges remain disallowed.
+Recognizable phone/card-like DECIMAL bounds and final values fail closed even
+when optional validation reporting is disabled. Do not treat a declared numeric
+type as permission to bypass content checks; ambiguous legitimate amounts may
+require a later, separately approved field-scoped policy.
 
 After constraint solving, valid-mode generation also performs unconditional
 schema/type and recognizable-PII checks before returning rows to any export or

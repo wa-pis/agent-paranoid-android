@@ -21,7 +21,9 @@ from test_data_agent.core.settings import OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.io.writers import write_dataset_rows, write_parquet
 from test_data_agent.postgres_sql_export import PostgresSqlExportError, postgres_literal, render_postgres_sql
-from test_data_agent.safety import SpecSafetyError, assert_spec_safe
+from test_data_agent.safety import (
+    SpecSafetyError, assert_spec_safe, validate_generated_row_privacy,
+)
 from test_data_agent.validation.schema_validator import validate_schema
 
 
@@ -128,6 +130,46 @@ def test_sensitive_decimal_range_does_not_bypass_source_free_policy():
     spec.entities[0].fields[0].sensitive = True
     with pytest.raises(SpecSafetyError, match="unsafe distribution kind"):
         assert_spec_safe(spec)
+
+
+@pytest.mark.parametrize("value", ["2025550147", "4242424242424242"])
+def test_decimal_bounds_reject_sensitive_looking_values(value):
+    spec = DatasetSpec(schema_version="1.1", entities=[EntitySpec(
+        name="fictional_items", row_count=1, fields=[FieldSpec(
+            name="amount", data_type="decimal",
+            distribution={"kind": "decimal_range", "precision": 20,
+                          "scale": 0, "min": value, "max": value},
+        )],
+    )])
+    with pytest.raises(SpecSafetyError, match="sensitive-looking") as error:
+        assert_spec_safe(spec)
+    assert value not in str(error.value)
+    with pytest.raises(SpecSafetyError):
+        generate_dataset(spec, seed=17)
+
+
+def test_decimal_rows_reject_card_like_value_inside_safe_bounds():
+    spec = DatasetSpec(schema_version="1.1", entities=[EntitySpec(
+        name="fictional_items", row_count=1, fields=[FieldSpec(
+            name="amount", data_type="decimal",
+            distribution={"kind": "decimal_range", "precision": 20,
+                          "scale": 0, "min": "4242424242424201", "max": "4242424242424300"},
+        )],
+    )])
+    assert_spec_safe(spec)
+    for value in (Decimal("4242424242424242"), "4242424242424242"):
+        rows = {"fictional_items": [{"amount": value}]}
+        assert validate_generated_row_privacy(
+            rows, spec, parse_numeric_strings=True,
+        ) == ["generated dataset failed post-solve privacy validation"]
+        with pytest.raises(PostgresSqlExportError, match="requires a safe dataset"):
+            render_postgres_sql(spec, rows)
+        spec.validation_settings.validate_privacy = False
+        with pytest.raises(PostgresSqlExportError, match="requires a safe dataset"):
+            render_postgres_sql(spec, rows)
+        spec.validation_settings.validate_privacy = True
+    safe_rows = {"fictional_items": [{"amount": Decimal("4242424242424201")}]}
+    assert validate_generated_row_privacy(safe_rows, spec) == []
 
 
 def test_exact_decimal_formula_is_rejected_before_float_arithmetic():

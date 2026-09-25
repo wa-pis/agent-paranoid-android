@@ -23,6 +23,7 @@ from test_data_agent.csv_profiler import (
     parse_int,
 )
 from test_data_agent.io.path_policy import atomic_write_bytes
+from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.reconciliation import validate_dataset
 
 
@@ -40,6 +41,12 @@ def render_postgres_sql(
         entity: [dict(row) for row in rows]
         for entity, rows in rows_by_entity.items()
     }
+    try:
+        assert_spec_safe(spec)
+    except SpecSafetyError:
+        raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset") from None
+    if validate_generated_row_privacy(normalized_rows, spec, parse_numeric_strings=True):
+        raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset")
     if not validate_dataset(normalized_rows, spec).valid:
         raise PostgresSqlExportError("PostgreSQL SQL export requires a valid dataset")
     entities = {entity.name: entity for entity in spec.entities}
