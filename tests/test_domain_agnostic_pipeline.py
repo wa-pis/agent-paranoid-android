@@ -253,6 +253,36 @@ def test_relationship_inference() -> None:
     )
 
 
+@pytest.mark.parametrize("linked_children", [100, 75])
+def test_folder_relationship_inference_gap_with_four_parents(
+    tmp_path: Path, linked_children: int
+) -> None:
+    (tmp_path / "parents.csv").write_text(
+        "parent_id\n" + "".join(f"{key}\n" for key in range(1, 5))
+    )
+    (tmp_path / "children.csv").write_text(
+        "child_id,parent_id\n"
+        + "".join(
+            f"{index + 1},{index % 4 + 1 if index < linked_children else index + 100}\n"
+            for index in range(100)
+        )
+    )
+
+    profile = profile_example_folder(tmp_path, cache_dir=None)
+    links = [
+        link for link in profile.relationships
+        if link.parent_entity == "parents" and link.child_entity == "children"
+    ]
+
+    assert profile.entity("parents").row_count == 4
+    assert profile.entity("children").row_count == 100
+    assert profile.entity("parents").primary_key_candidates == ["parent_id"]
+    assert len(links) == (1 if linked_children == 100 else 0)
+    if links:
+        assert (links[0].parent_field, links[0].child_field) == ("parent_id", "parent_id")
+        assert links[0].confidence == 1.0
+
+
 def test_formula_temporal_conditional_and_aggregate_inference() -> None:
     profile = profile_example_folder(FIXTURE)
     constraint_types = {constraint.type for constraint in profile.constraints}
