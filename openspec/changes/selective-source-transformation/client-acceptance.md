@@ -268,6 +268,23 @@ These tests cover private policy persistence and typed mapping validation only;
 they do not establish transformation execution, wizard parity, approval,
 financial Decimal support or acceptance of missing private client inputs.
 
+Finding 25 fractional CLI replay on fictional data: a reviewed three-route
+subprocess check runs `mixed/0.25` twice each from a saved spec, safe CSV profile
+and direct CSV. Public installed 1.5.0 failed the spec route by reporting
+effective `valid/0` while profile/CSV routes passed. A separately installed
+wheel from current main `6b9c37b` passed all three: deterministic rows,
+nonzero but not all invalid integer values, effective manifest settings,
+invalid validation reports and matching JSON-envelope/exit values. The
+candidate wheel SHA-256 is
+`311619294ca9970e9f600dd3d1582f5bd13835e48796a3888431e0e830fb2403`;
+the adapted test SHA-256 is
+`b6cdd5c48eac4b1fba50e41192eae3b557d6d316ce5050ebbf6afc0803ed3587`.
+The installed candidate still advertises 1.5.0 and reuses development
+dependencies, so this is not clean or final-RC acceptance. One public contract
+gap remains: with intentionally invalid rows, spec CLI exits 1/status
+`validation_failed`, but profile/CSV exit 0/status `succeeded`; the owner has
+been asked to choose the uniform semantics before a runtime change.
+
 Add one-to-one preserved reference combinations; changed amounts with zero and
 rounding exceptions; explicit formulas; consistent key domains; exact date
 substitution in selected fields; inline YAML/file CSV equivalence; profile
