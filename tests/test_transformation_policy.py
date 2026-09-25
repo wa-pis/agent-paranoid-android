@@ -190,6 +190,39 @@ def test_observed_sensitivity_blocks_preservation(fallback):
         validate_policy_field_coverage(decision, profile)
 
 
+@pytest.mark.parametrize("fallback", [False, True])
+@pytest.mark.parametrize("observed_sensitive", [False, True])
+def test_decimal_preservation_blocked_by_default(fallback, observed_sensitive):
+    behavior = {"action": "preserve", "authorization_ref": "review",
+                "comment": "Fictional financial amount"}
+    if fallback:
+        behavior = {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+            {"original": ["1.00"], "replacement": ["2.00"]}]}, "unmatched": behavior}
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "amount", "data_type": "decimal", "decimal_precision": 20,
+                    "decimal_scale": 2, "sensitive": observed_sensitive}]}]})
+    payload = policy(behavior)
+    payload["fields"][0]["field"] = "amount"
+    payload["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    decision = parse_behavior_policy(payload)
+    with pytest.raises(BehaviorPolicyError, match="^invalid policy field coverage$"):
+        validate_policy_profile(decision, profile)
+
+
+@pytest.mark.parametrize("metadata", [
+    {"decimal_precision": 21, "decimal_scale": 2},
+    {"decimal_precision": 20, "decimal_scale": 3},
+])
+def test_decimal_shape_changes_schema_fingerprint(metadata):
+    profile = DatasetProfile.model_validate({"entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "amount", "data_type": "decimal", "decimal_precision": 20,
+                    "decimal_scale": 2}]}]})
+    changed = profile.model_copy(deep=True)
+    for key, value in metadata.items():
+        setattr(changed.entities[0].fields[0], key, value)
+    assert transformation_schema_fingerprint(changed) != transformation_schema_fingerprint(profile)
+
+
 @pytest.mark.parametrize("field_name,semantic_type", [
     ("customer_email", None), ("value", "phone"),
 ])

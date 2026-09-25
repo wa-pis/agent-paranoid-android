@@ -1927,6 +1927,30 @@ Broader transformation remains unfinished.
   targeted mypy passed. This is not full finding-26 closure: public unknown
   representation, sensitivity and installed-RC replay remain. Next: agree a
   versioned unknown/measured contract before changing that public surface.
+- PR #564 exact DECIMAL head `09e05ae317991ddc96e278aa7bdf9239d4530344`
+  passed all applicable CI and merged through GitHub as
+  `f545d1ef40297893a30134ab30f95bc3fc46eca6` on 2026-09-25. Its
+  source-free numeric privacy guard is unchanged since the completed AI safety
+  review at `aed538a`; later integration added only an exact CSV companion
+  regression. This does not approve source preservation or private acceptance.
+  Draft #568 locally merged that mainline with both progress histories retained;
+  165 focused policy/approval/mapping/DECIMAL tests passed. Two new executable
+  negative tests confirm positive DECIMAL profile sensitivity still rejects
+  direct and unmatched fallback preservation. Next: inspect independent read-only
+  review of the proposed narrow exception, then amend AGENTS.md/baseline specs
+  only with explicit evidence provenance and tests. No preservation execution.
+- Independent read-only AI proposal review by Nash (“Boundary Sentinel”),
+  2026-09-25, pre-merge `cd38d44`, found that a DECIMAL field with a negative
+  profile flag could pass direct/fallback preserve, the schema fingerprint
+  omitted precision/scale, and current evidence lacks signal provenance.
+  The first two findings reproduced as four and two failing fictional tests,
+  respectively. Local draft now rejects DECIMAL preservation by default and
+  binds declared precision/scale into the private schema fingerprint; 169
+  focused policy/approval/mapping/DECIMAL tests, Ruff and diff check pass.
+  Reviewer made no writes or GitHub approval. Next: push integrated draft for
+  fresh CI, obtain exact-head safety review of this hardening, then design
+  typed evidence provenance before attempting the authorized policy exception.
+  AGENTS.md amendment and source-preserving execution remain disabled.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

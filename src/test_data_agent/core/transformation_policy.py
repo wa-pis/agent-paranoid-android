@@ -8,7 +8,7 @@ from typing import Annotated, Literal, TypeAlias
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
 
 from test_data_agent.core.dataset import DatasetProfile
-from test_data_agent.core.field import FieldProfile
+from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
 from test_data_agent.core.privacy import is_sensitive_field, normalize_field_name
 from test_data_agent.core.transformation_mapping import (
@@ -149,7 +149,8 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
             )
             if preserves and identity in source_fields:
                 field = source_fields[identity]
-                if field.sensitive or is_sensitive_field(field.name, field.semantic_type):
+                if (field.data_type == FieldType.DECIMAL or field.sensitive
+                        or is_sensitive_field(field.name, field.semantic_type)):
                     valid = False
             if isinstance(behavior, DeriveAction):
                 dependencies = {(decision.entity, name) for name in behavior.dependencies}
@@ -185,7 +186,9 @@ def transformation_schema_fingerprint(profile: DatasetProfile) -> str:
             error.__context__ = None
             raise
     schema = [{"entity": entity.name, "fields": [
-        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable}
+        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable,
+         **({"precision": field.decimal_precision, "scale": field.decimal_scale}
+            if field.data_type == FieldType.DECIMAL else {})}
         for field in entity.fields]} for entity in profile.entities]
     canonical = json.dumps({"version": "0.1", "entities": schema},
                            sort_keys=True, separators=(",", ":"), ensure_ascii=True)
