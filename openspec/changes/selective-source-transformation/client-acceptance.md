@@ -184,6 +184,25 @@ date32 and timestamp[us] physical readback. That wheel still labels itself
 candidate, clean install or final RC acceptance. Intentionally invalid mixed
 Parquet, DECIMAL and final-RC cases remain open.
 
+Finding 23 local source-tree evidence (not installed-RC acceptance): fictional
+DatasetSpec 1.1 tests generate `DECIMAL(20,2)` and `DECIMAL(38,16)` without
+FLOAT, validate their values, and read exact `decimal128` types and values back
+from the CLI's Parquet output. CSV/JSON and PostgreSQL NUMERIC export are also
+covered by focused tests. Automatic exact profiling, formula rounding,
+source-preserving transformation, clean-wheel replay and private inputs remain
+unverified; finding 23 is not closed.
+The same fictional CLI Parquet probe also passed from a separately installed
+interim --no-deps wheel (SHA-256
+`c9f5d4e4ea4bde7472fa55bed9313de0f299038a9cc18ff3df990cd8bd15c320`)
+with verified import root. It still reports package version 1.5.0 and shares
+the development interpreter dependencies, so this is not final 1.6.0rc1
+clean-environment or private-client acceptance.
+Additional local profile tests confirm declared Parquet decimal128 and
+PostgreSQL/query numeric(p,s) expose precision/scale without source values or
+exact extrema. Direct infer-spec fails until reviewed exact bounds are supplied;
+unbounded SQL numeric remains approximate. These are fictional metadata tests,
+not live database or client-private acceptance.
+
 The installed publication candidate was `c3f1308`, version-labelled 1.5.0,
 not the current branch or final 1.6.0rc1. Its wheel hash and original script hash
 are recorded in progress. The initial installed 1.4.0 comparison was diagnostic

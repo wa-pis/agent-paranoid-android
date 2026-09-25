@@ -5,6 +5,7 @@ import json
 import pytest
 
 from test_data_agent.core.privacy import LocalCategoryField
+from test_data_agent.core.field import FieldType
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.sql_query_profiling import (
     QueryResultColumn,
@@ -127,6 +128,7 @@ def test_query_profile_feeds_deterministic_synthetic_generation() -> None:
         fetch_query=results.fetch,
     )
     spec = infer_dataset_spec(profile, count=8)
+    assert profile.entities[0].field("amount").data_type == FieldType.FLOAT
 
     first = generate_dataset(spec, seed=73)
     second = generate_dataset(spec, seed=73)
@@ -134,6 +136,24 @@ def test_query_profile_feeds_deterministic_synthetic_generation() -> None:
     assert first == second
     assert validate_dataset(first, spec).valid is True
     assert "source-only" not in json.dumps(first, sort_keys=True)
+
+
+def test_declared_query_decimal_keeps_shape_and_requires_reviewed_bounds() -> None:
+    class ExactResults(FakeResults):
+        def describe(self, query: TrustedProfileQuery) -> tuple[QueryResultColumn, ...]:
+            columns = super().describe(query)
+            return (*columns[:2], QueryResultColumn("amount", "numeric(12,2)", True))
+
+    results = ExactResults()
+    profile = profile_validated_query(
+        plan(), describe_query=results.describe, fetch_query=results.fetch,
+    )
+    field = profile.entities[0].field("amount")
+    assert field.data_type == FieldType.DECIMAL
+    assert (field.decimal_precision, field.decimal_scale) == (12, 2)
+    assert "min_value" not in field.distribution
+    with pytest.raises(ValueError, match="decimal_range distribution"):
+        infer_dataset_spec(profile, count=8)
 
 
 def test_default_profile_does_not_query_or_store_category_literals() -> None:

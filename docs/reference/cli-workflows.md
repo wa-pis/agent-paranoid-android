@@ -137,7 +137,21 @@ boolean, string, date and timestamp Arrow types, including nullable fields.
 Timestamp offsets are preserved when one consistent offset is available.
 Rows that cannot fit the declared type, including intentionally invalid mixed
 values, fail before publication; they are never silently converted into an
-all-string column. Exact DECIMAL typing remains planned for 1.6.0rc1.
+all-string column. A reviewed `DatasetSpec` version `1.1` may declare a
+`decimal` field with a required `decimal_range` distribution containing
+`precision` (1–38), `scale` (0–precision), and exact plain-text `min`/`max`
+bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
+text, PostgreSQL SQL uses `NUMERIC(p,s)`, and Parquet uses `decimal128(p,s)`.
+CSV is not self-describing: the generated directory's `dataset_spec.yaml`
+records the DECIMAL precision, scale and nullability, while null cells are
+empty in CSV. Keep that companion specification when reusing the export;
+the manifest binds it by fingerprint.
+Version `1.0` remains readable but cannot declare `decimal`. Parquet and
+declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
+and scale; they do not infer a runnable exact range. Financial formulas and
+source-preserving transformations remain unsupported. Bare SQL `numeric`
+without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
+Sensitive DECIMAL ranges and formula constraints are rejected before generation.
 
 Folder generation requires a new or empty destination. Single-entity output
 suffixes must match the selected format. Overwrite fails closed when ownership,

@@ -14,8 +14,11 @@ from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, ValidationSettings
 
 
-DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
-SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS = frozenset({DATASET_SPEC_SCHEMA_VERSION})
+LEGACY_DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
+DATASET_SPEC_SCHEMA_VERSION: Literal["1.1"] = "1.1"
+SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS = frozenset({
+    LEGACY_DATASET_SPEC_SCHEMA_VERSION, DATASET_SPEC_SCHEMA_VERSION,
+})
 DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS: frozenset[str] = frozenset()
 RESERVED_ENTITY_ARTIFACT_BASENAMES = frozenset(
     {
@@ -67,9 +70,9 @@ class DatasetProfile(BaseModel):
 
 
 class DatasetSpec(BaseModel):
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(validate_assignment=True, hide_input_in_errors=True)
 
-    schema_version: Literal["1.0"] = DATASET_SPEC_SCHEMA_VERSION
+    schema_version: Literal["1.0", "1.1"] = DATASET_SPEC_SCHEMA_VERSION
     entities: list[EntitySpec] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
@@ -81,6 +84,11 @@ class DatasetSpec(BaseModel):
 
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetSpec:
+        if self.schema_version == LEGACY_DATASET_SPEC_SCHEMA_VERSION and any(
+            field.data_type.value == "decimal"
+            for entity in self.entities for field in entity.fields
+        ):
+            raise ValueError("decimal fields require DatasetSpec schema_version 1.1")
         _validate_entity_names(self.entities, "dataset spec")
         _validate_reserved_entity_names(self.entities)
         _validate_relationship_references(self.entities, self.relationships)
@@ -107,7 +115,7 @@ def parse_dataset_spec_payload(payload: Any) -> DatasetSpec:
     """Validate a DatasetSpec with an explicit fail-closed version check."""
 
     if isinstance(payload, Mapping):
-        version = payload.get("schema_version", DATASET_SPEC_SCHEMA_VERSION)
+        version = payload.get("schema_version", LEGACY_DATASET_SPEC_SCHEMA_VERSION)
         if not isinstance(version, str):
             raise ValueError("DatasetSpec schema_version must be a string")
         if version not in SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS:
@@ -116,6 +124,8 @@ def parse_dataset_spec_payload(payload: Any) -> DatasetSpec:
                 f"unsupported DatasetSpec schema_version {version!r}; "
                 f"this package supports: {supported}"
             )
+        if "schema_version" not in payload:
+            payload = {**payload, "schema_version": LEGACY_DATASET_SPEC_SCHEMA_VERSION}
     return DatasetSpec.model_validate(payload)
 
 

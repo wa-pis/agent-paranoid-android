@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import re
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -113,9 +114,12 @@ def _field_profile_from_column(
         or is_sensitive_field(name, semantic_type)
         or content_sensitive_type is not None
     )
+    precision, scale = _declared_decimal_shape(column)
     return FieldProfile(
         name=name,
         data_type=_field_type_from_raw(column.get("data_type", "string")),
+        decimal_precision=precision,
+        decimal_scale=scale,
         nullable=bool(column.get("nullable", False)),
         null_ratio=float(column.get("null_ratio", 0.0) or 0.0),
         unique_ratio=unique_ratio,
@@ -142,6 +146,8 @@ def _field_type_from_raw(value: Any) -> FieldType:
         return FieldType.INTEGER
     if normalized == FieldType.FLOAT.value:
         return FieldType.FLOAT
+    if normalized == FieldType.DECIMAL.value:
+        return FieldType.DECIMAL
     if normalized == FieldType.BOOLEAN.value:
         return FieldType.BOOLEAN
     if normalized == FieldType.DATE.value:
@@ -159,11 +165,27 @@ def _field_type_from_raw(value: Any) -> FieldType:
     return _field_type_from_profile_type(coerced)
 
 
+def _declared_decimal_shape(column: Mapping[str, Any]) -> tuple[Any, Any]:
+    precision = column.get("decimal_precision")
+    scale = column.get("decimal_scale")
+    if precision is not None or scale is not None:
+        return precision, scale
+    raw = str(column.get("data_type", "")).lower().replace(" ", "")
+    if not raw.startswith(("decimal(", "numeric(")):
+        return None, None
+    match = re.fullmatch(r"(?:decimal|numeric)\((\d{1,4})(?:,(\d{1,4}))?\)", raw)
+    if match is None:
+        raise ValueError("unsupported decimal type declaration")
+    return int(match.group(1)), int(match.group(2) or "0")
+
+
 def _field_type_from_profile_type(data_type: ProfileDataType) -> FieldType:
     if data_type == ProfileDataType.INTEGER:
         return FieldType.INTEGER
     if data_type == ProfileDataType.FLOAT:
         return FieldType.FLOAT
+    if data_type == ProfileDataType.DECIMAL:
+        return FieldType.DECIMAL
     if data_type == ProfileDataType.BOOLEAN:
         return FieldType.BOOLEAN
     if data_type == ProfileDataType.DATE:
@@ -183,6 +205,10 @@ def _distribution_from_profile_column(
     *,
     suppress_sensitive_numeric: bool = False,
 ) -> dict[str, Any]:
+    raw_type = str(column.get("data_type", "")).lower()
+    if raw_type == FieldType.DECIMAL.value or coerce_profile_type(raw_type) == ProfileDataType.DECIMAL:
+        shape = column.get("numeric_shape")
+        return {"kind": "numeric_shape", **dict(shape)} if isinstance(shape, Mapping) else {}
     top_values = column.get("top_values") or []
     masked_patterns = column.get("masked_patterns") or []
     if is_identifier:

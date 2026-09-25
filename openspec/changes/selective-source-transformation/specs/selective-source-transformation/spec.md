@@ -39,6 +39,9 @@ intermediates. Typed Parquet output SHALL preserve declared supported logical
 types; unsupported or intentionally invalid values SHALL follow an explicit
 contract rather than silently converting a whole column. Profiling SHALL NOT
 present unmeasured statistics or sensitivity as observed zero or established safety.
+For 1.6.0rc1, exact DECIMAL precision SHALL be 1..38 with scale 0..precision;
+higher precision SHALL fail with a value-free error, never fall back to FLOAT,
+implicit rounding or decimal256 output.
 
 #### Scenario: Typed output is read back
 

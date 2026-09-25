@@ -215,7 +215,7 @@ def _profile_column(
         and column.name in plan.safe_temporal_output_fields
     )
     numeric_shape = profile_type in {
-        ProfileDataType.INTEGER, ProfileDataType.FLOAT,
+        ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
     }
     summary = _single_row(
         fetch_query(

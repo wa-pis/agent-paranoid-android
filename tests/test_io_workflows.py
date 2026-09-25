@@ -676,7 +676,7 @@ def test_infer_dataset_spec_artifact_writes_json_for_json_suffix(tmp_path) -> No
     infer_dataset_spec_artifact(profile, output_path=output_path, count=3)
 
     payload = json.loads(output_path.read_text())
-    assert payload["schema_version"] == "1.0"
+    assert payload["schema_version"] == "1.1"
     assert payload["entities"][0]["row_count"] == 3
 
 

@@ -103,6 +103,8 @@ class CSVSourceRowDigests:
 class CSVColumnProfile(BaseModel):
     name: str
     data_type: str
+    decimal_precision: int | None = Field(default=None, exclude_if=lambda value: value is None)
+    decimal_scale: int | None = Field(default=None, exclude_if=lambda value: value is None)
     nullable: bool
     null_count: int
     null_ratio: float

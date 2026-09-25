@@ -1325,6 +1325,113 @@ Broader transformation remains unfinished.
   OpenSpec and diff check passed. This is not exact-commit CI or final RC
   acceptance. Next: run exact-head draft-PR CI and await invalid-mode Parquet
   policy choice before merge; do not repeat local gates unchanged.
+- Exact DECIMAL ceiling selected for 1.6.0rc1 by owner-delegated decision:
+  38 base-ten digits with scale
+  0..precision, matching Arrow decimal128 and required fictional DECIMAL(20,2)
+  and DECIMAL(38,16) examples. decimal256/76-digit support is deferred; values
+  beyond this ceiling fail closed without FLOAT conversion or implicit rounding.
+  A private exact integer-units parser/constructor and fictional boundary tests
+  are staged in a dependent worktree; this does not yet provide end-to-end
+  profile/generation/formula/export support or preservation authority. Twelve
+  focused tests, Ruff, focused mypy, strict OpenSpec and diff checks passed. Next: carry
+  precision/scale through a typed field contract and deterministic generation,
+  then test Arrow readback; leave formula rounding as a separate decision.
+- Added private exact seeded DECIMAL sampling from explicit inclusive textual
+  bounds using integer units and Random.randrange; no float, source-row input,
+  public field type or transformation execution. Rejects inexact/reversed
+  bounds with value-free errors. Fifteen fictional focused tests, Ruff and
+  focused mypy passed. Next: connect the exact representation to a complete
+  typed field/generator/validator/writer path before exposing DECIMAL publicly.
+- Dependent exact-DECIMAL slice now threads an explicit `decimal_range` through
+  DatasetSpec 1.1, deterministic generation, schema validation, CSV/JSON,
+  PostgreSQL NUMERIC and Arrow decimal128 exports. Versionless/1.0 specs retain
+  legacy semantics. Fictional CLI proves DECIMAL(20,2) and DECIMAL(38,16)
+  physical Parquet types and exact readback without float. Sensitive range and
+  active constraints on DECIMAL entities fail closed; source profiling,
+  financial formulas, preservation, clean-wheel and private acceptance remain
+  unfinished. Full source-tree non-integration gate: 1730 passed, 10 deselected
+  after updating two explicit schema-version assertions. Ruff, package mypy,
+  strict MkDocs, strict OpenSpec and diff checks passed. Generated JSON Schema
+  and contract fixtures were refreshed using the source checkout. An interim
+  wheel built from this uncommitted worktree is 265978 bytes (<512 KiB), SHA-256
+  `c9f5d4e4ea4bde7472fa55bed9313de0f299038a9cc18ff3df990cd8bd15c320`;
+  separate --no-deps install passed the fictional CLI Parquet exact-readback
+  probe with verified import root. Wheel still advertises 1.5.0 and uses shared
+  development dependencies: not final 1.6.0rc1 clean acceptance. Next: finish
+  direct exact-profile evidence and formula rounding, then arrange a PR after
+  draft #552 resolves; do not rerun unchanged gates or claim finding 23 closed.
+  Subsequent writer parity change accepts canonical exact decimal CSV text for
+  PostgreSQL/Parquet export, rejecting injection and excess scale. Its 28
+  affected tests, focused mypy and Ruff passed; the wheel and installed CLI
+  probe above were rebuilt/replayed after this change. The 1730-test full gate
+  preceded only this focused writer change and test additions.
+- Declared-type profile slice: Parquet decimal128 and PostgreSQL/allowed-query
+  numeric(p,s) now retain metadata-only precision/scale; no source values,
+  exact extrema, added SQL permissions, or new DB calls. Direct inference of a
+  runnable DECIMAL spec fails until the operator supplies reviewed exact bounds.
+  Bare SQL numeric remains the existing approximate FLOAT path and is named as
+  such in docs. Fictional Parquet, fake-driver PostgreSQL/Trino-query and
+  contract focused tests: 92 passed. Full local non-integration gate: 1734
+  passed, 10 deselected; Ruff, package mypy, strict MkDocs, strict OpenSpec
+  and diff checks passed. A Trino query fixture with declared decimal(12,2)
+  now correctly requires reviewed bounds instead of implicit FLOAT; its
+  allowlist/no-SELECT-star checks remain in place. Next: cover CSV companion
+  type/null/format metadata and decide exact formula rounding before claiming
+  finding 23; no installed-RC, private or live-DB acceptance yet.
+- Exact DECIMAL range enforcement: schema validation and typed Parquet now
+  reject well-formed values outside reviewed inclusive `decimal_range` bounds;
+  PostgreSQL SQL export inherits the schema check. Direct Parquet rejection
+  preserves an existing artifact. Fictional focused checks: 61 passed across
+  decimal, writers, SQL export, safety and Parquet acceptance; Ruff and focused
+  mypy passed. `uv run` could not initialize its user cache in this sandbox,
+  so checks used the existing project venv directly. Next: complete CSV
+  companion type/null/format metadata; formula rounding remains a separate
+  product decision. Do not infer preservation authority or final acceptance.
+- Dependent draft PR #564 targets draft #552; its original exact SHA
+  `c2c2911b4cc78e934ba47dfec49b4d5f0e037f1c` passed all 37 applicable
+  CI checks (four publication-only skips). Independent AI safety reviewer
+  Schrodinger, 2026-09-25, read-only scope `safety.py` DECIMAL paths and focused
+  call sites/tests, found a high-severity numeric-string privacy bypass on that
+  SHA: fictional phone/card-like fixed DECIMAL bounds and values could reach
+  output. This is AI review, not human approval; evidence is on PR #564.
+  Local follow-up rejects sensitive-looking bounds and native/CSV DECIMAL
+  values, including SQL export with optional privacy reporting disabled. New
+  fictional negative tests plus control passed (33 affected tests); full
+  non-integration gate 1738 passed, 10 deselected; Ruff, package mypy (119
+  files), strict MkDocs, strict OpenSpec and diff check passed. Next: sign and
+  push safety correction, rerun exact-head CI and independent AI review of
+  changed scope; do not merge #564 until #552 and owner decisions resolve.
+- Independent AI re-review by Sagan (self-reported “Moth”), 2026-09-25, of
+  exact SHA `e36b4ffd05a353234d3d4537c21b57a64398c31d` found the prior
+  finding only partially fixed: decimal-point and scientific-notation forms
+  could hide recognizable card digits. This remains AI evidence, not human
+  approval. A further local correction canonicalizes bounded DECIMAL values
+  before checking whole/fraction/combined digits, rejects excessive exponents
+  without expanding them, and adds `.00` and scientific-form negative tests.
+  Thirty-five affected tests, then a full 1740-passed/10-deselected
+  non-integration gate, package mypy (119 files), Ruff, strict OpenSpec and
+  diff check passed.
+  Next: sign/push this correction, require fresh exact-head CI and independent
+  AI safety re-review; no release or merge claim.
+- Signed draft PR #564 head `aed538ab397c915ecd10b578fdc80da36bca4e56`
+  passed 37 applicable checks (four publication-only skips). Independent
+  read-only AI reviewer Euclid (self-reported Kepler), 2026-09-25, found no new
+  issue in the corrected DECIMAL safety scope. This is AI evidence, not human
+  approval; full review chronology and disposition:
+  https://github.com/wa-pis/agent-paranoid-android/pull/564#issuecomment-5826458339.
+  Local exact-head gate: 1740 passed, 10 deselected; Ruff, mypy (119 files),
+  strict OpenSpec and MkDocs passed. Draft PR remains unmerged and depends on
+  draft #552 and its intentionally-invalid Parquet decision.
+- Owner delegated the RC precision-ceiling choice on 2026-09-25. Decision:
+  retain 38 base-ten digits/Arrow decimal128, scale 0..precision. Requested
+  DECIMAL(20,2) and DECIMAL(38,16) cases are covered; 76-digit/decimal256
+  support is deferred. Above-cap input rejects without FLOAT conversion,
+  implicit rounding or publication. This resolves only the precision-cap
+  question, not numeric-content/privacy policy or formula rounding.
+  OpenSpec plan, design and requirement now record the decision; no runtime
+  code or safety boundary changed. Next: settle the separate numeric-content
+  decision and #552 Parquet policy before merging #564; continue independent
+  source-free work meanwhile. Do not repeat unchanged full gates.
 - Signed `2d8a793b45935cb8cc2a4e22f8d0387ca7d00b1e` pushed as draft
   PR #552; GitHub verified the signature. Its exact head passed all 37
   applicable checks; four publication-only checks skipped. PR remains draft
@@ -1617,6 +1724,17 @@ Broader transformation remains unfinished.
   Parquet type; older pending-decision notes above are historical. Next:
   run focused checks on the integrated tree, push the signed merge, require
   fresh exact-head CI, then consider normal merge.
+- PR #552 merged normally as `d00eee2f0cdfb355c91f87dc1f3dfece8f4fe66d`
+  after 37 green applicable checks and the owner-selected whole-export
+  Parquet rejection contract. The dependent #564 branch now integrates that
+  main state. Merge resolution keeps DECIMAL precision metadata and numeric
+  shape in the existing one-query aggregate path for PostgreSQL and allowed
+  SQL, preserving temporal bounds and budgets. No numeric-content/privacy
+  exception or formula rounding policy was added. On the integrated tree,
+  152 focused fake-driver, temporal, Parquet and DECIMAL tests passed; Ruff,
+  targeted mypy, strict OpenSpec and diff check passed. Next: push a signed
+  draft-PR merge and require fresh exact-head CI; numeric-content/privacy
+  choice and safety re-review remain prerequisites to #564 merge.
 - User-skill offline checkpoint on merged main `d00eee2`: wheel SHA-256
   `2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`
   was installed under a separate import root without network access. Both
@@ -1638,3 +1756,21 @@ Broader transformation remains unfinished.
   targeted mypy passed. This is not full finding-26 closure: public unknown
   representation, sensitivity and installed-RC replay remain. Next: agree a
   versioned unknown/measured contract before changing that public surface.
+- Draft PR #564 integrated main through `46cd9cd` without changing the
+  source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
+  and the newly merged row-group null-statistics path coexist in the same
+  metadata adapter. Ninety-one focused fictional adapter, DECIMAL, SQL-source
+  and installed-CLI test cases passed; changed-file Ruff, targeted mypy and
+  strict OpenSpec passed. Next: sign/push the integration, require exact-head
+  CI, and keep the PR draft until the numeric-content exception is settled and
+  the changed safety scope independently reviewed. No final RC acceptance.
+- Draft PR #564 exact head `2883d95f73f264fd315f0c8c53c249b56adba31a`
+  passed 37 applicable GitHub checks. A new fictional installed-root-aware CLI
+  CSV regression verifies DECIMAL(20,2) text beyond binary FLOAT precision,
+  nullable DECIMAL(38,16) empty cells, saved `dataset_spec.yaml` precision/
+  scale/nullability and manifest version/format. The existing bundle already
+  carries this companion spec; no new public format or runtime code was needed.
+  Sixteen focused DECIMAL tests, Ruff, strict OpenSpec, strict MkDocs and diff
+  checks passed. Next: submit this test/documentation delta to the same draft
+  PR; retain the numeric-content
+  choice and safety review gates. No private data or final RC acceptance.

@@ -6,7 +6,9 @@ from collections.abc import Mapping
 from datetime import date, datetime
 from typing import Annotated, Any, Literal, TypeAlias
 
-from pydantic import BaseModel, Field, TypeAdapter, model_serializer, model_validator
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_serializer, model_validator
+
+from test_data_agent.core.decimal_units import decimal_to_units
 
 
 class CategoryWeight(BaseModel):
@@ -51,6 +53,26 @@ class NumericDistribution(BaseModel):
             raise ValueError("numeric min_value must be <= max_value")
         if self.p05 is not None and self.p95 is not None and self.p05 > self.p95:
             raise ValueError("numeric p05 must be <= p95")
+        return self
+
+
+class DecimalRangeDistribution(BaseModel):
+    """Exact synthetic bounds; never derived from source rows."""
+
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+
+    kind: Literal["decimal_range"] = "decimal_range"
+    precision: int = Field(strict=True, ge=1, le=38)
+    scale: int = Field(strict=True, ge=0)
+    min: str = Field(repr=False)
+    max: str = Field(repr=False)
+
+    @model_validator(mode="after")
+    def validate_exact_bounds(self) -> DecimalRangeDistribution:
+        if decimal_to_units(self.min, precision=self.precision, scale=self.scale) > decimal_to_units(
+            self.max, precision=self.precision, scale=self.scale,
+        ):
+            raise ValueError("invalid decimal range")
         return self
 
 
@@ -161,6 +183,7 @@ FieldDistribution: TypeAlias = Annotated[
     SyntheticIdentifierDistribution
     | MaskedPatternsDistribution
     | NumericDistribution
+    | DecimalRangeDistribution
     | NumericShapeDistribution
     | BooleanDistribution
     | DateRangeDistribution
@@ -177,6 +200,7 @@ _TYPED_DISTRIBUTION_KINDS = frozenset(
         "synthetic_identifier",
         "masked_patterns",
         "numeric",
+        "decimal_range",
         "numeric_shape",
         "boolean",
         "date_range",
