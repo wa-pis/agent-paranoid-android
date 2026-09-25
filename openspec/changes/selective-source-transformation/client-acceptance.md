@@ -191,6 +191,20 @@ from the CLI's Parquet output. CSV/JSON and PostgreSQL NUMERIC export are also
 covered by focused tests. Automatic exact profiling, formula rounding,
 source-preserving transformation, clean-wheel replay and private inputs remain
 unverified; finding 23 is not closed.
+Later private-engine checkpoint at `7bd752c85acdf678009b207a28514dc78a1927ea`:
+explicit CSV decimal_type keeps precision/scale separate from observed profile
+classification. Fictional tests in tests/test_transformation_execute.py cover
+exact transformed dependencies, positive/negative HALF_UP, direct/fallback
+synthesis with matching DatasetSpec shape and inline/CSV numeric-text mappings.
+tests/test_transformation_exact_formula.py checks rational arithmetic and
+resource/width failures. Shared mapping tests cover canonical duplicate keys
+and invalid shapes even with null entries. The 492-test milestone precedes the
+later null-shape/report fixes, whose focused checks are recorded in progress.md.
+These are source-tree tests, not installed-RC or client-private acceptance.
+Null encoding, zero/rounding coincidence policies, complete finance/relationship
+fixtures, public execution and final independent review remain open. No
+filesystem transformation publisher was added: the attempted adapter was
+rejected by the tool approval gate. This does not close finding 23.
 The same fictional CLI Parquet probe also passed from a separately installed
 interim --no-deps wheel (SHA-256
 `c9f5d4e4ea4bde7472fa55bed9313de0f299038a9cc18ff3df990cd8bd15c320`)

@@ -2806,3 +2806,7 @@ Broader transformation remains unfinished.
   test failed before implementation; all 20 loader tests, Ruff and targeted
   mypy pass. Corrected stale policy-contract descriptions of decimal/datetime
   validation. This only loads private mappings; no output publisher was added.
+- Updated finding-23 client-acceptance evidence at exact published 7bd752c:
+  distinguishes completed private DECIMAL formula/mapping/synthesis tests from
+  remaining null/coincidence, full finance/relationship, public and RC gates.
+  This is evidence reconciliation, not a new test run or final acceptance.
