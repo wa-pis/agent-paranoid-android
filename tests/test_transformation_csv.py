@@ -70,21 +70,21 @@ def test_file_and_column_text_rules_match_without_cascade():
     }
 
 
-def test_overlapping_file_and_column_rules_reject_without_values():
+def test_column_override_matches_once_and_trace_uses_selected_scope():
     declaration = CsvMapping(kind="csv", path="not-opened.csv",
                              source_columns=("old",), replacement_columns=("new",))
     file_table = compile_text_replacement_table(
-        b"old,new\ntrue,global-false\n", declaration, budget=GenerationBudget(),
+        b"old,new\ntrue,global-false\nlocal-false,cascade\n", declaration, budget=GenerationBudget(),
     )
     column_table = compile_text_replacement_table(
         b"old,new\ntrue,local-false\n", declaration, budget=GenerationBudget(),
     )
-    with pytest.raises(MappingDeclarationError) as error:
-        match_scoped_text("true", "flag", file_table, {"flag": column_table})
-    assert str(error.value) == "conflicting text replacement scopes"
-    assert "true" not in repr(error.value)
-    with pytest.raises(MappingDeclarationError, match="^conflicting text replacement scopes$"):
-        trace_text_row(1, ("true",), ("flag",), file_table, {"flag": column_table})
+    assert replace_text_row(("true", "true"), ("flag", "other"),
+                            file_table, {"flag": column_table}) == ("local-false", "global-false")
+    assert trace_text_row(1, ("true", "true"), ("flag", "other"),
+                          file_table, {"flag": column_table}) == (
+        TextTraceEvent(1, 1, True, "column", 1), TextTraceEvent(1, 2, True, "file", 1),
+    )
 
 
 def test_file_wide_and_column_rules_replace_entire_row_once():
@@ -102,7 +102,7 @@ def test_file_wide_and_column_rules_replace_entire_row_once():
     assert replace_text_row(("false",), ("a",), file_table, {}) == ("next",)
 
 
-def test_text_row_rejects_unmapped_and_overlapping_cells_without_values():
+def test_text_row_rejects_unmapped_cells_without_values():
     declaration = CsvMapping(kind="csv", path="not-opened.csv",
                              source_columns=("old",), replacement_columns=("new",))
     file_table = compile_text_replacement_table(
@@ -113,7 +113,7 @@ def test_text_row_rejects_unmapped_and_overlapping_cells_without_values():
     )
     for values, columns, column_tables, message in (
         (("true", "private-marker"), ("a", "b"), {}, "unmapped text replacement"),
-        (("true",), ("a",), {"a": column_table}, "conflicting text replacement scopes"),
+        (("private-marker",), ("a",), {"a": column_table}, "unmapped text replacement"),
     ):
         with pytest.raises(MappingDeclarationError) as error:
             replace_text_row(values, columns, file_table, column_tables)

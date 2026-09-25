@@ -205,6 +205,32 @@ def test_sensitive_text_review_checks_other_sensitive_source_columns(other_sensi
                                           max_review_bytes=4096, budget=GenerationBudget(5)).snapshot_sha256
 
 
+@pytest.mark.parametrize("column_target,blocked", [("B", True), ("synthetic-C", False)])
+def test_sensitive_review_checks_selected_column_override(column_target, blocked):
+    source = SnapshotPart("source", "items", b"status\nA\nB\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5),
+    ))
+    def table(path):
+        return {"kind": "csv", "path": path, "source_columns": ["old"],
+                "replacement_columns": ["new"]}
+    policy = yaml.safe_dump({
+        "schema_version": "0.1", "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "seed": 7, "file_text_mapping": table("all.csv"),
+        "fields": [{"entity": "items", "field": "status", "sensitivity": "sensitive",
+                    "behavior": {"action": "replace_text", "mapping": table("column.csv")}}],
+    }).encode()
+    mappings = (SnapshotPart("mapping", "all.csv", b"old,new\nA,B\nB,synthetic-D\n"),
+                SnapshotPart("mapping", "column.csv", f"old,new\nA,{column_target}\n".encode()))
+    if blocked:
+        with pytest.raises(TransformationSourceError, match="^invalid transformation source review$"):
+            prepare_csv_review_request(policy, source, mappings, max_total_bytes=8192,
+                                       max_review_bytes=4096, budget=GenerationBudget(5))
+    else:
+        assert prepare_csv_review_request(policy, source, mappings, max_total_bytes=8192,
+                                          max_review_bytes=4096, budget=GenerationBudget(5))
+
+
 def test_csv_review_reads_policy_source_and_mapping_from_fixed_local_paths(tmp_path):
     source = tmp_path / "items.csv"
     source.write_bytes(b"status\nready\nwaiting\n")

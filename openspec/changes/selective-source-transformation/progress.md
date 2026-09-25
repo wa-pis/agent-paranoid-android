@@ -2391,3 +2391,15 @@ Broader transformation remains unfinished.
   These are not engine end-to-end evidence. Next: independent AI review of
   this safety clarification at its exact signed SHA.
   Automation remains paused; no duplicate engine or review job was launched.
+- PR #576 merged as `cc3c28feced8ad95ee88ab7c1d0fa97bc9a2ee16`; Raman's
+  independent AI safety-policy review found no issues at exact
+  `0e7dee5ced113096b5f90d8e51aaaf73f23d2ddc`. Evidence:
+  https://github.com/wa-pis/agent-paranoid-android/pull/576#issuecomment-5837209533
+- Implemented approved column-over-file precedence on a branch from that merge.
+  TDD first reproduced two failures in matcher and approval preflight. Shared
+  matcher now selects the column rule once; trace and sensitive reachable-value
+  checks reuse that choice. Duplicate keys within each table and unmatched
+  rejection remain enforced. Updated CLI trace regression and added selected
+  sensitive replacement controls; 125 relevant tests, changed-file Ruff,
+  strict OpenSpec and diff checks pass. No output engine/activation added.
+  Next: signed PR and required CI, then closed fictional-data engine work.

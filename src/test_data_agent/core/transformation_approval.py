@@ -98,9 +98,8 @@ def prepare_approval_request(
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
         domains = {domain.name: domain.mapping for domain in policy.domains}
         mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
-        file_text_table = None
         if policy.file_text_mapping is not None:
-            file_text_table = compile_text_replacement_table(
+            compile_text_replacement_table(
                 mapping_bytes[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
             )
         domain_members: dict[str, dict[str, dict[int, tuple[FieldProfile, bool]]]] = {}
@@ -108,13 +107,9 @@ def prepare_approval_request(
             action = decision.behavior
             if isinstance(action, ReplaceTextAction):
                 if action.mapping is not None:
-                    column_text_table = compile_text_replacement_table(
+                    compile_text_replacement_table(
                         mapping_bytes[action.mapping.path], action.mapping, budget=budget,
                     )
-                    if file_text_table is not None and any(
-                            file_text_table.lookup(source) is not None
-                            for source in column_text_table._by_source):
-                        raise ValueError
                 continue
             if not isinstance(action, SubstituteAction):
                 continue

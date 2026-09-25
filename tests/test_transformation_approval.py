@@ -82,8 +82,9 @@ def test_exact_text_review_binds_global_and_column_tables_without_literals():
     assert prepare(policy_yaml, evidence, tuple(changed)).snapshot_sha256 != request.snapshot_sha256
     overlapping = list(parts)
     overlapping[2] = replace(overlapping[2], payload=b"old,new\ntrue,column-result\n")
-    with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
-        prepare(policy_yaml, evidence, tuple(overlapping))
+    overridden = prepare(policy_yaml, evidence, tuple(overlapping))
+    assert overridden.snapshot_sha256 != request.snapshot_sha256
+    assert b"column-result" not in overridden.review
     identity = list(parts)
     identity[1] = replace(identity[1], payload=b"old,new\ntrue,true\n")
     with pytest.raises(ApprovalMaterialError, match="^invalid transformation approval material$"):
