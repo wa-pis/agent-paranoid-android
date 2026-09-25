@@ -2242,3 +2242,24 @@ Broader transformation remains unfinished.
   checks passed. Next: submit this test/documentation delta to the same draft
   PR; retain the numeric-content
   choice and safety review gates. No private data or final RC acceptance.
+- The owner reconfirmed that exact-text replacement needs a file-wide table
+  **as well as** per-column tables in the same CSV run. This is already in
+  the OpenSpec and the private row matcher; it is not yet a public execution
+  path. The current contract applies the file-wide table to columns explicitly
+  assigned `replace_text`, never silently overriding another field action.
+  File/column key overlap still fails closed pending a precedence decision.
+- Local gated AGENTS.md and baseline generation-spec amendments remain
+  uncommitted and inactive. A new negative CLI regression confirms normal
+  `generate` rejects transformation-policy/receipt flags (2 focused tests
+  passed); changed-file Ruff, strict OpenSpec and diff check pass. This is
+  partial source-free evidence, not the required end-to-end execution safety
+  suite. Next: finish that suite and obtain independent safety review of the
+  exact policy-amendment SHA before enabling any source-preserving output.
+- The existing fictional CLI golden path still generates disjoint synthetic
+  rows and a source-free manifest (1 focused test passed). One generator-MCP
+  workflow test passed; its transport validation companion skipped because
+  optional FastMCP is unavailable in this local environment. These checks
+  establish only unchanged default behavior, not transformation execution.
+  The inactive AGENTS.md/baseline guard is ready for signed commit and narrow
+  independent AI safety review; executable end-to-end transformation gates
+  remain open.

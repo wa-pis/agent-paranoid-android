@@ -29,6 +29,8 @@ row count, mode, and output format.
 ### Requirement: No Source Row Copying
 
 Synthetic generation SHALL NOT copy, shuffle, duplicate, or export source rows.
+The presence of a separate selective-transformation policy or local approval
+receipt SHALL NOT change this rule for existing generation entrances.
 
 #### Scenario: CSV-derived profile drives generation
 
@@ -37,6 +39,13 @@ Synthetic generation SHALL NOT copy, shuffle, duplicate, or export source rows.
 - **THEN** source identifiers are regenerated synthetically
 - **AND** generated rows are checked against source rows where source data is
   available to the workflow
+
+#### Scenario: Transformation material cannot enable generation reuse
+
+- **GIVEN** a transformation policy or receipt referring to local source data
+- **WHEN** a normal generation entrance is called
+- **THEN** that entrance remains source-free and does not consume the policy
+  or receipt as permission to copy original values.
 
 ### Requirement: Reviewable DatasetSpec Contract
 
