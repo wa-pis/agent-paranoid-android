@@ -58,9 +58,12 @@ def prepare_csv_review_from_paths(
 ) -> ApprovalRequest:
     """Read private inputs once and prepare a value-free local CSV review."""
     try:
+        if type(max_total_bytes) is not int or max_total_bytes < 1:
+            raise ValueError
         policy_yaml = read_mapping_snapshot(
             policy_root, policy_path, max_bytes=max_total_bytes, budget=budget,
         ).payload
+        remaining = max_total_bytes - len(policy_yaml)
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
         mapping_paths = {domain.mapping.path for domain in policy.domains
                          if isinstance(domain.mapping, CsvMapping)}
@@ -76,19 +79,20 @@ def prepare_csv_review_from_paths(
                     generation_paths.add(action.unmatched.generation_policy_ref)
         if len(mapping_paths) + len(generation_paths) > 3 * DEFAULT_MAX_INPUT_COLUMNS:
             raise ValueError
-        referenced = tuple(
-            SnapshotPart(kind, path, read_mapping_snapshot(
-                policy_root, path, max_bytes=max_total_bytes, budget=budget,
-            ).payload)
-            for kind, paths in (("mapping", mapping_paths), ("generation_policy", generation_paths))
-            for path in sorted(paths)
-        )
+        referenced_parts: list[SnapshotPart] = []
+        for kind, paths in (("mapping", mapping_paths), ("generation_policy", generation_paths)):
+            for path in sorted(paths):
+                snapshot = read_mapping_snapshot(
+                    policy_root, path, max_bytes=remaining, budget=budget,
+                )
+                remaining -= len(snapshot.payload)
+                referenced_parts.append(SnapshotPart(kind, path, snapshot.payload))
         source = load_csv_source_snapshot(
             source_path, table_name, budget=budget,
-            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, max_total_bytes),
+            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, remaining),
         )
         return prepare_csv_review_request(
-            policy_yaml, source, referenced, max_total_bytes=max_total_bytes,
+            policy_yaml, source, tuple(referenced_parts), max_total_bytes=max_total_bytes,
             max_review_bytes=max_review_bytes, budget=budget,
         )
     except (OSError, ValueError, TypeError, AttributeError):

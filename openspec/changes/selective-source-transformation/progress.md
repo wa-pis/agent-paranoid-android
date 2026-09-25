@@ -2080,6 +2080,34 @@ Broader transformation remains unfinished.
   acceptance of the read-only command, not final RC or preservation acceptance.
   Next: require exact-head CI for this public CLI addition, then review the
   remaining approval/trace gates before enabling any output route.
+- Corrected the OpenSpec policy contract locally to name the read-only
+  `transform-review` behavior and separate it from private receipt helpers;
+  strict OpenSpec validation and diff check pass. This documentation delta
+  remains uncommitted while the public CLI head's CI is in progress. Next:
+  include it with the next substantive draft update after exact-head CI,
+  without restarting CI solely for this documentation correction.
+- Updated the packaged transformation skill's offline routing: an installed
+  `transform-review` is explicitly review-only, not evidence that approval or
+  execution exists. Skill frontmatter validation passed. The change remains
+  local alongside the policy-contract correction while exact-head CI for the
+  CLI commit runs. Next: check package inclusion and a fictional offline
+  agent-route after the reviewed execution surface exists; do not present
+  review-only capability as finished transformation.
+- Tightened the public read-only review loader's cumulative input budget:
+  each policy-referenced mapping now receives only the remaining bytes before
+  it is read, and the source snapshot receives the remainder. A fictional
+  policy+mapping+source one-byte-over-limit case fails with a fixed value-free
+  error. Ten focused source/CLI tests, Ruff and targeted mypy pass. This
+  changed scope is local while `d0c0880` CI completes. Next: verify exact-head
+  CI, then push this budget fix with the OpenSpec and skill correction.
+- The current source wheel contains both portable user skills. The updated
+  transformation `SKILL.md` in that wheel has the same SHA-256 as the repository
+  source (`00d411d1a4c9fc0af93e74a94702a9f66111d68e21875a89db7d4e47fb84f2b0`);
+  this is a packaging-byte check, not an independent agent-runtime acceptance.
+  Draft #568 `d0c0880f73b4b1c4e6e24b63f43736b5d1fd4437` completed 37
+  applicable GitHub checks successfully with four release-only skips. Next:
+  sign and push the bounded-loader/skill/OpenSpec correction, then require
+  fresh exact-head CI without an ordinary per-commit AI review.
 - Draft PR #564 integrated main through `46cd9cd` without changing the
   source-free DECIMAL privacy guard. Its declared Parquet precision/scale path
   and the newly merged row-group null-statistics path coexist in the same

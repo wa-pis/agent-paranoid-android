@@ -1,7 +1,7 @@
 # Behavior Policy Contract — Review Draft
 
-Internal design for implementation; not a supported CLI/API or permission to
-execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
+Internal execution design with a read-only local CLI review step; not permission
+to execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
 schemas and source-free generation remain unchanged.
 
 ## Separate Evidence And Decisions
@@ -251,9 +251,14 @@ generation-policy references before binding source bytes. The separate local
 receipt helper opens `/dev/tty`, requires a fresh `APPROVE` line, writes only
 the identity to an owner-only atomic file, and verifies it against the same
 in-memory snapshots. A caller-supplied authorization reference alone never
-creates a receipt. These helpers are not a public CLI command or execution
-grant: source snapshot loading/reprofiling, complete semantic checks, the
-scoped safety amendment and end-to-end no-reopen execution still remain.
+creates a receipt. The public `transform-review SOURCE.csv POLICY.yaml` CLI
+uses a fixed bounded CSV snapshot, derives classification evidence from those
+same bytes, and includes referenced local mapping/generation-policy bytes
+resolved relative to the policy file. It emits only the value-free field review
+and snapshot digest; `--json` uses the normal versioned CLI envelope. It never
+mints a receipt, writes transformed rows or treats a valid review as approval.
+The receipt helpers remain private; complete semantic checks, the scoped
+safety amendment and end-to-end no-reopen execution still remain.
 
 `validate_inline_mapping_shape` checks a caller-declared tuple width and rejects
 exact duplicate source tuples, including repeated nulls. Scalar kind participates

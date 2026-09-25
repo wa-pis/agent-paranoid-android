@@ -112,6 +112,14 @@ def test_csv_review_reads_policy_source_and_mapping_from_fixed_local_paths(tmp_p
         max_review_bytes=4096, budget=GenerationBudget(5),
     )
     assert changed.snapshot_sha256 != request.snapshot_sha256
+    total_input_bytes = (source.stat().st_size + (tmp_path / "policy.yaml").stat().st_size
+                         + (tmp_path / "status-map.csv").stat().st_size)
+    with pytest.raises(TransformationSourceError, match="^invalid transformation source review$") as error:
+        prepare_csv_review_from_paths(
+            source, "items", tmp_path, "policy.yaml", max_total_bytes=total_input_bytes - 1,
+            max_review_bytes=4096, budget=GenerationBudget(5),
+        )
+    assert "ready" not in str(error.value)
 
 
 def test_fixed_bytes_reprofile_without_reopening_path(tmp_path):
