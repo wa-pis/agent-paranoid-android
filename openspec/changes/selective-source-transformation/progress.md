@@ -1479,3 +1479,11 @@ Broader transformation remains unfinished.
   This is a local reproduction of numeric ambiguity, not a fix or a blanket
   declassification rule. Next: wait for the explicit field-exception decision
   before changing classifier policy; retain identifier/secret controls.
+- Receipt-binding regression slice on current main: fictional local-TTY tests
+  reject changed source bytes, policy contents and bytes, mapping bytes,
+  evidence serialization and corrupted receipts without reflecting values.
+  The existing source-byte check and added rejection cases passed together (9
+  tests); changed-file Ruff and diff check passed. No preservation execution,
+  safety-policy amendment or new approval authority was enabled. Next: submit
+  this focused test-only PR, require exact-head CI, then continue approved
+  transformation work; keep draft Parquet #552 separate pending its decision.
