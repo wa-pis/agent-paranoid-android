@@ -283,6 +283,33 @@ These tests cover private policy persistence and typed mapping validation only;
 they do not establish transformation execution, wizard parity, approval,
 financial Decimal support or acceptance of missing private client inputs.
 
+## Packaged user-skill offline checkpoint
+
+On 2026-09-25, a wheel built without network access from merged `main`
+`d00eee2f0cdfb355c91f87dc1f3dfece8f4fe66d` (wheel SHA-256
+`2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`)
+was installed into an isolated target. The import root was verified inside
+that target, not the source checkout. `importlib.resources.files("test_data_agent")`
+located both packaged `SKILL.md` files offline. The installed CLI help exposed
+the commands used below; no agent runtime was auto-registered.
+
+Following the usage skill on its bundled fictional demo data, `demo`,
+`profile-csv`, `infer-spec`, `generate` with seed 42 and `validate` all exited
+0; validation reported schema, relationships, constraints and privacy passed.
+The installed command inventory had no transformation command, and an explicit
+`transform --help` probe exited 2. The transformation skill's safe route for
+this version is therefore to report unavailability, never substitute
+synthetic generation for one-to-one preservation. No DB, external API,
+private input, custom agent harness or source-preserving execution was used.
+
+This proves package discovery and one fictional offline CLI route, not that
+different AI agents consistently select the right skill, that MCP parity is
+ready, or that the final 1.6.0rc1 wheel works. Before RC acceptance, exercise
+both skills with distinct agent runtimes against the exact installed RC, test
+capability detection and unavailable-operation refusal, then retain bounded
+value-free evidence. Do not count this checkpoint as the full skill-guided
+agent-use task.
+
 Finding 25 fractional CLI replay on fictional data: a reviewed three-route
 subprocess check runs `mixed/0.25` twice each from a saved spec, safe CSV profile
 and direct CSV. Public installed 1.5.0 failed the spec route by reporting

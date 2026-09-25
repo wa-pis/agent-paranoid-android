@@ -1617,3 +1617,13 @@ Broader transformation remains unfinished.
   Parquet type; older pending-decision notes above are historical. Next:
   run focused checks on the integrated tree, push the signed merge, require
   fresh exact-head CI, then consider normal merge.
+- User-skill offline checkpoint on merged main `d00eee2`: wheel SHA-256
+  `2b8a02ad77f177ed61956c8b0c90e045a4626c044b923186fe43553d922ab18a`
+  was installed under a separate import root without network access. Both
+  packaged `SKILL.md` files were discoverable. The fictional demo/profile/
+  infer/generate/validate CLI route passed with seed 42; `transform --help`
+  exited 2 because no transformation command exists. This is partial offline
+  acceptance only, not an AI-agent run or final RC proof; details and remaining
+  agent-runtime/MCP cases are in client-acceptance.md. Next: keep this evidence
+  with a focused documentation PR; test distinct agent runtimes against the
+  exact installed RC once the reviewed interfaces exist.
