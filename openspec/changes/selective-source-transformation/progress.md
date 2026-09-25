@@ -1407,3 +1407,14 @@ Broader transformation remains unfinished.
   checks were skipped. No runtime policy or release changed. This formula
   diagnostic branch integrated that main state; next: focused checks, then a
   signed PR for the fixed error-boundary regression.
+- PR #558 merged the formula-error redaction regression after 37 applicable
+  green checks on 2026-09-25 as `8abe16f7de0627fd9189ceaceeef1004e057b577`;
+  four publication-only checks were skipped. A narrow active-docs audit found
+  two stale claims calling historical 1.0.0rc6 current; the pilot now names
+  stable 1.5.0, and release guidance labels RC6 historical. A planned-only
+  1.6.0rc1 section records safety/review gates without claiming readiness or
+  authorizing stable 1.6.0. This is not the full documentation audit. Strict
+  MkDocs and OpenSpec validation,
+  diff check, and active-docs stale-RC6 search passed. Next: submit a signed
+  docs PR through ordinary CI; keep planned transformation features explicitly
+  unshipped until their safety gates are complete.

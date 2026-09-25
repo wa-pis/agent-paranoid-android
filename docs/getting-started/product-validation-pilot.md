@@ -16,7 +16,7 @@ evidence inputs include:
 - a bounded sample or safe profile with representative distributions;
 - a short description of the business invariants that must reconcile.
 
-The current RC6 user-facing source paths are CSV files or folders, validated
+In stable 1.5.0, user-facing source paths are CSV files or folders, validated
 safe profiles, and optional PostgreSQL and Trino integrations. PostgreSQL uses
 mandatory schema/table/column allowlists and bounded aggregate profiling; see
 the [PostgreSQL workflow](../how-to/postgresql.md). SQL DDL, Django models, and
