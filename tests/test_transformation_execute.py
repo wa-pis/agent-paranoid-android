@@ -58,6 +58,46 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+def test_decimal_declaration_is_reviewed_and_never_silently_ignored():
+    material = request()
+    policy = yaml.safe_load(next(part.payload for part in material.parts if part.kind == "policy"))
+    policy["fields"][1]["decimal_type"] = {"precision": 20, "scale": 2}
+    source = next(part for part in material.parts if part.kind == "source")
+    references = tuple(part for part in material.parts if part.kind == "mapping")
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, references,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert b'"precision": 20' in material.review
+    assert b'"scale": 2' in material.review
+    module = import_module("test_data_agent.io.transformation_execute")
+    with pytest.raises(module.TransformationExecutionError):
+        execute(material)
+
+
+@pytest.mark.parametrize("replacement,expected", [("2.345", b"2.35,2.345\n"),
+    ("-2.345", b"-2.35,-2.345\n"), ("2.3456", None), ("NaN", None)])
+def test_exact_decimal_csv_formula(replacement, expected):
+    source = SnapshotPart("source", "items", b"total,amount\n1.00,1.000\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(source.payload, "items", budget=GenerationBudget()))
+    policy = {"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile), "fields": [
+            {"entity": "items", "field": "total", "sensitivity": "non_sensitive",
+             "decimal_type": {"precision": 20, "scale": 2},
+             "behavior": {"action": "derive", "expression": "amount + 0", "dependencies": ["amount"]}},
+            {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
+             "decimal_type": {"precision": 20, "scale": 3},
+             "behavior": {"action": "replace_text", "mapping": {"kind": "csv", "path": "m.csv",
+                 "source_columns": ["old"], "replacement_columns": ["new"]}}}]}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        (SnapshotPart("mapping", "m.csv", f"old,new\n1.000,{replacement}\n".encode()),),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if expected is None:
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError):
+            execute(material)
+    else:
+        assert execute(material) == b"total,amount\n" + expected
+
+
 @pytest.mark.parametrize("formula", ["amount * 2", "amount / 0", "amount * 1e309", "amount + True",
     "amount + 'fictional' * 999999999999999999999999999999"])
 @pytest.mark.parametrize("integer", [False, True])

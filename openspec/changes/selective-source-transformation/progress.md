@@ -2720,3 +2720,26 @@ Broader transformation remains unfinished.
   completed successfully. Publish the checked INTEGER/FLOAT derive work to
   the existing draft PR; next remains declared DECIMAL schema binding, not
   public activation or release readiness.
+- Added explicit private field decimal_type (strict precision 1..38 and
+  scale 0..precision), retaining observed profile/fingerprint and sensitivity.
+  TDD reproduced rejection of a valid declaration before implementation;
+  policy/YAML/engine checks pass (191 tests plus the new review/closed-execution
+  regression), targeted mypy and Ruff pass. Review displays precision/scale;
+  the executor rejects declarations until exact CSV parsing/output validation
+  is connected, rather than ignoring them. This is schema preparation only,
+  not completed DECIMAL execution. Next connect the existing decimal unit
+  parser and exact evaluator without replacing observed classification.
+- Connected declared CSV DECIMAL parsing and derive execution using existing
+  decimal units and rational evaluator. Both source and final output obey the
+  declaration; transformed dependencies are INTEGER or declared DECIMAL, never
+  implicit FLOAT. Positive/negative HALF_UP cases pass, excess source/output
+  scale and invalid decimal text reject. Typed substitution/synthesis remain
+  pending declared-schema binding and reject explicitly. Policy/engine suite:
+  174 passed before strengthening formula examples to explicit HALF_UP ties;
+  targeted Ruff/mypy pass. Public activation remains off.
+- Schema integration milestone: all 469 transformation tests pass in 19.62s,
+  including local TTY, approval binding and source evidence regressions.
+  Changed-file Ruff and strict OpenSpec validation pass. Existing PR #578
+  checks at 8f2c62a are green (release-only jobs skipped normally).
+  Decimal declaration and initial exact execution are ready to commit together;
+  remaining typed decimal mapping/synthesis are not marked complete.

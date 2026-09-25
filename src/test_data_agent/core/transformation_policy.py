@@ -74,11 +74,25 @@ FieldAction: TypeAlias = Annotated[
 ]
 
 
+class DecimalType(_PrivateModel):
+    """Explicit CSV interpretation; never inferred from approximate statistics."""
+
+    precision: StrictInt = Field(ge=1, le=38)
+    scale: StrictInt = Field(ge=0, le=38)
+
+    @model_validator(mode="after")
+    def require_supported_scale(self) -> "DecimalType":
+        if self.scale > self.precision:
+            raise ValueError("decimal scale exceeds precision")
+        return self
+
+
 class FieldDecision(_PrivateModel):
     entity: Reference = Field(repr=False)
     field: Reference = Field(repr=False)
     sensitivity: Literal["non_sensitive", "sensitive", "unknown"]
     behavior: FieldAction = Field(repr=False)
+    decimal_type: DecimalType | None = Field(default=None, repr=False)
 
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
@@ -269,6 +283,8 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "entity": decision.entity,
             "field": decision.field,
             "action": behavior.action,
+            **({"decimal_type": decision.decimal_type.model_dump()}
+               if decision.decimal_type is not None else {}),
             "unmatched": unmatched,
             "mapping_domain": domain_numbers[domain_ref.name] if domain_ref is not None else None,
             "mapping_component": domain_ref.component if domain_ref is not None else None,

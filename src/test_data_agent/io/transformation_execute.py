@@ -33,7 +33,8 @@ from test_data_agent.core.transformation_policy import (
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
-from test_data_agent.rules.expressions import eval_exact_integer, expression_constants, safe_eval
+from test_data_agent.rules.expressions import eval_exact_decimal, eval_exact_integer, expression_constants, safe_eval
+from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
@@ -112,11 +113,21 @@ def replace_csv_snapshot(
                                        max_review_bytes=max_review_bytes, budget=budget)
         policy_bytes = next(part.payload for part in canonical.parts if part.kind == "policy")
         policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes, budget=budget)
+        decimal_types = {decision.field: decision.decimal_type for decision in policy.fields
+                         if decision.decimal_type is not None}
         source = next(part for part in canonical.parts if part.kind == "source")
         mappings = {part.name: part.payload for part in canonical.parts if part.kind == "mapping"}
         profile = DatasetProfile.model_validate_json(
             next(part.payload for part in canonical.parts if part.kind == "evidence"))
         field_types = {field.name: field.data_type for entity in profile.entities for field in entity.fields}
+        field_types.update({name: FieldType.DECIMAL for name in decimal_types})
+
+        def scalar(name: str, value: str) -> Any:
+            if name in decimal_types:
+                shape = decimal_types[name]
+                units = decimal_to_units(value, precision=shape.precision, scale=shape.scale)
+                return decimal_from_units(units, precision=shape.precision, scale=shape.scale)
+            return normalize_csv_scalar(value, field_types[name])
         file_table = (compile_text_replacement_table(
             mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
         ) if policy.file_text_mapping is not None else None)
@@ -133,6 +144,10 @@ def replace_csv_snapshot(
         generation_bytes = {part.name: part.payload for part in canonical.parts if part.kind == "generation_policy"}
         for decision in policy.fields:
             action = decision.behavior
+            if decision.field in decimal_types and (
+                    isinstance(action, (SubstituteAction, SynthesizeAction)) or
+                    isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, SynthesizeAction)):
+                raise ValueError  # Typed mappings/generation need declared-schema binding too.
             if decision.entity != source.name:
                 raise ValueError
             if isinstance(action, DropAction):
@@ -142,8 +157,10 @@ def replace_csv_snapshot(
                 needs_receipt = True
                 continue
             if isinstance(action, DeriveAction):
-                if (field_types[decision.field] not in (FieldType.INTEGER, FieldType.FLOAT) or any(
-                        field_types[name] not in (FieldType.INTEGER, FieldType.FLOAT)
+                allowed = ((FieldType.INTEGER, FieldType.DECIMAL)
+                           if decision.field in decimal_types else (FieldType.INTEGER, FieldType.FLOAT))
+                if (field_types[decision.field] not in allowed or any(
+                        field_types[name] not in allowed
                         for name in action.dependencies)):
                     raise ValueError
                 if field_types[decision.field] == FieldType.INTEGER and any(
@@ -258,6 +275,8 @@ def replace_csv_snapshot(
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
                 raise ValueError
+            for name in decimal_types:
+                scalar(name, row[name])
             values: list[str] = []
             for name in execution_names:
                 budget.check("CSV replacement cell")
@@ -265,8 +284,13 @@ def replace_csv_snapshot(
                 if isinstance(action, DeriveAction):
                     transformed = dict(zip(execution_names, values))
                     operands = {
-                        dependency: normalize_csv_scalar(transformed[dependency], field_types[dependency])
+                        dependency: scalar(dependency, transformed[dependency])
                         for dependency in action.dependencies}
+                    if name in decimal_types:
+                        shape = decimal_types[name]
+                        values.append(format(eval_exact_decimal(action.expression, operands,
+                            precision=shape.precision, scale=shape.scale, budget=budget), "f"))
+                        continue
                     if field_types[name] == FieldType.INTEGER:
                         values.append(str(eval_exact_integer(action.expression, operands, budget=budget)))
                         continue
@@ -304,6 +328,9 @@ def replace_csv_snapshot(
                     raise ValueError
             transformed = dict(zip(execution_names, values, strict=True))
             replaced = tuple(transformed[name] for name in output_names)
+            for name in decimal_types:
+                if name in transformed:
+                    scalar(name, transformed[name])
             if output_names == names and replaced == tuple(row[name] for name in names):
                 raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):

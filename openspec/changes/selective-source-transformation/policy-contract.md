@@ -108,6 +108,19 @@ of them, raw row fragments or unbounded event output; default agent/MCP
 summaries remain aggregate and value-free. Trace generation and ordinary
 execution must share the same matching code and fixed input snapshot.
 
+Private field decisions may declare `decimal_type: {precision: 20, scale: 2}`.
+Precision and scale are strict integers, with precision 1..38 and scale
+0..precision. This declaration is included in local review and exact policy
+snapshot bytes; it does not overwrite observed profile evidence or sensitivity.
+The schema fingerprint continues to identify the observed source schema.
+The closed CSV executor validates declared decimal source and output text with
+the existing exact base-ten parser. Decimal derive uses transformed INTEGER or
+declared DECIMAL dependencies, exact rational arithmetic and final HALF_UP.
+Approximate FLOAT dependencies are not implicitly promoted. Typed substitution
+and synthesis for declared CSV decimals still require schema binding and reject;
+exact text replacement and existing receipt-gated preservation retain their
+existing authorization checks. Declarations never authorize preservation.
+
 Null is distinct from empty string. Exact decimal values are text plus declared
 precision/scale; never parse them through binary float. Dates and timestamps are
 distinct types; no implicit timezone conversion or timestamp truncation. Actual
@@ -222,7 +235,8 @@ transformed INTEGER/FLOAT inputs, not original cells. Only finite numeric
 literals are allowed; arithmetic/nonfinite results reject, and CSV column
 order is preserved. INTEGER derive uses the shared exact rational evaluator
 with INTEGER dependencies, rejects fractional final results and never rounds
-through float. DECIMAL derive result integration remains pending.
+through float. Declared CSV DECIMAL derive uses exact INTEGER/DECIMAL inputs
+and final HALF_UP at the declared scale; source and output widths are checked.
 Cross-input relationships and other typed substitutions remain unsupported;
 they fail rather than silently
 falling back to another action. Final independent implementation review and
