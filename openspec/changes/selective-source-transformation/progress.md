@@ -2248,8 +2248,9 @@ Broader transformation remains unfinished.
   path. The current contract applies the file-wide table to columns explicitly
   assigned `replace_text`, never silently overriding another field action.
   File/column key overlap still fails closed pending a precedence decision.
-- Local gated AGENTS.md and baseline generation-spec amendments remain
-  uncommitted and inactive. A new negative CLI regression confirms normal
+- At this local check, gated AGENTS.md and baseline generation-spec amendments
+  were uncommitted and inactive (they were subsequently committed as
+  `ee8ea0c`). A new negative CLI regression confirms normal
   `generate` rejects transformation-policy/receipt flags (2 focused tests
   passed); changed-file Ruff, strict OpenSpec and diff check pass. This is
   partial source-free evidence, not the required end-to-end execution safety
@@ -2260,9 +2261,9 @@ Broader transformation remains unfinished.
   workflow test passed; its transport validation companion skipped because
   optional FastMCP is unavailable in this local environment. These checks
   establish only unchanged default behavior, not transformation execution.
-  The inactive AGENTS.md/baseline guard is ready for signed commit and narrow
-  independent AI safety review; executable end-to-end transformation gates
-  remain open.
+  The inactive AGENTS.md/baseline guard was then signed as `ee8ea0c` and
+  sent for narrow independent AI safety review; executable end-to-end
+  transformation gates remain open.
 - Signed inactive safety-boundary commit `ee8ea0c7388b9db00e9a8e91f88fd801b3db7e5b`
   was pushed to draft PR #568; its 37 applicable GitHub checks succeeded
   (four release-only skips). Raman was resumed for a narrow read-only AI
@@ -2276,3 +2277,23 @@ Broader transformation remains unfinished.
   mypy, strict MkDocs, strict OpenSpec and diff check passed locally. Next:
   commit/push this read-only trace slice, require its exact-head CI, disposition
   the pending safety review, then continue separately gated CSV execution.
+- Raman/Sentinel completed independent read-only AI safety-policy review of
+  exact `ee8ea0c7388b9db00e9a8e91f88fd801b3db7e5b` on 2026-09-25 UTC:
+  no safety finding in the narrow AGENTS.md/baseline/negative-test scope.
+  One low documentation-accuracy finding (stale progress wording) is corrected
+  in the next change. Two narrow CLI tests and committed diff check passed.
+  [Review evidence](reviews/ee8ea0c-ai-safety.md). This is AI, not human
+  approval, and it does not authorize source-preserving execution. The
+  read-only trace was separately signed/pushed as `ec0eacc`; require its
+  exact-head CI before merging the draft PR.
+- Attempted next private replace-only CSV output engine after the inactive
+  policy amendment. Workspace auto-review rejected the edit because it would
+  return source-derived CSV before executable end-to-end safety tests and an
+  independent review of that execution path. No engine file was created and
+  no public execution command was enabled; do not retry through another path.
+  PR #568 `ec0eacc` had three checks running at this observation; they later
+  completed with 37 applicable successes and four release-only skips. The
+  heartbeat automation is already PAUSED. Next: record CI and AI evidence,
+  then obtain explicit permission for a test-first, private execution slice
+  before any output-capable implementation. Continue independent read-only
+  work meanwhile.
