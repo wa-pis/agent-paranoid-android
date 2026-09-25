@@ -79,10 +79,14 @@ def test_transform_review_reports_global_and_column_text_scopes_without_values(t
     assert "001" not in output.out
     assert not (tmp_path / "approval.json").exists()
 
-    (tmp_path / "code.csv").write_bytes(b"old,new\ntrue,mapped\n")
-    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) != 0
-    rejected = capsys.readouterr()
-    assert "mapped" not in rejected.out + rejected.err
+    (tmp_path / "code.csv").write_bytes(b"old,new\nlocal,mapped\n001,override\n")
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"),
+                 "--trace", "--json"]) == 0
+    overridden = capsys.readouterr()
+    trace = json.loads(overridden.out)["result"]["trace"]
+    assert trace["events"][-1]["scope"] == "column"
+    assert trace["events"][-1]["rule_ordinal"] == 2
+    assert "override" not in overridden.out + overridden.err
 
 
 def test_transform_review_rejects_sensitive_source_value_swap_without_values(tmp_path, capsys):

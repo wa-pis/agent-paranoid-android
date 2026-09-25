@@ -113,7 +113,7 @@ def match_scoped_text(
     value: str, column: str, file_table: TextReplacementTable | None,
     column_tables: Mapping[str, TextReplacementTable],
 ) -> TextMatch | None:
-    """Match original text once; overlap rejects until precedence is decided."""
+    """Match original text once, preferring a column rule over a file rule."""
     if type(value) is not str or type(column) is not str or not isinstance(column_tables, Mapping):
         raise MappingDeclarationError("invalid text replacement lookup") from None
     local_table = column_tables.get(column)
@@ -123,8 +123,6 @@ def match_scoped_text(
         raise MappingDeclarationError("invalid text replacement lookup") from None
     local = local_table.lookup(value) if local_table is not None else None
     global_match = file_table.lookup(value) if file_table is not None else None
-    if local is not None and global_match is not None:
-        raise MappingDeclarationError("conflicting text replacement scopes") from None
     if local is not None:
         return TextMatch(local[0], "column", local[1])
     if global_match is not None:

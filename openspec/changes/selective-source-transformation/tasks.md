@@ -85,7 +85,7 @@ All items below remain unverified until reproduced against the current candidate
   status, plus counts, but no literals or value hashes; test trace/execution
   consistency and value-free errors on fictional data.
   - [x] Record column-over-global precedence; no cascade (owner decision).
-  - [ ] Replace current overlap rejection consistently in matcher, preflight and
+  - [x] Replace current overlap rejection consistently in matcher, preflight and
     trace; add focused tests before claiming the new behavior is available.
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the

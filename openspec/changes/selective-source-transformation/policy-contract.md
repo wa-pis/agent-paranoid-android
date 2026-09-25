@@ -86,9 +86,9 @@ levels remain subject to field decisions and sensitivity/preservation gates.
 The owner-approved target precedence is a matching per-column key first, then
 a file-wide match, then the declared unmatched policy. Match the original cell
 once; never feed replacement text into another rule. Duplicate keys within a
-single table still reject. Current matcher and private approval-material
-preflight still reject cross-scope overlap; changing both and their trace/tests
-is pending implementation, not delivered behavior. The value-free review reports whether file and
+single table still reject. Matcher, private approval-material preflight and
+value-free trace support this precedence; public output execution remains
+unavailable. The value-free review reports whether file and
 column rules are configured, without showing their literals. No cascade or
 implicit two-step replacement is permitted.
 For a field declared sensitive or unknown, or with positive sensitivity
