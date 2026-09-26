@@ -273,7 +273,7 @@ def test_derive_uses_transformed_dependencies_in_topological_order(formula, inte
         assert caught.value.__context__ is None
 
 
-@pytest.mark.parametrize("case", ["valid", "final_schema", "negative_mode", "null", "numeric_identity"])
+@pytest.mark.parametrize("case", ["valid", "final_schema", "final_unique", "negative_mode", "null", "numeric_identity"])
 @pytest.mark.parametrize("action_kind", ["synthesize", "replace_text", "substitute"])
 def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action_kind):
     original = request(source_bytes=(b"flag,code\ntrue,1.00\nfalse,2.00\n"
@@ -296,6 +296,11 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
             "distribution": {"kind": "string_pattern", "min_length": 8, "max_length": 8}})
         spec["validation_settings"] = {"validate_schema": False, "validate_privacy": False,
                                        "validate_relationships": False, "validate_constraints": False}
+    elif case == "final_unique":
+        spec["entities"][0]["fields"].append({"name": "flag", "data_type": "string", "is_identifier": True})
+        spec["entities"][0]["primary_key"] = "flag"
+        spec["validation_settings"] = {"validate_schema": False, "validate_privacy": False,
+                                       "validate_relationships": False, "validate_constraints": False}
     elif case == "negative_mode":
         spec["generation_settings"]["mode"] = "negative"
     elif case == "null":
@@ -304,16 +309,32 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
         spec["entities"][0]["fields"][0].update(data_type="float",
             distribution={"kind": "numeric", "min_value": 1.0, "max_value": 1.0})
     parts = tuple(part for part in original.parts if part.kind == "mapping" and part.name == "all.csv")
+    if case == "final_unique":
+        parts = (replace(parts[0], payload=b"old,new\ntrue,duplicate\nfalse,duplicate\n"),)
     if action_kind == "replace_text":
         parts = (replace(parts[0], payload=parts[0].payload + b"alpha,manual\n"),)
     parts += (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if case == "final_unique":
+        valid_parts = tuple(replace(part, payload=part.payload.replace(
+            b"false,duplicate", b"false,distinct")) if part.name == "all.csv" else part for part in parts)
+        valid_request = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, valid_parts,
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+        valid_rows = list(csv.DictReader(io.StringIO(execute(valid_request).decode())))
+        assert [row["flag"] for row in valid_rows] == ["duplicate", "distinct"]
     if case != "valid":
         module = import_module("test_data_agent.io.transformation_execute")
         with pytest.raises(module.TransformationExecutionError) as caught:
             execute(material)
         assert caught.value.__context__ is None
+        if case in {"final_schema", "final_unique"}:
+            publisher = import_module("test_data_agent.io.transformation_publish")
+            with pytest.raises(publisher.TransformationPublicationError) as failed_publication:
+                with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+                        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+                    pytest.fail("invalid final dataset published")
+            assert failed_publication.value.__context__ is None
         return
     first = execute(material)
     assert execute(material) == first

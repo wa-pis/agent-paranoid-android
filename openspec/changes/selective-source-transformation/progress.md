@@ -2872,3 +2872,29 @@ Broader transformation remains unfinished.
   on the next committed SHA. No public activation or new policy decision.
   Verification: 226 tests passed across executor, policy and source suites;
   Ruff passed for all changed Python files. No unchanged full gate rerun.
+- Fixes committed as 67b02b28267c21bf1cbe9477edad2d5f40caf086. Same reviewer
+  Boyle / CSV-Gate-1 resumed for only the three changed scopes; submission
+  01a0dfaa-59f8-71c2-9b79-ef4671f0e351. Re-review pending, do not duplicate.
+- Re-review completed at 67b02b2: all three findings resolved, no regressions
+  identified in changed scope. Evidence and limitations saved in
+  [reviews/67b02b2-ai-safety.md](reviews/67b02b2-ai-safety.md).
+  GitHub checks at that SHA are complete: all executed checks SUCCESS;
+  release/deployment-only jobs SKIPPED. PR #578 remains draft.
+  Activation reconciliation: this clears the three discrepancies, not the
+  remaining full validation/finance, durable publication or installed CLI gates
+  listed in safety-boundary.md. Next implementation should close missing
+  integrated validation evidence; do not repeat the completed narrow review.
+- Added publication-boundary assertions to three final-schema synthesis cases:
+  direct synthesis and both fallback variants reject the final mixed dataset
+  before yielding any artifact even with optional validation flags disabled.
+  Three focused cases pass; no runtime change. Attempted primary-key fixture
+  is rejected during current preflight and was not retained as purported
+  cross-row execution evidence. Full relationship acceptance remains open.
+- Resolved that fixture issue: DatasetSpec requires primary-key fields to have
+  is_identifier=true. Three new direct/fallback synthesis cases now prove
+  distinct transformed keys succeed, duplicate transformed keys fail final
+  validation and cannot reach temporary publication, with all optional report
+  flags disabled. Three focused cases pass; Ruff passes. No validator changes
+  needed. This closes single-entity final-key evidence, not cross-table foreign
+  keys or full finance acceptance. Next: complete the remaining integrated
+  finance/relationship fixture using existing typed contracts.
