@@ -58,6 +58,35 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute"])
+def test_declared_decimal_preservation_rejected_before_approval(action):
+    from test_data_agent.core.transformation_policy import (
+        BehaviorPolicyError, parse_behavior_policy, validate_policy_field_coverage,
+    )
+    material = request(source_bytes=b"flag,code\ntrue,1.25\nfalse,2.50\n")
+    policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
+    preserve = {"action": "preserve", "authorization_ref": "fictional", "comment": "Fictional decimal"}
+    behavior = preserve if action == "preserve" else {"action": action, "unmatched": preserve}
+    if action == "substitute":
+        behavior["mapping"] = {"kind": "inline", "entries": [
+            {"original": ["1.25"], "replacement": ["3.75"]}]}
+    policy["fields"][1].update(decimal_type={"precision": 8, "scale": 2}, behavior=behavior)
+    source = next(p for p in material.parts if p.kind == "source")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
+        source.payload, source.name, budget=GenerationBudget(5)))
+    with pytest.raises(BehaviorPolicyError):
+        validate_policy_field_coverage(parse_behavior_policy(policy), profile)
+
+
+def test_source_evidence_error_has_no_private_context():
+    from test_data_agent.io.transformation_source import TransformationSourceError, revalidate_csv_evidence
+    with pytest.raises(TransformationSourceError) as caught:
+        revalidate_csv_evidence(SnapshotPart("source", "items", b"flag\nfictional\n"),
+            b'{"entities":"fictional-private-marker"}', budget=GenerationBudget(5))
+    assert caught.value.__context__ is None
+    assert caught.value.__cause__ is None
+
+
 def test_private_temporary_publication_contains_csv_and_manifest():
     import json
     module = import_module("test_data_agent.io.transformation_publish")
@@ -67,6 +96,7 @@ def test_private_temporary_publication_contains_csv_and_manifest():
         manifest_bytes = (output / "manifest.json").read_bytes()
         manifest = json.loads(manifest_bytes)
         assert manifest["origin"] == "transformed_mixed"
+        assert manifest["privacy_notice"] == "Mixed-origin output may retain source information; not anonymized."
         assert manifest["retention"]["compared_cells"] == 4
         assert b"second" not in manifest_bytes
         assert set(path.name for path in output.iterdir()) == {"dataset.csv", "manifest.json"}

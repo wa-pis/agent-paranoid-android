@@ -63,16 +63,18 @@ development ambiguity, not the public activation gate.
 
 Historical publication-tool denial: existing
 AGENTS permits isolated fictional development with temporary test output;
-the rejected proposal accepted arbitrary destinations. User confirmation of
-temporary-test-only development was requested and has not been received
-unambiguously. Do not silently substitute a different publication mechanism.
+the rejected proposal accepted arbitrary destinations. The subsequent explicit
+confirmation permits only the temporary-test-only adapter described above;
+it does not authorize arbitrary destinations.
 
 ## Decisions and stopping rules
 
 - DATETIME: outstanding question about retaining offsets and same-instant key
   equivalence. Do not infer an answer from automated goal continuations.
-- Publication: temporary-test-only development confirmed above. Heartbeat stays
-  PAUSED; public activation and permanent destinations remain separate gates.
+- Publication: temporary-test-only development confirmed above. The owner later
+  requested autonomous continuation and the heartbeat was reactivated. Pause it
+  on a decision/access blocker; public activation and permanent destinations
+  remain separate gates.
 - Other pending contracts: gather null encoding, financial coincidences and
   remaining auth/metadata choices into one concise decision list at resumption,
   using existing owner decisions first. Do not ask again about HALF_UP or

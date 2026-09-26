@@ -180,7 +180,7 @@ def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfi
             )
             if preserves and identity in source_fields:
                 field = source_fields[identity]
-                if (field.data_type == FieldType.DECIMAL or field.sensitive
+                if (decision.decimal_type is not None or field.data_type == FieldType.DECIMAL or field.sensitive
                         or is_sensitive_field(field.name, field.semantic_type)):
                     valid = False
             if isinstance(behavior, DeriveAction):

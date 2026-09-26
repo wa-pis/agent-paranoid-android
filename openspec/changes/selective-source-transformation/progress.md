@@ -2851,3 +2851,24 @@ Broader transformation remains unfinished.
   These automated fictional PTY checks are not human approval of a dataset.
   Next: independent safety review of the integrated private execution scope
   at a committed SHA, then disposition findings before activation work.
+- Independent AI safety-gate conformance review dispatched for exact SHA
+  fab08ed98206f66727bd33d2936caeaac4eed1cb on 2026-09-27 local date.
+  Reviewer Boyle / CSV-Gate-1, agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d.
+  Read-only scope: private CSV execution/source/receipt/temporary publication,
+  directly required validators and integration tests against agreed OpenSpec
+  activation prerequisites. No ordinary PR review, public activation, human
+  approval or release approval implied. Findings/disposition pending; resume
+  this reviewer rather than spawning another. Evidence: reviewer task above.
+  Reconciled stale resumption-plan permission/heartbeat statements with the
+  subsequent owner confirmation; no implementation or contract changed.
+- CSV-Gate-1 completed: three discrepancies at fab08ed (declared DECIMAL
+  preservation gate, attached evidence-validation exception, absent residual
+  privacy notice). Local fixes now check declared decimal_type in shared field
+  coverage, detach the evidence exception, and label the manifest as not
+  anonymized. Five focused regressions reproduced failures before fixes
+  (three DECIMAL action variants, exception chain, manifest notice).
+  Review evidence: agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d completion.
+  Disposition: fixes implemented locally; independent re-review still required
+  on the next committed SHA. No public activation or new policy decision.
+  Verification: 226 tests passed across executor, policy and source suites;
+  Ruff passed for all changed Python files. No unchanged full gate rerun.

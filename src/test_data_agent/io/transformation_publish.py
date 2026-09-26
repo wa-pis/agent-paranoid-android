@@ -37,6 +37,7 @@ def temporary_csv_publication(
                 next(part.payload for part in request.parts if part.kind == "policy"),
                 max_bytes=max_total_bytes, budget=budget)
             manifest = json.dumps({"version": 1, "origin": "transformed_mixed",
+                "privacy_notice": "Mixed-origin output may retain source information; not anonymized.",
                 "fields": [{"entity": item.entity, "field": item.field,
                             "action": item.behavior.action,
                             "unmatched": getattr(getattr(item.behavior, "unmatched", None), "action", None)}
