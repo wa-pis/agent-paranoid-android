@@ -75,6 +75,47 @@ def test_private_temporary_publication_contains_csv_and_manifest():
     assert not output.parent.exists()
 
 
+def test_saved_csv_policy_cli_review_to_private_publication(tmp_path):
+    """Real CLI review and file adapters share bytes; no public execution enabled."""
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+    from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
+
+    material = request()
+    for part in material.parts:
+        if part.kind in {"policy", "mapping", "source"}:
+            name = "items.csv" if part.kind == "source" else part.name
+            (tmp_path / name).write_bytes(part.payload)
+    cli = subprocess.run(
+        [sys.executable, "-m", "test_data_agent.cli", "transform-review",
+         str(tmp_path / "items.csv"), str(tmp_path / "behavior.yaml"), "--trace"],
+        env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")},
+        capture_output=True, text=True, timeout=30, check=True,
+    )
+    review = json.loads(cli.stdout)
+    assert review["status"] == "review_only"
+    assert review["snapshot_sha256"] == material.snapshot_sha256
+    assert "second" not in cli.stdout
+    assert not (tmp_path / "dataset.csv").exists()
+    captured = prepare_csv_review_from_paths(
+        tmp_path / "items.csv", "items", tmp_path, "behavior.yaml",
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert captured.snapshot_sha256 == review["snapshot_sha256"]
+    # Execution consumes the reviewed snapshot, not reopened mutable paths.
+    (tmp_path / "items.csv").write_bytes(b"flag,code\nchanged,999\n")
+    (tmp_path / "code.csv").write_bytes(b"old,new\n002,changed\n")
+    module = import_module("test_data_agent.io.transformation_publish")
+    with module.temporary_csv_publication(captured, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        assert (output / "dataset.csv").read_bytes() == b"flag,code\nno,1\nyes,second\n"
+        manifest = json.loads((output / "manifest.json").read_bytes())
+        assert manifest["origin"] == "transformed_mixed"
+        assert manifest["retention"]["compared_cells"] == 4
+    assert not output.parent.exists()
+
+
 @pytest.mark.parametrize("complete,limit", [(False, 8192), (True, 1), (True, 64)])
 def test_private_temporary_publication_rejects_before_yield(complete, limit):
     module = import_module("test_data_agent.io.transformation_publish")
@@ -449,7 +490,24 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     assert output.retention.unchanged_percent == ("75.00" if action == "preserve" else "50.00")
     assert output.retention.compared_cells == 4
     assert "second" not in repr(output)
+    # The same fictional TTY receipt gates filesystem publication, not only
+    # the in-memory executor. No public execution interface is registered.
+    import json
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, receipt_path=path,
+            budget=GenerationBudget(5), **kwargs) as published:
+        assert (published / "dataset.csv").read_bytes() == output.csv_bytes
+        manifest = json.loads((published / "manifest.json").read_bytes())
+        assert manifest["origin"] == "transformed_mixed"
+        assert manifest["retention"]["unchanged_percent"] == output.retention.unchanged_percent
+    assert not published.parent.exists()
     changed = request(target="changed", complete=False, behavior=behavior, source_bytes=source_bytes)
+    for invalid_request, receipt in ((changed, path), (material, None)):
+        with pytest.raises(publisher.TransformationPublicationError) as publication_error:
+            with publisher.temporary_csv_publication(invalid_request, receipt_path=receipt,
+                    budget=GenerationBudget(5), **kwargs):
+                pytest.fail("unapproved preservation was published")
+        assert publication_error.value.__context__ is None
     with pytest.raises(module.TransformationExecutionError):
         module.replace_csv_snapshot(changed, receipt_path=path, budget=GenerationBudget(5), **kwargs)
     for kind in ("source", "policy", "evidence", "review"):

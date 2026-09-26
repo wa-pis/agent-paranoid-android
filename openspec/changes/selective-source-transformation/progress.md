@@ -2828,3 +2828,26 @@ Broader transformation remains unfinished.
   Ruff, publisher mypy and strict OpenSpec pass. PR #578 still open/draft at
   f815d8d. Commit the adapter and resumption-plan together; public activation,
   durable output and full installed CLI acceptance remain open.
+- 2026-09-27: added a file-backed integration check joining the real CLI
+  transform-review --trace subprocess, saved YAML/CSV mappings, canonical
+  snapshot loader and private temporary publication. CLI and executor snapshot
+  digests agree; changing source/mapping paths after capture does not change
+  output. Column override/global fallback/no cascade, mixed-origin manifest,
+  retention count and temporary cleanup pass without product monkeypatching.
+  Focused check: 1 passed; changed-test Ruff passed. The initial test invocation
+  used the nonexistent package __main__; corrected to test_data_agent.cli.
+  This is source-tree CLI review plus private execution, NOT installed public
+  execution acceptance. No runtime/public surface changed. PR #578 remains
+  draft at 50594a6; GitHub Python 3.11-3.14 checks passed at that SHA.
+  Next: complete private approval-to-publication integration evidence before
+  independent activation safety review; durable/public execution stays gated.
+- Extended the existing fictional PTY approval integration through temporary
+  filesystem publication for preserve, replace-text fallback and substitution
+  fallback. CSV matches the approved in-memory result; mixed-origin manifest
+  reports the same unchanged percentage; cleanup removes the temporary output.
+  Missing receipts and receipts for changed mappings reject before yielding
+  artifacts, with detached value-free errors. Three focused cases and Ruff
+  pass. Reused existing receipt/test flow; no new helper or public activation.
+  These automated fictional PTY checks are not human approval of a dataset.
+  Next: independent safety review of the integrated private execution scope
+  at a committed SHA, then disposition findings before activation work.
