@@ -265,7 +265,14 @@ exact. Unconditional replacement with nonnumeric text counts as changed.
 STRING fields retain literal comparison, including leading zeros. This report
 does not authorize any preservation or change execution checks. The percentage
 does not authorize preservation or certify anonymity. No filesystem publication
-or mixed-origin manifest is implemented by this in-memory prototype.
+is implemented by this in-memory prototype itself. The separate private
+temporary_csv_publication test adapter validates first, then stages dataset.csv
+and manifest.json and publishes the directory together through existing
+no-follow filesystem helpers. It allocates its own temporary root, accepts no
+destination path, and deletes all artifacts on context exit. The output budget
+covers both files. Manifest contains action/fallback declarations and aggregate
+retention, not source cells, mapping entries, expressions or receipt contents.
+This is fictional-test development only, not public or durable publication.
 
 ## Approval Identity Binding
 

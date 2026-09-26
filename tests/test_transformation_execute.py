@@ -58,6 +58,66 @@ def test_closed_csv_exact_text_override_no_cascade():
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
 
 
+def test_private_temporary_publication_contains_csv_and_manifest():
+    import json
+    module = import_module("test_data_agent.io.transformation_publish")
+    with module.temporary_csv_publication(request(), max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        assert (output / "dataset.csv").read_bytes() == execute(request())
+        manifest_bytes = (output / "manifest.json").read_bytes()
+        manifest = json.loads(manifest_bytes)
+        assert manifest["origin"] == "transformed_mixed"
+        assert manifest["retention"]["compared_cells"] == 4
+        assert b"second" not in manifest_bytes
+        assert set(path.name for path in output.iterdir()) == {"dataset.csv", "manifest.json"}
+        assert output.stat().st_mode & 0o077 == 0
+        assert all(path.stat().st_mode & 0o077 == 0 for path in output.iterdir())
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("complete,limit", [(False, 8192), (True, 1), (True, 64)])
+def test_private_temporary_publication_rejects_before_yield(complete, limit):
+    module = import_module("test_data_agent.io.transformation_publish")
+    with pytest.raises(module.TransformationPublicationError) as error:
+        with module.temporary_csv_publication(request(complete=complete), max_total_bytes=8192,
+                max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)):
+            pytest.fail("invalid output published")
+    assert error.value.__context__ is None
+
+
+def test_temporary_publication_cleans_up_after_consumer_failure():
+    module = import_module("test_data_agent.io.transformation_publish")
+    with pytest.raises(RuntimeError, match="fictional consumer failure"):
+        with module.temporary_csv_publication(request(), max_total_bytes=8192,
+                max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+            raise RuntimeError("fictional consumer failure")
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("publication_check", [1, 2])
+def test_temporary_publication_checks_deadline_before_and_after_staging(publication_check):
+    module = import_module("test_data_agent.io.transformation_publish")
+    now = [0.0]
+
+    class PublicationBudget(GenerationBudget):
+        calls = 0
+
+        def check(self, stage):
+            if stage == "temporary transformation publication":
+                self.calls += 1
+                if self.calls == publication_check:
+                    now[0] = 10.0
+            super().check(stage)
+
+    budget = PublicationBudget(5, clock=lambda: now[0])
+    with pytest.raises(module.TransformationPublicationError) as error:
+        with module.temporary_csv_publication(request(), max_total_bytes=8192,
+                max_review_bytes=4096, max_output_bytes=8192, budget=budget):
+            pytest.fail("expired publication yielded artifacts")
+    assert budget.calls == publication_check
+    assert error.value.__context__ is None
+
+
 def test_engine_retention_counts_numeric_formatting_as_unchanged():
     material = request(source_bytes=b"flag,code\ntrue,1.0\nfalse,2.0\n")
     policy = next(part.payload for part in material.parts if part.kind == "policy")

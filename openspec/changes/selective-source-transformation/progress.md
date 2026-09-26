@@ -2810,3 +2810,21 @@ Broader transformation remains unfinished.
   distinguishes completed private DECIMAL formula/mapping/synthesis tests from
   remaining null/coincidence, full finance/relationship, public and RC gates.
   This is evidence reconciliation, not a new test run or final acceptance.
+- 2026-09-27: owner explicitly approved temporary-test-only publisher development.
+  Added a private context-managed adapter with no destination argument: it
+  allocates disposable test storage, executes the canonical request, stages CSV
+  plus mixed-origin manifest through existing no-follow helpers, then publishes
+  together. Context exit removes artifacts, including on consumer failure.
+  TDD first failed missing module; five publication cases now pass, including
+  validation failure, CSV/combined-size limits, permissions and cleanup.
+  All 118 engine tests pass; initial publisher Ruff/mypy pass. No public
+  CLI/Python facade/MCP registration or durable user destination was enabled.
+  Next complete publication failure/deadline evidence and the private CLI
+  integration design before activation review; do not claim the full user
+  workflow or RC complete from this temporary adapter.
+- Temporary-publication checkpoint: seven focused cases pass, adding deadline
+  failure before staging and after both files are staged through an explicitly
+  supplied GenerationBudget test subclass/clock (no product monkeypatch).
+  Ruff, publisher mypy and strict OpenSpec pass. PR #578 still open/draft at
+  f815d8d. Commit the adapter and resumption-plan together; public activation,
+  durable output and full installed CLI acceptance remain open.
