@@ -3282,3 +3282,185 @@ Broader transformation remains unfinished.
   author suites not repeated. Evidence reviews/c9ec98c-ai-safety.md records
   materialized-memory and untested filesystem-fault limitations. Next: publish
   private Parquet PR and await required CI; full RC/public activation pending.
+- Published through signed 528d40a as PR #581:
+  https://github.com/wa-pis/agent-paranoid-android/pull/581 . Next: inspect
+  required CI before normal protected merge. No repeat review or CI dispatch.
+- PR #581 merged 2026-09-27 14:00:11 UTC as
+  65424ced6d1184aa1aa183834325c08e277e24c8. All required checks passed;
+  37 successful, four intentionally skipped, none pending; CLEAN normal merge.
+  Private CSV input now supports CSV/SQL-script/Parquet output. This is three
+  routes, not all twelve: Parquet/query-result inputs and full common execution
+  extraction remain. Next: inspect source/approval and CSV engine boundaries
+  from this merged base for a bounded, exact-byte-bound Parquet input route.
+- Prepared codex/1-6-parquet-input from merged 65424ce in the same checkout;
+  preserved local progress. Traced source review, receipt canonicalization,
+  execution and final publication. All four still decode CSV directly; merely
+  converting Parquet to CSV would bind approval to the wrong representation
+  and lose native null/type identity. Do not implement that shortcut.
+  Next coherent batch: a format-bound source decoder used by all four paths,
+  retaining original snapshot bytes and native null provenance; preserve the
+  existing CSV defaults. Include policy-format/source-byte drift rejection and
+  fictional Parquet-to-CSV/SQL/Parquet round trips before claiming new routes.
+  No product changes or tests in this boundary-inspection step.
+- Owner decision needed for cross-format exact-text semantics: normative
+  replace_text matches original decoded text with no coercion; policy-contract
+  currently restricts file-wide tables to single-entity CSV. Native numeric/date
+  Parquet and SQL-result cells have no original lexical spelling. Proposed
+  default: replace_text applies to native string cells only; typed substitute
+  handles numeric/date cells, with no implicit stringify/null sentinel. Alternative
+  requires an explicitly configured text representation before matching.
+  Asked owner to choose this behavior before extending input execution;
+  automation PAUSED. Existing CSV behavior and merged output adapters unchanged.
+- Owner confirmed the detailed cross-format matching proposal: typed values
+  match by explicitly selected type; literal text matches spelling; native
+  non-string to text matching requires explicit formatting, never automatic
+  stringify. Output format remains independent. Recorded in policy-contract.md.
+  This resolves the input-adapter decision blocker, not formula null semantics
+  or implicit timestamp-key equality. Resume automation for the planned bounded
+  original-byte-bound decoder/common-engine integration; no activation claimed.
+- While removing CSV coupling, fixed a confirmed private cross-format defect:
+  SQL/Parquet null output incorrectly required a CSV output marker. Native
+  output now preserves null provenance without that marker; CSV output still
+  rejects unconfigured null. Added fictional publication tests for both native
+  outputs with empty/null swaps and temporary cleanup. 22 affected null tests
+  passed; Ruff/mypy passed. Changes local, not reviewed/published yet. Next:
+  continue original-byte-bound Parquet decoder and integrate all source consumers;
+  include this changed null boundary in the next exact-SHA safety review.
+- Implemented the first integrated Parquet input slice locally: input_format
+  is policy-byte-bound and shown in review; shared fixed-byte decoder is used
+  by profiling/review, receipt revalidation, trace, execution and final output
+  comparison. Native non-null string columns work without CSV serialization;
+  numeric-looking strings retain STRING evidence. Fictional end-to-end tests
+  pass for Parquet -> CSV/SQL/Parquet, source-byte tampering rejects, and native
+  numeric/boolean/nested/null inputs fail closed rather than stringify.
+  266 affected execution/approval/receipt/CLI-review/architecture tests passed;
+  changed Ruff and targeted mypy passed. Docs state the restricted scope.
+  Not full typed Parquet acceptance; no new PR or safety review yet. Next:
+  native null and typed scalar integration in the same decoder/engine, explicit
+  matching formatting, format-drift tests, then review the coherent final diff.
+- Native nullable Parquet strings now preserve None separately from empty text
+  through profiling, substitution, review/receipt validation and all three
+  outputs. Shared sensitivity accumulators remain in use; text matching skips
+  native null rather than inventing a spelling. CSV output still requires its
+  explicit null marker. Six string/null cross-format cases plus affected null
+  and unsupported-native regressions: 31 passed. Targeted mypy/Ruff passed.
+  Numeric/temporal/nested input remains fail-closed; formula-null semantics
+  unchanged. Next: typed scalar input and explicit text representation, then
+  coherent changed-scope review. No PR/CI/review duplicated.
+- Added native signed-integer/float64 Parquet decoding and typed substitution
+  without lexical key conversion. Profiling keeps native type and existing
+  sensitivity scanning; unsupported types and numeric text/preservation without
+  explicit formatting still reject. Six fictional numeric input/output cases
+  exposed native FLOAT comparison being routed through the CSV string parser;
+  fixed shared normalization to parse strings only, preserving final numeric
+  validation. All six now pass, plus 44 affected SQL/Parquet renderer tests.
+  Ruff/mypy passed before the one-line normalization fix; diff check passes.
+  Next: explicit text formatting and remaining decimal/temporal/boolean native
+  types, nonfinite/format-drift regressions, then final batch safety review.
+- Added four focused safety regressions: native Parquet NaN/+Infinity/-Infinity
+  reject during decoding even for a dropped numeric column; changing input_format
+  after review rejects before publication with detached error context. All four
+  passed. Ruff, shared-output mypy and diff checks passed; unchanged successful
+  suites not repeated. Next remains explicit field-level matching format wired
+  consistently through trace, sensitive-reuse preflight and execution; keep
+  original native values for final comparison. No new release/activation claim.
+- Checked native INTEGER/FLOAT identity substitution before extending formatting.
+  Existing mapping policy rejects identity already during source review, before
+  execution/publication; no product bypass confirmed and no extra guard added.
+  Initial test expected a later rejection and was corrected to assert the actual
+  earlier boundary. Two focused regressions now pass; Ruff/diff pass. Keep this
+  guard when explicit formatting is integrated; no new completed route claimed.
+- Added bounded explicit numeric match_format to the field policy and shared
+  lookup formatter across trace/preflight/execution. Native source values stay
+  unchanged for comparison; CSV lexical input rejects this native-only setting.
+  Added conservative numeric reuse comparison for formatted sensitive-source
+  matches and complete native rows, so spelling-only changes cannot bypass
+  safety. Two new end-to-end format/trace and reuse tests passed; targeted mypy
+  passed. Full affected execution/policy/receipt/CLI-review regression running;
+  next: collect result, add sensitive/format-boundary cases, finish remaining
+  native types before the coherent batch review. No publication/activation.
+- Regression outcome: 287 passed, five repr-contract failures caused by new
+  input_format appearing in BehaviorPolicy repr. Restored existing private repr
+  contract with repr=False; all five rerun cases passed. No other failed checks.
+- Added sensitive-source formatted-reuse coverage and six bounded-format
+  rejection cases (oversized width/precision, locale/template/empty patterns).
+  Sensitive 1.25 -> 1.250 rejects during review; unrelated literal replacement
+  remains accepted. Ten selected cases passed; Ruff/diff passed. No new product
+  change in this verification step. Next: remaining native types and final
+  changed-scope review, with no public activation or RC-readiness claim.
+- Added native BOOLEAN Parquet decoding and typed inline substitution using
+  existing mapping type checks and boolean parser. Kept native booleans for
+  matching; final equality guard recognizes boolean text representations.
+  CSV-input boolean substitution remains unchanged/unsupported in this slice;
+  native boolean text formatting/preservation still rejects. Three new fictional
+  Parquet BOOLEAN -> CSV/SQL/Parquet cases passed; targeted mypy passed.
+  Next: DECIMAL/temporal native input and final combined safety review; no new PR.
+- Added native decimal128 source decoding with explicit matching precision/scale
+  (up to 38 digits), schema-bound metadata and exact Decimal values. Reused
+  decimal_to_units/from_units and existing decimal mapping validation; no FLOAT
+  conversion for matching/execution. Decimal text formatting/preservation remain
+  fail-closed. Three fictional DECIMAL -> CSV/SQL/Parquet tests passed;
+  targeted mypy/Ruff passed. Next: shape/precision/null regressions and temporal
+  source support, then combined safety review. Local only; no new PR/CI.
+- Five new DECIMAL decoder boundary tests passed: decimal128(38,37) retains
+  the exact Decimal tuple; mismatched precision, mismatched scale, absent field
+  shape and decimal256(39,2) reject. Ruff/diff passed. No existing successful
+  suites rerun. Next: temporal input integration and remaining null/format cases,
+  followed by a single exact-SHA safety review of the complete local input batch.
+- Native Parquet date32 now participates in typed DATE substitution without
+  timezone inference. Three fictional DATE -> CSV/Parquet/SQL publication cases
+  passed (two initially failed due to a test-only temporal configuration key,
+  corrected from kind to type). Shared output comparison accepts native dates;
+  other unsupported native temporal scalars reject. DATE text matching and
+  timestamps remain unsupported. Next: DATE reuse/null boundary regressions,
+  then coherent input-batch safety review; no public activation or RC claim.
+- DATE boundaries: native null -> date and date -> null passed through all three
+  private outputs (CSV requires explicit output marker; SQL/Parquet retain native
+  null). Identity DATE substitution rejects before execution. Five reuse-guard
+  cases cover canonical/compact ISO spelling, changed dates, invalid text and
+  null; this is conservative source-reuse detection, not broader mapping-key
+  semantics. Nine new cases passed, plus five affected temporal SQL regressions.
+  Ruff/diff and strict OpenSpec passed. GitHub confirms no PR for current branch
+  codex/1-6-parquet-input. Next: consolidate current input batch checks and obtain
+  exact-SHA independent safety review; native DATETIME remains unsupported.
+- Input-batch milestone: 363 focused execution, SQL/Parquet output, policy and
+  receipt tests passed together after native DATE/null integration; mypy passed
+  all six changed product modules. No PR exists for this branch. Preparing a
+  signed checkpoint for independent AI safety review of this private input
+  boundary, not a release candidate or public activation approval.
+- Signed checkpoint 3759596b49ecaa8b59b39a9b6b4feef7bb49bc20 created.
+  Independent AI reviewer Boyle / CSV-Gate-1 (agent
+  01a0dfa0-7f22-75d3-9b19-d181e11f187d) dispatched for this exact SHA against
+  65424ced6d1184aa1aa183834325c08e277e24c8; submission
+  01a0e39d-3aa0-7b53-8dc4-ce420bf8b32f. Review pending; do not dispatch a duplicate.
+  No push/PR/CI launched. Local signature verification lacks allowedSignersFile;
+  commit contains an SSH signature, but local signer verification is unconfirmed.
+  Next: consume this review, resolve findings, record evidence before PR.
+- Review completed: two findings, recorded in reviews/3759596-ai-safety.md.
+  High decoded Parquet dictionary expansion remains open. Medium empty -> null
+  false preservation rejection fixed locally using logical null comparison;
+  new single-column private publication regression and identity/preservation
+  selection passed (18 tests), Ruff passed. No repeated review dispatched yet.
+  Next: bound cumulative decoded expansion before Python materialization, add
+  fictional dictionary-expansion regression, then review fixes at a new SHA.
+- Added cumulative Arrow decoded-buffer byte accounting against the existing
+  expanded-size limit, checked before each batch.to_pylist(). Three isolated
+  subprocess regressions passed: a small dictionary expansion succeeds, a
+  multi-batch cumulative overflow rejects, and the review's 4096-character
+  dictionary case rejects. No product monkeypatch; subprocess PYTHONPATH was
+  corrected after initial fixture import failures. Mypy/Ruff passed decoder.
+  This bounds decoded payload, not Python object overhead or Arrow peak RSS;
+  independent review must assess sufficiency. Next: commit both findings' fixes
+  and request scoped re-review on the new SHA. No public activation/PR/CI.
+- Both fixes committed with SSH signature at
+  39af3e4ccb4bf6979552ad214f1501dc08465313. Independent AI reviewer Boyle /
+  CSV-Gate-1 now re-reviews only these two findings against 3759596; submission
+  01a0e3aa-4b74-77e0-bd9b-f9e77098ec6c, same agent as recorded above.
+  Do not duplicate active review. Contract now states decoded-payload versus
+  peak-memory limitation explicitly. Next: consume re-review and resolve any
+  remaining finding before PR; no successful tests rerun or CI launched.
+- Re-review completed: both findings resolved at 39af3e4 under the explicit
+  decoded-payload (not peak-RSS) guarantee. Evidence: reviews/39af3e4-ai-safety.md.
+  AI review only, no human approval or activation authorization. Preparing PR
+  for private typed Parquet input and its regression tests; full RC scope remains
+  incomplete. Next: required GitHub checks, then normal merge if green.

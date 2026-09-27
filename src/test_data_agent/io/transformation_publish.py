@@ -5,6 +5,7 @@ Only fictional test requests are authorized before activation review.
 """
 
 import json
+from test_data_agent.io.transformation_input import source_reader
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict
@@ -19,7 +20,7 @@ from test_data_agent.io.transformation_execute import replace_csv_snapshot
 from test_data_agent.io.transformation_sql import render_transformation_sql
 from test_data_agent.io.transformation_parquet import render_transformation_parquet
 from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput
-from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
+from test_data_agent.csv_profiler import validate_csv_headers
 
 
 class TransformationPublicationError(ValueError):
@@ -41,7 +42,7 @@ def temporary_csv_publication(
                 next(part.payload for part in request.parts if part.kind == "policy"),
                 max_bytes=max_total_bytes, budget=budget)
             source = next(part for part in request.parts if part.kind == "source")
-            reader = _csv_reader_from_snapshot(source.payload)
+            reader = source_reader(source, policy, budget=budget)
             reader.fieldnames = validate_csv_headers(reader.fieldnames)
             source_rows = (tuple(None if row[name] == policy.csv_nulls.input_token else row[name]
                                  for name in result.columns) for row in reader)

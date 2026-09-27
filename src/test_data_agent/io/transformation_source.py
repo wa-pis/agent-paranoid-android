@@ -2,6 +2,9 @@
 
 import csv
 import os
+from decimal import Decimal
+from datetime import date
+from test_data_agent.core.field import FieldProfile
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 
@@ -25,6 +28,8 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, _profile_csv_rows, profile_csv_bytes, validate_csv_headers
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
+from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
+from test_data_agent.csv_profiler import CSVColumnAccumulator, CSVProfile
 from test_data_agent.io.path_policy import open_regular_file
 
 
@@ -47,6 +52,40 @@ def _profile_transformation_csv(
         literal_empty=True, null_token=null_token))
 
 
+
+def _profile_transformation_source(
+    source: SnapshotPart, policy: BehaviorPolicy, *, budget: GenerationBudget, max_bytes: int,
+) -> DatasetProfile:
+    if policy.input_format == "csv":
+        return _profile_transformation_csv(source, null_token=policy.csv_nulls.input_token,
+            budget=budget, max_bytes=max_bytes)
+    if type(max_bytes) is not int or max_bytes < 1 or len(source.payload) > max_bytes:
+        raise TransformationSourceError("invalid transformation source profile")
+    reader = source_reader(source, policy, budget=budget)
+    accumulators = {name: CSVColumnAccumulator(name) for name in reader.fieldnames}
+    count = 0
+    for row in reader:
+        count += 1
+        for name, accumulator in accumulators.items():
+            budget.check("Parquet string profiling")
+            value = row[name]
+            # Only profiling sensitivity uses numeric text; matching retains native values.
+            accumulator.add(None if value is None else str(value), literal_empty=value is not None)
+    profile = csv_profile_to_dataset_profile(CSVProfile(table=source.name, row_count=count,
+        columns=[accumulator.to_profile(count, preserve_categories=False)
+                 for accumulator in accumulators.values()]))
+    profile.source_type = "parquet"
+    for entity in profile.entities:
+        entity.primary_key_candidates = []
+        for index, item in enumerate(entity.fields):
+            values = item.model_dump()
+            values.update(data_type=reader.types[item.name], distribution={}, is_identifier=False)
+            if item.name in reader.decimal_shapes:
+                values["decimal_precision"], values["decimal_scale"] = reader.decimal_shapes[item.name]
+            entity.fields[index] = FieldProfile.model_validate(values)
+    return profile
+
+
 def prepare_csv_review_request(
     policy_yaml: bytes, source: SnapshotPart, referenced_parts: Sequence[SnapshotPart], *,
     max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
@@ -63,7 +102,7 @@ def prepare_csv_review_request(
                        for part in referenced_parts)):
             raise ValueError
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
-        profile = _profile_transformation_csv(source, null_token=policy.csv_nulls.input_token,
+        profile = _profile_transformation_source(source, policy,
             budget=budget, max_bytes=max_total_bytes)
         evidence_json = profile.model_dump_json().encode("utf-8")
         request = prepare_approval_request(
@@ -183,7 +222,7 @@ def trace_csv_review_request(
                         mapping_bytes[decision.behavior.mapping.path], decision.behavior.mapping,
                         budget=budget,
                     )
-        reader = _csv_reader_from_snapshot(source.payload)
+        reader = source_reader(source, policy, budget=budget)
         names = validate_csv_headers(reader.fieldnames)
         if set(names) != {decision.field for decision in policy.fields}:
             raise ValueError
@@ -192,11 +231,11 @@ def trace_csv_review_request(
         def events() -> Iterator[TextTraceEvent]:
             for row_ordinal, row in enumerate(reader, start=1):
                 budget.check("text trace")
-                if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                     raise ValueError
                 for column_ordinal, column in enumerate(names, start=1):
                     if column in selected:
-                        match = match_scoped_text(row[column], column, file_table, column_tables)
+                        match = (match_scoped_text(matching_text(policy, column, row[column]), column, file_table, column_tables) if row[column] is not None else None)
                         yield text_trace_event(row_ordinal, column_ordinal, match)
 
         return summarize_text_trace(
@@ -244,32 +283,33 @@ def reject_sensitive_text_reuse(
                 )
         names = tuple(fields)
         active: dict[str, set[str]] = {item.field: set() for item in sensitive}
-        reader = _csv_reader_from_snapshot(source.payload)
+        reader = source_reader(source, policy, budget=budget)
         normalized = validate_csv_headers(reader.fieldnames)
         if tuple(normalized) != names:
             raise ValueError
         reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
             for item in sensitive:
-                match = match_scoped_text(row[item.field], item.field, file_table, column_tables)
+                match = (match_scoped_text(matching_text(policy, item.field, row[item.field]), item.field, file_table, column_tables) if row[item.field] is not None else None)
                 if match is not None:
                     active[item.field].add(match.replacement)
         if not any(active.values()):
             return
         active_replacements = {value for replacements in active.values() for value in replacements}
-        reader = _csv_reader_from_snapshot(source.payload)
+        reader = source_reader(source, policy, budget=budget)
         normalized = validate_csv_headers(reader.fieldnames)
         if tuple(normalized) != names:
             raise ValueError
         reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
-            if any(row[field] in active_replacements for field in sensitive_source_columns):
+            if any(same_native_value(row[field], replacement)
+                   for field in sensitive_source_columns for replacement in active_replacements):
                 raise ValueError
     except (OSError, ValueError, TypeError, AttributeError, csv.Error, KeyError):
         raise TransformationSourceError("invalid sensitive text replacement") from None
@@ -309,9 +349,8 @@ def revalidate_csv_evidence(
         reviewed = DatasetProfile.model_validate_json(evidence_json)
         observed = csv_profile_to_dataset_profile(
             profile_csv_bytes(source.payload, source.name, budget=budget, max_bytes=max_bytes)
-        ) if policy_yaml is None else _profile_transformation_csv(source,
-            null_token=load_behavior_policy_yaml(policy_yaml, max_bytes=max_bytes,
-                                                budget=budget).csv_nulls.input_token,
+        ) if policy_yaml is None else _profile_transformation_source(source,
+            load_behavior_policy_yaml(policy_yaml, max_bytes=max_bytes, budget=budget),
             budget=budget, max_bytes=max_bytes)
         if reviewed.model_dump(mode="json") != observed.model_dump(mode="json"):
             raise ValueError

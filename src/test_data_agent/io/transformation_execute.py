@@ -6,6 +6,9 @@ receipt minting or external access.
 """
 
 import csv
+from decimal import Decimal
+from datetime import date
+from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
 import io
 import math
 from graphlib import TopologicalSorter
@@ -35,7 +38,7 @@ from test_data_agent.validation.reconciliation import assert_generated_dataset_v
 from test_data_agent.rules.expressions import eval_exact_decimal, eval_exact_integer, expression_constants, safe_eval
 from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
-from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
+from test_data_agent.csv_profiler import validate_csv_headers, parse_bool
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
 
 
@@ -75,20 +78,20 @@ def trace_csv_replacements(
             for name, action in actions.items()
             if isinstance(action, ReplaceTextAction) and action.mapping is not None
         }
-        reader = _csv_reader_from_snapshot(source.payload)
+        reader = source_reader(source, policy, budget=budget)
         names = tuple(validate_csv_headers(reader.fieldnames))
         reader.fieldnames = list(names)
 
         def events() -> Iterator[TextTraceEvent]:
             for row_number, row in enumerate(reader, 1):
                 budget.check("CSV replacement trace")
-                if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                     raise ValueError
                 for column_number, name in enumerate(names, 1):
                     budget.check("CSV replacement trace cell")
                     if isinstance(actions[name], ReplaceTextAction):
                         yield text_trace_event(row_number, column_number,
-                            match_scoped_text(row[name], name, file_table, column_tables))
+                            (match_scoped_text(matching_text(policy, name, row[name]), name, file_table, column_tables) if row[name] is not None else None))
 
         return summarize_text_trace(events(), max_events=max_events, max_cells=max_cells,
                                     max_rule_counts=max_rule_counts, budget=budget)
@@ -124,10 +127,22 @@ def replace_csv_snapshot(
         field_nullable = {field.name: field.nullable for entity in profile.entities for field in entity.fields}
         field_types.update({name: FieldType.DECIMAL for name in decimal_types})
 
-        def scalar(name: str, value: str) -> Any:
+        def scalar(name: str, value: Any) -> Any:
+            if policy.input_format == "parquet" and type(value) is date:
+                return value.isoformat()
+            if policy.input_format == "parquet" and field_types[name] == FieldType.BOOLEAN:
+                if type(value) is bool:
+                    return value
+                parsed = parse_bool(value)
+                if parsed is None:
+                    raise ValueError
+                return parsed
+            if policy.input_format == "parquet" and type(value) in (int, float):
+                return value
             if name in decimal_types:
                 shape = decimal_types[name]
-                units = decimal_to_units(value, precision=shape.precision, scale=shape.scale)
+                units = decimal_to_units(format(value, "f") if isinstance(value, Decimal) else value,
+                    precision=shape.precision, scale=shape.scale)
                 return decimal_from_units(units, precision=shape.precision, scale=shape.scale)
             return normalize_csv_scalar(value, field_types[name])
         file_table = (compile_text_replacement_table(
@@ -191,7 +206,9 @@ def replace_csv_snapshot(
             if isinstance(action, SynthesizeAction):
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL) or not isinstance(
+                if field_types[decision.field] == FieldType.BOOLEAN and policy.input_format != "parquet":
+                    raise ValueError
+                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL, FieldType.BOOLEAN) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
@@ -206,7 +223,7 @@ def replace_csv_snapshot(
                         and isinstance(item.behavior.mapping, DomainMapping)
                         and item.behavior.mapping.name == declaration.name)
                     source_columns = tuple(name for _, name in members)
-                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL) for name in source_columns):
+                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL, FieldType.BOOLEAN) for name in source_columns):
                         raise ValueError
                     declaration = domains[declaration.name]
                 shapes = tuple((decimal_types[name].precision, decimal_types[name].scale)
@@ -225,11 +242,11 @@ def replace_csv_snapshot(
                 pairs: dict[tuple[str | int | float | None, ...], str | None] = {}
                 for entry in declaration.entries:
                     budget.check("CSV substitution")
-                    if any(value is not None and type(value) not in (str, int, float)
+                    if any(value is not None and type(value) not in (str, int, float, bool)
                            for value in (*entry.original, *entry.replacement)):
                         raise ValueError
-                    if (None in entry.original and policy.csv_nulls.input_token is None
-                            or None in entry.replacement and policy.csv_nulls.output_token is None):
+                    if (None in entry.original and policy.csv_nulls.input_token is None and policy.input_format == "csv"
+                            or None in entry.replacement and policy.csv_nulls.output_token is None and policy.output is None):
                         raise ValueError
                     replacement = entry.replacement[component]
                     pairs[entry.original] = (
@@ -249,7 +266,7 @@ def replace_csv_snapshot(
                 raise ValueError
             verify_local_receipt(canonical, receipt_path, max_total_bytes=max_total_bytes,
                                  max_review_bytes=max_review_bytes, budget=budget)
-        reader = _csv_reader_from_snapshot(source.payload)
+        reader = source_reader(source, policy, budget=budget)
         names = tuple(validate_csv_headers(reader.fieldnames))
         if set(names) != {decision.field for decision in policy.fields}:
             raise ValueError
@@ -275,19 +292,19 @@ def replace_csv_snapshot(
         append_row(output_names)
         def preserved(name: str, original: str, action: PreserveAction) -> str:
             if original == policy.csv_nulls.input_token:
-                if policy.csv_nulls.output_token is None:
+                if policy.csv_nulls.output_token is None and policy.output is None:
                     raise ValueError
                 null_fields.add(name)
-                return policy.csv_nulls.output_token
+                return policy.csv_nulls.output_token or ""
             return temporal_types[name].render(original) if action.format_temporal else original
 
         def synthesized(action: SynthesizeAction, row_index: int, name: str, original: str) -> str:
             value = generated[action.generation_policy_ref][row_index][name]
             if value is None:
-                if policy.csv_nulls.output_token is None:
+                if policy.csv_nulls.output_token is None and policy.output is None:
                     raise ValueError
                 null_fields.add(name)
-                return policy.csv_nulls.output_token
+                return policy.csv_nulls.output_token or ""
             rendered = str(value)
             if original != policy.csv_nulls.input_token and scalar(name, rendered) == scalar(name, original):
                 raise ValueError
@@ -298,7 +315,7 @@ def replace_csv_snapshot(
         for row_index, row in enumerate(reader):
             null_fields: set[str] = set()
             budget.check("CSV replacement")
-            if set(row) != set(names) or any(type(value) is not str for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
             for name in decimal_types:
                 if row[name] != policy.csv_nulls.input_token:
@@ -338,15 +355,15 @@ def replace_csv_snapshot(
                 if isinstance(action, SubstituteAction):
                     key = tuple(None if row[column] == policy.csv_nulls.input_token else
                                 format(scalar(column, row[column]), "f") if column in decimal_types
-                                else normalize_csv_scalar(row[column], field_types[column])
+                                else scalar(column, row[column])
                                 for column in substitution_columns[name])
                     if key in substitutions[name]:
                         replacement = substitutions[name][key]
                         if replacement is None:
-                            if policy.csv_nulls.output_token is None:
+                            if policy.csv_nulls.output_token is None and policy.output is None:
                                 raise ValueError
                             null_fields.add(name)
-                            replacement = policy.csv_nulls.output_token
+                            replacement = policy.csv_nulls.output_token or ""
                         values.append(replacement)
                     elif isinstance(action.unmatched, PreserveAction):
                         preserved_fields.add(name)
@@ -356,7 +373,7 @@ def replace_csv_snapshot(
                     else:
                         raise ValueError
                     continue
-                match = match_scoped_text(row[name], name, file_table, column_tables)
+                match = (match_scoped_text(matching_text(policy, name, row[name]), name, file_table, column_tables) if row[name] is not None else None)
                 if match is not None:
                     values.append(match.replacement)
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
@@ -368,15 +385,21 @@ def replace_csv_snapshot(
                     raise ValueError
             transformed = dict(zip(execution_names, values, strict=True))
             replaced = tuple(transformed[name] for name in output_names)
-            if policy.csv_nulls.output_token is not None and any(
+            if policy.output is None and policy.csv_nulls.output_token is not None and any(
                     value == policy.csv_nulls.output_token and name not in null_fields
                     for name, value in zip(output_names, replaced, strict=True)):
                 raise ValueError
             for name in decimal_types:
                 if name in transformed and name not in null_fields:
                     scalar(name, transformed[name])
-            if output_names == names and (replaced == tuple(row[name] for name in names)
+            if output_names == names and (tuple(None if name in null_fields else value
+                    for name, value in zip(output_names, replaced, strict=True))
+                    == tuple(None if row[name] == policy.csv_nulls.input_token else row[name] for name in names)
                     or preserved_fields == set(names)):
+                raise ValueError
+            if policy.input_format == "parquet" and output_names == names and all(
+                    same_native_value(row[name], None if name in null_fields else value)
+                    for name, value in zip(output_names, replaced, strict=True)):
                 raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError

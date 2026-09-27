@@ -28,6 +28,9 @@ an explicit target/source timezone rather than guessing UTC. Shared normalized
 value privacy and complete-source-row checks run before encoding. Parquet bytes
 are bounded during writing and published only in the temporary test context.
 The optional existing parquet extra is required; no database access is added.
+Native SQL/Parquet null output does not require a CSV output marker. CSV output
+still requires an explicit marker for null, preserving its distinction from an
+empty string. CSV input null recognition remains explicitly configured.
 
 During private SQL/Parquet-adapter development, unchanged-value percentage is
 `unavailable` (null numerator/percentage), not the CSV intermediate percentage:
@@ -35,6 +38,60 @@ final output types can change logical equality. Compared/dropped counts remain.
 This is an incomplete reporting gate, not acceptance of missing RC reporting.
 
 ## Separate Evidence And Decisions
+
+### Cross-format matching decision (owner confirmed 2026-09-27)
+
+Private input development accepts `input_format: parquet` (omitted means CSV).
+The current slice supports nullable UTF-8 strings, signed integers, float64 and
+BOOLEAN with typed inline substitution, plus DATE and DECIMAL described below.
+Remaining numeric, temporal and nested types reject until implemented.
+BOOLEAN remains distinct from INTEGER mapping keys;
+native boolean text formatting/preservation is not implemented.
+Native date32 supports typed DATE substitution using canonical ISO date keys,
+without timezone inference. Native date text matching and timestamps remain
+unsupported in this private slice. Native DATE reuse checks compare date values.
+Native decimal128 is also accepted with precision at most 38 and nonnegative
+scale no greater than precision. Its exact precision/scale must match the field's
+decimal_type declaration and enters the schema fingerprint. Decimal mapping keys
+and replacements use existing exact decimal strings; source values remain
+Decimal, never FLOAT. Decimal text formatting and preservation still reject.
+Native numeric substitution uses numbers, not stringified lookup keys. Numeric
+text replacement requires `fields[].match_format`: bounded integer decimal
+width (`05d`, up to 99) or fixed fractional digits (`.2f`, zero through 18).
+This formats only the lookup text using native numeric formatting; it does not
+change the source snapshot, replacement literal or output schema. CSV text
+cannot use this native format setting. Trace, sensitive-reuse preflight and
+execution share the formatter. Review exposes presence, not arbitrary format
+text; exact policy bytes bind the setting. Native numeric preservation remains
+unimplemented and rejects. Nonfinite native floats reject.
+Native null is distinct from an empty string and is available to typed
+substitution without a CSV input marker; text matching never stringifies null.
+Numeric-looking native strings remain strings in review evidence. The original
+Parquet bytes, not a CSV serialization, are snapshot-bound and revalidated by
+the same source decoder in review, receipt verification, execution and output
+comparison. CSV input null markers are invalid for this Parquet slice. This is
+not completion of general typed Parquet input or public activation.
+
+The private decoder applies the existing Parquet expanded-byte limit both to
+encoded-page metadata and cumulatively to decoded Arrow batch buffers before
+conversion to Python rows. This is a decoded-payload limit, not a peak process
+memory guarantee: Arrow decoding allocations and Python object overhead remain
+outside that measurement. Independent AI safety re-review at 39af3e4 closed the
+decoded-payload finding under this limited guarantee, not peak-memory containment.
+The private implementation must not be advertised as public activation-ready.
+
+Matching semantics belong to the field, independently of input/output format.
+Literal text matching distinguishes `001.00` from `1.00`. Native numeric/date
+cells have no assumed original text spelling: they require explicitly selected
+text formatting before literal matching, never implicit stringify. Without that
+selection, use typed substitution for native non-string values. Typed numeric
+matching treats explicitly parsed `001.00`, `1.0` and `1` as the same number;
+typed DATE matching uses the date value after explicitly configured string
+parsing. Output rendering is a separate choice from matching representation.
+Literal replacement strings remain literal. No invented null spelling, timezone
+or implicit same-instant DATETIME key equivalence is authorized. Formula-null
+semantics remain unresolved. This records behavior approval, not implementation
+or public activation; exact formatting configuration must be snapshot-bound.
 
 A versioned private behavior policy references a source schema fingerprint and
 contains one explicit decision per `(entity, field)`. Profiling observations

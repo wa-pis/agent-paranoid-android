@@ -16,14 +16,14 @@ from test_data_agent.postgres_sql_export import postgres_literal
 
 def normalized_output_rows(result: CsvTransformationResult, output: TypedOutput, *,
                            budget: GenerationBudget,
-                           source_rows: Iterator[tuple[str | None, ...]] | None = None,
+                           source_rows: Iterator[tuple[str | int | float | Decimal | date | None, ...]] | None = None,
                            ) -> Iterator[tuple[list[str], list[Any]]]:
     """Share existing strict SQL-compatible scalars and final row safety gates."""
     if (tuple(item.name for item in output.fields) != result.columns
             or len(set(result.columns)) != len(result.columns)
             or any(looks_sensitive_value(name) for name in result.columns)):
         raise ValueError("invalid typed output schema")
-    def literals(row: tuple[str | None, ...], indices: tuple[int, ...] | None = None) -> tuple[list[str], list[Any]]:
+    def literals(row: tuple[str | int | float | Decimal | date | None, ...], indices: tuple[int, ...] | None = None) -> tuple[list[str], list[Any]]:
         values = []
         logical = []
         fields = output.fields if indices is None else tuple(output.fields[index] for index in indices)
@@ -32,10 +32,12 @@ def normalized_output_rows(result: CsvTransformationResult, output: TypedOutput,
             if value is None and not item.nullable:
                 raise ValueError("null in required SQL output field")
             shape = item.decimal_type
-            if value is not None and item.type == "float":
+            if isinstance(value, str) and item.type == "float":
                 normalize_csv_scalar(value, FieldType.FLOAT)
             encoded_value: Any = value
-            if value is not None and item.temporal_type is not None:
+            if value is not None and item.temporal_type is not None and not (item.type == "date" and type(value) is date):
+                if not isinstance(value, str):
+                    raise ValueError("unsupported native temporal output")
                 canonical = item.temporal_type.render(value)
                 encoded_value = date.fromisoformat(canonical) if item.type == "date" else datetime.fromisoformat(canonical)
                 if item.type == "datetime" and encoded_value.tzinfo is None:
