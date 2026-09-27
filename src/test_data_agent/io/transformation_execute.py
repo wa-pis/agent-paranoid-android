@@ -412,7 +412,7 @@ def replace_csv_snapshot(
                     row[name] if name in coincident_zero_fields else value
                     for name, value in zip(output_names, replaced, strict=True))
                     == tuple(None if row[name] == policy.csv_nulls.input_token else row[name] for name in names)
-                    or preserved_fields == set(names)):
+                    or preserved_fields | coincident_zero_fields == set(names)):
                 raise ValueError
             if policy.input_format == "parquet" and output_names == names and all(
                     same_native_value(row[name], None if name in null_fields else value)

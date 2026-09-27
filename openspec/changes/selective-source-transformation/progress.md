@@ -3637,3 +3637,15 @@ Broader transformation remains unfinished.
   GitHub read confirmed no PR for codex/1-6-finance-zero. No overlapping CI started.
   Next: signed checkpoint and independent exact-SHA safety review of this narrow
   zero allowance/complete-row guard change, then normal PR gates. Still private.
+- Signed checkpoint 1c5c905066c2ca573f878252289983f8dc716402 created for the
+  numeric-zero scope; strict OpenSpec validation passed. Independent AI reviewer
+  Boyle / CSV-Gate-1 (01a0dfa0-7f22-75d3-9b19-d181e11f187d) is reviewing that exact
+  SHA against ebfab03, read-only, excluding all prior closed scopes. Submission
+  01a0e4cd-3fbf-7b10-b538-c1f5ad5a1ced. Review pending; do not duplicate.
+  Next: consume findings and record evidence before push/PR. No public activation.
+- Review found High mixed formatted-preservation/generated-zero whole-row bypass;
+  evidence reviews/1c5c905-ai-safety.md. Two fictional full private-publication
+  regressions reproduced it (direct/fallback). Minimal guard correction unions
+  preserved and coincident-zero fields. Executor 237 passed, Ruff passed.
+  Next: signed corrected SHA and independent verification of this finding only;
+  no push/PR until review disposition is recorded. No public activation.

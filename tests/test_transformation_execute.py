@@ -1240,11 +1240,12 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve", "preserve_null", "typed_output"])
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve", "preserve_null", "typed_output", "zero_direct", "zero_fallback"])
 def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
 
-    all_preserved = action == "format_all_preserve"
+    zero_case = action if action.startswith("zero_") else None
+    all_preserved = action == "format_all_preserve" or zero_case is not None
     typed_output = action == "typed_output"
     if typed_output:
         action = "preserve"
@@ -1266,7 +1267,8 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
             {"original": ["ready"], "replacement": ["done"]}]}
     if action == "format_temporal":
         behavior = preserve
-        source_bytes = b"flag,code\n2026-08-31,001\n2026-09-01,002\n"
+        source_bytes = (b"flag,code\n2026-08-31,-0.00\n2026-09-01,2.5\n" if zero_case else
+                        b"flag,code\n2026-08-31,001\n2026-09-01,002\n")
     material = request(complete=False, behavior=behavior, source_bytes=source_bytes)
     if preserve_null:
         policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
@@ -1285,10 +1287,22 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
         if all_preserved:
             policy.pop("file_text_mapping")
             policy["fields"][1]["behavior"]["unmatched"] = preserve
+        extra_parts = ()
+        if zero_case:
+            synth = {"action": "synthesize", "generation_policy_ref": "gen.yaml"}
+            if zero_case == "zero_direct":
+                policy["fields"][1]["behavior"] = synth
+            else:
+                policy["fields"][1]["behavior"]["unmatched"] = synth
+            spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 2,
+                "fields": [{"name": "code", "data_type": "float", "distribution": {
+                    "kind": "numeric", "min_value": 0, "max_value": 0}}]}]}
+            extra_parts = (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
         material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
             next(p for p in material.parts if p.kind == "source"),
-            (SnapshotPart("mapping", "code.csv", b"old,new\n999,888\n"),) if all_preserved else
-            tuple(p for p in material.parts if p.kind == "mapping"),
+            ((() if zero_case == "zero_direct" else
+              (SnapshotPart("mapping", "code.csv", b"old,new\n999,888\n"),)) if all_preserved else
+             tuple(p for p in material.parts if p.kind == "mapping")) + extra_parts,
             max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     if typed_output:
         policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
