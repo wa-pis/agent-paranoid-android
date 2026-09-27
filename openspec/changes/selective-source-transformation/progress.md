@@ -2990,3 +2990,88 @@ Broader transformation remains unfinished.
   Its body still described implemented synthesis/substitution/derive as missing;
   reconcile the body and finish this closed-development PR without claiming
   public activation or full 1.6.0rc1 acceptance. Remaining scope stays in tasks.
+- PR #578 merged normally after all head checks passed at 010ca2c; merge SHA
+  84659f98af90ad00ad7dfd2f716edff764ac9e6c, 2026-09-27 07:48:27 UTC.
+  No protection bypass or human approval impersonation. Private execution only;
+  RC/public activation remains incomplete. Reused the same clean checkout for
+  codex/1-6-csv-completion from origin/main. Next: close remaining integrated
+  CSV/publication prerequisites on this branch; do not reopen merged PR #578
+  or repeat completed reviews/tests without relevant changes.
+- Paused heartbeat for explicit CSV null representation decision before
+  completing nullable execution. Existing mapping loader has null_token but
+  source/output execution contract remains unresolved (policy-contract.md).
+  Proposed owner choice: empty cell stays empty string; optional explicit
+  source/output null token (e.g. backslash-N), disabled when unspecified, with
+  literal token collisions rejected. Do not infer approval from heartbeat.
+  Next after decision: bind the chosen dialect/null configuration to snapshots
+  and implement focused nullable input/output tests, reusing mapping semantics.
+- Owner confirmed CSV null representation: empty remains empty string, explicit
+  optional nonempty marker (e.g. backslash-N), no implicit null conversion.
+  Recorded in policy-contract.md; decision blocker cleared. Resume nullable
+  source/output integration with exact snapshot binding and collision checks.
+- Added snapshot-bound csv_nulls.output_token and private synthesized-null CSV
+  encoding (direct and both fallback paths). Track null provenance separately
+  from text, validate final None rather than marker text, reject literal marker
+  collisions and keep empty strings unchanged. Three null synthesis tests
+  failed before implementation; added collision/empty-string and digest checks.
+  Policy/executor suites: 234 passed; Ruff and targeted mypy pass. Source null
+  decoding and nullable mappings remain next; no implicit formula-null behavior
+  or public activation introduced.
+- Added private csv_nulls.input_token for direct/fallback preservation, sharing
+  one encoder with explicit output-token requirement. Empty string stays text;
+  retention distinguishes logical null from literal marker text. Fictional PTY
+  test covers null/empty preservation, temporary publication, unchanged-value
+  accounting and receipt invalidation after either marker setting changes.
+  New test failed before implementation, then passed. Relevant policy/executor
+  suites: 235 passed; changed Ruff and targeted mypy pass. No public activation.
+  Next: integrate nullable typed mapping/source profiling; review changed null
+  preservation scope at a committed SHA before activation. No completed review
+  was repeated and no additional reviewer started.
+- Private typed substitutions now reuse profile nullability and existing inline/
+  CSV mapping null parsing, decode explicit source markers as None keys, and
+  encode None replacements with tracked provenance. Missing input/output marker
+  rejects; empty-string keys stay separate. Two regression cases failed before
+  the change; six inline/CSV positive/missing-marker cases now pass. Executor
+  suite: 144 passed; changed Ruff and targeted mypy pass. No new dependencies.
+  Next: transformation-specific profiling must infer types/nullability using
+  explicit markers without changing default source-free profiling. Current
+  legacy profile still interprets empty cells as null; nullable typed execution
+  is therefore not yet complete. Formula-null behavior remains unapproved.
+- Found and fixed numeric-looking output null marker being parsed as a derive
+  operand (e.g. logical None rendered as "0" became integer zero). Regression
+  failed before fix. Derive now rejects null-provenance dependencies before
+  scalar parsing; this preserves the unresolved formula-null boundary rather
+  than inventing arithmetic semantics. Focused derive/null/synthesis checks:
+  57 passed; Ruff and targeted mypy pass. No PR exists for current branch yet.
+  Profiling integration remains next; no activation or new review claimed.
+- Integrated literal-cell profiling into private review preparation and exact
+  receipt revalidation. Explicit input markers are excluded from type inference;
+  empty cells remain non-null strings. Reused existing bounded accumulators;
+  default source-free profiling unchanged. Old fingerprints fail rather than
+  silently rebinding approvals. Source/executor: 166 passed; two additional
+  marker/type/legacy-regression cases passed; profiler/receipt/decision suites:
+  54 passed. Changed Ruff and targeted mypy pass. PR still absent.
+  Next: close numeric-null synthesis/DECIMAL edges and update user-facing
+  profile preparation before finalizing the nullable CSV slice; then commit
+  and obtain changed-scope independent safety review. Public execution off.
+- Closed numeric input-null edges: synthesis no longer parses the explicit
+  source marker as a number while checking identity; declared DECIMAL input
+  validation skips only the exact explicit null marker. Inline substitution and
+  synthesis now pass fictional two-row INTEGER/DECIMAL null-to-number cases.
+  Regression exposed executor failures before fixes (DECIMAL synthesis fixture
+  also required matching decimal_range shape, not an integer generation spec).
+  Focused null/DECIMAL synthesis checks: 36 passed; Ruff and mypy pass.
+  Next: user-facing transformation profile preparation, then consolidate this
+  nullable slice into a signed commit and changed-scope safety review. No PR
+  exists yet; no public execution activation or release performed.
+- Confirmed no user-facing transformation profile creation command exists yet;
+  transform-review consumes an existing policy. Documented exact null semantics,
+  schema-fingerprint compatibility and this limitation in CLI reference instead
+  of implying that source-free profiling creates a compatible nullable policy.
+  Consolidating the implemented nullable slice for independent changed-scope
+  safety review; profile creation remains tracked user-interface work.
+- Nullable-slice checkpoint: six directly affected profiler/policy/source/
+  executor/receipt/decision suites passed, 323 tests total; strict OpenSpec and
+  diff whitespace checks passed. Prior changed-file Ruff/mypy checks remain
+  applicable. Independent reviewer CSV-Gate-1 confirmed idle (last completed
+  ad5eee6 temporal scope); next review will concern only the new nullable diff.

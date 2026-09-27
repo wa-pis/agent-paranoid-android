@@ -23,13 +23,28 @@ from test_data_agent.core.transformation_policy import (
 )
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
-from test_data_agent.csv_profiler import _csv_reader_from_snapshot, profile_csv_bytes, validate_csv_headers
+from test_data_agent.csv_profiler import _csv_reader_from_snapshot, _profile_csv_rows, profile_csv_bytes, validate_csv_headers
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
 from test_data_agent.io.path_policy import open_regular_file
 
 
 class TransformationSourceError(ValueError):
     """Invalid source snapshot or stale profile; never echo source values."""
+
+
+def _profile_transformation_csv(
+    source: SnapshotPart, *, null_token: str | None, budget: GenerationBudget, max_bytes: int,
+) -> DatasetProfile:
+    """Private literal-cell profile; default source-free profiling is unchanged."""
+    if (type(source.payload) is not bytes or type(max_bytes) is not int or max_bytes < 1
+            or len(source.payload) > min(max_bytes, DEFAULT_MAX_INPUT_FILE_BYTES)
+            or null_token is not None and (type(null_token) is not str or not null_token
+                                          or len(null_token) > 256)):
+        raise TransformationSourceError("invalid transformation source profile")
+    budget.check("transformation source profiling")
+    return csv_profile_to_dataset_profile(_profile_csv_rows(
+        _csv_reader_from_snapshot(source.payload), source.name, (), None, budget,
+        literal_empty=True, null_token=null_token))
 
 
 def prepare_csv_review_request(
@@ -47,10 +62,9 @@ def prepare_csv_review_request(
                        or part.kind not in {"mapping", "generation_policy"}
                        for part in referenced_parts)):
             raise ValueError
-        profile = csv_profile_to_dataset_profile(profile_csv_bytes(
-            source.payload, source.name, budget=budget,
-            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, max_total_bytes),
-        ))
+        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
+        profile = _profile_transformation_csv(source, null_token=policy.csv_nulls.input_token,
+            budget=budget, max_bytes=max_total_bytes)
         evidence_json = profile.model_dump_json().encode("utf-8")
         request = prepare_approval_request(
             policy_yaml, evidence_json, (source, *referenced_parts),
@@ -285,6 +299,7 @@ def load_csv_source_snapshot(
 def revalidate_csv_evidence(
     source: SnapshotPart, evidence_json: bytes, *, budget: GenerationBudget,
     max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
+    policy_yaml: bytes | None = None,
 ) -> DatasetProfile:
     """Reprofile fixed bytes and reject changed classification/evidence."""
     try:
@@ -294,7 +309,10 @@ def revalidate_csv_evidence(
         reviewed = DatasetProfile.model_validate_json(evidence_json)
         observed = csv_profile_to_dataset_profile(
             profile_csv_bytes(source.payload, source.name, budget=budget, max_bytes=max_bytes)
-        )
+        ) if policy_yaml is None else _profile_transformation_csv(source,
+            null_token=load_behavior_policy_yaml(policy_yaml, max_bytes=max_bytes,
+                                                budget=budget).csv_nulls.input_token,
+            budget=budget, max_bytes=max_bytes)
         if reviewed.model_dump(mode="json") != observed.model_dump(mode="json"):
             raise ValueError
         budget.check("transformation source evidence")

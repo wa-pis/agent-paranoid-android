@@ -11,7 +11,6 @@ import math
 from graphlib import TopologicalSorter
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import cast
 from typing import Any
 from collections.abc import Iterator
 
@@ -120,6 +119,7 @@ def replace_csv_snapshot(
         profile = DatasetProfile.model_validate_json(
             next(part.payload for part in canonical.parts if part.kind == "evidence"))
         field_types = {field.name: field.data_type for entity in profile.entities for field in entity.fields}
+        field_nullable = {field.name: field.nullable for entity in profile.entities for field in entity.fields}
         field_types.update({name: FieldType.DECIMAL for name in decimal_types})
 
         def scalar(name: str, value: str) -> Any:
@@ -132,7 +132,7 @@ def replace_csv_snapshot(
             mappings[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
         ) if policy.file_text_mapping is not None else None)
         column_tables = {}
-        substitutions: dict[str, dict[tuple[str | int | float, ...], str]] = {}
+        substitutions: dict[str, dict[tuple[str | int | float | None, ...], str | None]] = {}
         substitution_columns: dict[str, tuple[str, ...]] = {}
         domains = {domain.name: domain.mapping for domain in policy.domains}
         dropped = set()
@@ -213,19 +213,25 @@ def replace_csv_snapshot(
                     parsed = parse_csv_mapping_bytes(mappings[declaration.path], declaration, budget=budget)
                     declaration = normalize_csv_mapping(parsed,
                         data_types=tuple(field_types[name] for name in source_columns),
-                        nullable=tuple(False for _ in source_columns), budget=budget, decimal_shapes=shapes)
+                        nullable=tuple(field_nullable[name] for name in source_columns), budget=budget, decimal_shapes=shapes)
                 else:
                     declaration = validate_inline_scalar_mapping(declaration,
                         data_types=tuple(field_types[name] for name in source_columns),
-                        nullable=tuple(False for _ in source_columns), decimal_shapes=shapes)
+                        nullable=tuple(field_nullable[name] for name in source_columns), decimal_shapes=shapes)
                 if not isinstance(declaration, InlineMapping):
                     raise ValueError
-                pairs: dict[tuple[str | int | float, ...], str] = {}
+                pairs: dict[tuple[str | int | float | None, ...], str | None] = {}
                 for entry in declaration.entries:
                     budget.check("CSV substitution")
-                    if any(type(value) not in (str, int, float) for value in (*entry.original, *entry.replacement)):
+                    if any(value is not None and type(value) not in (str, int, float)
+                           for value in (*entry.original, *entry.replacement)):
                         raise ValueError
-                    pairs[cast(tuple[str | int | float, ...], entry.original)] = str(entry.replacement[component])
+                    if (None in entry.original and policy.csv_nulls.input_token is None
+                            or None in entry.replacement and policy.csv_nulls.output_token is None):
+                        raise ValueError
+                    replacement = entry.replacement[component]
+                    pairs[entry.original] = (
+                        None if replacement is None else str(replacement))
                 substitutions[decision.field] = pairs
                 substitution_columns[decision.field] = source_columns
                 continue
@@ -265,28 +271,43 @@ def replace_csv_snapshot(
         if any(looks_sensitive_value(name) for name in output_names):
             raise ValueError
         append_row(output_names)
+        def preserved(name: str, original: str, action: PreserveAction) -> str:
+            if original == policy.csv_nulls.input_token:
+                if policy.csv_nulls.output_token is None:
+                    raise ValueError
+                null_fields.add(name)
+                return policy.csv_nulls.output_token
+            return temporal_types[name].render(original) if action.format_temporal else original
+
         def synthesized(action: SynthesizeAction, row_index: int, name: str, original: str) -> str:
             value = generated[action.generation_policy_ref][row_index][name]
             if value is None:
-                raise ValueError  # CSV null encoding remains an explicit pending contract.
+                if policy.csv_nulls.output_token is None:
+                    raise ValueError
+                null_fields.add(name)
+                return policy.csv_nulls.output_token
             rendered = str(value)
-            if scalar(name, rendered) == scalar(name, original):
+            if original != policy.csv_nulls.input_token and scalar(name, rendered) == scalar(name, original):
                 raise ValueError
             return rendered
 
         unchanged = compared = dropped_cells = 0
         for row_index, row in enumerate(reader):
+            null_fields: set[str] = set()
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str for value in row.values()):
                 raise ValueError
             for name in decimal_types:
-                scalar(name, row[name])
+                if row[name] != policy.csv_nulls.input_token:
+                    scalar(name, row[name])
             values: list[str] = []
             preserved_fields: set[str] = set()
             for name in execution_names:
                 budget.check("CSV replacement cell")
                 action = actions[name]
                 if isinstance(action, DeriveAction):
+                    if null_fields.intersection(action.dependencies):
+                        raise ValueError
                     transformed = dict(zip(execution_names, values))
                     operands = {
                         dependency: scalar(dependency, transformed[dependency])
@@ -306,20 +327,27 @@ def replace_csv_snapshot(
                     continue
                 if isinstance(action, PreserveAction):
                     preserved_fields.add(name)
-                    values.append(temporal_types[name].render(row[name]) if action.format_temporal else row[name])
+                    values.append(preserved(name, row[name], action))
                     continue
                 if isinstance(action, SynthesizeAction):
                     values.append(synthesized(action, row_index, name, row[name]))
                     continue
                 if isinstance(action, SubstituteAction):
-                    key = tuple(format(scalar(column, row[column]), "f") if column in decimal_types
+                    key = tuple(None if row[column] == policy.csv_nulls.input_token else
+                                format(scalar(column, row[column]), "f") if column in decimal_types
                                 else normalize_csv_scalar(row[column], field_types[column])
                                 for column in substitution_columns[name])
                     if key in substitutions[name]:
-                        values.append(substitutions[name][key])
+                        replacement = substitutions[name][key]
+                        if replacement is None:
+                            if policy.csv_nulls.output_token is None:
+                                raise ValueError
+                            null_fields.add(name)
+                            replacement = policy.csv_nulls.output_token
+                        values.append(replacement)
                     elif isinstance(action.unmatched, PreserveAction):
                         preserved_fields.add(name)
-                        values.append(row[name])
+                        values.append(preserved(name, row[name], action.unmatched))
                     elif isinstance(action.unmatched, SynthesizeAction):
                         values.append(synthesized(action.unmatched, row_index, name, row[name]))
                     else:
@@ -330,15 +358,19 @@ def replace_csv_snapshot(
                     values.append(match.replacement)
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
                     preserved_fields.add(name)
-                    values.append(row[name])
+                    values.append(preserved(name, row[name], action.unmatched))
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, SynthesizeAction):
                     values.append(synthesized(action.unmatched, row_index, name, row[name]))
                 else:
                     raise ValueError
             transformed = dict(zip(execution_names, values, strict=True))
             replaced = tuple(transformed[name] for name in output_names)
+            if policy.csv_nulls.output_token is not None and any(
+                    value == policy.csv_nulls.output_token and name not in null_fields
+                    for name, value in zip(output_names, replaced, strict=True)):
+                raise ValueError
             for name in decimal_types:
-                if name in transformed:
+                if name in transformed and name not in null_fields:
                     scalar(name, transformed[name])
             if output_names == names and (replaced == tuple(row[name] for name in names)
                     or preserved_fields == set(names)):
@@ -346,13 +378,19 @@ def replace_csv_snapshot(
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError
             append_row(replaced)
-            final_row = dict(zip(output_names, replaced, strict=True))
+            final_row = {name: None if name in null_fields else value
+                         for name, value in zip(output_names, replaced, strict=True)}
             for reference, spec in generation_specs.items():
                 final_generated[reference].append({field.name: final_row[field.name]
                                                    for field in spec.entities[0].fields})
             compared += len(output_names)
             dropped_cells += len(dropped)
             for name, value in zip(output_names, replaced, strict=True):
+                if name in null_fields:
+                    unchanged += int(row[name] == policy.csv_nulls.input_token)
+                    continue
+                if row[name] == policy.csv_nulls.input_token:
+                    continue
                 try:
                     same = scalar(name, row[name]) == scalar(name, value)
                 except ValueError:

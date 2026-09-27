@@ -17,14 +17,14 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.csv_profiler import profile_csv_bytes
-from test_data_agent.io.transformation_source import prepare_csv_review_request
+from test_data_agent.io.transformation_source import prepare_csv_review_request, _profile_transformation_csv, TransformationSourceError
 
 
 def request(target="second", complete=True, behavior=None,
             source_bytes=b"flag,code\ntrue,001\nfalse,002\n"):
     source = SnapshotPart("source", "items", source_bytes)
-    profile = csv_profile_to_dataset_profile(profile_csv_bytes(
-        source.payload, source.name, budget=GenerationBudget(5)))
+    profile = _profile_transformation_csv(source, null_token=None,
+        budget=GenerationBudget(5), max_bytes=8192)
     def table(path):
         return {"kind": "csv", "path": path, "source_columns": ["old"],
                 "replacement_columns": ["new"]}
@@ -204,6 +204,115 @@ def test_engine_retention_counts_numeric_formatting_as_unchanged():
     assert result.retention.unchanged_percent == "50.00"
 
 
+@pytest.mark.parametrize("target", ["\\N", ""])
+def test_output_null_marker_does_not_reinterpret_literal_replacement(target):
+    original = request(target=target)
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["csv_nulls"] = {"output_token": "\\N"}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"),
+        tuple(p for p in original.parts if p.kind == "mapping"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert material.snapshot_sha256 != original.snapshot_sha256
+    if target:
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError):
+            execute(material)
+    else:
+        assert execute(material).endswith(b"yes,\n")
+
+
+@pytest.mark.parametrize("csv_mapping", [False, True])
+@pytest.mark.parametrize("missing_token", [None, "input_token", "output_token"])
+def test_nullable_substitution_keeps_empty_distinct_from_null(csv_mapping, missing_token):
+    original = request(source_bytes=b"flag,code\ntrue,\\N\nfalse,\n")
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["csv_nulls"] = {"input_token": "\\N", "output_token": "NULL"}
+    if missing_token:
+        policy["csv_nulls"].pop(missing_token)
+    mapping = ({"kind": "csv", "path": "nullable.csv", "source_columns": ["old"],
+                "replacement_columns": ["new"], "null_token": "<null>"} if csv_mapping else
+               {"kind": "inline", "entries": [
+                   {"original": [None], "replacement": ["filled"]},
+                   {"original": [""], "replacement": [None]}]})
+    policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": mapping}
+    parts = tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv")
+    if csv_mapping:
+        parts += (SnapshotPart("mapping", "nullable.csv", b"old,new\n<null>,filled\n,<null>\n"),)
+    source = next(p for p in original.parts if p.kind == "source")
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(_profile_transformation_csv(
+        source, null_token=policy["csv_nulls"].get("input_token"), budget=GenerationBudget(5), max_bytes=8192))
+    if missing_token == "input_token":
+        with pytest.raises(TransformationSourceError):
+            prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+                max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+        return
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"), parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if missing_token:
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError):
+            execute(material)
+    else:
+        assert execute(material) == b"flag,code\nno,filled\nyes,NULL\n"
+
+
+@pytest.mark.parametrize("decimal", [False, True])
+@pytest.mark.parametrize("action", ["substitute", "synthesize"])
+def test_numeric_null_source_can_be_replaced(decimal, action):
+    source = SnapshotPart("source", "items", b"flag,amount\ntrue,\\N\nfalse,2\n")
+    profile = _profile_transformation_csv(source, null_token="\\N", budget=GenerationBudget(5), max_bytes=8192)
+    behavior = ({"action": "synthesize", "generation_policy_ref": "gen.yaml"} if action == "synthesize" else
+        {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+            {"original": [None], "replacement": ["3.00" if decimal else 3]},
+            {"original": ["2.00" if decimal else 2], "replacement": ["4.00" if decimal else 4]}]}})
+    amount = {"entity": "items", "field": "amount", "sensitivity": "non_sensitive", "behavior": behavior}
+    if decimal:
+        amount["decimal_type"] = {"precision": 12, "scale": 2}
+    policy = {"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "csv_nulls": {"input_token": "\\N"}, "fields": [
+            {"entity": "items", "field": "flag", "sensitivity": "non_sensitive",
+             "behavior": {"action": "replace_text"}}, amount],
+        "file_text_mapping": {"kind": "csv", "path": "flags.csv",
+            "source_columns": ["old"], "replacement_columns": ["new"]}}
+    parts = (SnapshotPart("mapping", "flags.csv", b"old,new\ntrue,no\nfalse,yes\n"),)
+    if action == "synthesize":
+        spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 2,
+            "fields": [{"name": "amount", "data_type": "integer",
+                "distribution": {"kind": "numeric", "min_value": 8, "max_value": 8}}]}]}
+        if decimal:
+            spec["entities"][0]["fields"][0].update(data_type="decimal", distribution={
+                "kind": "decimal_range", "precision": 12, "scale": 2, "min": "8.00", "max": "8.00"})
+        parts += (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    result = list(csv.DictReader(io.StringIO(execute(material).decode())))
+    assert [row["amount"] for row in result] == (["8.00" if decimal else "8"] * 2 if action == "synthesize" else
+                                               ["3.00", "4.00"] if decimal else ["3", "4"])
+
+
+def test_derive_rejects_numeric_null_marker_in_transformed_dependency():
+    source = SnapshotPart("source", "items", b"total,amount\n9,2\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(source.payload, "items", budget=GenerationBudget()))
+    policy = {"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile),
+        "csv_nulls": {"output_token": "0"}, "fields": [
+            {"entity": "items", "field": "total", "sensitivity": "non_sensitive",
+             "behavior": {"action": "derive", "expression": "amount + 1", "dependencies": ["amount"]}},
+            {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
+             "behavior": {"action": "synthesize", "generation_policy_ref": "gen.yaml"}}]}
+    spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 1,
+        "fields": [{"name": "amount", "data_type": "integer", "nullable": True, "null_ratio": 1.0}]}]}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    module = import_module("test_data_agent.io.transformation_execute")
+    with pytest.raises(module.TransformationExecutionError):
+        execute(material)
+
+
 def test_literal_date_replacement_ignores_temporal_format_settings():
     original = request(target="2026-08-31")
     policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
@@ -318,7 +427,7 @@ def test_derive_uses_transformed_dependencies_in_topological_order(formula, inte
         assert caught.value.__context__ is None
 
 
-@pytest.mark.parametrize("case", ["valid", "final_schema", "final_unique", "negative_mode", "null", "numeric_identity"])
+@pytest.mark.parametrize("case", ["valid", "final_schema", "final_unique", "negative_mode", "null", "null_encoded", "numeric_identity"])
 @pytest.mark.parametrize("action_kind", ["synthesize", "replace_text", "substitute"])
 def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action_kind):
     original = request(source_bytes=(b"flag,code\ntrue,1.00\nfalse,2.00\n"
@@ -348,8 +457,10 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
                                        "validate_relationships": False, "validate_constraints": False}
     elif case == "negative_mode":
         spec["generation_settings"]["mode"] = "negative"
-    elif case == "null":
+    elif case in {"null", "null_encoded"}:
         spec["entities"][0]["fields"][0].update(nullable=True, null_ratio=1.0)
+        if case == "null_encoded":
+            policy["csv_nulls"] = {"output_token": "\\N"}
     elif case == "numeric_identity":
         spec["entities"][0]["fields"][0].update(data_type="float",
             distribution={"kind": "numeric", "min_value": 1.0, "max_value": 1.0})
@@ -368,6 +479,11 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
             max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
         valid_rows = list(csv.DictReader(io.StringIO(execute(valid_request).decode())))
         assert [row["flag"] for row in valid_rows] == ["duplicate", "distinct"]
+    if case == "null_encoded":
+        rows = list(csv.DictReader(io.StringIO(execute(material).decode())))
+        assert rows[-1]["code"] == "\\N"
+        assert rows[0]["code"] == ("\\N" if action_kind == "synthesize" else "manual")
+        return
     if case != "valid":
         module = import_module("test_data_agent.io.transformation_execute")
         with pytest.raises(module.TransformationExecutionError) as caught:
@@ -544,11 +660,14 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve"])
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve", "preserve_null"])
 def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
 
     all_preserved = action == "format_all_preserve"
+    preserve_null = action == "preserve_null"
+    if preserve_null:
+        action = "preserve"
     if all_preserved:
         action = "format_temporal"
 
@@ -556,6 +675,8 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
                 "comment": "Reviewed fictional flag"}
     behavior = {"action": action, "unmatched": preserve} if action != "preserve" else preserve
     source_bytes = b"flag,code\ntrue,001\nfalse,002\n"
+    if preserve_null:
+        source_bytes = b"flag,code\n\\N,001\n,002\n"
     if action == "substitute":
         source_bytes = b"flag,code\nready,001\nwaiting,002\n"
         behavior["mapping"] = {"kind": "inline", "entries": [
@@ -564,6 +685,16 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
         behavior = preserve
         source_bytes = b"flag,code\n2026-08-31,001\n2026-09-01,002\n"
     material = request(complete=False, behavior=behavior, source_bytes=source_bytes)
+    if preserve_null:
+        policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
+        policy["csv_nulls"] = {"input_token": "\\N", "output_token": "NULL"}
+        policy["schema_fingerprint"] = transformation_schema_fingerprint(_profile_transformation_csv(
+            next(p for p in material.parts if p.kind == "source"), null_token="\\N",
+            budget=GenerationBudget(5), max_bytes=8192))
+        material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+            next(p for p in material.parts if p.kind == "source"),
+            tuple(p for p in material.parts if p.kind == "mapping"),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     if action == "format_temporal":
         policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
         policy["fields"][0]["behavior"]["format_temporal"] = True
@@ -606,6 +737,8 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
                                          budget=GenerationBudget(5), **kwargs)
     expected_flags = {"preserve": ("true", "false"), "replace_text": ("no", "false"),
                       "substitute": ("done", "waiting"), "format_temporal": ("31/08/2026", "01/09/2026")}[action]
+    if preserve_null:
+        expected_flags = ("NULL", "")
     assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
         ["flag", "code"], [expected_flags[0], "1"], [expected_flags[1], "second"]]
     # Profile identifies code as INTEGER: 001 -> 1 also retains its numeric value.
@@ -615,6 +748,22 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
         assert output.retention.status == "unavailable"
         assert output.retention.unchanged_percent is None
     assert output.retention.compared_cells == 4
+    if preserve_null:
+        # Changing either marker invalidates the exact local approval.
+        for settings in ({"input_token": "OTHER", "output_token": "NULL"},
+                         {"input_token": "\\N"}):
+            changed_policy = dict(policy, csv_nulls=settings)
+            changed_policy["schema_fingerprint"] = transformation_schema_fingerprint(_profile_transformation_csv(
+                next(p for p in material.parts if p.kind == "source"), null_token=settings["input_token"],
+                budget=GenerationBudget(5), max_bytes=8192))
+            changed_nulls = prepare_csv_review_request(yaml.safe_dump(changed_policy).encode(),
+                next(p for p in material.parts if p.kind == "source"),
+                tuple(p for p in material.parts if p.kind == "mapping"),
+                max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+            assert changed_nulls.snapshot_sha256 != material.snapshot_sha256
+            with pytest.raises(module.TransformationExecutionError):
+                module.replace_csv_snapshot(changed_nulls, receipt_path=path,
+                    budget=GenerationBudget(5), **kwargs)
     assert "second" not in repr(output)
     # The same fictional TTY receipt gates filesystem publication, not only
     # the in-memory executor. No public execution interface is registered.

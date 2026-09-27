@@ -132,6 +132,37 @@ precision/scale; never parse them through binary float. Dates and timestamps are
 distinct types; no implicit timezone conversion or timestamp truncation. Actual
 CSV null tokens, encoding and timezone policy must be explicit before execution.
 
+Owner decision (2026-09-27): empty CSV cells remain empty strings. Null decoding
+and encoding use an optional explicitly configured nonempty marker, for example
+`\N`; without a configured marker there is no automatic null conversion.
+Source/output marker settings must be snapshot-bound. A literal string equal
+to the configured output marker must reject rather than silently become null.
+CSV quoting is not a null escape mechanism. This confirms representation only;
+nullable formula behavior and other unresolved semantics remain separate.
+
+Private output encoding now accepts `csv_nulls: {output_token: "\\N"}` in the
+behavior policy (YAML double quotes escape the backslash). Synthesized None,
+including fallback synthesis, is emitted with that marker while final schema
+validation consumes None. Without output_token it rejects. Literal output
+equal to the marker rejects; empty strings remain strings. Settings are bound
+through exact policy bytes. Private preservation also accepts `input_token`
+inside `csv_nulls`: an exact source marker becomes logical null and is emitted
+using output_token (required for that null). Empty cells remain strings.
+Direct and unmatched preservation retain their exact local receipt gate;
+changing either marker invalidates that receipt. Text replacement still matches
+literal source text. Private typed inline/CSV substitutions now support null
+keys and replacements for fields marked nullable in the bound profile. Null
+keys require input_token; null replacements require output_token. Mapping-file
+null_token is separate from source/output tokens. Empty-string keys remain
+distinct. Private review and receipt revalidation use the same literal-cell
+profiler: only the explicit input marker counts as null; empty cells are
+non-null strings and prevent numeric-only inference. Default source-free
+profiling is unchanged. Policies with obsolete schema fingerprints must be
+reprofiled, never silently rebound. Nullable derive remains incomplete. Until
+formula-null semantics are approved, derive rejects any logical null dependency
+before parsing its rendered marker, including numeric-looking markers such as
+`0`; a CSV representation must never silently supply a numeric operand.
+
 Owner decision (2026-09-27): temporal formatting belongs to the field's typed
 description, exposed in the saved behavior profile and field configuration in
 the CLI wizard. `format` describes input parsing; `output_format` describes

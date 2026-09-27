@@ -48,6 +48,18 @@ matching field rules take priority over file-wide rules, without cascading.
 Duplicate keys within either table are rejected. These declarations do not enable
 replacement output.
 
+CSV review uses literal empty cells: an empty cell is a non-null string. A
+behavior policy may set `csv_nulls.input_token` to a nonempty explicit null
+marker; the marker is matched exactly and excluded from type inference. The
+private executor additionally uses `csv_nulls.output_token` for null output;
+this setting does not enable public execution. Source/output markers are
+separate from a mapping file's `null_token`. All settings are bound to the
+exact policy snapshot, so changing them invalidates existing approvals.
+The schema fingerprint must match this transformation-specific profile;
+ordinary source-free profiling still treats empty cells as missing values.
+A profile-creation wizard for this contract is not yet available. Review never
+silently repairs a stale fingerprint or approves the revised policy.
+
 Add `--trace` to the same read-only command for up to 50 row/column/rule
 ordinal events plus match counts. It reads only the fixed snapshot (at most
 10,000 replacement cells), returns no source or replacement literals or

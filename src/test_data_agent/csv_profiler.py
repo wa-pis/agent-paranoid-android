@@ -222,6 +222,7 @@ def _profile_csv_rows(
     reader: csv.DictReader[str], table_name: str,
     local_category_fields: Sequence[LocalCategoryField], row_digests: set[bytes] | None,
     budget: GenerationBudget | None,
+    *, literal_empty: bool = False, null_token: str | None = None,
 ) -> CSVProfile:
     fieldnames = validate_csv_headers(reader.fieldnames)
     enforce_input_column_count(len(fieldnames), label="CSV")
@@ -237,7 +238,10 @@ def _profile_csv_rows(
         for name in fieldnames:
             if budget is not None:
                 budget.check("CSV snapshot profiling")
-            accumulators[name].add(row.get(name, ""))
+            raw = row.get(name, "")
+            if literal_empty and raw == null_token:
+                continue
+            accumulators[name].add(raw, literal_empty=literal_empty)
         if row_digests is not None:
             row_digests.add(csv_row_digest(row, fieldnames))
     allowed = {item.field for item in local_category_fields if item.entity == table_name}
@@ -315,9 +319,9 @@ class CSVColumnAccumulator:
         self.all_datetime = True
         self.all_date = True
 
-    def add(self, raw_value: str | None) -> None:
+    def add(self, raw_value: str | None, *, literal_empty: bool = False) -> None:
         value = raw_value.strip() if raw_value is not None else ""
-        if value == "":
+        if value == "" and not literal_empty:
             return
         self.non_null_count += 1
         if len(self.semantic_sample) < 100:
