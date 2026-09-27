@@ -1,6 +1,6 @@
 """Value-free source-retention aggregate for fictional transformed rows."""
 
-from decimal import Decimal
+from decimal import Decimal, Inexact, localcontext
 
 import pytest
 
@@ -8,8 +8,18 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_policy import parse_behavior_policy
 from test_data_agent.core.transformation_report import (
     TransformationReportError,
+    retention_summary_from_counts,
     summarize_source_retention,
 )
+
+
+def test_retention_percentage_does_not_depend_on_decimal_context():
+    with localcontext() as context:
+        context.prec = 2
+        context.traps[Inexact] = True
+        assert retention_summary_from_counts(1, 3, 0).unchanged_percent == "33.33"
+        assert retention_summary_from_counts(1, 32, 0).unchanged_percent == "3.13"
+        assert retention_summary_from_counts(3, 3, 0).unchanged_percent == "100.00"
 
 
 def policy(*actions: tuple[str, dict[str, object]]):

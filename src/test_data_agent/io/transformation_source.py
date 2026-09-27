@@ -300,4 +300,9 @@ def revalidate_csv_evidence(
         budget.check("transformation source evidence")
         return observed
     except (OSError, ValueError, TypeError, AttributeError, csv.Error):
-        raise TransformationSourceError("invalid transformation source evidence") from None
+        pass
+    try:
+        raise TransformationSourceError("invalid transformation source evidence")
+    except TransformationSourceError as error:
+        error.__context__ = None
+        raise

@@ -13,6 +13,30 @@ from test_data_agent.core.transformation_mapping import (
 from test_data_agent.core.field import FieldType
 
 
+def test_decimal_mapping_canonicalizes_exact_text():
+    result = validate_inline_scalar_mapping({"kind": "inline", "entries": [
+        {"original": ["1.0"], "replacement": ["2"]}]},
+        data_types=(FieldType.DECIMAL,), nullable=(False,), decimal_shapes=((20, 2),))
+    assert result.entries[0].original == ("1.00",)
+    assert result.entries[0].replacement == ("2.00",)
+
+
+def test_decimal_mapping_rejects_numeric_duplicate_keys():
+    with pytest.raises(MappingDeclarationError):
+        validate_inline_scalar_mapping({"kind": "inline", "entries": [
+            {"original": ["1.0"], "replacement": ["2"]},
+            {"original": ["1.00"], "replacement": ["3"]}]},
+            data_types=(FieldType.DECIMAL,), nullable=(False,), decimal_shapes=((20, 2),))
+
+
+@pytest.mark.parametrize("shape", [(0, 0), (39, 2), (2, 3), (True, 0)])
+def test_null_decimal_mapping_still_validates_declared_shape(shape):
+    with pytest.raises(MappingDeclarationError):
+        validate_inline_scalar_mapping({"kind": "inline", "entries": [
+            {"original": [None], "replacement": [None]}]},
+            data_types=(FieldType.DECIMAL,), nullable=(True,), decimal_shapes=(shape,))
+
+
 @pytest.mark.parametrize("payload", [
     {"kind": "inline", "entries": [{"original": ["2025-04-30"], "replacement": ["2026-09-23"]}]},
     {"kind": "csv", "path": "fictional.csv", "source_columns": ["source"], "replacement_columns": ["target"]},

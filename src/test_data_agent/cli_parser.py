@@ -341,6 +341,10 @@ def register_dataset_commands(
         help="With --decide, also choose field actions, mapping declarations and unmatched behavior.",
     )
     transform_review_parser.add_argument(
+        "--edit-formats", action="store_true",
+        help="With --decide, edit field temporal-format metadata; does not execute conversion.",
+    )
+    transform_review_parser.add_argument(
         "--trace", action="store_true",
         help="Include bounded, value-free exact-text match ordinals and counts.",
     )

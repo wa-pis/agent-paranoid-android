@@ -16,6 +16,95 @@ def policy(behavior):
                         "behavior": behavior}]}
 
 
+def test_declared_decimal_type_roundtrips_without_changing_sensitivity():
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["decimal_type"] = {"precision": 38, "scale": 16}
+    payload["fields"][0]["sensitivity"] = "unknown"
+    result = parse_behavior_policy(payload)
+    assert result.fields[0].decimal_type.precision == 38
+    assert result.fields[0].decimal_type.scale == 16
+    assert result.fields[0].sensitivity == "unknown"
+    assert parse_behavior_policy(result.model_dump(mode="json")) == result
+
+
+def test_temporal_field_format_roundtrips_without_enabling_conversion():
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["temporal_type"] = {"type": "datetime", "format": "%Y-%m-%d %H:%M",
+        "output_format": "%Y-%m-%dT%H:%M:%S%z", "source_timezone": "Europe/Samara", "target_timezone": "UTC"}
+    result = parse_behavior_policy(payload)
+    assert result.fields[0].temporal_type.target_timezone == "UTC"
+    assert result.fields[0].behavior.action == "drop"
+    assert parse_behavior_policy(result.model_dump(mode="json")) == result
+
+
+@pytest.mark.parametrize("settings", [
+    {"type": "date", "format": "%Y-%m-%d", "output_format": "%Y-%m-%d", "target_timezone": "UTC"},
+    {"type": "datetime", "format": "", "output_format": "%Y"},
+    {"type": "datetime", "format": "%Y", "output_format": "%Y", "source_timezone": "not/a/timezone"},
+])
+def test_invalid_temporal_field_settings_reject(settings):
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["temporal_type"] = settings
+    with pytest.raises(BehaviorPolicyError):
+        parse_behavior_policy(payload)
+
+
+@pytest.mark.parametrize("kind,source,pattern,output,source_zone,target_zone,expected", [
+    ("date", "2026-08-31", "%Y-%m-%d", "%d/%m/%Y", None, None, "31/08/2026"),
+    ("datetime", "2026-08-31 01:00", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M%z", "Europe/Samara", "UTC", "2026-08-30T21:00+0000"),
+    ("datetime", "2026-08-31T01:00+0400", "%Y-%m-%dT%H:%M%z", "%Y-%m-%dT%H:%M%z", None, "UTC", "2026-08-30T21:00+0000"),
+])
+def test_explicit_temporal_render(kind, source, pattern, output, source_zone, target_zone, expected):
+    from test_data_agent.core.transformation_policy import TemporalType
+    config = TemporalType(type=kind, format=pattern, output_format=output,
+                          source_timezone=source_zone, target_timezone=target_zone)
+    assert config.render(source) == expected
+
+
+@pytest.mark.parametrize("value,zone", [
+    ("2026-08-31 01:00", None),
+    ("2026-03-29 02:30", "Europe/Berlin"),
+    ("2026-10-25 02:30", "Europe/Berlin"),
+    ("fictional-private-marker", "UTC"),
+])
+def test_temporal_render_rejects_missing_or_ambiguous_zone(value, zone):
+    from test_data_agent.core.transformation_policy import TemporalType
+    config = TemporalType(type="datetime", format="%Y-%m-%d %H:%M", output_format="%Y-%m-%dT%H:%M%z",
+                          source_timezone=zone, target_timezone="UTC")
+    with pytest.raises(BehaviorPolicyError) as error:
+        config.render(value)
+    assert error.value.__context__ is None
+    assert value not in str(error.value)
+
+
+@pytest.mark.parametrize("kind,pattern,output", [
+    ("date", "%m-%d", "%Y-%m-%d"),
+    ("date", "%Y-%m-%d", "%Q"),
+    ("date", "%Y-%m-%d", "%Y-%m-%d%"),
+    ("date", "%Y-%m-%d", "%H:%M"),
+    ("datetime", "%Y-%m-%d", "%c"),
+    ("datetime", "%Y-%m-%d %Y", "%Y"),
+])
+def test_temporal_formats_reject_implicit_or_platform_specific_directives(kind, pattern, output):
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["temporal_type"] = {"type": kind, "format": pattern, "output_format": output}
+    with pytest.raises(BehaviorPolicyError):
+        parse_behavior_policy(payload)
+
+
+@pytest.mark.parametrize("declaration", [
+    {"precision": 39, "scale": 2}, {"precision": 0, "scale": 0},
+    {"precision": 3, "scale": 4}, {"precision": 3, "scale": -1},
+    {"precision": True, "scale": 0}, {"precision": "3", "scale": 0},
+    {"precision": 3}, {"precision": 3, "scale": 0, "rounding": "DOWN"},
+])
+def test_invalid_decimal_declarations_reject(declaration):
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["decimal_type"] = declaration
+    with pytest.raises(BehaviorPolicyError, match="^invalid behavior policy$"):
+        parse_behavior_policy(payload)
+
+
 @pytest.mark.parametrize("behavior", [
     {"action": "preserve", "authorization_ref": "user-review", "comment": "Reviewed business code"},
     {"action": "synthesize", "generation_policy_ref": "amount-rule"},

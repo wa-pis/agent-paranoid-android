@@ -6,6 +6,7 @@ from collections.abc import Hashable
 import yaml
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.dataset import DatasetSpec, parse_dataset_spec_payload
 from test_data_agent.core.serialization import LimitedSafeLoader
 from test_data_agent.core.transformation_policy import BehaviorPolicy, BehaviorPolicyError, parse_behavior_policy
 
@@ -23,17 +24,40 @@ class _PolicyLoader(LimitedSafeLoader):
         return result
 
 
+def _load_private_yaml(payload: bytes, max_bytes: int) -> Any:
+    if type(max_bytes) is not int or max_bytes < 1 or type(payload) is not bytes or len(payload) > max_bytes:
+        raise ValueError
+    loader = _PolicyLoader(payload.decode("utf-8"))
+    try:
+        return loader.get_single_data()
+    finally:
+        loader.dispose()  # type: ignore[no-untyped-call]
+
+
+def load_generation_policy_yaml(payload: bytes, *, max_bytes: int, budget: GenerationBudget) -> DatasetSpec:
+    """Parse bound synthesis bytes using the approved DatasetSpec 1.1 format."""
+    try:
+        budget.check("generation policy YAML")
+        raw = _load_private_yaml(payload, max_bytes)
+        if not isinstance(raw, dict) or raw.get("schema_version") != "1.1":
+            raise ValueError
+        result = parse_dataset_spec_payload(raw)
+        budget.check("generation policy YAML")
+        return result
+    except (ValueError, yaml.YAMLError, KeyError, AttributeError, TypeError):
+        pass
+    try:
+        raise BehaviorPolicyError("invalid private generation policy")
+    except BehaviorPolicyError as error:
+        error.__context__ = None
+        raise
+
+
 def load_behavior_policy_yaml(payload: bytes, *, max_bytes: int, budget: GenerationBudget) -> BehaviorPolicy:
     """Bounded UTF-8 safe load; reject duplicate/non-string keys and YAML merges."""
     try:
         budget.check("policy YAML")
-        if type(max_bytes) is not int or max_bytes < 1 or type(payload) is not bytes or len(payload) > max_bytes:
-            raise ValueError
-        loader = _PolicyLoader(payload.decode("utf-8"))
-        try:
-            raw = loader.get_single_data()
-        finally:
-            loader.dispose()  # type: ignore[no-untyped-call]
+        raw = _load_private_yaml(payload, max_bytes)
         result = parse_behavior_policy(raw)
         budget.check("policy YAML")
         return result

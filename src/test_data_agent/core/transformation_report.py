@@ -4,7 +4,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from typing import Literal
 
 from test_data_agent.core.limits import GenerationBudget
@@ -33,6 +33,23 @@ def _is_scalar(value: object) -> bool:
     if type(value) is Decimal:
         return value.is_finite()
     return False
+
+
+def retention_summary_from_counts(
+    unchanged: int, compared: int, dropped: int,
+) -> SourceRetentionSummary:
+    """Finalize bounded aggregate counts; no source values or authority."""
+    if (any(type(count) is not int or count < 0 for count in (unchanged, compared, dropped))
+            or unchanged > compared):
+        raise TransformationReportError("invalid transformation retention report") from None
+    if compared == 0:
+        return SourceRetentionSummary(
+            "unavailable", "corresponding_output_cells", None, 0, dropped, None)
+    hundredths, remainder = divmod(unchanged * 10000, compared)
+    hundredths += int(2 * remainder >= compared)
+    return SourceRetentionSummary(
+        "measured", "corresponding_output_cells", unchanged, compared, dropped,
+        f"{hundredths // 100}.{hundredths % 100:02d}")
 
 
 def summarize_source_retention(
@@ -92,17 +109,7 @@ def summarize_source_retention(
 
         dropped = len(source_rows) * (len(source_fields) - len(output_fields))
         budget.check("transformation retention report")
-        if compared == 0:
-            return SourceRetentionSummary(
-                "unavailable", "corresponding_output_cells", None, 0, dropped, None,
-            )
-        percentage = (
-            Decimal(unchanged) * 100 / Decimal(compared)
-        ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-        return SourceRetentionSummary(
-            "measured", "corresponding_output_cells", unchanged, compared, dropped,
-            format(percentage, ".2f"),
-        )
+        return retention_summary_from_counts(unchanged, compared, dropped)
     except (ValueError, TypeError, AttributeError, ArithmeticError):
         pass
     try:

@@ -6,6 +6,7 @@ from datetime import datetime
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, normalize_csv_mapping, parse_csv_mapping_bytes,
@@ -20,7 +21,7 @@ from test_data_agent.core.transformation_policy import (
     render_policy_review,
 )
 from test_data_agent.core.transformation_snapshot import SnapshotPart, snapshot_identity
-from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml, load_generation_policy_yaml
 
 
 class ApprovalMaterialError(ValueError):
@@ -96,6 +97,41 @@ def prepare_approval_request(
         if mapping_refs != actual_mappings or generation_refs != actual_generation:
             raise ValueError
         fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        for decision in policy.fields:
+            if decision.decimal_type is not None:
+                identity = (decision.entity, decision.field)
+                fields[identity] = fields[identity].model_copy(update={
+                    "data_type": FieldType.DECIMAL, "decimal_precision": decision.decimal_type.precision,
+                    "decimal_scale": decision.decimal_type.scale})
+
+        def shapes(ordered: Sequence[FieldProfile]) -> tuple[tuple[int, int] | None, ...]:
+            return tuple((field.decimal_precision, field.decimal_scale)
+                         if field.decimal_precision is not None and field.decimal_scale is not None
+                         else None for field in ordered)
+        generation_specs = {
+            part.name: load_generation_policy_yaml(part.payload, max_bytes=max_total_bytes, budget=budget)
+            for part in external_parts if part.kind == "generation_policy"
+        }
+        for decision in policy.fields:
+            action = decision.behavior
+            synthesis = (action if isinstance(action, SynthesizeAction) else
+                         action.unmatched if isinstance(action, (SubstituteAction, ReplaceTextAction)) else None)
+            if not isinstance(synthesis, SynthesizeAction):
+                continue
+            budget.check("generation policy binding")
+            spec = generation_specs[synthesis.generation_policy_ref]
+            targets = [field for entity in spec.entities if entity.name == decision.entity
+                       for field in entity.fields if field.name == decision.field]
+            source_field = fields[(decision.entity, decision.field)]
+            expected_type = FieldType.DECIMAL if decision.decimal_type is not None else source_field.data_type
+            if len(targets) != 1 or targets[0].data_type != expected_type:
+                raise ValueError
+            if decision.decimal_type is not None:
+                distribution = targets[0].typed_distribution
+                if (not isinstance(distribution, DecimalRangeDistribution)
+                        or distribution.precision != decision.decimal_type.precision
+                        or distribution.scale != decision.decimal_type.scale):
+                    raise ValueError
         domains = {domain.name: domain.mapping for domain in policy.domains}
         mapping_bytes = {part.name: part.payload for part in external_parts if part.kind == "mapping"}
         if policy.file_text_mapping is not None:
@@ -126,6 +162,7 @@ def prepare_approval_request(
             if isinstance(mapping, InlineMapping):
                 typed = validate_inline_scalar_mapping(
                     mapping, data_types=(field.data_type,), nullable=(field.nullable,),
+                    decimal_shapes=shapes((field,)),
                 )
             elif isinstance(mapping, CsvMapping):
                 parsed = parse_csv_mapping_bytes(
@@ -133,6 +170,7 @@ def prepare_approval_request(
                 )
                 typed = normalize_csv_mapping(
                     parsed, data_types=(field.data_type,), nullable=(field.nullable,), budget=budget,
+                    decimal_shapes=shapes((field,)),
                 )
             else:
                 raise ValueError
@@ -147,6 +185,7 @@ def prepare_approval_request(
                 mapping_bytes[mapping.path], mapping, budget=budget, max_bytes=max_total_bytes,
             ))
             shared_types: tuple[FieldType, ...] | None = None
+            shared_shapes: tuple[tuple[int, int] | None, ...] | None = None
             for members in groups.values():
                 if set(members) != expected or (width > 1 and any(not explicit for _, explicit in members.values())):
                     raise ValueError
@@ -155,10 +194,15 @@ def prepare_approval_request(
                 nullable = tuple(field.nullable for field in ordered)
                 if shared_types is not None and data_types != shared_types:
                     raise ValueError
+                if shared_shapes is not None and shapes(ordered) != shared_shapes:
+                    raise ValueError
                 shared_types = data_types
-                typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable)
+                shared_shapes = shapes(ordered)
+                typed = (validate_inline_scalar_mapping(parsed, data_types=data_types, nullable=nullable,
+                                                       decimal_shapes=shapes(ordered))
                          if isinstance(mapping, InlineMapping) else
-                         normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget))
+                         normalize_csv_mapping(parsed, data_types=data_types, nullable=nullable, budget=budget,
+                                               decimal_shapes=shapes(ordered)))
                 _reject_identity_components(typed, data_types)
         parts = (
             SnapshotPart("review", "display", review),

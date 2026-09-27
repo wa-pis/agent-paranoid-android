@@ -83,6 +83,7 @@ def edit_csv_policy_decisions(
     input_stream: TextIO, output_stream: TextIO,
     max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
     edit_actions: bool = False,
+    edit_formats: bool = False,
 ) -> ApprovalRequest:
     """Save explicit decisions; edit actions only when separately requested."""
     try:
@@ -97,7 +98,7 @@ def edit_csv_policy_decisions(
         policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes, budget=budget)
         payload = policy.model_dump(mode="json")
         review = json.loads(original.review)
-        output_stream.write("Edit policy decisions; this is not approval.\n" if edit_actions else
+        output_stream.write("Edit policy decisions; this is not approval.\n" if edit_actions or edit_formats else
                             "Edit sensitivity decisions only. Actions stay unchanged; this is not approval.\n")
         for decision, field in zip(payload["fields"], review["fields"], strict=True):
             budget.check("policy decision wizard")
@@ -111,6 +112,11 @@ def edit_csv_policy_decisions(
                 action = _action(input_stream.fileno(), output_stream)
                 if action is not None:
                     decision["behavior"] = action
+            if edit_formats:
+                settings = _private_answer(input_stream.fileno(), output_stream,
+                    "Temporal settings JSON (hidden; null clears, empty keeps): ")
+                if settings:
+                    decision["temporal_type"] = load_limited_json(settings)
         revised = parse_behavior_policy(payload)
         revised_bytes = dump_behavior_policy_yaml(revised, max_bytes=max_total_bytes, budget=budget)
         source = next(part for part in original.parts if part.kind == "source")

@@ -1,8 +1,29 @@
 import pytest
-
+from test_data_agent.core import transformation_yaml
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_policy import BehaviorPolicyError, parse_behavior_policy
 from test_data_agent.core.transformation_yaml import dump_behavior_policy_yaml, load_behavior_policy_yaml
+
+
+@pytest.mark.parametrize("payload, valid", [
+    (b"schema_version: '1.1'\nentities: []\n", True),
+    (b"schema_version: '1.0'\nentities: []\n", False),
+    (b"schema_version: '1.1'\nschema_version: '1.1'\n", False),
+    (b"!!python/object/apply:os.system ['fictional']", False),
+    (b"entities: [fictional-private-marker", False),
+])
+def test_synthesis_payload_requires_bounded_dataset_spec_11(payload, valid):
+    if valid:
+        spec = transformation_yaml.load_generation_policy_yaml(
+            payload, max_bytes=1000, budget=GenerationBudget())
+        assert spec.schema_version == "1.1"
+        return
+    with pytest.raises(BehaviorPolicyError) as caught:
+        transformation_yaml.load_generation_policy_yaml(
+            payload, max_bytes=1000, budget=GenerationBudget())
+    assert str(caught.value) == "invalid private generation policy"
+    assert caught.value.__context__ is None
+
 
 
 def test_private_yaml_roundtrip_preserves_mapping_scalar_kinds():

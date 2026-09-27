@@ -1,5 +1,9 @@
 # Tasks: selective-source-transformation
 
+Budget-aware continuation: [remaining-work reconciliation and next complete
+deliverable](resumption-plan.md). Existing checkboxes retain their acceptance
+meaning; the reconciliation does not mark partial implementations complete.
+
 ## Specification
 
 - [x] Record one-to-one rows and explicit reference-field preservation.

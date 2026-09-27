@@ -139,6 +139,7 @@ def main(argv: list[str] | None = None) -> None:
 
     verify_install_profile(args.profile)
     verify_installed_demo()
+    verify_installed_skill_discovery()
     verify_installed_csv_json_quickstart()
     if args.profile == "postgres":
         verify_installed_postgres_sql_smoke()
@@ -186,6 +187,24 @@ def requirement_extras(requirement: str) -> set[str]:
             requirement,
         )
     )
+
+
+def verify_installed_skill_discovery(entrypoint: Path | None = None) -> None:
+    """Exercise offline capability discovery prescribed by the bundled skills."""
+    cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
+    for arguments in (("--version",), ("--help",),
+                      ("profile-csv", "--help"), ("infer-spec", "--help"),
+                      ("generate", "--help"), ("validate", "--help"),
+                      ("transform-review", "--help")):
+        completed = subprocess.run([cli, *arguments], capture_output=True,
+                                   text=True, check=False, timeout=30)
+        if completed.returncode != 0 or not completed.stdout.strip():
+            raise SystemExit("installed skill capability discovery failed")
+    # Closed-engine stage: discovery must not imply an executable public route.
+    completed = subprocess.run([cli, "transform-execute", "--help"],
+                               capture_output=True, text=True, check=False, timeout=30)
+    if completed.returncode != 2:
+        raise SystemExit("closed transformation execution boundary changed")
 
 
 def verify_install_profile(profile: str) -> None:

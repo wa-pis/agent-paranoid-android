@@ -25,6 +25,15 @@ def test_loaded_dates_and_hash_match_same_snapshot(tmp_path):
     assert repr(result) == "LoadedCsvMapping()"
 
 
+def test_loader_accepts_explicit_decimal_shape(tmp_path):
+    payload = b"old,new\n1.0,2.345\n"
+    (tmp_path / "map.csv").write_bytes(payload)
+    result = load(tmp_path.resolve(), FieldType.DECIMAL, decimal_shapes=((20, 3),))
+    assert result.mapping.entries[0].original == ("1.000",)
+    assert result.mapping.entries[0].replacement == ("2.345",)
+    assert result.source_sha256 == hashlib.sha256(payload).hexdigest()
+
+
 @pytest.mark.parametrize("kind,payload", [
     (FieldType.INTEGER, b"old,new\n1.5,2\n"),
     (FieldType.DATE, b"old,new\n2025-04-30T00:00:00,2026-09-23\n"),

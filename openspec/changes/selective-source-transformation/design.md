@@ -121,8 +121,10 @@ Higher precision is rejected with a value-free error; it is never downcast to
 FLOAT or silently rounded. This boundary covers the requested DECIMAL(20,2)
 and DECIMAL(38,16) cases; decimal256/76-digit support is deferred rather than
 partially implemented. The final numeric-content policy remains under review.
-The rounding policy for formulas is a separate
-decision, and this ceiling alone does not enable exact-decimal execution.
+The owner approved ROUND_HALF_UP for exact DECIMAL formula results at the
+declared output scale; overflow must reject rather than truncate or convert to
+FLOAT. This decision still requires executable implementation and validation;
+the precision ceiling alone does not enable exact-decimal execution.
 DatasetSpec 1.1 carries a `decimal_range` distribution with precision, scale
 and exact textual inclusive bounds. Only reviewed source-free generation uses
 these bounds; sensitive ranges and active constraints on DECIMAL entities fail
