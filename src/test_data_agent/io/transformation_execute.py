@@ -9,7 +9,7 @@ import csv
 import io
 import math
 from graphlib import TopologicalSorter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import cast
 from typing import Any
@@ -138,6 +138,8 @@ def replace_csv_snapshot(
         dropped = set()
         needs_receipt = False
         actions = {decision.field: decision.behavior for decision in policy.fields}
+        temporal_types = {decision.field: decision.temporal_type for decision in policy.fields
+                          if decision.temporal_type is not None}
         generation_specs: dict[str, DatasetSpec] = {}
         generated: dict[str, list[dict[str, Any]]] = {}
         final_generated: dict[str, list[dict[str, Any]]] = {}
@@ -302,7 +304,7 @@ def replace_csv_snapshot(
                     values.append(str(float(result)))
                     continue
                 if isinstance(action, PreserveAction):
-                    values.append(row[name])
+                    values.append(temporal_types[name].render(row[name]) if action.format_temporal else row[name])
                     continue
                 if isinstance(action, SynthesizeAction):
                     values.append(synthesized(action, row_index, name, row[name]))
@@ -334,7 +336,8 @@ def replace_csv_snapshot(
             for name in decimal_types:
                 if name in transformed:
                     scalar(name, transformed[name])
-            if output_names == names and replaced == tuple(row[name] for name in names):
+            if output_names == names and (replaced == tuple(row[name] for name in names)
+                    or all(isinstance(actions[name], PreserveAction) for name in names)):
                 raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError
@@ -356,8 +359,11 @@ def replace_csv_snapshot(
         for reference, spec in generation_specs.items():
             assert_generated_dataset_valid({source.name: final_generated[reference]}, spec)
             budget.check("CSV synthesis final validation")
-        return CsvTransformationResult(
-            output.getvalue(), retention_summary_from_counts(unchanged, compared, dropped_cells))
+        retention = retention_summary_from_counts(unchanged, compared, dropped_cells)
+        if any(isinstance(action, PreserveAction) and action.format_temporal for action in actions.values()):
+            # Temporal logical-equality reporting is not defined by text formatting.
+            retention = replace(retention, status="unavailable", unchanged_cells=None, unchanged_percent=None)
+        return CsvTransformationResult(output.getvalue(), retention)
     except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:

@@ -2,11 +2,12 @@
 
 import hashlib
 import json
+from datetime import datetime, timezone as utc_timezone
 from graphlib import TopologicalSorter
 from typing import Annotated, Literal, TypeAlias
 from zoneinfo import ZoneInfo
 
-from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
+from pydantic import Field, StrictBool, StrictInt, StrictStr, ValidationError, model_validator
 
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
@@ -23,6 +24,7 @@ Reference: TypeAlias = Annotated[StrictStr, Field(min_length=1, max_length=256)]
 
 class PreserveAction(_PrivateModel):
     action: Literal["preserve"]
+    format_temporal: StrictBool = False
     authorization_ref: Reference = Field(repr=False)
     comment: StrictStr = Field(min_length=1, max_length=256, repr=False)
 
@@ -97,10 +99,56 @@ class TemporalType(_PrivateModel):
     source_timezone: Reference | None = Field(default=None, repr=False)
     target_timezone: Reference | None = Field(default=None, repr=False)
 
+    def render(self, value: str) -> str:
+        """Private explicit conversion; does not grant source preservation."""
+        try:
+            if type(value) is not str or len(value) > 4096:
+                raise ValueError
+            parsed = datetime.strptime(value, self.format)
+            if self.type == "date":
+                if parsed.tzinfo is not None or parsed.time() != datetime.min.time():
+                    raise ValueError
+                return parsed.date().strftime(self.output_format)
+            if parsed.tzinfo is None and self.source_timezone is not None:
+                zone = ZoneInfo(self.source_timezone)
+                first = parsed.replace(tzinfo=zone, fold=0)
+                second = parsed.replace(tzinfo=zone, fold=1)
+                # Without an offset there is no unique instant in a DST fold/gap.
+                if first.utcoffset() != second.utcoffset():
+                    raise ValueError
+                if first.astimezone(utc_timezone.utc).astimezone(zone).replace(tzinfo=None) != parsed:
+                    raise ValueError
+                parsed = first
+            if self.target_timezone is not None:
+                if parsed.tzinfo is None:
+                    raise ValueError
+                parsed = parsed.astimezone(ZoneInfo(self.target_timezone))
+            return parsed.strftime(self.output_format)
+        except (ValueError, TypeError, OverflowError, KeyError):
+            pass
+        try:
+            raise BehaviorPolicyError("invalid temporal conversion")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+
     @model_validator(mode="after")
     def validate_settings(self) -> "TemporalType":
         if not self.format.strip() or not self.output_format.strip():
             raise ValueError("temporal formats must not be blank")
+        allowed = set("Ymd%" if self.type == "date" else "YmdHMSfz%")
+        for index, pattern in enumerate((self.format, self.output_format)):
+            directives: set[str] = set()
+            position = 0
+            while position < len(pattern):
+                if pattern[position] == "%":
+                    position += 1
+                    if position == len(pattern) or pattern[position] not in allowed:
+                        raise ValueError("unsupported temporal directive")
+                    directives.add(pattern[position])
+                position += 1
+            if index == 0 and not set("Ymd") <= directives:
+                raise ValueError("input format requires year month and day")
         for timezone in (self.source_timezone, self.target_timezone):
             if timezone is not None:
                 if self.type == "date":
@@ -122,6 +170,11 @@ class FieldDecision(_PrivateModel):
 
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
+        if isinstance(self.behavior, PreserveAction) and self.behavior.format_temporal and self.temporal_type is None:
+            raise ValueError("temporal formatting requires field settings")
+        if (isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
+                and isinstance(self.behavior.unmatched, PreserveAction) and self.behavior.unmatched.format_temporal):
+            raise ValueError("temporal formatting requires an explicit field action")
         if self.temporal_type is not None and self.decimal_type is not None:
             raise ValueError("conflicting field types")
         preserve = isinstance(self.behavior, PreserveAction) or (
@@ -311,6 +364,7 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "entity": decision.entity,
             "field": decision.field,
             "action": behavior.action,
+            **({"format_temporal": True} if isinstance(behavior, PreserveAction) and behavior.format_temporal else {}),
             **({"decimal_type": decision.decimal_type.model_dump()}
                if decision.decimal_type is not None else {}),
             "unmatched": unmatched,

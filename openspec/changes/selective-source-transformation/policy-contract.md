@@ -156,6 +156,25 @@ unimplemented. The review-only wizard supports `--decide --edit-formats` with
 hidden JSON input, empty input to keep, null to clear, and explicit atomic SAVE.
 Literal replacement ignores these settings.
 
+Private temporal rendering now supports numeric, locale-independent directives:
+DATE `%Y`, `%m`, `%d`, `%%`; DATETIME additionally `%H`, `%M`, `%S`, `%f`, `%z`.
+Input requires year/month/day; output may select a subset. Unknown/platform or
+locale-dependent directives reject. Rendering uses explicit source/target zones;
+naive input cannot convert zones without source_timezone. Offset-free ambiguous
+or nonexistent DST local times reject. This renderer is not yet a CSV action
+and does not itself authorize retaining source information.
+
+Private CSV execution can explicitly request rendering with
+`behavior: {action: preserve, format_temporal: true, authorization_ref: ..., comment: ...}`
+and the field's `temporal_type`. This is still preservation: existing explicit
+non-sensitive decision, evidence checks and exact local receipt are mandatory.
+Missing temporal settings reject; unmatched fallbacks cannot select formatting.
+Formatting never activates implicitly from field metadata or literal replacement.
+All-preserved full rows remain prohibited, including formatting-only rewrites.
+Temporal retention equality is not yet defined; reports containing formatted
+preservation mark percentage/unchanged count unavailable, not a textual estimate.
+This is private fictional development, not public activation.
+
 Unmatched values default to rejection. Explicit preserve fallback requires the
 same permission as preserve action; synthesis fallback requires its own complete
 generation policy. Apply the mapping once, never cascade replacement values.

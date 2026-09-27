@@ -544,7 +544,7 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute"])
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal"])
 def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
 
@@ -556,7 +556,18 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
         source_bytes = b"flag,code\nready,001\nwaiting,002\n"
         behavior["mapping"] = {"kind": "inline", "entries": [
             {"original": ["ready"], "replacement": ["done"]}]}
+    if action == "format_temporal":
+        behavior = preserve
+        source_bytes = b"flag,code\n2026-08-31,001\n2026-09-01,002\n"
     material = request(complete=False, behavior=behavior, source_bytes=source_bytes)
+    if action == "format_temporal":
+        policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
+        policy["fields"][0]["behavior"]["format_temporal"] = True
+        policy["fields"][0]["temporal_type"] = {"type": "date", "format": "%Y-%m-%d", "output_format": "%d/%m/%Y"}
+        material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+            next(p for p in material.parts if p.kind == "source"),
+            tuple(p for p in material.parts if p.kind == "mapping"),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     module = import_module("test_data_agent.io.transformation_execute")
     path = tmp_path / "approval.json"
     kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192)
@@ -579,11 +590,15 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     output = module.replace_csv_snapshot(material, receipt_path=path,
                                          budget=GenerationBudget(5), **kwargs)
     expected_flags = {"preserve": ("true", "false"), "replace_text": ("no", "false"),
-                      "substitute": ("done", "waiting")}[action]
+                      "substitute": ("done", "waiting"), "format_temporal": ("31/08/2026", "01/09/2026")}[action]
     assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
         ["flag", "code"], [expected_flags[0], "1"], [expected_flags[1], "second"]]
     # Profile identifies code as INTEGER: 001 -> 1 also retains its numeric value.
-    assert output.retention.unchanged_percent == ("75.00" if action == "preserve" else "50.00")
+    if action != "format_temporal":
+        assert output.retention.unchanged_percent == ("75.00" if action == "preserve" else "50.00")
+    else:
+        assert output.retention.status == "unavailable"
+        assert output.retention.unchanged_percent is None
     assert output.retention.compared_cells == 4
     assert "second" not in repr(output)
     # The same fictional TTY receipt gates filesystem publication, not only

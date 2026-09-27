@@ -2940,3 +2940,30 @@ Broader transformation remains unfinished.
   suites were not repeated. Preparing one coherent commit containing the
   approved temporal metadata/wizard contract and previously checked finance
   integration evidence; conversion execution remains unimplemented.
+- Confirmed 22b3aeb push completed. Added private TemporalType.render using
+  stdlib datetime/zoneinfo: explicit date rendering, aware-offset conversion and
+  naive input with declared source timezone -> UTC, including date rollover.
+  Missing required timezone and offset-free DST fold/gap fail rather than guess;
+  malformed input produces a detached fixed error. Seven tests failed absent
+  implementation; all 11 temporal tests now pass, Ruff/mypy pass.
+  Not wired to CSV actions: literal replacement and preservation authority are
+  unchanged. Next: validate supported format directives and integrate explicit
+  conversion without making formatting an implicit source-preservation bypass.
+- Added portable numeric format-directive validation: input requires Y/m/d;
+  DATE excludes time directives; unknown/trailing/locale directives reject.
+  Five regressions reproduced silent acceptance before validation; all 96
+  policy tests and Ruff pass. Contract documents supported directives and
+  missing/ambiguous timezone behavior. CSV conversion wiring remains next;
+  no review rerun or activation claim from this private renderer checkpoint.
+- Wired explicit preserve.format_temporal into private CSV execution and the
+  existing receipt gate; missing settings/fallback selection reject. Extended
+  the fictional PTY test through CSV/manifest publication: missing/stale receipt
+  failures, formatted dates, cleanup and tampering checks pass. All-preserve
+  rows cannot evade the whole-row rule through formatting. Temporal retention
+  percentage stays unavailable pending its logical-equality contract.
+  No public activation; literal replace_text remains independent. Next: record
+  checks and commit this complete private conversion slice, then scoped review
+  of the changed preservation path before any activation.
+  Verification: 227 policy/executor tests pass; changed Python Ruff and targeted
+  mypy pass. Public CLI conversion remains disabled; format settings alone do
+  not request preservation or execution.
