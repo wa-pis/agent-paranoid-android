@@ -3649,3 +3649,11 @@ Broader transformation remains unfinished.
   preserved and coincident-zero fields. Executor 237 passed, Ruff passed.
   Next: signed corrected SHA and independent verification of this finding only;
   no push/PR until review disposition is recorded. No public activation.
+- Corrected signed SHA ee06d97d76ebd7d1434a81dad520efa91bef7ad1 submitted to the
+  same independent reviewer for the High finding's changed scope only. Review
+  pending; do not duplicate. Next: consume disposition, then normal PR gates.
+- Independent AI re-review closed High at ee06d97; evidence
+  reviews/ee06d97-ai-safety.md records exact scope, checks and limitations.
+  No additional corrective-diff issue identified. Preparing evidence-only signed
+  commit and PR; runtime unchanged since 237 passing tests. Next: required CI
+  and normal merge only after green gates. Public execution remains disabled.
