@@ -3273,3 +3273,12 @@ Broader transformation remains unfinished.
   policy/approval/receipt/CLI-review/architecture tests passed; targeted
   Ruff/mypy, strict OpenSpec and diff checks passed. Next: commit this private
   adapter batch and request one new-scope independent safety review before PR.
+- Signed c9ec98cf1ff012e2c39cdcdf21676c4afdf6ead2 sent to existing independent
+  AI reviewer Boyle/CSV-Gate-1 (01a0dfa0-7f22-75d3-9b19-d181e11f187d).
+  Scope: new Parquet path and shared-check extraction versus merged 0c259af.
+  Review pending; no duplicate reviewer, PR or CI started. Next: collect findings.
+- CSV-Gate-1 completed c9ec98c review: no new reportable finding. Two additional
+  fictional decimal38 and microsecond/+05:45 in-memory probes passed; prior
+  author suites not repeated. Evidence reviews/c9ec98c-ai-safety.md records
+  materialized-memory and untested filesystem-fault limitations. Next: publish
+  private Parquet PR and await required CI; full RC/public activation pending.
