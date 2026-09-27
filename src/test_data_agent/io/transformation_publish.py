@@ -57,14 +57,16 @@ def temporary_csv_publication(
                 filename = "dataset.parquet"
             else:
                 payload, filename = result.csv_bytes, "dataset.csv"
-            manifest = json.dumps({"version": 1, "origin": "transformed_mixed",
+            if result.provenance is None:
+                raise ValueError
+            manifest = json.dumps({"version": 2, "origin": "transformed_mixed",
                 "output": policy.output.review_summary() if policy.output else {"format": "csv"},
                 "privacy_notice": "Mixed-origin output may retain source information; not anonymized.",
                 "fields": [{"entity": item.entity, "field": item.field,
                             "action": item.behavior.action,
                             "unmatched": getattr(getattr(item.behavior, "unmatched", None), "action", None)}
                            for item in policy.fields],
-                "retention": asdict(result.retention)}, ensure_ascii=True, sort_keys=True).encode("ascii")
+                "provenance": asdict(result.provenance)}, ensure_ascii=True, sort_keys=True).encode("ascii")
             if len(manifest) + len(payload) > max_output_bytes:
                 raise ValueError
             budget.check("temporary transformation publication")

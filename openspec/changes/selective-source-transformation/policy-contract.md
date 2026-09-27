@@ -32,12 +32,38 @@ Native SQL/Parquet null output does not require a CSV output marker. CSV output
 still requires an explicit marker for null, preserving its distinction from an
 empty string. CSV input null recognition remains explicitly configured.
 
-During private SQL/Parquet-adapter development, unchanged-value percentage is
+Historical prototype: during private SQL/Parquet-adapter development, unchanged-value percentage was
 `unavailable` (null numerator/percentage), not the CSV intermediate percentage:
 final output types can change logical equality. Compared/dropped counts remain.
-This is an incomplete reporting gate, not acceptance of missing RC reporting.
+Private manifest v2 now replaces this field with action-origin provenance below.
+The legacy internal equality summary remains; public reporting acceptance is pending.
 
 ## Separate Evidence And Decisions
+
+### Output provenance decision (owner confirmed 2026-09-28)
+
+The user-facing report uses three per-output-cell origins instead of treating
+value equality as origin: replacement (замена), synthetic (синтетика), original
+(исходное). This supersedes earlier unchanged-percentage requirements for that
+report; existing equality-based safety checks remain independent and unchanged.
+
+- An applied mapping, literal replacement, source-derived formula, or explicit
+  type/format transformation is replacement, even if its value equals the input.
+- A generated value is synthetic even if it coincides with the input. Formatting
+  a generated value retains synthetic origin.
+- A value left untouched is original, including an original null. An unmatched
+  rule uses its actual fallback: preserve -> original, generate -> synthetic.
+- Explicit replacement with null or empty text is replacement. File encoding,
+  CSV quoting and physical Parquet serialization alone do not change origin.
+- Classify individual cells, not entire columns. Report aggregate counts and
+  proportions without values. Dropped cells are counted separately and excluded
+  from the output-cell denominator. Label the original share as values left
+  original, not values unchanged by equality.
+
+These statuses neither certify anonymization nor authorize preservation, source
+row copying, receipts or public execution. Formula-null and DATETIME-key equality
+remain unresolved. Implementation and acceptance of this reporting change remain
+pending; older reporting descriptions below document the existing prototype.
 
 ### Cross-format matching decision (owner confirmed 2026-09-27)
 

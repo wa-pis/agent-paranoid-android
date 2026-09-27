@@ -143,10 +143,11 @@ All items below remain unverified until reproduced against the current candidate
   parity with the noninteractive policy.
 - [ ] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
-- [ ] Implement the approved “Сохранено исходных значений: X%” transformation
-  report indicator: actual unchanged values, explicit comparison scope and
-  denominator, typed equality/null/drop/derive/empty-input tests, and safe
-  aggregate disclosure. Unavailable is not zero; this is not uniqueness or
+- [ ] Implement the owner-confirmed three-origin report (2026-09-28): replacement,
+  synthetic, original, based on executed cell actions rather than value equality.
+  Verify mapping/generation/preserve fallbacks, explicit formatting, nulls,
+  dropped-cell exclusion and empty output; expose counts and proportions without
+  values. Equality safety guards remain independent; origin is not anonymity or
   permission to preserve source data.
 - [ ] Add an end-to-end fictional finance fixture: preserved product/segment/
   bank combinations, replaced amounts, recalculated totals, mapped identifiers.

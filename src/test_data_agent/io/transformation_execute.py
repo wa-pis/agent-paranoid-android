@@ -38,6 +38,7 @@ from test_data_agent.validation.reconciliation import assert_generated_dataset_v
 from test_data_agent.rules.expressions import eval_exact_decimal, eval_exact_integer, expression_constants, safe_eval
 from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
 from test_data_agent.core.transformation_report import SourceRetentionSummary, retention_summary_from_counts
+from test_data_agent.core.transformation_report import ProvenanceSummary, provenance_summary
 from test_data_agent.csv_profiler import validate_csv_headers, parse_bool
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
 
@@ -54,6 +55,7 @@ class CsvTransformationResult:
     retention: SourceRetentionSummary
     columns: tuple[str, ...] = field(repr=False)
     rows: tuple[tuple[str | None, ...], ...] = field(repr=False)
+    provenance: ProvenanceSummary | None = None
 
 
 def trace_csv_replacements(
@@ -291,6 +293,11 @@ def replace_csv_snapshot(
             raise ValueError
         append_row(output_names)
         def preserved(name: str, original: str, action: PreserveAction) -> str:
+            origins[name] = "replacement" if action.format_temporal else "original"
+            if policy.output is not None:
+                target = next(item for item in policy.output.fields if item.name == name)
+                if target.type != field_types[name].value or target.temporal_type is not None:
+                    origins[name] = "replacement"
             if original == policy.csv_nulls.input_token:
                 if policy.csv_nulls.output_token is None and policy.output is None:
                     raise ValueError
@@ -299,6 +306,7 @@ def replace_csv_snapshot(
             return temporal_types[name].render(original) if action.format_temporal else original
 
         def synthesized(action: SynthesizeAction, row_index: int, name: str, original: str) -> str:
+            origins[name] = "synthetic"
             value = generated[action.generation_policy_ref][row_index][name]
             if value is None:
                 if policy.csv_nulls.output_token is None and policy.output is None:
@@ -311,8 +319,10 @@ def replace_csv_snapshot(
             return rendered
 
         unchanged = compared = dropped_cells = 0
+        origin_counts = {"replacement": 0, "synthetic": 0, "original": 0}
         logical_rows: list[tuple[str | None, ...]] = []
         for row_index, row in enumerate(reader):
+            origins = dict.fromkeys(execution_names, "replacement")
             null_fields: set[str] = set()
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
@@ -407,6 +417,8 @@ def replace_csv_snapshot(
             final_row = {name: None if name in null_fields else value
                          for name, value in zip(output_names, replaced, strict=True)}
             logical_rows.append(tuple(final_row[name] for name in output_names))
+            for name in output_names:
+                origin_counts[origins[name]] += 1
             for reference, spec in generation_specs.items():
                 final_generated[reference].append({field.name: final_row[field.name]
                                                    for field in spec.entities[0].fields})
@@ -433,7 +445,9 @@ def replace_csv_snapshot(
                 isinstance(action, PreserveAction) and action.format_temporal for action in actions.values()):
             # A lexical comparison does not measure final typed/temporal output equality.
             retention = replace(retention, status="unavailable", unchanged_cells=None, unchanged_percent=None)
-        return CsvTransformationResult(output.getvalue(), retention, output_names, tuple(logical_rows))
+        provenance = provenance_summary(origin_counts["replacement"], origin_counts["synthetic"],
+                                        origin_counts["original"], dropped_cells)
+        return CsvTransformationResult(output.getvalue(), retention, output_names, tuple(logical_rows), provenance)
     except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:

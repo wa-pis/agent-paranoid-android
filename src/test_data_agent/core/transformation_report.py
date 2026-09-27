@@ -25,6 +25,29 @@ class SourceRetentionSummary:
     unchanged_percent: str | None
 
 
+@dataclass(frozen=True, slots=True)
+class ProvenanceSummary:
+    replacement_cells: int
+    synthetic_cells: int
+    original_cells: int
+    output_cells: int
+    excluded_dropped_cells: int
+    replacement_percent: str | None
+    synthetic_percent: str | None
+    original_percent: str | None
+
+
+def provenance_summary(replacement: int, synthetic: int, original: int,
+                       dropped: int) -> ProvenanceSummary:
+    """Report executed actions, never infer origin from value equality."""
+    if any(type(count) is not int or count < 0 for count in (replacement, synthetic, original, dropped)):
+        raise TransformationReportError("invalid transformation provenance report")
+    total = replacement + synthetic + original
+    shares = [retention_summary_from_counts(count, total, dropped).unchanged_percent
+              for count in (replacement, synthetic, original)]
+    return ProvenanceSummary(replacement, synthetic, original, total, dropped, *shares)
+
+
 def _is_scalar(value: object) -> bool:
     if value is None or type(value) in {str, bool, int, date, datetime}:
         return True

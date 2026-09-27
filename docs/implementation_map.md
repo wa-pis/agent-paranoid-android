@@ -73,9 +73,15 @@ authorize source-value preservation or transform rows.
 Derived-field coverage reuses `rules.expressions.expression_references` to
 parse bounded row-local arithmetic and require exact declared dependencies;
 it does not evaluate formulas or establish financial/null/result-type semantics.
-`transformation_report.py` computes a bounded, value-free unchanged-cell
-aggregate from corresponding source/output rows. The private CSV executor now
-uses it; the report module itself neither transforms nor publishes rows.
+`transformation_report.py` computes value-free action-origin counts and shares:
+replacement, synthetic and original. The private executor records actual
+executed branches, not value equality. Explicit type/format transformation is
+replacement; generated values remain synthetic after formatting. Dropped cells
+are excluded; empty output shares are null. Shares round independently to two
+decimal places and may sum to 99.99 or 100.01. Private manifest v2 exposes
+`provenance`, replacing v1 `retention`. Legacy internal equality aggregates remain
+for compatibility; neither reporting path authorizes preservation or weakens
+independent safety checks. The report module neither transforms nor publishes.
 
 `src/test_data_agent/io/mapping_snapshot.py`, `mapping_loader.py`,
 `behavior_policy_files.py`, and `transformation_source.py` read bounded local

@@ -4,6 +4,30 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Report executed cell provenance
+
+Transformation reporting SHALL classify output cells as replacement, synthetic,
+or original according to the actual executed action, independently of equality
+with source values. It SHALL disclose only aggregate counts and proportions.
+Dropped cells SHALL be counted separately and excluded from the denominator.
+An empty output-cell scope SHALL have unavailable proportions, not zero percent.
+This reporting SHALL NOT weaken independent sensitive-data or source-copy guards.
+
+#### Scenario: Actual fallback determines origin
+- **WHEN** an unmatched mapping preserves or generates a value
+- **THEN** its origin is original or synthetic respectively, while a matched
+  replacement remains replacement even when its result equals the input.
+
+#### Scenario: Explicit formatting and physical serialization
+- **WHEN** explicit type or format transformation is applied to original data
+- **THEN** origin is replacement; formatting generated data retains synthetic
+  origin, and physical file encoding or quoting alone does not change origin.
+
+#### Scenario: Null and dropped cells
+- **WHEN** a rule replaces a cell with null or empty text
+- **THEN** it is replacement; an untouched null is original, and dropped cells
+  have no output origin and do not contribute to output-cell proportions.
+
 ### Requirement: Input and output formats are independent
 
 The transformation system SHALL support CSV and Parquet file inputs and
