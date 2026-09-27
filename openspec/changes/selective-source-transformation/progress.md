@@ -3584,3 +3584,56 @@ Broader transformation remains unfinished.
   No runtime tests independently rerun; installed-command acceptance remains
   unproven. Preparing private command PR, then isolated installed-wheel evidence.
   Public registration/durable destinations remain disabled.
+- PR #584 opened and attached: https://github.com/wa-pis/agent-paranoid-android/pull/584
+  head 6a113f6 (review evidence only after reviewed product d2b3f07). Required CI
+  pending; no manual duplicate runs. Next: required checks and isolated installed
+  wheel evidence; normal merge only after green gates.
+- Installed artifact smoke passed from /private/tmp/apa-installed-command.lCsYlH:
+  hatchling wheel from HEAD 6a113f6; existing development metadata remains 1.5.0
+  (not a released/new stable version or RC). SHA256
+  50b6147fdcd45223ca62a107e14c967e034cb288bce86065ea5168cff0de62e4.
+  uv installed wheel --no-deps into dedicated site target, runtime uses existing
+  dependency environment; module path asserted under installed target, no source
+  checkout import or product monkeypatch. Fictional inline mapping: installed
+  CLI transform-review -> digest -> installed private command -> 2 replacements,
+  no durable output. Smoke script retained in that temp root. Initial uv cache
+  permission failure fixed by task-local cache; then install/smoke passed.
+  Not clean-dependency or public execution acceptance. PR #584 CI was still
+  running at first check; next inspect gates, merge normally if all green.
+- PR #584 merged normally at 2026-09-27T21:17:43Z, merge SHA
+  ebfab030fe081149d5394d91fb8159bf9545e01d. All CI completed SUCCESS/SKIPPED,
+  required checks passed, merge state CLEAN, GitHub head signature verified.
+  Closed saved-policy command and installed private-path evidence complete for
+  this slice; not public CLI activation or full financial/SQL acceptance.
+  Next: reconcile required activation evidence with the finance/relationship
+  scenarios and prepare the exact scoped activation amendment only when those
+  gates are met. Preserve local installed-smoke evidence/progress on next branch.
+- Finance gate audit identified approved zero synthesis still rejected by the
+  blanket generated-value equality guard. On codex/1-6-finance-zero from ebfab03,
+  new fictional DECIMAL-zero cases reproduced two failures (direct/fallback).
+  Narrow local fix permits generated numeric zero coincidence only after actual
+  generation; mappings/text/bool and complete-row guards unchanged. 30 focused
+  decimal-shape/synthesis/numeric-identity cases passed; Ruff passed. No push/PR.
+  Next: integer/FLOAT zero and complete-row rejection regressions, provenance
+  assertions, then exact-SHA independent safety review before publication.
+  Nonzero declared-rounding coincidence and cross-row relations still incomplete.
+- Added INTEGER/FLOAT numeric-zero provenance and whole-row rejection cases:
+  4 passed; focused Ruff passed. Initial FLOAT fixture incorrectly profiled as
+  INTEGER and was rejected during review preparation; corrected fictional input
+  to explicit fractional values, without weakening product schema checks.
+  Prior 30 decimal/numeric cases were not rerun (product unchanged).
+  Next: test noncanonical zero spellings against complete-row guards before
+  exact-SHA independent safety review. Local finance-zero diff remains uncommitted;
+  no push, PR, CI, public activation or RC readiness claimed.
+- Noncanonical FLOAT zero regression reproduced a complete-row guard bypass in
+  the local zero allowance: -0.00 -> 0.0 passed byte comparison. Fixed by tracking
+  numeric zero coincidences already established during synthesis and treating
+  those cells as unchanged for the complete-row guard only. Output and synthetic
+  provenance are untouched; no new text/DATETIME equivalence rule introduced.
+  INTEGER noncanonical spellings failed review schema compatibility, so the
+  regression matrix uses canonical INTEGER and canonical/noncanonical FLOAT.
+  Six zero cases passed; after the product guard change, the focused executor
+  module passed all 235 tests (3.34s), Ruff and diff checks passed.
+  GitHub read confirmed no PR for codex/1-6-finance-zero. No overlapping CI started.
+  Next: signed checkpoint and independent exact-SHA safety review of this narrow
+  zero allowance/complete-row guard change, then normal PR gates. Still private.

@@ -1051,12 +1051,48 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
         assert rows[0]["code"] == "manual"
 
 
+@pytest.mark.parametrize(("kind", "zero"), [("integer", "0"), ("float", "0.0"), ("float", "-0.00")])
+@pytest.mark.parametrize("whole_row", [False, True])
+def test_numeric_zero_synthesis_origin_and_whole_row_guard(kind, zero, whole_row):
+    second = "2.5" if kind == "float" else "2"
+    original = request(source_bytes=f"flag,code\ntrue,{zero}\nfalse,{second}\n".encode())
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["fields"][1]["behavior"] = {"action": "synthesize", "generation_policy_ref": "gen.yaml"}
+    source = next(p for p in original.parts if p.kind == "source")
+    parts = tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv")
+    if whole_row:
+        source = replace(source, payload=f"code\n{zero}\n{second}\n".encode())
+        policy["fields"] = [policy["fields"][1]]
+        policy.pop("file_text_mapping")
+        parts = ()
+        policy["schema_fingerprint"] = transformation_schema_fingerprint(_profile_transformation_csv(
+            source, null_token=None, budget=GenerationBudget(5), max_bytes=8192))
+    spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 2,
+        "fields": [{"name": "code", "data_type": kind,
+                    "distribution": {"kind": "numeric", "min_value": 0, "max_value": 0}}]}]}
+    parts += (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    module = import_module("test_data_agent.io.transformation_execute")
+    kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+                  budget=GenerationBudget(5))
+    if whole_row:
+        with pytest.raises(module.TransformationExecutionError):
+            module.replace_csv_snapshot(material, **kwargs)
+    else:
+        result = module.replace_csv_snapshot(material, **kwargs)
+        assert result.provenance.synthetic_cells == 2
+        assert result.provenance.replacement_cells == 2
+        assert result.provenance.original_cells == 0
+
+
 @pytest.mark.parametrize("scale", [2, 3])
 @pytest.mark.parametrize("precision", [20, 19])
 @pytest.mark.parametrize("fallback", [False, True])
-@pytest.mark.parametrize("generated", ["3.00", "1.00"])
+@pytest.mark.parametrize("generated", ["3.00", "1.00", "0.00"])
 def test_decimal_synthesis_binds_declared_shape(scale, precision, fallback, generated):
-    original = request(source_bytes=b"flag,code\ntrue,1.00\nfalse,2.00\n")
+    original = request(source_bytes=b"flag,code\ntrue,0.00\nfalse,0.00\n" if generated == "0.00"
+                       else b"flag,code\ntrue,1.00\nfalse,2.00\n")
     source = next(part for part in original.parts if part.kind == "source")
     policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
     policy["fields"][1].update(decimal_type={"precision": 20, "scale": 2},
@@ -1083,7 +1119,7 @@ def test_decimal_synthesis_binds_declared_shape(scale, precision, fallback, gene
             with pytest.raises(module.TransformationExecutionError):
                 execute(material)
         else:
-            assert execute(material) == b"flag,code\nno,3.00\nyes,3.00\n"
+            assert execute(material) == f"flag,code\nno,{generated}\nyes,{generated}\n".encode()
 
 
 @pytest.mark.parametrize("csv_mapping", [False, True])
