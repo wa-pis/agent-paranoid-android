@@ -3573,3 +3573,14 @@ Broader transformation remains unfinished.
   output-budget rejection and asserts dedicated TMPDIR is empty on both paths.
   Nine focused cases passed; Ruff passed. Next: consolidate command documentation/commit for
   scoped review; no public registration or persistent destination added.
+- Signed checkpoint d2b3f0743a979a4db63a7f7e88ed27dc8cf660b0 created; strict
+  OpenSpec/diff passed; no PR exists. Independent AI reviewer Boyle / CSV-Gate-1
+  (01a0dfa0-7f22-75d3-9b19-d181e11f187d) reviewing only the new command
+  orchestration against db62e41. Prior closed decoder/output scopes excluded.
+  Review pending; do not duplicate. Next: consume findings, then installed
+  private-path evidence and separately gated activation. No push/CI started.
+- Independent AI review completed without actionable findings at d2b3f07;
+  evidence reviews/d2b3f07-ai-safety.md records scope, checks and limitations.
+  No runtime tests independently rerun; installed-command acceptance remains
+  unproven. Preparing private command PR, then isolated installed-wheel evidence.
+  Public registration/durable destinations remain disabled.
