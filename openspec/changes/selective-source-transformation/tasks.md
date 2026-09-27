@@ -6,6 +6,17 @@ meaning; the reconciliation does not mark partial implementations complete.
 
 ## Specification
 
+- [x] Record owner-confirmed independent input/output format contract (2026-09-27).
+- [ ] Separate shared transformation/validation from CSV-specific parsing and
+  rendering, retaining existing CSV regression evidence.
+- [ ] Implement input adapters for CSV, Parquet and separately authorized bounded
+  Trino/PostgreSQL query results; no SQL-file import or real DB access in tests.
+- [ ] Implement independently selected CSV, Parquet and SQL-script output
+  adapters; bind format/dialect settings to approval; never execute output SQL.
+- [ ] Verify all 12 input/output combinations with fictional data, common field
+  policy semantics, logical readback, decimal/null/date fidelity and atomic
+  publication failure checks. Query fixtures do not count as live acceptance.
+
 - [x] Record one-to-one rows and explicit reference-field preservation.
 - [x] Record financial replacement, zero/rounding equality exceptions and
   declared dependencies.

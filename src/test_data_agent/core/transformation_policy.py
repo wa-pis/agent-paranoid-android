@@ -194,10 +194,16 @@ class MappingDomain(_PrivateModel):
     mapping: Annotated[InlineMapping | CsvMapping, Field(discriminator="kind")] = Field(repr=False)
 
 
+class CsvNullSettings(_PrivateModel):
+    input_token: Annotated[StrictStr, Field(min_length=1, max_length=256)] | None = Field(default=None, repr=False)
+    output_token: Annotated[StrictStr, Field(min_length=1, max_length=256)] | None = Field(default=None, repr=False)
+
+
 class BehaviorPolicy(_PrivateModel):
     schema_version: Literal["0.1"]
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
+    csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     file_text_mapping: CsvMapping | None = Field(default=None, repr=False)

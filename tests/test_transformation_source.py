@@ -19,6 +19,41 @@ from test_data_agent.io.transformation_source import (
 )
 
 
+@pytest.mark.parametrize("token,kind,nullable", [(None, "string", False), ("\\N", "integer", True)])
+def test_private_null_profile_infers_type_without_changing_default(token, kind, nullable):
+    from test_data_agent.io.transformation_source import _profile_transformation_csv
+    source = SnapshotPart("source", "items", b"amount,blank\n12,\n\\N,\n")
+    profile = _profile_transformation_csv(source, null_token=token, budget=GenerationBudget(5), max_bytes=8192)
+    amount, blank = profile.entities[0].fields
+    assert amount.data_type.value == kind
+    assert amount.nullable is nullable
+    assert blank.data_type.value == "string"
+    assert blank.nullable is False
+    assert blank.null_ratio == 0
+    legacy = profile_csv_bytes(source.payload, source.name, budget=GenerationBudget(5))
+    assert legacy.columns[1].null_count == 2
+    assert legacy.columns[0].nullable is False
+
+
+@pytest.mark.parametrize("marker", ["fictional@example.invalid", " fictional@example.invalid "])
+def test_null_marker_cannot_erase_positive_sensitivity_evidence(marker):
+    from test_data_agent.io.transformation_source import _profile_transformation_csv
+    source = SnapshotPart("source", "items", f"status\n{marker}\nready\n".encode())
+    for token in (None, marker):
+        profile = _profile_transformation_csv(source, null_token=token,
+            budget=GenerationBudget(5), max_bytes=8192)
+        assert profile.entities[0].fields[0].sensitive
+        policy = {"schema_version": "0.1", "seed": 7,
+            "schema_fingerprint": transformation_schema_fingerprint(profile),
+            "csv_nulls": {"input_token": token, "output_token": "NULL"},
+            "fields": [{"entity": "items", "field": "status", "sensitivity": "non_sensitive",
+                "behavior": {"action": "preserve", "authorization_ref": "fictional",
+                             "comment": "Fictional test decision"}}]}
+        with pytest.raises(TransformationSourceError):
+            prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, (),
+                max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+
+
 def test_csv_review_derives_evidence_from_bound_source_bytes():
     source = SnapshotPart("source", "items", b"status\nready\nwaiting\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(

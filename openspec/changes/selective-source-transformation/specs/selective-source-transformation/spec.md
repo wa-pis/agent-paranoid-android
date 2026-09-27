@@ -4,6 +4,34 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Input and output formats are independent
+
+The transformation system SHALL support CSV and Parquet file inputs and
+separately authorized bounded read-only Trino or PostgreSQL query-result
+inputs. Each input SHALL independently support CSV, Parquet and SQL-script
+file outputs through shared transformation and validation semantics. Adapters
+SHALL own physical encodings while the common core owns field policy and
+logical types. Approval SHALL bind the captured source and selected output
+settings as well as the policy and mappings. SQL outputs SHALL NOT execute
+database writes. SQL-file input is outside this requirement.
+
+#### Scenario: Cross-format transformation
+
+- **GIVEN** a fictional authorized input snapshot and reviewed field policy
+- **WHEN** any of the four input kinds selects any of the three output kinds
+- **THEN** the same one-to-one field rules and logical validation apply,
+  independent of physical encoding, and failed validation publishes no output.
+- **AND** null/empty, exact decimal and explicit temporal semantics survive
+  supported adapter readback without implicit type coercion.
+
+#### Scenario: Database query result exported as a script
+
+- **GIVEN** an authorized bounded read-only Trino or PostgreSQL result snapshot
+- **WHEN** SQL-script output is selected
+- **THEN** the system creates a script file using its declared dialect and safe
+  literal/identifier encoding, never executes it, and preserves source access
+  allowlists, budgets and sensitivity gates.
+
 ### Requirement: Existing permitted SQL connectors remain usable
 
 The system SHALL consistently enforce already-permitted boolean expressions

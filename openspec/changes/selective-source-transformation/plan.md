@@ -5,6 +5,25 @@ Implementation and 1.6.0rc1 publication authorized by the user on 2026-09-24
 review applies to the final exact RC SHA and safety-policy changes, not every PR.
 Stable publication is not authorized. No production source access is authorized.
 
+## Format-independent scope clarification — 2026-09-27
+
+The owner clarified the original RC scope: CSV and Parquet files, and bounded
+read-only query results from Trino or PostgreSQL, are independent input choices.
+Each can target CSV, Parquet or an SQL script file. SQL output is never executed
+against a database; SQL-file import is not included. This is not live-access
+authorization. Preserve SQL allowlists, budgets and explicit source authority.
+
+Use input adapters -> shared typed transformation/validation -> output adapters.
+Field rules and logical null/decimal/date semantics belong to the common core;
+CSV dialect/null markers, Parquet physical types and SQL literal/identifier
+encoding belong to adapters. Bind source snapshot, policy, mappings and selected
+output settings to review/approval. Do not place CSV parsing in the common core.
+Reuse the working CSV slice as the first route and regression baseline, then
+extract only shared behavior needed by the next adapter. No per-format engines.
+Completion requires all 4 input kinds x 3 output kinds, not CSV-only acceptance.
+For query results, preserve the captured snapshot order; do not promise stable
+database order across executions without an explicit ordering contract.
+
 The refreshed 2026-09-24 handover is planned in
 [client feedback v2](feedback-2026-09-24-v2.md): findings 20–26, strengthened
 acceptance for 1–19, dependencies and unresolved decisions. It extends this

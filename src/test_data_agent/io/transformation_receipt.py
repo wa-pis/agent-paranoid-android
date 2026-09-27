@@ -34,7 +34,8 @@ def _canonical_request(
     sources = [part for part in canonical.parts if part.kind == "source"]
     if len(sources) != 1:
         raise ValueError
-    profile = revalidate_csv_evidence(sources[0], evidence, budget=budget, max_bytes=max_total_bytes)
+    profile = revalidate_csv_evidence(sources[0], evidence, budget=budget,
+                                      max_bytes=max_total_bytes, policy_yaml=policy)
     reject_sensitive_text_reuse(policy, profile, sources[0], external, budget=budget)
     return canonical
 
