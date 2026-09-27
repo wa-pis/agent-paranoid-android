@@ -43,8 +43,9 @@ This is an incomplete reporting gate, not acceptance of missing RC reporting.
 
 Private input development accepts `input_format: parquet` (omitted means CSV).
 The current slice supports nullable UTF-8 strings, signed integers, float64 and
-BOOLEAN with typed inline substitution. Other numeric, temporal and nested types
-reject until implemented. BOOLEAN remains distinct from INTEGER mapping keys;
+BOOLEAN with typed inline substitution, plus DATE and DECIMAL described below.
+Remaining numeric, temporal and nested types reject until implemented.
+BOOLEAN remains distinct from INTEGER mapping keys;
 native boolean text formatting/preservation is not implemented.
 Native date32 supports typed DATE substitution using canonical ISO date keys,
 without timezone inference. Native date text matching and timestamps remain

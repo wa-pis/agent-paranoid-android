@@ -3428,3 +3428,27 @@ Broader transformation remains unfinished.
   all six changed product modules. No PR exists for this branch. Preparing a
   signed checkpoint for independent AI safety review of this private input
   boundary, not a release candidate or public activation approval.
+- Signed checkpoint 3759596b49ecaa8b59b39a9b6b4feef7bb49bc20 created.
+  Independent AI reviewer Boyle / CSV-Gate-1 (agent
+  01a0dfa0-7f22-75d3-9b19-d181e11f187d) dispatched for this exact SHA against
+  65424ced6d1184aa1aa183834325c08e277e24c8; submission
+  01a0e39d-3aa0-7b53-8dc4-ce420bf8b32f. Review pending; do not dispatch a duplicate.
+  No push/PR/CI launched. Local signature verification lacks allowedSignersFile;
+  commit contains an SSH signature, but local signer verification is unconfirmed.
+  Next: consume this review, resolve findings, record evidence before PR.
+- Review completed: two findings, recorded in reviews/3759596-ai-safety.md.
+  High decoded Parquet dictionary expansion remains open. Medium empty -> null
+  false preservation rejection fixed locally using logical null comparison;
+  new single-column private publication regression and identity/preservation
+  selection passed (18 tests), Ruff passed. No repeated review dispatched yet.
+  Next: bound cumulative decoded expansion before Python materialization, add
+  fictional dictionary-expansion regression, then review fixes at a new SHA.
+- Added cumulative Arrow decoded-buffer byte accounting against the existing
+  expanded-size limit, checked before each batch.to_pylist(). Three isolated
+  subprocess regressions passed: a small dictionary expansion succeeds, a
+  multi-batch cumulative overflow rejects, and the review's 4096-character
+  dictionary case rejects. No product monkeypatch; subprocess PYTHONPATH was
+  corrected after initial fixture import failures. Mypy/Ruff passed decoder.
+  This bounds decoded payload, not Python object overhead or Arrow peak RSS;
+  independent review must assess sufficiency. Next: commit both findings' fixes
+  and request scoped re-review on the new SHA. No public activation/PR/CI.

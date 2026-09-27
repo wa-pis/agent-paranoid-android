@@ -10,7 +10,7 @@ from collections.abc import Iterator
 
 from test_data_agent.core.limits import (
     GenerationBudget, DEFAULT_MAX_INPUT_FILE_BYTES, DEFAULT_MAX_INPUT_CELL_CHARS,
-    enforce_parquet_metadata_limits,
+    enforce_parquet_metadata_limits, max_parquet_expanded_bytes, InputLimitError,
 )
 from test_data_agent.core.transformation_policy import BehaviorPolicy
 from test_data_agent.core.field import FieldType
@@ -83,8 +83,15 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
                         or getattr(getattr(action, "unmatched", None), "action", None) == "preserve"):
                     raise ValueError("native numeric text/preservation requires explicit formatting")
         rows = []
+        decoded_bytes = 0
+        expanded_limit = max_parquet_expanded_bytes()
         for batch in parquet.iter_batches(batch_size=1024):
             budget.check("transformation Parquet input batch")
+            # Arrow string buffers include dictionary expansion, unlike page metadata.
+            # This bounds decoded payload, not Python object overhead or Arrow peak RSS.
+            decoded_bytes += batch.nbytes
+            if decoded_bytes > expanded_limit:
+                raise InputLimitError("transformation Parquet decoded size exceeds limit")
             for row in batch.to_pylist():
                 budget.check("transformation Parquet input row")
                 if any(value is not None and (

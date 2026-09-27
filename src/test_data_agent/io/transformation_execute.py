@@ -392,7 +392,9 @@ def replace_csv_snapshot(
             for name in decimal_types:
                 if name in transformed and name not in null_fields:
                     scalar(name, transformed[name])
-            if output_names == names and (replaced == tuple(row[name] for name in names)
+            if output_names == names and (tuple(None if name in null_fields else value
+                    for name, value in zip(output_names, replaced, strict=True))
+                    == tuple(None if row[name] == policy.csv_nulls.input_token else row[name] for name in names)
                     or preserved_fields == set(names)):
                 raise ValueError
             if policy.input_format == "parquet" and output_names == names and all(

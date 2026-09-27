@@ -343,6 +343,33 @@ def test_native_numeric_identity_rejects_before_execution(value):
             max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
 
 
+def test_native_empty_to_null_is_not_whole_row_preservation():
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"code": ["", None]}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    policy = {"schema_version": "0.1", "schema_fingerprint": "0" * 64,
+        "input_format": "parquet", "seed": 7, "fields": [
+            {"entity": "items", "field": "code", "sensitivity": "non_sensitive",
+             "behavior": {"action": "substitute", "mapping": {"kind": "inline",
+                 "entries": [{"original": [""], "replacement": [None]},
+                             {"original": [None], "replacement": ["filled"]}]}}}],
+        "output": {"format": "parquet", "fields": [
+            {"name": "code", "type": "string", "nullable": True}]}}
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
+    profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, (),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        assert pq.read_table(output / "dataset.parquet").column("code").to_pylist() == [None, "filled"]
+
+
 @pytest.mark.parametrize("replacement,expected", [
     ("2026-02-03", True), ("20260203", True), ("2027-02-03", False),
     ("not-a-date", False), (None, False)])
