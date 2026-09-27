@@ -33,3 +33,14 @@ Ruff/mypy passed; then both exact/padded marker regression cases passed.
 
 This is AI conformance review, not human/GitHub approval, public activation,
 or release authorization.
+
+## Independent re-review
+
+CSV-Gate-1 verified `cc327e9e060c168dbad45573d6839ac41deeb9d6` on
+2026-09-27 (Europe/Samara), single finding only, submission
+`01a0e2b3-83d7-7973-9c88-ac2eb9790c65`. High finding resolved; no additional
+issue identified in the changed scope. Static diff, surrounding detector logic,
+exact/padded-marker regression and evidence inspected. Author tests were not
+rerun; commit identity verified, cryptographic signature not independently
+verified. No edits, network, real data, receipts or publication. Unrelated
+progress edit excluded. This is not release or activation approval.

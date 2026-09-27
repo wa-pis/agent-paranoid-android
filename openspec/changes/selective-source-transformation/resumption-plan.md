@@ -36,6 +36,13 @@ not by commissioning a duplicate review.
 
 ## Next deliverable: one complete CSV user workflow
 
+Owner clarification (2026-09-27): this is the first route, not a CSV-specific
+architecture. Full RC requires independent CSV/Parquet/Trino-result/PostgreSQL-
+result inputs and CSV/Parquet/SQL-script outputs through one transformation
+core. After the CSV baseline, separate adapter concerns and verify all 12
+routes; see plan.md. SQL output is a file, not database writes. No live database
+authorization or SQL-file import is implied.
+
 Deliver CSV + saved behavior policy -> reviewed local CLI execution -> output
 CSV + mixed-origin manifest + value-free retention report. Start with the
 already agreed global/per-column exact replacements, not another helper layer.

@@ -3088,3 +3088,16 @@ Broader transformation remains unfinished.
   [reviews/5404407-ai-safety.md](reviews/5404407-ai-safety.md).
   No new user decision needed; public execution remains disabled. Commit fix
   and re-review only this finding at new SHA; do not duplicate reviewer.
+- Signed fix cc327e9e060c168dbad45573d6839ac41deeb9d6 sent to the same
+  CSV-Gate-1 for narrow read-only re-review. Pending; no duplicate worker.
+- Re-review at cc327e9 resolved the sole High finding; no additional changed-
+  scope issue. Evidence updated in reviews/5404407-ai-safety.md. No review active.
+- Owner clarified original format-independent RC intent: CSV/Parquet files and
+  bounded Trino/PostgreSQL query results independently target CSV, Parquet or
+  SQL-script files. Recorded in plan/tasks/client-acceptance/resumption-plan and
+  normative spec delta. All 12 routes require fictional acceptance; SQL output
+  is never executed, SQL-file import and real DB access are not authorized.
+  CSV remains first regression route, not core architecture. Strict OpenSpec
+  and diff checks pass; no runtime code changed for this clarification.
+  Next: publish reviewed nullable checkpoint PR, then implement remaining
+  common-core/adapter and user-profile work against the clarified plan.

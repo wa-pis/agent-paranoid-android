@@ -13,6 +13,17 @@ historical, not overwritten by the new document's measurements.
 
 ## Finding Dispositions To Verify
 
+Owner clarification, 2026-09-27: format independence is RC acceptance, not a new
+client-reported defect. Exercise CSV, Parquet, fictional Trino-result and
+fictional PostgreSQL-result inputs against each of CSV, Parquet and SQL-script
+outputs (12 routes). Reuse one logical fixture/policy where types permit; verify
+row correspondence, replacements, keys, logical null versus empty, exact DECIMAL
+and declared temporal settings after adapter readback. Check SQL escaping and
+declared dialect without executing against a real database. Input permissions,
+budgets, sensitivity checks and output publication failures must be consistent
+across routes. Unimplemented routes remain unchecked; passing CSV is not RC
+completion. Source-free tools remain unchanged; SQL scripts are files only.
+
 | Finding | Plan / acceptance boundary |
 | --- | --- |
 | 1 | Reproduce identifier/phone validation mismatch; correct generator/validator agreement without a blanket privacy bypass. Check claimed short-string path reachability separately. |
