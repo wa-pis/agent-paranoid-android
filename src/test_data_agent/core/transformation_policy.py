@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 from datetime import datetime, timezone as utc_timezone
 from graphlib import TopologicalSorter
 from typing import Annotated, Literal, TypeAlias
@@ -124,7 +125,7 @@ class TemporalType(_PrivateModel):
                     raise ValueError
                 parsed = parsed.astimezone(ZoneInfo(self.target_timezone))
             return parsed.strftime(self.output_format)
-        except (ValueError, TypeError, OverflowError, KeyError):
+        except (ValueError, TypeError, OverflowError, KeyError, re.error):
             pass
         try:
             raise BehaviorPolicyError("invalid temporal conversion")
@@ -145,6 +146,8 @@ class TemporalType(_PrivateModel):
                     position += 1
                     if position == len(pattern) or pattern[position] not in allowed:
                         raise ValueError("unsupported temporal directive")
+                    if index == 0 and pattern[position] != "%" and pattern[position] in directives:
+                        raise ValueError("repeated input directive")
                     directives.add(pattern[position])
                 position += 1
             if index == 0 and not set("Ymd") <= directives:

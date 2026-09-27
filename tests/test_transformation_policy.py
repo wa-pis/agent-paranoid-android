@@ -83,6 +83,7 @@ def test_temporal_render_rejects_missing_or_ambiguous_zone(value, zone):
     ("date", "%Y-%m-%d", "%Y-%m-%d%"),
     ("date", "%Y-%m-%d", "%H:%M"),
     ("datetime", "%Y-%m-%d", "%c"),
+    ("datetime", "%Y-%m-%d %Y", "%Y"),
 ])
 def test_temporal_formats_reject_implicit_or_platform_specific_directives(kind, pattern, output):
     payload = policy({"action": "drop"})

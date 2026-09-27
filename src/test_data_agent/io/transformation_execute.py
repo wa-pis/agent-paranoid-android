@@ -282,6 +282,7 @@ def replace_csv_snapshot(
             for name in decimal_types:
                 scalar(name, row[name])
             values: list[str] = []
+            preserved_fields: set[str] = set()
             for name in execution_names:
                 budget.check("CSV replacement cell")
                 action = actions[name]
@@ -304,6 +305,7 @@ def replace_csv_snapshot(
                     values.append(str(float(result)))
                     continue
                 if isinstance(action, PreserveAction):
+                    preserved_fields.add(name)
                     values.append(temporal_types[name].render(row[name]) if action.format_temporal else row[name])
                     continue
                 if isinstance(action, SynthesizeAction):
@@ -316,6 +318,7 @@ def replace_csv_snapshot(
                     if key in substitutions[name]:
                         values.append(substitutions[name][key])
                     elif isinstance(action.unmatched, PreserveAction):
+                        preserved_fields.add(name)
                         values.append(row[name])
                     elif isinstance(action.unmatched, SynthesizeAction):
                         values.append(synthesized(action.unmatched, row_index, name, row[name]))
@@ -326,6 +329,7 @@ def replace_csv_snapshot(
                 if match is not None:
                     values.append(match.replacement)
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
+                    preserved_fields.add(name)
                     values.append(row[name])
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, SynthesizeAction):
                     values.append(synthesized(action.unmatched, row_index, name, row[name]))
@@ -337,7 +341,7 @@ def replace_csv_snapshot(
                 if name in transformed:
                     scalar(name, transformed[name])
             if output_names == names and (replaced == tuple(row[name] for name in names)
-                    or all(isinstance(actions[name], PreserveAction) for name in names)):
+                    or preserved_fields == set(names)):
                 raise ValueError
             if any(looks_sensitive_value(value) for value in replaced):
                 raise ValueError

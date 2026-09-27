@@ -544,9 +544,13 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal"])
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve"])
 def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
+
+    all_preserved = action == "format_all_preserve"
+    if all_preserved:
+        action = "format_temporal"
 
     preserve = {"action": "preserve", "authorization_ref": "fictional-ref",
                 "comment": "Reviewed fictional flag"}
@@ -564,8 +568,12 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
         policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
         policy["fields"][0]["behavior"]["format_temporal"] = True
         policy["fields"][0]["temporal_type"] = {"type": "date", "format": "%Y-%m-%d", "output_format": "%d/%m/%Y"}
+        if all_preserved:
+            policy.pop("file_text_mapping")
+            policy["fields"][1]["behavior"]["unmatched"] = preserve
         material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
             next(p for p in material.parts if p.kind == "source"),
+            (SnapshotPart("mapping", "code.csv", b"old,new\n999,888\n"),) if all_preserved else
             tuple(p for p in material.parts if p.kind == "mapping"),
             max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     module = import_module("test_data_agent.io.transformation_execute")
@@ -587,6 +595,13 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     finally:
         os.close(master)
         os.close(slave)
+    if all_preserved:
+        publisher = import_module("test_data_agent.io.transformation_publish")
+        with pytest.raises(publisher.TransformationPublicationError):
+            with publisher.temporary_csv_publication(material, receipt_path=path,
+                    budget=GenerationBudget(5), **kwargs):
+                pytest.fail("whole row information retained through fallback")
+        return
     output = module.replace_csv_snapshot(material, receipt_path=path,
                                          budget=GenerationBudget(5), **kwargs)
     expected_flags = {"preserve": ("true", "false"), "replace_text": ("no", "false"),

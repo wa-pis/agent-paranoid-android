@@ -2967,3 +2967,17 @@ Broader transformation remains unfinished.
   Verification: 227 policy/executor tests pass; changed Python Ruff and targeted
   mypy pass. Public CLI conversion remains disabled; format settings alone do
   not request preservation or execution.
+- Committed temporal slice 447fd4e0e1189e4bc1f22a763a389545048925fd.
+  Boyle / CSV-Gate-1 resumed for changed temporal preservation scope only;
+  agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d, submission
+  01a0e1c3-59f9-7061-81fb-5fedf6b5c15e. Review pending: do not duplicate or
+  reopen the three resolved findings from 67b02b2 without new evidence.
+- Temporal AI review at 447fd4e found two new discrepancies: formatted direct
+  preservation combined with actual unmatched preservation escaped whole-row
+  protection; repeated input directives could expose a re.error context.
+  Fictional real-PTY publication regression reproduced the first; repeated-Y
+  validation regression reproduced the second. Local fixes track actual
+  preserved fields per row (direct and both fallbacks), reject duplicate input
+  directives and detach regex parser failures. 229 policy/executor tests and
+  Ruff pass. Findings remain pending independent re-review of committed fixes;
+  no public activation. Evidence: CSV-Gate-1 agent completion at 447fd4e.
