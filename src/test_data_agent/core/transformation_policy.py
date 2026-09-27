@@ -222,9 +222,8 @@ class SqlOutputField(_PrivateModel):
         return self
 
 
-class SqlOutput(_PrivateModel):
-    format: Literal["postgresql_sql"]
-    table: Reference = Field(repr=False)
+class TypedOutput(_PrivateModel):
+    format: Literal["postgresql_sql", "parquet"]
     fields: tuple[SqlOutputField, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
 
     def review_summary(self) -> dict[str, object]:
@@ -239,12 +238,21 @@ class SqlOutput(_PrivateModel):
             for index, item in enumerate(self.fields, start=1)]}
 
 
+class SqlOutput(TypedOutput):
+    format: Literal["postgresql_sql"]
+    table: Reference = Field(repr=False)
+
+
+class ParquetOutput(TypedOutput):
+    format: Literal["parquet"]
+
+
 class BehaviorPolicy(_PrivateModel):
     schema_version: Literal["0.1"]
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
     csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
-    output: SqlOutput | None = Field(default=None, repr=False)
+    output: SqlOutput | ParquetOutput | None = Field(default=None, repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     file_text_mapping: CsvMapping | None = Field(default=None, repr=False)

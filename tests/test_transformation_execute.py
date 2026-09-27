@@ -54,6 +54,39 @@ def execute(material, limit=8192):
 
 
 @pytest.mark.parametrize("invalid_type", [False, True])
+def test_private_csv_to_parquet_publication(invalid_type):
+    import json
+    pq = pytest.importorskip("pyarrow.parquet")
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["output"] = {"format": "parquet", "fields": [
+        {"name": "flag", "type": "string"},
+        {"name": "code", "type": "integer" if invalid_type else "string"}]}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"),
+        tuple(p for p in original.parts if p.kind == "mapping"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert material.snapshot_sha256 != original.snapshot_sha256
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    kwargs = dict(max_total_bytes=8192, max_review_bytes=4096,
+                  max_output_bytes=8192, budget=GenerationBudget(5))
+    if invalid_type:
+        with pytest.raises(publisher.TransformationPublicationError) as caught:
+            with publisher.temporary_csv_publication(material, **kwargs):
+                pytest.fail("invalid Parquet output published")
+        assert caught.value.__context__ is None
+        return
+    with publisher.temporary_csv_publication(material, **kwargs) as output:
+        assert pq.read_table(output / "dataset.parquet").to_pylist() == [
+            {"flag": "no", "code": "1"}, {"flag": "yes", "code": "second"}]
+        manifest = json.loads((output / "manifest.json").read_bytes())
+        assert manifest["output"] == json.loads(material.review)["output"]
+        assert manifest["retention"]["status"] == "unavailable"
+        assert not (output / "dataset.csv").exists()
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("invalid_type", [False, True])
 def test_private_csv_to_sql_publication_uses_bound_output_schema(invalid_type):
     import json
     original = request(target="fictional'quoted")

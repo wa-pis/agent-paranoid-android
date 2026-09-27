@@ -20,9 +20,18 @@ arbitrary table identifiers or cell literals. Output column names must match
 the transformed result exactly. Omitted output retains CSV. This is private
 temporary publication, not a new public CLI/API execution surface.
 
-During private SQL-adapter development, unchanged-value percentage is
+Private `format: parquet` uses the same ordered field declarations without a
+table identifier. It retains native null versus empty string and explicit
+decimal128 precision/scale. Timestamp output requires one representable explicit
+offset per column; mixed offsets reject. An all-null timestamp column requires
+an explicit target/source timezone rather than guessing UTC. Shared normalized
+value privacy and complete-source-row checks run before encoding. Parquet bytes
+are bounded during writing and published only in the temporary test context.
+The optional existing parquet extra is required; no database access is added.
+
+During private SQL/Parquet-adapter development, unchanged-value percentage is
 `unavailable` (null numerator/percentage), not the CSV intermediate percentage:
-final SQL types can change logical equality. Compared/dropped counts remain.
+final output types can change logical equality. Compared/dropped counts remain.
 This is an incomplete reporting gate, not acceptance of missing RC reporting.
 
 ## Separate Evidence And Decisions
