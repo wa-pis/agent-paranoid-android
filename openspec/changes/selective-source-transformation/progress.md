@@ -3075,3 +3075,16 @@ Broader transformation remains unfinished.
   diff whitespace checks passed. Prior changed-file Ruff/mypy checks remain
   applicable. Independent reviewer CSV-Gate-1 confirmed idle (last completed
   ad5eee6 temporal scope); next review will concern only the new nullable diff.
+- Signed nullable checkpoint: 540440742e907e41b5e798577d269537f6a45a19.
+  Independent AI reviewer CSV-Gate-1 (01a0dfa0-7f22-75d3-9b19-d181e11f187d)
+  resumed read-only for 84659f9..5404407 only; submission
+  01a0e2ae-d133-7e20-a95a-cabc95ff9778. Review pending; do not spawn a duplicate.
+  Next: collect findings, fix confirmed issues, then push/PR after evidence.
+- CSV-Gate-1 review completed: one High finding, marker filtering could suppress
+  positive sensitivity evidence. Reproduced with fictional email marker; fixed
+  by observing sensitivity independently of null/type filtering, including
+  whitespace normalization. 41 source/profiler checks plus two exact/padded
+  marker regressions passed; Ruff/mypy pass. Evidence:
+  [reviews/5404407-ai-safety.md](reviews/5404407-ai-safety.md).
+  No new user decision needed; public execution remains disabled. Commit fix
+  and re-review only this finding at new SHA; do not duplicate reviewer.

@@ -240,6 +240,7 @@ def _profile_csv_rows(
                 budget.check("CSV snapshot profiling")
             raw = row.get(name, "")
             if literal_empty and raw == null_token:
+                accumulators[name].observe_sensitivity(raw)
                 continue
             accumulators[name].add(raw, literal_empty=literal_empty)
         if row_digests is not None:
@@ -326,11 +327,14 @@ class CSVColumnAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < 100:
             self.semantic_sample.append(value)
-        detected_type = _csv_sensitive_value_type(value)
-        if detected_type == "secret" or self.content_sensitive_type is None:
-            self.content_sensitive_type = detected_type
+        self.observe_sensitivity(value)
         self.add_count(value)
         self.add_typed_samples(value)
+
+    def observe_sensitivity(self, value: str) -> None:
+        detected_type = _csv_sensitive_value_type(value.strip())
+        if detected_type == "secret" or self.content_sensitive_type is None:
+            self.content_sensitive_type = detected_type
 
     def add_count(self, value: str) -> None:
         if len(self.distinct_digests) < MAX_DISTINCT_DIGESTS:
