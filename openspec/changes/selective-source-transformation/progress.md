@@ -3528,3 +3528,59 @@ Broader transformation remains unfinished.
   corrected test assertion to dataset.sql. Strict OpenSpec/diff passed, Ruff
   passed changed code/tests. Reporting package ready for signed commit and PR;
   no independent AI review requested for this ordinary reporting-only change.
+- Signed commit 209c764 pushed; PR #583 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/583 . Required CI pending;
+  no manual duplicate run. Next: inspect checks, fix any failures, normal merge
+  only when all gates pass, then continue the end-to-end CSV activation scope.
+- PR #583 merged normally at 2026-09-27T20:37:16Z, merge SHA
+  db62e41e38ff210cc0cc3baef6f49b4f320f8a2a. All CI completed successfully or
+  legitimately skipped; required checks passed, merge state CLEAN, GitHub
+  signature verified. Three-origin private reporting is merged, not public
+  execution acceptance. Next: audit the remaining CLI execution/activation
+  gates and implement the complete saved-policy CSV workflow under those gates.
+  Preserve local progress edits when advancing this reused worktree.
+- CSV activation-path audit: public transform-review currently stops at a
+  value-free review; saved-policy integration test then calls the private
+  publisher directly. It is not an installed CLI execution acceptance test.
+  Existing AGENTS/baseline permits only private fictional temporary execution
+  until complete path evidence and independent activation review. Next concrete
+  slice: an unregistered private command handler composing snapshot capture,
+  existing receipt consumption, temporary publisher and value-free provenance
+  output under one invocation budget; exercise through a private test parser,
+  without adding a public command, user destination or receipt-minting agent API.
+  This closes command orchestration evidence before separately reviewed public
+  registration/durable publication. No completed checks or reviews rerun.
+- On codex/1-6-csv-command (base db62e41), added unregistered private command
+  orchestration in the existing publisher: saved source/policy paths plus expected
+  review digest, one shared budget, existing receipt consumption, temporary-only
+  publication, cleanup and value-free provenance summary. Digest does not grant
+  preservation. No public parser entry, destination argument or receipt creation.
+  Extended real CLI-review integration test: command succeeds on reviewed bytes
+  and rejects changed source/mapping files with detached fixed error; test passed,
+  mypy/Ruff passed. Next: subprocess/private-parser coverage, receipt-required and
+  budget/error cleanup cases, then exact-path safety review before activation.
+- Seven new command-boundary tests passed: wrong/malformed expected digest,
+  input/output byte budgets, injected explicit budget clock expiry and missing
+  preservation receipt all reject with fixed detached errors and unchanged input
+  files. A separate process with a test-only argparse parser runs the real private
+  command and leaves its dedicated TMPDIR empty, returning only provenance and
+  snapshot identity (no replacement literals). No product monkeypatch or public
+  command registration. Ruff/diff passed. Next: receipt-success command path,
+  failure cleanup in isolated TMPDIR, then consolidate exact-path review evidence.
+- Extended receipt scenarios to consume actual test-TTY-issued receipts through
+  the path-based private command, covering direct/fallback preservation, nulls,
+  temporal formatting and typed SQL output. Subprocess parser now also exercises
+  output-budget rejection and asserts dedicated TMPDIR is empty on both paths.
+  Nine focused cases passed; Ruff passed. Next: consolidate command documentation/commit for
+  scoped review; no public registration or persistent destination added.
+- Signed checkpoint d2b3f0743a979a4db63a7f7e88ed27dc8cf660b0 created; strict
+  OpenSpec/diff passed; no PR exists. Independent AI reviewer Boyle / CSV-Gate-1
+  (01a0dfa0-7f22-75d3-9b19-d181e11f187d) reviewing only the new command
+  orchestration against db62e41. Prior closed decoder/output scopes excluded.
+  Review pending; do not duplicate. Next: consume findings, then installed
+  private-path evidence and separately gated activation. No push/CI started.
+- Independent AI review completed without actionable findings at d2b3f07;
+  evidence reviews/d2b3f07-ai-safety.md records scope, checks and limitations.
+  No runtime tests independently rerun; installed-command acceptance remains
+  unproven. Preparing private command PR, then isolated installed-wheel evidence.
+  Public registration/durable destinations remain disabled.

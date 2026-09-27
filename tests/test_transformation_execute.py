@@ -518,6 +518,75 @@ def test_private_temporary_publication_contains_csv_and_manifest():
     assert not output.parent.exists()
 
 
+@pytest.mark.parametrize("failure", ["digest", "digest_shape", "input_budget", "output_budget", "deadline", "receipt"])
+def test_private_command_failures_preserve_input_files(tmp_path, failure):
+    material = request(behavior={"action": "preserve", "authorization_ref": "fictional-ref",
+        "comment": "Fictional local approval required"} if failure == "receipt" else None)
+    for part in material.parts:
+        if part.kind in {"policy", "mapping", "source"}:
+            (tmp_path / ("items.csv" if part.kind == "source" else part.name)).write_bytes(part.payload)
+    before = {path.name: path.read_bytes() for path in tmp_path.iterdir()}
+    ticks = iter([0.0, 2.0])
+    budget = GenerationBudget(1, clock=lambda: next(ticks)) if failure == "deadline" else GenerationBudget(5)
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with pytest.raises(publisher.TransformationPublicationError) as caught:
+        publisher._run_temporary_transform(tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
+            expected_snapshot_sha256=("0" * 64 if failure == "digest" else "bad" if failure == "digest_shape"
+                                      else material.snapshot_sha256),
+            max_total_bytes=1 if failure == "input_budget" else 8192,
+            max_review_bytes=4096, max_output_bytes=1 if failure == "output_budget" else 8192,
+            budget=budget)
+    assert str(caught.value) == "invalid temporary transformation command"
+    assert caught.value.__context__ is None
+    assert {path.name: path.read_bytes() for path in tmp_path.iterdir()} == before
+
+
+@pytest.mark.parametrize("output_limit", [8192, 1])
+def test_private_command_subprocess_parser_and_cleanup(tmp_path, output_limit):
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+    material = request()
+    for part in material.parts:
+        if part.kind in {"policy", "mapping", "source"}:
+            (tmp_path / ("items.csv" if part.kind == "source" else part.name)).write_bytes(part.payload)
+    temporary = tmp_path / "temporary"
+    temporary.mkdir()
+    script = '''
+import argparse
+import json
+from pathlib import Path
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.io.transformation_publish import _run_temporary_transform, TransformationPublicationError
+parser = argparse.ArgumentParser()
+parser.add_argument("source", type=Path)
+parser.add_argument("policy", type=Path)
+parser.add_argument("digest")
+parser.add_argument("limit", type=int)
+args = parser.parse_args()
+try:
+    result = _run_temporary_transform(args.source, "items", args.policy,
+        expected_snapshot_sha256=args.digest, max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=args.limit, budget=GenerationBudget(5))
+except TransformationPublicationError as error:
+    assert error.__context__ is None
+    print(json.dumps({"status": "rejected"}))
+else:
+    print(json.dumps(result))
+'''
+    completed = subprocess.run([sys.executable, "-c", script, str(tmp_path / "items.csv"),
+        str(tmp_path / "behavior.yaml"), material.snapshot_sha256, str(output_limit)],
+        env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src"),
+             "TMPDIR": str(temporary)}, capture_output=True, text=True, timeout=30, check=True)
+    if output_limit == 1:
+        assert json.loads(completed.stdout) == {"status": "rejected"}
+    else:
+        assert json.loads(completed.stdout)["provenance"]["replacement_percent"] == "100.00"
+    assert "second" not in completed.stdout + completed.stderr
+    assert list(temporary.iterdir()) == []
+
+
 def test_saved_csv_policy_cli_review_to_private_publication(tmp_path):
     """Real CLI review and file adapters share bytes; no public execution enabled."""
     import json
@@ -546,9 +615,25 @@ def test_saved_csv_policy_cli_review_to_private_publication(tmp_path):
         tmp_path / "items.csv", "items", tmp_path, "behavior.yaml",
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     assert captured.snapshot_sha256 == review["snapshot_sha256"]
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    summary = publisher._run_temporary_transform(
+        tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
+        expected_snapshot_sha256=review["snapshot_sha256"], max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert summary["status"] == "temporary_test_completed"
+    assert summary["provenance"]["replacement_cells"] == 4
+    assert "second" not in json.dumps(summary)
+    assert not (tmp_path / "dataset.csv").exists()
     # Execution consumes the reviewed snapshot, not reopened mutable paths.
     (tmp_path / "items.csv").write_bytes(b"flag,code\nchanged,999\n")
     (tmp_path / "code.csv").write_bytes(b"old,new\n002,changed\n")
+    with pytest.raises(publisher.TransformationPublicationError) as drift:
+        publisher._run_temporary_transform(
+            tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
+            expected_snapshot_sha256=review["snapshot_sha256"], max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert str(drift.value) == "invalid temporary transformation command"
+    assert drift.value.__context__ is None
     module = import_module("test_data_agent.io.transformation_publish")
     with module.temporary_csv_publication(captured, max_total_bytes=8192,
             max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
@@ -1221,6 +1306,14 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     assert output.provenance.synthetic_cells == 0
     assert output.provenance.original_cells == (0 if action == "format_temporal" or typed_output else 2 if action == "preserve" else 1)
     assert output.provenance.replacement_cells == 4 - output.provenance.original_cells
+    for part in material.parts:
+        if part.kind in {"policy", "mapping", "source"}:
+            (tmp_path / ("items.csv" if part.kind == "source" else part.name)).write_bytes(part.payload)
+    command_summary = import_module("test_data_agent.io.transformation_publish")._run_temporary_transform(
+        tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
+        expected_snapshot_sha256=material.snapshot_sha256, receipt_path=path,
+        budget=GenerationBudget(5), **kwargs)
+    assert command_summary["provenance"]["original_cells"] == output.provenance.original_cells
     if preserve_null:
         # Changing either marker invalidates the exact local approval.
         for settings in ({"input_token": "OTHER", "output_token": "NULL"},

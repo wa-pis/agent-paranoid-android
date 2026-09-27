@@ -652,6 +652,19 @@ and fail with the same bounded error. No global integer limit is changed.
 
 ## Private Behavior Policy YAML
 
+### Closed command orchestration
+
+The unregistered `_run_temporary_transform` path in `io/transformation_publish.py`
+captures saved source/policy/reference files under one invocation budget and
+requires the previously reviewed snapshot digest to match. The digest is drift
+detection, not preservation approval; preservation still consumes an exact local
+receipt through the existing verifier. The command cannot create receipts.
+It delegates to the existing temporary-only publisher, then returns aggregate
+provenance and snapshot identity after cleanup. It has no output-destination
+argument and no public CLI/Python facade/MCP registration. A test-only parser
+exercises subprocess behavior; this is not installed public CLI acceptance.
+Input/output budget, receipt and drift failures return detached value-free errors.
+
 `core/transformation_yaml.py` loads/saves UTF-8 bytes without filesystem access.
 The existing safe loader supplies depth/alias limits; policy loading additionally
 rejects duplicate/non-string keys and YAML merge keys. Model validation is repeated
