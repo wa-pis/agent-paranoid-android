@@ -72,6 +72,14 @@ the same source decoder in review, receipt verification, execution and output
 comparison. CSV input null markers are invalid for this Parquet slice. This is
 not completion of general typed Parquet input or public activation.
 
+The private decoder applies the existing Parquet expanded-byte limit both to
+encoded-page metadata and cumulatively to decoded Arrow batch buffers before
+conversion to Python rows. This is a decoded-payload limit, not a peak process
+memory guarantee: Arrow decoding allocations and Python object overhead remain
+outside that measurement. Independent AI safety re-review at 39af3e4 closed the
+decoded-payload finding under this limited guarantee, not peak-memory containment.
+The private implementation must not be advertised as public activation-ready.
+
 Matching semantics belong to the field, independently of input/output format.
 Literal text matching distinguishes `001.00` from `1.00`. Native numeric/date
 cells have no assumed original text spelling: they require explicitly selected

@@ -3452,3 +3452,15 @@ Broader transformation remains unfinished.
   This bounds decoded payload, not Python object overhead or Arrow peak RSS;
   independent review must assess sufficiency. Next: commit both findings' fixes
   and request scoped re-review on the new SHA. No public activation/PR/CI.
+- Both fixes committed with SSH signature at
+  39af3e4ccb4bf6979552ad214f1501dc08465313. Independent AI reviewer Boyle /
+  CSV-Gate-1 now re-reviews only these two findings against 3759596; submission
+  01a0e3aa-4b74-77e0-bd9b-f9e77098ec6c, same agent as recorded above.
+  Do not duplicate active review. Contract now states decoded-payload versus
+  peak-memory limitation explicitly. Next: consume re-review and resolve any
+  remaining finding before PR; no successful tests rerun or CI launched.
+- Re-review completed: both findings resolved at 39af3e4 under the explicit
+  decoded-payload (not peak-RSS) guarantee. Evidence: reviews/39af3e4-ai-safety.md.
+  AI review only, no human approval or activation authorization. Preparing PR
+  for private typed Parquet input and its regression tests; full RC scope remains
+  incomplete. Next: required GitHub checks, then normal merge if green.
