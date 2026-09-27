@@ -10,7 +10,25 @@ from test_data_agent.core.transformation_report import (
     TransformationReportError,
     retention_summary_from_counts,
     summarize_source_retention,
+    provenance_summary,
 )
+
+
+def test_provenance_counts_and_rounding_are_action_based():
+    with localcontext() as context:
+        context.prec = 2
+        context.traps[Inexact] = True
+        report = provenance_summary(1, 1, 1, 9)
+    assert report.output_cells == 3
+    assert report.excluded_dropped_cells == 9
+    assert (report.replacement_percent, report.synthetic_percent, report.original_percent) == ("33.33",) * 3
+    assert provenance_summary(0, 0, 0, 4).original_percent is None
+
+
+@pytest.mark.parametrize("invalid", [-1, True, 1.5, "1", None])
+def test_provenance_rejects_invalid_counts(invalid):
+    with pytest.raises(TransformationReportError, match="invalid transformation provenance report"):
+        provenance_summary(invalid, 0, 0, 0)
 
 
 def test_retention_percentage_does_not_depend_on_decimal_context():

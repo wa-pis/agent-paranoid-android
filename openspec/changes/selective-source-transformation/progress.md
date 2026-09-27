@@ -3464,3 +3464,67 @@ Broader transformation remains unfinished.
   AI review only, no human approval or activation authorization. Preparing PR
   for private typed Parquet input and its regression tests; full RC scope remains
   incomplete. Next: required GitHub checks, then normal merge if green.
+- PR #582 opened: https://github.com/wa-pis/agent-paranoid-android/pull/582
+  Head 307b204 (documentation-only after reviewed product SHA 39af3e4).
+  Branch pushed once; required CI is pending, no manual duplicate run triggered.
+  Next: inspect required checks and signature verification on GitHub; merge only
+  after all required gates pass. Public execution and RC release remain closed.
+- PR #582 merged normally at 2026-09-27T16:30:22Z, merge SHA
+  37a34b2a884c5e05b5cc836e3371766d32728483. All checks completed SUCCESS/SKIPPED;
+  required checks passed and merge state CLEAN. GitHub verified all three branch
+  commit signatures (3759596, 39af3e4, 307b204), resolving local-verifier uncertainty.
+  No branch protection bypass or human approval claim. Preserve this local
+  progress edit when advancing the worktree. Next: reconcile final typed-output
+  retention reporting with existing contracts before the CSV user-workflow
+  activation milestone; DATETIME equality and formula-null remain undecided.
+- Retention contract reconciliation found a cross-type reporting decision not
+  covered by the approved matching rule: native STRING "001" transformed to
+  INTEGER 1. Source-type literal comparison and output-type normalization yield
+  different unchanged counts. Existing typed outputs deliberately report
+  unavailable; no new equality rule implemented. Request owner choice whether
+  type changes count as changed (recommended; numeric formatting within the
+  explicitly selected numeric type remains unchanged), or normalize both sides
+  to output type. Automation paused pending this reporting-only decision; no
+  safety guard relaxation, test rerun or new branch/PR.
+- 2026-09-28 owner confirmed three output-cell provenance statuses and discussed
+  edge cases: replacement, synthetic, original. Recorded in policy-contract.md;
+  supersedes the equality-based user-facing retention report, not safety guards.
+  Applied identity replacement remains replacement; generated coincidences and
+  formatting generated values remain synthetic; fallback follows actual action.
+  Dropped cells excluded from denominator; physical serialization is not a
+  replacement. Reporting decision blocker resolved. Next: implement origin
+  tracking along actual execution paths and aggregate report with focused tests;
+  reconcile tasks/docs and preserve existing source-copy/sensitive-data checks.
+- Began implementation on codex/1-6-provenance-report from merged main 37a34b2,
+  preserving local contract/progress decisions. Existing executor now tracks
+  actual per-cell action internally and returns aggregate provenance; private
+  manifest v2 publishes replacement/synthetic/original counts and percentages
+  instead of equality retention. Legacy internal retention remains temporarily
+  for compatibility; safety guards unchanged. Applied identity mapping counts
+  as replacement, dropped cells excluded. 207 execution tests passed initially;
+  five old manifest assertions were migrated and their rerun passed (212 total).
+  Targeted mypy passed; initial Ruff passed. No PR/review/CI started.
+  Next: focused tests for synthetic/preserve fallbacks, output formatting and
+  empty scopes, then reconcile remaining docs/specs before committing. This is
+  local private integration, not completed public CLI acceptance.
+- Provenance assertions added to existing fictional synthesis, unmatched fallback,
+  local-TTY preservation, temporal-formatting and all-dropped scenarios: 28
+  focused cases passed. Synthetic versus replacement counts follow actual
+  branches; original counts include preserved nulls, explicit formatting is
+  replacement, and empty output percentages are unavailable. Updated task and
+  normative OpenSpec requirement to the owner-confirmed action-origin report;
+  strict OpenSpec, Ruff and diff checks passed. Next: finish documentation and
+  typed-output formatting coverage, then commit the coherent reporting change.
+- Added six focused aggregate tests: independent deterministic rounding, dropped
+  denominator exclusion, unavailable empty shares and rejection of invalid count
+  types/negative counts. All passed; Ruff passed. Implementation map documents
+  private manifest v2 provenance replacing v1 retention and rounding totals;
+  legacy internal equality summary is not a public origin indicator. Next:
+  typed-output formatting regression and coherent reporting commit/PR; no
+  safety-policy change or repeated independent review required for this report.
+- Typed-output regression passed: receipt-authorized original BOOLEAN exported
+  explicitly as SQL STRING counts as replacement, with successful private SQL
+  publication and manifest v2 origin checks. Initial test assumed dataset.csv;
+  corrected test assertion to dataset.sql. Strict OpenSpec/diff passed, Ruff
+  passed changed code/tests. Reporting package ready for signed commit and PR;
+  no independent AI review requested for this ordinary reporting-only change.

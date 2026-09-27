@@ -83,7 +83,7 @@ def test_private_csv_to_parquet_publication(invalid_type):
             {"flag": "no", "code": "1"}, {"flag": "yes", "code": "second"}]
         manifest = json.loads((output / "manifest.json").read_bytes())
         assert manifest["output"] == json.loads(material.review)["output"]
-        assert manifest["retention"]["status"] == "unavailable"
+        assert manifest["provenance"]["replacement_percent"] == "100.00"
         assert not (output / "dataset.csv").exists()
     assert not output.parent.exists()
 
@@ -123,9 +123,9 @@ def test_private_csv_to_sql_publication_uses_bound_output_schema(invalid_type):
         assert sql.endswith("COMMIT;\n")
         assert not (output / "dataset.csv").exists()
         assert json.loads((output / "manifest.json").read_bytes())["output"] == output_review
-        retention = json.loads((output / "manifest.json").read_bytes())["retention"]
-        assert retention["status"] == "unavailable"
-        assert retention["unchanged_percent"] is None
+        provenance = json.loads((output / "manifest.json").read_bytes())["provenance"]
+        assert provenance["replacement_percent"] == "100.00"
+        assert provenance["output_cells"] == 4
     assert not output.parent.exists()
 
 
@@ -510,7 +510,7 @@ def test_private_temporary_publication_contains_csv_and_manifest():
         manifest = json.loads(manifest_bytes)
         assert manifest["origin"] == "transformed_mixed"
         assert manifest["privacy_notice"] == "Mixed-origin output may retain source information; not anonymized."
-        assert manifest["retention"]["compared_cells"] == 4
+        assert manifest["provenance"]["output_cells"] == 4
         assert b"second" not in manifest_bytes
         assert set(path.name for path in output.iterdir()) == {"dataset.csv", "manifest.json"}
         assert output.stat().st_mode & 0o077 == 0
@@ -555,7 +555,7 @@ def test_saved_csv_policy_cli_review_to_private_publication(tmp_path):
         assert (output / "dataset.csv").read_bytes() == b"flag,code\nno,1\nyes,second\n"
         manifest = json.loads((output / "manifest.json").read_bytes())
         assert manifest["origin"] == "transformed_mixed"
-        assert manifest["retention"]["compared_cells"] == 4
+        assert manifest["provenance"]["output_cells"] == 4
     assert not output.parent.exists()
 
 
@@ -805,8 +805,8 @@ def test_financial_mapping_derivation_temporary_csv_end_to_end():
             max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
         assert (output / "dataset.csv").read_bytes() == b"total,amount,quantity\n7.04,2.345,3\n12.50,3.125,4\n"
         manifest = json.loads((output / "manifest.json").read_bytes())
-        assert manifest["retention"]["compared_cells"] == 6
-        assert manifest["retention"]["unchanged_percent"] == "0.00"
+        assert manifest["provenance"]["output_cells"] == 6
+        assert manifest["provenance"]["replacement_percent"] == "100.00"
         assert manifest["origin"] == "transformed_mixed"
     assert not output.parent.exists()
 
@@ -950,7 +950,13 @@ def test_closed_synthesis_uses_bound_spec_seed_and_source_row_count(case, action
                     pytest.fail("invalid final dataset published")
             assert failed_publication.value.__context__ is None
         return
-    first = execute(material)
+    module = import_module("test_data_agent.io.transformation_execute")
+    measured = module.replace_csv_snapshot(material, max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert measured.provenance.synthetic_cells == (2 if action_kind == "synthesize" else 1)
+    assert measured.provenance.original_cells == 0
+    assert measured.provenance.replacement_cells == (2 if action_kind == "synthesize" else 3)
+    first = measured.csv_bytes
     assert execute(material) == first
     rows = list(csv.DictReader(io.StringIO(first.decode())))
     assert len(rows) == 2
@@ -1113,11 +1119,14 @@ def test_closed_csv_drops_selected_column_without_changing_row_order():
         ["code"], ["1"], ["second"]]
 
 
-@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve", "preserve_null"])
+@pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute", "format_temporal", "format_all_preserve", "preserve_null", "typed_output"])
 def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
 
     all_preserved = action == "format_all_preserve"
+    typed_output = action == "typed_output"
+    if typed_output:
+        action = "preserve"
     preserve_null = action == "preserve_null"
     if preserve_null:
         action = "preserve"
@@ -1160,6 +1169,14 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
             (SnapshotPart("mapping", "code.csv", b"old,new\n999,888\n"),) if all_preserved else
             tuple(p for p in material.parts if p.kind == "mapping"),
             max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if typed_output:
+        policy = yaml.safe_load(next(p.payload for p in material.parts if p.kind == "policy"))
+        policy["output"] = {"format": "postgresql_sql", "table": "items", "fields": [
+            {"name": name, "type": "string"} for name in ("flag", "code")]}
+        material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+            next(p for p in material.parts if p.kind == "source"),
+            tuple(p for p in material.parts if p.kind == "mapping"),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     module = import_module("test_data_agent.io.transformation_execute")
     path = tmp_path / "approval.json"
     kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192)
@@ -1195,12 +1212,15 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     assert list(csv.reader(io.StringIO(output.csv_bytes.decode()))) == [
         ["flag", "code"], [expected_flags[0], "1"], [expected_flags[1], "second"]]
     # Profile identifies code as INTEGER: 001 -> 1 also retains its numeric value.
-    if action != "format_temporal":
+    if action != "format_temporal" and not typed_output:
         assert output.retention.unchanged_percent == ("75.00" if action == "preserve" else "50.00")
     else:
         assert output.retention.status == "unavailable"
         assert output.retention.unchanged_percent is None
     assert output.retention.compared_cells == 4
+    assert output.provenance.synthetic_cells == 0
+    assert output.provenance.original_cells == (0 if action == "format_temporal" or typed_output else 2 if action == "preserve" else 1)
+    assert output.provenance.replacement_cells == 4 - output.provenance.original_cells
     if preserve_null:
         # Changing either marker invalidates the exact local approval.
         for settings in ({"input_token": "OTHER", "output_token": "NULL"},
@@ -1224,10 +1244,15 @@ def test_closed_preservation_requires_exact_local_receipt(tmp_path, action):
     publisher = import_module("test_data_agent.io.transformation_publish")
     with publisher.temporary_csv_publication(material, receipt_path=path,
             budget=GenerationBudget(5), **kwargs) as published:
-        assert (published / "dataset.csv").read_bytes() == output.csv_bytes
+        if typed_output:
+            assert "VALUES ('true', '1');" in (published / "dataset.sql").read_text()
+        else:
+            assert (published / "dataset.csv").read_bytes() == output.csv_bytes
         manifest = json.loads((published / "manifest.json").read_bytes())
         assert manifest["origin"] == "transformed_mixed"
-        assert manifest["retention"]["unchanged_percent"] == output.retention.unchanged_percent
+        assert manifest["version"] == 2
+        assert "retention" not in manifest
+        assert manifest["provenance"]["original_cells"] == output.provenance.original_cells
     assert not published.parent.exists()
     changed = request(target="changed", complete=False, behavior=behavior, source_bytes=source_bytes)
     for invalid_request, receipt in ((changed, path), (material, None)):
@@ -1274,6 +1299,10 @@ def test_engine_retention_excludes_dropped_cells():
     assert result.retention.compared_cells == 2
     assert result.retention.excluded_dropped_cells == 2
     assert result.retention.unchanged_percent == "50.00"
+    assert result.provenance.replacement_cells == 2
+    assert result.provenance.original_cells == 0
+    assert result.provenance.replacement_percent == "100.00"
+    assert result.provenance.excluded_dropped_cells == 2
 
 
 def test_all_dropped_columns_have_no_retention_measurement():
@@ -1293,6 +1322,11 @@ def test_all_dropped_columns_have_no_retention_measurement():
     assert result.retention.unchanged_percent is None
     assert result.retention.compared_cells == 0
     assert result.retention.excluded_dropped_cells == 4
+    assert result.provenance.output_cells == 0
+    assert result.provenance.excluded_dropped_cells == 4
+    assert result.provenance.original_percent is None
+    assert result.provenance.synthetic_percent is None
+    assert result.provenance.replacement_percent is None
 
 
 @pytest.mark.parametrize("delimiter", [",", ";", "\t", "|"])
