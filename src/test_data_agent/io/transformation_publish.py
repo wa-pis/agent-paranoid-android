@@ -17,6 +17,8 @@ from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.path_policy import atomic_write_bytes, make_staging_directory, publish_directory
 from test_data_agent.io.transformation_execute import replace_csv_snapshot
 from test_data_agent.io.transformation_sql import render_transformation_sql
+from test_data_agent.io.transformation_parquet import render_transformation_parquet
+from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 
 
@@ -43,11 +45,17 @@ def temporary_csv_publication(
             reader.fieldnames = validate_csv_headers(reader.fieldnames)
             source_rows = (tuple(None if row[name] == policy.csv_nulls.input_token else row[name]
                                  for name in result.columns) for row in reader)
-            payload = (render_transformation_sql(result, policy.output,
-                max_bytes=max_output_bytes, budget=budget,
-                source_rows=source_rows if tuple(reader.fieldnames) == result.columns else None)
-                if policy.output else result.csv_bytes)
-            filename = "dataset.sql" if policy.output else "dataset.csv"
+            original_rows = source_rows if tuple(reader.fieldnames) == result.columns else None
+            if isinstance(policy.output, SqlOutput):
+                payload = render_transformation_sql(result, policy.output,
+                    max_bytes=max_output_bytes, budget=budget, source_rows=original_rows)
+                filename = "dataset.sql"
+            elif isinstance(policy.output, ParquetOutput):
+                payload = render_transformation_parquet(result, policy.output,
+                    max_bytes=max_output_bytes, budget=budget, source_rows=original_rows)
+                filename = "dataset.parquet"
+            else:
+                payload, filename = result.csv_bytes, "dataset.csv"
             manifest = json.dumps({"version": 1, "origin": "transformed_mixed",
                 "output": policy.output.review_summary() if policy.output else {"format": "csv"},
                 "privacy_notice": "Mixed-origin output may retain source information; not anonymized.",

@@ -111,9 +111,13 @@ not reparsing rendered CSV (which loses null and logical-type provenance).
 Reuse `postgres_sql_export.quote_postgres_identifier` and `postgres_literal`
 for PostgreSQL encoding. Do not route mixed-origin output through
 `render_postgres_sql` by weakening its synthetic-generation checks.
-`io/writers.typed_parquet_table` is the existing typed Parquet serializer;
-its schema must describe final transformed fields, not inferred source types
-after unconditional text replacement. Output selection/schema/dialect must be
+`io/transformation_output.py` shares normalized scalar/privacy/whole-row checks
+between private SQL and Parquet adapters. `io/transformation_parquet.py` builds
+an explicit Arrow schema and bounds output bytes while writing. It does not
+fabricate generation distributions to use `io/writers.typed_parquet_table`,
+which remains the unchanged source-free generation writer. Final transformed
+types are declared, not inferred from source after text replacement.
+Output selection/schema/dialect must be
 snapshot-bound before execution. Source-free generation/export stays separate.
 
 ## Validation

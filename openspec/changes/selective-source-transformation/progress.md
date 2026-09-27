@@ -3234,3 +3234,51 @@ Broader transformation remains unfinished.
   in reviews/a9cbc0e-ai-safety.md; no unchanged tests rerun. Next: publish the
   private CSV-to-SQL adapter PR and await required CI. No public activation,
   database execution, complete format-matrix acceptance or RC readiness claimed.
+- Published signed branch through c01fb8c as PR #580:
+  https://github.com/wa-pis/agent-paranoid-android/pull/580 . Required CI pending;
+  next: inspect checks and merge only after green required gates. Do not rerun
+  unchanged local tests or start a duplicate review/CI run.
+- PR #580 merged 2026-09-27 13:29:48 UTC as
+  0c259afbbf970e9fb250cde3467c2626ea9e5b0f after all required GitHub checks
+  passed (37 successful, four intentionally skipped, none pending/failed;
+  merge state CLEAN). Normal protected merge, no approval bypass. Next small
+  step: prepare the reusable checkout from this merged base and inspect shared
+  typed-row extraction for the remaining Parquet routes. Preserve this local
+  progress entry; no repeat SQL review or unchanged test runs needed.
+- Reused the same checkout on codex/1-6-parquet-adapters from merged 0c259af;
+  preserved all local progress edits. Inspected SQL normalization/publication
+  and existing typed_parquet_table. The latter requires generation FieldSpec
+  decimal ranges, so fabricating generator distributions for transformed data
+  would couple unrelated contracts. Next implementation batch: share explicit
+  output scalar normalization and final privacy/whole-row checks, then encode
+  a declared Arrow schema directly using the existing optional pyarrow extra;
+  wire private CSV-to-Parquet publication with fictional round-trip and reject
+  tests. Keep default source-free writers unchanged. No new tests run yet.
+- Local private CSV-to-Parquet route implemented on codex/1-6-parquet-adapters:
+  explicit output schema bound in policy/review, shared SQL-compatible scalar
+  normalization and final privacy/whole-row checks, bounded in-memory Parquet
+  encoding and existing temporary atomic publication. Existing source-free
+  writers unchanged. Fictional temporary publication round trip and invalid-type
+  rejection pass; scalar coverage includes null/empty, integer, float, boolean,
+  decimal, date and explicit timezone rollover. 45 SQL/Parquet-focused tests
+  passed, plus one added timezone/all-null test; targeted mypy and Ruff pass.
+  This is local development, not public activation or full common-core/input
+  extraction. Next: complete changed-scope schema/budget/cleanup regressions,
+  update policy/architecture documentation, then independent safety review of
+  the exact committed adapter/shared-check diff. No duplicate old reviews.
+- Added four schema/source-cardinality regressions; short source iterators now
+  reject with a value-free ValueError instead of generator StopIteration leakage.
+  Policy and implementation-map docs describe explicit Parquet schema/timezone
+  limits and unchanged source-free writer. Four new tests and 199 affected
+  policy/approval/receipt/CLI-review/architecture tests passed; targeted
+  Ruff/mypy, strict OpenSpec and diff checks passed. Next: commit this private
+  adapter batch and request one new-scope independent safety review before PR.
+- Signed c9ec98cf1ff012e2c39cdcdf21676c4afdf6ead2 sent to existing independent
+  AI reviewer Boyle/CSV-Gate-1 (01a0dfa0-7f22-75d3-9b19-d181e11f187d).
+  Scope: new Parquet path and shared-check extraction versus merged 0c259af.
+  Review pending; no duplicate reviewer, PR or CI started. Next: collect findings.
+- CSV-Gate-1 completed c9ec98c review: no new reportable finding. Two additional
+  fictional decimal38 and microsecond/+05:45 in-memory probes passed; prior
+  author suites not repeated. Evidence reviews/c9ec98c-ai-safety.md records
+  materialized-memory and untested filesystem-fault limitations. Next: publish
+  private Parquet PR and await required CI; full RC/public activation pending.
