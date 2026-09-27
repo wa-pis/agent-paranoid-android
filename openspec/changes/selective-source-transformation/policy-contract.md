@@ -4,6 +4,27 @@ Internal execution design with a read-only local CLI review step; not permission
 to execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
 schemas and source-free generation remain unchanged.
 
+Private output-adapter development accepts an optional `output` declaration:
+`format: postgresql_sql`, a table identifier, and ordered `fields` with `name`,
+`type`, `nullable` and required `decimal_type` for decimal output. Initial types
+are string/integer/float/boolean/decimal/date/datetime. SQL temporal fields
+require `temporal_type` with an explicit input format and canonical output_format
+(`%Y-%m-%d` for DATE, `%Y-%m-%dT%H:%M:%S.%f%z` for DATETIME). DATETIME requires
+an input offset or explicit source_timezone; optional target_timezone performs
+the reviewed conversion. Ambiguous/nonexistent local times reject. The SQL
+types are DATE and TIMESTAMPTZ, with explicit offset literals, never session-
+timezone interpretation. Text output remains literal and is not date-parsed.
+The full declaration is policy-byte-bound. Review and mixed-origin manifest
+show format and ordered positions/types/nullability/decimal shape, never
+arbitrary table identifiers or cell literals. Output column names must match
+the transformed result exactly. Omitted output retains CSV. This is private
+temporary publication, not a new public CLI/API execution surface.
+
+During private SQL-adapter development, unchanged-value percentage is
+`unavailable` (null numerator/percentage), not the CSV intermediate percentage:
+final SQL types can change logical equality. Compared/dropped counts remain.
+This is an incomplete reporting gate, not acceptance of missing RC reporting.
+
 ## Separate Evidence And Decisions
 
 A versioned private behavior policy references a source schema fingerprint and

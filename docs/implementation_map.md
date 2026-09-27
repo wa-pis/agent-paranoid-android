@@ -73,9 +73,9 @@ authorize source-value preservation or transform rows.
 Derived-field coverage reuses `rules.expressions.expression_references` to
 parse bounded row-local arithmetic and require exact declared dependencies;
 it does not evaluate formulas or establish financial/null/result-type semantics.
-`transformation_report.py` computes only a bounded, value-free unchanged-cell
-aggregate from already corresponding source/output rows. It does not transform,
-publish, retain, or expose those rows and is not yet connected to execution.
+`transformation_report.py` computes a bounded, value-free unchanged-cell
+aggregate from corresponding source/output rows. The private CSV executor now
+uses it; the report module itself neither transforms nor publishes rows.
 
 `src/test_data_agent/io/mapping_snapshot.py`, `mapping_loader.py`,
 `behavior_policy_files.py`, and `transformation_source.py` read bounded local
@@ -96,6 +96,25 @@ the same fixed CSV bytes included in its approval request; callers cannot
 provide an alternate profile to that entry. Receipt issue/verification still
 reprofiles those bytes. The public `transform-review` CLI uses this path only
 to display value-free decisions; it neither mints a receipt nor writes output.
+
+`io/transformation_execute.py` owns the closed CSV execution prototype:
+exact-text and typed replacement, synthesis, dependency-ordered derivation,
+receipt-gated preservation, explicit null provenance and final validation.
+`io/transformation_publish.py` publishes its CSV and mixed-origin manifest only
+inside automatically deleted private test storage. Neither is public activation.
+
+The format-independent RC target is input adapter -> common transformation and
+validation -> output adapter. Current executor still combines CSV decoding,
+execution and rendering; extraction is pending, not a completed architecture.
+First additional route is CSV -> SQL-script using a validated logical result,
+not reparsing rendered CSV (which loses null and logical-type provenance).
+Reuse `postgres_sql_export.quote_postgres_identifier` and `postgres_literal`
+for PostgreSQL encoding. Do not route mixed-origin output through
+`render_postgres_sql` by weakening its synthetic-generation checks.
+`io/writers.typed_parquet_table` is the existing typed Parquet serializer;
+its schema must describe final transformed fields, not inferred source types
+after unconditional text replacement. Output selection/schema/dialect must be
+snapshot-bound before execution. Source-free generation/export stays separate.
 
 ## Validation
 

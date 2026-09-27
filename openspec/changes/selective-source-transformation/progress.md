@@ -3101,3 +3101,136 @@ Broader transformation remains unfinished.
   and diff checks pass; no runtime code changed for this clarification.
   Next: publish reviewed nullable checkpoint PR, then implement remaining
   common-core/adapter and user-profile work against the clarified plan.
+- Published signed branch through 1d2e3ac and opened PR #579:
+  https://github.com/wa-pis/agent-paranoid-android/pull/579 . Nullable code and
+  independent AI-review evidence plus format-independent RC clarification;
+  no public activation. Required GitHub checks pending. Next: inspect their
+  result once available, fix failures or merge normally when requirements pass;
+  do not rerun unchanged local suites or launch duplicate CI/review.
+- PR #579 merged normally at 2026-09-27 12:09:15 UTC after 41 checks completed
+  without failures and GitHub CLEAN. Merge SHA:
+  902a5f639a9198d27c1135031bc0e9ffb379ff48. No protection bypass.
+  Nullable slice and independent-format specification are on main; public
+  execution and RC release remain incomplete. Reuse this checkout for next
+  common-core/adapter slice, carrying these uncommitted progress notes forward.
+- Checkout now on codex/1-6-format-adapters from origin/main 902a5f6; progress
+  notes preserved. Next: inspect existing output adapters and application
+  boundaries, reuse serializers for independent output selection while keeping
+  shared transformation separate from CSV decoding and physical rendering.
+- Inspected application boundaries and existing exporters. Reuse PostgreSQL
+  identifier/literal encoders and typed_parquet_table; do not weaken synthetic
+  SQL-renderer validation or reparse output CSV to recover logical values.
+  Corrected stale implementation-map claims about execution/retention and
+  recorded first cross-format route CSV -> SQL-script. Next implementation:
+  validated logical result separate from CSV rendering, with final output
+  schema/dialect policy binding before adapter selection. No runtime changes,
+  duplicate review, tests or CI launched in this documentation checkpoint.
+- Private executor result now carries ordered immutable columns/rows with
+  str-or-None cells alongside unchanged CSV bytes. Null provenance is captured
+  before rendering is discarded, not reconstructed by parsing CSV. Rows are
+  hidden from repr and returned only after all existing validation gates;
+  no public surface or destination added. New inline/CSV null-result assertions
+  failed before implementation; executor suite 149 passed, Ruff/mypy pass.
+  This is the intermediate lexical/null result, not yet the final typed output
+  schema or a completed SQL route. Next: bind output format/schema and render
+  the same validated result through the SQL adapter with existing encoders.
+- Added private output declaration for postgresql_sql with ordered explicit
+  scalar fields and DECIMAL shape, bound by exact policy bytes. Temporary
+  publisher renders validated lexical/null rows through existing PostgreSQL
+  literal/identifier encoders into dataset.sql, never executing SQL. Existing
+  synthetic exporter unchanged. Fictional CSV -> quoted-text SQL test verifies
+  snapshot change, escaping, selected artifact and cleanup. Policy/executor
+  suites: 247 passed; changed Ruff/mypy pass. First route is developmental,
+  not complete acceptance: numeric bounds/coercion negatives, null/type/schema
+  and byte-budget tests, output settings in value-free review/manifest, and
+  temporal output support still required before review/activation. No public
+  surface added. Next: close these adapter validation gaps before commit/PR.
+- Added SQL adapter boundary tests: BIGINT min/max, overflow, invalid numeric
+  strings, null versus empty, non-nullable rejection, exact byte-budget edge.
+  Two overflow tests failed before fix: generic SQL literal encoder accepts
+  arbitrary Python integers while selected SQL type is BIGINT. Private adapter
+  now enforces signed 64-bit range without changing source-free exporter.
+  Eight focused tests pass; Ruff/mypy/diff checks pass. No PR active for this
+  branch. Next: output schema in review/manifest and remaining typed/temporal
+  acceptance; CSV -> SQL remains private and incomplete, no new review started.
+- Output format and ordered field types/nullability/DECIMAL shape now appear
+  consistently in value-free review and mixed-origin manifest. Destination
+  names/cell literals are excluded; full output declaration stays policy-byte-
+  bound. Documented private output syntax and current scalar-only limitation.
+  Integrated SQL publication test checks matching metadata and no replacement
+  literal in review. Policy/executor: 247 passed; Ruff/mypy pass. Next: negative
+  schema/typed SQL cases and temporal output, then changed-scope review before
+  public activation. No PR/duplicate reviewer or live DB operation started.
+- SQL negative checks now cover mismatched columns/row widths, nonfinite and
+  underflow FLOAT, exact DECIMAL scale/precision and invalid typed publication.
+  Underflow probe failed first (1e-999 became 0.0); reused existing strict
+  numeric normalization before SQL FLOAT encoding. 18 adapter tests pass;
+  two integrated publication cases confirm valid script and detached error
+  before publication for incompatible output type. Ruff/mypy and diff checks
+  pass. Next: explicit temporal SQL encoding; common-core/other adapters and
+  full acceptance remain unfinished, no public activation.
+- Added private SQL DATE/TIMESTAMPTZ encoding using explicit temporal_type and
+  existing temporal conversion checks. Canonical SQL formats enforced; datetime
+  requires offset or named source timezone, so no session-timezone guessing.
+  Regressions cover DMY date, Samara -> UTC date rollover and DST fold rejection.
+  SQL/policy suites: 118 passed; Ruff/mypy pass. Literal string outputs stay
+  literal. Next: integrated temporal publication and temporal-setting review
+  metadata, then final adapter checkpoint/independent changed-scope review.
+- Added integrated CSV -> SQL DATE publication and invalid-calendar-date
+  rejection before publication, with automatic temporary cleanup. Review and
+  manifest temporal metadata now report explicit formatting and whether source/
+  target zones are configured; arbitrary format strings remain excluded.
+  Four focused SQL publication cases passed; Ruff/mypy pass. Next: checkpoint
+  remaining output-conversion/retention and approval binding boundaries before
+  independent changed-scope review. No public activation or new PR yet.
+- Fixed misleading retention reporting for typed SQL output: private result and
+  manifest now mark unchanged-value percentage unavailable instead of presenting
+  pre-serialization CSV equality as final SQL equality. Regression failed first;
+  15 focused SQL/preservation cases pass, Ruff/mypy pass. Counts remain intact.
+  This does not complete the required final-format retention feature. Next:
+  validate final typed output against source-reuse/privacy invariants (conversion
+  can change equality), then checkpoint review; do not activate based on lexical
+  checks alone. No user decision needed for enforcing existing invariants.
+- SQL renderer now compares corresponding complete source rows and final SQL
+  literals through the same typed encoder before appending INSERT statements.
+  Temporary publisher supplies rows from the already-bound source bytes, not a
+  reopened path; dropped-column results are not complete-source-row matches.
+  INTEGER whitespace normalization regression rejects restored identity and
+  accepts a genuinely changed source. Initial 01 probe was already rejected by
+  existing integer encoder, so changed fixture to the reachable whitespace case.
+  26 SQL-focused tests pass; Ruff/mypy pass. This literal-level guard is not a
+  proof of every SQL semantic equivalence (DECIMAL spelling/timezone aliases);
+  final typed equality/privacy review remains before activation. Next: consolidate
+  adapter evidence and review remaining normalization gaps, no public enablement.
+- Replaced SQL-literal text equality with typed value equality for the complete-
+  row guard. Exact Decimal, FLOAT signed zero, booleans, date and aware datetime
+  values are compared after the same validated conversion used by output.
+  Three regressions failed first: 1.0/1.00, 0.0/-0.0 and equal instants with
+  different offsets; now pass. 29 SQL-focused tests, Ruff/mypy pass. This guard
+  does not alter mapping-key matching or claim completed retention percentage.
+  Next: consolidate adapter checkpoint, test the complete changed scope, obtain
+  independent safety review of final output conversion/publication boundaries.
+- SQL adapter checkpoint: eight affected executor/SQL/policy/approval/receipt/
+  CLI-review/exporter/architecture suites: 380 passed, 1 skipped (optional
+  sqlglot import in existing SQL-export parser test). Changed Ruff, targeted
+  mypy, strict OpenSpec and diff checks pass. This is not full RC acceptance.
+  Reviewer CSV-Gate-1 confirmed idle; send only new adapter/publication/equality
+  scope at the signed checkpoint, excluding resolved nullable/temporal findings.
+- Signed checkpoint a9cbc0e0d1172bfdeb54210bac7ea5926a019cf3 sent to existing
+  independent AI reviewer CSV-Gate-1, agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d,
+  for new SQL adapter scope only. Review pending; do not spawn a duplicate.
+  Next: collect findings and resolve confirmed issues before publishing PR.
+- SQL AI review found two High issues: unresolved source conversion treated as
+  changed, and absent post-normalization privacy checking. Fixed with per-cell
+  proven-change requirement and existing detector on final normalized values.
+  Added fictional ISO/DMY and FLOAT normalization regressions; 31 SQL-focused
+  tests pass, Ruff/mypy/diff pass. Evidence reviews/a9cbc0e-ai-safety.md.
+  Commit and re-review these two changes only; no user decision or activation.
+- Signed fix ff6790c496c8ad3fa6cdd3df37a256c2f7dfe127 sent to existing
+  CSV-Gate-1 for narrow re-review of the two SQL findings. Pending; do not
+  duplicate reviewer or reopen unchanged completed scopes.
+- CSV-Gate-1 completed narrow independent AI re-review of ff6790c: both High
+  SQL findings resolved, no additional changed-scope findings. Evidence updated
+  in reviews/a9cbc0e-ai-safety.md; no unchanged tests rerun. Next: publish the
+  private CSV-to-SQL adapter PR and await required CI. No public activation,
+  database execution, complete format-matrix acceptance or RC readiness claimed.
