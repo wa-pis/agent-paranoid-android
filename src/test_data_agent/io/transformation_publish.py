@@ -21,10 +21,50 @@ from test_data_agent.io.transformation_sql import render_transformation_sql
 from test_data_agent.io.transformation_parquet import render_transformation_parquet
 from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput
 from test_data_agent.csv_profiler import validate_csv_headers
+from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
 
 
 class TransformationPublicationError(ValueError):
     """Value-free failure in private temporary publication."""
+
+
+def _run_temporary_transform(
+    source_path: Path, table_name: str, policy_path: Path, *,
+    expected_snapshot_sha256: str, max_total_bytes: int, max_review_bytes: int,
+    max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
+) -> dict[str, object]:
+    """Unregistered fictional-test command; return summary after artifact cleanup.
+
+    The expected review digest detects drift; it never substitutes for a receipt.
+    No destination argument, receipt creation, public command or retained output.
+    """
+    try:
+        budget.check("temporary transformation command")
+        if (type(expected_snapshot_sha256) is not str
+                or len(expected_snapshot_sha256) != 64
+                or any(char not in "0123456789abcdef" for char in expected_snapshot_sha256)):
+            raise ValueError
+        request = prepare_csv_review_from_paths(source_path, table_name,
+            policy_path.parent.absolute(), policy_path.name,
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget)
+        if request.snapshot_sha256 != expected_snapshot_sha256:
+            raise ValueError
+        with temporary_csv_publication(request, max_total_bytes=max_total_bytes,
+                max_review_bytes=max_review_bytes, max_output_bytes=max_output_bytes,
+                budget=budget, receipt_path=receipt_path) as output:
+            manifest = json.loads((output / "manifest.json").read_bytes())
+            summary = {"status": "temporary_test_completed",
+                       "snapshot_sha256": request.snapshot_sha256,
+                       "provenance": manifest["provenance"]}
+        budget.check("temporary transformation command completed")
+        return summary
+    except (OSError, ValueError, TypeError, AttributeError, KeyError):
+        pass
+    try:
+        raise TransformationPublicationError("invalid temporary transformation command")
+    except TransformationPublicationError as error:
+        error.__context__ = None
+        raise
 
 
 @contextmanager
