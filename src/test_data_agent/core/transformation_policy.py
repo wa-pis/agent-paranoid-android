@@ -199,11 +199,52 @@ class CsvNullSettings(_PrivateModel):
     output_token: Annotated[StrictStr, Field(min_length=1, max_length=256)] | None = Field(default=None, repr=False)
 
 
+class SqlOutputField(_PrivateModel):
+    name: Reference = Field(repr=False)
+    type: Literal["string", "integer", "float", "boolean", "decimal", "date", "datetime"]
+    nullable: StrictBool = False
+    decimal_type: DecimalType | None = None
+    temporal_type: TemporalType | None = Field(default=None, repr=False)
+
+    @model_validator(mode="after")
+    def require_decimal_shape(self) -> "SqlOutputField":
+        if (self.type == "decimal") != (self.decimal_type is not None):
+            raise ValueError("SQL decimal output requires exact shape")
+        if (self.type in {"date", "datetime"}) != (self.temporal_type is not None):
+            raise ValueError("SQL temporal output requires explicit format")
+        if self.temporal_type is not None:
+            temporal = self.temporal_type
+            canonical = "%Y-%m-%d" if self.type == "date" else "%Y-%m-%dT%H:%M:%S.%f%z"
+            if temporal.type != self.type or temporal.output_format != canonical:
+                raise ValueError("SQL temporal output requires canonical format")
+            if self.type == "datetime" and temporal.source_timezone is None and "%z" not in temporal.format:
+                raise ValueError("SQL datetime requires explicit source timezone or offset")
+        return self
+
+
+class SqlOutput(_PrivateModel):
+    format: Literal["postgresql_sql"]
+    table: Reference = Field(repr=False)
+    fields: tuple[SqlOutputField, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+
+    def review_summary(self) -> dict[str, object]:
+        """Bound schema metadata only; never expose arbitrary destination names."""
+        return {"format": self.format, "fields": [
+            {"position": index, "type": item.type, "nullable": item.nullable,
+             **({"temporal": {"explicit_format": True,
+                 "source_timezone_configured": item.temporal_type.source_timezone is not None,
+                 "target_timezone_configured": item.temporal_type.target_timezone is not None}}
+                if item.temporal_type else {}),
+             **({"decimal_type": item.decimal_type.model_dump()} if item.decimal_type else {})}
+            for index, item in enumerate(self.fields, start=1)]}
+
+
 class BehaviorPolicy(_PrivateModel):
     schema_version: Literal["0.1"]
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
     csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
+    output: SqlOutput | None = Field(default=None, repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     file_text_mapping: CsvMapping | None = Field(default=None, repr=False)
@@ -389,7 +430,9 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             ),
             "system_comment": _system_field_comment(field),
         })
-    payload = json.dumps({"version": 1, "fields": fields}, ensure_ascii=True, indent=2).encode("ascii")
+    payload = json.dumps({"version": 1, "fields": fields,
+        **({"output": policy.output.review_summary()} if policy.output else {})},
+        ensure_ascii=True, indent=2).encode("ascii")
     if len(payload) > max_bytes:
         raise BehaviorPolicyError("invalid policy review") from None
     return payload

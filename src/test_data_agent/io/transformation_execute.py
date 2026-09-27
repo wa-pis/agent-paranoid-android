@@ -49,6 +49,8 @@ class CsvTransformationResult:
 
     csv_bytes: bytes = field(repr=False)
     retention: SourceRetentionSummary
+    columns: tuple[str, ...] = field(repr=False)
+    rows: tuple[tuple[str | None, ...], ...] = field(repr=False)
 
 
 def trace_csv_replacements(
@@ -292,6 +294,7 @@ def replace_csv_snapshot(
             return rendered
 
         unchanged = compared = dropped_cells = 0
+        logical_rows: list[tuple[str | None, ...]] = []
         for row_index, row in enumerate(reader):
             null_fields: set[str] = set()
             budget.check("CSV replacement")
@@ -380,6 +383,7 @@ def replace_csv_snapshot(
             append_row(replaced)
             final_row = {name: None if name in null_fields else value
                          for name, value in zip(output_names, replaced, strict=True)}
+            logical_rows.append(tuple(final_row[name] for name in output_names))
             for reference, spec in generation_specs.items():
                 final_generated[reference].append({field.name: final_row[field.name]
                                                    for field in spec.entities[0].fields})
@@ -402,10 +406,11 @@ def replace_csv_snapshot(
             assert_generated_dataset_valid({source.name: final_generated[reference]}, spec)
             budget.check("CSV synthesis final validation")
         retention = retention_summary_from_counts(unchanged, compared, dropped_cells)
-        if any(isinstance(action, PreserveAction) and action.format_temporal for action in actions.values()):
-            # Temporal logical-equality reporting is not defined by text formatting.
+        if policy.output is not None or any(
+                isinstance(action, PreserveAction) and action.format_temporal for action in actions.values()):
+            # A lexical comparison does not measure final typed/temporal output equality.
             retention = replace(retention, status="unavailable", unchanged_cells=None, unchanged_percent=None)
-        return CsvTransformationResult(output.getvalue(), retention)
+        return CsvTransformationResult(output.getvalue(), retention, output_names, tuple(logical_rows))
     except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:

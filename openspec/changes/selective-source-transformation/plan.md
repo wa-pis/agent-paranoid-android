@@ -24,6 +24,17 @@ Completion requires all 4 input kinds x 3 output kinds, not CSV-only acceptance.
 For query results, preserve the captured snapshot order; do not promise stable
 database order across executions without an explicit ordering contract.
 
+Concrete next adapter increment: CSV -> SQL-script using existing PostgreSQL
+identifier/literal encoding. First separate the validated logical result from
+CSV rendering, retaining null provenance and exact values. Do not parse output
+CSV back into rows or infer final types from source-only metadata: unconditional
+replace_text may change a numeric input to arbitrary text. Bind explicit output
+schema/dialect/selection in policy snapshots and validate before publication.
+The existing synthetic SQL renderer keeps its source-free guards unchanged;
+reuse scalar encoding, not bypasses. Reuse typed_parquet_table for the following
+Parquet output increment. These are planned implementation steps, not completed
+routes or permission to publish to durable user destinations.
+
 The refreshed 2026-09-24 handover is planned in
 [client feedback v2](feedback-2026-09-24-v2.md): findings 20–26, strengthened
 acceptance for 1–19, dependencies and unresolved decisions. It extends this

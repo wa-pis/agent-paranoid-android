@@ -16,6 +16,8 @@ from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.path_policy import atomic_write_bytes, make_staging_directory, publish_directory
 from test_data_agent.io.transformation_execute import replace_csv_snapshot
+from test_data_agent.io.transformation_sql import render_transformation_sql
+from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers
 
 
 class TransformationPublicationError(ValueError):
@@ -36,19 +38,30 @@ def temporary_csv_publication(
             policy = load_behavior_policy_yaml(
                 next(part.payload for part in request.parts if part.kind == "policy"),
                 max_bytes=max_total_bytes, budget=budget)
+            source = next(part for part in request.parts if part.kind == "source")
+            reader = _csv_reader_from_snapshot(source.payload)
+            reader.fieldnames = validate_csv_headers(reader.fieldnames)
+            source_rows = (tuple(None if row[name] == policy.csv_nulls.input_token else row[name]
+                                 for name in result.columns) for row in reader)
+            payload = (render_transformation_sql(result, policy.output,
+                max_bytes=max_output_bytes, budget=budget,
+                source_rows=source_rows if tuple(reader.fieldnames) == result.columns else None)
+                if policy.output else result.csv_bytes)
+            filename = "dataset.sql" if policy.output else "dataset.csv"
             manifest = json.dumps({"version": 1, "origin": "transformed_mixed",
+                "output": policy.output.review_summary() if policy.output else {"format": "csv"},
                 "privacy_notice": "Mixed-origin output may retain source information; not anonymized.",
                 "fields": [{"entity": item.entity, "field": item.field,
                             "action": item.behavior.action,
                             "unmatched": getattr(getattr(item.behavior, "unmatched", None), "action", None)}
                            for item in policy.fields],
                 "retention": asdict(result.retention)}, ensure_ascii=True, sort_keys=True).encode("ascii")
-            if len(manifest) + len(result.csv_bytes) > max_output_bytes:
+            if len(manifest) + len(payload) > max_output_bytes:
                 raise ValueError
             budget.check("temporary transformation publication")
             destination = Path(temporary).resolve() / "output"
             staging = make_staging_directory(destination)
-            atomic_write_bytes(staging / "dataset.csv", result.csv_bytes)
+            atomic_write_bytes(staging / filename, payload)
             atomic_write_bytes(staging / "manifest.json", manifest)
             budget.check("temporary transformation publication")
             publish_directory(staging, destination)

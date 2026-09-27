@@ -53,6 +53,78 @@ def execute(material, limit=8192):
         max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)).csv_bytes
 
 
+@pytest.mark.parametrize("invalid_type", [False, True])
+def test_private_csv_to_sql_publication_uses_bound_output_schema(invalid_type):
+    import json
+    original = request(target="fictional'quoted")
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["output"] = {"format": "postgresql_sql", "table": "items",
+        "fields": [{"name": name, "type": "string"} for name in ("flag", "code")]}
+    if invalid_type:
+        policy["output"]["fields"][1]["type"] = "integer"
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"),
+        tuple(p for p in original.parts if p.kind == "mapping"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert material.snapshot_sha256 != original.snapshot_sha256
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    if invalid_type:
+        with pytest.raises(publisher.TransformationPublicationError) as caught:
+            with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+                    max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+                pytest.fail("invalid SQL output was published")
+        assert caught.value.__context__ is None
+        assert "fictional" not in str(caught.value)
+        return
+    output_review = json.loads(material.review)["output"]
+    assert output_review == {"format": "postgresql_sql", "fields": [
+        {"position": index, "type": "string", "nullable": False} for index in (1, 2)]}
+    assert "fictional'quoted" not in material.review.decode()
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        sql = (output / "dataset.sql").read_text()
+        assert "VALUES ('yes', 'fictional''quoted');" in sql
+        assert sql.endswith("COMMIT;\n")
+        assert not (output / "dataset.csv").exists()
+        assert json.loads((output / "manifest.json").read_bytes())["output"] == output_review
+        retention = json.loads((output / "manifest.json").read_bytes())["retention"]
+        assert retention["status"] == "unavailable"
+        assert retention["unchanged_percent"] is None
+    assert not output.parent.exists()
+
+
+@pytest.mark.parametrize("invalid_date", [False, True])
+def test_csv_to_sql_date_publication(invalid_date):
+    import json
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["output"] = {"format": "postgresql_sql", "table": "items", "fields": [
+        {"name": "flag", "type": "string"},
+        {"name": "code", "type": "date", "temporal_type": {
+            "type": "date", "format": "%d/%m/%Y", "output_format": "%Y-%m-%d"}}]}
+    parts = tuple(replace(p, payload=b"old,new\n001,31/08/2026\n002," +
+        (b"31/02/2026\n" if invalid_date else b"01/09/2026\n")) if p.name == "code.csv" else p
+        for p in original.parts if p.kind == "mapping")
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"), parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert json.loads(material.review)["output"]["fields"][1]["temporal"] == {
+        "explicit_format": True, "source_timezone_configured": False, "target_timezone_configured": False}
+    assert b"%d/%m/%Y" not in material.review
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    kwargs = dict(max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    if invalid_date:
+        with pytest.raises(publisher.TransformationPublicationError):
+            with publisher.temporary_csv_publication(material, **kwargs):
+                pytest.fail("invalid date was published")
+    else:
+        with publisher.temporary_csv_publication(material, **kwargs) as output:
+            sql = (output / "dataset.sql").read_text()
+            assert "DATE '2026-08-31'" in sql and "DATE '2026-09-01'" in sql
+        assert not output.parent.exists()
+
+
 def test_closed_csv_exact_text_override_no_cascade():
     assert list(csv.reader(io.StringIO(execute(request()).decode()))) == [
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
@@ -256,6 +328,12 @@ def test_nullable_substitution_keeps_empty_distinct_from_null(csv_mapping, missi
             execute(material)
     else:
         assert execute(material) == b"flag,code\nno,filled\nyes,NULL\n"
+        module = import_module("test_data_agent.io.transformation_execute")
+        result = module.replace_csv_snapshot(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+        assert result.columns == ("flag", "code")
+        assert result.rows == (("no", "filled"), ("yes", None))
+        assert "filled" not in repr(result)
 
 
 @pytest.mark.parametrize("decimal", [False, True])
