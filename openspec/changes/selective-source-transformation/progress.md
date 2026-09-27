@@ -2981,3 +2981,12 @@ Broader transformation remains unfinished.
   directives and detach regex parser failures. 229 policy/executor tests and
   Ruff pass. Findings remain pending independent re-review of committed fixes;
   no public activation. Evidence: CSV-Gate-1 agent completion at 447fd4e.
+- Fixes committed ad5eee6f693207c673f2b3ce225ceab8996b3f63; same reviewer
+  resumed for the two changed scopes only, submission
+  01a0e1cc-c2e1-7240-ac9f-ff4faf202159. Re-review pending; no duplicate worker.
+- Re-review at ad5eee6 resolved both temporal findings; no new changed-scope
+  findings. Evidence: [reviews/ad5eee6-ai-safety.md](reviews/ad5eee6-ai-safety.md).
+  GitHub reports all checks completed, no failures, PR #578 mergeable/CLEAN.
+  Its body still described implemented synthesis/substitution/derive as missing;
+  reconcile the body and finish this closed-development PR without claiming
+  public activation or full 1.6.0rc1 acceptance. Remaining scope stays in tasks.
