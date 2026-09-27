@@ -39,6 +39,38 @@ def draft(tmp_path):
     return source, path, policy
 
 
+def test_temporal_settings_wizard_saves_without_execution(tmp_path):
+    source, path, original = draft(tmp_path)
+    master, slave = pty.openpty()
+    process = subprocess.Popen(command(source, path) + ["--edit-formats"], stdin=slave,
+        stderr=slave, stdout=subprocess.PIPE, env=environment())
+    os.close(slave)
+    settings = {"type": "datetime", "format": "%Y-%m-%d", "output_format": "%Y",
+                "source_timezone": "Europe/Samara", "target_timezone": "UTC"}
+    try:
+        for marker, answer in [
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"unknown"),
+            (b"Temporal settings JSON (hidden; null clears, empty keeps): ", json.dumps(settings).encode()),
+            (b"Decision [sensitive/non_sensitive/unknown]: ", b"unknown"),
+            (b"Temporal settings JSON (hidden; null clears, empty keeps): ", b""),
+            (b"Type SAVE to replace the policy (not approval): ", b"SAVE"),
+        ]:
+            read_until(master, marker)
+            os.write(master, answer + b"\n")
+        stdout, _ = process.communicate(timeout=10)
+        assert process.returncode == 0, stdout
+        saved = yaml.safe_load(path.read_bytes())
+        assert saved["fields"][0]["temporal_type"] == settings
+        assert saved["fields"][0]["behavior"] == original["fields"][0]["behavior"]
+        assert not (tmp_path / "approval.json").exists()
+        assert not (tmp_path / "dataset.csv").exists()
+    finally:
+        if process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+        os.close(master)
+
+
 def command(source, policy):
     return [sys.executable, "-m", "test_data_agent.cli", "transform-review", str(source),
             str(policy), "--decide", "--json"]

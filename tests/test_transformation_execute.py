@@ -204,6 +204,51 @@ def test_engine_retention_counts_numeric_formatting_as_unchanged():
     assert result.retention.unchanged_percent == "50.00"
 
 
+def test_literal_date_replacement_ignores_temporal_format_settings():
+    original = request(target="2026-08-31")
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["fields"][1]["temporal_type"] = {"type": "datetime", "format": "%d/%m/%Y",
+        "output_format": "%Y", "source_timezone": "Europe/Samara", "target_timezone": "UTC"}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"),
+        tuple(p for p in original.parts if p.kind == "mapping"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert execute(material) == b"flag,code\nno,1\nyes,2026-08-31\n"
+    assert material.snapshot_sha256 != original.snapshot_sha256
+
+
+def test_financial_mapping_derivation_temporary_csv_end_to_end():
+    """Fictional two-row invoice slice; exact amounts and row order, no preservation."""
+    import json
+    source = SnapshotPart("source", "items", b"total,amount,quantity\n2.00,1.000,2\n6.00,2.000,3\n")
+    profile = csv_profile_to_dataset_profile(profile_csv_bytes(source.payload, "items", budget=GenerationBudget()))
+    policy = {"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile), "fields": [
+            {"entity": "items", "field": "total", "sensitivity": "non_sensitive",
+             "decimal_type": {"precision": 20, "scale": 2},
+             "behavior": {"action": "derive", "expression": "amount * quantity", "dependencies": ["amount", "quantity"]}},
+            {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
+             "decimal_type": {"precision": 20, "scale": 3},
+             "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+                 {"original": ["1.000"], "replacement": ["2.345"]},
+                 {"original": ["2.000"], "replacement": ["3.125"]}]}}},
+            {"entity": "items", "field": "quantity", "sensitivity": "non_sensitive",
+             "behavior": {"action": "replace_text", "mapping": {"kind": "csv", "path": "quantity.csv",
+                 "source_columns": ["old"], "replacement_columns": ["new"]}}}]}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        (SnapshotPart("mapping", "quantity.csv", b"old,new\n2,3\n3,4\n"),),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        assert (output / "dataset.csv").read_bytes() == b"total,amount,quantity\n7.04,2.345,3\n12.50,3.125,4\n"
+        manifest = json.loads((output / "manifest.json").read_bytes())
+        assert manifest["retention"]["compared_cells"] == 6
+        assert manifest["retention"]["unchanged_percent"] == "0.00"
+        assert manifest["origin"] == "transformed_mixed"
+    assert not output.parent.exists()
+
+
 def test_decimal_declaration_is_reviewed_and_never_silently_ignored():
     material = request()
     policy = yaml.safe_load(next(part.payload for part in material.parts if part.kind == "policy"))

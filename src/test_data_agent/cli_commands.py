@@ -100,6 +100,8 @@ def run_dataset_command(
         return profile_csv_command(args)
 
     if args.command == "transform-review":
+        if args.edit_formats and not args.decide:
+            raise ValueError("--edit-formats requires --decide")
         if args.edit_actions and not args.decide:
             raise ValueError("--edit-actions requires --decide")
         if args.decide and args.trace:
@@ -109,6 +111,7 @@ def run_dataset_command(
                 args.source, args.table or args.source.stem, args.policy,
                 input_stream=sys.stdin, output_stream=sys.stderr,
                 edit_actions=args.edit_actions,
+                edit_formats=args.edit_formats,
                 max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
                 max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget(),
             )

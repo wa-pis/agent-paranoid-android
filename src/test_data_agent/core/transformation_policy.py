@@ -4,6 +4,7 @@ import hashlib
 import json
 from graphlib import TopologicalSorter
 from typing import Annotated, Literal, TypeAlias
+from zoneinfo import ZoneInfo
 
 from pydantic import Field, StrictInt, StrictStr, ValidationError, model_validator
 
@@ -87,15 +88,42 @@ class DecimalType(_PrivateModel):
         return self
 
 
+class TemporalType(_PrivateModel):
+    """Explicit field formatting metadata; never an implicit conversion action."""
+
+    type: Literal["date", "datetime"]
+    format: Annotated[StrictStr, Field(min_length=1, max_length=256)] = Field(repr=False)
+    output_format: Annotated[StrictStr, Field(min_length=1, max_length=256)] = Field(repr=False)
+    source_timezone: Reference | None = Field(default=None, repr=False)
+    target_timezone: Reference | None = Field(default=None, repr=False)
+
+    @model_validator(mode="after")
+    def validate_settings(self) -> "TemporalType":
+        if not self.format.strip() or not self.output_format.strip():
+            raise ValueError("temporal formats must not be blank")
+        for timezone in (self.source_timezone, self.target_timezone):
+            if timezone is not None:
+                if self.type == "date":
+                    raise ValueError("date fields have no timezone")
+                try:
+                    ZoneInfo(timezone)
+                except (KeyError, ValueError):
+                    raise ValueError("invalid timezone") from None
+        return self
+
+
 class FieldDecision(_PrivateModel):
     entity: Reference = Field(repr=False)
     field: Reference = Field(repr=False)
     sensitivity: Literal["non_sensitive", "sensitive", "unknown"]
     behavior: FieldAction = Field(repr=False)
     decimal_type: DecimalType | None = Field(default=None, repr=False)
+    temporal_type: TemporalType | None = Field(default=None, repr=False)
 
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
+        if self.temporal_type is not None and self.decimal_type is not None:
+            raise ValueError("conflicting field types")
         preserve = isinstance(self.behavior, PreserveAction) or (
             isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
             and isinstance(self.behavior.unmatched, PreserveAction)

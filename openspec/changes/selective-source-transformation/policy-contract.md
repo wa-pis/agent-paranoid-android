@@ -132,6 +132,30 @@ precision/scale; never parse them through binary float. Dates and timestamps are
 distinct types; no implicit timezone conversion or timestamp truncation. Actual
 CSV null tokens, encoding and timezone policy must be explicit before execution.
 
+Owner decision (2026-09-27): temporal formatting belongs to the field's typed
+description, exposed in the saved behavior profile and field configuration in
+the CLI wizard. `format` describes input parsing; `output_format` describes
+rendering. DATETIME conversion may specify `source_timezone` for input without
+an offset and `target_timezone` (including UTC). Never guess a missing source
+timezone when conversion needs it. DATE values without time do not require a
+timezone. These options apply only to an explicitly selected temporal
+transformation. Unconditional `replace_text` remains literal: a replacement
+such as `2026-08-31` is emitted exactly as supplied, without date parsing,
+formatting or UTC conversion. This decision is not implementation evidence;
+the typed model and adapter integration remain to be added. It does not approve
+implicit timestamp-key equivalence or resolve CSV null encoding.
+
+Private schema now stores this metadata under `fields[].temporal_type`:
+`type: date|datetime`, `format`, `output_format`, optional `source_timezone`
+and `target_timezone`. Formats are bounded nonblank strings; timezone names
+must resolve through the standard IANA timezone database. DATE rejects timezone
+settings, and temporal/DECIMAL declarations cannot coexist. The policy bytes
+bind this metadata into the snapshot. These settings do not create an execution
+action: explicit temporal conversion and format-directive validation remain
+unimplemented. The review-only wizard supports `--decide --edit-formats` with
+hidden JSON input, empty input to keep, null to clear, and explicit atomic SAVE.
+Literal replacement ignores these settings.
+
 Unmatched values default to rejection. Explicit preserve fallback requires the
 same permission as preserve action; synthesis fallback requires its own complete
 generation policy. Apply the mapping once, never cascade replacement values.

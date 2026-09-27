@@ -2898,3 +2898,45 @@ Broader transformation remains unfinished.
   needed. This closes single-entity final-key evidence, not cross-table foreign
   keys or full finance acceptance. Next: complete the remaining integrated
   finance/relationship fixture using existing typed contracts.
+- Added a two-row fictional invoice integration: inline exact DECIMAL amount
+  substitution + CSV quantity replacements -> dependent total derivation ->
+  temporary CSV/manifest. Verified HALF_UP 2.345*3 -> 7.04, second total 12.50,
+  original column/row order, six compared cells, 0.00% unchanged and cleanup.
+  One focused test and Ruff pass. Existing implementation sufficed; no new
+  runtime helper. This is a finance slice, not reference preservation,
+  cross-table integrity, coincidence/null semantics or installed RC acceptance.
+  Next: retain this evidence with the key tests and address the remaining
+  multi-entity contract/adapter gap rather than claiming full finance acceptance.
+- Heartbeat paused for the outstanding execution-timezone decision recorded in
+  policy-contract.md and resumption-plan.md. Proposed contract: retain explicit
+  offsets, compare aware timestamps by instant, never infer a timezone for naive
+  values or mix naive/aware keys. Await owner confirmation before temporal
+  execution/acceptance; automated wakeups are not that confirmation. Other
+  completed evidence remains valid and must not be rerun on resumption.
+- Owner clarified temporal scope: field-level input format/output_format and
+  explicit source/target timezone for selected date conversion; DATE needs no
+  timezone. Literal replace_text ignores those settings, including replacement
+  `2026-08-31`. Recorded in policy-contract.md. This supersedes the proposed
+  implicit timezone handling above, not an implementation or acceptance claim.
+  Next: typed field configuration and focused tests; retain unrelated pending
+  null/relationship decisions and existing working-tree finance test.
+- Added private field temporal_type configuration (date/datetime, bounded input
+  and output formats, validated optional timezone names); DATE timezone and
+  simultaneous DECIMAL declarations reject. Test first failed absent model;
+  84 policy tests now pass. Literal date replacement test proves 2026-08-31 is
+  unchanged by format/timezone settings and settings alter the snapshot digest.
+  Targeted mypy and Ruff pass. No conversion action or public activation added.
+  Next: explicit temporal conversion execution and wizard integration; do not
+  present stored metadata alone as completed user workflow.
+- Connected temporal_type metadata to the existing review-only CLI wizard via
+  --decide --edit-formats. Hidden JSON input reuses typed validation, bounded
+  parsing, snapshot drift checks and atomic SAVE; empty keeps/null clears.
+  Real fictional PTY regression failed before the flag existed, then passed;
+  all 26 wizard tests and changed-file Ruff passed. CLI reference updated.
+  No receipt or dataset is created; literal replacement remains unchanged.
+  Next remains explicit temporal conversion execution, not RC publication.
+- Temporal configuration compatibility checkpoint: 20 CLI parser/review and
+  behavior-policy file tests pass. Existing executor and completed AI-review
+  suites were not repeated. Preparing one coherent commit containing the
+  approved temporal metadata/wizard contract and previously checked finance
+  integration evidence; conversion execution remains unimplemented.

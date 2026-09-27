@@ -27,6 +27,28 @@ def test_declared_decimal_type_roundtrips_without_changing_sensitivity():
     assert parse_behavior_policy(result.model_dump(mode="json")) == result
 
 
+def test_temporal_field_format_roundtrips_without_enabling_conversion():
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["temporal_type"] = {"type": "datetime", "format": "%Y-%m-%d %H:%M",
+        "output_format": "%Y-%m-%dT%H:%M:%S%z", "source_timezone": "Europe/Samara", "target_timezone": "UTC"}
+    result = parse_behavior_policy(payload)
+    assert result.fields[0].temporal_type.target_timezone == "UTC"
+    assert result.fields[0].behavior.action == "drop"
+    assert parse_behavior_policy(result.model_dump(mode="json")) == result
+
+
+@pytest.mark.parametrize("settings", [
+    {"type": "date", "format": "%Y-%m-%d", "output_format": "%Y-%m-%d", "target_timezone": "UTC"},
+    {"type": "datetime", "format": "", "output_format": "%Y"},
+    {"type": "datetime", "format": "%Y", "output_format": "%Y", "source_timezone": "not/a/timezone"},
+])
+def test_invalid_temporal_field_settings_reject(settings):
+    payload = policy({"action": "drop"})
+    payload["fields"][0]["temporal_type"] = settings
+    with pytest.raises(BehaviorPolicyError):
+        parse_behavior_policy(payload)
+
+
 @pytest.mark.parametrize("declaration", [
     {"precision": 39, "scale": 2}, {"precision": 0, "scale": 0},
     {"precision": 3, "scale": 4}, {"precision": 3, "scale": -1},

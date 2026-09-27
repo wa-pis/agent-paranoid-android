@@ -120,7 +120,23 @@ and byte budgets, validated, and checked again before saving. Changed or
 invalid references abort without replacing the policy. `--edit-actions`
 without `--decide` is rejected.
 
+### Temporal field settings (configuration only)
+
+Use `transform-review SOURCE POLICY --decide --edit-formats` to edit each
+field's `temporal_type` metadata. At the hidden JSON prompt, empty input keeps
+the current setting and `null` clears it. For example:
+
+```json
+{"type":"datetime","format":"%Y-%m-%d","output_format":"%Y-%m-%dT%H:%M:%S%z","source_timezone":"Europe/Samara","target_timezone":"UTC"}
+```
+
+`date` fields do not accept timezone settings. Explicit SAVE writes a validated
+policy atomically; it creates neither approval nor output data. This setting
+does not yet execute temporal conversion. Literal `replace_text` always ignores
+format/timezone metadata and emits its supplied replacement unchanged.
+
 ## Database Sources And SQL
+
 
 | Command | Purpose | Primary output |
 | --- | --- | --- |
