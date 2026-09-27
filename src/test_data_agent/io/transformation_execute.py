@@ -315,7 +315,12 @@ def replace_csv_snapshot(
                 return policy.csv_nulls.output_token or ""
             rendered = str(value)
             if original != policy.csv_nulls.input_token and scalar(name, rendered) == scalar(name, original):
-                raise ValueError
+                # Owner-approved numeric zero coincidence: generation already ran.
+                # Never applies to text/bool, mappings, preservation or whole rows.
+                if (field_types[name] not in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}
+                        or scalar(name, rendered) != 0):
+                    raise ValueError
+                coincident_zero_fields.add(name)
             return rendered
 
         unchanged = compared = dropped_cells = 0
@@ -324,6 +329,7 @@ def replace_csv_snapshot(
         for row_index, row in enumerate(reader):
             origins = dict.fromkeys(execution_names, "replacement")
             null_fields: set[str] = set()
+            coincident_zero_fields: set[str] = set()
             budget.check("CSV replacement")
             if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
@@ -402,10 +408,11 @@ def replace_csv_snapshot(
             for name in decimal_types:
                 if name in transformed and name not in null_fields:
                     scalar(name, transformed[name])
-            if output_names == names and (tuple(None if name in null_fields else value
+            if output_names == names and (tuple(None if name in null_fields else
+                    row[name] if name in coincident_zero_fields else value
                     for name, value in zip(output_names, replaced, strict=True))
                     == tuple(None if row[name] == policy.csv_nulls.input_token else row[name] for name in names)
-                    or preserved_fields == set(names)):
+                    or preserved_fields | coincident_zero_fields == set(names)):
                 raise ValueError
             if policy.input_format == "parquet" and output_names == names and all(
                     same_native_value(row[name], None if name in null_fields else value)
