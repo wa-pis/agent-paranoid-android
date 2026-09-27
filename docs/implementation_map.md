@@ -106,6 +106,12 @@ inside automatically deleted private test storage. Neither is public activation.
 The format-independent RC target is input adapter -> common transformation and
 validation -> output adapter. Current executor still combines CSV decoding,
 execution and rendering; extraction is pending, not a completed architecture.
+`io/transformation_input.py` now dispatches fixed-byte decoding for CSV and an
+initial native nullable string/signed-integer/float64/boolean/decimal128 Parquet slice. Review, receipt revalidation,
+execution/trace and final source comparison use that decoder. Unsupported native
+Parquet types fail closed until typed input integration; no intermediate
+CSV file replaces the source snapshot. Existing private CSV-named entry points
+are retained during this extraction, not newly public interfaces.
 First additional route is CSV -> SQL-script using a validated logical result,
 not reparsing rendered CSV (which loses null and logical-type provenance).
 Reuse `postgres_sql_export.quote_postgres_identifier` and `postgres_literal`

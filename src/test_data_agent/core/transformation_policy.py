@@ -168,11 +168,14 @@ class FieldDecision(_PrivateModel):
     field: Reference = Field(repr=False)
     sensitivity: Literal["non_sensitive", "sensitive", "unknown"]
     behavior: FieldAction = Field(repr=False)
+    match_format: Annotated[StrictStr, Field(pattern=r"^(?:0?[1-9][0-9]?d|\.(?:[0-9]|1[0-8])f)$")] | None = Field(default=None, repr=False)
     decimal_type: DecimalType | None = Field(default=None, repr=False)
     temporal_type: TemporalType | None = Field(default=None, repr=False)
 
     @model_validator(mode="after")
     def require_preservation_declaration(self) -> "FieldDecision":
+        if self.match_format is not None and not isinstance(self.behavior, ReplaceTextAction):
+            raise ValueError("matching format requires text replacement")
         if isinstance(self.behavior, PreserveAction) and self.behavior.format_temporal and self.temporal_type is None:
             raise ValueError("temporal formatting requires field settings")
         if (isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
@@ -249,6 +252,7 @@ class ParquetOutput(TypedOutput):
 
 class BehaviorPolicy(_PrivateModel):
     schema_version: Literal["0.1"]
+    input_format: Literal["csv", "parquet"] = Field(default="csv", repr=False)
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
     csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
@@ -422,6 +426,7 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "entity": decision.entity,
             "field": decision.field,
             "action": behavior.action,
+            **({"explicit_match_format": True} if decision.match_format is not None else {}),
             **({"format_temporal": True} if isinstance(behavior, PreserveAction) and behavior.format_temporal else {}),
             **({"decimal_type": decision.decimal_type.model_dump()}
                if decision.decimal_type is not None else {}),
@@ -439,6 +444,7 @@ def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max
             "system_comment": _system_field_comment(field),
         })
     payload = json.dumps({"version": 1, "fields": fields,
+        **({"input_format": policy.input_format} if policy.input_format != "csv" else {}),
         **({"output": policy.output.review_summary()} if policy.output else {})},
         ensure_ascii=True, indent=2).encode("ascii")
     if len(payload) > max_bytes:

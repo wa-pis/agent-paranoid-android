@@ -1,6 +1,8 @@
 """Fictional inputs only: closed executor, no public interface or file output."""
 
 import csv
+from decimal import Decimal
+from datetime import date
 import io
 import os
 import pty
@@ -161,6 +163,285 @@ def test_csv_to_sql_date_publication(invalid_date):
 def test_closed_csv_exact_text_override_no_cascade():
     assert list(csv.reader(io.StringIO(execute(request()).decode()))) == [
         ["flag", "code"], ["no", "1"], ["yes", "second"]]
+
+
+@pytest.mark.parametrize("output_format", ["csv", "postgresql_sql", "parquet"])
+@pytest.mark.parametrize("native_null", [False, True])
+def test_private_parquet_string_input_all_outputs(output_format, native_null):
+    import json
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    original = request()
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"flag": ["true", "false"],
+        "code": [None, ""] if native_null else ["001", "002"]}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    if native_null:
+        policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": {
+            "kind": "inline", "entries": [
+                {"original": [None], "replacement": [""]},
+                {"original": [""], "replacement": [None]}]}}
+        if output_format == "csv":
+            policy["csv_nulls"] = {"output_token": "\\N"}
+    if output_format != "csv":
+        policy["output"] = {"format": output_format, "fields": [
+            {"name": name, "type": "string", "nullable": native_null and name == "code"}
+            for name in ("flag", "code")]}
+        if output_format == "postgresql_sql":
+            policy["output"]["table"] = "items"
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
+    profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
+    assert all(field.data_type.value == "string" for field in profile.entities[0].fields)
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        tuple(p for p in original.parts if p.kind == "mapping" and (not native_null or p.name == "all.csv")),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert json.loads(material.review)["input_format"] == "parquet"
+    assert next(p.payload for p in material.parts if p.kind == "source") == buffer.getvalue()
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        if output_format == "csv":
+            assert (output / "dataset.csv").read_bytes() == (
+                b"flag,code\nno,\nyes,\\N\n" if native_null else b"flag,code\nno,1\nyes,second\n")
+        elif output_format == "parquet":
+            assert pq.read_table(output / "dataset.parquet").to_pylist() == [
+                {"flag": "no", "code": "" if native_null else "1"},
+                {"flag": "yes", "code": None if native_null else "second"}]
+        else:
+            assert ("VALUES ('yes', NULL);" if native_null else "VALUES ('yes', 'second');") in (
+                output / "dataset.sql").read_text()
+    assert not output.parent.exists()
+    tampered = replace(material, parts=tuple(replace(p, payload=p.payload + b"drift")
+        if p.kind == "source" else p for p in material.parts))
+    with pytest.raises(publisher.TransformationPublicationError):
+        with publisher.temporary_csv_publication(tampered, max_total_bytes=8192,
+                max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+            pytest.fail("changed source published")
+
+
+@pytest.mark.parametrize("values", [[1, 2], [True, False], [["nested"], ["value"]]])
+def test_parquet_input_unsupported_native_values_fail_closed(values):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"flag": ["true", "false"], "code": values}), buffer)
+    with pytest.raises(TransformationSourceError, match="invalid transformation source review"):
+        prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+            SnapshotPart("source", "items", buffer.getvalue()),
+            tuple(p for p in original.parts if p.kind == "mapping"),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+
+
+@pytest.mark.parametrize("kind,values,replacements", [
+    ("integer", [1, 2], [7, 8]), ("float", [1.25, 2.5], [7.5, 8.25]),
+    ("boolean", [True, False], [False, True]),
+    ("date", [date(2026, 1, 2), date(2026, 2, 3)], [date(2027, 3, 4), date(2027, 4, 5)]),
+    pytest.param("date", [None, date(2026, 2, 3)], [date(2027, 3, 4), None], id="nullable-date"),
+    ("decimal", [Decimal("1.25"), Decimal("2.50")], [Decimal("7.50"), Decimal("8.25")])])
+@pytest.mark.parametrize("output_format", ["csv", "parquet", "postgresql_sql"])
+def test_parquet_native_numeric_substitution(kind, values, replacements, output_format):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": {
+        "kind": "inline", "entries": [{"original": [str(a) if a is not None and kind in {"decimal", "date"} else a],
+                                        "replacement": [str(b) if b is not None and kind in {"decimal", "date"} else b]}
+                                      for a, b in zip(values, replacements)]}}
+    if None in replacements and output_format == "csv":
+        policy["csv_nulls"] = {"output_token": "\\N"}
+    if kind == "decimal":
+        policy["fields"][1]["decimal_type"] = {"precision": 5, "scale": 2}
+    if output_format != "csv":
+        policy["output"] = {"format": output_format, "fields": [
+            {"name": "flag", "type": "string"}, {"name": "code", "type": kind, "nullable": None in replacements}]}
+        if output_format == "postgresql_sql":
+            policy["output"]["table"] = "items"
+        if kind == "decimal":
+            policy["output"]["fields"][1]["decimal_type"] = {"precision": 5, "scale": 2}
+        if kind == "date":
+            policy["output"]["fields"][1]["temporal_type"] = {
+                "type": "date", "format": "%Y-%m-%d", "output_format": "%Y-%m-%d"}
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"flag": ["true", "false"], "code":
+        pa.array(values, type=pa.decimal128(5, 2)) if kind == "decimal" else values}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
+    profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
+    assert profile.entities[0].fields[1].data_type.value == kind
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        if output_format == "parquet":
+            assert pq.read_table(output / "dataset.parquet").column("code").to_pylist() == replacements
+        elif output_format == "csv":
+            assert [row["code"] for row in csv.DictReader(io.StringIO(
+                (output / "dataset.csv").read_text()))] == ["\\N" if value is None else str(value) for value in replacements]
+        else:
+            literal = str(replacements[1]).upper() if kind == "boolean" else str(replacements[1])
+            if kind == "date":
+                literal = f"DATE '{literal}'"
+            if replacements[1] is None:
+                literal = "NULL"
+            assert f"VALUES ('yes', {literal});" in (output / "dataset.sql").read_text()
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_native_parquet_nonfinite_rejects_before_profiling(value):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_input import source_reader
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    policy["fields"][1]["behavior"] = {"action": "drop"}
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(),
+        max_bytes=8192, budget=GenerationBudget(5))
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"flag": ["fictional"], "code": [value]}), buffer)
+    with pytest.raises(ValueError, match="unsupported Parquet source cell"):
+        source_reader(SnapshotPart("source", "items", buffer.getvalue()), parsed,
+            budget=GenerationBudget(5))
+
+
+@pytest.mark.parametrize("value", [1, 1.25, date(2026, 2, 3)])
+def test_native_numeric_identity_rejects_before_execution(value):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"amount": [value]}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    policy = {"schema_version": "0.1", "schema_fingerprint": "0" * 64,
+        "input_format": "parquet", "seed": 7, "fields": [
+            {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
+             "behavior": {"action": "substitute", "mapping": {"kind": "inline",
+                 "entries": [{"original": [value.isoformat() if type(value) is date else value],
+                              "replacement": [value.isoformat() if type(value) is date else value]}]}}}]}
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
+    profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    with pytest.raises(TransformationSourceError):
+        prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, (),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+
+
+@pytest.mark.parametrize("replacement,expected", [
+    ("2026-02-03", True), ("20260203", True), ("2027-02-03", False),
+    ("not-a-date", False), (None, False)])
+def test_native_date_reuse_guard(replacement, expected):
+    from test_data_agent.io.transformation_input import same_native_value
+    assert same_native_value(date(2026, 2, 3), replacement) is expected
+
+
+@pytest.mark.parametrize("target", ["done", "1.250"])
+@pytest.mark.parametrize("sensitivity", ["non_sensitive", "sensitive"])
+def test_explicit_native_text_format_and_row_reuse(target, sensitivity):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_source import _profile_transformation_source, trace_csv_review_request
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"amount": [1.25]}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    policy = {"schema_version": "0.1", "schema_fingerprint": "0" * 64,
+        "input_format": "parquet", "seed": 7, "fields": [
+            {"entity": "items", "field": "amount", "sensitivity": sensitivity, "match_format": ".2f",
+             "behavior": {"action": "replace_text", "mapping": {"kind": "csv", "path": "map.csv",
+                 "source_columns": ["old"], "replacement_columns": ["new"]}}}]}
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
+    profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
+    if sensitivity == "sensitive" and target == "1.250":
+        with pytest.raises(TransformationSourceError):
+            prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+                (SnapshotPart("mapping", "map.csv", b"old,new\n1.25,1.250\n"),),
+                max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+        return
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        (SnapshotPart("mapping", "map.csv", f"old,new\n1.25,{target}\n".encode()),),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    assert b'"explicit_match_format": true' in material.review
+    assert trace_csv_review_request(material, max_events=5, max_cells=5,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5)).matched_cells == 1
+    if target == "done":
+        assert execute(material) == b"amount\ndone\n"
+    else:
+        module = import_module("test_data_agent.io.transformation_execute")
+        with pytest.raises(module.TransformationExecutionError):
+            execute(material)
+
+
+@pytest.mark.parametrize("pattern", ["100d", ".19f", "n", "{value}", "1000000000d", ""])
+def test_native_match_format_is_bounded(pattern):
+    from test_data_agent.core.transformation_policy import parse_behavior_policy, BehaviorPolicyError
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["fields"][1]["match_format"] = pattern
+    with pytest.raises(BehaviorPolicyError):
+        parse_behavior_policy(policy)
+
+
+def test_input_format_change_invalidates_review_before_publication():
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    tampered = replace(original, parts=tuple(replace(p, payload=yaml.safe_dump(policy).encode())
+        if p.kind == "policy" else p for p in original.parts))
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with pytest.raises(publisher.TransformationPublicationError) as caught:
+        with publisher.temporary_csv_publication(tampered, max_total_bytes=8192,
+                max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+            pytest.fail("changed input format published")
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize("precision,scale,declared,valid", [
+    (38, 37, (38, 37), True), (6, 2, (5, 2), False),
+    (6, 2, (6, 3), False), (6, 2, None, False), (39, 2, (38, 2), False)])
+def test_native_decimal_shape_boundary(precision, scale, declared, valid):
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    from test_data_agent.io.transformation_input import source_reader
+    from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+    original = request()
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["input_format"] = "parquet"
+    policy["fields"][1]["behavior"] = {"action": "drop"}
+    if declared:
+        policy["fields"][1]["decimal_type"] = {"precision": declared[0], "scale": declared[1]}
+    parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(),
+        max_bytes=8192, budget=GenerationBudget(5))
+    value = Decimal("0." + "1234567890123456789012345678901234567") if scale == 37 else Decimal("1.25")
+    arrow_type = pa.decimal128(precision, scale) if precision <= 38 else pa.decimal256(precision, scale)
+    buffer = io.BytesIO()
+    pq.write_table(pa.table({"flag": ["fictional"], "code": pa.array([value], type=arrow_type)}), buffer)
+    source = SnapshotPart("source", "items", buffer.getvalue())
+    if valid:
+        reader = source_reader(source, parsed, budget=GenerationBudget(5))
+        assert reader.decimal_shapes["code"] == (38, 37)
+        observed = next(iter(reader))["code"]
+        assert type(observed) is Decimal and observed.as_tuple() == value.as_tuple()
+    else:
+        with pytest.raises(ValueError):
+            source_reader(source, parsed, budget=GenerationBudget(5))
 
 
 @pytest.mark.parametrize("action", ["preserve", "replace_text", "substitute"])
@@ -367,6 +648,40 @@ def test_nullable_substitution_keeps_empty_distinct_from_null(csv_mapping, missi
         assert result.columns == ("flag", "code")
         assert result.rows == (("no", "filled"), ("yes", None))
         assert "filled" not in repr(result)
+
+
+@pytest.mark.parametrize("output_format", ["parquet", "postgresql_sql"])
+def test_native_output_null_needs_no_csv_output_marker(output_format):
+    original = request(source_bytes=b"flag,code\ntrue,\\N\nfalse,\n")
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["csv_nulls"] = {"input_token": "\\N"}
+    policy["output"] = {"format": output_format, "fields": [
+        {"name": "flag", "type": "string"},
+        {"name": "code", "type": "string", "nullable": True}]}
+    if output_format == "postgresql_sql":
+        policy["output"]["table"] = "items"
+    policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": {
+        "kind": "inline", "entries": [
+            {"original": [None], "replacement": [""]},
+            {"original": [""], "replacement": [None]}]}}
+    source = next(p for p in original.parts if p.kind == "source")
+    policy["schema_fingerprint"] = transformation_schema_fingerprint(_profile_transformation_csv(
+        source, null_token="\\N", budget=GenerationBudget(5), max_bytes=8192))
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
+        tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    publisher = import_module("test_data_agent.io.transformation_publish")
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
+        if output_format == "parquet":
+            pq = pytest.importorskip("pyarrow.parquet")
+            assert pq.read_table(output / "dataset.parquet").to_pylist() == [
+                {"flag": "no", "code": ""}, {"flag": "yes", "code": None}]
+        else:
+            sql = (output / "dataset.sql").read_text()
+            assert "VALUES ('no', '');" in sql
+            assert "VALUES ('yes', NULL);" in sql
+    assert not output.parent.exists()
 
 
 @pytest.mark.parametrize("decimal", [False, True])
