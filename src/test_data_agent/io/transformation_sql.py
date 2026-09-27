@@ -44,10 +44,11 @@ def render_transformation_sql(result: CsvTransformationResult, output: SqlOutput
     columns = ", ".join(quote_postgres_identifier(name) for name in result.columns)
     append("BEGIN;\nSET LOCAL standard_conforming_strings = on;\n")
     append(f"CREATE TABLE {table} ({', '.join(definitions)});\n")
-    def literals(row: tuple[str | None, ...]) -> tuple[list[str], list[Any]]:
+    def literals(row: tuple[str | None, ...], indices: tuple[int, ...] | None = None) -> tuple[list[str], list[Any]]:
         values = []
         logical = []
-        for value, item in zip(row, output.fields, strict=True):
+        fields = output.fields if indices is None else tuple(output.fields[index] for index in indices)
+        for value, item in zip(row, fields, strict=True):
             budget.check("transformation SQL cell")
             if value is None and not item.nullable:
                 raise ValueError("null in required SQL output field")
@@ -71,6 +72,8 @@ def render_transformation_sql(result: CsvTransformationResult, output: SqlOutput
                 encoded_value = float(literal)
             elif value is not None and item.type == "boolean":
                 encoded_value = literal == "TRUE"
+            if encoded_value is not None and looks_sensitive_value(str(encoded_value)):
+                raise ValueError("sensitive normalized SQL output")
             logical.append(encoded_value)
         return values, logical
 
@@ -78,12 +81,15 @@ def render_transformation_sql(result: CsvTransformationResult, output: SqlOutput
         values, logical = literals(row)
         if source_rows is not None:
             original = next(source_rows)
-            try:
-                _, original_values = literals(original)
-            except (ValueError, ArithmeticError):
-                original_values = None
-            if original_values == logical:
-                raise ValueError("SQL output retains complete source row")
+            changed = False
+            for index, (source_value, final_value) in enumerate(zip(original, logical, strict=True)):
+                try:
+                    _, original_values = literals((source_value,), (index,))
+                except (ValueError, ArithmeticError):
+                    continue  # Unknown comparison is not evidence that this row changed.
+                changed |= original_values[0] != final_value
+            if not changed:
+                raise ValueError("SQL output retains complete source row or comparison is unresolved")
         append(f"INSERT INTO {table} ({columns}) VALUES ({', '.join(values)});\n")
     append("COMMIT;\n")
     return bytes(payload)

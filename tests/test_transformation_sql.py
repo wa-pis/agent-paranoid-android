@@ -66,6 +66,22 @@ def test_null_empty_and_output_budget():
         render("7", limit=len(payload) - 1)
 
 
+def test_normalized_float_is_checked_for_sensitivity():
+    with pytest.raises(ValueError, match="sensitive normalized"):
+        render("1.234567e6", kind="float")
+
+
+def test_unparseable_source_date_is_not_evidence_of_change():
+    output = SqlOutput.model_validate({"format": "postgresql_sql", "table": "items",
+        "fields": [{"name": "value", "type": "date", "temporal_type": {
+            "type": "date", "format": "%d/%m/%Y", "output_format": "%Y-%m-%d"}}]})
+    result = CsvTransformationResult(b"", retention_summary_from_counts(0, 1, 0),
+                                     ("value",), (("31/08/2026",),))
+    with pytest.raises(ValueError, match="comparison is unresolved"):
+        render_transformation_sql(result, output, max_bytes=4096,
+            budget=GenerationBudget(5), source_rows=iter([("2026-08-31",)]))
+
+
 @pytest.mark.parametrize("value", ["NaN", "Infinity", "1e999", "1e-999"])
 def test_float_rejects_nonfinite_and_underflow(value):
     with pytest.raises(ValueError):

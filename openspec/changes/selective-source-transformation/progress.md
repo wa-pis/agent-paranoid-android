@@ -3216,3 +3216,13 @@ Broader transformation remains unfinished.
   mypy, strict OpenSpec and diff checks pass. This is not full RC acceptance.
   Reviewer CSV-Gate-1 confirmed idle; send only new adapter/publication/equality
   scope at the signed checkpoint, excluding resolved nullable/temporal findings.
+- Signed checkpoint a9cbc0e0d1172bfdeb54210bac7ea5926a019cf3 sent to existing
+  independent AI reviewer CSV-Gate-1, agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d,
+  for new SQL adapter scope only. Review pending; do not spawn a duplicate.
+  Next: collect findings and resolve confirmed issues before publishing PR.
+- SQL AI review found two High issues: unresolved source conversion treated as
+  changed, and absent post-normalization privacy checking. Fixed with per-cell
+  proven-change requirement and existing detector on final normalized values.
+  Added fictional ISO/DMY and FLOAT normalization regressions; 31 SQL-focused
+  tests pass, Ruff/mypy/diff pass. Evidence reviews/a9cbc0e-ai-safety.md.
+  Commit and re-review these two changes only; no user decision or activation.
