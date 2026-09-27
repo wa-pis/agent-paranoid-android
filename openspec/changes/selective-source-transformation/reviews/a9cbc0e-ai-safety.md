@@ -18,7 +18,14 @@ budgets and temporary publication. Evidence submission
    intermediate checks (fictional 1.234567e6 -> 1234567.0). Fix: apply existing
    privacy detector to normalized values before accepting output.
 
-Author added regression tests and fixed both; independent re-review pending.
+Author added regression tests and fixed both. Independent re-review by the same
+reviewer on 2026-09-27 verified SHA
+`ff6790c496c8ad3fa6cdd3df37a256c2f7dfe127` against the initial reviewed SHA.
+Both High findings resolved; no additional changed-scope issue identified.
+Re-review submission: `01a0e302-17fd-7731-83df-e8ba84962a23`.
+Reviewer inspected the static diff, surrounding control flow and regression
+assertions; tests were not independently rerun. The progress-only edit was
+excluded. No edits, network, database access, receipts or publication occurred.
 31 SQL-focused tests passed; changed Ruff/mypy and diff checks passed.
 These conservative guards do not establish complete cross-format acceptance.
 

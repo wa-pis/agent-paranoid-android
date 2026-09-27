@@ -3226,3 +3226,11 @@ Broader transformation remains unfinished.
   Added fictional ISO/DMY and FLOAT normalization regressions; 31 SQL-focused
   tests pass, Ruff/mypy/diff pass. Evidence reviews/a9cbc0e-ai-safety.md.
   Commit and re-review these two changes only; no user decision or activation.
+- Signed fix ff6790c496c8ad3fa6cdd3df37a256c2f7dfe127 sent to existing
+  CSV-Gate-1 for narrow re-review of the two SQL findings. Pending; do not
+  duplicate reviewer or reopen unchanged completed scopes.
+- CSV-Gate-1 completed narrow independent AI re-review of ff6790c: both High
+  SQL findings resolved, no additional changed-scope findings. Evidence updated
+  in reviews/a9cbc0e-ai-safety.md; no unchanged tests rerun. Next: publish the
+  private CSV-to-SQL adapter PR and await required CI. No public activation,
+  database execution, complete format-matrix acceptance or RC readiness claimed.
