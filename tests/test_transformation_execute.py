@@ -864,10 +864,16 @@ def test_literal_date_replacement_ignores_temporal_format_settings():
     assert material.snapshot_sha256 != original.snapshot_sha256
 
 
-def test_financial_mapping_derivation_temporary_csv_end_to_end():
-    """Fictional two-row invoice slice; exact amounts and row order, no preservation."""
+@pytest.mark.parametrize("preserve_categories", [False, True])
+def test_financial_mapping_derivation_temporary_csv_end_to_end(tmp_path, preserve_categories):
+    """Fictional invoices: exact amounts, optional approved category preservation."""
     import json
     source = SnapshotPart("source", "items", b"total,amount,quantity\n2.00,1.000,2\n6.00,2.000,3\n")
+    if preserve_categories:
+        source = replace(source, payload=(
+            b"total,amount,quantity,product,segment,bank,invoice\n"
+            b"2.00,1.000,2,widget,retail,fictional-bank-a,invoice-a\n"
+            b"6.00,2.000,3,gadget,wholesale,fictional-bank-b,invoice-a\n"))
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(source.payload, "items", budget=GenerationBudget()))
     policy = {"schema_version": "0.1", "seed": 7,
         "schema_fingerprint": transformation_schema_fingerprint(profile), "fields": [
@@ -882,18 +888,62 @@ def test_financial_mapping_derivation_temporary_csv_end_to_end():
             {"entity": "items", "field": "quantity", "sensitivity": "non_sensitive",
              "behavior": {"action": "replace_text", "mapping": {"kind": "csv", "path": "quantity.csv",
                  "source_columns": ["old"], "replacement_columns": ["new"]}}}]}
+    if preserve_categories:
+        policy["fields"].extend({"entity": "items", "field": name, "sensitivity": "non_sensitive",
+            "behavior": {"action": "preserve", "authorization_ref": "fictional-ref",
+                         "comment": "Reviewed fictional category"}}
+            for name in ("product", "segment", "bank"))
+        policy["fields"].append({"entity": "items", "field": "invoice", "sensitivity": "non_sensitive",
+            "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+                {"original": ["invoice-a"], "replacement": ["synthetic-invoice-a"]}]}}})
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
         (SnapshotPart("mapping", "quantity.csv", b"old,new\n2,3\n3,4\n"),),
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     publisher = import_module("test_data_agent.io.transformation_publish")
+    receipt_path = None
+    if preserve_categories:
+        from test_data_agent.io.transformation_receipt import _issue_to_tty_fd
+        receipt_path = tmp_path / "approval.json"
+        with pytest.raises(publisher.TransformationPublicationError):
+            with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+                    max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+                pytest.fail("preservation without local receipt")
+        master, slave = pty.openpty()
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                issued = pool.submit(_issue_to_tty_fd, material, receipt_path, slave, GenerationBudget(5))
+                prompt = bytearray()
+                while b"Type APPROVE" not in prompt:
+                    assert select.select([master], [], [], 5)[0]
+                    prompt.extend(os.read(master, 4096))
+                os.write(master, b"APPROVE\n")
+                issued.result(timeout=5)
+        finally:
+            os.close(master)
+            os.close(slave)
     with publisher.temporary_csv_publication(material, max_total_bytes=8192,
-            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)) as output:
-        assert (output / "dataset.csv").read_bytes() == b"total,amount,quantity\n7.04,2.345,3\n12.50,3.125,4\n"
-        manifest = json.loads((output / "manifest.json").read_bytes())
-        assert manifest["provenance"]["output_cells"] == 6
-        assert manifest["provenance"]["replacement_percent"] == "100.00"
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5),
+            receipt_path=receipt_path) as output:
+        expected = (b"total,amount,quantity,product,segment,bank,invoice\n"
+                    b"7.04,2.345,3,widget,retail,fictional-bank-a,synthetic-invoice-a\n"
+                    b"12.50,3.125,4,gadget,wholesale,fictional-bank-b,synthetic-invoice-a\n" if preserve_categories else
+                    b"total,amount,quantity\n7.04,2.345,3\n12.50,3.125,4\n")
+        assert (output / "dataset.csv").read_bytes() == expected
+        manifest_bytes = (output / "manifest.json").read_bytes()
+        manifest = json.loads(manifest_bytes)
+        assert manifest["provenance"]["output_cells"] == (14 if preserve_categories else 6)
+        assert manifest["provenance"]["replacement_cells"] == (8 if preserve_categories else 6)
+        assert manifest["provenance"]["original_cells"] == (6 if preserve_categories else 0)
+        assert manifest["provenance"]["replacement_percent"] == ("57.14" if preserve_categories else "100.00")
         assert manifest["origin"] == "transformed_mixed"
+        assert all(value not in manifest_bytes for value in (b"fictional-bank-a", b"widget", b"invoice-a", b"2.345"))
     assert not output.parent.exists()
+    with publisher.temporary_csv_publication(material, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5),
+            receipt_path=receipt_path) as replay:
+        assert (replay / "dataset.csv").read_bytes() == expected
+        assert (replay / "manifest.json").read_bytes() == manifest_bytes
+    assert not replay.parent.exists()
 
 
 def test_decimal_declaration_is_reviewed_and_never_silently_ignored():

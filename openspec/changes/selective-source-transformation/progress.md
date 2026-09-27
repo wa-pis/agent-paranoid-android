@@ -3657,3 +3657,32 @@ Broader transformation remains unfinished.
   No additional corrective-diff issue identified. Preparing evidence-only signed
   commit and PR; runtime unchanged since 237 passing tests. Next: required CI
   and normal merge only after green gates. Public execution remains disabled.
+- PR #585 opened: https://github.com/wa-pis/agent-paranoid-android/pull/585
+  head 63f879e (evidence only after reviewed runtime ee06d97). Next: inspect
+  required checks and normal merge after green gates; no duplicate CI runs.
+- PR #585 gate snapshot: head 63f879e unchanged, GitHub signature verified;
+  all completed checks SUCCESS/SKIPPED, required Python 3.12 still IN_PROGRESS.
+  Merge remains BLOCKED by pending CI, not a user-decision blocker. No reruns
+  or merge attempted. Next heartbeat: consume that run's result, merge normally
+  only after all gates pass, then continue the integrated finance fixture.
+- PR #585 merged normally at 2026-09-27T21:48:52Z, merge SHA
+  56637eb8b97477e8f44ca9174a3ae4f8ea5fc93b. All checks SUCCESS/SKIPPED,
+  required checks passed, merge state CLEAN; no protection bypass.
+- Continued in reused worktree on codex/1-6-finance-scenario from that merge,
+  preserving local progress. Extended existing exact-finance publication test
+  with fictional product/segment/bank preservation, missing-receipt rejection,
+  existing test-only TTY approval, replaced amount/quantity, recomputed HALF_UP
+  totals, 6 replacement + 6 original cells and temporary cleanup. Two focused
+  cases passed; Ruff passed. No runtime changes or new AI review.
+  This is partial integrated evidence, not full finance acceptance: mapped IDs,
+  cross-row relationships, replay and installed public workflow remain.
+  Next: extend same scenario with repeated mapped identifiers and replay checks;
+  do not create another helper or activate public execution.
+- Extended the same finance scenario with repeated fictional invoice IDs mapped
+  consistently through inline substitution. Preserved variant now reports 8
+  replacement / 6 original cells, 57.14% replacement. Both variants replay exact
+  dataset and manifest bytes with fresh budgets and clean up temporary output;
+  manifest assertions exclude fixture values. Two focused cases passed, Ruff
+  and diff checks passed. Runtime unchanged, no new independent review needed.
+  Next: publish this acceptance-test slice through normal PR gates, then address
+  declared cross-row relationship validation (not proven by repeated-ID mapping).
