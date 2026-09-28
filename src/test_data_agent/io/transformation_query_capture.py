@@ -30,6 +30,10 @@ from test_data_agent.sql_query_source import (
 class _ResultQuery:
     sql: str = field(repr=False)
     max_rows: int
+    adapter: str
+    source_id: str
+    table: str
+    columns: tuple[str, ...]
 
 
 def _capture_authorized_result(
@@ -92,7 +96,11 @@ def _capture_authorized_result(
                 query_sha256=plan.fingerprint, entity=plan.entity_name)
             source_reader(empty, policy, budget=budget)
         fields = ", ".join(f'"{name}"' for name in plan.output_fields)
-        query = _ResultQuery(f'SELECT {fields} FROM ({plan.sql}) AS "__apa_capture" LIMIT {max_rows + 1}', max_rows + 1)
+        query = _ResultQuery(
+            f'SELECT {fields} FROM ({plan.sql}) AS "__apa_capture" LIMIT {max_rows + 1}',
+            max_rows + 1, plan.adapter.value, plan.source_id, draft.table_name,
+            tuple(item.name for item in source_columns),
+        )
         rows = decoded = 0
         expanded_limit = min(max_bytes, max_parquet_expanded_bytes())
         with BoundedBuffer() as buffer:

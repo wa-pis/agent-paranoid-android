@@ -3957,3 +3957,30 @@ Broader transformation remains unfinished.
   Initial16test run passed; unused test import corrected before final20run.
   Next: commit/push this private integration slice, consume CI; dedicated driver
   adapters and final activation safety review remain, not complete RC acceptance.
+- Signed f91ab31 pushed; PR #591 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/591 . No manual CI rerun
+  or extra ordinary-PR review. Next heartbeat: consume this head's CI before
+  another push/PR; preserve this local progress entry. Public activation off.
+- PR #591 merged normally 2026-09-28T16:33:34Z, merge SHA
+  f883c9baa48140fa084d8fc3e5e525a3d0f8840b. All checks SUCCESS/SKIPPED,
+  required gates green, CLEAN, exact head signature valid. No bypass or reruns.
+  Private typed stream capture delivered; public mixed-origin execution and
+  real DB access remain off. Next: dedicated PostgreSQL result-stream adapter
+  with injected fictional driver, server read-only/timeouts and resource cleanup;
+  do not repurpose the aggregate-only profiling session as a raw-row surface.
+- 2026-09-28: private PostgreSQL injected-driver slice implemented on
+  `codex/1-6-postgres-result-stream`, based on merged #591/f883c9b, same worktree
+  `/private/tmp/apa-private-csv-engine`. Added dedicated named forward-only
+  cursor adapter; no public wiring or real connection. Capture passes adapter,
+  source, physical table and frozen columns; adapter rechecks configured scope
+  and result budgets before connect. Read-only, statement/lock/idle-transaction
+  timeouts; one-row fetch, strict native types (no float-to-int coercion), exact
+  output names, nullability, cooperative total deadline, rollback/close including
+  consumer failure and KeyboardInterrupt. Profiling session unchanged.
+  Tests: query-capture module 33 passed (20 existing +13 fictional driver cases);
+  Ruff, mypy on both changed production modules, diff check passed. No rerun of
+  unchanged completed reviews or full gates. Explicit limitation: server cursor
+  bounds fetch row counts, not wire bytes/pre-return allocation or blocked-I/O
+  cancellation. Those remain activation gates; public execution stays off.
+  Next: publish this private slice, consume CI once; then close transport/work
+  budget gaps and implement Trino counterpart before final activation review.
