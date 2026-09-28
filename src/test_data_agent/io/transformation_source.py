@@ -74,7 +74,7 @@ def _profile_transformation_source(
     profile = csv_profile_to_dataset_profile(CSVProfile(table=source.name, row_count=count,
         columns=[accumulator.to_profile(count, preserve_categories=False)
                  for accumulator in accumulators.values()]))
-    profile.source_type = "parquet"
+    profile.source_type = policy.input_format
     for entity in profile.entities:
         entity.primary_key_candidates = []
         for index, item in enumerate(entity.fields):
@@ -231,7 +231,7 @@ def trace_csv_review_request(
         def events() -> Iterator[TextTraceEvent]:
             for row_ordinal, row in enumerate(reader, start=1):
                 budget.check("text trace")
-                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                     raise ValueError
                 for column_ordinal, column in enumerate(names, start=1):
                     if column in selected:
@@ -290,7 +290,7 @@ def reject_sensitive_text_reuse(
         reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
             for item in sensitive:
                 match = (match_scoped_text(matching_text(policy, item.field, row[item.field]), item.field, file_table, column_tables) if row[item.field] is not None else None)
@@ -306,7 +306,7 @@ def reject_sensitive_text_reuse(
         reader.fieldnames = normalized
         for row in reader:
             budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
             if any(same_native_value(row[field], replacement)
                    for field in sensitive_source_columns for replacement in active_replacements):

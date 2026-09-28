@@ -3811,3 +3811,37 @@ Broader transformation remains unfinished.
   Trino CI uses its existing isolated TPCH container; no local/live DB accessed.
   Next: finish current CI run before pushing correction to avoid overlapping
   runs, then consume corrected CI. No manual reruns or merge while red.
+- Correction signed/pushed as 5cb32a2 after prior run completed. New PR #588
+  snapshot: all completed checks SUCCESS/SKIPPED (including Trino integration);
+  Python 3.11–3.14 still IN_PROGRESS. No failed completed checks, no rerun/merge.
+  Next: consume remaining CI then normal merge. Subsequent SQL-result adapter
+  must preserve captured snapshot order, keep typed input independent of output,
+  and use fictional callbacks only; existing aggregate profiler is not row access.
+- PR #588 merged normally at 2026-09-28T15:15:28Z, merge SHA
+  02c3efe153504b2ac1112bfa1443107afdc57917. All checks SUCCESS/SKIPPED,
+  required gates passed, CLEAN, head signature verified. Finding18 automatic
+  inference rejection slice complete; private/live client results not claimed.
+  Next SQL-result integration must add an explicit typed captured-result input
+  boundary: current source_reader supports CSV/Parquet only. Reuse native type
+  checks and exact snapshot binding, not CSV stringify or aggregate-only profiler
+  callbacks. Keep development fictional/private; no DB connection, query-policy
+  widening or public activation implied by this merge.
+- Continued on codex/1-6-captured-sql-results from merged main 02c3efe.
+  Added private versioned query-result envelopes (adapter + query SHA-256 +
+  typed Parquet payload), reused native decoding and shared transformation
+  guards. No CSV stringification, DB calls, SQL-policy widening or public
+  execution. Caller-supplied hash is identity only, never access authority.
+  Fictional PostgreSQL/Trino captures now traverse all three temporary output
+  formats with integer/float/boolean/DECIMAL/DATE/nullable-DATE substitutions;
+  captured order/types retained. Query identity drift rejects publication;
+  missing/foreign/malformed envelopes and nested types reject before execution.
+  Checks: 410 focused tests passed (execute/query snapshot/source/input limits/
+  policy), Ruff and diff check passed. These are private fixtures, not live or
+  installed SQL-source acceptance. Existing activation gates remain unchanged.
+  Next: commit this integration slice, consume its CI; then implement separately
+  authorized bounded result capture with fictional callbacks, including query/
+  schema/allowlist identity and result budgets. Do not reuse aggregate-only
+  profiling callbacks as row access or claim the 12-route RC matrix complete.
+- Final local checks: strict OpenSpec passed; mypy passed on all five changed
+  production modules; 11 envelope tests passed after strict adapter-type guard.
+  No full release gate or public activation claimed for this intermediate slice.
