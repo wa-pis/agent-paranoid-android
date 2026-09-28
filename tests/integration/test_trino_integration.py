@@ -129,5 +129,5 @@ def test_local_trino_source_modes_run_from_installed_package(
         profile = json.loads(profile_text)
         assert profile["source_type"] == "trino_query"
         assert len(profile["source_fingerprint"]) == 64
-        assert profile["source_policy_version"] == "1.0"
+        assert profile["source_policy_version"] == "1.1"
         assert "999999" not in profile_text

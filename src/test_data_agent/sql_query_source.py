@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
     exp = None  # type: ignore[assignment]
 
 
-QUERY_SOURCE_POLICY_VERSION = "1.0"
+QUERY_SOURCE_POLICY_VERSION = "1.1"
 DEFAULT_MAX_QUERY_BYTES = 64 * 1024
 DEFAULT_MAX_AST_NODES = 500
 DEFAULT_MAX_AST_DEPTH = 32
@@ -131,6 +131,12 @@ class ValidatedSqlQuery:
 _ALLOWED_NODE_NAMES = frozenset(
     {
         "Abs",
+        "Avg",
+        "Count",
+        "Group",
+        "Max",
+        "Min",
+        "Sum",
         "Add",
         "Alias",
         "And",
@@ -175,7 +181,8 @@ _ALLOWED_NODE_NAMES = frozenset(
     }
 )
 _ALLOWED_FUNCTIONS = frozenset(
-    {"ABS", "CAST", "COALESCE", "LOWER", "ROUND", "TRIM", "UPPER"}
+    {"ABS", "CAST", "COALESCE", "LOWER", "ROUND", "TRIM", "UPPER",
+     "SUM", "COUNT", "MIN", "MAX", "AVG"}
 )
 
 
@@ -227,6 +234,11 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
     if len(tables) != 1:
         raise SqlQuerySourceError("SQL query must reference exactly one table")
     table = tables[0]
+    table_alias = table.args.get("alias")
+    if table_alias is not None and table_alias.args.get("columns"):
+        raise SqlQuerySourceError("SQL query table column aliases are unsupported")
+    if any(any(star.args.values()) for star in statement.find_all(exp.Star)):
+        raise SqlQuerySourceError("SQL query wildcard modifiers are unsupported")
     table_parts = _table_parts(table, request.adapter)
     alias = table.alias_or_name
     if not _IDENTIFIER_RE.fullmatch(alias):
@@ -276,6 +288,7 @@ def authorize_query_source(
     if len(projections) > draft.request.limits.max_projected_columns:
         raise SqlQuerySourceError("SQL query projected-column budget exceeded")
     statement.set("expressions", projections)
+    _validate_aggregate_shape(statement)
 
     for column in statement.find_all(exp.Column):
         if isinstance(column.this, exp.Star):
@@ -320,10 +333,43 @@ def authorize_query_source(
         sql=canonical_sql,
         safe_temporal_output_fields=safe_temporal_output_fields,
         has_unmodeled_expressions=any(
-            _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
+            bool(projection.find(exp.AggFunc))
+            or _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
             for projection in statement.expressions
         ),
     )
+
+
+def _validate_aggregate_shape(statement: Any) -> None:
+    """Bound the approved single-table aggregate subset before derived queries."""
+    aggregates = tuple(statement.find_all(exp.AggFunc))
+    group = statement.args.get("group")
+    if not aggregates and group is None:
+        return
+    groups = tuple(group.expressions) if group is not None else ()
+    if (group is not None and (not groups or any(
+            value for key, value in group.args.items() if key != "expressions"))
+            or any(not isinstance(item, exp.Column) or item.is_star for item in groups)):
+        raise SqlQuerySourceError("SQL query requires explicit grouping columns")
+    grouped_names = {item.name for item in groups}
+    projected_aggregates = []
+    for projection in statement.expressions:
+        value = projection.this if isinstance(projection, exp.Alias) else projection
+        if isinstance(value, exp.AggFunc):
+            projected_aggregates.append(value)
+            argument = value.this
+            if (argument is None or value.expressions
+                    or any(argument.find_all(exp.AggFunc))
+                    or any(argument.find_all(exp.Star)) and not (
+                        isinstance(value, exp.Count) and type(argument) is exp.Star)):
+                raise SqlQuerySourceError("SQL query aggregate argument is unsupported")
+        elif not isinstance(value, exp.Column) or value.is_star or value.name not in grouped_names:
+            raise SqlQuerySourceError("SQL query projection must be grouped or aggregated")
+    if len(aggregates) != len(projected_aggregates):
+        raise SqlQuerySourceError("SQL query aggregate placement is unsupported")
+    # Grouping and MIN/MAX can reveal source values; aliases cannot declassify them.
+    if any(infer_sensitive_from_name(column.name) for column in statement.find_all(exp.Column)):
+        raise SqlQuerySourceError("SQL query aggregate source is sensitive")
 
 
 def _direct_source_field(projection: Any) -> str | None:

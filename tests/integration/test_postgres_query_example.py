@@ -54,7 +54,7 @@ def test_postgres_examples_run_from_installed_package(
     assert profile["source_type"] == source_type
     if source_type == "postgres_query":
         assert len(profile["source_fingerprint"]) == 64
-        assert profile["source_policy_version"] == "1.0"
+        assert profile["source_policy_version"] == "1.1"
         assert "999999" not in profile_text
     assert manifest["synthetic"] is True
     assert manifest["source_rows_copied"] is False

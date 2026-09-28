@@ -62,7 +62,7 @@ def run_example(output: Path) -> dict[str, object]:
             profile_row_count = entity["row_count"]
             assert profile_fields == ["nationkey", "nation_name", "regionkey"]
             assert len(profile["source_fingerprint"]) == 64
-            assert profile["source_policy_version"] == "1.0"
+            assert profile["source_policy_version"] == "1.1"
             assert "999999" not in json.dumps(profile, sort_keys=True)
         else:
             profile = profile_table_safe(

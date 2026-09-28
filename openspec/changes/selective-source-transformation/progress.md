@@ -3845,3 +3845,84 @@ Broader transformation remains unfinished.
 - Final local checks: strict OpenSpec passed; mypy passed on all five changed
   production modules; 11 envelope tests passed after strict adapter-type guard.
   No full release gate or public activation claimed for this intermediate slice.
+- Signed/pushed c7e96c7fd358502f910ed3e894e31f2a5dd29613; PR #589 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/589 . CI is queued/running;
+  no reruns or merge requested. Next heartbeat: consume this exact head's checks
+  before another push/PR; preserve this local progress entry.
+- PR #589 merged normally at 2026-09-28T15:34:31Z, merge SHA
+  440101eb54d30fd300c189d27d6d1025c6bb501b. All checks SUCCESS/SKIPPED;
+  required checks green, CLEAN, exact head signature verified. No bypass,
+  duplicate review or rerun. Private captured-result slice complete, not public
+  query access or RC acceptance. Next: reuse this worktree from merged main for
+  bounded authorized capture with fictional callbacks and explicit authorization
+  context binding; preserve the local progress entries when switching branches.
+- 2026-09-28 continuation: reused worktree on
+  codex/1-6-bounded-query-capture from 440101e; no new product changes/tests.
+  Found policy decision gap before SQL-result capture: sql_query_source.py
+  permits ABS/CAST/COALESCE/LOWER/ROUND/TRIM/UPPER only; AST allowlist excludes
+  aggregate functions and GROUP BY. Existing aggregate-only profiler issues
+  trusted internal aggregate wrappers, not caller aggregate authorization.
+  Owner clarified aggregate-result scope but no concrete SQL-policy expansion
+  is recorded. Do not silently add SQL capabilities or advertise aggregate-query
+  acceptance from the fictional pre-captured snapshots in #589.
+  Decision requested: permit a bounded single-table SELECT aggregate subset
+  SUM/COUNT/MIN/MAX/AVG with optional GROUP BY on allowlisted columns, retaining
+  existing exclusions (JOIN/CTE/subqueries/windows/arbitrary functions) and all
+  budgets? This is SQL authorization, not internal formula semantics.
+  Automation paused pending that decision; no live DB or external API access.
+  After decision: explicit policy/spec amendment, executable rejection/budget
+  tests and independent safety review before activation; continue capture work.
+- Owner decision 2026-09-28: explicitly approved the proposed SUM/COUNT/MIN/MAX/
+  AVG and optional GROUP BY subset for one allowlisted table. Decision blocker
+  resolved; recorded in policy-contract.md, plan.md and tasks.md. Existing SQL
+  exclusions, budgets, sensitive-data controls and independent safety-review
+  gate remain. No implementation/acceptance claimed by this decision entry.
+  Resume automation; next step is the shared SQL parser/authorization change
+  and fictional regression tests for both adapters, then exact-SHA safety review.
+  Current branch codex/1-6-bounded-query-capture retains local progress entries;
+  no other active PR/review or overlapping test run.
+- Implemented owner-approved aggregate subset in shared SQL authorization:
+  policy 1.1, explicit-column grouping, count-star distinct from row wildcard,
+  shape/nesting guards, sensitive-source alias rejection, COUNT(*) inference
+  capability marker. Existing adapter wrappers and budgets unchanged. Updated
+  baseline/delta OpenSpec, safety guide, concepts/troubleshooting and changelog.
+  Checks: 133 SQL source/profiling/adapter tests passed; after adding integrated
+  fictional grouped-profile and failure-propagation cases, 25 profiling tests
+  passed. Ruff, strict OpenSpec and diff checks passed. First mypy environment
+  lacked sqlglot; project-environment mypy passed (one production module).
+  Next: signed exact-SHA independent safety review before merge/activation.
+  No DB access or claim of source-result capture completion.
+- Signed implementation 4876fcbd4916499d38bd1fa874292dbe46e344db sent for
+  independent read-only AI safety review to Boyle / CSV-Gate-1
+  (agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d), base 440101e. Review active;
+  do not start a duplicate or merge before disposition. Separately updated two
+  integration assertions from policy 1.0 to 1.1; no live integration executed.
+  Documentation tests: 49 passed. Next: consume review + exact PR CI; record
+  evidence and resolve findings before activation.
+- PR #590 opened: https://github.com/wa-pis/agent-paranoid-android/pull/590
+  head f14dc5c8111be8897779af029fbcf1a6892edac3, signed follow-up changes only
+  integration version assertions and progress; runtime still 4876fcb. Reviewer
+  informed of final head. CI and independent AI review pending; no merge,
+  overlapping PR, repeated review or test rerun. Next heartbeat: consume both.
+- Review returned High physical-column remapping through table column-alias
+  lists and Low decorated COUNT-star validation gap. Evidence:
+  reviews/4876fcb-ai-safety.md. Added shared parser rejection for both shapes
+  (also ordinary SELECT), retaining ordinary table aliases; 10 new regressions.
+  Focused SQL modules: 147 passed. Findings await independent corrective review.
+  All previous CI completed: Trino integration failed, other checks green/skipped.
+  Found stale policy1.0 assertions inside both installed example launchers;
+  updated to1.1 (integration test expectations alone were insufficient).
+  No safety check weakened, live local DB or manual CI rerun. Next: signed fix,
+  changed-scope re-review and corrected PR CI before merge.
+- Signed fix 16eece3 pushed after previous CI completed. Same independent
+  reviewer assigned changed-scope re-review; do not duplicate. Corrected CI and
+  review pending. Additional checks: 49 documentation tests, Ruff, project mypy,
+  strict OpenSpec and diff check passed. Next: consume both gates, record exact
+  corrective-review evidence and only then ordinary merge.
+- Independent corrective review closed both High/Low findings at exact SHA
+  16eece3c9da8a92656fc423b8049a140045a5586; 20 independent fictional probes
+  passed, no additional changed-scope finding. Evidence prepared locally:
+  reviews/16eece3-ai-safety.md (AI, not human approval). CI now has no failures;
+  only Python3.11–3.14 pending, Trino integration correction passed. Do not
+  repeat review/tests. Next: after CI completes, commit/push evidence-only diff,
+  consume that head's required checks and ordinary merge. No overlapping CI.

@@ -1,5 +1,13 @@
 # Tasks: selective-source-transformation
 
+## Authorized SQL aggregate follow-up — 2026-09-28
+
+- [ ] Implement owner-approved single-table SUM/COUNT/MIN/MAX/AVG and optional
+  GROUP BY, preserving column/table allowlists, sensitivity and resource budgets.
+- [ ] Amend SQL baseline/docs; prove accepted and rejected shapes for PostgreSQL
+  and Trino with fictional tests; independently safety-review the exact SHA
+  before public activation. No internal formula engine or live DB access.
+
 ## Owner scope correction — 2026-09-28
 
 The owner clarified that aggregates belong to allowlisted, bounded SQL queries

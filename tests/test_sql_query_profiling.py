@@ -22,6 +22,46 @@ from test_data_agent.sql_query_source import SqlQueryAdapter, ValidatedSqlQuery
 from test_data_agent.validation import validate_dataset
 
 
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("exhausted", [False, True])
+def test_authorized_grouped_profile_is_wrapped_and_bounded(tmp_path, adapter, exhausted):
+    from test_data_agent.sql_query_source import (QuerySourceColumn, SqlQueryProfileRequest,
+        authorize_query_source, inspect_query_source)
+    path = tmp_path / "query.sql"
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    path.write_text(f"SELECT status, COUNT(*) AS measured FROM {table} GROUP BY status")
+    query_plan = authorize_query_source(inspect_query_source(SqlQueryProfileRequest(
+        adapter, "warehouse", "summary", path)), (QuerySourceColumn("status", "text", False),))
+    seen = []
+
+    def describe(query):
+        assert query.sql.endswith("WHERE FALSE")
+        assert query.sql != query_plan.sql
+        return (QueryResultColumn("status", "text", False), QueryResultColumn("measured", "bigint", False))
+
+    def fetch(query):
+        seen.append(query.sql)
+        assert query.sql != query_plan.sql
+        if exhausted:
+            raise RuntimeError("fictional backend budget detail must stay private")
+        if "non_null_count" in query.sql:
+            return [{"row_count": 2, "non_null_count": 2, "distinct_count": 2,
+                "has_negative": False, "has_positive": True, "max_abs_magnitude": 1}]
+        return [{"row_count": 2}]
+
+    if exhausted:
+        with pytest.raises(SqlQueryProfileError, match="^SQL query source profiling failed$"):
+            profile_validated_query(query_plan, describe_query=describe, fetch_query=fetch)
+        assert len(seen) == 1
+    else:
+        profile = profile_validated_query(query_plan, describe_query=describe, fetch_query=fetch)
+        assert profile.entities[0].row_count == 2
+        assert profile.has_unmodeled_expressions
+        assert query_plan.sql not in profile.model_dump_json()
+        with pytest.raises(ValueError, match="SQL expression dependencies"):
+            infer_dataset_spec(profile)
+
+
 def plan(
     *,
     adapter: SqlQueryAdapter = SqlQueryAdapter.POSTGRES,
@@ -109,7 +149,7 @@ def test_profile_is_source_free_and_keeps_exact_local_category_values() -> None:
 
     assert profile.source_type == "postgres_query"
     assert profile.source_fingerprint == "a" * 64
-    assert profile.source_policy_version == "1.0"
+    assert profile.source_policy_version == "1.1"
     assert profile.entities[0].name == "warehouse.paid_orders"
     assert profile.entities[0].row_count == 3
     state = profile.entities[0].field("state")
