@@ -4,6 +4,45 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Configurable capacity and actionable limit failures
+
+Transformation SHALL support a configured target workload of 1,000,000 rows
+and 100 columns, with mandatory fictional end-to-end acceptance at 300,000 rows
+and 50 columns. Byte, value-width and time budgets SHALL remain explicit and
+independently enforced; capacity SHALL NOT imply arbitrary-width or unbounded
+inputs. Aggregate-only profiling disclosure budgets SHALL remain separate.
+
+Resource limits SHALL be configurable for a run/session and a saved profile,
+with documented keys, ranges and deterministic precedence. Limit failures SHALL
+distinguish a request above the configured threshold from an observed runtime
+exceedance, disclose safe dimension/amount/limit/units and effective setting
+origin, and explain concrete supported session and saved-profile configuration.
+Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
+
+#### Scenario: Requested capacity exceeds configured budget
+
+- **GIVEN** a requested workload above an effective configured limit
+- **WHEN** preflight validates the request
+- **THEN** it rejects before avoidable source work with requested amount, limit,
+  units, setting origin and supported session/profile recovery instructions
+- **AND** it neither increases the limit nor silently truncates the workload.
+
+#### Scenario: Processing reaches a configured limit
+
+- **GIVEN** an admitted workload whose observed consumption exceeds a limit
+- **WHEN** processing detects the excess
+- **THEN** it stops without partial publication and reports observed amount,
+  limit, units and supported session/profile configuration instructions
+- **AND** no source values, SQL literals or backend diagnostics are exposed.
+
+#### Scenario: Configured scale acceptance
+
+- **GIVEN** a fictional 300,000-row, 50-column workload and sufficient explicitly
+  configured byte/time budgets within the supported target
+- **WHEN** the end-to-end transformation runs through the actual interfaces
+- **THEN** all rows/columns required by the policy are handled without truncation,
+  configured limits remain enforced and measured resource evidence is recorded.
+
 ### Requirement: Report executed cell provenance
 
 Transformation reporting SHALL classify output cells as replacement, synthetic,

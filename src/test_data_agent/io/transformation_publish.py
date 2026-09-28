@@ -6,6 +6,7 @@ Only fictional test requests are authorized before activation review.
 
 import json
 from test_data_agent.io.transformation_input import source_reader
+from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict
@@ -58,6 +59,8 @@ def _run_temporary_transform(
                        "provenance": manifest["provenance"]}
         budget.check("temporary transformation command completed")
         return summary
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, KeyError):
         pass
     try:
@@ -108,7 +111,8 @@ def temporary_csv_publication(
                            for item in policy.fields],
                 "provenance": asdict(result.provenance)}, ensure_ascii=True, sort_keys=True).encode("ascii")
             if len(manifest) + len(payload) > max_output_bytes:
-                raise ValueError
+                raise TransformationLimitError(InputDimension.OUTPUT_BYTES,
+                    len(manifest) + len(payload), max_output_bytes, "bundle_run")
             budget.check("temporary transformation publication")
             destination = Path(temporary).resolve() / "output"
             staging = make_staging_directory(destination)
@@ -116,6 +120,8 @@ def temporary_csv_publication(
             atomic_write_bytes(staging / "manifest.json", manifest)
             budget.check("temporary transformation publication")
             publish_directory(staging, destination)
+        except TransformationLimitError:
+            raise
         except (OSError, ValueError, TypeError, AttributeError, StopIteration):
             failed = True
         else:

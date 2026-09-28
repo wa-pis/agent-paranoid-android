@@ -7,6 +7,7 @@ import yaml
 
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import TransformationLimitError
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
@@ -165,11 +166,16 @@ def test_csv_review_trace_combines_file_and_column_rules_without_values():
             trace_csv_review_request(forged, max_events=1, max_cells=2,
                                      max_total_bytes=8192, max_review_bytes=4096,
                                      budget=GenerationBudget(5))
-    with pytest.raises(TransformationSourceError, match="^invalid transformation trace$") as error:
+    with pytest.raises(TransformationLimitError) as error:
         trace_csv_review_request(request, max_events=1, max_cells=1,
                                  max_total_bytes=8192, max_review_bytes=4096,
                                  budget=GenerationBudget(5))
     assert "private-marker" not in str(error.value)
+    assert (error.value.code, error.value.amount, error.value.limit, error.value.origin) == (
+        "limit_exceeded", 2, 1, "trace_run")
+    assert error.value.run_setting == "trace_csv_review_request(max_cells=...)"
+    assert error.value.session_setting == "TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_CELLS"
+    assert error.value.profile_key == "resource_limits.max_input_cells"
 
 
 @pytest.mark.parametrize("source_bytes,sensitivity,field,blocked", [

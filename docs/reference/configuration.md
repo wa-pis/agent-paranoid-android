@@ -43,6 +43,97 @@ does not read provider credentials or test remote reachability.
 Values must be positive integers, except the two `*_SECONDS` values, which
 accept positive finite numbers. Invalid environment values fail closed.
 
+## Private Transformation Input Limits (1.6 Development)
+
+These settings currently apply to private source-file acquisition, the transformation input decoder and
+its policy-aware review preflight and CSV profiling/trace shape checks. They do not enable public execution, change
+source-free profiling/MCP budgets, or establish end-to-end capacity. Remaining
+pipeline caps still apply. The fictional private replacement-only CSV scenario
+passed 300,000 rows × 50 columns; see
+[candidate evidence](https://github.com/wa-pis/agent-paranoid-android/blob/12e9e272c98ea469cbef92fe9fae49c518046461/openspec/changes/selective-source-transformation/csv-scale-acceptance.md).
+This does not certify public execution, SQL routes or the 1M × 100 target.
+
+Use `resource_limits` in the saved **behavior profile** (not DatasetProfile):
+
+```yaml
+resource_limits:
+  max_input_rows: 1000000
+  max_input_columns: 100
+  max_input_cells: 100000000
+```
+
+For the current shell session, override a setting explicitly:
+
+```sh
+export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_ROWS=1000000
+export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_COLUMNS=100
+export TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_CELLS=100000000
+```
+
+For one invocation, prefix that invocation with the same `NAME=value`
+assignments instead of exporting them. No new public execution command is
+introduced here. In PowerShell, use
+`$env:TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_ROWS = '1000000'` for the session.
+
+| Behavior-profile key under `resource_limits` | Decoder default | Unit |
+| --- | ---: | --- |
+| `max_input_rows` | `1000000` | rows |
+| `max_input_columns` | `1000` | columns |
+| `max_input_cells` | `100000000` | cells |
+| `max_input_file_bytes` | `134217728` | bytes |
+| `max_input_cell_chars` | `1000000` | characters |
+| `max_parquet_expanded_bytes` | `536870912` | decoded/estimated expanded bytes |
+| `max_output_bytes` | `536870912` | private CSV output bytes |
+
+Each key has a session variable named `TEST_DATA_AGENT_TRANSFORM_` followed by
+the uppercase key. Values must be positive integers no greater than
+`9223372036854775807`. Precedence, per explicitly supplied field: transformation
+session variable, saved behavior profile, legacy `TEST_DATA_AGENT_<KEY>` variable,
+decoder default. Invalid settings fail; they are not silently ignored.
+
+Structured limit failures identify `requested_above_limit` or `limit_exceeded`,
+the amount, threshold, unit, and origin (`session`, `profile`, `legacy_session`,
+or `default`). They name the exact session variable and saved-profile key to
+change. No data values are included; no automatic increase or truncation occurs.
+Trace requests above the effective cell limit fail with `requested_above_limit`
+instead of being silently capped. If the trace exhausts its smaller per-run
+budget, `limit_exceeded` reports origin `trace_run` and explicitly names
+`trace_csv_review_request(max_cells=...)` as the parameter to increase within
+the session/profile ceiling. Changing only the ceiling does not change that
+explicit per-run argument. Remaining request/worker boundaries still
+need integration. Increasing a decoder limit
+does not override the explicit total-input budget, downstream work/output
+budgets, or SQL capture caps. Expanded-byte accounting is not a peak-RSS promise.
+
+Private CSV character limits reach parsing, sensitivity detection and profile
+finalization. Internal CSV readers coordinate the stdlib process-global field
+limit for each record and restore its previous value even on failure. Each
+reader keeps its own limit; source-free readers retain legacy/default limits.
+External code directly changing `csv.field_size_limit` is outside this
+coordination. On parser overflow, the reported amount is the first forbidden
+character (`limit + 1`), not the length of an unread remainder of the field.
+
+Private CSV execution uses `resource_limits.max_output_bytes` or
+`TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES` as the output ceiling, distinct
+from input-file bytes. Its explicit `max_output_bytes` run argument must fit
+that ceiling; it is no longer silently capped at 128 MiB. Actual exhaustion
+reports origin `output_run`, the encoded byte count (including CSV header and
+quoting), and `replace_csv_snapshot(max_output_bytes=...)`. Partial output is
+not returned. Private SQL/Parquet encoding checks its `max_bytes` run argument
+and reports `sql_output_run` / `parquet_output_run` with the corresponding
+`render_transformation_sql(max_bytes=...)` /
+`render_transformation_parquet(max_bytes=...)` recovery parameter. Publication
+also counts the manifest: `bundle_run` names
+`temporary_csv_publication(max_output_bytes=...)`. A bundle over budget is
+rejected before publication. These share the output ceiling when invoked by
+the publisher; standalone renderers only receive their explicit run budget.
+Query capture budgets remain separate.
+
+The private replacement dry-run has the same checks. Its exhausted run budget
+reports origin `replacement_trace_run` and names
+`trace_csv_replacements(max_cells=...)`; a request above the effective
+session/profile ceiling reports `requested_above_limit` before tracing.
+
 ## Local CSV-Folder Profile Limits
 
 Each fresh local folder profile receives one typed monotonic budget. Its

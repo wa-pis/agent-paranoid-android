@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import csv
+from test_data_agent.core.csv_reader import ScopedDictReader
 from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec, parse_dataset_spec_payload
 from test_data_agent.core.limits import (
-    configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -54,7 +53,6 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
     if len(stems) != len(set(stems)):
         raise ValueError("duplicate entity artifact names")
     enforce_input_files(input_paths)
-    configure_csv_field_limit(csv)
     total_rows = 0
     total_cells = 0
     for path in input_paths:
@@ -63,7 +61,7 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
             with path.open(newline="", encoding=encoding) as handle:
                 sample = handle.read(8192)
                 handle.seek(0)
-                reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+                reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
                 fieldnames = validate_csv_headers(reader.fieldnames)
                 enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
                 reader.fieldnames = fieldnames

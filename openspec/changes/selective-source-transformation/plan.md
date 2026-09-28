@@ -1,5 +1,19 @@
 # Proposed Implementation Milestones
 
+## Owner-approved capacity priority — 2026-09-28
+
+Target 1,000,000 rows x100 columns; mandatory fictional acceptance 300,000 x50.
+First audit effective configuration across all transformation stages and separate
+aggregate-only profile budgets from transformation capture limits. Implement
+session/run and saved-profile settings plus value-free structured limit errors:
+requested-too-large versus exceeded-during-processing, amount/limit/units,
+effective setting source and concrete session/profile recovery instructions.
+Generic adapter/worker errors must not hide known budget failures. Document actual
+keys, supported ranges and precedence; no silent truncation or auto-increase.
+Then measure full-route throughput/memory and finish the full RC scope. Existing
+hard-RSS/wire gate proposals were assistant-added, not required new guarantees;
+retain all implemented checks and honest residual-limit disclosures.
+
 ## SQL aggregate implementation authorized — 2026-09-28
 
 Private capture increment: authorize the frozen table/column scope before a

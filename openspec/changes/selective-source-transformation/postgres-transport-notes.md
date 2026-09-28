@@ -1,5 +1,28 @@
 # PostgreSQL transport gate — 2026-09-28
 
+## Scope reconciliation superseded by owner capacity decision
+
+Owner accepted a target of 1,000,000 x100 and mandatory 300,000 x50 acceptance,
+with actionable session/profile configuration in limit errors. Implement that
+measured capacity contract; do not introduce hard RSS/wire guarantees or change
+platform support without separate authority. Retain existing guards and identify
+unmeasured properties honestly. The historical pause below is no longer current.
+
+The author's recent notes elevated hard worker-memory/wire-byte containment
+into release gates without a separate owner decision. The existing contract
+(policy-contract.md, native Parquet decoded-payload paragraph) explicitly does
+not promise peak-memory containment. PostgreSQL baseline config defines rows,
+cells, columns, statements and timeouts, not exact wire-byte or RSS limits;
+Trino separately retains its configured scan/time and measured payload budgets.
+Existing implementation guards must not be removed or relabelled as stronger
+guarantees. No new platform/dependency restriction has been authorized.
+
+Owner question: retain these existing measured budgets and honestly disclose
+unmeasured peak-memory/wire properties for 1.6, leaving hard OS/wire containment
+as a separately scoped enhancement, or explicitly add that stronger guarantee
+to this release? Automation paused pending this safety/scope clarification.
+No current runtime policy changed and no activation gate declared passed.
+
 Status: private supervisor plus fictional evidence; public capture remains inactive. No database contacted,
 no new minimum dependency requirement and no completed transport gate claimed.
 
@@ -50,10 +73,14 @@ exit, valid bounded length and remaining time permit returning a snapshot.
 Fd diagnostics and exception objects do not pass through the result channel.
 Memoryview copies avoid expanding result bytes into a Python integer list.
 
-Eight integration cases cover success, driver failure and six blocked driver
-stages; six control cases reject invalid byte/time limits. The eleven earlier
-test-only lifecycle cases remain. The production cancellation branch still needs
-direct integration evidence, not just the test-only caller-cancellation proof.
+Integration cases cover success, driver failure and six blocked driver stages;
+six control cases reject invalid byte/time limits. The eleven earlier test-only
+lifecycle cases remain. Two additional POSIX tests now exercise the actual
+supervisor: isolated-harness SIGINT while the driver is blocked in fetch, and a
+worker ignoring SIGTERM that requires the kill fallback. Both passed locally;
+the cancellation case verifies no output, no active child and no remaining
+worker PID. Signals target only test-owned processes, not pytest/the terminal.
+These two tests skip non-POSIX hosts; Windows cancellation is not claimed passed.
 
 This bounds ordinary process waits and result IPC, not absolute OS scheduling,
 uninterruptible process start/kill, worker memory or network bytes. Failure to

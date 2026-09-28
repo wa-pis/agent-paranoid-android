@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import csv
+from test_data_agent.core.csv_reader import ScopedDictReader
 import random
 from collections import Counter
 from dataclasses import dataclass, field
@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.limits import (
-    configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -55,7 +54,6 @@ MAX_SEMANTIC_SAMPLE = 100
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
     csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
-    configure_csv_field_limit(csv)
     total_rows = 0
     total_cells = 0
     for path in csv_paths:
@@ -63,7 +61,7 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
         with path.open(newline="", encoding=encoding) as handle:
             sample = handle.read(8192)
             handle.seek(0)
-            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+            reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
@@ -189,7 +187,6 @@ def _profile_schema_with_sample(
     csv_paths = budget.check_input_files(sorted(input_folder.glob("*.csv")))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
-    configure_csv_field_limit(csv)
     total_rows = 0
     for path in csv_paths:
         budget.check_deadline("CSV file start")
@@ -198,7 +195,7 @@ def _profile_schema_with_sample(
         with path.open(newline="", encoding=encoding) as handle:
             sample = handle.read(8192)
             handle.seek(0)
-            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+            reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames

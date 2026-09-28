@@ -1,6 +1,7 @@
 """Private CSV mapping parser."""
 
 import csv
+from test_data_agent.core.csv_reader import ScopedCSVReader
 import io
 import math
 import re
@@ -214,8 +215,8 @@ def parse_csv_mapping_bytes(
         sources, targets = parsed.source_columns, parsed.replacement_columns
         if len(sources) != len(targets) or len(set(sources)) != len(sources) or len(set(targets)) != len(targets):
             raise ValueError
-        reader = csv.reader(io.StringIO(payload.decode(parsed.encoding), newline=""),
-                            delimiter=parsed.delimiter, strict=True)
+        reader = ScopedCSVReader(io.StringIO(payload.decode(parsed.encoding), newline=""),
+                                 max_chars=max_cell_chars, delimiter=parsed.delimiter, strict=True)
         header = next(reader, [])
         budget.check("CSV mapping")
         if len(header) > max_columns:

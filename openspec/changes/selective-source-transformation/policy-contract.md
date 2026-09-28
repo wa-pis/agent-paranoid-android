@@ -1,5 +1,34 @@
 # Behavior Policy Contract — Review Draft
 
+## Owner-approved scale and limit diagnostics — 2026-09-28
+
+Target workload for 1.6.0rc1 is 1,000,000 rows by 100 columns (100,000,000
+cells), with mandatory fictional end-to-end acceptance at 300,000 by 50
+(15,000,000 cells). This is a supported workload target, not a claim that current
+code already passes it or that arbitrary-width values fit byte/time budgets.
+Audit every participating input, query capture, mapping, review, execution and
+output limit; adjusting one constant does not establish capacity. Do not silently
+truncate, drop rows/columns or raise configured limits on the operator's behalf.
+
+Resource settings must be documented and configurable for a session/run and a
+saved profile. Diagnostics distinguish a request exceeding a configured limit
+before work starts from a measured limit exceeded during execution. Report a
+fixed safe dimension, requested/observed amount, configured limit, units and
+configuration origin (run/session, profile or default). Give concrete supported
+session configuration instructions and the actual saved-profile key to change;
+do not advertise unimplemented flags/keys. Never include source values, query
+literals, backend text, secrets or arbitrary profile content in these errors.
+Invalid configuration is a separate category. Known budget failures must survive
+adapter/worker/CLI/MCP boundaries instead of becoming generic invalid-input
+errors. Runtime failures leave no partial publication. Test exact-boundary,
+one-over, precedence, actionable recovery and value-free transport behavior.
+
+Keep source-free profiling budgets distinct from transformation result capacity;
+do not raise aggregate-only or default MCP disclosure limits incidentally.
+Retain allowlists, read-only access, sensitivity, exact snapshot approval and
+independent safety-review gates. No new peak-RSS/exact-wire-byte guarantee or
+platform restriction is implied; record measured payload/time limits honestly.
+
 ## Authorized SQL aggregate expansion — 2026-09-28
 
 The owner explicitly approved allowing SUM, COUNT, MIN, MAX and AVG, with

@@ -2,6 +2,7 @@
 
 import io
 import math
+import os
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from typing import Any
@@ -9,9 +10,9 @@ from dataclasses import dataclass, field
 from collections.abc import Iterator
 
 from test_data_agent.core.limits import (
-    GenerationBudget, DEFAULT_MAX_INPUT_FILE_BYTES, DEFAULT_MAX_INPUT_CELL_CHARS,
-    enforce_parquet_metadata_limits, max_parquet_expanded_bytes, InputLimitError,
+    GenerationBudget,
 )
+from test_data_agent.core.transformation_limits import InputDimension, resolve_input_limit
 from test_data_agent.core.transformation_policy import BehaviorPolicy
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.transformation_snapshot import SnapshotPart
@@ -33,12 +34,45 @@ class NativeSourceRows:
 def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: GenerationBudget) -> Any:
     """Decode supported nullable native scalars; never stringify for matching."""
     budget.check("transformation source decode")
-    if len(source.payload) > DEFAULT_MAX_INPUT_FILE_BYTES:
-        raise ValueError("transformation source byte limit exceeded")
+    limits = {item: resolve_input_limit(item, policy.resource_limits, os.environ) for item in InputDimension}
+    limits[InputDimension.BYTES].check(len(source.payload))
     if policy.input_format == "csv":
         if any(item.match_format is not None for item in policy.fields):
             raise ValueError("native match format cannot reformat CSV text")
-        return _csv_reader_from_snapshot(source.payload)
+        cell_limit = limits[InputDimension.CELL_CHARS]
+        reader = _csv_reader_from_snapshot(source.payload, max_chars=cell_limit.value,
+                                           check_size=cell_limit.check)
+        names = validate_csv_headers(reader.fieldnames)
+        limits[InputDimension.COLUMNS].check(len(names))
+
+        class BoundedCsvRows:
+            def __init__(self) -> None:
+                self.count = 0
+                reader.fieldnames = names
+
+            @property
+            def fieldnames(self) -> Any:
+                return reader.fieldnames
+
+            @fieldnames.setter
+            def fieldnames(self, value: Any) -> None:
+                reader.fieldnames = value
+
+            def __iter__(self) -> "BoundedCsvRows":
+                return self
+
+            def __next__(self) -> Any:
+                row = next(reader)
+                self.count += 1
+                budget.check("transformation CSV input row")
+                limits[InputDimension.ROWS].check(self.count)
+                limits[InputDimension.CELLS].check(self.count * len(names))
+                for value in row.values():
+                    if type(value) is str:
+                        limits[InputDimension.CELL_CHARS].check(len(value))
+                return row
+
+        return BoundedCsvRows()
     if policy.csv_nulls.input_token is not None:
         raise ValueError("native input cannot use a CSV null marker")
     payload = source.payload
@@ -51,7 +85,13 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
         raise ValueError("Parquet input requires the parquet extra") from None
     try:
         parquet = pq.ParquetFile(io.BytesIO(payload))
-        enforce_parquet_metadata_limits(parquet.metadata, label="transformation Parquet")
+        metadata = parquet.metadata
+        limits[InputDimension.ROWS].check(metadata.num_rows)
+        limits[InputDimension.COLUMNS].check(metadata.num_columns)
+        limits[InputDimension.CELLS].check(metadata.num_rows * metadata.num_columns)
+        limits[InputDimension.EXPANDED_BYTES].check(sum(
+            metadata.row_group(group).column(column).total_uncompressed_size
+            for group in range(metadata.num_row_groups) for column in range(metadata.num_columns)))
         schema = parquet.schema_arrow
         names = validate_csv_headers(schema.names)
         if list(names) != schema.names:
@@ -88,22 +128,22 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
                     raise ValueError("native numeric text/preservation requires explicit formatting")
         rows = []
         decoded_bytes = 0
-        expanded_limit = max_parquet_expanded_bytes()
         for batch in parquet.iter_batches(batch_size=1024):
             budget.check("transformation Parquet input batch")
             # Arrow string buffers include dictionary expansion, unlike page metadata.
             # This bounds decoded payload, not Python object overhead or Arrow peak RSS.
             decoded_bytes += batch.nbytes
-            if decoded_bytes > expanded_limit:
-                raise InputLimitError("transformation Parquet decoded size exceeds limit")
+            limits[InputDimension.EXPANDED_BYTES].check(decoded_bytes)
             for row in batch.to_pylist():
                 budget.check("transformation Parquet input row")
                 if any(value is not None and (
                         type(value) not in {str, int, float, bool, Decimal, date}
-                        or isinstance(value, str) and len(value) > DEFAULT_MAX_INPUT_CELL_CHARS
                         or isinstance(value, float) and not math.isfinite(value))
                        for value in row.values()):
                     raise ValueError("unsupported Parquet source cell")
+                for value in row.values():
+                    if type(value) is str:
+                        limits[InputDimension.CELL_CHARS].check(len(value))
                 rows.append(row)
         budget.check("transformation Parquet decoded")
         return NativeSourceRows(list(names), tuple(rows), types, decimal_shapes)
