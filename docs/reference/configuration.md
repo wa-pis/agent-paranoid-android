@@ -50,7 +50,7 @@ its policy-aware review preflight and CSV profiling/trace shape checks. They do 
 source-free profiling/MCP budgets, or establish end-to-end capacity. Remaining
 pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
-[candidate evidence](../../openspec/changes/selective-source-transformation/csv-scale-acceptance.md).
+[candidate evidence](https://github.com/wa-pis/agent-paranoid-android/blob/12e9e272c98ea469cbef92fe9fae49c518046461/openspec/changes/selective-source-transformation/csv-scale-acceptance.md).
 This does not certify public execution, SQL routes or the 1M × 100 target.
 
 Use `resource_limits` in the saved **behavior profile** (not DatasetProfile):

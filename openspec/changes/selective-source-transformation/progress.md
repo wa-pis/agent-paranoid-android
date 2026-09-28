@@ -4238,3 +4238,21 @@ Broader transformation remains unfinished.
   consume its CI without duplicate runs, then SQL/worker and public-interface
   scope. No new safety review required for each ordinary commit; activation
   and final exact-SHA independent review remain mandatory.
+- Signed milestone commit12e9e272c98ea469cbef92fe9fae49c518046461 pushed;
+  single PR #594 created and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/594 . GitHub verifies
+  signature valid (local verify-commit lacks allowedSignersFile; no settings
+  changed). CI started; do not rerun successful local acceptance or overlap
+  another push/PR. Next heartbeat: consume #594 checks, address actual failures,
+  merge only after required green gates. This local status note intentionally
+  stays uncommitted until next coherent update to avoid redundant CI.
+- #594 documentation CI failed on a relative link from published docs to the
+  non-published OpenSpec tree. Reproduced locally with mkdocs build --strict;
+  replaced it with an immutable GitHub link to evidence at12e9e272. No runtime
+  code changed, so installed-wheel/scale/regression evidence remains valid.
+  Local strict build now passes. GitHub REST/GraphQL/log downloads repeatedly
+  timed out, so current remaining CI state is unconfirmed. Checked CI/docs/
+  security/container concurrency: all cancel obsolete runs for this PR ref.
+  Push only this documentation correction on the same PR, letting configured
+  concurrency replace the old checks; no manual rerun/second PR or unchanged
+  scale replay. Do not merge without subsequently confirmed green gates.
