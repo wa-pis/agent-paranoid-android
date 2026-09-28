@@ -363,17 +363,19 @@ generation. Other synthesized non-null values SHALL differ from the original.
 ### Requirement: Explicit dependencies and consistent replacement keys
 
 Declared key relationships SHALL use consistent local replacement mappings.
-Derived values SHALL be recomputed from transformed inputs. Undeclared
+SQL aggregate columns SHALL be ordinary query-result fields, without internal
+formula translation or total recomputation. Undeclared
 relationships SHALL NOT be claimed as preserved. No dependency rule may silently
 override preservation decisions or row-count invariants.
 
-#### Scenario: Linked identifiers and derived total
+#### Scenario: Linked identifiers and SQL aggregate result
 
-- **GIVEN** linked identifier fields in the same mapping domain and a declared
-  total formula over replaceable amounts
+- **GIVEN** linked identifier fields in the same mapping domain and an aggregate
+  column already computed by an authorized bounded SQL query
 - **WHEN** transformation runs
 - **THEN** matching source keys map consistently, unrelated domains remain
-  distinct, and the total is calculated from transformed amounts.
+  distinct, and the aggregate column follows its explicit field action without
+  internal formula evaluation or recalculation from transformed amounts.
 
 ### Requirement: Bounded local processing and deterministic replay
 

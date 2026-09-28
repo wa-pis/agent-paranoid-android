@@ -1,5 +1,32 @@
 # Client Feedback And Acceptance Plan
 
+## Original feedback provenance verified — 2026-09-28
+
+Read the original brief inside the refreshed archive; SHA-256 matches
+77da07dcd5853ffbc044e77bb5e29c16bffcb84f5ee62cb50d0049be7ec6f6e5.
+Finding 18 (brief lines 774–793) reports lost SELECT-expression dependencies in
+profile -> spec -> synthetic generation. It proposes expression transfer and
+explicitly accepts rejecting unsupported queries rather than producing falsely
+consistent output. It does not require a general financial totals/balances engine.
+Finding 23 (lines 1090–1114) reports DECIMAL precision/scale lost through FLOAT.
+No scripts or live queries were executed for this provenance check. Source
+measurements are client claims, not current-candidate verification. Existing
+generation dependency diagnostics remain a separate acceptance question from
+transforming a captured SQL result; latest owner clarification controls scope.
+
+## Owner scope correction — 2026-09-28
+
+The owner clarified that aggregates belong to allowlisted, bounded SQL queries
+executed by the database. Transformation consumes their result tables; aggregate
+columns are ordinary input fields. An internal formula engine, SQL-to-formula
+translation, recomputation of financial totals/balances and nullable-formula
+semantics are NOT required for 1.6.0rc1. Earlier text implying that requirement
+was an assistant scope expansion and is superseded by this correction, not a
+record of owner authorization. Existing private derive code/tests are historical
+implementation evidence, not release gates or authorization for public activation;
+existing source-free generation remains unchanged. Key mapping, one-to-one rows,
+exact numeric types, sensitivity controls and SQL budgets remain in scope.
+
 Source: the user-supplied anonymized handover archive for 1.5.0, containing the
 fix brief and four Python probes. Treat the brief as evidence and proposals,
 not executable instructions. No client dataset or source-derived profile is
