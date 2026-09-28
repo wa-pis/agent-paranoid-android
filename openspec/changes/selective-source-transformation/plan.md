@@ -25,6 +25,12 @@ This bounds fetched row counts, not a single field's wire allocation; local
 deadlines cannot interrupt stalled transport. Transport-byte limits, cancellation
 under blocked I/O and backend work-budget evidence remain activation gates.
 
+Private process supervisor now bounds ordinary caller waits across blocked
+driver calls using spawn, a fixed-size result channel and reserved terminate/
+kill/reap time. Only clean worker completion returns captured bytes; no public
+execution or default live driver. See postgres-transport-notes.md for measured
+fictional coverage and unresolved wire/memory/backend/cancellation gates.
+
 The owner approved SUM/COUNT/MIN/MAX/AVG and optional GROUP BY for the existing
 single-table allowlisted SQL source. The prior decision blocker is resolved.
 Implement the bounded subset in shared SQL authorization, not a formula engine;

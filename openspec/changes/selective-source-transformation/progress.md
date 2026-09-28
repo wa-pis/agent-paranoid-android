@@ -3984,3 +3984,50 @@ Broader transformation remains unfinished.
   cancellation. Those remain activation gates; public execution stays off.
   Next: publish this private slice, consume CI once; then close transport/work
   budget gaps and implement Trino counterpart before final activation review.
+- Signed 0cce163 pushed; PR #592 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/592 . Strict OpenSpec
+  validation also passed. Next heartbeat: inspect this head's CI before another
+  push/PR; no overlapping implementation or duplicate review. Preserve this
+  local progress entry. Public execution and real DB access remain off.
+- PR #592 merged normally 2026-09-28T16:50:55Z, merge SHA
+  e2349ef915c57af2d0fd83751aef4c9e6c58cbe5. All checks SUCCESS/SKIPPED;
+  required checks green, CLEAN, exact head 0cce163 signature verified. No
+  reruns, protection bypass or duplicate review. Next: close the documented
+  PostgreSQL transport/work-budget gaps using fictional fixtures, then Trino
+  driver parity. Private implementation is not public activation or RC readiness.
+- 2026-09-28 transport investigation: confirmed #592 merged and preserved local
+  notes; no code/tests/CI repeated. Inspected installed psycopg 3.3.4 and official
+  connection API: cancel_safe timeout is ineffective with libpq <17; async
+  cancellation also resumes waiting for the original operation, and its failure
+  path can log driver exception text. Thus async timeout substitution alone is
+  not sufficient. Evidence/next experiment: postgres-transport-notes.md.
+  Next small step: fictional isolated-worker blocked-driver deadline/cleanup
+  proof with bounded result channel. Wire/pre-allocation/backend work limits
+  remain separate gates. No real connections, new compatibility restriction,
+  public activation, or new user decision required at this investigation stage.
+- 2026-09-28 fictional isolation experiment completed on new branch
+  `codex/1-6-postgres-isolation-proof` from merged main e2349ef, same worktree.
+  Added test-only spawn worker running actual private PostgreSQL capture with
+  fictional injected driver. Fixed-size shared result buffer; normal-exit/length
+  acceptance; terminate/reap with kill fallback; discarded child diagnostics.
+  Eleven cases passed in 4.97s: success, oversize, backend failure, partial write,
+  caller cancellation, blocked connect/execute/fetch/cursor close/rollback/
+  connection close. Initial collection failed on unqualified test-helper import;
+  corrected to tests package, then all11passed. No product monkeypatch or DB.
+  This is a test-only proof, not production deadline/wire/memory enforcement.
+  Preserve current local files; no new PR/CI until the corresponding private
+  supervisor integration is ready. Next: integrate bounded capture lifecycle
+  with one invocation deadline and cleanup allowance; retain all activation gates.
+- 2026-09-28: private `_capture_postgres_isolated` implemented in
+  io/transformation_postgres_capture.py on current isolation-proof branch.
+  Typed capture request, injected trusted factory, spawn, bounded shared result
+  buffer, common monotonic deadline with cleanup reserve, terminate/kill/reap,
+  detached fixed errors. Reuses existing capture authorization and typed reader;
+  no default real driver/public API, no approval or source-free path changes.
+  Checks: refactored experiment + integration initially19passed; after memoryview
+  copy refinement and six invalid-control cases, affected supervisor14passed
+  (11 unchanged experiment cases deselected). Ruff and production mypy passed.
+  No claim of worker-memory/wire-byte bounds or guaranteed backend cancellation.
+  Direct supervisor caller-cancellation coverage and resource/work-budget gates
+  remain; details in postgres-transport-notes.md. Next: finish that evidence before
+  public activation; publish private slice and consume CI without duplicate runs.
