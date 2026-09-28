@@ -3926,3 +3926,34 @@ Broader transformation remains unfinished.
   only Python3.11–3.14 pending, Trino integration correction passed. Do not
   repeat review/tests. Next: after CI completes, commit/push evidence-only diff,
   consume that head's required checks and ordinary merge. No overlapping CI.
+- Corrective runtime CI completed with all checks SUCCESS/SKIPPED. Signed
+  evidence-only follow-up 7fcf172 pushed after completion; runtime/tests remain
+  identical to independently reviewed 16eece3. No duplicate review or manual
+  rerun. Next: consume final evidence-head CI/signature/required checks and
+  merge PR #590 normally, then resume separately bounded SQL-result capture.
+- PR #590 merged normally 2026-09-28T16:17:03Z, merge SHA
+  849fea424d377175d662acdb75846d1cce637a08. All CI SUCCESS/SKIPPED,
+  required gates green, CLEAN, final head SSH signature valid. Verified final
+  head differs from independently reviewed 16eece3 only in evidence/progress.
+  Both safety findings closed; SQL source policy1.1 aggregate subset delivered.
+  This does not activate mixed-origin execution, implement DB result fetching,
+  or complete RC acceptance. Next: bounded authorized captured-result adapter
+  on merged main, fictional callbacks only, exact authorization/schema binding.
+- Continued on codex/1-6-query-result-stream from merged main849fea4. Added
+  closed _capture_authorized_result: shared SQL authorization before dedicated
+  context-managed Arrow batches; schema/native-type preflight, row/cell/decoded/
+  serialized byte caps, nullability and schema-drift checks, cooperative deadline,
+  fixed detached failures. Frozen allowlists/source/query/limits plus schema are
+  bound in captured bytes. COUNT-star SQL wrapper uses explicit output fields
+  and LIMIT(max_rows+1), rejecting overflow rather than publishing truncation.
+  No DB imports/connections, public wiring, durable destinations or receipt mint.
+  Existing aggregate-only clients remain untouched; future driver integration
+  must enforce backend read-only/scan/statement/transport/time limits. Callback
+  allocations/blocking are not claimed bounded by local cooperative checks.
+  Tests: 20 fictional cases passed, including both adapter identities through
+  temporary CSV/Parquet/SQL outputs, exact authorization-context binding,
+  preflight no-call failures and stream cleanup on row/byte/schema/null/backend/
+  deadline failures. Ruff, mypy on new production module and diff check passed.
+  Initial16test run passed; unused test import corrected before final20run.
+  Next: commit/push this private integration slice, consume CI; dedicated driver
+  adapters and final activation safety review remain, not complete RC acceptance.
