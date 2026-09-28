@@ -25,6 +25,10 @@ Run the same workflow with a `tpch.tiny.nation.*` profiling selector:
 examples/local_trino/run-wildcard.sh /tmp/agent-paranoid-trino-wildcard-example
 ```
 
+The generation example uses direct column aliases. Source-dependent expressions
+such as `upper(name)` can be profiled, but automatic specification inference
+rejects their unmodeled dependencies; it does not silently synthesize unrelated values.
+
 Run the checked-in reviewed `query.sql` through the aggregate-only query-source
 pipeline:
 

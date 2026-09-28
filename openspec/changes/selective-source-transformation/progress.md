@@ -3744,3 +3744,70 @@ Broader transformation remains unfinished.
   Scope clarification staged on codex/1-6-sql-scope from merged main, preserving
   all local documentation edits. Next: publish scope/provenance correction, then
   add a fictional focused dependency-loss probe at profile-to-spec boundary.
+- Signed scope checkpoint 932b441 pushed; PR #587 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/587. CI pending. No runtime
+  changes or duplicated tests/reviews. Next: normal merge after required gates,
+  then focused finding-18 probe and bounded SQL-result integration.
+- PR #587 merged normally at 2026-09-28T14:40:33Z, merge SHA
+  58f777f273389f336516ac07e8b8e3ace5450c94. All checks SUCCESS/SKIPPED,
+  required gates passed, CLEAN; GitHub signature verified.
+- Finding18 boundary reproduction on product HEAD 932b441: fictional local
+  /private/tmp/apa-finding18-boundary-probe.py supplies typed fake aggregate
+  callbacks to profile_validated_query, then real infer_dataset_spec and
+  generate_dataset (seed73). 20 rows, zero constraints, 20 expression mismatches.
+  No product monkeypatch, raw rows/log values or DB calls. This isolates the
+  post-authorization profile->spec boundary; it does not test SQL authorization
+  or reproduce the private client dataset. Command: PYTHONPATH=src
+  /private/tmp/apa-mapping-integration/.venv/bin/python /private/tmp/apa-finding18-boundary-probe.py.
+  Next: carry value-free expression-dependency capability metadata to inference
+  and explicitly reject unsupported consistency claims there, keeping permitted
+  aggregate profiling and SQL-result transformation available. No formula engine.
+- On codex/1-6-query-dependencies from 58f777f, local implementation adds a
+  value-free has_unmodeled_expressions marker from authorized source-dependent
+  SQL projections through DatasetProfile JSON to infer_dataset_spec rejection.
+  Direct renamed columns remain eligible; profiling stays available. No SQL
+  expression text or literals persisted. Runtime changes not committed/pushed.
+  First focused run used mapping venv without optional sqlglot: 22 parser-related
+  failures, 30 passes; Ruff passed. Reused project venv (sqlglot30.13.0) for failed
+  source module: all36 passed. No dependency install or repeated profiling tests.
+  Next: cover both adapters, legacy profile compatibility and alternate inference
+  paths; document metadata/API contract and add normative acceptance before PR.
+  This is partial fix evidence, not closure of all finding18 or public activation.
+- Extended both-adapter projection/JSON/reprofiling coverage. Missing SQL-profile
+  marker now means unknown, not safe; automatic inference requests reprofiling.
+  Legacy non-query inference remains supported. Both focused modules: 58 passed
+  with sqlglot30.13.0; Ruff passed. Agent planning and advisor without explicit
+  baseline call the shared inference function. Explicit user baseline bypasses
+  inference intentionally; no SQL-formula fidelity claim follows from it.
+  Documented capability metadata and normative rejection scenario. Next: check
+  profile serialization/fingerprint compatibility and CLI/agent regressions,
+  then signed PR. Runtime remains local/uncommitted; no new AI review launched.
+- Strict OpenSpec initially caught misplaced scenario before requirement text;
+  split inference capability into its own normative requirement. Strict validation
+  and diff check then passed. No runtime tests repeated after documentation fix.
+- CLI/agent/advisor/profile diagnostics regression slice passed: 59 tests.
+  Added explicit CLI no-spec-publication and advisor rejection plus fingerprint
+  binding test; passed. Fixed unknown-marker hashing to omit absent evidence and
+  preserve legacy profile hashes; explicit true/false remains hash-bound. Two
+  focused marker/fingerprint tests passed after that change; Ruff/diff passed.
+  Next: finish user-facing profile-query documentation and integration check of
+  fingerprint consumers, then signed PR. No new CI or AI review launched.
+- Fingerprint-consumer regression run: 53 passed, one expected public JSON
+  fixture mismatch (new nullable capability field in advisor profile). Reviewed
+  additive field; regenerated fixtures with existing script: only one null-field
+  line changed in advisor-exchange.json. Contract suite then 3 passed. User-facing
+  profile/query workflow docs now explain rejection, reprofile migration and
+  fingerprint behavior. No runtime changes since previous focused passes.
+  Preparing signed ordinary bugfix PR; no safety-policy relaxation, SQL widening,
+  new formula engine or public mixed-origin execution. Next: consume CI gates.
+- Signed e2095e1 pushed; PR #588 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/588. CI pending, no duplicate
+  runs. Next: required/all checks then normal merge; continue SQL-result path.
+- CI found two follow-ups: legacy fingerprint test constructed its old payload
+  from current model and retained the new null marker; fixed fixture to omit it
+  (focused test passed). Trino installed-example query used upper(name), now an
+  intentionally unsupported inference input; successful generation example now
+  uses direct alias, with explicit limitation documented. No safety guard relaxed.
+  Trino CI uses its existing isolated TPCH container; no local/live DB accessed.
+  Next: finish current CI run before pushing correction to avoid overlapping
+  runs, then consume corrected CI. No manual reruns or merge while red.

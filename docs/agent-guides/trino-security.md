@@ -82,6 +82,15 @@ remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
 
 ## Enforcement
 
+Query profiles carry value-free `has_unmodeled_expressions` metadata. A
+source-dependent non-column projection marks the profile unsupported for
+automatic `infer_dataset_spec`; profiling itself remains permitted. Direct
+column aliases do not set the flag. Saved SQL profiles lacking this metadata
+must be reprofiled before automatic inference; non-query legacy profiles keep
+their prior inference behavior. No SQL expressions or literals are persisted by
+this flag. Explicit independently authored specifications are not automatic
+SQL-dependency inference and must not be advertised as preserving query formulas.
+
 - Validate identifiers and enforce table/column allowlists before execution.
 - Return raw categorical aggregates only for explicitly non-sensitive columns
   covered by both table and column allowlists; a table allowlist alone does not

@@ -169,6 +169,7 @@
           "row_count": 12
         }
       ],
+      "has_unmodeled_expressions": null,
       "local_category_fields": [],
       "relationships": [],
       "source_fingerprint": null,

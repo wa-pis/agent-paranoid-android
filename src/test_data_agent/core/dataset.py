@@ -39,6 +39,7 @@ class DatasetProfile(BaseModel):
     source_type: str = "csv_folder"
     source_fingerprint: str | None = None
     source_policy_version: str | None = None
+    has_unmodeled_expressions: bool | None = Field(default=None, strict=True)
     entities: list[EntityProfile] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)

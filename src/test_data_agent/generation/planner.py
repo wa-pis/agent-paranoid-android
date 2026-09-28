@@ -11,6 +11,10 @@ from test_data_agent.safety import assert_profile_safe
 
 def infer_dataset_spec(profile: DatasetProfile, count: int | None = None) -> DatasetSpec:
     assert_profile_safe(profile)
+    if profile.source_type in {"postgres_query", "trino_query"} and profile.has_unmodeled_expressions is None:
+        raise ValueError("SQL query profile requires reprofiling for expression dependency checks")
+    if profile.has_unmodeled_expressions:
+        raise ValueError("SQL expression dependencies are unsupported for inferred generation")
     entities: list[EntitySpec] = []
     for entity in profile.entities:
         primary_key = entity.primary_key_candidates[0] if entity.primary_key_candidates else None

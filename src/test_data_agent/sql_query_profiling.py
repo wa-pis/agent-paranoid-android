@@ -86,6 +86,7 @@ def profile_validated_query(
             update={
                 "source_fingerprint": plan.fingerprint,
                 "source_policy_version": QUERY_SOURCE_POLICY_VERSION,
+                "has_unmodeled_expressions": plan.has_unmodeled_expressions,
             }
         )
     except SqlQueryProfileError:

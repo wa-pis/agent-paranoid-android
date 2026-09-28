@@ -383,6 +383,8 @@ def model_fingerprint(model: BaseModel) -> str:
         if payload.get("local_category_fields", None) == []:
             payload.pop("local_category_fields", None)
     if isinstance(model, DatasetProfile):
+        if payload.get("has_unmodeled_expressions") is None:
+            payload.pop("has_unmodeled_expressions", None)
         # Unspecified carries no new evidence; preserve pre-metadata plan hashes.
         for entity in payload["entities"]:
             for field in entity["fields"]:
