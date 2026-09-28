@@ -72,9 +72,20 @@ def test_explicit_query_is_canonicalized_and_fingerprinted(tmp_path: Path) -> No
     assert plan.table_parts == ("public", "orders")
     assert plan.entity_name == "warehouse.paid_orders"
     assert plan.output_fields == ("order_id", "state", "doubled")
+    assert plan.has_unmodeled_expressions
     assert len(plan.fingerprint) == 64
     assert "source-only-literal" not in repr(plan)
     assert str(path) not in repr(request(path))
+
+
+@pytest.mark.parametrize("projection,expected", [("amount AS renamed", False),
+    ("amount / 10.0 AS scaled", True), ("ROUND(-amount, 2) AS rounded", True)])
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_projection_dependency_capability(tmp_path, projection, expected, adapter):
+    table = "public.orders" if adapter == SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    path = write_query(tmp_path, f"SELECT {projection} FROM {table}")
+    query = authorize_query_source(inspect_query_source(request(path, adapter=adapter)), columns())
+    assert query.has_unmodeled_expressions is expected
 
 
 @pytest.mark.parametrize("adapter", list(SqlQueryAdapter))

@@ -377,6 +377,21 @@ override preservation decisions or row-count invariants.
   distinct, and the aggregate column follows its explicit field action without
   internal formula evaluation or recalculation from transformed amounts.
 
+### Requirement: Honest SQL-expression inference capability
+
+Automatic specification inference SHALL reject query profiles with unmodeled
+expression dependencies or missing dependency capability metadata.
+
+#### Scenario: Unsupported SQL-expression generation dependency
+
+- **GIVEN** a query profile with a source-dependent expression whose dependency
+  is not modeled for generation
+- **WHEN** automatic dataset specification inference is requested
+- **THEN** inference rejects with a fixed value-free diagnostic, while authorized
+  query profiling remains available and no expression text is persisted
+- **AND** legacy SQL profiles missing dependency capability metadata require
+  reprofiling; non-query legacy profiles retain their inference behavior.
+
 ### Requirement: Bounded local processing and deterministic replay
 
 Source reads SHALL be read-only, allowlisted and budgeted. Source rows and

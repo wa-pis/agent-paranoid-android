@@ -60,6 +60,16 @@ subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, multiple statements, and unauthorized references before
 derived aggregate work begins.
 
+Query profiles also record `has_unmodeled_expressions`: a source-dependent
+non-column projection sets it to `true`. Profiling remains available, but
+`infer-spec` rejects such profiles rather than silently generating independent
+values that break SQL-expression dependencies. Direct column aliases remain
+eligible. Older SQL profiles missing the marker must be reprofiled before
+automatic inference. Non-query legacy profiles retain prior inference behavior.
+The optional marker defaults to null (unknown); unknown does not change legacy
+profile fingerprints, while explicit true/false is included in the fingerprint.
+This does not translate SQL into formulas or authorize raw query-result access.
+
 The profile records `source_fingerprint` and `source_policy_version`, not SQL
 text or literals. The adapter performs a no-row schema probe followed by
 bounded aggregates. Query result rows are never returned, persisted, sent to a

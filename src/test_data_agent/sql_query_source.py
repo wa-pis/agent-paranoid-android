@@ -125,6 +125,7 @@ class ValidatedSqlQuery:
     fingerprint: str
     sql: str = field(repr=False, compare=False)
     safe_temporal_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
+    has_unmodeled_expressions: bool = False
 
 
 _ALLOWED_NODE_NAMES = frozenset(
@@ -318,6 +319,10 @@ def authorize_query_source(
         fingerprint=fingerprint,
         sql=canonical_sql,
         safe_temporal_output_fields=safe_temporal_output_fields,
+        has_unmodeled_expressions=any(
+            _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
+            for projection in statement.expressions
+        ),
     )
 
 

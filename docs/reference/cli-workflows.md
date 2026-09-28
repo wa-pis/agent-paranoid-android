@@ -82,6 +82,11 @@ Direct non-sensitive date/timestamp query outputs include observed min/max
 bounds when the aggregate source supplies valid endpoints. Derived expressions,
 sensitive source/output names and all-null fields do not claim them.
 
+`infer-spec` rejects query profiles marked with unsupported expression
+dependencies; `profile-query` itself remains available. Reprofile old SQL
+profiles without dependency metadata. Direct column aliases remain supported;
+there is no automatic SQL-to-formula translation.
+
 Follow the source-specific walkthrough instead of assembling commands from this
 reference:
 

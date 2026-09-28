@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 import pytest
 
@@ -118,6 +119,64 @@ def test_profile_is_source_free_and_keeps_exact_local_category_values() -> None:
     serialized = profile.model_dump_json()
     assert "source-only" not in serialized
     assert all("SELECT *" not in query.sql.upper() for query in results.queries)
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_expression_profile_remains_available_but_inferred_generation_rejects(adapter):
+    results = FakeResults()
+    profile = profile_validated_query(replace(plan(adapter=adapter), has_unmodeled_expressions=True),
+        describe_query=results.describe, fetch_query=results.fetch)
+    restored = type(profile).model_validate_json(profile.model_dump_json())
+    assert restored.has_unmodeled_expressions
+    with pytest.raises(ValueError, match="^SQL expression dependencies are unsupported for inferred generation$"):
+        infer_dataset_spec(restored)
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_legacy_query_profile_requires_expression_reprofiling(adapter):
+    results = FakeResults()
+    profile = profile_validated_query(plan(adapter=adapter),
+        describe_query=results.describe, fetch_query=results.fetch)
+    payload = profile.model_dump()
+    payload.pop("has_unmodeled_expressions")
+    restored = type(profile).model_validate(payload)
+    with pytest.raises(ValueError, match="requires reprofiling"):
+        infer_dataset_spec(restored)
+    payload["source_type"] = "csv_folder"
+    assert infer_dataset_spec(type(profile).model_validate(payload)).entities
+
+
+def test_expression_marker_binds_fingerprint_and_blocks_cli_advisor(tmp_path):
+    from test_data_agent.advisor import build_advisor_request
+    from test_data_agent.cli import main
+    from test_data_agent.io.artifacts import dataset_profile_fingerprint
+
+    results = FakeResults()
+    profile = profile_validated_query(replace(plan(), has_unmodeled_expressions=True),
+        describe_query=results.describe, fetch_query=results.fetch)
+    assert dataset_profile_fingerprint(profile) != dataset_profile_fingerprint(
+        profile.model_copy(update={"has_unmodeled_expressions": False}))
+    with pytest.raises(ValueError, match="expression dependencies are unsupported"):
+        build_advisor_request(profile)
+    source = tmp_path / "profile.json"
+    target = tmp_path / "spec.yaml"
+    source.write_text(profile.model_dump_json())
+    assert main(["infer-spec", str(source), "--output", str(target)]) != 0
+    assert not target.exists()
+
+
+def test_unknown_expression_marker_preserves_legacy_profile_fingerprint():
+    import hashlib
+    from test_data_agent.core.dataset import DatasetProfile
+    from test_data_agent.io.artifacts import dataset_profile_fingerprint
+
+    profile = DatasetProfile()
+    old_payload = profile.model_dump(mode="json")
+    old_payload.pop("has_unmodeled_expressions")
+    old_payload.pop("local_category_fields")
+    expected = hashlib.sha256(json.dumps(old_payload, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+    assert dataset_profile_fingerprint(profile) == expected
 
 
 def test_query_profile_feeds_deterministic_synthetic_generation() -> None:
