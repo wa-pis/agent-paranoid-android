@@ -234,6 +234,11 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
     if len(tables) != 1:
         raise SqlQuerySourceError("SQL query must reference exactly one table")
     table = tables[0]
+    table_alias = table.args.get("alias")
+    if table_alias is not None and table_alias.args.get("columns"):
+        raise SqlQuerySourceError("SQL query table column aliases are unsupported")
+    if any(any(star.args.values()) for star in statement.find_all(exp.Star)):
+        raise SqlQuerySourceError("SQL query wildcard modifiers are unsupported")
     table_parts = _table_parts(table, request.adapter)
     alias = table.alias_or_name
     if not _IDENTIFIER_RE.fullmatch(alias):

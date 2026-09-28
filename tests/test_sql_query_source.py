@@ -336,3 +336,22 @@ def test_aggregate_ast_budget_is_not_relaxed(tmp_path):
     path = write_query(tmp_path, "SELECT status, COUNT(*) AS measured FROM public.orders GROUP BY status")
     with pytest.raises(SqlQuerySourceError, match="AST node budget"):
         inspect_query_source(request(path, limits=SqlQueryProfileLimits(max_ast_nodes=3)))
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("selection", ["o.status AS state, COUNT(*) AS n", "MIN(o.status) AS n", "o.status"])
+def test_table_column_aliases_cannot_remap_physical_authority(tmp_path, adapter, selection):
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    sql = f"SELECT {selection} FROM {table} AS o(status, unused)"
+    if "COUNT" in selection:
+        sql += " GROUP BY o.status"
+    with pytest.raises(SqlQuerySourceError, match="table column aliases"):
+        inspect_query_source(request(write_query(tmp_path, sql), adapter=adapter))
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("selection", ["COUNT(* REPLACE (amount AS status)) AS n", "* REPLACE (amount AS status)"])
+def test_decorated_stars_fail_before_authorization(tmp_path, adapter, selection):
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    with pytest.raises(SqlQuerySourceError, match="wildcard modifiers"):
+        inspect_query_source(request(write_query(tmp_path, f"SELECT {selection} FROM {table}"), adapter=adapter))

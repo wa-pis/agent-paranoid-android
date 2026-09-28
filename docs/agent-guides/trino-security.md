@@ -85,6 +85,9 @@ remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
 SQL source policy 1.1 permits aliased SUM/COUNT/MIN/MAX/AVG projections and
 optional GROUP BY on explicit authorized source columns of one physical table.
 COUNT(*) is a row count, never a projection wildcard. Non-aggregate projections
+use physical source-column identity: table column-alias lists and decorated
+wildcards are rejected, including outside grouped queries. Ordinary table
+aliases remain supported. Non-aggregate projections
 must be grouping keys; nested/wrapped aggregates, HAVING, DISTINCT aggregates,
 grouping expressions/ordinals, ROLLUP and grouping sets remain rejected.
 Grouped/aggregate queries referencing sensitive-name source columns fail closed

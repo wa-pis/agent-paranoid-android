@@ -3899,3 +3899,18 @@ Broader transformation remains unfinished.
   integration assertions from policy 1.0 to 1.1; no live integration executed.
   Documentation tests: 49 passed. Next: consume review + exact PR CI; record
   evidence and resolve findings before activation.
+- PR #590 opened: https://github.com/wa-pis/agent-paranoid-android/pull/590
+  head f14dc5c8111be8897779af029fbcf1a6892edac3, signed follow-up changes only
+  integration version assertions and progress; runtime still 4876fcb. Reviewer
+  informed of final head. CI and independent AI review pending; no merge,
+  overlapping PR, repeated review or test rerun. Next heartbeat: consume both.
+- Review returned High physical-column remapping through table column-alias
+  lists and Low decorated COUNT-star validation gap. Evidence:
+  reviews/4876fcb-ai-safety.md. Added shared parser rejection for both shapes
+  (also ordinary SELECT), retaining ordinary table aliases; 10 new regressions.
+  Focused SQL modules: 147 passed. Findings await independent corrective review.
+  All previous CI completed: Trino integration failed, other checks green/skipped.
+  Found stale policy1.0 assertions inside both installed example launchers;
+  updated to1.1 (integration test expectations alone were insufficient).
+  No safety check weakened, live local DB or manual CI rerun. Next: signed fix,
+  changed-scope re-review and corrected PR CI before merge.
