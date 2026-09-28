@@ -3892,3 +3892,10 @@ Broader transformation remains unfinished.
   lacked sqlglot; project-environment mypy passed (one production module).
   Next: signed exact-SHA independent safety review before merge/activation.
   No DB access or claim of source-result capture completion.
+- Signed implementation 4876fcbd4916499d38bd1fa874292dbe46e344db sent for
+  independent read-only AI safety review to Boyle / CSV-Gate-1
+  (agent 01a0dfa0-7f22-75d3-9b19-d181e11f187d), base 440101e. Review active;
+  do not start a duplicate or merge before disposition. Separately updated two
+  integration assertions from policy 1.0 to 1.1; no live integration executed.
+  Documentation tests: 49 passed. Next: consume review + exact PR CI; record
+  evidence and resolve findings before activation.
