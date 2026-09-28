@@ -15,6 +15,16 @@ reuse aggregate-only profiler callbacks as result streams. The initial closed
 capture rejects sensitive-name metadata conservatively, even when unused;
 it grants no declassification or preservation authority.
 
+Private PostgreSQL driver increment uses a dedicated injected named, forward-only
+cursor, never the aggregate-only profiling session. Recheck source identity,
+frozen explicit column/table scope and configured result budgets before connect;
+use read-only connection options and statement/lock/idle-transaction timeouts.
+Fetch one row at a time, reject native-type coercion and schema/null drift, and
+rollback/close on failure or cancellation. Tests use fictional drivers only.
+This bounds fetched row counts, not a single field's wire allocation; local
+deadlines cannot interrupt stalled transport. Transport-byte limits, cancellation
+under blocked I/O and backend work-budget evidence remain activation gates.
+
 The owner approved SUM/COUNT/MIN/MAX/AVG and optional GROUP BY for the existing
 single-table allowlisted SQL source. The prior decision blocker is resolved.
 Implement the bounded subset in shared SQL authorization, not a formula engine;

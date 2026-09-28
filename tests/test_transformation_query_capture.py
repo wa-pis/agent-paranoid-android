@@ -3,6 +3,8 @@
 from contextlib import contextmanager
 import io
 import csv
+from dataclasses import replace
+from functools import partial
 
 import pytest
 import yaml
@@ -15,6 +17,105 @@ from test_data_agent.io.transformation_publish import temporary_csv_publication
 from test_data_agent.sql_query_source import SqlQueryAdapter, SqlQueryProfileRequest, QuerySourceColumn
 
 pa = pytest.importorskip("pyarrow")
+
+
+@pytest.mark.parametrize("fault", [None, "scope", "source", "connect", "execute", "fetch",
+    "names", "coercion", "null", "extra", "deadline", "consumer", "cancel"])
+def test_private_postgres_driver_capture(tmp_path, fault):
+    from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
+    from test_data_agent.postgres_config import PostgresConfig
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.status"}))
+    if fault == "scope":
+        config = replace(config, allowed_columns=frozenset({"public.orders.other"}))
+    if fault == "source":
+        config = replace(config, source_id="other")
+    events = []
+    now = [0.0]
+
+    class Driver:
+        description = [("label",), ("measured",)]
+        rows = [("alpha", 2), ("beta", 1)]
+
+        def connect(self, **options):
+            events.append("connect")
+            assert options["host"] == "fictional.invalid"
+            assert "default_transaction_read_only=on" in options["options"]
+            assert "statement_timeout=30000" in options["options"]
+            assert "lock_timeout=5000" in options["options"]
+            assert "idle_in_transaction_session_timeout=30000" in options["options"]
+            if fault == "connect":
+                raise RuntimeError("fictional backend detail")
+            return self
+
+        def cursor(self, **options):
+            events.append("cursor")
+            assert options == dict(name="apa_transform", scrollable=False, withhold=False)
+            return self
+
+        def execute(self, sql):
+            events.append("execute")
+            assert sql.endswith("LIMIT 4") and "COUNT(*)" in sql
+            if fault == "execute":
+                raise RuntimeError("fictional backend detail")
+
+        def fetchmany(self, size):
+            assert size == 1
+            events.append("fetch")
+            if fault == "fetch":
+                raise RuntimeError("fictional backend detail")
+            if fault == "cancel":
+                raise KeyboardInterrupt
+            if fault == "deadline":
+                now[0] = 121.0
+            if fault == "names":
+                self.description = [("other",), ("measured",)]
+            if fault == "coercion":
+                return [("alpha", 2.5)]
+            if fault == "null":
+                return [("alpha", None)]
+            if fault == "extra":
+                return [("alpha", 2), ("beta", 1)]
+            return [self.rows.pop(0)] if self.rows else []
+
+        def rollback(self):
+            events.append("rollback")
+
+        def close(self):
+            events.append("close")
+
+    stream = partial(_postgres_result_stream, config=config, schema=kwargs["schema"],
+        driver=Driver(), getenv=lambda name: None, clock=lambda: now[0])
+    if fault == "consumer":
+        original_stream = stream
+
+        @contextmanager
+        def stream(query):
+            with original_stream(query) as batches:
+                yield iter([next(batches), "invalid batch"])
+
+    if fault is None:
+        source = _capture_authorized_result(request, stream=stream, **kwargs)
+        profile = _profile_transformation_source(source, kwargs["policy"],
+            budget=GenerationBudget(5), max_bytes=16384)
+        assert profile.source_type == "postgres_query"
+    else:
+        expected = KeyboardInterrupt if fault == "cancel" else ValueError
+        with pytest.raises(expected) as caught:
+            _capture_authorized_result(request, stream=stream, **kwargs)
+        if fault != "cancel":
+            assert str(caught.value) == "invalid bounded query capture"
+            assert caught.value.__context__ is None
+    if fault in {"scope", "source"}:
+        assert events == []
+    elif fault == "connect":
+        assert events == ["connect"]
+    else:
+        assert events[-3:] == ["close", "rollback", "close"]
 
 
 def setup(tmp_path, adapter):
