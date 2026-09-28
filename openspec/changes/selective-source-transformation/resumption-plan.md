@@ -1,5 +1,26 @@
 # Resume plan — 2026-09-26
 
+## Latest completed private milestone — 2026-09-28
+
+Installed-wheel private CSV replacement route passed300,000 x50 (15M cells),
+including saved-policy file review, temporary publication, full ordered readback,
+mapping precedence/non-cascade, provenance and cleanup. Evidence and exact wheel
+digest: [csv-scale-acceptance.md](csv-scale-acceptance.md). This is not public
+CLI execution, source preservation, all12 routes or completed RC. Do not repeat
+this unchanged run. Next deliverable after this single PR: finish SQL capture/
+worker budgets and the remaining shared public interface/activation gates.
+
+## Capacity and diagnostic decision — 2026-09-28
+
+Owner accepted 1,000,000 rows x100 columns target and mandatory 300,000 x50
+fictional acceptance. Limit errors must distinguish over-request from runtime
+exhaustion and explain how to configure the current session/run and saved profile.
+Current 10M-cell and borrowed 10k SQL-profile row ceilings do not satisfy this.
+Next: audit/implement effective transformation budgets and real configuration
+paths; preserve safe typed diagnostics across worker and public boundaries.
+This supersedes the assistant-added hard-RSS/wire release-blocker detour, not
+any existing data-protection check. Full original RC scope remains required.
+
 ## Owner clarification and resume — 2026-09-28
 
 SQL aggregates are computed by the authorized database query; result columns

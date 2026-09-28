@@ -1,5 +1,22 @@
 # Tasks: selective-source-transformation
 
+## Owner-approved capacity and actionable limits — 2026-09-28
+
+- [x] Private replacement-only CSV installed-wheel acceptance300,000 x50:
+  15M cells, full ordered readback, column/global precedence, no cascade,
+  manifest/provenance and cleanup; see [evidence](csv-scale-acceptance.md).
+  Public/multi-route and1M x100 acceptance below remain open.
+
+- [ ] Support target 1,000,000 rows x100 columns across transformation routes;
+  audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
+- [ ] Expose/document effective run/session and saved-profile resource settings,
+  ranges and precedence without increasing source-free disclosure budgets.
+- [ ] Preserve typed value-free limit errors through core, adapters, worker,
+  CLI/Python/MCP: requested vs observed, limit, units, configuration origin,
+  working session instructions and actual profile key; no partial publication.
+- [ ] Verify boundary/one-over/config-precedence/recovery cases and complete
+  fictional 300,000 x50 end-to-end acceptance with measured resource evidence.
+
 ## Authorized SQL aggregate follow-up — 2026-09-28
 
 - [ ] Implement owner-approved single-table SUM/COUNT/MIN/MAX/AVG and optional

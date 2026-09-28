@@ -5,6 +5,7 @@ from typing import Any
 from collections.abc import Iterator
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError
 from test_data_agent.core.transformation_policy import ParquetOutput
 from test_data_agent.io.transformation_execute import CsvTransformationResult
 from test_data_agent.io.transformation_output import normalized_output_rows
@@ -26,7 +27,8 @@ def render_transformation_parquet(result: CsvTransformationResult, output: Parqu
         def write(self, data: Any) -> int:
             budget.check("transformation Parquet write")
             if self.tell() + len(data) > max_bytes:
-                raise ValueError("Parquet output budget exceeded")
+                raise TransformationLimitError(InputDimension.OUTPUT_BYTES,
+                    self.tell() + len(data), max_bytes, "parquet_output_run")
             return super().write(data)
 
     rows: list[dict[str, Any]] = []

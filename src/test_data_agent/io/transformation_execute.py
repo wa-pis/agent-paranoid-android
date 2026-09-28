@@ -6,9 +6,11 @@ receipt minting or external access.
 """
 
 import csv
+import os
 from decimal import Decimal
 from datetime import date
 from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
+from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError, resolve_input_limit
 import io
 import math
 from graphlib import TopologicalSorter
@@ -17,7 +19,7 @@ from pathlib import Path
 from typing import Any
 from collections.abc import Iterator
 
-from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
+from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.core.field import FieldType
@@ -69,6 +71,10 @@ def trace_csv_replacements(
         policy = load_behavior_policy_yaml(
             next(part.payload for part in canonical.parts if part.kind == "policy"),
             max_bytes=max_total_bytes, budget=budget)
+        if type(max_cells) is not int or max_cells < 1:
+            raise ValueError
+        resolve_input_limit(InputDimension.CELLS, policy.resource_limits, os.environ).check(
+            max_cells, requested=True)
         source = next(part for part in canonical.parts if part.kind == "source")
         mappings = {part.name: part.payload for part in canonical.parts if part.kind == "mapping"}
         file_table = (compile_text_replacement_table(
@@ -85,6 +91,7 @@ def trace_csv_replacements(
         reader.fieldnames = list(names)
 
         def events() -> Iterator[TextTraceEvent]:
+            traced_cells = 0
             for row_number, row in enumerate(reader, 1):
                 budget.check("CSV replacement trace")
                 if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
@@ -92,11 +99,17 @@ def trace_csv_replacements(
                 for column_number, name in enumerate(names, 1):
                     budget.check("CSV replacement trace cell")
                     if isinstance(actions[name], ReplaceTextAction):
+                        traced_cells += 1
+                        if traced_cells > max_cells:
+                            raise TransformationLimitError(InputDimension.CELLS, traced_cells,
+                                max_cells, "replacement_trace_run")
                         yield text_trace_event(row_number, column_number,
                             (match_scoped_text(matching_text(policy, name, row[name]), name, file_table, column_tables) if row[name] is not None else None))
 
         return summarize_text_trace(events(), max_events=max_events, max_cells=max_cells,
                                     max_rule_counts=max_rule_counts, budget=budget)
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, KeyError, StopIteration, csv.Error):
         pass
     try:
@@ -114,11 +127,13 @@ def replace_csv_snapshot(
     try:
         if type(max_output_bytes) is not int or max_output_bytes < 1:
             raise ValueError
-        limit = min(max_output_bytes, DEFAULT_MAX_INPUT_FILE_BYTES)
         canonical = _canonical_request(request, max_total_bytes=max_total_bytes,
                                        max_review_bytes=max_review_bytes, budget=budget)
         policy_bytes = next(part.payload for part in canonical.parts if part.kind == "policy")
         policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes, budget=budget)
+        resolve_input_limit(InputDimension.OUTPUT_BYTES, policy.resource_limits, os.environ).check(
+            max_output_bytes, requested=True)
+        limit = max_output_bytes
         decimal_types = {decision.field: decision.decimal_type for decision in policy.fields
                          if decision.decimal_type is not None}
         source = next(part for part in canonical.parts if part.kind == "source")
@@ -286,7 +301,8 @@ def replace_csv_snapshot(
             csv.writer(row_buffer, lineterminator="\n").writerow(values)
             encoded = row_buffer.getvalue().encode("utf-8")
             if output.tell() + len(encoded) > limit:
-                raise ValueError
+                raise TransformationLimitError(InputDimension.OUTPUT_BYTES,
+                    output.tell() + len(encoded), limit, "output_run")
             output.write(encoded)
 
         if any(looks_sensitive_value(name) for name in output_names):
@@ -455,6 +471,8 @@ def replace_csv_snapshot(
         provenance = provenance_summary(origin_counts["replacement"], origin_counts["synthetic"],
                                         origin_counts["original"], dropped_cells)
         return CsvTransformationResult(output.getvalue(), retention, output_names, tuple(logical_rows), provenance)
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):
         pass
     try:

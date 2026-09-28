@@ -13,6 +13,7 @@ from pydantic import Field, StrictBool, StrictInt, StrictStr, ValidationError, m
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
+from test_data_agent.core.transformation_limits import TransformationInputLimits
 from test_data_agent.core.privacy import is_sensitive_field, normalize_field_name
 from test_data_agent.core.transformation_mapping import (
     CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
@@ -256,6 +257,7 @@ class BehaviorPolicy(_PrivateModel):
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
     csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
+    resource_limits: TransformationInputLimits | None = Field(default=None, repr=False)
     output: SqlOutput | ParquetOutput | None = Field(default=None, repr=False)
     fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
     domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)

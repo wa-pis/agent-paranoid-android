@@ -2,6 +2,7 @@
 
 import multiprocessing
 import os
+import signal
 import time
 from functools import partial
 
@@ -17,6 +18,9 @@ from test_data_agent.sql_query_source import SqlQueryAdapter
 
 
 def _driver(fault, stage):
+    if fault == "ignore_term":
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        fault = "fetch"
     def step(name):
         if fault == name:
             stage.value = 1
@@ -140,7 +144,9 @@ def test_isolated_fictional_capture_is_reaped_and_never_returns_partial(tmp_path
 
 
 @pytest.mark.parametrize("fault", [None, "connect", "execute", "fetch", "rollback",
-    "cursor_close", "connection_close", "error"])
+    "cursor_close", "connection_close", "error",
+    pytest.param("ignore_term", marks=pytest.mark.skipif(os.name != "posix",
+        reason="SIGTERM-ignore evidence is POSIX-specific"))])
 def test_private_supervisor_uses_actual_capture(tmp_path, capfd, fault):
     from test_data_agent.io.transformation_postgres_capture import (
         _PostgresCapture, _capture_postgres_isolated,
@@ -185,3 +191,65 @@ def test_private_supervisor_rejects_unbounded_controls(tmp_path, seconds, byte_l
     with pytest.raises(ValueError, match="^invalid isolated PostgreSQL capture$") as caught:
         _capture_postgres_isolated(capture, driver_factory=forbidden, max_seconds=seconds)
     assert caught.value.__context__ is None
+
+
+def _cancellation_driver(stage, worker_pid):
+    worker_pid.value = os.getpid()
+    return _driver("fetch", stage)
+
+
+def _cancelled_supervisor(capture, stage, worker_pid, outcome):
+    from test_data_agent.io.transformation_postgres_capture import _capture_postgres_isolated
+
+    # Signal only this isolated harness, never pytest or the user's terminal.
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    try:
+        _capture_postgres_isolated(capture,
+            driver_factory=partial(_cancellation_driver, stage, worker_pid), max_seconds=10)
+        outcome.value = 2
+    except KeyboardInterrupt:
+        outcome.value = 1 if not multiprocessing.active_children() else -1
+    except BaseException:
+        outcome.value = -2
+    finally:
+        for child in multiprocessing.active_children():
+            child.terminate()
+            child.join(1)
+            if child.is_alive():
+                child.kill()
+                child.join(1)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="isolated SIGINT evidence is POSIX-specific")
+def test_actual_supervisor_caller_cancellation_reaps_worker(tmp_path):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    capture = _PostgresCapture(request=request, config=_config(), **{
+        key: value for key, value in kwargs.items() if key not in {"allowed_tables", "budget"}})
+    context = multiprocessing.get_context("spawn")
+    stage = context.RawValue("i", 0)
+    worker_pid = context.RawValue("i", 0)
+    outcome = context.RawValue("i", 0)
+    harness = context.Process(target=_cancelled_supervisor,
+        args=(capture, stage, worker_pid, outcome))
+    harness.start()
+    try:
+        deadline = time.monotonic() + 8
+        while stage.value != 1 and harness.is_alive() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        assert stage.value == 1 and worker_pid.value > 0
+        os.kill(harness.pid, signal.SIGINT)
+        harness.join(4)
+        assert not harness.is_alive() and harness.exitcode == 0
+        assert outcome.value == 1, "cancellation returned output or left worker alive"
+        with pytest.raises(ProcessLookupError):
+            os.kill(worker_pid.value, 0)
+    finally:
+        if harness.is_alive():
+            # Give the harness's own ten-second deadline/cleanup a chance to run.
+            harness.join(12)
+        if harness.is_alive():
+            harness.kill()
+            harness.join(1)
+        harness.close()

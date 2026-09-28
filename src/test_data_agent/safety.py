@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import csv
+from test_data_agent.core.csv_reader import ScopedDictReader
 import json
 import re
 from collections.abc import Iterable, Mapping
@@ -16,7 +16,6 @@ from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
-    configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -234,12 +233,11 @@ def assert_no_csv_source_rows(
     if not generated:
         return
     enforce_input_files([source_path])
-    configure_csv_field_limit(csv)
     encoding = detect_csv_encoding(source_path)
     with source_path.open(newline="", encoding=encoding) as handle:
         sample = handle.read(8192)
         handle.seek(0)
-        reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+        reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
         fieldnames = validate_csv_headers(
             list(reader.fieldnames) if reader.fieldnames is not None else None
         )

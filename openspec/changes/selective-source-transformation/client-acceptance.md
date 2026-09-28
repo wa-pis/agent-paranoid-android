@@ -421,3 +421,15 @@ that regression tests fail against the affected baseline, then pass on the
 unpatched candidate. Client/private-data validation may be performed locally by
 the client; report only approved non-sensitive outcomes. Do not claim their
 private scenario passed from fictional-fixture results alone.
+# Owner-approved capacity acceptance — 2026-09-28
+
+Mandatory fictional workload: 300,000 rows x50 columns. Target capability:
+1,000,000 x100. The private replacement-only CSV scenario passed300,000 x50
+on2026-09-28; see [exact candidate evidence](csv-scale-acceptance.md).
+Full public/multi-route capacity acceptance remains open. Check row/column preservation, final outputs,
+value-free provenance, mapping behavior, measured time/resources and cleanup.
+Independently trigger request-above-limit and runtime-exceeded-limit errors;
+confirm amount/threshold/unit and effective setting origin, concrete session
+override instructions and saved-profile key. Apply each documented override
+through the real interface and verify its effect. No product monkeypatch,
+silent truncation, implicit budget increase or raw input in error text.

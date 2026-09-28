@@ -549,14 +549,18 @@ def test_private_command_failures_preserve_input_files(tmp_path, failure):
     ticks = iter([0.0, 2.0])
     budget = GenerationBudget(1, clock=lambda: next(ticks)) if failure == "deadline" else GenerationBudget(5)
     publisher = import_module("test_data_agent.io.transformation_publish")
-    with pytest.raises(publisher.TransformationPublicationError) as caught:
+    with pytest.raises(publisher.TransformationLimitError if failure == "output_budget"
+                       else publisher.TransformationPublicationError) as caught:
         publisher._run_temporary_transform(tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
             expected_snapshot_sha256=("0" * 64 if failure == "digest" else "bad" if failure == "digest_shape"
                                       else material.snapshot_sha256),
             max_total_bytes=1 if failure == "input_budget" else 8192,
             max_review_bytes=4096, max_output_bytes=1 if failure == "output_budget" else 8192,
             budget=budget)
-    assert str(caught.value) == "invalid temporary transformation command"
+    if failure == "output_budget":
+        assert caught.value.code == "limit_exceeded" and caught.value.limit == 1
+    else:
+        assert str(caught.value) == "invalid temporary transformation command"
     assert caught.value.__context__ is None
     assert {path.name: path.read_bytes() for path in tmp_path.iterdir()} == before
 
@@ -579,6 +583,7 @@ import json
 from pathlib import Path
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.io.transformation_publish import _run_temporary_transform, TransformationPublicationError
+from test_data_agent.core.transformation_limits import TransformationLimitError
 parser = argparse.ArgumentParser()
 parser.add_argument("source", type=Path)
 parser.add_argument("policy", type=Path)
@@ -589,7 +594,7 @@ try:
     result = _run_temporary_transform(args.source, "items", args.policy,
         expected_snapshot_sha256=args.digest, max_total_bytes=8192,
         max_review_bytes=4096, max_output_bytes=args.limit, budget=GenerationBudget(5))
-except TransformationPublicationError as error:
+except (TransformationPublicationError, TransformationLimitError) as error:
     assert error.__context__ is None
     print(json.dumps({"status": "rejected"}))
 else:
@@ -667,11 +672,43 @@ def test_saved_csv_policy_cli_review_to_private_publication(tmp_path):
 @pytest.mark.parametrize("complete,limit", [(False, 8192), (True, 1), (True, 64)])
 def test_private_temporary_publication_rejects_before_yield(complete, limit):
     module = import_module("test_data_agent.io.transformation_publish")
-    with pytest.raises(module.TransformationPublicationError) as error:
+    with pytest.raises(module.TransformationLimitError if complete
+                       else module.TransformationPublicationError) as error:
         with module.temporary_csv_publication(request(complete=complete), max_total_bytes=8192,
                 max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)):
             pytest.fail("invalid output published")
     assert error.value.__context__ is None
+    if complete and limit == 64:
+        assert error.value.origin == "bundle_run"
+        assert error.value.amount > error.value.limit == 64
+        assert error.value.run_setting == "temporary_csv_publication(max_output_bytes=...)"
+
+
+@pytest.mark.parametrize("format", ["postgresql_sql", "parquet"])
+def test_final_format_budget_diagnostic_and_exact_boundary(format):
+    from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_sql import render_transformation_sql
+    from test_data_agent.io.transformation_parquet import render_transformation_parquet
+    module = import_module("test_data_agent.io.transformation_execute")
+    result = module.replace_csv_snapshot(request(), max_total_bytes=8192,
+        max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    fields = [{"name": name, "type": "string"} for name in result.columns]
+    if format == "parquet":
+        pytest.importorskip("pyarrow")
+        output = ParquetOutput.model_validate({"format": format, "fields": fields})
+        render = render_transformation_parquet
+    else:
+        output = SqlOutput.model_validate({"format": format, "table": "fictional", "fields": fields})
+        render = render_transformation_sql
+    expected = render(result, output, max_bytes=8192, budget=GenerationBudget(5))
+    assert render(result, output, max_bytes=len(expected), budget=GenerationBudget(5)) == expected
+    with pytest.raises(TransformationLimitError) as caught:
+        render(result, output, max_bytes=len(expected) - 1, budget=GenerationBudget(5))
+    assert caught.value.amount > caught.value.limit == len(expected) - 1
+    assert caught.value.unit == "bytes" and caught.value.code == "limit_exceeded"
+    assert caught.value.profile_key == "resource_limits.max_output_bytes"
+    assert "max_bytes=" in caught.value.run_setting
 
 
 def test_temporary_publication_cleans_up_after_consumer_failure():
@@ -1223,6 +1260,20 @@ def test_closed_csv_trace_reports_unmatched_without_values():
     assert all(value not in repr(result) for value in ("001", "002", "second", "cascade"))
 
 
+def test_closed_csv_trace_rejects_requested_budget_above_effective_limit():
+    module = import_module("test_data_agent.io.transformation_execute")
+    from test_data_agent.core.transformation_limits import InputDimension, resolve_input_limit
+    import os
+    limit = resolve_input_limit(InputDimension.CELLS, None, os.environ)
+    with pytest.raises(module.TransformationLimitError) as caught:
+        module.trace_csv_replacements(request(), max_total_bytes=8192,
+            max_review_bytes=4096, max_events=2, max_cells=limit.value + 1,
+            max_rule_counts=4, budget=GenerationBudget(5))
+    assert caught.value.code == "requested_above_limit"
+    assert (caught.value.amount, caught.value.limit, caught.value.origin) == (
+        limit.value + 1, limit.value, limit.origin)
+
+
 @pytest.mark.parametrize("case", ["events", "cells", "rules", "tampered"])
 def test_closed_csv_trace_rejects_limits_and_tampering(case):
     module = import_module("test_data_agent.io.transformation_execute")
@@ -1231,11 +1282,15 @@ def test_closed_csv_trace_rejects_limits_and_tampering(case):
         material = replace(material, parts=tuple(
             replace(part, payload=part.payload + b"true,003\n") if part.kind == "source" else part
             for part in material.parts))
-    with pytest.raises(module.TransformationExecutionError) as caught:
+    with pytest.raises(module.TransformationLimitError if case == "cells" else module.TransformationExecutionError) as caught:
         module.trace_csv_replacements(material, max_total_bytes=8192, max_review_bytes=4096,
             max_events=0 if case == "events" else 4, max_cells=3 if case == "cells" else 4,
             max_rule_counts=1 if case == "rules" else 4, budget=GenerationBudget(5))
-    assert str(caught.value) == "invalid CSV replacement trace"
+    if case == "cells":
+        assert (caught.value.code, caught.value.amount, caught.value.limit) == ("limit_exceeded", 4, 3)
+        assert caught.value.run_setting == "trace_csv_replacements(max_cells=...)"
+    else:
+        assert str(caught.value) == "invalid CSV replacement trace"
     assert caught.value.__context__ is None
 
 
@@ -1257,9 +1312,13 @@ def test_closed_csv_fails_without_returning_partial_output(case):
             replace(part, payload=b"flag,code\ntrue,001\n")
             if part.kind == "source" else part for part in material.parts))
     module = import_module("test_data_agent.io.transformation_execute")
-    with pytest.raises(module.TransformationExecutionError) as caught:
+    with pytest.raises(module.TransformationLimitError if case == "budget"
+                       else module.TransformationExecutionError) as caught:
         execute(material, 1 if case == "budget" else 8192)
-    assert str(caught.value) == "invalid CSV replacement"
+    if case == "budget":
+        assert caught.value.code == "limit_exceeded" and caught.value.limit == 1
+    else:
+        assert str(caught.value) == "invalid CSV replacement"
     assert caught.value.__context__ is None
 
 
@@ -1270,8 +1329,10 @@ def test_closed_csv_roundtrips_literal_replacement(target):
     assert rows == [["flag", "code"], ["no", "1"], ["yes", target]]
     assert execute(request(target=target), len(output)) == output
     module = import_module("test_data_agent.io.transformation_execute")
-    with pytest.raises(module.TransformationExecutionError):
+    with pytest.raises(module.TransformationLimitError) as caught:
         execute(request(target=target), len(output) - 1)
+    assert caught.value.amount == len(output) and caught.value.limit == len(output) - 1
+    assert caught.value.run_setting == "replace_csv_snapshot(max_output_bytes=...)"
 
 
 @pytest.mark.parametrize("behavior", [
@@ -1291,6 +1352,26 @@ def test_closed_csv_rejects_invalid_output_limits(limit):
     module = import_module("test_data_agent.io.transformation_execute")
     with pytest.raises(module.TransformationExecutionError, match="^invalid CSV replacement$"):
         execute(request(), limit)
+
+
+def test_output_profile_budget_and_above_old_input_cap_request():
+    original = request()
+    expected = execute(original)
+    assert execute(original, 128 * 1024 * 1024 + 1) == expected
+    policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
+    policy["resource_limits"] = {"max_output_bytes": len(expected)}
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(),
+        next(p for p in original.parts if p.kind == "source"),
+        tuple(p for p in original.parts if p.kind == "mapping"),
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    module = import_module("test_data_agent.io.transformation_execute")
+    with pytest.raises(module.TransformationLimitError) as caught:
+        execute(material, len(expected) + 1)
+    assert (caught.value.code, caught.value.origin, caught.value.limit) == (
+        "requested_above_limit", "profile", len(expected))
+    assert caught.value.session_setting == "TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES"
+    assert caught.value.profile_key == "resource_limits.max_output_bytes"
+    assert execute(material, len(expected)) == expected
 
 
 def test_closed_csv_enforces_invocation_deadline():

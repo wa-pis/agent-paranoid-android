@@ -11,7 +11,7 @@ from pathlib import Path
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import (
-    DEFAULT_MAX_INPUT_CELLS, DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
+    DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
     GenerationBudget,
 )
 from test_data_agent.core.privacy import is_sensitive_field
@@ -29,6 +29,7 @@ from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, _profile_csv_rows, profile_csv_bytes, validate_csv_headers
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
 from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
+from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationLimitError, resolve_input_limit
 from test_data_agent.csv_profiler import CSVColumnAccumulator, CSVProfile
 from test_data_agent.io.path_policy import open_regular_file
 
@@ -39,17 +40,32 @@ class TransformationSourceError(ValueError):
 
 def _profile_transformation_csv(
     source: SnapshotPart, *, null_token: str | None, budget: GenerationBudget, max_bytes: int,
+    policy: BehaviorPolicy | None = None,
 ) -> DatasetProfile:
     """Private literal-cell profile; default source-free profiling is unchanged."""
     if (type(source.payload) is not bytes or type(max_bytes) is not int or max_bytes < 1
-            or len(source.payload) > min(max_bytes, DEFAULT_MAX_INPUT_FILE_BYTES)
+            or len(source.payload) > max_bytes
+            or policy is None and len(source.payload) > DEFAULT_MAX_INPUT_FILE_BYTES
             or null_token is not None and (type(null_token) is not str or not null_token
                                           or len(null_token) > 256)):
         raise TransformationSourceError("invalid transformation source profile")
     budget.check("transformation source profiling")
+    limits = {dimension: resolve_input_limit(dimension, policy.resource_limits, os.environ)
+              for dimension in (InputDimension.ROWS, InputDimension.COLUMNS, InputDimension.CELLS)
+              } if policy is not None else {}
+
+    def check_shape(rows: int, columns: int) -> None:
+        limits[InputDimension.ROWS].check(rows)
+        limits[InputDimension.COLUMNS].check(columns)
+        limits[InputDimension.CELLS].check(rows * columns)
+
     return csv_profile_to_dataset_profile(_profile_csv_rows(
-        _csv_reader_from_snapshot(source.payload), source.name, (), None, budget,
-        literal_empty=True, null_token=null_token))
+        source_reader(source, policy, budget=budget) if policy is not None else _csv_reader_from_snapshot(source.payload),
+        source.name, (), None, budget,
+        literal_empty=True, null_token=null_token,
+        check_shape=check_shape if policy is not None else None,
+        max_chars=resolve_input_limit(InputDimension.CELL_CHARS, policy.resource_limits, os.environ).value
+        if policy is not None else None))
 
 
 
@@ -58,11 +74,12 @@ def _profile_transformation_source(
 ) -> DatasetProfile:
     if policy.input_format == "csv":
         return _profile_transformation_csv(source, null_token=policy.csv_nulls.input_token,
-            budget=budget, max_bytes=max_bytes)
+            budget=budget, max_bytes=max_bytes, policy=policy)
     if type(max_bytes) is not int or max_bytes < 1 or len(source.payload) > max_bytes:
         raise TransformationSourceError("invalid transformation source profile")
     reader = source_reader(source, policy, budget=budget)
-    accumulators = {name: CSVColumnAccumulator(name) for name in reader.fieldnames}
+    max_chars = resolve_input_limit(InputDimension.CELL_CHARS, policy.resource_limits, os.environ).value
+    accumulators = {name: CSVColumnAccumulator(name, max_chars=max_chars) for name in reader.fieldnames}
     count = 0
     for row in reader:
         count += 1
@@ -111,6 +128,8 @@ def prepare_csv_review_request(
         )
         reject_sensitive_text_reuse(policy_yaml, profile, source, referenced_parts, budget=budget)
         return request
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, csv.Error):
         raise TransformationSourceError("invalid transformation source review") from None
 
@@ -173,14 +192,17 @@ def prepare_csv_review_from_paths(
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
         referenced_parts = load_policy_references(policy, policy_root, max_bytes=remaining, budget=budget)
         remaining -= sum(len(part.payload) for part in referenced_parts)
+        input_limit = resolve_input_limit(InputDimension.BYTES, policy.resource_limits, os.environ)
         source = load_csv_source_snapshot(
             source_path, table_name, budget=budget,
-            max_bytes=min(DEFAULT_MAX_INPUT_FILE_BYTES, remaining),
+            max_bytes=remaining, input_limit=input_limit,
         )
         return prepare_csv_review_request(
             policy_yaml, source, tuple(referenced_parts), max_total_bytes=max_total_bytes,
             max_review_bytes=max_review_bytes, budget=budget,
         )
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError):
         raise TransformationSourceError("invalid transformation source review") from None
 
@@ -194,6 +216,10 @@ def trace_csv_review_request(
         parts = {(part.kind, part.name): part.payload for part in request.parts}
         policy_yaml = parts[("policy", "behavior.yaml")]
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=len(policy_yaml), budget=budget)
+        if type(max_cells) is not int or max_cells < 1:
+            raise ValueError
+        resolve_input_limit(InputDimension.CELLS, policy.resource_limits, os.environ).check(
+            max_cells, requested=True)
         source_parts = [part for part in request.parts if part.kind == "source"]
         if len(source_parts) != 1 or len(parts) != len(request.parts):
             raise ValueError
@@ -229,19 +255,26 @@ def trace_csv_review_request(
         reader.fieldnames = names
 
         def events() -> Iterator[TextTraceEvent]:
+            traced_cells = 0
             for row_ordinal, row in enumerate(reader, start=1):
                 budget.check("text trace")
                 if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                     raise ValueError
                 for column_ordinal, column in enumerate(names, start=1):
                     if column in selected:
+                        traced_cells += 1
+                        if traced_cells > max_cells:
+                            raise TransformationLimitError(InputDimension.CELLS, traced_cells,
+                                max_cells, "trace_run")
                         match = (match_scoped_text(matching_text(policy, column, row[column]), column, file_table, column_tables) if row[column] is not None else None)
                         yield text_trace_event(row_ordinal, column_ordinal, match)
 
         return summarize_text_trace(
-            events(), max_events=max_events, max_cells=min(max_cells, DEFAULT_MAX_INPUT_CELLS),
+            events(), max_events=max_events, max_cells=max_cells,
             max_rule_counts=DEFAULT_MAX_INPUT_COLUMNS * 2, budget=budget,
         )
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, KeyError, csv.Error):
         raise TransformationSourceError("invalid transformation trace") from None
 
@@ -311,6 +344,8 @@ def reject_sensitive_text_reuse(
             if any(same_native_value(row[field], replacement)
                    for field in sensitive_source_columns for replacement in active_replacements):
                 raise ValueError
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, csv.Error, KeyError):
         raise TransformationSourceError("invalid sensitive text replacement") from None
 
@@ -318,20 +353,32 @@ def reject_sensitive_text_reuse(
 def load_csv_source_snapshot(
     path: Path, table_name: str, *, budget: GenerationBudget,
     max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
+    input_limit: EffectiveInputLimit | None = None,
 ) -> SnapshotPart:
     """Read one regular file once; callers must reuse returned bytes."""
     try:
         budget.check("transformation source snapshot")
         if type(table_name) is not str or not table_name or type(max_bytes) is not int or max_bytes < 1:
             raise ValueError
+        if input_limit is not None:
+            if input_limit.dimension is not InputDimension.BYTES or input_limit.value < 1:
+                raise ValueError
+            max_bytes = min(max_bytes, input_limit.value)
         with open_regular_file(path) as handle:
-            if os.fstat(handle.fileno()).st_size > max_bytes:
+            size = os.fstat(handle.fileno()).st_size
+            if input_limit is not None:
+                input_limit.check(size)
+            if size > max_bytes:
                 raise ValueError
             payload = handle.read(max_bytes + 1)
+        if input_limit is not None:
+            input_limit.check(len(payload))
         if len(payload) > max_bytes:
             raise ValueError
         budget.check("transformation source snapshot")
         return SnapshotPart("source", table_name, payload)
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError):
         raise TransformationSourceError("invalid transformation source") from None
 
@@ -356,6 +403,8 @@ def revalidate_csv_evidence(
             raise ValueError
         budget.check("transformation source evidence")
         return observed
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, csv.Error):
         pass
     try:

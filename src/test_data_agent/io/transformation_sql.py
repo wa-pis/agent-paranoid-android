@@ -3,6 +3,7 @@
 from collections.abc import Iterator
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError
 from test_data_agent.core.privacy import looks_sensitive_value
 from test_data_agent.core.transformation_policy import SqlOutput
 from test_data_agent.io.transformation_execute import CsvTransformationResult
@@ -26,7 +27,8 @@ def render_transformation_sql(result: CsvTransformationResult, output: SqlOutput
         budget.check("transformation SQL output")
         encoded = statement.encode("utf-8")
         if len(payload) + len(encoded) > max_bytes:
-            raise ValueError("SQL output budget exceeded")
+            raise TransformationLimitError(InputDimension.OUTPUT_BYTES,
+                len(payload) + len(encoded), max_bytes, "sql_output_run")
         payload.extend(encoded)
 
     types = {"string": "TEXT", "integer": "BIGINT", "float": "DOUBLE PRECISION", "boolean": "BOOLEAN",

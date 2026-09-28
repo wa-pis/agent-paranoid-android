@@ -4031,3 +4031,210 @@ Broader transformation remains unfinished.
   Direct supervisor caller-cancellation coverage and resource/work-budget gates
   remain; details in postgres-transport-notes.md. Next: finish that evidence before
   public activation; publish private slice and consume CI without duplicate runs.
+- Signed d695c02 pushed; PR #593 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/593 . OpenSpec strict and
+  diff check also passed. Next heartbeat: consume this head's CI; no overlapping
+  push/PR or duplicate review. Preserve this local progress note. Activation off.
+- PR #593 merged normally 2026-09-28T17:17:30Z, merge SHA
+  737268d8e92b2876deb71fc035685bd3a3b01859. Exact head d695c02 signature valid;
+  all CI SUCCESS/SKIPPED, required gates passed, CLEAN. No reruns or bypass.
+  Next: direct supervisor cancellation evidence, then worker-memory/wire and
+  backend-work enforcement; see postgres-transport-notes.md. No public activation,
+  real DB access or completed RC acceptance claimed.
+- 2026-09-28: continued from merged #593/737268d on
+  `codex/1-6-postgres-resource-gates`, same worktree; preserved progress edits.
+  Added direct actual-supervisor POSIX cancellation evidence: SIGINT only to
+  isolated harness during fictional fetch; no result, active child or surviving
+  worker PID. Passed1 in1.12s. Added SIGTERM-ignoring worker proving kill fallback;
+  passed1 in3.96s. Ruff passed. These are two new focused checks, not reruns of
+  the prior25; no product monkeypatch, DB, API or public activation. Non-POSIX
+  signal evidence remains unverified (tests explicitly skip there).
+  Updated transport notes. Keep local tests/notes until resource-gate increment
+  is ready; no new PR/CI yet. Next: bounded worker-memory/wire enforcement options
+  without silently changing supported platforms/dependency contracts; server
+  statement/time limits remain distinct from an exact scan-byte guarantee.
+- 2026-09-28: scope reconciliation found author-added hard RSS/wire containment
+  gates were stronger than the recorded contract. policy-contract.md explicitly
+  limits native payload accounting, excluding peak-process-memory guarantees;
+  PostgreSQL baseline config has rows/cells/columns/statements/time limits, while
+  Trino keeps separate scan/time/measured-payload budgets. No guards removed.
+  Owner decision requested: keep these measured guarantees and disclose residual
+  memory/wire limits for 1.6, or explicitly scope hard containment into this RC.
+  Do not silently introduce platform restrictions/dependencies or mark unmeasured
+  properties passed. Automation `automation` confirmed PAUSED via app tool.
+  Current branch codex/1-6-postgres-resource-gates; pending local cancellation
+  tests/notes preserved, no new PR, no tests rerun, no real DB. Resume only after
+  owner resolves this boundary; then reconcile plan/notes and continue Trino /
+  remaining full-RC work without repeating merged #593 or successful tests.
+- 2026-09-28 owner decision resolves scope pause: accepted 1,000,000 rows x100
+  columns target and mandatory fictional acceptance at 300,000 x50. Explicitly
+  requires errors for requested-above-limit and exceeded-during-processing, plus
+  instructions to configure the current session/run or saved profile. Recorded
+  in policy-contract/plan/tasks/resumption-plan/client-acceptance. These are
+  requirements, not passed capacity tests or implemented profile settings.
+  Existing 10M-cell and SQL-profile 10k-row coupling do not meet target; audit
+  byte/time ceilings and all stages, not just those two constants. Typed safe
+  errors must survive generic query/worker wrapping and include effective limit
+  origin and real session/profile recovery settings. No automatic budget increase.
+  Preserve aggregate-only source-free limits, privacy and independent safety
+  review; no new RSS/wire/platform guarantee. Next: configuration/limit propagation
+  audit and smallest integrated implementation, then measured scale acceptance.
+  Local cancellation tests/notes remain preserved; no new PR/CI or capacity run.
+- OpenSpec delta now includes configurable capacity and actionable limit failures;
+  strict validation and diff check passed after amendment. Automation confirmed
+  ACTIVE with existing schedule/prompt preserved plus the new owner clarification.
+  Audit located hard 128MiB caps across transformation_input/source/execute,
+  query_snapshot/capture and postgres_capture, plus hard 10M cells in query capture
+  and source tracing. These must honor one effective configuration before claiming
+  scale support; byte and time budgets remain explicit. Next run: implement shared
+  effective transformation limits and recoverable diagnostics, then route callers.
+- 2026-09-28: private input-limit integration in the existing dirty worktree;
+  branch unchanged, GitHub confirms no open PR for this branch. Added typed
+  resource_limits to behavior policy and one resolver: transformation session
+  env > explicitly saved profile field > legacy env > default. Input decoder
+  checks rows/columns/cells/file bytes/cell characters/expanded Parquet bytes.
+  Fixed policy-aware CSV review preflight bypass of that decoder. Known typed
+  limit errors now survive source/execute/temporary-publication wrappers;
+  include safe amount/threshold/unit/origin and actual session/profile keys.
+  Configuration reference documents shell/PowerShell/YAML and current limitations.
+  Tests: initial policy/execute/input run 385 passed with one test assertion
+  defect (invalid-value test searched for digit 0 in a fixed numeric ceiling);
+  corrected assertion. Added real subprocess session recovery and review
+  preflight cases; preflight initially exposed the bypass above. After fix,
+  focused preflight passed1, then source + input suites passed42 in3.13s.
+  Ruff passed all seven changed Python files; mypy passed limits/input/source.
+  No real DB, new dependency, public activation, CI or scale acceptance run.
+  Decoder defaults are NOT proof of capacity: generic profiler/parser limits,
+  hard file/trace/query caps, borrowed SQL-profile budgets and worker error
+  transport still need propagation. Requested-above-limit is tested at shared
+  checker level only. Next: propagate effective budgets through CSV profiling
+  and tracing without raising source-free defaults, then query/worker boundaries
+  and measured fictional 300k x50 acceptance. Preserve cancellation tests/notes.
+- 2026-09-28 18:24 heartbeat: branch/diff preserved; GitHub reports no open PR
+  on codex/1-6-postgres-resource-gates. Removed duplicate generic CSV shape caps
+  from the policy-aware path by passing an explicit shape checker into the
+  existing private profiler; default callers retain their existing checks.
+  Isolated subprocess proves a saved private profile overrides lower legacy
+  row/column/cell settings while source-free profiling still rejects input.
+  Trace now rejects a requested cell budget above the effective profile/session
+  cap with requested_above_limit instead of silently min-clamping to 10M.
+  Regression proves rejection at5/profile4 and successful complete trace at4.
+  Source/input/CSV-profiler tests passed61 in2.04s; Ruff and mypy passed affected
+  files. Updated configuration reference. No scale run, activation, commit or CI.
+  Remaining: CSV parser/scalar and fixed-byte guards, effective per-run trace
+  exhaustion diagnostics, query/worker budget propagation; then measured scale
+  acceptance. Existing temporary-output, sensitivity and source-free gates stay.
+- 2026-09-28 18:29 heartbeat: unchanged branch, no open PR confirmed; retained
+  all pending edits. Actual trace exhaustion now raises the typed limit error
+  before the generic summarizer catch: amount/threshold/cells, origin trace_run,
+  exact private max_cells argument and session/profile ceiling recovery keys.
+  This avoids misleading advice to raise only the profile when an explicit
+  smaller run argument remains. Existing fictional regression now checks 2>1,
+  limit_exceeded and all recovery fields; requested-above-profile remains a
+  separate category. No partial result, source values or automatic increase.
+  Updated configuration reference. Next: parser/scalar and fixed-byte budget
+  propagation, then SQL capture/worker transport and full scale acceptance.
+  Checks: affected source/input suites44passed in1.96s; Ruff and mypy passed.
+  No scale acceptance, new PR/CI, public activation or real DB access.
+- 2026-09-28 continued on owner request: private file-review acquisition now
+  resolves the profile/session byte limit rather than hard-clamping to128MiB.
+  Checks stat size before reading and actual bytes afterwards; bounded read
+  still uses the lower of effective file limit and explicit remaining total
+  budget. Typed file-limit failures survive prepare-from-paths wrapping.
+  Policy-aware CSV profiling no longer imposes a second fixed128MiB cap;
+  no-policy callers retain the prior default. No total budget removed/raised.
+  New fictional temporary-file regression proves one-byte-over diagnostic and
+  recovery by editing the saved profile to the exact byte boundary, through
+  real prepare_csv_review_from_paths. Source/input suites45passed in2.00s;
+  Ruff and source mypy passed. GitHub confirms no open branch PR.
+  Next: CSV parser/scalar limit propagation, sibling execution-trace error
+  parity, output/query/worker limits; then scale acceptance. No scale claim,
+  live access, public activation, new CI or independent review launched.
+- 2026-09-28 18:34 heartbeat: no open branch PR; pending diff preserved.
+  Closed sibling private trace_csv_replacements diagnostic gap: requested cell
+  budget checked against effective policy/session ceiling; actual run exhaustion
+  raises typed limit_exceeded before generic trace validation. Recovery names
+  the correct replacement-trace max_cells argument, not the review-trace API.
+  Shared error accepts only fixed additional origin replacement_trace_run and
+  only for cell dimension; no arbitrary diagnostic text or source values.
+  Six affected trace regressions passed in0.33s; new above-ceiling regression
+  passed1 in0.29s. Ruff, production mypy and diff check passed. Configuration
+  reference updated. No CI, public activation or scale claim. Next: parser/scalar
+  propagation and output/query/worker budgets, then measured full CSV acceptance.
+- 2026-09-28 18:39 heartbeat: no open PR, existing diff preserved. Parser audit
+  found stdlib csv.field_size_limit is process-global; _csv_reader_from_snapshot
+  sets it from legacy config, while _csv_sensitive_value_type independently
+  reads legacy max_input_cell_chars during accumulation and finalization.
+  Raising only that global would not provide per-reader isolation. No global
+  mutation/guard removal implemented. This is implementation work, not a new
+  owner decision or reason to pause automation. Existing source-free isolation
+  regression previously set three low limits together, proving only the first
+  rejection. Split into independent row/column/cell subprocess cases:3passed;
+  Ruff passed. No product monkeypatch, external access, scale claim or CI.
+  Next: explicitly propagate scalar budget through sensitivity/finalization,
+  and use a coordinated parser-limit scope across internal CSV readers before
+  claiming per-session/profile scalar recovery. Output/query budgets remain.
+- 2026-09-28 explicit owner fix request: implemented scoped stdlib CSV reader
+  with per-reader character budget, shared internal read lock and finally-based
+  global-limit restoration. Routed snapshot/folder/dataset/safety/mapping CSV
+  readers through it; no internal direct readers remain outside the wrapper.
+  Private source decoder passes the effective character limit and typed overflow
+  callback; failure counts the first forbidden character, not unread field tail.
+  CSV accumulator, semantic inference and masked-pattern finalization now carry
+  the explicit scalar budget instead of re-reading legacy env. Native private
+  profiling passes that budget too. Source-free defaults and sensitivity checks
+  retained; no new dependencies, public activation or external access.
+  Tests: affected input/source/CSV/mapping/safety suites130passed in5.17s;
+  two new tests passed in0.93s (concurrent readers with differing limits/global
+  restoration, isolated raised private scalar limit with sensitivity detection
+  and unchanged source-free rejection). Ruff passed; mypy passed8 changed
+  production files. Folder-budget/distinct-overflow/dataset-command regressions
+  passed57 in1.32s; OpenSpec strict and diff check passed. Total189 checks across
+  these three nonoverlapping test runs. Changes remain local pending the coherent
+  resource-budget increment; no CI or duplicate independent review launched.
+  Next: output/query/worker effective budgets and measured full scale acceptance;
+  scalar-parser conflict fixed, no 300k x50 completion claimed.
+- 2026-09-28 continued: separate resource_limits.max_output_bytes and session
+  TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES now bound private CSV execution
+  (default512MiB, legacy output env fallback). Removed hidden128MiB input-cap
+  reuse: explicit requested output budget must fit effective output ceiling;
+  actual encoded header/row overflow reports bytes and output_run recovery.
+  Typed error survives temporary publication/command cleanup; no partial output.
+  Initial affected execution suite267passed/8failed: failures expected old
+  generic exceptions. Updated those assertions/subprocess adapter:7passed on
+  focused retry; one missed assertion then corrected. Final focused8passed
+  includes exact profile boundary/rejection, preserved input files and tamper
+  guard. Small-output test accepts a requested budget above128MiB; this is NOT
+  evidence of producing a128MiB artifact or scale acceptance. Ruff/mypy passed.
+  Updated config reference. Next: final-format/bundle limits and SQL/worker
+  propagation, then measured300k x50 acceptance. No public activation or CI.
+- 2026-09-28 18:52 heartbeat: branch/diff preserved, no open PR confirmed.
+  Final SQL/Parquet encoding and bundle bytes now report typed output-limit
+  errors with fixed origin and correct run parameter. Bundle counts payload
+  plus manifest and rejects before staging/publication. Publisher's effective
+  output ceiling remains checked by execution; standalone encoders retain
+  their explicit budgets (no policy argument or hidden ambient increase).
+  Execution/publication suite275passed/1failed because bundle test still
+  expected generic error; updated assertion. Focused5passed in0.52s, including
+  new SQL/Parquet exact-byte boundary and one-byte-under rejection. Ruff passed;
+  no real SQL execution, public activation, new CI or scale claim.
+  Next: SQL result capture/worker budget propagation, then measured scale
+  acceptance and coherent commit/PR. Existing safety review gates remain.
+- 2026-09-28 coherent CSV scale milestone completed, not another helper result.
+  Added opt-in fictional acceptance harness; 10x3 smoke first fixed harness-only
+  macOS temporary-path canonicalization (no product monkeypatch). Built/installed
+  local development wheel1.5.0, verified import from isolated target, then ran
+  300,000 x50 exactly once:15M cells passed in272.572s, output90,150,450 bytes.
+  Full profile → saved YAML/file review → private publication → ordered readback,
+  global/column precedence, no cascade, 100% replacement provenance, unchanged
+  input digest and cleanup passed. Exact wheel/commands/scope in
+  csv-scale-acceptance.md. Public execution/preservation remain gated; this is
+  neither all12 routes nor1M x100 nor RC release. No real DB/API/private data.
+  Full offline regression2557passed+2 environment failures (system Git exit69);
+  reran only those2 with Homebrew PATH, both passed.10 live integration tests
+  deselected; coverage90.99% exceeds85%. Full Ruff/mypy135files/compileall,
+  OpenSpec strict and diff checks passed. Capacity docs/checklist reconciled;
+  older helper-level progress above is historical. Next: one signed commit/PR,
+  consume its CI without duplicate runs, then SQL/worker and public-interface
+  scope. No new safety review required for each ordinary commit; activation
+  and final exact-SHA independent review remain mandatory.
