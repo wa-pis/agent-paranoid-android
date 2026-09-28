@@ -1,5 +1,18 @@
 # Tasks: selective-source-transformation
 
+## Owner scope correction — 2026-09-28
+
+The owner clarified that aggregates belong to allowlisted, bounded SQL queries
+executed by the database. Transformation consumes their result tables; aggregate
+columns are ordinary input fields. An internal formula engine, SQL-to-formula
+translation, recomputation of financial totals/balances and nullable-formula
+semantics are NOT required for 1.6.0rc1. Earlier text implying that requirement
+was an assistant scope expansion and is superseded by this correction, not a
+record of owner authorization. Existing private derive code/tests are historical
+implementation evidence, not release gates or authorization for public activation;
+existing source-free generation remains unchanged. Key mapping, one-to-one rows,
+exact numeric types, sensitivity controls and SQL budgets remain in scope.
+
 Budget-aware continuation: [remaining-work reconciliation and next complete
 deliverable](resumption-plan.md). Existing checkboxes retain their acceptance
 meaning; the reconciliation does not mark partial implementations complete.
@@ -113,7 +126,8 @@ All items below remain unverified until reproduced against the current candidate
   add execution authority or mark this complete from packaging alone.
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
-- [ ] Implement consistent key mapping and declared derived-value computation.
+- [ ] Implement consistent key mapping; internal derived-value computation is
+  excluded by the latest owner clarification (existing checks below historical).
   - [x] Reject malformed/aggregate derive expressions and dependency disagreement
     through bounded shared parsing before review/save; no evaluation yet.
 - [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
@@ -150,7 +164,8 @@ All items below remain unverified until reproduced against the current candidate
   values. Equality safety guards remain independent; origin is not anonymity or
   permission to preserve source data.
 - [ ] Add an end-to-end fictional finance fixture: preserved product/segment/
-  bank combinations, replaced amounts, recalculated totals, mapped identifiers.
+  bank combinations, replaced amounts, mapped identifiers and SQL aggregate
+  result columns as ordinary inputs, without internal total recomputation.
 - [ ] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping
   domains, deterministic replay and infeasible constraints.
 - [ ] Cover schema drift, sensitivity conflicts, leaks through reports/errors,

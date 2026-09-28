@@ -3686,3 +3686,61 @@ Broader transformation remains unfinished.
   and diff checks passed. Runtime unchanged, no new independent review needed.
   Next: publish this acceptance-test slice through normal PR gates, then address
   declared cross-row relationship validation (not proven by repeated-ID mapping).
+- Signed acceptance checkpoint 32ae21b pushed; PR #586 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/586. CI pending; no duplicate
+  runs or reviews. Next: consume required checks, normal merge after green gates.
+- PR #586 snapshot: Python 3.12/3.13 still running; no failed completed checks.
+  Read-only next-scope audit: BehaviorPolicy has no general relationship or
+  constraint declaration yet. Executor final validation only checks referenced
+  generation specs, not all mixed-origin fields. Existing Relationship model is
+  single-column; composite-key support must not be inferred from repeated-ID tests.
+  Reuse existing validators where compatible, but do not pass mixed-origin output
+  through generation modes that can skip constraints (MIXED/NEGATIVE). No runtime
+  changes or tests in this audit. Next after CI/merge: define bounded private
+  final-output constraint binding and fail-closed tests under the approved design;
+  unresolved formula-null/DATETIME equivalence remain excluded.
+- PR #586 merged normally at 2026-09-27T22:01:45Z, merge SHA
+  a9d0a089387d6593b429c54e0dad542c8ce3644c. All CI SUCCESS/SKIPPED,
+  required checks passed, CLEAN, GitHub head signature verified.
+- Validator reuse audit found two concrete incompatibilities with the approved
+  transformation contract: generation relationship_validator treats empty string
+  as missing for nullable keys; constraint_validator converts financial sums and
+  comparisons through float with fixed tolerance. Do not reuse these paths for
+  exact mixed-origin DECIMAL or explicit-null transformation semantics. Existing
+  source-free validators are not changed by this audit. Next implementation must
+  use bounded exact arithmetic and explicit typed key/null handling, bind declared
+  constraints to the reviewed policy, and validate final output before publication.
+  This is implementation work under the approved contract, not evidence of full
+  relationship support; no new null/formula or DATETIME equality decision inferred.
+- Paused automation for the explicitly unresolved product decision now needed
+  for nullable financial formulas/aggregates. Owner CSV null encoding approval
+  does not define arithmetic semantics. Proposed conservative rule: any null
+  operand or null amount in a declared aggregate rejects before publication;
+  never implicitly use zero or skip a row. Await owner confirmation or an explicit
+  alternative. Existing non-null finance evidence remains valid; no failed check
+  or new runtime change claimed. Resume after decision, implement exact totals
+  with executable null cases, preserve full RC scope.
+- Owner clarified aggregates refer to SQL queries/results, not an internal
+  formula engine, then explicitly requested continuation and automation resume.
+  Prior formula-null blocker withdrawn. Scope correction recorded in plan,
+  tasks, design, policy contract, acceptance, resumption and normative scenario.
+  Existing private code retained; no public activation. Feedback provenance for
+  findings 18/23 still requires original-source audit; it does not automatically
+  authorize new features. Next: inspect original anonymized feedback read-only,
+  then continue bounded SQL-result/common-core integration on fictional data.
+- Original feedback audit completed read-only: refreshed Downloads archive hash
+  matches recorded 77da07dc...6f6e5. Brief 18 asks SQL SELECT-expression consistency
+  in profile/spec/generation OR explicit rejection when unsupported, not a general
+  internal totals engine. Brief 23 reports DECIMAL -> FLOAT precision loss.
+  Evidence summarized in client-acceptance.md with original line references.
+  No scripts/live DB/tests run; no new requirement inferred. Next: reconcile the
+  existing unsupported-expression rejection path against finding 18, then bounded
+  SQL-result adapter integration; do not reinstate formula-null as RC blocker.
+- Read-only finding-18 trace: validated query retains output field names and
+  safe temporal projection flags, but no general expression dependency metadata
+  in that boundary. This is not runtime reproduction or a closed finding.
+  Keep aggregate profiling and captured-result transformation separate; do not
+  reject allowed SQL profiling globally to substitute for generation acceptance.
+  Scope clarification staged on codex/1-6-sql-scope from merged main, preserving
+  all local documentation edits. Next: publish scope/provenance correction, then
+  add a fictional focused dependency-loss probe at profile-to-spec boundary.

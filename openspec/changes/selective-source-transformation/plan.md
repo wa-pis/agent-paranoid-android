@@ -1,5 +1,18 @@
 # Proposed Implementation Milestones
 
+## Owner scope correction — 2026-09-28
+
+The owner clarified that aggregates belong to allowlisted, bounded SQL queries
+executed by the database. Transformation consumes their result tables; aggregate
+columns are ordinary input fields. An internal formula engine, SQL-to-formula
+translation, recomputation of financial totals/balances and nullable-formula
+semantics are NOT required for 1.6.0rc1. Earlier text implying that requirement
+was an assistant scope expansion and is superseded by this correction, not a
+record of owner authorization. Existing private derive code/tests are historical
+implementation evidence, not release gates or authorization for public activation;
+existing source-free generation remains unchanged. Key mapping, one-to-one rows,
+exact numeric types, sensitivity controls and SQL budgets remain in scope.
+
 Implementation and 1.6.0rc1 publication authorized by the user on 2026-09-24
 (Europe/Samara). Use sequential signed PRs and green CI/CD. Independent AI
 review applies to the final exact RC SHA and safety-policy changes, not every PR.
@@ -64,8 +77,9 @@ repair instructions, live integrations or a weaker safety boundary.
    mode/ratio parity (25); batch doctor diagnostics (20). Track Trino auth (21)
    behind an explicit configuration/secret-source decision.
 3. **CSV vertical slice.** One-to-one rows, preserved reference combinations,
-   replaced financial values, scoped substitutions, consistent keys and derived
-   totals through a saved policy before adding interactive UI. The first
+   replaced financial values, scoped substitutions and consistent keys through
+   a saved policy before adding interactive UI. SQL aggregates are computed by
+   the authorized query, not an internal formula engine. The first
    executable replacement primitive is a table of unconditional exact-text
    pairs (`true` -> `false`, `001` -> `1`): no inferred source/target type or
    numeric conversion. Support file-wide and per-column tables together in

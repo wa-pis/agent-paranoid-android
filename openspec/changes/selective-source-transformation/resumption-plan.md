@@ -1,5 +1,17 @@
 # Resume plan — 2026-09-26
 
+## Owner clarification and resume — 2026-09-28
+
+SQL aggregates are computed by the authorized database query; result columns
+are ordinary transformation inputs. Internal formula/total/balance recomputation
+is not a required RC feature under the latest owner clarification. Earlier
+formula milestones below are historical and superseded for release gating.
+Audit original feedback findings 18/23 separately to distinguish existing bugs
+from new-feature proposals; do not infer new formula authority from feedback.
+Do not delete existing code or expose private derive paths. Formula-null is not
+a blocker for remaining SQL-result, mapping, interface and acceptance work.
+The owner explicitly requested autonomous continuation and automation resume.
+
 Budget checkpoint: user reports 5% weekly allowance remaining. This document
 reconciles existing evidence only; no new implementation, tests, CI or review.
 Full 1.6.0rc1 scope remains unchanged. Stable 1.6.0 is not authorized.

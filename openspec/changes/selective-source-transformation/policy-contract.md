@@ -1,5 +1,18 @@
 # Behavior Policy Contract — Review Draft
 
+## Owner scope correction — 2026-09-28
+
+The owner clarified that aggregates belong to allowlisted, bounded SQL queries
+executed by the database. Transformation consumes their result tables; aggregate
+columns are ordinary input fields. An internal formula engine, SQL-to-formula
+translation, recomputation of financial totals/balances and nullable-formula
+semantics are NOT required for 1.6.0rc1. Earlier text implying that requirement
+was an assistant scope expansion and is superseded by this correction, not a
+record of owner authorization. Existing private derive code/tests are historical
+implementation evidence, not release gates or authorization for public activation;
+existing source-free generation remains unchanged. Key mapping, one-to-one rows,
+exact numeric types, sensitivity controls and SQL budgets remain in scope.
+
 Internal execution design with a read-only local CLI review step; not permission
 to execute source-preserving transformations. Existing DatasetProfile/DatasetSpec
 schemas and source-free generation remain unchanged.
