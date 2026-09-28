@@ -3800,3 +3800,14 @@ Broader transformation remains unfinished.
   fingerprint behavior. No runtime changes since previous focused passes.
   Preparing signed ordinary bugfix PR; no safety-policy relaxation, SQL widening,
   new formula engine or public mixed-origin execution. Next: consume CI gates.
+- Signed e2095e1 pushed; PR #588 opened and attached:
+  https://github.com/wa-pis/agent-paranoid-android/pull/588. CI pending, no duplicate
+  runs. Next: required/all checks then normal merge; continue SQL-result path.
+- CI found two follow-ups: legacy fingerprint test constructed its old payload
+  from current model and retained the new null marker; fixed fixture to omit it
+  (focused test passed). Trino installed-example query used upper(name), now an
+  intentionally unsupported inference input; successful generation example now
+  uses direct alias, with explicit limitation documented. No safety guard relaxed.
+  Trino CI uses its existing isolated TPCH container; no local/live DB accessed.
+  Next: finish current CI run before pushing correction to avoid overlapping
+  runs, then consume corrected CI. No manual reruns or merge while red.

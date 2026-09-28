@@ -58,6 +58,7 @@ def test_persisted_profile_keeps_legacy_fingerprint(tmp_path):
     ])])
     legacy = profile.model_dump(mode="json")
     legacy.pop("local_category_fields")
+    legacy.pop("has_unmodeled_expressions")
     legacy["entities"][0]["fields"][0].pop("unique_ratio_kind")
     expected = hashlib.sha256(json.dumps(legacy, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     path = tmp_path / "profile.json"
