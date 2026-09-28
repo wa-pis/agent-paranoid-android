@@ -87,7 +87,7 @@ def trace_csv_replacements(
         def events() -> Iterator[TextTraceEvent]:
             for row_number, row in enumerate(reader, 1):
                 budget.check("CSV replacement trace")
-                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                     raise ValueError
                 for column_number, name in enumerate(names, 1):
                     budget.check("CSV replacement trace cell")
@@ -130,16 +130,16 @@ def replace_csv_snapshot(
         field_types.update({name: FieldType.DECIMAL for name in decimal_types})
 
         def scalar(name: str, value: Any) -> Any:
-            if policy.input_format == "parquet" and type(value) is date:
+            if policy.input_format != "csv" and type(value) is date:
                 return value.isoformat()
-            if policy.input_format == "parquet" and field_types[name] == FieldType.BOOLEAN:
+            if policy.input_format != "csv" and field_types[name] == FieldType.BOOLEAN:
                 if type(value) is bool:
                     return value
                 parsed = parse_bool(value)
                 if parsed is None:
                     raise ValueError
                 return parsed
-            if policy.input_format == "parquet" and type(value) in (int, float):
+            if policy.input_format != "csv" and type(value) in (int, float):
                 return value
             if name in decimal_types:
                 shape = decimal_types[name]
@@ -208,7 +208,7 @@ def replace_csv_snapshot(
             if isinstance(action, SynthesizeAction):
                 continue
             if isinstance(action, SubstituteAction):
-                if field_types[decision.field] == FieldType.BOOLEAN and policy.input_format != "parquet":
+                if field_types[decision.field] == FieldType.BOOLEAN and policy.input_format == "csv":
                     raise ValueError
                 if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL, FieldType.BOOLEAN) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction)):
@@ -331,7 +331,7 @@ def replace_csv_snapshot(
             null_fields: set[str] = set()
             coincident_zero_fields: set[str] = set()
             budget.check("CSV replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format == "parquet" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
                 raise ValueError
             for name in decimal_types:
                 if row[name] != policy.csv_nulls.input_token:
@@ -414,7 +414,7 @@ def replace_csv_snapshot(
                     == tuple(None if row[name] == policy.csv_nulls.input_token else row[name] for name in names)
                     or preserved_fields | coincident_zero_fields == set(names)):
                 raise ValueError
-            if policy.input_format == "parquet" and output_names == names and all(
+            if policy.input_format != "csv" and output_names == names and all(
                     same_native_value(row[name], None if name in null_fields else value)
                     for name, value in zip(output_names, replaced, strict=True)):
                 raise ValueError

@@ -247,14 +247,15 @@ def test_parquet_input_unsupported_native_values_fail_closed(values):
     pytest.param("date", [None, date(2026, 2, 3)], [date(2027, 3, 4), None], id="nullable-date"),
     ("decimal", [Decimal("1.25"), Decimal("2.50")], [Decimal("7.50"), Decimal("8.25")])])
 @pytest.mark.parametrize("output_format", ["csv", "parquet", "postgresql_sql"])
-def test_parquet_native_numeric_substitution(kind, values, replacements, output_format):
+@pytest.mark.parametrize("input_format", ["parquet", "postgres_query", "trino_query"])
+def test_parquet_native_numeric_substitution(kind, values, replacements, output_format, input_format):
     pa = pytest.importorskip("pyarrow")
     pq = pytest.importorskip("pyarrow.parquet")
     from test_data_agent.io.transformation_source import _profile_transformation_source
     from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
     original = request()
     policy = yaml.safe_load(next(p.payload for p in original.parts if p.kind == "policy"))
-    policy["input_format"] = "parquet"
+    policy["input_format"] = input_format
     policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": {
         "kind": "inline", "entries": [{"original": [str(a) if a is not None and kind in {"decimal", "date"} else a],
                                         "replacement": [str(b) if b is not None and kind in {"decimal", "date"} else b]}
@@ -277,9 +278,14 @@ def test_parquet_native_numeric_substitution(kind, values, replacements, output_
     pq.write_table(pa.table({"flag": ["true", "false"], "code":
         pa.array(values, type=pa.decimal128(5, 2)) if kind == "decimal" else values}), buffer)
     source = SnapshotPart("source", "items", buffer.getvalue())
+    if input_format != "parquet":
+        from test_data_agent.io.transformation_query_snapshot import _capture_query_result
+        source = _capture_query_result(buffer.getvalue(), adapter=input_format,
+            query_sha256="a" * 64, entity="items")
     parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
     profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
     assert profile.entities[0].fields[1].data_type.value == kind
+    assert profile.source_type == input_format
     policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
         tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv"),
@@ -299,6 +305,20 @@ def test_parquet_native_numeric_substitution(kind, values, replacements, output_
             if replacements[1] is None:
                 literal = "NULL"
             assert f"VALUES ('yes', {literal});" in (output / "dataset.sql").read_text()
+    assert not output.parent.exists()
+    if input_format != "parquet" and kind == "integer" and output_format == "csv":
+        changed_source = _capture_query_result(buffer.getvalue(), adapter=input_format,
+            query_sha256="b" * 64, entity="items")
+        changed = prepare_csv_review_request(yaml.safe_dump(policy).encode(), changed_source,
+            tuple(p for p in original.parts if p.kind == "mapping" and p.name == "all.csv"),
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+        assert changed.snapshot_sha256 != material.snapshot_sha256
+        tampered = replace(material, parts=tuple(changed_source if p.kind == "source" else p
+            for p in material.parts))
+        with pytest.raises(publisher.TransformationPublicationError):
+            with publisher.temporary_csv_publication(tampered, max_total_bytes=8192,
+                    max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5)):
+                pytest.fail("changed query identity published")
 
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])

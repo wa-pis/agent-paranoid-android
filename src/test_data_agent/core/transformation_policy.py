@@ -252,7 +252,7 @@ class ParquetOutput(TypedOutput):
 
 class BehaviorPolicy(_PrivateModel):
     schema_version: Literal["0.1"]
-    input_format: Literal["csv", "parquet"] = Field(default="csv", repr=False)
+    input_format: Literal["csv", "parquet", "postgres_query", "trino_query"] = Field(default="csv", repr=False)
     schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
     seed: StrictInt = Field(repr=False)
     csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)

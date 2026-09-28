@@ -16,6 +16,7 @@ from test_data_agent.core.transformation_policy import BehaviorPolicy
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, validate_csv_headers, parse_bool
+from test_data_agent.io.transformation_query_snapshot import _query_result_payload
 
 
 @dataclass(repr=False)
@@ -39,14 +40,17 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
             raise ValueError("native match format cannot reformat CSV text")
         return _csv_reader_from_snapshot(source.payload)
     if policy.csv_nulls.input_token is not None:
-        raise ValueError("Parquet input cannot use a CSV null marker")
+        raise ValueError("native input cannot use a CSV null marker")
+    payload = source.payload
+    if policy.input_format in {"postgres_query", "trino_query"}:
+        payload = _query_result_payload(payload, policy.input_format)
     try:
         import pyarrow as pa
         import pyarrow.parquet as pq
     except ImportError:
         raise ValueError("Parquet input requires the parquet extra") from None
     try:
-        parquet = pq.ParquetFile(io.BytesIO(source.payload))
+        parquet = pq.ParquetFile(io.BytesIO(payload))
         enforce_parquet_metadata_limits(parquet.metadata, label="transformation Parquet")
         schema = parquet.schema_arrow
         names = validate_csv_headers(schema.names)

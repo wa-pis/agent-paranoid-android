@@ -37,6 +37,17 @@ Completion requires all 4 input kinds x 3 output kinds, not CSV-only acceptance.
 For query results, preserve the captured snapshot order; do not promise stable
 database order across executions without an explicit ordering contract.
 
+Private captured-result increment (2026-09-28): `postgres_query` and
+`trino_query` drafts consume a versioned in-memory envelope containing adapter,
+query SHA-256 and typed Parquet bytes. Parquet is an internal encoding only;
+the selected source remains a query result. The full envelope (including schema,
+row order and nulls) participates in the existing exact-byte snapshot binding.
+This is fictional closed-executor development, not a database row-fetch adapter,
+query authorization proof, aggregate recomputation or public activation. The
+capture helper accepts already captured bytes and opens no database. Before
+activation, separately implement and verify authorized bounded capture and
+bind its authorization context; a caller-supplied query hash grants no access.
+
 Concrete next adapter increment: CSV -> SQL-script using existing PostgreSQL
 identifier/literal encoding. First separate the validated logical result from
 CSV rendering, retaining null provenance and exact values. Do not parse output
