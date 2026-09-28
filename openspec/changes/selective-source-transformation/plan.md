@@ -2,6 +2,19 @@
 
 ## SQL aggregate implementation authorized — 2026-09-28
 
+Private capture increment: authorize the frozen table/column scope before a
+dedicated injected typed-batch stream, then enforce row/cell/decoded-byte and
+serialized-byte caps, schema/nullability identity and cooperative deadlines.
+Bind query policy/fingerprint, source/entity, frozen allowlists, limits and
+schema into the captured bytes. Exercise both query identities through all
+three temporary output formats on fictional streams. This is not a live DB
+adapter: backend read-only, scan/statement/transport limits and cancellation
+still require dedicated driver integration before activation. A local deadline
+cannot interrupt a blocked callback or bound its pre-return allocation. Do not
+reuse aggregate-only profiler callbacks as result streams. The initial closed
+capture rejects sensitive-name metadata conservatively, even when unused;
+it grants no declassification or preservation authority.
+
 The owner approved SUM/COUNT/MIN/MAX/AVG and optional GROUP BY for the existing
 single-table allowlisted SQL source. The prior decision blocker is resolved.
 Implement the bounded subset in shared SQL authorization, not a formula engine;
