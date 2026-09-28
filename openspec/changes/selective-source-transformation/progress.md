@@ -3845,3 +3845,50 @@ Broader transformation remains unfinished.
 - Final local checks: strict OpenSpec passed; mypy passed on all five changed
   production modules; 11 envelope tests passed after strict adapter-type guard.
   No full release gate or public activation claimed for this intermediate slice.
+- Signed/pushed c7e96c7fd358502f910ed3e894e31f2a5dd29613; PR #589 opened:
+  https://github.com/wa-pis/agent-paranoid-android/pull/589 . CI is queued/running;
+  no reruns or merge requested. Next heartbeat: consume this exact head's checks
+  before another push/PR; preserve this local progress entry.
+- PR #589 merged normally at 2026-09-28T15:34:31Z, merge SHA
+  440101eb54d30fd300c189d27d6d1025c6bb501b. All checks SUCCESS/SKIPPED;
+  required checks green, CLEAN, exact head signature verified. No bypass,
+  duplicate review or rerun. Private captured-result slice complete, not public
+  query access or RC acceptance. Next: reuse this worktree from merged main for
+  bounded authorized capture with fictional callbacks and explicit authorization
+  context binding; preserve the local progress entries when switching branches.
+- 2026-09-28 continuation: reused worktree on
+  codex/1-6-bounded-query-capture from 440101e; no new product changes/tests.
+  Found policy decision gap before SQL-result capture: sql_query_source.py
+  permits ABS/CAST/COALESCE/LOWER/ROUND/TRIM/UPPER only; AST allowlist excludes
+  aggregate functions and GROUP BY. Existing aggregate-only profiler issues
+  trusted internal aggregate wrappers, not caller aggregate authorization.
+  Owner clarified aggregate-result scope but no concrete SQL-policy expansion
+  is recorded. Do not silently add SQL capabilities or advertise aggregate-query
+  acceptance from the fictional pre-captured snapshots in #589.
+  Decision requested: permit a bounded single-table SELECT aggregate subset
+  SUM/COUNT/MIN/MAX/AVG with optional GROUP BY on allowlisted columns, retaining
+  existing exclusions (JOIN/CTE/subqueries/windows/arbitrary functions) and all
+  budgets? This is SQL authorization, not internal formula semantics.
+  Automation paused pending that decision; no live DB or external API access.
+  After decision: explicit policy/spec amendment, executable rejection/budget
+  tests and independent safety review before activation; continue capture work.
+- Owner decision 2026-09-28: explicitly approved the proposed SUM/COUNT/MIN/MAX/
+  AVG and optional GROUP BY subset for one allowlisted table. Decision blocker
+  resolved; recorded in policy-contract.md, plan.md and tasks.md. Existing SQL
+  exclusions, budgets, sensitive-data controls and independent safety-review
+  gate remain. No implementation/acceptance claimed by this decision entry.
+  Resume automation; next step is the shared SQL parser/authorization change
+  and fictional regression tests for both adapters, then exact-SHA safety review.
+  Current branch codex/1-6-bounded-query-capture retains local progress entries;
+  no other active PR/review or overlapping test run.
+- Implemented owner-approved aggregate subset in shared SQL authorization:
+  policy 1.1, explicit-column grouping, count-star distinct from row wildcard,
+  shape/nesting guards, sensitive-source alias rejection, COUNT(*) inference
+  capability marker. Existing adapter wrappers and budgets unchanged. Updated
+  baseline/delta OpenSpec, safety guide, concepts/troubleshooting and changelog.
+  Checks: 133 SQL source/profiling/adapter tests passed; after adding integrated
+  fictional grouped-profile and failure-propagation cases, 25 profiling tests
+  passed. Ruff, strict OpenSpec and diff checks passed. First mypy environment
+  lacked sqlglot; project-environment mypy passed (one production module).
+  Next: signed exact-SHA independent safety review before merge/activation.
+  No DB access or claim of source-result capture completion.

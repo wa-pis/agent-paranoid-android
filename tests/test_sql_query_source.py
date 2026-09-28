@@ -276,3 +276,63 @@ def test_query_limits_load_from_environment(monkeypatch: pytest.MonkeyPatch) -> 
         max_ast_depth=16,
         max_projected_columns=20,
     )
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("projection", ["SUM(amount)", "COUNT(*)", "COUNT(amount)",
+    "COUNT(1)", "MIN(amount)", "MAX(amount)", "AVG(amount)", "SUM(amount * 2)"])
+@pytest.mark.parametrize("grouped", [False, True])
+def test_allowed_aggregate_sources(tmp_path, adapter, projection, grouped):
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    sql = f"SELECT {'status, ' if grouped else ''}{projection} AS measured FROM {table}"
+    if grouped:
+        sql += " WHERE amount > 0 GROUP BY status"
+    plan = authorize_query_source(inspect_query_source(request(write_query(tmp_path, sql), adapter=adapter)), columns())
+    assert plan.output_fields == (("status", "measured") if grouped else ("measured",))
+    assert plan.has_unmodeled_expressions
+    assert "GROUP BY" in plan.sql if grouped else "GROUP BY" not in plan.sql
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("body", [
+    "SUM(SUM(amount)) AS measured FROM {table}",
+    "SUM(amount) + 1 AS measured FROM {table}",
+    "COUNT(amount, status) AS measured FROM {table}",
+    "SUM(*) AS measured FROM {table}",
+    "COUNT(o.*) AS measured FROM {table} o",
+    "status, SUM(amount) AS measured FROM {table}",
+    "SUM(amount) AS measured FROM {table} WHERE COUNT(*) > 1",
+    "status, SUM(amount) AS measured FROM {table} GROUP BY 1",
+    "status, SUM(amount) AS measured FROM {table} GROUP BY LOWER(status)",
+    "status, SUM(amount) AS measured FROM {table} GROUP BY status HAVING COUNT(*) > 1",
+    "SUM(amount) OVER () AS measured FROM {table}",
+    "COUNT(DISTINCT status) AS measured FROM {table}",
+    "status, SUM(amount) AS measured FROM {table} GROUP BY ROLLUP(status)",
+    "STRING_AGG(status, ',') AS measured FROM {table}",
+    "MAX(private_token) AS harmless FROM {table}",
+    "private_token AS harmless, COUNT(*) AS measured FROM {table} GROUP BY private_token",
+])
+def test_aggregate_expansion_keeps_rejection_boundary(tmp_path, adapter, body):
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    sql = "SELECT " + body.format(table=table)
+    with pytest.raises(SqlQuerySourceError) as caught:
+        authorize_query_source(inspect_query_source(request(write_query(tmp_path, sql), adapter=adapter)),
+            columns() + (QuerySourceColumn("private_token", "text", True),))
+    assert "private_token" not in str(caught.value)
+    assert sql not in str(caught.value)
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("sql", ["SELECT SUM(unlisted) AS measured FROM {table}",
+    "SELECT COUNT(*) AS measured FROM {table} GROUP BY unlisted"])
+def test_aggregate_columns_still_need_authorization(tmp_path, adapter, sql):
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    with pytest.raises(SqlQuerySourceError, match="unauthorized column"):
+        authorize_query_source(inspect_query_source(request(
+            write_query(tmp_path, sql.format(table=table)), adapter=adapter)), columns())
+
+
+def test_aggregate_ast_budget_is_not_relaxed(tmp_path):
+    path = write_query(tmp_path, "SELECT status, COUNT(*) AS measured FROM public.orders GROUP BY status")
+    with pytest.raises(SqlQuerySourceError, match="AST node budget"):
+        inspect_query_source(request(path, limits=SqlQueryProfileLimits(max_ast_nodes=3)))

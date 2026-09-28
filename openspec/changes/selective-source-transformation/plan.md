@@ -1,5 +1,15 @@
 # Proposed Implementation Milestones
 
+## SQL aggregate implementation authorized — 2026-09-28
+
+The owner approved SUM/COUNT/MIN/MAX/AVG and optional GROUP BY for the existing
+single-table allowlisted SQL source. The prior decision blocker is resolved.
+Implement the bounded subset in shared SQL authorization, not a formula engine;
+retain all other SQL exclusions and budgets. Add executable authorization,
+malformed-shape, resource and sensitivity regressions for both adapters, amend
+the baseline SQL spec/docs, and obtain independent safety review of the exact
+implementation SHA before activation. Fictional callbacks only, no live access.
+
 ## Owner scope correction — 2026-09-28
 
 The owner clarified that aggregates belong to allowlisted, bounded SQL queries

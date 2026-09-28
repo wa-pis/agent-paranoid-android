@@ -79,11 +79,18 @@ the table is wider than the intended profiling scope.
 ## SQL Query Source Rejected
 
 Pass one UTF-8 file to `profile-query`; SQL text is not accepted in an option
-or environment variable. The initial policy permits one fully qualified,
+or environment variable. SQL source policy 1.1 permits one fully qualified,
 single-table `SELECT` with explicit output aliases, bounded filters, and the
 documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
 window operations, table functions, comments, volatile/unknown functions,
 multiple statements, and unauthorized tables or columns.
+
+Aliased SUM/COUNT/MIN/MAX/AVG and explicit-source-column GROUP BY are allowed.
+Other selected columns must be grouping keys. Remove nested/wrapped aggregates,
+DISTINCT aggregates, HAVING, grouping expressions/ordinals and grouping sets.
+Sensitive-name source references remain blocked for grouped/aggregate queries,
+even with renamed outputs. An accepted aggregate profile is not permission to
+fetch result rows or automatically infer a dependency-preserving generation spec.
 
 The query file, AST, projected fields, and adapter work must remain inside all
 configured budgets. A changed file, unsupported type, malformed backend

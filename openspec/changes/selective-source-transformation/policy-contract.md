@@ -1,5 +1,19 @@
 # Behavior Policy Contract — Review Draft
 
+## Authorized SQL aggregate expansion — 2026-09-28
+
+The owner explicitly approved allowing SUM, COUNT, MIN, MAX and AVG, with
+optional GROUP BY on authorized columns, for a single allowlisted table.
+This resolves the SQL-policy decision blocker; it is not an internal formula
+engine request. Keep the existing exclusions for JOIN, CTE, subqueries, windows,
+arbitrary functions and writes, plus all statement/scan/result/time budgets.
+COUNT(*) counts rows; it must not authorize projection-star row disclosure.
+Grouping keys do not become non-sensitive merely because the result is grouped.
+Source-column authorization and sensitivity evidence must survive aliases.
+Implement explicit policy/spec amendments and executable positive/negative
+tests, then independent safety review before public activation. No live DB/API
+access, dataset approval or source-preserving public execution is authorized.
+
 ## Owner scope correction — 2026-09-28
 
 The owner clarified that aggregates belong to allowlisted, bounded SQL queries

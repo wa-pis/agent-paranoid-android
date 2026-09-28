@@ -82,6 +82,18 @@ remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
 
 ## Enforcement
 
+SQL source policy 1.1 permits aliased SUM/COUNT/MIN/MAX/AVG projections and
+optional GROUP BY on explicit authorized source columns of one physical table.
+COUNT(*) is a row count, never a projection wildcard. Non-aggregate projections
+must be grouping keys; nested/wrapped aggregates, HAVING, DISTINCT aggregates,
+grouping expressions/ordinals, ROLLUP and grouping sets remain rejected.
+Grouped/aggregate queries referencing sensitive-name source columns fail closed
+before derived queries, including aliases and predicate-only references.
+Existing table/column authorization, AST/statement/scan/result/time budgets and
+source-free profile wrappers apply unchanged. Grouping does not declassify values
+or authorize disclosure of small groups. Aggregate profiles do not support
+automatic dependency-preserving inference, including COUNT(*) without columns.
+
 Query profiles carry value-free `has_unmodeled_expressions` metadata. A
 source-dependent non-column projection marks the profile unsupported for
 automatic `infer_dataset_spec`; profiling itself remains permitted. Direct
