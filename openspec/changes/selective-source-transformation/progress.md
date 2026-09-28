@@ -3914,3 +3914,15 @@ Broader transformation remains unfinished.
   updated to1.1 (integration test expectations alone were insufficient).
   No safety check weakened, live local DB or manual CI rerun. Next: signed fix,
   changed-scope re-review and corrected PR CI before merge.
+- Signed fix 16eece3 pushed after previous CI completed. Same independent
+  reviewer assigned changed-scope re-review; do not duplicate. Corrected CI and
+  review pending. Additional checks: 49 documentation tests, Ruff, project mypy,
+  strict OpenSpec and diff check passed. Next: consume both gates, record exact
+  corrective-review evidence and only then ordinary merge.
+- Independent corrective review closed both High/Low findings at exact SHA
+  16eece3c9da8a92656fc423b8049a140045a5586; 20 independent fictional probes
+  passed, no additional changed-scope finding. Evidence prepared locally:
+  reviews/16eece3-ai-safety.md (AI, not human approval). CI now has no failures;
+  only Python3.11–3.14 pending, Trino integration correction passed. Do not
+  repeat review/tests. Next: after CI completes, commit/push evidence-only diff,
+  consume that head's required checks and ordinary merge. No overlapping CI.
