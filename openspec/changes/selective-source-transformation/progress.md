@@ -4256,3 +4256,86 @@ Broader transformation remains unfinished.
   Push only this documentation correction on the same PR, letting configured
   concurrency replace the old checks; no manual rerun/second PR or unchanged
   scale replay. Do not merge without subsequently confirmed green gates.
+- 2026-09-28 heartbeat: GitHub access recovered. PR #594 head
+  606ef3c062d855fbe192f10f596f8f93249ceac4 remains OPEN/BLOCKED: documentation,
+  wheel smoke/compatibility, optional and minimum dependencies, container
+  validations, CodeQL, dependency review, secret scan and Trino integration
+  are green; Python 3.11/3.12/3.13/3.14 checks are still in progress. No failed
+  checks reported. No local tests, scale acceptance or CI were restarted.
+  Next: consume those existing checks and merge normally only after all gates
+  are confirmed green. Keep this status note local until the next coherent
+  update rather than triggering another CI run for polling evidence.
+- 2026-09-28T19:17:11Z: PR #594 merged normally (squash) as
+  637065966c12584e11c9b437c1e8b8f8d708c0df after all reported checks completed
+  successfully (non-applicable jobs skipped), including all required checks.
+  GitHub confirmed head 606ef3c signature valid, MERGEABLE/CLEAN; merge pinned
+  to that exact head, no admin override or fabricated approval. The coherent
+  private CSV 300,000 x 50 milestone is now merged. No public execution or RC
+  release activated. Next coherent implementation scope: propagate independent
+  transformation limits through SQL capture/PostgreSQL worker boundaries and
+  preserve actionable safe diagnostics, without raising source-free budgets.
+- 2026-09-28: next branch codex/1-6-query-limits starts from merged6370659;
+  preserved local merge notes. Private query capture now resolves transformation
+  row/column/cell/encoded/expanded/scalar limits, binds effective settings and
+  origins in snapshot metadata, and checks explicit run requests before stream
+  access. Encoded accounting includes the exact query envelope. PostgreSQL no
+  longer borrows aggregate-profile row/cell limits; allowlists/read-only/time
+  settings remain unchanged. Supervisor validates requested limits before IPC
+  allocation and transports only fixed-schema bounded numeric diagnostics,
+  accepting them after clean exit/reaping; generic driver errors remain opaque.
+  Fictional end-to-end regression proves worker scalar overflow, session
+  override recovery, captured-source review, mapped temporary CSV and cleanup.
+  A requested10001-row capacity is accepted with default profiling settings;
+  that fixture returns TWO rows, not SQL scale evidence. No real DB, public
+  activation, new approval or source-free budget increase.
+  Checks: affected capture/snapshot/supervisor/input-limit suite100 passed;
+  final extended worker-to-publication scenario1 passed. Earlier four failures
+  were outdated generic-error/borrowed-byte-budget assertions, updated to the
+  accepted typed diagnostic and independent expanded-byte contract.
+  Focused Ruff, mypy(four adapter modules), strict OpenSpec, strict MkDocs and
+  git diff --check also passed. CSV scale/full regression were not repeated.
+  Next: finish SQL-result throughput/capacity evidence and remaining interface
+  activation gates; independent safety review of exact SHA before activation.
+- Owner-requested rest/pause, 2026-09-28: stop work and recurring automation.
+  Resume only on the owner's next instruction, not automatically tomorrow or
+  merely because a technical step is available. Current query-limit changes
+  remain local and uncommitted on codex/1-6-query-limits; checks recorded above.
+  At resumption, first reconsider the working approach with the owner: define
+  complete user-visible outcomes and acceptance gates before further coding,
+  rather than another sequence of small implementation/status increments.
+- 2026-09-29 owner-requested project-wide ADR collection completed locally:
+  docs/adr/index.md indexes28 records, covering all16 baseline OpenSpec
+  capabilities plus transformation and cross-cutting boundaries. Each records
+  context/decision/tradeoffs/evidence/revisit conditions; accepted decisions are
+  distinct from implementation or activation. Repository evidence links pin
+  merged6370659; no historical approval dates or fresh runtime passes invented.
+  open-questions.md separates4 unresolved decisions,5 implementation/evidence
+  gaps and6 documentary conflicts; formula-null is explicitly not an RC blocker.
+  Added template, contributor/agent routing and MkDocs navigation; annotated the
+  stale formula/scope prose without changing runtime or safety authority.
+  Validation:49 documentation tests passed initially; one MCP wording assertion
+  failed and passed after correction. New ADR coverage/traceability check passed.
+  All93 immutable repository links resolve in local Git; strict MkDocs, focused
+  Ruff and diff whitespace checks passed. Prior uncommitted SQL-limit work is
+  preserved, not merged/published by this task. Automation stays PAUSED.
+- 2026-09-29 owner resumed active work. Defined one complete next milestone
+  under ADR-0015/0024/0027: fictional PostgreSQL worker → profile → saved-policy
+  review → CSV publication → full300,000 x50 readback and cleanup. Initial small
+  fixture had an unqualified entity name; corrected the harness, not product.
+  A passing1,000 x50 smoke then exposed per-row Parquet groups (7,518,430 bytes).
+  Bounded row/estimated-byte batching fixed the cause without raising limits;
+  same smoke passed with25,653 bytes. Fetch-one/type/scalar/deadline/cleanup
+  enforcement retained; no hard RSS/wire guarantee added.
+  Installed-wheel large scenario PASSED:15M cells,217.623s,capture2,730,386 bytes,
+  output90,000,450 bytes. Full ordered replacements/provenance/source digest/
+  worker and file cleanup verified; aggregate-profile defaults unchanged.
+  Exact artifacts and scope: postgres-scale-acceptance.md. No real DB, public
+  activation, preservation approval or repeated unchanged CSV-scale test.
+  Focused capture/isolation66 passed; documentation50 passed; Ruff(all), mypy
+  (135 modules), compileall, strict OpenSpec/MkDocs and whitespace check passed.
+  Full offline milestone regression:2567 passed,10 live-service cases deselected,
+  coverage90.98% (gate85%),118.56s. Verified all133 Python files in the tested
+  wheel equal candidate source bytes. ADR collection signed as0cf3cb4; prepare
+  SQL/evidence commit and one PR, then consume required CI without duplicate
+  runs. Automation remains PAUSED, no duplicate work. Next functional outcome:
+  shared public workflow and activation evidence, not another isolated helper.

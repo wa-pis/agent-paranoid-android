@@ -7,6 +7,11 @@
   manifest/provenance and cleanup; see [evidence](csv-scale-acceptance.md).
   Public/multi-route and1M x100 acceptance below remain open.
 
+- [x] Private installed PostgreSQL-result worker → review → CSV acceptance
+  300,000 x50 with fictional injected driver, full readback and cleanup;
+  independent transformation limits and bounded row groups. See
+  [evidence](postgres-scale-acceptance.md). No live DB/public activation claim.
+
 - [ ] Support target 1,000,000 rows x100 columns across transformation routes;
   audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
 - [ ] Expose/document effective run/session and saved-profile resource settings,

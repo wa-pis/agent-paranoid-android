@@ -4,6 +4,8 @@ import multiprocessing
 import os
 import signal
 import time
+import csv
+import yaml
 from functools import partial
 
 import pytest
@@ -11,6 +13,8 @@ import pytest
 pytest.importorskip("pyarrow")
 
 from tests.test_transformation_query_capture import setup
+from test_data_agent.core.transformation_limits import TransformationLimitError
+from test_data_agent.core.transformation_policy import BehaviorPolicy
 from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
 from test_data_agent.postgres_config import PostgresConfig
@@ -188,9 +192,50 @@ def test_private_supervisor_rejects_unbounded_controls(tmp_path, seconds, byte_l
     def forbidden():
         pytest.fail("invalid controls opened driver")
 
-    with pytest.raises(ValueError, match="^invalid isolated PostgreSQL capture$") as caught:
+    expected = "requested_above_limit" if byte_limit == 1_000_000_000 else "^invalid isolated PostgreSQL capture$"
+    with pytest.raises(ValueError, match=expected) as caught:
         _capture_postgres_isolated(capture, driver_factory=forbidden, max_seconds=seconds)
     assert caught.value.__context__ is None
+
+
+def test_isolated_limit_diagnostic_and_session_recovery(tmp_path, monkeypatch, capfd):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
+    from test_data_agent.core.limits import GenerationBudget
+    from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
+    from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_request
+    from test_data_agent.io.transformation_publish import temporary_csv_publication
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    kwargs["max_rows"] = 10001  # Above profiling defaults; no profiling setting is raised.
+    kwargs["policy"] = BehaviorPolicy.model_validate({**kwargs["policy"].model_dump(),
+        "resource_limits": {"max_input_cell_chars": 4}})
+    capture = _PostgresCapture(request=request, config=_config(), **{
+        key: value for key, value in kwargs.items() if key not in {"allowed_tables", "budget"}})
+    stage = multiprocessing.get_context("spawn").RawValue("i", 0)
+    previous = {child.pid for child in multiprocessing.active_children()}
+    with pytest.raises(TransformationLimitError) as caught:
+        _capture_postgres_isolated(capture, driver_factory=partial(_driver, None, stage), max_seconds=5)
+    error = caught.value
+    assert (error.amount, error.limit, error.origin, error.code) == (5, 4, "profile", "limit_exceeded")
+    assert error.dimension.value == "max_input_cell_chars"
+    assert "TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_CELL_CHARS" in str(error)
+    assert "resource_limits.max_input_cell_chars" in str(error)
+    assert "alpha" not in str(error) and error.__context__ is None
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_CELL_CHARS", "5")
+    source = _capture_postgres_isolated(capture, driver_factory=partial(_driver, None, stage), max_seconds=5)
+    assert source.payload.startswith(b"APA-QUERY-1\npostgres_query\n")
+    profile = _profile_transformation_source(source, capture.policy, budget=GenerationBudget(5), max_bytes=16384)
+    policy = capture.policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    material = prepare_csv_review_request(yaml.safe_dump(policy.model_dump(mode="json")).encode(), source, (),
+        max_total_bytes=32768, max_review_bytes=8192, budget=GenerationBudget(5))
+    with temporary_csv_publication(material, max_total_bytes=32768, max_review_bytes=8192,
+            max_output_bytes=16384, budget=GenerationBudget(5)) as output:
+        with (output / "dataset.csv").open() as handle:
+            assert list(csv.DictReader(handle)) == [
+                {"label": "gamma", "measured": "8"}, {"label": "delta", "measured": "7"}]
+    assert not output.parent.exists()
+    assert {child.pid for child in multiprocessing.active_children()} == previous
+    assert "fictional driver diagnostic" not in capfd.readouterr().err
 
 
 def _cancellation_driver(stage, worker_pid):

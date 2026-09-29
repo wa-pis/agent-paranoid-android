@@ -100,10 +100,10 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Remaining request/worker boundaries still
+explicit per-run argument. Public request boundaries still
 need integration. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
-budgets, or SQL capture caps. Expanded-byte accounting is not a peak-RSS promise.
+budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
 
 Private CSV character limits reach parsing, sensitivity detection and profile
 finalization. Internal CSV readers coordinate the stdlib process-global field
@@ -127,7 +127,18 @@ also counts the manifest: `bundle_run` names
 `temporary_csv_publication(max_output_bytes=...)`. A bundle over budget is
 rejected before publication. These share the output ceiling when invoked by
 the publisher; standalone renderers only receive their explicit run budget.
-Query capture budgets remain separate.
+Private fictional query capture uses the same transformation input ceilings:
+`max_rows` / `max_bytes` must fit the effective row / input-file-byte limits
+before opening its stream. Runtime exhaustion names `query_rows_run` or
+`query_bytes_run` and the corresponding `_capture_authorized_result` argument.
+Captured bytes include the query envelope; decoded bytes have their own
+`max_parquet_expanded_bytes` ceiling. The resolved limits and their origins
+are bound into capture metadata. PostgreSQL's private stream uses these
+authorized capture limits, not aggregate-profiling result-row/cell budgets;
+allowlists, read-only sessions and existing statement/time limits remain.
+The private process supervisor reconstructs only validated fixed-schema limit
+diagnostics after clean worker exit and cleanup, never driver exception text.
+This does not activate public execution or establish real-database evidence.
 
 The private replacement dry-run has the same checks. Its exhausted run budget
 reports origin `replacement_trace_run` and names

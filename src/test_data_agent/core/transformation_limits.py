@@ -40,7 +40,9 @@ class TransformationLimitError(InputLimitError):
         if (type(dimension) is not InputDimension or type(amount) is not int
                 or type(limit) is not int or not 0 <= amount <= 2**63 - 1
                 or not 0 < limit <= 2**63 - 1
-                or origin not in {"default", "profile", "session", "legacy_session", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run"}
+                or origin not in {"default", "profile", "session", "legacy_session", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run", "query_rows_run", "query_bytes_run"}
+                or origin == "query_rows_run" and dimension is not InputDimension.ROWS
+                or origin == "query_bytes_run" and dimension is not InputDimension.BYTES
                 or origin in {"trace_run", "replacement_trace_run"} and dimension is not InputDimension.CELLS
                 or origin in {"output_run", "bundle_run", "sql_output_run", "parquet_output_run"} and dimension is not InputDimension.OUTPUT_BYTES
                 or type(requested) is not bool):
@@ -53,6 +55,8 @@ class TransformationLimitError(InputLimitError):
         self.session_setting = "TEST_DATA_AGENT_TRANSFORM_" + dimension.value.upper()
         self.profile_key = "resource_limits." + dimension.value
         self.run_setting = {"trace_run": "trace_csv_review_request(max_cells=...)",
+                            "query_rows_run": "_capture_authorized_result(max_rows=...)",
+                            "query_bytes_run": "_capture_authorized_result(max_bytes=...)",
                             "replacement_trace_run": "trace_csv_replacements(max_cells=...)",
                             "output_run": "replace_csv_snapshot(max_output_bytes=...)",
                             "bundle_run": "temporary_csv_publication(max_output_bytes=...)",

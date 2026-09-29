@@ -1,5 +1,17 @@
 # Resume plan — 2026-09-26
 
+## Latest completed private milestone — 2026-09-29
+
+Owner resumed work after the ADR collection. The installed private PostgreSQL
+worker → captured-source profile → saved-policy review → temporary CSV route
+passed300,000 x50 with full readback and cleanup in217.623s. Only a fictional
+injected driver was used; no live database or public activation. Exact wheel,
+harness and limits: [postgres-scale-acceptance.md](postgres-scale-acceptance.md).
+The next deliverable after this coherent PR is the remaining shared public
+interface/activation workflow, subject to existing executable safety evidence
+and exact-SHA independent review. Do not repeat accepted scale runs unchanged.
+Automation remains PAUSED to avoid overlapping active work.
+
 ## Latest completed private milestone — 2026-09-28
 
 Installed-wheel private CSV replacement route passed300,000 x50 (15M cells),
