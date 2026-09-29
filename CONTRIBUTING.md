@@ -74,6 +74,11 @@ openspec/changes/<change-id>/
 
 ## Boundary Changes
 
+- Read the relevant [Architecture Decision Record](docs/adr/index.md) before
+  changing a boundary. Record a changed decision in a successor ADR with its
+  authority, consequences and affected contracts; do not silently revise the
+  meaning of an accepted record. ADR acceptance does not replace safety tests,
+  OpenSpec updates, review or public activation gates.
 - Keep CLI parsing and presentation separate from application dispatch.
 - Keep MCP SDK loading, tool registration, and audit wrapping in transport
   modules.

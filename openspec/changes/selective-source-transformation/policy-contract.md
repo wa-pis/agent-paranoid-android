@@ -1,5 +1,13 @@
 # Behavior Policy Contract — Review Draft
 
+Decision navigation (recorded 2026-09-29): see the project-wide
+[ADR register](../../../docs/adr/index.md) and
+[known conflicts](../../../docs/adr/open-questions.md). This document contains
+historical implementation slices as well as dated owner decisions. Later
+explicit scope/provenance decisions govern conflicting earlier prose; old
+formula, retention and parser-status paragraphs do not create new authority or
+release blockers. ADRs do not activate the private execution path.
+
 ## Owner-approved scale and limit diagnostics — 2026-09-28
 
 Target workload for 1.6.0rc1 is 1,000,000 rows by 100 columns (100,000,000

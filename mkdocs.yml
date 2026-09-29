@@ -80,6 +80,8 @@ nav:
       - Container Deployment: operations/containers.md
   - Roadmap: roadmap.md
   - Maintainers:
+      - Architecture Decisions: adr/index.md
+      - Open Decisions And Discrepancies: adr/open-questions.md
       - Architecture: agent_design.md
       - Development: development.md
       - Release Process: release.md

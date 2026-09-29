@@ -1,5 +1,11 @@
 # Selective Transformation Safety Boundary — Local Operator Decision
 
+Scope note (2026-09-29): the owner's 2026-09-28 clarification removed internal
+formula/total recomputation from the 1.6 RC requirements; historical examples
+below do not reinstate it. See [ADR-0026](../../../docs/adr/0026-transformation-scope.md).
+All preservation, classification, exact-input approval, privacy and activation
+gates remain in force; see [ADR-0021](../../../docs/adr/0021-local-preservation-approval.md).
+
 This document proposes a scoped amendment, not an active exception to AGENTS.md.
 Do not enable source-preserving execution until this boundary, matching baseline
 specifications and executable safety checks have received independent review.
