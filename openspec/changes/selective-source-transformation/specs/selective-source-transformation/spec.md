@@ -4,6 +4,26 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Read-only transformation review parity
+
+CLI and generator MCP SHALL prepare the same value-free review and exact-byte
+snapshot identity for a saved local behavior policy and supported source
+snapshot. MCP SHALL enforce workspace paths and existing input, review and
+transport budgets, write no artifacts and mint no approval receipt.
+
+#### Scenario: Agent reviews a saved policy
+
+- **GIVEN** a fictional source snapshot and saved policy inside the workspace
+- **WHEN** `review_transformation` is called
+- **THEN** its review and snapshot digest equal CLI `transform-review`
+- **AND** no source/mapping values, database access, execution or approval occur
+
+#### Scenario: A review path escapes the workspace
+
+- **WHEN** source or policy paths resolve outside the configured workspace
+- **THEN** the tool rejects before reading those files
+- **AND** public transformation execution remains gated
+
 ### Requirement: Configurable capacity and actionable limit failures
 
 Transformation SHALL support a configured target workload of 1,000,000 rows

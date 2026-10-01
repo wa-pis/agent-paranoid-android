@@ -4,6 +4,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -83,6 +84,17 @@ def main() -> None:
                 assert review["snapshot_sha256"] == request.snapshot_sha256
                 assert review["status"] == "review_only"
                 assert all(value not in cli.stdout for value in ("alpha", "beta", "gamma", "delta"))
+                mcp = subprocess.run([sys.executable, "-c",
+                    "import json,sys; from test_data_agent.mcp_generator_server import review_transformation; "
+                    "print(json.dumps(review_transformation(sys.argv[1],sys.argv[2],sys.argv[3])))",
+                    source_path.name, policy_path.name, entity],
+                    env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(root)},
+                    capture_output=True, text=True, timeout=30, check=True)
+                mcp_review = json.loads(mcp.stdout)
+                assert mcp_review["status"] == "review_only"
+                assert mcp_review["snapshot_sha256"] == review["snapshot_sha256"]
+                assert mcp_review["review"] == review["review"]
+                assert all(value not in mcp.stdout for value in ("alpha", "beta", "gamma", "delta"))
                 summary = _run_temporary_transform(source_path, entity, policy_path,
                     expected_snapshot_sha256=request.snapshot_sha256, max_total_bytes=65536,
                     max_review_bytes=8192, max_output_bytes=32768, budget=GenerationBudget(10))
@@ -110,7 +122,7 @@ def main() -> None:
             assert not root.exists()
             passed.append(f"{input_format}->{output_format}")
     print(json.dumps({"status": "passed", "routes": passed,
-        "scope": "fictional small replacement workflow; CLI review and private execution; no DB"}))
+        "scope": "fictional small replacement workflow; CLI/MCP service review and private execution; no DB"}))
 
 
 if __name__ == "__main__":

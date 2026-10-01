@@ -4378,3 +4378,26 @@ Broader transformation remains unfinished.
   116 passed. No primary venv changes, no data/SQL policy changes or suppression.
   Push to existing #599 and consume fresh mandatory CI/container scans before
   normal merge. Basic route and scale evidence remain valid; not replayed.
+- 2026-10-01 PR #599 merged normally after all green CI at
+  36ebb424fd5268ba4759f59c74c4b875158d3691 (head f47667c).
+  Active checkout /private/tmp/apa-rc-workflow, branch codex/1-6-agent-review.
+  Added read-only review_transformation MCP service using the existing shared
+  review core, workspace confinement and bounded snapshots. No execution,
+  database connection, preservation receipt or generation-policy change.
+  Installed fictional 12-route acceptance now verifies CLI/MCP service review
+  digest parity before existing private execution, full readback and cleanup.
+  Evidence appended to route-workflow-acceptance.md; this is service parity,
+  not a claim of new-tool MCP wire acceptance or public activation.
+  Full offline regression: 2569 passed, 10 deselected, one documentation
+  inventory failure. Added missing tool entry; focused review/contracts/docs
+  rerun: 56 passed. Mypy, Ruff, strict MkDocs, strict OpenSpec and diff checks
+  passed. No unchanged large-scale replay. Next: SDK transport acceptance for
+  this tool, then one coherent PR; public execution still needs activation
+  evidence and independent safety review. Automation remains ACTIVE.
+- SDK stdio acceptance completed for the registered review_transformation tool:
+  successful result equals the shared request, outside-workspace input is
+  rejected and its fictional marker absent from wire response and stderr.
+  Existing source/policy bytes unchanged. Three focused review tests passed
+  with the real subprocess transport (no product monkeypatch). Prepare one
+  signed read-only review PR; consume CI before normal merge. Next functional
+  work remains complete public execution activation evidence under ADR-0020.

@@ -103,6 +103,7 @@ out of `cli.py` must not change those contracts.
 `mcp-generator-tools.json` freezes these generator tools:
 
 - `approve_dataset_plan`, `export_dataset`, `generate_dataset`
+- `review_transformation` (read-only local snapshot review; no execution or receipt)
 - `infer_dataset_spec`, `inspect_dataset_plan`, `plan_dataset`
 - `plan_trino_dataset`, `profile_csv`,
   `recover_dataset_plan`, `validate_dataset`

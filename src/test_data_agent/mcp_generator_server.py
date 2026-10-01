@@ -75,6 +75,23 @@ class WorkspacePathError(ValueError):
     """Raised when an MCP path escapes the configured workspace root."""
 
 
+def review_transformation(input_path: str, policy_path: str, table_name: str | None = None) -> dict[str, Any]:
+    """Review fixed local snapshots; no execution, DB access or approval receipt."""
+    from test_data_agent.core.limits import (
+        DEFAULT_MAX_TOTAL_INPUT_BYTES, DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
+    )
+    from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
+
+    source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
+    policy = resolve_workspace_path(policy_path, must_exist=True, expect_file=True)
+    _require_suffix(policy, {".yaml", ".yml"}, "behavior policy")
+    request = prepare_csv_review_from_paths(source, table_name or source.stem,
+        policy.parent, policy.name, max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+        max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget())
+    return {"operation": "review_transformation", "status": "review_only",
+            "snapshot_sha256": request.snapshot_sha256, "review": json.loads(request.review)}
+
+
 def profile_csv(input_path: str, output_path: str, table_name: str | None = None) -> dict[str, Any]:
     """Create a safe aggregate profile for one workspace CSV file."""
 
@@ -673,6 +690,7 @@ def _require_new_output(path: Path) -> None:
 
 
 _GENERATOR_MCP_TOOLS = (
+    review_transformation,
     profile_csv,
     infer_dataset_spec,
     plan_dataset,
