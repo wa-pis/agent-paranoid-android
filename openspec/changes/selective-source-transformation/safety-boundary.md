@@ -30,6 +30,49 @@ not bypassed through another path.
 
 ## Separate Surface
 
+### Activation contract under review (not enabled)
+
+The first shared execution entrance is a separately selected local-file
+transformation, not `generate`, `agent-approve`, profiling, or an advisor.
+Local interactive CLI alone may issue a receipt; noninteractive CLI and
+workspace-confined agent execution may consume an existing matching receipt.
+No agent/MCP approval operation, environment switch, or boolean may substitute
+for the controlling-terminal confirmation. The current candidate modules are
+unregistered; this amendment does not register them or approve a dataset.
+
+The entrance must reject unsupported actions/routes rather than silently use
+private implementations. In particular, private `derive` remains unavailable
+publicly under ADR-0026. Database query capture remains separately gated by
+read-only allowlists and shared budgets; a local-file receipt does not authorize
+a database connection or external API. Publication is a new local bundle,
+never overwrite or in-place mutation of source, policy, mapping or receipt.
+
+Before policy settings can be read, policy bytes and YAML parsing share the
+bounded session/default bootstrap ceiling. Once parsed, the existing resolver
+selects each transformation ceiling from session override, explicit saved
+profile setting, legacy session fallback, then default. An explicit run cap
+may only lower that effective ceiling; a larger request fails with
+`requested_above_limit`. Actual cumulative exhaustion fails with
+`limit_exceeded`. Total accounting includes policy, source, referenced mapping
+and generation-policy bytes, classification evidence and displayed review.
+Errors identify amount, threshold, units, configuration origin and supported
+recovery keys, never source literals. Source-free disclosure ceilings are
+separate and unchanged; there is no truncation or automatic budget increase.
+
+Publication requires all validation and manifest preparation before commit.
+On failure, cleanup is limited to captured identities owned by that invocation.
+If cleanup cannot be verified, a distinct sanitized cleanup-incomplete error
+must warn that output/staging may remain. The operator must inspect the exact
+destination and staging locations locally before retrying; neither automatic
+deletion of an unverified path nor an overwrite retry is authorized.
+
+Activation requires matching AGENTS.md, project safety documentation and
+baseline/OpenSpec amendments, executable positive/negative interface evidence,
+and independent AI safety review of the precise activation SHA. Review is
+labelled AI, not human GitHub approval; required branch protections still apply.
+All sensitivity, DECIMAL, exact-byte binding and residual privacy restrictions
+below survive activation unchanged.
+
 Existing generate/profile/advisor/MCP workflows remain source-free as documented.
 Neither a valid behavior policy nor a loaded mapping enables preservation there.
 The new explicitly selected transformation surface produces a mixed-origin,

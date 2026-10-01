@@ -9,6 +9,16 @@ rows to shuffle, duplicate, or export.
 
 ## Trust Boundaries
 
+Selective transformation is a separate, currently gated mixed-origin surface,
+not synthetic generation. Its inactive [activation contract](../../openspec/changes/selective-source-transformation/safety-boundary.md#activation-contract-under-review-not-enabled)
+requires local interactive approval of exact input/review bytes before any
+explicitly non-sensitive field can be preserved. Agent execution can only
+consume an existing matching receipt; it cannot issue or broaden approval.
+Sensitivity conflicts, unknown fields and default DECIMAL preservation remain
+blocked. Receipt integrity does not prove personhood or anonymity. Existing
+generation, profiling and default responses retain their source-free contracts.
+Private implementation review does not activate public registration.
+
 Treat all of these as untrusted:
 
 - CSV, JSON, YAML, and Parquet files;

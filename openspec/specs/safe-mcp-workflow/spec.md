@@ -32,6 +32,13 @@ read-only query operations.
 The generator MCP server SHALL resolve input and output paths inside an
 explicit workspace root.
 
+Separate selective-transformation activation SHALL NOT authorize preservation
+through existing generator tools. Its prospective workspace execution SHALL
+only consume matching local controlling-terminal receipts, never issue them.
+Private implementation review alone SHALL NOT activate registration; matching
+policy amendments, executable interface evidence and exact-SHA independent
+safety review SHALL remain required.
+
 #### Scenario: Path traversal is attempted
 
 - **GIVEN** a client provides `../`, absolute paths outside the workspace, or

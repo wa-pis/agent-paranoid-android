@@ -4704,3 +4704,30 @@ Broader transformation remains unfinished.
   unit instrumentation observes arguments but delegates to the real parser.
   Mypy source module/Ruff/diff-check pass. Next signed fix checkpoint and
   changed-scope independent disposition, then explicit activation amendments.
+- Parser fix signed as c0e1a0ef80ad0cff667a7d7419e515d785e5b48c;
+  same independent AI reviewer assigned only changed-scope disposition, active,
+  no duplicate. Added explicitly inactive activation contract to safety-boundary:
+  local-only receipt issuance, existing-receipt agent consumption, public derive
+  exclusion, admitted budget precedence/accounting, identity-limited cleanup
+  and cleanup-incomplete inspection/retry. No registration or data authority.
+  Next reconcile this contract with AGENTS/project safety/baseline deltas and
+  obtain exact-SHA amendment/activation review before enabling interfaces.
+- Independent AI changed-scope review of c0e1a0e completed:low bootstrap finding
+  closed by static inspection, no regression. Full disposition recorded in
+  publication-safety-review.md; tests not independently rerun. Reconciled the
+  inactive activation contract in AGENTS, project safety model and synthetic
+  generation baseline, preserving all registration gates and source-free rules.
+  Next finish matching MCP/baseline delta and executable gate evidence, sign
+  the amendment checkpoint and obtain independent amendment review; no public
+  registration or data authorization has occurred.
+- Strict baseline validation exposed a pre-existing missing scenario under
+  Nullable Relationships And Complete Field Bounds (present in HEAD before
+  this amendment). Added a scenario restating its existing nullable-FK contract;
+  no runtime change. Strict synthetic-generation and selective transformation
+  validation now pass; diff-check passes. No completed suites replayed.
+- Added matching safe-mcp-workflow delta and baseline clarification for inactive
+  activation: separate authority, local receipt consumption only, unchanged
+  source-free generator entrances, exact-SHA registration gates, typed snapshot
+  exhaustion and identity-limited cleanup-incomplete recovery. No tool added.
+  Next sign coherent amendment checkpoint with existing interface evidence and
+  independently review policy amendment before proceeding to public wiring.

@@ -123,3 +123,16 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
   supported-route and action boundaries (private derive stays unavailable),
   budget precedence/accounting and cleanup-incomplete recovery contract.
   This is neither human approval, activation authority nor final RC review.
+
+### Bootstrap correction disposition
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason, same identity.
+- UTC date: 2026-10-01.
+- Exact SHA: `c0e1a0ef80ad0cff667a7d7419e515d785e5b48c`.
+- Scope: correction and two parameterized unit cases versus `3ef89981`.
+- Low finding closed by static inspection; no changed-scope regression found.
+  Read and parse share admitted bootstrap.value; later cumulative checks remain.
+- Tests establish argument plumbing, not large-policy acceptance. Reviewer did
+  not independently run tests, lint, types or wheel execution; no writes.
+- Prior closures remain valid. Activation amendment and registration reviews
+  remain outstanding; no human approval, activation or final RC claim.

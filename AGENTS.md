@@ -53,6 +53,18 @@ destinations. This permits no real data access or dataset approval. Passing
 end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
 
+The activation amendment under review is defined in
+`openspec/changes/selective-source-transformation/safety-boundary.md`.
+Its separate local-file execution contract permits only local controlling-TTY
+receipt issuance and matching-receipt consumption by noninteractive/workspace
+execution. Private `derive`, database capture and external APIs are not enabled
+by that contract. Preserve source-free entrances and disclosure budgets;
+enforce complete snapshot totals and identity-limited publication cleanup.
+These instructions still do not activate execution: registration must wait for
+matching baseline amendments, executable interface evidence and independent
+safety review of the exact activation SHA. A review of private code alone does
+not satisfy review of the policy amendment or public registration.
+
 ## Engineering contract
 
 - Target Python 3.11+ and use typed Pydantic or dataclass models at module
