@@ -4731,3 +4731,17 @@ Broader transformation remains unfinished.
   exhaustion and identity-limited cleanup-incomplete recovery. No tool added.
   Next sign coherent amendment checkpoint with existing interface evidence and
   independently review policy amendment before proceeding to public wiring.
+- Gated activation amendment signed:d7a5296bb72f10f5412dbda956669077c1feeb14.
+  Independent AI PublicationBoundary-R1/Jason now reviews only safety-policy
+  amendment and enforceable activation conditions against accepted ADRs and
+  existing closed interface evidence. Active; do not duplicate. Prior parser
+  and publication findings stay closed. No public execution registered.
+  Next consume amendment disposition, then implement reviewed public wiring
+  with focused interface safety evidence and exact activation-SHA review.
+- Amendment AI review d7a5296 completed:boundary preserved, one low bootstrap
+  wording mismatch. Updated safety-boundary to describe explicit run bootstrap
+  and subsequent effective profile/session validation; no code/budget change.
+  Full review evidence recorded. Before registration, shared public action/route
+  enforcement must exclude private derive and actual installed registration
+  evidence must replace closed-candidate evidence. Next signed wording fix and
+  scoped disposition, then shared public-boundary enforcement; no activation.

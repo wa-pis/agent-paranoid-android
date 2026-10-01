@@ -48,10 +48,16 @@ a database connection or external API. Publication is a new local bundle,
 never overwrite or in-place mutation of source, policy, mapping or receipt.
 
 Before policy settings can be read, policy bytes and YAML parsing share the
-bounded session/default bootstrap ceiling. Once parsed, the existing resolver
+bounded session/legacy-session/default bootstrap ceiling. An explicit positive
+run cap replaces the default bootstrap before reading policy; when a session
+or legacy-session ceiling exists, that request is checked against it first.
+This permits a bounded run request above the default to read a profile declaring
+a larger ceiling, not automatic elevation of the effective profile ceiling.
+After parsing, the request is checked against the resolved effective ceiling
+and rejected if larger. Once parsed, the existing resolver
 selects each transformation ceiling from session override, explicit saved
 profile setting, legacy session fallback, then default. An explicit run cap
-may only lower that effective ceiling; a larger request fails with
+may equal or lower that effective ceiling; a larger request fails with
 `requested_above_limit`. Actual cumulative exhaustion fails with
 `limit_exceeded`. Total accounting includes policy, source, referenced mapping
 and generation-policy bytes, classification evidence and displayed review.

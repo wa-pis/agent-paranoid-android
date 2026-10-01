@@ -136,3 +136,24 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
   not independently run tests, lint, types or wheel execution; no writes.
 - Prior closures remain valid. Activation amendment and registration reviews
   remain outstanding; no human approval, activation or final RC claim.
+
+## Inactive activation amendment review
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason, same agent identity.
+- UTC date: 2026-10-01; exact SHA:
+  `d7a5296bb72f10f5412dbda956669077c1feeb14`.
+- Scope: amendment versus `c0e1a0e` in AGENTS, safety model/boundary,
+  synthetic-generation and safe-mcp baselines/delta, compared with ADR-0021/0026
+  and closed candidate evidence. Static read-only; no checks independently run.
+- Disposition: inactive amendment preserves owner-authorized safety boundary.
+  One low wording mismatch: explicit run cap may replace default bootstrap
+  before policy loading, then must pass the parsed effective-ceiling check.
+  Documented that existing behavior; no runtime change or new budget authority.
+  Changed-SHA amendment disposition remains pending.
+- Before registration: enforce named public action/route subset at the shared
+  boundary (private executor supports derive), installed actual CLI/MCP positive
+  and negative interface evidence, exact activation-SHA review and required
+  branch protections. Closed 25-pass evidence is not public registration proof.
+- Evidence: exact amendment diff, accepted ADRs, code and installed acceptance
+  log inspected. Dirty progress excluded. Prior parser/publication closures
+  unchanged. No human approval, product authority, activation or RC claim.
