@@ -18,6 +18,7 @@ from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.path_policy import (
     atomic_write_bytes, discard_staging_directory, make_staging_directory, publish_directory,
+    path_identity, remove_tree_if_identity,
 )
 from test_data_agent.io.transformation_execute import replace_csv_snapshot
 from test_data_agent.io.transformation_sql import render_transformation_sql
@@ -44,11 +45,17 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
             len(payload) + len(manifest), max_output_bytes, "bundle_run")
     budget.check("temporary transformation publication")
     staging = make_staging_directory(destination)
+    staging_identity = path_identity(staging)
     try:
         atomic_write_bytes(staging / filename, payload)
         atomic_write_bytes(staging / "manifest.json", manifest)
         budget.check("temporary transformation publication")
         publish_directory(staging, destination)
+    except BaseException:
+        # Rename may have committed before its directory fsync failed.
+        # Never remove a replaced or pre-existing destination.
+        remove_tree_if_identity(destination, staging_identity)
+        raise
     finally:
         discard_staging_directory(staging)
 
@@ -74,10 +81,9 @@ def _execute_reviewed_test_from_paths(
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget)
         if request.snapshot_sha256 != expected_snapshot_sha256:
             raise ValueError
-        _publish_reviewed_test_snapshot(request, destination, max_total_bytes=max_total_bytes,
+        manifest = _publish_reviewed_test_snapshot(request, destination, max_total_bytes=max_total_bytes,
             max_review_bytes=max_review_bytes, max_output_bytes=max_output_bytes,
             budget=budget, receipt_path=receipt_path)
-        manifest = json.loads((destination / "manifest.json").read_bytes())
         return {"status": "closed_test_completed", "snapshot_sha256": request.snapshot_sha256,
                 "provenance": manifest["provenance"]}
     except TransformationLimitError:
@@ -110,7 +116,7 @@ def _publish_reviewed_test_snapshot(
     request: ApprovalRequest, destination: Path, *, max_total_bytes: int,
     max_review_bytes: int, max_output_bytes: int, budget: GenerationBudget,
     receipt_path: Path | None = None,
-) -> None:
+) -> dict[str, object]:
     """Closed fictional-test execution; canonical review and receipts enforced."""
     try:
         result = replace_csv_snapshot(request, max_total_bytes=max_total_bytes,
@@ -137,28 +143,27 @@ def _publish_reviewed_test_snapshot(
             payload, filename = result.csv_bytes, "dataset.csv"
         if result.provenance is None:
             raise ValueError
-        manifest = json.dumps({"version": 2, "origin": "transformed_mixed",
+        summary: dict[str, object] = {"version": 2, "origin": "transformed_mixed",
             "output": policy.output.review_summary() if policy.output else {"format": "csv"},
             "privacy_notice": "Mixed-origin output may retain source information; not anonymized.",
             "fields": [{"entity": item.entity, "field": item.field,
                         "action": item.behavior.action,
                         "unmatched": getattr(getattr(item.behavior, "unmatched", None), "action", None)}
                        for item in policy.fields],
-            "provenance": asdict(result.provenance)}, ensure_ascii=True, sort_keys=True).encode("ascii")
+            "provenance": asdict(result.provenance)}
+        manifest = json.dumps(summary, ensure_ascii=True, sort_keys=True).encode("ascii")
         _publish_test_bundle(destination, filename, payload, manifest, budget,
                              max_output_bytes=max_output_bytes)
+        return summary
     except TransformationLimitError:
         raise
     except (OSError, ValueError, TypeError, AttributeError, StopIteration):
-        failed = True
-    else:
-        failed = False
-    if failed:
-        try:
-            raise TransformationPublicationError("invalid temporary transformation publication")
-        except TransformationPublicationError as error:
-            error.__context__ = None
-            raise
+        pass
+    try:
+        raise TransformationPublicationError("invalid temporary transformation publication")
+    except TransformationPublicationError as error:
+        error.__context__ = None
+        raise
 
 
 @contextmanager

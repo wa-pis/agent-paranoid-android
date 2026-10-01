@@ -91,6 +91,31 @@ def test_closed_bundle_writer_byte_boundary_before_any_files(tmp_path):
     assert list(tmp_path.iterdir()) == [destination]
 
 
+def test_publication_fsync_failure_after_rename_rolls_back_own_bundle(tmp_path, monkeypatch):
+    from test_data_agent.io import path_policy
+    from test_data_agent.io.transformation_publish import (
+        TransformationPublicationError, _publish_reviewed_test_snapshot,
+    )
+    destination = tmp_path / "output"
+    original_fsync = path_policy.os.fsync
+    failures = []
+
+    def fail_after_rename(fd):
+        if destination.exists():
+            failures.append(True)
+            raise OSError("fictional-private-fsync-marker")
+        return original_fsync(fd)
+
+    monkeypatch.setattr(path_policy.os, "fsync", fail_after_rename)
+    with pytest.raises(TransformationPublicationError) as caught:
+        _publish_reviewed_test_snapshot(request(), destination, max_total_bytes=8192,
+            max_review_bytes=4096, max_output_bytes=8192, budget=GenerationBudget(5))
+    assert failures == [True]
+    assert list(tmp_path.iterdir()) == []
+    assert caught.value.__context__ is None
+    assert "fictional-private-fsync-marker" not in str(caught.value)
+
+
 @pytest.mark.parametrize("failure", [None, "changed_review", "output_budget"])
 def test_fixed_review_to_closed_destination_publication(tmp_path, failure):
     import json

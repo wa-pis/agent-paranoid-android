@@ -4474,3 +4474,23 @@ Broader transformation remains unfinished.
   Next: consolidate a signed evidence SHA and narrow independent safety review
   of the shared publication/receipt boundary before any public wiring; retain
   full RC scope and do not treat these gate tests as completed public execution.
+- Closed workflow/evidence signed as1575fcd0b92722b2c85d014be75fbb122fbdafca.
+  Independent AI safety reviewer PublicationBoundary-R1 (Jason), agent
+  01a0f8f6-5e7e-7b81-a337-b2476bf458f5, dispatched read-only for exact SHA:
+  shared publication/digest/budgets/receipt and public-gating boundaries, not
+  ordinary PR review or final RC approval. No findings/approval claimed yet.
+  Full offline milestone regression running in session78819; do not duplicate
+  it or this active review. No public commands registered; wait for results,
+  fix concrete findings before any activation. Automation ACTIVE.
+- Full offline milestone regression at1575fcd completed:2581 passed,
+  10 live-service cases deselected,84.03s. Session78819 finished; do not replay
+  unchanged tests. Mypy publication module passed. Independent safety reviewer
+  remains active; next continuation consume its result, no duplicate reviewer.
+- PublicationBoundary-R1 completed: medium post-rename fsync/manifest-read
+  failure can leave a committed bundle. Finding/evidence/disposition recorded
+  in publication-safety-review.md; it blocks prospective public wiring.
+  Candidate identity-checked rollback added; postcommit manifest reopen removed.
+  Fault test fails on prior installed wheel (output remains), passes candidate.
+  Executor287 passed; after typing cleanup focused32 passed, Mypy/Ruff passed.
+  Next: signed fix SHA and independent follow-up of changed scope, then resume
+  complete activation scenario. No public activation or final RC approval.
