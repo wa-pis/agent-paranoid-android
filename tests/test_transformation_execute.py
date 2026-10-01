@@ -122,7 +122,12 @@ def test_successful_publication_does_not_reopen_staging_for_cleanup(tmp_path, mo
     def fail_cleanup(path):
         pytest.fail("cleanup called after successful publication")
 
-    monkeypatch.setattr(publisher, "discard_staging_directory", fail_cleanup)
+    original_remove = publisher.remove_tree_if_identity
+    def fail_staging_cleanup(path, identity):
+        if path != tmp_path / "output":
+            fail_cleanup(path)
+        return original_remove(path, identity)
+    monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_staging_cleanup)
     destination = tmp_path / "output"
     summary = publisher._publish_reviewed_test_snapshot(request(), destination,
         max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
@@ -155,6 +160,37 @@ def test_failed_rollback_has_distinct_value_free_retained_output_error(tmp_path,
     assert "fictional-private" not in str(caught.value)
     assert caught.value.__context__ is None
     assert (destination / "dataset.csv").read_bytes() == execute(request())
+
+
+@pytest.mark.parametrize("phase", ["initial_identity", "cleanup_lookup"])
+def test_staging_lookup_failure_is_not_silently_discarded(tmp_path, monkeypatch, phase):
+    from test_data_agent.io import transformation_publish as publisher
+    original_remove = publisher.remove_tree_if_identity
+    destination = tmp_path / "output"
+
+    def fail_write(path, payload):
+        raise OSError("fictional-private-write-marker")
+
+    def fail_staging_lookup(path, identity):
+        if path != destination:
+            raise ValueError("fictional-private-lookup-marker")
+        return original_remove(path, identity)
+
+    monkeypatch.setattr(publisher, "atomic_write_bytes", fail_write)
+    monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_staging_lookup)
+    if phase == "initial_identity":
+        def fail_identity(path):
+            raise ValueError("fictional-private-identity-marker")
+        monkeypatch.setattr(publisher, "path_identity", fail_identity)
+    with pytest.raises(publisher.TransformationCleanupError) as caught:
+        publisher._publish_reviewed_test_snapshot(request(), destination,
+            max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+            budget=GenerationBudget(5))
+    assert "cleanup incomplete" in str(caught.value)
+    assert "fictional-private" not in str(caught.value)
+    assert caught.value.__context__ is None
+    assert not destination.exists()
+    assert len(list(tmp_path.iterdir())) == 1
 
 
 @pytest.mark.parametrize("failure", [None, "changed_review", "output_budget"])

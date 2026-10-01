@@ -17,8 +17,8 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.path_policy import (
-    atomic_write_bytes, discard_staging_directory, make_staging_directory, publish_directory,
-    path_identity, remove_tree_if_identity,
+    atomic_write_bytes, make_staging_directory, publish_directory,
+    PathIdentity, path_identity, remove_tree_if_identity,
 )
 from test_data_agent.io.transformation_execute import replace_csv_snapshot
 from test_data_agent.io.transformation_sql import render_transformation_sql
@@ -49,8 +49,9 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
             len(payload) + len(manifest), max_output_bytes, "bundle_run")
     budget.check("temporary transformation publication")
     staging = make_staging_directory(destination)
-    staging_identity = path_identity(staging)
+    staging_identity: PathIdentity | None = None
     try:
+        staging_identity = path_identity(staging)
         atomic_write_bytes(staging / filename, payload)
         atomic_write_bytes(staging / "manifest.json", manifest)
         budget.check("temporary transformation publication")
@@ -59,8 +60,10 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
         # Rename may have committed before its directory fsync failed.
         # Never remove a replaced or pre-existing destination.
         try:
+            if staging_identity is None:
+                raise ValueError("staging identity not confirmed")
             remove_tree_if_identity(destination, staging_identity)
-            discard_staging_directory(staging)
+            remove_tree_if_identity(staging, staging_identity)
         except (OSError, ValueError):
             try:
                 raise TransformationCleanupError(

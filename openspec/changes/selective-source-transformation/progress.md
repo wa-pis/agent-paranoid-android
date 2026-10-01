@@ -4517,3 +4517,14 @@ Broader transformation remains unfinished.
   warns output/staging may remain and requires inspection before retry; no
   false no-output guarantee on OS removal failure. New fault tests cover both
   paths. Next: exact-SHA changed-scope review; public activation still disabled.
+- Second fix signed f5842d84cccad4a2733dcbf2feaf3348c9f91e15;34 focused
+  publication/command/bundle/rollback tests, Mypy/Ruff/diff checks passed.
+  PublicationBoundary-R1/Jason sent follow-up for that exact changed scope,
+  same agent01a0f8f6-5e7e-7b81-a337-b2476bf458f5 now active. Do not duplicate.
+  Next continuation consume disposition before any wiring; no final RC claim.
+- Review atf5842d8 remediated the two earlier findings but found generic staging
+  discard suppresses lookup failures. Third candidate uses captured identity
+  directly and reports initial identity/cleanup lookup failures as incomplete
+  cleanup, without unverified deletion.36 focused tests, Mypy/Ruff pass.
+  Reviewer finished; next signed changed-scope SHA and same-reviewer follow-up.
+  No public activation; broader path_policy helper deliberately unchanged.

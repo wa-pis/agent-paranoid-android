@@ -65,3 +65,14 @@ inspection before retry. It propagates through the closed command rather than
 being collapsed into ordinary failure. Fault tests cover successful publication
 with unavailable cleanup and failed post-rename rollback with retained output;
 they do not claim OS failure can always be rolled back. Follow-up review pending.
+
+Review at `f5842d84cccad4a2733dcbf2feaf3348c9f91e15`: original fsync/manifest
+and post-success cleanup findings remediated, but generic discard helper can
+suppress staging identity lookup failures. Remaining medium incomplete-cleanup
+reporting finding; no unsafe deletion found. Reviewer ran no tests or writes.
+
+Third candidate fix uses the captured staging identity directly for removal,
+without the suppressing discard helper. Failure to obtain initial identity also
+reports cleanup incomplete rather than claiming staging removal; no unverified
+identity is used for deletion. Fault cases cover initial identity and cleanup
+lookup failures with sanitized diagnostics. Follow-up disposition pending.
