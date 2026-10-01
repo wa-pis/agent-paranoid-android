@@ -4361,3 +4361,20 @@ Broader transformation remains unfinished.
   to existing positional contract. Focused CLI/parser11 tests and Ruff passed;
   no unchanged scale replay. Remaining full type/route/public activation gates
   stay open. Next complete outcome remains shared public execution workflow.
+- PR #599 opened at signed12b7712 for the basic installed route workflow and
+  review help; consume existing CI before merge, no repeat acceptance needed.
+  GitHub push reported two open high dependency alerts, verified via API:
+  #2 PyJWT BOM Bypass and #3 public JWK containers as HMAC secrets, uv.lock,
+  first patched version2.14.0. Applicability not yet assessed; next continuation
+  must inspect dependency constraints/usages and update the locked dependency
+  with relevant compatibility checks before RC gates. No vulnerability fix or
+  dependency approval is claimed here. Automation remains ACTIVE.
+- 2026-10-01 PR #599 CI failed in dependency audit and MCP image vulnerability
+  scans, not route acceptance: audit reported13 PyJWT and3 urllib3 advisories.
+  Updated only locked PyJWT2.13.0→2.15.1 and urllib3 2.7.0→2.8.0, regenerated
+  artifact hashes through uv. Full frozen all-extras require-hashes pip-audit:
+  no known vulnerabilities found. New dependency versions verified in isolated
+  target; MCP SDK/generator/Trino and dependency compatibility/license suites:
+  116 passed. No primary venv changes, no data/SQL policy changes or suppression.
+  Push to existing #599 and consume fresh mandatory CI/container scans before
+  normal merge. Basic route and scale evidence remain valid; not replayed.
