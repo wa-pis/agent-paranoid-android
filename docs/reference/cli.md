@@ -35,12 +35,17 @@ Use these focused references for task detail:
 
 ## Selective Transformation (Review And Policy Decisions)
 
-`transform-review SOURCE.csv POLICY.yaml` reads a fixed local CSV snapshot and
+`transform-review SOURCE POLICY.yaml` reads a fixed local source snapshot and
 the policy's referenced local mapping files, then prints value-free field
 decisions and a snapshot digest. It does not approve, transform, or export
 source rows. Mapping paths in the policy are relative to the policy file's
 directory. Use `--table NAME` when the entity name differs from the source
 filename stem; `--json` wraps the same review in the standard CLI response.
+The policy's `input_format` selects CSV, Parquet or an already captured
+PostgreSQL/Trino query-result envelope. Query capture remains private; this
+review command neither reads a SQL script as data nor connects to a database.
+Private fictional acceptance covers all four inputs and three outputs using
+the same saved policy, review digest and temporary execution path.
 For review-only exact-text plans, a single-file policy may declare a top-level
 `file_text_mapping` and optional CSV `mapping` on each `replace_text` field.
 The review reports configured scopes but never shows mapping literals;
