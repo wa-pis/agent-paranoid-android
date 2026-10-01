@@ -4,11 +4,36 @@ No tool registration or approval issuer. Public activation requires the
 completed wiring's independent safety review and matching policy amendments.
 """
 
+from typing import Any
+
 from test_data_agent.core.limits import (
     DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
 )
 from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths
 from test_data_agent.mcp_generator_server import resolve_workspace_path
+
+
+def _create_test_candidate_mcp() -> Any | None:
+    """Fictional test composition only; production registration is unchanged."""
+    from test_data_agent.mcp_generator_transport import create_generator_mcp
+    from test_data_agent.trino_work_budget import (
+        DEFAULT_QUERY_WORK_LIMITS, QueryWorkBudget, with_query_work_budget,
+    )
+
+    def request_budget() -> QueryWorkBudget | None:
+        if server is None:
+            return None
+        try:
+            request = server.get_context().request_context.request
+        except (LookupError, ValueError):
+            return None
+        return request if isinstance(request, QueryWorkBudget) else None
+
+    server = create_generator_mcp([
+        with_query_work_budget(_execute_candidate_transformation, DEFAULT_QUERY_WORK_LIMITS,
+                               budget_provider=request_budget),
+    ])
+    return server
 
 
 def _execute_candidate_transformation(

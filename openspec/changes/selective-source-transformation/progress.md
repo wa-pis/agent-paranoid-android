@@ -4770,3 +4770,65 @@ Broader transformation remains unfinished.
   wording disposition in publication-safety-review.md. Next consolidate
   supported route contract, installed changed wiring evidence and reviewed
   registration; no public surface activated or new PR opened.
+- Action guard signed:cfd8682. Installed changed-wiring acceptance:15 passed
+  in4.25s (CLI review/execution, fictional controlling-TTY receipt, workspace
+  consumption/containment, three derive rejection entrances). Evidence:
+  /private/tmp/apa-action-workflow-wheel.0cXZiI/acceptance.log;
+  wheel SHA256:e60e660d521f2a48ade01771d5ce3eee9e4aad731588a491ec7245ed8282113c.
+  No real data/services, no product safeguard patching. Public registration
+  remains unavailable; this is installed candidate evidence, not RC acceptance.
+  Next complete multi-route path preparation through the shared snapshot
+  contract, then reviewed actual CLI/MCP registration evidence. Full RC scope
+  remains; accepted scale runs and closed reviews are not replayed.
+- Multi-route audit found existing policy-selected reader already handles all
+  four fixed input families; no new adapter/helper added. Expanded inspected
+  fictional route harness with closed CLI/workspace execution subprocesses and
+  byte-for-byte artifact/manifest parity against shared publication. All12
+  installed candidate routes pass on e60e660d wheel; evidence:
+  /private/tmp/apa-action-workflow-wheel.0cXZiI/routes-candidate.log.
+  Captured query results use injected fictional streams, no DB connection;
+  this is not live query capture or public registration acceptance. Ruff and
+  diff-check pass. Next reconcile prospective route documentation and complete
+  reviewed registration/transport evidence; full RC scope unchanged.
+- Audited production CLI/MCP composition before prospective registration.
+  Added private fictional-test MCP composition using existing audited/redacted
+  transport and invocation-budget wrapper, with only candidate execution and
+  no receipt issuer. Actual SDK tool-list test passes; production service list
+  unchanged. Ruff passes; Mypy annotation corrected and passes. No stdio/public
+  execution acceptance claim yet. Next actual closed SDK execution/error tests
+  and transport budget-context integration, then exact-SHA activation review.
+- Closed actual FastMCP SDK dispatch now exercises saved fictional policy →
+  fixed review SHA → execution bundle, plus stale-SHA rejection without output.
+  Both focused cases pass (2 passed, 5 deselected); source/policy bytes unchanged,
+  response/error contain neither fictional source nor replacement values.
+  Existing audited/redacted transport reused (Ponytail); no production tool
+  registration or approval issuer added. This is SDK dispatch, not stdio or
+  public activation acceptance. Next integrate request transport-budget context
+  and complete closed stdio/negative evidence before exact-SHA activation review.
+- Closed MCP composition now consumes its own SDK request-context work budget,
+  not the production server's global context. Reuses existing budget wrapper;
+  exhausted canonical-argument budget rejects before workspace access without
+  reflecting the fictional path marker. Focused request-context test passes;
+  initial assertion spelling corrected to existing dimension display text.
+  Changed-wrapper success/stale SDK cases pass (2); Ruff/Mypy and diff-check
+  pass. Production registration unchanged. Next closed bounded-stdio execution
+  evidence, including malformed requests, then coherent installed workflow gate.
+- Closed bounded-stdio subprocess acceptance now uses real MCP initialization,
+  tool-list and tool-call dispatch: saved fictional CSV/policy/review SHA publishes
+  the expected bundle; stale SHA rejects without output. Malformed typed path
+  arguments reject without reflecting their fictional marker before each valid
+  call. Both new stdio cases pass (2 passed, 8 deselected, 1.14s); inputs unchanged,
+  responses source/replacement-value-free. Existing bounded transport and SDK
+  client reused, no product monkeypatch, DB/API or production registration.
+  Ruff/diff-check pass. Next installed-wheel closed workflow gate and reconcile
+  prospective public registration documentation before exact-SHA safety review.
+- Built isolated closed-workflow wheel with current MCP composition/stdio tests:
+  /private/tmp/apa-stdio-workflow-wheel.jeY5nN, SHA256
+  ac379bcca9017cb6e6a0870a71bbd1121a8b376c992e2723ae2d29ee788e40eb.
+  Installed --no-deps --target; primary environment unchanged. Initial build
+  blocked by default uv cache sandbox; corrected to isolated temp cache.
+  Installed focused gate: 20 passed, controlling-TTY receipt case failed in
+  sandbox (acceptance.log); rerunning only that case with TTY access, not the
+  successful 20. Isolated TTY retry passed (1 passed, 10 deselected, 1.70s).
+  Next finish documentation/gate;
+  no release or production activation claim.
