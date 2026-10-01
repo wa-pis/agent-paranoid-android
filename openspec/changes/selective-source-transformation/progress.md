@@ -4494,3 +4494,26 @@ Broader transformation remains unfinished.
   Executor287 passed; after typing cleanup focused32 passed, Mypy/Ruff passed.
   Next: signed fix SHA and independent follow-up of changed scope, then resume
   complete activation scenario. No public activation or final RC approval.
+- Fix signed as2f823678ad3df994fc415a9fca624c65653c93b2. Same independent
+  AI reviewer PublicationBoundary-R1/Jason dispatched for follow-up limited to
+  rollback and postcommit metadata handling at that exact SHA. No duplicate
+  reviewer or broader repeat review. Await finding disposition before wiring;
+  public activation remains closed. Continue non-overlapping acceptance/docs.
+- Fix installed-wheel acceptance:13 focused rollback/receipt/public-gate tests
+  passed with pytest source injection disabled. Wheel SHA/path recorded in
+  publication-safety-review.md. Same reviewer follow-up remains active; no
+  duplicate dispatch, no unchanged route/scale/full-regression replay.
+- Follow-up received at2f82367: partially remediated, remaining medium issue.
+  Staging cleanup after confirmed rename can still report generic failure with
+  output retained; failed rollback likewise lacks distinct retained-output
+  diagnostics. Identity deletion judged safe; no unsafe-deletion finding.
+  Reviewer is finished, not active. Next: remove postcommit staging cleanup,
+  distinguish unsuccessful rollback without values, test both fault paths,
+  then changed-scope exact-SHA review. No new owner decision needed; automation
+  ACTIVE, public wiring remains disabled. Evidence updated in safety review.
+- Second candidate fix removes postcommit staging cleanup and preserves a
+  distinct value-free TransformationCleanupError through shared publication and
+  command boundaries when rollback cannot be confirmed. Diagnostic explicitly
+  warns output/staging may remain and requires inspection before retry; no
+  false no-output guarantee on OS removal failure. New fault tests cover both
+  paths. Next: exact-SHA changed-scope review; public activation still disabled.

@@ -32,6 +32,10 @@ class TransformationPublicationError(ValueError):
     """Value-free failure in private temporary publication."""
 
 
+class TransformationCleanupError(TransformationPublicationError):
+    """Publication failed and artifact removal could not be confirmed."""
+
+
 def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
                          manifest: bytes, budget: GenerationBudget, *,
                          max_output_bytes: int) -> None:
@@ -54,10 +58,18 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
     except BaseException:
         # Rename may have committed before its directory fsync failed.
         # Never remove a replaced or pre-existing destination.
-        remove_tree_if_identity(destination, staging_identity)
+        try:
+            remove_tree_if_identity(destination, staging_identity)
+            discard_staging_directory(staging)
+        except (OSError, ValueError):
+            try:
+                raise TransformationCleanupError(
+                    "transformation publication failed; cleanup incomplete; output or staging may remain; "
+                    "inspect the selected destination before retrying")
+            except TransformationCleanupError as error:
+                error.__context__ = None
+                raise
         raise
-    finally:
-        discard_staging_directory(staging)
 
 
 def _execute_reviewed_test_from_paths(
@@ -86,7 +98,7 @@ def _execute_reviewed_test_from_paths(
             budget=budget, receipt_path=receipt_path)
         return {"status": "closed_test_completed", "snapshot_sha256": request.snapshot_sha256,
                 "provenance": manifest["provenance"]}
-    except TransformationLimitError:
+    except (TransformationLimitError, TransformationCleanupError):
         raise
     except (OSError, ValueError, TypeError, AttributeError, KeyError):
         pass
@@ -155,7 +167,7 @@ def _publish_reviewed_test_snapshot(
         _publish_test_bundle(destination, filename, payload, manifest, budget,
                              max_output_bytes=max_output_bytes)
         return summary
-    except TransformationLimitError:
+    except (TransformationLimitError, TransformationCleanupError):
         raise
     except (OSError, ValueError, TypeError, AttributeError, StopIteration):
         pass

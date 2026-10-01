@@ -116,6 +116,47 @@ def test_publication_fsync_failure_after_rename_rolls_back_own_bundle(tmp_path, 
     assert "fictional-private-fsync-marker" not in str(caught.value)
 
 
+def test_successful_publication_does_not_reopen_staging_for_cleanup(tmp_path, monkeypatch):
+    from test_data_agent.io import transformation_publish as publisher
+
+    def fail_cleanup(path):
+        pytest.fail("cleanup called after successful publication")
+
+    monkeypatch.setattr(publisher, "discard_staging_directory", fail_cleanup)
+    destination = tmp_path / "output"
+    summary = publisher._publish_reviewed_test_snapshot(request(), destination,
+        max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+        budget=GenerationBudget(5))
+    assert summary["origin"] == "transformed_mixed"
+    assert (destination / "dataset.csv").read_bytes() == execute(request())
+
+
+def test_failed_rollback_has_distinct_value_free_retained_output_error(tmp_path, monkeypatch):
+    from test_data_agent.io import path_policy, transformation_publish as publisher
+    destination = tmp_path / "output"
+    original_fsync = path_policy.os.fsync
+
+    def fail_after_rename(fd):
+        if destination.exists():
+            raise OSError("fictional-private-fsync-marker")
+        return original_fsync(fd)
+
+    def fail_rollback(path, identity):
+        raise OSError("fictional-private-rollback-marker")
+
+    monkeypatch.setattr(path_policy.os, "fsync", fail_after_rename)
+    monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_rollback)
+    with pytest.raises(publisher.TransformationCleanupError) as caught:
+        publisher._publish_reviewed_test_snapshot(request(), destination,
+            max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+            budget=GenerationBudget(5))
+    assert "output or staging may remain" in str(caught.value)
+    assert "before retrying" in str(caught.value)
+    assert "fictional-private" not in str(caught.value)
+    assert caught.value.__context__ is None
+    assert (destination / "dataset.csv").read_bytes() == execute(request())
+
+
 @pytest.mark.parametrize("failure", [None, "changed_review", "output_budget"])
 def test_fixed_review_to_closed_destination_publication(tmp_path, failure):
     import json
