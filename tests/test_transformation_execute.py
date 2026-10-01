@@ -750,7 +750,7 @@ def test_private_command_failures_preserve_input_files(tmp_path, failure):
     ticks = iter([0.0, 2.0])
     budget = GenerationBudget(1, clock=lambda: next(ticks)) if failure == "deadline" else GenerationBudget(5)
     publisher = import_module("test_data_agent.io.transformation_publish")
-    with pytest.raises(publisher.TransformationLimitError if failure == "output_budget"
+    with pytest.raises(publisher.TransformationLimitError if failure in {"input_budget", "output_budget"}
                        else publisher.TransformationPublicationError) as caught:
         publisher._run_temporary_transform(tmp_path / "items.csv", "items", tmp_path / "behavior.yaml",
             expected_snapshot_sha256=("0" * 64 if failure == "digest" else "bad" if failure == "digest_shape"
@@ -758,7 +758,7 @@ def test_private_command_failures_preserve_input_files(tmp_path, failure):
             max_total_bytes=1 if failure == "input_budget" else 8192,
             max_review_bytes=4096, max_output_bytes=1 if failure == "output_budget" else 8192,
             budget=budget)
-    if failure == "output_budget":
+    if failure in {"input_budget", "output_budget"}:
         assert caught.value.code == "limit_exceeded" and caught.value.limit == 1
     else:
         assert str(caught.value) == "invalid temporary transformation command"

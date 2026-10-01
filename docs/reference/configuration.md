@@ -81,6 +81,7 @@ introduced here. In PowerShell, use
 | `max_input_columns` | `1000` | columns |
 | `max_input_cells` | `100000000` | cells |
 | `max_input_file_bytes` | `134217728` | bytes |
+| `max_total_input_bytes` | `536870912` | combined snapshot bytes |
 | `max_input_cell_chars` | `1000000` | characters |
 | `max_parquet_expanded_bytes` | `536870912` | decoded/estimated expanded bytes |
 | `max_output_bytes` | `536870912` | private CSV output bytes |
@@ -104,6 +105,17 @@ explicit per-run argument. Public request boundaries still
 need integration. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
 budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
+
+Transformation total-input accounting includes source, behavior policy,
+referenced mappings/generation policies, classification evidence and displayed
+review bytes. Read-only review resolves the same session/profile ceiling as the
+closed execution candidate; it does not silently request the default ceiling.
+Set `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES` for the session or
+`resource_limits.max_total_input_bytes` in the saved behavior profile. The closed,
+unregistered CLI candidate additionally accepts `--max-total-input-bytes` and
+the unregistered workspace adapter accepts `max_total_input_bytes`; neither is
+an activated public execution command/tool. Smaller explicit run caps report
+`snapshot_run`; a run cap above the configured ceiling is rejected, not raised.
 
 Private CSV character limits reach parsing, sensitivity detection and profile
 finalization. Internal CSV readers coordinate the stdlib process-global field

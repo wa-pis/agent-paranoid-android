@@ -112,14 +112,14 @@ def run_dataset_command(
                 input_stream=sys.stdin, output_stream=sys.stderr,
                 edit_actions=args.edit_actions,
                 edit_formats=args.edit_formats,
-                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_total_bytes=None,
                 max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget(),
             )
         else:
             request = prepare_csv_review_from_paths(
                 args.source, args.table or args.source.stem,
                 args.policy.parent.absolute(), args.policy.name,
-                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_total_bytes=None,
                 max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
                 budget=GenerationBudget(),
             )

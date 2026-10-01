@@ -12,6 +12,7 @@ from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
+    DEFAULT_MAX_TOTAL_INPUT_BYTES,
     GenerationBudget,
 )
 from test_data_agent.core.privacy import is_sensitive_field
@@ -136,10 +137,11 @@ def prepare_csv_review_request(
 
 def load_policy_references(
     policy: BehaviorPolicy, policy_root: Path, *, max_bytes: int, budget: GenerationBudget,
+    total_limit: EffectiveInputLimit | None = None, consumed_bytes: int = 0,
 ) -> tuple[SnapshotPart, ...]:
     """Load the exact restricted mapping/generation references of a draft."""
     try:
-        if type(max_bytes) is not int or max_bytes < 1:
+        if type(max_bytes) is not int or max_bytes < 0 or max_bytes == 0 and total_limit is None:
             raise ValueError
         policy = parse_behavior_policy(policy)
         remaining = max_bytes
@@ -169,38 +171,59 @@ def load_policy_references(
             for path in sorted(paths):
                 snapshot = read_mapping_snapshot(
                     policy_root, path, max_bytes=remaining, budget=budget,
+                    total_limit=total_limit, consumed_bytes=consumed_bytes + max_bytes - remaining,
                 )
                 remaining -= len(snapshot.payload)
                 referenced_parts.append(SnapshotPart(kind, path, snapshot.payload))
         return tuple(referenced_parts)
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError):
         raise TransformationSourceError("invalid transformation references") from None
 
 
 def prepare_csv_review_from_paths(
     source_path: Path, table_name: str, policy_root: Path, policy_path: str, *,
-    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
+    max_total_bytes: int | None, max_review_bytes: int, budget: GenerationBudget,
 ) -> ApprovalRequest:
     """Read private inputs once and prepare a value-free local CSV review."""
     try:
-        if type(max_total_bytes) is not int or max_total_bytes < 1:
+        if max_total_bytes is not None and (type(max_total_bytes) is not int or max_total_bytes < 1):
             raise ValueError
+        bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, os.environ)
+        if max_total_bytes is not None:
+            if bootstrap.origin != "default":
+                bootstrap.check(max_total_bytes, requested=True)
+            bootstrap = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "snapshot_run")
         policy_yaml = read_mapping_snapshot(
-            policy_root, policy_path, max_bytes=max_total_bytes, budget=budget,
+            policy_root, policy_path, max_bytes=bootstrap.value, budget=budget, total_limit=bootstrap,
         ).payload
+        policy = load_behavior_policy_yaml(policy_yaml,
+            max_bytes=max_total_bytes or DEFAULT_MAX_TOTAL_INPUT_BYTES, budget=budget)
+        total_limit = resolve_input_limit(InputDimension.TOTAL_BYTES, policy.resource_limits, os.environ)
+        if max_total_bytes is None:
+            max_total_bytes = total_limit.value
+        else:
+            total_limit.check(max_total_bytes, requested=True)
+            if max_total_bytes < total_limit.value:
+                total_limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "snapshot_run")
+        total_limit.check(len(policy_yaml))
         remaining = max_total_bytes - len(policy_yaml)
-        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
-        referenced_parts = load_policy_references(policy, policy_root, max_bytes=remaining, budget=budget)
+        referenced_parts = load_policy_references(policy, policy_root, max_bytes=remaining, budget=budget,
+            total_limit=total_limit, consumed_bytes=len(policy_yaml))
         remaining -= sum(len(part.payload) for part in referenced_parts)
         input_limit = resolve_input_limit(InputDimension.BYTES, policy.resource_limits, os.environ)
         source = load_csv_source_snapshot(
             source_path, table_name, budget=budget,
             max_bytes=remaining, input_limit=input_limit,
+            total_limit=total_limit, consumed_bytes=max_total_bytes - remaining,
         )
-        return prepare_csv_review_request(
+        request = prepare_csv_review_request(
             policy_yaml, source, tuple(referenced_parts), max_total_bytes=max_total_bytes,
             max_review_bytes=max_review_bytes, budget=budget,
         )
+        total_limit.check(sum(len(part.payload) for part in request.parts))
+        return request
     except TransformationLimitError:
         raise
     except (OSError, ValueError, TypeError, AttributeError):
@@ -354,11 +377,16 @@ def load_csv_source_snapshot(
     path: Path, table_name: str, *, budget: GenerationBudget,
     max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
     input_limit: EffectiveInputLimit | None = None,
+    total_limit: EffectiveInputLimit | None = None, consumed_bytes: int = 0,
 ) -> SnapshotPart:
     """Read one regular file once; callers must reuse returned bytes."""
     try:
         budget.check("transformation source snapshot")
-        if type(table_name) is not str or not table_name or type(max_bytes) is not int or max_bytes < 1:
+        if (type(table_name) is not str or not table_name or type(max_bytes) is not int
+                or max_bytes < 0 or max_bytes == 0 and total_limit is None):
+            raise ValueError
+        if (type(consumed_bytes) is not int or consumed_bytes < 0
+                or total_limit is not None and total_limit.dimension is not InputDimension.TOTAL_BYTES):
             raise ValueError
         if input_limit is not None:
             if input_limit.dimension is not InputDimension.BYTES or input_limit.value < 1:
@@ -366,11 +394,15 @@ def load_csv_source_snapshot(
             max_bytes = min(max_bytes, input_limit.value)
         with open_regular_file(path) as handle:
             size = os.fstat(handle.fileno()).st_size
+            if total_limit is not None:
+                total_limit.check(consumed_bytes + size)
             if input_limit is not None:
                 input_limit.check(size)
             if size > max_bytes:
                 raise ValueError
             payload = handle.read(max_bytes + 1)
+        if total_limit is not None:
+            total_limit.check(consumed_bytes + len(payload))
         if input_limit is not None:
             input_limit.check(len(payload))
         if len(payload) > max_bytes:

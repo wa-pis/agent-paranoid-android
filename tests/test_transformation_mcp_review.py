@@ -18,6 +18,7 @@ from test_data_agent.mcp_generator_server import WorkspacePathError, review_tran
 
 def test_review_matches_shared_request_and_never_writes(tmp_path, monkeypatch):
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES", "8192")
     source = SnapshotPart("source", "items", b"label\nalpha\nbeta\n")
     policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "schema_fingerprint": "0" * 64,
         "seed": 7, "fields": [{"entity": "items", "field": "label", "sensitivity": "non_sensitive",

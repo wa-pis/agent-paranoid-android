@@ -11,7 +11,8 @@ from test_data_agent.core.transformation_policy import transformation_schema_fin
 from test_data_agent.csv_profiler import profile_csv_bytes
 
 
-def test_transform_review_uses_fixed_csv_and_local_mapping_without_values(tmp_path, capsys):
+def test_transform_review_uses_fixed_csv_and_local_mapping_without_values(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES", "8192")
     source = tmp_path / "items.csv"
     source.write_bytes(b"status\nready\nwaiting\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(

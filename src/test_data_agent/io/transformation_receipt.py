@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import TransformationLimitError
 from test_data_agent.core.transformation_approval import ApprovalRequest, prepare_approval_request
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.path_policy import atomic_write_bytes, open_regular_file
@@ -99,6 +100,8 @@ def issue_local_receipt(
         finally:
             os.close(fd)
         return
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, StopIteration, AttributeError, TypeError):
         pass
     try:
@@ -131,6 +134,8 @@ def verify_local_receipt(
             raise ValueError
         budget.check("local approval receipt")
         return canonical.parts
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, StopIteration, AttributeError, TypeError):
         pass
     try:

@@ -8,6 +8,7 @@ import time
 from typing import TextIO
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError, resolve_input_limit
 from test_data_agent.core.serialization import load_limited_json
 from test_data_agent.core.transformation_approval import ApprovalRequest
 from test_data_agent.core.transformation_policy import BehaviorPolicyError, parse_behavior_policy
@@ -81,7 +82,7 @@ def _action(input_fd: int, output: TextIO, *, unmatched: bool = False) -> dict[s
 def edit_csv_policy_decisions(
     source_path: Path, table_name: str, policy_path: Path, *,
     input_stream: TextIO, output_stream: TextIO,
-    max_total_bytes: int, max_review_bytes: int, budget: GenerationBudget,
+    max_total_bytes: int | None, max_review_bytes: int, budget: GenerationBudget,
     edit_actions: bool = False,
     edit_formats: bool = False,
 ) -> ApprovalRequest:
@@ -95,7 +96,10 @@ def edit_csv_policy_decisions(
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget,
         )
         policy_bytes = next(part.payload for part in original.parts if part.kind == "policy")
-        policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes, budget=budget)
+        policy = load_behavior_policy_yaml(policy_bytes, max_bytes=max_total_bytes or len(policy_bytes), budget=budget)
+        if max_total_bytes is None:
+            max_total_bytes = resolve_input_limit(InputDimension.TOTAL_BYTES,
+                policy.resource_limits, os.environ).value
         payload = policy.model_dump(mode="json")
         review = json.loads(original.review)
         output_stream.write("Edit policy decisions; this is not approval.\n" if edit_actions or edit_formats else
@@ -140,6 +144,8 @@ def edit_csv_policy_decisions(
             raise ValueError
         save_behavior_policy_file(root, policy_path.name, revised, max_bytes=max_total_bytes, budget=budget)
         return updated
+    except TransformationLimitError:
+        raise
     except (OSError, ValueError, TypeError, AttributeError, ImportError):
         pass
     try:

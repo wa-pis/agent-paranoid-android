@@ -60,6 +60,28 @@ Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
 
 #### Scenario: Processing reaches a configured limit
 
+- **GIVEN** a transformation total snapshot budget configured through
+  `resource_limits.max_total_input_bytes` or
+  `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES`
+- **WHEN** policy, references, source, classification evidence and displayed
+  review consume that budget, including an exact-zero remainder before a read
+- **THEN** preparation and receipt revalidation preserve a value-free typed
+  limit diagnostic with amount, threshold, bytes, effective origin and recovery
+  settings, without publishing output or truncating inputs
+- **AND** read-only CLI/MCP review uses the same effective ceiling rather than
+  silently requesting a fixed default as a run override.
+
+#### Scenario: Explicit snapshot run cap
+
+- **GIVEN** an explicitly supplied transformation snapshot run cap
+- **WHEN** it exceeds the configured session/profile ceiling
+- **THEN** preparation rejects it as `requested_above_limit`
+- **AND** a smaller admitted run cap is enforced cumulatively with
+  `snapshot_run` diagnostics, without granting preservation authority or
+  increasing source-free profiling/transport disclosure budgets.
+
+#### Scenario: Processing reaches a configured runtime limit
+
 - **GIVEN** an admitted workload whose observed consumption exceeds a limit
 - **WHEN** processing detects the excess
 - **THEN** it stops without partial publication and reports observed amount,

@@ -17,7 +17,8 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
 
 
-@pytest.mark.parametrize("mode", ["explicit", "stale", "profile", "session", "above_session"])
+@pytest.mark.parametrize("mode", ["explicit", "stale", "profile", "session", "above_session",
+    "total_above", "total_exceeded"])
 def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     source = SnapshotPart("source", "items", b"label\nalpha\n")
     policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
@@ -28,7 +29,7 @@ def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
     if mode == "profile":
         policy = BehaviorPolicy.model_validate({**policy.model_dump(mode="json"),
-            "resource_limits": {"max_output_bytes": 8192}})
+            "resource_limits": {"max_output_bytes": 8192, "max_total_input_bytes": 8192}})
     (tmp_path / "items.csv").write_bytes(source.payload)
     (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
     request = prepare_csv_review_from_paths(tmp_path / "items.csv", "items", tmp_path,
@@ -44,12 +45,21 @@ def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     env = dict(os.environ)
     if mode in {"session", "above_session"}:
         env["TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES"] = "8192" if mode == "session" else "4096"
+        env["TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES"] = "8192"
+    if mode in {"total_above", "total_exceeded"}:
+        env["TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES"] = "1024"
+        if mode == "total_above":
+            argv += ["--max-total-input-bytes", "8192"]
     result = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=15)
-    if mode in {"stale", "above_session"}:
+    if mode in {"stale", "above_session", "total_above", "total_exceeded"}:
         assert result.returncode != 0
         assert not (tmp_path / "output").exists()
         if mode == "above_session":
             assert "requested_above_limit" in result.stderr
+            assert "origin=session" in result.stderr
+        if mode in {"total_above", "total_exceeded"}:
+            assert ("requested_above_limit" if mode == "total_above" else "limit_exceeded") in result.stderr
+            assert "max_total_input_bytes" in result.stderr
             assert "origin=session" in result.stderr
     else:
         assert result.returncode == 0, result.stderr

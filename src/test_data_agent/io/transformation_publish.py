@@ -80,7 +80,7 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
 
 def _execute_reviewed_test_from_paths(
     source_path: Path, table_name: str, policy_path: Path, destination: Path, *,
-    expected_snapshot_sha256: str, max_total_bytes: int, max_review_bytes: int,
+    expected_snapshot_sha256: str, max_total_bytes: int | None, max_review_bytes: int,
     max_output_bytes: int | None, budget: GenerationBudget, receipt_path: Path | None = None,
 ) -> dict[str, object]:
     """Closed fictional-test command; validate fixed review before publication.
@@ -99,8 +99,12 @@ def _execute_reviewed_test_from_paths(
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget)
         if request.snapshot_sha256 != expected_snapshot_sha256:
             raise ValueError
-        policy = load_behavior_policy_yaml(next(part.payload for part in request.parts
-            if part.kind == "policy"), max_bytes=max_total_bytes, budget=budget)
+        policy_payload = next(part.payload for part in request.parts if part.kind == "policy")
+        policy = load_behavior_policy_yaml(policy_payload,
+            max_bytes=max_total_bytes or len(policy_payload), budget=budget)
+        if max_total_bytes is None:
+            max_total_bytes = resolve_input_limit(InputDimension.TOTAL_BYTES,
+                policy.resource_limits, os.environ).value
         output_ceiling = resolve_input_limit(InputDimension.OUTPUT_BYTES, policy.resource_limits, os.environ)
         output_limit = output_ceiling.value if max_output_bytes is None else max_output_bytes
         manifest = _publish_reviewed_test_snapshot(request, destination, max_total_bytes=max_total_bytes,

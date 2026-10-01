@@ -4604,3 +4604,86 @@ Broader transformation remains unfinished.
   300000×50 runs; do not replay them. Next finish explicit shared snapshot-total
   configuration/diagnostics without changing source-free disclosure budgets,
   then activation amendment and exact-SHA review. No new owner decision needed.
+- Saved closed workflow checkpoint:9db6c775c3f82a7be6061215f0d93ab518220c04
+  (signed). Total-snapshot configuration now has a typed transformation-only
+  resource_limits.max_total_input_bytes field (unchanged512MiB default), session
+  override and legacy-session fallback through the existing resolver. Boundary
+  diagnostics distinguish actual/requested excess, bytes, origin and recovery
+  keys. This model change is NOT yet wired into snapshot loaders/receipt paths;
+  do not mark the fixed-cap defect closed or repeat installed acceptance yet.
+  Next wire effective total budgets through shared preparation and canonical
+  receipt validation, preserving exact bytes and typed errors across boundaries.
+  Checks:26 focused total/input-limit tests pass; Mypy limits module, Ruff and
+  diff-check pass. No source-free defaults, public registration or CI changed.
+- Connected optional effective snapshot-total budget to closed path preparation,
+  CLI approval/execution and workspace agent candidate; fixed-request receipt
+  revalidation receives the same resolved cap. Policy bootstrap remains bounded
+  by the existing512MiB default before profile settings can be read; defaults
+  and read-only public review are unchanged. Profile/session8192-byte settings
+  are exercised by candidate subprocess tests. Mypy four modules/Ruff pass.
+  Remaining: typed diagnostics for cumulative early loader and final identity
+  exhaustion (generic exceptions still exist); explicit run-cap option and
+  canonical-policy total enforcement must be finished before closing this gap.
+  No public activation or installed acceptance claimed for this changed code.
+  Focused changed-scope checks:12 candidate/total-limit tests pass in3.01s.
+- Early cumulative budget checks now run before and during mapping reads and
+  before/after source snapshot reads, counting already consumed policy/reference
+  bytes. Typed total-limit errors propagate through reference loading without
+  exposing values. Exact-boundary/one-byte-over tests for both readers pass;
+  38 focused total/mapping/source tests pass, Mypy two modules and Ruff pass.
+  No cap increase or public registration. Next final approval identity/canonical
+  enforcement, explicit run cap, shared workflow regression and documentation;
+  total-budget defect remains open until those paths and installed evidence pass.
+- Approval material now checks configured total ceiling and explicit snapshot
+  run cap before final identity, including displayed review bytes. Receipt
+  issuance/verification preserve typed budget errors rather than masking them.
+  Effective limit errors detach ambient exception context; safety test covers
+  a fictional private marker. Old small-budget expectation updated from generic
+  approval failure to actionable total-budget error. Mypy three modules/Ruff pass.
+  Next explicit CLI/agent run cap and end-to-end cumulative exhaustion cases,
+  documentation and installed shared workflow; public activation remains gated.
+  Focused approval/receipt/total-budget checks:69 passed in0.36s.
+- Explicit run cap connected to closed CLI approval/execution
+  (--max-total-input-bytes) and agent candidate(max_total_input_bytes). Above
+  effective ceiling rejects as requested_above_limit before source execution;
+  lower run caps use snapshot_run origin. Complete approval material now reports
+  configured session/profile origin before equal run-cap exhaustion. Fictional
+  subprocess cases prove above-request vs actual cumulative session exhaustion,
+  no output and no source literals.62 CLI/approval tests pass in3.39s; Mypy three
+  modules/Ruff pass before the final test-only addition.
+  Next reconcile read-only transform-review/MCP review callers still passing a
+  fixed512MiB explicit cap (must not become an unintended above-request), finish
+  early bootstrap/exact-zero budget cases and docs, then installed acceptance
+  and exact-SHA safety review of completed activation wiring. No public activation.
+- Read-only CLI/MCP review no longer requests fixed512MiB as a run override:
+  both resolve the effective saved-profile/session total cap. Policy decision
+  wizard resolves the same cap and preserves typed exhaustion errors. Existing
+  CLI mapping review and actual registered MCP stdio parity now run under an
+  8192-byte session ceiling;7 focused review tests pass. Mypy three modules pass,
+  Ruff/diff-check pass. Configuration docs distinguish combined snapshot budget,
+  closed run-cap options and still-unregistered execution.
+  Next finish early policy-bootstrap/exact-zero exhaustion cases, run changed
+  shared workflow milestone gates and installed acceptance, update OpenSpec and
+  activation amendment, then exact-SHA independent review. No scaling replay.
+- Installed total-budget workflow acceptance:25 passed in3.91s, including
+  fictional local TTY approval, shared CLI/agent execution, registered read-only
+  MCP parity, above-request and cumulative exhaustion with no publication.
+  Wheel:/private/tmp/apa-total-workflow-wheel.5vAiaf/agent_paranoid_android-1.5.0-py3-none-any.whl;
+  SHA256:190937f1a84d5a0628931ded74491bd9a0b4313effb58d1f8635490e9af8949f.
+  Evidence:acceptance.log in that directory. Previous truncated tool output was
+  not counted as acceptance. Strict OpenSpec passes; Ruff passes; Mypy all135
+  source files passes. Transformation milestone:873 passed, one outdated
+  generic input-budget error expectation failed in58.58s. Updated that test to
+  require the actionable typed limit error; focused regression passes in0.29s.
+  Evidence:milestone.log in the same directory. Successful873 cases not replayed.
+  Next complete activation-contract amendments and exact-SHA independent safety
+  review of the shared wiring; public execution remains unregistered, RC not ready.
+- Policy bootstrap now uses bounded session/default total budget (or explicit
+  run cap) with typed early exhaustion; exact-zero remaining capacity reaches
+  a typed one-byte-over diagnostic rather than a generic loader failure.
+  No unbounded reads. Mapping/source zero-cap regression cases pass. Changed
+  source expectation updated for actionable snapshot_run error:65 focused tests
+  passed initially, one old generic-error assertion failed and then its focused
+  regression passed after updating expectation. Mypy two modules/Ruff pass.
+  Next OpenSpec budget delta and installed workflow milestone; do not repeat
+  successful wizard cases unchanged. Public activation and final RC still gated.
