@@ -12,7 +12,6 @@ from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
-    DEFAULT_MAX_TOTAL_INPUT_BYTES,
     GenerationBudget,
 )
 from test_data_agent.core.privacy import is_sensitive_field
@@ -199,7 +198,7 @@ def prepare_csv_review_from_paths(
             policy_root, policy_path, max_bytes=bootstrap.value, budget=budget, total_limit=bootstrap,
         ).payload
         policy = load_behavior_policy_yaml(policy_yaml,
-            max_bytes=max_total_bytes or DEFAULT_MAX_TOTAL_INPUT_BYTES, budget=budget)
+            max_bytes=bootstrap.value, budget=budget)
         total_limit = resolve_input_limit(InputDimension.TOTAL_BYTES, policy.resource_limits, os.environ)
         if max_total_bytes is None:
             max_total_bytes = total_limit.value

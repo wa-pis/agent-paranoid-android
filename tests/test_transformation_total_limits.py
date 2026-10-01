@@ -7,6 +7,28 @@ from test_data_agent.core.transformation_limits import (
 )
 
 
+@pytest.mark.parametrize("run_cap", [None, 8192])
+def test_policy_parser_uses_admitted_bootstrap_budget(tmp_path, monkeypatch, run_cap):
+    from test_data_agent.core.limits import GenerationBudget
+    from test_data_agent.io import transformation_source as source
+
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES", "1073741824")
+    (tmp_path / "policy.yaml").write_bytes(b"schema_version: '0.1'\nfields: []\n")
+    original = source.load_behavior_policy_yaml
+    observed = []
+
+    def observe(payload, *, max_bytes, budget):
+        observed.append(max_bytes)
+        return original(payload, max_bytes=max_bytes, budget=budget)
+
+    # Unit instrumentation only: real parser still enforces validation.
+    monkeypatch.setattr(source, "load_behavior_policy_yaml", observe)
+    with pytest.raises(source.TransformationSourceError):
+        source.prepare_csv_review_from_paths(tmp_path / "missing.csv", "items", tmp_path,
+            "policy.yaml", max_total_bytes=run_cap, max_review_bytes=4096,
+            budget=GenerationBudget(5))
+    assert observed == [1073741824 if run_cap is None else run_cap]
+
 def test_total_snapshot_limit_configuration_and_diagnostic():
     profile = TransformationInputLimits(max_total_input_bytes=4096)
     effective = resolve_input_limit(InputDimension.TOTAL_BYTES, profile, {})

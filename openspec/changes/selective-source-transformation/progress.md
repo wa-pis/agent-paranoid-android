@@ -4687,3 +4687,20 @@ Broader transformation remains unfinished.
   regression passed after updating expectation. Mypy two modules/Ruff pass.
   Next OpenSpec budget delta and installed workflow milestone; do not repeat
   successful wizard cases unchanged. Public activation and final RC still gated.
+- Signed snapshot-budget checkpoint:3ef89981c72ebfb324e316cf7fed9d80ca70c54a.
+  Independent AI reviewer PublicationBoundary-R1/Jason
+  (01a0f8f6-5e7e-7b81-a337-b2476bf458f5) assigned read-only changed scope:
+  shared local approval/execution and workspace-agent wiring since3721503e,
+  total budget/canonical receipt binding and read-only review callers. Review
+  active; do not duplicate. No public activation approval or final RC claim.
+  Next consume findings and activation amendment requirements; preserve the
+  existing closed gates until executable evidence and review are complete.
+- AI review3ef8998 completed:PublicationBoundary-R1/Jason,2026-10-01 UTC,
+  static/read-only changed scope. One low fail-closed capacity finding: policy
+  loader honored session bootstrap but YAML parser retained512MiB default.
+  No additional safety findings; no public activation/final RC approval.
+  Fixed parser to reuse admitted bootstrap ceiling. Two focused unit cases
+  (session1GiB, optional smaller8192-byte run cap) pass without huge allocation;
+  unit instrumentation observes arguments but delegates to the real parser.
+  Mypy source module/Ruff/diff-check pass. Next signed fix checkpoint and
+  changed-scope independent disposition, then explicit activation amendments.

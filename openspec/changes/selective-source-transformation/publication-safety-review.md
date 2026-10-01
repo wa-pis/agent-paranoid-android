@@ -93,3 +93,33 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
   tests inspected. Tests, Mypy, Ruff and diff checks not independently run.
 - Limits: no edits/GitHub writes, public activation permission, human approval
   or final RC approval. Prospective public wiring requires its own evidence.
+
+## Shared workflow and total-budget review
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason,
+  agent `01a0f8f6-5e7e-7b81-a337-b2476bf458f5`; not the author.
+- Date: 2026-10-01 UTC.
+- Exact SHA: `3ef89981c72ebfb324e316cf7fed9d80ca70c54a`.
+- Scope: changes since `3721503e` in closed local approval/execution,
+  workspace-agent candidate wiring, cumulative limits, canonical receipts and
+  public read-only review callers. Static inspection only; no edits or writes.
+- Finding (low): policy reading used the admitted bootstrap/session limit but
+  YAML parsing used the default 512 MiB when no explicit run cap was supplied.
+  A larger session cap could therefore produce an inconsistent generic
+  rejection. Fail-closed capacity/diagnostic defect, not authorization bypass.
+- Disposition: parser now uses the admitted bootstrap limit; two focused unit
+  cases pass with session 1 GiB and smaller explicit 8192-byte run cap. Argument
+  observation delegates to the real parser; no large allocation or client
+  harness product patching. Changed-SHA disposition remains pending.
+- No additional reportable safety finding identified. Canonical approval and
+  receipt consumption remain separate, workspace paths confined, responses
+  value-free, candidate modules unregistered. Prior publication findings remain
+  closed. Reviewer inspected acceptance evidence but did not rerun checks.
+- Evidence: committed code/tests and progress at the exact SHA; installed
+  `/private/tmp/apa-total-workflow-wheel.5vAiaf/acceptance.log` (25 passed),
+  `milestone.log` (873 passed, obsolete expectation failed and subsequently
+  corrected as recorded in progress).
+- Activation still requires matching AGENTS/safety/baseline amendments,
+  supported-route and action boundaries (private derive stays unavailable),
+  budget precedence/accounting and cleanup-incomplete recovery contract.
+  This is neither human approval, activation authority nor final RC review.
