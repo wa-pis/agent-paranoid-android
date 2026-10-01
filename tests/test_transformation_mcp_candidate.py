@@ -11,6 +11,29 @@ from test_data_agent.mcp_generator_server import WorkspacePathError
 from test_data_agent.mcp_transformation_candidate import _execute_candidate_transformation
 
 
+def test_closed_sdk_limit_error_keeps_value_free_recovery(tmp_path, monkeypatch):
+    from mcp.server.fastmcp.exceptions import ToolError
+    from test_data_agent.mcp_transformation_candidate import _create_test_candidate_mcp
+
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES", "1024")
+    (tmp_path / "items.csv").write_text("label\nfictional-source-marker\n")
+    (tmp_path / "policy.yaml").write_text("fictional-policy-marker")
+    server = _create_test_candidate_mcp()
+    assert server is not None
+    with pytest.raises(ToolError) as error:
+        asyncio.run(server.call_tool("_execute_candidate_transformation", {
+            "input_path": "items.csv", "policy_path": "policy.yaml", "output_path": "output",
+            "snapshot_sha256": "0" * 64, "max_total_input_bytes": 8192}))
+    message = str(error.value)
+    assert "requested_above_limit" in message and "8192 > 1024 bytes" in message
+    assert "origin=session" in message
+    assert "TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES" in message
+    assert "resource_limits.max_total_input_bytes" in message
+    assert "fictional-source-marker" not in message and "fictional-policy-marker" not in message
+    assert not (tmp_path / "output").exists()
+
+
 def test_closed_sdk_uses_existing_request_budget(tmp_path, monkeypatch):
     from mcp.server.fastmcp.exceptions import ToolError
     from mcp.server.lowlevel.server import request_ctx

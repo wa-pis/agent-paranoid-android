@@ -4832,3 +4832,53 @@ Broader transformation remains unfinished.
   successful 20. Isolated TTY retry passed (1 passed, 10 deselected, 1.70s).
   Next finish documentation/gate;
   no release or production activation claim.
+- Signed checkpoint 96cafd8db07e256a8dc6fbc0dcbb26496da078ee saves closed
+  workflow/transport evidence; no push, PR or production registration. Clarified
+  test-server versus production registration in candidate docstring and inactive
+  activation contract. Next reconcile complete prospective CLI/MCP contracts,
+  including typed failure recovery, before exact activation-SHA review.
+- Actual closed SDK limit-error test confirms requested total cap above session
+  ceiling preserves requested_above_limit, amount/threshold/bytes, origin and
+  concrete session/profile recovery keys without fictional source/policy text;
+  no destination created. Focused case passes (1, 10 deselected); Ruff passes.
+  Inactive contract now records actual closed CLI/workspace inputs, run-cap
+  counterparts, profile-selected output and row-free status; no advertised public
+  command. Next complete public-boundary error adaptation and registration draft
+  as one reviewed workflow, retaining no-issuer/default-source-free guards.
+- Found closed candidate argparse errors could reflect rejected values before
+  publication guards. Both execution and local-approval parsers now reuse the
+  existing helpful CLI parser with fixed invalid-arguments text and --help
+  recovery. Four subprocess cases (bad integer/unknown option × both entrances)
+  pass, expose no fictional marker and create no files. Ruff/Mypy pass.
+  No public registration changed. Next finish boundary error contract and
+  activation wiring draft; installed wheel evidence predates this parser fix.
+- Read-only GitHub check confirms no open PR for codex/1-6-execution-activation;
+  no competing CI dispatched. Reconciled inactive CLI/MCP malformed-argument,
+  typed-limit and cleanup-warning contract against actual focused evidence.
+  Activation review is still outstanding; prior inactive amendment review is
+  not treated as registration approval. Next finish prospective registration
+  composition and public-facing error adaptation, then installed interface
+  evidence and exact-SHA safety review before enabling the separate surface.
+- Existing CLI presenter already retains safe typed transformation limits and
+  distinct cleanup-incomplete warnings in human and JSON forms; no duplicate
+  presenter added (Ponytail). Four focused cases pass across formats/failures.
+  Initial test assumed JSON stderr; corrected to existing stdout contract and
+  reran only the two affected JSON cases. Ruff/diff-check pass. These are
+  presenter checks, not registered-command acceptance. Next compose proposed
+  commands with that presenter and existing shared executor, still gated.
+- Closed execution entrypoint now composes shared executor with existing human/
+  JSON error presenter, retaining safe typed limits and cleanup warning before
+  generic value-free failures. Parser supports fixed JSON argument errors.
+  Three real subprocess cases (malformed arguments, missing source, requested
+  cap above session) pass: JSON stdout, exit 2, no traceback/raw fixture marker,
+  no output. Ruff/Mypy pass. Production CLI remains unregistered. Next exercise
+  successful saved-profile execution through this entrypoint and reconcile
+  prospective registration, then installed gate/exact-SHA activation review.
+- Successful saved fictional policy → fixed review → closed CLI entrypoint
+  subprocess now passes through the same success/error composition: digest
+  matches review, exact replacement CSV verified, source/policy unchanged and
+  source/replacement literals absent from stdout/stderr. New case passes (1,
+  22 deselected); Ruff/diff-check pass. Existing successful helper cases were
+  not replayed. Next consolidate changed candidate boundary and inactive
+  contract into signed checkpoint, then completed registration draft review;
+  production surface and full RC remain incomplete.

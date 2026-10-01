@@ -40,6 +40,28 @@ No agent/MCP approval operation, environment switch, or boolean may substitute
 for the controlling-terminal confirmation. The current candidate modules are
 unregistered; this amendment does not register them or approve a dataset.
 
+Closed fictional-test composition may register the private execution callable
+only in its test server. It reuses the audited/redacted bounded stdio transport
+and the same request-context work budget for transport and application dispatch.
+No receipt issuer is registered. SDK and subprocess tests of this composition
+are evidence for review, not public activation or authorization of any dataset.
+
+Closed candidate execution requires source, saved policy, new destination and
+the exact reviewed `snapshot_sha256`; table identity and existing receipt are
+optional explicit inputs. CLI run caps are `--max-total-input-bytes` and
+`--max-output-bytes`; workspace-call counterparts are `max_total_input_bytes`
+and `max_output_bytes`. Omission selects the effective session/profile ceiling,
+not an unlimited budget. Output format belongs to the saved policy. Success
+returns digest, provenance counts and output-budget metadata, not dataset rows.
+The closed status `closed_test_completed` is not a public release contract.
+
+Malformed CLI arguments use fixed invalid-arguments text and a command help
+hint; rejected tokens are never echoed. MCP typed argument failures use the
+existing fixed validation error. Transformation limit failures retain their
+safe typed counters, units, origin and session/profile recovery keys through
+SDK dispatch. Generic publication failures must not be mistaken for confirmed
+cleanup: the distinct cleanup-incomplete warning below takes precedence.
+
 The entrance must reject unsupported actions/routes rather than silently use
 private implementations. In particular, private `derive` remains unavailable
 publicly under ADR-0026. Database query capture remains separately gated by

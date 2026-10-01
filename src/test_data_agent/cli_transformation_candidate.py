@@ -4,8 +4,12 @@ Not imported by CLI composition, package facade or MCP. Activation requires
 end-to-end evidence and independent review of the completed wiring.
 """
 
-import argparse
 from pathlib import Path
+from typing import Never
+import argparse
+import json
+
+from test_data_agent.cli_parser import HelpfulArgumentParser
 
 from test_data_agent.core.limits import (
     DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
@@ -19,9 +23,16 @@ from test_data_agent.io.transformation_receipt import LocalReceiptError, issue_l
 from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
 
 
-def _run_candidate_execution(argv: list[str]) -> dict[str, object]:
+class _CandidateArgumentParser(HelpfulArgumentParser):
+    """Keep rejected caller values out of CLI diagnostics."""
+
+    def error(self, message: str) -> Never:
+        super().error("invalid transformation arguments")
+
+
+def _run_candidate_execution(argv: list[str], *, json_errors: bool = False) -> dict[str, object]:
     """Parse a proposed execution request; never mint an approval receipt."""
-    parser = argparse.ArgumentParser(prog="closed-transform-execute")
+    parser = _CandidateArgumentParser(prog="closed-transform-execute", json_errors=json_errors)
     parser.add_argument("source", type=Path)
     parser.add_argument("policy", type=Path)
     parser.add_argument("destination", type=Path)
@@ -40,9 +51,28 @@ def _run_candidate_execution(argv: list[str]) -> dict[str, object]:
         receipt_path=args.receipt)
 
 
+def _candidate_execution_main(argv: list[str], *, json_output: bool = False) -> int:
+    """Closed test entrypoint; not connected to production command composition."""
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import report_cli_error
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_publish import TransformationCleanupError
+
+    args = argparse.Namespace(command="closed-transform-execute", json_output=json_output)
+    try:
+        result = _run_candidate_execution(argv, json_errors=json_output)
+    except (TransformationLimitError, TransformationCleanupError) as error:
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
+    except (ValueError, OSError):
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,
+            message="invalid transformation request; no successful publication confirmed")
+    print(json.dumps(result))
+    return 0
+
+
 def _run_candidate_local_approval(argv: list[str]) -> dict[str, object]:
     """Local controlling-TTY confirmation only; never registered in MCP."""
-    parser = argparse.ArgumentParser(prog="closed-transform-approve")
+    parser = _CandidateArgumentParser(prog="closed-transform-approve")
     parser.add_argument("source", type=Path)
     parser.add_argument("policy", type=Path)
     parser.add_argument("receipt", type=Path)

@@ -1,6 +1,6 @@
 """Unregistered workspace execution candidate; fictional test use only.
 
-No tool registration or approval issuer. Public activation requires the
+No production tool registration or approval issuer. Public activation requires the
 completed wiring's independent safety review and matching policy amendments.
 """
 

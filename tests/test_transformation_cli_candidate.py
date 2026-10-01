@@ -1,6 +1,7 @@
 """Fictional private CLI composition; production commands stay unregistered."""
 
 import json
+import argparse
 import os
 import pty
 import select
@@ -15,6 +16,80 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
+
+
+@pytest.mark.parametrize("mode", ["malformed", "missing", "limit"])
+def test_closed_entrypoint_returns_safe_json_failure(tmp_path, mode):
+    program = ("import sys; from test_data_agent.cli_transformation_candidate import "
+        "_candidate_execution_main; sys.exit(_candidate_execution_main(sys.argv[1:], json_output=True))")
+    source = tmp_path / "source.csv"
+    policy = tmp_path / "policy.yaml"
+    if mode == "limit":
+        source.write_text("label\nfictional-secret-marker\n")
+        policy.write_text("fictional-secret-marker")
+    arguments = [str(source), str(policy), str(tmp_path / "output"), "--snapshot-sha256", "0" * 64]
+    if mode == "malformed":
+        arguments += ["--max-total-input-bytes", "fictional-secret-marker"]
+    elif mode == "limit":
+        arguments += ["--max-total-input-bytes", "8192"]
+    result = subprocess.run([sys.executable, "-c", program, *arguments], capture_output=True,
+        text=True, timeout=15, env={**os.environ, "TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES": "1024"})
+    assert result.returncode == 2
+    document = json.loads(result.stdout)
+    assert document["ok"] is False
+    assert not result.stderr
+    assert "fictional-secret-marker" not in result.stdout
+    if mode == "limit":
+        assert "requested_above_limit" in document["error"]["message"]
+    assert not (tmp_path / "output").exists()
+
+
+@pytest.mark.parametrize("json_output", [False, True])
+@pytest.mark.parametrize("failure", ["limit", "cleanup"])
+def test_existing_cli_presenter_preserves_transformation_recovery(capsys, json_output, failure):
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import friendly_error, report_cli_error
+    from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError
+    from test_data_agent.io.transformation_publish import TransformationCleanupError
+
+    error = (TransformationLimitError(InputDimension.TOTAL_BYTES, 8192, 1024,
+        "session", requested=True) if failure == "limit" else
+        TransformationCleanupError("transformation cleanup incomplete; output or staging may remain"))
+    args = argparse.Namespace(command="closed-transform-execute", json_output=json_output)
+    assert report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=friendly_error(error)) == 2
+    captured = capsys.readouterr()
+    if json_output:
+        document = json.loads(captured.out)
+        message = document["error"]["message"]
+        assert document["ok"] is False
+        assert not captured.err
+    else:
+        message = captured.err
+    if failure == "limit":
+        assert "requested_above_limit" in message and "8192 > 1024 bytes" in message
+        assert "origin=session" in message and "resource_limits.max_total_input_bytes" in message
+    else:
+        assert "cleanup incomplete" in message and "may remain" in message
+    if not json_output:
+        assert not captured.out
+
+
+@pytest.mark.parametrize("function", ["_run_candidate_execution", "_run_candidate_local_approval"])
+@pytest.mark.parametrize("invalid", ["integer", "unknown"])
+def test_candidate_parser_rejects_without_reflecting_arguments(tmp_path, function, invalid):
+    program = (f"import sys; from test_data_agent.cli_transformation_candidate import {function}; "
+        f"{function}(sys.argv[1:])")
+    arguments = ["source.csv", "policy.yaml", str(tmp_path / "output"),
+        "--snapshot-sha256", "0" * 64]
+    arguments += (["--max-total-input-bytes", "fictional-secret-marker"] if invalid == "integer"
+                  else ["--fictional-secret-marker"])
+    result = subprocess.run([sys.executable, "-c", program, *arguments],
+        capture_output=True, text=True, timeout=15)
+    assert result.returncode == 2
+    assert "invalid transformation arguments" in result.stderr
+    assert "fictional-secret-marker" not in result.stdout + result.stderr
+    assert "--help" in result.stderr
+    assert not list(tmp_path.iterdir())
 
 
 @pytest.mark.parametrize("entrance", ["approval", "execution", "workspace"])
@@ -55,7 +130,7 @@ def test_candidate_entrances_reject_private_derive_before_artifacts(tmp_path, en
     assert {p.name: p.read_bytes() for p in tmp_path.iterdir()} == before
 
 
-@pytest.mark.parametrize("mode", ["explicit", "stale", "profile", "session", "above_session",
+@pytest.mark.parametrize("mode", ["entrypoint", "explicit", "stale", "profile", "session", "above_session",
     "total_above", "total_exceeded"])
 def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     source = SnapshotPart("source", "items", b"label\nalpha\n")
@@ -75,6 +150,9 @@ def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
     program = ("import json,sys; from test_data_agent.cli_transformation_candidate import "
         "_run_candidate_execution; print(json.dumps(_run_candidate_execution(sys.argv[1:])))")
+    if mode == "entrypoint":
+        program = ("import sys; from test_data_agent.cli_transformation_candidate import "
+            "_candidate_execution_main; sys.exit(_candidate_execution_main(sys.argv[1:], json_output=True))")
     argv = [sys.executable, "-c", program, str(tmp_path / "items.csv"),
         str(tmp_path / "behavior.yaml"), str(tmp_path / "output"), "--snapshot-sha256",
         "0" * 64 if mode == "stale" else request.snapshot_sha256]
