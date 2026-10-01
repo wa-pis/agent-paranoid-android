@@ -4401,3 +4401,76 @@ Broader transformation remains unfinished.
   with the real subprocess transport (no product monkeypatch). Prepare one
   signed read-only review PR; consume CI before normal merge. Next functional
   work remains complete public execution activation evidence under ADR-0020.
+- PR #600 merged normally after all required and reported CI succeeded;
+  head377b05692f302ea6eeb14e34acea3ce05697d1a3,
+  mergebef20dbe50dc29a18ff2d94b2fac664b02049148. Read-only MCP review is
+  integrated; no public execution or receipt authority activated.
+  Active checkout /private/tmp/apa-rc-workflow, new branch
+  codex/1-6-execution-activation from merged main. Next complete outcome:
+  audit existing shared executor/publication/approval boundaries, assemble
+  executable end-to-end activation evidence and independent safety review
+  before enabling the public execution interfaces. Reuse accepted route/scale
+  evidence where unchanged; no duplicate review or CI runs. Automation ACTIVE.
+- Activation audit at bef20db: existing replace_csv_snapshot verifies canonical
+  fixed snapshots and matching receipts; issue_local_receipt is a private
+  controlling-TTY helper, not a registered command. Existing publication builds
+  all three formats and mixed-origin provenance but exposes only automatically
+  deleted temporary output. Public CLI registers review only; no execute/approve
+  transformation path. Reuse path_policy staging/atomic publication and identity
+  cleanup, not a new filesystem framework. Next implementation: extract the
+  existing artifact writer for a closed fictional destination-bound acceptance
+  path, test fail-before-publication and unchanged/changed review binding, then
+  assemble exact-SHA safety review before registering public commands. This is
+  an audit, not evidence that activation or preservation acceptance has passed.
+- Closed publication preparation: extracted the existing atomic bundle writer
+  without registering public destinations; added staging cleanup on failure and
+  a fixed artifact-name allowlist. Fictional existing-output collision test
+  proves the prior artifact remains unchanged and staging is removed; path-name
+  traversal fails before creating files. Executor/publication suite279 passed,
+  Ruff and diff checks passed. Public activation remains disabled. Next: extend
+  the complete fixed-review execution request through this writer with bounded
+  configuration and approval consumption; assemble one activation PR only after
+  end-to-end acceptance and exact-SHA independent safety review.
+- Bundle limit enforcement now lives at the shared closed writer, before any
+  staging creation; no duplicated caller-only check. Executable fictional exact
+  byte-boundary/one-over acceptance covers payload plus manifest, typed counters
+  and origin, no files on rejection, full readback on success. Public surfaces
+  remain unchanged. Executor/publication280 tests, Ruff and diff checks passed.
+  Continue the complete activation scenario in this branch;
+  no separate helper PR or scale replay.
+- Fixed-review→closed destination→artifact readback now uses the same extracted
+  executor/publication path as automatically cleaned temporary acceptance.
+  No second renderer/engine and no public facade. Fictional end-to-end tests
+  verify complete CSV/manifest/provenance, changed review rejects before files,
+  and output-budget exhaustion leaves no destination or staging. All283 focused
+  executor/publication tests passed; Ruff/diff checks passed. Receipt verification
+  stays in replace_csv_snapshot; no receipt minting or declassification added.
+  Next: bind expected review digest and effective session/profile limits at the
+  command boundary, add complete CLI/agent execution acceptance behind the
+  activation gate, then exact-SHA independent safety review. Keep one PR scope.
+- Saved policy paths→exact reviewed digest→shared closed executor→destination
+  publication→full readback acceptance now passes. Temporary command delegates
+  to that same path and still removes artifacts before returning. Stale digest
+  rejects without destination; explicit session output ceiling retains typed
+  requested_above_limit/session diagnostics before staging. Source/policy/mapping
+  bytes remain unchanged. All286 focused executor/publication tests plus Ruff
+  and diff checks passed after the refactor. No public interface or approval
+  issuance added. Next: installed route acceptance on the changed writer,
+  preservation/receipt-consumption acceptance and executable public gate tests;
+  then consolidate docs/contract and exact-SHA independent review before wiring.
+- Changed publication integration installed-wheel acceptance completed: all12
+  fictional routes passed; 15 installed fixed-review/receipt-consumption tests
+  passed with pytest pythonpath injection disabled. Fresh wheel/harness hashes
+  and scope recorded in route-workflow-acceptance.md. python-build unavailable;
+  existing pip/Hatch built offline without dependencies or primary venv changes.
+  No scale replay, no public activation or real-data approval. Next: executable
+  public activation-gate checks and contract/docs consolidation, then coherent
+  exact-SHA independent safety review before public command wiring.
+- Public activation boundary made executable against the same installed wheel:
+  3 tests pass proving transform-execute/transform-approve unregistered, MCP
+  transformation surface review-only and no receipt endpoints/public Python
+  exports. MCP guide now explicitly distinguishes closed writer acceptance from
+  activation. Ruff, strict MkDocs and diff checks pass. No gate relaxed.
+  Next: consolidate a signed evidence SHA and narrow independent safety review
+  of the shared publication/receipt boundary before any public wiring; retain
+  full RC scope and do not treat these gate tests as completed public execution.

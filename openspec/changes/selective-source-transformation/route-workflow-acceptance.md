@@ -29,6 +29,28 @@ Next: connect common execution/publication contracts to CLI/Python/MCP under
 the existing safety amendments and independent activation review.
 # MCP service parity follow-up — 2026-10-01
 
+## Closed publication integration follow-up
+
+Changed publication path verified on a freshly built, isolated installed wheel:
+all 12 fictional routes passed again (CLI/MCP service review, common private
+command, full artifact readback, provenance and cleanup). Accepted large-scale
+workflows were not replayed. Wheel SHA-256:
+`ac0ecb1912138d7ca8ee3177f75eeb7a9ecb777b72b3d7ba3d3836fcf0d9d21b`;
+path `/private/tmp/apa-activation-wheel.6RCKz6/agent_paranoid_android-1.5.0-py3-none-any.whl`.
+Harness SHA-256 remains
+`6c9bb0783050ea20e59bcfe51ece3e903780e4808abcbc9394b58244c918be6d`.
+
+Installed-wheel focused acceptance: 15 tests passed with pytest source-path
+injection disabled (`-o pythonpath=`). Scope: existing fictional TTY-issued
+receipt consumed by preservation/publication, stale or missing approval blocked,
+fixed review to private destination and configured session ceiling rejection.
+This is private fictional test authority, not human approval of any real data,
+nor evidence of public activation. No external database connection or SQL writes.
+Development version remains 1.5.0, not a published release candidate.
+
+`python -m build` was unavailable locally; existing pip/Hatch wheel build used
+`--no-deps --no-build-isolation` successfully, without changing the primary venv.
+
 All 12 fictional small route combinations passed with installed CLI and MCP
 application-service review parity (same review metadata and snapshot SHA-256),
 followed by the existing private executor, full artifact readback, provenance,

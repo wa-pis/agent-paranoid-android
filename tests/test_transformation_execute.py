@@ -55,6 +55,105 @@ def execute(material, limit=8192):
         max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)).csv_bytes
 
 
+def test_closed_bundle_writer_preserves_existing_output_and_cleans_staging(tmp_path):
+    from test_data_agent.io.transformation_publish import _publish_test_bundle
+    destination = tmp_path / "output"
+    destination.mkdir()
+    (destination / "owned.txt").write_bytes(b"fictional-existing-artifact")
+    with pytest.raises(ValueError):
+        _publish_test_bundle(destination, "dataset.csv", b"label\ngamma\n",
+                             b'{"origin":"transformed_mixed"}', GenerationBudget(5),
+                             max_output_bytes=8192)
+    assert list(tmp_path.iterdir()) == [destination]
+    assert (destination / "owned.txt").read_bytes() == b"fictional-existing-artifact"
+    with pytest.raises(ValueError):
+        _publish_test_bundle(tmp_path / "new", "../escape", b"", b"", GenerationBudget(5),
+                             max_output_bytes=8192)
+    assert list(tmp_path.iterdir()) == [destination]
+
+
+def test_closed_bundle_writer_byte_boundary_before_any_files(tmp_path):
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_publish import _publish_test_bundle
+    destination = tmp_path / "output"
+    payload, manifest = b"label\ngamma\n", b'{"origin":"transformed_mixed"}'
+    size = len(payload) + len(manifest)
+    with pytest.raises(TransformationLimitError) as caught:
+        _publish_test_bundle(destination, "dataset.csv", payload, manifest, GenerationBudget(5),
+                             max_output_bytes=size - 1)
+    assert caught.value.amount == size and caught.value.limit == size - 1
+    assert caught.value.origin == "bundle_run"
+    assert list(tmp_path.iterdir()) == []
+    _publish_test_bundle(destination, "dataset.csv", payload, manifest, GenerationBudget(5),
+                         max_output_bytes=size)
+    assert (destination / "dataset.csv").read_bytes() == payload
+    assert (destination / "manifest.json").read_bytes() == manifest
+    assert list(tmp_path.iterdir()) == [destination]
+
+
+@pytest.mark.parametrize("failure", [None, "changed_review", "output_budget"])
+def test_fixed_review_to_closed_destination_publication(tmp_path, failure):
+    import json
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_publish import (
+        TransformationPublicationError, _publish_reviewed_test_snapshot,
+    )
+    material = request()
+    destination = tmp_path / "output"
+    if failure == "changed_review":
+        material = replace(material, review=b"{}")
+    kwargs = dict(max_total_bytes=8192, max_review_bytes=4096,
+                  max_output_bytes=1 if failure == "output_budget" else 8192,
+                  budget=GenerationBudget(5))
+    if failure:
+        with pytest.raises(TransformationLimitError if failure == "output_budget"
+                           else TransformationPublicationError):
+            _publish_reviewed_test_snapshot(material, destination, **kwargs)
+        assert list(tmp_path.iterdir()) == []
+        return
+    _publish_reviewed_test_snapshot(material, destination, **kwargs)
+    assert list(csv.reader(io.StringIO((destination / "dataset.csv").read_text()))) == [
+        ["flag", "code"], ["no", "1"], ["yes", "second"]]
+    manifest = json.loads((destination / "manifest.json").read_bytes())
+    assert manifest["origin"] == "transformed_mixed"
+    assert manifest["provenance"]["replacement_percent"] == "100.00"
+    assert list(tmp_path.iterdir()) == [destination]
+
+
+@pytest.mark.parametrize("failure", [None, "stale_digest", "session_ceiling"])
+def test_saved_policy_to_closed_command_publication(tmp_path, monkeypatch, failure):
+    from test_data_agent.io.transformation_publish import (
+        TransformationLimitError, TransformationPublicationError, _execute_reviewed_test_from_paths,
+    )
+    material = request()
+    for part in material.parts:
+        if part.kind in {"policy", "mapping", "source"}:
+            (tmp_path / ("items.csv" if part.kind == "source" else part.name)).write_bytes(part.payload)
+    before = {path.name: path.read_bytes() for path in tmp_path.iterdir()}
+    destination = tmp_path / "output"
+    if failure == "session_ceiling":
+        monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES", "4096")
+    kwargs = dict(expected_snapshot_sha256="0" * 64 if failure == "stale_digest"
+                  else material.snapshot_sha256, max_total_bytes=8192, max_review_bytes=4096,
+                  max_output_bytes=8192, budget=GenerationBudget(5))
+    if failure:
+        with pytest.raises(TransformationLimitError if failure == "session_ceiling"
+                           else TransformationPublicationError) as caught:
+            _execute_reviewed_test_from_paths(tmp_path / "items.csv", "items",
+                tmp_path / "behavior.yaml", destination, **kwargs)
+        assert not destination.exists()
+        if failure == "session_ceiling":
+            assert caught.value.code == "requested_above_limit"
+            assert caught.value.origin == "session" and caught.value.limit == 4096
+    else:
+        summary = _execute_reviewed_test_from_paths(tmp_path / "items.csv", "items",
+            tmp_path / "behavior.yaml", destination, **kwargs)
+        assert summary["snapshot_sha256"] == material.snapshot_sha256
+        assert (destination / "dataset.csv").read_bytes() == execute(material)
+        assert summary["provenance"]["replacement_percent"] == "100.00"
+    assert {name: (tmp_path / name).read_bytes() for name in before} == before
+
+
 @pytest.mark.parametrize("invalid_type", [False, True])
 def test_private_csv_to_parquet_publication(invalid_type):
     import json

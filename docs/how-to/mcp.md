@@ -176,3 +176,9 @@ The server rejects:
 
 See [MCP Tools](../mcp_examples.md) and
 [Configuration](../reference/configuration.md) for details.
+
+Transformation execution and preservation approval are not MCP capabilities.
+The shared destination writer is currently a private fictional-test boundary;
+passing its acceptance does not enable a public execution tool. Agents cannot
+issue local preservation receipts. Public activation still requires the scoped
+safety review and executable evidence specified by ADR-0020 and ADR-0021.
