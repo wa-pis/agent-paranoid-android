@@ -19,6 +19,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Describe all supported local snapshot formats in `transform-review` help;
+  query-result review reads an existing captured envelope without DB access.
+
 - Separate generated identifier domains across entities and fields, while
   retaining declared foreign-key assignments and seeded replay. Regenerate
   identifier fixtures: seeded values and string identifier format have changed.

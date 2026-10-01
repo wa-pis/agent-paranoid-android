@@ -4339,3 +4339,25 @@ Broader transformation remains unfinished.
   SQL/evidence commit and one PR, then consume required CI without duplicate
   runs. Automation remains PAUSED, no duplicate work. Next functional outcome:
   shared public workflow and activation evidence, not another isolated helper.
+- 2026-10-01 owner requested merge, continuation and automation resume.
+  PR #595 merged normally after green required and all reported CI checks,
+  valid signature and CLEAN status, pinned to c894ce0; merge99cc4d0a908187a4b6c7d264cf7d2f6892d4280b.
+  Prior /private/tmp/apa-private-csv-engine checkout is absent; do not use the
+  older primary codex/1-6-parquet-typed branch as continuation evidence.
+  Active checkout: /private/tmp/apa-rc-workflow, branch codex/1-6-shared-workflow,
+  based on merged99cc4d0. Managed worktree tool reported Git unavailable, so
+  Homebrew Git created the isolated checkout; primary checkout preserved.
+  Next complete outcome: shared saved-policy review/execution workflow and
+  executable activation evidence under ADR-0020/0024/0027. Audit existing
+  interfaces and remaining routes first; keep public execution gated until
+  required independent review. Reuse accepted CSV/PostgreSQL scale evidence.
+- 2026-10-01: installed saved-policy basic route matrix PASSED all12 input/output
+  combinations, including public CLI review digest parity, private file-command
+  execution, full artifact readback/provenance, unchanged inputs and cleanup.
+  See route-workflow-acceptance.md for hashes/scope. Uses existing shared engine;
+  corrected CSV-only CLI help after observing native/query snapshots already
+  supported. No public execution activated or source-preservation approval.
+  Harness initially passed an unsupported --policy flag; corrected invocation
+  to existing positional contract. Focused CLI/parser11 tests and Ruff passed;
+  no unchanged scale replay. Remaining full type/route/public activation gates
+  stay open. Next complete outcome remains shared public execution workflow.

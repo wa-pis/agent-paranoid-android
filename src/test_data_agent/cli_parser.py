@@ -322,14 +322,16 @@ def register_dataset_commands(
 
     transform_review_parser = subparsers.add_parser(
         "transform-review",
-        help="Review a CSV transformation policy without executing it.",
-        description=("Read one fixed CSV snapshot and a local behavior policy. "
+        help="Review a transformation snapshot and policy without executing it.",
+        description=("Read one fixed source snapshot and a local behavior policy. "
+                     "The policy selects CSV, Parquet or an already captured query result; "
+                     "this command does not capture query results or connect to databases. "
                      "Show value-free field decisions and a snapshot digest; "
                      "do not approve or transform source data. "
                      "With --decide, interactively edit and save sensitivity decisions."),
         formatter_class=PublicHelpFormatter,
     )
-    transform_review_parser.add_argument("source", type=Path, help="Local source CSV file.")
+    transform_review_parser.add_argument("source", type=Path, help="Local source snapshot file; format selected by policy.")
     transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
     transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
     transform_review_parser.add_argument(
