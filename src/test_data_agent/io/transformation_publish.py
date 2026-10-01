@@ -5,8 +5,11 @@ Only fictional test requests are authorized before activation review.
 """
 
 import json
+import os
 from test_data_agent.io.transformation_input import source_reader
-from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError
+from test_data_agent.core.transformation_limits import (
+    InputDimension, TransformationLimitError, resolve_input_limit,
+)
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict
@@ -78,7 +81,7 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
 def _execute_reviewed_test_from_paths(
     source_path: Path, table_name: str, policy_path: Path, destination: Path, *,
     expected_snapshot_sha256: str, max_total_bytes: int, max_review_bytes: int,
-    max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
+    max_output_bytes: int | None, budget: GenerationBudget, receipt_path: Path | None = None,
 ) -> dict[str, object]:
     """Closed fictional-test command; validate fixed review before publication.
 
@@ -96,11 +99,17 @@ def _execute_reviewed_test_from_paths(
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget)
         if request.snapshot_sha256 != expected_snapshot_sha256:
             raise ValueError
+        policy = load_behavior_policy_yaml(next(part.payload for part in request.parts
+            if part.kind == "policy"), max_bytes=max_total_bytes, budget=budget)
+        output_ceiling = resolve_input_limit(InputDimension.OUTPUT_BYTES, policy.resource_limits, os.environ)
+        output_limit = output_ceiling.value if max_output_bytes is None else max_output_bytes
         manifest = _publish_reviewed_test_snapshot(request, destination, max_total_bytes=max_total_bytes,
-            max_review_bytes=max_review_bytes, max_output_bytes=max_output_bytes,
+            max_review_bytes=max_review_bytes, max_output_bytes=output_limit,
             budget=budget, receipt_path=receipt_path)
         return {"status": "closed_test_completed", "snapshot_sha256": request.snapshot_sha256,
-                "provenance": manifest["provenance"]}
+                "provenance": manifest["provenance"], "output_budget": {
+                    "run_bytes": output_limit, "ceiling_bytes": output_ceiling.value,
+                    "ceiling_origin": output_ceiling.origin}}
     except (TransformationLimitError, TransformationCleanupError):
         raise
     except (OSError, ValueError, TypeError, AttributeError, KeyError):

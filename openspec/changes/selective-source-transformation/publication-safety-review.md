@@ -76,3 +76,20 @@ without the suppressing discard helper. Failure to obtain initial identity also
 reports cleanup incomplete rather than claiming staging removal; no unverified
 identity is used for deletion. Fault cases cover initial identity and cleanup
 lookup failures with sanitized diagnostics. Follow-up disposition pending.
+
+## Final changed-scope disposition
+
+- Reviewer: PublicationBoundary-R1/Jason, same independent AI subagent.
+- Date: 2026-10-01.
+- SHA: `3721503e38522fa6966bdc4fd64adbdbecbe3f08`.
+- Prior: `f5842d84cccad4a2733dcbf2feaf3348c9f91e15`.
+- Scope: staging identity capture, cleanup/error boundary, two new fault phases
+  and directly relevant path-policy dependencies; static inspection only.
+- Disposition: incomplete-cleanup finding closed; no new findings in changed
+  scope. Known identities constrain deletion; lookup failures propagate to a
+  sanitized distinct warning. Initial capture failure performs no unverified
+  deletion. Successful publication does not reopen staging for cleanup.
+- Evidence: exact HEAD/scoped files, diff and initial_identity/cleanup_lookup
+  tests inspected. Tests, Mypy, Ruff and diff checks not independently run.
+- Limits: no edits/GitHub writes, public activation permission, human approval
+  or final RC approval. Prospective public wiring requires its own evidence.

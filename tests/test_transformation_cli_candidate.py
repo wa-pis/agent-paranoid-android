@@ -1,0 +1,151 @@
+"""Fictional private CLI composition; production commands stay unregistered."""
+
+import json
+import os
+import pty
+import select
+import subprocess
+import sys
+import time
+
+import pytest
+import yaml
+
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
+from test_data_agent.core.transformation_snapshot import SnapshotPart
+from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
+
+
+@pytest.mark.parametrize("mode", ["explicit", "stale", "profile", "session", "above_session"])
+def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
+    source = SnapshotPart("source", "items", b"label\nalpha\n")
+    policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": "0" * 64, "fields": [{"entity": "items", "field": "label",
+        "sensitivity": "non_sensitive", "behavior": {"action": "substitute", "mapping": {
+        "kind": "inline", "entries": [{"original": ["alpha"], "replacement": ["gamma"]}]}}}]})
+    profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
+    policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    if mode == "profile":
+        policy = BehaviorPolicy.model_validate({**policy.model_dump(mode="json"),
+            "resource_limits": {"max_output_bytes": 8192}})
+    (tmp_path / "items.csv").write_bytes(source.payload)
+    (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
+    request = prepare_csv_review_from_paths(tmp_path / "items.csv", "items", tmp_path,
+        "behavior.yaml", max_total_bytes=8192, max_review_bytes=8192, budget=GenerationBudget(5))
+    before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+    program = ("import json,sys; from test_data_agent.cli_transformation_candidate import "
+        "_run_candidate_execution; print(json.dumps(_run_candidate_execution(sys.argv[1:])))")
+    argv = [sys.executable, "-c", program, str(tmp_path / "items.csv"),
+        str(tmp_path / "behavior.yaml"), str(tmp_path / "output"), "--snapshot-sha256",
+        "0" * 64 if mode == "stale" else request.snapshot_sha256]
+    if mode not in {"profile", "session"}:
+        argv += ["--max-output-bytes", "8192"]
+    env = dict(os.environ)
+    if mode in {"session", "above_session"}:
+        env["TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES"] = "8192" if mode == "session" else "4096"
+    result = subprocess.run(argv, env=env, capture_output=True, text=True, timeout=15)
+    if mode in {"stale", "above_session"}:
+        assert result.returncode != 0
+        assert not (tmp_path / "output").exists()
+        if mode == "above_session":
+            assert "requested_above_limit" in result.stderr
+            assert "origin=session" in result.stderr
+    else:
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout)["snapshot_sha256"] == request.snapshot_sha256
+        if mode in {"profile", "session"}:
+            assert json.loads(result.stdout)["output_budget"] == {
+                "run_bytes": 8192, "ceiling_bytes": 8192, "ceiling_origin": mode}
+        assert (tmp_path / "output" / "dataset.csv").read_bytes() == b"label\ngamma\n"
+    assert "alpha" not in result.stdout + result.stderr
+    assert {name: (tmp_path / name).read_bytes() for name in before} == before
+
+
+def test_local_candidate_tty_receipt_to_execution(tmp_path):
+    from test_data_agent.io.transformation_receipt import _canonical_request
+    source = SnapshotPart("source", "items", b"code,label\nfictional-a,alpha\n")
+    policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": "0" * 64, "fields": [
+        {"entity": "items", "field": "code", "sensitivity": "non_sensitive",
+         "behavior": {"action": "preserve", "authorization_ref": "fictional-local",
+                      "comment": "Reviewed fictional business code"}},
+        {"entity": "items", "field": "label", "sensitivity": "non_sensitive",
+         "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
+             {"original": ["alpha"], "replacement": ["gamma"]}]}}}]})
+    profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
+    policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    (tmp_path / "items.csv").write_bytes(source.payload)
+    (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
+    request = prepare_csv_review_from_paths(tmp_path / "items.csv", "items", tmp_path,
+        "behavior.yaml", max_total_bytes=8192, max_review_bytes=8192, budget=GenerationBudget(5))
+    assert _canonical_request(request, max_total_bytes=8192, max_review_bytes=8192,
+        budget=GenerationBudget(5)) == request
+    program = ("import fcntl,termios,json,sys,os; fcntl.ioctl(0,termios.TIOCSCTTY,0); "
+        "os.tcsetpgrp(0,os.getpgrp()); "
+        "from test_data_agent.cli_transformation_candidate import _run_candidate_local_approval; "
+        "print(json.dumps(_run_candidate_local_approval(sys.argv[1:])))")
+    master, slave = pty.openpty()
+    process = subprocess.Popen([sys.executable, "-c", program, str(tmp_path / "items.csv"),
+        str(tmp_path / "behavior.yaml"), str(tmp_path / "receipt.json"), "--snapshot-sha256",
+        request.snapshot_sha256], stdin=slave, stdout=slave, stderr=slave, start_new_session=True)
+    os.close(slave)
+    transcript = bytearray()
+    try:
+        deadline = time.monotonic() + 15
+        while b"Type APPROVE" not in transcript:
+            assert time.monotonic() < deadline, bytes(transcript)
+            assert select.select([master], [], [], 1)[0]
+            transcript.extend(os.read(master, 16384))
+            assert process.poll() is None, bytes(transcript)
+        assert b"fictional-a" not in transcript and b"alpha" not in transcript
+        os.write(master, b"APPROVE\n")
+        # Drain the PTY while waiting: terminal output can otherwise block exit.
+        deadline = time.monotonic() + 15
+        while process.poll() is None:
+            assert time.monotonic() < deadline, bytes(transcript)
+            if select.select([master], [], [], 0.1)[0]:
+                transcript.extend(os.read(master, 16384))
+        assert process.returncode == 0, bytes(transcript)
+    finally:
+        os.close(master)
+        if process.poll() is None:
+            process.kill()
+            process.wait(timeout=10)
+    receipt = tmp_path / "receipt.json"
+    assert receipt.stat().st_mode & 0o077 == 0
+    execution = ("import json,sys; from test_data_agent.cli_transformation_candidate import "
+        "_run_candidate_execution; print(json.dumps(_run_candidate_execution(sys.argv[1:])))")
+    result = subprocess.run([sys.executable, "-c", execution, str(tmp_path / "items.csv"),
+        str(tmp_path / "behavior.yaml"), str(tmp_path / "output"), "--snapshot-sha256",
+        request.snapshot_sha256, "--receipt", str(receipt), "--max-output-bytes", "8192"],
+        capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    assert (tmp_path / "output" / "dataset.csv").read_bytes() == b"code,label\nfictional-a,gamma\n"
+    assert "fictional-a" not in result.stdout + result.stderr
+    agent = ("import json; from test_data_agent.mcp_transformation_candidate import "
+        "_execute_candidate_transformation; print(json.dumps(_execute_candidate_transformation("
+        f"'items.csv','behavior.yaml','agent-output',{request.snapshot_sha256!r},"
+        "receipt_path='receipt.json',max_output_bytes=8192)))")
+    agent_result = subprocess.run([sys.executable, "-c", agent], capture_output=True,
+        text=True, timeout=15, env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
+    assert agent_result.returncode == 0, agent_result.stderr
+    assert json.loads(agent_result.stdout) == json.loads(result.stdout)
+    assert (tmp_path / "agent-output" / "dataset.csv").read_bytes() == (
+        tmp_path / "output" / "dataset.csv").read_bytes()
+    assert "fictional-a" not in agent_result.stdout + agent_result.stderr
+    receipt_before = receipt.read_bytes()
+    for mode in ("existing", "stale", "no_tty"):
+        target = receipt if mode == "existing" else tmp_path / f"{mode}.json"
+        approval = ("import json,sys; from test_data_agent.cli_transformation_candidate import "
+            "_run_candidate_local_approval; print(json.dumps(_run_candidate_local_approval(sys.argv[1:])))")
+        rejected = subprocess.run([sys.executable, "-c", approval,
+            str(tmp_path / "items.csv"), str(tmp_path / "behavior.yaml"), str(target),
+            "--snapshot-sha256", "0" * 64 if mode == "stale" else request.snapshot_sha256],
+            input="APPROVE\n", capture_output=True, text=True, timeout=15,
+            start_new_session=True)
+        assert rejected.returncode != 0
+        assert "fictional-a" not in rejected.stdout + rejected.stderr
+        assert receipt.read_bytes() == receipt_before
+        if mode != "existing":
+            assert not target.exists()

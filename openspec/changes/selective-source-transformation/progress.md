@@ -4528,3 +4528,79 @@ Broader transformation remains unfinished.
   cleanup, without unverified deletion.36 focused tests, Mypy/Ruff pass.
   Reviewer finished; next signed changed-scope SHA and same-reviewer follow-up.
   No public activation; broader path_policy helper deliberately unchanged.
+- Third fix signed3721503e38522fa6966bdc4fd64adbdbecbe3f08; same independent
+  reviewerPublicationBoundary-R1/Jason follow-up now active for changed scope.
+  Do not duplicate review; next consume disposition, keep one workflow PR scope.
+- PublicationBoundary-R1 completed at3721503: incomplete-cleanup finding closed
+  by static inspection, no new findings in changed scope. Exact identity/date/
+  scope/evidence and checks-not-run recorded in publication-safety-review.md.
+  Reviewer finished; no active duplicate review. Public activation still closed.
+  Next complete result: public command/agent request workflow with existing
+  shared core, explicit reviewed digest, effective limits and local-only receipt
+  issuance/agent consumption, acceptance and scoped review of new wiring before
+  activation. Publication finding is no longer the blocker; full RC not ready.
+- Unregistered CLI execution candidate added; no production composition import,
+  facade or MCP registration. Fictional saved policy→fixed review digest→parsed
+  CLI request in a subprocess→shared publication→full CSV readback passes;
+  stale digest rejects without output and inputs stay unchanged. Five candidate/
+  public-gate tests pass, Mypy/Ruff/diff pass. Initial fixture incorrectly expected
+  CRLF; corrected to existing LF output, no product format change. Candidate
+  currently requires explicit max-output-bytes and consumes only existing
+  receipt; no approval issuer. Next: effective session/profile defaults and
+  local-only confirmation composition, installed acceptance and scoped wiring
+  review before registration; retain one complete workflow PR scope.
+- Candidate execution output budget now defaults to effective profile/session
+  ceiling; explicit run cap remains independently checked by the shared core.
+  Value-free command result reports run bytes, ceiling bytes and origin.
+  Subprocess acceptance covers explicit cap, profile default, session default,
+  request above session ceiling and stale digest with no output on rejection.
+  No public registration, approval creation or source-free budget changes.
+  Next: local-only interactive confirmation composition and installed candidate
+  workflow acceptance; review new wiring before activation, one workflow PR.
+- Effective output-budget candidate acceptance:39 focused tests pass, Mypy two
+  modules/Ruff pass. Added unregistered local-approval candidate with mandatory
+  exact digest, controlling-TTY confirmation via existing receipt core and no
+  overwrite of existing receipt. No MCP issuer or automatic approval flag.
+  New real controlling-TTY subprocess integration currently FAILS before prompt
+  with sanitized LocalReceiptError; five execution candidate cases pass.
+  Do not claim local-approval composition accepted. Next diagnose canonical
+  request versus terminal boundary on fictional fixture, fix shared cause and
+  finish the approval→execution scenario; no user decision needed or activation.
+- TTY diagnosis: canonical request validation passes. Sandboxed subprocess fails
+  opening `/dev/tty` with PermissionError (EPERM), before receipt prompting.
+  Isolated unsandboxed fictional test reaches the real APPROVE prompt, but child
+  does not finish within ten seconds after the answer. This is not acceptance.
+  Harness now reports early child failure immediately rather than spinning for
+  fifteen seconds. Next inspect controlling-terminal answer/read behavior and
+  complete receipt→execution; no policy bypass or public activation performed.
+- Closed CLI approval→execution now accepted on fictional temporary fixtures.
+  Root cause of post-answer timeout: PTY harness waited without draining output;
+  corrected harness only, receipt core unchanged. Real controlling-TTY prompt,
+  exact-digest owner-only receipt and separate noninteractive artifact readback
+  pass. Stale digest, existing receipt overwrite and piped APPROVE without TTY
+  reject without new receipt. Source candidate:6 tests pass; receipt scope:17
+  pass; Ruff and Mypy two modules pass. Installed development wheel:17 pass,
+  SHA256 6ab034ca3be1091b614eb46db0fe527c19068800253d590f813973822632eaff.
+  Evidence:route-workflow-acceptance.md. No public activation or real approval.
+  Next: complete common CLI/agent execution wiring and configuration audit,
+  document activation amendment, then exact-SHA independent safety review before
+  registration; keep one coherent workflow PR and all remaining RC scope.
+- Common workflow candidate now includes an unregistered workspace-confined
+  agent adapter consuming the same existing local receipt and shared executor.
+  Fictional subprocess acceptance compares CLI/agent status and artifact bytes:
+  identical, no source literals in status. No issuer or MCP registration added.
+  Six updated CLI workflow tests pass; four input/policy/output/receipt workspace
+  escape cases reject before execution; Mypy adapter and Ruff pass.
+  Next complete configuration/activation-contract audit and installed shared
+  workflow evidence, then review exact completed SHA before public wiring.
+- Installed common candidate:10 changed-scope tests pass in2.99s; wheel SHA256
+  2e413fe920c4f807ae0a92e7bf3ba4ca2c8b0869a257c4d24fc9457edaf9ecfb,
+  evidence:route-workflow-acceptance.md. Current branch has no open PR.
+  Configuration audit found a remaining mismatch: candidate review/approval/
+  execution pass fixed DEFAULT_MAX_TOTAL_INPUT_BYTES (512MiB), independent of
+  configurable per-file limits. Combined source/policy/reference/review identity
+  exceeding that cap fails through generic snapshot/source errors, not an
+  actionable typed total-budget diagnostic. This does not invalidate accepted
+  300000×50 runs; do not replay them. Next finish explicit shared snapshot-total
+  configuration/diagnostics without changing source-free disclosure budgets,
+  then activation amendment and exact-SHA review. No new owner decision needed.

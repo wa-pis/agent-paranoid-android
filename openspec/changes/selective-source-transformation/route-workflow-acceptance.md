@@ -69,3 +69,43 @@ returns the same shared review; outside-workspace requests fail without the
 fictional path marker in wire response or stderr. Source/policy bytes remain
 unchanged. `tests/test_transformation_mcp_review.py`: 3 passed. This transport
 test is separate from the installed wheel service acceptance above.
+
+## Closed CLI approval-to-execution acceptance (2026-10-02)
+
+Installed development wheel, fictional temporary fixtures only. The unregistered
+CLI candidate reads saved source/policy bytes, requires the exact review digest,
+prompts through the real controlling `/dev/tty`, writes an owner-only receipt,
+then consumes that receipt in a separate noninteractive execution subprocess.
+Artifact readback confirms one explicitly non-sensitive preserved field and one
+replacement; source values are absent from review/status output. This simulated
+operator confirmation is test evidence, not approval of any real dataset.
+
+The same suite rejects stale digests, above-session output requests, receipt
+overwrite and piped APPROVE without a controlling terminal. Profile/session
+output defaults are exercised. Existing receipt boundary tests remain passing.
+17 tests passed in 2.70s against installed code (`-o pythonpath=`); no product
+monkeypatch, database or external API. Host test escalation was required because
+the execution sandbox denies `/dev/tty`. PTY output must be drained while waiting
+for child exit; the prior timeout was a harness defect, not a product fix.
+
+- Wheel: `/private/tmp/apa-cli-candidate-wheel.S7i8x4/agent_paranoid_android-1.5.0-py3-none-any.whl`
+- SHA-256: `6ab034ca3be1091b614eb46db0fe527c19068800253d590f813973822632eaff`
+- Installed target: `/private/tmp/apa-cli-candidate-wheel.S7i8x4/installed`
+- Harness: `tests/test_transformation_cli_candidate.py` and existing receipt tests.
+
+Not public CLI registration, MCP execution, activation review, final RC review
+or published 1.6.0rc1 acceptance. Remaining workflow wiring stays gated.
+
+### Installed common CLI/agent candidate (2026-10-02)
+
+The changed workspace candidate was exercised from installed code, not the
+source checkout:10 tests passed in2.99s with `-o pythonpath=`. CLI and agent
+subprocesses consume the same exact local receipt and return identical bounded
+status, provenance and dataset bytes. Four path positions reject workspace
+escape before execution. Candidate remains unregistered; this is not MCP-wire
+or public activation acceptance. No new database/scaling acceptance claimed.
+
+- Wheel: `/private/tmp/apa-shared-candidate-wheel.6HPhU5/agent_paranoid_android-1.5.0-py3-none-any.whl`
+- SHA-256: `2e413fe920c4f807ae0a92e7bf3ba4ca2c8b0869a257c4d24fc9457edaf9ecfb`
+- Installed target: `/private/tmp/apa-shared-candidate-wheel.6HPhU5/installed`
+- Harness: `tests/test_transformation_cli_candidate.py`, `tests/test_transformation_mcp_candidate.py`.
