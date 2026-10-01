@@ -27,3 +27,23 @@ preservation, live query capture, public execution/MCP parity, scale per route
 or RC readiness. Prior CSV and PostgreSQL scale evidence was not repeated.
 Next: connect common execution/publication contracts to CLI/Python/MCP under
 the existing safety amendments and independent activation review.
+# MCP service parity follow-up — 2026-10-01
+
+All 12 fictional small route combinations passed with installed CLI and MCP
+application-service review parity (same review metadata and snapshot SHA-256),
+followed by the existing private executor, full artifact readback, provenance,
+unchanged inputs and temporary cleanup. No database access or public execution.
+This does not claim new-tool SDK/wire acceptance, preservation approval, full
+type coverage or additional scaling acceptance.
+
+- Wheel: `/private/tmp/apa-mcp-review-wheel.L0CxKQ/agent_paranoid_android-1.5.0-py3-none-any.whl`
+- Wheel SHA-256: `398914f145cbe95113b7767949db5cd0c7dc1280b83cd737d2af4f23f67dff5c`
+- Harness SHA-256: `6c9bb0783050ea20e59bcfe51ece3e903780e4808abcbc9394b58244c918be6d`
+- Installed target: `/private/tmp/apa-mcp-review-wheel.L0CxKQ/installed`
+- Development version 1.5.0; not a published release candidate.
+
+Additional candidate-source SDK stdio check: the actually registered tool
+returns the same shared review; outside-workspace requests fail without the
+fictional path marker in wire response or stderr. Source/policy bytes remain
+unchanged. `tests/test_transformation_mcp_review.py`: 3 passed. This transport
+test is separate from the installed wheel service acceptance above.

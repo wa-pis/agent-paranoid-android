@@ -487,6 +487,45 @@
     }
   },
   {
+    "description": "Review fixed local snapshots; no execution, DB access or approval receipt.",
+    "input_schema": {
+      "properties": {
+        "input_path": {
+          "title": "Input Path",
+          "type": "string"
+        },
+        "policy_path": {
+          "title": "Policy Path",
+          "type": "string"
+        },
+        "table_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Name"
+        }
+      },
+      "required": [
+        "input_path",
+        "policy_path"
+      ],
+      "title": "review_transformationArguments",
+      "type": "object"
+    },
+    "name": "review_transformation",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "review_transformationDictOutput",
+      "type": "object"
+    }
+  },
+  {
     "description": "Validate generated workspace artifacts against a DatasetSpec.",
     "input_schema": {
       "properties": {

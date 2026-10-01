@@ -58,6 +58,15 @@ Use the client's secret mechanism or an environment injected by the runtime.
 
 ## Safe Generator Sequence
 
+For selective transformation review, call `review_transformation` with
+workspace-relative `input_path`, `policy_path` and optional `table_name`.
+It reads a fixed local snapshot in the format selected by the saved policy and
+returns `review_only`, `snapshot_sha256` and the same value-free review as CLI
+`transform-review`. Referenced mapping files stay local to the policy directory.
+The tool writes no artifacts, creates no approval receipt, executes no
+transformation and connects to no database. Public transformation execution
+remains gated; normal generator operations below remain source-free.
+
 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
    and output format.

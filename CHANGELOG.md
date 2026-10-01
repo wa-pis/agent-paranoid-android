@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Add read-only MCP `review_transformation` for saved local behavior policies,
+  with the same value-free review and snapshot digest as CLI `transform-review`.
+
 - Profile single-table SQL sources with `SUM`, `COUNT`, `MIN`, `MAX`, `AVG`
   and explicit-column `GROUP BY`. Existing allowlists and budgets remain;
   aggregate profiles require an explicitly authored generation specification.

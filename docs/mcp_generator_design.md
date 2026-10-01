@@ -60,6 +60,7 @@ patterns. Source rows and raw sensitive values do not cross it.
 
 | Tool | Why it exists | Input | Written output | MCP response |
 | --- | --- | --- | --- | --- |
+| `review_transformation` | Review a saved local transformation policy through the shared CLI core | Workspace source snapshot, YAML policy, optional table name | None | Review-only metadata and snapshot SHA-256; no execution or approval receipt |
 | `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
 | `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
 | `plan_dataset` | Build a review-first workspace from a local supported source | Workspace CSV, CSV folder, or safe profile path | Profile, DatasetSpec, and plan | Plan summary and review paths |
