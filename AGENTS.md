@@ -81,6 +81,11 @@ for activation, not prerequisites for writing the implementation and its tests.
 - Architecture or module ownership: use `docs/implementation_map.md` and
   `docs/reference/application-boundaries.md`; do not infer module names from
   this file.
+- Architectural decisions: read the relevant record in `docs/adr/index.md`
+  and its cited contract. Distinguish accepted decisions, gated implementation
+  and open questions; do not reopen an accepted choice through a progress-note
+  edit. A changed decision needs an explicit successor ADR and the existing
+  approval/test gates. ADRs do not grant data access or activate public behavior.
 - Release candidates, versioning, tags, PyPI, or release checks: read
   `CONTRIBUTING.md` and `docs/release.md`.
 

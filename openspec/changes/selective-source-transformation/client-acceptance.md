@@ -1,5 +1,13 @@
 # Client Feedback And Acceptance Plan
 
+## Private workload evidence — 2026-09-29
+
+The installed fictional PostgreSQL-result worker → saved-policy review → CSV
+scenario passed300,000 x50 with full ordered readback, provenance and cleanup:
+[exact artifacts and limits](postgres-scale-acceptance.md). This supplements
+the prior private CSV checkpoint, not client-private data, live PostgreSQL,
+all-format, public-interface or full1M x100 acceptance. Those claims stay open.
+
 ## Original feedback provenance verified — 2026-09-28
 
 Read the original brief inside the refreshed archive; SHA-256 matches

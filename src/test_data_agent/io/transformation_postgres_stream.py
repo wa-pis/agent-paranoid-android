@@ -12,7 +12,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from test_data_agent.core.limits import DEFAULT_MAX_INPUT_CELL_CHARS
+from test_data_agent.core.transformation_limits import TransformationLimitError
 from test_data_agent.io.transformation_query_capture import _ResultQuery
 from test_data_agent.postgres_config import PostgresConfig
 
@@ -40,10 +40,9 @@ The query originates in capture authorization, not caller SQL or a receipt.
                 or not query.columns
                 or any(f"{query.table}.{name}" not in columns for name in query.columns)
                 or type(query.max_rows) is not int
-                or not 0 < query.max_rows <= config.limits.max_result_rows
+                or not 0 < query.max_rows <= 2**63 - 1
                 or not isinstance(schema, pa.Schema)
-                or not 0 < len(schema) <= config.limits.max_columns
-                or query.max_rows * len(schema) > config.limits.max_result_cells):
+                or not len(schema)):
             raise ValueError
         password = None if config.password_env is None else getenv(config.password_env)
         if config.password_env is not None and password is None:
@@ -71,6 +70,15 @@ The query originates in capture authorization, not caller SQL or a receipt.
         # Psycopg's server cursor may populate description only after first FETCH.
         def batches() -> Iterator[Any]:
             count = 0
+            values: list[list[Any]] = [[] for _ in schema]
+            buffered_bytes = 0
+
+            def batch() -> Any:
+                check()
+                return pa.RecordBatch.from_arrays([
+                    pa.array(column, type=field.type, safe=True)
+                    for column, field in zip(values, schema, strict=True)], schema=schema)
+
             while True:
                 check()
                 rows = cursor.fetchmany(1)
@@ -79,19 +87,21 @@ The query originates in capture authorization, not caller SQL or a receipt.
                 if names != tuple(schema.names) or len(rows) > 1:
                     raise ValueError
                 if not rows:
+                    if values[0]:
+                        yield batch()
                     return
                 count += 1
                 row = rows[0]
                 if count > query.max_rows or len(row) != len(schema):
                     raise ValueError
-                arrays = []
-                for value, field in zip(row, schema, strict=True):
+                for index, (value, field) in enumerate(zip(row, schema, strict=True)):
+                    if type(value) is str:
+                        query.cell_chars.check(len(value))
                     if value is None:
                         if not field.nullable:
                             raise ValueError
                     elif not (
-                        (pa.types.is_string(field.type) and type(value) is str
-                         and len(value) <= DEFAULT_MAX_INPUT_CELL_CHARS)
+                        (pa.types.is_string(field.type) and type(value) is str)
                         or (pa.types.is_signed_integer(field.type) and type(value) is int)
                         or (pa.types.is_float64(field.type) and type(value) is float and math.isfinite(value))
                         or (pa.types.is_boolean(field.type) and type(value) is bool)
@@ -99,10 +109,19 @@ The query originates in capture authorization, not caller SQL or a receipt.
                         or (pa.types.is_decimal128(field.type) and type(value) is Decimal and value.is_finite())
                     ):
                         raise ValueError
-                    arrays.append(pa.array([value], type=field.type, safe=True))
-                yield pa.RecordBatch.from_arrays(arrays, schema=schema)
+                    values[index].append(value)
+                    buffered_bytes += 4 + 4 * len(value) if type(value) is str else 16
+                # ponytail: bounded chunks avoid one Parquet row group per row.
+                # Estimate controls flushing, not a hard RSS/wire guarantee;
+                # one fetched row and Arrow allocations retain existing limits.
+                if len(values[0]) >= 1024 or buffered_bytes >= 1024 * 1024:
+                    yield batch()
+                    values = [[] for _ in schema]
+                    buffered_bytes = 0
 
         yield batches()
+    except TransformationLimitError:
+        raise
     except Exception:
         failed = True
     finally:

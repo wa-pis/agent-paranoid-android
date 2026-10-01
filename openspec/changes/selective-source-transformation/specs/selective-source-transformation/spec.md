@@ -19,6 +19,17 @@ exceedance, disclose safe dimension/amount/limit/units and effective setting
 origin, and explain concrete supported session and saved-profile configuration.
 Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
 
+#### Scenario: Private query capture limit crosses the worker boundary
+
+- **GIVEN** a fictional authorized PostgreSQL result and explicit transformation
+  limits independent of aggregate-profiling disclosure budgets
+- **WHEN** capture exceeds a configured dimension in the isolated worker
+- **THEN** the parent receives only validated dimension/count/threshold/origin
+  diagnostics after worker cleanup, without backend text or partial output
+- **AND** changing the documented session or saved-profile setting permits a
+  subsequent in-budget capture, review and temporary publication without
+  changing source-free profiling budgets or activating public execution.
+
 #### Scenario: Requested capacity exceeds configured budget
 
 - **GIVEN** a requested workload above an effective configured limit
