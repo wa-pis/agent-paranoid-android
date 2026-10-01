@@ -157,3 +157,15 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
 - Evidence: exact amendment diff, accepted ADRs, code and installed acceptance
   log inspected. Dirty progress excluded. Prior parser/publication closures
   unchanged. No human approval, product authority, activation or RC claim.
+
+### Amendment wording disposition
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason, same identity.
+- UTC date: 2026-10-01; SHA `67cf8c306f8e4795d2c8c657e349e4a4f79daad8`.
+- Scope: bootstrap wording versus `d7a5296` and committed evidence only.
+- Low wording finding closed; no changed-scope inconsistency. Explicit-run
+  bootstrap, prior session checks and later effective-ceiling validation are
+  distinguished, with equality allowed and no automatic elevation implied.
+- Static inspection, no repeated code review/tests/writes. Public action/route
+  enforcement, installed registration evidence and activation-SHA review remain
+  pending. No human approval, activation or final RC authority.

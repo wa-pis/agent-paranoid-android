@@ -4745,3 +4745,28 @@ Broader transformation remains unfinished.
   enforcement must exclude private derive and actual installed registration
   evidence must replace closed-candidate evidence. Next signed wording fix and
   scoped disposition, then shared public-boundary enforcement; no activation.
+- Bootstrap wording correction signed:67cf8c306f8e4795d2c8c657e349e4a4f79daad8.
+  Same independent AI reviewer assigned changed-policy disposition only; active,
+  no duplicate. Audited candidate call graph:local CLI and workspace candidate
+  share _execute_reviewed_test_from_paths, while local receipt issuance prepares
+  its own fixed request. Next enforce supported public actions on both approval
+  and execution fixed policies without altering private derive implementation;
+  keep public registration closed pending amendment/activation evidence.
+- AI amendment disposition on67cf8c3:bootstrap wording low closed, no changed
+  inconsistency; prior safety dispositions unchanged, no activation authority.
+  Added shared deterministic execution-action allowlist to fixed-policy path
+  execution (CLI/workspace candidates) and local candidate approval before
+  receipt issuance. Publicly intended actions:preserve/synthesize/substitute/
+  replace_text/drop; private derive model/engine retained, rejected by this
+  entrance. Four focused scope tests pass, Ruff and Mypy three modules pass.
+  This is not installed/public-interface acceptance. Next fictional subprocess
+  derive rejection through approval/execution and workspace candidate, then
+  actual registration evidence and exact activation-SHA review; still gated.
+- Fictional derive rejection now exercised in three subprocess entrances:
+  local candidate approval, CLI execution and workspace execution. Fixed review
+  is valid, but unsupported action rejects before receipt/output artifacts;
+  all input bytes remain unchanged. No product monkeypatch or live service.
+  Three focused checks pass in1.04s; Ruff passes. Recorded final amendment
+  wording disposition in publication-safety-review.md. Next consolidate
+  supported route contract, installed changed wiring evidence and reviewed
+  registration; no public surface activated or new PR opened.

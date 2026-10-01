@@ -12,6 +12,7 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.core.transformation_limits import InputDimension, resolve_input_limit
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
+from test_data_agent.core.transformation_policy import validate_execution_actions
 import os
 from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths
 from test_data_agent.io.transformation_receipt import LocalReceiptError, issue_local_receipt
@@ -58,6 +59,7 @@ def _run_candidate_local_approval(argv: list[str]) -> dict[str, object]:
         raise LocalReceiptError("local transformation approval failed")
     policy_bytes = next(part.payload for part in request.parts if part.kind == "policy")
     policy = load_behavior_policy_yaml(policy_bytes, max_bytes=len(policy_bytes), budget=budget)
+    validate_execution_actions(policy)
     total = resolve_input_limit(InputDimension.TOTAL_BYTES, policy.resource_limits, os.environ).value
     issue_local_receipt(request, args.receipt,
         max_total_bytes=total if args.max_total_input_bytes is None else args.max_total_input_bytes,

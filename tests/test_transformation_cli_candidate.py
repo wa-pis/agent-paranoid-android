@@ -17,6 +17,44 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
 
 
+@pytest.mark.parametrize("entrance", ["approval", "execution", "workspace"])
+def test_candidate_entrances_reject_private_derive_before_artifacts(tmp_path, entrance):
+    source = SnapshotPart("source", "items", b"amount,total\n12,24\n")
+    policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": "0" * 64, "fields": [
+        {"entity": "items", "field": "amount", "sensitivity": "non_sensitive",
+         "behavior": {"action": "substitute", "mapping": {"kind": "inline",
+          "entries": [{"original": [12], "replacement": [13]}]}}},
+        {"entity": "items", "field": "total", "sensitivity": "non_sensitive",
+         "behavior": {"action": "derive", "expression": "amount * 2", "dependencies": ["amount"]}}]})
+    profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
+    policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    (tmp_path / "items.csv").write_bytes(source.payload)
+    (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
+    request = prepare_csv_review_from_paths(tmp_path / "items.csv", "items", tmp_path,
+        "behavior.yaml", max_total_bytes=8192, max_review_bytes=8192, budget=GenerationBudget(5))
+    before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+    if entrance == "workspace":
+        program = ("import sys; from test_data_agent.mcp_transformation_candidate import "
+            "_execute_candidate_transformation; _execute_candidate_transformation("
+            "'items.csv','behavior.yaml','output',sys.argv[1])")
+        arguments = [request.snapshot_sha256]
+    else:
+        function = "_run_candidate_local_approval" if entrance == "approval" else "_run_candidate_execution"
+        program = (f"import sys; from test_data_agent.cli_transformation_candidate import {function}; "
+            f"{function}(sys.argv[1:])")
+        arguments = [str(tmp_path / "items.csv"), str(tmp_path / "behavior.yaml"),
+            str(tmp_path / ("receipt.json" if entrance == "approval" else "output")),
+            "--snapshot-sha256", request.snapshot_sha256]
+    env = {**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)}
+    result = subprocess.run([sys.executable, "-c", program, *arguments], env=env,
+        capture_output=True, text=True, timeout=15)
+    assert result.returncode != 0
+    assert "unsupported transformation execution action" in result.stderr if entrance == "approval" else (
+        "invalid temporary transformation command" in result.stderr)
+    assert {p.name: p.read_bytes() for p in tmp_path.iterdir()} == before
+
+
 @pytest.mark.parametrize("mode", ["explicit", "stale", "profile", "session", "above_session",
     "total_above", "total_exceeded"])
 def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):

@@ -26,7 +26,7 @@ from test_data_agent.io.path_policy import (
 from test_data_agent.io.transformation_execute import replace_csv_snapshot
 from test_data_agent.io.transformation_sql import render_transformation_sql
 from test_data_agent.io.transformation_parquet import render_transformation_parquet
-from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput
+from test_data_agent.core.transformation_policy import SqlOutput, ParquetOutput, validate_execution_actions
 from test_data_agent.csv_profiler import validate_csv_headers
 from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
 
@@ -102,6 +102,7 @@ def _execute_reviewed_test_from_paths(
         policy_payload = next(part.payload for part in request.parts if part.kind == "policy")
         policy = load_behavior_policy_yaml(policy_payload,
             max_bytes=max_total_bytes or len(policy_payload), budget=budget)
+        validate_execution_actions(policy)
         if max_total_bytes is None:
             max_total_bytes = resolve_input_limit(InputDimension.TOTAL_BYTES,
                 policy.resource_limits, os.environ).value
