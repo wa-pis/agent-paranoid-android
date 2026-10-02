@@ -1,5 +1,19 @@
 # Implementation Progress
 
+## Reviewed activation PR preparation — 2026-10-02
+
+Independent ActivationSafety-R3 / Plato completed review of exact
+911ade071e4a309ab3e3538dfe6c4a9f676624aa with no new confirmed findings in
+32 changed files; 22 tiny fictional checks personally performed. Full/installed
+gates are explicitly inherited. See [R3 evidence](activation-safety-r3.md).
+R2-1 superseded by owner ADR-0029, R2-2/3/4 addressed, identifier fix reviewed.
+Evidence-only successor and user-facing CLI/MCP/changelog reconciliation change
+no runtime. Documentation suite: 50 passed; strict MkDocs and diff check passed.
+Next: one signed activation PR and mandatory GitHub gates. No human approval
+claimed. Final exact RC review, clean locked release and public acceptance remain
+mandatory; no version bump, tag or release yet. Earlier pending-R3 notes below
+are chronological history, superseded by this completed review.
+
 ## Sensitive identifier candidate fix — 2026-10-02
 
 Traced generation and the shared post-solve privacy validator: identifier

@@ -73,6 +73,11 @@ with workspace-relative `input_path`, `policy_path`, new `output_path`, mandator
 `max_total_input_bytes`/`max_output_bytes` run caps. It consumes the same exact
 snapshots and budgets as CLI execution and returns `transformation_completed`,
 digest, provenance and budget summaries, never dataset rows or mapping literals.
+Explicit replacements may permute sensitive source values under the same
+field-independent contract. Review retains a value-free sensitivity note;
+mapped values stay in the selected local artifact, never MCP responses. This
+does not grant direct preservation or an implicit copy fallback.
+
 Preservation requires a matching receipt issued separately by the human local
 controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
 Changed inputs invalidate receipts; workspace escapes, existing destinations,

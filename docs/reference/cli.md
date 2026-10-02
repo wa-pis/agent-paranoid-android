@@ -91,6 +91,12 @@ uses `transformation_completed` inside the existing JSON `result` envelope;
 errors retain the existing `error` envelope and exit code.
 
 Preservation additionally requires a matching restricted local receipt.
+Explicit `substitute` and `replace_text` use one contract for all fields:
+mapped values may equal other source values, including sensitive permutations.
+Review retains a value-free sensitivity note. Such values stay only in the
+selected local mixed-origin output, never CLI summaries or logs. This does not
+authorize direct preservation or a copying fallback.
+
 Only `transform-approve SOURCE POLICY RECEIPT --snapshot-sha256 SHA` in a
 controlling terminal may create one after displaying the value-free review
 and receiving fresh `APPROVE`. Piped input, flags and agent approval cannot
