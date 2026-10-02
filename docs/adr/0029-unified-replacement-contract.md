@@ -35,3 +35,20 @@ Owner conversation 2026-10-02: “да разрешаю контракт зам�
 followed by explicit instructions to implement. See the owner amendment in
 `openspec/changes/selective-source-transformation/policy-contract.md` and the
 historical report `activation-safety-r2.md` there. No human GitHub approval claimed.
+
+See the [policy contract](https://github.com/wa-pis/agent-paranoid-android/blob/915536ae2240ad2475149a7e02418f741ca7d716/openspec/changes/selective-source-transformation/policy-contract.md)
+and [historical independent AI review](https://github.com/wa-pis/agent-paranoid-android/blob/915536ae2240ad2475149a7e02418f741ca7d716/openspec/changes/selective-source-transformation/activation-safety-r2.md).
+
+## Alternatives and consequences
+
+Keeping a source-membership ban would contradict the explicit owner decision.
+Instead, deterministic mapped-cell evidence confines the exception to actual
+replacement output. Direct preservation and transport disclosure retain their
+separate restrictions. Sensitive mapped artifacts require local handling and
+are not synthetic datasets; sensitivity notes do not declassify their contents.
+
+## Revisit when
+
+An owner-authorized successor changes replacement semantics or output disclosure.
+Any such amendment requires executable safety evidence and independent review
+of its complete exact SHA before public activation.

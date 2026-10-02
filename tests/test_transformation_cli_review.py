@@ -90,7 +90,7 @@ def test_transform_review_reports_global_and_column_text_scopes_without_values(t
     assert "override" not in overridden.out + overridden.err
 
 
-def test_transform_review_rejects_sensitive_source_value_swap_without_values(tmp_path, capsys):
+def test_transform_review_notes_sensitive_source_value_swap_without_values(tmp_path, capsys):
     source = tmp_path / "items.csv"
     source.write_bytes(b"status\nfictional-A\nfictional-B\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
@@ -105,8 +105,11 @@ def test_transform_review_rejects_sensitive_source_value_swap_without_values(tmp
     (tmp_path / "all.csv").write_bytes(
         b"old,new\nfictional-A,fictional-B\nfictional-B,fictional-A\n",
     )
-    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) != 0
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) == 0
     output = capsys.readouterr()
+    reviewed = json.loads(output.out)["result"]
+    assert reviewed["status"] == "review_only"
+    assert reviewed["review"]["fields"][0]["system_comment"]
     assert "fictional-A" not in output.out + output.err
     assert "fictional-B" not in output.out + output.err
     assert not (tmp_path / "approval.json").exists()
