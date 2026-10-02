@@ -1,5 +1,31 @@
 # Implementation Progress
 
+## Complete matrix follow-up and installed replay — 2026-10-02
+
+CI e4374e3 run 37025599204 completed failed: all Python jobs retained a second
+TTY-to-MCP scenario's legacy timedelta and the architecture inventory omitted
+the new pure typed error contract dependency; Python 3.14 additionally differed
+only in the new multiline tool description's compiler-normalized indentation.
+Fixed that sibling timeout/wire alias, explicitly listed only the typed budget
+module (no broad architecture exemption), and normalized generator tool docs with
+stdlib cleandoc. Reviewed fixture delta is description whitespace only; no names,
+schema, authority or values changed. Boundary documentation now matches candidate
+registrations. Reconciled stale identifier/R3 acceptance status and superseded
+membership task without closing absent private/live or final RC acceptance.
+Isolated locked Python 3.14 affected five-file suite: 128 passed/6 existing skips.
+MCP 1 architecture/contract/candidate/docs suite: 129 passed/6 existing skips.
+Ruff, transport mypy, strict MkDocs and diff checks passed. Updated standalone
+installed harness for MCP 1/2 and Linux PTY EOF, retaining all negative controls;
+contract now first checks current goldens before isolating the declared delta.
+Actual installed wheel seven fictional CLI/MCP/TTY/wizard/replacement cases:
+7 passed in 10.12s, no source imports/product monkeypatch or live access.
+Wheel SHA256 30a609b8be9b2e977ca596f594d9ea467741ce8fdbb8cfff49cd7ba0c90ab55d,
+root /private/tmp/apa-matrix-installed.8cYJ0f/installed, still version 1.5.0.
+Initial earlier replay was 6 passed/1 stale harness-contract failure, then its
+isolated correction passed; final seven-case result above uses rebuilt runtime.
+Next: signed same-PR update and fresh automatic mandatory CI; no merge/tag yet.
+Final exact RC review must cover the typed diagnostic and doc-normalization delta.
+
 ## MCP matrix compatibility remediation — 2026-10-02
 
 PR #601 remains blocked at cc27b59; no merge/tag/release. Corrected removed MCP

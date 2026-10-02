@@ -27,7 +27,7 @@
     }
   },
   {
-    "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\n    Requires the reviewed snapshot digest and, for preservation, a matching\n    receipt issued by the separate controlling-TTY local approval operation.\n    Returns bounded counts and digest metadata, never source or output rows.\n    ",
+    "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\nRequires the reviewed snapshot digest and, for preservation, a matching\nreceipt issued by the separate controlling-TTY local approval operation.\nReturns bounded counts and digest metadata, never source or output rows.",
     "input_schema": {
       "properties": {
         "input_path": {

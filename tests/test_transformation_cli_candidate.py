@@ -307,6 +307,7 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
     # The same real local receipt must authorize the prospective bounded tool.
     import asyncio
     from datetime import timedelta
+    from importlib.metadata import version
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
 
@@ -323,7 +324,8 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
         parameters = StdioServerParameters(command=sys.executable, args=["-c", program],
             env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
         async with stdio_client(parameters) as (reader, writer):
-            async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+            timeout = 15 if int(version("mcp").split(".")[0]) >= 2 else timedelta(seconds=15)
+            async with ClientSession(reader, writer, read_timeout_seconds=timeout) as session:
                 await session.initialize()
                 return await session.call_tool("execute_transformation", {
                     "input_path": "items.csv", "policy_path": "behavior.yaml",
@@ -331,7 +333,7 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
                     "receipt_path": "receipt.json", "max_output_bytes": 8192})
 
     response = asyncio.run(invoke())
-    assert not response.isError
+    assert not response.model_dump(by_alias=True)["isError"]
     assert "fictional-a" not in response.model_dump_json() and "alpha" not in response.model_dump_json()
     assert (tmp_path / "stdio-output" / "dataset.csv").read_bytes() == (
         tmp_path / "output" / "dataset.csv").read_bytes()

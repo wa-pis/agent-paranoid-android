@@ -179,9 +179,10 @@ All items below remain unverified until reproduced against the current candidate
     through bounded shared parsing before review/save; no evaluation yet.
 - [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
   one-pass semantics, collision checks and restricted local mapping handling.
-- [ ] Reject source-value retention disguised as substitution across inline,
-  local CSV and shared-domain mappings before approval/execution; cover typed
-  identity, null and composite entries with value-free failures.
+- [x] Supersede the historical source-membership ban with owner ADR-0029:
+  actual explicit mappings may permute source values in local output only.
+  Identity-pair rules, unmatched-preserve receipts and source-free disclosure
+  checks remain; executable mapped-cell coverage and exact-SHA R3 evidence apply.
 - [ ] Expose substitution as a specification-level action separate from synthesis;
   test saved wizard-policy parity with noninteractive CLI and Python execution.
 - [ ] Expose substitution, mapping references and unmatched-value handling in

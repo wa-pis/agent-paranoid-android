@@ -103,7 +103,8 @@ def test_safety_policy_is_enforced_below_transports(
         ),
         (
             "test_data_agent.mcp_trino_transport",
-            {"test_data_agent.audit", "test_data_agent.trino_work_budget"},
+            {"test_data_agent.audit", "test_data_agent.trino_work_budget",
+             "test_data_agent.core.transformation_limits"},
         ),
     ],
 )

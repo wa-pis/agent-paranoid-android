@@ -4,6 +4,7 @@ Run pytest on this file with candidate-only PYTHONPATH and -o pythonpath=.
 Never patches product guards; no DB/API connections.
 """
 import asyncio
+import errno
 import json
 import os
 import subprocess
@@ -12,6 +13,7 @@ import pty
 import select
 import time
 from datetime import timedelta
+from importlib.metadata import version
 from pathlib import Path
 
 import yaml
@@ -24,6 +26,8 @@ from test_data_agent.core.transformation_policy import BehaviorPolicy, transform
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_source import _profile_transformation_source
 
+SDK_TIMEOUT = 15 if int(version("mcp").split(".")[0]) >= 2 else timedelta(seconds=15)
+
 
 def test_registered_contract_delta(tmp_path):
     from scripts.contract_fixtures import build_contract_fixtures
@@ -34,6 +38,7 @@ def test_registered_contract_delta(tmp_path):
     assert {name: actual[name] for name in candidate_inventories} == candidate_inventories
     expected = {name: json.loads((Path("tests/fixtures/contracts") / name).read_text())
                 for name in actual}
+    assert actual == expected
     parser = actual["cli-parser-surface.json"]
     added_commands = {"transform-execute", "transform-approve"}
     assert added_commands <= set(parser["commands"])
@@ -50,6 +55,12 @@ def test_registered_contract_delta(tmp_path):
     assert "approved" not in schema["properties"]
     actual["mcp-generator-tools.json"] = [tool for tool in tools
                                          if tool["name"] != "execute_transformation"]
+    expected["cli-parser-surface.json"]["commands"] = [
+        name for name in expected["cli-parser-surface.json"]["commands"]
+        if name not in added_commands]
+    expected["mcp-generator-tools.json"] = [
+        tool for tool in expected["mcp-generator-tools.json"]
+        if tool["name"] != "execute_transformation"]
     assert actual == expected
 
 
@@ -157,7 +168,16 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
             while process.poll() is None:
                 assert time.monotonic() < deadline, bytes(transcript)
                 if select.select([master], [], [], 0.1)[0]:
-                    transcript.extend(os.read(master, 16384))
+                    try:
+                        chunk = os.read(master, 16384)
+                    except OSError as exc:
+                        if exc.errno != errno.EIO:
+                            raise
+                        chunk = b""  # Linux PTY EOF after approval.
+                    if not chunk:
+                        process.wait(timeout=max(0.1, deadline - time.monotonic()))
+                        break
+                    transcript.extend(chunk)
             assert process.returncode == 0, bytes(transcript)
         finally:
             os.close(master)
@@ -195,7 +215,7 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
             args=["-m", "test_data_agent.mcp_generator_server"],
             env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
         async with stdio_client(parameters) as (reader, writer):
-            async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+            async with ClientSession(reader, writer, read_timeout_seconds=SDK_TIMEOUT) as session:
                 await session.initialize()
                 tools = await session.list_tools()
                 assert "execute_transformation" in {tool.name for tool in tools.tools}
@@ -219,7 +239,7 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
                     cli_before = (tmp_path / "cli-output" / "dataset.csv").read_bytes()
                     for change in changes:
                         rejected = await session.call_tool("execute_transformation", {**arguments, **change})
-                        assert rejected.isError
+                        assert rejected.model_dump(by_alias=True)["isError"]
                         rendered = rejected.model_dump_json()
                         assert all(value not in rendered for value in
                                    ("alpha", "gamma", "fictional-a", "fictional-secret-marker"))
@@ -236,7 +256,7 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
                             assert changed["snapshot_sha256"] != digest
                             rejected = await session.call_tool("execute_transformation", {
                                 **arguments, "snapshot_sha256": changed["snapshot_sha256"]})
-                            assert rejected.isError
+                            assert rejected.model_dump(by_alias=True)["isError"]
                             assert all(value not in rejected.model_dump_json() for value in
                                        ("alpha", "gamma", "delta", "fictional-a", "fictional-b"))
                             assert not (tmp_path / "mcp-output").exists()
@@ -247,7 +267,7 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
                 return await session.call_tool("execute_transformation", arguments)
 
     response = asyncio.run(invoke())
-    assert not response.isError
+    assert not response.model_dump(by_alias=True)["isError"]
     assert "alpha" not in response.model_dump_json() and "gamma" not in response.model_dump_json()
     assert "fictional-a" not in response.model_dump_json()
     assert digest in response.model_dump_json()
@@ -304,14 +324,14 @@ def test_registered_sensitive_replacement_stays_local(tmp_path, mapping_kind):
             args=["-m", "test_data_agent.mcp_generator_server"],
             env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
         async with stdio_client(parameters) as (reader, writer):
-            async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+            async with ClientSession(reader, writer, read_timeout_seconds=SDK_TIMEOUT) as session:
                 await session.initialize()
                 return await session.call_tool("execute_transformation", {
                     "input_path": "items.csv", "policy_path": "behavior.yaml",
                     "output_path": "mcp-output", "snapshot_sha256": digest})
 
     response = asyncio.run(invoke())
-    assert not response.isError
+    assert not response.model_dump(by_alias=True)["isError"]
     assert all(value not in response.model_dump_json() for value in values)
     expected = ("email\n" + "\n".join(reversed(values)) + "\n").encode()
     for name in ("cli-output", "mcp-output"):

@@ -5,12 +5,13 @@ direction before the 1.0 application-boundaries refactor moves code. It does
 not declare internal modules public or approve a contract change.
 
 The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
-The separate inactive activation candidate adds `transform-execute` and local
+The reviewed development activation candidate adds `transform-execute` and local
 `transform-approve` CLI entrances and the workspace consumer
 `execute_transformation`. They share fixed-snapshot application enforcement;
 MCP has no receipt issuer. Ordinary generation remains source-free. These
-additions require exact-SHA safety review before public activation; their
-candidate inventories are isolated from the current public goldens.
+additions have exact-SHA safety evidence in ActivationSafety-R3; the current
+development goldens include their registration. Final RC review and release
+gates remain required before public delivery.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 
@@ -80,12 +81,12 @@ Public operations:
 
 ## CLI Surface
 
-`cli-parser-surface.json` tracks these 24 commands; the read-only
+`cli-parser-surface.json` tracks these 26 commands; the read-only
 `transform-review` entry was added for the 1.6 candidate after the original
 1.0 baseline:
 
 - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
-  `transform-review`,
+  `transform-review`, `transform-execute`, `transform-approve`,
   `profile-postgres`, `profile-query`
 - `generate-from-csv`, `validate`, `generate-from-example`
 - `demo`, `doctor`, `audit-verify`, `completion`
@@ -110,6 +111,7 @@ out of `cli.py` must not change those contracts.
 
 - `approve_dataset_plan`, `export_dataset`, `generate_dataset`
 - `review_transformation` (read-only local snapshot review; no execution or receipt)
+- `execute_transformation` (reviewed snapshot/receipt consumer; no receipt issuer)
 - `infer_dataset_spec`, `inspect_dataset_plan`, `plan_dataset`
 - `plan_trino_dataset`, `profile_csv`,
   `recover_dataset_plan`, `validate_dataset`
@@ -202,7 +204,7 @@ The current dependencies after completed extraction increments are:
 | `trino_profiling.py` | allowlisted metadata, deterministic wildcard expansion/preflight, and aggregate-only profiling orchestration with injected query fetching |
 | `trino_masking.py` | sensitive-value masking, synthetic category summaries, safe column completion, and opt-in safe-select masking |
 | Trino MCP server | audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory |
-| MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
+| MCP transport modules | optional FastMCP and audit wrapping around supplied callables; detached typed budget-error translation, not limit enforcement |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
 Exact local category values pass the shared `core.privacy` content validator

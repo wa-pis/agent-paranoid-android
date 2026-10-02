@@ -11,15 +11,19 @@ CLI/MCP summaries must not disclose mapping literals or source values.
 
 Historical [ActivationSafety-R2](activation-safety-r2.md) remains evidence for
 343305e, not approval of the amended candidate. R2-1's membership prohibition
-is superseded by the owner decision. R2-2/3/4 have candidate fixes and focused
-executable coverage, but require independent review on the finished new SHA.
+is superseded by the owner decision. R2-2/3/4 were independently reviewed by
+ActivationSafety-R3 / Plato on exact `911ade071e4a309ab3e3538dfe6c4a9f676624aa`;
+see [R3 evidence](activation-safety-r3.md). This is AI review, not human approval.
 The affected six-file suite passed 373 tests; this does not replace installed
 interface acceptance, final release gates, or remaining client bug acceptance.
 The original sensitive synthetic-identifier/validator disagreement now has a
 candidate shared-validator fix: only exact numeric `synthetic_` tokens on
 identifier fields are recognized, while non-identifier semantic checks and
 arbitrary-prefix negatives remain. Focused identifier/safety tests passed 48
-cases. Installed client acceptance and independent exact-SHA review remain open.
+cases. The isolated installed registered-interface suite subsequently passed
+seven fictional cases, and R3 reviewed the identifier fix. Final exact RC review,
+locked release acceptance and public-artifact verification remain open. The later
+MCP 2 typed-budget diagnostic correction must be included in final review.
 
 
 ## Private workload evidence — 2026-09-29
@@ -72,10 +76,16 @@ historical, not overwritten by the new document's measurements.
 
 The historical checkpoints below retain their original package identities and
 limitations; their pending wording is not a new owner decision or a claim that
-later evidence is absent. The current changed-scope isolated registered candidate wheel is
+later evidence is absent. The earlier changed-scope isolated registered candidate wheel was
 SHA256 `53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb`,
 still development-version-labelled 1.5.0, not a public RC.
-Its installed root is `/private/tmp/apa-complete-candidate.ZIoRWw/installed-client-reuse`.
+Its historical installed root is `/private/tmp/apa-complete-candidate.ZIoRWw/installed-client-reuse`.
+The reviewed `911ade0` registered candidate wheel has SHA256
+`8af3499ca72939f197f5992733f5d702937dddd9d7d494aa687c04f9f456cc57`;
+its full gates passed 2702 tests (17 skips, coverage 90.83%) and seven installed
+registered-interface cases. This wheel predates the MCP 2 diagnostic fix in
+`e4374e3`, whose focused SDK 1/2 evidence is recorded in progress. None of these
+development-version wheels is the final `1.6.0rc1` or a public release.
 Earlier scenario/scale identities remain separate evidence, not a claim that
 every historical check was rerun against this wheel.
 
@@ -107,7 +117,7 @@ executable evidence locations, not assertions that they were rerun today.
 
 | Finding | Disposition | Evidence and remaining boundary |
 | --- | --- | --- |
-| 1 | Confirmed; sensitive-semantic identifier remedy not implemented | The generic short-string branch is disproved as unreachable by `tests/test_csv_pipeline_regressions.py`. Phone/email/SSN identifier combinations still reject; no approved privacy exemption exists. Do not label this subcase fixed. |
+| 1 | Confirmed sensitive-semantic identifier subcase fixed locally and independently reviewed | Exact ASCII integer synthetic tokens on identifier fields now validate; deterministic seed, malformed/Unicode/raw-sensitive and non-identifier negatives remain. R3 reviewed exact `911ade0`; final RC/package acceptance is still required. |
 | 2 | Fixed locally / merged | Distinct overflow is lower-bound evidence, never row-count uniqueness or PK proof: `tests/test_schema_distinct_overflow.py`; PR #534. Old cached profiles require reprofile. |
 | 3 | Confirmed ambiguity; conservative rejection retained | Fractional numeric-shape false positive is reproduced; phone/card/rare-secret checks remain active in `tests/test_csv_pipeline_regressions.py` and `tests/test_privacy_corpus.py`. No field declaration silently overrides content evidence; ADR-0008/Q-03 governs any future exception. |
 | 4 | Blanket claim not reproduced; numeric repeated-key case fixed | Text categories already exist. Approved bounded synthetic identifier pool covers numeric repeated keys: `tests/test_identifier_pool.py`; PR #536. No raw identifier pool is copied. |

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
+from inspect import cleandoc
 from typing import Any
 
 from test_data_agent.audit import audited_mcp_tool
@@ -23,7 +24,8 @@ def create_generator_mcp(
 
     mcp = _create_redacted_fast_mcp("test-data-agent-generator", FastMCP)
     for tool in tools:
-        mcp.tool()(audited_mcp_tool("generator-mcp", tool))
+        mcp.tool(description=cleandoc(tool.__doc__ or ""))(
+            audited_mcp_tool("generator-mcp", tool))
     return mcp
 
 
