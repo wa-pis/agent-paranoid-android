@@ -41,6 +41,8 @@ def legacy_profile_to_dataset_profile(
     ]
 
     for field, column in zip(field_profiles, profile.get("columns", []), strict=True):
+        if field.null_ratio is None:
+            continue
         distinct = column.get("approx_distinct_count")
         non_null_rows = row_count * (1 - field.null_ratio)
         if (
@@ -54,7 +56,7 @@ def legacy_profile_to_dataset_profile(
     primary_key_candidates = [
         field.name
         for field in field_profiles
-        if field.is_identifier and field.unique_ratio >= 1.0
+        if field.is_identifier and field.unique_ratio is not None and field.unique_ratio >= 1.0
     ]
 
     return DatasetProfile(
@@ -98,9 +100,11 @@ def _field_profile_from_column(
     suppress_sensitive_numeric: bool = False,
 ) -> FieldProfile:
     name = str(column.get("name", "column"))
-    unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
-    is_identifier = _is_identifier(name, unique_ratio) and not (
-        column.get("top_values") and unique_ratio < 1.0
+    unique_ratio = None if column.get("approx_distinct_count", 0) is None else _safe_ratio(
+        column.get("approx_distinct_count"), row_count
+    )
+    is_identifier = _is_identifier(name, unique_ratio if unique_ratio is not None else 0.0) and not (
+        column.get("top_values") and unique_ratio is not None and unique_ratio < 1.0
     )
     semantic_type = _optional_string(column.get("semantic_type"))
     top_values = column.get("top_values") or []
@@ -121,7 +125,8 @@ def _field_profile_from_column(
         decimal_precision=precision,
         decimal_scale=scale,
         nullable=bool(column.get("nullable", False)),
-        null_ratio=float(column.get("null_ratio", 0.0) or 0.0),
+        null_ratio=None if column.get("null_ratio", 0.0) is None
+        else float(column.get("null_ratio", 0.0)),
         unique_ratio=unique_ratio,
         sensitive=sensitive,
         semantic_type=semantic_type,

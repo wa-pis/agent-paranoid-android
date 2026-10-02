@@ -4,6 +4,73 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Synthetic Identifier Privacy Agreement
+
+Source-free string identifier generation and post-solve privacy validation SHALL
+agree on the existing `synthetic_` plus ASCII integer token namespace, including
+fields annotated with email, phone or SSN semantics. This recognition SHALL apply
+only to identifier fields, SHALL NOT accept arbitrary prefixed sensitive text,
+and SHALL NOT permit source-row reuse or broaden ordinary sensitive field formats.
+
+#### Scenario: Sensitive semantic identifier uses a bounded synthetic pool
+
+- **GIVEN** a string identifier with sensitive semantics and an explicit pool size
+- **WHEN** seeded source-free generation creates repeated keys
+- **THEN** exact synthetic identifier tokens pass privacy validation reproducibly
+- **AND** arbitrary prefixed sensitive text fails privacy validation
+- **AND** non-identifier fields retain semantic synthetic-format checks
+
+### Requirement: Explicit runtime Trino authentication
+The candidate SHALL compose driver-supported Basic, JWT, Kerberos, GSSAPI,
+OAuth2 and Certificate authentication through the shared bounded Trino client.
+Secrets SHALL be runtime-only, outside saved profiles, URLs and logs.
+Authenticated connections SHALL use verified HTTPS. Missing requirements and
+configuration conflicts SHALL reject before connection with value-free errors.
+OAuth2 SHALL NOT use the driver's default console URL disclosure handler.
+The candidate CLI browser route SHALL require explicit opt-in and a local
+interactive terminal. MCP SHALL NOT install this callback. Browser redirects
+and direct token-adapter requests SHALL be restricted to the configured HTTPS
+Trino origin without printing authentication URLs. Existing invocation budgets
+SHALL apply to token requests and before/after redirect callbacks.
+
+#### Scenario: Noninteractive browser authentication
+- **WHEN** the explicit OAuth2 browser flag is invoked through a pipe
+- **THEN** the CLI rejects before connecting or publishing a profile
+
+#### Scenario: Token server attempts a different origin
+- **WHEN** the driver's direct adapter send targets another host, port or HTTP
+- **THEN** the shared adapter rejects before network I/O with a value-free error
+
+#### Scenario: Missing JWT and safe driver failure
+- **WHEN** a JWT runtime secret is missing or authentication construction fails
+- **THEN** no database connection is attempted and no secret or backend error
+  is exposed in the detached user-facing error
+
+### Requirement: Honest bounded Parquet profile evidence
+Parquet profiles SHALL retain unknown null and distinctness statistics as null,
+not measured zero. Unknown distinctness SHALL NOT establish a primary key or
+relationship confidence. Automatic generation-spec inference SHALL reject unknown null ratios.
+Local sensitivity inspection SHALL remain byte/cell/time bounded, retain no
+source values and reject exhaustion instead of publishing a partial profile.
+
+#### Scenario: Missing statistics and sensitive neutral column
+- **WHEN** a fictional Parquet input has no null statistics or sensitive content
+  in a neutral-named column
+- **THEN** unknown null ratios remain null and sensitive content is flagged
+- **AND** no input value appears in the serialized profile
+
+### Requirement: Honest generation validation exit parity
+All generation CLI entrances SHALL preserve supported deliberately invalid
+output and its report while returning exit code 1 and JSON status
+`validation_failed` whenever validation fails. Generation mode SHALL NOT
+override validation status, and privacy failures SHALL still prevent publication.
+
+#### Scenario: Mixed mode across input entrances
+- **WHEN** fictional mixed-mode generation from spec, profile or CSV produces
+  a failed validation report
+- **THEN** the supported result and report remain published
+- **AND** every entrance returns exit 1 and JSON status `validation_failed`
+
 ### Requirement: Read-only transformation review parity
 
 CLI and generator MCP SHALL prepare the same value-free review and exact-byte
@@ -59,6 +126,28 @@ Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
 - **AND** it neither increases the limit nor silently truncates the workload.
 
 #### Scenario: Processing reaches a configured limit
+
+- **GIVEN** a transformation total snapshot budget configured through
+  `resource_limits.max_total_input_bytes` or
+  `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES`
+- **WHEN** policy, references, source, classification evidence and displayed
+  review consume that budget, including an exact-zero remainder before a read
+- **THEN** preparation and receipt revalidation preserve a value-free typed
+  limit diagnostic with amount, threshold, bytes, effective origin and recovery
+  settings, without publishing output or truncating inputs
+- **AND** read-only CLI/MCP review uses the same effective ceiling rather than
+  silently requesting a fixed default as a run override.
+
+#### Scenario: Explicit snapshot run cap
+
+- **GIVEN** an explicitly supplied transformation snapshot run cap
+- **WHEN** it exceeds the configured session/profile ceiling
+- **THEN** preparation rejects it as `requested_above_limit`
+- **AND** a smaller admitted run cap is enforced cumulatively with
+  `snapshot_run` diagnostics, without granting preservation authority or
+  increasing source-free profiling/transport disclosure budgets.
+
+#### Scenario: Processing reaches a configured runtime limit
 
 - **GIVEN** an admitted workload whose observed consumption exceeds a limit
 - **WHEN** processing detects the excess
@@ -265,14 +354,26 @@ and value-free and report the same selected rule as execution.
 - **AND** local debugging reports only row/column/scope/rule ordinals, match
   status and bounded counts, never either literal or its hash.
 
-#### Scenario: Sensitive source-value reuse
+#### Scenario: One mapping contract regardless of sensitivity
 
 - **GIVEN** a sensitive field and a reachable replacement equal to an original
   value in a sensitive or unresolved field of the same fixed CSV snapshot
-- **WHEN** local review or receipt verification runs
-- **THEN** the plan is rejected with a value-free error before any output.
-- **AND** a distinct explicitly reviewed non-sensitive field is not blocked
-  merely because its ordinary mapping values also occur in the source.
+- **WHEN** local review or receipt verification runs for explicit replacement
+- **THEN** source membership alone SHALL NOT reject the mapping, including an
+  explicit permutation of sensitive values.
+- **AND** effective sensitivity SHALL remain a value-free field note.
+- **AND** direct preserve and preserve fallback SHALL retain their existing
+  non-sensitive classification and local human receipt requirements.
+
+#### Scenario: Explicit mapping versus synthesis at output normalization
+
+- **GIVEN** fictional email-shaped explicit replacements and cells without an
+  actually applied mapping
+- **WHEN** CSV, SQL-script or Parquet output is encoded
+- **THEN** only actually mapped cells use the uniform replacement contract.
+- **AND** synthesis, derive and preservation retain their existing content
+  checks; absent or malformed execution evidence SHALL NOT grant an exception.
+- **AND** type, null, snapshot, budget and value-free transport checks remain.
 
 ### Requirement: Behavior profile retains substitution decisions
 

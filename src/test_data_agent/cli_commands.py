@@ -99,6 +99,20 @@ def run_dataset_command(
     if args.command == "profile-csv":
         return profile_csv_command(args)
 
+    if args.command == "transform-execute":
+        from test_data_agent.cli_transformation_candidate import _execute_candidate_namespace
+
+        result = _execute_candidate_namespace(args)
+        print(json.dumps({**result, "status": "transformation_completed"}))
+        return 0
+
+    if args.command == "transform-approve":
+        from test_data_agent.cli_transformation_candidate import _approve_candidate_namespace
+
+        result = _approve_candidate_namespace(args)
+        print(json.dumps(result))
+        return 0
+
     if args.command == "transform-review":
         if args.edit_formats and not args.decide:
             raise ValueError("--edit-formats requires --decide")
@@ -112,14 +126,14 @@ def run_dataset_command(
                 input_stream=sys.stdin, output_stream=sys.stderr,
                 edit_actions=args.edit_actions,
                 edit_formats=args.edit_formats,
-                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_total_bytes=None,
                 max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget(),
             )
         else:
             request = prepare_csv_review_from_paths(
                 args.source, args.table or args.source.stem,
                 args.policy.parent.absolute(), args.policy.name,
-                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_total_bytes=None,
                 max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
                 budget=GenerationBudget(),
             )

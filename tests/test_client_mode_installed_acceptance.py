@@ -37,7 +37,7 @@ def test_explicit_negative_mode_reaches_installed_generation(tmp_path: Path) -> 
          "--mode", "negative", "--invalid-ratio", "1", "--output", "out"],
         cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30,
     )
-    assert completed.returncode in {0, 1}
+    assert completed.returncode == 1
     rows = json.loads((tmp_path / "out/fictional_orders.json").read_text())
     manifest = json.loads((tmp_path / "out/generation_manifest.json").read_text())
     report = json.loads((tmp_path / "out/validation_report.json").read_text())
@@ -106,14 +106,12 @@ def test_fractional_mixed_mode_replays_across_installed_cli_inputs(
             [sys.executable, "-m", "test_data_agent.cli", *command, "--json"],
             cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30,
         )
-        # Exit parity is a separate public contract decision: spec currently
-        # returns 1 for controlled invalid rows, profile/CSV return 0.
-        assert completed.returncode in {0, 1}, completed.stderr
+        # Owner-confirmed parity: publication survives deliberate invalidity,
+        # but the exit/envelope honestly report failed validation.
+        assert completed.returncode == 1, completed.stderr
         response = json.loads(completed.stdout)
         assert response["exit_code"] == completed.returncode
-        assert response["status"] == (
-            "succeeded" if completed.returncode == 0 else "validation_failed"
-        )
+        assert response["status"] == "validation_failed"
         rows = json.loads(rows_path.read_text())
         manifest = json.loads((artifact_dir / "generation_manifest.json").read_text())
         report = json.loads((artifact_dir / "validation_report.json").read_text())

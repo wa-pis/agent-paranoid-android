@@ -142,6 +142,11 @@ Provider integrations map to ADR-0012/0016, not to a new source-data permission.
 
 ## Implementation and acceptance snapshot
 
+Owner successor [ADR-0029: unified replacement contract](0029-unified-replacement-contract.md)
+permits explicit mapped source-membership/permutations for every field, with
+value-free sensitivity notes. Direct preservation and source-free rules remain
+unchanged; activation requires new executable evidence and independent review.
+
 - Existing generation/profiling/agent contracts remain separate from transformation.
 - PR #594 merged private installed-wheel CSV replacement acceptance at
   **300,000 × 50**. See [immutable evidence](https://github.com/wa-pis/agent-paranoid-android/blob/637065966c12584e11c9b437c1e8b8f8d708c0df/openspec/changes/selective-source-transformation/csv-scale-acceptance.md).

@@ -100,6 +100,8 @@ def test_cleanup_refuses_replaced_directory(tmp_path: Path) -> None:
     (output / "keep.txt").write_text("keep")
 
     assert remove_tree_if_identity(output, expected) is False
+    with pytest.raises(ValueError, match="cleanup path changed"):
+        remove_tree_if_identity(output, expected, strict=True)
     assert (output / "keep.txt").read_text() == "keep"
 
 

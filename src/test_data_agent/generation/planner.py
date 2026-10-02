@@ -17,6 +17,8 @@ def infer_dataset_spec(profile: DatasetProfile, count: int | None = None) -> Dat
         raise ValueError("SQL expression dependencies are unsupported for inferred generation")
     entities: list[EntitySpec] = []
     for entity in profile.entities:
+        if any(field.null_ratio is None for field in entity.fields):
+            raise ValueError("unknown null statistics require an explicit reviewed generation spec")
         primary_key = entity.primary_key_candidates[0] if entity.primary_key_candidates else None
         entities.append(
             EntitySpec(
@@ -28,7 +30,7 @@ def infer_dataset_spec(profile: DatasetProfile, count: int | None = None) -> Dat
                         name=field.name,
                         data_type=field.data_type,
                         nullable=field.nullable,
-                        null_ratio=field.null_ratio,
+                        null_ratio=field.null_ratio if field.null_ratio is not None else 0.0,
                         sensitive=field.sensitive or is_sensitive_field(field.name, field.semantic_type),
                         semantic_type=field.semantic_type,
                         is_identifier=field.is_identifier,

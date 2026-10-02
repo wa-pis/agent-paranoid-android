@@ -5,9 +5,13 @@ from __future__ import annotations
 import os
 import re
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
+from typing import TYPE_CHECKING
 from urllib.parse import parse_qsl, unquote, urlsplit
+
+if TYPE_CHECKING:
+    from test_data_agent.trino_auth import TrinoAuthConfig
 
 DEFAULT_MAX_RESULT_ROWS = 10_000
 ABSOLUTE_MAX_RESULT_ROWS = 100_000
@@ -85,9 +89,12 @@ class TrinoConfig:
     deployment_profile: TrinoDeploymentProfile = TrinoDeploymentProfile.TRUSTED_LOCAL
     default_catalog: str | None = None
     default_schema: str | None = None
+    authentication: TrinoAuthConfig | None = field(default=None, repr=False)
 
     @classmethod
     def from_env(cls) -> TrinoConfig:
+        from test_data_agent.trino_auth import TrinoAuthConfig
+
         endpoint = _trino_jdbc_endpoint_from_env()
         config = cls(
             host=_resolved_text_env(
@@ -137,6 +144,7 @@ class TrinoConfig:
             allow_unrestricted=parse_env_bool("TRINO_ALLOW_UNRESTRICTED"),
             allow_insecure_http=parse_env_bool("TRINO_ALLOW_INSECURE_HTTP"),
             deployment_profile=deployment_profile_from_env(),
+            authentication=TrinoAuthConfig.from_env(os.environ),
         )
         config.validate_security()
         return config

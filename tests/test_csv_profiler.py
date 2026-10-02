@@ -188,8 +188,8 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     ]
     mixed_args = [*base_args, "--mode", "mixed", "--invalid-ratio", "0.1"]
 
-    assert main([*mixed_args, "--format", "csv", "--output", str(csv_output)]) == 0
-    assert main([*mixed_args, "--format", "json", "--output", str(json_output)]) == 0
+    assert main([*mixed_args, "--format", "csv", "--output", str(csv_output)]) == 1
+    assert main([*mixed_args, "--format", "json", "--output", str(json_output)]) == 1
     assert main([*base_args, "--format", "parquet", "--output", str(parquet_output)]) == 0
 
     with csv_output.open() as handle:

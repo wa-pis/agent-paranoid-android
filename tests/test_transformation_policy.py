@@ -16,6 +16,24 @@ def policy(behavior):
                         "behavior": behavior}]}
 
 
+@pytest.mark.parametrize("behavior", [
+    {"action": "drop"},
+    {"action": "synthesize", "generation_policy_ref": "fictional.yaml"},
+    {"action": "preserve", "authorization_ref": "fictional", "comment": "Fictional decision"},
+    {"action": "derive", "expression": "value + 1", "dependencies": ["value"]},
+])
+def test_execution_scope_excludes_private_derive_without_removing_it(behavior):
+    from test_data_agent.core.transformation_policy import validate_execution_actions
+
+    parsed = parse_behavior_policy(policy(behavior))
+    if behavior["action"] == "derive":
+        with pytest.raises(BehaviorPolicyError, match="^unsupported transformation execution action$"):
+            validate_execution_actions(parsed)
+        assert parsed.fields[0].behavior.action == "derive"
+    else:
+        validate_execution_actions(parsed)
+
+
 def test_declared_decimal_type_roundtrips_without_changing_sensitivity():
     payload = policy({"action": "drop"})
     payload["fields"][0]["decimal_type"] = {"precision": 38, "scale": 16}

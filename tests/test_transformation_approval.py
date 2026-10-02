@@ -311,9 +311,16 @@ def test_incomplete_or_unsafe_request_is_value_free(change):
     try:
         raise ValueError("fictional-private-marker")
     except ValueError:
-        with pytest.raises(ApprovalMaterialError) as error:
+        from test_data_agent.core.transformation_limits import TransformationLimitError
+        expected = TransformationLimitError if change == "small_budget" else ApprovalMaterialError
+        with pytest.raises(expected) as error:
             prepare_approval_request(policy, evidence, parts,
                 max_total_bytes=1 if change == "small_budget" else 8192,
                 max_review_bytes=4096, budget=GenerationBudget(5))
-    assert str(error.value) == "invalid transformation approval material"
+    if change == "small_budget":
+        assert error.value.code == "limit_exceeded"
+        assert error.value.origin == "snapshot_run"
+        assert "fictional-private-marker" not in str(error.value)
+    else:
+        assert str(error.value) == "invalid transformation approval material"
     assert error.value.__context__ is None

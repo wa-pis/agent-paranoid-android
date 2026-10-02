@@ -31,13 +31,23 @@ generation. It may eventually produce a labelled mixed-origin, one-to-one
 dataset, but these instructions do not enable that execution path. Existing
 generation, profiling, advisors and default MCP remain source-free.
 
-Before any source value may be retained in transformation output, require an
+Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
 evidence, a bounded operator comment, and fresh interactive local-CLI approval
 of the exact displayed plan, source bytes, classification and mapping bytes.
 Agents and MCP may not create that approval. Sensitive, unknown and disputed
 fields remain blocked; DECIMAL preservation remains blocked by default.
-No source row may be copied wholesale, and no raw PII or secret may be emitted.
+No implicit source-row copy is permitted; the explicit replacement exception
+below is separate from synthetic generation and transport disclosure.
+
+Owner amendment 2026-10-02 (ADR-0029): explicit `substitute`/`replace_text`
+mappings have one contract for every field. A mapped replacement is not
+preservation merely because it equals another value in the fixed source,
+including a sensitive field. Sensitivity remains a value-free field note,
+not a mapping-membership prohibition. This permits explicit mapped permutations,
+not implicit copying, source-free generation reuse, `preserve`, secrets in logs,
+errors, summaries, providers or MCP responses. Public activation still requires
+matching specifications, executable tests and independent exact-SHA safety review.
 
 This proposed exception remains disabled until matching baseline/OpenSpec
 amendments, executable end-to-end safety tests, and independent safety review
@@ -52,6 +62,29 @@ surfaces. Test outputs stay in bounded temporary test locations, never user
 destinations. This permits no real data access or dataset approval. Passing
 end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
+
+The activation amendment under review is defined in
+`openspec/changes/selective-source-transformation/safety-boundary.md`.
+Its separate local-file execution contract permits only local controlling-TTY
+receipt issuance and matching-receipt consumption by noninteractive/workspace
+execution. Private `derive`, database capture and external APIs are not enabled
+by that contract. Preserve source-free entrances and disclosure budgets;
+enforce complete snapshot totals and identity-limited publication cleanup.
+These instructions still do not activate execution: registration must wait for
+matching baseline amendments, executable interface evidence and independent
+safety review of the exact activation SHA. A review of private code alone does
+not satisfy review of the policy amendment or public registration.
+
+The concrete candidate names `transform-approve` as the local-only
+issuer, `transform-execute` as the CLI consumer and `execute_transformation`
+as the workspace-confined MCP consumer. Execution requires the exact reviewed
+snapshot digest; a new review digest does not validate an old receipt after
+any bound input changes. Never register an MCP issuer or accept an agent
+approval boolean. Registration may be materialized only in an isolated fictional
+candidate before review, never exposed publicly or used on real inputs. Public
+delivery requires independent safety review of this exact complete code/policy
+SHA and the executable gates above. Candidate help, receipts and acceptance
+are not dataset authorization or proof of completed review.
 
 ## Engineering contract
 

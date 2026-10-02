@@ -11,7 +11,8 @@ from test_data_agent.core.transformation_policy import transformation_schema_fin
 from test_data_agent.csv_profiler import profile_csv_bytes
 
 
-def test_transform_review_uses_fixed_csv_and_local_mapping_without_values(tmp_path, capsys):
+def test_transform_review_uses_fixed_csv_and_local_mapping_without_values(tmp_path, capsys, monkeypatch):
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES", "8192")
     source = tmp_path / "items.csv"
     source.write_bytes(b"status\nready\nwaiting\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
@@ -89,7 +90,7 @@ def test_transform_review_reports_global_and_column_text_scopes_without_values(t
     assert "override" not in overridden.out + overridden.err
 
 
-def test_transform_review_rejects_sensitive_source_value_swap_without_values(tmp_path, capsys):
+def test_transform_review_notes_sensitive_source_value_swap_without_values(tmp_path, capsys):
     source = tmp_path / "items.csv"
     source.write_bytes(b"status\nfictional-A\nfictional-B\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
@@ -104,8 +105,11 @@ def test_transform_review_rejects_sensitive_source_value_swap_without_values(tmp
     (tmp_path / "all.csv").write_bytes(
         b"old,new\nfictional-A,fictional-B\nfictional-B,fictional-A\n",
     )
-    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) != 0
+    assert main(["transform-review", str(source), str(tmp_path / "policy.yaml"), "--json"]) == 0
     output = capsys.readouterr()
+    reviewed = json.loads(output.out)["result"]
+    assert reviewed["status"] == "review_only"
+    assert reviewed["review"]["fields"][0]["system_comment"]
     assert "fictional-A" not in output.out + output.err
     assert "fictional-B" not in output.out + output.err
     assert not (tmp_path / "approval.json").exists()

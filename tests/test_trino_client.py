@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 from threading import BoundedSemaphore
 from typing import Any
+from types import SimpleNamespace
 
 import pytest
 
@@ -15,6 +16,8 @@ from test_data_agent.trino_client import (
     rows_to_dicts,
 )
 from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_auth import TrinoAuthConfig
+from test_data_agent.trino_config import TrinoConfigurationError
 from test_data_agent.trino_work_budget import (
     DEFAULT_QUERY_WORK_LIMITS,
     QueryWorkBudget,
@@ -98,6 +101,41 @@ def client_config(*, max_result_rows: int = 2) -> TrinoConfig:
         query_max_scan_physical_bytes="128MB",
         max_result_rows=max_result_rows,
     )
+
+
+def test_authentication_preflight_and_tls_propagation(monkeypatch: pytest.MonkeyPatch) -> None:
+    driver = FakeDriver(FakeCursor([]))
+    token_auth = object()
+    constructed = []
+    driver.auth = SimpleNamespace(JWTAuthentication=lambda token: constructed.append(token) or token_auth)
+    config = replace(client_config(), authentication=TrinoAuthConfig(method="jwt", secret_env="FICTIONAL_TOKEN"))
+    client = TrinoClient(config=config, driver=driver)
+    monkeypatch.delenv("FICTIONAL_TOKEN", raising=False)
+    with pytest.raises(TrinoConfigurationError, match="missing or invalid"):
+        client.fetch_dicts("SELECT synthetic_id FROM safe_table LIMIT 1")
+    assert driver.dbapi.connect_kwargs is None
+    monkeypatch.setenv("FICTIONAL_TOKEN", "fictional-token")
+    assert client.fetch_dicts("SELECT synthetic_id FROM safe_table LIMIT 1") == []
+    assert driver.dbapi.connect_kwargs is not None
+    assert driver.dbapi.connect_kwargs["auth"] is token_auth
+    assert driver.dbapi.connect_kwargs["verify"] is True
+    assert client.fetch_dicts("SELECT synthetic_id FROM safe_table LIMIT 1") == []
+    assert constructed == ["fictional-token"]
+
+
+def test_driver_authentication_error_is_detached_and_resources_close() -> None:
+    class FictionalAuthError(Exception):
+        pass
+    cursor = FakeCursor([], execute_error=FictionalAuthError("fictional-token-response"))
+    driver = FakeDriver(cursor)
+    driver.exceptions = SimpleNamespace(TrinoAuthError=FictionalAuthError)
+    with pytest.raises(TrinoConfigurationError, match="^Trino authentication failed$") as caught:
+        TrinoClient(config=client_config(), driver=driver).fetch_dicts(
+            "SELECT synthetic_id FROM safe_table LIMIT 1"
+        )
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert cursor.closed and driver.dbapi.connection.closed
 
 
 def test_client_applies_budgets_and_closes_resources() -> None:

@@ -1,5 +1,106 @@
 # Implementation Progress
 
+## Registration test-double follow-up — 2026-10-02
+
+PR #601 head 4208046 CI run 37034916010 failed minimum-MCP job 110930773667:
+FakeMCP.tool did not accept the newly explicit description keyword. Real SDK
+registration/installed execution already passed; this is a stale unit double,
+not a reason to remove normalization or bypass the gate. Updated its exact
+keyword signature, retained callable/audit/order checks and added assertions for
+multiline cleandoc output and an undocumented tool's empty description.
+Generator transport suite: 11 passed with MCP 1/Python 3.11 and 11 passed with
+locked MCP 2/Python 3.14; Ruff passed. No runtime or policy changes, new review,
+full-gate/scale replay or live access. Remaining old-head Python jobs still run;
+wait for their final diagnostics before pushing a single same-PR update.
+Next: signed test correction, push only without overlapping old-head CI, then
+latest-head mandatory gates before merge. No tag/version/release.
+
+## Complete matrix follow-up and installed replay — 2026-10-02
+
+CI e4374e3 run 37025599204 completed failed: all Python jobs retained a second
+TTY-to-MCP scenario's legacy timedelta and the architecture inventory omitted
+the new pure typed error contract dependency; Python 3.14 additionally differed
+only in the new multiline tool description's compiler-normalized indentation.
+Fixed that sibling timeout/wire alias, explicitly listed only the typed budget
+module (no broad architecture exemption), and normalized generator tool docs with
+stdlib cleandoc. Reviewed fixture delta is description whitespace only; no names,
+schema, authority or values changed. Boundary documentation now matches candidate
+registrations. Reconciled stale identifier/R3 acceptance status and superseded
+membership task without closing absent private/live or final RC acceptance.
+Isolated locked Python 3.14 affected five-file suite: 128 passed/6 existing skips.
+MCP 1 architecture/contract/candidate/docs suite: 129 passed/6 existing skips.
+Ruff, transport mypy, strict MkDocs and diff checks passed. Updated standalone
+installed harness for MCP 1/2 and Linux PTY EOF, retaining all negative controls;
+contract now first checks current goldens before isolating the declared delta.
+Actual installed wheel seven fictional CLI/MCP/TTY/wizard/replacement cases:
+7 passed in 10.12s, no source imports/product monkeypatch or live access.
+Wheel SHA256 30a609b8be9b2e977ca596f594d9ea467741ce8fdbb8cfff49cd7ba0c90ab55d,
+root /private/tmp/apa-matrix-installed.8cYJ0f/installed, still version 1.5.0.
+Initial earlier replay was 6 passed/1 stale harness-contract failure, then its
+isolated correction passed; final seven-case result above uses rebuilt runtime.
+Next: signed same-PR update and fresh automatic mandatory CI; no merge/tag yet.
+Final exact RC review must cover the typed diagnostic and doc-normalization delta.
+
+## MCP matrix compatibility remediation — 2026-10-02
+
+PR #601 remains blocked at cc27b59; no merge/tag/release. Corrected removed MCP
+imports, native request context, timeout types and wire-alias assertions for SDK
+1/2 without skipping dispatch, receipt or privacy assertions. Linux PTY EIO
+after approval is EOF; final child exit, receipt and actual execution remain
+asserted. Local PTY needs terminal access outside the sandbox and passed there.
+Actual MCP 2.2 temporary dependency install exposed a runtime diagnostic issue:
+SDK unexpected-error wrapping hid typed budget recovery. Transport reconstructs
+only exact transformation-limit/query-budget errors and detaches their cause;
+other unexpected errors remain generic, not arbitrary ValueError disclosure.
+MCP 2 candidate/roundtrip: 17 passed, 6 existing preservation-route skips;
+transport: 49 passed. MCP 1 affected candidate/CLI/roundtrip/transport suite:
+93 passed, 6 existing skips. Ruff and transport mypy passed. No scale rerun,
+product monkeypatch, live DB/API or claim of final RC clearance. Next: signed
+same-PR update and latest-head mandatory matrix; final exact RC review must
+include this narrow diagnostic change. No ordinary PR review or duplicate CI.
+
+## Reviewed activation PR preparation — 2026-10-02
+
+Independent ActivationSafety-R3 / Plato completed review of exact
+911ade071e4a309ab3e3538dfe6c4a9f676624aa with no new confirmed findings in
+32 changed files; 22 tiny fictional checks personally performed. Full/installed
+gates are explicitly inherited. See [R3 evidence](activation-safety-r3.md).
+R2-1 superseded by owner ADR-0029, R2-2/3/4 addressed, identifier fix reviewed.
+Evidence-only successor and user-facing CLI/MCP/changelog reconciliation change
+no runtime. Documentation suite: 50 passed; strict MkDocs and diff check passed.
+Next: one signed activation PR and mandatory GitHub gates. No human approval
+claimed. Final exact RC review, clean locked release and public acceptance remain
+mandatory; no version bump, tag or release yet. Earlier pending-R3 notes below
+are chronological history, superseded by this completed review.
+
+## Sensitive identifier candidate fix — 2026-10-02
+
+Traced generation and the shared post-solve privacy validator: identifier
+generation correctly takes precedence and emits deterministic numeric synthetic
+tokens, but semantic email/phone/SSN validation rejected those tokens. Validator
+now recognizes only the existing exact ASCII integer token on identifier fields.
+No generator format change, source reuse, arbitrary prefix exemption or ordinary
+semantic-field relaxation. Added seeded positive/negative-seed pool cases across
+three semantics, malformed/Unicode/raw-sensitive negatives and non-identifier
+negative. Identifier/safety suite: 48 passed in 0.43s; Ruff and diff check passed.
+Guide, change contract and client disposition updated. This is a candidate fix,
+not installed acceptance or independent safety clearance. Next: materialize the
+complete amended isolated activation candidate and run milestone installed gates
+before independent exact-SHA review; public registrations remain inactive.
+
+## Documentation reconciliation — 2026-10-02
+
+Reconciled plan/tasks, baseline safe-MCP contract, its change delta and client
+acceptance with owner-approved ADR-0029. Uniform explicit replacement permits
+sensitive permutations only in actual mapped local output cells; value-free
+field notes, preservation receipts and source-free disclosure boundaries remain.
+Historical R2 review is not approval of this amended candidate. Strict OpenSpec
+validation and diff whitespace check passed after correcting delta structure.
+No repeated runtime/scale gates or new review. Public registration stays inactive.
+Next: resolve the remaining synthetic sensitive-identifier/validator disagreement,
+then materialize the complete amended activation candidate for installed gates
+and independent review of its exact SHA.
+
 ## Authority And Target
 
 - User authorized implementation, signed commits/push, sequential PR merges
@@ -4401,3 +4502,1328 @@ Broader transformation remains unfinished.
   with the real subprocess transport (no product monkeypatch). Prepare one
   signed read-only review PR; consume CI before normal merge. Next functional
   work remains complete public execution activation evidence under ADR-0020.
+- PR #600 merged normally after all required and reported CI succeeded;
+  head377b05692f302ea6eeb14e34acea3ce05697d1a3,
+  mergebef20dbe50dc29a18ff2d94b2fac664b02049148. Read-only MCP review is
+  integrated; no public execution or receipt authority activated.
+  Active checkout /private/tmp/apa-rc-workflow, new branch
+  codex/1-6-execution-activation from merged main. Next complete outcome:
+  audit existing shared executor/publication/approval boundaries, assemble
+  executable end-to-end activation evidence and independent safety review
+  before enabling the public execution interfaces. Reuse accepted route/scale
+  evidence where unchanged; no duplicate review or CI runs. Automation ACTIVE.
+- Activation audit at bef20db: existing replace_csv_snapshot verifies canonical
+  fixed snapshots and matching receipts; issue_local_receipt is a private
+  controlling-TTY helper, not a registered command. Existing publication builds
+  all three formats and mixed-origin provenance but exposes only automatically
+  deleted temporary output. Public CLI registers review only; no execute/approve
+  transformation path. Reuse path_policy staging/atomic publication and identity
+  cleanup, not a new filesystem framework. Next implementation: extract the
+  existing artifact writer for a closed fictional destination-bound acceptance
+  path, test fail-before-publication and unchanged/changed review binding, then
+  assemble exact-SHA safety review before registering public commands. This is
+  an audit, not evidence that activation or preservation acceptance has passed.
+- Closed publication preparation: extracted the existing atomic bundle writer
+  without registering public destinations; added staging cleanup on failure and
+  a fixed artifact-name allowlist. Fictional existing-output collision test
+  proves the prior artifact remains unchanged and staging is removed; path-name
+  traversal fails before creating files. Executor/publication suite279 passed,
+  Ruff and diff checks passed. Public activation remains disabled. Next: extend
+  the complete fixed-review execution request through this writer with bounded
+  configuration and approval consumption; assemble one activation PR only after
+  end-to-end acceptance and exact-SHA independent safety review.
+- Bundle limit enforcement now lives at the shared closed writer, before any
+  staging creation; no duplicated caller-only check. Executable fictional exact
+  byte-boundary/one-over acceptance covers payload plus manifest, typed counters
+  and origin, no files on rejection, full readback on success. Public surfaces
+  remain unchanged. Executor/publication280 tests, Ruff and diff checks passed.
+  Continue the complete activation scenario in this branch;
+  no separate helper PR or scale replay.
+- Fixed-review→closed destination→artifact readback now uses the same extracted
+  executor/publication path as automatically cleaned temporary acceptance.
+  No second renderer/engine and no public facade. Fictional end-to-end tests
+  verify complete CSV/manifest/provenance, changed review rejects before files,
+  and output-budget exhaustion leaves no destination or staging. All283 focused
+  executor/publication tests passed; Ruff/diff checks passed. Receipt verification
+  stays in replace_csv_snapshot; no receipt minting or declassification added.
+  Next: bind expected review digest and effective session/profile limits at the
+  command boundary, add complete CLI/agent execution acceptance behind the
+  activation gate, then exact-SHA independent safety review. Keep one PR scope.
+- Saved policy paths→exact reviewed digest→shared closed executor→destination
+  publication→full readback acceptance now passes. Temporary command delegates
+  to that same path and still removes artifacts before returning. Stale digest
+  rejects without destination; explicit session output ceiling retains typed
+  requested_above_limit/session diagnostics before staging. Source/policy/mapping
+  bytes remain unchanged. All286 focused executor/publication tests plus Ruff
+  and diff checks passed after the refactor. No public interface or approval
+  issuance added. Next: installed route acceptance on the changed writer,
+  preservation/receipt-consumption acceptance and executable public gate tests;
+  then consolidate docs/contract and exact-SHA independent review before wiring.
+- Changed publication integration installed-wheel acceptance completed: all12
+  fictional routes passed; 15 installed fixed-review/receipt-consumption tests
+  passed with pytest pythonpath injection disabled. Fresh wheel/harness hashes
+  and scope recorded in route-workflow-acceptance.md. python-build unavailable;
+  existing pip/Hatch built offline without dependencies or primary venv changes.
+  No scale replay, no public activation or real-data approval. Next: executable
+  public activation-gate checks and contract/docs consolidation, then coherent
+  exact-SHA independent safety review before public command wiring.
+- Public activation boundary made executable against the same installed wheel:
+  3 tests pass proving transform-execute/transform-approve unregistered, MCP
+  transformation surface review-only and no receipt endpoints/public Python
+  exports. MCP guide now explicitly distinguishes closed writer acceptance from
+  activation. Ruff, strict MkDocs and diff checks pass. No gate relaxed.
+  Next: consolidate a signed evidence SHA and narrow independent safety review
+  of the shared publication/receipt boundary before any public wiring; retain
+  full RC scope and do not treat these gate tests as completed public execution.
+- Closed workflow/evidence signed as1575fcd0b92722b2c85d014be75fbb122fbdafca.
+  Independent AI safety reviewer PublicationBoundary-R1 (Jason), agent
+  01a0f8f6-5e7e-7b81-a337-b2476bf458f5, dispatched read-only for exact SHA:
+  shared publication/digest/budgets/receipt and public-gating boundaries, not
+  ordinary PR review or final RC approval. No findings/approval claimed yet.
+  Full offline milestone regression running in session78819; do not duplicate
+  it or this active review. No public commands registered; wait for results,
+  fix concrete findings before any activation. Automation ACTIVE.
+- Full offline milestone regression at1575fcd completed:2581 passed,
+  10 live-service cases deselected,84.03s. Session78819 finished; do not replay
+  unchanged tests. Mypy publication module passed. Independent safety reviewer
+  remains active; next continuation consume its result, no duplicate reviewer.
+- PublicationBoundary-R1 completed: medium post-rename fsync/manifest-read
+  failure can leave a committed bundle. Finding/evidence/disposition recorded
+  in publication-safety-review.md; it blocks prospective public wiring.
+  Candidate identity-checked rollback added; postcommit manifest reopen removed.
+  Fault test fails on prior installed wheel (output remains), passes candidate.
+  Executor287 passed; after typing cleanup focused32 passed, Mypy/Ruff passed.
+  Next: signed fix SHA and independent follow-up of changed scope, then resume
+  complete activation scenario. No public activation or final RC approval.
+- Fix signed as2f823678ad3df994fc415a9fca624c65653c93b2. Same independent
+  AI reviewer PublicationBoundary-R1/Jason dispatched for follow-up limited to
+  rollback and postcommit metadata handling at that exact SHA. No duplicate
+  reviewer or broader repeat review. Await finding disposition before wiring;
+  public activation remains closed. Continue non-overlapping acceptance/docs.
+- Fix installed-wheel acceptance:13 focused rollback/receipt/public-gate tests
+  passed with pytest source injection disabled. Wheel SHA/path recorded in
+  publication-safety-review.md. Same reviewer follow-up remains active; no
+  duplicate dispatch, no unchanged route/scale/full-regression replay.
+- Follow-up received at2f82367: partially remediated, remaining medium issue.
+  Staging cleanup after confirmed rename can still report generic failure with
+  output retained; failed rollback likewise lacks distinct retained-output
+  diagnostics. Identity deletion judged safe; no unsafe-deletion finding.
+  Reviewer is finished, not active. Next: remove postcommit staging cleanup,
+  distinguish unsuccessful rollback without values, test both fault paths,
+  then changed-scope exact-SHA review. No new owner decision needed; automation
+  ACTIVE, public wiring remains disabled. Evidence updated in safety review.
+- Second candidate fix removes postcommit staging cleanup and preserves a
+  distinct value-free TransformationCleanupError through shared publication and
+  command boundaries when rollback cannot be confirmed. Diagnostic explicitly
+  warns output/staging may remain and requires inspection before retry; no
+  false no-output guarantee on OS removal failure. New fault tests cover both
+  paths. Next: exact-SHA changed-scope review; public activation still disabled.
+- Second fix signed f5842d84cccad4a2733dcbf2feaf3348c9f91e15;34 focused
+  publication/command/bundle/rollback tests, Mypy/Ruff/diff checks passed.
+  PublicationBoundary-R1/Jason sent follow-up for that exact changed scope,
+  same agent01a0f8f6-5e7e-7b81-a337-b2476bf458f5 now active. Do not duplicate.
+  Next continuation consume disposition before any wiring; no final RC claim.
+- Review atf5842d8 remediated the two earlier findings but found generic staging
+  discard suppresses lookup failures. Third candidate uses captured identity
+  directly and reports initial identity/cleanup lookup failures as incomplete
+  cleanup, without unverified deletion.36 focused tests, Mypy/Ruff pass.
+  Reviewer finished; next signed changed-scope SHA and same-reviewer follow-up.
+  No public activation; broader path_policy helper deliberately unchanged.
+- Third fix signed3721503e38522fa6966bdc4fd64adbdbecbe3f08; same independent
+  reviewerPublicationBoundary-R1/Jason follow-up now active for changed scope.
+  Do not duplicate review; next consume disposition, keep one workflow PR scope.
+- PublicationBoundary-R1 completed at3721503: incomplete-cleanup finding closed
+  by static inspection, no new findings in changed scope. Exact identity/date/
+  scope/evidence and checks-not-run recorded in publication-safety-review.md.
+  Reviewer finished; no active duplicate review. Public activation still closed.
+  Next complete result: public command/agent request workflow with existing
+  shared core, explicit reviewed digest, effective limits and local-only receipt
+  issuance/agent consumption, acceptance and scoped review of new wiring before
+  activation. Publication finding is no longer the blocker; full RC not ready.
+- Unregistered CLI execution candidate added; no production composition import,
+  facade or MCP registration. Fictional saved policy→fixed review digest→parsed
+  CLI request in a subprocess→shared publication→full CSV readback passes;
+  stale digest rejects without output and inputs stay unchanged. Five candidate/
+  public-gate tests pass, Mypy/Ruff/diff pass. Initial fixture incorrectly expected
+  CRLF; corrected to existing LF output, no product format change. Candidate
+  currently requires explicit max-output-bytes and consumes only existing
+  receipt; no approval issuer. Next: effective session/profile defaults and
+  local-only confirmation composition, installed acceptance and scoped wiring
+  review before registration; retain one complete workflow PR scope.
+- Candidate execution output budget now defaults to effective profile/session
+  ceiling; explicit run cap remains independently checked by the shared core.
+  Value-free command result reports run bytes, ceiling bytes and origin.
+  Subprocess acceptance covers explicit cap, profile default, session default,
+  request above session ceiling and stale digest with no output on rejection.
+  No public registration, approval creation or source-free budget changes.
+  Next: local-only interactive confirmation composition and installed candidate
+  workflow acceptance; review new wiring before activation, one workflow PR.
+- Effective output-budget candidate acceptance:39 focused tests pass, Mypy two
+  modules/Ruff pass. Added unregistered local-approval candidate with mandatory
+  exact digest, controlling-TTY confirmation via existing receipt core and no
+  overwrite of existing receipt. No MCP issuer or automatic approval flag.
+  New real controlling-TTY subprocess integration currently FAILS before prompt
+  with sanitized LocalReceiptError; five execution candidate cases pass.
+  Do not claim local-approval composition accepted. Next diagnose canonical
+  request versus terminal boundary on fictional fixture, fix shared cause and
+  finish the approval→execution scenario; no user decision needed or activation.
+- TTY diagnosis: canonical request validation passes. Sandboxed subprocess fails
+  opening `/dev/tty` with PermissionError (EPERM), before receipt prompting.
+  Isolated unsandboxed fictional test reaches the real APPROVE prompt, but child
+  does not finish within ten seconds after the answer. This is not acceptance.
+  Harness now reports early child failure immediately rather than spinning for
+  fifteen seconds. Next inspect controlling-terminal answer/read behavior and
+  complete receipt→execution; no policy bypass or public activation performed.
+- Closed CLI approval→execution now accepted on fictional temporary fixtures.
+  Root cause of post-answer timeout: PTY harness waited without draining output;
+  corrected harness only, receipt core unchanged. Real controlling-TTY prompt,
+  exact-digest owner-only receipt and separate noninteractive artifact readback
+  pass. Stale digest, existing receipt overwrite and piped APPROVE without TTY
+  reject without new receipt. Source candidate:6 tests pass; receipt scope:17
+  pass; Ruff and Mypy two modules pass. Installed development wheel:17 pass,
+  SHA256 6ab034ca3be1091b614eb46db0fe527c19068800253d590f813973822632eaff.
+  Evidence:route-workflow-acceptance.md. No public activation or real approval.
+  Next: complete common CLI/agent execution wiring and configuration audit,
+  document activation amendment, then exact-SHA independent safety review before
+  registration; keep one coherent workflow PR and all remaining RC scope.
+- Common workflow candidate now includes an unregistered workspace-confined
+  agent adapter consuming the same existing local receipt and shared executor.
+  Fictional subprocess acceptance compares CLI/agent status and artifact bytes:
+  identical, no source literals in status. No issuer or MCP registration added.
+  Six updated CLI workflow tests pass; four input/policy/output/receipt workspace
+  escape cases reject before execution; Mypy adapter and Ruff pass.
+  Next complete configuration/activation-contract audit and installed shared
+  workflow evidence, then review exact completed SHA before public wiring.
+- Installed common candidate:10 changed-scope tests pass in2.99s; wheel SHA256
+  2e413fe920c4f807ae0a92e7bf3ba4ca2c8b0869a257c4d24fc9457edaf9ecfb,
+  evidence:route-workflow-acceptance.md. Current branch has no open PR.
+  Configuration audit found a remaining mismatch: candidate review/approval/
+  execution pass fixed DEFAULT_MAX_TOTAL_INPUT_BYTES (512MiB), independent of
+  configurable per-file limits. Combined source/policy/reference/review identity
+  exceeding that cap fails through generic snapshot/source errors, not an
+  actionable typed total-budget diagnostic. This does not invalidate accepted
+  300000×50 runs; do not replay them. Next finish explicit shared snapshot-total
+  configuration/diagnostics without changing source-free disclosure budgets,
+  then activation amendment and exact-SHA review. No new owner decision needed.
+- Saved closed workflow checkpoint:9db6c775c3f82a7be6061215f0d93ab518220c04
+  (signed). Total-snapshot configuration now has a typed transformation-only
+  resource_limits.max_total_input_bytes field (unchanged512MiB default), session
+  override and legacy-session fallback through the existing resolver. Boundary
+  diagnostics distinguish actual/requested excess, bytes, origin and recovery
+  keys. This model change is NOT yet wired into snapshot loaders/receipt paths;
+  do not mark the fixed-cap defect closed or repeat installed acceptance yet.
+  Next wire effective total budgets through shared preparation and canonical
+  receipt validation, preserving exact bytes and typed errors across boundaries.
+  Checks:26 focused total/input-limit tests pass; Mypy limits module, Ruff and
+  diff-check pass. No source-free defaults, public registration or CI changed.
+- Connected optional effective snapshot-total budget to closed path preparation,
+  CLI approval/execution and workspace agent candidate; fixed-request receipt
+  revalidation receives the same resolved cap. Policy bootstrap remains bounded
+  by the existing512MiB default before profile settings can be read; defaults
+  and read-only public review are unchanged. Profile/session8192-byte settings
+  are exercised by candidate subprocess tests. Mypy four modules/Ruff pass.
+  Remaining: typed diagnostics for cumulative early loader and final identity
+  exhaustion (generic exceptions still exist); explicit run-cap option and
+  canonical-policy total enforcement must be finished before closing this gap.
+  No public activation or installed acceptance claimed for this changed code.
+  Focused changed-scope checks:12 candidate/total-limit tests pass in3.01s.
+- Early cumulative budget checks now run before and during mapping reads and
+  before/after source snapshot reads, counting already consumed policy/reference
+  bytes. Typed total-limit errors propagate through reference loading without
+  exposing values. Exact-boundary/one-byte-over tests for both readers pass;
+  38 focused total/mapping/source tests pass, Mypy two modules and Ruff pass.
+  No cap increase or public registration. Next final approval identity/canonical
+  enforcement, explicit run cap, shared workflow regression and documentation;
+  total-budget defect remains open until those paths and installed evidence pass.
+- Approval material now checks configured total ceiling and explicit snapshot
+  run cap before final identity, including displayed review bytes. Receipt
+  issuance/verification preserve typed budget errors rather than masking them.
+  Effective limit errors detach ambient exception context; safety test covers
+  a fictional private marker. Old small-budget expectation updated from generic
+  approval failure to actionable total-budget error. Mypy three modules/Ruff pass.
+  Next explicit CLI/agent run cap and end-to-end cumulative exhaustion cases,
+  documentation and installed shared workflow; public activation remains gated.
+  Focused approval/receipt/total-budget checks:69 passed in0.36s.
+- Explicit run cap connected to closed CLI approval/execution
+  (--max-total-input-bytes) and agent candidate(max_total_input_bytes). Above
+  effective ceiling rejects as requested_above_limit before source execution;
+  lower run caps use snapshot_run origin. Complete approval material now reports
+  configured session/profile origin before equal run-cap exhaustion. Fictional
+  subprocess cases prove above-request vs actual cumulative session exhaustion,
+  no output and no source literals.62 CLI/approval tests pass in3.39s; Mypy three
+  modules/Ruff pass before the final test-only addition.
+  Next reconcile read-only transform-review/MCP review callers still passing a
+  fixed512MiB explicit cap (must not become an unintended above-request), finish
+  early bootstrap/exact-zero budget cases and docs, then installed acceptance
+  and exact-SHA safety review of completed activation wiring. No public activation.
+- Read-only CLI/MCP review no longer requests fixed512MiB as a run override:
+  both resolve the effective saved-profile/session total cap. Policy decision
+  wizard resolves the same cap and preserves typed exhaustion errors. Existing
+  CLI mapping review and actual registered MCP stdio parity now run under an
+  8192-byte session ceiling;7 focused review tests pass. Mypy three modules pass,
+  Ruff/diff-check pass. Configuration docs distinguish combined snapshot budget,
+  closed run-cap options and still-unregistered execution.
+  Next finish early policy-bootstrap/exact-zero exhaustion cases, run changed
+  shared workflow milestone gates and installed acceptance, update OpenSpec and
+  activation amendment, then exact-SHA independent review. No scaling replay.
+- Installed total-budget workflow acceptance:25 passed in3.91s, including
+  fictional local TTY approval, shared CLI/agent execution, registered read-only
+  MCP parity, above-request and cumulative exhaustion with no publication.
+  Wheel:/private/tmp/apa-total-workflow-wheel.5vAiaf/agent_paranoid_android-1.5.0-py3-none-any.whl;
+  SHA256:190937f1a84d5a0628931ded74491bd9a0b4313effb58d1f8635490e9af8949f.
+  Evidence:acceptance.log in that directory. Previous truncated tool output was
+  not counted as acceptance. Strict OpenSpec passes; Ruff passes; Mypy all135
+  source files passes. Transformation milestone:873 passed, one outdated
+  generic input-budget error expectation failed in58.58s. Updated that test to
+  require the actionable typed limit error; focused regression passes in0.29s.
+  Evidence:milestone.log in the same directory. Successful873 cases not replayed.
+  Next complete activation-contract amendments and exact-SHA independent safety
+  review of the shared wiring; public execution remains unregistered, RC not ready.
+- Policy bootstrap now uses bounded session/default total budget (or explicit
+  run cap) with typed early exhaustion; exact-zero remaining capacity reaches
+  a typed one-byte-over diagnostic rather than a generic loader failure.
+  No unbounded reads. Mapping/source zero-cap regression cases pass. Changed
+  source expectation updated for actionable snapshot_run error:65 focused tests
+  passed initially, one old generic-error assertion failed and then its focused
+  regression passed after updating expectation. Mypy two modules/Ruff pass.
+  Next OpenSpec budget delta and installed workflow milestone; do not repeat
+  successful wizard cases unchanged. Public activation and final RC still gated.
+- Signed snapshot-budget checkpoint:3ef89981c72ebfb324e316cf7fed9d80ca70c54a.
+  Independent AI reviewer PublicationBoundary-R1/Jason
+  (01a0f8f6-5e7e-7b81-a337-b2476bf458f5) assigned read-only changed scope:
+  shared local approval/execution and workspace-agent wiring since3721503e,
+  total budget/canonical receipt binding and read-only review callers. Review
+  active; do not duplicate. No public activation approval or final RC claim.
+  Next consume findings and activation amendment requirements; preserve the
+  existing closed gates until executable evidence and review are complete.
+- AI review3ef8998 completed:PublicationBoundary-R1/Jason,2026-10-01 UTC,
+  static/read-only changed scope. One low fail-closed capacity finding: policy
+  loader honored session bootstrap but YAML parser retained512MiB default.
+  No additional safety findings; no public activation/final RC approval.
+  Fixed parser to reuse admitted bootstrap ceiling. Two focused unit cases
+  (session1GiB, optional smaller8192-byte run cap) pass without huge allocation;
+  unit instrumentation observes arguments but delegates to the real parser.
+  Mypy source module/Ruff/diff-check pass. Next signed fix checkpoint and
+  changed-scope independent disposition, then explicit activation amendments.
+- Parser fix signed as c0e1a0ef80ad0cff667a7d7419e515d785e5b48c;
+  same independent AI reviewer assigned only changed-scope disposition, active,
+  no duplicate. Added explicitly inactive activation contract to safety-boundary:
+  local-only receipt issuance, existing-receipt agent consumption, public derive
+  exclusion, admitted budget precedence/accounting, identity-limited cleanup
+  and cleanup-incomplete inspection/retry. No registration or data authority.
+  Next reconcile this contract with AGENTS/project safety/baseline deltas and
+  obtain exact-SHA amendment/activation review before enabling interfaces.
+- Independent AI changed-scope review of c0e1a0e completed:low bootstrap finding
+  closed by static inspection, no regression. Full disposition recorded in
+  publication-safety-review.md; tests not independently rerun. Reconciled the
+  inactive activation contract in AGENTS, project safety model and synthetic
+  generation baseline, preserving all registration gates and source-free rules.
+  Next finish matching MCP/baseline delta and executable gate evidence, sign
+  the amendment checkpoint and obtain independent amendment review; no public
+  registration or data authorization has occurred.
+- Strict baseline validation exposed a pre-existing missing scenario under
+  Nullable Relationships And Complete Field Bounds (present in HEAD before
+  this amendment). Added a scenario restating its existing nullable-FK contract;
+  no runtime change. Strict synthetic-generation and selective transformation
+  validation now pass; diff-check passes. No completed suites replayed.
+- Added matching safe-mcp-workflow delta and baseline clarification for inactive
+  activation: separate authority, local receipt consumption only, unchanged
+  source-free generator entrances, exact-SHA registration gates, typed snapshot
+  exhaustion and identity-limited cleanup-incomplete recovery. No tool added.
+  Next sign coherent amendment checkpoint with existing interface evidence and
+  independently review policy amendment before proceeding to public wiring.
+- Gated activation amendment signed:d7a5296bb72f10f5412dbda956669077c1feeb14.
+  Independent AI PublicationBoundary-R1/Jason now reviews only safety-policy
+  amendment and enforceable activation conditions against accepted ADRs and
+  existing closed interface evidence. Active; do not duplicate. Prior parser
+  and publication findings stay closed. No public execution registered.
+  Next consume amendment disposition, then implement reviewed public wiring
+  with focused interface safety evidence and exact activation-SHA review.
+- Amendment AI review d7a5296 completed:boundary preserved, one low bootstrap
+  wording mismatch. Updated safety-boundary to describe explicit run bootstrap
+  and subsequent effective profile/session validation; no code/budget change.
+  Full review evidence recorded. Before registration, shared public action/route
+  enforcement must exclude private derive and actual installed registration
+  evidence must replace closed-candidate evidence. Next signed wording fix and
+  scoped disposition, then shared public-boundary enforcement; no activation.
+- Bootstrap wording correction signed:67cf8c306f8e4795d2c8c657e349e4a4f79daad8.
+  Same independent AI reviewer assigned changed-policy disposition only; active,
+  no duplicate. Audited candidate call graph:local CLI and workspace candidate
+  share _execute_reviewed_test_from_paths, while local receipt issuance prepares
+  its own fixed request. Next enforce supported public actions on both approval
+  and execution fixed policies without altering private derive implementation;
+  keep public registration closed pending amendment/activation evidence.
+- AI amendment disposition on67cf8c3:bootstrap wording low closed, no changed
+  inconsistency; prior safety dispositions unchanged, no activation authority.
+  Added shared deterministic execution-action allowlist to fixed-policy path
+  execution (CLI/workspace candidates) and local candidate approval before
+  receipt issuance. Publicly intended actions:preserve/synthesize/substitute/
+  replace_text/drop; private derive model/engine retained, rejected by this
+  entrance. Four focused scope tests pass, Ruff and Mypy three modules pass.
+  This is not installed/public-interface acceptance. Next fictional subprocess
+  derive rejection through approval/execution and workspace candidate, then
+  actual registration evidence and exact activation-SHA review; still gated.
+- Fictional derive rejection now exercised in three subprocess entrances:
+  local candidate approval, CLI execution and workspace execution. Fixed review
+  is valid, but unsupported action rejects before receipt/output artifacts;
+  all input bytes remain unchanged. No product monkeypatch or live service.
+  Three focused checks pass in1.04s; Ruff passes. Recorded final amendment
+  wording disposition in publication-safety-review.md. Next consolidate
+  supported route contract, installed changed wiring evidence and reviewed
+  registration; no public surface activated or new PR opened.
+- Action guard signed:cfd8682. Installed changed-wiring acceptance:15 passed
+  in4.25s (CLI review/execution, fictional controlling-TTY receipt, workspace
+  consumption/containment, three derive rejection entrances). Evidence:
+  /private/tmp/apa-action-workflow-wheel.0cXZiI/acceptance.log;
+  wheel SHA256:e60e660d521f2a48ade01771d5ce3eee9e4aad731588a491ec7245ed8282113c.
+  No real data/services, no product safeguard patching. Public registration
+  remains unavailable; this is installed candidate evidence, not RC acceptance.
+  Next complete multi-route path preparation through the shared snapshot
+  contract, then reviewed actual CLI/MCP registration evidence. Full RC scope
+  remains; accepted scale runs and closed reviews are not replayed.
+- Multi-route audit found existing policy-selected reader already handles all
+  four fixed input families; no new adapter/helper added. Expanded inspected
+  fictional route harness with closed CLI/workspace execution subprocesses and
+  byte-for-byte artifact/manifest parity against shared publication. All12
+  installed candidate routes pass on e60e660d wheel; evidence:
+  /private/tmp/apa-action-workflow-wheel.0cXZiI/routes-candidate.log.
+  Captured query results use injected fictional streams, no DB connection;
+  this is not live query capture or public registration acceptance. Ruff and
+  diff-check pass. Next reconcile prospective route documentation and complete
+  reviewed registration/transport evidence; full RC scope unchanged.
+- Audited production CLI/MCP composition before prospective registration.
+  Added private fictional-test MCP composition using existing audited/redacted
+  transport and invocation-budget wrapper, with only candidate execution and
+  no receipt issuer. Actual SDK tool-list test passes; production service list
+  unchanged. Ruff passes; Mypy annotation corrected and passes. No stdio/public
+  execution acceptance claim yet. Next actual closed SDK execution/error tests
+  and transport budget-context integration, then exact-SHA activation review.
+- Closed actual FastMCP SDK dispatch now exercises saved fictional policy →
+  fixed review SHA → execution bundle, plus stale-SHA rejection without output.
+  Both focused cases pass (2 passed, 5 deselected); source/policy bytes unchanged,
+  response/error contain neither fictional source nor replacement values.
+  Existing audited/redacted transport reused (Ponytail); no production tool
+  registration or approval issuer added. This is SDK dispatch, not stdio or
+  public activation acceptance. Next integrate request transport-budget context
+  and complete closed stdio/negative evidence before exact-SHA activation review.
+- Closed MCP composition now consumes its own SDK request-context work budget,
+  not the production server's global context. Reuses existing budget wrapper;
+  exhausted canonical-argument budget rejects before workspace access without
+  reflecting the fictional path marker. Focused request-context test passes;
+  initial assertion spelling corrected to existing dimension display text.
+  Changed-wrapper success/stale SDK cases pass (2); Ruff/Mypy and diff-check
+  pass. Production registration unchanged. Next closed bounded-stdio execution
+  evidence, including malformed requests, then coherent installed workflow gate.
+- Closed bounded-stdio subprocess acceptance now uses real MCP initialization,
+  tool-list and tool-call dispatch: saved fictional CSV/policy/review SHA publishes
+  the expected bundle; stale SHA rejects without output. Malformed typed path
+  arguments reject without reflecting their fictional marker before each valid
+  call. Both new stdio cases pass (2 passed, 8 deselected, 1.14s); inputs unchanged,
+  responses source/replacement-value-free. Existing bounded transport and SDK
+  client reused, no product monkeypatch, DB/API or production registration.
+  Ruff/diff-check pass. Next installed-wheel closed workflow gate and reconcile
+  prospective public registration documentation before exact-SHA safety review.
+- Built isolated closed-workflow wheel with current MCP composition/stdio tests:
+  /private/tmp/apa-stdio-workflow-wheel.jeY5nN, SHA256
+  ac379bcca9017cb6e6a0870a71bbd1121a8b376c992e2723ae2d29ee788e40eb.
+  Installed --no-deps --target; primary environment unchanged. Initial build
+  blocked by default uv cache sandbox; corrected to isolated temp cache.
+  Installed focused gate: 20 passed, controlling-TTY receipt case failed in
+  sandbox (acceptance.log); rerunning only that case with TTY access, not the
+  successful 20. Isolated TTY retry passed (1 passed, 10 deselected, 1.70s).
+  Next finish documentation/gate;
+  no release or production activation claim.
+- Signed checkpoint 96cafd8db07e256a8dc6fbc0dcbb26496da078ee saves closed
+  workflow/transport evidence; no push, PR or production registration. Clarified
+  test-server versus production registration in candidate docstring and inactive
+  activation contract. Next reconcile complete prospective CLI/MCP contracts,
+  including typed failure recovery, before exact activation-SHA review.
+- Actual closed SDK limit-error test confirms requested total cap above session
+  ceiling preserves requested_above_limit, amount/threshold/bytes, origin and
+  concrete session/profile recovery keys without fictional source/policy text;
+  no destination created. Focused case passes (1, 10 deselected); Ruff passes.
+  Inactive contract now records actual closed CLI/workspace inputs, run-cap
+  counterparts, profile-selected output and row-free status; no advertised public
+  command. Next complete public-boundary error adaptation and registration draft
+  as one reviewed workflow, retaining no-issuer/default-source-free guards.
+- Found closed candidate argparse errors could reflect rejected values before
+  publication guards. Both execution and local-approval parsers now reuse the
+  existing helpful CLI parser with fixed invalid-arguments text and --help
+  recovery. Four subprocess cases (bad integer/unknown option × both entrances)
+  pass, expose no fictional marker and create no files. Ruff/Mypy pass.
+  No public registration changed. Next finish boundary error contract and
+  activation wiring draft; installed wheel evidence predates this parser fix.
+- Read-only GitHub check confirms no open PR for codex/1-6-execution-activation;
+  no competing CI dispatched. Reconciled inactive CLI/MCP malformed-argument,
+  typed-limit and cleanup-warning contract against actual focused evidence.
+  Activation review is still outstanding; prior inactive amendment review is
+  not treated as registration approval. Next finish prospective registration
+  composition and public-facing error adaptation, then installed interface
+  evidence and exact-SHA safety review before enabling the separate surface.
+- Existing CLI presenter already retains safe typed transformation limits and
+  distinct cleanup-incomplete warnings in human and JSON forms; no duplicate
+  presenter added (Ponytail). Four focused cases pass across formats/failures.
+  Initial test assumed JSON stderr; corrected to existing stdout contract and
+  reran only the two affected JSON cases. Ruff/diff-check pass. These are
+  presenter checks, not registered-command acceptance. Next compose proposed
+  commands with that presenter and existing shared executor, still gated.
+- Closed execution entrypoint now composes shared executor with existing human/
+  JSON error presenter, retaining safe typed limits and cleanup warning before
+  generic value-free failures. Parser supports fixed JSON argument errors.
+  Three real subprocess cases (malformed arguments, missing source, requested
+  cap above session) pass: JSON stdout, exit 2, no traceback/raw fixture marker,
+  no output. Ruff/Mypy pass. Production CLI remains unregistered. Next exercise
+  successful saved-profile execution through this entrypoint and reconcile
+  prospective registration, then installed gate/exact-SHA activation review.
+- Successful saved fictional policy → fixed review → closed CLI entrypoint
+  subprocess now passes through the same success/error composition: digest
+  matches review, exact replacement CSV verified, source/policy unchanged and
+  source/replacement literals absent from stdout/stderr. New case passes (1,
+  22 deselected); Ruff/diff-check pass. Existing successful helper cases were
+  not replayed. Next consolidate changed candidate boundary and inactive
+  contract into signed checkpoint, then completed registration draft review;
+  production surface and full RC remain incomplete.
+- Signed checkpoint 79bdce4dcd1bd041ea2c046e6ef5b1bd584b924f saves candidate
+  CLI redaction/entrypoint, typed recovery tests and inactive interface contract;
+  checkout clean immediately after commit. No push/PR/CI or repeated AI review.
+  Next registration work must preserve existing process entrypoints and default
+  source-free service inventory, introduce only the separately selected
+  transformation consumer (local approval never MCP), update golden contracts
+  and documentation, and obtain exact-SHA activation review before enabling.
+- Updated installed closed-boundary milestone from 79bdce4: isolated wheel
+  /private/tmp/apa-boundary-workflow-wheel.3udGzn, SHA256
+  b8a9707631c0d7518db8c1083aac21aab0579d3e91d6ce5cd74a46ef522eb1a8.
+  Installed --no-deps --target, no primary environment mutation. Sequential
+  gate completed: 33 candidate CLI/MCP cases pass, 1 controlling-TTY case
+  deliberately excluded (acceptance.log); all 12 fictional small route cases
+  pass with bundle byte parity/readback and cleanup (routes.log). Changed CLI
+  parser/entrypoint justified this milestone replay; accepted scaling not rerun.
+  Next run only installed TTY case with necessary local access, then complete
+  prospective registration and exact-SHA activation review. Still no public
+  registration, DB/API access, RC publication or final-acceptance claim.
+- Remaining installed controlling-TTY case passed with required local access
+  (1 passed, 22 deselected, 1.70s) against the same b8a97076 wheel. Closed
+  installed workflow gate therefore has 34 passing CLI/MCP cases plus 12 routes;
+  this is not production registration evidence or final RC acceptance.
+  Next implement prospective command/tool composition only in the closed test
+  surface, matching production parser/presenter/audit/budget boundaries, so
+  registration itself can be reviewed before activation without exposing a
+  production execution path prematurely. No additional product decision needed.
+- Closed prospective root parser now composes explicit transform-execute with
+  existing common JSON/debug options and the same execution-argument definition
+  as the tested candidate entrypoint. No production parser import/registration;
+  no approval command in this consumer composition. Focused parser case passes
+  (1, 23 deselected); Ruff/Mypy pass. Next connect this closed parsed namespace
+  to shared execution/presenter and exercise full command dispatch before
+  prospective MCP naming/registration review; parser-only check is not activation.
+- Closed prospective transform-execute dispatch now uses the shared parsed-
+  namespace executor and existing presenter, not a second transformation path.
+  Full saved-policy/review subprocess passes with exact CSV readback; missing
+  mandatory review SHA fails as fixed JSON invalid_arguments before file access.
+  Two new focused cases pass; Ruff/Mypy pass for changed composition. Production
+  registrations unchanged. Next prospective MCP consumer name/schema parity,
+  then coherent exact-SHA review of completed activation wiring and policy.
+- Prospective closed MCP composition names only its fresh budget wrapper
+  execute_transformation; shared callable and production registry unchanged.
+  Real bounded-stdio success/stale dispatch and malformed typed arguments pass
+  under that name (2), with required snapshot digest and optional receipt in
+  SDK schema, no issuer, exact CSV readback and value-free response/errors.
+  Ruff/Mypy pass. Next finish prospective command/tool documentation and
+  full boundary negatives, checkpoint exact SHA for activation-scope review;
+  closed naming evidence is not public activation.
+- Prospective MCP bounded-stdio negatives now exercise workspace escape for
+  input, policy, output and receipt paths through the actual SDK tool dispatch.
+  All reject without reflecting the fictional path marker or publishing output;
+  subsequent success/stale checks still pass (2 cases, 11 deselected, 1.15s).
+  Ruff passes for the changed test. No production registration or safety
+  monkeypatch, no accepted scale replay. Next test missing/forged receipt and
+  agent approval flags against a preserve policy (substitution-only execution
+  cannot prove preservation authorization), then checkpoint completed closed
+  composition for exact-SHA activation-scope review.
+- Prospective bounded MCP stdio now rejects preservation with a current review
+  digest but no receipt, a fictional forged approval JSON, or an agent-supplied
+  approved=true flag. Three new cases pass (19 deselected, 1.54s); no output,
+  source/policy/forged-receipt bytes unchanged, no source or forged marker in
+  responses. Initial test assertions compared isError to scenario strings;
+  corrected to bool(scenario), with no product change. Ruff/diff check pass.
+  Ponytail: reused existing real-stdio fixture/dispatch, no new harness or
+  dependencies. These are rejection checks, not proof of public activation or
+  of every receipt-validation branch. Next checkpoint closed prospective
+  composition and finish exact-SHA activation-scope evidence/review; production
+  registry remains unchanged, accepted capacity checks not rerun.
+- Preservation negatives additionally validate the complete canonical request
+  before transport invocation, ruling out invalid review/evidence as an earlier
+  rejection. Static execution trace: the single preserve field sets needs_receipt
+  and reaches the receipt gate; no other field action is present. Updated three
+  cases pass (1.54s); Ruff for both candidate modules/tests and diff check pass.
+  Checkpoint closed prospective parser/dispatch and tool-name composition for
+  exact-SHA safety review. This is not production registration or release review.
+- Independent AI safety reviewer PublicationBoundary-R1/Jason resumed read-only
+  review of exact 561f9f8d2523e5ea956a790dbe4c520a73986098 on 2026-10-02 UTC.
+  Scope: closed prospective CLI/MCP composition since 79bdce4, inactive safety
+  amendment, transport/receipt gates and evidence validity; not ordinary commit
+  approval, production activation or final RC review. Prior review completed;
+  no duplicate reviewer. Current branch clean before this tracking entry;
+  GitHub reports no open PR for codex/1-6-execution-activation. No tests/scale
+  replay. Next collect findings into publication-safety-review.md, fix required
+  changed scope, then actual registration gates and exact activation-SHA review.
+- Independent AI review of 561f9f8 completed; identity/scope/findings recorded in
+  publication-safety-review.md. Medium evidence gap: single-field preservation
+  negatives can be satisfied by downstream whole-row-copy rejection, so the
+  earlier claim of isolated receipt-gate evidence is withdrawn. Product bypass
+  not demonstrated. Next use preserve+replacement and real local receipt success
+  through prospective stdio, then negative variants. Low argv-only --json parser
+  discrepancy fixed locally with production argv-selection pattern; revised
+  focused test passes (1, 25 deselected, 0.22s), Ruff passes. Changed scope needs
+  exact new-SHA review after both fixes; no duplicate reviewer, no activation.
+- Medium review gap addressed locally: preservation-negative fixture now uses
+  code preserve plus independent label alpha→gamma replacement, matching the
+  successful real local-TTY receipt scenario. Three revised prospective stdio
+  negatives pass (1.56s); cannot rely on identical whole-row output rejection.
+  Existing real-TTY scenario extended to consume its genuine receipt through
+  prospective bounded execute_transformation stdio; passes with required local
+  access (1, 25 deselected, 2.23s), exact mixed-origin CSV readback and no source
+  values in transport result. No safety monkeypatch or agent issuer. Ruff passes.
+  Ponytail reused existing TTY fixture rather than a second approval harness.
+  Next commit both review fixes/evidence, obtain narrow changed-scope independent
+  review at new exact SHA, then production registration gates. Not activated.
+- Signed remediation checkpoint a2ae7b0341c80db413d238176e420ffdb2ddba7a
+  contains both findings' fixes and evidence. PublicationBoundary-R1/Jason
+  dispatched read-only independent closure review of only changed scope versus
+  561f9f8 on 2026-10-02 UTC; prior review completed, no duplicate. No successful
+  test/scale replay or production registration. Next collect closure/disposition
+  evidence, then complete production activation wiring and installed gates.
+- PublicationBoundary-R1/Jason independently closed both remediation findings
+  at exact a2ae7b0341c80db413d238176e420ffdb2ddba7a, 2026-10-02 UTC, by static
+  changed-scope inspection; no new regression. Full disposition/identity/checks
+  recorded in publication-safety-review.md. Author tests were inspected, not
+  rerun by reviewer; no gate/scale replay. Next connect reviewed shared execution
+  to actual command/tool composition with matching documentation/contracts and
+  installed tests, then exact-final-activation-SHA review before public activation.
+  This closure alone does not activate interfaces or approve final RC.
+- Registration integration audit located actual CLI register_dataset_commands,
+  run_command/run_json_command and generator_mcp_services composition. Existing
+  public parser reflects argparse messages and generic JSON dispatch captures
+  stderr: transformation parser must retain fixed errors; local receipt approval
+  must keep the controlling-TTY prompt visible rather than treating approval as
+  agent-approve or buffered noninteractive output. No registration enabled.
+  Added argv-only --json malformed-cap regression (fictional rejected token),
+  new case passes (1, 26 deselected, 0.22s); unchanged digest case not rerun.
+  Next draft actual registration patch with matching policy/baseline/CLI/MCP
+  docs and installed tests for exact-SHA safety review before public activation.
+- Rebuilt closed candidate wheel after prospective composition/review fixes,
+  installed without dependencies into /private/tmp/apa-reviewed-interfaces.6HB4JM/installed.
+  Wheel SHA256 4961dc261b89c0c43487be8de2355174763adc03ca5ddbc466f180f967c9d646;
+  version remains development 1.5.0, not published RC. Tests use explicit
+  installed PYTHONPATH and disable pytest source pythonpath. New installed
+  prospective gate: 9 passed, 40 deselected, 2.70s. Includes actual bounded
+  stdio preserve negatives and argv-only JSON parsing. This milestone replay is
+  justified by changed composition/receipt evidence; scaling and 12 unchanged
+  routes not rerun. Production registration remains absent. Next record same
+  wheel's TTY gate, then complete actual registration patch and matching docs.
+- Same installed 4961dc26 wheel: genuine local controlling-TTY receipt consumed
+  through prospective bounded MCP stdio passed with required local access
+  (1, 26 deselected, 2.22s). Exact mixed-origin readback; no safety monkeypatch.
+  Closed installed interface milestone totals 10 passes; not actual public
+  registration evidence, full RC acceptance or approval of a real dataset.
+- Draft activation-registration.patch contains the concrete MCP registration
+  delta, not applied: explicit execute_transformation wraps the same workspace
+  executor and enters existing generator_mcp_services audit/transport budgets;
+  no issuer or new data path. Proposed success label transformation_completed
+  replaces the private test label; docs/schema evidence must match before use.
+  Read-only git apply --check passes after correcting draft hunk line count.
+  Public source registry unchanged. This is an incomplete activation artifact,
+  not approved activation: next add CLI execution/local-TTY registration and
+  matching baseline/AGENTS/docs/tests, exercise only an isolated fictional
+  candidate, then exact activation-SHA independent review. No successful gate
+  replay, DB/API access or source disclosure.
+- Unapplied registration delta now includes actual register_dataset_commands
+  and run_dataset_command execution branches, reusing shared argument definition
+  and parsed-namespace executor. CLI result uses existing run_json_command
+  success envelope rather than a second presenter. Read-only apply check passes.
+  This draft deliberately remains incomplete/unapplied: transformation-specific
+  fixed parser errors, local-TTY approval registration/prompt routing, matching
+  safety/docs/golden updates and installed full-composition checks are still
+  required before exact activation review. No public parser/tool change or
+  approval claim. Next finish fixed parser selection and local approval wiring
+  in this same delta, then isolated fictional full-composition acceptance.
+- Unapplied CLI delta selects the existing fixed CandidateArgumentParser for
+  explicit transformation commands (including leading common --json/--debug),
+  preserving ordinary commands' parser class. The chosen subparser factory
+  receives JSON mode before parsing via stdlib partial; no global parser
+  monkeypatch. Read-only git apply --check passes after correcting draft hunk
+  counts/context. Not yet executed as actual composition; do not treat patch
+  applicability as validation. Next complete local-TTY approval namespace and
+  prompt routing in the delta, then isolated full-composition executable tests
+  and matching documentation/activation review. Public registry unchanged.
+- Closed approval parser now delegates to a shared parsed-namespace dispatcher;
+  unchanged controlling-TTY issuer, digest/action/budget checks reused. Changed
+  TTY→receipt→CLI/workspace/prospective stdio scenario passes with required local
+  access (1, 26 deselected, 2.22s); Ruff passes. Unapplied registration delta
+  adds transform-approve parser/dispatch and leaves stderr live under existing
+  JSON success envelope so the local prompt is not buffered. No MCP issuer.
+  Read-only apply check passes after adding adequate hunk context. Next exercise
+  full delta only in an isolated temporary fictional candidate, including
+  parser redaction/JSON/approval failures and real TTY→registered MCP success;
+  complete matching docs/baselines and exact-SHA review before activation.
+- Registration delta materialized with apply_patch only in the isolated copied
+  package /private/tmp/apa-registration-parser.RDaewh/test_data_agent; primary
+  source registries unchanged. First real-composition smoke passed: actual
+  cli.main with leading --json and malformed fictional cap produces fixed
+  invalid_arguments without reflection; root help lists local transform-approve;
+  actual generator MCP registry lists execute_transformation with mandatory
+  digest/optional receipt schema and no approval tool. No source-bearing input,
+  DB/API access or safety monkeypatch. This is parser/schema evidence, not full
+  execution/installed/public activation. Next add durable full-composition
+  acceptance using this isolated candidate for saved profile→review→local TTY
+  receipt→CLI/MCP publication, failures and value-free envelopes, then matching
+  docs/baselines and exact activation-SHA independent review.
+- Durable registered-interface-acceptance.py now exercises saved fictional
+  policy→actual CLI review→actual CLI execution JSON envelope→actual registered
+  bounded generator MCP stdio execution in the isolated copied package. Pass:
+  1 case, 1.19s, exact CLI/MCP CSV readback, same reviewed digest, input/policy
+  bytes unchanged, no source/replacement literals in responses, no MCP issuer.
+  Initial harness invocation assumed a package __main__; corrected to the real
+  cli.main entrypoint without product changes. No monkeypatch, DB/API access,
+  production activation or installed-wheel claim. Next extend this same durable
+  acceptance with actual local-TTY approval→receipt→registered MCP preservation
+  and negative paths, then matching docs/baselines and activation-SHA review.
+- Durable isolated registration acceptance now includes two-field preservation
+  plus replacement: actual cli.main transform-review→transform-approve --json
+  with real controlling TTY/fresh APPROVE→owner-only receipt→actual CLI execution
+  envelope→actual registered bounded MCP stdio execution. New preserve case
+  passes with required local access (1, 1 deselected, 1.43s); exact mixed-origin
+  readback and value-free CLI/MCP response, original input/policy unchanged.
+  Unchanged substitution case not rerun. No issuer/safety monkeypatch, real
+  database/API or public activation. Next add registered negative receipt/drift,
+  workspace/parser/limits/publication checks to this same acceptance and finish
+  matching contracts/docs and exact-SHA review.
+- Same durable isolated registered preserve scenario now rejects eight actual
+  bounded-stdio invocations: missing/forged receipt, agent approved flag, stale
+  SHA, workspace escape, malformed typed input, excessive output request, and
+  existing destination. No new output or reflected fictional marker; genuine
+  receipt and earlier CLI dataset unchanged, then valid MCP publication succeeds.
+  Changed preserve case passes with necessary TTY access (1, 1 deselected, 1.49s).
+  Existing substitution/scaling gates not rerun. No product safety monkeypatch
+  or public registry changes. Next actual CLI negative approval/execution paths
+  and mutation-bound receipt checks, then matching docs/baselines and exact SHA.
+- Registered isolated preserve acceptance now also rejects detached CLI approval
+  even with piped APPROVE, missing-receipt CLI execution and stale-SHA execution.
+  Source and inline-policy mapping byte mutations are separately reviewed to a
+  new digest; the old genuine receipt is rejected by registered MCP even when
+  supplied the new digest. No output, receipt or earlier dataset changes; exact
+  fixture bytes restored, then valid execution succeeds. Changed case passes
+  (1, 1 deselected, 2.67s). Initial test expected a nonexistent status field in
+  the existing CLI error envelope; corrected to error.exit_code, no product fix.
+  Public registries remain unchanged. Next matching activation docs/baselines
+  and installed full-composition gates, then exact-SHA independent safety review.
+- Reconciled the inactive safety-boundary contract with concrete proposed CLI
+  approval/execution and MCP execution registrations, existing JSON envelopes,
+  durable positive/negative acceptance and the remaining installed/docs/golden/
+  exact-SHA review gates. No public registration or policy activation. Read-only
+  GitHub check confirms no open branch PR (sandbox network attempt failed;
+  approved read-only access succeeded); diff whitespace check passes. No unchanged
+  executable gates replayed. Next reconcile affected baseline and interface
+  documentation in the same activation artifact, then installed candidate gates.
+- CLI reference and MCP guide now describe the concrete inactive execution/
+  local approval candidate, exact-byte receipt invalidation, existing JSON
+  envelopes, workspace/new-destination rules, caps and remaining activation
+  gates. Existing public review/source-free behavior remains accurately marked;
+  no runtime registration change. Diff whitespace check passes; unchanged
+  execution/scaling tests not repeated. Next baseline/OpenSpec reconciliation
+  and isolated installed candidate acceptance before exact activation-SHA review.
+- Baseline safe-mcp-workflow and its change delta now name the inactive concrete
+  CLI consumer/local-terminal issuer and workspace MCP consumer, without
+  authorizing public registration. Added executable-evidence-aligned scenarios:
+  fresh review digest cannot rescue a stale receipt after byte mutations, and
+  piped APPROVE cannot issue a receipt. Workspace/request-budget/new-bundle and
+  value-free result requirements remain explicit. Strict OpenSpec validation
+  and diff whitespace pass. Next prepare the isolated installed complete
+  registration candidate and golden/interface inventory checks; no activation
+  or unchanged scaling acceptance claimed.
+- Built the concrete isolated registration package with unchanged project build
+  settings/bundled skills and installed it without dependencies into
+  /private/tmp/apa-registered-wheel.NupM2D/installed; development version 1.5.0,
+  not RC/publication. Wheel SHA256:
+  914c7af62db130f05f48a7245f343c84406773bdf64209e2c22d5eabca18e22f.
+  Installed-only PYTHONPATH and disabled pytest source-path injection exercise
+  actual CLI/MCP composition, not the source copy. No public registry changes.
+- Installed registered-interface acceptance passes both coherent scenarios
+  (2, 3.64s): saved policy→review→CLI/MCP publication, plus genuine local-TTY
+  receipt and all detached/missing/forged/drift/workspace/budget/destination
+  rejection checks. Exact readback and unchanged restricted inputs enforced;
+  fictional data only, no product monkeypatch or external connection. This is
+  new installed composition evidence, not repetition of source-copy or scale
+  acceptance. Next golden inventories/full milestone gates and exact activation
+  artifact SHA review before applying public registration.
+- Installed candidate parser/contract milestone: 9 pass, 1 expected freshness
+  failure (0.45s) against unchanged public goldens. Read-only fixture comparison
+  confirms exactly two changed inventories: cli-parser-surface.json adds
+  transform-execute/transform-approve; mcp-generator-tools.json adds
+  execute_transformation. All other 12 contract fixtures are byte-semantically
+  unchanged. Public goldens intentionally not regenerated before activation;
+  no blanket fixture acceptance or regression bypass. Next bind these explicit
+  additive inventories into the activation artifact, verify candidate goldens
+  in isolation, then full milestone checks and exact-SHA safety review.
+- Durable isolated acceptance now enforces the exact additive contract delta:
+  only two CLI names and one MCP consumer may differ from public goldens;
+  consumer requires source/policy/destination/digest, has exactly the eight
+  declared properties and no approved flag. After removing those additions,
+  all 14 generated contract fixtures must equal the baseline. Installed check
+  passes (1, 2 deselected, 0.38s); previous end-to-end cases not rerun. Existing
+  fixture builder fixes only random source-free plan identity, not product
+  safety guards; transformation execution acceptance remains unpatched.
+  Public goldens/registration unchanged. Next consolidate activation artifact,
+  full milestone checks and exact-SHA independent safety review.
+- Full isolated candidate and durable acceptance Ruff passes. Full strict mypy
+  initially found argparse parser_class's stub rejecting the supported partial
+  parser factory. Added an explicit narrow type cast in the unapplied delta and
+  isolated build source, without runtime behavior or guard changes. Delta
+  applicability passes; installed wheel evidence above predates this typing-only
+  repair and remains tied to its recorded hash. Next rebuild corrected candidate
+  and complete milestone evidence before exact activation-SHA review.
+- Corrected isolated candidate strict mypy passes all 135 production files.
+  Rebuilt without changing project version/dependencies; corrected wheel SHA256
+  baa6c350a4667703bc5008d17d3aa27e7e9cbfbf4b52da856a74c5a0a1523ada,
+  installed at /private/tmp/apa-registered-wheel.NupM2D/corrected-installed.
+  Changed parser plus exact additive inventory checks pass (8, 2 deselected,
+  0.50s); changed CLI Ruff passes. Unchanged TTY/execution/scale scenarios not
+  replayed. No publication or public registration. Next consolidate signed
+  activation evidence/artifact and milestone checks for exact-SHA safety review.
+- Signed checkpoint a0006d8bf2d4af7ddbb60c918a8cfc18e5250d9e binds the concrete
+  unapplied registration delta, durable installed acceptance, narrow contract
+  comparison, inactive docs/specs and prior reviewer dispositions. Changed
+  argv-only malformed/digest checks pass (2, 25 deselected, 0.20s); focused
+  Ruff and diff whitespace pass. No public activation, push, PR or RC claim.
+  Next complete remaining milestone gates and review the immutable activation
+  artifact/scope independently; final public activation SHA still needs review.
+- Installed corrected-candidate transformation milestone completed: 910 pass,
+  6 skip, 1 failure, 64.89s. Sole failure is the intentional inactive-registry
+  assertion in test_transformation_activation_boundary: baseline permits only
+  review_transformation, isolated candidate additionally registers the proposed
+  execute_transformation. No runtime/safety failure reported by this group;
+  skipped cases are not passes. Public test/goldens/registry remain unchanged,
+  so this gate is not claimed green. Next include the explicit activation-boundary
+  test amendment in the immutable delta (retain no issuer/source-free checks),
+  test changed scope, then independent exact-SHA safety review. No duplicate run.
+- Unapplied activation delta now includes the explicit registry-test amendment;
+  baseline test remains unchanged. Isolated amended test passes against the
+  corrected installed wheel (3, 0.34s), retaining no Python transformation API
+  and no MCP issue/verify receipt tools. Also fixed a misleading test premise:
+  parsing command-only argv exits 2 for missing required arguments even when
+  registered; candidate now asserts actual subparser choices. No product guard
+  changed. Delta applicability passes after adding complete trailing context.
+  Next bind amended artifact SHA and remaining activation documentation/goldens
+  before independent review; no full gate or public activation claim.
+- AGENTS inactive amendment now names the concrete local-only issuer and CLI/
+  workspace consumers and expressly rejects old receipts with fresh digests,
+  MCP issuers and agent approval booleans. This clarifies accepted authority,
+  does not activate execution. Current unapplied code/test registration patch
+  SHA256 is 3b8d8801ea3622a06f989f05be23b18eeee75663f5195dcab07e32bb3bcddaf9;
+  this hash is not the eventual reviewed public activation commit. Next bind
+  final golden/doc amendments and independent immutable-scope safety review;
+  previously successful executable checks not repeated.
+- Removed whitespace-only blank context in the stored patch after diff-check
+  flagged it; applicability and whitespace checks now pass. No executable change.
+- Stored both exact installed-candidate inventories in the separate inactive
+  activation-contract-inventories.json artifact, without overwriting public
+  goldens. Durable contract acceptance compares the complete candidate JSON
+  (not merely names) before enforcing unchanged baseline contracts; changed
+  check passes. No runtime change or end-to-end/scaling replay. Next bind final
+  artifact/evidence commit and independent safety review, then reviewed public
+  activation amendments and full release-candidate gates.
+- Signed ed24f7b599bbf5e83c9735b5827776c54ff123c8 pins candidate inventories,
+  inactive AGENTS authority and explicit boundary-test delta. Reused independent
+  AI reviewer PublicationBoundary-R1/Jason (01a0f8f6-5e7e-7b81-a337-b2476bf458f5)
+  for narrow read-only registration/artifact/policy scope at this exact SHA on
+  2026-10-02; submission 01a0fa93-a5db-78e3-8ad4-b792e23742ef. Review active,
+  do not start a duplicate or claim approval. Not final public activation/RC SHA
+  review or human GitHub approval. Next consume findings and repair changed scope
+  if required, then complete reviewed activation and milestone gates.
+- 2026-10-02 continuation: existing independent reviewer Jason returned an
+  errored status (usage limit), not a review conclusion, for ed24f7b and the
+  pinned activation artifact. No duplicate reviewer, test replay, public
+  activation or release. Automation automation paused pending restored reviewer
+  capacity; next resume the same narrow read-only review at the unchanged SHA
+  when capacity is available, then consume findings before activation gates.
+- Owner correction 2026-10-02: supersedes that next step. Do not resume the
+  intermediate ed24f7b review. Prepare one complete candidate first; perform
+  exact-SHA activation safety review only then, plus final RC review. Reviewer
+  capacity is not a preparation blocker. Automation resumed ACTIVE with this
+  instruction saved; public registry remains unchanged.
+- Consolidated the unapplied activation artifact: runtime registration plus
+  explicit boundary/contract-test amendments and the two additive inventories.
+  Full isolated checkout /private/tmp/apa-unified-candidate.4BxZzh compares its
+  candidate goldens against the installed corrected wheel: 6 pass, 0.81s.
+  No TTY, execution or scale replay; no review/activation/RC claim. Patch
+  applicability and whitespace pass. Next complete remaining documentation and
+  saved-wizard/installed-interface acceptance in this unified candidate, then
+  milestone gates before freezing the actual activation SHA for review.
+- Installed shared-workflow acceptance now starts at the actual interactive
+  decision/action wizard, saves inline or CSV substitution, re-reviews exact
+  saved bytes and executes through both actual CLI and bounded MCP stdio. No
+  product monkeypatch, source disclosure, approval receipt or real connection.
+  Inline scenario passed in the initial run; CSV initially failed only because
+  the harness omitted explicit serializer defaults (delimiter/encoding/null
+  token) from its exact policy expectation. Corrected that expectation, not
+  product behavior; CSV scenario passes (1, 4 deselected, 2.17s). Unchanged
+  inline case not replayed. Changed acceptance Ruff/diff checks pass. Wheel
+  remains baa6c350a4667703bc5008d17d3aa27e7e9cbfbf4b52da856a74c5a0a1523ada.
+  Documented the same saved-wizard sequence and separate preservation approval.
+  Next consolidate candidate-facing docs/baseline activation amendments and
+  remaining milestone gates; no new reviewer or public activation.
+- Documentation milestone: installed-candidate documentation checks pass
+  (50, 0.48s). Strict MkDocs initially found the safety-model link escaping
+  the published documentation tree into OpenSpec. Pointed it at the maintained
+  CLI execution/approval contract instead; strict build now passes (0.38s).
+  Updated safety-boundary evidence wording from copied-package-only to actual
+  installed-wheel/wizard acceptance without claiming activation or RC readiness.
+  No product runtime change, review, CI or unchanged acceptance replay.
+  Next freeze complete candidate-facing activation docs/spec amendments together
+  with code/contracts and run remaining unified milestone gates before review.
+- Full unified installed-candidate coverage milestone: 2636 passed, 5 failed,
+  16 skipped, 130.39s; coverage 90.77% (threshold 85%). Not a green release
+  gate. Initial collection stopped because the isolated checkout omitted
+  examples; copied the unchanged examples/release assets before this run.
+  Two candidate integration gaps: 80-column help overflow for both new commands
+  and missing additive names in the architectural contract inventory. Reused
+  PublicHelpFormatter and short BYTES metavars (no guard/limit changes); revised
+  isolated help cases pass at 80/120 (2, 0.24s), inventory case passes.
+  The two signed-release tests used system Git (exit 69) and controlling-TTY
+  case lacked required local access; all three pass with explicit Homebrew PATH
+  and required local execution permission (3, 2.64s). No product monkeypatch.
+  Updated inactive architecture inventory and consolidated registration patch;
+  applicability, changed-code Ruff and whitespace pass. Installed wheel above
+  predates the help repair: rebuild required for changed installed-parser scope;
+  do not replay unchanged 2636 successes or claim complete release gates yet.
+  Next rebuild the unified candidate, verify only changed installed scope and
+  finish candidate-facing policy/docs amendments before exact-SHA review.
+- Rebuilt/installed the isolated unified candidate after help repairs, without
+  version/dependency changes: wheel SHA256
+  b0cfe8e10793b84e83f9da596ecbf327c9a6675f554f660b937bf1454df50f6d.
+  Installed changed help at both widths plus architectural inventory pass
+  (3, 0.45s); previous full suite not replayed. Audited installed skill probe:
+  its old closed-engine --help expectation would reject the activated candidate.
+  In the unapplied unified delta, discovery now checks explicit execution/local
+  approval help, then requires missing-input execution to reject. Narrow probe
+  tests pass (3, 8 deselected, 0.21s); no receipt or execution authority inferred
+  from discoverability. Public probe remains unchanged before activation.
+  Consolidated probe/test amendment into the same patch; applicability and
+  whitespace pass. Next finish candidate-facing docs/baselines and remaining
+  release gates, then freeze exact activation SHA; no intermediate review.
+- Unified candidate remaining local milestone checks pass: full src/tests/scripts
+  Ruff; strict mypy (137 files); compileall; dependency license policy (104
+  observed distributions, including isolated overlay duplicates); compatibility
+  policy and generated-manifest compatibility; exact DatasetSpec schema cmp.
+  Installed synthetic quickstart passes with seed 12345, 25 customers/25 orders,
+  valid report, synthetic=true and source_rows_copied=false. Representative
+  operational budgets pass: profile 0.287s/2349102 peak bytes, generation
+  0.624s/2579393, validation 0.384s/313060. This is the existing source-free
+  release workload, not a repeated transformation scaling acceptance. No branch
+  PR exists; no CI/review/push/activation. Full coverage results and changed-scope
+  closures above retain their exact package identity; final exact-SHA gates
+  remain required. Next finish coherent activation policy/docs payload, then
+  freeze that complete isolated candidate rather than requesting helper review.
+- Consolidated matching candidate AGENTS, safe-MCP baseline and CLI/MCP
+  documentation into the same unapplied activation patch, not another review
+  artifact. Wording distinguishes registered isolated candidate from released
+  1.5.0 and preserves exact-SHA public-delivery gates, source-free generation,
+  no agent issuer/boolean, exact snapshots and no real-input authority. Public
+  source/instructions remain inactive. Changed complete candidate docs pass
+  strict MkDocs (0.40s) and installed documentation suite (50, 0.45s); patch
+  applicability/whitespace pass. No runtime/scale replay or new review.
+  Next bind the full candidate payload/evidence in one signed checkpoint and
+  reconcile remaining full RC acceptance before requesting exact-SHA review.
+- Unified checkpoint binds registration/code/test/golden/probe and matching
+  AGENTS/baseline/CLI/MCP amendment payload, plus installed wizard/coverage/gate
+  evidence and owner-corrected review cadence. Current patch SHA256:
+  99708e95bc39dcb1e3cd6393104174c08fde90f415123695cc57f6fb7ac61e04.
+  Strict OpenSpec, applicability and whitespace pass. This is an unapplied
+  payload checkpoint, not the final actual activation commit or RC approval.
+  Next reconcile client-acceptance gaps and freeze the complete isolated
+  activation tree at an exact SHA only after that scope is finished. No push,
+  PR, activation or intermediate reviewer requested by this checkpoint.
+- Client-acceptance reconciliation records the current installed wheel identity,
+  saved inline/CSV wizard-to-execution evidence, real local approval boundaries,
+  twelve-route and already completed scale checkpoints with their limitations.
+  Removed obsolete mandatory internal-formula wording from findings 18/23,
+  scenario list and refreshed task 23 to match the September 28 owner correction.
+  No runtime change, replay, new decision or review; no full client/final-RC
+  acceptance claimed. Next finish per-finding dispositions against current
+  executable evidence, including auth/metadata decision provenance, before
+  freezing the completed actual activation SHA.
+- Current-code decision audit (2026-10-02): TrinoClient connection options have
+  no authentication object and TrinoConfig has no selected auth/secret-source
+  contract (finding 21). Parquet's complete-statistics helper returns None for
+  missing statistics, but its public CSVProfile conversion still substitutes
+  null_count=0/null_ratio=0.0 and sensitive=False (finding 26); the helper test
+  therefore does not close public unknown/content semantics. Installed mode
+  acceptance intentionally tolerates both exit 0 and 1 and derives status from
+  that code, so it does not settle the known cross-entry invalid-output contract
+  (25/24). These are verified unresolved choices, not new formula requirements.
+  Requested one consolidated owner decision: authentication method/secret
+  indirection; explicit unknown metadata and bounded sensitivity profiling;
+  uniform intentionally-invalid publication/status/exit behavior. Automation
+  paused pending that decision; no runtime change or successful test replay.
+  Branch PR lookup could not reach GitHub in sandbox; no new PR state inferred.
+- Owner resolved all three decisions on 2026-10-02: all Trino Python-driver
+  authentication methods with runtime secrets outside profiles/URLs/logs;
+  unknown Parquet statistics plus bounded local sensitivity inspection without
+  source-value output or safety claims from incomplete inspection; deliberately
+  invalid supported output/report retained with uniform validation_failed/exit 1.
+  Recorded policy contract and resumed automation with the accepted decisions.
+  Tightened fictional CLI acceptance first: pre-fix 2 passed / 2 failed (2.74s),
+  reproducing profile/CSV exit 0 versus spec exit 1. Shared CLI helper bypassed
+  invalid reports for mixed/negative modes; removed that bypass without changing
+  publication/privacy enforcement or exported helper signature. Added matching
+  CLI/OpenSpec contract. This changes the candidate and invalidates prior wheel
+  identity for this scope; installed rebuild/replay remains required.
+- Post-fix fictional subprocess acceptance: 4 passed (3.06s), retaining rows,
+  manifests, invalid reports, deterministic replay and unchanged source/spec
+  while requiring the uniform exit/envelope. Relevant I/O command suite:
+  35 passed (0.39s). Changed-code Ruff, strict OpenSpec and whitespace pass.
+  CLI name filter selected no tests (81 deselected), not a passed check.
+  Next implement the accepted Parquet unknown/sensitivity contract and inventory
+  actual Trino-driver authentication methods, then rebuild the unified installed
+  candidate for changed scopes. No intermediate review/public activation.
+- Finding 26 public-path regressions now exercise the real exported Parquet
+  adapter, not just its metadata helper. Fictional no-statistics input still
+  returns null_ratio=0.0; a fictional email under neutral column name remains
+  sensitive=False. Both expected-contract tests fail on the current candidate
+  (2 failed, 12 deselected, 0.35s), with no product monkeypatch/live access.
+  Traced the unknown-to-zero conversion through CSVColumnProfile, legacy profile
+  conversion and FieldProfile; downstream planner/review/relationship/presenter
+  consumers assume numeric null ratios. A local adapter-only change would leave
+  inconsistent public/inference behavior, so no such partial fix was applied.
+  Next implement explicit unknown profile metrics through these consumers and
+  bounded Parquet content inspection; these two regression tests remain red
+  until the agreed product correction. Prior successful checks not repeated.
+- Parquet unknown-null correction now propagates None through CSVColumnProfile,
+  legacy conversion and FieldProfile. Measured profiles retain prior values;
+  automatic inference rejects unknown ratios instead of inventing zero, and
+  relationship discovery skips unknown child-null evidence. Presenter supports
+  unknown nullable metrics; spec-based review/advisor fields remain numerical.
+  Bounded local sensitivity inspection walks batches of 256, checks existing
+  expanded-byte/cell/time budgets and retains only boolean flags. Neutral-name
+  fictional email is detected; unsupported composites are conservative-sensitive.
+  No source values or partial trusted profile on budget failure. Updated matching
+  profiling guide/OpenSpec and oversized-cell negative test. Relevant adapter /
+  decimal tests: 16 passed (0.27s); adapter/relationship/presenter including new
+  inference/budget assertions: 33 passed (0.29s). Ruff passed for changed runtime.
+  Next finish distinctness/sensitivity evidence-state audit and installed replay,
+  then implement driver-auth contract. This source WIP is not reviewed activation
+  or final RC; previous installed wheel predates it. No intermediate review.
+- Finished Parquet distinctness audit: metadata adapter had fabricated zero
+  distinct count in addition to the null metric. It now propagates unknown
+  count/unique_ratio as None; CSV measured counts remain unchanged. Primary-key
+  nomination and relationship-confidence paths explicitly exclude unknown
+  evidence; legacy name-based synthetic identifier inference remains separate
+  from measured uniqueness. Changed adapter/relationship tests: 25 passed
+  (0.28s), full strict mypy: 135 files pass. Guide/OpenSpec match the contract.
+  Actual installed Trino driver inventory is 0.338.0: Basic, JWT, Kerberos,
+  GSSAPI, OAuth2 and Certificate authentication. Inspected actual constructors:
+  Kerberos/GSSAPI require optional requests adapters; their config option mutates
+  process environment, so do not forward it casually. OAuth2's default callback
+  prints redirect URLs and opens a browser; product composition must supply a
+  bounded non-logging local interactive route, never use that default in MCP.
+  Inventory is implementation input, not auth acceptance or live-server evidence.
+  Next implement shared pre-connect typed auth configuration with redaction/TLS
+  tests and complete installed replay of these accumulated candidate changes.
+- Implemented typed runtime-only TrinoAuthConfig for the six inventoried driver
+  methods plus unchanged unauthenticated mode. Runtime reference names are hidden
+  from repr; secret values are resolved only during construction, bounded and
+  absent from config. Auth requires HTTPS; conflicting references and missing
+  secrets reject before connection. Kerberos/GSSAPI require their optional
+  adapters and force mutual authentication without delegation/environment mutation.
+  OAuth2 requires an explicitly supplied trusted redirect handler, never the
+  driver's console/browser default. Constructor failures become detached fixed
+  errors. Fictional basic/JWT/missing-secret/HTTP/OAuth-default checks: 3 passed
+  (0.20s). Initial Ruff found test lambda assignment; replaced with named handler.
+  This module is not yet wired to public clients, so finding 21 is NOT closed.
+  Next integrate frozen references through shared Trino configuration/client and
+  CLI-only bounded OAuth handling, then test all methods and failure propagation
+  with isolated drivers before rebuilding the unified candidate. No live access,
+  new dependency, intermediate review or public authentication activation.
+- Shared Trino integration now freezes method/runtime-reference names in typed
+  TrinoConfig.from_env and builds auth before query-work admission/connection.
+  All actual driver connections route through TrinoClient (SQL query adapter
+  and MCP table paths included); auth and verify=True propagate together, while
+  unauthenticated connection kwargs stay unchanged. OAuth requires an explicit
+  trusted application-owned callback; no MCP/stdout fallback was introduced.
+  Auth/client/config focused suites: 59 passed (0.37s). Added real shared-client
+  injected-driver test proves absent JWT stops before connect and supplied JWT
+  propagates auth with verified TLS: 1 passed (0.35s). Changed-code Ruff passes.
+  Documented actual candidate environment keys, never secret contents. This
+  uncommitted source candidate is not public delivery or full finding-21 closure:
+  remaining certificate/optional-adapter/OAuth local-route and error tests plus
+  installed acceptance are required. Next finish those methods end to end and
+  consolidate current contracts/evidence into the complete isolated candidate.
+- Expanded isolated auth-constructor checks cover certificate reference mapping,
+  missing key, Kerberos/GSSAPI mutual/no-delegation flags, method/reference
+  conflicts, unknown-method redaction and detached secret-bearing driver errors:
+  11 passed (0.28s), Ruff pass. Dependency stubs are disclosed unit fixtures,
+  not a monkeypatch of product safety or evidence of a real handshake.
+  Rebuilt the unified isolated runtime with accumulated CLI/Parquet/auth changes
+  in /private/tmp/apa-client-candidate.l4x8yp. Wheel version 1.5.0, SHA256
+  423c30d7a784d0b2a9c00f9b7189e5c8043fe4edad5e36338352d30ea77eb3b9.
+  Build first lacked force-included .agents assets; copied unchanged assets and
+  rebuilt. Install initially hit restricted default uv cache; explicit temporary
+  cache resolved it without permission expansion or primary-environment mutation.
+  Installed changed-scope acceptance: mode/adapter/auth/client 49 passed (3.77s),
+  including verified installed-import CLI subprocesses. Shared development
+  dependencies/overlay remain, not clean final-RC acceptance. Matching auth
+  OpenSpec/configuration notes explicitly retain the unfinished CLI OAuth route.
+  Strict OpenSpec/whitespace pass. Next finish that local OAuth/certificate
+  preflight scope and candidate docs/contracts before exact-SHA review; no public
+  activation, ordinary helper review, CI restart or repeated scale workload.
+- Certificate preflight now checks runtime-referenced certificate/key are readable
+  regular files before constructing driver authentication. Missing/invalid file
+  errors are fixed and path-free; no certificate/key contents are read or
+  certified by this preflight. Fictional placeholder files exercise resolution,
+  missing reference and missing-file rejection (2 passed, 9 deselected, 0.21s);
+  changed-code Ruff pass. Existing installed wheel predates this correction.
+  Further OAuth audit of driver 0.338.0 found private bearer code logs nextUri
+  at debug level and raises authentication errors containing headers/token-server
+  response bodies. A safe redirect callback alone therefore does not complete
+  the no-secret-log/error contract. Its token polling is capped at five attempts,
+  but transport/redirect origin and invocation budgets still need composition.
+  No default browser/console or real auth endpoint was invoked. Next contain
+  OAuth transport/log/error behavior with supported composition and local-only
+  tests before enabling a CLI route; do not claim six-method end-to-end acceptance
+  from constructor tests. No new owner decision or intermediate review requested.
+- OAuth driver diagnostics now use an idempotent application logging filter on
+  trino.auth before OAuth constructor execution: message/arguments/exception
+  text/stack are replaced with a fixed suppression message. This is standard
+  logging composition, not patched driver code or temporary process-wide logging
+  disable/level changes; no secret is stored in filter state. Fictional emitted
+  debug URL test passes (1, 11 deselected, 0.20s). Shared TrinoClient recognizes
+  the driver's typed TrinoAuthError and converts it outside the exception handler
+  to a detached fixed error after releasing slots/closing resources. Other errors
+  and budget categories retain their existing propagation. Relevant auth/budget
+  tests: 8 passed (0.37s); changed-code Ruff and strict mypy (136 files) pass.
+  Repaired configuration-table layout while retaining explicit unfinished OAuth
+  CLI notes. These two leak paths are corrected in source, not proof of bounded
+  OAuth transport/origin/interactive behavior or a reviewed installed RC.
+  Next complete that composition and isolated no-network acceptance; prior wheel
+  predates these changes. No new review, network call or scale replay.
+
+- 2026-10-02: OAuth transport composition now uses the public requests HTTPAdapter
+  extension and dbapi http_session option, including the driver's direct
+  response.connection.send token polling. Configured HTTPS origin only; verified
+  TLS, no inherited environment proxies/netrc, per-send remaining deadline and
+  detached fixed transport errors. Sessions close even when connect fails; work
+  slots release even if session cleanup fails. Dependency-send stubs use only
+  fictional requests without network or product-policy monkeypatches. Focused
+  auth/client checks: 40 passed (0.37s); Ruff passed; mypy 136 files passed after
+  correcting the adapter's positional-compatible public send signature.
+  This does not complete CLI OAuth, certify remote identity providers, or promise
+  hard wall-clock bounds for slow response bodies. Existing installed wheel is
+  unchanged and predates these edits. Next: finish explicit CLI-only redirect
+  composition and bounded callback/no-network installed acceptance, then consolidate
+  the complete candidate. No intermediate review, publication or scale replay.
+
+- 2026-10-02: Completed local CLI OAuth composition for the isolated candidate:
+  explicit --trino-oauth-browser, OAuth method requirement, input/output TTY
+  checks, configured HTTPS redirect origin, bounded URL validation, no console
+  URL output, fixed detached browser errors and invocation checks around the
+  callback. MCP receives no callback. Registration remains unapplied in
+  oauth-browser-registration.patch; activation-registration.patch also remains
+  unapplied in the working checkout. Shared Trino client reuses authentication
+  across its profiling queries instead of rebuilding the OAuth cache per query.
+  No actual browser or DB/API was opened; browser/HTTP tests use dependency stubs.
+  Installed changed-scope candidate: 48 pass (3.54s); explicit pipe preflight
+  passes (0.68s), no artifact/connection; after auth-reuse correction, 30 auth/
+  client/query checks pass (0.92s) and shared deadline exhaustion passes (0.20s).
+  Current wheel 53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb
+  at /private/tmp/apa-complete-candidate.ZIoRWw/dist-client-reuse; installed root
+  /private/tmp/apa-complete-candidate.ZIoRWw/installed-client-reuse. It remains
+  development-labelled 1.5.0, not RC/release, and uses existing dependency overlay.
+  Registration delta passes against the inactive baseline (0.40s). First delta
+  attempt used activated candidate goldens as the inactive baseline and failed;
+  corrected harness cwd, not product guards. Initial help invocation used the
+  nonexistent package __main__; explicit test_data_agent.cli help passed.
+  Ruff, mypy 136 modules, strict OpenSpec and diff checks pass. GitHub PR list is
+  empty for codex/1-6-execution-activation (read-only network retry succeeded).
+  Updated current client evidence for 21/25/26 without closing private/live
+  measurements or pretending all prior scenarios were rerun on the new wheel.
+  Next: reconcile remaining finding dispositions and complete candidate contracts/
+  docs, then milestone gates and exact-SHA safety review before activation.
+
+- 2026-10-02: Reconciled all 26 original findings into an explicit dated candidate
+  disposition register with executable anchors and separate unavailable/private/
+  remote boundaries. Finding 1's sensitive-semantic phone/email/SSN identifier
+  mismatch remains unfixed, not silently called accepted; conservative numeric
+  classification and DECIMAL preservation prohibition remain unchanged. Updated
+  obsolete task decision wording for the three October 2 owner decisions and
+  documented auth/CLI ownership without activating public registrations.
+  GitHub current-branch PR list remains empty (read-only retry outside sandbox).
+  Ran the audited scripts/check_release.sh milestone in the isolated complete
+  candidate with TEST_TRINO_INTEGRATION=0 and TEST_POSTGRES_INTEGRATION=0:
+  Ruff passed, mypy 138 files passed, compileall passed, 103 dependency license
+  records approved, compatibility passed, direct privacy/SQL 19 passed.
+  Full coverage run: 2671 passed, 2 failed, 16 skipped in 129.04s; coverage 90.75%.
+  Both failures were old exit-0 expectations for already-invalid mixed outputs
+  in test_cli/test_csv_profiler, superseded by the explicit October 2 contract.
+  Updated only those exit assertions to 1; all existing physical output/report
+  and incompatible-Parquet rejection assertions remain. Both corrected tests
+  pass (0.44s), changed-test Ruff passes. This is not a single all-green final run.
+  Completed remaining audited gate steps separately after the script stopped:
+  operational budgets passed (profile 0.292s/2.35MB, generate 0.638s/2.58MB,
+  validate 2.688s/0.313MB), DatasetSpec schema byte comparison passed, fictional
+  quickstart seed 12345 produced 25 customers/25 orders, valid report and no
+  copied source rows; manifest compatibility/checks passed. Strict MkDocs 0.40s
+  and OpenSpec passed. No repeated 300k-scale run or actual DB/API/browser.
+  The tested runtime wheel remains 53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb;
+  later changes are documentation and those two test expectations, not a rebuilt
+  or released wheel. No independent review or public activation claimed.
+  Next: finish candidate safety/contract reconciliation and freeze the actual
+  activation tree at an exact signed SHA; final milestone gates/review must target
+  that complete identity, not this unsigned working-tree/partial-green history.
+
+- 2026-10-02: Candidate safety reconciliation caught OAuth token URL diagnostics
+  in urllib3.connectionpool in addition to trino.auth. The local installed urllib3
+  source logs request/redirect/retry paths. Expanded the actual-logger fictional
+  regression: one pass/one failure reproduced the uncovered logger (0.24s).
+  Applied the existing idempotent, stateless diagnostic filter to both logger
+  names; both cases now pass (0.20s), Ruff/diff checks pass. Documented the
+  process-lifetime effect on those loggers without claiming a scoped logging
+  disable or a secret-retaining filter. No real HTTP request or browser call.
+  The prior 53f1179 wheel and full-suite milestone predate this source change.
+  Current GitHub PR list remains empty. Consolidate the complete inactive source,
+  contracts, client dispositions and activation payloads into one signed local
+  checkpoint, then materialize/sign the actual activation tree in isolation for
+  final milestone gates and exact-SHA independent safety review. No ordinary
+  helper review, public registration, push or release is performed by this step.
+
+- 2026-10-02: Inactive checkpoint signed as
+  6dec03860fb2cbb7150e93253519e12c3e3c595a; current branch remains
+  codex/1-6-execution-activation. Actual activation tree materialized and signed
+  only in detached /private/tmp/apa-activation-exact.vWa4be:
+  343305e28dc5980e54e4ff580419e95e7f650f72, clean at freeze. Both committed
+  registration payloads are applied there, including baseline/AGENTS amendments,
+  CLI/MCP entrances, goldens and browser flag. Six focused registration tests
+  passed (0.51s), Ruff/diff passed. Git commits contain SSH signatures, but local
+  allowedSignersFile is absent, so verified trust/GitHub approval is not claimed.
+  App worktree helper returned Git unavailable; explicit Homebrew git fallback
+  succeeded after inspecting existing checkouts. No external publication/review.
+  Continue final milestone build/gates at exact 343305e, without post-freeze
+  source edits; main progress updates are external evidence, not part of that
+  reviewed tree. Independent safety review follows only after that complete
+  candidate evidence, not an ordinary helper checkpoint. Final RC version/review
+  and public artifact acceptance remain distinct later release steps.
+
+- 2026-10-02: Final isolated activation milestone at exact signed
+  343305e28dc5980e54e4ff580419e95e7f650f72 passed scripts/check_release.sh
+  with real Trino/PostgreSQL integrations disabled: 2674 passed, 16 skipped in
+  136.03s, coverage 90.79%; Ruff, mypy 138 files, compileall, licenses,
+  compatibility, privacy/SQL, operational budgets, schema freshness and fictional
+  source-free quickstart passed. Strict MkDocs and OpenSpec also passed.
+  Exact-tree dev wheel SHA256:
+  c381c86f97384616c65a5795a498c67cc14eb8b871ed942916a9f2b5d065b50b,
+  installed at /private/tmp/apa-sha343-gates.VNHE7y/installed (version 1.5.0
+  development checkpoint, not published RC). Explicit registered-interface
+  installed acceptance passed all five cases in 7.57s, using the inactive
+  checkout as contract baseline and installed wheel as runtime: CLI/MCP shared
+  profile-review-execution, local controlling-TTY approval and inline/CSV wizard
+  routes. No product monkeypatch, real database/API/browser or repeated 300k
+  scale acceptance. These results do not close unavailable private/live evidence
+  or the documented finding-1 identifier mismatch. Frozen activation tree was
+  not edited; this progress entry is external evidence in the inactive checkout.
+  Next: independent AI safety review of exact 343305e before public activation;
+  final RC version SHA/review, required GitHub checks and release remain pending.
+
+- 2026-10-02 11:58 UTC: Required independent safety-review setup blocked by
+  Codex Security host Git access: start_codex_security_prompt_only_scan for
+  /private/tmp/apa-activation-exact.vWa4be, range bef20dbe50dc29a18ff2d94b2fac664b02049148
+  to 343305e28dc5980e54e4ff580419e95e7f650f72 returned isError:
+  "Review changes requires a non-bare Git worktree with a resolvable HEAD."
+  Explicit /opt/homebrew/bin/git checks prove non-bare=false, HEAD resolves to
+  exact 343305e, baseline resolves and head object is a commit. No scan ID or
+  reviewer was created; no review completion or approval claimed. Current branch
+  PR list is empty, frozen tree remains clean. Automation paused to avoid repeated
+  identical setup failures. Required action: restore Git discovery/access in the
+  Codex Security host so this exact worktree/range is accepted. Resume safely after
+  access recovery; retain existing green gates and installed acceptance evidence.
+
+- 2026-10-02: Owner explicitly authorized the separate reviewer path after the
+  plugin-host Git discovery failure. Independent agent Plato
+  (01a0fc87-f221-7823-94fe-b5e5c74b73a7) verified exact HEAD 343305e, non-bare
+  clean worktree and 74 changed files, all commands exit 0, no access errors.
+  Assigned the same non-author agent ActivationSafety-R2 / Plato the narrow
+  read-only safety review of exact 343305e versus bef20dbe: activation/receipt
+  byte binding and TTY issuer, source-free separation, adapter sensitivity and
+  budgets, allowed SQL scope, Trino auth/secrets/OAuth, unknown Parquet metadata,
+  invalid output privacy and exit parity. No further delegation, real DB/API/
+  browser, source edits, push or approvals permitted. Review is pending; this is
+  standalone independent AI reviewer evidence, not a completed Codex Security
+  scan or human GitHub approval. Do not start a duplicate reviewer or resume
+  Jason/ed24f7b. Automation resumed because a safe executable next step exists.
+  Existing green gates retained; no public activation or release authorized by
+  the access probe. Next: receive and record reviewer findings/disposition before
+  any activation; keep frozen SHA unchanged during review.
+
+- 2026-10-02: Independent ActivationSafety-R2 / Plato completed exact 343305e
+  versus bef20dbe; report: activation-safety-r2.md. Disposition BLOCKED for public
+  activation. Four confirmed findings: R2-1 High typed mapping sensitive source
+  reuse without receipt; R2-2 Medium numeric/binary Parquet sensitivity missed;
+  R2-3 Medium generation deadline used for local profiling; R2-4 Medium silent
+  identity-mismatch cleanup lacks incomplete-cleanup warning. All pending fixes.
+  Reviewer inventoried 74 changed files, static tracing and five tiny fictional/
+  file-free checks; no live access, edits or full gates rerun. Inherited gates are
+  explicitly distinct from reviewer executions. Exact frozen tree remains intact.
+  This is independent AI evidence, not human approval or completed plugin scan.
+  Next: fix R2-1 in shared enforcement in inactive working branch, add focused
+  cross-row/cross-column negative tests; then remaining findings and review changed
+  scope at a new immutable SHA. No new safety exception authorized or needed;
+  automation remains active because implementation remediation is executable.
+
+- 2026-10-02: Owner stopped work/automation, discussed R2-1 and explicitly
+  authorized the uniform replacement contract for all fields, including sensitive
+  mapped permutations, then instructed implementation. Recorded successor ADR-0029
+  and amended AGENTS/policy-contract/safety-boundary/OpenSpec; direct preserve and
+  fallback receipt authority, source-free generation and value-free transport stay
+  separate. R2-1 is a superseded policy-membership restriction, not a silently
+  closed bug or review approval. Historical R2 evidence remains intact.
+  Removed the sensitive-source-membership preflight from shared review and receipt
+  canonicalization, including its obsolete helper. Updated text membership cases;
+  source/receipt/policy focused tests: 137 passed (0.47s). Added six actual private
+  executor cases covering typed/text sensitive/unknown/non-sensitive permutations,
+  observed sensitivity note, value-free review and no preserve authority:
+  six passed (0.34s). No real inputs, output publication or product monkeypatch.
+  Frozen 343305e unchanged, public registrations still inactive. This is partial
+  implementation evidence, not completed uniform-contract activation: remaining
+  output content checks, registration amendments, related documentation and wider
+  focused safety coverage still need reconciliation before new exact-SHA review.
+  R2-2/3/4 remain pending. Next: finish uniform mapping execution/output boundaries
+  without broadening preserve or source-free capabilities, then prepare the complete
+  amended candidate for independent review. Owner's latest instruction resumes work.
+
+- 2026-10-02: Continued ADR-0029 through private CSV execution and shared SQL/
+  Parquet normalization. Executor records actual mapped cells in compact private
+  byte masks; only those cells use the uniform replacement contract. Synthesis,
+  derive and preserve are not implicitly exempted; absent/malformed masks fail
+  closed at typed output. Source comparison normalizes internally without treating
+  sensitive input as comparison failure. Added six actual fictional email mapping
+  cases (typed inline/text CSV × CSV/SQL/Parquet), source-row comparison, value-free
+  field note/review, repr suppression and missing/malformed evidence negatives.
+  Existing normalized-float privacy negative remains. First focused run: 33 passed.
+  R2-2 numeric Parquet inspection uses explicit numeric text only for sensitivity;
+  binary/composite evidence remains conservatively sensitive, never decoded into
+  matching semantics or retained. R2-3 uses one existing LocalProfileBudget across
+  inspection/metadata completion; fictional clock exhaustion proves local 1s is
+  not generation 300s. R2-4 adds strict identity handling only for transformation
+  cleanup, attempts both cleanup locations, reports sanitized cleanup-incomplete
+  on mismatches and never deletes replaced paths. Other helper callers retain
+  their legacy non-strict behavior. Added a real temporary-directory path-replacement
+  fault test; the foreign replacement and moved owned artifact remain, with explicit
+  warning and detached error context. No production inputs or external access.
+  Initial wider run: 304 passed, four old membership/output-ban expectations failed;
+  updated only owner-superseded mapping expectations, retaining unchanged-row,
+  unmatched, tampered, budget and privacy-negative coverage. Updated non-TTY run:
+  362 passed, 10 deselected. Full affected six-file run including TTY/receipt:
+  373 passed in 4.31s; Ruff passed, mypy 138 files passed, strict OpenSpec passed.
+  No repeated scale/full-release gates. R2-2/3/4 have candidate fixes, not independent
+  clearance. Frozen reviewed 343305e unchanged; public entrances remain inactive.
+  Next: reconcile activation/baseline documentation and source-free boundaries,
+  complete the amended isolated candidate, then milestone gates and independent
+  review of the changed scope on its new exact SHA before public activation.

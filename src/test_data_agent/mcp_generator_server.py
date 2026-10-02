@@ -78,7 +78,7 @@ class WorkspacePathError(ValueError):
 def review_transformation(input_path: str, policy_path: str, table_name: str | None = None) -> dict[str, Any]:
     """Review fixed local snapshots; no execution, DB access or approval receipt."""
     from test_data_agent.core.limits import (
-        DEFAULT_MAX_TOTAL_INPUT_BYTES, DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
+        DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
     )
     from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
 
@@ -86,7 +86,7 @@ def review_transformation(input_path: str, policy_path: str, table_name: str | N
     policy = resolve_workspace_path(policy_path, must_exist=True, expect_file=True)
     _require_suffix(policy, {".yaml", ".yml"}, "behavior policy")
     request = prepare_csv_review_from_paths(source, table_name or source.stem,
-        policy.parent, policy.name, max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+        policy.parent, policy.name, max_total_bytes=None,
         max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget())
     return {"operation": "review_transformation", "status": "review_only",
             "snapshot_sha256": request.snapshot_sha256, "review": json.loads(request.review)}
@@ -689,7 +689,29 @@ def _require_new_output(path: Path) -> None:
         raise WorkspacePathError("MCP output path already exists")
 
 
+def execute_transformation(
+    input_path: str, policy_path: str, output_path: str, snapshot_sha256: str,
+    table_name: str | None = None, receipt_path: str | None = None,
+    max_output_bytes: int | None = None, max_total_input_bytes: int | None = None,
+) -> dict[str, object]:
+    """Explicit local mixed-origin execution; cannot issue preservation receipts.
+
+    Requires the reviewed snapshot digest and, for preservation, a matching
+    receipt issued by the separate controlling-TTY local approval operation.
+    Returns bounded counts and digest metadata, never source or output rows.
+    """
+    from test_data_agent.mcp_transformation_candidate import _execute_candidate_transformation
+
+    result = _execute_candidate_transformation(
+        input_path, policy_path, output_path, snapshot_sha256,
+        table_name=table_name, receipt_path=receipt_path,
+        max_output_bytes=max_output_bytes, max_total_input_bytes=max_total_input_bytes,
+    )
+    return {**result, "status": "transformation_completed"}
+
+
 _GENERATOR_MCP_TOOLS = (
+    execute_transformation,
     review_transformation,
     profile_csv,
     infer_dataset_spec,

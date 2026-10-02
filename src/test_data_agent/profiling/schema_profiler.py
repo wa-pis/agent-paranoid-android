@@ -221,7 +221,7 @@ def _profile_schema_with_sample(
             fields.append(accumulator.to_profile(row_count))
         primary_key_candidates = [
             field.name for field in fields
-            if field.is_identifier and field.unique_ratio >= 0.98
+            if field.is_identifier and field.unique_ratio is not None and field.unique_ratio >= 0.98
             and field.unique_ratio_kind != "lower_bound"
             and "pool_size" not in field.distribution
         ]

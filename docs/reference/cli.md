@@ -1,5 +1,11 @@
 # CLI Command Index
 
+Generation retains supported intentionally invalid output and its validation
+report, but returns exit `1` / JSON status `validation_failed` when validation
+fails, including `mixed` and `negative` modes. Spec, profile and CSV inputs use
+the same contract. Valid reports return exit `0`. Privacy failures still prevent
+publication; invalid mode never bypasses them.
+
 The executable is `test-data-agent`. Built-in help is the authoritative option
 reference for the installed version:
 
@@ -71,9 +77,57 @@ ordinal events plus match counts. It reads only the fixed snapshot (at most
 value hashes, and fails closed above the limit. Unmatched cells are counted,
 not copied. This is debugging metadata, not a preview of output or approval.
 
-No source-preserving transformation command is available yet. The separate
-local approval and execution gates in the active OpenSpec are not satisfied by
-this read-only review.
+Review alone does not authorize source preservation. The separate local
+approval and execution entrances below enforce the exact reviewed snapshot.
+
+### Execution candidate — not publicly enabled
+
+The isolated activation candidate uses the same saved policy and reviewed
+`snapshot_sha256` for `transform-execute SOURCE POLICY DESTINATION
+--snapshot-sha256 SHA`. Output format comes from the policy; destination must
+be a new bundle, never an existing directory or an input file. Success reports
+digest, provenance counts and output-budget metadata, not rows. The candidate
+uses `transformation_completed` inside the existing JSON `result` envelope;
+errors retain the existing `error` envelope and exit code.
+
+Preservation additionally requires a matching restricted local receipt.
+Explicit `substitute` and `replace_text` use one contract for all fields:
+mapped values may equal other source values, including sensitive permutations.
+Review retains a value-free sensitivity note. Such values stay only in the
+selected local mixed-origin output, never CLI summaries or logs. This does not
+authorize direct preservation or a copying fallback.
+
+Only `transform-approve SOURCE POLICY RECEIPT --snapshot-sha256 SHA` in a
+controlling terminal may create one after displaying the value-free review
+and receiving fresh `APPROVE`. Piped input, flags and agent approval cannot
+replace this confirmation. `--json` keeps the review/prompt visible on the
+terminal. Execution consumes that receipt with `--receipt RECEIPT`; changing
+source, policy, classification or referenced mapping/generation-policy bytes
+requires review and approval again. Sensitive, unknown or conflicting fields
+remain ineligible for preservation.
+
+Candidate run caps are `--max-total-input-bytes` and `--max-output-bytes`.
+They may lower, not silently raise, effective session/profile limits. A request
+above the ceiling and actual exhaustion are distinct typed failures with safe
+counters and supported recovery keys. Cleanup-incomplete errors require local
+inspection of destination/staging before retry; they do not permit overwrite.
+Database capture and private `derive` are not enabled by this entrance.
+
+These commands are registered in this isolated candidate, not in the released
+1.5.0 package. Public delivery requires the matching safety/spec amendment,
+installed-candidate gates and independent exact-SHA safety review. Neither
+command discovery nor passing fictional acceptance authorizes a dataset;
+ordinary generation stays source-free.
+
+In the isolated candidate, the existing decision wizard feeds this same
+execution contract: edit an already reviewable policy with `transform-review
+SOURCE POLICY --decide --edit-actions`, save with `SAVE`, then review the saved
+bytes again and use that digest for execution. Inline and local CSV substitution
+mappings follow the same workflow; CSV paths remain relative to the policy.
+Saving decisions does not issue a preservation receipt. If the saved policy
+retains any eligible source field, separate local `transform-approve` remains
+mandatory before CLI or MCP execution. The wizard does not create or repair an
+invalid initial policy or turn a sensitivity answer into approval.
 
 ### Edit Field Decisions Locally
 

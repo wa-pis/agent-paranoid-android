@@ -99,9 +99,32 @@ def main() -> None:
                     expected_snapshot_sha256=request.snapshot_sha256, max_total_bytes=65536,
                     max_review_bytes=8192, max_output_bytes=32768, budget=GenerationBudget(10))
                 assert summary["status"] == "temporary_test_completed"
+                candidate_bundles = []
+                for entrance in ("cli", "workspace"):
+                    destination = root / f"candidate-{entrance}"
+                    if entrance == "cli":
+                        program = ("import json,sys; from test_data_agent.cli_transformation_candidate import "
+                            "_run_candidate_execution; print(json.dumps(_run_candidate_execution(sys.argv[1:])))")
+                        arguments = [str(source_path), str(policy_path), str(destination),
+                            "--table", entity, "--snapshot-sha256", request.snapshot_sha256]
+                    else:
+                        program = ("import json,sys; from test_data_agent.mcp_transformation_candidate import "
+                            "_execute_candidate_transformation; print(json.dumps(_execute_candidate_transformation("
+                            "sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4],table_name=sys.argv[5])))")
+                        arguments = [source_path.name, policy_path.name, destination.name,
+                            request.snapshot_sha256, entity]
+                    completed = subprocess.run([sys.executable, "-c", program, *arguments],
+                        env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(root)},
+                        capture_output=True, text=True, timeout=30, check=True)
+                    assert json.loads(completed.stdout)["snapshot_sha256"] == request.snapshot_sha256
+                    assert all(value not in completed.stdout + completed.stderr
+                               for value in ("alpha", "beta", "gamma", "delta"))
+                    candidate_bundles.append({p.name: p.read_bytes() for p in destination.iterdir()})
                 with temporary_csv_publication(request, max_total_bytes=65536,
                         max_review_bytes=8192, max_output_bytes=32768, budget=GenerationBudget(10)) as output:
                     manifest = json.loads((output / "manifest.json").read_bytes())
+                    assert all(bundle == {p.name: p.read_bytes() for p in output.iterdir()}
+                               for bundle in candidate_bundles)
                     assert manifest["provenance"]["output_cells"] == 4
                     assert manifest["provenance"]["replacement_percent"] == "100.00"
                     if output_format == "csv":
@@ -122,7 +145,7 @@ def main() -> None:
             assert not root.exists()
             passed.append(f"{input_format}->{output_format}")
     print(json.dumps({"status": "passed", "routes": passed,
-        "scope": "fictional small replacement workflow; CLI/MCP service review and private execution; no DB"}))
+        "scope": "fictional small replacement workflow; CLI/MCP review and closed CLI/workspace execution; no DB"}))
 
 
 if __name__ == "__main__":

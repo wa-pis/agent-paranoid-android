@@ -1,5 +1,21 @@
 # Resume plan — 2026-09-26
 
+## Current continuation — 2026-10-02
+
+Owner corrected the review cadence: assemble one complete implementation,
+documentation, contract and installed acceptance candidate before independent
+safety review of its exact activation SHA. Do not resume the incomplete ed24f7b
+artifact review or commission reviews of helpers/ordinary commits. Reviewer
+capacity does not block candidate preparation; final RC review remains required.
+Automation is ACTIVE for this preparation. Earlier pause/next-step statements
+below are historical, not the current instruction.
+
+Public execution stays disabled. The unapplied activation-registration.patch
+now carries runtime registration, explicit boundary/contract test amendments and
+the two additive contract inventories together. Materialize/test it only in an
+isolated candidate checkout before the required activation review. Preserve the
+unchanged source-free contracts, all other RC routes and acceptance requirements.
+
 ## Latest completed private milestone — 2026-09-29
 
 Owner resumed work after the ADR collection. The installed private PostgreSQL

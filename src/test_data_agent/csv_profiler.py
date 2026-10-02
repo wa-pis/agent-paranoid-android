@@ -106,9 +106,9 @@ class CSVColumnProfile(BaseModel):
     decimal_precision: int | None = Field(default=None, exclude_if=lambda value: value is None)
     decimal_scale: int | None = Field(default=None, exclude_if=lambda value: value is None)
     nullable: bool
-    null_count: int
-    null_ratio: float
-    approx_distinct_count: int
+    null_count: int | None
+    null_ratio: float | None
+    approx_distinct_count: int | None
     sensitive: bool
     semantic_type: str | None = None
     top_values: list[dict[str, Any]] = Field(default_factory=list)
