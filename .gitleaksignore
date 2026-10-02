@@ -1,3 +1,3 @@
-# False positive: progress prose "missing key, Kerberos/GSSAPI"; no credential.
+# False positive in historical authentication-test prose; no credential.
 # Scope only this immutable commit/file/rule/line, not authentication code.
 6dec03860fb2cbb7150e93253519e12c3e3c595a:openspec/changes/selective-source-transformation/progress.md:generic-api-key:5461
