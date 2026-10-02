@@ -31,13 +31,23 @@ generation. It may eventually produce a labelled mixed-origin, one-to-one
 dataset, but these instructions do not enable that execution path. Existing
 generation, profiling, advisors and default MCP remain source-free.
 
-Before any source value may be retained in transformation output, require an
+Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
 evidence, a bounded operator comment, and fresh interactive local-CLI approval
 of the exact displayed plan, source bytes, classification and mapping bytes.
 Agents and MCP may not create that approval. Sensitive, unknown and disputed
 fields remain blocked; DECIMAL preservation remains blocked by default.
-No source row may be copied wholesale, and no raw PII or secret may be emitted.
+No implicit source-row copy is permitted; the explicit replacement exception
+below is separate from synthetic generation and transport disclosure.
+
+Owner amendment 2026-10-02 (ADR-0029): explicit `substitute`/`replace_text`
+mappings have one contract for every field. A mapped replacement is not
+preservation merely because it equals another value in the fixed source,
+including a sensitive field. Sensitivity remains a value-free field note,
+not a mapping-membership prohibition. This permits explicit mapped permutations,
+not implicit copying, source-free generation reuse, `preserve`, secrets in logs,
+errors, summaries, providers or MCP responses. Public activation still requires
+matching specifications, executable tests and independent exact-SHA safety review.
 
 This proposed exception remains disabled until matching baseline/OpenSpec
 amendments, executable end-to-end safety tests, and independent safety review

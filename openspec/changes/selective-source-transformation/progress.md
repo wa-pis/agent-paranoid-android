@@ -1,5 +1,33 @@
 # Implementation Progress
 
+## Sensitive identifier candidate fix — 2026-10-02
+
+Traced generation and the shared post-solve privacy validator: identifier
+generation correctly takes precedence and emits deterministic numeric synthetic
+tokens, but semantic email/phone/SSN validation rejected those tokens. Validator
+now recognizes only the existing exact ASCII integer token on identifier fields.
+No generator format change, source reuse, arbitrary prefix exemption or ordinary
+semantic-field relaxation. Added seeded positive/negative-seed pool cases across
+three semantics, malformed/Unicode/raw-sensitive negatives and non-identifier
+negative. Identifier/safety suite: 48 passed in 0.43s; Ruff and diff check passed.
+Guide, change contract and client disposition updated. This is a candidate fix,
+not installed acceptance or independent safety clearance. Next: materialize the
+complete amended isolated activation candidate and run milestone installed gates
+before independent exact-SHA review; public registrations remain inactive.
+
+## Documentation reconciliation — 2026-10-02
+
+Reconciled plan/tasks, baseline safe-MCP contract, its change delta and client
+acceptance with owner-approved ADR-0029. Uniform explicit replacement permits
+sensitive permutations only in actual mapped local output cells; value-free
+field notes, preservation receipts and source-free disclosure boundaries remain.
+Historical R2 review is not approval of this amended candidate. Strict OpenSpec
+validation and diff whitespace check passed after correcting delta structure.
+No repeated runtime/scale gates or new review. Public registration stays inactive.
+Next: resolve the remaining synthetic sensitive-identifier/validator disagreement,
+then materialize the complete amended activation candidate for installed gates
+and independent review of its exact SHA.
+
 ## Authority And Target
 
 - User authorized implementation, signed commits/push, sequential PR merges
@@ -5593,3 +5621,136 @@ Broader transformation remains unfinished.
   checkpoint, then materialize/sign the actual activation tree in isolation for
   final milestone gates and exact-SHA independent safety review. No ordinary
   helper review, public registration, push or release is performed by this step.
+
+- 2026-10-02: Inactive checkpoint signed as
+  6dec03860fb2cbb7150e93253519e12c3e3c595a; current branch remains
+  codex/1-6-execution-activation. Actual activation tree materialized and signed
+  only in detached /private/tmp/apa-activation-exact.vWa4be:
+  343305e28dc5980e54e4ff580419e95e7f650f72, clean at freeze. Both committed
+  registration payloads are applied there, including baseline/AGENTS amendments,
+  CLI/MCP entrances, goldens and browser flag. Six focused registration tests
+  passed (0.51s), Ruff/diff passed. Git commits contain SSH signatures, but local
+  allowedSignersFile is absent, so verified trust/GitHub approval is not claimed.
+  App worktree helper returned Git unavailable; explicit Homebrew git fallback
+  succeeded after inspecting existing checkouts. No external publication/review.
+  Continue final milestone build/gates at exact 343305e, without post-freeze
+  source edits; main progress updates are external evidence, not part of that
+  reviewed tree. Independent safety review follows only after that complete
+  candidate evidence, not an ordinary helper checkpoint. Final RC version/review
+  and public artifact acceptance remain distinct later release steps.
+
+- 2026-10-02: Final isolated activation milestone at exact signed
+  343305e28dc5980e54e4ff580419e95e7f650f72 passed scripts/check_release.sh
+  with real Trino/PostgreSQL integrations disabled: 2674 passed, 16 skipped in
+  136.03s, coverage 90.79%; Ruff, mypy 138 files, compileall, licenses,
+  compatibility, privacy/SQL, operational budgets, schema freshness and fictional
+  source-free quickstart passed. Strict MkDocs and OpenSpec also passed.
+  Exact-tree dev wheel SHA256:
+  c381c86f97384616c65a5795a498c67cc14eb8b871ed942916a9f2b5d065b50b,
+  installed at /private/tmp/apa-sha343-gates.VNHE7y/installed (version 1.5.0
+  development checkpoint, not published RC). Explicit registered-interface
+  installed acceptance passed all five cases in 7.57s, using the inactive
+  checkout as contract baseline and installed wheel as runtime: CLI/MCP shared
+  profile-review-execution, local controlling-TTY approval and inline/CSV wizard
+  routes. No product monkeypatch, real database/API/browser or repeated 300k
+  scale acceptance. These results do not close unavailable private/live evidence
+  or the documented finding-1 identifier mismatch. Frozen activation tree was
+  not edited; this progress entry is external evidence in the inactive checkout.
+  Next: independent AI safety review of exact 343305e before public activation;
+  final RC version SHA/review, required GitHub checks and release remain pending.
+
+- 2026-10-02 11:58 UTC: Required independent safety-review setup blocked by
+  Codex Security host Git access: start_codex_security_prompt_only_scan for
+  /private/tmp/apa-activation-exact.vWa4be, range bef20dbe50dc29a18ff2d94b2fac664b02049148
+  to 343305e28dc5980e54e4ff580419e95e7f650f72 returned isError:
+  "Review changes requires a non-bare Git worktree with a resolvable HEAD."
+  Explicit /opt/homebrew/bin/git checks prove non-bare=false, HEAD resolves to
+  exact 343305e, baseline resolves and head object is a commit. No scan ID or
+  reviewer was created; no review completion or approval claimed. Current branch
+  PR list is empty, frozen tree remains clean. Automation paused to avoid repeated
+  identical setup failures. Required action: restore Git discovery/access in the
+  Codex Security host so this exact worktree/range is accepted. Resume safely after
+  access recovery; retain existing green gates and installed acceptance evidence.
+
+- 2026-10-02: Owner explicitly authorized the separate reviewer path after the
+  plugin-host Git discovery failure. Independent agent Plato
+  (01a0fc87-f221-7823-94fe-b5e5c74b73a7) verified exact HEAD 343305e, non-bare
+  clean worktree and 74 changed files, all commands exit 0, no access errors.
+  Assigned the same non-author agent ActivationSafety-R2 / Plato the narrow
+  read-only safety review of exact 343305e versus bef20dbe: activation/receipt
+  byte binding and TTY issuer, source-free separation, adapter sensitivity and
+  budgets, allowed SQL scope, Trino auth/secrets/OAuth, unknown Parquet metadata,
+  invalid output privacy and exit parity. No further delegation, real DB/API/
+  browser, source edits, push or approvals permitted. Review is pending; this is
+  standalone independent AI reviewer evidence, not a completed Codex Security
+  scan or human GitHub approval. Do not start a duplicate reviewer or resume
+  Jason/ed24f7b. Automation resumed because a safe executable next step exists.
+  Existing green gates retained; no public activation or release authorized by
+  the access probe. Next: receive and record reviewer findings/disposition before
+  any activation; keep frozen SHA unchanged during review.
+
+- 2026-10-02: Independent ActivationSafety-R2 / Plato completed exact 343305e
+  versus bef20dbe; report: activation-safety-r2.md. Disposition BLOCKED for public
+  activation. Four confirmed findings: R2-1 High typed mapping sensitive source
+  reuse without receipt; R2-2 Medium numeric/binary Parquet sensitivity missed;
+  R2-3 Medium generation deadline used for local profiling; R2-4 Medium silent
+  identity-mismatch cleanup lacks incomplete-cleanup warning. All pending fixes.
+  Reviewer inventoried 74 changed files, static tracing and five tiny fictional/
+  file-free checks; no live access, edits or full gates rerun. Inherited gates are
+  explicitly distinct from reviewer executions. Exact frozen tree remains intact.
+  This is independent AI evidence, not human approval or completed plugin scan.
+  Next: fix R2-1 in shared enforcement in inactive working branch, add focused
+  cross-row/cross-column negative tests; then remaining findings and review changed
+  scope at a new immutable SHA. No new safety exception authorized or needed;
+  automation remains active because implementation remediation is executable.
+
+- 2026-10-02: Owner stopped work/automation, discussed R2-1 and explicitly
+  authorized the uniform replacement contract for all fields, including sensitive
+  mapped permutations, then instructed implementation. Recorded successor ADR-0029
+  and amended AGENTS/policy-contract/safety-boundary/OpenSpec; direct preserve and
+  fallback receipt authority, source-free generation and value-free transport stay
+  separate. R2-1 is a superseded policy-membership restriction, not a silently
+  closed bug or review approval. Historical R2 evidence remains intact.
+  Removed the sensitive-source-membership preflight from shared review and receipt
+  canonicalization, including its obsolete helper. Updated text membership cases;
+  source/receipt/policy focused tests: 137 passed (0.47s). Added six actual private
+  executor cases covering typed/text sensitive/unknown/non-sensitive permutations,
+  observed sensitivity note, value-free review and no preserve authority:
+  six passed (0.34s). No real inputs, output publication or product monkeypatch.
+  Frozen 343305e unchanged, public registrations still inactive. This is partial
+  implementation evidence, not completed uniform-contract activation: remaining
+  output content checks, registration amendments, related documentation and wider
+  focused safety coverage still need reconciliation before new exact-SHA review.
+  R2-2/3/4 remain pending. Next: finish uniform mapping execution/output boundaries
+  without broadening preserve or source-free capabilities, then prepare the complete
+  amended candidate for independent review. Owner's latest instruction resumes work.
+
+- 2026-10-02: Continued ADR-0029 through private CSV execution and shared SQL/
+  Parquet normalization. Executor records actual mapped cells in compact private
+  byte masks; only those cells use the uniform replacement contract. Synthesis,
+  derive and preserve are not implicitly exempted; absent/malformed masks fail
+  closed at typed output. Source comparison normalizes internally without treating
+  sensitive input as comparison failure. Added six actual fictional email mapping
+  cases (typed inline/text CSV × CSV/SQL/Parquet), source-row comparison, value-free
+  field note/review, repr suppression and missing/malformed evidence negatives.
+  Existing normalized-float privacy negative remains. First focused run: 33 passed.
+  R2-2 numeric Parquet inspection uses explicit numeric text only for sensitivity;
+  binary/composite evidence remains conservatively sensitive, never decoded into
+  matching semantics or retained. R2-3 uses one existing LocalProfileBudget across
+  inspection/metadata completion; fictional clock exhaustion proves local 1s is
+  not generation 300s. R2-4 adds strict identity handling only for transformation
+  cleanup, attempts both cleanup locations, reports sanitized cleanup-incomplete
+  on mismatches and never deletes replaced paths. Other helper callers retain
+  their legacy non-strict behavior. Added a real temporary-directory path-replacement
+  fault test; the foreign replacement and moved owned artifact remain, with explicit
+  warning and detached error context. No production inputs or external access.
+  Initial wider run: 304 passed, four old membership/output-ban expectations failed;
+  updated only owner-superseded mapping expectations, retaining unchanged-row,
+  unmatched, tampered, budget and privacy-negative coverage. Updated non-TTY run:
+  362 passed, 10 deselected. Full affected six-file run including TTY/receipt:
+  373 passed in 4.31s; Ruff passed, mypy 138 files passed, strict OpenSpec passed.
+  No repeated scale/full-release gates. R2-2/3/4 have candidate fixes, not independent
+  clearance. Frozen reviewed 343305e unchanged; public entrances remain inactive.
+  Next: reconcile activation/baseline documentation and source-free boundaries,
+  complete the amended isolated candidate, then milestone gates and independent
+  review of the changed scope on its new exact SHA before public activation.

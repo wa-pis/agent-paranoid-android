@@ -20,6 +20,23 @@ literals. Local `transform-approve` SHALL be the only supported receipt issuer;
 `transform-execute` and MCP SHALL consume, not create, preservation authority.
 These names SHALL NOT imply that candidate registration is publicly active.
 
+Explicit `substitute` and `replace_text` SHALL use the same replacement contract
+for sensitive, unknown and non-sensitive fields. Actual mapped output cells MAY
+equal other source values, including sensitive permutations, in the selected
+local mixed-origin artifact. Review SHALL retain a value-free sensitivity note.
+This exception SHALL NOT broaden direct preservation, unmatched-preserve
+fallback, receipt issuance, source-free generation, or transport disclosure.
+Deterministic execution SHALL record actual mapped-cell evidence; a caller's
+approval flag SHALL NOT provide that evidence.
+
+#### Scenario: Sensitive permutation stays local
+
+- **GIVEN** an explicit mapping swaps fictional sensitive values
+- **WHEN** the separately gated workspace execution applies the mapping
+- **THEN** mapped cells use the uniform replacement contract
+- **AND** MCP returns bounded summaries and artifact paths without mapping literals
+- **AND** ordinary generation remains source-free and synthetic
+
 #### Scenario: Receipt is stale despite a fresh review digest
 
 - **GIVEN** a genuine receipt binds the earlier exact source and policy bytes

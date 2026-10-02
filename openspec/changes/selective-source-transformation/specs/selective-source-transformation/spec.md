@@ -4,6 +4,22 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Synthetic Identifier Privacy Agreement
+
+Source-free string identifier generation and post-solve privacy validation SHALL
+agree on the existing `synthetic_` plus ASCII integer token namespace, including
+fields annotated with email, phone or SSN semantics. This recognition SHALL apply
+only to identifier fields, SHALL NOT accept arbitrary prefixed sensitive text,
+and SHALL NOT permit source-row reuse or broaden ordinary sensitive field formats.
+
+#### Scenario: Sensitive semantic identifier uses a bounded synthetic pool
+
+- **GIVEN** a string identifier with sensitive semantics and an explicit pool size
+- **WHEN** seeded source-free generation creates repeated keys
+- **THEN** exact synthetic identifier tokens pass privacy validation reproducibly
+- **AND** arbitrary prefixed sensitive text fails privacy validation
+- **AND** non-identifier fields retain semantic synthetic-format checks
+
 ### Requirement: Explicit runtime Trino authentication
 The candidate SHALL compose driver-supported Basic, JWT, Kerberos, GSSAPI,
 OAuth2 and Certificate authentication through the shared bounded Trino client.
@@ -338,14 +354,26 @@ and value-free and report the same selected rule as execution.
 - **AND** local debugging reports only row/column/scope/rule ordinals, match
   status and bounded counts, never either literal or its hash.
 
-#### Scenario: Sensitive source-value reuse
+#### Scenario: One mapping contract regardless of sensitivity
 
 - **GIVEN** a sensitive field and a reachable replacement equal to an original
   value in a sensitive or unresolved field of the same fixed CSV snapshot
-- **WHEN** local review or receipt verification runs
-- **THEN** the plan is rejected with a value-free error before any output.
-- **AND** a distinct explicitly reviewed non-sensitive field is not blocked
-  merely because its ordinary mapping values also occur in the source.
+- **WHEN** local review or receipt verification runs for explicit replacement
+- **THEN** source membership alone SHALL NOT reject the mapping, including an
+  explicit permutation of sensitive values.
+- **AND** effective sensitivity SHALL remain a value-free field note.
+- **AND** direct preserve and preserve fallback SHALL retain their existing
+  non-sensitive classification and local human receipt requirements.
+
+#### Scenario: Explicit mapping versus synthesis at output normalization
+
+- **GIVEN** fictional email-shaped explicit replacements and cells without an
+  actually applied mapping
+- **WHEN** CSV, SQL-script or Parquet output is encoded
+- **THEN** only actually mapped cells use the uniform replacement contract.
+- **AND** synthesis, derive and preservation retain their existing content
+  checks; absent or malformed execution evidence SHALL NOT grant an exception.
+- **AND** type, null, snapshot, budget and value-free transport checks remain.
 
 ### Requirement: Behavior profile retains substitution decisions
 

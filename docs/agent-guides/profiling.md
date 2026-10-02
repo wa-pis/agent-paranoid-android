@@ -14,6 +14,10 @@ reviewed spec rather than silently inventing a distribution. Local sensitivity
 inspection uses bounded batches with existing cell, expanded-byte and time
 budgets. It retains only flags, not values; composite content is conservatively
 sensitive. Exhaustion fails without publishing a partial trusted profile.
+Numeric inspection uses an explicit textual representation only for sensitivity,
+not field matching. Unsupported binary evidence is conservatively sensitive.
+The existing local profiling deadline spans inspection and metadata finalization;
+the generation deadline is not a substitute.
 
 SQL query-source files follow the same rule. Parse and authorize the bounded
 file before database access, retain only a source fingerprint, policy version,
@@ -57,6 +61,11 @@ Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
 
 ## Forbidden behavior
+
+These are source-free profiling/generation rules. The separate gated selective
+transformation contract (ADR-0029) permits explicit mapped replacements to equal
+other source values for every field, with value-free sensitivity notes. It does
+not permit raw profile/review/transport disclosure or broaden direct preserve.
 
 - copying or shuffling source rows;
 - exposing real names, emails, phones, addresses, IDs, tokens, secrets, or

@@ -151,8 +151,14 @@ the same local filesystem and terminal privileges can impersonate the operator.
 That equal-privilege impersonation is explicitly outside this deployment's
 protection claim. No source-bearing dataset was approved by this conversation.
 
-Every input field requires an explicit action. Only fields explicitly declared
-non-sensitive and authorized for preservation may carry original logical values.
+Every input field requires an explicit action. Direct preservation requires a
+field explicitly declared non-sensitive and authorized for preservation.
+Owner amendment 2026-10-02 / ADR-0029 permits explicit mapped replacements to
+equal another original value, including sensitive mapped permutations. This is
+replacement, not implicit copying or preserve authority; sensitivity remains a
+value-free field note. Existing source-free and transport disclosure boundaries
+remain unchanged. This amended contract still awaits executable evidence and
+independent exact-SHA review before activation.
 Unresolved sensitive/unknown classifications or conflicting profiling evidence
 block preservation, including unmatched-value preserve fallback. Agent proposals,
 heuristic output, arbitrary authorization-reference strings and bulk acceptance

@@ -344,6 +344,12 @@ def validate_generated_row_privacy(
                 )
                 if field.data_type == FieldType.DECIMAL and isinstance(value, Decimal) and detected:
                     return ["generated dataset failed post-solve privacy validation"]
+                # Identifier generation takes precedence over semantic formatting.
+                # Accept only its exact source-free token, not arbitrary prefixed text.
+                if field.is_identifier and isinstance(value, str) and re.fullmatch(
+                    re.escape(SYNTHETIC_PREFIX) + r"-?[0-9]+", value,
+                ):
+                    continue
                 if isinstance(value, str) and (
                     sensitive or detected is not None
                 ) and not _is_synthetic_sensitive_value(

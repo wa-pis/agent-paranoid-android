@@ -48,6 +48,22 @@ referenced input mutations. MCP SHALL register no receipt issuer. These named
 candidate interfaces SHALL remain unregistered publicly until the activation
 gates above complete; ordinary generator tools remain source-free.
 
+The owner-approved explicit replacement contract SHALL apply uniformly to all
+fields: mapped source membership or sensitive-value permutations alone SHALL
+NOT reject a separately reviewed transformation. Effective sensitivity SHALL
+remain a bounded value-free field note. This SHALL NOT broaden direct preserve,
+preserve fallback, receipt issuance, source-free tools, or MCP row disclosure.
+Only deterministic evidence of actually applied mappings may select the local
+artifact replacement path; no client approval flag SHALL substitute for it.
+
+#### Scenario: Sensitive mapping has a value-free response
+
+- **GIVEN** fictional explicit mappings between sensitive source values
+- **WHEN** the separately gated workspace transformation executes after review
+- **THEN** local mixed-origin artifact values follow the selected mapping.
+- **AND** MCP returns bounded summaries/paths, never either mapping literal.
+- **AND** ordinary generator tools retain their synthetic-only contract.
+
 #### Scenario: Path traversal is attempted
 
 - **GIVEN** a client provides `../`, absolute paths outside the workspace, or

@@ -58,6 +58,8 @@ class CsvTransformationResult:
     columns: tuple[str, ...] = field(repr=False)
     rows: tuple[tuple[str | None, ...], ...] = field(repr=False)
     provenance: ProvenanceSummary | None = None
+    # Private execution evidence, never an operator-supplied bypass or manifest field.
+    mapped_cells: tuple[bytes, ...] = field(default=(), repr=False)
 
 
 def trace_csv_replacements(
@@ -342,7 +344,9 @@ def replace_csv_snapshot(
         unchanged = compared = dropped_cells = 0
         origin_counts = {"replacement": 0, "synthetic": 0, "original": 0}
         logical_rows: list[tuple[str | None, ...]] = []
+        mapped_cells: list[bytes] = []
         for row_index, row in enumerate(reader):
+            mapped_fields: set[str] = set()
             origins = dict.fromkeys(execution_names, "replacement")
             null_fields: set[str] = set()
             coincident_zero_fields: set[str] = set()
@@ -390,6 +394,7 @@ def replace_csv_snapshot(
                                 else scalar(column, row[column])
                                 for column in substitution_columns[name])
                     if key in substitutions[name]:
+                        mapped_fields.add(name)
                         replacement = substitutions[name][key]
                         if replacement is None:
                             if policy.csv_nulls.output_token is None and policy.output is None:
@@ -407,6 +412,7 @@ def replace_csv_snapshot(
                     continue
                 match = (match_scoped_text(matching_text(policy, name, row[name]), name, file_table, column_tables) if row[name] is not None else None)
                 if match is not None:
+                    mapped_fields.add(name)
                     values.append(match.replacement)
                 elif isinstance(action, ReplaceTextAction) and isinstance(action.unmatched, PreserveAction):
                     preserved_fields.add(name)
@@ -434,12 +440,14 @@ def replace_csv_snapshot(
                     same_native_value(row[name], None if name in null_fields else value)
                     for name, value in zip(output_names, replaced, strict=True)):
                 raise ValueError
-            if any(looks_sensitive_value(value) for value in replaced):
+            if any(name not in mapped_fields and looks_sensitive_value(value)
+                   for name, value in zip(output_names, replaced, strict=True)):
                 raise ValueError
             append_row(replaced)
             final_row = {name: None if name in null_fields else value
                          for name, value in zip(output_names, replaced, strict=True)}
             logical_rows.append(tuple(final_row[name] for name in output_names))
+            mapped_cells.append(bytes(name in mapped_fields for name in output_names))
             for name in output_names:
                 origin_counts[origins[name]] += 1
             for reference, spec in generation_specs.items():
@@ -470,7 +478,8 @@ def replace_csv_snapshot(
             retention = replace(retention, status="unavailable", unchanged_cells=None, unchanged_percent=None)
         provenance = provenance_summary(origin_counts["replacement"], origin_counts["synthetic"],
                                         origin_counts["original"], dropped_cells)
-        return CsvTransformationResult(output.getvalue(), retention, output_names, tuple(logical_rows), provenance)
+        return CsvTransformationResult(output.getvalue(), retention, output_names,
+            tuple(logical_rows), provenance, tuple(mapped_cells))
     except TransformationLimitError:
         raise
     except (OSError, ValueError, TypeError, ArithmeticError, AttributeError, KeyError, IndexError, StopIteration, csv.Error):

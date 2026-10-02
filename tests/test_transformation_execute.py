@@ -55,6 +55,44 @@ def execute(material, limit=8192):
         max_review_bytes=4096, max_output_bytes=limit, budget=GenerationBudget(5)).csv_bytes
 
 
+@pytest.mark.parametrize("action", ["substitute", "replace_text"])
+@pytest.mark.parametrize("sensitivity", ["sensitive", "unknown", "non_sensitive"])
+def test_explicit_mapping_permutation_has_one_contract_and_field_note(action, sensitivity):
+    import json
+    source = SnapshotPart("source", "items", b"full_name\nAster Vale\nBirch Cove\n")
+    profile = _profile_transformation_csv(source, null_token=None,
+        budget=GenerationBudget(5), max_bytes=8192)
+    behavior = {"action": action}
+    external = ()
+    extra = {}
+    if action == "substitute":
+        behavior["mapping"] = {"kind": "inline", "entries": [
+            {"original": ["Aster Vale"], "replacement": ["Birch Cove"]},
+            {"original": ["Birch Cove"], "replacement": ["Aster Vale"]}]}
+    else:
+        extra["file_text_mapping"] = {"kind": "csv", "path": "names.csv",
+            "source_columns": ["old"], "replacement_columns": ["new"]}
+        external = (SnapshotPart("mapping", "names.csv",
+            b"old,new\nAster Vale,Birch Cove\nBirch Cove,Aster Vale\n"),)
+    policy = yaml.safe_dump({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": transformation_schema_fingerprint(profile), **extra,
+        "fields": [{"entity": "items", "field": "full_name",
+                    "sensitivity": sensitivity, "behavior": behavior}]}).encode()
+    material = prepare_csv_review_request(policy, source, external,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    review = json.loads(material.review)["fields"][0]
+    assert review["observed_sensitivity"] == "sensitive"
+    assert review["system_comment"]
+    assert "Aster Vale" not in material.review.decode()
+    assert "Birch Cove" not in material.review.decode()
+    assert not review["preserves_original"]
+    result = import_module("test_data_agent.io.transformation_execute").replace_csv_snapshot(
+        material, max_total_bytes=8192, max_review_bytes=4096, max_output_bytes=8192,
+        budget=GenerationBudget(5))
+    assert result.rows == (("Birch Cove",), ("Aster Vale",))
+    assert result.provenance is not None
+
+
 def test_closed_bundle_writer_preserves_existing_output_and_cleans_staging(tmp_path):
     from test_data_agent.io.transformation_publish import _publish_test_bundle
     destination = tmp_path / "output"
@@ -123,10 +161,10 @@ def test_successful_publication_does_not_reopen_staging_for_cleanup(tmp_path, mo
         pytest.fail("cleanup called after successful publication")
 
     original_remove = publisher.remove_tree_if_identity
-    def fail_staging_cleanup(path, identity):
+    def fail_staging_cleanup(path, identity, *, strict=False):
         if path != tmp_path / "output":
             fail_cleanup(path)
-        return original_remove(path, identity)
+        return original_remove(path, identity, strict=strict)
     monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_staging_cleanup)
     destination = tmp_path / "output"
     summary = publisher._publish_reviewed_test_snapshot(request(), destination,
@@ -134,6 +172,30 @@ def test_successful_publication_does_not_reopen_staging_for_cleanup(tmp_path, mo
         budget=GenerationBudget(5))
     assert summary["origin"] == "transformed_mixed"
     assert (destination / "dataset.csv").read_bytes() == execute(request())
+
+
+def test_publication_identity_mismatch_warns_without_deleting_replacement(tmp_path, monkeypatch):
+    from test_data_agent.io import transformation_publish as publisher
+    moved = tmp_path / "fictional-moved-owned"
+    replaced = []
+
+    def replace_staging_then_fail(staging, destination):
+        staging.rename(moved)
+        staging.mkdir()
+        (staging / "keep.txt").write_text("fictional-unrelated-file")
+        replaced.append(staging)
+        raise OSError("fictional-private-publish-marker")
+
+    monkeypatch.setattr(publisher, "publish_directory", replace_staging_then_fail)
+    with pytest.raises(publisher.TransformationCleanupError) as caught:
+        publisher._publish_test_bundle(tmp_path / "output", "dataset.csv",
+            b"label\nfictional\n", b'{"origin":"transformed_mixed"}',
+            GenerationBudget(5), max_output_bytes=8192)
+    assert "cleanup incomplete" in str(caught.value)
+    assert "fictional-private" not in str(caught.value)
+    assert caught.value.__context__ is None
+    assert (replaced[0] / "keep.txt").read_text() == "fictional-unrelated-file"
+    assert (moved / "dataset.csv").read_bytes() == b"label\nfictional\n"
 
 
 def test_failed_rollback_has_distinct_value_free_retained_output_error(tmp_path, monkeypatch):
@@ -146,7 +208,7 @@ def test_failed_rollback_has_distinct_value_free_retained_output_error(tmp_path,
             raise OSError("fictional-private-fsync-marker")
         return original_fsync(fd)
 
-    def fail_rollback(path, identity):
+    def fail_rollback(path, identity, *, strict=False):
         raise OSError("fictional-private-rollback-marker")
 
     monkeypatch.setattr(path_policy.os, "fsync", fail_after_rename)
@@ -171,10 +233,10 @@ def test_staging_lookup_failure_is_not_silently_discarded(tmp_path, monkeypatch,
     def fail_write(path, payload):
         raise OSError("fictional-private-write-marker")
 
-    def fail_staging_lookup(path, identity):
+    def fail_staging_lookup(path, identity, *, strict=False):
         if path != destination:
             raise ValueError("fictional-private-lookup-marker")
-        return original_remove(path, identity)
+        return original_remove(path, identity, strict=strict)
 
     monkeypatch.setattr(publisher, "atomic_write_bytes", fail_write)
     monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_staging_lookup)
@@ -617,12 +679,6 @@ def test_explicit_native_text_format_and_row_reuse(target, sensitivity):
     parsed = load_behavior_policy_yaml(yaml.safe_dump(policy).encode(), max_bytes=8192, budget=GenerationBudget(5))
     profile = _profile_transformation_source(source, parsed, budget=GenerationBudget(5), max_bytes=8192)
     policy["schema_fingerprint"] = transformation_schema_fingerprint(profile)
-    if sensitivity == "sensitive" and target == "1.250":
-        with pytest.raises(TransformationSourceError):
-            prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
-                (SnapshotPart("mapping", "map.csv", b"old,new\n1.25,1.250\n"),),
-                max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
-        return
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source,
         (SnapshotPart("mapping", "map.csv", f"old,new\n1.25,{target}\n".encode()),),
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
@@ -1506,8 +1562,12 @@ def test_closed_csv_trace_keeps_source_column_ordinals_after_drop():
 
 @pytest.mark.parametrize("case", ["unmatched", "tampered", "budget", "pii"])
 def test_closed_csv_fails_without_returning_partial_output(case):
-    material = request(target="fictional@example.com" if case == "pii" else "second",
+    material = request(target="fictional@example.invalid" if case == "pii" else "second",
                        complete=case != "unmatched")
+    if case == "pii":
+        assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
+            ["flag", "code"], ["no", "1"], ["yes", "fictional@example.invalid"]]
+        return
     if case == "tampered":
         material = replace(material, parts=tuple(
             replace(part, payload=b"flag,code\ntrue,001\n")
@@ -1840,7 +1900,7 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
     original = request(source_bytes=b"flag,code\ntrue,alpha\nfalse,beta\n")
     source = next(part for part in original.parts if part.kind == "source")
     policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
-    target = "fictional@example.com" if case == "pii" else "second"
+    target = "fictional@example.invalid" if case == "pii" else "second"
     pairs = [("alpha", "first")]
     if case != "unmatched":
         pairs.append(("beta", target))
@@ -1857,8 +1917,8 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
         parts.append(SnapshotPart("mapping", "pairs.csv", payload.getvalue().encode()))
     policy["fields"][1]["behavior"] = {"action": "substitute", "mapping": mapping}
     material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, tuple(parts),
-        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
-    if case != "valid":
+            max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    if case == "unmatched":
         module = import_module("test_data_agent.io.transformation_execute")
         with pytest.raises(module.TransformationExecutionError) as caught:
             execute(material)
@@ -1866,7 +1926,7 @@ def test_string_substitute_inline_and_csv_have_same_result(kind, case):
         assert caught.value.__context__ is None
         return
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
-        ["flag", "code"], ["no", "first"], ["yes", "second"]]
+        ["flag", "code"], ["no", "first"], ["yes", target]]
 
 
 @pytest.mark.parametrize("missing", [False, True])

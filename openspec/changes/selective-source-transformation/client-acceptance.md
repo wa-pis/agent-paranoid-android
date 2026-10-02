@@ -1,5 +1,27 @@
 # Client Feedback And Acceptance Plan
 
+## Amended replacement acceptance — 2026-10-02
+
+Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
+defines one explicit replacement contract for all fields. Sensitive-source
+membership and permutations are permitted for actual mapped output cells;
+review retains a value-free sensitivity note. Direct preservation and its
+fallback still require the existing local receipt. Source-free generation and
+CLI/MCP summaries must not disclose mapping literals or source values.
+
+Historical [ActivationSafety-R2](activation-safety-r2.md) remains evidence for
+343305e, not approval of the amended candidate. R2-1's membership prohibition
+is superseded by the owner decision. R2-2/3/4 have candidate fixes and focused
+executable coverage, but require independent review on the finished new SHA.
+The affected six-file suite passed 373 tests; this does not replace installed
+interface acceptance, final release gates, or remaining client bug acceptance.
+The original sensitive synthetic-identifier/validator disagreement now has a
+candidate shared-validator fix: only exact numeric `synthetic_` tokens on
+identifier fields are recognized, while non-identifier semantic checks and
+arbitrary-prefix negatives remain. Focused identifier/safety tests passed 48
+cases. Installed client acceptance and independent exact-SHA review remain open.
+
+
 ## Private workload evidence — 2026-09-29
 
 The installed fictional PostgreSQL-result worker → saved-policy review → CSV

@@ -14,7 +14,6 @@ from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_COLUMNS, DEFAULT_MAX_INPUT_FILE_BYTES,
     GenerationBudget,
 )
-from test_data_agent.core.privacy import is_sensitive_field
 from test_data_agent.core.transformation_csv import (
     TextTraceEvent, TextTraceSummary, compile_text_replacement_table, match_scoped_text,
     summarize_text_trace, text_trace_event,
@@ -28,7 +27,7 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, _profile_csv_rows, profile_csv_bytes, validate_csv_headers
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
-from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
+from test_data_agent.io.transformation_input import source_reader, matching_text
 from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationLimitError, resolve_input_limit
 from test_data_agent.csv_profiler import CSVColumnAccumulator, CSVProfile
 from test_data_agent.io.path_policy import open_regular_file
@@ -126,7 +125,6 @@ def prepare_csv_review_request(
             policy_yaml, evidence_json, (source, *referenced_parts),
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes, budget=budget,
         )
-        reject_sensitive_text_reuse(policy_yaml, profile, source, referenced_parts, budget=budget)
         return request
     except TransformationLimitError:
         raise
@@ -301,75 +299,6 @@ def trace_csv_review_request(
         raise TransformationSourceError("invalid transformation trace") from None
 
 
-def reject_sensitive_text_reuse(
-    policy_yaml: bytes, profile: DatasetProfile, source: SnapshotPart,
-    referenced_parts: Sequence[SnapshotPart], *, budget: GenerationBudget,
-) -> None:
-    """Reject reachable sensitive replacements found in the fixed source bytes."""
-    try:
-        policy = load_behavior_policy_yaml(policy_yaml, max_bytes=len(policy_yaml), budget=budget)
-        decisions = [item for item in policy.fields if isinstance(item.behavior, ReplaceTextAction)]
-        if not decisions:
-            return
-        if any(item.entity != source.name for item in decisions):
-            raise ValueError
-        fields = {field.name: field for entity in profile.entities if entity.name == source.name
-                  for field in entity.fields}
-        declarations = {(item.entity, item.field): item for item in policy.fields}
-        sensitive_source_columns = {name for name, field in fields.items() if (
-            declarations[(source.name, name)].sensitivity != "non_sensitive" or field.sensitive
-            or is_sensitive_field(field.name, field.semantic_type)
-        )}
-        sensitive = [item for item in decisions if (
-            item.field in sensitive_source_columns
-        )]
-        if not sensitive:
-            return
-        mapping_bytes = {part.name: part.payload for part in referenced_parts if part.kind == "mapping"}
-        file_table = (compile_text_replacement_table(
-            mapping_bytes[policy.file_text_mapping.path], policy.file_text_mapping, budget=budget,
-        ) if policy.file_text_mapping is not None else None)
-        column_tables = {}
-        for item in sensitive:
-            action = item.behavior
-            if isinstance(action, ReplaceTextAction) and action.mapping is not None:
-                column_tables[item.field] = compile_text_replacement_table(
-                    mapping_bytes[action.mapping.path], action.mapping, budget=budget,
-                )
-        names = tuple(fields)
-        active: dict[str, set[str]] = {item.field: set() for item in sensitive}
-        reader = source_reader(source, policy, budget=budget)
-        normalized = validate_csv_headers(reader.fieldnames)
-        if tuple(normalized) != names:
-            raise ValueError
-        reader.fieldnames = normalized
-        for row in reader:
-            budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
-                raise ValueError
-            for item in sensitive:
-                match = (match_scoped_text(matching_text(policy, item.field, row[item.field]), item.field, file_table, column_tables) if row[item.field] is not None else None)
-                if match is not None:
-                    active[item.field].add(match.replacement)
-        if not any(active.values()):
-            return
-        active_replacements = {value for replacements in active.values() for value in replacements}
-        reader = source_reader(source, policy, budget=budget)
-        normalized = validate_csv_headers(reader.fieldnames)
-        if tuple(normalized) != names:
-            raise ValueError
-        reader.fieldnames = normalized
-        for row in reader:
-            budget.check("sensitive text replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
-                raise ValueError
-            if any(same_native_value(row[field], replacement)
-                   for field in sensitive_source_columns for replacement in active_replacements):
-                raise ValueError
-    except TransformationLimitError:
-        raise
-    except (OSError, ValueError, TypeError, AttributeError, csv.Error, KeyError):
-        raise TransformationSourceError("invalid sensitive text replacement") from None
 
 
 def load_csv_source_snapshot(

@@ -65,8 +65,14 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
         try:
             if staging_identity is None:
                 raise ValueError("staging identity not confirmed")
-            remove_tree_if_identity(destination, staging_identity)
-            remove_tree_if_identity(staging, staging_identity)
+            incomplete = False
+            for path in (destination, staging):
+                try:
+                    remove_tree_if_identity(path, staging_identity, strict=True)
+                except (OSError, ValueError):
+                    incomplete = True
+            if incomplete:
+                raise ValueError("cleanup identity or removal not confirmed")
         except (OSError, ValueError):
             try:
                 raise TransformationCleanupError(

@@ -10,6 +10,27 @@ release blockers. ADRs do not activate the private execution path.
 
 ## Owner-confirmed client decisions — 2026-10-02
 
+Owner amendment after independent review R2-1: explicit `substitute` and
+`replace_text` mappings use one contract for all fields. A replacement may equal
+another source value, including a sensitive value; mapped permutations are
+allowed. Source-membership alone is not a preservation action or rejection
+reason. Effective sensitivity remains a bounded value-free field note in review.
+This supersedes the earlier reachable sensitive-source reuse prohibition below,
+not direct `preserve`, preserve fallback or DECIMAL-preservation restrictions.
+Typed matching, mapping scope/duplicate/identity-pair checks, exact-byte binding,
+budgets and source-free generation are unchanged. It grants no raw values in
+logs/errors/profiles/review/MCP/providers and no live data access. ADR-0029 records
+the successor decision; implementation and exact-SHA independent review remain
+required before public activation.
+
+Private execution tracks which cells actually applied an explicit mapping,
+separately from aggregate provenance. Only those cells use the unified mapping
+contract through CSV and typed SQL/Parquet normalization; synthesised, derived
+and preserved cells retain existing output content checks. Missing or malformed
+private mapped-cell evidence does not grant this exception. It is never a user
+flag, profile field, manifest field or MCP authorization input. Review/transport
+remain value-free; matching and output type/null/budget validation stay mandatory.
+
 Finding 21: support every authentication method provided by the selected Trino
 Python driver, not a guessed subset or arbitrary authentication callbacks.
 Inventory the actual dependency and optional requirements before implementation.
@@ -287,14 +308,10 @@ value-free trace support this precedence; public output execution remains
 unavailable. The value-free review reports whether file and
 column rules are configured, without showing their literals. No cascade or
 implicit two-step replacement is permitted.
-For a field declared sensitive or unknown, or with positive sensitivity
-evidence, local CSV review and receipt verification check only replacements
-reachable from the fixed source bytes. A reachable right-hand literal must
-not equal an original value in any sensitive/unknown column of that same
-snapshot. This comparison uses the same CSV decoding/dialect as profiling,
-does not persist raw source values, and fails with a value-free error. An
-explicitly reviewed non-sensitive column is not blanket-banned from ordinary
-text substitutions, though execution still needs its separate safety gate.
+For all fields, a reachable mapped replacement may equal another source value.
+Sensitivity is a value-free field note, not a source-membership ban (owner
+amendment 2026-10-02 / ADR-0029). Ordinary mapping validation and execution gates
+remain; this does not authorize an implicit preserve fallback.
 
 Debugging is local and opt-in. A bounded dry-run/trace may report source row
 ordinal, column ordinal, rule scope (file or column), mapping-rule ordinal
@@ -521,8 +538,11 @@ activation gates still apply.
 Execution consumes revalidated fixed input bytes, never reopened source paths.
 Preservation requires the existing local receipt verifier, including exact-byte
 binding and owner-only regular-file checks; a policy authorization reference
-alone is insufficient. The engine does not mint receipts. Whole-row copying
-and recognizable sensitive output remain rejected.
+alone is insufficient. The engine does not mint receipts. Implicit whole-row
+copying remains rejected. Under ADR-0029, an actually applied explicit mapping
+may produce recognizable sensitive content or another source value in the local
+mixed-origin artifact; other cells retain their content checks. No values enter
+the manifest, review, errors, summaries, providers or MCP responses.
 
 The private result carries restricted UTF-8 comma CSV bytes (omitted from repr)
 and a value-free retention summary. Input decoding/dialect is shared with

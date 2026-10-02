@@ -1,5 +1,20 @@
 # Tasks: selective-source-transformation
 
+## Owner-approved uniform mapping amendment — 2026-10-02
+
+- [x] Record explicit owner decision and successor ADR-0029; source membership
+  is not a mapping rejection, sensitivity is a value-free field note.
+- [x] Remove text-only membership preflight without removing source/evidence
+  canonicalization, direct preserve restrictions or receipt verification.
+- [x] Track actually mapped cells through private CSV/SQL/Parquet execution;
+  retain checks for synthesis/derive/preserve and malformed/absent evidence.
+- [x] Add fictional mapping permutation/readback tests and candidate R2-2/3/4
+  fixes with focused Parquet deadline/sensitivity and identity-cleanup tests.
+- [ ] Finish baseline/activation amendments and complete installed candidate
+  acceptance for the changed contract without claiming private/live data passed.
+- [ ] Independently review finished exact changed SHA before public activation;
+  final RC version review, GitHub checks and release remain separate gates.
+
 ## Owner-approved capacity and actionable limits — 2026-09-28
 
 - [x] Private replacement-only CSV installed-wheel acceptance300,000 x50:

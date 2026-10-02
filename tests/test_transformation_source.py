@@ -179,15 +179,15 @@ def test_csv_review_trace_combines_file_and_column_rules_without_values():
 
 
 @pytest.mark.parametrize("source_bytes,sensitivity,field,blocked", [
-    (b"status\nA\nB\n", "sensitive", "status", True),
-    (b"status\nA\nB\n", "unknown", "status", True),
+    (b"status\nA\nB\n", "sensitive", "status", False),
+    (b"status\nA\nB\n", "unknown", "status", False),
     (b"status\nA\nB\n", "non_sensitive", "status", False),
     (b"status\nA\n", "sensitive", "status", False),
     (b" status \nA\n", "sensitive", "status", False),
-    (b"status;other\nA;x\nB;y\n", "sensitive", "status", True),
-    (b"email\nA\nB\n", "non_sensitive", "email", True),
+    (b"status;other\nA;x\nB;y\n", "sensitive", "status", False),
+    (b"email\nA\nB\n", "non_sensitive", "email", False),
 ])
-def test_sensitive_text_review_rejects_only_reachable_source_value_reuse(
+def test_text_review_allows_mapped_source_membership_for_all_sensitivities(
     source_bytes, sensitivity, field, blocked,
 ):
     source = SnapshotPart("source", "items", source_bytes)
@@ -221,7 +221,7 @@ def test_sensitive_text_review_rejects_only_reachable_source_value_reuse(
                                           max_review_bytes=4096, budget=GenerationBudget(5)) == request
 
 
-@pytest.mark.parametrize("other_sensitivity,blocked", [("sensitive", True), ("non_sensitive", False)])
+@pytest.mark.parametrize("other_sensitivity,blocked", [("sensitive", False), ("non_sensitive", False)])
 def test_sensitive_text_review_checks_other_sensitive_source_columns(other_sensitivity, blocked):
     source = SnapshotPart("source", "items", b"status,other\nA,X\nB,Y\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(
@@ -246,7 +246,7 @@ def test_sensitive_text_review_checks_other_sensitive_source_columns(other_sensi
                                           max_review_bytes=4096, budget=GenerationBudget(5)).snapshot_sha256
 
 
-@pytest.mark.parametrize("column_target,blocked", [("B", True), ("synthetic-C", False)])
+@pytest.mark.parametrize("column_target,blocked", [("B", False), ("synthetic-C", False)])
 def test_sensitive_review_checks_selected_column_override(column_target, blocked):
     source = SnapshotPart("source", "items", b"status\nA\nB\n")
     profile = csv_profile_to_dataset_profile(profile_csv_bytes(

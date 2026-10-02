@@ -1,5 +1,18 @@
 # Proposed Implementation Milestones
 
+## Owner amendment after safety review — 2026-10-02
+
+ADR-0029 governs explicit replacements uniformly for every field. Source-value
+membership and mapped permutations are permitted even for sensitive fields;
+effective sensitivity remains a value-free field note. Direct preserve/fallback,
+DECIMAL preserve, source-free generation and transport disclosures are unchanged.
+R2-1's former membership prohibition is superseded, not silently marked fixed.
+R2-2/3/4 have private candidate fixes and focused evidence in progress.md; obtain
+independent changed-scope review on the finished new immutable activation SHA.
+Do not reuse 343305e approval (none exists), alter the historical R2 report, or
+activate registrations from passing private checks alone. Finish remaining client
+bugs and full RC acceptance; this amendment does not make the RC ready.
+
 ## Owner-approved capacity priority — 2026-09-28
 
 Target 1,000,000 rows x100 columns; mandatory fictional acceptance 300,000 x50.

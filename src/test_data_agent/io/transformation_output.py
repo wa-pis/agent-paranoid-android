@@ -23,11 +23,16 @@ def normalized_output_rows(result: CsvTransformationResult, output: TypedOutput,
             or len(set(result.columns)) != len(result.columns)
             or any(looks_sensitive_value(name) for name in result.columns)):
         raise ValueError("invalid typed output schema")
-    def literals(row: tuple[str | int | float | Decimal | date | None, ...], indices: tuple[int, ...] | None = None) -> tuple[list[str], list[Any]]:
+    if result.mapped_cells and (len(result.mapped_cells) != len(result.rows)
+            or any(type(mask) is not bytes or len(mask) != len(result.columns)
+                   or any(flag not in (0, 1) for flag in mask) for mask in result.mapped_cells)):
+        raise ValueError("invalid mapped-cell execution evidence")
+    def literals(row: tuple[str | int | float | Decimal | date | None, ...], indices: tuple[int, ...] | None = None,
+                 *, mapped: bytes = b"", check_sensitive: bool = True) -> tuple[list[str], list[Any]]:
         values = []
         logical = []
         fields = output.fields if indices is None else tuple(output.fields[index] for index in indices)
-        for value, item in zip(row, fields, strict=True):
+        for column, (value, item) in enumerate(zip(row, fields, strict=True)):
             budget.check("transformation SQL cell")
             if value is None and not item.nullable:
                 raise ValueError("null in required SQL output field")
@@ -53,13 +58,14 @@ def normalized_output_rows(result: CsvTransformationResult, output: TypedOutput,
                 encoded_value = float(literal)
             elif value is not None and item.type == "boolean":
                 encoded_value = literal == "TRUE"
-            if encoded_value is not None and looks_sensitive_value(str(encoded_value)):
+            if (check_sensitive and not (mapped and mapped[column])
+                    and encoded_value is not None and looks_sensitive_value(str(encoded_value))):
                 raise ValueError("sensitive normalized SQL output")
             logical.append(encoded_value)
         return values, logical
 
-    for row in result.rows:
-        values, logical = literals(row)
+    for row_index, row in enumerate(result.rows):
+        values, logical = literals(row, mapped=result.mapped_cells[row_index] if result.mapped_cells else b"")
         if source_rows is not None:
             original = next(source_rows, None)
             if original is None:
@@ -67,7 +73,8 @@ def normalized_output_rows(result: CsvTransformationResult, output: TypedOutput,
             changed = False
             for index, (source_value, final_value) in enumerate(zip(original, logical, strict=True)):
                 try:
-                    _, original_values = literals((source_value,), (index,))
+                    # Comparing fixed source values is not publication authority.
+                    _, original_values = literals((source_value,), (index,), check_sensitive=False)
                 except (ValueError, ArithmeticError):
                     continue  # Unknown comparison is not evidence that this row changed.
                 changed |= original_values[0] != final_value

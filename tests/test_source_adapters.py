@@ -259,6 +259,32 @@ def test_parquet_sensitivity_rejects_oversized_cells_without_value_disclosure(
     assert value not in str(caught.value)
 
 
+@pytest.mark.parametrize("value", [999001234, b"fictional.person@example.invalid", b"\xff\xfe"])
+def test_parquet_native_sensitivity_is_not_assumed_safe(tmp_path: Path, value) -> None:
+    path = tmp_path / "fictional-native.parquet"
+    pq.write_table(pa.table({"note": [value]}), path)
+    profile = dataset_profile_from_parquet(path)
+    assert profile.entity("fictional-native").field("note").sensitive
+    assert str(value) not in profile.model_dump_json()
+
+
+def test_parquet_inspection_uses_local_deadline(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from test_data_agent.adapters.parquet_dataset import _parquet_sensitive_columns
+    from test_data_agent.profiling.budget import LocalProfileBudget, LocalProfileLimitError
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SECONDS", "1")
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_GENERATION_SECONDS", "300")
+    ticks = iter([0.0, 0.0, 2.0])
+    budget = LocalProfileBudget(clock=lambda: next(ticks))
+    assert budget.limits.max_seconds == 1
+    path = tmp_path / "fictional-deadline.parquet"
+    pq.write_table(pa.table({"note": ["fictional"]}), path)
+    with pytest.raises(LocalProfileLimitError) as caught:
+        _parquet_sensitive_columns(pq.ParquetFile(path), budget=budget)
+    assert caught.value.limit == 1
+    assert caught.value.attempted == 2
+    assert "fictional" not in str(caught.value)
+
+
 def test_parquet_adapter_rejects_row_count_before_reading_data(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

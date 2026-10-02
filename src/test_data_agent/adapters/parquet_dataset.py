@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 from pathlib import Path
+from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
-    GenerationBudget, InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
+    InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
     max_input_cell_chars, max_parquet_expanded_bytes,
 )
 from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, csv_profile_to_dataset_spec
+from test_data_agent.profiling.budget import LocalProfileBudget
 
 
 def parquet_file_to_dataset_profile(path: Path, table_name: str | None = None) -> DatasetProfile:
@@ -55,6 +57,8 @@ def dataset_spec_from_parquet(
 
 
 def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) -> CSVProfile:
+    budget = LocalProfileBudget()
+    budget.check_deadline("Parquet profiling preflight")
     try:
         import pyarrow.parquet as pq
     except ImportError as exc:  # pragma: no cover - optional dependency guard
@@ -65,9 +69,10 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
     enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
     arrow_schema = parquet_file.schema_arrow
     row_count = parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0
-    sensitive = _parquet_sensitive_columns(parquet_file)
+    sensitive = _parquet_sensitive_columns(parquet_file, budget=budget)
     columns = []
     for index, field in enumerate(arrow_schema):
+        budget.check_deadline("Parquet field metadata")
         null_count = _parquet_null_count(parquet_file.metadata, index, field.name)
         columns.append(CSVColumnProfile(
             name=field.name,
@@ -81,6 +86,7 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
             approx_distinct_count=None,
             sensitive=sensitive[index],
         ))
+    budget.check_deadline("Parquet profile complete")
     return CSVProfile(
         source_type="parquet",
         table=table_name or path.stem,
@@ -89,28 +95,30 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
     )
 
 
-def _parquet_sensitive_columns(parquet_file: Any) -> list[bool]:
+def _parquet_sensitive_columns(parquet_file: Any, *, budget: LocalProfileBudget | None = None) -> list[bool]:
     """Inspect bounded local values; retain only sensitivity flags, never rows."""
     flags = [infer_sensitive_from_name(field.name) for field in parquet_file.schema_arrow]
-    budget = GenerationBudget()
+    budget = budget or LocalProfileBudget()
     expanded_limit = max_parquet_expanded_bytes()
     char_limit = max_input_cell_chars()
     expanded = 0
     for batch in parquet_file.iter_batches(batch_size=256):
-        budget.check("Parquet sensitivity inspection")
+        budget.check_deadline("Parquet sensitivity inspection")
         expanded += batch.nbytes
         if expanded > expanded_limit:
             raise InputLimitError("Parquet sensitivity inspection exceeded expanded byte budget")
         for index, column in enumerate(batch.columns):
             for scalar in column:
-                budget.check("Parquet sensitivity inspection")
+                budget.check_deadline("Parquet sensitivity inspection")
                 value = scalar.as_py()
                 if isinstance(value, (str, bytes)) and len(value) > char_limit:
                     raise InputLimitError("Parquet sensitivity inspection exceeded cell size budget")
-                # Composite content is unsupported evidence, not proof of safety.
-                if isinstance(value, (list, tuple, dict)) or infer_sensitive_value_type(value):
+                # This representation is inspection-only, never native matching.
+                evidence = str(value) if type(value) in (int, float, Decimal) else value
+                # Binary/composite content is unsupported evidence, not proof of safety.
+                if isinstance(value, (bytes, list, tuple, dict)) or infer_sensitive_value_type(evidence):
                     flags[index] = True
-    budget.check("Parquet sensitivity inspection")
+    budget.check_deadline("Parquet sensitivity inspection")
     return flags
 
 

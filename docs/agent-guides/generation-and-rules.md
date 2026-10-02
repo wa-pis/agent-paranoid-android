@@ -60,6 +60,11 @@ Only the count is carried forward, never source identifiers or row mappings.
 The typed `synthetic_identifier` distribution accepts positive integer `pool_size`;
 without it, identifiers retain their existing per-row generation behavior.
 Pools cycle deterministically and unrelated identifier domains remain disjoint.
+String identifiers retain the exact `synthetic_` plus ASCII integer namespace,
+including when their field has email, phone or SSN semantics. Identifier generation
+takes precedence over semantic formatting. Privacy validation recognizes only that
+exact token on identifier fields, not arbitrary prefixed sensitive text; ordinary
+non-identifier sensitive fields still use their semantic synthetic formats.
 Fewer output rows or nulls can leave some pool members unused. Source frequencies
 are not reproduced, and declared relationship constraints still take precedence.
 Repeated-key pools are not nominated as primary keys; an explicit primary key
