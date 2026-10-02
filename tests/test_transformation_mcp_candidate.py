@@ -81,8 +81,10 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
         "kind": "inline", "entries": [{"original": ["alpha"], "replacement": ["gamma"]}]}}}]})
     if preservation_negative:
         data = policy.model_dump(mode="json")
-        data["fields"][0]["behavior"] = {"action": "preserve",
-            "authorization_ref": "fictional-local", "comment": "Reviewed fictional label"}
+        source = SnapshotPart("source", "items", b"code,label\nfictional-a,alpha\n")
+        data["fields"].insert(0, {"entity": "items", "field": "code", "sensitivity": "non_sensitive",
+            "behavior": {"action": "preserve", "authorization_ref": "fictional-local",
+                         "comment": "Reviewed fictional business code"}})
         policy = BehaviorPolicy.model_validate(data)
     profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
     policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
@@ -147,6 +149,7 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
         rendered = response.model_dump_json()
         assert response.isError == bool(stale)
         assert "alpha" not in rendered and "gamma" not in rendered
+        assert "fictional-a" not in rendered
         assert "fictional-secret-marker" not in rendered
         if stale:
             assert not (tmp_path / "output").exists()

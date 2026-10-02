@@ -34,7 +34,7 @@ def test_closed_prospective_dispatch_requires_review_digest(tmp_path, capsys):
 
     with pytest.raises(SystemExit) as error:
         _candidate_execution_main(["transform-execute", "fictional-secret-marker.csv",
-            "policy.yaml", str(tmp_path / "output")], json_output=True, prospective=True)
+            "policy.yaml", str(tmp_path / "output"), "--json"], prospective=True)
     assert error.value.code == 2
     captured = capsys.readouterr()
     assert json.loads(captured.out)["error"]["code"] == "invalid_arguments"
@@ -290,6 +290,37 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
     assert (tmp_path / "agent-output" / "dataset.csv").read_bytes() == (
         tmp_path / "output" / "dataset.csv").read_bytes()
     assert "fictional-a" not in agent_result.stdout + agent_result.stderr
+    # The same real local receipt must authorize the prospective bounded tool.
+    import asyncio
+    from datetime import timedelta
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+
+    program = (
+        "from test_data_agent.mcp_transformation_candidate import _create_test_candidate_mcp; "
+        "from test_data_agent.mcp_generator_server import _new_transport_work_budget; "
+        "from test_data_agent.mcp_generator_transport import run_bounded_generator_mcp; "
+        "from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS; "
+        "run_bounded_generator_mcp(_create_test_candidate_mcp(prospective=True), "
+        "max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes, "
+        "request_context_factory=_new_transport_work_budget)")
+
+    async def invoke():
+        parameters = StdioServerParameters(command=sys.executable, args=["-c", program],
+            env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
+        async with stdio_client(parameters) as (reader, writer):
+            async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+                await session.initialize()
+                return await session.call_tool("execute_transformation", {
+                    "input_path": "items.csv", "policy_path": "behavior.yaml",
+                    "output_path": "stdio-output", "snapshot_sha256": request.snapshot_sha256,
+                    "receipt_path": "receipt.json", "max_output_bytes": 8192})
+
+    response = asyncio.run(invoke())
+    assert not response.isError
+    assert "fictional-a" not in response.model_dump_json() and "alpha" not in response.model_dump_json()
+    assert (tmp_path / "stdio-output" / "dataset.csv").read_bytes() == (
+        tmp_path / "output" / "dataset.csv").read_bytes()
     receipt_before = receipt.read_bytes()
     for mode in ("existing", "stale", "no_tty"):
         target = receipt if mode == "existing" else tmp_path / f"{mode}.json"

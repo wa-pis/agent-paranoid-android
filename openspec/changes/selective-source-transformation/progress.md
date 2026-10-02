@@ -4957,3 +4957,32 @@ Broader transformation remains unfinished.
   cases pass (1.54s); Ruff for both candidate modules/tests and diff check pass.
   Checkpoint closed prospective parser/dispatch and tool-name composition for
   exact-SHA safety review. This is not production registration or release review.
+- Independent AI safety reviewer PublicationBoundary-R1/Jason resumed read-only
+  review of exact 561f9f8d2523e5ea956a790dbe4c520a73986098 on 2026-10-02 UTC.
+  Scope: closed prospective CLI/MCP composition since 79bdce4, inactive safety
+  amendment, transport/receipt gates and evidence validity; not ordinary commit
+  approval, production activation or final RC review. Prior review completed;
+  no duplicate reviewer. Current branch clean before this tracking entry;
+  GitHub reports no open PR for codex/1-6-execution-activation. No tests/scale
+  replay. Next collect findings into publication-safety-review.md, fix required
+  changed scope, then actual registration gates and exact activation-SHA review.
+- Independent AI review of 561f9f8 completed; identity/scope/findings recorded in
+  publication-safety-review.md. Medium evidence gap: single-field preservation
+  negatives can be satisfied by downstream whole-row-copy rejection, so the
+  earlier claim of isolated receipt-gate evidence is withdrawn. Product bypass
+  not demonstrated. Next use preserve+replacement and real local receipt success
+  through prospective stdio, then negative variants. Low argv-only --json parser
+  discrepancy fixed locally with production argv-selection pattern; revised
+  focused test passes (1, 25 deselected, 0.22s), Ruff passes. Changed scope needs
+  exact new-SHA review after both fixes; no duplicate reviewer, no activation.
+- Medium review gap addressed locally: preservation-negative fixture now uses
+  code preserve plus independent label alpha→gamma replacement, matching the
+  successful real local-TTY receipt scenario. Three revised prospective stdio
+  negatives pass (1.56s); cannot rely on identical whole-row output rejection.
+  Existing real-TTY scenario extended to consume its genuine receipt through
+  prospective bounded execute_transformation stdio; passes with required local
+  access (1, 25 deselected, 2.23s), exact mixed-origin CSV readback and no source
+  values in transport result. No safety monkeypatch or agent issuer. Ruff passes.
+  Ponytail reused existing TTY fixture rather than a second approval harness.
+  Next commit both review fixes/evidence, obtain narrow changed-scope independent
+  review at new exact SHA, then production registration gates. Not activated.

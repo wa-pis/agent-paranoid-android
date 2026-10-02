@@ -84,7 +84,7 @@ def _candidate_execution_main(argv: list[str], *, json_output: bool = False,
     args = argparse.Namespace(command="closed-transform-execute", json_output=json_output)
     try:
         if prospective:
-            args = _create_test_execution_parser(json_errors=json_output).parse_args(argv)
+            args = _create_test_execution_parser(json_errors=json_output or "--json" in argv).parse_args(argv)
             args.json_output = args.json_output or json_output
             result = _execute_candidate_namespace(args)
         else:

@@ -169,3 +169,45 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
 - Static inspection, no repeated code review/tests/writes. Public action/route
   enforcement, installed registration evidence and activation-SHA review remain
   pending. No human approval, activation or final RC authority.
+
+### Closed prospective composition review
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason
+  (`01a0f8f6-5e7e-7b81-a337-b2476bf458f5`), not implementation author.
+- UTC date: 2026-10-02; exact SHA
+  `561f9f8d2523e5ea956a790dbe4c520a73986098`, compared with `79bdce4`.
+- Scope: closed prospective CLI/MCP composition, inactive safety amendment,
+  supporting authority/transport/budget code and focused tests.
+- Medium: preservation negatives preserve the only field. Downstream whole-row
+  copy rejection could hide a receipt-enforcement regression. Canonical-request
+  validation does not isolate that gate. Disposition: open evidence gap, not a
+  demonstrated product bypass. Use preservation plus independent replacement,
+  valid local receipt success through prospective stdio and negative variants.
+- Low: argv-only --json does not select prospective parser JSON errors; existing
+  test forced the Python json_output argument. Disposition: fixed locally after
+  review using the existing production argv selection pattern; focused argv-only
+  test pending evidence below/in progress. Changed-SHA review still required.
+- Static tracing found no new receipt-authority/source-disclosure bypass; no
+  issuer registered, fresh wrapper naming retains audited/redacted bounded
+  transport and request budgeting. Prior findings remain closed.
+- Checks: read-only Git revision/diff and static tracing; reviewer ran no tests,
+  lint, scaling or workflows. Inspected AGENTS, safety-boundary, this evidence,
+  progress and prior installed acceptance/routes logs. Prior installed evidence
+  predates prospective composition. Source evidence: candidate modules and
+  tests at exact SHA above, especially MCP test preservation fixture and
+  transformation_execute.py whole-row-copy guard.
+- No human approval, public activation or final RC authority. Resolve gaps,
+  obtain actual installed registration evidence, exact activation-SHA review
+  and mandatory GitHub protections before activation/release.
+
+### Author remediation evidence (not independent closure)
+
+- Low JSON finding: argv-only --json selects prospective parser errors using
+  the production argv pattern. Revised focused test: 1 passed, 0.22s.
+- Medium fixture finding: negatives now preserve code and independently replace
+  label alpha→gamma; 3 passed, 1.56s. Existing real controlling-TTY scenario
+  additionally consumes its genuine local receipt through prospective bounded
+  execute_transformation stdio: 1 passed, 2.23s with required local TTY access,
+  exact mixed-origin readback and value-free response. No safety monkeypatch.
+- Ruff passed for changed tests. Independent changed-SHA closure still pending;
+  no activation or final release acceptance implied.
