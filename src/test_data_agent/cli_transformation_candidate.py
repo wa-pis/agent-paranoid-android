@@ -108,6 +108,11 @@ def _run_candidate_local_approval(argv: list[str]) -> dict[str, object]:
     parser.add_argument("--table")
     parser.add_argument("--max-total-input-bytes", type=int)
     args = parser.parse_args(argv)
+    return _approve_candidate_namespace(args)
+
+
+def _approve_candidate_namespace(args: argparse.Namespace) -> dict[str, object]:
+    """Shared local-only approval dispatch; controlling-TTY enforcement unchanged."""
     budget = GenerationBudget()
     request = prepare_csv_review_from_paths(args.source, args.table or args.source.stem,
         args.policy.parent.absolute(), args.policy.name, max_total_bytes=args.max_total_input_bytes,

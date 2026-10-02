@@ -211,3 +211,24 @@ lookup failures with sanitized diagnostics. Follow-up disposition pending.
   exact mixed-origin readback and value-free response. No safety monkeypatch.
 - Ruff passed for changed tests. Independent changed-SHA closure still pending;
   no activation or final release acceptance implied.
+
+### Independent remediation closure
+
+- Independent AI reviewer: PublicationBoundary-R1/Jason
+  (`01a0f8f6-5e7e-7b81-a337-b2476bf458f5`), UTC 2026-10-02.
+- Exact SHA: `a2ae7b0341c80db413d238176e420ffdb2ddba7a`; scope: two findings'
+  corrections versus `561f9f8`, associated tests and committed evidence.
+- Low argv-only JSON finding closed: parser error mode selected before parsing;
+  regression no longer forces Python json_output.
+- Medium preservation evidence gap closed: code preservation plus independent
+  label replacement removes identical whole-row rejection as the alternative
+  explanation; genuine controlling-TTY receipt succeeds through the same
+  prospective bounded stdio composition with mixed-origin readback and
+  value-free response. No changed-scope regression or safety monkeypatch found.
+- Checks: independent read-only revision/diff and static inspection of clean
+  scoped files. Author executions (1/0.22s, 3/1.56s, TTY 1/2.23s) inspected in
+  committed evidence, not independently reproduced. No tests, writes, scaling,
+  DB/API access or registration by reviewer.
+- Prior closures unchanged. Actual installed production registration evidence,
+  exact-final-activation-SHA review and required GitHub protections still pending.
+  No human approval, activation authority or final RC approval.

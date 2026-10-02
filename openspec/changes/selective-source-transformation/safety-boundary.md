@@ -55,6 +55,36 @@ not an unlimited budget. Output format belongs to the saved policy. Success
 returns digest, provenance counts and output-budget metadata, not dataset rows.
 The closed status `closed_test_completed` is not a public release contract.
 
+#### Concrete registration candidate (still inactive)
+
+The unapplied `activation-registration.patch` proposes `transform-execute`
+and `transform-approve` in the existing CLI dispatcher, and
+`execute_transformation` in the existing bounded generator MCP registry.
+The proposed execution success status is `transformation_completed`, inside
+the existing CLI JSON result envelope or MCP structured result. Existing CLI
+error envelopes retain `error.exit_code`; execution does not invent another
+error schema. `transform-approve` keeps the local terminal review and fresh
+confirmation visible even with `--json`; piped APPROVE cannot authorize it.
+MCP registers only receipt consumption, never an approval operation.
+
+`registered-interface-acceptance.py` is an explicitly invoked acceptance file,
+not normal production registration. It exercises the concrete patch only in
+an isolated copied package on fictional temporary inputs: saved policy, actual
+CLI review, controlling-TTY approval, CLI publication and bounded MCP stdio
+publication. It also rejects missing/forged receipts, agent approval flags,
+workspace escapes, invalid arguments, exhausted/requested budgets, existing
+destinations, stale digests and old receipts after freshly reviewed source or
+inline-mapping byte mutations. The original input bytes, receipt and prior
+publication must survive failures unchanged. This evidence does not establish
+installed-wheel behavior, completed activation review or public availability.
+
+Before applying this candidate to public source, reconcile AGENTS.md and
+baseline/OpenSpec safety contracts, affected CLI/MCP documentation and golden
+inventories; test the installed complete candidate; record independent AI
+safety review of the exact activation SHA. Ordinary source-free commands and
+their disclosure budgets remain unchanged. Release readiness and final RC SHA
+review are additional gates, not implied by interface acceptance.
+
 Malformed CLI arguments use fixed invalid-arguments text and a command help
 hint; rejected tokens are never echoed. MCP typed argument failures use the
 existing fixed validation error. Transformation limit failures retain their

@@ -29,12 +29,16 @@ def test_closed_prospective_parser_has_explicit_execution_and_no_approval():
     assert "transform-approve" not in parser.format_help()
 
 
-def test_closed_prospective_dispatch_requires_review_digest(tmp_path, capsys):
+@pytest.mark.parametrize("failure", ["missing_digest", "invalid_cap"])
+def test_closed_prospective_dispatch_requires_review_digest(tmp_path, capsys, failure):
     from test_data_agent.cli_transformation_candidate import _candidate_execution_main
 
+    arguments = ["transform-execute", "fictional-secret-marker.csv", "policy.yaml",
+                 str(tmp_path / "output"), "--json"]
+    if failure == "invalid_cap":
+        arguments.extend(["--snapshot-sha256", "0" * 64, "--max-output-bytes", "fictional-secret-marker"])
     with pytest.raises(SystemExit) as error:
-        _candidate_execution_main(["transform-execute", "fictional-secret-marker.csv",
-            "policy.yaml", str(tmp_path / "output"), "--json"], prospective=True)
+        _candidate_execution_main(arguments, prospective=True)
     assert error.value.code == 2
     captured = capsys.readouterr()
     assert json.loads(captured.out)["error"]["code"] == "invalid_arguments"

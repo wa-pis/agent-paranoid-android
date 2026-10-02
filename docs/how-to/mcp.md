@@ -67,6 +67,20 @@ The tool writes no artifacts, creates no approval receipt, executes no
 transformation and connects to no database. Public transformation execution
 remains gated; normal generator operations below remain source-free.
 
+The isolated activation candidate additionally registers `execute_transformation`
+with workspace-relative `input_path`, `policy_path`, new `output_path`, mandatory
+`snapshot_sha256`, optional `table_name`/existing `receipt_path`, and optional
+`max_total_input_bytes`/`max_output_bytes` run caps. It consumes the same exact
+snapshots and budgets as CLI execution and returns `transformation_completed`,
+digest, provenance and budget summaries, never dataset rows or mapping literals.
+Preservation requires a matching receipt issued separately by the human local
+controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
+Changed inputs invalidate receipts; workspace escapes, existing destinations,
+unsupported actions and budget violations fail closed without copying fallback.
+This tool is not registered in the public package yet: installed acceptance,
+matching safety/spec documentation and independent exact-SHA safety review remain
+activation gates. A receipt never authorizes database access or external APIs.
+
 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
    and output format.

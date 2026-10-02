@@ -39,6 +39,15 @@ Private implementation review alone SHALL NOT activate registration; matching
 policy amendments, executable interface evidence and exact-SHA independent
 safety review SHALL remain required.
 
+The inactive concrete candidate names the separate workspace consumer
+`execute_transformation`, local CLI consumer `transform-execute` and local
+controlling-terminal issuer `transform-approve`. Execution SHALL require the
+reviewed exact snapshot digest and a matching receipt for preservation. A fresh
+review digest SHALL NOT make an earlier receipt valid after source, policy or
+referenced input mutations. MCP SHALL register no receipt issuer. These named
+candidate interfaces SHALL remain unregistered publicly until the activation
+gates above complete; ordinary generator tools remain source-free.
+
 #### Scenario: Path traversal is attempted
 
 - **GIVEN** a client provides `../`, absolute paths outside the workspace, or

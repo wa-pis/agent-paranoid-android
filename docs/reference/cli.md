@@ -75,6 +75,38 @@ No source-preserving transformation command is available yet. The separate
 local approval and execution gates in the active OpenSpec are not satisfied by
 this read-only review.
 
+### Execution candidate — not publicly enabled
+
+The isolated activation candidate uses the same saved policy and reviewed
+`snapshot_sha256` for `transform-execute SOURCE POLICY DESTINATION
+--snapshot-sha256 SHA`. Output format comes from the policy; destination must
+be a new bundle, never an existing directory or an input file. Success reports
+digest, provenance counts and output-budget metadata, not rows. The candidate
+uses `transformation_completed` inside the existing JSON `result` envelope;
+errors retain the existing `error` envelope and exit code.
+
+Preservation additionally requires a matching restricted local receipt.
+Only `transform-approve SOURCE POLICY RECEIPT --snapshot-sha256 SHA` in a
+controlling terminal may create one after displaying the value-free review
+and receiving fresh `APPROVE`. Piped input, flags and agent approval cannot
+replace this confirmation. `--json` keeps the review/prompt visible on the
+terminal. Execution consumes that receipt with `--receipt RECEIPT`; changing
+source, policy, classification or referenced mapping/generation-policy bytes
+requires review and approval again. Sensitive, unknown or conflicting fields
+remain ineligible for preservation.
+
+Candidate run caps are `--max-total-input-bytes` and `--max-output-bytes`.
+They may lower, not silently raise, effective session/profile limits. A request
+above the ceiling and actual exhaustion are distinct typed failures with safe
+counters and supported recovery keys. Cleanup-incomplete errors require local
+inspection of destination/staging before retry; they do not permit overwrite.
+Database capture and private `derive` are not enabled by this entrance.
+
+These commands are not registered in the public package yet. Isolated fictional
+acceptance is not availability or dataset authorization. Matching safety/spec
+amendments, installed-candidate gates and independent exact-SHA safety review
+must precede activation; ordinary generation stays source-free.
+
 ### Edit Field Decisions Locally
 
 `transform-review SOURCE.csv POLICY.yaml --decide` edits an existing valid

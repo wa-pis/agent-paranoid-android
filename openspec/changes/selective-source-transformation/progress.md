@@ -4986,3 +4986,206 @@ Broader transformation remains unfinished.
   Ponytail reused existing TTY fixture rather than a second approval harness.
   Next commit both review fixes/evidence, obtain narrow changed-scope independent
   review at new exact SHA, then production registration gates. Not activated.
+- Signed remediation checkpoint a2ae7b0341c80db413d238176e420ffdb2ddba7a
+  contains both findings' fixes and evidence. PublicationBoundary-R1/Jason
+  dispatched read-only independent closure review of only changed scope versus
+  561f9f8 on 2026-10-02 UTC; prior review completed, no duplicate. No successful
+  test/scale replay or production registration. Next collect closure/disposition
+  evidence, then complete production activation wiring and installed gates.
+- PublicationBoundary-R1/Jason independently closed both remediation findings
+  at exact a2ae7b0341c80db413d238176e420ffdb2ddba7a, 2026-10-02 UTC, by static
+  changed-scope inspection; no new regression. Full disposition/identity/checks
+  recorded in publication-safety-review.md. Author tests were inspected, not
+  rerun by reviewer; no gate/scale replay. Next connect reviewed shared execution
+  to actual command/tool composition with matching documentation/contracts and
+  installed tests, then exact-final-activation-SHA review before public activation.
+  This closure alone does not activate interfaces or approve final RC.
+- Registration integration audit located actual CLI register_dataset_commands,
+  run_command/run_json_command and generator_mcp_services composition. Existing
+  public parser reflects argparse messages and generic JSON dispatch captures
+  stderr: transformation parser must retain fixed errors; local receipt approval
+  must keep the controlling-TTY prompt visible rather than treating approval as
+  agent-approve or buffered noninteractive output. No registration enabled.
+  Added argv-only --json malformed-cap regression (fictional rejected token),
+  new case passes (1, 26 deselected, 0.22s); unchanged digest case not rerun.
+  Next draft actual registration patch with matching policy/baseline/CLI/MCP
+  docs and installed tests for exact-SHA safety review before public activation.
+- Rebuilt closed candidate wheel after prospective composition/review fixes,
+  installed without dependencies into /private/tmp/apa-reviewed-interfaces.6HB4JM/installed.
+  Wheel SHA256 4961dc261b89c0c43487be8de2355174763adc03ca5ddbc466f180f967c9d646;
+  version remains development 1.5.0, not published RC. Tests use explicit
+  installed PYTHONPATH and disable pytest source pythonpath. New installed
+  prospective gate: 9 passed, 40 deselected, 2.70s. Includes actual bounded
+  stdio preserve negatives and argv-only JSON parsing. This milestone replay is
+  justified by changed composition/receipt evidence; scaling and 12 unchanged
+  routes not rerun. Production registration remains absent. Next record same
+  wheel's TTY gate, then complete actual registration patch and matching docs.
+- Same installed 4961dc26 wheel: genuine local controlling-TTY receipt consumed
+  through prospective bounded MCP stdio passed with required local access
+  (1, 26 deselected, 2.22s). Exact mixed-origin readback; no safety monkeypatch.
+  Closed installed interface milestone totals 10 passes; not actual public
+  registration evidence, full RC acceptance or approval of a real dataset.
+- Draft activation-registration.patch contains the concrete MCP registration
+  delta, not applied: explicit execute_transformation wraps the same workspace
+  executor and enters existing generator_mcp_services audit/transport budgets;
+  no issuer or new data path. Proposed success label transformation_completed
+  replaces the private test label; docs/schema evidence must match before use.
+  Read-only git apply --check passes after correcting draft hunk line count.
+  Public source registry unchanged. This is an incomplete activation artifact,
+  not approved activation: next add CLI execution/local-TTY registration and
+  matching baseline/AGENTS/docs/tests, exercise only an isolated fictional
+  candidate, then exact activation-SHA independent review. No successful gate
+  replay, DB/API access or source disclosure.
+- Unapplied registration delta now includes actual register_dataset_commands
+  and run_dataset_command execution branches, reusing shared argument definition
+  and parsed-namespace executor. CLI result uses existing run_json_command
+  success envelope rather than a second presenter. Read-only apply check passes.
+  This draft deliberately remains incomplete/unapplied: transformation-specific
+  fixed parser errors, local-TTY approval registration/prompt routing, matching
+  safety/docs/golden updates and installed full-composition checks are still
+  required before exact activation review. No public parser/tool change or
+  approval claim. Next finish fixed parser selection and local approval wiring
+  in this same delta, then isolated fictional full-composition acceptance.
+- Unapplied CLI delta selects the existing fixed CandidateArgumentParser for
+  explicit transformation commands (including leading common --json/--debug),
+  preserving ordinary commands' parser class. The chosen subparser factory
+  receives JSON mode before parsing via stdlib partial; no global parser
+  monkeypatch. Read-only git apply --check passes after correcting draft hunk
+  counts/context. Not yet executed as actual composition; do not treat patch
+  applicability as validation. Next complete local-TTY approval namespace and
+  prompt routing in the delta, then isolated full-composition executable tests
+  and matching documentation/activation review. Public registry unchanged.
+- Closed approval parser now delegates to a shared parsed-namespace dispatcher;
+  unchanged controlling-TTY issuer, digest/action/budget checks reused. Changed
+  TTY→receipt→CLI/workspace/prospective stdio scenario passes with required local
+  access (1, 26 deselected, 2.22s); Ruff passes. Unapplied registration delta
+  adds transform-approve parser/dispatch and leaves stderr live under existing
+  JSON success envelope so the local prompt is not buffered. No MCP issuer.
+  Read-only apply check passes after adding adequate hunk context. Next exercise
+  full delta only in an isolated temporary fictional candidate, including
+  parser redaction/JSON/approval failures and real TTY→registered MCP success;
+  complete matching docs/baselines and exact-SHA review before activation.
+- Registration delta materialized with apply_patch only in the isolated copied
+  package /private/tmp/apa-registration-parser.RDaewh/test_data_agent; primary
+  source registries unchanged. First real-composition smoke passed: actual
+  cli.main with leading --json and malformed fictional cap produces fixed
+  invalid_arguments without reflection; root help lists local transform-approve;
+  actual generator MCP registry lists execute_transformation with mandatory
+  digest/optional receipt schema and no approval tool. No source-bearing input,
+  DB/API access or safety monkeypatch. This is parser/schema evidence, not full
+  execution/installed/public activation. Next add durable full-composition
+  acceptance using this isolated candidate for saved profile→review→local TTY
+  receipt→CLI/MCP publication, failures and value-free envelopes, then matching
+  docs/baselines and exact activation-SHA independent review.
+- Durable registered-interface-acceptance.py now exercises saved fictional
+  policy→actual CLI review→actual CLI execution JSON envelope→actual registered
+  bounded generator MCP stdio execution in the isolated copied package. Pass:
+  1 case, 1.19s, exact CLI/MCP CSV readback, same reviewed digest, input/policy
+  bytes unchanged, no source/replacement literals in responses, no MCP issuer.
+  Initial harness invocation assumed a package __main__; corrected to the real
+  cli.main entrypoint without product changes. No monkeypatch, DB/API access,
+  production activation or installed-wheel claim. Next extend this same durable
+  acceptance with actual local-TTY approval→receipt→registered MCP preservation
+  and negative paths, then matching docs/baselines and activation-SHA review.
+- Durable isolated registration acceptance now includes two-field preservation
+  plus replacement: actual cli.main transform-review→transform-approve --json
+  with real controlling TTY/fresh APPROVE→owner-only receipt→actual CLI execution
+  envelope→actual registered bounded MCP stdio execution. New preserve case
+  passes with required local access (1, 1 deselected, 1.43s); exact mixed-origin
+  readback and value-free CLI/MCP response, original input/policy unchanged.
+  Unchanged substitution case not rerun. No issuer/safety monkeypatch, real
+  database/API or public activation. Next add registered negative receipt/drift,
+  workspace/parser/limits/publication checks to this same acceptance and finish
+  matching contracts/docs and exact-SHA review.
+- Same durable isolated registered preserve scenario now rejects eight actual
+  bounded-stdio invocations: missing/forged receipt, agent approved flag, stale
+  SHA, workspace escape, malformed typed input, excessive output request, and
+  existing destination. No new output or reflected fictional marker; genuine
+  receipt and earlier CLI dataset unchanged, then valid MCP publication succeeds.
+  Changed preserve case passes with necessary TTY access (1, 1 deselected, 1.49s).
+  Existing substitution/scaling gates not rerun. No product safety monkeypatch
+  or public registry changes. Next actual CLI negative approval/execution paths
+  and mutation-bound receipt checks, then matching docs/baselines and exact SHA.
+- Registered isolated preserve acceptance now also rejects detached CLI approval
+  even with piped APPROVE, missing-receipt CLI execution and stale-SHA execution.
+  Source and inline-policy mapping byte mutations are separately reviewed to a
+  new digest; the old genuine receipt is rejected by registered MCP even when
+  supplied the new digest. No output, receipt or earlier dataset changes; exact
+  fixture bytes restored, then valid execution succeeds. Changed case passes
+  (1, 1 deselected, 2.67s). Initial test expected a nonexistent status field in
+  the existing CLI error envelope; corrected to error.exit_code, no product fix.
+  Public registries remain unchanged. Next matching activation docs/baselines
+  and installed full-composition gates, then exact-SHA independent safety review.
+- Reconciled the inactive safety-boundary contract with concrete proposed CLI
+  approval/execution and MCP execution registrations, existing JSON envelopes,
+  durable positive/negative acceptance and the remaining installed/docs/golden/
+  exact-SHA review gates. No public registration or policy activation. Read-only
+  GitHub check confirms no open branch PR (sandbox network attempt failed;
+  approved read-only access succeeded); diff whitespace check passes. No unchanged
+  executable gates replayed. Next reconcile affected baseline and interface
+  documentation in the same activation artifact, then installed candidate gates.
+- CLI reference and MCP guide now describe the concrete inactive execution/
+  local approval candidate, exact-byte receipt invalidation, existing JSON
+  envelopes, workspace/new-destination rules, caps and remaining activation
+  gates. Existing public review/source-free behavior remains accurately marked;
+  no runtime registration change. Diff whitespace check passes; unchanged
+  execution/scaling tests not repeated. Next baseline/OpenSpec reconciliation
+  and isolated installed candidate acceptance before exact activation-SHA review.
+- Baseline safe-mcp-workflow and its change delta now name the inactive concrete
+  CLI consumer/local-terminal issuer and workspace MCP consumer, without
+  authorizing public registration. Added executable-evidence-aligned scenarios:
+  fresh review digest cannot rescue a stale receipt after byte mutations, and
+  piped APPROVE cannot issue a receipt. Workspace/request-budget/new-bundle and
+  value-free result requirements remain explicit. Strict OpenSpec validation
+  and diff whitespace pass. Next prepare the isolated installed complete
+  registration candidate and golden/interface inventory checks; no activation
+  or unchanged scaling acceptance claimed.
+- Built the concrete isolated registration package with unchanged project build
+  settings/bundled skills and installed it without dependencies into
+  /private/tmp/apa-registered-wheel.NupM2D/installed; development version 1.5.0,
+  not RC/publication. Wheel SHA256:
+  914c7af62db130f05f48a7245f343c84406773bdf64209e2c22d5eabca18e22f.
+  Installed-only PYTHONPATH and disabled pytest source-path injection exercise
+  actual CLI/MCP composition, not the source copy. No public registry changes.
+- Installed registered-interface acceptance passes both coherent scenarios
+  (2, 3.64s): saved policy→review→CLI/MCP publication, plus genuine local-TTY
+  receipt and all detached/missing/forged/drift/workspace/budget/destination
+  rejection checks. Exact readback and unchanged restricted inputs enforced;
+  fictional data only, no product monkeypatch or external connection. This is
+  new installed composition evidence, not repetition of source-copy or scale
+  acceptance. Next golden inventories/full milestone gates and exact activation
+  artifact SHA review before applying public registration.
+- Installed candidate parser/contract milestone: 9 pass, 1 expected freshness
+  failure (0.45s) against unchanged public goldens. Read-only fixture comparison
+  confirms exactly two changed inventories: cli-parser-surface.json adds
+  transform-execute/transform-approve; mcp-generator-tools.json adds
+  execute_transformation. All other 12 contract fixtures are byte-semantically
+  unchanged. Public goldens intentionally not regenerated before activation;
+  no blanket fixture acceptance or regression bypass. Next bind these explicit
+  additive inventories into the activation artifact, verify candidate goldens
+  in isolation, then full milestone checks and exact-SHA safety review.
+- Durable isolated acceptance now enforces the exact additive contract delta:
+  only two CLI names and one MCP consumer may differ from public goldens;
+  consumer requires source/policy/destination/digest, has exactly the eight
+  declared properties and no approved flag. After removing those additions,
+  all 14 generated contract fixtures must equal the baseline. Installed check
+  passes (1, 2 deselected, 0.38s); previous end-to-end cases not rerun. Existing
+  fixture builder fixes only random source-free plan identity, not product
+  safety guards; transformation execution acceptance remains unpatched.
+  Public goldens/registration unchanged. Next consolidate activation artifact,
+  full milestone checks and exact-SHA independent safety review.
+- Full isolated candidate and durable acceptance Ruff passes. Full strict mypy
+  initially found argparse parser_class's stub rejecting the supported partial
+  parser factory. Added an explicit narrow type cast in the unapplied delta and
+  isolated build source, without runtime behavior or guard changes. Delta
+  applicability passes; installed wheel evidence above predates this typing-only
+  repair and remains tied to its recorded hash. Next rebuild corrected candidate
+  and complete milestone evidence before exact activation-SHA review.
+- Corrected isolated candidate strict mypy passes all 135 production files.
+  Rebuilt without changing project version/dependencies; corrected wheel SHA256
+  baa6c350a4667703bc5008d17d3aa27e7e9cbfbf4b52da856a74c5a0a1523ada,
+  installed at /private/tmp/apa-registered-wheel.NupM2D/corrected-installed.
+  Changed parser plus exact additive inventory checks pass (8, 2 deselected,
+  0.50s); changed CLI Ruff passes. Unchanged TTY/execution/scale scenarios not
+  replayed. No publication or public registration. Next consolidate signed
+  activation evidence/artifact and milestone checks for exact-SHA safety review.

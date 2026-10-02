@@ -10,6 +10,30 @@ evidence and independent safety review of the precise activation SHA complete.
 Existing default profiling/generation tools and disclosure budgets SHALL remain
 unchanged.
 
+The concrete activation candidate SHALL name its separate workspace tool
+`execute_transformation`. It SHALL require the reviewed `snapshot_sha256`,
+resolve source/policy/receipt/output paths through the existing workspace
+boundary, share the bounded transport request budget and publish only a new
+validated local bundle. Success SHALL return `transformation_completed`,
+digest, provenance counts and output-budget metadata, never rows or mapping
+literals. Local `transform-approve` SHALL be the only supported receipt issuer;
+`transform-execute` and MCP SHALL consume, not create, preservation authority.
+These names SHALL NOT imply that candidate registration is publicly active.
+
+#### Scenario: Receipt is stale despite a fresh review digest
+
+- **GIVEN** a genuine receipt binds the earlier exact source and policy bytes
+- **WHEN** source or inline mapping bytes change and review produces a new digest
+- **AND** execution supplies that new digest with the earlier receipt
+- **THEN** preservation fails before publication
+- **AND** the receipt and previous publication remain unchanged
+
+#### Scenario: Piped approval text is supplied
+
+- **WHEN** a detached local CLI receives APPROVE through piped stdin
+- **THEN** no preservation receipt is created
+- **AND** an agent approval flag cannot substitute for terminal confirmation
+
 #### Scenario: Agent requests preservation without local approval
 
 - **GIVEN** a policy requests preservation or unmatched-preserve fallback
