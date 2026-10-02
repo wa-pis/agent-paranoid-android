@@ -18,6 +18,30 @@ from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
 
 
+def test_closed_prospective_parser_has_explicit_execution_and_no_approval():
+    from test_data_agent.cli_transformation_candidate import _create_test_execution_parser
+
+    parser = _create_test_execution_parser()
+    arguments = parser.parse_args(["transform-execute", "source.csv", "policy.yaml", "output",
+        "--snapshot-sha256", "0" * 64, "--json", "--max-output-bytes", "8192"])
+    assert arguments.command == "transform-execute" and arguments.json_output
+    assert arguments.max_output_bytes == 8192 and arguments.receipt is None
+    assert "transform-approve" not in parser.format_help()
+
+
+def test_closed_prospective_dispatch_requires_review_digest(tmp_path, capsys):
+    from test_data_agent.cli_transformation_candidate import _candidate_execution_main
+
+    with pytest.raises(SystemExit) as error:
+        _candidate_execution_main(["transform-execute", "fictional-secret-marker.csv",
+            "policy.yaml", str(tmp_path / "output")], json_output=True, prospective=True)
+    assert error.value.code == 2
+    captured = capsys.readouterr()
+    assert json.loads(captured.out)["error"]["code"] == "invalid_arguments"
+    assert "fictional-secret-marker" not in captured.out + captured.err
+    assert not list(tmp_path.iterdir())
+
+
 @pytest.mark.parametrize("mode", ["malformed", "missing", "limit"])
 def test_closed_entrypoint_returns_safe_json_failure(tmp_path, mode):
     program = ("import sys; from test_data_agent.cli_transformation_candidate import "
@@ -130,7 +154,7 @@ def test_candidate_entrances_reject_private_derive_before_artifacts(tmp_path, en
     assert {p.name: p.read_bytes() for p in tmp_path.iterdir()} == before
 
 
-@pytest.mark.parametrize("mode", ["entrypoint", "explicit", "stale", "profile", "session", "above_session",
+@pytest.mark.parametrize("mode", ["prospective", "entrypoint", "explicit", "stale", "profile", "session", "above_session",
     "total_above", "total_exceeded"])
 def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     source = SnapshotPart("source", "items", b"label\nalpha\n")
@@ -153,9 +177,15 @@ def test_saved_policy_review_to_candidate_cli_subprocess(tmp_path, mode):
     if mode == "entrypoint":
         program = ("import sys; from test_data_agent.cli_transformation_candidate import "
             "_candidate_execution_main; sys.exit(_candidate_execution_main(sys.argv[1:], json_output=True))")
+    if mode == "prospective":
+        program = ("import sys; from test_data_agent.cli_transformation_candidate import "
+            "_candidate_execution_main; sys.exit(_candidate_execution_main(sys.argv[1:], "
+            "json_output=True, prospective=True))")
     argv = [sys.executable, "-c", program, str(tmp_path / "items.csv"),
         str(tmp_path / "behavior.yaml"), str(tmp_path / "output"), "--snapshot-sha256",
         "0" * 64 if mode == "stale" else request.snapshot_sha256]
+    if mode == "prospective":
+        argv.insert(3, "transform-execute")
     if mode not in {"profile", "session"}:
         argv += ["--max-output-bytes", "8192"]
     env = dict(os.environ)

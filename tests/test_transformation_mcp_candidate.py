@@ -60,8 +60,8 @@ def test_closed_sdk_uses_existing_request_budget(tmp_path, monkeypatch):
         request_ctx.reset(token)
 
 
-@pytest.mark.parametrize("transport", ["sdk", "stdio"])
-@pytest.mark.parametrize("stale", [False, True])
+@pytest.mark.parametrize("transport", ["sdk", "stdio", "prospective_stdio"])
+@pytest.mark.parametrize("stale", [False, True, "missing_receipt", "forged_receipt", "agent_flag"])
 def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monkeypatch, stale, transport):
     from mcp.server.fastmcp.exceptions import ToolError
     from test_data_agent.core.limits import GenerationBudget
@@ -70,24 +70,42 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
     from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_from_paths
     from test_data_agent.mcp_transformation_candidate import _create_test_candidate_mcp
 
+    preservation_negative = isinstance(stale, str)
+    if preservation_negative and transport != "prospective_stdio":
+        pytest.skip("preservation negatives target prospective bounded stdio")
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
     source = SnapshotPart("source", "items", b"label\nalpha\n")
     policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
         "schema_fingerprint": "0" * 64, "fields": [{"entity": "items", "field": "label",
         "sensitivity": "non_sensitive", "behavior": {"action": "substitute", "mapping": {
         "kind": "inline", "entries": [{"original": ["alpha"], "replacement": ["gamma"]}]}}}]})
+    if preservation_negative:
+        data = policy.model_dump(mode="json")
+        data["fields"][0]["behavior"] = {"action": "preserve",
+            "authorization_ref": "fictional-local", "comment": "Reviewed fictional label"}
+        policy = BehaviorPolicy.model_validate(data)
     profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
     policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
     (tmp_path / "items.csv").write_bytes(source.payload)
     (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
     request = prepare_csv_review_from_paths(tmp_path / "items.csv", "items", tmp_path,
         "behavior.yaml", max_total_bytes=8192, max_review_bytes=8192, budget=GenerationBudget(5))
+    if preservation_negative:
+        from test_data_agent.io.transformation_receipt import _canonical_request
+        assert _canonical_request(request, max_total_bytes=8192, max_review_bytes=8192,
+            budget=GenerationBudget(5)) == request
     before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
     server = _create_test_candidate_mcp()
     assert server is not None
     arguments = {"input_path": "items.csv", "policy_path": "behavior.yaml", "output_path": "output",
-        "snapshot_sha256": "0" * 64 if stale else request.snapshot_sha256, "max_output_bytes": 8192}
-    if transport == "stdio":
+        "snapshot_sha256": "0" * 64 if stale is True else request.snapshot_sha256, "max_output_bytes": 8192}
+    if stale == "forged_receipt":
+        (tmp_path / "receipt.json").write_text('{"approved":true,"fictional-secret-marker":"forged"}')
+        before["receipt.json"] = (tmp_path / "receipt.json").read_bytes()
+        arguments["receipt_path"] = "receipt.json"
+    elif stale == "agent_flag":
+        arguments["approved"] = True
+    if transport in {"stdio", "prospective_stdio"}:
         from datetime import timedelta
         from mcp import ClientSession, StdioServerParameters
         from mcp.client.stdio import stdio_client
@@ -97,10 +115,11 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
             "from test_data_agent.mcp_generator_server import _new_transport_work_budget; "
             "from test_data_agent.mcp_generator_transport import run_bounded_generator_mcp; "
             "from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS; "
-            "run_bounded_generator_mcp(_create_test_candidate_mcp(), "
+            f"run_bounded_generator_mcp(_create_test_candidate_mcp(prospective={transport == 'prospective_stdio'}), "
             "max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transport_payload_bytes, "
             "request_context_factory=_new_transport_work_budget)"
         )
+        tool_name = "execute_transformation" if transport == "prospective_stdio" else "_execute_candidate_transformation"
 
         async def invoke():
             parameters = StdioServerParameters(command=sys.executable, args=["-c", program], env=dict(os.environ))
@@ -108,17 +127,27 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
                 async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
                     await session.initialize()
                     tools = await session.list_tools()
-                    assert [tool.name for tool in tools.tools] == ["_execute_candidate_transformation"]
-                    malformed = await session.call_tool("_execute_candidate_transformation", {
+                    assert [tool.name for tool in tools.tools] == [tool_name]
+                    assert "snapshot_sha256" in tools.tools[0].inputSchema["required"]
+                    assert "receipt_path" in tools.tools[0].inputSchema["properties"]
+                    malformed = await session.call_tool(tool_name, {
                         **arguments, "input_path": {"fictional-secret-marker": "rejected"}})
                     assert malformed.isError
                     assert "fictional-secret-marker" not in malformed.model_dump_json()
-                    return await session.call_tool("_execute_candidate_transformation", arguments)
+                    if transport == "prospective_stdio":
+                        for path_argument in ("input_path", "policy_path", "output_path", "receipt_path"):
+                            escaped = await session.call_tool(tool_name, {
+                                **arguments, path_argument: "../fictional-secret-marker"})
+                            assert escaped.isError
+                            assert "fictional-secret-marker" not in escaped.model_dump_json()
+                            assert not (tmp_path / "output").exists()
+                    return await session.call_tool(tool_name, arguments)
 
         response = asyncio.run(invoke())
         rendered = response.model_dump_json()
-        assert response.isError == stale
+        assert response.isError == bool(stale)
         assert "alpha" not in rendered and "gamma" not in rendered
+        assert "fictional-secret-marker" not in rendered
         if stale:
             assert not (tmp_path / "output").exists()
         else:

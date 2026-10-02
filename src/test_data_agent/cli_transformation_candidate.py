@@ -30,9 +30,7 @@ class _CandidateArgumentParser(HelpfulArgumentParser):
         super().error("invalid transformation arguments")
 
 
-def _run_candidate_execution(argv: list[str], *, json_errors: bool = False) -> dict[str, object]:
-    """Parse a proposed execution request; never mint an approval receipt."""
-    parser = _CandidateArgumentParser(prog="closed-transform-execute", json_errors=json_errors)
+def _add_execution_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("source", type=Path)
     parser.add_argument("policy", type=Path)
     parser.add_argument("destination", type=Path)
@@ -42,7 +40,31 @@ def _run_candidate_execution(argv: list[str], *, json_errors: bool = False) -> d
     parser.add_argument("--max-total-input-bytes", type=int)
     parser.add_argument("--max-output-bytes", type=int,
         help="Run output cap in bytes; defaults to effective session/profile ceiling.")
+
+
+def _create_test_execution_parser(*, json_errors: bool = False) -> argparse.ArgumentParser:
+    """Prospective command composition, only constructed by fictional tests."""
+    from test_data_agent.cli_parser import add_common_runtime_options
+
+    parser = _CandidateArgumentParser(prog="test-data-agent", json_errors=json_errors)
+    commands = parser.add_subparsers(dest="command", required=True, parser_class=_CandidateArgumentParser)
+    execution = commands.add_parser("transform-execute", json_errors=json_errors,
+        help="Execute a separately reviewed local mixed-origin transformation.")
+    _add_execution_arguments(execution)
+    add_common_runtime_options(parser)
+    add_common_runtime_options(execution)
+    return parser
+
+
+def _run_candidate_execution(argv: list[str], *, json_errors: bool = False) -> dict[str, object]:
+    """Parse a proposed execution request; never mint an approval receipt."""
+    parser = _CandidateArgumentParser(prog="closed-transform-execute", json_errors=json_errors)
+    _add_execution_arguments(parser)
     args = parser.parse_args(argv)
+    return _execute_candidate_namespace(args)
+
+
+def _execute_candidate_namespace(args: argparse.Namespace) -> dict[str, object]:
     return _execute_reviewed_test_from_paths(args.source, args.table or args.source.stem,
         args.policy, args.destination, expected_snapshot_sha256=args.snapshot_sha256,
         max_total_bytes=args.max_total_input_bytes,
@@ -51,7 +73,8 @@ def _run_candidate_execution(argv: list[str], *, json_errors: bool = False) -> d
         receipt_path=args.receipt)
 
 
-def _candidate_execution_main(argv: list[str], *, json_output: bool = False) -> int:
+def _candidate_execution_main(argv: list[str], *, json_output: bool = False,
+                              prospective: bool = False) -> int:
     """Closed test entrypoint; not connected to production command composition."""
     from test_data_agent.cli_contract import CliErrorCode
     from test_data_agent.cli_presenter import report_cli_error
@@ -60,7 +83,12 @@ def _candidate_execution_main(argv: list[str], *, json_output: bool = False) -> 
 
     args = argparse.Namespace(command="closed-transform-execute", json_output=json_output)
     try:
-        result = _run_candidate_execution(argv, json_errors=json_output)
+        if prospective:
+            args = _create_test_execution_parser(json_errors=json_output).parse_args(argv)
+            args.json_output = args.json_output or json_output
+            result = _execute_candidate_namespace(args)
+        else:
+            result = _run_candidate_execution(argv, json_errors=json_output)
     except (TransformationLimitError, TransformationCleanupError) as error:
         return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
     except (ValueError, OSError):

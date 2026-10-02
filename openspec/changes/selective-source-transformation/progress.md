@@ -4882,3 +4882,78 @@ Broader transformation remains unfinished.
   not replayed. Next consolidate changed candidate boundary and inactive
   contract into signed checkpoint, then completed registration draft review;
   production surface and full RC remain incomplete.
+- Signed checkpoint 79bdce4dcd1bd041ea2c046e6ef5b1bd584b924f saves candidate
+  CLI redaction/entrypoint, typed recovery tests and inactive interface contract;
+  checkout clean immediately after commit. No push/PR/CI or repeated AI review.
+  Next registration work must preserve existing process entrypoints and default
+  source-free service inventory, introduce only the separately selected
+  transformation consumer (local approval never MCP), update golden contracts
+  and documentation, and obtain exact-SHA activation review before enabling.
+- Updated installed closed-boundary milestone from 79bdce4: isolated wheel
+  /private/tmp/apa-boundary-workflow-wheel.3udGzn, SHA256
+  b8a9707631c0d7518db8c1083aac21aab0579d3e91d6ce5cd74a46ef522eb1a8.
+  Installed --no-deps --target, no primary environment mutation. Sequential
+  gate completed: 33 candidate CLI/MCP cases pass, 1 controlling-TTY case
+  deliberately excluded (acceptance.log); all 12 fictional small route cases
+  pass with bundle byte parity/readback and cleanup (routes.log). Changed CLI
+  parser/entrypoint justified this milestone replay; accepted scaling not rerun.
+  Next run only installed TTY case with necessary local access, then complete
+  prospective registration and exact-SHA activation review. Still no public
+  registration, DB/API access, RC publication or final-acceptance claim.
+- Remaining installed controlling-TTY case passed with required local access
+  (1 passed, 22 deselected, 1.70s) against the same b8a97076 wheel. Closed
+  installed workflow gate therefore has 34 passing CLI/MCP cases plus 12 routes;
+  this is not production registration evidence or final RC acceptance.
+  Next implement prospective command/tool composition only in the closed test
+  surface, matching production parser/presenter/audit/budget boundaries, so
+  registration itself can be reviewed before activation without exposing a
+  production execution path prematurely. No additional product decision needed.
+- Closed prospective root parser now composes explicit transform-execute with
+  existing common JSON/debug options and the same execution-argument definition
+  as the tested candidate entrypoint. No production parser import/registration;
+  no approval command in this consumer composition. Focused parser case passes
+  (1, 23 deselected); Ruff/Mypy pass. Next connect this closed parsed namespace
+  to shared execution/presenter and exercise full command dispatch before
+  prospective MCP naming/registration review; parser-only check is not activation.
+- Closed prospective transform-execute dispatch now uses the shared parsed-
+  namespace executor and existing presenter, not a second transformation path.
+  Full saved-policy/review subprocess passes with exact CSV readback; missing
+  mandatory review SHA fails as fixed JSON invalid_arguments before file access.
+  Two new focused cases pass; Ruff/Mypy pass for changed composition. Production
+  registrations unchanged. Next prospective MCP consumer name/schema parity,
+  then coherent exact-SHA review of completed activation wiring and policy.
+- Prospective closed MCP composition names only its fresh budget wrapper
+  execute_transformation; shared callable and production registry unchanged.
+  Real bounded-stdio success/stale dispatch and malformed typed arguments pass
+  under that name (2), with required snapshot digest and optional receipt in
+  SDK schema, no issuer, exact CSV readback and value-free response/errors.
+  Ruff/Mypy pass. Next finish prospective command/tool documentation and
+  full boundary negatives, checkpoint exact SHA for activation-scope review;
+  closed naming evidence is not public activation.
+- Prospective MCP bounded-stdio negatives now exercise workspace escape for
+  input, policy, output and receipt paths through the actual SDK tool dispatch.
+  All reject without reflecting the fictional path marker or publishing output;
+  subsequent success/stale checks still pass (2 cases, 11 deselected, 1.15s).
+  Ruff passes for the changed test. No production registration or safety
+  monkeypatch, no accepted scale replay. Next test missing/forged receipt and
+  agent approval flags against a preserve policy (substitution-only execution
+  cannot prove preservation authorization), then checkpoint completed closed
+  composition for exact-SHA activation-scope review.
+- Prospective bounded MCP stdio now rejects preservation with a current review
+  digest but no receipt, a fictional forged approval JSON, or an agent-supplied
+  approved=true flag. Three new cases pass (19 deselected, 1.54s); no output,
+  source/policy/forged-receipt bytes unchanged, no source or forged marker in
+  responses. Initial test assertions compared isError to scenario strings;
+  corrected to bool(scenario), with no product change. Ruff/diff check pass.
+  Ponytail: reused existing real-stdio fixture/dispatch, no new harness or
+  dependencies. These are rejection checks, not proof of public activation or
+  of every receipt-validation branch. Next checkpoint closed prospective
+  composition and finish exact-SHA activation-scope evidence/review; production
+  registry remains unchanged, accepted capacity checks not rerun.
+- Preservation negatives additionally validate the complete canonical request
+  before transport invocation, ruling out invalid review/evidence as an earlier
+  rejection. Static execution trace: the single preserve field sets needs_receipt
+  and reaches the receipt gate; no other field action is present. Updated three
+  cases pass (1.54s); Ruff for both candidate modules/tests and diff check pass.
+  Checkpoint closed prospective parser/dispatch and tool-name composition for
+  exact-SHA safety review. This is not production registration or release review.

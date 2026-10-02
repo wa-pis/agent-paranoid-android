@@ -13,7 +13,7 @@ from test_data_agent.io.transformation_publish import _execute_reviewed_test_fro
 from test_data_agent.mcp_generator_server import resolve_workspace_path
 
 
-def _create_test_candidate_mcp() -> Any | None:
+def _create_test_candidate_mcp(*, prospective: bool = False) -> Any | None:
     """Fictional test composition only; production registration is unchanged."""
     from test_data_agent.mcp_generator_transport import create_generator_mcp
     from test_data_agent.trino_work_budget import (
@@ -29,10 +29,12 @@ def _create_test_candidate_mcp() -> Any | None:
             return None
         return request if isinstance(request, QueryWorkBudget) else None
 
-    server = create_generator_mcp([
-        with_query_work_budget(_execute_candidate_transformation, DEFAULT_QUERY_WORK_LIMITS,
-                               budget_provider=request_budget),
-    ])
+    consumer = with_query_work_budget(_execute_candidate_transformation, DEFAULT_QUERY_WORK_LIMITS,
+                                     budget_provider=request_budget)
+    if prospective:
+        # Rename only this fresh wrapper; never mutate the shared application callable.
+        consumer.__name__ = "execute_transformation"
+    server = create_generator_mcp([consumer])
     return server
 
 
