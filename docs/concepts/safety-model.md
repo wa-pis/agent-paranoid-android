@@ -10,7 +10,7 @@ rows to shuffle, duplicate, or export.
 ## Trust Boundaries
 
 Selective transformation is a separate, currently gated mixed-origin surface,
-not synthetic generation. Its inactive [activation contract](../../openspec/changes/selective-source-transformation/safety-boundary.md#activation-contract-under-review-not-enabled)
+not synthetic generation. Its inactive [execution and approval contract](../reference/cli.md#execution-candidate-not-publicly-enabled)
 requires local interactive approval of exact input/review bytes before any
 explicitly non-sensitive field can be preserved. Agent execution can only
 consume an existing matching receipt; it cannot issue or broaden approval.

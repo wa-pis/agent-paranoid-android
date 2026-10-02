@@ -54,7 +54,7 @@ def test_registered_contract_delta(tmp_path):
 
 
 @pytest.mark.parametrize("preserve", [False, True])
-def test_registered_profile_review_execution(tmp_path, preserve):
+def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=None):
     source = SnapshotPart("source", "items", b"label\nalpha\n")
     policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
         "schema_fingerprint": "0" * 64, "fields": [{"entity": "items", "field": "label",
@@ -73,6 +73,54 @@ def test_registered_profile_review_execution(tmp_path, preserve):
     policy_path = tmp_path / "behavior.yaml"
     input_path.write_bytes(source.payload)
     policy_path.write_text(yaml.safe_dump(policy.model_dump(mode="json")))
+    if wizard_mapping is not None:
+        original_policy = policy_path.read_bytes()
+        mapping = {"kind": "inline", "entries": [
+            {"original": ["alpha"], "replacement": ["gamma"]}]}
+        if wizard_mapping == "csv":
+            (tmp_path / "mapping.csv").write_bytes(b"old,new\nalpha,gamma\n")
+            mapping = {"kind": "csv", "path": "mapping.csv",
+                       "source_columns": ["old"], "replacement_columns": ["new"],
+                       "delimiter": ",", "encoding": "utf-8", "null_token": None}
+        master, slave = pty.openpty()
+        process = subprocess.Popen([sys.executable, "-c",
+            "import sys; from test_data_agent.cli import main; sys.exit(main())",
+            "transform-review", str(input_path), str(policy_path),
+            "--decide", "--edit-actions", "--json"], stdin=slave,
+            stderr=slave, stdout=subprocess.PIPE, start_new_session=True)
+        os.close(slave)
+        transcript = bytearray()
+        try:
+            for marker, answer in [
+                (b"Decision [sensitive/non_sensitive/unknown]: ", b"non_sensitive"),
+                (b"Action [keep/drop/preserve/synthesize/substitute/replace_text/derive]: ", b"substitute"),
+                (b"Mapping JSON (hidden): ", json.dumps(mapping).encode()),
+                (b"Unmatched [reject/preserve/synthesize]: ", b"reject"),
+                (b"Type SAVE to replace the policy (not approval): ", b"SAVE"),
+            ]:
+                pending = bytearray()
+                deadline = time.monotonic() + 15
+                while marker not in pending:
+                    assert time.monotonic() < deadline and process.poll() is None
+                    if select.select([master], [], [], 0.1)[0]:
+                        pending.extend(os.read(master, 65536))
+                transcript.extend(pending)
+                os.write(master, answer + b"\n")
+            stdout, _ = process.communicate(timeout=15)
+            assert process.returncode == 0, stdout
+            assert json.loads(stdout)["result"]["status"] == "policy_saved"
+            assert all(value not in transcript + stdout for value in (b"alpha", b"gamma"))
+            saved = yaml.safe_load(policy_path.read_bytes())
+            assert saved["fields"][0]["behavior"]["mapping"] == mapping
+            assert policy_path.read_bytes() != original_policy
+            assert input_path.read_bytes() == source.payload
+            assert not (tmp_path / "receipt.json").exists()
+            assert not (tmp_path / "cli-output").exists()
+        finally:
+            os.close(master)
+            if process.poll() is None:
+                process.kill()
+                process.wait(timeout=10)
     before = (input_path.read_bytes(), policy_path.read_bytes())
 
     def cli(*arguments):
@@ -207,3 +255,8 @@ def test_registered_profile_review_execution(tmp_path, preserve):
         expected = b"code,label\nfictional-a,gamma\n" if preserve else b"label\ngamma\n"
         assert (tmp_path / name / "dataset.csv").read_bytes() == expected
     assert before == (input_path.read_bytes(), policy_path.read_bytes())
+
+
+@pytest.mark.parametrize("mapping_kind", ["inline", "csv"])
+def test_registered_wizard_saved_policy_execution(tmp_path, mapping_kind):
+    test_registered_profile_review_execution(tmp_path, False, wizard_mapping=mapping_kind)

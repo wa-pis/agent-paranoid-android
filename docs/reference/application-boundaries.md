@@ -5,6 +5,12 @@ direction before the 1.0 application-boundaries refactor moves code. It does
 not declare internal modules public or approve a contract change.
 
 The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
+The separate inactive activation candidate adds `transform-execute` and local
+`transform-approve` CLI entrances and the workspace consumer
+`execute_transformation`. They share fixed-snapshot application enforcement;
+MCP has no receipt issuer. Ordinary generation remains source-free. These
+additions require exact-SHA safety review before public activation; their
+candidate inventories are isolated from the current public goldens.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 

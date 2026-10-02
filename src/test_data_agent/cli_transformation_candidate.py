@@ -37,8 +37,8 @@ def _add_execution_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--snapshot-sha256", required=True)
     parser.add_argument("--table")
     parser.add_argument("--receipt", type=Path)
-    parser.add_argument("--max-total-input-bytes", type=int)
-    parser.add_argument("--max-output-bytes", type=int,
+    parser.add_argument("--max-total-input-bytes", type=int, metavar="BYTES")
+    parser.add_argument("--max-output-bytes", type=int, metavar="BYTES",
         help="Run output cap in bytes; defaults to effective session/profile ceiling.")
 
 

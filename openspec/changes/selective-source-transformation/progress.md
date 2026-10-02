@@ -5231,3 +5231,114 @@ Broader transformation remains unfinished.
   check passes. No runtime change or end-to-end/scaling replay. Next bind final
   artifact/evidence commit and independent safety review, then reviewed public
   activation amendments and full release-candidate gates.
+- Signed ed24f7b599bbf5e83c9735b5827776c54ff123c8 pins candidate inventories,
+  inactive AGENTS authority and explicit boundary-test delta. Reused independent
+  AI reviewer PublicationBoundary-R1/Jason (01a0f8f6-5e7e-7b81-a337-b2476bf458f5)
+  for narrow read-only registration/artifact/policy scope at this exact SHA on
+  2026-10-02; submission 01a0fa93-a5db-78e3-8ad4-b792e23742ef. Review active,
+  do not start a duplicate or claim approval. Not final public activation/RC SHA
+  review or human GitHub approval. Next consume findings and repair changed scope
+  if required, then complete reviewed activation and milestone gates.
+- 2026-10-02 continuation: existing independent reviewer Jason returned an
+  errored status (usage limit), not a review conclusion, for ed24f7b and the
+  pinned activation artifact. No duplicate reviewer, test replay, public
+  activation or release. Automation automation paused pending restored reviewer
+  capacity; next resume the same narrow read-only review at the unchanged SHA
+  when capacity is available, then consume findings before activation gates.
+- Owner correction 2026-10-02: supersedes that next step. Do not resume the
+  intermediate ed24f7b review. Prepare one complete candidate first; perform
+  exact-SHA activation safety review only then, plus final RC review. Reviewer
+  capacity is not a preparation blocker. Automation resumed ACTIVE with this
+  instruction saved; public registry remains unchanged.
+- Consolidated the unapplied activation artifact: runtime registration plus
+  explicit boundary/contract-test amendments and the two additive inventories.
+  Full isolated checkout /private/tmp/apa-unified-candidate.4BxZzh compares its
+  candidate goldens against the installed corrected wheel: 6 pass, 0.81s.
+  No TTY, execution or scale replay; no review/activation/RC claim. Patch
+  applicability and whitespace pass. Next complete remaining documentation and
+  saved-wizard/installed-interface acceptance in this unified candidate, then
+  milestone gates before freezing the actual activation SHA for review.
+- Installed shared-workflow acceptance now starts at the actual interactive
+  decision/action wizard, saves inline or CSV substitution, re-reviews exact
+  saved bytes and executes through both actual CLI and bounded MCP stdio. No
+  product monkeypatch, source disclosure, approval receipt or real connection.
+  Inline scenario passed in the initial run; CSV initially failed only because
+  the harness omitted explicit serializer defaults (delimiter/encoding/null
+  token) from its exact policy expectation. Corrected that expectation, not
+  product behavior; CSV scenario passes (1, 4 deselected, 2.17s). Unchanged
+  inline case not replayed. Changed acceptance Ruff/diff checks pass. Wheel
+  remains baa6c350a4667703bc5008d17d3aa27e7e9cbfbf4b52da856a74c5a0a1523ada.
+  Documented the same saved-wizard sequence and separate preservation approval.
+  Next consolidate candidate-facing docs/baseline activation amendments and
+  remaining milestone gates; no new reviewer or public activation.
+- Documentation milestone: installed-candidate documentation checks pass
+  (50, 0.48s). Strict MkDocs initially found the safety-model link escaping
+  the published documentation tree into OpenSpec. Pointed it at the maintained
+  CLI execution/approval contract instead; strict build now passes (0.38s).
+  Updated safety-boundary evidence wording from copied-package-only to actual
+  installed-wheel/wizard acceptance without claiming activation or RC readiness.
+  No product runtime change, review, CI or unchanged acceptance replay.
+  Next freeze complete candidate-facing activation docs/spec amendments together
+  with code/contracts and run remaining unified milestone gates before review.
+- Full unified installed-candidate coverage milestone: 2636 passed, 5 failed,
+  16 skipped, 130.39s; coverage 90.77% (threshold 85%). Not a green release
+  gate. Initial collection stopped because the isolated checkout omitted
+  examples; copied the unchanged examples/release assets before this run.
+  Two candidate integration gaps: 80-column help overflow for both new commands
+  and missing additive names in the architectural contract inventory. Reused
+  PublicHelpFormatter and short BYTES metavars (no guard/limit changes); revised
+  isolated help cases pass at 80/120 (2, 0.24s), inventory case passes.
+  The two signed-release tests used system Git (exit 69) and controlling-TTY
+  case lacked required local access; all three pass with explicit Homebrew PATH
+  and required local execution permission (3, 2.64s). No product monkeypatch.
+  Updated inactive architecture inventory and consolidated registration patch;
+  applicability, changed-code Ruff and whitespace pass. Installed wheel above
+  predates the help repair: rebuild required for changed installed-parser scope;
+  do not replay unchanged 2636 successes or claim complete release gates yet.
+  Next rebuild the unified candidate, verify only changed installed scope and
+  finish candidate-facing policy/docs amendments before exact-SHA review.
+- Rebuilt/installed the isolated unified candidate after help repairs, without
+  version/dependency changes: wheel SHA256
+  b0cfe8e10793b84e83f9da596ecbf327c9a6675f554f660b937bf1454df50f6d.
+  Installed changed help at both widths plus architectural inventory pass
+  (3, 0.45s); previous full suite not replayed. Audited installed skill probe:
+  its old closed-engine --help expectation would reject the activated candidate.
+  In the unapplied unified delta, discovery now checks explicit execution/local
+  approval help, then requires missing-input execution to reject. Narrow probe
+  tests pass (3, 8 deselected, 0.21s); no receipt or execution authority inferred
+  from discoverability. Public probe remains unchanged before activation.
+  Consolidated probe/test amendment into the same patch; applicability and
+  whitespace pass. Next finish candidate-facing docs/baselines and remaining
+  release gates, then freeze exact activation SHA; no intermediate review.
+- Unified candidate remaining local milestone checks pass: full src/tests/scripts
+  Ruff; strict mypy (137 files); compileall; dependency license policy (104
+  observed distributions, including isolated overlay duplicates); compatibility
+  policy and generated-manifest compatibility; exact DatasetSpec schema cmp.
+  Installed synthetic quickstart passes with seed 12345, 25 customers/25 orders,
+  valid report, synthetic=true and source_rows_copied=false. Representative
+  operational budgets pass: profile 0.287s/2349102 peak bytes, generation
+  0.624s/2579393, validation 0.384s/313060. This is the existing source-free
+  release workload, not a repeated transformation scaling acceptance. No branch
+  PR exists; no CI/review/push/activation. Full coverage results and changed-scope
+  closures above retain their exact package identity; final exact-SHA gates
+  remain required. Next finish coherent activation policy/docs payload, then
+  freeze that complete isolated candidate rather than requesting helper review.
+- Consolidated matching candidate AGENTS, safe-MCP baseline and CLI/MCP
+  documentation into the same unapplied activation patch, not another review
+  artifact. Wording distinguishes registered isolated candidate from released
+  1.5.0 and preserves exact-SHA public-delivery gates, source-free generation,
+  no agent issuer/boolean, exact snapshots and no real-input authority. Public
+  source/instructions remain inactive. Changed complete candidate docs pass
+  strict MkDocs (0.40s) and installed documentation suite (50, 0.45s); patch
+  applicability/whitespace pass. No runtime/scale replay or new review.
+  Next bind the full candidate payload/evidence in one signed checkpoint and
+  reconcile remaining full RC acceptance before requesting exact-SHA review.
+- Unified checkpoint binds registration/code/test/golden/probe and matching
+  AGENTS/baseline/CLI/MCP amendment payload, plus installed wizard/coverage/gate
+  evidence and owner-corrected review cadence. Current patch SHA256:
+  99708e95bc39dcb1e3cd6393104174c08fde90f415123695cc57f6fb7ac61e04.
+  Strict OpenSpec, applicability and whitespace pass. This is an unapplied
+  payload checkpoint, not the final actual activation commit or RC approval.
+  Next reconcile client-acceptance gaps and freeze the complete isolated
+  activation tree at an exact SHA only after that scope is finished. No push,
+  PR, activation or intermediate reviewer requested by this checkpoint.

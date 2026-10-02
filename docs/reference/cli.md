@@ -107,6 +107,16 @@ acceptance is not availability or dataset authorization. Matching safety/spec
 amendments, installed-candidate gates and independent exact-SHA safety review
 must precede activation; ordinary generation stays source-free.
 
+In the isolated candidate, the existing decision wizard feeds this same
+execution contract: edit an already reviewable policy with `transform-review
+SOURCE POLICY --decide --edit-actions`, save with `SAVE`, then review the saved
+bytes again and use that digest for execution. Inline and local CSV substitution
+mappings follow the same workflow; CSV paths remain relative to the policy.
+Saving decisions does not issue a preservation receipt. If the saved policy
+retains any eligible source field, separate local `transform-approve` remains
+mandatory before CLI or MCP execution. The wizard does not create or repair an
+invalid initial policy or turn a sensitivity answer into approval.
+
 ### Edit Field Decisions Locally
 
 `transform-review SOURCE.csv POLICY.yaml --decide` edits an existing valid

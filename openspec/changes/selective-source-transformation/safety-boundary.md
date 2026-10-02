@@ -69,14 +69,18 @@ MCP registers only receipt consumption, never an approval operation.
 
 `registered-interface-acceptance.py` is an explicitly invoked acceptance file,
 not normal production registration. It exercises the concrete patch only in
-an isolated copied package on fictional temporary inputs: saved policy, actual
+an isolated installed wheel on fictional temporary inputs: saved policy, actual
 CLI review, controlling-TTY approval, CLI publication and bounded MCP stdio
 publication. It also rejects missing/forged receipts, agent approval flags,
 workspace escapes, invalid arguments, exhausted/requested budgets, existing
 destinations, stale digests and old receipts after freshly reviewed source or
 inline-mapping byte mutations. The original input bytes, receipt and prior
-publication must survive failures unchanged. This evidence does not establish
-installed-wheel behavior, completed activation review or public availability.
+publication must survive failures unchanged. The installed acceptance also
+starts with the actual decision/action wizard for inline and local CSV mappings,
+saves the policy, re-reviews its exact bytes and executes via CLI and MCP.
+Saving decisions is not preservation approval. Exact wheel and check outcomes
+are recorded in progress.md; this evidence does not establish completed
+activation review, full RC acceptance or public availability.
 
 Before applying this candidate to public source, reconcile AGENTS.md and
 baseline/OpenSpec safety contracts, affected CLI/MCP documentation and golden
