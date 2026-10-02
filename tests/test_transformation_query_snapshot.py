@@ -5,6 +5,7 @@ import io
 import pytest
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationLimitError
 from test_data_agent.core.transformation_policy import BehaviorPolicy
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_input import source_reader
@@ -43,3 +44,15 @@ def test_capture_keeps_bytes_and_rejects_bad_identity():
     for digest in ("", "A" * 64, "a" * 63, "a" * 65, None):
         with pytest.raises(ValueError, match="invalid captured query result"):
             _capture_query_result(b"typed-bytes", adapter="postgres_query", query_sha256=digest, entity="items")
+
+
+def test_capture_envelope_included_in_exact_byte_budget():
+    arguments = dict(adapter="postgres_query", query_sha256="a" * 64, entity="items")
+    source = _capture_query_result(b"typed-bytes", **arguments)
+    size = len(source.payload)
+    assert _capture_query_result(b"typed-bytes", **arguments,
+        byte_limit=EffectiveInputLimit(InputDimension.BYTES, size, "profile")) == source
+    with pytest.raises(TransformationLimitError) as caught:
+        _capture_query_result(b"typed-bytes", **arguments,
+            byte_limit=EffectiveInputLimit(InputDimension.BYTES, size - 1, "profile"))
+    assert (caught.value.amount, caught.value.limit) == (size, size - 1)

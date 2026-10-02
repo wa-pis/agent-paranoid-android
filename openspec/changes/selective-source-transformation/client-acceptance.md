@@ -1,5 +1,39 @@
 # Client Feedback And Acceptance Plan
 
+## Amended replacement acceptance — 2026-10-02
+
+Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
+defines one explicit replacement contract for all fields. Sensitive-source
+membership and permutations are permitted for actual mapped output cells;
+review retains a value-free sensitivity note. Direct preservation and its
+fallback still require the existing local receipt. Source-free generation and
+CLI/MCP summaries must not disclose mapping literals or source values.
+
+Historical [ActivationSafety-R2](activation-safety-r2.md) remains evidence for
+343305e, not approval of the amended candidate. R2-1's membership prohibition
+is superseded by the owner decision. R2-2/3/4 were independently reviewed by
+ActivationSafety-R3 / Plato on exact `911ade071e4a309ab3e3538dfe6c4a9f676624aa`;
+see [R3 evidence](activation-safety-r3.md). This is AI review, not human approval.
+The affected six-file suite passed 373 tests; this does not replace installed
+interface acceptance, final release gates, or remaining client bug acceptance.
+The original sensitive synthetic-identifier/validator disagreement now has a
+candidate shared-validator fix: only exact numeric `synthetic_` tokens on
+identifier fields are recognized, while non-identifier semantic checks and
+arbitrary-prefix negatives remain. Focused identifier/safety tests passed 48
+cases. The isolated installed registered-interface suite subsequently passed
+seven fictional cases, and R3 reviewed the identifier fix. Final exact RC review,
+locked release acceptance and public-artifact verification remain open. The later
+MCP 2 typed-budget diagnostic correction must be included in final review.
+
+
+## Private workload evidence — 2026-09-29
+
+The installed fictional PostgreSQL-result worker → saved-policy review → CSV
+scenario passed300,000 x50 with full ordered readback, provenance and cleanup:
+[exact artifacts and limits](postgres-scale-acceptance.md). This supplements
+the prior private CSV checkpoint, not client-private data, live PostgreSQL,
+all-format, public-interface or full1M x100 acceptance. Those claims stay open.
+
 ## Original feedback provenance verified — 2026-09-28
 
 Read the original brief inside the refreshed archive; SHA-256 matches
@@ -38,7 +72,85 @@ See [v2 intake, work packages and evidence rules](feedback-2026-09-24-v2.md).
 New claims are client-reported until reproduced; old baseline evidence remains
 historical, not overwritten by the new document's measurements.
 
-## Finding Dispositions To Verify
+## Current candidate reconciliation — 2026-10-02
+
+The historical checkpoints below retain their original package identities and
+limitations; their pending wording is not a new owner decision or a claim that
+later evidence is absent. The earlier changed-scope isolated registered candidate wheel was
+SHA256 `53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb`,
+still development-version-labelled 1.5.0, not a public RC.
+Its historical installed root is `/private/tmp/apa-complete-candidate.ZIoRWw/installed-client-reuse`.
+The reviewed `911ade0` registered candidate wheel has SHA256
+`8af3499ca72939f197f5992733f5d702937dddd9d7d494aa687c04f9f456cc57`;
+its full gates passed 2702 tests (17 skips, coverage 90.83%) and seven installed
+registered-interface cases. This wheel predates the MCP 2 diagnostic fix in
+`e4374e3`, whose focused SDK 1/2 evidence is recorded in progress. None of these
+development-version wheels is the final `1.6.0rc1` or a public release.
+Earlier scenario/scale identities remain separate evidence, not a claim that
+every historical check was rerun against this wheel.
+
+| Agreed scenario | Current disposition and evidence |
+| --- | --- |
+| Saved inline YAML / local CSV mapping → review → execution | Fictional installed CLI wizard cases pass through actual CLI and bounded MCP execution; see `registered-interface-acceptance.py` and dated results in progress. No agent receipt issuer or product guard monkeypatch. |
+| Explicit non-sensitive preservation | Fictional controlling-TTY approval and receipt consumption pass; missing, forged and stale receipts reject. This is isolated candidate evidence, not permission for private inputs or public activation. |
+| Independent input/output formats | Twelve private fictional routes recorded in `route-workflow-acceptance.md`; installed registered interface coverage is complementary, not proof of every public route. |
+| Mandatory 300000 × 50 workload | CSV and injected fictional PostgreSQL-result checkpoints recorded separately in `csv-scale-acceptance.md` and `postgres-scale-acceptance.md`. Do not repeat unchanged or claim all-format scale / 1000000 × 100 measured acceptance. |
+| Internal formulas / financial total recomputation (18/23) | Not required for RC by owner correction of 2026-09-28. Existing private derive code remains inactive. Exact numeric transport and permitted bounded SQL aggregates remain in scope. |
+| Trino auth (21) | Owner selected all six driver methods on October 2. Runtime indirection, preflight, TLS and detached errors have focused tests. Isolated CLI OAuth opt-in rejects pipes before connection/publication; direct token requests enforce configured HTTPS origin/deadlines. Installed changed auth/client/query scope: 30 pass; shared invocation exhaustion: 1 pass. Dependency stubs are not remote authentication acceptance. |
+| Invalid modes / exit (25) | Isolated installed spec/profile/CSV mixed-mode tests check physical values, effective settings, retained invalid output/report, JSON validation_failed and exit 1. These are fictional tests, not absent private-script acceptance. |
+| Parquet missing statistics (26) | Owner accepted unknown null/distinctness and bounded local sensitivity inspection. Changed installed adapter tests cover absent statistics, neutral-name sensitive values and budget rejection without raw-value output. Automatic inference rejects unknown null ratios; private inputs remain unavailable. |
+| All client findings / private inputs / final RC | Not closed by the unified milestone. Each finding still needs an explicit final disposition; absent private inputs and live client measurements remain unverified. Final exact-SHA review and public-artifact acceptance remain outstanding. |
+
+The unified full-suite milestone and changed-scope closures are recorded in
+progress, including the five initial failures and their bounded reruns. Do not
+label that history a single green final-release run. No intermediate helper
+review is required; independent safety review targets the finished actual
+activation SHA before public delivery.
+
+## Candidate finding dispositions — 2026-10-02
+
+This is a reconciliation of existing evidence and governing decisions, not a new
+26-case test run or final RC acceptance. “Fixed locally” identifies the reproduced
+case; private inputs, live backend measurements and final exact-SHA/public wheel
+acceptance remain unverified unless separately recorded. Test-file anchors are
+executable evidence locations, not assertions that they were rerun today.
+
+| Finding | Disposition | Evidence and remaining boundary |
+| --- | --- | --- |
+| 1 | Confirmed sensitive-semantic identifier subcase fixed locally and independently reviewed | Exact ASCII integer synthetic tokens on identifier fields now validate; deterministic seed, malformed/Unicode/raw-sensitive and non-identifier negatives remain. R3 reviewed exact `911ade0`; final RC/package acceptance is still required. |
+| 2 | Fixed locally / merged | Distinct overflow is lower-bound evidence, never row-count uniqueness or PK proof: `tests/test_schema_distinct_overflow.py`; PR #534. Old cached profiles require reprofile. |
+| 3 | Confirmed ambiguity; conservative rejection retained | Fractional numeric-shape false positive is reproduced; phone/card/rare-secret checks remain active in `tests/test_csv_pipeline_regressions.py` and `tests/test_privacy_corpus.py`. No field declaration silently overrides content evidence; ADR-0008/Q-03 governs any future exception. |
+| 4 | Blanket claim not reproduced; numeric repeated-key case fixed | Text categories already exist. Approved bounded synthetic identifier pool covers numeric repeated keys: `tests/test_identifier_pool.py`; PR #536. No raw identifier pool is copied. |
+| 5 | Intentional source-free default; explicit local alternative supported | Synthetic categories are the default. Reviewed bounded local categories use `tests/test_local_category_policy.py`; one-to-one source retention instead requires the distinct reviewed transformation/TTY receipt path. |
+| 6 | Intentional safety boundary | Classification review records decisions but cannot declassify positive sensitivity evidence. `tests/test_transformation_policy.py`, `tests/test_transformation_approval.py`; ADR-0021. No unrestricted override flag. |
+| 7 | Timestamp fixed/already present; routing diagnostics fixed; monthly-category proposal deferred | Timestamp and timezone regressions in `tests/test_csv_pipeline_regressions.py`; spec/profile routing recovery in PR #537. Field format/output_format govern approved transformations. No automatic monthly source-category fidelity is claimed. |
+| 8 | Fixed under approved fixed-cardinality contract | `tests/test_identifier_pool.py`; PR #536. Counts become fresh synthetic domains, not source keys. Small/null-heavy outputs may use fewer members. |
+| 9 | Fixed for independent domains and declared links | `tests/test_identifier_domains.py`; PR #517. No promise of arbitrary inferred relationships or cross-run source mappings. |
+| 10 | Fixed for supported typed bounds; absent bounds remain unknown | `tests/test_postgres_temporal_bounds.py`, `tests/test_sql_query_temporal_bounds.py`, `tests/test_date_fallback_disclosure.py`; PR #539/#560 and corrected installed A/B evidence below. Sensitive-source aliases cannot disclose extrema. |
+| 11 | Fixed safe diagnostics for identifiable typed failures | `tests/test_postgres_client.py`; PR #537. Unknown/wrapped failures stay generic; no driver-text parsing, live reachability or remote timing claim. |
+| 12 | Intentional conservative name/content classification | Reviewed non-sensitive preservation still requires no positive content/name conflict, exact binding and TTY authority. Policy/approval/snapshot tests and ADR-0021; an operator comment is not a privacy bypass. |
+| 13 | Fixed tie-case / declared-link behavior; general inference and orphan fidelity unverified | `tests/test_domain_agnostic_pipeline.py`, `tests/test_identifier_domains.py`, `tests/test_relationship_discovery.py`. No source orphan-rate preservation promise. |
+| 14 | Conformance supported; unmeasured utility not passed | Schema, constraints and declared relationships are validated. `tests/test_domain_business_invariants.py` and validation tests do not establish client-private statistical/business fidelity. No invented utility score. |
+| 15 | Fixed preflight; existing category budgets retained | `tests/test_local_category_policy.py`, PostgreSQL profiling tests; PR #538. Exact scopes fail before session; wildcard scopes resolve bounded metadata first. No automatic budget increase. |
+| 16 | Fixed supported-shape diagnostics; JOIN/CTE remain unsupported | `tests/test_sql_query_source.py`; PR #537. Fixed recovery hints never expose query text/literals or broaden SQL authorization. |
+| 17 | Fixed bounded numeric-summary reuse; live performance unverified | Query/profiler statement-count evidence below; `tests/test_sql_query_profiling.py`, `tests/test_postgres_query_builders.py`. No temporary writes, live scan-byte or latency claim. |
+| 18 | Safe unsupported-dependency rejection; internal formula proposal out of RC scope | `tests/test_sql_query_adapters.py` and `tests/test_sql_query_profiling.py` reject automatic inference with unmodeled expressions. Owner correction and ADR-0026 exclude formula transfer/recomputation; permitted single-table aggregates remain separately bounded. |
+| 19 | Fixed deterministic atime/publication case | `tests/test_io_path_policy.py`, `tests/test_client_publication_acceptance.py`; PR #516. Original unchanged script did not reproduce timing failure; adaptations remain distinguished below. Path-swap/rollback safeguards remain. |
+| 20 | Fixed report retention / safe capability categories | `tests/test_cli_doctor.py`; PR #542. Installed dependency-failure replay below is explicitly a dependency shim, not a real Parquet fault or client probe. |
+| 21 | Implemented local six-method candidate; remote auth unverified | Current reconciliation above and `tests/test_trino_auth.py`, `tests/test_trino_client.py`, `tests/test_trino_oauth_cli.py`. Browser registration remains gated; optional Kerberos/GSSAPI prerequisites and driver OAuth cache semantics are documented. |
+| 22 | Fixed allowed AND/OR classification | `tests/test_sql_query_source.py`, `tests/test_sql_query_adapters.py`; PR #541. Both adapters retain forbidden-function, allowlist and budget controls. |
+| 23 | Exact supported DECIMAL contract implemented; no approximate fidelity or preservation exemption | `tests/test_exact_decimal_dataset.py`, `tests/test_exact_decimal_units.py`, `tests/test_parquet_decimal_profile.py`, transformation route evidence. Declared precision/scale and reviewed bounds, not FLOAT conversion; unbounded numeric approximate, preservation blocked by default (ADR-0008). |
+| 24 | Declared physical Parquet types fixed; unsupported invalid coercion rejects | `tests/test_client_parquet_acceptance.py`, `tests/test_exact_decimal_dataset.py`; installed A/B below. Supported invalid outputs persist; Parquet cannot silently coerce a declared typed column to publish incompatible values. |
+| 25 | Fixed precedence / invalid exit parity in local installed candidate | `tests/test_client_mode_installed_acceptance.py`: spec/profile/CSV settings, output/report retention and validation_failed/exit 1. Owner decision October 2 governs older pending exit-policy notes. |
+| 26 | Fixed unknown metadata and bounded local sensitivity inspection | `tests/test_source_adapters.py`, `tests/test_parquet_decimal_profile.py`. Missing null/distinctness is null/unknown; incomplete inspection rejects; automatic inference with unknown null ratios rejects. No absent private Parquet data is passed. |
+
+Outstanding work is not hidden by this register: complete-candidate gates,
+exact-SHA independent safety review, GitHub-required checks and public RC artifact
+acceptance remain mandatory. Unapproved exceptions/proposals remain unsupported,
+not silently implemented or promoted into new scope. Finding 1's sensitive-semantic
+identifier subcase remains explicitly unfixed.
+
+## Finding-specific verification boundaries
 
 Owner clarification, 2026-09-27: format independence is RC acceptance, not a new
 client-reported defect. Exercise CSV, Parquet, fictional Trino-result and
@@ -70,15 +182,15 @@ completion. Source-free tools remain unchanged; SQL scripts are files only.
 | 15 | Test category limits and early validation before unnecessary reads; settle configurable budgets explicitly. |
 | 16 | Improve actionable safe SQL diagnostics; JOIN/CTE expansion remains a separate decision, not an assumed fix. |
 | 17 | Measure query count and scan budgets; assess bounded aggregate batching. Temporary table writes are outside the read-only contract. |
-| 18 | Test explicit derived formulas and unsupported expression disclosure; SQL-to-formula translation requires type/null/rounding semantics, not AST copying alone. A fictional unsupported-function expression previously echoed its literal through the AST error, and malformed syntax retained the input-bearing `SyntaxError` as exception context. Both are fixed locally with value-free, detached errors; this does not add `ROUND` support or establish derived-finance acceptance. |
+| 18 | Owner correction of 2026-09-28 excludes internal formulas and SQL-to-formula translation from RC. Retain existing private code inactive and its value-free error regressions; permitted SQL expressions are enforced by the bounded SQL contract, not an internal formula engine. |
 | 19 | Reproduce atime-only publication failures; preserve path-swap protection. Define directory overwrite behavior explicitly and test rollback. |
 | 20 | Reproduce doctor capability/publication failures with installed extras; preserve checks and safe causes without misleading reinstall advice or raw exception disclosure. |
-| 21 | Plan Trino authentication with explicit method/secret-source decision; prove propagation, preflight, TLS/redaction using isolated drivers. Live client measurements remain unverified. |
+| 21 | Owner decision recorded October 2; local six-method composition and CLI opt-in evidence above. Review complete candidate safety before public activation. Live client measurements remain unverified. |
 | 22 | Reproduce permitted SQL connector/function classification on both adapters; fix without extending SQL policy, and retain allowlist/budget/forbidden-function controls. |
-| 23 | Exact DECIMAL precision/scale across profile, spec, generation, formulas and export; link to financial contract and distinguish approximate inputs. |
+| 23 | Exact DECIMAL precision/scale across the agreed profile/spec/generation and transformation/export paths; distinguish approximate inputs. Internal financial formulas/recomputation are outside RC under the owner correction of 2026-09-28. |
 | 24 | Declared Parquet physical types and readback; no silent date/decimal or mixed-column coercion. Resolve invalid-mode publication semantics explicitly. |
 | 25 | Mode/invalid-ratio precedence and parity across spec/profile/CSV; verify actual output, effective settings, validation, publication and JSON/exit consistency. |
-| 26 | Honest bounded Parquet input metadata: unknown is not zero/safe; test nulls, distinctness, sensitivity and type round trips; decide CLI/API compatibility. |
+| 26 | Owner decision recorded October 2; unknown null/distinctness and bounded sensitivity tests above. Unknown null ratios reject automatic inference; physical/readback checks remain separate from metadata evidence. |
 
 Fictional finding-26 follow-up on main snapshot `cd8410a` (2026-09-25):
 four rows in two Parquet row groups contained two null `amount` values.
@@ -409,8 +521,8 @@ gap remains: with intentionally invalid rows, spec CLI exits 1/status
 `validation_failed`, but profile/CSV exit 0/status `succeeded`; the owner has
 been asked to choose the uniform semantics before a runtime change.
 
-Add one-to-one preserved reference combinations; changed amounts with zero and
-rounding exceptions; explicit formulas; consistent key domains; exact date
+Add one-to-one preserved reference combinations; exact numeric transport and
+declared substitutions; consistent key domains; exact date
 substitution in selected fields; inline YAML/file CSV equivalence; profile
 save/load/spec conversion; wizard/noninteractive parity; unknown mapping keys;
 high cardinality under budgets; sensitivity conflicts and report/provider leaks.

@@ -5,6 +5,7 @@ OS process start/termination can exceed requested deadlines under OS failure.
 """
 
 import math
+import json
 import multiprocessing
 import os
 import time
@@ -13,8 +14,11 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any
 
-from test_data_agent.core.limits import DEFAULT_MAX_INPUT_FILE_BYTES, GenerationBudget
-from test_data_agent.core.transformation_policy import BehaviorPolicy
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import (
+    InputDimension, TransformationLimitError, resolve_input_limit,
+)
+from test_data_agent.core.transformation_policy import BehaviorPolicy, parse_behavior_policy
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
@@ -35,7 +39,7 @@ class _PostgresCapture:
 
 def _capture_worker(
     capture: _PostgresCapture, driver_factory: Callable[[], Any], deadline: float,
-    result: Any, length: Any,
+    result: Any, length: Any, diagnostic: Any,
 ) -> None:
     try:
         with open(os.devnull, "wb") as sink:
@@ -55,6 +59,15 @@ def _capture_worker(
             return
         memoryview(result).cast("B")[:len(source.payload)] = source.payload
         length.value = len(source.payload)
+    except TransformationLimitError as error:
+        # Fixed schema only: never serialize exception messages or backend text.
+        data = json.dumps([error.dimension.value, error.amount, error.limit,
+            error.origin, error.code == "requested_above_limit"], separators=(",", ":")).encode("ascii")
+        if len(data) < len(diagnostic):
+            diagnostic[:len(data)] = data
+            length.value = -2
+        else:
+            length.value = -1
     except BaseException:
         # No pickled exceptions, driver logs or tracebacks cross the boundary.
         length.value = -1
@@ -71,21 +84,29 @@ def _capture_postgres_isolated(
     process = None
     cleanup_failed = False
     payload = None
+    limit_error = None
     try:
         if (type(capture) is not _PostgresCapture
                 or type(capture.max_bytes) is not int
-                or not 0 < capture.max_bytes <= DEFAULT_MAX_INPUT_FILE_BYTES
+                or not 0 < capture.max_bytes <= 2**63 - 1
+                or type(capture.max_rows) is not int
+                or not 0 < capture.max_rows < 2**63 - 1
                 or type(max_seconds) not in {int, float}
                 or not math.isfinite(max_seconds) or not 0.1 <= max_seconds <= 3600):
             raise ValueError
+        policy = parse_behavior_policy(capture.policy)
+        for dimension, amount in ((InputDimension.BYTES, capture.max_bytes),
+                                  (InputDimension.ROWS, capture.max_rows)):
+            resolve_input_limit(dimension, policy.resource_limits, os.environ).check(amount, requested=True)
         deadline = time.monotonic() + max_seconds
         reserve = min(2.0, max_seconds / 4)
         work_deadline = deadline - reserve
         context = multiprocessing.get_context("spawn")
         result = context.RawArray("B", capture.max_bytes)
-        length = context.RawValue("i", 0)
+        length = context.RawValue("q", 0)
+        diagnostic = context.RawArray("B", 512)
         process = context.Process(target=_capture_worker,
-            args=(capture, driver_factory, work_deadline, result, length))
+            args=(capture, driver_factory, work_deadline, result, length, diagnostic))
         process.start()
         process.join(max(0.0, work_deadline - time.monotonic()))
         if (not process.is_alive() and process.exitcode == 0
@@ -93,6 +114,14 @@ def _capture_postgres_isolated(
             payload = bytes(memoryview(result).cast("B")[:length.value])
             if time.monotonic() >= work_deadline:
                 payload = None
+        elif (not process.is_alive() and process.exitcode == 0
+                and length.value == -2 and time.monotonic() < work_deadline):
+            dimension, amount, threshold, origin, requested = json.loads(
+                bytes(diagnostic).split(b"\0", 1)[0])
+            limit_error = TransformationLimitError(InputDimension(dimension), amount,
+                threshold, origin, requested=requested)
+    except TransformationLimitError as error:
+        limit_error = error
     except Exception:
         payload = None
     finally:
@@ -111,6 +140,8 @@ def _capture_postgres_isolated(
                 cleanup_failed = True
     if cleanup_failed:
         raise ValueError("PostgreSQL capture worker could not be reaped")
+    if limit_error is not None:
+        raise limit_error
     if payload is None:
         raise ValueError("invalid isolated PostgreSQL capture")
     return SnapshotPart("source", capture.request.entity_name, payload)

@@ -126,6 +126,10 @@ SQL-dependency inference and must not be advertised as preserving query formulas
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
 - Replace FastMCP/Pydantic argument-validation failures with a fixed detached
   error before returning a tool result; never reflect rejected values.
+- MCP 2 unexpected errors remain generic and detached. Only exact typed
+  transformation-limit and query-work-budget failures retain reconstructed,
+  value-free dimensions, counters and supported recovery settings; never forward
+  arbitrary exception messages or backend causes.
 - Reject malformed typed MCP requests and notifications before SDK dispatch;
   never pass their caller-controlled values into SDK logs or exceptions.
 - Audit-log capacity must reject a new invocation before its `started` record

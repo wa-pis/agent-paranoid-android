@@ -37,6 +37,25 @@ final implementation review; public transformation activation SHALL remain
 gated by matching amendments, passing end-to-end safety tests and independent
 review. No user-data approval is implied by permission to develop or test.
 
+Any activation amendment SHALL name a separate mixed-origin entrance rather
+than modifying synthetic generation. Local controlling-terminal approval SHALL
+bind exact policy, source, classification, displayed review and referenced
+mapping/generation-policy bytes. Agents SHALL only consume matching receipts,
+never issue or broaden them. Unknown, sensitive or conflicting preservation
+and default DECIMAL preservation SHALL remain blocked. Private `derive` SHALL
+NOT become public through this amendment. Registration SHALL remain unavailable
+until matching policy amendments, executable interface evidence and independent
+safety review of the exact activation SHA are complete.
+
+#### Scenario: Private transformation review has completed
+
+- **GIVEN** a private implementation has passing fictional-input tests and
+  independent AI safety review
+- **WHEN** public activation amendments or registration have not completed
+  their required gates
+- **THEN** public transformation execution remains unavailable
+- **AND** generation cannot consume transformation preservation authority
+
 #### Scenario: CSV-derived profile drives generation
 
 - **GIVEN** a profile inferred from source CSV files
@@ -352,6 +371,13 @@ targets SHALL fail with a value-free error.
 Nullable non-primary-key foreign keys SHALL preserve generated nulls and accept
 them during validation. Required identifiers SHALL reject missing values.
 String-pattern bounds SHALL include the complete generated string.
+
+#### Scenario: Nullable foreign key is generated
+
+- **GIVEN** a nullable non-primary-key foreign key
+- **WHEN** generation selects a null value
+- **THEN** validation accepts that null without rewriting it to an identifier
+- **AND** missing required identifiers remain invalid
 
 ### Requirement: Valid Publication And Row Privacy
 Non-negative generation SHALL validate all schema, relationship, and constraint

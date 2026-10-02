@@ -5,6 +5,13 @@ direction before the 1.0 application-boundaries refactor moves code. It does
 not declare internal modules public or approve a contract change.
 
 The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
+The reviewed development activation candidate adds `transform-execute` and local
+`transform-approve` CLI entrances and the workspace consumer
+`execute_transformation`. They share fixed-snapshot application enforcement;
+MCP has no receipt issuer. Ordinary generation remains source-free. These
+additions have exact-SHA safety evidence in ActivationSafety-R3; the current
+development goldens include their registration. Final RC review and release
+gates remain required before public delivery.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 
@@ -74,12 +81,12 @@ Public operations:
 
 ## CLI Surface
 
-`cli-parser-surface.json` tracks these 24 commands; the read-only
+`cli-parser-surface.json` tracks these 26 commands; the read-only
 `transform-review` entry was added for the 1.6 candidate after the original
 1.0 baseline:
 
 - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
-  `transform-review`,
+  `transform-review`, `transform-execute`, `transform-approve`,
   `profile-postgres`, `profile-query`
 - `generate-from-csv`, `validate`, `generate-from-example`
 - `demo`, `doctor`, `audit-verify`, `completion`
@@ -103,6 +110,8 @@ out of `cli.py` must not change those contracts.
 `mcp-generator-tools.json` freezes these generator tools:
 
 - `approve_dataset_plan`, `export_dataset`, `generate_dataset`
+- `review_transformation` (read-only local snapshot review; no execution or receipt)
+- `execute_transformation` (reviewed snapshot/receipt consumer; no receipt issuer)
 - `infer_dataset_spec`, `inspect_dataset_plan`, `plan_dataset`
 - `plan_trino_dataset`, `profile_csv`,
   `recover_dataset_plan`, `validate_dataset`
@@ -180,6 +189,7 @@ The current dependencies after completed extraction increments are:
 | `io/path_policy.py` | descriptor-relative no-follow file/folder publication, inode revalidation, and guarded cleanup |
 | Generator MCP server | agent, adapters, audit, core, I/O, rules, safety, generator transport factory |
 | `trino_config.py` | environment parsing, credential-free JDBC-style endpoint normalization, validated catalog/schema defaults, typed exact/table-wildcard column selectors, connection settings, allowlist inputs, and resource budgets |
+| `trino_auth.py` | candidate runtime secret references, six-method driver authentication construction, fixed authentication diagnostics, and origin/deadline-guarded OAuth HTTP adapter; no CLI/browser ownership |
 | `postgres_config.py` | PostgreSQL source identity, credential-free JDBC-style endpoint normalization, connection settings, typed mandatory exact/table-wildcard column selectors, secret indirection, and profiling budgets |
 | `postgres_client.py` | injected-driver PostgreSQL sessions, forced read-only connection settings, cumulative profiling budgets, bounded result fetching, and redacted failures |
 | `postgres_query_builders.py` | allowlisted PostgreSQL metadata, aggregate shape, local category candidate, and relationship coverage queries without source-row access |
@@ -190,11 +200,11 @@ The current dependencies after completed extraction increments are:
 | `postgres_sql_export.py` | deterministic validated PostgreSQL DDL/INSERT rendering and atomic one-file publication without source access |
 | `trino_sql_policy.py` | identifier validation, allowlists, SQL parsing, and bounded read-only policy |
 | `trino_query_builders.py` | typed, parameterized metadata and aggregate profiling query construction without I/O |
-| `trino_client.py` | injected driver access, session resource budgets, result limits, row conversion, and cleanup |
+| `trino_client.py` | injected driver access, per-client runtime authentication reuse, verified authenticated connections, session resource budgets, result limits, row conversion, and cleanup |
 | `trino_profiling.py` | allowlisted metadata, deterministic wildcard expansion/preflight, and aggregate-only profiling orchestration with injected query fetching |
 | `trino_masking.py` | sensitive-value masking, synthetic category summaries, safe column completion, and opt-in safe-select masking |
 | Trino MCP server | audit, extracted Trino config/policy/query builders/client/profiling/masking, compatibility wrappers, Trino transport factory |
-| MCP transport modules | optional FastMCP and audit wrapping around supplied callables |
+| MCP transport modules | optional FastMCP and audit wrapping around supplied callables; detached typed budget-error translation, not limit enforcement |
 | generation/profiling/validation/rules | core models and pure policy helpers |
 
 Exact local category values pass the shared `core.privacy` content validator

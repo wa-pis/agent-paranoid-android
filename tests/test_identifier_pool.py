@@ -9,6 +9,7 @@ from test_data_agent.core.field import FieldSpec
 from test_data_agent.csv_profiler import MAX_DISTINCT_DIGESTS
 from test_data_agent.generation import generate_dataset, infer_dataset_spec
 from test_data_agent.profiling.schema_profiler import profile_schema
+from test_data_agent.safety import validate_generated_row_privacy
 
 
 @pytest.mark.parametrize("count", [2, 100, 1000])
@@ -44,6 +45,38 @@ def test_pool_size_requires_positive_integer(size):
 
 def test_absent_pool_preserves_old_distribution_serialization():
     assert SyntheticIdentifierDistribution().model_dump() == {"kind": "synthetic_identifier", "prefix": None}
+
+
+@pytest.mark.parametrize("semantic_type", ["email", "phone", "ssn"])
+@pytest.mark.parametrize("seed", [7, -7])
+def test_sensitive_identifier_pool_remains_synthetic_and_valid(semantic_type, seed):
+    spec = DatasetSpec(entities=[EntitySpec(name="events", row_count=12, fields=[
+        FieldSpec(name="contact_id", data_type="string", is_identifier=True,
+                  sensitive=True, semantic_type=semantic_type,
+                  distribution={"kind": "synthetic_identifier", "pool_size": 4}),
+    ])])
+    rows = generate_dataset(spec, seed=seed)
+    assert rows == generate_dataset(spec, seed=seed)
+    values = {row["contact_id"] for row in rows["events"]}
+    assert len(values) == 4
+    assert all(value.startswith("synthetic_") for value in values)
+
+
+@pytest.mark.parametrize("value", ["synthetic_fake@example.invalid", "synthetic_123tail",
+                                   "synthetic_", "synthetic_١٢٣", "aster@example.invalid"])
+def test_sensitive_identifier_does_not_accept_arbitrary_prefixed_values(value):
+    spec = DatasetSpec(entities=[EntitySpec(name="events", row_count=1, fields=[
+        FieldSpec(name="contact_id", data_type="string", is_identifier=True,
+                  sensitive=True, semantic_type="email"),
+    ])])
+    assert validate_generated_row_privacy({"events": [{"contact_id": value}]}, spec)
+
+
+def test_sensitive_non_identifier_still_requires_semantic_synthetic_format():
+    spec = DatasetSpec(entities=[EntitySpec(name="events", row_count=1, fields=[
+        FieldSpec(name="contact", data_type="string", sensitive=True, semantic_type="email"),
+    ])])
+    assert validate_generated_row_privacy({"events": [{"contact": "synthetic_123"}]}, spec)
 
 
 def test_small_pool_cannot_claim_primary_key():

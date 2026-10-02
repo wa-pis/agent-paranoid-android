@@ -250,14 +250,14 @@ def remove_tree(path: Path, expected: PathIdentity) -> None:
         shutil.rmtree(name, dir_fd=parent)
 
 
-def remove_tree_if_identity(path: Path, expected: PathIdentity) -> bool:
+def remove_tree_if_identity(path: Path, expected: PathIdentity, *, strict: bool = False) -> bool:
     with _parent_descriptor(path) as (parent, name):
         current = _stat_at(parent, name)
-        if (
-            current is None
-            or _identity(current) != expected
-            or not stat.S_ISDIR(current.st_mode)
-        ):
+        if current is None:
+            return False
+        if _identity(current) != expected or not stat.S_ISDIR(current.st_mode):
+            if strict:
+                raise ValueError("cleanup path changed")
             return False
         if not shutil.rmtree.avoids_symlink_attacks:
             raise ValueError("secure directory cleanup is unavailable")

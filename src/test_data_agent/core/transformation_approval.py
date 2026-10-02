@@ -1,6 +1,7 @@
 """Private approval material preparation; no receipt or execution authority."""
 
 from collections.abc import Sequence
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -8,6 +9,9 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldProfile, FieldType
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget
+from test_data_agent.core.transformation_limits import (
+    EffectiveInputLimit, InputDimension, TransformationLimitError, resolve_input_limit,
+)
 from test_data_agent.core.transformation_csv import (
     compile_text_replacement_table, normalize_csv_mapping, parse_csv_mapping_bytes,
 )
@@ -61,14 +65,18 @@ def prepare_approval_request(
             type(policy_yaml) is not bytes or type(evidence_json) is not bytes
             or type(max_total_bytes) is not int or max_total_bytes < 1
             or type(max_review_bytes) is not int or max_review_bytes < 1
-            or len(policy_yaml) + len(evidence_json) > max_total_bytes
             or len(external_parts) > 3 * DEFAULT_MAX_INPUT_COLUMNS
             or any(not isinstance(part, SnapshotPart) or type(part.payload) is not bytes
                    for part in external_parts)
-            or sum(len(part.payload) for part in external_parts) > max_total_bytes - len(policy_yaml) - len(evidence_json)
         ):
             raise ValueError
+        run_limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "snapshot_run")
+        material_bytes = len(policy_yaml) + len(evidence_json) + sum(len(part.payload) for part in external_parts)
+        run_limit.check(len(policy_yaml))
         policy = load_behavior_policy_yaml(policy_yaml, max_bytes=max_total_bytes, budget=budget)
+        total_limit = resolve_input_limit(InputDimension.TOTAL_BYTES, policy.resource_limits, os.environ)
+        total_limit.check(material_bytes)
+        run_limit.check(material_bytes)
         profile = DatasetProfile.model_validate_json(evidence_json)
         review = render_policy_review(policy, profile, max_bytes=max_review_bytes)
         mapping_refs: set[str] = set()
@@ -210,9 +218,14 @@ def prepare_approval_request(
             SnapshotPart("evidence", "profile.json", evidence_json),
             *external_parts,
         )
+        complete_bytes = sum(len(part.payload) for part in parts)
+        total_limit.check(complete_bytes)
+        run_limit.check(complete_bytes)
         digest = snapshot_identity(parts, max_total_bytes=max_total_bytes)
         budget.check("transformation approval material")
         return ApprovalRequest(review, parts, digest)
+    except TransformationLimitError:
+        raise
     except (ValueError, TypeError, AttributeError):
         pass
     try:

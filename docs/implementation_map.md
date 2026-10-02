@@ -199,6 +199,14 @@ the existing typed Python client configuration. `postgres_client.py` and
 `trino_client.py` remain unaware of JDBC syntax; Trino receives only validated
 allowlisted catalog/schema defaults.
 
+The gated authentication candidate composes six driver methods through
+`trino_auth.py` and `trino_client.py`, resolving runtime secret references without
+saving credential values in profiles. The client reuses its auth object; the
+OAuth HTTP adapter constrains direct token polling to the configured verified
+HTTPS origin and remaining budgets. The explicit browser callback belongs only
+to `io/commands.py`; its CLI registration remains in an unapplied candidate patch,
+never an MCP callback or source-preservation receipt issuer.
+
 `postgres_profiler.py` and `trino_profiling.py` expand qualified column
 wildcards through bounded table metadata into immutable deterministic explicit
 snapshots. Query builders receive only validated concrete identifiers; local

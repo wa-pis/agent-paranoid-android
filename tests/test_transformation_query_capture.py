@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import TransformationLimitError
 from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_request
@@ -211,7 +212,8 @@ def test_capture_preflight_never_opens_stream_on_invalid_input(tmp_path, fault):
     def forbidden(query):
         pytest.fail("invalid preflight called stream")
 
-    with pytest.raises(ValueError, match="^invalid bounded query capture$") as caught:
+    expected = "limit_exceeded" if fault == "bytes" else "^invalid bounded query capture$"
+    with pytest.raises(ValueError, match=expected) as caught:
         _capture_authorized_result(request, stream=forbidden, **kwargs)
     assert caught.value.__context__ is None
 
@@ -223,6 +225,9 @@ def test_stream_failure_closes_without_snapshot(tmp_path, fault):
     clock = [0.0]
     kwargs["budget"] = GenerationBudget(5, clock=lambda: clock[0])
     kwargs["max_rows"] = 1
+    if fault == "decoded_bytes":
+        kwargs["policy"] = BehaviorPolicy.model_validate({**kwargs["policy"].model_dump(),
+            "resource_limits": {"max_parquet_expanded_bytes": 16384}})
 
     @contextmanager
     def stream(query):
@@ -244,7 +249,112 @@ def test_stream_failure_closes_without_snapshot(tmp_path, fault):
         finally:
             closed.append(True)
 
-    with pytest.raises(ValueError, match="^invalid bounded query capture$") as caught:
+    expected = "limit_exceeded" if fault in {"row_limit", "decoded_bytes"} else "^invalid bounded query capture$"
+    with pytest.raises(ValueError, match=expected) as caught:
         _capture_authorized_result(request, stream=stream, **kwargs)
     assert closed == [True]
     assert caught.value.__context__ is None
+
+
+def test_query_requested_limit_fails_before_stream_and_session_recovers(tmp_path, monkeypatch):
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    kwargs["policy"] = BehaviorPolicy.model_validate({**kwargs["policy"].model_dump(),
+        "resource_limits": {"max_input_rows": 2}})
+    opened = []
+
+    @contextmanager
+    def stream(query):
+        opened.append(True)
+        yield iter(())
+
+    with pytest.raises(TransformationLimitError) as caught:
+        _capture_authorized_result(request, stream=stream, **kwargs)
+    assert not opened
+    assert (caught.value.code, caught.value.amount, caught.value.limit, caught.value.origin) == (
+        "requested_above_limit", 3, 2, "profile")
+    monkeypatch.setenv("TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_ROWS", "3")
+    assert _capture_authorized_result(request, stream=stream, **kwargs).kind == "source"
+    assert opened == [True]
+
+
+@pytest.mark.parametrize("key,threshold,amount", [
+    ("max_input_columns", 1, 2), ("max_input_cells", 3, 4),
+])
+def test_query_dimensions_fail_closed_and_profile_recovers(tmp_path, key, threshold, amount):
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    opened = []
+
+    @contextmanager
+    def stream(query):
+        opened.append(True)
+        yield iter([pa.RecordBatch.from_pylist([
+            {"label": "alpha", "measured": 2}, {"label": "beta", "measured": 1}], schema=kwargs["schema"])])
+
+    for limit in (threshold, amount):
+        kwargs["policy"] = BehaviorPolicy.model_validate({**kwargs["policy"].model_dump(),
+            "resource_limits": {key: limit}})
+        if limit == threshold:
+            with pytest.raises(TransformationLimitError) as caught:
+                _capture_authorized_result(request, stream=stream, **kwargs)
+            assert (caught.value.dimension.value, caught.value.amount, caught.value.limit) == (key, amount, threshold)
+            assert caught.value.origin == "profile"
+            assert caught.value.code == ("requested_above_limit" if key == "max_input_columns" else "limit_exceeded")
+            if key == "max_input_columns":
+                assert not opened
+        else:
+            assert _capture_authorized_result(request, stream=stream, **kwargs).kind == "source"
+
+
+@pytest.mark.parametrize("invalid_tail", [False, True])
+def test_postgres_batching_preserves_order_and_rejects_invalid_tail(tmp_path, invalid_tail):
+    from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
+    from test_data_agent.io.transformation_input import source_reader
+    from test_data_agent.io.transformation_query_snapshot import _query_result_payload
+    from test_data_agent.postgres_config import PostgresConfig
+    import pyarrow.parquet as pq
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    kwargs.update(max_rows=2049, max_bytes=1024 * 1024)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}), allowed_columns=frozenset({"public.orders.status"}))
+    events = []
+
+    class Driver:
+        description = [("label",), ("measured",)]
+        index = 0
+
+        def connect(self, **options):
+            return self
+
+        def cursor(self, **options):
+            return self
+
+        def execute(self, sql):
+            assert sql.endswith("LIMIT 2050")
+
+        def fetchmany(self, size):
+            assert size == 1
+            if self.index == 2049:
+                return []
+            self.index += 1
+            return [("alpha", True if invalid_tail and self.index == 2049 else self.index)]
+
+        def rollback(self):
+            events.append("rollback")
+
+        def close(self):
+            events.append("close")
+
+    stream = partial(_postgres_result_stream, config=config, schema=kwargs["schema"],
+        driver=Driver(), getenv=lambda _: None, clock=lambda: 0.0)
+    if invalid_tail:
+        with pytest.raises(ValueError, match="^invalid bounded query capture$"):
+            _capture_authorized_result(request, stream=stream, **kwargs)
+    else:
+        source = _capture_authorized_result(request, stream=stream, **kwargs)
+        assert [row["measured"] for row in source_reader(source, kwargs["policy"],
+            budget=GenerationBudget(5))] == list(range(1, 2050))
+        parquet = pq.ParquetFile(io.BytesIO(_query_result_payload(source.payload, "postgres_query")))
+        assert parquet.metadata.num_row_groups == 3
+    assert events == ["close", "rollback", "close"]

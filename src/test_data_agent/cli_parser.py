@@ -320,16 +320,36 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
 
+    from test_data_agent.cli_transformation_candidate import _add_execution_arguments
+
+    transform_execute_parser = subparsers.add_parser(
+        "transform-execute",
+        formatter_class=PublicHelpFormatter,
+        help="Execute a separately reviewed local mixed-origin transformation.",
+    )
+    _add_execution_arguments(transform_execute_parser)
+    transform_approve_parser = subparsers.add_parser(
+        "transform-approve", formatter_class=PublicHelpFormatter,
+        help="Confirm an exact reviewed transformation at the local terminal.")
+    transform_approve_parser.add_argument("source", type=Path)
+    transform_approve_parser.add_argument("policy", type=Path)
+    transform_approve_parser.add_argument("receipt", type=Path)
+    transform_approve_parser.add_argument("--snapshot-sha256", required=True)
+    transform_approve_parser.add_argument("--table")
+    transform_approve_parser.add_argument("--max-total-input-bytes", type=int, metavar="BYTES")
+
     transform_review_parser = subparsers.add_parser(
         "transform-review",
-        help="Review a CSV transformation policy without executing it.",
-        description=("Read one fixed CSV snapshot and a local behavior policy. "
+        help="Review a transformation snapshot and policy without executing it.",
+        description=("Read one fixed source snapshot and a local behavior policy. "
+                     "The policy selects CSV, Parquet or an already captured query result; "
+                     "this command does not capture query results or connect to databases. "
                      "Show value-free field decisions and a snapshot digest; "
                      "do not approve or transform source data. "
                      "With --decide, interactively edit and save sensitivity decisions."),
         formatter_class=PublicHelpFormatter,
     )
-    transform_review_parser.add_argument("source", type=Path, help="Local source CSV file.")
+    transform_review_parser.add_argument("source", type=Path, help="Local source snapshot file; format selected by policy.")
     transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
     transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
     transform_review_parser.add_argument(

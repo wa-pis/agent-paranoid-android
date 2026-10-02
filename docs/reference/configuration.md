@@ -81,6 +81,7 @@ introduced here. In PowerShell, use
 | `max_input_columns` | `1000` | columns |
 | `max_input_cells` | `100000000` | cells |
 | `max_input_file_bytes` | `134217728` | bytes |
+| `max_total_input_bytes` | `536870912` | combined snapshot bytes |
 | `max_input_cell_chars` | `1000000` | characters |
 | `max_parquet_expanded_bytes` | `536870912` | decoded/estimated expanded bytes |
 | `max_output_bytes` | `536870912` | private CSV output bytes |
@@ -100,10 +101,21 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Remaining request/worker boundaries still
+explicit per-run argument. Public request boundaries still
 need integration. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
-budgets, or SQL capture caps. Expanded-byte accounting is not a peak-RSS promise.
+budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
+
+Transformation total-input accounting includes source, behavior policy,
+referenced mappings/generation policies, classification evidence and displayed
+review bytes. Read-only review resolves the same session/profile ceiling as the
+closed execution candidate; it does not silently request the default ceiling.
+Set `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES` for the session or
+`resource_limits.max_total_input_bytes` in the saved behavior profile. The closed,
+unregistered CLI candidate additionally accepts `--max-total-input-bytes` and
+the unregistered workspace adapter accepts `max_total_input_bytes`; neither is
+an activated public execution command/tool. Smaller explicit run caps report
+`snapshot_run`; a run cap above the configured ceiling is rejected, not raised.
 
 Private CSV character limits reach parsing, sensitivity detection and profile
 finalization. Internal CSV readers coordinate the stdlib process-global field
@@ -127,7 +139,18 @@ also counts the manifest: `bundle_run` names
 `temporary_csv_publication(max_output_bytes=...)`. A bundle over budget is
 rejected before publication. These share the output ceiling when invoked by
 the publisher; standalone renderers only receive their explicit run budget.
-Query capture budgets remain separate.
+Private fictional query capture uses the same transformation input ceilings:
+`max_rows` / `max_bytes` must fit the effective row / input-file-byte limits
+before opening its stream. Runtime exhaustion names `query_rows_run` or
+`query_bytes_run` and the corresponding `_capture_authorized_result` argument.
+Captured bytes include the query envelope; decoded bytes have their own
+`max_parquet_expanded_bytes` ceiling. The resolved limits and their origins
+are bound into capture metadata. PostgreSQL's private stream uses these
+authorized capture limits, not aggregate-profiling result-row/cell budgets;
+allowlists, read-only sessions and existing statement/time limits remain.
+The private process supervisor reconstructs only validated fixed-schema limit
+diagnostics after clean worker exit and cleanup, never driver exception text.
+This does not activate public execution or establish real-database evidence.
 
 The private replacement dry-run has the same checks. Its exhausted run budget
 reports origin `replacement_trace_run` and names
@@ -290,6 +313,10 @@ catalog or schema identifier to 255 characters.
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
+| `TRINO_AUTH_METHOD` | `none` | Candidate methods: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
+| `TRINO_AUTH_SECRET_ENV` | unset | Name of a runtime environment variable containing the Basic password or JWT, not the secret itself |
+| `TRINO_AUTH_CERTIFICATE_ENV` | unset | Name of a runtime environment variable containing the client certificate path |
+| `TRINO_AUTH_KEY_ENV` | unset | Name of a runtime environment variable containing the private-key path |
 | `TRINO_CATALOG` | unset | Optional request default; must be in `TRINO_ALLOWED_CATALOGS` |
 | `TRINO_SCHEMA` | unset | Optional request default; requires `TRINO_CATALOG` and membership in `TRINO_ALLOWED_SCHEMAS` |
 | `TRINO_ALLOWED_CATALOGS` | required | Comma-separated catalog allowlist |
@@ -301,6 +328,31 @@ catalog or schema identifier to 255 characters.
 | `TRINO_QUERY_MAX_RUN_TIME` | `45s` | Trino total run-time session budget |
 | `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` | `1GB` | Trino physical scan budget |
 | `TRINO_DEPLOYMENT_PROFILE` | `trusted-local` | `trusted-local` permits an unset cumulative scan ceiling; `shared-hardened` requires a finite `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` |
+
+Candidate Kerberos/GSSAPI methods require their driver's optional
+`requests_kerberos` / `requests_gssapi` dependencies and existing runtime
+credentials. They use mutual authentication without delegation. The isolated
+candidate's `profile-query --adapter trino --trino-oauth-browser` explicitly opts
+into opening the configured Trino HTTPS authentication route at a local terminal
+when `TRINO_AUTH_METHOD=oauth2`. It never prints authentication URLs; pipes reject
+before connection. This flag remains in an unapplied registration patch until
+the complete candidate's safety gate. MCP never installs a browser callback.
+Python applications can explicitly supply their own trusted redirect callback.
+The auth object is reused within one client; OAuth token caching remains the
+driver's implementation, including its optional operating-system keyring backend.
+These local checks do not prove remote reachability or authorize live access.
+
+The candidate OAuth2 HTTP adapter also guards the driver's direct token polling:
+requests must target the configured HTTPS Trino host and port, use verified TLS,
+and fit the remaining invocation/request deadline. Environment proxies and netrc
+are not inherited. Other token-server origins fail closed; this is not evidence
+of acceptance against a remote identity provider or a hard wall-clock guarantee
+for arbitrary slow response bodies.
+Selecting OAuth2 installs idempotent value-free diagnostic filters on
+`trino.auth` and `urllib3.connectionpool`; the latter can log token request paths
+at DEBUG. These filters remain attached for the process lifetime, including
+other traffic using those loggers. They neither store secrets nor disable the
+process logger or change its level.
 
 Duration values use `ms`, `s`, `m`, or `h`. Data-size values use `B`, `kB`,
 `MB`, or `GB`.

@@ -289,6 +289,15 @@ class BehaviorPolicyError(ValueError):
     """Bounded structural error; no private policy values attached."""
 
 
+def validate_execution_actions(policy: BehaviorPolicy) -> None:
+    """Shared prospective interface scope; private derivation is not activated."""
+    policy = parse_behavior_policy(policy)
+    if any(item.behavior.action not in {
+            "preserve", "synthesize", "substitute", "replace_text", "drop",
+    } for item in policy.fields):
+        raise BehaviorPolicyError("unsupported transformation execution action")
+
+
 def parse_behavior_policy(payload: object) -> BehaviorPolicy:
     """Parse a private draft; references are declarations, never approvals."""
     try:
