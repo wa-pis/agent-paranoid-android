@@ -77,9 +77,8 @@ ordinal events plus match counts. It reads only the fixed snapshot (at most
 value hashes, and fails closed above the limit. Unmatched cells are counted,
 not copied. This is debugging metadata, not a preview of output or approval.
 
-No source-preserving transformation command is available yet. The separate
-local approval and execution gates in the active OpenSpec are not satisfied by
-this read-only review.
+Review alone does not authorize source preservation. The separate local
+approval and execution entrances below enforce the exact reviewed snapshot.
 
 ### Execution candidate — not publicly enabled
 
@@ -108,10 +107,11 @@ counters and supported recovery keys. Cleanup-incomplete errors require local
 inspection of destination/staging before retry; they do not permit overwrite.
 Database capture and private `derive` are not enabled by this entrance.
 
-These commands are not registered in the public package yet. Isolated fictional
-acceptance is not availability or dataset authorization. Matching safety/spec
-amendments, installed-candidate gates and independent exact-SHA safety review
-must precede activation; ordinary generation stays source-free.
+These commands are registered in this isolated candidate, not in the released
+1.5.0 package. Public delivery requires the matching safety/spec amendment,
+installed-candidate gates and independent exact-SHA safety review. Neither
+command discovery nor passing fictional acceptance authorizes a dataset;
+ordinary generation stays source-free.
 
 In the isolated candidate, the existing decision wizard feeds this same
 execution contract: edit an already reviewable policy with `transform-review

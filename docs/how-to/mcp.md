@@ -77,9 +77,10 @@ Preservation requires a matching receipt issued separately by the human local
 controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
 Changed inputs invalidate receipts; workspace escapes, existing destinations,
 unsupported actions and budget violations fail closed without copying fallback.
-This tool is not registered in the public package yet: installed acceptance,
-matching safety/spec documentation and independent exact-SHA safety review remain
-activation gates. A receipt never authorizes database access or external APIs.
+This isolated candidate registers the consumer; the released 1.5.0 package
+does not. Public delivery requires installed acceptance, matching safety/spec
+documentation and independent exact-SHA safety review. A receipt never
+authorizes database access or external APIs.
 
 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
@@ -191,8 +192,7 @@ The server rejects:
 See [MCP Tools](../mcp_examples.md) and
 [Configuration](../reference/configuration.md) for details.
 
-Transformation execution and preservation approval are not MCP capabilities.
-The shared destination writer is currently a private fictional-test boundary;
-passing its acceptance does not enable a public execution tool. Agents cannot
-issue local preservation receipts. Public activation still requires the scoped
-safety review and executable evidence specified by ADR-0020 and ADR-0021.
+Preservation approval is never an MCP capability. This candidate's separate
+workspace execution consumer cannot issue local receipts, return rows or
+broaden source-free generator authority. Public delivery still requires the
+scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.

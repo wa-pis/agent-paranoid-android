@@ -27,6 +27,91 @@
     }
   },
   {
+    "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\n    Requires the reviewed snapshot digest and, for preservation, a matching\n    receipt issued by the separate controlling-TTY local approval operation.\n    Returns bounded counts and digest metadata, never source or output rows.\n    ",
+    "input_schema": {
+      "properties": {
+        "input_path": {
+          "title": "Input Path",
+          "type": "string"
+        },
+        "max_output_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Output Bytes"
+        },
+        "max_total_input_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Total Input Bytes"
+        },
+        "output_path": {
+          "title": "Output Path",
+          "type": "string"
+        },
+        "policy_path": {
+          "title": "Policy Path",
+          "type": "string"
+        },
+        "receipt_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt Path"
+        },
+        "snapshot_sha256": {
+          "title": "Snapshot Sha256",
+          "type": "string"
+        },
+        "table_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Table Name"
+        }
+      },
+      "required": [
+        "input_path",
+        "policy_path",
+        "output_path",
+        "snapshot_sha256"
+      ],
+      "title": "execute_transformationArguments",
+      "type": "object"
+    },
+    "name": "execute_transformation",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "execute_transformationDictOutput",
+      "type": "object"
+    }
+  },
+  {
     "description": "Generate and export fresh synthetic data; source-row conversion is not supported.",
     "input_schema": {
       "properties": {
@@ -286,7 +371,7 @@
           "type": "integer"
         },
         "invalid_ratio": {
-          "default": 0.0,
+          "default": 0,
           "title": "Invalid Ratio",
           "type": "number"
         },

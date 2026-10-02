@@ -689,7 +689,29 @@ def _require_new_output(path: Path) -> None:
         raise WorkspacePathError("MCP output path already exists")
 
 
+def execute_transformation(
+    input_path: str, policy_path: str, output_path: str, snapshot_sha256: str,
+    table_name: str | None = None, receipt_path: str | None = None,
+    max_output_bytes: int | None = None, max_total_input_bytes: int | None = None,
+) -> dict[str, object]:
+    """Explicit local mixed-origin execution; cannot issue preservation receipts.
+
+    Requires the reviewed snapshot digest and, for preservation, a matching
+    receipt issued by the separate controlling-TTY local approval operation.
+    Returns bounded counts and digest metadata, never source or output rows.
+    """
+    from test_data_agent.mcp_transformation_candidate import _execute_candidate_transformation
+
+    result = _execute_candidate_transformation(
+        input_path, policy_path, output_path, snapshot_sha256,
+        table_name=table_name, receipt_path=receipt_path,
+        max_output_bytes=max_output_bytes, max_total_input_bytes=max_total_input_bytes,
+    )
+    return {**result, "status": "transformation_completed"}
+
+
 _GENERATOR_MCP_TOOLS = (
+    execute_transformation,
     review_transformation,
     profile_csv,
     infer_dataset_spec,

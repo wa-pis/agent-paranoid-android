@@ -320,6 +320,24 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
 
+    from test_data_agent.cli_transformation_candidate import _add_execution_arguments
+
+    transform_execute_parser = subparsers.add_parser(
+        "transform-execute",
+        formatter_class=PublicHelpFormatter,
+        help="Execute a separately reviewed local mixed-origin transformation.",
+    )
+    _add_execution_arguments(transform_execute_parser)
+    transform_approve_parser = subparsers.add_parser(
+        "transform-approve", formatter_class=PublicHelpFormatter,
+        help="Confirm an exact reviewed transformation at the local terminal.")
+    transform_approve_parser.add_argument("source", type=Path)
+    transform_approve_parser.add_argument("policy", type=Path)
+    transform_approve_parser.add_argument("receipt", type=Path)
+    transform_approve_parser.add_argument("--snapshot-sha256", required=True)
+    transform_approve_parser.add_argument("--table")
+    transform_approve_parser.add_argument("--max-total-input-bytes", type=int, metavar="BYTES")
+
     transform_review_parser = subparsers.add_parser(
         "transform-review",
         help="Review a transformation snapshot and policy without executing it.",

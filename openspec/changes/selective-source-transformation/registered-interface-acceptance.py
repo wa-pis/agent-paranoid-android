@@ -260,3 +260,61 @@ def test_registered_profile_review_execution(tmp_path, preserve, wizard_mapping=
 @pytest.mark.parametrize("mapping_kind", ["inline", "csv"])
 def test_registered_wizard_saved_policy_execution(tmp_path, mapping_kind):
     test_registered_profile_review_execution(tmp_path, False, wizard_mapping=mapping_kind)
+
+
+@pytest.mark.parametrize("mapping_kind", ["inline", "csv"])
+def test_registered_sensitive_replacement_stays_local(tmp_path, mapping_kind):
+    values = ["aster@example.invalid", "birch@example.invalid"]
+    source = SnapshotPart("source", "items", ("email\n" + "\n".join(values) + "\n").encode())
+    mapping = {"kind": "inline", "entries": [
+        {"original": [old], "replacement": [new]}
+        for old, new in zip(values, reversed(values), strict=True)]}
+    if mapping_kind == "csv":
+        (tmp_path / "mapping.csv").write_text(
+            "old,new\n" + "\n".join(f"{old},{new}"
+                for old, new in zip(values, reversed(values), strict=True)) + "\n")
+        mapping = {"kind": "csv", "path": "mapping.csv", "source_columns": ["old"],
+                   "replacement_columns": ["new"], "delimiter": ",", "encoding": "utf-8",
+                   "null_token": None}
+    policy = BehaviorPolicy.model_validate({"schema_version": "0.1", "seed": 7,
+        "schema_fingerprint": "0" * 64, "fields": [{"entity": "items", "field": "email",
+        "sensitivity": "sensitive", "behavior": {"action": "substitute", "mapping": mapping}}]})
+    profile = _profile_transformation_source(source, policy, max_bytes=8192, budget=GenerationBudget(5))
+    policy = policy.model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    (tmp_path / "items.csv").write_bytes(source.payload)
+    (tmp_path / "behavior.yaml").write_text(yaml.safe_dump(policy.model_dump(mode="json")))
+
+    def cli(*arguments):
+        response = subprocess.run([sys.executable, "-c",
+            "import sys; from test_data_agent.cli import main; sys.exit(main())", *arguments, "--json"],
+            capture_output=True, text=True, timeout=15)
+        assert response.returncode == 0, response.stderr
+        assert all(value not in response.stdout + response.stderr for value in values)
+        return json.loads(response.stdout)["result"]
+
+    reviewed = cli("transform-review", str(tmp_path / "items.csv"), str(tmp_path / "behavior.yaml"))
+    assert "sensitive" in json.dumps(reviewed)
+    digest = reviewed["snapshot_sha256"]
+    result = cli("transform-execute", str(tmp_path / "items.csv"), str(tmp_path / "behavior.yaml"),
+                 str(tmp_path / "cli-output"), "--snapshot-sha256", digest)
+    assert result["status"] == "transformation_completed"
+
+    async def invoke():
+        parameters = StdioServerParameters(command=sys.executable,
+            args=["-m", "test_data_agent.mcp_generator_server"],
+            env={**os.environ, "TEST_DATA_AGENT_WORKSPACE_ROOT": str(tmp_path)})
+        async with stdio_client(parameters) as (reader, writer):
+            async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+                await session.initialize()
+                return await session.call_tool("execute_transformation", {
+                    "input_path": "items.csv", "policy_path": "behavior.yaml",
+                    "output_path": "mcp-output", "snapshot_sha256": digest})
+
+    response = asyncio.run(invoke())
+    assert not response.isError
+    assert all(value not in response.model_dump_json() for value in values)
+    expected = ("email\n" + "\n".join(reversed(values)) + "\n").encode()
+    for name in ("cli-output", "mcp-output"):
+        assert (tmp_path / name / "dataset.csv").read_bytes() == expected
+    assert (tmp_path / "items.csv").read_bytes() == source.payload
+    assert not (tmp_path / "receipt.json").exists()
