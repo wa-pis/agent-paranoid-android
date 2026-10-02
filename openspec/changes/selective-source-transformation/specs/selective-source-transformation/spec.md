@@ -4,6 +4,57 @@ Proposed capability only; no existing guarantee is modified by this document.
 
 ## ADDED Requirements
 
+### Requirement: Explicit runtime Trino authentication
+The candidate SHALL compose driver-supported Basic, JWT, Kerberos, GSSAPI,
+OAuth2 and Certificate authentication through the shared bounded Trino client.
+Secrets SHALL be runtime-only, outside saved profiles, URLs and logs.
+Authenticated connections SHALL use verified HTTPS. Missing requirements and
+configuration conflicts SHALL reject before connection with value-free errors.
+OAuth2 SHALL NOT use the driver's default console URL disclosure handler.
+The candidate CLI browser route SHALL require explicit opt-in and a local
+interactive terminal. MCP SHALL NOT install this callback. Browser redirects
+and direct token-adapter requests SHALL be restricted to the configured HTTPS
+Trino origin without printing authentication URLs. Existing invocation budgets
+SHALL apply to token requests and before/after redirect callbacks.
+
+#### Scenario: Noninteractive browser authentication
+- **WHEN** the explicit OAuth2 browser flag is invoked through a pipe
+- **THEN** the CLI rejects before connecting or publishing a profile
+
+#### Scenario: Token server attempts a different origin
+- **WHEN** the driver's direct adapter send targets another host, port or HTTP
+- **THEN** the shared adapter rejects before network I/O with a value-free error
+
+#### Scenario: Missing JWT and safe driver failure
+- **WHEN** a JWT runtime secret is missing or authentication construction fails
+- **THEN** no database connection is attempted and no secret or backend error
+  is exposed in the detached user-facing error
+
+### Requirement: Honest bounded Parquet profile evidence
+Parquet profiles SHALL retain unknown null and distinctness statistics as null,
+not measured zero. Unknown distinctness SHALL NOT establish a primary key or
+relationship confidence. Automatic generation-spec inference SHALL reject unknown null ratios.
+Local sensitivity inspection SHALL remain byte/cell/time bounded, retain no
+source values and reject exhaustion instead of publishing a partial profile.
+
+#### Scenario: Missing statistics and sensitive neutral column
+- **WHEN** a fictional Parquet input has no null statistics or sensitive content
+  in a neutral-named column
+- **THEN** unknown null ratios remain null and sensitive content is flagged
+- **AND** no input value appears in the serialized profile
+
+### Requirement: Honest generation validation exit parity
+All generation CLI entrances SHALL preserve supported deliberately invalid
+output and its report while returning exit code 1 and JSON status
+`validation_failed` whenever validation fails. Generation mode SHALL NOT
+override validation status, and privacy failures SHALL still prevent publication.
+
+#### Scenario: Mixed mode across input entrances
+- **WHEN** fictional mixed-mode generation from spec, profile or CSV produces
+  a failed validation report
+- **THEN** the supported result and report remain published
+- **AND** every entrance returns exit 1 and JSON status `validation_failed`
+
 ### Requirement: Read-only transformation review parity
 
 CLI and generator MCP SHALL prepare the same value-free review and exact-byte

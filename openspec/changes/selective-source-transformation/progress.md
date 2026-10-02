@@ -5342,3 +5342,254 @@ Broader transformation remains unfinished.
   Next reconcile client-acceptance gaps and freeze the complete isolated
   activation tree at an exact SHA only after that scope is finished. No push,
   PR, activation or intermediate reviewer requested by this checkpoint.
+- Client-acceptance reconciliation records the current installed wheel identity,
+  saved inline/CSV wizard-to-execution evidence, real local approval boundaries,
+  twelve-route and already completed scale checkpoints with their limitations.
+  Removed obsolete mandatory internal-formula wording from findings 18/23,
+  scenario list and refreshed task 23 to match the September 28 owner correction.
+  No runtime change, replay, new decision or review; no full client/final-RC
+  acceptance claimed. Next finish per-finding dispositions against current
+  executable evidence, including auth/metadata decision provenance, before
+  freezing the completed actual activation SHA.
+- Current-code decision audit (2026-10-02): TrinoClient connection options have
+  no authentication object and TrinoConfig has no selected auth/secret-source
+  contract (finding 21). Parquet's complete-statistics helper returns None for
+  missing statistics, but its public CSVProfile conversion still substitutes
+  null_count=0/null_ratio=0.0 and sensitive=False (finding 26); the helper test
+  therefore does not close public unknown/content semantics. Installed mode
+  acceptance intentionally tolerates both exit 0 and 1 and derives status from
+  that code, so it does not settle the known cross-entry invalid-output contract
+  (25/24). These are verified unresolved choices, not new formula requirements.
+  Requested one consolidated owner decision: authentication method/secret
+  indirection; explicit unknown metadata and bounded sensitivity profiling;
+  uniform intentionally-invalid publication/status/exit behavior. Automation
+  paused pending that decision; no runtime change or successful test replay.
+  Branch PR lookup could not reach GitHub in sandbox; no new PR state inferred.
+- Owner resolved all three decisions on 2026-10-02: all Trino Python-driver
+  authentication methods with runtime secrets outside profiles/URLs/logs;
+  unknown Parquet statistics plus bounded local sensitivity inspection without
+  source-value output or safety claims from incomplete inspection; deliberately
+  invalid supported output/report retained with uniform validation_failed/exit 1.
+  Recorded policy contract and resumed automation with the accepted decisions.
+  Tightened fictional CLI acceptance first: pre-fix 2 passed / 2 failed (2.74s),
+  reproducing profile/CSV exit 0 versus spec exit 1. Shared CLI helper bypassed
+  invalid reports for mixed/negative modes; removed that bypass without changing
+  publication/privacy enforcement or exported helper signature. Added matching
+  CLI/OpenSpec contract. This changes the candidate and invalidates prior wheel
+  identity for this scope; installed rebuild/replay remains required.
+- Post-fix fictional subprocess acceptance: 4 passed (3.06s), retaining rows,
+  manifests, invalid reports, deterministic replay and unchanged source/spec
+  while requiring the uniform exit/envelope. Relevant I/O command suite:
+  35 passed (0.39s). Changed-code Ruff, strict OpenSpec and whitespace pass.
+  CLI name filter selected no tests (81 deselected), not a passed check.
+  Next implement the accepted Parquet unknown/sensitivity contract and inventory
+  actual Trino-driver authentication methods, then rebuild the unified installed
+  candidate for changed scopes. No intermediate review/public activation.
+- Finding 26 public-path regressions now exercise the real exported Parquet
+  adapter, not just its metadata helper. Fictional no-statistics input still
+  returns null_ratio=0.0; a fictional email under neutral column name remains
+  sensitive=False. Both expected-contract tests fail on the current candidate
+  (2 failed, 12 deselected, 0.35s), with no product monkeypatch/live access.
+  Traced the unknown-to-zero conversion through CSVColumnProfile, legacy profile
+  conversion and FieldProfile; downstream planner/review/relationship/presenter
+  consumers assume numeric null ratios. A local adapter-only change would leave
+  inconsistent public/inference behavior, so no such partial fix was applied.
+  Next implement explicit unknown profile metrics through these consumers and
+  bounded Parquet content inspection; these two regression tests remain red
+  until the agreed product correction. Prior successful checks not repeated.
+- Parquet unknown-null correction now propagates None through CSVColumnProfile,
+  legacy conversion and FieldProfile. Measured profiles retain prior values;
+  automatic inference rejects unknown ratios instead of inventing zero, and
+  relationship discovery skips unknown child-null evidence. Presenter supports
+  unknown nullable metrics; spec-based review/advisor fields remain numerical.
+  Bounded local sensitivity inspection walks batches of 256, checks existing
+  expanded-byte/cell/time budgets and retains only boolean flags. Neutral-name
+  fictional email is detected; unsupported composites are conservative-sensitive.
+  No source values or partial trusted profile on budget failure. Updated matching
+  profiling guide/OpenSpec and oversized-cell negative test. Relevant adapter /
+  decimal tests: 16 passed (0.27s); adapter/relationship/presenter including new
+  inference/budget assertions: 33 passed (0.29s). Ruff passed for changed runtime.
+  Next finish distinctness/sensitivity evidence-state audit and installed replay,
+  then implement driver-auth contract. This source WIP is not reviewed activation
+  or final RC; previous installed wheel predates it. No intermediate review.
+- Finished Parquet distinctness audit: metadata adapter had fabricated zero
+  distinct count in addition to the null metric. It now propagates unknown
+  count/unique_ratio as None; CSV measured counts remain unchanged. Primary-key
+  nomination and relationship-confidence paths explicitly exclude unknown
+  evidence; legacy name-based synthetic identifier inference remains separate
+  from measured uniqueness. Changed adapter/relationship tests: 25 passed
+  (0.28s), full strict mypy: 135 files pass. Guide/OpenSpec match the contract.
+  Actual installed Trino driver inventory is 0.338.0: Basic, JWT, Kerberos,
+  GSSAPI, OAuth2 and Certificate authentication. Inspected actual constructors:
+  Kerberos/GSSAPI require optional requests adapters; their config option mutates
+  process environment, so do not forward it casually. OAuth2's default callback
+  prints redirect URLs and opens a browser; product composition must supply a
+  bounded non-logging local interactive route, never use that default in MCP.
+  Inventory is implementation input, not auth acceptance or live-server evidence.
+  Next implement shared pre-connect typed auth configuration with redaction/TLS
+  tests and complete installed replay of these accumulated candidate changes.
+- Implemented typed runtime-only TrinoAuthConfig for the six inventoried driver
+  methods plus unchanged unauthenticated mode. Runtime reference names are hidden
+  from repr; secret values are resolved only during construction, bounded and
+  absent from config. Auth requires HTTPS; conflicting references and missing
+  secrets reject before connection. Kerberos/GSSAPI require their optional
+  adapters and force mutual authentication without delegation/environment mutation.
+  OAuth2 requires an explicitly supplied trusted redirect handler, never the
+  driver's console/browser default. Constructor failures become detached fixed
+  errors. Fictional basic/JWT/missing-secret/HTTP/OAuth-default checks: 3 passed
+  (0.20s). Initial Ruff found test lambda assignment; replaced with named handler.
+  This module is not yet wired to public clients, so finding 21 is NOT closed.
+  Next integrate frozen references through shared Trino configuration/client and
+  CLI-only bounded OAuth handling, then test all methods and failure propagation
+  with isolated drivers before rebuilding the unified candidate. No live access,
+  new dependency, intermediate review or public authentication activation.
+- Shared Trino integration now freezes method/runtime-reference names in typed
+  TrinoConfig.from_env and builds auth before query-work admission/connection.
+  All actual driver connections route through TrinoClient (SQL query adapter
+  and MCP table paths included); auth and verify=True propagate together, while
+  unauthenticated connection kwargs stay unchanged. OAuth requires an explicit
+  trusted application-owned callback; no MCP/stdout fallback was introduced.
+  Auth/client/config focused suites: 59 passed (0.37s). Added real shared-client
+  injected-driver test proves absent JWT stops before connect and supplied JWT
+  propagates auth with verified TLS: 1 passed (0.35s). Changed-code Ruff passes.
+  Documented actual candidate environment keys, never secret contents. This
+  uncommitted source candidate is not public delivery or full finding-21 closure:
+  remaining certificate/optional-adapter/OAuth local-route and error tests plus
+  installed acceptance are required. Next finish those methods end to end and
+  consolidate current contracts/evidence into the complete isolated candidate.
+- Expanded isolated auth-constructor checks cover certificate reference mapping,
+  missing key, Kerberos/GSSAPI mutual/no-delegation flags, method/reference
+  conflicts, unknown-method redaction and detached secret-bearing driver errors:
+  11 passed (0.28s), Ruff pass. Dependency stubs are disclosed unit fixtures,
+  not a monkeypatch of product safety or evidence of a real handshake.
+  Rebuilt the unified isolated runtime with accumulated CLI/Parquet/auth changes
+  in /private/tmp/apa-client-candidate.l4x8yp. Wheel version 1.5.0, SHA256
+  423c30d7a784d0b2a9c00f9b7189e5c8043fe4edad5e36338352d30ea77eb3b9.
+  Build first lacked force-included .agents assets; copied unchanged assets and
+  rebuilt. Install initially hit restricted default uv cache; explicit temporary
+  cache resolved it without permission expansion or primary-environment mutation.
+  Installed changed-scope acceptance: mode/adapter/auth/client 49 passed (3.77s),
+  including verified installed-import CLI subprocesses. Shared development
+  dependencies/overlay remain, not clean final-RC acceptance. Matching auth
+  OpenSpec/configuration notes explicitly retain the unfinished CLI OAuth route.
+  Strict OpenSpec/whitespace pass. Next finish that local OAuth/certificate
+  preflight scope and candidate docs/contracts before exact-SHA review; no public
+  activation, ordinary helper review, CI restart or repeated scale workload.
+- Certificate preflight now checks runtime-referenced certificate/key are readable
+  regular files before constructing driver authentication. Missing/invalid file
+  errors are fixed and path-free; no certificate/key contents are read or
+  certified by this preflight. Fictional placeholder files exercise resolution,
+  missing reference and missing-file rejection (2 passed, 9 deselected, 0.21s);
+  changed-code Ruff pass. Existing installed wheel predates this correction.
+  Further OAuth audit of driver 0.338.0 found private bearer code logs nextUri
+  at debug level and raises authentication errors containing headers/token-server
+  response bodies. A safe redirect callback alone therefore does not complete
+  the no-secret-log/error contract. Its token polling is capped at five attempts,
+  but transport/redirect origin and invocation budgets still need composition.
+  No default browser/console or real auth endpoint was invoked. Next contain
+  OAuth transport/log/error behavior with supported composition and local-only
+  tests before enabling a CLI route; do not claim six-method end-to-end acceptance
+  from constructor tests. No new owner decision or intermediate review requested.
+- OAuth driver diagnostics now use an idempotent application logging filter on
+  trino.auth before OAuth constructor execution: message/arguments/exception
+  text/stack are replaced with a fixed suppression message. This is standard
+  logging composition, not patched driver code or temporary process-wide logging
+  disable/level changes; no secret is stored in filter state. Fictional emitted
+  debug URL test passes (1, 11 deselected, 0.20s). Shared TrinoClient recognizes
+  the driver's typed TrinoAuthError and converts it outside the exception handler
+  to a detached fixed error after releasing slots/closing resources. Other errors
+  and budget categories retain their existing propagation. Relevant auth/budget
+  tests: 8 passed (0.37s); changed-code Ruff and strict mypy (136 files) pass.
+  Repaired configuration-table layout while retaining explicit unfinished OAuth
+  CLI notes. These two leak paths are corrected in source, not proof of bounded
+  OAuth transport/origin/interactive behavior or a reviewed installed RC.
+  Next complete that composition and isolated no-network acceptance; prior wheel
+  predates these changes. No new review, network call or scale replay.
+
+- 2026-10-02: OAuth transport composition now uses the public requests HTTPAdapter
+  extension and dbapi http_session option, including the driver's direct
+  response.connection.send token polling. Configured HTTPS origin only; verified
+  TLS, no inherited environment proxies/netrc, per-send remaining deadline and
+  detached fixed transport errors. Sessions close even when connect fails; work
+  slots release even if session cleanup fails. Dependency-send stubs use only
+  fictional requests without network or product-policy monkeypatches. Focused
+  auth/client checks: 40 passed (0.37s); Ruff passed; mypy 136 files passed after
+  correcting the adapter's positional-compatible public send signature.
+  This does not complete CLI OAuth, certify remote identity providers, or promise
+  hard wall-clock bounds for slow response bodies. Existing installed wheel is
+  unchanged and predates these edits. Next: finish explicit CLI-only redirect
+  composition and bounded callback/no-network installed acceptance, then consolidate
+  the complete candidate. No intermediate review, publication or scale replay.
+
+- 2026-10-02: Completed local CLI OAuth composition for the isolated candidate:
+  explicit --trino-oauth-browser, OAuth method requirement, input/output TTY
+  checks, configured HTTPS redirect origin, bounded URL validation, no console
+  URL output, fixed detached browser errors and invocation checks around the
+  callback. MCP receives no callback. Registration remains unapplied in
+  oauth-browser-registration.patch; activation-registration.patch also remains
+  unapplied in the working checkout. Shared Trino client reuses authentication
+  across its profiling queries instead of rebuilding the OAuth cache per query.
+  No actual browser or DB/API was opened; browser/HTTP tests use dependency stubs.
+  Installed changed-scope candidate: 48 pass (3.54s); explicit pipe preflight
+  passes (0.68s), no artifact/connection; after auth-reuse correction, 30 auth/
+  client/query checks pass (0.92s) and shared deadline exhaustion passes (0.20s).
+  Current wheel 53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb
+  at /private/tmp/apa-complete-candidate.ZIoRWw/dist-client-reuse; installed root
+  /private/tmp/apa-complete-candidate.ZIoRWw/installed-client-reuse. It remains
+  development-labelled 1.5.0, not RC/release, and uses existing dependency overlay.
+  Registration delta passes against the inactive baseline (0.40s). First delta
+  attempt used activated candidate goldens as the inactive baseline and failed;
+  corrected harness cwd, not product guards. Initial help invocation used the
+  nonexistent package __main__; explicit test_data_agent.cli help passed.
+  Ruff, mypy 136 modules, strict OpenSpec and diff checks pass. GitHub PR list is
+  empty for codex/1-6-execution-activation (read-only network retry succeeded).
+  Updated current client evidence for 21/25/26 without closing private/live
+  measurements or pretending all prior scenarios were rerun on the new wheel.
+  Next: reconcile remaining finding dispositions and complete candidate contracts/
+  docs, then milestone gates and exact-SHA safety review before activation.
+
+- 2026-10-02: Reconciled all 26 original findings into an explicit dated candidate
+  disposition register with executable anchors and separate unavailable/private/
+  remote boundaries. Finding 1's sensitive-semantic phone/email/SSN identifier
+  mismatch remains unfixed, not silently called accepted; conservative numeric
+  classification and DECIMAL preservation prohibition remain unchanged. Updated
+  obsolete task decision wording for the three October 2 owner decisions and
+  documented auth/CLI ownership without activating public registrations.
+  GitHub current-branch PR list remains empty (read-only retry outside sandbox).
+  Ran the audited scripts/check_release.sh milestone in the isolated complete
+  candidate with TEST_TRINO_INTEGRATION=0 and TEST_POSTGRES_INTEGRATION=0:
+  Ruff passed, mypy 138 files passed, compileall passed, 103 dependency license
+  records approved, compatibility passed, direct privacy/SQL 19 passed.
+  Full coverage run: 2671 passed, 2 failed, 16 skipped in 129.04s; coverage 90.75%.
+  Both failures were old exit-0 expectations for already-invalid mixed outputs
+  in test_cli/test_csv_profiler, superseded by the explicit October 2 contract.
+  Updated only those exit assertions to 1; all existing physical output/report
+  and incompatible-Parquet rejection assertions remain. Both corrected tests
+  pass (0.44s), changed-test Ruff passes. This is not a single all-green final run.
+  Completed remaining audited gate steps separately after the script stopped:
+  operational budgets passed (profile 0.292s/2.35MB, generate 0.638s/2.58MB,
+  validate 2.688s/0.313MB), DatasetSpec schema byte comparison passed, fictional
+  quickstart seed 12345 produced 25 customers/25 orders, valid report and no
+  copied source rows; manifest compatibility/checks passed. Strict MkDocs 0.40s
+  and OpenSpec passed. No repeated 300k-scale run or actual DB/API/browser.
+  The tested runtime wheel remains 53f117921bdfbce2377a47120e7265295221400d51f546c863311c0cd16d03bb;
+  later changes are documentation and those two test expectations, not a rebuilt
+  or released wheel. No independent review or public activation claimed.
+  Next: finish candidate safety/contract reconciliation and freeze the actual
+  activation tree at an exact signed SHA; final milestone gates/review must target
+  that complete identity, not this unsigned working-tree/partial-green history.
+
+- 2026-10-02: Candidate safety reconciliation caught OAuth token URL diagnostics
+  in urllib3.connectionpool in addition to trino.auth. The local installed urllib3
+  source logs request/redirect/retry paths. Expanded the actual-logger fictional
+  regression: one pass/one failure reproduced the uncovered logger (0.24s).
+  Applied the existing idempotent, stateless diagnostic filter to both logger
+  names; both cases now pass (0.20s), Ruff/diff checks pass. Documented the
+  process-lifetime effect on those loggers without claiming a scoped logging
+  disable or a secret-retaining filter. No real HTTP request or browser call.
+  The prior 53f1179 wheel and full-suite milestone predate this source change.
+  Current GitHub PR list remains empty. Consolidate the complete inactive source,
+  contracts, client dispositions and activation payloads into one signed local
+  checkpoint, then materialize/sign the actual activation tree in isolation for
+  final milestone gates and exact-SHA independent safety review. No ordinary
+  helper review, public registration, push or release is performed by this step.

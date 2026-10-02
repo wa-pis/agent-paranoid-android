@@ -109,14 +109,16 @@ All items below remain unverified until reproduced against the current candidate
   mode and ratio precedence; effective spec/manifest/report/exit reflect execution.
 - [ ] Reproduce/fix 20: doctor retains failed checks, distinguishes missing extras
   from capability failures and gives safe recovery hints without backend text.
-- [ ] Decide 21 auth methods/secret indirection, then implement shared Trino
-  propagation, pre-connect requirements, TLS and redaction tests; no live access.
+- [ ] Consolidate 21's October 2 approved six-method auth/secret-indirection
+  implementation, local CLI opt-in and installed evidence into the final candidate;
+  complete exact-SHA safety review before public activation. No live access.
 - [ ] Integrate 23 into exact-decimal contract and carry precision/scale through
-  profile/spec/generation/formulas/exports without float intermediates.
-- [ ] Reproduce/fix 24 with declared Parquet schemas and physical/readback checks;
-  settle intentional-invalid mixed-type behavior with 25 before implementation.
-- [ ] Reproduce/fix 26 unknown-versus-measured Parquet metadata and bounded
-  sensitivity profiling; decide CLI exposure/export compatibility explicitly.
+  agreed profile/spec/generation/transformation/exports without float
+  intermediates; internal formulas are excluded by the owner scope correction.
+- [ ] Consolidate 24's declared Parquet physical/readback evidence with 25's
+  October 2 invalid-result/exit decision; retain fail-closed incompatible typed output.
+- [ ] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
+  implementation/evidence; finish final-candidate CLI/API compatibility gates.
 - [ ] Reconcile refreshed 1–19 evidence: missing date bounds, SQL diagnostics and
   scan costs, formula dependencies, publication/overwrite and utility boundaries.
 - [ ] Extend candidate matrix to findings 1–26 and section E safeguards; record

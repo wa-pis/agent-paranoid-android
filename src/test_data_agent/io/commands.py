@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import webbrowser
 from pathlib import Path
 from typing import Any, Callable
+from urllib.parse import urlsplit
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.cli_contract import CliExternalServiceError
@@ -51,7 +53,8 @@ from test_data_agent.sql_query_source import (
     SqlQueryProfileRequest,
     SqlQuerySourceError,
 )
-from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.trino_config import TrinoConfig, TrinoConfigurationError
+from test_data_agent.trino_work_budget import current_query_work_budget
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 
 BusinessRulesApplier = Callable[..., Any | None]
@@ -265,6 +268,9 @@ def profile_query_command(args: argparse.Namespace, *, driver: Any) -> int:
         overwrite=getattr(args, "overwrite", False),
     )
     adapter = SqlQueryAdapter(args.adapter)
+    browser_enabled = getattr(args, "trino_oauth_browser", False)
+    if browser_enabled and adapter is not SqlQueryAdapter.TRINO:
+        raise TrinoConfigurationError("OAuth2 browser authentication requires the Trino adapter")
     request = SqlQueryProfileRequest(
         adapter=adapter,
         source_id=args.source_id,
@@ -283,10 +289,13 @@ def profile_query_command(args: argparse.Namespace, *, driver: Any) -> int:
                 ),
             )
         else:
+            config = TrinoConfig.from_env()
+            redirect = _cli_trino_oauth_redirect(config) if browser_enabled else None
             profile = profile_trino_query_source(
                 request,
-                config=TrinoConfig.from_env(),
+                config=config,
                 driver=driver,
+                oauth_redirect=redirect,
                 local_category_fields=tuple(
                     getattr(args, "local_category_fields", ())
                 ),
@@ -296,6 +305,44 @@ def profile_query_command(args: argparse.Namespace, *, driver: Any) -> int:
     write_dataset_profile_artifact(profile, args.output)
     write_profile_summary(args.output)
     return 0
+
+
+def _cli_trino_oauth_redirect(config: TrinoConfig) -> Callable[[str], None]:
+    """Explicit CLI-only browser opt-in, never the driver's console callback."""
+    if config.authentication is None or config.authentication.method != "oauth2":
+        raise TrinoConfigurationError("OAuth2 browser authentication requires TRINO_AUTH_METHOD=oauth2")
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        raise TrinoConfigurationError("OAuth2 browser authentication requires a local interactive terminal")
+
+    def redirect(url: str) -> None:
+        allowed = False
+        try:
+            if isinstance(url, str) and len(url) <= 8192 and not any(ord(char) < 32 for char in url):
+                endpoint = urlsplit(url)
+                allowed = (
+                    endpoint.scheme == "https" and endpoint.hostname == config.host.lower()
+                    and (endpoint.port or 443) == config.port
+                    and endpoint.username is None and endpoint.password is None
+                    and not endpoint.fragment
+                )
+        except ValueError:
+            pass
+        if not allowed:
+            raise TrinoConfigurationError("OAuth2 browser redirect requires the configured HTTPS Trino origin")
+        budget = current_query_work_budget()
+        if budget is not None:
+            budget.check_invocation_deadline()
+        opened = False
+        try:
+            opened = webbrowser.open(url, new=2)
+        except Exception:
+            pass
+        if not opened:
+            raise TrinoConfigurationError("OAuth2 browser could not be opened")
+        if budget is not None:
+            budget.check_invocation_deadline()
+
+    return redirect
 
 
 def generate_dataset_from_csv_command(
@@ -415,8 +462,8 @@ def write_generation_errors(schema_report: Any, business_report: Any | None) -> 
 
 
 def should_fail_generation(schema_report: Any, business_report: Any | None, mode: str) -> bool:
-    if mode in {"mixed", "negative"}:
-        return False
+    # Mode selects generation, not whether failed validation is reported.
+    # Keep the exported helper's mode argument for caller compatibility.
     if not schema_report.valid:
         return True
     return business_report is not None and not business_report.valid

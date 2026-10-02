@@ -6,7 +6,11 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.limits import enforce_input_files, enforce_parquet_metadata_limits
+from test_data_agent.core.limits import (
+    GenerationBudget, InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
+    max_input_cell_chars, max_parquet_expanded_bytes,
+)
+from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, csv_profile_to_dataset_spec
 
@@ -61,6 +65,7 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
     enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
     arrow_schema = parquet_file.schema_arrow
     row_count = parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0
+    sensitive = _parquet_sensitive_columns(parquet_file)
     columns = []
     for index, field in enumerate(arrow_schema):
         null_count = _parquet_null_count(parquet_file.metadata, index, field.name)
@@ -70,10 +75,11 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
             decimal_precision=field.type.precision if str(field.type).startswith("decimal") else None,
             decimal_scale=field.type.scale if str(field.type).startswith("decimal") else None,
             nullable=field.nullable,
-            null_count=null_count if null_count is not None else 0,
-            null_ratio=round(null_count / row_count, 6) if null_count is not None and row_count else 0.0,
-            approx_distinct_count=0,
-            sensitive=False,
+            null_count=null_count,
+            null_ratio=(round(null_count / row_count, 6) if row_count else 0.0)
+            if null_count is not None else None,
+            approx_distinct_count=None,
+            sensitive=sensitive[index],
         ))
     return CSVProfile(
         source_type="parquet",
@@ -81,6 +87,31 @@ def _parquet_metadata_as_csv_profile(path: Path, table_name: str | None = None) 
         row_count=row_count,
         columns=columns,
     )
+
+
+def _parquet_sensitive_columns(parquet_file: Any) -> list[bool]:
+    """Inspect bounded local values; retain only sensitivity flags, never rows."""
+    flags = [infer_sensitive_from_name(field.name) for field in parquet_file.schema_arrow]
+    budget = GenerationBudget()
+    expanded_limit = max_parquet_expanded_bytes()
+    char_limit = max_input_cell_chars()
+    expanded = 0
+    for batch in parquet_file.iter_batches(batch_size=256):
+        budget.check("Parquet sensitivity inspection")
+        expanded += batch.nbytes
+        if expanded > expanded_limit:
+            raise InputLimitError("Parquet sensitivity inspection exceeded expanded byte budget")
+        for index, column in enumerate(batch.columns):
+            for scalar in column:
+                budget.check("Parquet sensitivity inspection")
+                value = scalar.as_py()
+                if isinstance(value, (str, bytes)) and len(value) > char_limit:
+                    raise InputLimitError("Parquet sensitivity inspection exceeded cell size budget")
+                # Composite content is unsupported evidence, not proof of safety.
+                if isinstance(value, (list, tuple, dict)) or infer_sensitive_value_type(value):
+                    flags[index] = True
+    budget.check("Parquet sensitivity inspection")
+    return flags
 
 
 def _parquet_null_count(metadata: Any, index: int, field_name: str) -> int | None:

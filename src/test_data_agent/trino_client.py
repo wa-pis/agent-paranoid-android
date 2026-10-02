@@ -2,17 +2,22 @@
 
 from __future__ import annotations
 
+import os
+
 from collections.abc import Callable, Iterable, Sequence
 from contextlib import closing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from functools import cached_property
 from threading import BoundedSemaphore
 from typing import Any, TypeVar, cast
 
+from test_data_agent.trino_auth import bounded_oauth_session
 from test_data_agent.trino_config import (
     MAX_QUERY_EXECUTION_TIME_MS,
     MAX_QUERY_RUN_TIME_MS,
     MAX_QUERY_SCAN_BYTES,
     TrinoConfig,
+    TrinoConfigurationError,
     parse_data_size_value,
     parse_duration_value,
 )
@@ -51,6 +56,17 @@ class TrinoClient:
 
     config: TrinoConfig
     driver: Any
+    oauth_redirect: Callable[[str], None] | None = field(default=None, repr=False)
+
+    @cached_property
+    def _authentication(self) -> Any:
+        if self.config.authentication is None:
+            return None
+        return self.config.authentication.build(
+            driver_auth=getattr(self.driver, "auth", None), environ=os.environ,
+            username=self.config.user, http_scheme=self.config.http_scheme,
+            oauth_redirect=self.oauth_redirect,
+        )
 
     @classmethod
     def from_env(cls, *, driver: Any = None) -> TrinoClient:
@@ -95,6 +111,9 @@ class TrinoClient:
         if self.driver is None:
             raise RuntimeError("trino package is not installed")
 
+        authentication = self._authentication
+        auth_config = self.config.authentication
+
         estimated_scan_bytes = parse_data_size_value(
             self.config.query_max_scan_physical_bytes,
             "TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES",
@@ -111,6 +130,7 @@ class TrinoClient:
         )
         if not _TRINO_WORK_SLOTS.acquire(blocking=False):
             raise TrinoCapacityError("Trino request capacity exhausted")
+        oauth_session = None
         try:
             connection_options: dict[str, Any] = dict(
                 host=self.config.host,
@@ -128,6 +148,15 @@ class TrinoClient:
                 connection_options["catalog"] = self.config.default_catalog
             if self.config.default_schema is not None:
                 connection_options["schema"] = self.config.default_schema
+            if authentication is not None:
+                connection_options["auth"] = authentication
+                connection_options["verify"] = True
+            if auth_config is not None and auth_config.method == "oauth2":
+                oauth_session = bounded_oauth_session(
+                    host=self.config.host, port=self.config.port,
+                    request_timeout=request_timeout, budget=budget,
+                )
+                connection_options["http_session"] = oauth_session
             connection = self.driver.dbapi.connect(**connection_options)
             with closing(connection), closing(connection.cursor()) as cursor:
                 try:
@@ -161,8 +190,18 @@ class TrinoClient:
                     except QueryWorkBudgetExceeded as deadline_error:
                         raise deadline_error from error
                     raise
+        except Exception as error:
+            auth_error_type = getattr(getattr(self.driver, "exceptions", None), "TrinoAuthError", None)
+            if not isinstance(auth_error_type, type) or not isinstance(error, auth_error_type):
+                raise
         finally:
-            _TRINO_WORK_SLOTS.release()
+            try:
+                if oauth_session is not None:
+                    oauth_session.close()
+            finally:
+                _TRINO_WORK_SLOTS.release()
+        # Raise outside the driver exception handler to detach backend content.
+        raise TrinoConfigurationError("Trino authentication failed")
 
 
 def _bounded_query_timeouts(

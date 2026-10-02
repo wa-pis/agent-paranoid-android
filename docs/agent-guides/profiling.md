@@ -6,6 +6,15 @@ schema inference.
 Treat every input file as potentially sensitive. Profiling may retain only
 metadata and bounded evidence needed to build a generation specification.
 
+Parquet profiles represent unavailable null and distinctness statistics as
+`null`, not zero. Unknown distinctness cannot nominate a primary key or supply
+relationship-confidence evidence.
+Automatic spec inference rejects unknown null ratios; provide an explicit
+reviewed spec rather than silently inventing a distribution. Local sensitivity
+inspection uses bounded batches with existing cell, expanded-byte and time
+budgets. It retains only flags, not values; composite content is conservatively
+sensitive. Exhaustion fails without publishing a partial trusted profile.
+
 SQL query-source files follow the same rule. Parse and authorize the bounded
 file before database access, retain only a source fingerprint, policy version,
 virtual schema, and safe aggregates, and never retain SQL text, literals,

@@ -8,6 +8,25 @@ explicit scope/provenance decisions govern conflicting earlier prose; old
 formula, retention and parser-status paragraphs do not create new authority or
 release blockers. ADRs do not activate the private execution path.
 
+## Owner-confirmed client decisions — 2026-10-02
+
+Finding 21: support every authentication method provided by the selected Trino
+Python driver, not a guessed subset or arbitrary authentication callbacks.
+Inventory the actual dependency and optional requirements before implementation.
+Keep secrets outside profiles, URLs and logs; use runtime secret indirection,
+verified TLS and pre-connect validation. No live database access is authorized.
+
+Finding 26: missing Parquet statistics are unknown, never measured zero.
+Sensitivity inspection may read locally under explicit existing work budgets,
+without returning source values. Incomplete inspection does not establish a
+non-sensitive field. Maintain bounded, source-free profile output.
+
+Findings 25/24: intentionally invalid generated datasets and their validation
+reports remain published when supported by the selected output format; every
+CLI entrance reports validation_failed and exit 1 when validation fails,
+including mixed/negative modes. Valid reports still produce exit 0. This does
+not authorize lossy Parquet coercion or publication after a privacy failure.
+
 ## Owner-approved scale and limit diagnostics — 2026-09-28
 
 Target workload for 1.6.0rc1 is 1,000,000 rows by 100 columns (100,000,000

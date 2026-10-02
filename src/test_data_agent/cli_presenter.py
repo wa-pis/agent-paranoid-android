@@ -398,7 +398,8 @@ def write_agent_review_report(report: AgentReviewReport) -> None:
         for field in entity.fields[:20]:
             flags = [
                 (
-                    f"nullable {field.null_ratio:.2f}"
+                    (f"nullable {field.null_ratio:.2f}" if field.null_ratio is not None
+                     else "nullable unknown")
                     if field.nullable
                     else "required"
                 )

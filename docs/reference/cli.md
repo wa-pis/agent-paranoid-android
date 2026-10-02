@@ -1,5 +1,11 @@
 # CLI Command Index
 
+Generation retains supported intentionally invalid output and its validation
+report, but returns exit `1` / JSON status `validation_failed` when validation
+fails, including `mixed` and `negative` modes. Spec, profile and CSV inputs use
+the same contract. Valid reports return exit `0`. Privacy failures still prevent
+publication; invalid mode never bypasses them.
+
 The executable is `test-data-agent`. Built-in help is the authoritative option
 reference for the installed version:
 

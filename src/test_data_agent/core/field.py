@@ -37,8 +37,8 @@ class FieldProfile(BaseModel):
     decimal_precision: int | None = Field(default=None, strict=True, exclude_if=lambda value: value is None)
     decimal_scale: int | None = Field(default=None, strict=True, exclude_if=lambda value: value is None)
     nullable: bool = False
-    null_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
-    unique_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
+    null_ratio: float | None = Field(default=0.0, ge=0.0, le=1.0)
+    unique_ratio: float | None = Field(default=0.0, ge=0.0, le=1.0)
     unique_ratio_kind: Literal["unspecified", "exact", "lower_bound"] = "unspecified"
     sensitive: bool = False
     semantic_type: str | None = None

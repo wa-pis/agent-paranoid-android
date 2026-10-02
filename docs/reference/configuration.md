@@ -313,6 +313,10 @@ catalog or schema identifier to 255 characters.
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
+| `TRINO_AUTH_METHOD` | `none` | Candidate methods: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
+| `TRINO_AUTH_SECRET_ENV` | unset | Name of a runtime environment variable containing the Basic password or JWT, not the secret itself |
+| `TRINO_AUTH_CERTIFICATE_ENV` | unset | Name of a runtime environment variable containing the client certificate path |
+| `TRINO_AUTH_KEY_ENV` | unset | Name of a runtime environment variable containing the private-key path |
 | `TRINO_CATALOG` | unset | Optional request default; must be in `TRINO_ALLOWED_CATALOGS` |
 | `TRINO_SCHEMA` | unset | Optional request default; requires `TRINO_CATALOG` and membership in `TRINO_ALLOWED_SCHEMAS` |
 | `TRINO_ALLOWED_CATALOGS` | required | Comma-separated catalog allowlist |
@@ -324,6 +328,31 @@ catalog or schema identifier to 255 characters.
 | `TRINO_QUERY_MAX_RUN_TIME` | `45s` | Trino total run-time session budget |
 | `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` | `1GB` | Trino physical scan budget |
 | `TRINO_DEPLOYMENT_PROFILE` | `trusted-local` | `trusted-local` permits an unset cumulative scan ceiling; `shared-hardened` requires a finite `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` |
+
+Candidate Kerberos/GSSAPI methods require their driver's optional
+`requests_kerberos` / `requests_gssapi` dependencies and existing runtime
+credentials. They use mutual authentication without delegation. The isolated
+candidate's `profile-query --adapter trino --trino-oauth-browser` explicitly opts
+into opening the configured Trino HTTPS authentication route at a local terminal
+when `TRINO_AUTH_METHOD=oauth2`. It never prints authentication URLs; pipes reject
+before connection. This flag remains in an unapplied registration patch until
+the complete candidate's safety gate. MCP never installs a browser callback.
+Python applications can explicitly supply their own trusted redirect callback.
+The auth object is reused within one client; OAuth token caching remains the
+driver's implementation, including its optional operating-system keyring backend.
+These local checks do not prove remote reachability or authorize live access.
+
+The candidate OAuth2 HTTP adapter also guards the driver's direct token polling:
+requests must target the configured HTTPS Trino host and port, use verified TLS,
+and fit the remaining invocation/request deadline. Environment proxies and netrc
+are not inherited. Other token-server origins fail closed; this is not evidence
+of acceptance against a remote identity provider or a hard wall-clock guarantee
+for arbitrary slow response bodies.
+Selecting OAuth2 installs idempotent value-free diagnostic filters on
+`trino.auth` and `urllib3.connectionpool`; the latter can log token request paths
+at DEBUG. These filters remain attached for the process lifetime, including
+other traffic using those loggers. They neither store secrets nor disable the
+process logger or change its level.
 
 Duration values use `ms`, `s`, `m`, or `h`. Data-size values use `B`, `kB`,
 `MB`, or `GB`.

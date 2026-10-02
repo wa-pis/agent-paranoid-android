@@ -1403,7 +1403,7 @@ def test_generate_from_profile_writes_data_spec_and_report(tmp_path) -> None:
         ]
     )
 
-    assert exit_code == 0
+    assert exit_code == 1
     assert output_path.exists()
 
     with output_path.open() as handle:
