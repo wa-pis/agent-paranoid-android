@@ -22,10 +22,12 @@ class FakeMCP:
     def __init__(self, name: str) -> None:
         self.name = name
         self.tools: list[Callable[..., Any]] = []
+        self.descriptions: list[str] = []
 
-    def tool(self) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    def tool(self, *, description: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         def register(function: Callable[..., Any]) -> Callable[..., Any]:
             self.tools.append(function)
+            self.descriptions.append(description)
             return function
 
         return register
@@ -37,6 +39,10 @@ def test_generator_transport_registers_audited_services_in_order(
     audited: list[tuple[str, str]] = []
 
     def profile_csv() -> str:
+        """Profile metadata.
+
+        No rows returned.
+        """
         return "profiled"
 
     def generate_dataset() -> str:
@@ -67,6 +73,7 @@ def test_generator_transport_registers_audited_services_in_order(
     ]
     assert mcp.tools[0]() == "profiled"
     assert mcp.tools[1]() == "generated"
+    assert mcp.descriptions == ["Profile metadata.\n\nNo rows returned.", ""]
 
 
 def test_generator_transport_is_optional(

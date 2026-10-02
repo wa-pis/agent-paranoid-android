@@ -1,5 +1,20 @@
 # Implementation Progress
 
+## Registration test-double follow-up — 2026-10-02
+
+PR #601 head 4208046 CI run 37034916010 failed minimum-MCP job 110930773667:
+FakeMCP.tool did not accept the newly explicit description keyword. Real SDK
+registration/installed execution already passed; this is a stale unit double,
+not a reason to remove normalization or bypass the gate. Updated its exact
+keyword signature, retained callable/audit/order checks and added assertions for
+multiline cleandoc output and an undocumented tool's empty description.
+Generator transport suite: 11 passed with MCP 1/Python 3.11 and 11 passed with
+locked MCP 2/Python 3.14; Ruff passed. No runtime or policy changes, new review,
+full-gate/scale replay or live access. Remaining old-head Python jobs still run;
+wait for their final diagnostics before pushing a single same-PR update.
+Next: signed test correction, push only without overlapping old-head CI, then
+latest-head mandatory gates before merge. No tag/version/release.
+
 ## Complete matrix follow-up and installed replay — 2026-10-02
 
 CI e4374e3 run 37025599204 completed failed: all Python jobs retained a second
