@@ -97,6 +97,8 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
         "plan_trino_dataset",
         "profile_csv",
         "recover_dataset_plan",
+        "review_transformation",
+        "execute_transformation",
         "validate_dataset",
     }
     trino_tool_names = {tool["name"] for tool in trino_tools}

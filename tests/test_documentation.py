@@ -23,6 +23,8 @@ PROJECT_VERSION = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"
 STABLE_VERSION = "1.5.0"
 LOCAL_LINK = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 REQUIRED_NAV_DOCS = {
+    "adr/index.md",
+    "adr/open-questions.md",
     "index.md",
     "getting-started/installation.md",
     "getting-started/first-csv.md",
@@ -93,6 +95,25 @@ CLI_COMMANDS = {
     "agent-review",
     "agent-approve",
 }
+
+
+def test_architecture_decisions_are_traceable_and_cover_baseline_specs() -> None:
+    directory = ROOT / "docs" / "adr"
+    index = (directory / "index.md").read_text()
+    records = sorted(directory.glob("[0-9][0-9][0-9][0-9]-*.md"))
+    assert records, "the ADR register must contain decision records"
+    assert len({path.name[:4] for path in records}) == len(records)
+    for path in records:
+        body = path.read_text()
+        assert f"({path.name})" in index, f"unindexed decision: {path.name}"
+        assert body.startswith(f"# ADR-{path.name[:4]}:")
+        assert "- Status:" in body and "- Recorded:" in body
+        for heading in ("Context", "Decision", "Alternatives and consequences", "Evidence", "Revisit when"):
+            assert f"\n## {heading}\n" in body, f"missing {heading}: {path.name}"
+        evidence = body.split("\n## Evidence\n", 1)[1].split("\n## Revisit when\n", 1)[0]
+        assert LOCAL_LINK.search(evidence), f"untraceable decision: {path.name}"
+    for spec in (ROOT / "openspec" / "specs").glob("*/spec.md"):
+        assert f"openspec/specs/{spec.parent.name}/spec.md" in index, f"unmapped capability: {spec.parent.name}"
 
 
 def test_readme_is_a_focused_entrypoint() -> None:
@@ -461,7 +482,16 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     assert active == {
         "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
         "fix-csv-generation-pipeline",
+        "selective-source-transformation",
     }
+
+    transformation = changes / "selective-source-transformation"
+    assert "- [ ]" in (transformation / "tasks.md").read_text()
+    for filename in ("proposal.md", "design.md", "plan.md", "client-acceptance.md"):
+        assert (transformation / filename).is_file()
+    assert (
+        transformation / "specs" / "selective-source-transformation" / "spec.md"
+    ).is_file()
 
     openai_change = changes / "openai-3-sdk-compatibility"
     openai_tasks = (openai_change / "tasks.md").read_text()

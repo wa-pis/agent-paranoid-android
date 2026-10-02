@@ -1,0 +1,257 @@
+# Selective Transformation Safety Boundary — Local Operator Decision
+
+Scope note (2026-09-29): the owner's 2026-09-28 clarification removed internal
+formula/total recomputation from the 1.6 RC requirements; historical examples
+below do not reinstate it. See [ADR-0026](../../../docs/adr/0026-transformation-scope.md).
+All preservation, classification, exact-input approval, privacy and activation
+gates remain in force; see [ADR-0021](../../../docs/adr/0021-local-preservation-approval.md).
+
+This document proposes a scoped amendment, not an active exception to AGENTS.md.
+Do not enable source-preserving execution until this boundary, matching baseline
+specifications and executable safety checks have received independent review.
+
+## Development Before Activation
+
+The owner approved separating development from activation on 2026-09-25.
+Private implementation and isolated executable tests on fictional inputs may
+precede the final implementation safety review. Use bounded temporary test
+outputs, no user destinations, real databases, production data or external APIs.
+Keep public CLI/Python/MCP execution unavailable. Tests must exercise the actual
+private implementation, not monkeypatch product safeguards to obtain a pass.
+
+The sequence is implementation with failing/passing tests, end-to-end safety
+evidence, independent review of the exact implementation SHA, then separately
+gated activation and release. Existing preservation, classification, receipt,
+snapshot, privacy and publication requirements still govern the implementation.
+No dataset is authorized by this development permission. Documentation changes
+do not override workspace/tool restrictions or establish that prior tool
+rejections have been lifted; a remaining tool restriction must be reported,
+not bypassed through another path.
+
+## Separate Surface
+
+### Activation contract under review (not enabled)
+
+The first shared execution entrance is a separately selected local-file
+transformation, not `generate`, `agent-approve`, profiling, or an advisor.
+Local interactive CLI alone may issue a receipt; noninteractive CLI and
+workspace-confined agent execution may consume an existing matching receipt.
+No agent/MCP approval operation, environment switch, or boolean may substitute
+for the controlling-terminal confirmation. The current candidate modules are
+unregistered; this amendment does not register them or approve a dataset.
+
+Closed fictional-test composition may register the private execution callable
+only in its test server. It reuses the audited/redacted bounded stdio transport
+and the same request-context work budget for transport and application dispatch.
+No receipt issuer is registered. SDK and subprocess tests of this composition
+are evidence for review, not public activation or authorization of any dataset.
+
+Closed candidate execution requires source, saved policy, new destination and
+the exact reviewed `snapshot_sha256`; table identity and existing receipt are
+optional explicit inputs. CLI run caps are `--max-total-input-bytes` and
+`--max-output-bytes`; workspace-call counterparts are `max_total_input_bytes`
+and `max_output_bytes`. Omission selects the effective session/profile ceiling,
+not an unlimited budget. Output format belongs to the saved policy. Success
+returns digest, provenance counts and output-budget metadata, not dataset rows.
+The closed status `closed_test_completed` is not a public release contract.
+
+#### Concrete registration candidate (still inactive)
+
+The unapplied `activation-registration.patch` proposes `transform-execute`
+and `transform-approve` in the existing CLI dispatcher, and
+`execute_transformation` in the existing bounded generator MCP registry.
+The proposed execution success status is `transformation_completed`, inside
+the existing CLI JSON result envelope or MCP structured result. Existing CLI
+error envelopes retain `error.exit_code`; execution does not invent another
+error schema. `transform-approve` keeps the local terminal review and fresh
+confirmation visible even with `--json`; piped APPROVE cannot authorize it.
+MCP registers only receipt consumption, never an approval operation.
+
+`registered-interface-acceptance.py` is an explicitly invoked acceptance file,
+not normal production registration. It exercises the concrete patch only in
+an isolated installed wheel on fictional temporary inputs: saved policy, actual
+CLI review, controlling-TTY approval, CLI publication and bounded MCP stdio
+publication. It also rejects missing/forged receipts, agent approval flags,
+workspace escapes, invalid arguments, exhausted/requested budgets, existing
+destinations, stale digests and old receipts after freshly reviewed source or
+inline-mapping byte mutations. The original input bytes, receipt and prior
+publication must survive failures unchanged. The installed acceptance also
+starts with the actual decision/action wizard for inline and local CSV mappings,
+saves the policy, re-reviews its exact bytes and executes via CLI and MCP.
+Saving decisions is not preservation approval. Exact wheel and check outcomes
+are recorded in progress.md; this evidence does not establish completed
+activation review, full RC acceptance or public availability.
+
+Before applying this candidate to public source, reconcile AGENTS.md and
+baseline/OpenSpec safety contracts, affected CLI/MCP documentation and golden
+inventories; test the installed complete candidate; record independent AI
+safety review of the exact activation SHA. Ordinary source-free commands and
+their disclosure budgets remain unchanged. Release readiness and final RC SHA
+review are additional gates, not implied by interface acceptance.
+
+Malformed CLI arguments use fixed invalid-arguments text and a command help
+hint; rejected tokens are never echoed. MCP typed argument failures use the
+existing fixed validation error. Transformation limit failures retain their
+safe typed counters, units, origin and session/profile recovery keys through
+SDK dispatch. Generic publication failures must not be mistaken for confirmed
+cleanup: the distinct cleanup-incomplete warning below takes precedence.
+
+The entrance must reject unsupported actions/routes rather than silently use
+private implementations. In particular, private `derive` remains unavailable
+publicly under ADR-0026. Database query capture remains separately gated by
+read-only allowlists and shared budgets; a local-file receipt does not authorize
+a database connection or external API. Publication is a new local bundle,
+never overwrite or in-place mutation of source, policy, mapping or receipt.
+
+Before policy settings can be read, policy bytes and YAML parsing share the
+bounded session/legacy-session/default bootstrap ceiling. An explicit positive
+run cap replaces the default bootstrap before reading policy; when a session
+or legacy-session ceiling exists, that request is checked against it first.
+This permits a bounded run request above the default to read a profile declaring
+a larger ceiling, not automatic elevation of the effective profile ceiling.
+After parsing, the request is checked against the resolved effective ceiling
+and rejected if larger. Once parsed, the existing resolver
+selects each transformation ceiling from session override, explicit saved
+profile setting, legacy session fallback, then default. An explicit run cap
+may equal or lower that effective ceiling; a larger request fails with
+`requested_above_limit`. Actual cumulative exhaustion fails with
+`limit_exceeded`. Total accounting includes policy, source, referenced mapping
+and generation-policy bytes, classification evidence and displayed review.
+Errors identify amount, threshold, units, configuration origin and supported
+recovery keys, never source literals. Source-free disclosure ceilings are
+separate and unchanged; there is no truncation or automatic budget increase.
+
+Publication requires all validation and manifest preparation before commit.
+On failure, cleanup is limited to captured identities owned by that invocation.
+If cleanup cannot be verified, a distinct sanitized cleanup-incomplete error
+must warn that output/staging may remain. The operator must inspect the exact
+destination and staging locations locally before retrying; neither automatic
+deletion of an unverified path nor an overwrite retry is authorized.
+
+Activation requires matching AGENTS.md, project safety documentation and
+baseline/OpenSpec amendments, executable positive/negative interface evidence,
+and independent AI safety review of the precise activation SHA. Review is
+labelled AI, not human GitHub approval; required branch protections still apply.
+All sensitivity, DECIMAL, exact-byte binding and residual privacy restrictions
+below survive activation unchanged.
+
+Existing generate/profile/advisor/MCP workflows remain source-free as documented.
+Neither a valid behavior policy nor a loaded mapping enables preservation there.
+The new explicitly selected transformation surface produces a mixed-origin,
+one-to-one transformed dataset, never a certified anonymous or fully synthetic one.
+
+## Preservation Authority
+
+On 2026-09-24 the user approved the product requirement that the human personally
+confirms concrete columns and the exact plan before execution; the agent cannot
+grant itself permission, and sensitive or disputed columns remain blocked.
+The user subsequently selected trust in the local CLI operator as the deployment
+boundary. This is not a cryptographic proof of human identity: a process with
+the same local filesystem and terminal privileges can impersonate the operator.
+That equal-privilege impersonation is explicitly outside this deployment's
+protection claim. No source-bearing dataset was approved by this conversation.
+
+Every input field requires an explicit action. Direct preservation requires a
+field explicitly declared non-sensitive and authorized for preservation.
+Owner amendment 2026-10-02 / ADR-0029 permits explicit mapped replacements to
+equal another original value, including sensitive mapped permutations. This is
+replacement, not implicit copying or preserve authority; sensitivity remains a
+value-free field note. Existing source-free and transport disclosure boundaries
+remain unchanged. This amended contract still awaits executable evidence and
+independent exact-SHA review before activation.
+Unresolved sensitive/unknown classifications or conflicting profiling evidence
+block preservation, including unmatched-value preserve fallback. Agent proposals,
+heuristic output, arbitrary authorization-reference strings and bulk acceptance
+cannot grant or expand this authority. Sensitive fields require replacement or
+exclusion; merely relabeling them does not declassify them.
+
+DECIMAL preservation is blocked by default, including an unmatched-value
+preserve fallback, even when the profile has no positive sensitivity flag.
+The proposed narrow human exception is not active: current profile evidence
+does not identify whether a positive numeric signal came solely from a
+false-positive shape or from card/phone/semantic evidence. No exception may
+be enabled until that provenance is typed, snapshot-bound, tested and
+independently reviewed. Source-free DECIMAL generation keeps its existing
+privacy checks.
+
+The execution boundary must verify approval of the exact reviewed plan and
+fixed input snapshots. Private receipt helpers are not a completed execution
+boundary; the selection below is not permission to trust a boolean or opaque
+reference.
+
+### Selected Approval Transport: Trusted Local Operator
+
+The existing `agent-approve` spec hash selects a source-free generation plan; it
+is not transformation approval. The new, separate local CLI approval must:
+
+- present a bounded, value-free review of the exact effective plan in the local
+  terminal: input/plan identity, every field action including unmatched-preserve
+  fallbacks, the proposed preserved columns, and each column's reviewed
+  sensitivity/conflict status. A digest alone is not sufficient for confirmation;
+- require a fresh explicit interactive terminal confirmation, not a CLI flag,
+  environment variable, piped stdin, or caller-supplied `authorization_ref`;
+- bind the resulting restricted receipt to that displayed review, its immutable
+  sensitivity/classification evidence, the reviewed policy, fixed source bytes
+  and all referenced mapping/generation-policy bytes. Revalidate the evidence
+  against those same snapshots and consume them at execution; a changed input
+  or classification requires review and approval again;
+- keep default MCP and agent planning/advice unable to create or broaden that
+  receipt. No agent/MCP transformation-approval endpoint may mint a receipt.
+  Noninteractive/agent execution may only consume an existing matching receipt,
+  never replace local approval;
+- keep sensitive, unknown and conflicting preservation prohibited regardless
+  of operator confirmation.
+
+The receipt is an exact-input integrity record, not a signature or proof of
+personhood. Owner-only local storage and an interactive prompt prevent accidental
+or remote approval through supported interfaces; they do not protect against an
+agent/process with equivalent local privileges. A separately controlled signing
+authority is not selected or implemented. This boundary must receive matching
+AGENTS.md/baseline-spec amendments, executable tests and independent safety
+review before source-preserving execution is enabled.
+
+## Identity And Execution
+
+Approval binds source bytes/supported fixed snapshots, policy, referenced mapping
+bytes and generation policies, including transitive inputs. A column-schema hash
+alone is insufficient. Validate and consume the same snapshots; changed inputs
+require renewed review. Budgets apply across the invocation, not per helper.
+SQL reads remain separately authorized, read-only, allowlisted and bounded.
+
+Copying original values is allowed only in explicitly permitted preserved output
+fields. This does not prohibit independently synthesized equality for approved
+zero/declared-rounding cases or independently recomputed derived values that
+coincide with originals. Those cases never permit skipping replacement/computation
+or falling back to copying; the financial replacement contract still applies.
+Mappings may contain private originals locally; mapping output values must still
+pass applicable privacy/type/constraint checks. One-to-one row correspondence is
+internal and must not become an exported original-to-replacement lookup table.
+All derived values and relationships must validate before atomic publication.
+Failures must not publish a partial dataset or fall back to copying source values.
+
+## Restricted And Public Artifacts
+
+Source-bearing policies, maps, snapshots and identity evidence are restricted
+local inputs. Never send them to providers, logs, exception chains or default MCP
+responses. Public summaries contain bounded counts/status and opaque references,
+not literals. Output manifests must state mixed origin and residual privacy risk.
+Preserved combinations can still identify people or reveal confidential facts;
+successful validation does not prove anonymity.
+
+## Required Executable Evidence
+
+- Default source-free surfaces cannot invoke preservation through forged settings.
+- Unknown/new fields and schema drift fail before execution.
+- Sensitive/unknown/conflicting preservation fails, including fallback and agent use.
+- Approval cannot be fabricated by setting authorization_ref or reusing stale hashes.
+- Source/policy/mapping mutations invalidate approval; no check-then-reopen path.
+- Restricted values do not leak through errors, warnings, summaries or providers.
+- Mapping collisions, invalid formulas, resource exhaustion and privacy failures
+  prevent publication and preserve existing destination artifacts.
+- Fictional end-to-end finance data retains authorized reference combinations,
+  changes amounts, recomputes totals and preserves declared key relationships.
+- Zero/declared-rounding equality and coincident computed totals are accepted only
+  through the declared synthesis/derivation path, never a copy/skip fallback.
+
+The existing helper tests cover only parts of these requirements. No task above
+is considered passed merely because isolated parsers or loaders passed review.

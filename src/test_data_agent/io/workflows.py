@@ -77,9 +77,20 @@ def generate_dataset_bundle(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    mode: str | None = None,
+    invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> DatasetGenerationResult:
     effective_spec = spec.model_copy(deep=True)
+    if mode is not None or invalid_ratio is not None:
+        apply_dataset_mode_options(
+            effective_spec,
+            mode=mode or effective_spec.generation_settings.mode.value,
+            invalid_ratio=(
+                effective_spec.generation_settings.invalid_ratio
+                if invalid_ratio is None else invalid_ratio
+            ),
+        )
     if not effective_spec.entities:
         raise ValueError("dataset spec must contain at least one entity")
     effective_output_format = output_format or effective_spec.generation_settings.output_format
@@ -119,7 +130,7 @@ def generate_dataset_bundle(
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
-        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder)
+        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec)
         budget.check("dataset validation")
@@ -165,6 +176,8 @@ def generate_dataset_artifacts(
     output_format: OutputFormat | None = None,
     seed: int | None = None,
     count: int | None = None,
+    mode: str | None = None,
+    invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
 ) -> int:
     result = generate_dataset_bundle(
@@ -173,6 +186,8 @@ def generate_dataset_artifacts(
         output_format=output_format,
         seed=seed,
         count=count,
+        mode=mode,
+        invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
     )
     return 0 if result_is_valid(result) else 1
@@ -254,7 +269,7 @@ def generate_single_entity_profile_artifacts(
     report = validate_dataset(rows_by_entity, spec)
     budget.check("dataset validation")
     if output_path is None:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -271,7 +286,7 @@ def generate_single_entity_profile_artifacts(
     temp_identity = path_identity(temp_folder)
     temp_output_path = temp_folder / output_path.name
     try:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -431,7 +446,7 @@ def generate_dataset_review_artifacts(
     try:
         if source_folder is not None:
             assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
-        write_dataset_rows(rows_by_entity, output_format, temp_folder)
+        write_dataset_rows(rows_by_entity, output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec)
         budget.check("dataset validation")
@@ -501,6 +516,7 @@ def apply_dataset_mode_options(spec: DatasetSpec, *, mode: str, invalid_ratio: f
         raise ValueError("--invalid-ratio requires --mode mixed or --mode negative")
     else:
         spec.generation_settings.mode = GenerationMode(mode)
+        spec.generation_settings.invalid_ratio = 0.0
 
 
 def max_generation_count() -> int:

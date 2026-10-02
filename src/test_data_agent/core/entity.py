@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from test_data_agent.core.field import FieldProfile, FieldSpec
+from test_data_agent.core.distribution import SyntheticIdentifierDistribution
 
 
 class EntityProfile(BaseModel):
@@ -33,7 +34,7 @@ class EntityProfile(BaseModel):
 
 
 class EntitySpec(BaseModel):
-    model_config = ConfigDict(validate_assignment=True)
+    model_config = ConfigDict(validate_assignment=True, hide_input_in_errors=True)
 
     name: str = Field(min_length=1)
     row_count: int = Field(gt=0)
@@ -53,6 +54,13 @@ class EntitySpec(BaseModel):
                 raise ValueError(
                     f"entity spec {self.name!r} primary key must be an identifier field"
                 )
+            distribution = primary_key_field.typed_distribution
+            if (
+                isinstance(distribution, SyntheticIdentifierDistribution)
+                and distribution.pool_size is not None
+                and distribution.pool_size < self.row_count
+            ):
+                raise ValueError("primary key pool cannot be smaller than row count")
         return self
 
     def field(self, name: str) -> FieldSpec:

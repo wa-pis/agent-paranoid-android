@@ -11,6 +11,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from test_data_agent.core.privacy import infer_sensitive_from_name
+
 try:  # pragma: no cover - optional database extra.
     import sqlglot
     from sqlglot import exp
@@ -19,7 +21,7 @@ except ImportError:  # pragma: no cover
     exp = None  # type: ignore[assignment]
 
 
-QUERY_SOURCE_POLICY_VERSION = "1.0"
+QUERY_SOURCE_POLICY_VERSION = "1.1"
 DEFAULT_MAX_QUERY_BYTES = 64 * 1024
 DEFAULT_MAX_AST_NODES = 500
 DEFAULT_MAX_AST_DEPTH = 32
@@ -122,11 +124,19 @@ class ValidatedSqlQuery:
     output_fields: tuple[str, ...]
     fingerprint: str
     sql: str = field(repr=False, compare=False)
+    safe_temporal_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
+    has_unmodeled_expressions: bool = False
 
 
 _ALLOWED_NODE_NAMES = frozenset(
     {
         "Abs",
+        "Avg",
+        "Count",
+        "Group",
+        "Max",
+        "Min",
+        "Sum",
         "Add",
         "Alias",
         "And",
@@ -171,7 +181,8 @@ _ALLOWED_NODE_NAMES = frozenset(
     }
 )
 _ALLOWED_FUNCTIONS = frozenset(
-    {"ABS", "CAST", "COALESCE", "LOWER", "ROUND", "TRIM", "UPPER"}
+    {"ABS", "CAST", "COALESCE", "LOWER", "ROUND", "TRIM", "UPPER",
+     "SUM", "COUNT", "MIN", "MAX", "AVG"}
 )
 
 
@@ -201,14 +212,33 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
     if any(getattr(node, "comments", None) for node in nodes):
         raise SqlQuerySourceError("SQL query comments are not allowed")
     if any(type(node).__name__ not in _ALLOWED_NODE_NAMES for node in nodes):
+        if any(isinstance(node, exp.With) for node in nodes):
+            raise SqlQuerySourceError(
+                "SQL query contains a forbidden operation: CTE/WITH is not supported; "
+                "use one fully qualified single-table SELECT"
+            )
+        if any(isinstance(node, exp.Join) for node in nodes):
+            raise SqlQuerySourceError(
+                "SQL query contains a forbidden operation: JOIN is not supported; "
+                "profile permitted tables separately"
+            )
         raise SqlQuerySourceError("SQL query contains a forbidden operation")
     for node in nodes:
-        if isinstance(node, exp.Func) and node.sql_name().upper() not in _ALLOWED_FUNCTIONS:
+        if (
+            isinstance(node, exp.Func)
+            and type(node) not in (exp.And, exp.Or)
+            and node.sql_name().upper() not in _ALLOWED_FUNCTIONS
+        ):
             raise SqlQuerySourceError("SQL query contains a forbidden function")
     tables = tuple(statement.find_all(exp.Table))
     if len(tables) != 1:
         raise SqlQuerySourceError("SQL query must reference exactly one table")
     table = tables[0]
+    table_alias = table.args.get("alias")
+    if table_alias is not None and table_alias.args.get("columns"):
+        raise SqlQuerySourceError("SQL query table column aliases are unsupported")
+    if any(any(star.args.values()) for star in statement.find_all(exp.Star)):
+        raise SqlQuerySourceError("SQL query wildcard modifiers are unsupported")
     table_parts = _table_parts(table, request.adapter)
     alias = table.alias_or_name
     if not _IDENTIFIER_RE.fullmatch(alias):
@@ -258,6 +288,7 @@ def authorize_query_source(
     if len(projections) > draft.request.limits.max_projected_columns:
         raise SqlQuerySourceError("SQL query projected-column budget exceeded")
     statement.set("expressions", projections)
+    _validate_aggregate_shape(statement)
 
     for column in statement.find_all(exp.Column):
         if isinstance(column.this, exp.Star):
@@ -272,6 +303,18 @@ def authorize_query_source(
     output_fields = tuple(_projection_name(item) for item in statement.expressions)
     if len(output_fields) != len(set(output_fields)):
         raise SqlQuerySourceError("SQL query output field names must be unique")
+    source_fields_are_non_sensitive = all(
+        not infer_sensitive_from_name(column.name)
+        for column in statement.find_all(exp.Column)
+    )
+    safe_temporal_output_fields = frozenset(
+        output
+        for projection, output in zip(statement.expressions, output_fields, strict=True)
+        if source_fields_are_non_sensitive
+        and (source := _direct_source_field(projection)) is not None
+        and not infer_sensitive_from_name(source)
+        and not infer_sensitive_from_name(output)
+    )
     dialect = "postgres" if draft.request.adapter is SqlQueryAdapter.POSTGRES else "trino"
     canonical_sql = statement.sql(dialect=dialect, pretty=False)
     fingerprint = hashlib.sha256(
@@ -288,7 +331,50 @@ def authorize_query_source(
         output_fields=output_fields,
         fingerprint=fingerprint,
         sql=canonical_sql,
+        safe_temporal_output_fields=safe_temporal_output_fields,
+        has_unmodeled_expressions=any(
+            bool(projection.find(exp.AggFunc))
+            or _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
+            for projection in statement.expressions
+        ),
     )
+
+
+def _validate_aggregate_shape(statement: Any) -> None:
+    """Bound the approved single-table aggregate subset before derived queries."""
+    aggregates = tuple(statement.find_all(exp.AggFunc))
+    group = statement.args.get("group")
+    if not aggregates and group is None:
+        return
+    groups = tuple(group.expressions) if group is not None else ()
+    if (group is not None and (not groups or any(
+            value for key, value in group.args.items() if key != "expressions"))
+            or any(not isinstance(item, exp.Column) or item.is_star for item in groups)):
+        raise SqlQuerySourceError("SQL query requires explicit grouping columns")
+    grouped_names = {item.name for item in groups}
+    projected_aggregates = []
+    for projection in statement.expressions:
+        value = projection.this if isinstance(projection, exp.Alias) else projection
+        if isinstance(value, exp.AggFunc):
+            projected_aggregates.append(value)
+            argument = value.this
+            if (argument is None or value.expressions
+                    or any(argument.find_all(exp.AggFunc))
+                    or any(argument.find_all(exp.Star)) and not (
+                        isinstance(value, exp.Count) and type(argument) is exp.Star)):
+                raise SqlQuerySourceError("SQL query aggregate argument is unsupported")
+        elif not isinstance(value, exp.Column) or value.is_star or value.name not in grouped_names:
+            raise SqlQuerySourceError("SQL query projection must be grouped or aggregated")
+    if len(aggregates) != len(projected_aggregates):
+        raise SqlQuerySourceError("SQL query aggregate placement is unsupported")
+    # Grouping and MIN/MAX can reveal source values; aliases cannot declassify them.
+    if any(infer_sensitive_from_name(column.name) for column in statement.find_all(exp.Column)):
+        raise SqlQuerySourceError("SQL query aggregate source is sensitive")
+
+
+def _direct_source_field(projection: Any) -> str | None:
+    source = projection.this if isinstance(projection, exp.Alias) else projection
+    return source.name if isinstance(source, exp.Column) else None
 
 
 def _read_stable_query_file(path: Path, *, max_bytes: int) -> str:

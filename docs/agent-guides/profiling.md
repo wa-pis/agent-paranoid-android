@@ -6,6 +6,19 @@ schema inference.
 Treat every input file as potentially sensitive. Profiling may retain only
 metadata and bounded evidence needed to build a generation specification.
 
+Parquet profiles represent unavailable null and distinctness statistics as
+`null`, not zero. Unknown distinctness cannot nominate a primary key or supply
+relationship-confidence evidence.
+Automatic spec inference rejects unknown null ratios; provide an explicit
+reviewed spec rather than silently inventing a distribution. Local sensitivity
+inspection uses bounded batches with existing cell, expanded-byte and time
+budgets. It retains only flags, not values; composite content is conservatively
+sensitive. Exhaustion fails without publishing a partial trusted profile.
+Numeric inspection uses an explicit textual representation only for sensitivity,
+not field matching. Unsupported binary evidence is conservatively sensitive.
+The existing local profiling deadline spans inspection and metadata finalization;
+the generation deadline is not a substitute.
+
 SQL query-source files follow the same rule. Parse and authorize the bounded
 file before database access, retain only a source fingerprint, policy version,
 virtual schema, and safe aggregates, and never retain SQL text, literals,
@@ -24,7 +37,35 @@ first resolve to a deterministic explicit-column snapshot.
 - masked patterns; and
 - synthetic examples that were not copied from the input.
 
+Parquet `decimal128(p,s)` and declared PostgreSQL/allowed-query
+`numeric(p,s)` retain schema-only precision and scale (up to 38 digits) in
+`DatasetProfile`; no decimal source values or extrema are retained. A profile
+cannot supply exact generation bounds on its own: infer-spec requires a human
+to provide a reviewed `decimal_range` in DatasetSpec 1.1. Higher declared
+precision fails closed. Unbounded SQL `numeric` retains its legacy approximate
+FLOAT path and must not be presented as exact financial evidence.
+
+Folder CSV profiles label `unique_ratio_kind` as `exact` (rounded to six decimal
+places) or `lower_bound` when the 10,000-value distinct tracker overflows.
+For `lower_bound`, display “at least X%”, not exact uniqueness. The ratio uses
+non-null normalized values and is truncated downward to six decimal places.
+Overflow evidence cannot nominate a primary key, even when its lower bound
+exceeds the usual threshold. Relationship discovery excludes lower-bound parent
+keys and omits lower-bound child distinct ratios from numeric evidence. Older
+profiles and other producers default to `unspecified`, not proven exact; reprofile
+old folder artifacts to obtain the new uncertainty metadata. This statistic is
+unrelated to the planned percentage of unchanged values after transformation.
+Cache format 4 invalidates older folder caches and recomputes their evidence,
+including repeated-identifier pool sizes.
+Unspecified metadata is omitted from canonical profile fingerprints to preserve
+saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
+
 ## Forbidden behavior
+
+These are source-free profiling/generation rules. The separate gated selective
+transformation contract (ADR-0029) permits explicit mapped replacements to equal
+other source values for every field, with value-free sensitivity notes. It does
+not permit raw profile/review/transport disclosure or broaden direct preserve.
 
 - copying or shuffling source rows;
 - exposing real names, emails, phones, addresses, IDs, tokens, secrets, or

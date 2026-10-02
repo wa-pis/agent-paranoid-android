@@ -205,7 +205,7 @@ def test_infer_generate_validate_and_export_dataset_through_mcp_tools(
         csv_rows = list(csv.DictReader(handle))
     json_rows = json.loads((tmp_path / "generated" / "json" / "customers.json").read_text())
 
-    assert inferred["schema_version"] == "1.0"
+    assert inferred["schema_version"] == "1.1"
     assert generated["row_counts"] == {"customers": 4}
     assert generated["validation"]["valid"] is True
     assert validated["validation"]["valid"] is True

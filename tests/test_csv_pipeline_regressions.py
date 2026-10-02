@@ -161,7 +161,7 @@ def test_sensitive_string_identifier_passes_final_privacy_validation() -> None:
     assert validate_dataset(rows, spec).valid
 
 
-@pytest.mark.parametrize("length", [9, 10, 11, 12, 15, 16])
+@pytest.mark.parametrize("length", [7, 8, 9, 10, 11, 12, 15, 16])
 def test_short_string_patterns_keep_random_suffix(length: int) -> None:
     spec = DatasetSpec.model_validate({
         "entities": [{"name": "items", "row_count": 100, "fields": [{

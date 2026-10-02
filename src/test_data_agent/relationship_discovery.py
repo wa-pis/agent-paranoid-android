@@ -54,10 +54,14 @@ def mine_relationship_candidates(
     for parent in profile.entities:
         for parent_field_name in parent.primary_key_candidates:
             parent_field = parent.field(parent_field_name)
+            if parent_field.unique_ratio_kind == "lower_bound" or parent_field.unique_ratio is None:
+                continue
             for child in profile.entities:
                 if child.name == parent.name:
                     continue
                 for child_field in child.fields:
+                    if child_field.null_ratio is None or child_field.unique_ratio is None:
+                        continue
                     if child_field.name != parent_field.name:
                         continue
                     if not _key_types_compatible(parent_field, child_field):
@@ -84,6 +88,8 @@ def mine_relationship_candidates(
                             ),
                         ),
                     ]
+                    if child_field.unique_ratio_kind == "lower_bound":
+                        evidence = [item for item in evidence if item.metric != "child_distinct_ratio"]
                     fields = [
                         DiscoveryFieldReference(
                             entity=parent.name, field=parent_field.name

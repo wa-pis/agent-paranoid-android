@@ -35,6 +35,7 @@ from test_data_agent.csv_profiler import profile_csv
 from test_data_agent.generation.entity_generator import generate_dataset
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldType
+from test_data_agent.core.dataset import parse_dataset_spec_payload
 
 
 PROJECT_VERSION = tomllib.loads(
@@ -70,12 +71,16 @@ def test_dataset_spec_loads_minimal_shape_with_default_settings() -> None:
     assert spec.privacy_settings.treat_unknown_as_sensitive is True
     assert spec.generation_settings.mode == GenerationMode.VALID
     assert spec.validation_settings == ValidationSettings()
-    assert spec.schema_version == "1.0"
+    assert spec.schema_version == "1.1"
 
 
 def test_dataset_spec_compatibility_registry_matches_current_contract() -> None:
-    assert SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS == {"1.0"}
+    assert SUPPORTED_DATASET_SPEC_SCHEMA_VERSIONS == {"1.0", "1.1"}
     assert DEPRECATED_DATASET_SPEC_SCHEMA_VERSIONS == set()
+
+
+def test_missing_spec_version_keeps_legacy_semantics() -> None:
+    assert parse_dataset_spec_payload({"entities": []}).schema_version == "1.0"
 
 
 def test_local_category_allowlist_rejects_unknown_and_duplicate_fields() -> None:
@@ -395,7 +400,7 @@ def test_privacy_policy_helpers_detect_and_mask_sensitive_values() -> None:
 
 def test_package_root_exposes_only_dataset_oriented_api() -> None:
     assert test_data_agent.DatasetSpec is DatasetSpec
-    assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.0"
+    assert test_data_agent.DATASET_SPEC_SCHEMA_VERSION == "1.1"
     assert test_data_agent.__version__ == PROJECT_VERSION
     assert test_data_agent.generate_dataset_bundle is not None
     assert test_data_agent.generate_dataset is not None

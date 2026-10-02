@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+import re
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -18,6 +19,7 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.profile_types import ProfileDataType, coerce_profile_type
+from test_data_agent.csv_profiler import MAX_DISTINCT_DIGESTS
 
 
 def legacy_profile_to_dataset_profile(
@@ -38,10 +40,23 @@ def legacy_profile_to_dataset_profile(
         for column in profile.get("columns", [])
     ]
 
+    for field, column in zip(field_profiles, profile.get("columns", []), strict=True):
+        if field.null_ratio is None:
+            continue
+        distinct = column.get("approx_distinct_count")
+        non_null_rows = row_count * (1 - field.null_ratio)
+        if (
+            field.is_identifier and type(distinct) is int
+            and 0 < distinct < non_null_rows
+            # CSV digest counts at the cap are censored, not a measured pool.
+            and not (source_type == "csv" and distinct >= MAX_DISTINCT_DIGESTS - 1)
+        ):
+            field.distribution = {**field.distribution, "pool_size": distinct}
+
     primary_key_candidates = [
         field.name
         for field in field_profiles
-        if field.is_identifier and field.unique_ratio >= 1.0
+        if field.is_identifier and field.unique_ratio is not None and field.unique_ratio >= 1.0
     ]
 
     return DatasetProfile(
@@ -85,9 +100,11 @@ def _field_profile_from_column(
     suppress_sensitive_numeric: bool = False,
 ) -> FieldProfile:
     name = str(column.get("name", "column"))
-    unique_ratio = _safe_ratio(column.get("approx_distinct_count"), row_count)
-    is_identifier = _is_identifier(name, unique_ratio) and not (
-        column.get("top_values") and unique_ratio < 1.0
+    unique_ratio = None if column.get("approx_distinct_count", 0) is None else _safe_ratio(
+        column.get("approx_distinct_count"), row_count
+    )
+    is_identifier = _is_identifier(name, unique_ratio if unique_ratio is not None else 0.0) and not (
+        column.get("top_values") and unique_ratio is not None and unique_ratio < 1.0
     )
     semantic_type = _optional_string(column.get("semantic_type"))
     top_values = column.get("top_values") or []
@@ -101,11 +118,15 @@ def _field_profile_from_column(
         or is_sensitive_field(name, semantic_type)
         or content_sensitive_type is not None
     )
+    precision, scale = _declared_decimal_shape(column)
     return FieldProfile(
         name=name,
         data_type=_field_type_from_raw(column.get("data_type", "string")),
+        decimal_precision=precision,
+        decimal_scale=scale,
         nullable=bool(column.get("nullable", False)),
-        null_ratio=float(column.get("null_ratio", 0.0) or 0.0),
+        null_ratio=None if column.get("null_ratio", 0.0) is None
+        else float(column.get("null_ratio", 0.0)),
         unique_ratio=unique_ratio,
         sensitive=sensitive,
         semantic_type=semantic_type,
@@ -130,6 +151,8 @@ def _field_type_from_raw(value: Any) -> FieldType:
         return FieldType.INTEGER
     if normalized == FieldType.FLOAT.value:
         return FieldType.FLOAT
+    if normalized == FieldType.DECIMAL.value:
+        return FieldType.DECIMAL
     if normalized == FieldType.BOOLEAN.value:
         return FieldType.BOOLEAN
     if normalized == FieldType.DATE.value:
@@ -147,11 +170,27 @@ def _field_type_from_raw(value: Any) -> FieldType:
     return _field_type_from_profile_type(coerced)
 
 
+def _declared_decimal_shape(column: Mapping[str, Any]) -> tuple[Any, Any]:
+    precision = column.get("decimal_precision")
+    scale = column.get("decimal_scale")
+    if precision is not None or scale is not None:
+        return precision, scale
+    raw = str(column.get("data_type", "")).lower().replace(" ", "")
+    if not raw.startswith(("decimal(", "numeric(")):
+        return None, None
+    match = re.fullmatch(r"(?:decimal|numeric)\((\d{1,4})(?:,(\d{1,4}))?\)", raw)
+    if match is None:
+        raise ValueError("unsupported decimal type declaration")
+    return int(match.group(1)), int(match.group(2) or "0")
+
+
 def _field_type_from_profile_type(data_type: ProfileDataType) -> FieldType:
     if data_type == ProfileDataType.INTEGER:
         return FieldType.INTEGER
     if data_type == ProfileDataType.FLOAT:
         return FieldType.FLOAT
+    if data_type == ProfileDataType.DECIMAL:
+        return FieldType.DECIMAL
     if data_type == ProfileDataType.BOOLEAN:
         return FieldType.BOOLEAN
     if data_type == ProfileDataType.DATE:
@@ -171,6 +210,10 @@ def _distribution_from_profile_column(
     *,
     suppress_sensitive_numeric: bool = False,
 ) -> dict[str, Any]:
+    raw_type = str(column.get("data_type", "")).lower()
+    if raw_type == FieldType.DECIMAL.value or coerce_profile_type(raw_type) == ProfileDataType.DECIMAL:
+        shape = column.get("numeric_shape")
+        return {"kind": "numeric_shape", **dict(shape)} if isinstance(shape, Mapping) else {}
     top_values = column.get("top_values") or []
     masked_patterns = column.get("masked_patterns") or []
     if is_identifier:

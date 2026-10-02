@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import math
 import os
+import socket
+import ssl
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -109,10 +111,13 @@ class PostgresProfileSession:
         }
         if password is not None:
             connect_kwargs["password"] = password
+        failure = None
         try:
             self._connection = self._driver.connect(**connect_kwargs)
-        except Exception:
-            raise PostgresConnectionError("PostgreSQL connection failed") from None
+        except Exception as exc:
+            failure = _connection_failure_message(exc)
+        if failure is not None:
+            raise PostgresConnectionError(failure)
         self._deadline = self._clock() + self._config.limits.max_seconds
         return self
 
@@ -246,6 +251,31 @@ class PostgresProfileSession:
     def _check_deadline(self) -> None:
         if self._clock() >= self._deadline:
             raise PostgresBudgetExceeded("PostgreSQL session deadline exceeded")
+
+
+def _connection_failure_message(exc: Exception) -> str:
+    """Return fixed recovery hints, never driver text or dynamic identifiers."""
+    for error_type, hint in (
+        (TimeoutError, "timeout; check reachability and connection timeout"),
+        (ConnectionRefusedError, "connection refused; check service availability"),
+        (socket.gaierror, "name resolution failed; check host configuration"),
+        (ssl.SSLError, "TLS negotiation failed; check certificate and TLS configuration"),
+    ):
+        if isinstance(exc, error_type):
+            return f"PostgreSQL connection failed: {hint}"
+    try:
+        state = getattr(exc, "sqlstate", None)
+    except Exception:
+        state = None
+    hints = {
+        "28000": "authorization rejected; check credentials and access policy",
+        "28P01": "authentication rejected; check credentials",
+        "3D000": "database unavailable; check database configuration",
+        "42501": "permission denied; check read-only role grants",
+    }
+    if type(state) is str and state in hints:
+        return f"PostgreSQL connection failed: {hints[state]}"
+    return "PostgreSQL connection failed"
 
 
 def _description_value(item: Any, attribute: str, index: int) -> str:

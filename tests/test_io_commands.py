@@ -121,6 +121,49 @@ generation_settings:
     assert written_report["valid"] is True
 
 
+@pytest.mark.parametrize(
+    ("options", "expected_mode", "expected_ratio", "expected_invalid"),
+    [
+        ([], "mixed", 1.0, True),
+        (["--mode", "negative", "--invalid-ratio", "1"], "negative", 1.0, True),
+        (["--invalid-ratio", "0"], "mixed", 0.0, False),
+        (["--mode", "valid", "--invalid-ratio", "0"], "valid", 0.0, False),
+        (["--mode", "edge", "--invalid-ratio", "0"], "edge", 0.0, False),
+        (["--mode", "load_test", "--invalid-ratio", "0"], "load_test", 0.0, False),
+    ],
+)
+def test_generate_spec_mode_options_match_rows_and_artifacts(
+    tmp_path: Path,
+    options: list[str],
+    expected_mode: str,
+    expected_ratio: float,
+    expected_invalid: bool,
+) -> None:
+    spec_path = tmp_path / "dataset_spec.json"
+    spec_path.write_text(json.dumps({
+        "entities": [{"name": "orders", "row_count": 3,
+                      "fields": [{"name": "amount", "data_type": "integer"}]}],
+        "generation_settings": {"seed": 7, "mode": "mixed", "invalid_ratio": 1.0,
+                                "output_format": "json"},
+    }))
+    output = tmp_path / "generated"
+
+    exit_code = main(["generate", str(spec_path), "--output", str(output), *options])
+
+    rows = json.loads((output / "orders.json").read_text())
+    saved = load_dataset_spec(output / "dataset_spec.yaml")
+    manifest = json.loads((output / "generation_manifest.json").read_text())
+    report = json.loads((output / "validation_report.json").read_text())
+    assert exit_code == int(expected_invalid)
+    assert all(isinstance(row["amount"], str if expected_invalid else int) for row in rows)
+    assert manifest["effective_rules"]["generation_mode"] == expected_mode
+    assert manifest["effective_rules"]["invalid_ratio"] == expected_ratio
+    assert saved.generation_settings.mode.value == expected_mode
+    assert saved.generation_settings.invalid_ratio == expected_ratio
+    assert report["valid"] is not expected_invalid
+    assert json.loads(spec_path.read_text())["generation_settings"]["mode"] == "mixed"
+
+
 def test_validate_dataset_artifacts_ignores_json_metadata_files(tmp_path) -> None:
     spec_path = tmp_path / "dataset_spec.yaml"
     spec_path.write_text(

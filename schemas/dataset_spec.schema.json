@@ -224,6 +224,7 @@
       "enum": [
         "integer",
         "float",
+        "decimal",
         "boolean",
         "string",
         "date",
@@ -564,8 +565,11 @@
       "type": "array"
     },
     "schema_version": {
-      "const": "1.0",
-      "default": "1.0",
+      "default": "1.1",
+      "enum": [
+        "1.0",
+        "1.1"
+      ],
       "title": "Schema Version",
       "type": "string"
     },
@@ -575,5 +579,5 @@
   },
   "title": "DatasetSpec",
   "type": "object",
-  "x-schema-version": "1.0"
+  "x-schema-version": "1.1"
 }

@@ -48,6 +48,11 @@ def dedupe_relationships(relationships: list[Relationship]) -> list[Relationship
     best: dict[tuple[str, str], Relationship] = {}
     for relationship in relationships:
         key = (relationship.child_entity, relationship.child_field)
-        if key not in best or relationship.confidence > best[key].confidence:
+        current = best.get(key)
+        if current is None or relationship.confidence > current.confidence or (
+            relationship.confidence == current.confidence
+            and relationship.parent_field == relationship.child_field
+            and current.parent_field != current.child_field
+        ):
             best[key] = relationship
     return list(best.values())

@@ -113,7 +113,7 @@ if "warehouse.orders_query" in entities:
     fields = {field["name"]: field for field in entities["warehouse.orders_query"]["fields"]}
     assert list(fields) == ["order_id", "customer_id", "state", "doubled_amount", "expedited"]
     assert len(profile["source_fingerprint"]) == 64
-    assert profile["source_policy_version"] == "1.0"
+    assert profile["source_policy_version"] == "1.1"
     assert "999999" not in json.dumps(profile, sort_keys=True)
     values = {item["value"] for item in fields["state"]["distribution"]["categories"]}
     assert values == {"new", "paid", "shipped"}

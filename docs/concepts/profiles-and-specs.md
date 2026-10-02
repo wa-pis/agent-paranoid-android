@@ -53,12 +53,33 @@ test-data-agent profile-query query.sql \
   --output out/profile.json
 ```
 
-The initial policy accepts exactly one fully qualified, single-table `SELECT`
+SQL source policy 1.1 accepts exactly one fully qualified, single-table `SELECT`
 with explicit projections or an authorized qualified wildcard, bounded filters,
 and a small deterministic scalar-expression set. It rejects joins, CTEs,
 subqueries, set operations, windows, table functions, commands, volatile or
 unknown functions, multiple statements, and unauthorized references before
 derived aggregate work begins.
+
+It also accepts aliased `SUM`, `COUNT`, `MIN`, `MAX` and `AVG` projections,
+optionally grouped by explicit authorized source columns. Each other selected
+column must be a grouping key. `COUNT(*)` counts rows; it is not a row wildcard.
+Aggregate arguments may use the existing scalar expressions, but nested or
+wrapped aggregates, DISTINCT aggregates, HAVING, grouping expressions/ordinals,
+ROLLUP and grouping sets remain unsupported. Grouped/aggregate queries referencing
+sensitive-name source columns fail closed even when renamed. Existing budgets
+and disclosure checks remain; small groups are not an anonymity guarantee.
+For example, `SELECT status, COUNT(*) AS measured FROM public.orders GROUP BY
+status` profiles a grouped relation without fetching its rows.
+
+Query profiles also record `has_unmodeled_expressions`: a source-dependent
+non-column projection or any aggregate (including `COUNT(*)`) sets it to `true`. Profiling remains available, but
+`infer-spec` rejects such profiles rather than silently generating independent
+values that break SQL-expression dependencies. Direct column aliases remain
+eligible. Older SQL profiles missing the marker must be reprofiled before
+automatic inference. Non-query legacy profiles retain prior inference behavior.
+The optional marker defaults to null (unknown); unknown does not change legacy
+profile fingerprints, while explicit true/false is included in the fingerprint.
+This does not translate SQL into formulas or authorize raw query-result access.
 
 The profile records `source_fingerprint` and `source_policy_version`, not SQL
 text or literals. The adapter performs a no-row schema probe followed by

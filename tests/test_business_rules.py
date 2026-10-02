@@ -12,6 +12,7 @@ from test_data_agent.business_validator import validate_business_rules
 from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.rules.business_config import apply_and_validate_business_rules
 from test_data_agent.rules.engine import apply_business_rules as apply_neutral_business_rules
+from test_data_agent.rules.expressions import parse_safe_expression
 from test_data_agent.rules.models import (
     ScenarioRule as NeutralScenarioRule,
     business_rules_from_dict,
@@ -753,6 +754,18 @@ def test_business_rule_contract_rejects_unsupported_formula_syntax() -> None:
         validate_business_rules_for_spec(rules, spec)
 
 
+@pytest.mark.parametrize("expression", [
+    "round('fictional_private_marker', 2)",
+    "fictional_private_marker(",
+])
+def test_formula_parse_errors_do_not_retain_expression_values(expression: str) -> None:
+    with pytest.raises(ValueError) as error:
+        parse_safe_expression(expression)
+
+    assert "fictional_private_marker" not in str(error.value)
+    assert error.value.__context__ is None
+
+
 def test_business_rule_contract_rejects_formula_value_injection() -> None:
     spec = DatasetSpec(
         entities=[
@@ -824,3 +837,11 @@ def test_business_validation_bounds_total_report_errors() -> None:
     assert sum(len(result.errors) for result in report.results) == 1_000
     assert report.results[-1].errors == []
     assert report.results[-1].errors_truncated is True
+
+
+def test_expression_references_distinguishes_function_calls_from_same_named_fields():
+    from test_data_agent.rules.expressions import expression_references
+
+    assert expression_references("sum + sum('input') + count + count()") == (
+        {"sum", "count"}, {"input"}, {"sum", "count"},
+    )

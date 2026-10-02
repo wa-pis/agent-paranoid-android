@@ -1,0 +1,463 @@
+"""Internal private behavior-policy structure, not execution authorization."""
+
+import hashlib
+import json
+import re
+from datetime import datetime, timezone as utc_timezone
+from graphlib import TopologicalSorter
+from typing import Annotated, Literal, TypeAlias
+from zoneinfo import ZoneInfo
+
+from pydantic import Field, StrictBool, StrictInt, StrictStr, ValidationError, model_validator
+
+from test_data_agent.core.dataset import DatasetProfile
+from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
+from test_data_agent.core.transformation_limits import TransformationInputLimits
+from test_data_agent.core.privacy import is_sensitive_field, normalize_field_name
+from test_data_agent.core.transformation_mapping import (
+    CsvMapping, DomainMapping, InlineMapping, MappingSource, _PrivateModel,
+)
+from test_data_agent.rules.expressions import expression_references
+
+
+Reference: TypeAlias = Annotated[StrictStr, Field(min_length=1, max_length=256)]
+
+
+class PreserveAction(_PrivateModel):
+    action: Literal["preserve"]
+    format_temporal: StrictBool = False
+    authorization_ref: Reference = Field(repr=False)
+    comment: StrictStr = Field(min_length=1, max_length=256, repr=False)
+
+    @model_validator(mode="after")
+    def require_meaningful_comment(self) -> "PreserveAction":
+        if not self.comment.strip():
+            raise ValueError("preservation comment is required")
+        return self
+
+
+class SynthesizeAction(_PrivateModel):
+    action: Literal["synthesize"]
+    generation_policy_ref: Reference = Field(repr=False)
+
+
+class RejectUnmatched(_PrivateModel):
+    action: Literal["reject"] = "reject"
+
+
+UnmatchedPolicy: TypeAlias = Annotated[
+    RejectUnmatched | PreserveAction | SynthesizeAction, Field(discriminator="action")
+]
+
+
+class SubstituteAction(_PrivateModel):
+    action: Literal["substitute"]
+    mapping: MappingSource = Field(repr=False)
+    unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
+
+
+class ReplaceTextAction(_PrivateModel):
+    action: Literal["replace_text"]
+    mapping: CsvMapping | None = Field(default=None, repr=False)
+    unmatched: UnmatchedPolicy = Field(default_factory=RejectUnmatched, repr=False)
+
+
+class DeriveAction(_PrivateModel):
+    action: Literal["derive"]
+    expression: StrictStr = Field(min_length=1, repr=False)
+    dependencies: tuple[Reference, ...] = Field(min_length=1, repr=False)
+
+
+class DropAction(_PrivateModel):
+    action: Literal["drop"]
+
+
+FieldAction: TypeAlias = Annotated[
+    PreserveAction | SynthesizeAction | SubstituteAction | ReplaceTextAction | DeriveAction | DropAction,
+    Field(discriminator="action"),
+]
+
+
+class DecimalType(_PrivateModel):
+    """Explicit CSV interpretation; never inferred from approximate statistics."""
+
+    precision: StrictInt = Field(ge=1, le=38)
+    scale: StrictInt = Field(ge=0, le=38)
+
+    @model_validator(mode="after")
+    def require_supported_scale(self) -> "DecimalType":
+        if self.scale > self.precision:
+            raise ValueError("decimal scale exceeds precision")
+        return self
+
+
+class TemporalType(_PrivateModel):
+    """Explicit field formatting metadata; never an implicit conversion action."""
+
+    type: Literal["date", "datetime"]
+    format: Annotated[StrictStr, Field(min_length=1, max_length=256)] = Field(repr=False)
+    output_format: Annotated[StrictStr, Field(min_length=1, max_length=256)] = Field(repr=False)
+    source_timezone: Reference | None = Field(default=None, repr=False)
+    target_timezone: Reference | None = Field(default=None, repr=False)
+
+    def render(self, value: str) -> str:
+        """Private explicit conversion; does not grant source preservation."""
+        try:
+            if type(value) is not str or len(value) > 4096:
+                raise ValueError
+            parsed = datetime.strptime(value, self.format)
+            if self.type == "date":
+                if parsed.tzinfo is not None or parsed.time() != datetime.min.time():
+                    raise ValueError
+                return parsed.date().strftime(self.output_format)
+            if parsed.tzinfo is None and self.source_timezone is not None:
+                zone = ZoneInfo(self.source_timezone)
+                first = parsed.replace(tzinfo=zone, fold=0)
+                second = parsed.replace(tzinfo=zone, fold=1)
+                # Without an offset there is no unique instant in a DST fold/gap.
+                if first.utcoffset() != second.utcoffset():
+                    raise ValueError
+                if first.astimezone(utc_timezone.utc).astimezone(zone).replace(tzinfo=None) != parsed:
+                    raise ValueError
+                parsed = first
+            if self.target_timezone is not None:
+                if parsed.tzinfo is None:
+                    raise ValueError
+                parsed = parsed.astimezone(ZoneInfo(self.target_timezone))
+            return parsed.strftime(self.output_format)
+        except (ValueError, TypeError, OverflowError, KeyError, re.error):
+            pass
+        try:
+            raise BehaviorPolicyError("invalid temporal conversion")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+
+    @model_validator(mode="after")
+    def validate_settings(self) -> "TemporalType":
+        if not self.format.strip() or not self.output_format.strip():
+            raise ValueError("temporal formats must not be blank")
+        allowed = set("Ymd%" if self.type == "date" else "YmdHMSfz%")
+        for index, pattern in enumerate((self.format, self.output_format)):
+            directives: set[str] = set()
+            position = 0
+            while position < len(pattern):
+                if pattern[position] == "%":
+                    position += 1
+                    if position == len(pattern) or pattern[position] not in allowed:
+                        raise ValueError("unsupported temporal directive")
+                    if index == 0 and pattern[position] != "%" and pattern[position] in directives:
+                        raise ValueError("repeated input directive")
+                    directives.add(pattern[position])
+                position += 1
+            if index == 0 and not set("Ymd") <= directives:
+                raise ValueError("input format requires year month and day")
+        for timezone in (self.source_timezone, self.target_timezone):
+            if timezone is not None:
+                if self.type == "date":
+                    raise ValueError("date fields have no timezone")
+                try:
+                    ZoneInfo(timezone)
+                except (KeyError, ValueError):
+                    raise ValueError("invalid timezone") from None
+        return self
+
+
+class FieldDecision(_PrivateModel):
+    entity: Reference = Field(repr=False)
+    field: Reference = Field(repr=False)
+    sensitivity: Literal["non_sensitive", "sensitive", "unknown"]
+    behavior: FieldAction = Field(repr=False)
+    match_format: Annotated[StrictStr, Field(pattern=r"^(?:0?[1-9][0-9]?d|\.(?:[0-9]|1[0-8])f)$")] | None = Field(default=None, repr=False)
+    decimal_type: DecimalType | None = Field(default=None, repr=False)
+    temporal_type: TemporalType | None = Field(default=None, repr=False)
+
+    @model_validator(mode="after")
+    def require_preservation_declaration(self) -> "FieldDecision":
+        if self.match_format is not None and not isinstance(self.behavior, ReplaceTextAction):
+            raise ValueError("matching format requires text replacement")
+        if isinstance(self.behavior, PreserveAction) and self.behavior.format_temporal and self.temporal_type is None:
+            raise ValueError("temporal formatting requires field settings")
+        if (isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
+                and isinstance(self.behavior.unmatched, PreserveAction) and self.behavior.unmatched.format_temporal):
+            raise ValueError("temporal formatting requires an explicit field action")
+        if self.temporal_type is not None and self.decimal_type is not None:
+            raise ValueError("conflicting field types")
+        preserve = isinstance(self.behavior, PreserveAction) or (
+            isinstance(self.behavior, (SubstituteAction, ReplaceTextAction))
+            and isinstance(self.behavior.unmatched, PreserveAction)
+        )
+        if preserve and self.sensitivity != "non_sensitive":
+            raise ValueError("preservation requires non-sensitive declaration")
+        return self
+
+
+class MappingDomain(_PrivateModel):
+    name: Reference = Field(repr=False)
+    mapping: Annotated[InlineMapping | CsvMapping, Field(discriminator="kind")] = Field(repr=False)
+
+
+class CsvNullSettings(_PrivateModel):
+    input_token: Annotated[StrictStr, Field(min_length=1, max_length=256)] | None = Field(default=None, repr=False)
+    output_token: Annotated[StrictStr, Field(min_length=1, max_length=256)] | None = Field(default=None, repr=False)
+
+
+class SqlOutputField(_PrivateModel):
+    name: Reference = Field(repr=False)
+    type: Literal["string", "integer", "float", "boolean", "decimal", "date", "datetime"]
+    nullable: StrictBool = False
+    decimal_type: DecimalType | None = None
+    temporal_type: TemporalType | None = Field(default=None, repr=False)
+
+    @model_validator(mode="after")
+    def require_decimal_shape(self) -> "SqlOutputField":
+        if (self.type == "decimal") != (self.decimal_type is not None):
+            raise ValueError("SQL decimal output requires exact shape")
+        if (self.type in {"date", "datetime"}) != (self.temporal_type is not None):
+            raise ValueError("SQL temporal output requires explicit format")
+        if self.temporal_type is not None:
+            temporal = self.temporal_type
+            canonical = "%Y-%m-%d" if self.type == "date" else "%Y-%m-%dT%H:%M:%S.%f%z"
+            if temporal.type != self.type or temporal.output_format != canonical:
+                raise ValueError("SQL temporal output requires canonical format")
+            if self.type == "datetime" and temporal.source_timezone is None and "%z" not in temporal.format:
+                raise ValueError("SQL datetime requires explicit source timezone or offset")
+        return self
+
+
+class TypedOutput(_PrivateModel):
+    format: Literal["postgresql_sql", "parquet"]
+    fields: tuple[SqlOutputField, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+
+    def review_summary(self) -> dict[str, object]:
+        """Bound schema metadata only; never expose arbitrary destination names."""
+        return {"format": self.format, "fields": [
+            {"position": index, "type": item.type, "nullable": item.nullable,
+             **({"temporal": {"explicit_format": True,
+                 "source_timezone_configured": item.temporal_type.source_timezone is not None,
+                 "target_timezone_configured": item.temporal_type.target_timezone is not None}}
+                if item.temporal_type else {}),
+             **({"decimal_type": item.decimal_type.model_dump()} if item.decimal_type else {})}
+            for index, item in enumerate(self.fields, start=1)]}
+
+
+class SqlOutput(TypedOutput):
+    format: Literal["postgresql_sql"]
+    table: Reference = Field(repr=False)
+
+
+class ParquetOutput(TypedOutput):
+    format: Literal["parquet"]
+
+
+class BehaviorPolicy(_PrivateModel):
+    schema_version: Literal["0.1"]
+    input_format: Literal["csv", "parquet", "postgres_query", "trino_query"] = Field(default="csv", repr=False)
+    schema_fingerprint: StrictStr = Field(pattern=r"^[0-9a-f]{64}$", repr=False)
+    seed: StrictInt = Field(repr=False)
+    csv_nulls: CsvNullSettings = Field(default_factory=CsvNullSettings, repr=False)
+    resource_limits: TransformationInputLimits | None = Field(default=None, repr=False)
+    output: SqlOutput | ParquetOutput | None = Field(default=None, repr=False)
+    fields: tuple[FieldDecision, ...] = Field(min_length=1, max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    domains: tuple[MappingDomain, ...] = Field(default=(), max_length=DEFAULT_MAX_INPUT_COLUMNS, repr=False)
+    file_text_mapping: CsvMapping | None = Field(default=None, repr=False)
+
+    @model_validator(mode="after")
+    def require_unique_resolved_decisions(self) -> "BehaviorPolicy":
+        identities = [(item.entity, item.field) for item in self.fields]
+        names = [domain.name for domain in self.domains]
+        if len(identities) != len(set(identities)) or len(names) != len(set(names)):
+            raise ValueError("duplicate policy declaration")
+        for item in self.fields:
+            if isinstance(item.behavior, SubstituteAction):
+                mapping = item.behavior.mapping
+                if isinstance(mapping, DomainMapping) and mapping.name not in names:
+                    raise ValueError("unresolved mapping domain")
+            if isinstance(item.behavior, ReplaceTextAction):
+                if item.behavior.mapping is None and self.file_text_mapping is None:
+                    raise ValueError("missing text replacement table")
+        if self.file_text_mapping is not None and not any(
+                isinstance(item.behavior, ReplaceTextAction) for item in self.fields):
+            raise ValueError("unused text replacement table")
+        if self.file_text_mapping is not None and len({item.entity for item in self.fields}) != 1:
+            raise ValueError("file text table requires one entity")
+        return self
+
+
+class BehaviorPolicyError(ValueError):
+    """Bounded structural error; no private policy values attached."""
+
+
+def validate_execution_actions(policy: BehaviorPolicy) -> None:
+    """Shared prospective interface scope; private derivation is not activated."""
+    policy = parse_behavior_policy(policy)
+    if any(item.behavior.action not in {
+            "preserve", "synthesize", "substitute", "replace_text", "drop",
+    } for item in policy.fields):
+        raise BehaviorPolicyError("unsupported transformation execution action")
+
+
+def parse_behavior_policy(payload: object) -> BehaviorPolicy:
+    """Parse a private draft; references are declarations, never approvals."""
+    try:
+        return BehaviorPolicy.model_validate(payload)
+    except ValidationError:
+        pass
+    try:
+        raise BehaviorPolicyError("invalid behavior policy")
+    except BehaviorPolicyError as error:
+        error.__context__ = None
+        raise
+
+
+def validate_policy_field_coverage(policy: BehaviorPolicy, profile: DatasetProfile) -> None:
+    """Check coverage, local dependencies and preservation conflicts, not approval."""
+    policy = parse_behavior_policy(policy)
+    # Reparse mutable profile models, including nested instances, without retaining
+    # source-derived Pydantic errors at this private boundary.
+    valid = False
+    try:
+        profile = DatasetProfile.model_validate(profile.model_dump(warnings=False))
+        source_fields = {(entity.name, field.name): field for entity in profile.entities for field in entity.fields}
+        expected = set(source_fields)
+        actual = {(decision.entity, decision.field) for decision in policy.fields}
+        valid = expected == actual
+        decisions = {(item.entity, item.field): item for item in policy.fields}
+        graph: dict[tuple[str, str], set[tuple[str, str]]] = {}
+        for identity, decision in decisions.items():
+            graph[identity] = set()
+            behavior = decision.behavior
+            preserves = isinstance(behavior, PreserveAction) or (
+                isinstance(behavior, (SubstituteAction, ReplaceTextAction))
+                and isinstance(behavior.unmatched, PreserveAction)
+            )
+            if preserves and identity in source_fields:
+                field = source_fields[identity]
+                if (decision.decimal_type is not None or field.data_type == FieldType.DECIMAL or field.sensitive
+                        or is_sensitive_field(field.name, field.semantic_type)):
+                    valid = False
+            if isinstance(behavior, DeriveAction):
+                names, aggregate_fields, functions = expression_references(behavior.expression)
+                if names != set(behavior.dependencies) or aggregate_fields or functions:
+                    valid = False
+                dependencies = {(decision.entity, name) for name in behavior.dependencies}
+                if len(dependencies) != len(behavior.dependencies):
+                    valid = False
+                for dependency in dependencies:
+                    if dependency not in decisions or isinstance(decisions[dependency].behavior, DropAction):
+                        valid = False
+                graph[identity] = dependencies
+        tuple(TopologicalSorter(graph).static_order())
+    except ValueError:
+        valid = False
+    if not valid:
+        try:
+            raise BehaviorPolicyError("invalid policy field coverage")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+
+
+def transformation_schema_fingerprint(profile: DatasetProfile) -> str:
+    """Private ordered column-schema identity; never source-content identity."""
+    valid = False
+    try:
+        profile = DatasetProfile.model_validate(profile.model_dump(warnings=False))
+        valid = True
+    except ValidationError:
+        pass
+    if not valid:
+        try:
+            raise BehaviorPolicyError("invalid source schema")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+    schema = [{"entity": entity.name, "fields": [
+        {"name": field.name, "type": field.data_type.value, "nullable": field.nullable,
+         **({"precision": field.decimal_precision, "scale": field.decimal_scale}
+            if field.data_type == FieldType.DECIMAL else {})}
+        for field in entity.fields]} for entity in profile.entities]
+    canonical = json.dumps({"version": "0.1", "entities": schema},
+                           sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def validate_policy_profile(policy: BehaviorPolicy, profile: DatasetProfile) -> None:
+    """Validate column-schema binding; not mapping types, formulas or approval."""
+    policy = parse_behavior_policy(policy)
+    validate_policy_field_coverage(policy, profile)
+    if policy.schema_fingerprint != transformation_schema_fingerprint(profile):
+        try:
+            raise BehaviorPolicyError("source schema mismatch")
+        except BehaviorPolicyError as error:
+            error.__context__ = None
+            raise
+
+
+def _system_field_comment(field: FieldProfile) -> str:
+    """Fixed, value-free hint from metadata; never a preservation decision."""
+    name = normalize_field_name(field.name)
+    semantic = (field.semantic_type or "").lower()
+    for markers, meaning in (
+        (("token", "password", "secret", "credential", "card", "ssn"), "credential or private identifier"),
+        (("email", "mail"), "email or contact"),
+        (("phone",), "phone or contact"),
+        (("address",), "address"),
+        (("name",), "personal name"),
+    ):
+        if any(marker in name or marker == semantic for marker in markers):
+            return f"Possible {meaning} field from metadata; treat as potentially sensitive."
+    if field.sensitive:
+        return "Profile flags possible sensitive data; field meaning unverified."
+    if field.is_identifier:
+        return "Likely identifier from profile metadata; sensitivity unverified."
+    return f"Likely {field.data_type.value} field; meaning and sensitivity unverified."
+
+
+def render_policy_review(policy: BehaviorPolicy, profile: DatasetProfile, *, max_bytes: int) -> bytes:
+    """Value-free local review; bind these bytes with full policy/evidence bytes."""
+    policy = parse_behavior_policy(policy)
+    profile = profile.model_copy(deep=True)
+    validate_policy_profile(policy, profile)
+    if type(max_bytes) is not int or max_bytes < 1:
+        raise BehaviorPolicyError("invalid policy review") from None
+    observed = {(entity.name, field.name): field
+                for entity in profile.entities for field in entity.fields}
+    domain_numbers = {domain.name: index for index, domain in enumerate(policy.domains, start=1)}
+    fields = []
+    for decision in policy.fields:
+        behavior = decision.behavior
+        unmatched = behavior.unmatched.action if isinstance(behavior, (SubstituteAction, ReplaceTextAction)) else None
+        domain_ref = behavior.mapping if isinstance(behavior, SubstituteAction) and isinstance(
+            behavior.mapping, DomainMapping
+        ) else None
+        field = observed[(decision.entity, decision.field)]
+        fields.append({
+            "entity": decision.entity,
+            "field": decision.field,
+            "action": behavior.action,
+            **({"explicit_match_format": True} if decision.match_format is not None else {}),
+            **({"format_temporal": True} if isinstance(behavior, PreserveAction) and behavior.format_temporal else {}),
+            **({"decimal_type": decision.decimal_type.model_dump()}
+               if decision.decimal_type is not None else {}),
+            "unmatched": unmatched,
+            "mapping_domain": domain_numbers[domain_ref.name] if domain_ref is not None else None,
+            "mapping_component": domain_ref.component if domain_ref is not None else None,
+            "file_text_rules": isinstance(behavior, ReplaceTextAction) and policy.file_text_mapping is not None,
+            "column_text_rules": isinstance(behavior, ReplaceTextAction) and behavior.mapping is not None,
+            "preserves_original": behavior.action == "preserve" or unmatched == "preserve",
+            "declared_sensitivity": decision.sensitivity,
+            "observed_sensitivity": (
+                "sensitive" if field.sensitive or is_sensitive_field(field.name, field.semantic_type)
+                else "unknown"
+            ),
+            "system_comment": _system_field_comment(field),
+        })
+    payload = json.dumps({"version": 1, "fields": fields,
+        **({"input_format": policy.input_format} if policy.input_format != "csv" else {}),
+        **({"output": policy.output.review_summary()} if policy.output else {})},
+        ensure_ascii=True, indent=2).encode("ascii")
+    if len(payload) > max_bytes:
+        raise BehaviorPolicyError("invalid policy review") from None
+    return payload

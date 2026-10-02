@@ -63,6 +63,75 @@ This is a map of the codebase for the domain-agnostic generator.
   foreign keys, formulas, temporal ordering, conditional required fields, and
   aggregate mappings.
 
+## Selective Transformation Preparation (Private)
+
+`src/test_data_agent/core/transformation_policy.py` validates reviewable
+per-field behavior decisions and field coverage. `transformation_mapping.py`,
+`transformation_csv.py`, and `transformation_yaml.py` validate inline/CSV
+mapping declarations and restricted policy serialization. These parsers do not
+authorize source-value preservation or transform rows.
+Derived-field coverage reuses `rules.expressions.expression_references` to
+parse bounded row-local arithmetic and require exact declared dependencies;
+it does not evaluate formulas or establish financial/null/result-type semantics.
+`transformation_report.py` computes value-free action-origin counts and shares:
+replacement, synthetic and original. The private executor records actual
+executed branches, not value equality. Explicit type/format transformation is
+replacement; generated values remain synthetic after formatting. Dropped cells
+are excluded; empty output shares are null. Shares round independently to two
+decimal places and may sum to 99.99 or 100.01. Private manifest v2 exposes
+`provenance`, replacing v1 `retention`. Legacy internal equality aggregates remain
+for compatibility; neither reporting path authorizes preservation or weakens
+independent safety checks. The report module neither transforms nor publishes.
+
+`src/test_data_agent/io/mapping_snapshot.py`, `mapping_loader.py`,
+`behavior_policy_files.py`, and `transformation_source.py` read bounded local
+mapping, policy, and CSV-source byte snapshots. The core
+`transformation_snapshot.py` and `transformation_approval.py` bind those exact
+bytes and reviewed material. `io/transformation_receipt.py` handles a private
+local interactive confirmation receipt; a receipt alone is not execution
+permission. There is no public CLI/MCP source-preserving execution path yet.
+`io/transformation_decisions.py` implements the local `transform-review --decide`
+wizard: explicit per-column sensitivity answers, optional `--edit-actions`
+configuration of the existing action models, fixed-snapshot validation and
+atomic policy save. It creates no approval receipt. Shared
+`transformation_source.load_policy_references` handles restricted references
+both before review and after action edits; newly referenced files are also
+revalidated before saving.
+The private `prepare_csv_review_request` entry derives profile evidence from
+the same fixed CSV bytes included in its approval request; callers cannot
+provide an alternate profile to that entry. Receipt issue/verification still
+reprofiles those bytes. The public `transform-review` CLI uses this path only
+to display value-free decisions; it neither mints a receipt nor writes output.
+
+`io/transformation_execute.py` owns the closed CSV execution prototype:
+exact-text and typed replacement, synthesis, dependency-ordered derivation,
+receipt-gated preservation, explicit null provenance and final validation.
+`io/transformation_publish.py` publishes its CSV and mixed-origin manifest only
+inside automatically deleted private test storage. Neither is public activation.
+
+The format-independent RC target is input adapter -> common transformation and
+validation -> output adapter. Current executor still combines CSV decoding,
+execution and rendering; extraction is pending, not a completed architecture.
+`io/transformation_input.py` now dispatches fixed-byte decoding for CSV and an
+initial native nullable string/signed-integer/float64/boolean/decimal128 Parquet slice. Review, receipt revalidation,
+execution/trace and final source comparison use that decoder. Unsupported native
+Parquet types fail closed until typed input integration; no intermediate
+CSV file replaces the source snapshot. Existing private CSV-named entry points
+are retained during this extraction, not newly public interfaces.
+First additional route is CSV -> SQL-script using a validated logical result,
+not reparsing rendered CSV (which loses null and logical-type provenance).
+Reuse `postgres_sql_export.quote_postgres_identifier` and `postgres_literal`
+for PostgreSQL encoding. Do not route mixed-origin output through
+`render_postgres_sql` by weakening its synthetic-generation checks.
+`io/transformation_output.py` shares normalized scalar/privacy/whole-row checks
+between private SQL and Parquet adapters. `io/transformation_parquet.py` builds
+an explicit Arrow schema and bounds output bytes while writing. It does not
+fabricate generation distributions to use `io/writers.typed_parquet_table`,
+which remains the unchanged source-free generation writer. Final transformed
+types are declared, not inferred from source after text replacement.
+Output selection/schema/dialect must be
+snapshot-bound before execution. Source-free generation/export stays separate.
+
 ## Validation
 
 `src/test_data_agent/validation/`
@@ -116,6 +185,7 @@ Public dataset-oriented commands:
 - `agent-approve`
 
 - `profile-csv`
+- `transform-review` (read-only)
 - `generate-from-csv`
 
 ## Database Configuration
@@ -128,6 +198,14 @@ They discard the input URL before returning
 the existing typed Python client configuration. `postgres_client.py` and
 `trino_client.py` remain unaware of JDBC syntax; Trino receives only validated
 allowlisted catalog/schema defaults.
+
+The gated authentication candidate composes six driver methods through
+`trino_auth.py` and `trino_client.py`, resolving runtime secret references without
+saving credential values in profiles. The client reuses its auth object; the
+OAuth HTTP adapter constrains direct token polling to the configured verified
+HTTPS origin and remaining budgets. The explicit browser callback belongs only
+to `io/commands.py`; its CLI registration remains in an unapplied candidate patch,
+never an MCP callback or source-preservation receipt issuer.
 
 `postgres_profiler.py` and `trino_profiling.py` expand qualified column
 wildcards through bounded table metadata into immutable deterministic explicit

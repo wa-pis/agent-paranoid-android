@@ -58,6 +58,35 @@ Use the client's secret mechanism or an environment injected by the runtime.
 
 ## Safe Generator Sequence
 
+For selective transformation review, call `review_transformation` with
+workspace-relative `input_path`, `policy_path` and optional `table_name`.
+It reads a fixed local snapshot in the format selected by the saved policy and
+returns `review_only`, `snapshot_sha256` and the same value-free review as CLI
+`transform-review`. Referenced mapping files stay local to the policy directory.
+The tool writes no artifacts, creates no approval receipt, executes no
+transformation and connects to no database. Public transformation execution
+remains gated; normal generator operations below remain source-free.
+
+The isolated activation candidate additionally registers `execute_transformation`
+with workspace-relative `input_path`, `policy_path`, new `output_path`, mandatory
+`snapshot_sha256`, optional `table_name`/existing `receipt_path`, and optional
+`max_total_input_bytes`/`max_output_bytes` run caps. It consumes the same exact
+snapshots and budgets as CLI execution and returns `transformation_completed`,
+digest, provenance and budget summaries, never dataset rows or mapping literals.
+Explicit replacements may permute sensitive source values under the same
+field-independent contract. Review retains a value-free sensitivity note;
+mapped values stay in the selected local artifact, never MCP responses. This
+does not grant direct preservation or an implicit copy fallback.
+
+Preservation requires a matching receipt issued separately by the human local
+controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
+Changed inputs invalidate receipts; workspace escapes, existing destinations,
+unsupported actions and budget violations fail closed without copying fallback.
+This isolated candidate registers the consumer; the released 1.5.0 package
+does not. Public delivery requires installed acceptance, matching safety/spec
+documentation and independent exact-SHA safety review. A receipt never
+authorizes database access or external APIs.
+
 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
    and output format.
@@ -167,3 +196,8 @@ The server rejects:
 
 See [MCP Tools](../mcp_examples.md) and
 [Configuration](../reference/configuration.md) for details.
+
+Preservation approval is never an MCP capability. This candidate's separate
+workspace execution consumer cannot issue local receipts, return rows or
+broaden source-free generator authority. Public delivery still requires the
+scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.

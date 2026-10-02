@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import json
+import sys
 from collections.abc import Callable
+from dataclasses import asdict
 from typing import Any, Protocol
 
 from test_data_agent.audit import verify_audit_log_from_env
@@ -17,6 +20,9 @@ from test_data_agent.cli_presenter import (
     write_validation_result,
 )
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import (
+    DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, DEFAULT_MAX_TOTAL_INPUT_BYTES, GenerationBudget,
+)
 from test_data_agent.demo import run_demo
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.io import (
@@ -34,6 +40,10 @@ from test_data_agent.io import (
     write_generation_summary,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
+from test_data_agent.io.transformation_source import (
+    prepare_csv_review_from_paths, trace_csv_review_request,
+)
+from test_data_agent.io.transformation_decisions import edit_csv_policy_decisions
 
 BusinessRulesApplier = Callable[
     [dict[str, list[dict[str, Any]]], argparse.Namespace, int, DatasetSpec | None],
@@ -88,6 +98,57 @@ def run_dataset_command(
 
     if args.command == "profile-csv":
         return profile_csv_command(args)
+
+    if args.command == "transform-execute":
+        from test_data_agent.cli_transformation_candidate import _execute_candidate_namespace
+
+        result = _execute_candidate_namespace(args)
+        print(json.dumps({**result, "status": "transformation_completed"}))
+        return 0
+
+    if args.command == "transform-approve":
+        from test_data_agent.cli_transformation_candidate import _approve_candidate_namespace
+
+        result = _approve_candidate_namespace(args)
+        print(json.dumps(result))
+        return 0
+
+    if args.command == "transform-review":
+        if args.edit_formats and not args.decide:
+            raise ValueError("--edit-formats requires --decide")
+        if args.edit_actions and not args.decide:
+            raise ValueError("--edit-actions requires --decide")
+        if args.decide and args.trace:
+            raise ValueError("use --trace separately after saving decisions")
+        if args.decide:
+            request = edit_csv_policy_decisions(
+                args.source, args.table or args.source.stem, args.policy,
+                input_stream=sys.stdin, output_stream=sys.stderr,
+                edit_actions=args.edit_actions,
+                edit_formats=args.edit_formats,
+                max_total_bytes=None,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget(),
+            )
+        else:
+            request = prepare_csv_review_from_paths(
+                args.source, args.table or args.source.stem,
+                args.policy.parent.absolute(), args.policy.name,
+                max_total_bytes=None,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+                budget=GenerationBudget(),
+            )
+        result = {"status": "policy_saved" if args.decide else "review_only",
+                  "snapshot_sha256": request.snapshot_sha256,
+                  "review": json.loads(request.review)}
+        if args.trace:
+            result["trace"] = asdict(trace_csv_review_request(
+                request, max_events=50, max_cells=10_000,
+                max_total_bytes=DEFAULT_MAX_TOTAL_INPUT_BYTES,
+                max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+                budget=GenerationBudget(),
+            ))
+        print(json.dumps(result, ensure_ascii=True, indent=2))
+        return 0
 
     if args.command == "profile-postgres":
         driver = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
@@ -192,8 +253,11 @@ def apply_business_rules_from_args(
         rows_by_table,
         getattr(args, "business_rules", None),
         seed=seed,
-        mode=args.mode,
-        invalid_ratio=args.invalid_ratio,
+        mode=spec.generation_settings.mode.value if spec is not None else args.mode or "valid",
+        invalid_ratio=(
+            spec.generation_settings.invalid_ratio
+            if spec is not None else args.invalid_ratio or 0.0
+        ),
         field_defaults=field_defaults,
         spec=spec,
     )

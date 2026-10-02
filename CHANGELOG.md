@@ -4,6 +4,52 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Add separately selected local transformation execution, controlling-terminal
+  preservation approval, and a workspace-confined MCP execution consumer using
+  the same saved policy and exact reviewed snapshot. Ordinary generation remains
+  source-free; this candidate is not yet a published release.
+
+- Add read-only MCP `review_transformation` for saved local behavior policies,
+  with the same value-free review and snapshot digest as CLI `transform-review`.
+
+- Profile single-table SQL sources with `SUM`, `COUNT`, `MIN`, `MAX`, `AVG`
+  and explicit-column `GROUP BY`. Existing allowlists and budgets remain;
+  aggregate profiles require an explicitly authored generation specification.
+
+- Add DatasetSpec `1.1` for explicitly reviewed source-free DECIMAL ranges up to
+  precision 38, with exact seeded generation and CSV/JSON/SQL/Parquet output.
+  Legacy `1.0` remains readable; exact profile inference and decimal formulas
+  remain unavailable.
+- Retain declared Parquet/PostgreSQL/query DECIMAL precision and scale as
+  metadata-only profile evidence. Reviewed generation bounds remain required.
+
+### Fixed
+
+- Accept exact synthetic identifier tokens on email, phone and SSN identifier
+  fields without weakening ordinary sensitive-field format checks.
+- Inspect native numeric and binary Parquet sensitivity conservatively within
+  the configured local profiling deadline; report identity-mismatch cleanup as
+  incomplete without deleting replacement paths.
+
+- Describe all supported local snapshot formats in `transform-review` help;
+  query-result review reads an existing captured envelope without DB access.
+
+- Separate generated identifier domains across entities and fields, while
+  retaining declared foreign-key assignments and seeded replay. Regenerate
+  identifier fixtures: seeded values and string identifier format have changed.
+- Publish generated datasets into existing empty directories even when directory
+  reads update access timestamps; retain path-replacement checks and file-change
+  detection during publication and rollback.
+
+### Security
+
+- Apply one explicit replacement contract to all fields, including sensitive
+  mapped permutations. Keep sensitivity notes value-free and mapped values only
+  in selected local mixed-origin artifacts. Direct preservation still requires
+  non-sensitive decisions and local approval; MCP never returns mapping values.
+
 ## [1.5.0] - 2026-09-23
 
 ### Changed

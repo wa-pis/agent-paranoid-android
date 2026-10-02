@@ -8,7 +8,7 @@ import io
 import json
 import sys
 import traceback
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import nullcontext, redirect_stderr, redirect_stdout
 from pathlib import Path
 from typing import Any, Literal
 
@@ -178,7 +178,18 @@ def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
     """Build the public CLI parser for the requested output mode."""
     arguments = list(sys.argv[1:] if argv is None else argv)
     json_errors = "--json" in arguments or arguments[:1] == ["agent-advisor-request"]
-    parser = HelpfulArgumentParser(
+    from functools import partial
+    from typing import cast
+    from test_data_agent.cli_transformation_candidate import _CandidateArgumentParser
+
+    selected_command = next((argument for argument in arguments
+                             if argument not in {"--json", "--debug"}), None)
+    transformation = selected_command in {"transform-execute", "transform-approve"}
+    parser_type = _CandidateArgumentParser if transformation else HelpfulArgumentParser
+    command_parser_type = (cast(type[HelpfulArgumentParser],
+                               partial(_CandidateArgumentParser, json_errors=json_errors)) if transformation
+                           else JsonHelpfulArgumentParser if json_errors else HelpfulArgumentParser)
+    parser = parser_type(
         prog="test-data-agent",
         description=(
             "Agent Paranoid Android: safe deterministic synthetic data generation "
@@ -193,7 +204,7 @@ def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
         dest="command",
         title="commands",
         metavar="COMMAND",
-        parser_class=JsonHelpfulArgumentParser if json_errors else HelpfulArgumentParser,
+        parser_class=command_parser_type,
     )
 
     register_dataset_commands(
@@ -366,7 +377,9 @@ def run_json_command(args: argparse.Namespace) -> int:
     """Run a human presenter behind one stable machine-readable envelope."""
     stdout = io.StringIO()
     stderr = io.StringIO()
-    with redirect_stdout(stdout), redirect_stderr(stderr):
+    interactive_decisions = (args.command == "transform-approve" or
+                             args.command == "transform-review" and getattr(args, "decide", False))
+    with redirect_stdout(stdout), (nullcontext() if interactive_decisions else redirect_stderr(stderr)):
         exit_code = run_command(args)
     if exit_code not in {0, 1}:
         return exit_code

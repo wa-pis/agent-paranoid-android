@@ -6,7 +6,12 @@ import ast
 import operator
 from collections.abc import Callable
 from datetime import datetime
+from decimal import Decimal, DecimalException
+from fractions import Fraction
 from typing import Any
+
+from test_data_agent.core.decimal_units import decimal_from_units
+from test_data_agent.core.limits import GenerationBudget
 
 
 BinaryOperator = Callable[[Any, Any], Any]
@@ -22,6 +27,7 @@ UNARY_OPERATORS: dict[type[ast.unaryop], UnaryOperator] = {
 }
 MAX_EXPRESSION_CHARS = 1_024
 MAX_EXPRESSION_NODES = 128
+MAX_EXACT_EXPRESSION_BITS = 16_384
 
 
 def comparable_number(value: Any) -> float | None:
@@ -58,6 +64,86 @@ def safe_eval(expression: str, row: dict[str, Any]) -> Any:
     return eval_node(parse_safe_expression(expression), row)
 
 
+def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> Fraction:
+    """Bounded rational arithmetic shared by integer and decimal results."""
+    try:
+        budget.check("exact expression")
+        tree = parse_safe_expression(expression)
+
+        def number(value: Any) -> Fraction:
+            if type(value) is int:
+                if value.bit_length() > MAX_EXACT_EXPRESSION_BITS:
+                    raise ValueError
+            elif type(value) is Decimal:
+                parts = value.as_tuple()
+                if (not value.is_finite() or len(parts.digits) > MAX_EXPRESSION_CHARS
+                        or not isinstance(parts.exponent, int)
+                        or abs(parts.exponent) > MAX_EXPRESSION_CHARS):
+                    raise ValueError
+            else:
+                raise ValueError
+            return Fraction(value)
+
+        def evaluate(node: ast.AST) -> Fraction:
+            budget.check("exact expression node")
+            if isinstance(node, ast.Constant) and type(node.value) in (int, float):
+                literal = ast.get_source_segment(expression, node)
+                if literal is None:
+                    raise ValueError
+                result = number(Decimal(literal))
+            elif isinstance(node, ast.Name):
+                result = number(row[node.id])
+            elif isinstance(node, ast.BinOp) and type(node.op) in BINARY_OPERATORS:
+                result = BINARY_OPERATORS[type(node.op)](evaluate(node.left), evaluate(node.right))
+            elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+                result = -evaluate(node.operand)
+            else:
+                raise ValueError
+            if max(result.numerator.bit_length(), result.denominator.bit_length()) > MAX_EXACT_EXPRESSION_BITS:
+                raise ValueError
+            return result
+
+        result = evaluate(tree)
+        budget.check("exact expression result")
+        return result
+    except (ValueError, TypeError, KeyError, ArithmeticError, DecimalException):
+        pass
+    try:
+        raise ValueError("invalid exact decimal expression")
+    except ValueError as error:
+        error.__context__ = None
+        raise
+
+
+def eval_exact_integer(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> int:
+    """Require an integral exact result; never truncate or round a fraction."""
+    result = _eval_exact_fraction(expression, row, budget=budget)
+    if result.denominator != 1:
+        raise ValueError("invalid exact integer expression") from None
+    return result.numerator
+
+
+def eval_exact_decimal(
+    expression: str, row: dict[str, Any], *, precision: int, scale: int,
+    budget: GenerationBudget,
+) -> Decimal:
+    """Apply HALF_UP once, after exact arithmetic, with declared-width checks."""
+    try:
+        decimal_from_units(0, precision=precision, scale=scale)
+        result = _eval_exact_fraction(expression, row, budget=budget)
+        units, remainder = divmod(abs(result.numerator) * 10**scale, result.denominator)
+        units += int(2 * remainder >= result.denominator)
+        budget.check("exact expression result")
+        return decimal_from_units(-units if result < 0 else units, precision=precision, scale=scale)
+    except (ValueError, TypeError, KeyError, ArithmeticError, DecimalException):
+        pass
+    try:
+        raise ValueError("invalid exact decimal expression")
+    except ValueError as error:
+        error.__context__ = None
+        raise
+
+
 def parse_safe_expression(expression: str) -> ast.AST:
     if len(expression) > MAX_EXPRESSION_CHARS:
         raise ValueError(
@@ -65,8 +151,10 @@ def parse_safe_expression(expression: str) -> ast.AST:
         )
     try:
         parsed = ast.parse(expression, mode="eval")
-    except SyntaxError as exc:
-        raise ValueError("expression must be valid arithmetic syntax") from exc
+    except SyntaxError:
+        parsed = None
+    if parsed is None:
+        raise ValueError("expression must be valid arithmetic syntax")
     if sum(1 for _ in ast.walk(parsed)) > MAX_EXPRESSION_NODES:
         raise ValueError(f"expression must contain <= {MAX_EXPRESSION_NODES} nodes")
     validate_expression_node(parsed.body)
@@ -91,11 +179,12 @@ def validate_expression_node(node: ast.AST) -> None:
             return
         if node.func.id == "count" and not node.args:
             return
-    raise ValueError(f"unsupported expression: {ast.dump(node)}")
+    raise ValueError("unsupported expression")
 
 
 def expression_references(expression: str) -> tuple[set[str], set[str], set[str]]:
     node = parse_safe_expression(expression)
+    call_names = {child.func for child in ast.walk(node) if isinstance(child, ast.Call)}
     names: set[str] = set()
     aggregate_fields: set[str] = set()
     functions: set[str] = set()
@@ -104,7 +193,7 @@ def expression_references(expression: str) -> tuple[set[str], set[str], set[str]
             functions.add(child.func.id)
             if child.func.id == "sum":
                 aggregate_fields.add(expect_field_name(child.args[0]))
-        elif isinstance(child, ast.Name) and child.id not in {"sum", "count"}:
+        elif isinstance(child, ast.Name) and child not in call_names:
             names.add(child.id)
     return names, aggregate_fields, functions
 
@@ -139,7 +228,7 @@ def eval_node(node: ast.AST, row: dict[str, Any]) -> Any:
             return aggregate(field, row.get("rows", []))
         if node.func.id == "count":
             return float(len(row.get("rows", [])))
-    raise ValueError(f"unsupported expression: {ast.dump(node)}")
+    raise ValueError("unsupported expression")
 
 
 def expect_field_name(node: ast.AST) -> str:

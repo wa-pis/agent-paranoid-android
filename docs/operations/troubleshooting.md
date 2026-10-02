@@ -17,8 +17,14 @@ test-data-agent doctor --require-extra parquet
 
 For Parquet this performs a local temporary generation and read-back, checks
 row counts and manifest safety flags, and contacts no external service. A
-failure recommends the exact extra to reinstall without exposing the original
-exception text or temporary paths.
+missing extra recommends installation. An installed extra whose local smoke
+fails reports a capability failure instead of recommending reinstall; check
+local setup and rerun doctor. A broken dependency import is reported as an
+import failure, not as an absent package. Exception text and temporary paths
+are omitted.
+If quickstart generation fails, earlier dependency checks remain in the report
+and `doctor --json` returns `ok: false`, exit code 1, and a failed quickstart
+check without exposing the underlying exception.
 
 `doctor --require-extra mcp` constructs the real generator `FastMCP`
 transport, registers one local audited probe tool, and verifies its public tool
@@ -28,15 +34,15 @@ contact an MCP client.
 `doctor --require-extra trino` validates a bounded allowlisted query with the
 installed Trino SQL parser, constructs a client for the reserved
 `doctor.invalid` host, and closes it without opening a cursor or executing SQL.
-It does not read Trino credentials or contact a coordinator. On failure,
-reinstall `agent-paranoid-android[trino]` before checking deployment-specific
-allowlists and credentials.
+It does not read Trino credentials or contact a coordinator. A missing extra
+gets installation guidance; a local smoke failure does not establish a missing
+package or remote connectivity problem.
 
 `doctor --require-extra openai` constructs and closes the installed SDK client
 with a local non-secret placeholder and verifies the structured Responses API
 used by the advisor adapter. It does not read `OPENAI_API_KEY`, send a request,
-or contact the provider. On failure, reinstall
-`agent-paranoid-android[openai]` before checking deployment credentials.
+or contact the provider. A local smoke failure does not establish a missing
+package or a problem with deployment credentials.
 
 `doctor --require-extra gigachat` uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
@@ -73,11 +79,18 @@ the table is wider than the intended profiling scope.
 ## SQL Query Source Rejected
 
 Pass one UTF-8 file to `profile-query`; SQL text is not accepted in an option
-or environment variable. The initial policy permits one fully qualified,
+or environment variable. SQL source policy 1.1 permits one fully qualified,
 single-table `SELECT` with explicit output aliases, bounded filters, and the
 documented deterministic scalar subset. Remove joins, CTEs, subqueries, set or
 window operations, table functions, comments, volatile/unknown functions,
 multiple statements, and unauthorized tables or columns.
+
+Aliased SUM/COUNT/MIN/MAX/AVG and explicit-source-column GROUP BY are allowed.
+Other selected columns must be grouping keys. Remove nested/wrapped aggregates,
+DISTINCT aggregates, HAVING, grouping expressions/ordinals and grouping sets.
+Sensitive-name source references remain blocked for grouped/aggregate queries,
+even with renamed outputs. An accepted aggregate profile is not permission to
+fetch result rows or automatically infer a dependency-preserving generation spec.
 
 The query file, AST, projected fields, and adapter work must remain inside all
 configured budgets. A changed file, unsupported type, malformed backend

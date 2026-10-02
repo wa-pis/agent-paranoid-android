@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import csv
+from test_data_agent.core.csv_reader import ScopedDictReader
 import random
 from collections import Counter
 from dataclasses import dataclass, field
@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.limits import (
-    configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -55,7 +54,6 @@ MAX_SEMANTIC_SAMPLE = 100
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
     csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
-    configure_csv_field_limit(csv)
     total_rows = 0
     total_cells = 0
     for path in csv_paths:
@@ -63,7 +61,7 @@ def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) 
         with path.open(newline="", encoding=encoding) as handle:
             sample = handle.read(8192)
             handle.seek(0)
-            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+            reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
@@ -189,7 +187,6 @@ def _profile_schema_with_sample(
     csv_paths = budget.check_input_files(sorted(input_folder.glob("*.csv")))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
-    configure_csv_field_limit(csv)
     total_rows = 0
     for path in csv_paths:
         budget.check_deadline("CSV file start")
@@ -198,7 +195,7 @@ def _profile_schema_with_sample(
         with path.open(newline="", encoding=encoding) as handle:
             sample = handle.read(8192)
             handle.seek(0)
-            reader = csv.DictReader(handle, dialect=detect_csv_dialect(sample))
+            reader = ScopedDictReader(handle, dialect=detect_csv_dialect(sample))
             fieldnames = validate_csv_headers(reader.fieldnames)
             enforce_input_column_count(len(fieldnames), label=f"CSV {path.name!r}")
             reader.fieldnames = fieldnames
@@ -222,7 +219,12 @@ def _profile_schema_with_sample(
         for accumulator in accumulators.values():
             budget.check_deadline("field finalization")
             fields.append(accumulator.to_profile(row_count))
-        primary_key_candidates = [field.name for field in fields if field.is_identifier and field.unique_ratio >= 0.98]
+        primary_key_candidates = [
+            field.name for field in fields
+            if field.is_identifier and field.unique_ratio is not None and field.unique_ratio >= 0.98
+            and field.unique_ratio_kind != "lower_bound"
+            and "pool_size" not in field.distribution
+        ]
         entities.append(
             EntityProfile(
                 name=entity_name,
@@ -253,6 +255,7 @@ def profile_field(name: str, values: list[str], row_count: int) -> FieldProfile:
         nullable=len(non_null) < row_count,
         null_ratio=round((row_count - len(non_null)) / row_count, 6) if row_count else 0.0,
         unique_ratio=round(unique_ratio, 6),
+        unique_ratio_kind="exact",
         sensitive=sensitive,
         semantic_type=semantic_type,
         is_identifier=is_identifier,
@@ -371,7 +374,9 @@ class FieldAccumulator:
             semantic_type = self.content_sensitive_type or semantic_type
         data_type = self.infer_field_type(semantic_type)
         unique_ratio = self.estimate_unique_ratio()
-        is_identifier = is_identifier_name(self.name) or (unique_ratio >= 0.98 and "id" in self.name.lower())
+        is_identifier = is_identifier_name(self.name) or (
+            not self.distinct_overflow and unique_ratio >= 0.98 and "id" in self.name.lower()
+        )
         sensitive = (
             infer_sensitive_from_name(self.name)
             or semantic_type_is_sensitive(semantic_type)
@@ -383,6 +388,7 @@ class FieldAccumulator:
             nullable=self.null_count > 0,
             null_ratio=round(self.null_count / table_row_count, 6) if table_row_count else 0.0,
             unique_ratio=round(unique_ratio, 6),
+            unique_ratio_kind="lower_bound" if self.distinct_overflow else "exact",
             sensitive=sensitive,
             semantic_type=semantic_type,
             is_identifier=is_identifier,
@@ -410,12 +416,15 @@ class FieldAccumulator:
     def estimate_unique_ratio(self) -> float:
         if self.non_null_count == 0:
             return 0.0
-        if self.distinct_overflow and not self.duplicate_seen:
-            return 1.0
+        if self.distinct_overflow:
+            # Truncate rather than round upward: this is a guaranteed lower bound.
+            return (len(self.distinct_values) * 1_000_000 // self.non_null_count) / 1_000_000
         return len(self.distinct_values) / self.non_null_count
 
     def distribution(self, profile: FieldProfile) -> dict[str, Any]:
         if profile.is_identifier:
+            if not self.distinct_overflow and 0 < len(self.distinct_values) < self.non_null_count:
+                return {"kind": "synthetic_identifier", "pool_size": len(self.distinct_values)}
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
             patterns = Counter(

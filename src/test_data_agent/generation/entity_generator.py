@@ -10,14 +10,17 @@ from typing import Any
 from faker import Faker
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.decimal_units import sample_decimal
 from test_data_agent.core.distribution import (
     BooleanDistribution,
     CategoricalDistribution,
     DateRangeDistribution,
     DateTimeRangeDistribution,
+    DecimalRangeDistribution,
     NumericDistribution,
     NumericShapeDistribution,
     StringPatternDistribution,
+    SyntheticIdentifierDistribution,
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
@@ -51,6 +54,13 @@ def generate_dataset(
     faker.seed_instance(seed)
     mode = spec.generation_settings.mode
     invalid_ratio = spec.generation_settings.invalid_ratio
+    identifier_domains = {
+        key: index for index, key in enumerate(sorted(
+            (entity.name, field.name)
+            for entity in spec.entities for field in entity.fields
+            if field.is_identifier
+        ))
+    }
     for entity_index, entity in enumerate(spec.entities):
         budget.check(f"entity {entity.name!r} setup")
         enforce_row_count_limit(entity.row_count)
@@ -68,6 +78,7 @@ def generate_dataset(
                     mode=mode,
                     invalid_ratio=invalid_ratio,
                     semantic_provider=semantic_provider,
+                    identifier_domains=identifier_domains,
                 )
             )
         rows_by_entity[entity.name] = rows
@@ -95,6 +106,7 @@ def generate_row(
     mode: GenerationMode,
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
+    identifier_domains: dict[tuple[str, str], int] | None = None,
 ) -> dict[str, Any]:
     return {
         field.name: generate_field_value(
@@ -108,6 +120,8 @@ def generate_row(
             invalid_ratio=invalid_ratio,
             semantic_provider=semantic_provider,
             allow_null=field.name != entity.primary_key,
+            identifier_domain=(identifier_domains or {}).get((entity.name, field.name), 0),
+            identifier_domain_count=max(1, len(identifier_domains or {})),
         )
         for field in entity.fields
     }
@@ -125,17 +139,23 @@ def generate_field_value(
     invalid_ratio: float,
     semantic_provider: SemanticValueProvider | None = None,
     allow_null: bool = True,
+    identifier_domain: int = 0,
+    identifier_domain_count: int = 1,
 ) -> Any:
     if allow_null and field.nullable and rng.random() < field.null_ratio:
         return None
     if should_generate_invalid_value(field, rng, mode=mode, invalid_ratio=invalid_ratio):
         return invalid_value_for_type(field.data_type)
     if field.is_identifier:
-        return synthetic_identifier(entity_name, field, row_index, seed)
+        return synthetic_identifier(
+            entity_name, field, row_index, seed,
+            domain=identifier_domain, domain_count=identifier_domain_count,
+        )
     if field.sensitive and field.data_type == FieldType.STRING:
         return synthetic_sensitive_value(field, faker)
     if (
         semantic_provider is not None
+        and field.data_type != FieldType.DECIMAL
         and field.semantic_type is not None
         and not is_sensitive_field(field.name, field.semantic_type)
     ):
@@ -166,6 +186,12 @@ def generate_field_value(
         return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
     if field.data_type == FieldType.FLOAT:
         return round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0), 6)
+    if field.data_type == FieldType.DECIMAL:
+        assert isinstance(typed_distribution, DecimalRangeDistribution)
+        return sample_decimal(
+            rng, low=typed_distribution.min, high=typed_distribution.max,
+            precision=typed_distribution.precision, scale=typed_distribution.scale,
+        )
     if field.data_type == FieldType.BOOLEAN:
         return boolean_value(boolean_distribution, distribution, rng)
     if field.data_type == FieldType.DATE:
@@ -175,10 +201,18 @@ def generate_field_value(
     return synthetic_string(field, string_distribution, rng)
 
 
-def synthetic_identifier(entity_name: str, field: FieldSpec, row_index: int, seed: int) -> Any:
+def synthetic_identifier(
+    entity_name: str, field: FieldSpec, row_index: int, seed: int,
+    *, domain: int = 0, domain_count: int = 1,
+) -> Any:
+    # Disjoint residue classes avoid hash collisions and fixed-size row blocks.
+    distribution = field.typed_distribution
+    if isinstance(distribution, SyntheticIdentifierDistribution) and distribution.pool_size is not None:
+        row_index %= distribution.pool_size
+    value = (seed * 1_000_000 + row_index) * domain_count + domain + 1
     if field.data_type == FieldType.INTEGER:
-        return seed * 1_000_000 + row_index + 1
-    return f"{SYNTHETIC_PREFIX}{entity_name}_{row_index + 1:08d}"
+        return value
+    return f"{SYNTHETIC_PREFIX}{value}"
 
 
 def synthetic_sensitive_value(field: FieldSpec, faker: Faker) -> str:
@@ -319,7 +353,7 @@ def should_generate_invalid_value(
 
 
 def invalid_value_for_type(data_type: FieldType) -> Any:
-    if data_type in {FieldType.INTEGER, FieldType.FLOAT}:
+    if data_type in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}:
         return "not-a-number"
     if data_type == FieldType.BOOLEAN:
         return "not-a-boolean"

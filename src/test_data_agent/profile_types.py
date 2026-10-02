@@ -9,6 +9,7 @@ from typing import Any
 class ProfileDataType(StrEnum):
     INTEGER = "integer"
     FLOAT = "float"
+    DECIMAL = "decimal"
     BOOLEAN = "boolean"
     STRING = "string"
     DATE = "date"
@@ -21,7 +22,7 @@ class ProfileDataType(StrEnum):
 
 
 def coerce_profile_type(raw_type: str) -> ProfileDataType:
-    type_name = raw_type.lower()
+    type_name = raw_type.strip().lower()
     if "email" in type_name:
         return ProfileDataType.EMAIL
     if "phone" in type_name:
@@ -30,10 +31,9 @@ def coerce_profile_type(raw_type: str) -> ProfileDataType:
         return ProfileDataType.ADDRESS
     if any(part in type_name for part in ("int", "bigint", "smallint", "tinyint")):
         return ProfileDataType.INTEGER
-    if any(
-        part in type_name
-        for part in ("decimal", "double", "float", "numeric", "real")
-    ):
+    if type_name.startswith(("decimal(", "numeric(")):
+        return ProfileDataType.DECIMAL
+    if any(part in type_name for part in ("decimal", "numeric", "double", "float", "real")):
         return ProfileDataType.FLOAT
     if "bool" in type_name:
         return ProfileDataType.BOOLEAN

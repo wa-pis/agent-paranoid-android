@@ -73,7 +73,7 @@ MAX_DISTRIBUTIONS = {
     "trino": 25,
 }
 BOOTSTRAP_DISTRIBUTIONS = {"pip", "setuptools", "uv", "wheel"}
-MAX_WHEEL_SIZE_BYTES = 256 * 1024
+MAX_WHEEL_SIZE_BYTES = 512 * 1024
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -117,6 +117,12 @@ def main(argv: list[str] | None = None) -> None:
     )
     if not demo_fixture.is_file():
         raise SystemExit("installed wheel is missing the bundled demo fixture")
+    for skill in (
+        "agent-paranoid-android-usage",
+        "agent-paranoid-android-transformation",
+    ):
+        if not files("test_data_agent").joinpath("skills", skill, "SKILL.md").is_file():
+            raise SystemExit(f"installed wheel is missing bundled skill: {skill}")
 
     scripts = {
         entry.name: entry.value
@@ -133,6 +139,7 @@ def main(argv: list[str] | None = None) -> None:
 
     verify_install_profile(args.profile)
     verify_installed_demo()
+    verify_installed_skill_discovery()
     verify_installed_csv_json_quickstart()
     if args.profile == "postgres":
         verify_installed_postgres_sql_smoke()
@@ -180,6 +187,25 @@ def requirement_extras(requirement: str) -> set[str]:
             requirement,
         )
     )
+
+
+def verify_installed_skill_discovery(entrypoint: Path | None = None) -> None:
+    """Exercise offline capability discovery prescribed by the bundled skills."""
+    cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
+    for arguments in (("--version",), ("--help",),
+                      ("profile-csv", "--help"), ("infer-spec", "--help"),
+                      ("generate", "--help"), ("validate", "--help"),
+                      ("transform-review", "--help"), ("transform-execute", "--help"),
+                      ("transform-approve", "--help")):
+        completed = subprocess.run([cli, *arguments], capture_output=True,
+                                   text=True, check=False, timeout=30)
+        if completed.returncode != 0 or not completed.stdout.strip():
+            raise SystemExit("installed skill capability discovery failed")
+    # Discoverability does not supply required inputs or preservation authority.
+    completed = subprocess.run([cli, "transform-execute"],
+                               capture_output=True, text=True, check=False, timeout=30)
+    if completed.returncode != 2:
+        raise SystemExit("transformation execution accepted missing required inputs")
 
 
 def verify_install_profile(profile: str) -> None:

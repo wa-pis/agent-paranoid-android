@@ -27,6 +27,16 @@ def _file_version(value: os.stat_result) -> tuple[PathIdentity, int, int]:
     return _identity(value), value.st_ctime_ns, value.st_size
 
 
+def _publication_version(
+    value: os.stat_result | None,
+) -> PathIdentity | tuple[PathIdentity, int, int] | None:
+    if value is None:
+        return None
+    # Reading a directory can change its timestamps, not its identity.
+    # Files retain content-change detection without comparing access time.
+    return _identity(value) if stat.S_ISDIR(value.st_mode) else _file_version(value)
+
+
 def _flags(*, directory: bool = False) -> int:
     flags = os.O_RDONLY | os.O_NOFOLLOW
     if hasattr(os, "O_CLOEXEC"):
@@ -148,7 +158,8 @@ def atomic_write_bytes(path: Path, payload: bytes) -> None:
 @contextmanager
 def open_regular_file(path: Path) -> Iterator[BinaryIO]:
     with _parent_descriptor(path) as (parent, name):
-        descriptor = os.open(name, _flags(), dir_fd=parent)
+        # Reject FIFOs after fstat without waiting for a writer during open.
+        descriptor = os.open(name, _flags() | os.O_NONBLOCK, dir_fd=parent)
         value = os.fstat(descriptor)
         if not stat.S_ISREG(value.st_mode):
             os.close(descriptor)
@@ -191,9 +202,9 @@ def publish_directory(source: Path, destination: Path) -> PathIdentity:
                     raise ValueError("output path changed during publication")
             finally:
                 os.close(output_descriptor)
-        if _stat_at(parent, source_name) != source_stat:
+        if _publication_version(_stat_at(parent, source_name)) != _publication_version(source_stat):
             raise ValueError("staging path changed during publication")
-        if _stat_at(parent, destination_name) != destination_stat:
+        if _publication_version(_stat_at(parent, destination_name)) != _publication_version(destination_stat):
             raise ValueError("output path changed during publication")
         os.replace(source_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
         published = _stat_at(parent, destination_name)
@@ -215,9 +226,9 @@ def replace_path(source: Path, destination: Path) -> None:
                 raise ValueError("source path is not safe to publish")
             if destination_stat is not None and stat.S_ISLNK(destination_stat.st_mode):
                 raise ValueError("output path must not be a symbolic link")
-            if _stat_at(source_parent, source_name) != source_stat:
+            if _publication_version(_stat_at(source_parent, source_name)) != _publication_version(source_stat):
                 raise ValueError("source path changed during publication")
-            if _stat_at(destination_parent, destination_name) != destination_stat:
+            if _publication_version(_stat_at(destination_parent, destination_name)) != _publication_version(destination_stat):
                 raise ValueError("output path changed during publication")
             os.replace(
                 source_name,
@@ -239,14 +250,14 @@ def remove_tree(path: Path, expected: PathIdentity) -> None:
         shutil.rmtree(name, dir_fd=parent)
 
 
-def remove_tree_if_identity(path: Path, expected: PathIdentity) -> bool:
+def remove_tree_if_identity(path: Path, expected: PathIdentity, *, strict: bool = False) -> bool:
     with _parent_descriptor(path) as (parent, name):
         current = _stat_at(parent, name)
-        if (
-            current is None
-            or _identity(current) != expected
-            or not stat.S_ISDIR(current.st_mode)
-        ):
+        if current is None:
+            return False
+        if _identity(current) != expected or not stat.S_ISDIR(current.st_mode):
+            if strict:
+                raise ValueError("cleanup path changed")
             return False
         if not shutil.rmtree.avoids_symlink_attacks:
             raise ValueError("secure directory cleanup is unavailable")

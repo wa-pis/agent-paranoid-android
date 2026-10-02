@@ -17,7 +17,7 @@ from test_data_agent.cli_dependencies import install_extra_command
 def test_doctor_service_reports_optional_and_required_extras() -> None:
     def import_without_pyarrow(name: str) -> ModuleType:
         if name == "pyarrow":
-            raise ImportError("not installed")
+            raise ModuleNotFoundError("not installed", name=name)
         return ModuleType(name)
 
     service = _service(import_without_pyarrow)
@@ -51,11 +51,56 @@ def test_doctor_service_redacts_capability_failure() -> None:
 
     report = service.inspect(required_extras={"mcp"})
 
-    assert report.failures == (
-        "capability mcp: failed (reinstall agent-paranoid-android[mcp] with: "
-        f"{install_extra_command('mcp')})",
-    )
+    assert report.failures == ("capability mcp: failed (local smoke)",)
+    capability = next(check for check in report.states if check.name == "capability:mcp")
+    assert capability.remediation == "check local capability setup and rerun doctor"
     assert "secret-provider-token" not in repr(report)
+
+
+def test_doctor_keeps_dependency_report_when_quickstart_raises(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail_quickstart(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("secret-fixture-path")
+
+    monkeypatch.setattr(
+        cli_doctor_module, "generate_dataset_from_example_artifacts", fail_quickstart
+    )
+    report = _service(lambda name: ModuleType(name)).inspect()
+
+    assert report.failures == ("quickstart smoke: local generation failed",)
+    assert "python: ok" in report.checks[0]
+    assert any(check.name == "dependency:pydantic" for check in report.states)
+    assert any(check.name == "quickstart" and check.status == "failed" for check in report.states)
+    assert "secret-fixture-path" not in repr(report)
+
+
+def test_doctor_does_not_echo_dependency_import_failure() -> None:
+    def fail_core(name: str) -> ModuleType:
+        if name == "faker":
+            raise ImportError("secret-loader-path")
+        return ModuleType(name)
+
+    report = _service(fail_core).inspect(skip_smoke=True)
+
+    assert report.failures == ("dependency faker: import failed",)
+    assert next(check for check in report.states if check.name == "dependency:faker").status == "failed"
+    assert "secret-loader-path" not in repr(report)
+
+
+def test_doctor_distinguishes_missing_from_broken_optional_import() -> None:
+    def broken_import(name: str) -> ModuleType:
+        if name == "pyarrow":
+            raise ImportError("secret-loader-path")
+        return ModuleType(name)
+
+    report = _service(broken_import).inspect(skip_smoke=True, required_extras={"parquet"})
+
+    assert report.failures == ("extra parquet: import failed",)
+    check = next(check for check in report.states if check.name == "extra:parquet")
+    assert check.status == "failed"
+    assert check.remediation is None
+    assert "secret-loader-path" not in repr(report)
 
 
 def test_doctor_reports_effective_trino_deployment_profile(

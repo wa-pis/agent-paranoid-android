@@ -1,0 +1,432 @@
+diff --git a/src/test_data_agent/mcp_generator_server.py b/src/test_data_agent/mcp_generator_server.py
+--- a/src/test_data_agent/mcp_generator_server.py
++++ b/src/test_data_agent/mcp_generator_server.py
+@@ -691,2 +691,24 @@
++def execute_transformation(
++    input_path: str, policy_path: str, output_path: str, snapshot_sha256: str,
++    table_name: str | None = None, receipt_path: str | None = None,
++    max_output_bytes: int | None = None, max_total_input_bytes: int | None = None,
++) -> dict[str, object]:
++    """Explicit local mixed-origin execution; cannot issue preservation receipts.
++
++    Requires the reviewed snapshot digest and, for preservation, a matching
++    receipt issued by the separate controlling-TTY local approval operation.
++    Returns bounded counts and digest metadata, never source or output rows.
++    """
++    from test_data_agent.mcp_transformation_candidate import _execute_candidate_transformation
++
++    result = _execute_candidate_transformation(
++        input_path, policy_path, output_path, snapshot_sha256,
++        table_name=table_name, receipt_path=receipt_path,
++        max_output_bytes=max_output_bytes, max_total_input_bytes=max_total_input_bytes,
++    )
++    return {**result, "status": "transformation_completed"}
++
++
+ _GENERATOR_MCP_TOOLS = (
++    execute_transformation,
+     review_transformation,
+diff --git a/src/test_data_agent/cli_parser.py b/src/test_data_agent/cli_parser.py
+--- a/src/test_data_agent/cli_parser.py
++++ b/src/test_data_agent/cli_parser.py
+@@ -323,2 +323,20 @@
++    from test_data_agent.cli_transformation_candidate import _add_execution_arguments
++
++    transform_execute_parser = subparsers.add_parser(
++        "transform-execute",
++        formatter_class=PublicHelpFormatter,
++        help="Execute a separately reviewed local mixed-origin transformation.",
++    )
++    _add_execution_arguments(transform_execute_parser)
++    transform_approve_parser = subparsers.add_parser(
++        "transform-approve", formatter_class=PublicHelpFormatter,
++        help="Confirm an exact reviewed transformation at the local terminal.")
++    transform_approve_parser.add_argument("source", type=Path)
++    transform_approve_parser.add_argument("policy", type=Path)
++    transform_approve_parser.add_argument("receipt", type=Path)
++    transform_approve_parser.add_argument("--snapshot-sha256", required=True)
++    transform_approve_parser.add_argument("--table")
++    transform_approve_parser.add_argument("--max-total-input-bytes", type=int, metavar="BYTES")
++
+     transform_review_parser = subparsers.add_parser(
+         "transform-review",
+diff --git a/src/test_data_agent/cli_commands.py b/src/test_data_agent/cli_commands.py
+--- a/src/test_data_agent/cli_commands.py
++++ b/src/test_data_agent/cli_commands.py
+@@ -102,2 +102,16 @@
++    if args.command == "transform-execute":
++        from test_data_agent.cli_transformation_candidate import _execute_candidate_namespace
++
++        result = _execute_candidate_namespace(args)
++        print(json.dumps({**result, "status": "transformation_completed"}))
++        return 0
++
++    if args.command == "transform-approve":
++        from test_data_agent.cli_transformation_candidate import _approve_candidate_namespace
++
++        result = _approve_candidate_namespace(args)
++        print(json.dumps(result))
++        return 0
++
+     if args.command == "transform-review":
+         if args.edit_formats and not args.decide:
+diff --git a/src/test_data_agent/cli.py b/src/test_data_agent/cli.py
+--- a/src/test_data_agent/cli.py
++++ b/src/test_data_agent/cli.py
+@@ -179,4 +179,15 @@
+     arguments = list(sys.argv[1:] if argv is None else argv)
+     json_errors = "--json" in arguments or arguments[:1] == ["agent-advisor-request"]
+-    parser = HelpfulArgumentParser(
++    from functools import partial
++    from typing import cast
++    from test_data_agent.cli_transformation_candidate import _CandidateArgumentParser
++
++    selected_command = next((argument for argument in arguments
++                             if argument not in {"--json", "--debug"}), None)
++    transformation = selected_command in {"transform-execute", "transform-approve"}
++    parser_type = _CandidateArgumentParser if transformation else HelpfulArgumentParser
++    command_parser_type = (cast(type[HelpfulArgumentParser],
++                               partial(_CandidateArgumentParser, json_errors=json_errors)) if transformation
++                           else JsonHelpfulArgumentParser if json_errors else HelpfulArgumentParser)
++    parser = parser_type(
+         prog="test-data-agent",
+@@ -195,3 +206,3 @@
+         metavar="COMMAND",
+-        parser_class=JsonHelpfulArgumentParser if json_errors else HelpfulArgumentParser,
++        parser_class=command_parser_type,
+     )
+@@ -368,3 +379,4 @@
+     stderr = io.StringIO()
+-    interactive_decisions = args.command == "transform-review" and getattr(args, "decide", False)
++    interactive_decisions = (args.command == "transform-approve" or
++                             args.command == "transform-review" and getattr(args, "decide", False))
+     with redirect_stdout(stdout), (nullcontext() if interactive_decisions else redirect_stderr(stderr)):
+diff --git a/tests/test_transformation_activation_boundary.py b/tests/test_transformation_activation_boundary.py
+--- a/tests/test_transformation_activation_boundary.py
++++ b/tests/test_transformation_activation_boundary.py
+@@ -1,3 +1,4 @@
+-"""Public activation remains closed while private fictional evidence is assembled."""
++"""Separate execution registration never exposes a receipt issuer to agents."""
+
++import argparse
+ import pytest
+@@ -10,14 +11,15 @@
+ @pytest.mark.parametrize("command", ["transform-execute", "transform-approve"])
+-def test_execution_and_receipt_cli_not_registered(command, capsys):
+-    with pytest.raises(SystemExit) as caught:
+-        build_parser([command]).parse_args([command])
+-    assert caught.value.code == 2
+-    capsys.readouterr()
++def test_execution_and_receipt_cli_explicitly_registered(command):
++    parser = build_parser([command])
++    choices = next(action.choices for action in parser._actions
++                   if isinstance(action, argparse._SubParsersAction))
++    assert command in choices
+
+
+-def test_agent_surfaces_expose_review_only_for_transformation():
++def test_agent_surfaces_expose_consumers_not_receipt_issuers():
+     names = {tool.__name__ for tool in _GENERATOR_MCP_TOOLS}
+-    assert {name for name in names if "transform" in name} == {"review_transformation"}
++    assert {name for name in names if "transform" in name} == {
++        "review_transformation", "execute_transformation"}
+     assert not {name for name in test_data_agent.__all__ if "transform" in name.lower()}
+     assert "issue_local_receipt" not in names
+     assert "verify_local_receipt" not in names
+diff --git a/tests/test_contract_fixtures.py b/tests/test_contract_fixtures.py
+index a5cb861..27f0315 100644
+--- a/tests/test_contract_fixtures.py
++++ b/tests/test_contract_fixtures.py
+@@ -98,6 +98,7 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
+         "profile_csv",
+         "recover_dataset_plan",
+         "review_transformation",
++        "execute_transformation",
+         "validate_dataset",
+     }
+     trino_tool_names = {tool["name"] for tool in trino_tools}
+diff --git a/tests/fixtures/contracts/cli-parser-surface.json b/tests/fixtures/contracts/cli-parser-surface.json
+index 53882bb..d71c54b 100644
+--- a/tests/fixtures/contracts/cli-parser-surface.json
++++ b/tests/fixtures/contracts/cli-parser-surface.json
+@@ -21,6 +21,8 @@
+     "profile-example",
+     "infer-spec",
+     "profile-csv",
++    "transform-execute",
++    "transform-approve",
+     "transform-review",
+     "profile-postgres",
+     "profile-query",
+diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/contracts/mcp-generator-tools.json
+index 48f85d3..eff0347 100644
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -26,6 +26,91 @@
+       "type": "object"
+     }
+   },
++  {
++    "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\n    Requires the reviewed snapshot digest and, for preservation, a matching\n    receipt issued by the separate controlling-TTY local approval operation.\n    Returns bounded counts and digest metadata, never source or output rows.\n    ",
++    "input_schema": {
++      "properties": {
++        "input_path": {
++          "title": "Input Path",
++          "type": "string"
++        },
++        "max_output_bytes": {
++          "anyOf": [
++            {
++              "type": "integer"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Max Output Bytes"
++        },
++        "max_total_input_bytes": {
++          "anyOf": [
++            {
++              "type": "integer"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Max Total Input Bytes"
++        },
++        "output_path": {
++          "title": "Output Path",
++          "type": "string"
++        },
++        "policy_path": {
++          "title": "Policy Path",
++          "type": "string"
++        },
++        "receipt_path": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Receipt Path"
++        },
++        "snapshot_sha256": {
++          "title": "Snapshot Sha256",
++          "type": "string"
++        },
++        "table_name": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Table Name"
++        }
++      },
++      "required": [
++        "input_path",
++        "policy_path",
++        "output_path",
++        "snapshot_sha256"
++      ],
++      "title": "execute_transformationArguments",
++      "type": "object"
++    },
++    "name": "execute_transformation",
++    "output_schema": {
++      "additionalProperties": true,
++      "title": "execute_transformationDictOutput",
++      "type": "object"
++    }
++  },
+   {
+     "description": "Generate and export fresh synthetic data; source-row conversion is not supported.",
+     "input_schema": {
+@@ -286,7 +371,7 @@
+           "type": "integer"
+         },
+         "invalid_ratio": {
+-          "default": 0.0,
++          "default": 0,
+           "title": "Invalid Ratio",
+           "type": "number"
+         },
+diff --git a/scripts/check_installed_package.py b/scripts/check_installed_package.py
+index 6ffcf62..889db10 100644
+--- a/scripts/check_installed_package.py
++++ b/scripts/check_installed_package.py
+@@ -195,16 +195,17 @@ def verify_installed_skill_discovery(entrypoint: Path | None = None) -> None:
+     for arguments in (("--version",), ("--help",),
+                       ("profile-csv", "--help"), ("infer-spec", "--help"),
+                       ("generate", "--help"), ("validate", "--help"),
+-                      ("transform-review", "--help")):
++                      ("transform-review", "--help"), ("transform-execute", "--help"),
++                      ("transform-approve", "--help")):
+         completed = subprocess.run([cli, *arguments], capture_output=True,
+                                    text=True, check=False, timeout=30)
+         if completed.returncode != 0 or not completed.stdout.strip():
+             raise SystemExit("installed skill capability discovery failed")
+-    # Closed-engine stage: discovery must not imply an executable public route.
+-    completed = subprocess.run([cli, "transform-execute", "--help"],
++    # Discoverability does not supply required inputs or preservation authority.
++    completed = subprocess.run([cli, "transform-execute"],
+                                capture_output=True, text=True, check=False, timeout=30)
+     if completed.returncode != 2:
+-        raise SystemExit("closed transformation execution boundary changed")
++        raise SystemExit("transformation execution accepted missing required inputs")
+
+
+ def verify_install_profile(profile: str) -> None:
+diff --git a/tests/test_installed_package.py b/tests/test_installed_package.py
+index 5b17b30..85994ab 100644
+--- a/tests/test_installed_package.py
++++ b/tests/test_installed_package.py
+@@ -20,13 +20,13 @@ from scripts.check_installed_package import (
+
+
+ @pytest.mark.parametrize("failure", [None, "discovery", "execution"])
+-def test_skill_discovery_checks_help_and_closed_execution(monkeypatch, failure):
++def test_skill_discovery_checks_help_and_required_execution_inputs(monkeypatch, failure):
+     calls = []
+
+     def run(command, **kwargs):
+         calls.append(command[1:])
+         assert kwargs["timeout"] == 30
+-        execute = command[1] == "transform-execute"
++        execute = command[1:] == ["transform-execute"]
+         code = (0 if failure == "execution" else 2) if execute else (1 if failure == "discovery" else 0)
+         return subprocess.CompletedProcess(command, code, "fictional help", "")
+
+@@ -37,7 +37,9 @@ def test_skill_discovery_checks_help_and_closed_execution(monkeypatch, failure):
+     else:
+         verify_installed_skill_discovery(Path("fictional-cli"))
+         assert ["profile-csv", "--help"] in calls
+-        assert calls[-1] == ["transform-execute", "--help"]
++        assert ["transform-execute", "--help"] in calls
++        assert ["transform-approve", "--help"] in calls
++        assert calls[-1] == ["transform-execute"]
+
+
+ def test_requirements_are_grouped_by_runtime_extra() -> None:
+diff --git a/AGENTS.md b/AGENTS.md
+index 80a3479..41dbb67 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -65,13 +65,16 @@ matching baseline amendments, executable interface evidence and independent
+ safety review of the exact activation SHA. A review of private code alone does
+ not satisfy review of the policy amendment or public registration.
+
+-The concrete inactive candidate names `transform-approve` as the local-only
++The concrete candidate names `transform-approve` as the local-only
+ issuer, `transform-execute` as the CLI consumer and `execute_transformation`
+ as the workspace-confined MCP consumer. Execution requires the exact reviewed
+ snapshot digest; a new review digest does not validate an old receipt after
+ any bound input changes. Never register an MCP issuer or accept an agent
+-approval boolean. The unapplied registration patch and isolated installed
+-acceptance are evidence for review, not permission to enable these entrances.
++approval boolean. Registration may be materialized only in an isolated fictional
++candidate before review, never exposed publicly or used on real inputs. Public
++delivery requires independent safety review of this exact complete code/policy
++SHA and the executable gates above. Candidate help, receipts and acceptance
++are not dataset authorization or proof of completed review.
+
+ ## Engineering contract
+
+diff --git a/openspec/specs/safe-mcp-workflow/spec.md b/openspec/specs/safe-mcp-workflow/spec.md
+index 159de2d..b4b2ba3 100644
+--- a/openspec/specs/safe-mcp-workflow/spec.md
++++ b/openspec/specs/safe-mcp-workflow/spec.md
+@@ -39,14 +39,15 @@ Private implementation review alone SHALL NOT activate registration; matching
+ policy amendments, executable interface evidence and exact-SHA independent
+ safety review SHALL remain required.
+
+-The inactive concrete candidate names the separate workspace consumer
++The separately selected candidate names the workspace consumer
+ `execute_transformation`, local CLI consumer `transform-execute` and local
+ controlling-terminal issuer `transform-approve`. Execution SHALL require the
+ reviewed exact snapshot digest and a matching receipt for preservation. A fresh
+ review digest SHALL NOT make an earlier receipt valid after source, policy or
+ referenced input mutations. MCP SHALL register no receipt issuer. These named
+-candidate interfaces SHALL remain unregistered publicly until the activation
+-gates above complete; ordinary generator tools remain source-free.
++candidate interfaces MAY be registered in an isolated fictional acceptance
++candidate, but SHALL remain unavailable publicly until the activation gates
++above complete; ordinary generator tools remain source-free.
+
+ #### Scenario: Path traversal is attempted
+
+diff --git a/docs/reference/cli.md b/docs/reference/cli.md
+index 2085a12..a84034c 100644
+--- a/docs/reference/cli.md
++++ b/docs/reference/cli.md
+@@ -71,9 +71,8 @@ ordinal events plus match counts. It reads only the fixed snapshot (at most
+ value hashes, and fails closed above the limit. Unmatched cells are counted,
+ not copied. This is debugging metadata, not a preview of output or approval.
+
+-No source-preserving transformation command is available yet. The separate
+-local approval and execution gates in the active OpenSpec are not satisfied by
+-this read-only review.
++Review alone does not authorize source preservation. The separate local
++approval and execution entrances below enforce the exact reviewed snapshot.
+
+ ### Execution candidate — not publicly enabled
+
+@@ -102,10 +101,11 @@ counters and supported recovery keys. Cleanup-incomplete errors require local
+ inspection of destination/staging before retry; they do not permit overwrite.
+ Database capture and private `derive` are not enabled by this entrance.
+
+-These commands are not registered in the public package yet. Isolated fictional
+-acceptance is not availability or dataset authorization. Matching safety/spec
+-amendments, installed-candidate gates and independent exact-SHA safety review
+-must precede activation; ordinary generation stays source-free.
++These commands are registered in this isolated candidate, not in the released
++1.5.0 package. Public delivery requires the matching safety/spec amendment,
++installed-candidate gates and independent exact-SHA safety review. Neither
++command discovery nor passing fictional acceptance authorizes a dataset;
++ordinary generation stays source-free.
+
+ In the isolated candidate, the existing decision wizard feeds this same
+ execution contract: edit an already reviewable policy with `transform-review
+diff --git a/docs/how-to/mcp.md b/docs/how-to/mcp.md
+index 7868fd1..968fad0 100644
+--- a/docs/how-to/mcp.md
++++ b/docs/how-to/mcp.md
+@@ -77,9 +77,10 @@ Preservation requires a matching receipt issued separately by the human local
+ controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
+ Changed inputs invalidate receipts; workspace escapes, existing destinations,
+ unsupported actions and budget violations fail closed without copying fallback.
+-This tool is not registered in the public package yet: installed acceptance,
+-matching safety/spec documentation and independent exact-SHA safety review remain
+-activation gates. A receipt never authorizes database access or external APIs.
++This isolated candidate registers the consumer; the released 1.5.0 package
++does not. Public delivery requires installed acceptance, matching safety/spec
++documentation and independent exact-SHA safety review. A receipt never
++authorizes database access or external APIs.
+
+ 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
+ 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
+@@ -191,8 +192,7 @@ The server rejects:
+ See [MCP Tools](../mcp_examples.md) and
+ [Configuration](../reference/configuration.md) for details.
+
+-Transformation execution and preservation approval are not MCP capabilities.
+-The shared destination writer is currently a private fictional-test boundary;
+-passing its acceptance does not enable a public execution tool. Agents cannot
+-issue local preservation receipts. Public activation still requires the scoped
+-safety review and executable evidence specified by ADR-0020 and ADR-0021.
++Preservation approval is never an MCP capability. This candidate's separate
++workspace execution consumer cannot issue local receipts, return rows or
++broaden source-free generator authority. Public delivery still requires the
++scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.

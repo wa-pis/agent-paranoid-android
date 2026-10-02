@@ -4,12 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
+from datetime import date, datetime
 
 from test_data_agent.adapters.legacy_profile import legacy_profile_to_dataset_profile
 from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.entity import EntityProfile
 from test_data_agent.core.privacy import (
     LocalCategoryField,
+    infer_sensitive_from_name,
     validate_local_category_values,
 )
 from test_data_agent.core.relationship import Relationship
@@ -54,9 +56,11 @@ class PostgresProfiler:
     ) -> DatasetProfile:
         self.config.validate()
         categories = tuple(local_category_fields)
+        _validate_explicit_categories(self.config, categories)
         table_rows = self.fetch_query(build_list_tables_query(self.config))
         tables = self._complete_tables(table_rows)
         profiler = replace(self, config=self._expanded_config(tables))
+        _validate_explicit_categories(profiler.config, categories)
         entities = [profiler._profile_table(*table, categories) for table in tables]
         relationships = profiler._relationships(entities)
         return DatasetProfile(
@@ -239,9 +243,23 @@ class PostgresProfiler:
     ) -> dict[str, object]:
         name = _required_text(column, "column_name")
         data_type = _required_text(column, "data_type")
+        profile_type = coerce_profile_type(data_type)
+        numeric_shape = profile_type in {
+            ProfileDataType.INTEGER, ProfileDataType.FLOAT, ProfileDataType.DECIMAL,
+        }
+        temporal_bounds = (
+            profile_type in {ProfileDataType.DATE, ProfileDataType.DATETIME}
+            and not infer_sensitive_from_name(name)
+        )
         summary = _single_row(
             self.fetch_query(
-                build_column_summary_query(self.config, schema, table, name)
+                (
+                    build_numeric_shape_query(self.config, schema, table, name)
+                    if numeric_shape else build_column_summary_query(
+                        self.config, schema, table, name,
+                        temporal_bounds=temporal_bounds,
+                    )
+                )
             ),
             "column summary",
         )
@@ -265,19 +283,24 @@ class PostgresProfiler:
             "null_ratio": (row_count - non_null_count) / row_count if row_count else 0.0,
             "approx_distinct_count": distinct_count,
         }
-        if coerce_profile_type(data_type) in {
-            ProfileDataType.INTEGER,
-            ProfileDataType.FLOAT,
-        }:
-            shape = _single_row(
-                self.fetch_query(
-                    build_numeric_shape_query(self.config, schema, table, name)
-                ),
-                "numeric shape",
-            )
-            has_negative = _as_bool(shape.get("has_negative"))
-            has_positive = _as_bool(shape.get("has_positive"))
-            magnitude = shape.get("max_abs_magnitude")
+        if temporal_bounds and non_null_count:
+            lower, upper = summary.get("min_temporal"), summary.get("max_temporal")
+            expected_type = datetime if profile_type == ProfileDataType.DATETIME else date
+            if type(lower) is not expected_type or type(upper) is not expected_type:
+                raise PostgresProfileError("PostgreSQL temporal bounds are invalid")
+            assert isinstance(lower, date) and isinstance(upper, date)
+            if isinstance(lower, datetime) and isinstance(upper, datetime):
+                if (lower.utcoffset() is None) != (upper.utcoffset() is None):
+                    raise PostgresProfileError("PostgreSQL temporal bounds have inconsistent timezone metadata")
+            if lower > upper:
+                raise PostgresProfileError("PostgreSQL temporal bounds are reversed")
+            suffix = "timestamp" if profile_type == ProfileDataType.DATETIME else "date"
+            result[f"min_{suffix}"] = lower.isoformat()
+            result[f"max_{suffix}"] = upper.isoformat()
+        if numeric_shape:
+            has_negative = _as_bool(summary.get("has_negative"))
+            has_positive = _as_bool(summary.get("has_positive"))
+            magnitude = summary.get("max_abs_magnitude")
             if magnitude is not None and (has_negative or has_positive):
                 result["numeric_shape"] = {
                     "max_abs_magnitude": _bounded_magnitude(magnitude),
@@ -365,11 +388,23 @@ def dataset_profile_from_postgres(
 ) -> DatasetProfile:
     """Profile one PostgreSQL source through its bounded read-only session."""
 
+    client.config.validate()
+    _validate_explicit_categories(client.config, local_category_fields)
     with client.session() as session:
         return PostgresProfiler(
             config=client.config,
             fetch_query=session.fetch_aggregate_dicts,
         ).profile(local_category_fields=local_category_fields)
+
+
+def _validate_explicit_categories(
+    config: PostgresConfig, categories: Sequence[LocalCategoryField],
+) -> None:
+    columns = config.resolved_columns if config.resolved_columns is not None else config.allowed_columns
+    if any(parse_postgres_column_selector(column).is_wildcard for column in columns):
+        return  # Metadata expansion must precede validation against a fixed snapshot.
+    for category in categories:
+        build_local_category_candidates_query(config, category)
 
 
 def _single_row(

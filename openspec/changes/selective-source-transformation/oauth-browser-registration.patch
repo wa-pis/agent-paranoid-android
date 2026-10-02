@@ -1,0 +1,10 @@
+diff --git a/src/test_data_agent/cli_parser.py b/src/test_data_agent/cli_parser.py
+--- a/src/test_data_agent/cli_parser.py
++++ b/src/test_data_agent/cli_parser.py
+@@ -424,1 +424,6 @@
++    profile_query_parser.add_argument(
++        "--trino-oauth-browser", action="store_true",
++        help="Explicit local-terminal OAuth2 browser opt-in for Trino; never prints authentication URLs.",
++    )
++
+     add_local_category_option(profile_query_parser)

@@ -40,8 +40,71 @@ accepts one bounded local file, validates one fully qualified single-table
 `SELECT`, and executes only trusted no-row schema and aggregate wrappers.
 Query text, literals, backend errors, endpoints, and rows must not cross into
 profiles, generated data, logs, providers, or default MCP responses.
+Unsupported JOIN and CTE/WITH shapes receive fixed recovery hints without table
+names, query text or literals. This does not broaden the permitted SQL subset.
+Boolean AND/OR predicates are permitted within that existing single-table
+subset; they do not authorize additional functions, tables, query shapes or
+larger work budgets.
+Direct non-sensitive date/timestamp projections include validated min/max
+aggregates in their existing column-summary query. Any sensitive source field
+in the query, a sensitive output name, or a derived expression suppresses these
+bounds; renaming a sensitive source cannot declassify it. Missing or malformed
+nonempty bounds fail closed; all-null fields make no observed-period claim. No
+query rows or extra aggregate round trips are added.
+
+PostgreSQL connection failures expose only fixed categories when identifiable
+from typed network/TLS exceptions or allowlisted SQLSTATE codes: timeout,
+connection refused, name resolution, TLS, authentication/authorization, database
+configuration or permissions. Unknown failures remain generic. Driver text is
+never parsed for clues or returned; sanitized connection errors are detached
+from the original exception context. Some drivers wrap network failures in a
+generic exception, so a specific category is not guaranteed.
+
+PostgreSQL local-category requests are checked against explicit column allowlists
+before opening the profiling session or issuing queries. Wildcard configurations
+first resolve bounded metadata into a fixed column snapshot; category validation
+then runs before aggregate queries. Category count, value-content and disclosure
+checks still apply, and these preflight checks do not grant preservation rights.
+
+PostgreSQL table profiling includes date/timestamp minima and maxima in the same
+column-summary aggregate for non-sensitive temporal columns. No extra query or
+row sample is needed. Sensitive-name columns do not request or retain these
+bounds. Nonempty temporal aggregates must have correctly typed, ordered endpoints
+with compatible timezone metadata; malformed endpoints fail closed. All-null
+columns have no observed bounds. Query-source profiling applies the same
+temporal-bound guard to its derived output. Neither path certifies source-period
+utility when bounds are missing.
+
+Declared `numeric(p,s)` in PostgreSQL or allowed query metadata carries only
+precision/scale into the profile; it does not authorize exact source extrema,
+raw values, a wider SQL subset or a larger scan budget. Unbounded `numeric`
+remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
 
 ## Enforcement
+
+SQL source policy 1.1 permits aliased SUM/COUNT/MIN/MAX/AVG projections and
+optional GROUP BY on explicit authorized source columns of one physical table.
+COUNT(*) is a row count, never a projection wildcard. Non-aggregate projections
+use physical source-column identity: table column-alias lists and decorated
+wildcards are rejected, including outside grouped queries. Ordinary table
+aliases remain supported. Non-aggregate projections
+must be grouping keys; nested/wrapped aggregates, HAVING, DISTINCT aggregates,
+grouping expressions/ordinals, ROLLUP and grouping sets remain rejected.
+Grouped/aggregate queries referencing sensitive-name source columns fail closed
+before derived queries, including aliases and predicate-only references.
+Existing table/column authorization, AST/statement/scan/result/time budgets and
+source-free profile wrappers apply unchanged. Grouping does not declassify values
+or authorize disclosure of small groups. Aggregate profiles do not support
+automatic dependency-preserving inference, including COUNT(*) without columns.
+
+Query profiles carry value-free `has_unmodeled_expressions` metadata. A
+source-dependent non-column projection marks the profile unsupported for
+automatic `infer_dataset_spec`; profiling itself remains permitted. Direct
+column aliases do not set the flag. Saved SQL profiles lacking this metadata
+must be reprofiled before automatic inference; non-query legacy profiles keep
+their prior inference behavior. No SQL expressions or literals are persisted by
+this flag. Explicit independently authored specifications are not automatic
+SQL-dependency inference and must not be advertised as preserving query formulas.
 
 - Validate identifiers and enforce table/column allowlists before execution.
 - Return raw categorical aggregates only for explicitly non-sensitive columns
@@ -63,6 +126,10 @@ profiles, generated data, logs, providers, or default MCP responses.
 - Do not log SQL parameters, source values, credentials, prompts, or secrets.
 - Replace FastMCP/Pydantic argument-validation failures with a fixed detached
   error before returning a tool result; never reflect rejected values.
+- MCP 2 unexpected errors remain generic and detached. Only exact typed
+  transformation-limit and query-work-budget failures retain reconstructed,
+  value-free dimensions, counters and supported recovery settings; never forward
+  arbitrary exception messages or backend causes.
 - Reject malformed typed MCP requests and notifications before SDK dispatch;
   never pass their caller-controlled values into SDK logs or exceptions.
 - Audit-log capacity must reject a new invocation before its `started` record

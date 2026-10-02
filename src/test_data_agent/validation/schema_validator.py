@@ -6,7 +6,8 @@ from collections.abc import Mapping
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.distribution import StringPatternDistribution
+from test_data_agent.core.decimal_units import value_matches_decimal
+from test_data_agent.core.distribution import DecimalRangeDistribution, StringPatternDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.csv_profiler import parse_bool, parse_date_value, parse_datetime_value, parse_float, parse_int
 
@@ -56,7 +57,14 @@ def validate_schema(rows_by_entity: dict[str, list[dict[str, Any]]], spec: Datas
                     and not distribution.min_length <= len(value) <= distribution.max_length
                 ):
                     errors.append(f"{entity.name}[{row_index}].{field.name} has wrong length")
-                if not value_matches_type(value, field.data_type):
+                if field.data_type == FieldType.DECIMAL:
+                    exact = field.typed_distribution
+                    if not isinstance(exact, DecimalRangeDistribution) or not value_matches_decimal(
+                        value, precision=exact.precision, scale=exact.scale,
+                        low=exact.min, high=exact.max,
+                    ):
+                        errors.append(f"{entity.name}[{row_index}].{field.name} has wrong type")
+                elif not value_matches_type(value, field.data_type):
                     errors.append(f"{entity.name}[{row_index}].{field.name} has wrong type")
     return errors
 

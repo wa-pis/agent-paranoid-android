@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile
@@ -92,13 +92,14 @@ def profile_trino_query_source(
     config: TrinoConfig,
     driver: Any,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    oauth_redirect: Callable[[str], None] | None = None,
 ) -> DatasetProfile:
     if request.adapter is not SqlQueryAdapter.TRINO:
         raise SqlQuerySourceError("SQL query adapter does not match Trino")
     draft = inspect_query_source(request)
     config.validate_security()
     selectors = _trino_table_selectors(config, draft.table_name)
-    client = TrinoClient(config=config, driver=driver)
+    client = TrinoClient(config=config, driver=driver, oauth_redirect=oauth_redirect)
 
     def run() -> DatasetProfile:
         catalog, schema, table = draft.table_parts

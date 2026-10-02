@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import json
 import re
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
@@ -19,10 +20,12 @@ from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
+from test_data_agent.core.csv_reader import ScopedDictReader
 
 from test_data_agent.core.limits import (
+    DEFAULT_MAX_INPUT_FILE_BYTES,
+    GenerationBudget,
     InputLimitError,
-    configure_csv_field_limit,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -51,8 +54,8 @@ MAX_NUMERIC_SAMPLE_VALUES = 10_000
 CSV_SAMPLE_BYTES = 8192
 
 
-def _csv_sensitive_value_type(value: str) -> str | None:
-    if len(value) > max_input_cell_chars():
+def _csv_sensitive_value_type(value: str, *, max_chars: int | None = None) -> str | None:
+    if len(value) > (max_input_cell_chars() if max_chars is None else max_chars):
         raise InputLimitError("CSV cell exceeds character limit")
     detected = infer_sensitive_value_type(value)
     if detected not in {None, "phone"}:
@@ -100,10 +103,12 @@ class CSVSourceRowDigests:
 class CSVColumnProfile(BaseModel):
     name: str
     data_type: str
+    decimal_precision: int | None = Field(default=None, exclude_if=lambda value: value is None)
+    decimal_scale: int | None = Field(default=None, exclude_if=lambda value: value is None)
     nullable: bool
-    null_count: int
-    null_ratio: float
-    approx_distinct_count: int
+    null_count: int | None
+    null_ratio: float | None
+    approx_distinct_count: int | None
     sensitive: bool
     semantic_type: str | None = None
     top_values: list[dict[str, Any]] = Field(default_factory=list)
@@ -152,6 +157,32 @@ def profile_csv(
     )
 
 
+def profile_csv_bytes(
+    payload: bytes, table_name: str, *, budget: GenerationBudget,
+    max_bytes: int = DEFAULT_MAX_INPUT_FILE_BYTES,
+) -> CSVProfile:
+    """Profile a fixed, bounded CSV snapshot without reopening its source path."""
+    budget.check("CSV snapshot profiling")
+    if (type(payload) is not bytes or type(table_name) is not str or not table_name
+            or type(max_bytes) is not int or max_bytes < 1 or len(payload) > max_bytes):
+        raise ValueError("invalid CSV snapshot")
+    return _profile_csv_rows(_csv_reader_from_snapshot(payload), table_name, (), None, budget)
+
+
+def _csv_reader_from_snapshot(payload: bytes, *, max_chars: int | None = None,
+                              check_size: Callable[[int], None] | None = None) -> csv.DictReader[str]:
+    """Use identical decoding and dialect for profiling and local review."""
+    encoding = "utf-8-sig"
+    try:
+        payload[:CSV_SAMPLE_BYTES].decode(encoding)
+    except UnicodeDecodeError:
+        encoding = "latin-1"
+    text = payload.decode(encoding)
+    dialect = detect_csv_dialect(payload[:CSV_SAMPLE_BYTES].decode(encoding, errors="replace"))
+    return ScopedDictReader(io.StringIO(text, newline=""), dialect=dialect,
+                            max_chars=max_chars, check_size=check_size)
+
+
 def profile_csv_with_row_digests(
     path: Path,
     table_name: str | None = None,
@@ -179,31 +210,61 @@ def _profile_csv(
     local_category_fields: Sequence[LocalCategoryField] = (),
 ) -> CSVProfile:
     enforce_input_files([path])
-    configure_csv_field_limit(csv)
     encoding = detect_csv_encoding(path)
     sample = read_csv_sample(path, encoding)
     dialect = detect_csv_dialect(sample)
     with path.open(newline="", encoding=encoding) as handle:
-        reader = csv.DictReader(handle, dialect=dialect)
-        fieldnames = validate_csv_headers(reader.fieldnames)
+        reader = ScopedDictReader(handle, dialect=dialect)
+        return _profile_csv_rows(reader, table_name or path.stem, local_category_fields, row_digests, None)
+
+
+def _profile_csv_rows(
+    reader: csv.DictReader[str], table_name: str,
+    local_category_fields: Sequence[LocalCategoryField], row_digests: set[bytes] | None,
+    budget: GenerationBudget | None,
+    *, literal_empty: bool = False, null_token: str | None = None,
+    check_shape: Callable[[int, int], None] | None = None,
+    max_chars: int | None = None,
+) -> CSVProfile:
+    fieldnames = validate_csv_headers(reader.fieldnames)
+    if check_shape is None:
         enforce_input_column_count(len(fieldnames), label="CSV")
-        reader.fieldnames = fieldnames
-        accumulators = {name: CSVColumnAccumulator(name) for name in fieldnames}
-        row_count = 0
-        for row in reader:
-            row_count += 1
+    else:
+        check_shape(0, len(fieldnames))
+    reader.fieldnames = fieldnames
+    accumulators = {name: CSVColumnAccumulator(name, max_chars=max_chars) for name in fieldnames}
+    row_count = 0
+    for row in reader:
+        if budget is not None:
+            budget.check("CSV snapshot profiling")
+        row_count += 1
+        if check_shape is None:
             enforce_input_row_count(row_count, label="CSV")
             enforce_input_cell_count(row_count * len(fieldnames), label="CSV")
-            for name in fieldnames:
-                accumulators[name].add(row.get(name, ""))
-            if row_digests is not None:
-                row_digests.add(csv_row_digest(row, fieldnames))
-    allowed = {item.field for item in local_category_fields if item.entity == (table_name or path.stem)}
+        else:
+            check_shape(row_count, len(fieldnames))
+        for name in fieldnames:
+            if budget is not None:
+                budget.check("CSV snapshot profiling")
+            raw = row.get(name, "")
+            if literal_empty and raw == null_token:
+                accumulators[name].observe_sensitivity(raw)
+                continue
+            accumulators[name].add(raw, literal_empty=literal_empty)
+        if row_digests is not None:
+            row_digests.add(csv_row_digest(row, fieldnames))
+    allowed = {item.field for item in local_category_fields if item.entity == table_name}
+    columns = []
+    for name, accumulator in accumulators.items():
+        if budget is not None:
+            budget.check("CSV snapshot profiling")
+        columns.append(accumulator.to_profile(row_count, preserve_categories=name in allowed))
+    if budget is not None:
+        budget.check("CSV snapshot profiling")
     return CSVProfile(
-        table=table_name or path.stem,
+        table=table_name,
         row_count=row_count,
-        columns=[accumulator.to_profile(row_count, preserve_categories=name in allowed)
-                 for name, accumulator in accumulators.items()],
+        columns=columns,
         local_category_fields=list(local_category_fields),
     )
 
@@ -249,8 +310,11 @@ def validate_csv_headers(fieldnames: Sequence[str] | None) -> list[str]:
 
 
 class CSVColumnAccumulator:
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, *, max_chars: int | None = None) -> None:
         self.name = name
+        self.max_chars = max_input_cell_chars() if max_chars is None else max_chars
+        if type(self.max_chars) is not int or self.max_chars < 1:
+            raise ValueError("invalid CSV character limit")
         self.non_null_count = 0
         self.semantic_sample: list[str] = []
         self.content_sensitive_type: str | None = None
@@ -267,18 +331,21 @@ class CSVColumnAccumulator:
         self.all_datetime = True
         self.all_date = True
 
-    def add(self, raw_value: str | None) -> None:
+    def add(self, raw_value: str | None, *, literal_empty: bool = False) -> None:
         value = raw_value.strip() if raw_value is not None else ""
-        if value == "":
+        if value == "" and not literal_empty:
             return
         self.non_null_count += 1
         if len(self.semantic_sample) < 100:
             self.semantic_sample.append(value)
-        detected_type = _csv_sensitive_value_type(value)
-        if detected_type == "secret" or self.content_sensitive_type is None:
-            self.content_sensitive_type = detected_type
+        self.observe_sensitivity(value)
         self.add_count(value)
         self.add_typed_samples(value)
+
+    def observe_sensitivity(self, value: str) -> None:
+        detected_type = _csv_sensitive_value_type(value.strip(), max_chars=self.max_chars)
+        if detected_type == "secret" or self.content_sensitive_type is None:
+            self.content_sensitive_type = detected_type
 
     def add_count(self, value: str) -> None:
         if len(self.distinct_digests) < MAX_DISTINCT_DIGESTS:
@@ -321,7 +388,7 @@ class CSVColumnAccumulator:
 
     def to_profile(self, row_count: int, *, preserve_categories: bool = False) -> CSVColumnProfile:
         null_count = row_count - self.non_null_count
-        semantic_type = infer_semantic_type(self.name, self.semantic_sample)
+        semantic_type = infer_semantic_type(self.name, self.semantic_sample, max_chars=self.max_chars)
         if self.content_sensitive_type == "secret" or semantic_type is None:
             semantic_type = self.content_sensitive_type or semantic_type
         base_type = self.infer_data_type(semantic_type)
@@ -335,7 +402,7 @@ class CSVColumnAccumulator:
         if sensitive:
             pattern_counts: Counter[str] = Counter()
             for value, count in self.counts.items():
-                value_type = _csv_sensitive_value_type(value) or semantic_type
+                value_type = _csv_sensitive_value_type(value, max_chars=self.max_chars) or semantic_type
                 pattern_counts[mask_pattern(value, value_type)] += count
             masked_patterns = [{"pattern": pattern, "count": count} for pattern, count in pattern_counts.most_common(10)]
         elif (
@@ -455,7 +522,7 @@ def profile_column(name: str, values: list[str], row_count: int) -> CSVColumnPro
     )
 
 
-def infer_semantic_type(name: str, values: list[str]) -> str | None:
+def infer_semantic_type(name: str, values: list[str], *, max_chars: int | None = None) -> str | None:
     lowered = name.lower()
     if "email" in lowered or "mail" in lowered:
         return "email"
@@ -469,7 +536,7 @@ def infer_semantic_type(name: str, values: list[str]) -> str | None:
     if sample and sum(bool(SSN_RE.fullmatch(value)) for value in sample) / len(sample) >= 0.8:
         return "ssn"
     if sample and sum(
-        _csv_sensitive_value_type(value) == "phone" for value in sample
+        _csv_sensitive_value_type(value, max_chars=max_chars) == "phone" for value in sample
     ) / len(sample) >= 0.8:
         return "phone"
     return None

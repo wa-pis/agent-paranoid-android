@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from types import SimpleNamespace
 
 import pytest
 
+from test_data_agent.core.field import FieldType
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
-from test_data_agent.postgres_profiler import PostgresProfileError, PostgresProfiler
+from test_data_agent.postgres_profiler import (
+    PostgresProfileError, PostgresProfiler, dataset_profile_from_postgres,
+)
 from test_data_agent.postgres_query_builders import PostgresQuery
+from test_data_agent.postgres_query_builders import PostgresScopeError
 
 
 def postgres_config() -> PostgresConfig:
@@ -101,6 +106,9 @@ class SyntheticPostgresResults:
             if '"amount"' in sql:
                 return [
                     {
+                        "row_count": 3,
+                        "non_null_count": 2,
+                        "distinct_count": 2,
                         "max_abs_magnitude": 2,
                         "has_negative": False,
                         "has_positive": True,
@@ -108,6 +116,9 @@ class SyntheticPostgresResults:
                 ]
             return [
                 {
+                    "row_count": 2 if '"customers"' in sql else 3,
+                    "non_null_count": 2 if '"customers"' in sql else 3,
+                    "distinct_count": 2 if '"customers"' in sql else 3,
                     "max_abs_magnitude": 0,
                     "has_negative": False,
                     "has_positive": True,
@@ -171,6 +182,8 @@ def test_normalizes_bounded_results_into_relational_dataset_profile() -> None:
         ],
     }
     assert orders.field("amount").nullable is True
+    assert orders.field("amount").data_type == FieldType.DECIMAL
+    assert (orders.field("amount").decimal_precision, orders.field("amount").decimal_scale) == (12, 2)
     assert orders.field("amount").null_ratio == pytest.approx(1 / 3)
     assert orders.field("amount").distribution == {
         "kind": "numeric_shape",
@@ -189,6 +202,24 @@ def test_normalizes_bounded_results_into_relational_dataset_profile() -> None:
     assert all("SELECT *" not in query.sql.upper() for query in results.queries)
 
 
+@pytest.mark.parametrize("with_category,expected_queries", [(False, 12), (True, 13)])
+def test_numeric_summary_uses_one_aggregate_per_column(
+    with_category: bool, expected_queries: int,
+) -> None:
+    results = SyntheticPostgresResults()
+    categories = (
+        [LocalCategoryField(entity="warehouse.crm.customers", field="tier")]
+        if with_category else []
+    )
+    PostgresProfiler(postgres_config(), results.fetch).profile(
+        local_category_fields=categories,
+    )
+
+    assert len(results.queries) == expected_queries
+    assert sum("AS distinct_count" in query.sql for query in results.queries) == 4
+    assert sum("AS max_abs_magnitude" in query.sql for query in results.queries) == 3
+
+
 def test_missing_allowlisted_table_fails_without_partial_profile() -> None:
     results = SyntheticPostgresResults(omit_orders=True)
 
@@ -196,6 +227,43 @@ def test_missing_allowlisted_table_fails_without_partial_profile() -> None:
         PostgresProfiler(postgres_config(), results.fetch).profile()
 
     assert len(results.queries) == 1
+
+
+@pytest.mark.parametrize("entity,column", [
+    ("warehouse.crm.customers", "missing"),
+    ("warehouse.private.records", "tier"),
+])
+def test_invalid_category_scope_rejected_before_any_query(entity, column):
+    results = SyntheticPostgresResults()
+    with pytest.raises(PostgresScopeError):
+        PostgresProfiler(postgres_config(), results.fetch).profile(
+            local_category_fields=[LocalCategoryField(entity=entity, field=column)]
+        )
+    assert results.queries == []
+
+
+def test_invalid_category_scope_rejected_before_connection():
+    client = SimpleNamespace(
+        config=postgres_config(),
+        session=lambda: pytest.fail("invalid category must not open a session"),
+    )
+    with pytest.raises(PostgresScopeError):
+        dataset_profile_from_postgres(client, local_category_fields=[
+            LocalCategoryField(entity="warehouse.crm.customers", field="missing")
+        ])
+
+
+def test_invalid_wildcard_category_rejected_before_aggregates():
+    results = SyntheticPostgresResults()
+    config = replace(postgres_config(), allowed_columns=frozenset({
+        "public.orders.*", "crm.customers.*",
+    }))
+    with pytest.raises(PostgresScopeError):
+        PostgresProfiler(config, results.fetch).profile(local_category_fields=[
+            LocalCategoryField(entity="warehouse.crm.customers", field="missing")
+        ])
+    assert len(results.queries) == 3  # Table list and two bounded column snapshots.
+    assert not any("count(*)" in query.sql for query in results.queries)
 
 
 def test_qualified_wildcards_expand_to_stable_explicit_snapshot() -> None:

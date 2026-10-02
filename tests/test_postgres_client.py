@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+import socket
+import ssl
 
 import pytest
 
@@ -279,6 +281,44 @@ def test_connection_error_text_is_not_exposed() -> None:
 
     assert secret not in str(error.value)
     assert error.value.__cause__ is None
+    assert error.value.__context__ is None
+
+
+@pytest.mark.parametrize("backend,hint", [
+    (TimeoutError("private endpoint"), "timeout"),
+    (ConnectionRefusedError("private endpoint"), "connection refused"),
+    (socket.gaierror("private endpoint"), "name resolution"),
+    (ssl.SSLError("private endpoint"), "TLS negotiation"),
+])
+def test_connection_failure_categories_are_static(backend, hint):
+    client = PostgresClient(postgres_config(password_env=None), FakeDriver(backend))
+    with pytest.raises(PostgresConnectionError) as caught:
+        with client.session():
+            pytest.fail("connection unexpectedly succeeded")
+    assert hint in str(caught.value)
+    assert "private endpoint" not in str(caught.value)
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize("state,hint", [
+    ("28000", "authorization rejected"), ("28P01", "authentication rejected"),
+    ("3D000", "database unavailable"), ("42501", "permission denied"),
+    ("private-state", None), ([], None),
+])
+def test_connection_sqlstate_allowlist(state, hint):
+    backend = RuntimeError("private endpoint and password")
+    backend.sqlstate = state
+    client = PostgresClient(postgres_config(password_env=None), FakeDriver(backend))
+    with pytest.raises(PostgresConnectionError) as caught:
+        with client.session():
+            pytest.fail("connection unexpectedly succeeded")
+    message = str(caught.value)
+    assert "private" not in message
+    assert caught.value.__context__ is None
+    if hint is None:
+        assert message == "PostgreSQL connection failed"
+    else:
+        assert hint in message
 
 
 def test_deadline_is_checked_before_next_statement() -> None:

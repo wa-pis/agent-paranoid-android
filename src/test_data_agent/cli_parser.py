@@ -235,8 +235,8 @@ def register_dataset_commands(
     generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
     generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
-    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], metavar="MODE", default="valid", help="Generation mode: valid rows by default, or controlled invalid/edge data.")
-    generate_parser.add_argument("--invalid-ratio", type=ratio, default=0.0, help="Share of invalid values for mixed/negative modes, between 0 and 1.")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], metavar="MODE", help="Override saved generation mode; profiles default to valid.")
+    generate_parser.add_argument("--invalid-ratio", type=ratio, help="Override saved invalid share for mixed/negative modes, between 0 and 1.")
     generate_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed. Reuse it to reproduce the same output.")
     generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
     generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
@@ -319,6 +319,55 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
+
+    from test_data_agent.cli_transformation_candidate import _add_execution_arguments
+
+    transform_execute_parser = subparsers.add_parser(
+        "transform-execute",
+        formatter_class=PublicHelpFormatter,
+        help="Execute a separately reviewed local mixed-origin transformation.",
+    )
+    _add_execution_arguments(transform_execute_parser)
+    transform_approve_parser = subparsers.add_parser(
+        "transform-approve", formatter_class=PublicHelpFormatter,
+        help="Confirm an exact reviewed transformation at the local terminal.")
+    transform_approve_parser.add_argument("source", type=Path)
+    transform_approve_parser.add_argument("policy", type=Path)
+    transform_approve_parser.add_argument("receipt", type=Path)
+    transform_approve_parser.add_argument("--snapshot-sha256", required=True)
+    transform_approve_parser.add_argument("--table")
+    transform_approve_parser.add_argument("--max-total-input-bytes", type=int, metavar="BYTES")
+
+    transform_review_parser = subparsers.add_parser(
+        "transform-review",
+        help="Review a transformation snapshot and policy without executing it.",
+        description=("Read one fixed source snapshot and a local behavior policy. "
+                     "The policy selects CSV, Parquet or an already captured query result; "
+                     "this command does not capture query results or connect to databases. "
+                     "Show value-free field decisions and a snapshot digest; "
+                     "do not approve or transform source data. "
+                     "With --decide, interactively edit and save sensitivity decisions."),
+        formatter_class=PublicHelpFormatter,
+    )
+    transform_review_parser.add_argument("source", type=Path, help="Local source snapshot file; format selected by policy.")
+    transform_review_parser.add_argument("policy", type=Path, help="Local behavior-policy YAML file.")
+    transform_review_parser.add_argument("--table", type=str, help="Entity name; defaults to source filename stem.")
+    transform_review_parser.add_argument(
+        "--decide", action="store_true",
+        help="Interactively edit each sensitivity decision and explicitly save the policy in place; not approval.",
+    )
+    transform_review_parser.add_argument(
+        "--edit-actions", action="store_true",
+        help="With --decide, also choose field actions, mapping declarations and unmatched behavior.",
+    )
+    transform_review_parser.add_argument(
+        "--edit-formats", action="store_true",
+        help="With --decide, edit field temporal-format metadata; does not execute conversion.",
+    )
+    transform_review_parser.add_argument(
+        "--trace", action="store_true",
+        help="Include bounded, value-free exact-text match ordinals and counts.",
+    )
 
     profile_postgres_parser = subparsers.add_parser(
         "profile-postgres",

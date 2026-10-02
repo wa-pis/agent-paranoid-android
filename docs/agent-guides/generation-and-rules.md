@@ -24,6 +24,17 @@ The generator must:
 - validate every rule after generation; and
 - produce a business-validation report.
 
+Reviewed DatasetSpec `1.1` can generate exact `decimal_range` fields with
+precision at most 38 and explicit base-ten bounds. This source-free path uses
+integer units and exports Parquet `decimal128`, never binary FLOAT. It does not
+make automatic profiling or formulas exact: active constraints on entities
+containing DECIMAL currently fail closed pending a separately tested formula
+rounding contract. Sensitive DECIMAL ranges remain disallowed.
+Recognizable phone/card-like DECIMAL bounds and final values fail closed even
+when optional validation reporting is disabled. Do not treat a declared numeric
+type as permission to bypass content checks; ambiguous legitimate amounts may
+require a later, separately approved field-scoped policy.
+
 After constraint solving, valid-mode generation also performs unconditional
 schema/type and recognizable-PII checks before returning rows to any export or
 publication adapter. These safety checks are not disabled by validation-report
@@ -36,3 +47,29 @@ explicit local seeded random source. Do not introduce source-row reuse,
 identity preservation, or implicit real-value dictionaries as a shortcut.
 Entity names reserved for generated control artifacts are rejected by the
 dataset specification and writer before any output file is created.
+
+Review-first plans warn when date/time ranges lack endpoints: default generation
+uses 2020-01-01 for a missing minimum and 2025-01-01 for a missing maximum.
+These are fallback assumptions, not observed source bounds or measured fidelity.
+Set explicit bounds in the reviewed specification when a particular period is
+required. This warning does not change generation or certify source-period utility.
+
+Repeated identifier fields inferred from CSV profiles use a fixed synthetic key
+pool: four distinct source keys yield four synthetic keys even when output grows.
+Only the count is carried forward, never source identifiers or row mappings.
+The typed `synthetic_identifier` distribution accepts positive integer `pool_size`;
+without it, identifiers retain their existing per-row generation behavior.
+Pools cycle deterministically and unrelated identifier domains remain disjoint.
+String identifiers retain the exact `synthetic_` plus ASCII integer namespace,
+including when their field has email, phone or SSN semantics. Identifier generation
+takes precedence over semantic formatting. Privacy validation recognizes only that
+exact token on identifier fields, not arbitrary prefixed sensitive text; ordinary
+non-identifier sensitive fields still use their semantic synthetic formats.
+Fewer output rows or nulls can leave some pool members unused. Source frequencies
+are not reproduced, and declared relationship constraints still take precedence.
+Repeated-key pools are not nominated as primary keys; an explicit primary key
+cannot have a pool smaller than its requested row count.
+Folder overflow and censored single-CSV counts cannot infer a fixed pool.
+Other aggregate profiles may supply approximate counts: these define the requested
+synthetic pool, not proof of exact source cardinality. Reprofile older artifacts
+to obtain pool metadata; no source-preservation permission is implied.

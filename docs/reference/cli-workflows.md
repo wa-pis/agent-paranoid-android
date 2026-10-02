@@ -36,12 +36,25 @@ business-rule guidance.
 
 ## Reviewed DatasetSpec
 
+`infer-spec` expects a profiling-command artifact, not an existing DatasetSpec.
+JSON keys `schema_version`, `privacy_rules`, `privacy_settings`,
+`generation_settings` and `validation_settings` select spec parsing even if
+profile fields are also present. Use the original profiling artifact for
+inference, or pass a reviewed spec directly to `generate`. Do not delete privacy
+settings to force a mixed JSON document to be interpreted as a profile.
+
 ```bash
 test-data-agent generate dataset_spec.yaml \
   --seed 12345 \
   --format csv \
   --output out/generated
 ```
+
+For a reviewed DatasetSpec, omitted `--mode` and `--invalid-ratio` retain its
+saved settings. Explicit options override the effective spec, generated rows,
+saved output spec and manifest together. A nonzero ratio requires `mixed` or
+`negative`; specify `--invalid-ratio 0` when explicitly changing a saved mixed
+spec to `valid`. Profile and direct-CSV generation still default to `valid/0`.
 
 For previously reviewed safe profile metadata, use `--profile`:
 
@@ -65,6 +78,14 @@ are environment configuration, never command-line secrets. Qualified column
 wildcards expand only against allowlisted metadata and never become a
 projection star. Reviewed query files use `profile-query`; query rows, SQL text,
 literals, endpoints, and backend messages are excluded from the profile.
+Direct non-sensitive date/timestamp query outputs include observed min/max
+bounds when the aggregate source supplies valid endpoints. Derived expressions,
+sensitive source/output names and all-null fields do not claim them.
+
+`infer-spec` rejects query profiles marked with unsupported expression
+dependencies; `profile-query` itself remains available. Reprofile old SQL
+profiles without dependency metadata. Direct column aliases remain supported;
+there is no automatic SQL-to-formula translation.
 
 Follow the source-specific walkthrough instead of assembling commands from this
 reference:
@@ -115,6 +136,27 @@ and trust-channel guidance.
 | `--business-rules PATH` | Reviewed YAML or JSON rule file |
 | `--output PATH` | Output file or new output directory |
 | `--overwrite` | Replace one valid manifest-owned target |
+
+Parquet output from a reviewed specification uses declared integer, float,
+boolean, string, date and timestamp Arrow types, including nullable fields.
+Timestamp offsets are preserved when one consistent offset is available.
+Rows that cannot fit the declared type, including intentionally invalid mixed
+values, fail before publication; they are never silently converted into an
+all-string column. A reviewed `DatasetSpec` version `1.1` may declare a
+`decimal` field with a required `decimal_range` distribution containing
+`precision` (1–38), `scale` (0–precision), and exact plain-text `min`/`max`
+bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
+text, PostgreSQL SQL uses `NUMERIC(p,s)`, and Parquet uses `decimal128(p,s)`.
+CSV is not self-describing: the generated directory's `dataset_spec.yaml`
+records the DECIMAL precision, scale and nullability, while null cells are
+empty in CSV. Keep that companion specification when reusing the export;
+the manifest binds it by fingerprint.
+Version `1.0` remains readable but cannot declare `decimal`. Parquet and
+declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
+and scale; they do not infer a runnable exact range. Financial formulas and
+source-preserving transformations remain unsupported. Bare SQL `numeric`
+without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
+Sensitive DECIMAL ranges and formula constraints are rejected before generation.
 
 Folder generation requires a new or empty destination. Single-entity output
 suffixes must match the selected format. Overwrite fails closed when ownership,
