@@ -29,6 +29,9 @@ def test_registered_contract_delta(tmp_path):
     from scripts.contract_fixtures import build_contract_fixtures
 
     actual = build_contract_fixtures(tmp_path)
+    candidate_inventories = json.loads(Path(__file__).with_name(
+        "activation-contract-inventories.json").read_text())
+    assert {name: actual[name] for name in candidate_inventories} == candidate_inventories
     expected = {name: json.loads((Path("tests/fixtures/contracts") / name).read_text())
                 for name in actual}
     parser = actual["cli-parser-surface.json"]

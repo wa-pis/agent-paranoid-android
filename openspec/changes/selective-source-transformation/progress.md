@@ -5189,3 +5189,45 @@ Broader transformation remains unfinished.
   0.50s); changed CLI Ruff passes. Unchanged TTY/execution/scale scenarios not
   replayed. No publication or public registration. Next consolidate signed
   activation evidence/artifact and milestone checks for exact-SHA safety review.
+- Signed checkpoint a0006d8bf2d4af7ddbb60c918a8cfc18e5250d9e binds the concrete
+  unapplied registration delta, durable installed acceptance, narrow contract
+  comparison, inactive docs/specs and prior reviewer dispositions. Changed
+  argv-only malformed/digest checks pass (2, 25 deselected, 0.20s); focused
+  Ruff and diff whitespace pass. No public activation, push, PR or RC claim.
+  Next complete remaining milestone gates and review the immutable activation
+  artifact/scope independently; final public activation SHA still needs review.
+- Installed corrected-candidate transformation milestone completed: 910 pass,
+  6 skip, 1 failure, 64.89s. Sole failure is the intentional inactive-registry
+  assertion in test_transformation_activation_boundary: baseline permits only
+  review_transformation, isolated candidate additionally registers the proposed
+  execute_transformation. No runtime/safety failure reported by this group;
+  skipped cases are not passes. Public test/goldens/registry remain unchanged,
+  so this gate is not claimed green. Next include the explicit activation-boundary
+  test amendment in the immutable delta (retain no issuer/source-free checks),
+  test changed scope, then independent exact-SHA safety review. No duplicate run.
+- Unapplied activation delta now includes the explicit registry-test amendment;
+  baseline test remains unchanged. Isolated amended test passes against the
+  corrected installed wheel (3, 0.34s), retaining no Python transformation API
+  and no MCP issue/verify receipt tools. Also fixed a misleading test premise:
+  parsing command-only argv exits 2 for missing required arguments even when
+  registered; candidate now asserts actual subparser choices. No product guard
+  changed. Delta applicability passes after adding complete trailing context.
+  Next bind amended artifact SHA and remaining activation documentation/goldens
+  before independent review; no full gate or public activation claim.
+- AGENTS inactive amendment now names the concrete local-only issuer and CLI/
+  workspace consumers and expressly rejects old receipts with fresh digests,
+  MCP issuers and agent approval booleans. This clarifies accepted authority,
+  does not activate execution. Current unapplied code/test registration patch
+  SHA256 is 3b8d8801ea3622a06f989f05be23b18eeee75663f5195dcab07e32bb3bcddaf9;
+  this hash is not the eventual reviewed public activation commit. Next bind
+  final golden/doc amendments and independent immutable-scope safety review;
+  previously successful executable checks not repeated.
+- Removed whitespace-only blank context in the stored patch after diff-check
+  flagged it; applicability and whitespace checks now pass. No executable change.
+- Stored both exact installed-candidate inventories in the separate inactive
+  activation-contract-inventories.json artifact, without overwriting public
+  goldens. Durable contract acceptance compares the complete candidate JSON
+  (not merely names) before enforcing unchanged baseline contracts; changed
+  check passes. No runtime change or end-to-end/scaling replay. Next bind final
+  artifact/evidence commit and independent safety review, then reviewed public
+  activation amendments and full release-candidate gates.

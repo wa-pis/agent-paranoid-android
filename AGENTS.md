@@ -65,6 +65,14 @@ matching baseline amendments, executable interface evidence and independent
 safety review of the exact activation SHA. A review of private code alone does
 not satisfy review of the policy amendment or public registration.
 
+The concrete inactive candidate names `transform-approve` as the local-only
+issuer, `transform-execute` as the CLI consumer and `execute_transformation`
+as the workspace-confined MCP consumer. Execution requires the exact reviewed
+snapshot digest; a new review digest does not validate an old receipt after
+any bound input changes. Never register an MCP issuer or accept an agent
+approval boolean. The unapplied registration patch and isolated installed
+acceptance are evidence for review, not permission to enable these entrances.
+
 ## Engineering contract
 
 - Target Python 3.11+ and use typed Pydantic or dataclass models at module

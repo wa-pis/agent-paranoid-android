@@ -99,3 +99,35 @@ diff --git a/src/test_data_agent/cli.py b/src/test_data_agent/cli.py
 +    interactive_decisions = (args.command == "transform-approve" or
 +                             args.command == "transform-review" and getattr(args, "decide", False))
      with redirect_stdout(stdout), (nullcontext() if interactive_decisions else redirect_stderr(stderr)):
+diff --git a/tests/test_transformation_activation_boundary.py b/tests/test_transformation_activation_boundary.py
+--- a/tests/test_transformation_activation_boundary.py
++++ b/tests/test_transformation_activation_boundary.py
+@@ -1,3 +1,4 @@
+-"""Public activation remains closed while private fictional evidence is assembled."""
++"""Separate execution registration never exposes a receipt issuer to agents."""
+
++import argparse
+ import pytest
+@@ -10,14 +11,15 @@
+ @pytest.mark.parametrize("command", ["transform-execute", "transform-approve"])
+-def test_execution_and_receipt_cli_not_registered(command, capsys):
+-    with pytest.raises(SystemExit) as caught:
+-        build_parser([command]).parse_args([command])
+-    assert caught.value.code == 2
+-    capsys.readouterr()
++def test_execution_and_receipt_cli_explicitly_registered(command):
++    parser = build_parser([command])
++    choices = next(action.choices for action in parser._actions
++                   if isinstance(action, argparse._SubParsersAction))
++    assert command in choices
+
+
+-def test_agent_surfaces_expose_review_only_for_transformation():
++def test_agent_surfaces_expose_consumers_not_receipt_issuers():
+     names = {tool.__name__ for tool in _GENERATOR_MCP_TOOLS}
+-    assert {name for name in names if "transform" in name} == {"review_transformation"}
++    assert {name for name in names if "transform" in name} == {
++        "review_transformation", "execute_transformation"}
+     assert not {name for name in test_data_agent.__all__ if "transform" in name.lower()}
+     assert "issue_local_receipt" not in names
+     assert "verify_local_receipt" not in names
