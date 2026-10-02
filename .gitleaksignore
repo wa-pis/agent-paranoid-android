@@ -1,3 +1,5 @@
 # False positive in historical authentication-test prose; no credential.
 # Scope only this immutable commit/file/rule/line, not authentication code.
 6dec03860fb2cbb7150e93253519e12c3e3c595a:openspec/changes/selective-source-transformation/progress.md:generic-api-key:5461
+# Same prose repeated in the first explanation, removed in the next commit.
+0a4f451a9292ff24f0cd628448bec16cea659185:.gitleaksignore:generic-api-key:1
