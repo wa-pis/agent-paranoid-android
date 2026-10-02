@@ -2,6 +2,7 @@
 
 import json
 import argparse
+import errno
 import os
 import pty
 import select
@@ -265,7 +266,16 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
         while process.poll() is None:
             assert time.monotonic() < deadline, bytes(transcript)
             if select.select([master], [], [], 0.1)[0]:
-                transcript.extend(os.read(master, 16384))
+                try:
+                    chunk = os.read(master, 16384)
+                except OSError as exc:
+                    if exc.errno != errno.EIO:
+                        raise
+                    chunk = b""  # Linux PTY EOF after the slave closes.
+                if not chunk:
+                    process.wait(timeout=max(0.1, deadline - time.monotonic()))
+                    break
+                transcript.extend(chunk)
         assert process.returncode == 0, bytes(transcript)
     finally:
         os.close(master)

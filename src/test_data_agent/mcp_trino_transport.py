@@ -135,6 +135,22 @@ def _create_redacted_fast_mcp(name: str, fast_mcp_type: type[Any]) -> Any:
                 if type(exc).__name__ == "UnexpectedToolError":
                     # MCP 2 logs the cause traceback for unexpected errors.
                     # Detach it before SDK logging can expose tool inputs.
+                    from test_data_agent.core.transformation_limits import TransformationLimitError
+                    from test_data_agent.trino_work_budget import QueryWorkDimension
+
+                    cause = exc.__cause__
+                    if type(cause) is TransformationLimitError:
+                        diagnostic = TransformationLimitError(
+                            cause.dimension, cause.amount, cause.limit, cause.origin,
+                            requested=cause.code == "requested_above_limit")
+                        raise ToolError(str(diagnostic)) from None
+                    if (type(cause) is QueryWorkBudgetExceeded
+                            and type(cause.dimension) is QueryWorkDimension
+                            and type(cause.attempted) in {int, float}
+                            and type(cause.limit) in {int, float}):
+                        diagnostic_budget = QueryWorkBudgetExceeded(
+                            dimension=cause.dimension, attempted=cause.attempted, limit=cause.limit)
+                        raise ToolError(str(diagnostic_budget)) from None
                     raise ToolError("Tool execution failed") from None
                 raise
             finally:

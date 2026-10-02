@@ -10,9 +10,37 @@ import sys
 from test_data_agent.mcp_generator_server import WorkspacePathError
 from test_data_agent.mcp_transformation_candidate import _execute_candidate_transformation
 
+try:
+    from mcp.server.fastmcp.exceptions import ToolError
+    MCP_V2 = False
+except ImportError:
+    from mcp.server.mcpserver.exceptions import ToolError
+    MCP_V2 = True
+
+
+async def _call_sdk_tool(server, arguments, budget=None):
+    if MCP_V2:
+        from mcp.server.context import ServerRequestContext
+        from mcp.server.mcpserver.context import Context
+
+        context = Context(mcp_server=server, request_context=ServerRequestContext(
+            session=None, lifespan_context=None, protocol_version="2025-11-25",
+            method="tools/call", request_id=1, request=budget))
+        return await server.call_tool("_execute_candidate_transformation", arguments, context)
+    if budget is None:
+        return await server.call_tool("_execute_candidate_transformation", arguments)
+    from mcp.server.lowlevel.server import request_ctx
+    from mcp.shared.context import RequestContext
+
+    token = request_ctx.set(RequestContext(
+        request_id=1, meta=None, session=None, lifespan_context=None, request=budget))
+    try:
+        return await server.call_tool("_execute_candidate_transformation", arguments)
+    finally:
+        request_ctx.reset(token)
+
 
 def test_closed_sdk_limit_error_keeps_value_free_recovery(tmp_path, monkeypatch):
-    from mcp.server.fastmcp.exceptions import ToolError
     from test_data_agent.mcp_transformation_candidate import _create_test_candidate_mcp
 
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
@@ -22,7 +50,7 @@ def test_closed_sdk_limit_error_keeps_value_free_recovery(tmp_path, monkeypatch)
     server = _create_test_candidate_mcp()
     assert server is not None
     with pytest.raises(ToolError) as error:
-        asyncio.run(server.call_tool("_execute_candidate_transformation", {
+        asyncio.run(_call_sdk_tool(server, {
             "input_path": "items.csv", "policy_path": "policy.yaml", "output_path": "output",
             "snapshot_sha256": "0" * 64, "max_total_input_bytes": 8192}))
     message = str(error.value)
@@ -35,9 +63,6 @@ def test_closed_sdk_limit_error_keeps_value_free_recovery(tmp_path, monkeypatch)
 
 
 def test_closed_sdk_uses_existing_request_budget(tmp_path, monkeypatch):
-    from mcp.server.fastmcp.exceptions import ToolError
-    from mcp.server.lowlevel.server import request_ctx
-    from mcp.shared.context import RequestContext
     from test_data_agent.mcp_transformation_candidate import _create_test_candidate_mcp
     from test_data_agent.trino_work_budget import DEFAULT_QUERY_WORK_LIMITS, QueryWorkBudget
 
@@ -46,24 +71,18 @@ def test_closed_sdk_uses_existing_request_budget(tmp_path, monkeypatch):
     budget.consume_canonical_argument_bytes(DEFAULT_QUERY_WORK_LIMITS.canonical_argument_bytes)
     server = _create_test_candidate_mcp()
     assert server is not None
-    context = RequestContext(request_id=1, meta=None, session=None, lifespan_context=None, request=budget)
-    token = request_ctx.set(context)
-    try:
-        with pytest.raises(ToolError) as error:
-            asyncio.run(server.call_tool("_execute_candidate_transformation", {
-                "input_path": "fictional-secret-marker.csv", "policy_path": "policy.yaml",
-                "output_path": "output", "snapshot_sha256": "0" * 64}))
-        assert "fictional-secret-marker" not in str(error.value)
-        assert "query work budget exceeded for canonical argument bytes" in str(error.value)
-        assert not list(tmp_path.iterdir())
-    finally:
-        request_ctx.reset(token)
+    with pytest.raises(ToolError) as error:
+        asyncio.run(_call_sdk_tool(server, {
+            "input_path": "fictional-secret-marker.csv", "policy_path": "policy.yaml",
+            "output_path": "output", "snapshot_sha256": "0" * 64}, budget))
+    assert "fictional-secret-marker" not in str(error.value)
+    assert "query work budget exceeded for canonical argument bytes" in str(error.value)
+    assert not list(tmp_path.iterdir())
 
 
 @pytest.mark.parametrize("transport", ["sdk", "stdio", "prospective_stdio"])
 @pytest.mark.parametrize("stale", [False, True, "missing_receipt", "forged_receipt", "agent_flag"])
 def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monkeypatch, stale, transport):
-    from mcp.server.fastmcp.exceptions import ToolError
     from test_data_agent.core.limits import GenerationBudget
     from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
     from test_data_agent.core.transformation_snapshot import SnapshotPart
@@ -126,28 +145,29 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
         async def invoke():
             parameters = StdioServerParameters(command=sys.executable, args=["-c", program], env=dict(os.environ))
             async with stdio_client(parameters) as (reader, writer):
-                async with ClientSession(reader, writer, read_timeout_seconds=timedelta(seconds=15)) as session:
+                async with ClientSession(reader, writer, read_timeout_seconds=15 if MCP_V2 else timedelta(seconds=15)) as session:
                     await session.initialize()
                     tools = await session.list_tools()
                     assert [tool.name for tool in tools.tools] == [tool_name]
-                    assert "snapshot_sha256" in tools.tools[0].inputSchema["required"]
-                    assert "receipt_path" in tools.tools[0].inputSchema["properties"]
+                    schema = tools.tools[0].model_dump(by_alias=True)["inputSchema"]
+                    assert "snapshot_sha256" in schema["required"]
+                    assert "receipt_path" in schema["properties"]
                     malformed = await session.call_tool(tool_name, {
                         **arguments, "input_path": {"fictional-secret-marker": "rejected"}})
-                    assert malformed.isError
+                    assert malformed.model_dump(by_alias=True)["isError"]
                     assert "fictional-secret-marker" not in malformed.model_dump_json()
                     if transport == "prospective_stdio":
                         for path_argument in ("input_path", "policy_path", "output_path", "receipt_path"):
                             escaped = await session.call_tool(tool_name, {
                                 **arguments, path_argument: "../fictional-secret-marker"})
-                            assert escaped.isError
+                            assert escaped.model_dump(by_alias=True)["isError"]
                             assert "fictional-secret-marker" not in escaped.model_dump_json()
                             assert not (tmp_path / "output").exists()
                     return await session.call_tool(tool_name, arguments)
 
         response = asyncio.run(invoke())
         rendered = response.model_dump_json()
-        assert response.isError == bool(stale)
+        assert response.model_dump(by_alias=True)["isError"] == bool(stale)
         assert "alpha" not in rendered and "gamma" not in rendered
         assert "fictional-a" not in rendered
         assert "fictional-secret-marker" not in rendered
@@ -160,11 +180,11 @@ def test_closed_sdk_dispatch_publishes_or_rejects_stale_snapshot(tmp_path, monke
         return
     if stale:
         with pytest.raises(ToolError) as error:
-            asyncio.run(server.call_tool("_execute_candidate_transformation", arguments))
+            asyncio.run(_call_sdk_tool(server, arguments))
         assert "alpha" not in str(error.value) and "gamma" not in str(error.value)
         assert not (tmp_path / "output").exists()
     else:
-        result = asyncio.run(server.call_tool("_execute_candidate_transformation", arguments))
+        result = asyncio.run(_call_sdk_tool(server, arguments))
         rendered = json.dumps(result, default=lambda item: item.model_dump(mode="json"))
         assert request.snapshot_sha256 in rendered
         assert "alpha" not in rendered and "gamma" not in rendered

@@ -1,5 +1,23 @@
 # Implementation Progress
 
+## MCP matrix compatibility remediation — 2026-10-02
+
+PR #601 remains blocked at cc27b59; no merge/tag/release. Corrected removed MCP
+imports, native request context, timeout types and wire-alias assertions for SDK
+1/2 without skipping dispatch, receipt or privacy assertions. Linux PTY EIO
+after approval is EOF; final child exit, receipt and actual execution remain
+asserted. Local PTY needs terminal access outside the sandbox and passed there.
+Actual MCP 2.2 temporary dependency install exposed a runtime diagnostic issue:
+SDK unexpected-error wrapping hid typed budget recovery. Transport reconstructs
+only exact transformation-limit/query-budget errors and detaches their cause;
+other unexpected errors remain generic, not arbitrary ValueError disclosure.
+MCP 2 candidate/roundtrip: 17 passed, 6 existing preservation-route skips;
+transport: 49 passed. MCP 1 affected candidate/CLI/roundtrip/transport suite:
+93 passed, 6 existing skips. Ruff and transport mypy passed. No scale rerun,
+product monkeypatch, live DB/API or claim of final RC clearance. Next: signed
+same-PR update and latest-head mandatory matrix; final exact RC review must
+include this narrow diagnostic change. No ordinary PR review or duplicate CI.
+
 ## Reviewed activation PR preparation — 2026-10-02
 
 Independent ActivationSafety-R3 / Plato completed review of exact
