@@ -1,5 +1,114 @@
 # Private saved-policy route acceptance — 2026-10-01
 
+## Corrected installed twelve-route and temporal replay — 2026-10-04 local
+
+Read both complete harnesses before execution. Corrected isolated runtime
+`3c00148c0d2afcf255e7355b6f52bb779d52f70a`, installed development wheel SHA256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`:
+`PYTHONPATH=/private/tmp/apa-budget-installed.fiQPEX/installed`
+with `/private/tmp/apa-py314-matrix.baFOFT/venv/bin/python`.
+
+- `scripts/accept_transformation_routes.py --public`: all12 typed routes passed,
+  including36 CLI refusal assertions (stale digest, one-byte output ceiling,
+  existing destination). Readback verifies ordered replacement rows, exact
+  DECIMAL, DATE, null versus empty string, provenance, unchanged inputs and
+  cleanup. Harness SHA256 remains
+  `b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57`.
+- `pytest openspec/changes/selective-source-transformation/temporal-workflow-acceptance.py
+  -o pythonpath=. -q`:3 passed (1.87s), literal CSV text and explicit selected
+  timezone conversion to typed Parquet and SQL text; unchanged mapping/source/
+  policy bytes and value-free review/status. No native timestamp input claim.
+
+All data fictional; query capture uses an explicitly injected Arrow stream,
+not a database. SQL output is never executed. `--public` refers to entry points
+registered only in the isolated candidate, not activation of the author branch
+or a published RC. Application-function MCP parity is not twelve-route wire
+parity. These are author-run checks, not independent review. Historical artifact
+results below remain separate; full scale per route and public RC remain open.
+
+## Explicit temporal output acceptance — 2026-10-02 UTC
+
+`temporal-workflow-acceptance.py` exercises a saved local CSV mapping and public
+review/execute against installed wheel30a609b8 (full identity below). CSV output
+keeps the replacement string literal, with no implicit parsing or UTC. Typed
+Parquet and SQL output declare input format, output format, source timezone
+Europe/Samara and target UTC: readback verifies the selected instant and SQL
+TIMESTAMPTZ literal. Review/status omit source/replacement markers; original
+source/policy/mapping bytes remain unchanged. No TTY receipt, external connection
+or product monkeypatch; every cell is actually replaced, not preserved.
+
+Two scenarios (CSV/Parquet) passed in1.93s initial three-case run; SQL assertion
+initially assumed policy-rendered text rather than the serializer's TIMESTAMPTZ
+literal. Corrected only the harness and reran SQL:1 passed0.75s. No combined green
+rerun claimed. Ruff/diff-check pass. Harness SHA-256:
+`be3f39834371464107f258e85c569bfe6795c21cba1488db36280d60602dfab3`.
+Run installed-only PYTHONPATH with pytest `-o pythonpath=. --no-cov`.
+
+Important boundary: this covers textual DATETIME replacement and explicit output
+conversion, not implicit matching of equivalent instants or native Arrow timestamp
+input. Inspection confirms the native input adapter currently rejects timestamps
+as an unsupported native type; no passing native timestamp claim is made. Full
+input-type coverage and final RC contracts must retain this limitation explicitly.
+
+## Installed public-entry and refusal matrix — 2026-10-02 UTC
+
+`scripts/accept_transformation_routes.py --public` passed all twelve typed routes
+against the same installed development wheel recorded below. Public CLI
+`transform-execute --json` and the actually registered `execute_transformation`
+application function produce artifacts identical to the bounded publication
+contract. MCP application-function parity is not twelve-route SDK/wire parity;
+prior real SDK stdio acceptance remains separate evidence.
+
+For every route the public CLI also rejects stale snapshot digest, one-byte
+output ceiling and existing destination: 36 refusal cases. No new destination
+or staging entry remains; the fictional existing owner artifact stays byte-exact.
+Refusal output contains none of the fixture's source/replacement text markers.
+No production data, live backend, SQL execution, product guard monkeypatch or
+preservation receipt issuer is involved.
+
+Harness SHA-256: `b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57`.
+Ruff and diff-check pass. Initial public CLI harness assertion expected the
+private helper's bare result; corrected it to consume the documented JSON
+`result` envelope, with no product change. Final invocation passed all12 plus
+36 refusal assertions. The final printed scope string retains historical closed
+wording; `--public` branches and this evidence distinguish actual entry points.
+DATETIME conversion and skill-guided workflow remain open. This is not a
+published RC, exact final-SHA review or proof of arbitrary crash/race recovery.
+
+## Installed typed twelve-route follow-up — 2026-10-02 UTC
+
+Extended the existing fictional harness with `--typed`; no product patch or
+guard monkeypatch. All twelve combinations passed with five columns: replaced
+string/integer, exact DECIMAL(5,2), DATE, and nullable string. Readback verifies
+two ordered rows, explicit CSV null marker versus empty string, exact decimal
+values and declared date types in Parquet and SQL literals. SQL output is inspected
+as text, never executed. Captured query input uses a fictional injected Arrow
+stream through actual query authorization, not a live database.
+
+Command: `PYTHONPATH=/private/tmp/apa-matrix-installed.8cYJ0f/installed
+/private/tmp/apa-py314-matrix.baFOFT/venv/bin/python
+scripts/accept_transformation_routes.py --typed` (one shell command).
+Installed development wheel SHA-256:
+`30a609b8be9b2e977ca596f594d9ea467741ce8fdbb8cfff49cd7ba0c90ab55d`.
+Harness SHA-256: `5f59636069b21b0a80a939d45287ce33176c377214fa1cd3a6f2516bfe0fa515`.
+Harness base accepted main: `8670e562f50980cfd62678c6f0f51d4887cb8961`.
+Installed code remains the previously recorded development candidate, not a new
+wheel of this documentation/harness diff or a released 1.6.0rc1.
+
+Each route compares CLI/MCP review metadata and fixed digest, closed CLI/workspace
+execution artifacts and temporary publication bytes, 100% action-based replacement
+provenance, unchanged input/policy bytes and removed temporary directories.
+The first invocation had an incompatible Python-extension dependency overlay;
+removed that overlay and used the existing locked Python environment. The next
+invocation rejected a harness CSV input null marker on native inputs; corrected
+the fixture to configure input markers only for CSV and output markers only for
+CSV output. No product behavior changed. Final invocation completed all12.
+Ruff and diff-check passed. Prior large-scale workflows were not repeated.
+
+This supplements earlier basic routes and typed unit tests. It does not close
+DATETIME conversion, every failure/rollback combination, public SDK execution
+for every route, skill-guided acceptance or final exact-RC/public-artifact gates.
+
 The installed development candidate completes all twelve combinations of CSV,
 Parquet, PostgreSQL captured result and Trino captured result inputs with CSV,
 Parquet and PostgreSQL SQL-file outputs. Each uses the same two-row fictional

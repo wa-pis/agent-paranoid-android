@@ -1,5 +1,193 @@
 # Client Feedback And Acceptance Plan
 
+## Remaining coherent acceptance queue — 2026-10-04
+
+Use corrected runtime SHA3c00148 / wheel dd6b4ad2 evidence above and below;
+unchecked parent tasks are not all missing implementation. No historical pass
+or source-only test automatically certifies an installed release artifact.
+
+| Scope | Evidence already recorded | Next bounded local deliverable |
+|---|---|---|
+| 1–4, 8–9 | Identifier/domain44, CSV/date78, distinct/cache9 | Reconcile original finding dispositions; retain private-input gaps |
+| 5–6, 12 | Explicit category regression, saved-policy/TTY and finance scenario | Link approved sensitivity/preservation contract and wizard evidence; no blanket declassification |
+| 7, 10 | Timestamp offset, missing-bound warning and spec/profile routing | Monthly source-category fidelity remains a deferred proposal, not an agreed RC gate; explicit field formats do not imply monthly sampling. Installed routing diagnostics supplement the existing mode replay below. |
+| 11, 15–17 | Policy predicate/authorization/budget probes; historical bounded query counts | Bind safe connection diagnostics, early category limits and fictional adapter scan-budget evidence to current artifact |
+| 13–14 | Declared FK counts/chains and validation | Separate inference/utility claims from conformance; unmeasured source fidelity remains unverified |
+| 18 | Owner scope correction | Keep internal formulas inactive; reconcile supported SQL expression/rejection evidence only |
+| 19 | Installed publication5 | Bind deterministic atime/path-swap/rollback and original-script provenance, without repeating unchanged successful adaptation |
+| 20–26 | Corrected doctor/mode9, SQL/units/temporal28, Decimal pipeline16, Parquet renderer/profile19 and metadata11 | Consolidate six-method auth and remaining interface compatibility; preserve live/native prerequisite limitations |
+| Transformation routes | Corrected typed twelve-route matrix,36 CLI refusals, temporal3, common CLI/MCP matrix and finance end-to-end1 | Consolidate remaining key/wizard and wire boundaries; no live query, native timestamp or scale-per-route claim |
+| Release | Closed full gate2894, published draftPR602 | Final contract/docs disposition, mandatory independent clearance, protected CI and RC artifact verification |
+
+This queue is not a new product decision or a declaration that all client
+requirements passed. Private/live data remain unavailable; do not connect real
+databases to fill those gaps. Independent review is unavailable and must not be
+retried, rephrased or routed to another provider to evade the restriction.
+
+## Corrected budget candidate evidence — 2026-10-03
+
+Finding11/adapter budget evidence on corrected installed wheel:22 PostgreSQL
+client cases passed (0.22s), Python3.14, tests/test_postgres_client.py with
+-o pythonpath=. -q. Explicit fictional driver/cursor/clock injection verifies
+safe static connection/SQLSTATE diagnostics, detached backend failures,
+read-only/timeouts, cumulative statement/result/deadline limits, missing-secret
+fail-before-connect and rejection of untrusted SQL strings. No product patch,
+live connection or measured remote performance; query-policy authorization and
+query-profiling cost evidence remain distinct.
+
+Finding21 corrected installed auth contract: test_trino_auth.py,22 passed
+(0.21s), Python3.14 with -o pythonpath=. -q. Six configured methods use runtime
+references/explicit injected constructors; OAuth token origin/TLS/deadline and
+value-free diagnostic negatives remain enforced. HTTP send and optional modules
+are disclosed dependency stubs, not product-policy patches or live authentication.
+No DB/API contacted; Kerberos/GSSAPI system prerequisites and remote success
+remain unverified. Author-run tests do not replace independent clearance.
+
+Corrected installed wizard-to-execution: registered-interface-acceptance.py,
+registered_wizard_saved_policy_execution only,2 passed,5 deselected (4.28s),
+Python3.14/MCP2 with -o pythonpath=. -q. Fictional inline/local CSV mapping
+entry stays hidden; SAVE records policy without receipt/output. Subsequent CLI
+and actual SDK stdio MCP execution agree on output rows and snapshot identity;
+source bytes unchanged and fixture values absent from review/status. No operator
+preservation approval, product monkeypatch, live backend or independent review.
+
+Corrected installed saved linked-key/mapping contract:21 passed,166 deselected
+(1.37s), selected test_transformation_batch.py cases with -o pythonpath=. -q.
+Fictional parent/child profiles cover inline/CSV null-versus-empty mappings,
+literal replacement, deterministic synthesis/fallback and generation-byte binding,
+shared CSV domain byte conflicts, final orphan rejection and composite tuple
+cardinality/incomplete-declaration negatives. Unbound receipt versions reject;
+no receipt issued, DB/API or product monkeypatch. This adds current-artifact
+evidence, not automatic relationship inference or independent safety review.
+
+Finding2 corrected installed distinct-overflow/cache suite passed nine cases
+(0.42s): lower-bound uncertainty after cap overflow, no false primary key,
+legacy fingerprint compatibility and stale-cache reprofile. Fictional data only;
+private inputs and final public RC remain unverified.
+
+Corrected-wheel finance end-to-end acceptance passed one scenario (1.52s):
+authorized fictional PostgreSQL aggregate stream -> captured source/saved policy
+-> CLI review -> missing-receipt rejection -> local controlling-TTY test approval
+-> execution and readback. Business combinations remain, identifiers map and
+Decimal amounts replace exactly. No real database or internal totals engine;
+this test receipt does not authorize any real dataset.
+
+Corrected-wheel CSV/date pipeline passed 78 cases (0.63s), one product-constant
+monkeypatch probe excluded: profile/spec/generation/CLI roundtrip, explicit local
+categories, timezone retention, missing-bound fallback disclosure and existing
+numeric/rare-secret controls. Monthly-date granularity and unmeasured utility
+remain separate; these results do not imply general source fidelity.
+
+Corrected installed identifier pool/domain suite passed 44 cases (0.39s).
+This supplies fictional evidence for findings1/4/8/9 and the declared-link part
+of13: fixed cardinality, synthetic sensitive identifiers, independent nullable
+domains, declared FK counts/chains and replay. General relationship inference,
+source orphan-rate fidelity and all selective mapping routes are not closed.
+
+Client19 reviewed installed publication adaptation passed five corrected-wheel
+cases (2.94s): absent/empty destination success and filled-directory rejection
+with/without overwrite, including output readback and old-byte preservation.
+Original supplied script and deterministic atime/path-swap evidence remain
+separate; this adaptation alone does not close the full finding.
+
+Corrected-wheel unknown Parquet metrics and bounded local sensitivity probes
+passed 11 cases (0.31s): missing metrics remain unknown, incomplete metadata
+cannot authorize inference, fictional native/string detection exposes no values,
+and cell/row/deadline limits reject. Environment overrides and explicit clock
+injection are test inputs, not product-function monkeypatch or live acceptance.
+
+Corrected-wheel declared decimal profile and private typed Parquet renderer
+passed 19 cases (0.37s), including nulls, decimal/date/timezone readback and
+byte/cardinality/reuse negatives. Renderer checks do not close entire mapping
+execution or the separate unknown-metadata/sensitivity acceptance requirement.
+
+Corrected installed Decimal pipeline subsequently passed 16 cases (1.53s):
+spec/generation/validation, CSV/JSON/Parquet/PostgreSQL export, actual CLI
+CSV/Parquet, saved precision/scale/nulls and rejection/publication negatives.
+This complements the units probes below, not proof of every transformation or
+mapping route. All fixtures were fictional; PostgreSQL export was local SQL text,
+not a database connection.
+
+On 4 October local time, corrected-wheel Decimal units, actual Parquet temporal
+CLI/readback and both-dialect SQL predicate/authorization/budget probes passed
+28 cases (1.10s). Decimal units do not prove the entire generation/export/
+transformation pipeline. SQL policy probes are not live adapter execution;
+native Parquet timestamp transformation remains outside implicit support.
+
+Exact isolated registration SHA: `3c00148c0d2afcf255e7355b6f52bb779d52f70a`.
+Its src tree matches this wheel build source, excluding generated bytecode caches.
+Explicit corrected-wheel client20/25 entrance acceptance subsequently passed nine
+cases (8.55s): actual failed local doctor configuration and explicit/embedded
+negative, mixed/default spec/profile/CSV generation with retained artifacts and
+deterministic replay. These do not close unrelated remaining client scope.
+
+Closed author candidate: signed commit
+`d038ec2dc162727ac9e1b381f6900ba69a1b9b7c`. Public registrations remain disabled.
+The corrected isolated development wheel has SHA256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`
+and retains version 1.5.0; it is not a published release candidate.
+
+Explicit installed Python3.14/MCP2 checks passed 27 cases covering common CLI
+creation/runtime/contracts, retained MCP stdio and session/per-file limit
+rejections. Python3.11/MCP1 contract and retained stdio checks passed four cases.
+Installed doctor with --skip-smoke passed; network reachability and quickstart
+were not tested by that invocation. Earlier client20–26 wheel results below
+remain tied to their own artifacts, not automatically transferred to this wheel.
+
+The closed source milestone gate passed 2894 tests with 21 explicit skips and
+90.05% coverage, plus lint, types, compatibility, licenses, resource checks,
+schema freshness and fictional quickstart. This is author-run evidence, not
+independent safety review, live integration acceptance or public RC acceptance.
+Exact activation-tree materialization is complete at 3c00148; remaining client
+evidence reconciliation, mandatory independent clearance and public artifact
+verification remain open.
+See [progress](progress.md) for commands, boundaries and preserved artifacts.
+
+## Installed client20–26 evidence ledger — 2026-10-03
+
+All runs use fictional local inputs. Harnesses were inspected before execution;
+no product monkeypatch, live database, external API or private client inputs.
+Environment configuration and explicit clock/dependency injection are identified
+in [progress](progress.md), not presented as remote integration acceptance.
+
+| Finding | Wheel | Focused evidence | Still open |
+|---|---|---|---|
+| 20 doctor | dd6c0c6e | Actual local configuration failure: 1 passed; dependency-injected subset: 4 passed | Other quickstart failures, final compatibility |
+| 21 auth | dd6c0c6e / 9da73de5 | Six-method local dependency guards: 22 passed on earlier wheel; actual OAuth pipe guard: 1 passed on newer wheel | Remote login/native prerequisites, exact-SHA review |
+| 22 SQL | 9da73de5 | Both-dialect predicates, unauthorized columns and budget negatives: 17 passed | Adapter execution, private reproduction |
+| 23 decimal | 9da73de5 | Units, generation, exports, actual CLI, schema/readback and negatives: 33 passed | Remaining transformation/mapping scope |
+| 24 Parquet | 9da73de5 | Actual declared temporal CLI/readback: 1 passed | Native timestamp transformation is not implicitly supported |
+| 25 mode/exit | 9da73de5 | Negative override and mixed spec/profile/CSV deterministic replay: 4 passed; embedded negative with omitted override: 1 passed; default valid spec/profile/CSV: 3 passed; invalid artifacts retained, exit1 | Remaining entrances and final artifact gates |
+| 26 metadata | 9da73de5 | Unknown metrics, sensitivity and local byte/row/time boundaries: 11 passed | Final CLI/MCP compatibility |
+
+New OAuth-composed development wheel SHA256:
+`9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b`.
+It retains development version 1.5.0, not a published RC. Earlier wheel evidence
+below remains tied to its exact artifact; no automatic transfer of successful
+common-interface tests to the newer wheel. Main public registration is unchanged.
+The changed wheel was subsequently revalidated explicitly: actual common CLI/MCP
+creation/runtime/stdio matrix21passed14.31s on Python3.14/MCP2, read-only contract
+inventory1passed0.46s. These results are attached to9da73de5, not inferred from
+dd6c0c6e. Explicit newer-wheel Python3.11/MCP1 retained stdio and contract
+inventory checks subsequently passed4cases4.01s. The earlier MCP1 result remains
+historical; final compatibility gates must use the frozen candidate.
+Final coherent candidate gates, exact-SHA independent AI safety/RC reviews and
+public 1.6.0rc1 artifact verification remain required. Parent client tasks stay
+open until their remaining agreed scope is completed.
+
+## Installed common interface evidence — 2026-10-03
+
+Isolated development wheel SHA256
+dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3
+contains prospective actual common CLI/MCP composition. Main checkout registration
+is unchanged. Focused Python3.14/MCP2 acceptance18passed10.45s covers configuration
+save/reopen, schema1.0 CLI, runtime flags, controlling-TTY receipts, direct and
+fallback preservation, retained CLI/MCP output readback, ordinary CSV profiling
+and value-free rejection paths. Same wheel Python3.11/MCP1 wire3passed3.95s.
+These fictional cases do not certify client-private/live inputs, all formats at
+target scale, full project compatibility or final RC safety/release acceptance.
+No new independent review was launched for these helper-level changes.
+
 ## Amended replacement acceptance — 2026-10-02
 
 Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
@@ -147,8 +335,9 @@ executable evidence locations, not assertions that they were rerun today.
 Outstanding work is not hidden by this register: complete-candidate gates,
 exact-SHA independent safety review, GitHub-required checks and public RC artifact
 acceptance remain mandatory. Unapproved exceptions/proposals remain unsupported,
-not silently implemented or promoted into new scope. Finding 1's sensitive-semantic
-identifier subcase remains explicitly unfixed.
+not silently implemented or promoted into new scope. Finding 1's bounded
+synthetic-identifier remedy is implemented and reviewed as recorded above;
+final RC/package and unavailable private-data acceptance are not implied.
 
 ## Finding-specific verification boundaries
 

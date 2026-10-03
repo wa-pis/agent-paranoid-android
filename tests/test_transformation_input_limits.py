@@ -23,6 +23,21 @@ def _policy(limits):
              "behavior": {"action": "drop"}} for name in ("a", "b")]})
 
 
+@pytest.mark.parametrize("origin,dimension,command", [
+    ("batch_input_run", InputDimension.TOTAL_BYTES, "prepare_batch(max_total_bytes=...)"),
+    ("batch_output_run", InputDimension.OUTPUT_BYTES, "execute_batch(max_output_bytes=...)"),
+    ("batch_bundle_run", InputDimension.OUTPUT_BYTES, "temporary_batch_publication(max_output_bytes=...)"),
+])
+def test_batch_diagnostic_origins_are_dimension_guarded(origin, dimension, command):
+    error = TransformationLimitError(dimension, 11, 10, origin)
+    assert error.origin == origin and error.run_setting == command
+    assert error.amount == 11 and error.limit == 10 and error.unit == "bytes"
+    assert command in str(error) and "No automatic increase or truncation" in str(error)
+    wrong = InputDimension.OUTPUT_BYTES if dimension is InputDimension.TOTAL_BYTES else InputDimension.TOTAL_BYTES
+    with pytest.raises(ValueError, match="invalid limit diagnostic"):
+        TransformationLimitError(wrong, 11, 10, origin)
+
+
 def test_scoped_csv_readers_restore_global_limit_across_threads():
     import csv
     from concurrent.futures import ThreadPoolExecutor

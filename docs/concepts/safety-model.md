@@ -10,7 +10,7 @@ rows to shuffle, duplicate, or export.
 ## Trust Boundaries
 
 Selective transformation is a separate, currently gated mixed-origin surface,
-not synthetic generation. Its inactive [execution and approval contract](../reference/cli.md#execution-candidate-not-publicly-enabled)
+not synthetic generation. Its implemented RC [execution and approval contract](../reference/cli.md#implemented-rc-execution-candidate)
 requires local interactive approval of exact input/review bytes before any
 explicitly non-sensitive field can be preserved. Agent execution can only
 consume an existing matching receipt; it cannot issue or broaden approval.

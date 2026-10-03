@@ -128,3 +128,162 @@ def _approve_candidate_namespace(args: argparse.Namespace) -> dict[str, object]:
         max_total_bytes=total if args.max_total_input_bytes is None else args.max_total_input_bytes,
         max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=budget)
     return {"status": "local_receipt_created", "snapshot_sha256": request.snapshot_sha256}
+
+
+def _write_common_result(result: dict[str, object], *, versioned_output: bool) -> None:
+    if versioned_output:
+        from test_data_agent.cli_contract import CliSuccessResponse
+        result = CliSuccessResponse(command="test-data-agent transform-batch", exit_code=0,
+            status="succeeded", result=result).model_dump(mode="json")
+    print(json.dumps(result, sort_keys=True))
+
+
+def _candidate_batch_main(argv: list[str], *, versioned_output: bool = False) -> int:
+    """Isolated common-profile CLI composition; no production registration."""
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import report_cli_error
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_batch_workflow import BatchWorkflowRequest, run_batch_workflow
+
+    parser = _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
+        else "closed-common-transform", json_errors=True)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("operation", choices=("review", "validate", "execute"))
+    parser.add_argument("root", type=Path)
+    parser.add_argument("profile")
+    parser.add_argument("--snapshot-sha256")
+    parser.add_argument("--receipt")
+    parser.add_argument("--destination")
+    parser.add_argument("--max-total-input-bytes", type=int, required=True)
+    parser.add_argument("--max-review-bytes", type=int, required=True)
+    parser.add_argument("--max-output-bytes", type=int, required=True)
+    args = parser.parse_args(argv)
+    args.command, args.json_output = "transform-batch" if versioned_output else "closed-common-transform", True
+    try:
+        request = BatchWorkflowRequest(operation=args.operation, root=args.root.absolute(),
+            profile=args.profile, snapshot_sha256=args.snapshot_sha256, receipt=args.receipt,
+            destination=args.destination,
+            max_total_bytes=args.max_total_input_bytes, max_review_bytes=args.max_review_bytes,
+            max_output_bytes=args.max_output_bytes)
+        result = run_batch_workflow(request, budget=GenerationBudget())
+    except TransformationLimitError as error:
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
+    except (ValueError, OSError):
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,
+            message="invalid common transformation request; no completion confirmed")
+    _write_common_result(result.metadata(), versioned_output=versioned_output)
+    return 0
+
+
+def _candidate_batch_approve_main(argv: list[str], *, versioned_output: bool = False) -> int:
+    """Unregistered local-only common approval CLI; controlling TTY required."""
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import report_cli_error
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_batch_profile import load_batch_profile
+    from test_data_agent.io.transformation_batch_receipt import issue_batch_receipt
+
+    parser = _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
+        else "closed-common-approve", json_errors=True)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("root", type=Path)
+    parser.add_argument("profile")
+    parser.add_argument("receipt")
+    parser.add_argument("--snapshot-sha256", required=True)
+    parser.add_argument("--max-total-input-bytes", type=int, required=True)
+    parser.add_argument("--max-review-bytes", type=int, required=True)
+    args = parser.parse_args(argv)
+    args.command, args.json_output = "transform-batch" if versioned_output else "closed-common-approve", True
+    try:
+        root, relative = args.root.absolute(), Path(args.receipt)
+        if (len(relative.parts) != 1 or relative.is_absolute() or relative.name in {".", ".."}
+                or args.max_total_input_bytes <= 0 or args.max_review_bytes <= 0):
+            raise LocalReceiptError("local batch confirmation failed")
+        receipt = root / relative
+        if receipt.exists() or receipt.is_symlink():
+            raise LocalReceiptError("local batch confirmation failed")
+        budget = GenerationBudget()
+        batch = load_batch_profile(root, args.profile, max_total_bytes=args.max_total_input_bytes,
+            max_review_bytes=args.max_review_bytes, budget=budget)
+        if batch.snapshot_sha256 != args.snapshot_sha256:
+            raise LocalReceiptError("local batch confirmation failed")
+        issue_batch_receipt(batch, receipt, max_total_bytes=args.max_total_input_bytes,
+            max_review_bytes=args.max_review_bytes, budget=budget)
+    except TransformationLimitError as error:
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
+    except (ValueError, OSError):
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,
+            message="local batch confirmation failed; no approval confirmed")
+    _write_common_result({"status": "local_batch_receipt_created",
+        "snapshot_sha256": batch.snapshot_sha256}, versioned_output=versioned_output)
+    return 0
+
+
+def _candidate_common_main(argv: list[str], *, versioned_output: bool = False) -> int:
+    """Single closed workflow entry; never registered by the production CLI."""
+    if argv and argv[0] in {"review", "validate", "execute"}:
+        return _candidate_batch_main(argv, versioned_output=versioned_output)
+    if argv and argv[0] == "approve":
+        return _candidate_batch_approve_main(argv[1:], versioned_output=versioned_output)
+    if argv and argv[0] == "create":
+        return _candidate_batch_create_main(argv[1:], versioned_output=versioned_output)
+    _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
+        else "closed-common-transform", json_errors=True).error(
+        "expected create, review, approve, validate or execute")
+
+
+def _candidate_batch_create_main(argv: list[str], *, versioned_output: bool = False) -> int:
+    """Materialize/save configuration only; optional local decision wizard."""
+    import sys
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import report_cli_error
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.core.transformation_yaml import _load_private_yaml
+    from test_data_agent.io.transformation_batch_profile import (
+        BatchProfile, temporary_batch_profile, temporary_batch_decisions, save_batch_profile,
+        capture_batch_profile,
+    )
+
+    parser = _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
+        else "closed-common-create", json_errors=True)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("root", type=Path)
+    parser.add_argument("profile")
+    parser.add_argument("destination")
+    parser.add_argument("--max-total-input-bytes", type=int, required=True)
+    parser.add_argument("--max-review-bytes", type=int, required=True)
+    parser.add_argument("--create-csv-policies", action="store_true")
+    parser.add_argument("--seed", type=int)
+    parser.add_argument("--decide", action="store_true")
+    parser.add_argument("--edit-actions", action="store_true")
+    parser.add_argument("--edit-formats", action="store_true")
+    args = parser.parse_args(argv)
+    args.command, args.json_output = "transform-batch" if versioned_output else "closed-common-create", True
+    try:
+        root, budget = args.root.absolute(), GenerationBudget()
+        if (args.max_total_input_bytes <= 0 or args.max_review_bytes <= 0
+                or not args.decide and (args.edit_actions or args.edit_formats)):
+            raise ValueError
+        captured = capture_batch_profile(root, args.profile,
+            max_total_bytes=args.max_total_input_bytes, budget=budget)
+        profile = BatchProfile.model_validate(_load_private_yaml(captured, args.max_total_input_bytes))
+        arguments = dict(max_total_bytes=args.max_total_input_bytes, max_review_bytes=args.max_review_bytes,
+            budget=budget, create_csv_policies=args.create_csv_policies, seed=args.seed)
+        context = (temporary_batch_decisions(root, profile, input_stream=sys.stdin,
+            output_stream=sys.stdout, edit_actions=args.edit_actions, edit_formats=args.edit_formats,
+            **arguments) if args.decide else temporary_batch_profile(root, profile, **arguments))
+        with context as (_, batch):
+            saved = save_batch_profile(root, args.destination, batch,
+                max_total_bytes=args.max_total_input_bytes, max_review_bytes=args.max_review_bytes,
+                budget=budget)
+    except TransformationLimitError as error:
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
+    except (ValueError, OSError):
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,
+            message="common configuration not saved or requires revalidation; no approval issued")
+    _write_common_result({"status": "common_configuration_saved", "approved": False,
+        "snapshot_sha256": saved.snapshot_sha256}, versioned_output=versioned_output)
+    return 0

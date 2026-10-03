@@ -16,6 +16,43 @@ an explicit CLI value. Use `COMMAND --help` to inspect CLI defaults and
 `doctor --json` for installed/local capability states. `doctor` deliberately
 does not read provider credentials or test remote reachability.
 
+## Closed common transformation profile
+
+This development candidate is unregistered and exercised only on fictional
+temporary roots. Its versioned reference profile combines two or more inputs
+with one independently reviewed DatasetSpec for final linked validation:
+
+```yaml
+schema_version: "0.1"
+validation: validation.yaml
+inputs:
+  - entity: fictional_parents
+    source: parents.csv
+    policy: parents-policy.yaml
+  - entity: fictional_children
+    source: children.csv
+    policy: children-policy.yaml
+    mappings: [keys.csv]
+```
+
+`mappings` and `generation_policies` list exact local reference paths to bind;
+they do not embed source rows. All paths are relative to the explicit reference
+root, not to each policy's directory, and must pass restricted no-follow reads.
+Entities must match their policies and final validation spec. Unknown/duplicate
+keys, conflicting links, unsafe references and budget exhaustion fail closed.
+Source, policies, mappings, generation policies, validation and exact profile
+bytes bind the reviewed digest, including order and whitespace.
+
+Optional shared `resource_limits` supports only `max_total_input_bytes` and
+`max_output_bytes`; remaining dimensions stay in per-input behavior policies.
+Session precedence and explicit run-cap checks below still apply. Combined
+review bytes must fit `--max-review-bytes`; no truncation or implicit cap raise.
+The closed create/wizard saves only policies/spec/references, not source copies
+or receipts. Saving changes paths and therefore requires fresh review. See the
+[closed CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
+CSV proposals, local confirmation and retained-publication restrictions. This
+profile is not a compatibility promise for the released `1.5.0` package.
+
 ## Input And Generation Limits
 
 | Variable | Default | Purpose |
@@ -84,7 +121,7 @@ introduced here. In PowerShell, use
 | `max_total_input_bytes` | `536870912` | combined snapshot bytes |
 | `max_input_cell_chars` | `1000000` | characters |
 | `max_parquet_expanded_bytes` | `536870912` | decoded/estimated expanded bytes |
-| `max_output_bytes` | `536870912` | private CSV output bytes |
+| `max_output_bytes` | `536870912` | transformation output bytes |
 
 Each key has a session variable named `TEST_DATA_AGENT_TRANSFORM_` followed by
 the uppercase key. Values must be positive integers no greater than
@@ -101,20 +138,21 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Public request boundaries still
-need integration. Increasing a decoder limit
+explicit per-run argument. Registered candidate CLI/MCP request boundaries
+retain typed value-free limit failures. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
 budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
 
 Transformation total-input accounting includes source, behavior policy,
 referenced mappings/generation policies, classification evidence and displayed
 review bytes. Read-only review resolves the same session/profile ceiling as the
-closed execution candidate; it does not silently request the default ceiling.
+registered execution candidate; it does not silently request the default ceiling.
 Set `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES` for the session or
-`resource_limits.max_total_input_bytes` in the saved behavior profile. The closed,
-unregistered CLI candidate additionally accepts `--max-total-input-bytes` and
-the unregistered workspace adapter accepts `max_total_input_bytes`; neither is
-an activated public execution command/tool. Smaller explicit run caps report
+`resource_limits.max_total_input_bytes` in the saved behavior profile. The
+registered `transform-execute` CLI additionally accepts `--max-total-input-bytes`
+and the workspace-scoped `execute_transformation` tool accepts
+`max_total_input_bytes`. These implemented RC interfaces do not issue approval.
+Smaller explicit run caps report
 `snapshot_run`; a run cap above the configured ceiling is rejected, not raised.
 
 Private CSV character limits reach parsing, sensitivity detection and profile

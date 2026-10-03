@@ -78,6 +78,13 @@ regenerating existing fixtures.
 
 ## Development
 
+The 1.6 development candidate includes an isolated saved-profile transformation
+workflow, not an available command in the published 1.5.0 package. Public common
+CLI/MCP activation remains gated by completed candidate checks and independent
+safety review. See the [candidate CLI contract](docs/reference/cli.md#closed-common-profile-workflow-candidate)
+and [acceptance evidence](openspec/changes/selective-source-transformation/client-acceptance.md).
+Ordinary generation remains source-free; agents cannot issue preservation approval.
+
 ```bash
 python3 -m pip install "uv==0.11.23"
 uv sync --frozen --all-extras --no-install-project

@@ -125,6 +125,16 @@ Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
   units, setting origin and supported session/profile recovery instructions
 - **AND** it neither increases the limit nor silently truncates the workload.
 
+#### Scenario: Common profile source exceeds its file ceiling
+
+- **GIVEN** a fictional regular source file inside the authorized root, with
+  size above its effective behavior-policy file-byte ceiling but below the
+  remaining common aggregate byte budget
+- **WHEN** common profile loading or local profile creation captures that source
+- **THEN** descriptor size is checked against the file ceiling before reading
+- **AND** the observed-limit error retains dimension, amount, threshold and
+  setting origin, without publishing a partial result or increasing limits.
+
 #### Scenario: Processing reaches a configured limit
 
 - **GIVEN** a transformation total snapshot budget configured through

@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare an isolated common saved-profile workflow for create/review/local
+  approval/validate/execute, with explicit shared budgets, exact snapshot binding
+  and metadata-only MCP consumption. Common public registration remains closed
+  pending the finished candidate's independent safety review and release gates.
+
 - Add separately selected local transformation execution, controlling-terminal
   preservation approval, and a workspace-confined MCP execution consumer using
   the same saved policy and exact reviewed snapshot. Ordinary generation remains
@@ -26,6 +31,12 @@ All notable changes to this project are documented here.
   metadata-only profile evidence. Reviewed generation bounds remain required.
 
 ### Fixed
+
+- Retain intentionally invalid mixed/negative output and validation evidence
+  where the selected format can represent it; CLI routes report
+  `validation_failed` and exit 1 rather than successful validation.
+- Keep absent Parquet null/distinct metrics unknown; bounded local sensitivity
+  inspection cannot turn an incomplete scan into proof of safety.
 
 - Accept exact synthetic identifier tokens on email, phone and SSN identifier
   fields without weakening ordinary sensitive-field format checks.

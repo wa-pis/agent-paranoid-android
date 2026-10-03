@@ -153,8 +153,12 @@ empty in CSV. Keep that companion specification when reusing the export;
 the manifest binds it by fingerprint.
 Version `1.0` remains readable but cannot declare `decimal`. Parquet and
 declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
-and scale; they do not infer a runnable exact range. Financial formulas and
-source-preserving transformations remain unsupported. Bare SQL `numeric`
+and scale; they do not infer a runnable exact range. Financial formulas remain
+unsupported for exact-decimal generation. Ordinary generation never preserves
+source rows. The separately selected transformation candidate has its own
+[saved-profile contract](cli.md#closed-common-profile-workflow-candidate), exact
+typed mappings and local approval boundary; its common public registration is
+not enabled by these generation commands. Bare SQL `numeric`
 without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
 Sensitive DECIMAL ranges and formula constraints are rejected before generation.
 

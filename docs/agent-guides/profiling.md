@@ -94,6 +94,11 @@ values. Infer local relationships and conditional rules before replacing
 non-allowlisted categorical values, then rewrite their predicates to the same
 synthetic labels so generation semantics remain intact. On deadline
 or budget failure, do not publish a partial profile as trusted evidence.
+The closed common transformation workflow checks configured session total-byte
+ceilings before profile capture. Existing behavior policies are parsed before
+source capture so each source's file-byte ceiling is checked before reading and
+while reading. New policy drafts use the configured session/default file ceiling;
+aggregate limits remain independent, with no truncation or automatic increase.
 Single-CSV generation binds its complete-row reuse check to non-reversible row
 digests collected during the same CSV read that produced the profile; it does
 not reopen the mutable source path before publication.

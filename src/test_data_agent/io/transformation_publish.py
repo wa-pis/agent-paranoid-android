@@ -45,18 +45,31 @@ def _publish_test_bundle(destination: Path, filename: str, payload: bytes,
     """Closed fictional-test writer; no public execution or approval authority."""
     if filename not in {"dataset.csv", "dataset.parquet", "dataset.sql"}:
         raise ValueError("invalid transformation artifact name")
+    _publish_test_artifacts(destination, ((filename, payload), ("manifest.json", manifest)),
+                            budget, max_output_bytes=max_output_bytes)
+
+
+def _publish_test_artifacts(destination: Path, artifacts: tuple[tuple[str, bytes], ...],
+                            budget: GenerationBudget, *, max_output_bytes: int) -> None:
+    """Shared closed writer; validated local payloads only, no row-returning surface."""
+    if (not artifacts or len({name for name, _ in artifacts}) != len(artifacts)
+            or any(not name or Path(name).name != name or name in {".", ".."}
+                   for name, _ in artifacts)):
+        raise ValueError("invalid transformation artifact name")
     if type(max_output_bytes) is not int or not 0 < max_output_bytes <= 2**63 - 1:
         raise ValueError("invalid transformation output budget")
-    if len(payload) + len(manifest) > max_output_bytes:
+    size = sum(len(payload) for _, payload in artifacts)
+    if size > max_output_bytes:
         raise TransformationLimitError(InputDimension.OUTPUT_BYTES,
-            len(payload) + len(manifest), max_output_bytes, "bundle_run")
+            size, max_output_bytes, "bundle_run")
     budget.check("temporary transformation publication")
     staging = make_staging_directory(destination)
     staging_identity: PathIdentity | None = None
     try:
         staging_identity = path_identity(staging)
-        atomic_write_bytes(staging / filename, payload)
-        atomic_write_bytes(staging / "manifest.json", manifest)
+        for name, payload in artifacts:
+            budget.check("temporary transformation publication")
+            atomic_write_bytes(staging / name, payload)
         budget.check("temporary transformation publication")
         publish_directory(staging, destination)
     except BaseException:

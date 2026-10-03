@@ -99,7 +99,10 @@ def _parse_jsonrpc(payload: bytes | str) -> Any:
     return TypeAdapter(types.JSONRPCMessage).validate_json(payload)
 
 
-def _create_redacted_fast_mcp(name: str, fast_mcp_type: type[Any]) -> Any:
+def _create_redacted_fast_mcp(
+    name: str, fast_mcp_type: type[Any],
+    *, argument_names: dict[str, frozenset[str]] | None = None,
+) -> Any:
     """Create FastMCP with source-free argument validation failures."""
     active_context: ContextVar[Any] = ContextVar(f"{name}-tool-context")
 
@@ -125,6 +128,11 @@ def _create_redacted_fast_mcp(name: str, fast_mcp_type: type[Any]) -> Any:
             except ImportError:
                 ToolError = import_module("mcp.server.mcpserver.exceptions").ToolError
             from pydantic import ValidationError
+
+            if (argument_names is not None and tool_name in argument_names
+                    and (not isinstance(arguments, dict)
+                         or not arguments.keys() <= argument_names[tool_name])):
+                raise ToolError(_INVALID_TOOL_ARGUMENTS_MESSAGE) from None
 
             token = active_context.set(args[0] if args else kwargs.get("context"))
             try:

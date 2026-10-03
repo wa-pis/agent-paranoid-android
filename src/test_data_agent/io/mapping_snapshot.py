@@ -20,6 +20,7 @@ class MappingSnapshot:
 def read_mapping_snapshot(
     root: Path, relative_path: str, *, max_bytes: int, budget: GenerationBudget,
     total_limit: EffectiveInputLimit | None = None, consumed_bytes: int = 0,
+    input_limit: EffectiveInputLimit | None = None,
 ) -> MappingSnapshot:
     """Read once below an explicit root; return the exact bytes that were hashed."""
     try:
@@ -31,12 +32,18 @@ def read_mapping_snapshot(
                 or total_limit is not None and total_limit.dimension is not InputDimension.TOTAL_BYTES):
             raise ValueError
         path = Path(relative_path)
+        if input_limit is not None:
+            if input_limit.dimension is not InputDimension.BYTES or input_limit.value < 1:
+                raise ValueError
+            max_bytes = min(max_bytes, input_limit.value)
         if not root.is_absolute() or not relative_path or path.is_absolute() or ".." in path.parts:
             raise ValueError
         with open_regular_file(root / path) as handle:
             before = os.fstat(handle.fileno())
             if total_limit is not None:
                 total_limit.check(consumed_bytes + before.st_size)
+            if input_limit is not None:
+                input_limit.check(before.st_size)
             if before.st_size > max_bytes:
                 raise ValueError
             chunks: list[bytes] = []
@@ -49,6 +56,8 @@ def read_mapping_snapshot(
                 size += len(chunk)
                 if total_limit is not None:
                     total_limit.check(consumed_bytes + size)
+                if input_limit is not None:
+                    input_limit.check(size)
                 if size > max_bytes:
                     raise ValueError
                 chunks.append(chunk)
