@@ -1,6 +1,69 @@
 # Client Feedback And Acceptance Plan
 
+## Remaining coherent acceptance queue — 2026-10-04
+
+Use corrected runtime SHA3c00148 / wheel dd6b4ad2 evidence above and below;
+unchecked parent tasks are not all missing implementation. No historical pass
+or source-only test automatically certifies an installed release artifact.
+
+| Scope | Evidence already recorded | Next bounded local deliverable |
+|---|---|---|
+| 1–4, 8–9 | Identifier/domain44, CSV/date78, distinct/cache9 | Reconcile original finding dispositions; retain private-input gaps |
+| 5–6, 12 | Explicit category regression, saved-policy/TTY and finance scenario | Link approved sensitivity/preservation contract and wizard evidence; no blanket declassification |
+| 7, 10 | Timestamp offset, missing-bound warning and spec/profile routing | Monthly source-category fidelity remains a deferred proposal, not an agreed RC gate; explicit field formats do not imply monthly sampling. Installed routing diagnostics supplement the existing mode replay below. |
+| 11, 15–17 | Policy predicate/authorization/budget probes; historical bounded query counts | Bind safe connection diagnostics, early category limits and fictional adapter scan-budget evidence to current artifact |
+| 13–14 | Declared FK counts/chains and validation | Separate inference/utility claims from conformance; unmeasured source fidelity remains unverified |
+| 18 | Owner scope correction | Keep internal formulas inactive; reconcile supported SQL expression/rejection evidence only |
+| 19 | Installed publication5 | Bind deterministic atime/path-swap/rollback and original-script provenance, without repeating unchanged successful adaptation |
+| 20–26 | Corrected doctor/mode9, SQL/units/temporal28, Decimal pipeline16, Parquet renderer/profile19 and metadata11 | Consolidate six-method auth and remaining interface compatibility; preserve live/native prerequisite limitations |
+| Transformation routes | Corrected typed twelve-route matrix,36 CLI refusals, temporal3, common CLI/MCP matrix and finance end-to-end1 | Consolidate remaining key/wizard and wire boundaries; no live query, native timestamp or scale-per-route claim |
+| Release | Closed full gate2894, published draftPR602 | Final contract/docs disposition, mandatory independent clearance, protected CI and RC artifact verification |
+
+This queue is not a new product decision or a declaration that all client
+requirements passed. Private/live data remain unavailable; do not connect real
+databases to fill those gaps. Independent review is unavailable and must not be
+retried, rephrased or routed to another provider to evade the restriction.
+
 ## Corrected budget candidate evidence — 2026-10-03
+
+Finding11/adapter budget evidence on corrected installed wheel:22 PostgreSQL
+client cases passed (0.22s), Python3.14, tests/test_postgres_client.py with
+-o pythonpath=. -q. Explicit fictional driver/cursor/clock injection verifies
+safe static connection/SQLSTATE diagnostics, detached backend failures,
+read-only/timeouts, cumulative statement/result/deadline limits, missing-secret
+fail-before-connect and rejection of untrusted SQL strings. No product patch,
+live connection or measured remote performance; query-policy authorization and
+query-profiling cost evidence remain distinct.
+
+Finding21 corrected installed auth contract: test_trino_auth.py,22 passed
+(0.21s), Python3.14 with -o pythonpath=. -q. Six configured methods use runtime
+references/explicit injected constructors; OAuth token origin/TLS/deadline and
+value-free diagnostic negatives remain enforced. HTTP send and optional modules
+are disclosed dependency stubs, not product-policy patches or live authentication.
+No DB/API contacted; Kerberos/GSSAPI system prerequisites and remote success
+remain unverified. Author-run tests do not replace independent clearance.
+
+Corrected installed wizard-to-execution: registered-interface-acceptance.py,
+registered_wizard_saved_policy_execution only,2 passed,5 deselected (4.28s),
+Python3.14/MCP2 with -o pythonpath=. -q. Fictional inline/local CSV mapping
+entry stays hidden; SAVE records policy without receipt/output. Subsequent CLI
+and actual SDK stdio MCP execution agree on output rows and snapshot identity;
+source bytes unchanged and fixture values absent from review/status. No operator
+preservation approval, product monkeypatch, live backend or independent review.
+
+Corrected installed saved linked-key/mapping contract:21 passed,166 deselected
+(1.37s), selected test_transformation_batch.py cases with -o pythonpath=. -q.
+Fictional parent/child profiles cover inline/CSV null-versus-empty mappings,
+literal replacement, deterministic synthesis/fallback and generation-byte binding,
+shared CSV domain byte conflicts, final orphan rejection and composite tuple
+cardinality/incomplete-declaration negatives. Unbound receipt versions reject;
+no receipt issued, DB/API or product monkeypatch. This adds current-artifact
+evidence, not automatic relationship inference or independent safety review.
+
+Finding2 corrected installed distinct-overflow/cache suite passed nine cases
+(0.42s): lower-bound uncertainty after cap overflow, no false primary key,
+legacy fingerprint compatibility and stale-cache reprofile. Fictional data only;
+private inputs and final public RC remain unverified.
 
 Corrected-wheel finance end-to-end acceptance passed one scenario (1.52s):
 authorized fictional PostgreSQL aggregate stream -> captured source/saved policy

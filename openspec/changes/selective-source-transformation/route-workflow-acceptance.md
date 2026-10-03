@@ -1,5 +1,31 @@
 # Private saved-policy route acceptance — 2026-10-01
 
+## Corrected installed twelve-route and temporal replay — 2026-10-04 local
+
+Read both complete harnesses before execution. Corrected isolated runtime
+`3c00148c0d2afcf255e7355b6f52bb779d52f70a`, installed development wheel SHA256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`:
+`PYTHONPATH=/private/tmp/apa-budget-installed.fiQPEX/installed`
+with `/private/tmp/apa-py314-matrix.baFOFT/venv/bin/python`.
+
+- `scripts/accept_transformation_routes.py --public`: all12 typed routes passed,
+  including36 CLI refusal assertions (stale digest, one-byte output ceiling,
+  existing destination). Readback verifies ordered replacement rows, exact
+  DECIMAL, DATE, null versus empty string, provenance, unchanged inputs and
+  cleanup. Harness SHA256 remains
+  `b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57`.
+- `pytest openspec/changes/selective-source-transformation/temporal-workflow-acceptance.py
+  -o pythonpath=. -q`:3 passed (1.87s), literal CSV text and explicit selected
+  timezone conversion to typed Parquet and SQL text; unchanged mapping/source/
+  policy bytes and value-free review/status. No native timestamp input claim.
+
+All data fictional; query capture uses an explicitly injected Arrow stream,
+not a database. SQL output is never executed. `--public` refers to entry points
+registered only in the isolated candidate, not activation of the author branch
+or a published RC. Application-function MCP parity is not twelve-route wire
+parity. These are author-run checks, not independent review. Historical artifact
+results below remain separate; full scale per route and public RC remain open.
+
 ## Explicit temporal output acceptance — 2026-10-02 UTC
 
 `temporal-workflow-acceptance.py` exercises a saved local CSV mapping and public

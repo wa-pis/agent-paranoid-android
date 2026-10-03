@@ -1,5 +1,150 @@
 # Implementation Progress
 
+## Accumulated installed acceptance evidence publication — 2026-10-04 local
+
+- Consolidate three documentation files for draftPR602: corrected-wheel typed
+  twelve-route/refusal/temporal evidence, linked keys/null/mapping contracts,
+  wizard CLI/SDK workflow, auth and PostgreSQL diagnostics, and remaining queue.
+  Entire diff inspected; strict MkDocs passed (0.35s), diff-check passed.
+- Runtime and registration unchanged; no repeated successful full gate, new
+  wheel, review request, activation, merge or release. Pre-update pushed51e57e5
+  CI already completed without pending/failed checks; new documentation head
+  must obtain its own CI, without manual duplicate dispatch.
+- Next reconcile final original-finding disposition and remaining profiling/
+  publication boundaries; preserve unavailable private/live data and mandatory
+  independent clearance as limitations, not passes.
+
+## Corrected installed PostgreSQL diagnostic/budget evidence — 2026-10-04 local
+
+- Read test_postgres_client.py completely before execution. Reused fictional
+  explicitly injected driver/cursor and clock fixtures, no product monkeypatch
+  or external database. Corrected dd6b4ad2 installed wheel, Python3.14,
+  pytest tests/test_postgres_client.py -o pythonpath=. -q:22 passed (0.22s).
+- Scope includes static connection/SQLSTATE categories and generic unknown
+  failures without backend text/context, late secret resolution and missing-secret
+  fail-before-connect, read-only/timeouts, metadata-only no-row inspection,
+  cumulative statement/result budgets, deadline before next statement and raw
+  string SQL refusal before cursor execution. This does not prove live backend
+  reachability, query profiling cost or unrestricted query authorization.
+- Next consolidate accumulated acceptance evidence and remaining original finding
+  dispositions in one documentation update for draftPR602. No source changes,
+  repeated CI, independent-review retry, public activation, merge or release.
+
+## Corrected installed authentication contract evidence — 2026-10-04 local
+
+- Read test_trino_auth.py completely. Corrected dd6b4ad2 installed wheel,
+  Python3.14, pytest tests/test_trino_auth.py -o pythonpath=. -q:
+  22 passed (0.21s). Basic/JWT runtime secret references, certificate reference
+  checks, explicit OAuth redirect, Kerberos/GSSAPI mutual non-delegating options,
+  conflicting configuration rejection and detached value-free errors covered.
+- No network or real authentication: constructors are explicit injected driver
+  fakes; HTTP dependency send and optional auth modules are dependency stubs,
+  not product-policy monkeypatches. OAuth direct token origins reject before
+  transport; TLS/timeouts/shared invocation deadlines and suppressed driver
+  diagnostics checked. These are contract tests, not live driver/server acceptance
+  or independent safety review. Optional system prerequisites remain unverified.
+- Next finish bounded adapter diagnostic evidence and consolidate accumulated
+  documentation for draftPR602. Runtime unchanged; existing green CI snapshot
+  not queried again, public registration/merge/release remain gated.
+
+## Corrected installed wizard-to-CLI/MCP acceptance — 2026-10-04 local
+
+- Read registered-interface-acceptance.py completely before execution. Selected
+  only registered_wizard_saved_policy_execution: corrected dd6b4ad2 installed
+  wheel, Python3.14/MCP2, -o pythonpath=. -q:2 passed,5 deselected (4.28s).
+- Fictional inline YAML and local CSV mappings pass actual interactive decision/
+  action editing, hidden mapping entry and SAVE into the policy, then separate
+  CLI review/execute and actual MCP SDK stdio execute with full artifact readback.
+  Input bytes remain unchanged, review/status omit fixture values, and policy
+  saving creates neither receipt nor output. No preservation approval, sensitive
+  replacement replay, product monkeypatch, DB/API or independent review involved.
+- Existing PR602 latest read-only snapshot remains green/draft at51e57e5;
+  no duplicate GitHub query or CI dispatch. Source registration remains closed.
+  Next reconcile current-artifact six-method auth and bounded diagnostics, then
+  publish the accumulated documentation evidence in one focused update.
+
+## Corrected installed linked-key and mapping contract — 2026-10-04 local
+
+- Read selected tests and complete fixture helpers in test_transformation_batch.py
+  before execution. Corrected dd6b4ad2 installed wheel, Python3.14,
+  -o pythonpath=. -q, selection saved_linked_batch_distinguishes_empty_and_null,
+  saved_linked_batch_with_unlinked_replacements, shared_csv_domain_compares_its_exact_bytes,
+  linked_synthesis_fallback_validates_final_keys, batch_receipt_cannot_confirm_unbound_review,
+  saved_composite_relationship_uses_whole_tuple:21 passed,166 deselected (1.37s).
+- Fictional saved parent/child profiles verify inline/CSV null-versus-empty
+  mapping, literal replace_text, seeded synthesis/fallback and generation-byte
+  snapshot binding. Shared CSV domains reject conflicting bytes; final linked
+  synthetic keys reject orphans. Composite tuples reject incomplete declarations,
+  duplicate parents and one-to-one duplicate children. Unbound receipt versions
+  reject. No approval issuer, external connection or product monkeypatch used.
+- Complements twelve-route output evidence; not arbitrary source relationship
+  inference, public wire/scale-per-route or independent safety clearance.
+  Next consolidate installed wizard/auth and bounded adapter diagnostics, then
+  batch documentation evidence for PR602. Existing green CI snapshot unchanged;
+  no repeated CI, activation, merge, release or blocked-review request.
+
+## Corrected installed complete format matrix — 2026-10-04 local
+
+- Read complete existing route and temporal harnesses; reused without changes.
+  Corrected installed dd6b4ad2, Python3.14: accept_transformation_routes.py
+  --public passed all12 typed routes plus36 refusal assertions. Ordered rows,
+  exact Decimal/DATE/null/empty-string outputs, action provenance, CLI/MCP
+  application parity, immutable inputs and cleanup checked. No live DB/API,
+  product monkeypatch, new receipt or scale replay.
+- Sequential temporal-workflow-acceptance.py -o pythonpath=. -q:3 passed1.87s.
+  Literal CSV replacement remains literal; explicitly configured timezone
+  conversion produces typed Parquet/SQL text. No native timestamp input claim.
+  Updated route-workflow-acceptance.md with exact artifact and command evidence;
+  independent review and twelve-route MCP wire parity are not implied.
+- Read-only GitHub snapshot: draft PR602 OPEN at51e57e5, no pending or failed
+  checks. Initial sandbox network request failed; authorized read-only retry
+  succeeded, no CI dispatch/repetition. Author branch registration unchanged.
+- Next consolidate remaining key/wizard, auth and safe diagnostic evidence;
+  no blocked independent-review retry, activation, merge or release.
+
+## Routing diagnostic evidence and monthly-scope reconciliation — 2026-10-04 local
+
+- Existing finding7 disposition and historical policy notes classify automatic
+  monthly source-category fidelity as a deferred proposal, not an approved bug
+  fix. Explicit field format/output_format does not authorize monthly sampling.
+  Removed its misleading placement as an outstanding RC acceptance requirement;
+  no new temporal semantics or product code introduced. Original archive was
+  not reread this run; this reconciliation uses the recorded disposition.
+- Inspected both CLI input-selection regressions before running corrected
+  dd6b4ad2 installed package under Python3.14: tests/test_cli.py with selection
+  generate_without_input_shows_two_valid_forms or
+  generate_rejects_two_input_sources_with_help, -o pythonpath=. -q:
+  2 passed, 79 deselected (0.32s). Missing input and conflicting spec/profile
+  inputs return exit2 and supported recovery commands, without opening files.
+  Existing six installed valid/mixed spec/profile/CSV replays were not repeated.
+- Next reconcile remaining diagnostic/format-route evidence on this artifact.
+  PR602 remains draft; no independent-review retry, activation, merge or release.
+
+## Coherent remaining acceptance queue reconciled — 2026-10-04 local
+
+- Added grouped finding1–26/route/release queue to client-acceptance.md, linking
+  completed corrected-wheel evidence to specific remaining deliverables instead
+  of treating every unchecked parent task as absent implementation. No parent
+  checkbox closed, product scope changed or private/live fidelity pass invented.
+- Runtime unchanged, no repeated tests/CI, independent-review retry or rerouting.
+  Next review original monthly-date/mixed-input subcases and current-artifact
+  diagnostic/format-route evidence before selecting only missing scenarios.
+  PR602 draft, activation/merge/release still gated.
+
+## Corrected installed distinct-overflow/cache evidence — 2026-10-04 local
+
+- Previous read-only GitHub process53474 completed: PR602 OPEN/draft at51e57e5,
+  full Python matrix and CodeQL were still running in its returned snapshot;
+  no duplicated query/workflow was launched and no all-green new-SHA claim made.
+- Read tests/test_schema_distinct_overflow.py completely. Corrected dd6b4ad2
+  installed package, Python3.14: pytest tests/test_schema_distinct_overflow.py
+  -o pythonpath=. -q: 9 passed (0.42s), fictional temporary data, no monkeypatch.
+  Cap overflow reports lower-bound uncertainty, rejects false PK nomination,
+  preserves legacy fingerprints and reprofiles stale cache. This supplements
+  finding2 without claiming private data acceptance.
+- Next consolidate remaining diagnostics/utility/format-route disposition;
+  no runtime change, blocked-review retry, public activation, merge or release.
+
 ## Consolidated evidence update for draft PR602 — 2026-10-04 local
 
 - Publish one documentation-only update for accumulated corrected-wheel CSV/date,
