@@ -1,5 +1,124 @@
 # Implementation Progress
 
+## Owner authorized closed-candidate PR preparation — 2026-10-04 local
+
+- Owner explicitly requested PRs. Prepare a draft PR from the closed coherent
+  branch with signed implementation and accumulated installed acceptance evidence.
+  Isolated 3c00148 registrations stay excluded; mandatory independent clearance
+  remains unavailable and no merge, public activation or release is authorized
+  by this preparation step. No security request retry or provider rerouting.
+- Local full gate and corrected-wheel focused results above remain evidence;
+  do not rerun unchanged successful checks or create duplicate PR/CI runs.
+  Next collect draft PR identity and GitHub checks, then continue remaining
+  client1–19/mapping evidence without claiming complete acceptance.
+
+## Corrected installed client19 publication adaptation — 2026-10-04 local
+
+- Read complete reviewed tests/test_client_publication_acceptance.py. Corrected
+  dd6b4ad2 installed import verified by subprocess, Python3.14, explicit package
+  root: pytest tests/test_client_publication_acceptance.py -o pythonpath=. -q:
+  5 passed (2.94s). Fictional data only, no product monkeypatch.
+- Absent/empty destinations succeed with schema/row/manifest readback; filled
+  destinations reject both with and without --overwrite and retain old bytes.
+  This reviewed adaptation does not replace original script or deterministic
+  atime/path-swap regression evidence, nor private input acceptance.
+- Corrected stale ledger sentence: isolated activation tree materialization is
+  complete at 3c00148, while reconciliation/independent clearance/public artifact
+  gates remain open. Next client1–19 date/cardinality/domain evidence; no review
+  retry, activation, merge or release.
+
+## Corrected installed Parquet unknown metrics/sensitivity — 2026-10-04 local
+
+- Located actual harness tests/test_source_adapters.py and inspected all selected
+  Parquet probes. Corrected installed dd6b4ad2, Python3.14, explicit PYTHONPATH:
+  pytest tests/test_source_adapters.py -o pythonpath=. -k parquet -q:
+  11 passed, 8 deselected (0.31s).
+- Missing null/unique metrics remain unknown, unsupported inference rejects;
+  complete null statistics are measured. Fictional string/native sensitivity
+  remains value-free; oversized cells, row count and local deadline reject.
+  Three probes change environment configuration; deadline uses explicit clock
+  injection. No product function/client monkeypatch, real DB or external API.
+- Existing wheel metadata/sensitivity behavior is now explicitly exercised on
+  corrected artifact, not inferred from old wheel. This is author acceptance,
+  not independent clearance. Next mapping/Decimal transformation and client1–19
+  ledger reconciliation; public activation and release remain closed.
+
+## Corrected installed Parquet typed output and decimal profile — 2026-10-04 local
+
+- Read both fictional harnesses completely. Corrected installed dd6b4ad2 on
+  Python3.14: pytest tests/test_parquet_decimal_profile.py
+  tests/test_transformation_parquet.py -o pythonpath=. -q: 19 passed (0.37s).
+  No product monkeypatch, external API/DB or repeated successful wheel tests.
+- Declared decimal precision/scale profiling without source-value bounds,
+  unsupported decimal256 precision rejection, typed/null/decimal/date/timezone
+  output readback, byte ceiling and normalized source/cardinality negatives
+  covered. This is private renderer evidence, not whole mapping execution.
+- Attempted test_file_profiling.py lookup found no such file; no test was run
+  or claimed from that path. Next locate actual unknown-metric/sensitivity
+  harness and reconcile remaining mapping/client1–19 evidence. No activation,
+  review retry, merge or release; exact isolated SHA remains 3c00148.
+
+## Corrected installed Decimal generation/export pipeline — 2026-10-04 local
+
+- Read complete tests/test_exact_decimal_dataset.py before execution. Selected
+  corrected dd6b4ad2 installed package explicitly through PYTHONPATH and
+  TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT; isolated candidate 3c00148 checkout.
+  Python3.14 pytest tests/test_exact_decimal_dataset.py -o pythonpath=. -q:
+  16 passed (1.53s), no skips, monkeypatch, live database or external API.
+- Exact spec -> generation -> validation -> CSV/JSON/Parquet/PostgreSQL export
+  readback, precision20/38 and scale2/16, actual CLI CSV/Parquet, saved decimal
+  schema/nulls, invalid range/shape and existing-artifact preservation covered.
+  Existing source-free sensitive-looking and unsupported-formula rejection
+  controls remain tested; this does not authorize internal formula activation.
+- No runtime edits or repeat of previously passed corrected-wheel units. Mapping/
+  transformation and unknown Parquet metrics evidence remain separate. Next
+  reconcile those with refreshed1–19; mandatory independent review still blocked.
+
+## Corrected wheel Decimal/Parquet/SQL focused acceptance — 2026-10-04 local
+
+- Reviewed selected existing fictional harnesses; excluded adapter tests that
+  monkeypatch product clients. Python3.14 imports corrected installed dd6b4ad2
+  package explicitly; temporal CLI probe verifies installed import provenance.
+- pytest tests/test_client_parquet_acceptance.py tests/test_exact_decimal_units.py
+  tests/test_sql_query_source.py -o pythonpath=.
+  -k 'decimal or installed_cli or boolean_predicate or unauthorized_column or file_byte_and_ast'
+  -q: 28 passed, 106 deselected (1.10s).
+- Covers exact decimal units/38-digit bounds/seeded sampling and invalid values;
+  actual Parquet generation physical temporal schema/readback; both SQL dialects'
+  AND/OR/nested predicates with forbidden functions, authorization and byte/AST
+  negatives. No live adapters, source row disclosure or independent review claim.
+  Decimal generation/export/transformation scope is not closed by units alone.
+- Next remaining client evidence reconciliation, especially Decimal pipeline,
+  unknown Parquet metrics and refreshed1–19. Public activation/release still gated.
+
+## Corrected wheel client20/25 entrances accepted — 2026-10-03
+
+- Exact isolated candidate 3c00148c0d2afcf255e7355b6f52bb779d52f70a is clean.
+  Reviewed installed-mode harness and actual doctor probe before execution.
+  Python3.14, PYTHONPATH and TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT explicitly
+  select /private/tmp/apa-budget-installed.fiQPEX/installed (wheel dd6b4ad2).
+- pytest tests/test_client_mode_installed_acceptance.py tests/test_cli_doctor.py
+  -o pythonpath=. -k 'installed or actual_doctor' -q: 9 passed, 8 deselected,
+  8.55s. Fictional negative explicit/embedded mode, mixed/default spec/profile/CSV
+  replay and actual failed local doctor configuration covered on corrected wheel.
+  No product monkeypatch or external database/API. Earlier-wheel successes were
+  not reused as new-artifact execution evidence; parent acceptance remains open.
+- Next reconcile remaining decimal/Parquet/SQL/client1–19 scope; no duplicate
+  process, blocked review retry, public activation, merge or release.
+
+## Corrected isolated registration tree materialized — 2026-10-03
+
+- Closed documentation freeze 0c388c9; new detached candidate checkout
+  /private/tmp/apa-corrected-candidate.mIiVzx. Applied only the three existing
+  common CLI/MCP/OAuth patches with --unidiff-zero in that isolated checkout.
+- Compared its entire src tree with the tested dd6b4ad2 wheel build source:
+  exact match excluding generated __pycache__ directories. Initial comparison
+  stopped on those cache-only differences; no source discrepancy was found.
+  No rebuild or unchanged successful tests repeated. Candidate signed locally;
+  author registration remains closed, old d84b6a1 and incomplete scan preserved.
+- Next reconcile outstanding client scope against this exact source identity.
+  No independent review retry, push, merge, version bump or public activation.
+
 ## Signed closed freeze and acceptance identity reconciled — 2026-10-03
 
 - Signed local freeze d038ec2dc162727ac9e1b381f6900ba69a1b9b7c verified against
