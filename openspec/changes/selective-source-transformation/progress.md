@@ -1,5 +1,18 @@
 # Implementation Progress
 
+## Signed closed freeze and acceptance identity reconciled — 2026-10-03
+
+- Signed local freeze d038ec2dc162727ac9e1b381f6900ba69a1b9b7c verified against
+  repository release-signers. Author checkout was clean at this checkpoint;
+  no push, PR, merge, registration activation or release performed.
+- client-acceptance.md now distinguishes corrected wheel dd6b4ad2 from prior
+  client20–26 artifacts and records explicit installed compatibility and closed
+  full-gate evidence. Historical successes are not transferred automatically.
+  No successful tests were rerun and no blocked review was retried or rerouted.
+- Next: materialize the corrected exact isolated activation tree, preserving
+  d84b6a1 and its incomplete scan, then reconcile remaining client evidence.
+  Independent clearance remains unavailable; author checks cannot replace it.
+
 ## Corrected closed candidate full milestone gate passed — 2026-10-03
 
 - Single scripts/check_release.sh process 96641 finished exit0. Lint, strict types

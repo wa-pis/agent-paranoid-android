@@ -1,5 +1,28 @@
 # Client Feedback And Acceptance Plan
 
+## Corrected budget candidate evidence — 2026-10-03
+
+Closed author candidate: signed commit
+`d038ec2dc162727ac9e1b381f6900ba69a1b9b7c`. Public registrations remain disabled.
+The corrected isolated development wheel has SHA256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`
+and retains version 1.5.0; it is not a published release candidate.
+
+Explicit installed Python3.14/MCP2 checks passed 27 cases covering common CLI
+creation/runtime/contracts, retained MCP stdio and session/per-file limit
+rejections. Python3.11/MCP1 contract and retained stdio checks passed four cases.
+Installed doctor with --skip-smoke passed; network reachability and quickstart
+were not tested by that invocation. Earlier client20–26 wheel results below
+remain tied to their own artifacts, not automatically transferred to this wheel.
+
+The closed source milestone gate passed 2894 tests with 21 explicit skips and
+90.05% coverage, plus lint, types, compatibility, licenses, resource checks,
+schema freshness and fictional quickstart. This is author-run evidence, not
+independent safety review, live integration acceptance or public RC acceptance.
+Exact activation-tree materialization, remaining client evidence reconciliation,
+mandatory independent clearance and public artifact verification remain open.
+See [progress](progress.md) for commands, boundaries and preserved artifacts.
+
 ## Installed client20–26 evidence ledger — 2026-10-03
 
 All runs use fictional local inputs. Harnesses were inspected before execution;
