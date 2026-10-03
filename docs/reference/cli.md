@@ -50,20 +50,24 @@ filename stem; `--json` wraps the same review in the standard CLI response.
 The policy's `input_format` selects CSV, Parquet or an already captured
 PostgreSQL/Trino query-result envelope. Query capture remains private; this
 review command neither reads a SQL script as data nor connects to a database.
-Private fictional acceptance covers all four inputs and three outputs using
-the same saved policy, review digest and temporary execution path.
-For review-only exact-text plans, a single-file policy may declare a top-level
+Installed fictional candidate acceptance covers all four inputs and three outputs
+using the same saved policy and review digest, including public command execution.
+Native Parquet/captured-result input supports nullable strings, signed integers,
+float64, BOOLEAN, date32 and declared decimal128. Native Arrow timestamps,
+nested types and unsupported numeric shapes fail closed; this is not a promise
+of arbitrary Parquet input support. Textual DATETIME output conversion is separate.
+For exact-text plans, a single-file policy may declare a top-level
 `file_text_mapping` and optional CSV `mapping` on each `replace_text` field.
 The review reports configured scopes but never shows mapping literals;
 matching field rules take priority over file-wide rules, without cascading.
-Duplicate keys within either table are rejected. These declarations do not enable
-replacement output.
+Duplicate keys within either table are rejected. Review itself never produces
+replacement output; execution consumes the separately reviewed snapshot.
 
 CSV review uses literal empty cells: an empty cell is a non-null string. A
 behavior policy may set `csv_nulls.input_token` to a nonempty explicit null
 marker; the marker is matched exactly and excluded from type inference. The
-private executor additionally uses `csv_nulls.output_token` for null output;
-this setting does not enable public execution. Source/output markers are
+executor additionally uses `csv_nulls.output_token` for null output.
+Setting a marker is not approval or execution. Source/output markers are
 separate from a mapping file's `null_token`. All settings are bound to the
 exact policy snapshot, so changing them invalidates existing approvals.
 The schema fingerprint must match this transformation-specific profile;
@@ -80,9 +84,9 @@ not copied. This is debugging metadata, not a preview of output or approval.
 Review alone does not authorize source preservation. The separate local
 approval and execution entrances below enforce the exact reviewed snapshot.
 
-### Execution candidate — not publicly enabled
+### Implemented RC execution candidate
 
-The isolated activation candidate uses the same saved policy and reviewed
+The registered RC implementation uses the same saved policy and reviewed
 `snapshot_sha256` for `transform-execute SOURCE POLICY DESTINATION
 --snapshot-sha256 SHA`. Output format comes from the policy; destination must
 be a new bundle, never an existing directory or an input file. Success reports
@@ -128,6 +132,39 @@ Saving decisions does not issue a preservation receipt. If the saved policy
 retains any eligible source field, separate local `transform-approve` remains
 mandatory before CLI or MCP execution. The wizard does not create or repair an
 invalid initial policy or turn a sensitivity answer into approval.
+
+### Closed common-profile workflow candidate
+
+The common multi-input workflow is not registered in the production CLI or MCP.
+Fictional isolated acceptance uses `_candidate_common_main` with these operations:
+
+| Operation | Required local arguments | Effect |
+| --- | --- | --- |
+| `create` | root, draft profile, configuration destination | Save policies/spec/references only; optional `--decide` invokes the local wizard. |
+| `review` | root, saved profile | Return a bounded value-free plan and exact digest. |
+| `approve` | root, saved profile, new receipt, `--snapshot-sha256` | Require fresh controlling-TTY confirmation; pipe/flag approval is rejected. |
+| `validate` | root, saved profile, `--snapshot-sha256` | Validate temporary output without retained publication. |
+| `execute` | root, saved profile, `--snapshot-sha256` | Execute temporarily, or retain a new direct-child bundle with `--destination`. |
+
+All operations require explicit `--max-total-input-bytes` and `--max-review-bytes`;
+review/validate/execute also require `--max-output-bytes`. Preservation consumers
+need `--receipt`. Creation from absent CSV policies requires
+`--create-csv-policies --seed INTEGER`; initial proposals are unknown/drop-only,
+not approved decisions. `--edit-actions`/`--edit-formats` require `--decide`, and
+CSV creation with interactive decisions requires explicit action editing.
+Saving configuration changes reference paths and requires a fresh reviewed digest.
+Existing files, unsafe references and output destinations are not overwritten.
+No command above is a shipped command-discovery promise or authorization to use
+private data before final safety/activation gates.
+
+The isolated activation candidate composes these operations under
+`transform-batch`, without enabling that command in the main checkout. Its
+machine-readable success and error responses use CLI schema version `1.0`;
+success metadata is inside `result`, not flattened into the envelope. Runtime
+`--json`/`--debug` flags are accepted before the command, before the operation,
+or after operation arguments. Debug does not disclose rejected arguments.
+Controlling-TTY approval remains local-only; `create` and `SAVE` never issue a
+receipt. Installed isolated CLI/MCP acceptance is not public activation approval.
 
 ### Edit Field Decisions Locally
 
@@ -203,8 +240,11 @@ the current setting and `null` clears it. For example:
 
 `date` fields do not accept timezone settings. Explicit SAVE writes a validated
 policy atomically; it creates neither approval nor output data. This setting
-does not yet execute temporal conversion. Literal `replace_text` always ignores
-format/timezone metadata and emits its supplied replacement unchanged.
+does not itself execute temporal conversion. Literal `replace_text` always
+ignores field format/timezone metadata and supplies its replacement unchanged.
+A separately selected typed Parquet/SQL output may explicitly parse that result
+using its output field's `temporal_type`, including declared source/target
+timezones. CSV replacement output remains literal; no implicit UTC is applied.
 
 ## Database Sources And SQL
 

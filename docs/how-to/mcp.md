@@ -15,6 +15,26 @@ no network, while the Trino worker receives no generator workspace mount.
 
 ## Prepare A Workspace
 
+### Closed Common-Profile Candidate
+
+The isolated activation candidate adds `common_transformation` to the generator
+server; it is not registered in the main checkout until final safety gates.
+It accepts `operation` (`review`, `validate`, `execute`), workspace-relative
+`profile`, and positive explicit `max_total_bytes`, `max_review_bytes`,
+`max_output_bytes`. Validation/execution require the exact reviewed
+`snapshot_sha256`. Preservation additionally requires a pre-existing local
+`receipt`; MCP cannot issue it. Optional `destination` is execute-only and names
+a new direct-child output bundle. Without it, execution is temporary.
+
+The workspace root comes from server configuration, never tool arguments.
+Responses contain value-free review/summary metadata, not output rows or mapping
+literals. Existing transport/work budgets still apply; these byte settings do
+not enlarge source-free profiling or serialized response budgets. Unknown
+arguments, including `root` and `approved`, are rejected without reflection.
+Configuration creation and human confirmation remain local CLI operations.
+Installed fictional acceptance with MCP SDK1/SDK2 is evidence for this candidate,
+not permission to activate it or process private data.
+
 ```bash
 mkdir -p /path/to/synthetic-workspace
 ```

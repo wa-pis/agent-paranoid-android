@@ -4,13 +4,14 @@ No production tool registration or approval issuer. Public activation requires t
 completed wiring's independent safety review and matching policy amendments.
 """
 
-from typing import Any
+from typing import Any, Literal
+from pathlib import Path
+from collections.abc import Callable
 
 from test_data_agent.core.limits import (
     DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
 )
 from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths
-from test_data_agent.mcp_generator_server import resolve_workspace_path
 
 
 def _create_test_candidate_mcp(*, prospective: bool = False) -> Any | None:
@@ -45,6 +46,8 @@ def _execute_candidate_transformation(
     max_total_input_bytes: int | None = None,
 ) -> dict[str, object]:
     """Consume existing approval only; never return rows or create receipts."""
+    from test_data_agent.mcp_generator_server import resolve_workspace_path
+
     source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
     policy = resolve_workspace_path(policy_path, must_exist=True, expect_file=True)
     destination = resolve_workspace_path(output_path, expect_directory=True)
@@ -57,3 +60,29 @@ def _execute_candidate_transformation(
         max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
         max_output_bytes=max_output_bytes, budget=GenerationBudget(), receipt_path=receipt,
     )
+
+
+def _create_test_batch_mcp(root: Path) -> Any | None:
+    """Isolated common consumer server with trusted fixed root; no issuer."""
+    from test_data_agent.mcp_generator_transport import create_generator_mcp
+
+    return create_generator_mcp([_common_batch_tool(root)], strict_arguments=True)
+
+
+def _common_batch_tool(root: Path) -> Callable[..., dict[str, object]]:
+    """Closed callable for prospective composition; root is server-owned."""
+    from test_data_agent.io.transformation_batch_workflow import BatchWorkflowRequest, run_batch_workflow
+
+    def common_transformation(operation: Literal["review", "validate", "execute"], profile: str,
+                              max_total_bytes: int, max_review_bytes: int, max_output_bytes: int,
+                              snapshot_sha256: str | None = None, receipt: str | None = None,
+                              destination: str | None = None
+                              ) -> dict[str, object]:
+        """Closed fictional common-profile consumer; no rows or approval issuer."""
+        request = BatchWorkflowRequest(operation=operation, root=root, profile=profile,
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+            max_output_bytes=max_output_bytes, snapshot_sha256=snapshot_sha256, receipt=receipt,
+            destination=destination)
+        return run_batch_workflow(request, budget=GenerationBudget()).metadata()
+
+    return common_transformation

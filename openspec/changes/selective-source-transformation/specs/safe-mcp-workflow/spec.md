@@ -1,5 +1,28 @@
 ## ADDED Requirements
 
+### Requirement: Common saved-profile consumers preserve local authority
+
+The common CLI and generator MCP SHALL consume the same saved profile and exact
+reviewed identity. Generator MCP SHALL take its root from trusted server workspace
+configuration, require explicit positive input/review/output byte budgets, retain
+existing transport/work ceilings and reject unknown caller arguments without
+reflecting their values. MCP SHALL NOT create preservation receipts. Public
+registration SHALL remain gated by finished-candidate independent safety review.
+
+#### Scenario: Installed common workflow consumes a local receipt
+- **GIVEN** a fictional saved profile reviewed and confirmed through local controlling-TTY CLI
+- **WHEN** CLI or MCP validates or executes the exact reviewed snapshot
+- **THEN** preservation requires the existing bound receipt
+- **AND** missing or stale authority is rejected without exposing source values
+- **AND** MCP returns bounded review/summary metadata rather than output rows
+
+#### Scenario: Common output retention is explicit and bounded
+- **GIVEN** an execute request with a configured workspace and explicit byte budgets
+- **WHEN** destination names a new direct-child bundle
+- **THEN** validated output may be retained using the existing safe publication mechanism
+- **AND** review/validate destinations, unsafe paths and existing destinations are rejected
+- **AND** omission of destination retains no output bundle
+
 ### Requirement: Transformation Authority Is Separate From Generation
 
 Workspace transformation execution SHALL be a separately selected mixed-origin

@@ -1,4 +1,8 @@
 import ast
+import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 from types import ModuleType
 
@@ -12,6 +16,24 @@ from test_data_agent.cli_doctor import (
     trino_deployment_status,
 )
 from test_data_agent.cli_dependencies import install_extra_command
+
+
+def test_actual_doctor_retains_failed_local_configuration() -> None:
+    pytest.importorskip("trino")
+    environment = dict(os.environ)
+    environment["TRINO_DEPLOYMENT_PROFILE"] = "fictional-private-marker"
+    result = subprocess.run([sys.executable, "-m", "test_data_agent.cli", "doctor",
+        "--require-extra", "trino", "--json"], env=environment,
+        capture_output=True, text=True, timeout=30)
+    assert result.returncode == 1 and not result.stderr
+    assert "fictional-private-marker" not in result.stdout
+    report = json.loads(result.stdout)
+    assert report["schema_version"] == "1.0" and report["ok"] is False
+    assert report["exit_code"] == 1
+    states = {check["name"]: check for check in report["checks"]}
+    assert states["dependency:pydantic"]["status"] == "available"
+    assert states["capability:trino"]["status"] == "failed"
+    assert states["capability:trino"]["remediation"] == "check local capability setup and rerun doctor"
 
 
 def test_doctor_service_reports_optional_and_required_extras() -> None:

@@ -1,5 +1,50 @@
 # Client Feedback And Acceptance Plan
 
+## Installed client20–26 evidence ledger — 2026-10-03
+
+All runs use fictional local inputs. Harnesses were inspected before execution;
+no product monkeypatch, live database, external API or private client inputs.
+Environment configuration and explicit clock/dependency injection are identified
+in [progress](progress.md), not presented as remote integration acceptance.
+
+| Finding | Wheel | Focused evidence | Still open |
+|---|---|---|---|
+| 20 doctor | dd6c0c6e | Actual local configuration failure: 1 passed; dependency-injected subset: 4 passed | Other quickstart failures, final compatibility |
+| 21 auth | dd6c0c6e / 9da73de5 | Six-method local dependency guards: 22 passed on earlier wheel; actual OAuth pipe guard: 1 passed on newer wheel | Remote login/native prerequisites, exact-SHA review |
+| 22 SQL | 9da73de5 | Both-dialect predicates, unauthorized columns and budget negatives: 17 passed | Adapter execution, private reproduction |
+| 23 decimal | 9da73de5 | Units, generation, exports, actual CLI, schema/readback and negatives: 33 passed | Remaining transformation/mapping scope |
+| 24 Parquet | 9da73de5 | Actual declared temporal CLI/readback: 1 passed | Native timestamp transformation is not implicitly supported |
+| 25 mode/exit | 9da73de5 | Negative override and mixed spec/profile/CSV deterministic replay: 4 passed; embedded negative with omitted override: 1 passed; default valid spec/profile/CSV: 3 passed; invalid artifacts retained, exit1 | Remaining entrances and final artifact gates |
+| 26 metadata | 9da73de5 | Unknown metrics, sensitivity and local byte/row/time boundaries: 11 passed | Final CLI/MCP compatibility |
+
+New OAuth-composed development wheel SHA256:
+`9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b`.
+It retains development version 1.5.0, not a published RC. Earlier wheel evidence
+below remains tied to its exact artifact; no automatic transfer of successful
+common-interface tests to the newer wheel. Main public registration is unchanged.
+The changed wheel was subsequently revalidated explicitly: actual common CLI/MCP
+creation/runtime/stdio matrix21passed14.31s on Python3.14/MCP2, read-only contract
+inventory1passed0.46s. These results are attached to9da73de5, not inferred from
+dd6c0c6e. Explicit newer-wheel Python3.11/MCP1 retained stdio and contract
+inventory checks subsequently passed4cases4.01s. The earlier MCP1 result remains
+historical; final compatibility gates must use the frozen candidate.
+Final coherent candidate gates, exact-SHA independent AI safety/RC reviews and
+public 1.6.0rc1 artifact verification remain required. Parent client tasks stay
+open until their remaining agreed scope is completed.
+
+## Installed common interface evidence — 2026-10-03
+
+Isolated development wheel SHA256
+dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3
+contains prospective actual common CLI/MCP composition. Main checkout registration
+is unchanged. Focused Python3.14/MCP2 acceptance18passed10.45s covers configuration
+save/reopen, schema1.0 CLI, runtime flags, controlling-TTY receipts, direct and
+fallback preservation, retained CLI/MCP output readback, ordinary CSV profiling
+and value-free rejection paths. Same wheel Python3.11/MCP1 wire3passed3.95s.
+These fictional cases do not certify client-private/live inputs, all formats at
+target scale, full project compatibility or final RC safety/release acceptance.
+No new independent review was launched for these helper-level changes.
+
 ## Amended replacement acceptance — 2026-10-02
 
 Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
@@ -147,8 +192,9 @@ executable evidence locations, not assertions that they were rerun today.
 Outstanding work is not hidden by this register: complete-candidate gates,
 exact-SHA independent safety review, GitHub-required checks and public RC artifact
 acceptance remain mandatory. Unapproved exceptions/proposals remain unsupported,
-not silently implemented or promoted into new scope. Finding 1's sensitive-semantic
-identifier subcase remains explicitly unfixed.
+not silently implemented or promoted into new scope. Finding 1's bounded
+synthetic-identifier remedy is implemented and reviewed as recorded above;
+final RC/package and unavailable private-data acceptance are not implied.
 
 ## Finding-specific verification boundaries
 

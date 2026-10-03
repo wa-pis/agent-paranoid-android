@@ -63,7 +63,7 @@ This is a map of the codebase for the domain-agnostic generator.
   foreign keys, formulas, temporal ordering, conditional required fields, and
   aggregate mappings.
 
-## Selective Transformation Preparation (Private)
+## Selective Transformation (RC Implementation)
 
 `src/test_data_agent/core/transformation_policy.py` validates reviewable
 per-field behavior decisions and field coverage. `transformation_mapping.py`,
@@ -89,7 +89,10 @@ mapping, policy, and CSV-source byte snapshots. The core
 `transformation_snapshot.py` and `transformation_approval.py` bind those exact
 bytes and reviewed material. `io/transformation_receipt.py` handles a private
 local interactive confirmation receipt; a receipt alone is not execution
-permission. There is no public CLI/MCP source-preserving execution path yet.
+permission. Registered `transform-approve` issues a local interactive receipt;
+`transform-execute` and workspace `execute_transformation` consume it through
+the reviewed single-input application boundary. MCP cannot issue receipts.
+Registration is not final RC review or public-artifact acceptance.
 `io/transformation_decisions.py` implements the local `transform-review --decide`
 wizard: explicit per-column sensitivity answers, optional `--edit-actions`
 configuration of the existing action models, fixed-snapshot validation and
@@ -101,24 +104,67 @@ The private `prepare_csv_review_request` entry derives profile evidence from
 the same fixed CSV bytes included in its approval request; callers cannot
 provide an alternate profile to that entry. Receipt issue/verification still
 reprofiles those bytes. The public `transform-review` CLI uses this path only
-to display value-free decisions; it neither mints a receipt nor writes output.
+to display value-free decisions; its decision editor can save the existing
+policy, but neither mints a receipt nor writes transformed output.
 
-`io/transformation_execute.py` owns the closed CSV execution prototype:
-exact-text and typed replacement, synthesis, dependency-ordered derivation,
+The closed common-profile candidate lives in `io/transformation_batch_profile.py`,
+`transformation_batch.py`, and `transformation_batch_receipt.py`: restricted
+reference capture, exact ordered snapshot identity, shared review and local-TTY
+receipt, linked final validation, and owned temporary mixed-origin publication.
+It is not registered in CLI/MCP. `temporary_batch_profile` materializes explicit
+references into an owned fictional temporary root without changing user files.
+`temporary_batch_decisions` reuses the per-input editor there, requires explicit
+field decisions and a final common SAVE, then revalidates the displayed snapshot.
+SAVE creates no approval receipt. Explicit `create_csv_policies` plus a required
+seed can initialize CSV policies from fixed schema evidence with unknown
+sensitivity/drop-only proposals; the wizard requires action decisions for this
+route. Native/captured sources still start from valid per-input proposals.
+Closed `save_batch_profile` publishes only behavior policies, validation-spec
+and a common reference profile into a new/empty sibling directory below the
+original reference root. It does not copy source snapshots or issue approval.
+Source/reference bytes are rechecked and the published profile reloaded; changed
+paths produce a new identity and require review. Publication failures leave no
+trusted approval; a post-publication revalidation failure may leave configuration
+requiring another review. Public interface parity/activation remain unfinished.
+Shared profile limits accept only total-input and output bytes; other
+dimensions remain per-input policy settings.
+
+`io/transformation_batch_workflow.py` owns the closed typed review/validate/execute
+consumer and shared metadata serialization. Unregistered `_candidate_batch_main`
+and `_create_test_batch_mcp` in the candidate adapter modules delegate to it.
+Execution/validation require the exact reviewed digest; receipt references stay
+below the trusted root. MCP captures that root server-side and cannot issue
+receipts. Its strict argument-name check runs at the existing redacted transport
+boundary before SDK parsing. By default consumers return value-free metadata
+after temporary bundle cleanup. The isolated execution candidate can instead
+retain a bundle in an explicitly named new direct-child destination below its
+trusted root, using the same validation/receipt gates and atomic writer. Review
+and validation cannot publish; traversal, nested or existing destinations fail.
+No rows or caller path literals enter returned metadata. Real installed
+SDK1/SDK2 stdio evidence does not activate a public common-profile command/tool.
+Unregistered `_candidate_batch_approve_main` parses local common approval requests
+and delegates to the same controlling-TTY issuer after checking the reviewed
+digest and a new direct-child receipt path. Piped confirmation cannot approve;
+MCP has no counterpart and neither parsing nor SAVE creates authority.
+
+`io/transformation_execute.py` owns deterministic snapshot execution:
+exact-text and typed replacement, synthesis, private dependency-ordered derivation,
 receipt-gated preservation, explicit null provenance and final validation.
-`io/transformation_publish.py` publishes its CSV and mixed-origin manifest only
-inside automatically deleted private test storage. Neither is public activation.
+`io/transformation_publish.py` owns bounded atomic mixed-origin publication and
+temporary acceptance storage. Registered CLI and workspace execution use the
+shared application boundary; private derive is not enabled by those entrances.
+Implementation registration is not final RC release/public-artifact acceptance.
 
 The format-independent RC target is input adapter -> common transformation and
-validation -> output adapter. Current executor still combines CSV decoding,
-execution and rendering; extraction is pending, not a completed architecture.
-`io/transformation_input.py` now dispatches fixed-byte decoding for CSV and an
-initial native nullable string/signed-integer/float64/boolean/decimal128 Parquet slice. Review, receipt revalidation,
+validation -> output adapter. The shared executor still has CSV-named internal
+entry points; they are implementation details, not permanent public API promises.
+`io/transformation_input.py` dispatches fixed-byte decoding for CSV and the
+native nullable string/signed-integer/float64/boolean/date32/decimal128 Parquet slice. Review, receipt revalidation,
 execution/trace and final source comparison use that decoder. Unsupported native
-Parquet types fail closed until typed input integration; no intermediate
-CSV file replaces the source snapshot. Existing private CSV-named entry points
-are retained during this extraction, not newly public interfaces.
-First additional route is CSV -> SQL-script using a validated logical result,
+Parquet types, including native timestamps and nested values, fail closed; no intermediate
+CSV file replaces the source snapshot. Captured PostgreSQL/Trino envelopes use
+the same bounded native decoder; capture itself remains a separate private route.
+SQL-script output uses a validated logical result,
 not reparsing rendered CSV (which loses null and logical-type provenance).
 Reuse `postgres_sql_export.quote_postgres_identifier` and `postgres_literal`
 for PostgreSQL encoding. Do not route mixed-origin output through
@@ -185,7 +231,9 @@ Public dataset-oriented commands:
 - `agent-approve`
 
 - `profile-csv`
-- `transform-review` (read-only)
+- `transform-review` (value-free review; optional local policy decision editor)
+- `transform-approve` (local interactive receipt issuer)
+- `transform-execute` (fixed-snapshot execution and publication)
 - `generate-from-csv`
 
 ## Database Configuration

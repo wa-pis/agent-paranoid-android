@@ -10,10 +10,35 @@
   retain checks for synthesis/derive/preserve and malformed/absent evidence.
 - [x] Add fictional mapping permutation/readback tests and candidate R2-2/3/4
   fixes with focused Parquet deadline/sensitivity and identity-cleanup tests.
-- [ ] Finish baseline/activation amendments and complete installed candidate
+- [x] Finish baseline/activation amendments and complete installed candidate
   acceptance for the changed contract without claiming private/live data passed.
-- [ ] Independently review finished exact changed SHA before public activation;
+- [x] Independently review finished exact changed SHA before public activation;
   final RC version review, GitHub checks and release remain separate gates.
+  Evidence: ActivationSafety-R3 exact 911ade071e4a309ab3e3538dfe6c4a9f676624aa,
+  installed registered-interface acceptance and merged PR #601. Subsequent SDK
+  compatibility fixes remain part of final exact-RC review, not this closure.
+
+## Accepted-main evidence reconciliation — 2026-10-02
+
+Accepted main: 8670e562f50980cfd62678c6f0f51d4887cb8961. This inventory
+consumes prior evidence; it is not a new test run or final RC acceptance.
+
+- Basic twelve-route replacement workflow is recorded in
+  [route evidence](route-workflow-acceptance.md). Null/empty, DECIMAL and temporal
+  output unit checks exist in `tests/test_transformation_parquet.py` and
+  `tests/test_transformation_sql.py`, but do not close the complete twelve-route
+  typed/readback/publication matrix below.
+- Resource defaults admit 1M rows and 100M cells, with explicit byte ceilings;
+  `core/transformation_limits.py` defines session > profile > legacy > default
+  precedence. Input/total-limit tests cover boundaries and configuration recovery.
+  This is not measured 1M x100 acceptance or every-route scalability proof.
+- Installed capability discovery now checks both public transformation commands
+  and rejection of missing execution inputs (`scripts/check_installed_package.py`).
+  Prior closed-engine unavailable-command evidence remains historical. Packaging
+  and help discovery alone do not close skill-guided workflow acceptance below.
+- Single-table SQL aggregate implementation and rejection tests are present;
+  baseline/docs, independent safety evidence and remaining acceptance must be
+  reconciled separately before closing the second aggregate task.
 
 ## Owner-approved capacity and actionable limits — 2026-09-28
 
@@ -29,18 +54,25 @@
 
 - [ ] Support target 1,000,000 rows x100 columns across transformation routes;
   audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
-- [ ] Expose/document effective run/session and saved-profile resource settings,
+- [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.
-- [ ] Preserve typed value-free limit errors through core, adapters, worker,
+- [x] Preserve typed value-free limit errors through core, adapters, worker,
   CLI/Python/MCP: requested vs observed, limit, units, configuration origin,
   working session instructions and actual profile key; no partial publication.
-- [ ] Verify boundary/one-over/config-precedence/recovery cases and complete
+- [x] Verify boundary/one-over/config-precedence/recovery cases and complete
   fictional 300,000 x50 end-to-end acceptance with measured resource evidence.
+  Evidence: input/total/output limit tests, SDK compatibility/typed diagnostics
+  in PR #601, current configuration reference, and the two installed scale
+  checkpoints above. Public twelve-route refusals supplement them; no new scale
+  rerun, hard-RSS promise or final RC artifact acceptance is implied.
 
 ## Authorized SQL aggregate follow-up — 2026-09-28
 
-- [ ] Implement owner-approved single-table SUM/COUNT/MIN/MAX/AVG and optional
+- [x] Implement owner-approved single-table SUM/COUNT/MIN/MAX/AVG and optional
   GROUP BY, preserving column/table allowlists, sensitivity and resource budgets.
+  Executable evidence: `tests/test_sql_query_source.py` aggregate accepted/rejected
+  shapes, column authorization and AST budgets for both adapters; implementation
+  and docs are on accepted main. No live backend claim.
 - [ ] Amend SQL baseline/docs; prove accepted and rejected shapes for PostgreSQL
   and Trino with fictional tests; independently safety-review the exact SHA
   before public activation. No internal formula engine or live DB access.
@@ -67,13 +99,19 @@ meaning; the reconciliation does not mark partial implementations complete.
 - [x] Record owner-confirmed independent input/output format contract (2026-09-27).
 - [ ] Separate shared transformation/validation from CSV-specific parsing and
   rendering, retaining existing CSV regression evidence.
-- [ ] Implement input adapters for CSV, Parquet and separately authorized bounded
+- [x] Implement input adapters for CSV, Parquet and separately authorized bounded
   Trino/PostgreSQL query results; no SQL-file import or real DB access in tests.
-- [ ] Implement independently selected CSV, Parquet and SQL-script output
+  Captured-result envelopes are implemented; capture stays private. Native type
+  exclusions in policy-contract remain explicit, including timestamps/nested data.
+- [x] Implement independently selected CSV, Parquet and SQL-script output
   adapters; bind format/dialect settings to approval; never execute output SQL.
-- [ ] Verify all 12 input/output combinations with fictional data, common field
+- [x] Verify all 12 input/output combinations with fictional data, common field
   policy semantics, logical readback, decimal/null/date fidelity and atomic
   publication failure checks. Query fixtures do not count as live acceptance.
+  Installed --public typed route matrix plus36 stale-digest/budget/overwrite
+  refusals: [evidence](route-workflow-acceptance.md). Explicit textual DATETIME
+  output has separate three-route evidence; native timestamps remain unsupported.
+  No all-format scale, arbitrary crash/race recovery or twelve-route SDK claim.
 
 - [x] Record one-to-one rows and explicit reference-field preservation.
 - [x] Record financial replacement, zero/rounding equality exceptions and
@@ -94,6 +132,11 @@ safety tests and independent review, not the reverse.
 The user selected trusted local CLI operator approval; equal-privilege agent
 impersonation is outside that deployment boundary. This selects transport, not
 approval of any dataset or completion of the safety amendment below.
+
+The preceding paragraph records the historical pre-activation checkpoint.
+PR #601 subsequently registered reviewed CLI/MCP execution after R3 and required
+gates. Final RC release remains distinct; old pending wording does not undo
+that accepted activation or imply final release acceptance.
 
 See [milestones](plan.md) for the approved order and release scope. Safety-policy
 amendments still require scoped review and executable checks before activation.
@@ -147,11 +190,11 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Locally replay reviewed client scripts against isolated baseline and
   installed candidate-branch packages; record per-requirement before/after
   results, disclosed harness adaptations and genuinely unverified private cases.
-- [ ] Support inline YAML and local CSV mappings with equivalent validation;
+- [x] Support inline YAML and local CSV mappings with equivalent validation;
   keep external script/API execution an unapproved future TODO.
 
-- [ ] Implement bounded local CSV transformation with explicit field actions.
-- [ ] Make the first CSV replacement primitive unconditional exact-text
+- [x] Implement bounded local CSV transformation with explicit field actions.
+- [x] Make the first CSV replacement primitive unconditional exact-text
   file-wide and per-column lookup tables (`true -> false`, `001 -> 1`) with
   one-pass matching, duplicate-key rejection within each table and no type
   inference. Apply column match before file-wide match, then declared fallback.
@@ -165,19 +208,34 @@ All items below remain unverified until reproduced against the current candidate
 - [ ] Implement review/validate/execute parity for supported agent interfaces
   with bounded structured responses and no source-row disclosure; only the
   interactive local CLI may mint preservation approval receipts.
-- [ ] Add RC acceptance for skill-guided agents: discover both packaged
+  - [x] Materialize prospective actual common CLI/MCP composition only in an
+    isolated source copy; preserve main registration and independent-review gate.
+  - [x] Prove installed common profile creation/reopen, CLI schema1.0 and runtime
+    flags, controlling-TTY receipt issuance, CLI/MCP retained consumption,
+    direct/fallback preservation, safe rejections and full fictional readback.
+    Wheel dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3:
+    Python3.14/MCP2 focused18passed; same wheel Python3.11/MCP1 wire3passed.
+    Subsequent OAuth-composed wheel9da73de5 explicitly revalidated actual common
+    CLI/MCP21passed and unchanged ordinary contract inventory1passed; see progress.
+  - [ ] Complete public contract/golden inventories and full candidate gates;
+    obtain finished exact-SHA independent review before actual registration.
+- [x] Add RC acceptance for skill-guided agents: discover both packaged
   `SKILL.md` files through a documented, runtime-neutral path; choose only
   capabilities present in the installed version; propose a safe workflow and
   use existing reviewed CLI/Python/MCP boundaries. Test fictional offline
   routes and unavailable-transformation rejection. Do not auto-register skills,
   add execution authority or mark this complete from packaging alone.
+  Added installed offline guided-caller generation/transformation and actual
+  baseline unavailable-command acceptance; see [evidence](skill-workflow-acceptance.md).
+  This closes the added local harness/workflow, not final reviewed RC artifacts
+  or an external model/integration benchmark.
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
 - [ ] Implement consistent key mapping; internal derived-value computation is
   excluded by the latest owner clarification (existing checks below historical).
   - [x] Reject malformed/aggregate derive expressions and dependency disagreement
     through bounded shared parsing before review/save; no evaluation yet.
-- [ ] Implement scoped typed substitution dictionaries, unmapped-value policy,
+- [x] Implement scoped typed substitution dictionaries, unmapped-value policy,
   one-pass semantics, collision checks and restricted local mapping handling.
 - [x] Supersede the historical source-membership ban with owner ADR-0029:
   actual explicit mappings may permute source values in local output only.
@@ -190,12 +248,23 @@ All items below remain unverified until reproduced against the current candidate
   round trips, conflict rejection and separation from observed evidence.
 - [ ] Add a profile-review wizard that saves explicit field decisions; bulk
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
+  - [x] Closed common CSV creation/decision/save/resume scenario: required seed,
+    unknown/drop-only initial proposals, per-field action/sensitivity prompts,
+    final SAVE and exact revalidation; configuration-only publication never
+    copies sources or issues receipts. Installed common suite120passed8.90s;
+    public common CLI/MCP registration and final safety gates remain pending.
+  - [x] Unified closed CLI creation parser and real-PTY blank-policy wizard:
+    explicit field decisions/SAVE, configuration-only save, reopened review,
+    validate and retained execute. Installed development wheel6dcf2c0f scenario
+    passed; this does not complete public registration or exact-SHA review.
   - [x] Existing valid-policy sensitivity editor: per-column prompts with system
     comments, no default/bulk answer, unchanged actions/mappings, snapshot drift
     rejection and atomic in-place save; no approval or execution.
   - [x] Add explicit selection/configuration of existing field actions, including
     inline/CSV/domain mappings and unmatched behavior; revalidate new references.
-  - [ ] Complete saved-policy parity with executable paths.
+  - [x] Complete saved-policy parity with executable paths.
+    Installed registered-interface acceptance exercises actual inline/CSV wizard
+    saves followed by execution; public route acceptance supplements readback.
 - [ ] Add a bounded, value-free system comment for each reviewed field: likely
   data meaning, sensitivity rationale and uncertainty from safe profile
   evidence. Display it with the suggestion and explicit operator decision in
@@ -205,15 +274,22 @@ All items below remain unverified until reproduced against the current candidate
   parity with the noninteractive policy.
 - [ ] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
-- [ ] Implement the owner-confirmed three-origin report (2026-09-28): replacement,
+- [x] Implement the owner-confirmed three-origin report (2026-09-28): replacement,
   synthetic, original, based on executed cell actions rather than value equality.
   Verify mapping/generation/preserve fallbacks, explicit formatting, nulls,
   dropped-cell exclusion and empty output; expose counts and proportions without
   values. Equality safety guards remain independent; origin is not anonymity or
   permission to preserve source data.
-- [ ] Add an end-to-end fictional finance fixture: preserved product/segment/
+  Consumed existing `test_transformation_report.py`, executed-action synthesis/
+  fallback/null/format/drop tests in `test_transformation_execute.py`, and installed
+  manifest acceptance. Report reflects actions, not a claim of anonymity.
+- [x] Add an end-to-end fictional finance fixture: preserved product/segment/
   bank combinations, replaced amounts, mapped identifiers and SQL aggregate
   result columns as ordinary inputs, without internal total recomputation.
+  `finance-workflow-acceptance.py`: installed candidate1passed1.42s, bounded
+  fictional driver stream through real SQL authorization, public CLI review/
+  TTY approval/execute, exact decimal readback and missing-receipt rejection.
+  No real SQL execution, private derive or final RC artifact claim.
 - [ ] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping
   domains, deterministic replay and infeasible constraints.
 - [ ] Cover schema drift, sensitivity conflicts, leaks through reports/errors,

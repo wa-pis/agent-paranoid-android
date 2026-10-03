@@ -1,8 +1,8 @@
-"""Closed CSV replacement prototype; not wired to public execution surfaces.
+"""Deterministic transformation shared by reviewed CLI and MCP execution.
 
-Development/tests only pending end-to-end safety review and activation gates.
-Preservation requires an existing local receipt. No filesystem publication,
-receipt minting or external access.
+Preservation requires an existing local receipt. This module performs no
+filesystem publication, receipt minting or external access. Private derive
+capabilities remain separate from the registered execution contract.
 """
 
 import csv
@@ -16,7 +16,7 @@ import math
 from graphlib import TopologicalSorter
 from dataclasses import dataclass, field, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 from collections.abc import Iterator
 
 from test_data_agent.core.limits import GenerationBudget
@@ -43,6 +43,9 @@ from test_data_agent.core.transformation_report import SourceRetentionSummary, r
 from test_data_agent.core.transformation_report import ProvenanceSummary, provenance_summary
 from test_data_agent.csv_profiler import validate_csv_headers, parse_bool
 from test_data_agent.io.transformation_receipt import _canonical_request, verify_local_receipt
+
+if TYPE_CHECKING:
+    from test_data_agent.io.transformation_batch import TransformationBatch
 
 
 class TransformationExecutionError(ValueError):
@@ -124,6 +127,17 @@ def trace_csv_replacements(
 def replace_csv_snapshot(
     request: ApprovalRequest, *, max_total_bytes: int, max_review_bytes: int,
     max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
+) -> CsvTransformationResult:
+    """Existing single-input contract; no batch authority through public callers."""
+    return _replace_csv_snapshot(request, max_total_bytes=max_total_bytes,
+        max_review_bytes=max_review_bytes, max_output_bytes=max_output_bytes,
+        budget=budget, receipt_path=receipt_path)
+
+
+def _replace_csv_snapshot(
+    request: ApprovalRequest, *, max_total_bytes: int, max_review_bytes: int,
+    max_output_bytes: int, budget: GenerationBudget, receipt_path: Path | None = None,
+    batch_receipt: tuple["TransformationBatch", Path] | None = None,
 ) -> CsvTransformationResult:
     """Apply reviewed actions to fixed bytes; preservation needs a bound receipt."""
     try:
@@ -281,10 +295,18 @@ def replace_csv_snapshot(
                 column_tables[decision.field] = compile_text_replacement_table(
                     mappings[action.mapping.path], action.mapping, budget=budget)
         if needs_receipt:
-            if receipt_path is None:
-                raise ValueError
-            verify_local_receipt(canonical, receipt_path, max_total_bytes=max_total_bytes,
-                                 max_review_bytes=max_review_bytes, budget=budget)
+            if batch_receipt is None:
+                if receipt_path is None:
+                    raise ValueError
+                verify_local_receipt(canonical, receipt_path, max_total_bytes=max_total_bytes,
+                                     max_review_bytes=max_review_bytes, budget=budget)
+            else:
+                from test_data_agent.io.transformation_batch_receipt import verify_batch_receipt
+                batch, common_receipt_path = batch_receipt
+                if receipt_path is not None or canonical not in batch.requests:
+                    raise ValueError
+                verify_batch_receipt(batch, common_receipt_path, max_total_bytes=max_total_bytes,
+                                     max_review_bytes=max_review_bytes, budget=budget)
         reader = source_reader(source, policy, budget=budget)
         names = tuple(validate_csv_headers(reader.fieldnames))
         if set(names) != {decision.field for decision in policy.fields}:

@@ -42,7 +42,9 @@ class TransformationLimitError(InputLimitError):
         if (type(dimension) is not InputDimension or type(amount) is not int
                 or type(limit) is not int or not 0 <= amount <= 2**63 - 1
                 or not 0 < limit <= 2**63 - 1
-                or origin not in {"default", "profile", "session", "legacy_session", "snapshot_run", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run", "query_rows_run", "query_bytes_run"}
+                or origin not in {"default", "profile", "session", "legacy_session", "snapshot_run", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run", "query_rows_run", "query_bytes_run", "batch_input_run", "batch_output_run", "batch_bundle_run"}
+                or origin == "batch_input_run" and dimension is not InputDimension.TOTAL_BYTES
+                or origin in {"batch_output_run", "batch_bundle_run"} and dimension is not InputDimension.OUTPUT_BYTES
                 or origin == "snapshot_run" and dimension is not InputDimension.TOTAL_BYTES
                 or origin == "query_rows_run" and dimension is not InputDimension.ROWS
                 or origin == "query_bytes_run" and dimension is not InputDimension.BYTES
@@ -65,7 +67,10 @@ class TransformationLimitError(InputLimitError):
                             "output_run": "replace_csv_snapshot(max_output_bytes=...)",
                             "bundle_run": "temporary_csv_publication(max_output_bytes=...)",
                             "sql_output_run": "render_transformation_sql(max_bytes=...)",
-                            "parquet_output_run": "render_transformation_parquet(max_bytes=...)"}.get(origin)
+                            "parquet_output_run": "render_transformation_parquet(max_bytes=...)",
+                            "batch_input_run": "prepare_batch(max_total_bytes=...)",
+                            "batch_output_run": "execute_batch(max_output_bytes=...)",
+                            "batch_bundle_run": "temporary_batch_publication(max_output_bytes=...)"}.get(origin)
         recovery = (f"Run: increase {self.run_setting} within the session/profile ceiling. "
                     if self.run_setting else "")
         super().__init__(f"{self.code}: {dimension.value} {amount} > {limit} {self.unit} "

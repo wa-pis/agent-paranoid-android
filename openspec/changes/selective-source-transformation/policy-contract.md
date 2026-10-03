@@ -455,6 +455,140 @@ position, never private domain names or mapping entries. This establishes only
 ordered field binding; relationship execution and full composite-key
 validation remain pending.
 
+Closed development checkpoint (2026-10-02): a private, unregistered batch
+candidate binds individual canonical snapshots plus exact DatasetSpec1.1 final
+validation bytes, rejects inconsistent concrete domains and requires linked
+field domain/components to agree. It supports domain/inline/CSV substitution
+and literal text replacement with reject/source-free synthesis fallback, plus independent direct
+synthesis using bound DatasetSpec1.1 bytes; preservation requires a verified
+common TTY receipt. It cannot reuse individual receipts or publish to
+a caller-controlled/retained destination. Its isolated fictional acceptance
+adapter atomically publishes both outputs and a bounded value-free manifest
+inside owned temporary storage, then removes that storage on context exit.
+Declared CSV/Parquet/PostgreSQL-SQL output policies now reuse the existing
+typed renderers after linked final validation, with normalized complete-source-row
+guards retained. Typed payloads and value-free manifest share the run output
+budget and one temporary bundle rename; SQL is encoded only, never executed.
+Fictional saved-profile readback covers native null versus empty string and
+exact DECIMAL(8,2) for Parquet/SQL. These are closed output checkpoints, not
+full multi-input native-source coverage or public interface activation.
+Closed common saved-profile acceptance also exercises native Parquet parents
+with CSV or Parquet children and all three output encodings. Existing readers
+retain native typed matching; modified source bytes invalidate common identity,
+and final orphan keys fail even with a newly bound snapshot. This bounded
+fictional checkpoint does not authorize real databases, demonstrate complete
+native scalar/scale coverage or activate public multi-input interfaces.
+Closed captured-query common acceptance uses the existing authorized capture
+boundary with fictional injected Arrow streams only: PostgreSQL/Trino source
+pairs, explicit allowlists, qualified entity identity, bounded wrappers and
+three output encodings. Unauthorized capture fails before stream access. This
+does not authorize real database access or claim live driver/authentication
+acceptance; query-capture envelopes do not grant access or human approval.
+It checks final schema/relationships/constraints before returning private
+results. This is not activation of cross-input CLI/MCP or completion of full
+composite-key relationship validation; retained atomic output, public activation
+and complete budget/negative acceptance remain pending.
+
+The closed saved-profile loader accepts restricted schema_version "0.1" YAML:
+Optional resource_limits reuses the existing typed transformation limits:
+shared max_total_input_bytes and max_output_bytes ceilings apply to requested
+run budgets; these are the only accepted common resource_limits keys. Per-input
+row/column/cell/file/expanded-byte/character limits belong to each behavior
+policy, and placing them in the common profile fails rather than silently
+ignoring them. Shared byte ceilings apply to requested
+run budgets at capture/preparation and execution, with the existing explicit
+session > saved profile > legacy session > default precedence. Exact saved
+profile bytes bind these settings into the common snapshot/receipt. Per-input
+behavior-policy limits remain enforced independently, without automatic
+increase or truncation; unrelated source-free budgets remain unchanged.
+validation names a local DatasetSpec1.1 file; ordered inputs contain entity,
+source, policy and optional mappings/generation_policies paths. All references remain below an
+explicit local root, with no-follow regular-file reads and one cumulative byte
+budget. No row payload is stored in the profile itself. Exact profile bytes,
+validation bytes and captured canonical input identities bind the common digest;
+changing whitespace or input order invalidates confirmation. Duplicate/unknown
+keys, traversal and symlinks fail with detached value-free errors. Only fictional
+temporary acceptance is enabled. The private controlling-TTY batch receipt
+confirms this snapshot and exact shown review for closed preservation execution.
+No public CLI/MCP
+registration or full-profile compatibility guarantee is introduced here.
+
+Closed creation can materialize a typed profile in an owned fictional temporary
+root without modifying user source/policy files. Explicit CSV-only creation uses
+a required integer seed and schema-derived unknown/drop-only policy proposals;
+the wizard must request action decisions, never infer sensitivity approval.
+Native/captured inputs still require valid proposals. The shared wizard shows
+each field's existing value-free plan, then the complete common review, requires
+SAVE and rechecks exact material. SAVE is configuration editing, not approval.
+
+Private configuration publication saves only policies, final validation-spec
+and common references below the original reference root. It never writes source
+snapshots or receipt files. External source/reference bytes must match the bound
+material; existing nonempty destinations, traversal and changed snapshots fail.
+Atomic staging publication and reload establish the expected new identity.
+Changed reference paths require a new review/receipt. A failure after atomic
+publication can leave configuration requiring revalidation, never approval.
+This adapter is exercised only on fictional temporary roots and remains
+unregistered; it does not enable retained transformed output before safety gates.
+
+Independent non-relationship fields reuse existing replacement semantics rather
+than being forced into shared domains. Linked relationship fields still require
+matching domain/component bindings. Domain conflict checks compare that domain's
+concrete definition and referenced CSV bytes only, not unrelated field mappings;
+conflicting shared CSV bytes remain rejected before outputs are returned.
+Independent direct synthesis reuses existing source-free generation: its bound
+spec must be valid-mode and match the entity/field, transformation seed governs
+replay, and input row count governs one-to-one output rather than the spec's
+requested count. Synthesis does not satisfy linked-key domain bindings. Missing
+generation files or changed exact generation bytes fail closed/rebind identity.
+Source-free synthesis fallbacks reuse the same bound-spec engine. Linked-key
+fallbacks remain subject to unconditional final FK/schema/constraint validation;
+different parent/child fallback keys fail before any result/publication, including
+when optional validation reporting is disabled. Derive is not enabled by this
+checkpoint.
+
+Common local review includes every canonical per-input plan (schema field/entity
+metadata, selected actions, sensitivity flags and system comments), its exact
+input snapshot identity, and parent/child relationships by input ordinal/field.
+It does not include source cells, mapping entries or private domain names.
+The complete combined review must fit the explicit review-byte budget; fitting
+each individual plan is insufficient and no truncation is permitted. The TTY
+shows this full bounded plan before confirmation, declaring closed preservation
+supported but public execution unsupported.
+The closed batch receipt version2 binds both snapshot_sha256 and review_sha256
+of the exact shown review bytes. Version1/count-only receipts and mismatched
+review digests fail closed; individual receipt format remains unchanged. Receipt
+size remains below the existing 256-byte bound, not an increased budget.
+
+Closed non-null composite acceptance groups declared DatasetSpec component
+relationships between the same parent/child entities and shared mapping domain.
+Every ordered domain component must have exactly one matching parent/child field
+relationship, with consistent cardinality. Incomplete or conflicting declarations
+fail before execution. Final validation checks the whole ordered parent/child
+tuple, parent tuple uniqueness and declared one-to-one child tuple uniqueness;
+separate component membership is insufficient. Single-component relationships
+continue through the existing scalar validator. Nullable composite tuple semantics
+are not activated by this checkpoint; null tuples fail closed. This adds no new
+public relationship schema or DatasetSpec generation behavior.
+
+Closed common preservation uses the existing engine's unchanged field eligibility,
+privacy and whole-row-copy checks. An internal-only execution adapter revalidates
+the common version2 receipt and exact membership of the canonical input before
+preserve/direct or fallback; it does not mint individual receipts or accept an
+approval boolean. The existing public single-input signature/receipt contract is
+unchanged and cannot consume common receipts. Only fictional temporary test-root
+batch output is allowed before final exact-SHA safety review/public activation.
+The isolated common consumer defaults to owned temporary output; explicit
+execute-only destination can retain a validated bundle under a new direct-child
+name below its trusted fictional root. Review/validate cannot publish. Absolute,
+traversal, nested, empty and existing destinations reject; source/configuration
+files are not overwritten. Shared descriptor-safe atomic staging and identity-safe
+cleanup apply to CSV, declared Parquet and SQL-file outputs, with no database
+execution or returned rows. CLI/MCP remain unregistered for this common surface.
+Bundle manifests label origin transformed_mixed, explicitly warn that output is
+not anonymized, and include value-free executed-action provenance per input.
+Manifest bytes remain charged to the existing common output budget.
+
 ## Replacement Semantics
 
 Owner-approved synthesis payload: `generation_policy_ref` identifies a bounded

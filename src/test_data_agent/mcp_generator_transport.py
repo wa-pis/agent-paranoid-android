@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from inspect import cleandoc
+from inspect import cleandoc, signature
 from typing import Any
 
 from test_data_agent.audit import audited_mcp_tool
@@ -16,13 +16,17 @@ from test_data_agent.mcp_trino_transport import (
 
 def create_generator_mcp(
     tools: Sequence[Callable[..., Any]],
+    *, strict_arguments: bool = False,
 ) -> Any | None:
     """Register audited generator services without owning their safety policy."""
 
     if FastMCP is None:
         return None
 
-    mcp = _create_redacted_fast_mcp("test-data-agent-generator", FastMCP)
+    argument_names = ({tool.__name__: frozenset(signature(tool).parameters) for tool in tools}
+                      if strict_arguments else None)
+    mcp = _create_redacted_fast_mcp("test-data-agent-generator", FastMCP,
+                                    argument_names=argument_names)
     for tool in tools:
         mcp.tool(description=cleandoc(tool.__doc__ or ""))(
             audited_mcp_tool("generator-mcp", tool))
