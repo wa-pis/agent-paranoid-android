@@ -1,5 +1,80 @@
 # Implementation Progress
 
+## Consolidated evidence update for draft PR602 — 2026-10-04 local
+
+- Publish one documentation-only update for accumulated corrected-wheel CSV/date,
+  identifier domains and finance end-to-end evidence. Runtime src is unchanged;
+  tested isolated3c00148 and wheel dd6b4ad2 remain the exact runtime identities.
+- Pre-update pushed d2b139c CI is green; no manual workflow dispatch, duplicate
+  PR or repeated successful local suite. Independent review remains unavailable.
+  Draft/closed registration, no merge/release/version bump remain unchanged.
+- Next finish finding-by-finding disposition for remaining diagnostics, caps,
+  utility and full format-route evidence; retain private/live limitations rather
+  than manufacture passes or keep repeating isolated helper checkpoints.
+
+## Corrected installed finance mapping end-to-end — 2026-10-04 local
+
+- Read complete finance-workflow-acceptance.py before execution. Python3.14,
+  explicit corrected dd6b4ad2 installed PYTHONPATH in isolated3c00148 checkout:
+  pytest openspec/changes/selective-source-transformation/finance-workflow-acceptance.py
+  -o pythonpath=. -q: 1 passed (1.52s). Local PTY access authorized.
+- Fictional injected bounded PostgreSQL aggregate stream passes actual SUM/
+  GROUP BY authorization and capture -> saved policy -> CLI review -> missing
+  receipt rejection -> controlling-TTY test approval -> execute/readback.
+  Product/segment/bank combinations retained, identifiers mapped, exact decimal
+  amounts replaced; value-free summaries and source/policy bytes unchanged.
+- This is synthetic test-only receipt issuance, not agent approval of real data;
+  no real database, product monkeypatch, internal totals/formula execution or
+  independent review. Old wheel finance evidence remains historical. Next
+  consolidate remaining-route/client ledger and publish one evidence update to
+  draft PR602 after current unchanged green CI, not many helper PRs.
+
+## PR602 CI green; corrected CSV/date pipeline evidence — 2026-10-04 local
+
+- Read-only GitHub check query found no pending, running or failed checks at
+  pushed SHA d2b139cf5799da992d8fee4978a8c5d4233bd210: all reported checks are
+  SUCCESS or intentional SKIPPED. PR602 remains draft; no merge/release. These
+  CI security checks are not mandatory independent exact-SHA safety clearance.
+- Read existing date fallback and CSV pipeline harnesses fully. Corrected
+  installed dd6b4ad2 on Python3.14: pytest tests/test_date_fallback_disclosure.py
+  tests/test_csv_pipeline_regressions.py -o pythonpath=. -k 'not distinct_budget'
+  -q: 78 passed, 1 deselected (0.63s). Excluded product-constant monkeypatch.
+- Fictional profile -> spec -> generation/validation and CLI roundtrip, local
+  category opt-in, timestamp timezone retention, missing-bound fallback warning,
+  short patterns, numeric false-positive/rare-secret and value-free controls
+  covered. This does not prove monthly-date granularity, general utility fidelity,
+  live adapter behavior or every mapping route. Next reconcile remaining scope
+  and consolidate evidence once without overlapping CI or blocked review retry.
+
+## Corrected installed identifier cardinality/domain acceptance — 2026-10-04 local
+
+- Owner asked to continue. Read both existing fictional harnesses fully; reused
+  them unchanged, no new abstractions. Explicit corrected dd6b4ad2 installed
+  package on Python3.14: pytest tests/test_identifier_pool.py
+  tests/test_identifier_domains.py -o pythonpath=. -q: 44 passed (0.39s).
+- Findings1/4/8/9/13 narrower evidence: fixed four-key pools across CSV/folder/
+  aggregate inputs and output sizes2/100/1000, synthetic sensitive identifiers,
+  arbitrary-prefix negatives, nullable disjoint domains, declared FK row counts,
+  reversed chains/cycles and deterministic replay. No product monkeypatch/live
+  data. General inference and source orphan-rate fidelity remain unverified;
+  this does not prove every selective mapping execution route.
+- Next date-bound/diagnostic/cap evidence and full mapping scenario reconciliation;
+  PR602 remains draft, no blocked review retry or public activation/release.
+
+## Draft PR602 pushed; CI checkpoint — 2026-10-04 local
+
+- Owner-authorized signed closed branch pushed at
+  d2b139cf5799da992d8fee4978a8c5d4233bd210; draft PR
+  https://github.com/wa-pis/agent-paranoid-android/pull/602 created and attached.
+  Isolated registration SHA3c00148 is excluded; no merge or release.
+- Read-only CI checkpoint: documentation, dependency review, CodeQL, wheel
+  compatibility Python3.11–3.14 and minimum dependency profiles passed. Python
+  full-suite jobs were still running at first snapshot. Do not dispatch duplicate
+  CI or treat partial green checks as all required gates completed.
+- Continue available client1–19/mapping evidence; exact-SHA independent review
+  remains unavailable and was not retried/rerouted. CI security checks do not
+  replace that mandatory independent review.
+
 ## Owner authorized closed-candidate PR preparation — 2026-10-04 local
 
 - Owner explicitly requested PRs. Prepare a draft PR from the closed coherent

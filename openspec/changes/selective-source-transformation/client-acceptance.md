@@ -2,6 +2,25 @@
 
 ## Corrected budget candidate evidence — 2026-10-03
 
+Corrected-wheel finance end-to-end acceptance passed one scenario (1.52s):
+authorized fictional PostgreSQL aggregate stream -> captured source/saved policy
+-> CLI review -> missing-receipt rejection -> local controlling-TTY test approval
+-> execution and readback. Business combinations remain, identifiers map and
+Decimal amounts replace exactly. No real database or internal totals engine;
+this test receipt does not authorize any real dataset.
+
+Corrected-wheel CSV/date pipeline passed 78 cases (0.63s), one product-constant
+monkeypatch probe excluded: profile/spec/generation/CLI roundtrip, explicit local
+categories, timezone retention, missing-bound fallback disclosure and existing
+numeric/rare-secret controls. Monthly-date granularity and unmeasured utility
+remain separate; these results do not imply general source fidelity.
+
+Corrected installed identifier pool/domain suite passed 44 cases (0.39s).
+This supplies fictional evidence for findings1/4/8/9 and the declared-link part
+of13: fixed cardinality, synthetic sensitive identifiers, independent nullable
+domains, declared FK counts/chains and replay. General relationship inference,
+source orphan-rate fidelity and all selective mapping routes are not closed.
+
 Client19 reviewed installed publication adaptation passed five corrected-wheel
 cases (2.94s): absent/empty destination success and filled-directory rejection
 with/without overwrite, including output readback and old-byte preservation.
