@@ -1,5 +1,264 @@
 # Implementation Progress
 
+## Corrected closed candidate full milestone gate passed — 2026-10-03
+
+- Single scripts/check_release.sh process 96641 finished exit0. Lint, strict types
+  142 files, compile, 101 licenses and compatibility passed. Direct API privacy/
+  SQL boundary pre-gate: 19 passed (0.38s). Full suite: 2894 passed, 21 skipped,
+  178.40s, coverage 90.05% against required 85%. Live integration and isolated
+  activation-only skips remain explicit; not private/live acceptance claims.
+- Operational fictional profile/generate/validate checks passed: elapsed
+  0.306/0.664/0.419s, traced peaks 2348034/2579900/313060 bytes; existing budgets,
+  not new hard-RSS guarantees. DatasetSpec schema freshness passed. Quickstart
+  customers/orders25 each seed12345 passed synthetic/source-free/validation flags
+  and dependency manifest check. Temporary gate workspace removed by its owned
+  mktemp cleanup; source and isolated wheels untouched.
+- Ordinary candidate fixes, focused contracts/docs and installed acceptance are
+  ready for signed local freeze; public registration remains closed. No repeated
+  independent-review request or provider rerouting, no RC version bump or public
+  release. Next materialize corrected exact activation tree and reconcile full
+  client acceptance evidence; mandatory independent review remains unavailable.
+
+## Closed candidate milestone gate running — 2026-10-03
+
+- Inspected scripts/check_release.sh before execution. Single local gate running
+  in this checkout, exec session 96641; do not launch an overlapping gate/test run.
+  PATH selects Homebrew git; exported shell python3 function selects the existing
+  Python3.11 dependency runtime explicitly. Actual local TTY access authorized.
+- Lint passed, strict types 142 files passed, compilation passed, 101 dependency
+  licenses approved, compatibility policy check passed. Direct service boundary
+  tests/full coverage/resource/schema/quickstart steps still pending at launch.
+  This is not completed gates, independent review or publication permission.
+- Next collect this exact process completion and record outcome; no source changes
+  while it runs. Existing isolated wheel and old immutable scan remain preserved.
+
+## Registration replay corrected; installed MCP1 compatibility — 2026-10-03
+
+- Correction to previous checkpoint: activation patches are NOT stale. They
+  intentionally contain zero-context hunks; plain git apply rejected them because
+  --unidiff-zero was omitted. Read-only check with that option passed. Applied all
+  three common CLI/MCP/OAuth patches ONLY to /private/tmp/apa-registration-replay.AhP7qZ;
+  cli.py, cli_parser.py and mcp_generator_server.py exactly match the tested isolated
+  wheel source, verified by byte comparison. No author registration edits, new
+  source behavior, wheel rebuild or repeat of successful MCP2 checks. Resumption
+  instructions now explain isolated replay and preserve activation gates.
+- Same wheel dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db
+  on Python3.11/MCP1: actual common tool contract plus three retained stdio cases
+  (synthetic/direct/fallback) passed, four tests in 4.25s. Python3.14 installed
+  doctor --skip-smoke --json passed exit0/ok true; network reachability and quickstart
+  correctly untested/skipped. Wheel 342850 bytes, below existing 524288-byte ceiling.
+- Next: full local closed-candidate milestone gates and coherent evidence freeze,
+  retaining the unavailable independent review as a blocker for public activation.
+  No release version bump, push/PR, external API/DB, review retry or approval claim.
+
+## Updated installed common candidate accepted locally — 2026-10-03
+
+- Remaining affected source TTY issuer/wizard and MCP stdio cases: 19 passed
+  (12.12s). Strict documentation build passed (0.41s). These complement the
+  earlier 101 regressions, without repeating scale or blocked reviewer work.
+- Preserved all prior wheels and immutable review trees. Created isolated source
+  copy /private/tmp/apa-budget-installed.fiQPEX from current closed author tree.
+  Old common CLI activation patch failed to apply atomically; no partial patch
+  was retained. Composed ONLY known cli.py/cli_parser.py/mcp_generator_server.py
+  registration bytes from immutable d84b6a1 in this copy. Author public gates stay
+  closed. Offline build initially lacked sandbox cache access; authorized offline
+  build succeeded, with no dependency changes or external calls.
+- New development wheel (still 1.5.0, not RC publication) SHA256
+  dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db;
+  dist/agent_paranoid_android-1.5.0-py3-none-any.whl under that isolated copy.
+  Installed separately to installed/; Python3.14/MCP2 import provenance verified.
+  Actual CLI creation/runtime flags, contract inventory, common MCP stdio with
+  direct/fallback receipts and retained/temporary output, plus new configured-byte
+  precedence cases: 27 passed (17.86s), fictional data only, no product monkeypatch.
+- This is author artifact evidence, not independent approval or exact new SHA
+  review. Existing scan remains incomplete. Next reconcile stale activation patch
+  against the closed candidate and finish artifact evidence/compatibility before
+  freezing the corrected candidate; no public registration, push/merge or release.
+
+## Common workflow regressions and capture contract reconciled — 2026-10-03
+
+- Current branch codex/1-6-coherent-candidate retains only intended local changes;
+  read-only GitHub query confirms no PR for this branch. Initial sandbox network
+  failure was resolved by authorized read-only access, not an implementation blocker.
+- Affected saved-profile/configuration publication, shared workflow/CLI creation,
+  destination rejection, linked/null/composite relationships and receipt negatives:
+  70 passed (12.76s). Separate affected native CSV/Parquet/exact-decimal and injected
+  PostgreSQL/Trino capture/output cases: 31 passed (2.73s), using local fictional
+  inputs and actual local terminal approval where required. No real DB/API, product
+  monkeypatch, repeated scale gates or independent-review claims.
+- policy-contract now documents bootstrap-before-capture and independent per-source
+  descriptor/read limits; OpenSpec adds a common source-file ceiling scenario.
+  Strict OpenSpec validation and diff whitespace checks passed. Existing session
+  precedence, diagnostics, default budgets and public registration gates unchanged.
+- Next: complete remaining affected controlling-TTY/common MCP route regressions
+  and installed-candidate evidence at a new artifact identity. Old immutable review
+  candidate and blocked validation remain untouched; ordinary automation continues.
+
+## Automation resumed for ordinary development — 2026-10-03
+
+- Owner asked to enable automation; status ACTIVE, existing schedule preserved.
+  Saved instructions point to this working checkout and prioritize affected
+  workflow regressions, contracts/documentation and fictional acceptance.
+- Restricted independent validation remains unavailable and is not retried,
+  rephrased or rerouted. Author tests cannot replace clearance. Public activation,
+  merge/release remain gated. Pause again once only unavailable review work remains.
+
+## Per-source byte ceilings applied before capture — 2026-10-03
+
+- Ordinary implementation continued at owner's request, without rerunning or
+  rerouting restricted review. Shared snapshot reader accepts an optional typed
+  file-byte limit, checks descriptor size before reads and running size during
+  reads, retaining aggregate accounting, no-follow and mutation protections.
+- Batch loading parses each behavior policy before source capture. Profile
+  materialization captures/parses existing policies first, derives source ceilings
+  (strictest for repeated source paths), then captures sources. Draft policy mode
+  uses session/default file limits. Existing callers without the new argument keep
+  their behavior. No defaults, public registrations or safety exceptions changed.
+- Checks: 23 focused snapshot/batch/precedence cases passed (2.12s); 13 draft and
+  create-review-execute cases passed (0.93s), including new session draft ceiling.
+  Runnable fictional clock check proves per-file rejection precedes the read loop;
+  no product monkeypatch. Ruff passed; mypy three changed source files passed;
+  diff whitespace check passed. These are author checks, not independent clearance.
+- Next: reconcile focused contracts/acceptance evidence and run affected common
+  workflow regressions before freezing a new candidate. Old exact-SHA review and
+  immutable tree remain untouched; automation/public activation/release paused.
+
+## Owner resumed ordinary implementation — 2026-10-03
+
+- Owner requested development continue without contacting support. Restricted
+  validation request was not retried or rerouted; scan remains unfinished and
+  automation remains paused. Public activation/release still requires independent
+  clearance; this work is ordinary implementation, not that clearance.
+- Shared batch loading and CLI creation now use one profile capture helper
+  enforcing non-default session total-byte ceilings before file capture/parsing.
+  Explicit run ceilings above defaults remain allowed as in single-input routing.
+  Added two fictional missing-profile checks proving session-limit error precedence
+  without product monkeypatch; existing four session/profile precedence checks
+  included. Initial subprocess run imported another installed checkout; corrected
+  with explicit candidate PYTHONPATH. CLI invalid-input exit remains 2.
+- Next: complete per-input byte-limit capture ordering in shared materialization
+  and loading, preserve diagnostic origins, then relevant regression checks.
+
+## Independent validation blocked by platform safeguard — 2026-10-03
+
+- Validation worker Copernicus (01a100b2-2ac9-7b80-9f93-217e79edb993)
+  returned an error: request flagged for possible cybersecurity risk. No
+  validation result, reproduction or clearance was obtained. Four discovery
+  candidates remain unvalidated in existing scan
+  e67d85e8-dedd-4957-96a6-8755b1ef390b; immutable candidate SHA unchanged.
+- Automation PAUSED because mandatory independent safety review requires
+  unavailable platform access. No retry through another worker or rephrased
+  request to bypass the safeguard, no public activation, merge or release.
+- Owner action: request authorized-security access through the platform-provided
+  Daybreak status-and-access page, or resolve the platform restriction with
+  support. Resume existing validation only after access is available; retain
+  original scan, exact SHA and all four candidate dispositions.
+
+## Budget candidates under independent validation — 2026-10-03
+
+- Independent AI discovery reviewer Lyra (runtime nickname Erdos) completed all
+  19 assigned changed-source paths on exact d84b6a1bbd564480f7245685c94f361ec043fa42.
+  Four distinct CWE-400 candidates concern profile bootstrap/session ceilings
+  and source capture/per-input ceilings, each in shared loading and creation.
+  They claim excess reads before rejection, not unauthorized publication or new
+  hard-RSS/wire guarantees. Not yet validated findings or activation approval.
+- Recorded all four once in existing scan e67d85e8-dedd-4957-96a6-8755b1ef390b;
+  separate non-author validation dispatched for this complete candidate set.
+  No source edits, repeated gates, new scan, public activation or release.
+- Next: retain every validation disposition, then attack-path assessment for
+  surviving/deferred instances; fix confirmed defects before exact-SHA clearance.
+
+## Context model retained; changed-source discovery started — 2026-10-03
+
+Maxwell architecture result received; parent inspected material common workflow,
+destination publisher, MCP closure, review metadata and OAuth callback consumers.
+Per-scan model retained via plugin at artifacts/01_context/threat_model.md,
+digestccee75649d0e6359c793df9e271bdbba5c9383b453f40d01f5b4bd14fc0cdaff.
+Capability labels/public_execution_supported=false and non-atomic-no-replace
+publisher distinction retained as questions, not confirmed vulnerabilities.
+Inventory prepared/read in full:19 changed source files. Existing scan advanced
+to discovery0/19 and fresh independent read-only reviewer dispatched for all19;
+no code/test/network activity authorized. Next collect complete file coverage and
+candidate evidence, record once, validate before any approval or activation.
+
+## Independent architecture reviewer dispatched — 2026-10-03
+
+Existing scan remains threat_model after ready preflight; fresh-context
+non-author Maxwell /01a1009f-15e1-77b1-a01f-18ba5c8bc730 successfully dispatched
+for read-only source-backed architecture of exactd84b6a1 and changed trust
+boundaries. No application execution, tests, edits, delegation or external calls
+authorized to this worker. Request canonical six-field model, effective-resource
+rows and verified citations, hypotheses distinct from findings. Context-specific
+model required; shared cached model must not be read/replaced. Next collect and
+verify material facts, persist per-scan model via plugin, then changed-file
+discovery without duplicate reviewer. Daybreak advisory checked once: not_granted,
+warning displayed; advisory does not gate scan. Public activation remains closed.
+
+## Capability preflight ready — 2026-10-03
+
+Anscombe preflight worker completed exit0/status ready: delegated_workers,
+goal_tools and goals_enabled all pass, no unmet/unknown capability or required
+remediation. No persistent configuration edits or network. Exact projected
+helper checks published to existing scan; phase advanced separately to
+threat_model. This is infrastructure readiness, not safety findings/review
+approval. Next threat-model context and independent changed-file review for
+exactd84b6a1; preserve non-author read-only reviewer and no public activation.
+
+## Dedicated capability preflight dispatched — 2026-10-03
+
+Resumed existing scan e67d85e8-dedd-4957-96a6-8755b1ef390b, still preflight;
+immutable range8670e56..d84b6a1 unchanged. Dedicated read-only preflight worker
+Anscombe /01a10099-dea6-7530-9baf-c9b3188d68ec successfully spawned, pending
+result at bounded wait. Scope only capability helper, no substantive review,
+config remediation or product edits. Verified nativeV1 delegation and exposed
+goal tools supplied to first helper invocation, Homebrew-first PATH. Next collect
+this worker's result, publish every projected capability check to same scan,
+advance only if ready. Do not dispatch duplicate preflight/reviewer or claim
+independent safety approval. Public activation/release remain closed.
+
+## Owner resolved launcher blocker — 2026-10-03
+
+Owner reported Xcode license action complete. System Git now returns version
+successfully; exact isolated SHA remainsd84b6a1bbd564480f7245685c94f361ec043fa42.
+Retried the same target/range once: durable diff scan created successfully,
+scanIde67d85e8-dedd-4957-96a6-8755b1ef390b, phase preflight, not completed review.
+Automation resumed ACTIVE after confirmed safe next step. Reuse this scan only;
+do not launch duplicates. Next dedicated capability preflight worker, then
+independent non-author read-only safety review; public activation remains closed.
+
+## Safety scan launcher access blocker — 2026-10-03 UTC
+
+Security Diff Scan launcher rejected the exact isolated range8670e56..d84b6a1
+with `Review changes requires a non-bare Git worktree with a resolvable HEAD.`
+No scanId was returned; no review/preflight worker or substantive review started.
+Homebrew Git independently confirms non-bare=true worktree and resolvable exact
+HEAD (is-bare=false, is-inside-work-tree=true). System /usr/bin/git --version
+fails exit69 because Xcode license agreements have not been accepted. This is
+a suspected launcher environment cause, not a proven scan diagnostic. Do not
+invent a scan, replace it with shell-authored canonical evidence or claim review.
+Automation PAUSED under owner stopping rule. Required external action: make
+the scan launcher's Git usable (Homebrew-first process PATH, or owner-handled
+Xcode license acceptance), then retry the same exact target/range. Do not accept
+legal terms on the owner's behalf. Both signed candidate SHAs/checkouts and
+prior fictional acceptance retained; public activation/release still closed.
+
+## Exact isolated activation SHA materialized — 2026-10-03 UTC
+
+Closed coherent commit444fb3dd77f9605860893a6e5240e012b2853669 is signed;
+signature verified with repository release-signers (bare verification lacked local
+allowedSignersFile, explicit repository configuration succeeded). Main branch
+codex/1-6-coherent-candidate remains publicly unactivated. Separate detached
+checkout /private/tmp/apa-safety-candidate.a97hVv materializes only the committed
+common CLI/MCP and OAuth registration patches, using normal file patching.
+All3 resulting registration files match the tested OAuth-composed source copy
+byte-for-byte. Signed isolated activation SHA:
+d84b6a1bbd564480f7245685c94f361ec043fa42; signature verified. No push/PR/release.
+Available separate reviewer tools identified, no reviewer dispatched yet:
+security-diff-scan workflow preparation precedes review. Next configure that
+read-only review for this finished exact activation SHA and record independent
+identity/date/scope/findings/disposition/evidence. Do not review helpers, revive
+ed24f7b or duplicate active work; final exact-RC review remains separate.
+
 ## Coherent closed candidate freeze — 2026-10-03 UTC
 
 Preparing one signed coherent implementation/documentation/contract/acceptance

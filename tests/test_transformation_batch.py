@@ -1380,6 +1380,90 @@ def test_closed_profile_creation_review_execution(tmp_path, case, recwarn):
     assert not recwarn
 
 
+@pytest.mark.parametrize("route", ["load", "create"])
+def test_batch_source_file_ceiling(tmp_path, route):
+    from test_data_agent.io.transformation_batch_profile import BatchProfile, temporary_batch_profile
+
+    save_fictional_batch_profile(tmp_path)
+    policy_path = tmp_path / "policy-0.yaml"
+    policy = yaml.safe_load(policy_path.read_bytes())
+    policy["resource_limits"] = {"max_input_file_bytes": 1}
+    policy_path.write_text(yaml.safe_dump(policy))
+    before = {path.name: path.read_bytes() for path in tmp_path.iterdir()}
+    with pytest.raises(TransformationLimitError) as caught:
+        if route == "load":
+            load_batch_profile(tmp_path, "batch.yaml", max_total_bytes=32768,
+                max_review_bytes=8192, budget=GenerationBudget(5))
+        else:
+            profile = BatchProfile.model_validate(yaml.safe_load((tmp_path / "batch.yaml").read_bytes()))
+            with temporary_batch_profile(tmp_path, profile, max_total_bytes=32768,
+                    max_review_bytes=8192, budget=GenerationBudget(5)):
+                pytest.fail("oversized source accepted")
+    assert caught.value.dimension.value == "max_input_file_bytes"
+    assert caught.value.origin == "profile" and caught.value.limit == 1
+    assert caught.value.amount == len(before["source-0.csv"])
+    assert {path.name: path.read_bytes() for path in tmp_path.iterdir()} == before
+
+
+def test_blank_batch_source_uses_session_file_ceiling(tmp_path):
+    save_fictional_batch_profile(tmp_path)
+    for index in range(2):
+        (tmp_path / f"policy-{index}.yaml").unlink()
+    program = '''
+import sys, yaml
+from pathlib import Path
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import TransformationLimitError
+from test_data_agent.io.transformation_batch_profile import BatchProfile, temporary_batch_profile
+root = Path(sys.argv[1])
+profile = BatchProfile.model_validate(yaml.safe_load((root / "batch.yaml").read_bytes()))
+try:
+    with temporary_batch_profile(root, profile, max_total_bytes=32768,
+            max_review_bytes=8192, budget=GenerationBudget(5), create_csv_policies=True, seed=7):
+        raise AssertionError("oversized source accepted")
+except TransformationLimitError as error:
+    assert error.origin == "session" and error.limit == 1
+    assert error.dimension.value == "max_input_file_bytes"
+'''
+    before = {path.name: path.read_bytes() for path in tmp_path.iterdir()}
+    result = subprocess.run([sys.executable, "-c", program, str(tmp_path)],
+        env={**os.environ, "TEST_DATA_AGENT_TRANSFORM_MAX_INPUT_FILE_BYTES": "1"},
+        capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    assert {path.name: path.read_bytes() for path in tmp_path.iterdir()} == before
+
+
+@pytest.mark.parametrize("route", ["load", "create"])
+def test_batch_session_ceiling_precedes_missing_profile(tmp_path, route):
+    program = '''
+import sys
+from pathlib import Path
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_limits import TransformationLimitError
+from test_data_agent.io.transformation_batch_profile import load_batch_profile
+from test_data_agent.cli_transformation_candidate import _candidate_batch_create_main
+if sys.argv[2] == "load":
+    try:
+        load_batch_profile(Path(sys.argv[1]), "missing.yaml", max_total_bytes=32768,
+            max_review_bytes=8192, budget=GenerationBudget(5))
+    except TransformationLimitError as error:
+        assert error.code == "requested_above_limit" and error.origin == "session"
+        assert error.limit == 1 and error.amount == 32768
+    else:
+        raise AssertionError("session ceiling not enforced")
+else:
+    assert _candidate_batch_create_main([sys.argv[1], "missing.yaml", "saved",
+        "--max-total-input-bytes", "32768", "--max-review-bytes", "8192"]) == 2
+'''
+    result = subprocess.run([sys.executable, "-c", program, str(tmp_path), route],
+        env={**os.environ, "TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES": "1"},
+        capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+    if route == "create":
+        assert "32768" in result.stdout and "session" in result.stdout
+    assert not list(tmp_path.iterdir())
+
+
 @pytest.mark.parametrize("dimension", ["max_total_input_bytes", "max_output_bytes"])
 @pytest.mark.parametrize("session_limit", [1, 65536])
 def test_saved_batch_session_overrides_profile(tmp_path, dimension, session_limit):

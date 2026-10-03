@@ -241,9 +241,9 @@ def _candidate_batch_create_main(argv: list[str], *, versioned_output: bool = Fa
     from test_data_agent.cli_presenter import report_cli_error
     from test_data_agent.core.transformation_limits import TransformationLimitError
     from test_data_agent.core.transformation_yaml import _load_private_yaml
-    from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
     from test_data_agent.io.transformation_batch_profile import (
         BatchProfile, temporary_batch_profile, temporary_batch_decisions, save_batch_profile,
+        capture_batch_profile,
     )
 
     parser = _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
@@ -267,9 +267,9 @@ def _candidate_batch_create_main(argv: list[str], *, versioned_output: bool = Fa
         if (args.max_total_input_bytes <= 0 or args.max_review_bytes <= 0
                 or not args.decide and (args.edit_actions or args.edit_formats)):
             raise ValueError
-        captured = read_mapping_snapshot(root, args.profile,
-            max_bytes=args.max_total_input_bytes, budget=budget)
-        profile = BatchProfile.model_validate(_load_private_yaml(captured.payload, args.max_total_input_bytes))
+        captured = capture_batch_profile(root, args.profile,
+            max_total_bytes=args.max_total_input_bytes, budget=budget)
+        profile = BatchProfile.model_validate(_load_private_yaml(captured, args.max_total_input_bytes))
         arguments = dict(max_total_bytes=args.max_total_input_bytes, max_review_bytes=args.max_review_bytes,
             budget=budget, create_csv_policies=args.create_csv_policies, seed=args.seed)
         context = (temporary_batch_decisions(root, profile, input_stream=sys.stdin,

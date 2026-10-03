@@ -17,6 +17,27 @@ def test_snapshot_hashes_returned_private_bytes(tmp_path):
     assert repr(snapshot) == "MappingSnapshot()"
 
 
+def test_snapshot_checks_per_file_limit_before_first_read(tmp_path):
+    from test_data_agent.core.transformation_limits import (
+        EffectiveInputLimit, InputDimension, TransformationLimitError,
+    )
+    (tmp_path / "source.csv").write_bytes(b"key\n1\n2\n")
+    calls = [0]
+
+    def clock():
+        calls[0] += 1
+        if calls[0] > 2:
+            raise AssertionError("read loop reached before file-limit rejection")
+        return 0.0
+
+    with pytest.raises(TransformationLimitError) as caught:
+        read_mapping_snapshot(tmp_path.resolve(), "source.csv", max_bytes=1024,
+            budget=GenerationBudget(max_seconds=1, clock=clock),
+            input_limit=EffectiveInputLimit(InputDimension.BYTES, 1, "profile"))
+    assert caught.value.amount == 8 and caught.value.limit == 1
+    assert caught.value.origin == "profile"
+
+
 @pytest.mark.parametrize("case", ["overflow", "escape", "absolute", "symlink", "missing"])
 def test_snapshot_rejects_unsafe_inputs_without_path_leaks(tmp_path, case):
     root = tmp_path.resolve()

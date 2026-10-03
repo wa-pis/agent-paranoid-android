@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget, GenerationLimitError
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationInputLimits, TransformationLimitError, resolve_input_limit
-from test_data_agent.core.transformation_yaml import _load_private_yaml
+from test_data_agent.core.transformation_yaml import _load_private_yaml, load_behavior_policy_yaml
 from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
 from test_data_agent.core.transformation_yaml import dump_behavior_policy_yaml
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
@@ -64,6 +64,7 @@ def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_byte
         consumed = len(profile_yaml)
         limit.check(consumed)
         paths = [profile.validation]
+        source_limits: dict[str, EffectiveInputLimit] = {}
         policy_paths = {Path(item.policy) for item in profile.inputs}
         for item in profile.inputs:
             paths.extend((item.source, *item.mappings, *item.generation_policies))
@@ -76,11 +77,33 @@ def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_byte
                        or path.parts[0] == "batch.yaml" for path in policy_paths)):
             raise ValueError
         captured: dict[str, bytes] = {}
+        # Existing policies determine each source ceiling before any source capture.
+        if not create_csv_policies:
+            for item in profile.inputs:
+                if item.policy not in captured:
+                    data = read_mapping_snapshot(root, item.policy, max_bytes=max_total_bytes,
+                        budget=budget, total_limit=limit, consumed_bytes=consumed).payload
+                    captured[item.policy] = data
+                    consumed += len(data)
+                policy = load_behavior_policy_yaml(captured[item.policy],
+                    max_bytes=max_total_bytes, budget=budget)
+                input_limit = resolve_input_limit(InputDimension.BYTES, policy.resource_limits, os.environ)
+                previous = source_limits.get(item.source)
+                if previous is None or input_limit.value < previous.value:
+                    source_limits[item.source] = input_limit
+        else:
+            source_limits = {item.source: resolve_input_limit(InputDimension.BYTES, None, os.environ)
+                             for item in profile.inputs}
         for path in dict.fromkeys(paths):
             if Path(path).parts and Path(path).parts[0] == "batch.yaml":
                 raise ValueError
+            if path in captured:
+                if path in source_limits:
+                    source_limits[path].check(len(captured[path]))
+                continue
             snapshot = read_mapping_snapshot(root, path, max_bytes=max_total_bytes,
-                budget=budget, total_limit=limit, consumed_bytes=consumed)
+                budget=budget, total_limit=limit, consumed_bytes=consumed,
+                input_limit=source_limits.get(path))
             captured[path] = snapshot.payload
             consumed += len(snapshot.payload)
         if create_csv_policies:
@@ -238,6 +261,17 @@ def save_batch_profile(root: Path, relative_destination: str, batch: Transformat
     return saved
 
 
+def capture_batch_profile(root: Path, relative_path: str, *, max_total_bytes: int,
+                          budget: GenerationBudget) -> bytes:
+    """Apply configured session ceilings before capturing or parsing a profile."""
+    bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, os.environ)
+    if bootstrap.origin != "default":
+        bootstrap.check(max_total_bytes, requested=True)
+    limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "batch_input_run")
+    return read_mapping_snapshot(root, relative_path, max_bytes=max_total_bytes,
+        budget=budget, total_limit=limit).payload
+
+
 def load_batch_profile(root: Path, relative_path: str, *, max_total_bytes: int,
                        max_review_bytes: int, budget: GenerationBudget) -> TransformationBatch:
     """Capture exact bounded local files once; reject traversal and symlinks."""
@@ -245,15 +279,18 @@ def load_batch_profile(root: Path, relative_path: str, *, max_total_bytes: int,
         limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "batch_input_run")
         consumed = 0
 
-        def read(path: str) -> bytes:
+        def read(path: str, input_limit: EffectiveInputLimit | None = None) -> bytes:
             nonlocal consumed
             budget.check("batch profile capture")
             payload = read_mapping_snapshot(root, path, max_bytes=max_total_bytes,
-                budget=budget, total_limit=limit, consumed_bytes=consumed).payload
+                budget=budget, total_limit=limit, consumed_bytes=consumed,
+                input_limit=input_limit).payload
             consumed += len(payload)
             return payload
 
-        profile_yaml = read(relative_path)
+        profile_yaml = capture_batch_profile(root, relative_path,
+            max_total_bytes=max_total_bytes, budget=budget)
+        consumed = len(profile_yaml)
         profile = BatchProfile.model_validate(_load_private_yaml(profile_yaml, max_total_bytes))
         resolve_input_limit(InputDimension.TOTAL_BYTES, profile.resource_limits, os.environ).check(
             max_total_bytes, requested=True)
@@ -262,7 +299,9 @@ def load_batch_profile(root: Path, relative_path: str, *, max_total_bytes: int,
         for item in profile.inputs:
             budget.check("batch profile input")
             policy = read(item.policy)
-            source = SnapshotPart("source", item.entity, read(item.source))
+            parsed = load_behavior_policy_yaml(policy, max_bytes=max_total_bytes, budget=budget)
+            input_limit = resolve_input_limit(InputDimension.BYTES, parsed.resource_limits, os.environ)
+            source = SnapshotPart("source", item.entity, read(item.source, input_limit))
             mappings = tuple(SnapshotPart("mapping", path, read(path)) for path in item.mappings)
             generation = tuple(SnapshotPart("generation_policy", path, read(path))
                                for path in item.generation_policies)

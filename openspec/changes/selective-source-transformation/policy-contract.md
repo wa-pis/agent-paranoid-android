@@ -501,6 +501,12 @@ session > saved profile > legacy session > default precedence. Exact saved
 profile bytes bind these settings into the common snapshot/receipt. Per-input
 behavior-policy limits remain enforced independently, without automatic
 increase or truncation; unrelated source-free budgets remain unchanged.
+Configured non-default session total-byte ceilings are checked before profile
+capture/parsing in both loading and creation. Explicit run ceilings above the
+default remain permitted when no configured session ceiling forbids them.
+Each behavior policy supplies its effective source-file byte ceiling before
+source capture; descriptor size and running read size are checked independently
+of aggregate accounting. Policy-free CSV drafts use session/default file limits.
 validation names a local DatasetSpec1.1 file; ordered inputs contain entity,
 source, policy and optional mappings/generation_policies paths. All references remain below an
 explicit local root, with no-follow regular-file reads and one cumulative byte

@@ -1,5 +1,21 @@
 # Resume plan — 2026-09-26
 
+## Current continuation — 2026-10-03
+
+Ordinary implementation automation is ACTIVE in /private/tmp/apa-amended-activation.RVGKRo,
+branch codex/1-6-coherent-candidate. Follow progress.md; earlier continuation
+states below are historical. Independent validation is blocked and must not be
+retried, rephrased or rerouted to evade the platform restriction. Finish available
+implementation/contracts/fictional acceptance; pause when only required review
+remains. Public activation, merge and release remain gated; stable is unauthorized.
+
+The common CLI/MCP and OAuth registration patches use zero-context hunks. Their
+isolated replay requires `git apply --check --unidiff-zero` followed by
+`git apply --unidiff-zero` only in the explicitly prepared candidate copy. Ordinary
+`git apply` failure is not evidence they are stale. Replay on 3 October produced
+exactly the three registration files already used by the installed candidate;
+do not apply them to the closed author checkout before independent clearance.
+
 ## Current continuation — 2026-10-02
 
 Owner corrected the review cadence: assemble one complete implementation,
