@@ -1,5 +1,19 @@
 # Implementation Progress
 
+## Owner removes private-volume release prerequisite — 2026-10-04 local
+
+- Owner states closed-segment volume cannot be replayed locally and confirms
+  proceeding with RC publication without that acceptance. Recorded in client
+  acceptance: fictional local evidence and mandatory300,000 x50 remain the basis;
+  private inputs/real integrations are unverified disclosures, not release blockers
+  or claimed passes. No real access or safety-policy exception granted.
+- Signed5ca2c87 handoff push completed to draftPR602. Checkout initially clean.
+  New decision is documentation-only; unchanged successful tests not repeated.
+- Independent safety clearance remains unavailable and cannot be retried/rerouted.
+  Automation stays PAUSED; next release action needs that external blocker removed,
+  then exact-SHA/final RC review, protected CI/merge and public RC artifact checks.
+  Stable1.6.0 remains unauthorized. No activation, merge or publication performed.
+
 ## Local candidate handoff consolidated — 2026-10-04 local
 
 - Reused existing26-finding dispositions and added corrected-wheel evidence

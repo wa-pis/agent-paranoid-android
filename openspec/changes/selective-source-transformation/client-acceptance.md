@@ -1,5 +1,17 @@
 # Client Feedback And Acceptance Plan
 
+## Owner release decision — 2026-10-04 local
+
+The owner cannot perform local acceptance on the full data volume available in
+the closed segment and explicitly confirmed proceeding with 1.6.0rc1 without
+that private-data replay. It is not a release prerequisite. Use fictional local
+acceptance, including the recorded mandatory300,000 x50 workload, and disclose
+private inputs and real integrations as unverified, never passed.
+This decision does not authorize live access, waive independent safety clearance,
+final RC review, mandatory CI/release gates or public artifact verification, or
+authorize stable1.6.0. Do not ask for unavailable private data as a substitute
+for completing the agreed release process.
+
 ## Consolidated local acceptance and release gates — 2026-10-04
 
 Use corrected runtime SHA3c00148 / wheel dd6b4ad2 evidence above and below;
