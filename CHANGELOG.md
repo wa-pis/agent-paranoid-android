@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Bound audit-log verification reads before parsing oversized records.
+
 - Apply one explicit replacement contract to all fields, including sensitive
   mapped permutations. Keep sensitivity notes value-free and mapped values only
   in selected local mixed-origin artifacts. Direct preservation still requires

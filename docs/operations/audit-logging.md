@@ -57,6 +57,9 @@ With the same key present in the environment:
 test-data-agent audit-verify /var/lib/test-data-agent/audit/mcp.jsonl
 ```
 
+Verification reads at most 4097 bytes per physical record and rejects records
+over 4096 bytes before JSON parsing or HMAC validation. The limit includes the
+newline; a valid final record without a newline is also accepted.
 Verification checks every sequence number, previous-record link, and HMAC. A
 changed, inserted, reordered, or removed interior record fails verification.
 

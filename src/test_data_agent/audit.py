@@ -155,7 +155,9 @@ def verify_audit_log(path: Path, key: bytes) -> AuditVerificationResult:
     record_count = 0
 
     with resolved.open("rb") as handle:
-        for line_number, raw_line in enumerate(handle, start=1):
+        line_number = 0
+        while raw_line := handle.readline(MAX_AUDIT_RECORD_BYTES + 1):
+            line_number += 1
             if len(raw_line) > MAX_AUDIT_RECORD_BYTES:
                 raise AuditVerificationError(
                     f"audit record {line_number} exceeds {MAX_AUDIT_RECORD_BYTES} bytes"
