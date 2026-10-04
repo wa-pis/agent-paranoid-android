@@ -22,6 +22,7 @@ from test_data_agent.core.limits import (
     enforce_output_payload_size,
     enforce_row_count_limit,
     max_generation_count as configured_max_generation_count,
+    max_local_profile_seconds,
 )
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import GenerationMode, OutputFormat
@@ -52,6 +53,7 @@ from test_data_agent.safety import (
     assert_no_profiled_csv_rows,
     assert_profile_safe,
 )
+from test_data_agent.trino_work_budget import generation_budget_for_invocation
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 from test_data_agent.validation.reconciliation import GenerationValidationError, assert_generated_dataset_valid
 
@@ -236,13 +238,16 @@ def write_csv_profile_artifact(
 ) -> DatasetProfile:
     ensure_paths_distinct(input_path, output_path)
     require_output_suffix(output_path, {".json"}, "profile output")
+    budget = generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
+    budget.check("CSV profile preflight")
     profile = csv_file_to_dataset_profile(
         input_path,
         table_name=table_name,
         local_category_fields=local_category_fields,
+        budget=budget,
     )
     assert_profile_safe(profile)
-    write_dataset_profile_artifact(profile, output_path)
+    write_dataset_profile_artifact(profile, output_path, budget=budget)
     return profile
 
 
@@ -303,6 +308,7 @@ def generate_single_entity_profile_artifacts(
             output_path.parent,
             primary_output_name=output_path.name,
             overwrite=overwrite,
+            budget=budget,
         )
     except BaseException:
         remove_tree(temp_folder, temp_identity)
@@ -541,7 +547,7 @@ def prepare_generation_budget(spec: DatasetSpec, output_path: Path | None) -> Ge
         estimate_dataset_output_bytes(spec),
         label="estimated generated data",
     )
-    return GenerationBudget()
+    return generation_budget_for_invocation()
 
 
 def estimate_dataset_output_bytes(spec: DatasetSpec) -> int:
@@ -590,6 +596,7 @@ def commit_single_entity_bundle(
     *,
     primary_output_name: str,
     overwrite: bool = False,
+    budget: GenerationBudget | None = None,
 ) -> None:
     output_identity, output_created = ensure_directory(output_folder)
     staged_paths = sorted(
@@ -620,11 +627,17 @@ def commit_single_entity_bundle(
     temp_identity = path_identity(temp_folder)
     try:
         for path in collisions:
+            if budget is not None:
+                budget.check("bundle publication")
             destination = output_folder / path.name
             replace_path(destination, rollback_folder / path.name)
         for path in staged_paths:
+            if budget is not None:
+                budget.check("bundle publication")
             destination = output_folder / path.name
             replace_path(path, destination)
+        if budget is not None:
+            budget.check("bundle publication complete")
     except BaseException:
         for path in reversed(staged_paths):
             destination = output_folder / path.name

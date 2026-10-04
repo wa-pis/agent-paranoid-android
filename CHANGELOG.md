@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Carry inherited MCP deadlines through CSV profiling, generation and rollback-safe publication; reject expired profile output before atomic replacement.
+
 - Read dataset Parquet in bounded batches; enforce cumulative decoded bytes, dictionary expansion, nested cells and cell sizes before Python row conversion.
 
 - Bound formula operands and intermediate results; reject oversized string/byte repetition and concatenation before allocation.

@@ -17,7 +17,7 @@
 - [x] F5: Cache identity/read authorization includes local-category policy; invalidate stale entries; test permission removal/change and predicates.
 - [x] F6: Formula operators enforce operand/result work bounds before allocations, with safe numeric compatibility tests.
 - [x] F7: Parquet dataset reads enforce actual decoded bytes, cell sizes and cumulative dataset cells before list conversion.
-- [ ] F8: Single CSV profiling honors inherited MCP deadline through final publication and fails without trusted partial output.
+- [x] F8: Single CSV profiling honors inherited MCP deadline through final publication and fails without trusted partial output.
 - [x] F9: Audit verification uses bounded line reads before parsing/authentication.
 - [ ] Commit/push only related changes and record exact fix SHAs.
 - [ ] Relevant CLI/MCP/direct-service regressions, lint/types, OpenSpec and documentation checks pass.
@@ -59,3 +59,5 @@ Fresh independent read-only F2 candidate review found no concrete bypass or regr
 2026-10-05 F6 completed: common evaluator checks operand/intermediate widths and sequence operation size before allocation; numeric/Decimal precision bounded.70focused expression/generation/constraint/business/exact-formula tests passed; Ruff and mypy passed. Fresh independent review found no surviving route (reviewer did not run tests; parent ran them with project Python). F7/F8 remain.
 
 2026-10-05 F7 completed:256-row batch gates cover actual bytes, retained-dictionary logical expansion, nested cell/depth/size and cumulative mixed-format counters before to_pylist.100focused reader/CLI/limits/workflow tests, Ruff, mypy and strict OpenSpec pass. Fresh independent review clean; reviewer14tests plus bounded map/fixed-list/binary/null-dictionary probes pass. Native Arrow allocation limitation documented. F8 remains.
+
+2026-10-05 F8 completed: captured invocation budget spans CSV rows/fields/finalization, row digests, generation and publication. Independent review reproduced post-replacement directory-fsync expiry; callback now checks completion and safely restores/removes the published profile. Bundle deadlines use existing rollback.299focused tests pass; final35atomic/deadline tests after backup-retention adjustment pass; Ruff/mypy/strict OpenSpec pass. All nine implementation fixes complete; full release gate and fresh exact-SHA audit remain mandatory.

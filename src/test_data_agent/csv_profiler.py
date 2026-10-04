@@ -31,6 +31,7 @@ from test_data_agent.core.limits import (
     enforce_input_files,
     enforce_input_row_count,
     max_input_cell_chars,
+    max_local_profile_seconds,
 )
 from test_data_agent.core.privacy import (
     LocalCategoryField,
@@ -42,6 +43,8 @@ from test_data_agent.core.privacy import (
     validate_local_category_values,
 )
 from test_data_agent.profile_types import ProfileDataType, infer_profile_data_type
+
+from test_data_agent.trino_work_budget import generation_budget_for_invocation
 
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -149,11 +152,13 @@ def profile_csv(
     table_name: str | None = None,
     *,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    budget: GenerationBudget | None = None,
 ) -> CSVProfile:
     return _profile_csv(
         path,
         table_name=table_name,
         local_category_fields=local_category_fields,
+        budget=budget,
     )
 
 
@@ -188,6 +193,7 @@ def profile_csv_with_row_digests(
     table_name: str | None = None,
     *,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    budget: GenerationBudget | None = None,
 ) -> tuple[CSVProfile, CSVSourceRowDigests]:
     digests: set[bytes] = set()
     profile = _profile_csv(
@@ -195,6 +201,7 @@ def profile_csv_with_row_digests(
         table_name=table_name,
         row_digests=digests,
         local_category_fields=local_category_fields,
+        budget=budget,
     )
     return profile, CSVSourceRowDigests(
         field_names=tuple(column.name for column in profile.columns),
@@ -208,14 +215,17 @@ def _profile_csv(
     table_name: str | None = None,
     row_digests: set[bytes] | None = None,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    budget: GenerationBudget | None = None,
 ) -> CSVProfile:
+    budget = budget or generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
+    budget.check("CSV profiling preflight")
     enforce_input_files([path])
     encoding = detect_csv_encoding(path)
     sample = read_csv_sample(path, encoding)
     dialect = detect_csv_dialect(sample)
     with path.open(newline="", encoding=encoding) as handle:
         reader = ScopedDictReader(handle, dialect=dialect)
-        return _profile_csv_rows(reader, table_name or path.stem, local_category_fields, row_digests, None)
+        return _profile_csv_rows(reader, table_name or path.stem, local_category_fields, row_digests, budget)
 
 
 def _profile_csv_rows(

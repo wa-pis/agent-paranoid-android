@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.limits import max_input_file_bytes, max_output_bytes
+from test_data_agent.core.limits import GenerationBudget, max_input_file_bytes, max_output_bytes
 from test_data_agent.core.settings import GenerationMode, OutputFormat, ValidationSettings
 from test_data_agent.io.writers import (
     dataset_spec_to_json,
@@ -95,8 +95,10 @@ def write_json_artifact_atomic(payload: Any, output: Path) -> None:
     write_json_artifact(payload, output)
 
 
-def write_dataset_profile_artifact(profile: DatasetProfile, output: Path) -> None:
-    write_json_artifact(profile, output)
+def write_dataset_profile_artifact(
+    profile: DatasetProfile, output: Path, *, budget: GenerationBudget | None = None,
+) -> None:
+    write_bounded_text(profile.model_dump_json(indent=2), output, budget=budget)
 
 
 def write_dataset_spec_artifact(spec: DatasetSpec, output: Path) -> None:

@@ -13,6 +13,8 @@ from functools import wraps
 from time import monotonic
 from typing import Any, ParamSpec, TypeVar
 
+from test_data_agent.core.limits import GenerationBudget
+
 from test_data_agent.trino_config import (
     TrinoDeploymentProfile,
     deployment_profile_from_env,
@@ -454,6 +456,23 @@ _CURRENT_QUERY_WORK_BUDGET: ContextVar[QueryWorkBudget | None] = ContextVar(
 def current_query_work_budget() -> QueryWorkBudget | None:
     """Return the budget shared by the current invocation, when present."""
     return _CURRENT_QUERY_WORK_BUDGET.get()
+
+
+class InvocationGenerationBudget(GenerationBudget):
+    """Carry one captured request deadline through existing I/O work checkpoints."""
+
+    def __init__(self, request_budget: QueryWorkBudget | None, *, max_seconds: float | None = None) -> None:
+        super().__init__(max_seconds=max_seconds)
+        self._request_budget = request_budget
+
+    def check(self, stage: str) -> None:
+        if self._request_budget is not None:
+            self._request_budget.check_invocation_deadline()
+        super().check(stage)
+
+
+def generation_budget_for_invocation(*, max_seconds: float | None = None) -> GenerationBudget:
+    return InvocationGenerationBudget(current_query_work_budget(), max_seconds=max_seconds)
 
 
 def consume_profiled_column_work(amount: int = 1) -> None:

@@ -9,7 +9,7 @@ import stat
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Iterator
+from typing import BinaryIO, Callable, Iterator
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,7 +114,7 @@ def ensure_directory(path: Path) -> tuple[PathIdentity, bool]:
 
 
 @contextmanager
-def atomic_binary_writer(path: Path) -> Iterator[BinaryIO]:
+def atomic_binary_writer(path: Path, *, check_publication: Callable[[], None] | None = None) -> Iterator[BinaryIO]:
     with _parent_descriptor(path, create=True) as (parent, name):
         original = _stat_at(parent, name)
         if original is not None and not stat.S_ISREG(original.st_mode):
@@ -139,8 +139,53 @@ def atomic_binary_writer(path: Path) -> Iterator[BinaryIO]:
                 changed = current is None or _file_version(current) != _file_version(original)
             if changed:
                 raise ValueError("output path changed during publication")
-            os.replace(temporary_name, name, src_dir_fd=parent, dst_dir_fd=parent)
-            os.fsync(parent)
+            backup_name = None
+            backup_created = False
+            retain_backup = False
+            published = False
+            try:
+                if check_publication is not None:
+                    check_publication()
+                    if original is not None:
+                        backup_name = f".{name}.{secrets.token_hex(8)}.rollback"
+                        os.link(name, backup_name, src_dir_fd=parent, dst_dir_fd=parent, follow_symlinks=False)
+                        backup_created = True
+                        backup = _stat_at(parent, backup_name)
+                        # Creating our hard link changes ctime; retain identity/content checks.
+                        if (backup is None or _identity(backup) != _identity(original)
+                                or (backup.st_mtime_ns, backup.st_size) != (original.st_mtime_ns, original.st_size)):
+                            raise ValueError("output path changed during publication")
+                if check_publication is not None:
+                    current = _stat_at(parent, name)
+                    expected = _stat_at(parent, backup_name) if backup_created and backup_name is not None else original
+                    if ((expected is None and current is not None)
+                            or (expected is not None and (current is None or _file_version(current) != _file_version(expected)))):
+                        raise ValueError("output path changed during publication")
+                os.replace(temporary_name, name, src_dir_fd=parent, dst_dir_fd=parent)
+                published = True
+                replacement = _stat_at(parent, name)
+                os.fsync(parent)
+                if check_publication is not None:
+                    check_publication()
+            except BaseException:
+                if published and check_publication is not None:
+                    retain_backup = backup_created
+                    current = _stat_at(parent, name)
+                    if replacement is None or current is None or _file_version(current) != _file_version(replacement):
+                        raise ValueError("output path changed during rollback") from None
+                    if backup_name is None:
+                        os.unlink(name, dir_fd=parent)
+                    else:
+                        os.replace(backup_name, name, src_dir_fd=parent, dst_dir_fd=parent)
+                    retain_backup = False
+                    os.fsync(parent)
+                raise
+            finally:
+                if backup_name is not None and backup_created and not retain_backup:
+                    try:
+                        os.unlink(backup_name, dir_fd=parent)
+                    except FileNotFoundError:
+                        pass
         finally:
             if not handle.closed:
                 handle.close()
