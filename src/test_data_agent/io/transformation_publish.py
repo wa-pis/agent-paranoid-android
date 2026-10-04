@@ -72,6 +72,7 @@ def _publish_test_artifacts(destination: Path, artifacts: tuple[tuple[str, bytes
             atomic_write_bytes(staging / name, payload)
         budget.check("temporary transformation publication")
         publish_directory(staging, destination)
+        budget.check("transformation publication complete")
     except BaseException:
         # Rename may have committed before its directory fsync failed.
         # Never remove a replaced or pre-existing destination.

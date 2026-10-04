@@ -6,12 +6,41 @@ completed wiring's independent safety review and matching policy amendments.
 
 from typing import Any, Literal
 from pathlib import Path
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 
 from test_data_agent.core.limits import (
     DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
 )
-from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths
+from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths, TransformationCleanupError
+from test_data_agent.trino_work_budget import QueryWorkBudget, current_query_work_budget
+
+
+class _McpTransformationBudget(GenerationBudget):
+    """Check both deadlines at the existing transformation work checkpoints."""
+
+    def __init__(self, request_budget: QueryWorkBudget | None) -> None:
+        super().__init__()
+        self._request_budget = request_budget
+
+    def check(self, stage: str) -> None:
+        if self._request_budget is not None:
+            self._request_budget.check_invocation_deadline()
+        super().check(stage)
+
+
+@contextmanager
+def _mcp_transformation_budget() -> Iterator[GenerationBudget]:
+    budget = _McpTransformationBudget(current_query_work_budget())
+    try:
+        yield budget
+    except TransformationCleanupError:
+        raise
+    except ValueError:
+        # Private parsers detach ValueError failures. Recheck the same monotonic
+        # deadlines at the adapter boundary to retain safe typed limit errors.
+        budget.check("MCP transformation failure")
+        raise
 
 
 def _create_test_candidate_mcp(*, prospective: bool = False) -> Any | None:
@@ -53,13 +82,14 @@ def _execute_candidate_transformation(
     destination = resolve_workspace_path(output_path, expect_directory=True)
     receipt = (resolve_workspace_path(receipt_path, must_exist=True, expect_file=True)
                if receipt_path is not None else None)
-    return _execute_reviewed_test_from_paths(
-        source, table_name or source.stem, policy, destination,
-        expected_snapshot_sha256=snapshot_sha256,
-        max_total_bytes=max_total_input_bytes,
-        max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
-        max_output_bytes=max_output_bytes, budget=GenerationBudget(), receipt_path=receipt,
-    )
+    with _mcp_transformation_budget() as budget:
+        return _execute_reviewed_test_from_paths(
+            source, table_name or source.stem, policy, destination,
+            expected_snapshot_sha256=snapshot_sha256,
+            max_total_bytes=max_total_input_bytes,
+            max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
+            max_output_bytes=max_output_bytes, budget=budget, receipt_path=receipt,
+        )
 
 
 def _create_test_batch_mcp(root: Path) -> Any | None:
@@ -83,6 +113,7 @@ def _common_batch_tool(root: Path) -> Callable[..., dict[str, object]]:
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
             max_output_bytes=max_output_bytes, snapshot_sha256=snapshot_sha256, receipt=receipt,
             destination=destination)
-        return run_batch_workflow(request, budget=GenerationBudget()).metadata()
+        with _mcp_transformation_budget() as budget:
+            return run_batch_workflow(request, budget=budget).metadata()
 
     return common_transformation

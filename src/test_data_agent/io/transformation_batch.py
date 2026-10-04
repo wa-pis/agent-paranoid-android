@@ -238,7 +238,7 @@ def execute_batch(batch: TransformationBatch, *, expected_snapshot_sha256: str,
                     raise ValueError
                 children.add(values)
         scalar_spec = spec.model_copy(update={"relationships": scalar_relationships})
-        if (validate_schema(rows_by_entity, spec) or validate_relationships(rows_by_entity, scalar_spec)
+        if (validate_schema(rows_by_entity, spec) or validate_relationships(rows_by_entity, scalar_spec, empty_string_is_null=False)
                 or validate_constraints(rows_by_entity, spec)):
             raise ValueError
         budget.check("transformation batch complete")
@@ -356,6 +356,7 @@ def temporary_batch_publication(batch: TransformationBatch, *, expected_snapshot
         atomic_write_bytes(staging / "manifest.json", manifest)
         budget.check("transformation batch publication")
         publish_directory(staging, destination)
+        budget.check("transformation batch publication complete")
         yield destination
 
 

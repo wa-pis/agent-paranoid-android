@@ -73,3 +73,9 @@ Folder overflow and censored single-CSV counts cannot infer a fixed pool.
 Other aggregate profiles may supply approximate counts: these define the requested
 synthetic pool, not proof of exact source cardinality. Reprofile older artifacts
 to obtain pool metadata; no source-preservation permission is implied.
+
+Batch transformation relationship validation distinguishes logical null from
+empty text: only `None` is null, and empty strings participate in scalar foreign
+key membership and one-to-one cardinality. The shared relationship validator
+keeps its legacy generated-CSV default unless a caller explicitly selects
+`empty_string_is_null=False`.

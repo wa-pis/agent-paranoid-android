@@ -139,3 +139,9 @@ SQL-dependency inference and must not be advertised as preserving query formulas
 Keep the Trino dependency optional for workflows that do not use Trino. Mock
 Trino responses in normal unit tests; use live access only in explicitly gated
 integration checks.
+
+MCP transformation adapters check the active request deadline at every existing
+transformation work checkpoint, including immediately before publication. The
+generation deadline also applies. Detached parser failures are rechecked at the
+adapter boundary to retain typed deadline diagnostics; cleanup-incomplete errors
+retain precedence over deadline reporting.
