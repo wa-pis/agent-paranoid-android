@@ -1,5 +1,56 @@
 # Implementation Progress
 
+## Local candidate handoff consolidated — 2026-10-04 local
+
+- Reused existing26-finding dispositions and added corrected-wheel evidence
+  bindings, local contract boundaries and remaining release gates. Closed only
+  the disposition-reconciliation task, not private/live reproduction or release
+  acceptance. Published-result, unsupported native types, statistical utility,
+  auth system prerequisites and arbitrary crash recovery remain unverified.
+- Current runtime evidence remains isolated3c00148 / wheel dd6b4ad2; author
+  registration stays closed. Source full gate2894 and mandatory fictional scale
+  evidence unchanged. Latest pushed d520000 CI completed without failures.
+- Accumulated quickstart/skill proof and handoff documentation await signed
+  publication. No runtime tests repeated; no new implementation/policy decision.
+- After this documentation handoff, the next mandatory forward step is independent
+  safety clearance, currently unavailable. Pause automation rather than invent
+  further helpers/retest unchanged evidence or repeat/reroute blocked validation.
+  Final RC review, activation, protected merge, release1.6.0rc1 and public artifact
+  acceptance stay open. Stable1.6.0 remains unauthorized.
+
+## Corrected offline skill-guided acceptance — 2026-10-04 local
+
+- Read complete project skills, support policy, migration guide and historical
+  offline skill evidence. No contract/document mismatch found. Historical wheel
+  alone did not certify corrected runtime; inspected full unchanged harness and
+  ran only its three cases against corrected installed dd6b4ad2 and actual
+  installed baseline1.5.0:3 passed (4.97s), Python3.14, -o pythonpath=. --no-cov -q.
+- Packaged offline skills/help, seeded generation/replay, explicit transformation
+  readback, missing-receipt refusal and absent-baseline-capability stop verified.
+  Fictional local files only, no product monkeypatch, DB/provider, real-data
+  approval or independent review. Current proof appended to skill acceptance.
+- Next publish accumulated quickstart/skill evidence and consolidate final
+  per-finding local dispositions versus clearance/public acceptance gaps.
+  PR602 d520000 last snapshot all completed without failures; no CI replay or
+  activation, merge/release, blocked-review retry or blanket RC readiness claim.
+
+## Quickstarts/OpenSpec consistency checkpoint — 2026-10-04 local
+
+- PR602 draft/open at signed d520000; completed CI snapshot has no pending or
+  failed checks. No workflow rerun, merge or release. Checkout initially clean.
+- Read installation, first-CSV and related-table quickstarts: stable1.5.0 pins,
+  fictional inputs and source-free manifest checks remain correct. Existing
+  successful example evidence is reused, not rerun without source changes.
+- Read transformation and common-MCP deltas against ADR0029, policy-contract
+  and corresponding baseline activation boundaries. Direct identity-pair rejection
+  remains intentional; allowing mapped permutations does not supersede it.
+  No new policy decision or contract mismatch found in these inspected sections.
+  No OpenSpec edit or repeat strict-validation run required for unchanged specs.
+- Next finish remaining integration-skill/support/migration document disposition
+  and coherent acceptance handoff. Independent review remains unavailable;
+  do not retry/rephrase/reroute it, activate public entrances or infer clearance
+  from author tests/green CI. Private/live/unsupported-native gaps remain disclosed.
+
 ## Acceptance register consistency — 2026-10-04 local
 
 - Read current intake/release task sections, changelog Unreleased and planned

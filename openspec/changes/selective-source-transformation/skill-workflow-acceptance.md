@@ -1,5 +1,20 @@
 # Installed offline skill-guided acceptance — 2026-10-02 UTC
 
+## Corrected installed candidate checkpoint — 2026-10-04 local
+
+Inspected the unchanged complete harness before execution. Corrected isolated
+runtime3c00148 / wheel SHA-256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`,
+installed at `/private/tmp/apa-budget-installed.fiQPEX/installed`, Python3.14:
+all three cases passed together (4.97s), candidate-only PYTHONPATH,
+`-o pythonpath=. --no-cov -q`, actual baseline
+`APA_SKILL_BASELINE=/private/tmp/apa-skill-baseline.TjzfRV`.
+Both packaged skills resolve offline; generation replay is identical, explicit
+transformation readback matches, direct preservation without a receipt refuses,
+and the real baseline stops at missing capability. No product monkeypatch,
+provider/database call, operator receipt issuance or independent review.
+The October2 wheel evidence below remains historical, not this current artifact.
+
 Executable harness: `skill-workflow-acceptance.py`. This is deterministic offline
 guided-caller acceptance, not an external model benchmark or automatic registration
 of a skill into another agent. No product monkeypatch, provider or database calls.

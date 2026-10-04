@@ -1,12 +1,12 @@
 # Client Feedback And Acceptance Plan
 
-## Remaining coherent acceptance queue — 2026-10-04
+## Consolidated local acceptance and release gates — 2026-10-04
 
 Use corrected runtime SHA3c00148 / wheel dd6b4ad2 evidence above and below;
 unchecked parent tasks are not all missing implementation. No historical pass
 or source-only test automatically certifies an installed release artifact.
 
-| Scope | Evidence already recorded | Next bounded local deliverable |
+| Scope | Evidence already recorded | Disposition / remaining boundary |
 |---|---|---|
 | 1–4, 8–9 | Identifier/domain44, CSV/date78, distinct/cache9 | Reconcile original finding dispositions; retain private-input gaps |
 | 5–6, 12 | Explicit category regression, saved-policy/TTY and finance scenario | Link approved sensitivity/preservation contract and wizard evidence; no blanket declassification |
@@ -23,6 +23,36 @@ This queue is not a new product decision or a declaration that all client
 requirements passed. Private/live data remain unavailable; do not connect real
 databases to fill those gaps. Independent review is unavailable and must not be
 retried, rephrased or routed to another provider to evade the restriction.
+
+The existing [finding dispositions](#candidate-finding-dispositions--2026-10-02)
+remain the per-finding decision register. Current installed evidence supplements
+that register rather than copying historical passes to a new artifact:
+
+| Findings | Corrected-wheel evidence binding | Local disposition |
+|---|---|---|
+| 1–4, 8–9, 13 | Identifier/domain44, CSV/date78, distinct/cache9 and linked-key21 | Implemented bounded identifier/declared-link remedies; conservative content decisions retained. General inference, source orphan fidelity and private inputs are not passed. |
+| 5–6, 12 | Saved-policy/TTY and finance scenario; wizard SDK2 | Explicit local categories and exact-snapshot preservation authority, never blanket declassification. Fictional receipts authorize no real dataset. |
+| 7, 10 | Temporal3, CSV/date78, typed bounds and entrance/routing evidence | Explicit temporal formats and bounded fallback disclosure; monthly fidelity remains deferred, native timestamp transformation unsupported. |
+| 11, 15–17, 18, 22 | Client22, query12, category7, combined units/temporal/predicate28 | Authorized SQL and local statement counts only. Internal formula recomputation excluded; live cost/latency and private queries unverified. |
+| 14 | Existing deterministic constraint/relationship evidence | Conformance, not statistical/business utility or anonymity certification. |
+| 19 | Publication5 and actual filesystem identity5 | Reviewed adaptation distinct from unchanged original script and historical product-stub simulations; no universal crash recovery claim. |
+| 20–21, 23–26 | Doctor/mode9, auth22, Decimal16, renderer/profile19, metadata11; typed twelve-route matrix | Declared local contracts covered; optional/native/remote prerequisites and public-artifact compatibility are not inferred. |
+
+Offline skill-guided corrected-wheel acceptance additionally passed all three
+cases together; see [installed skill evidence](skill-workflow-acceptance.md).
+Documentation reconciliation covers current README/CLI/MCP/configuration/safety,
+output/architecture/roadmap, quickstarts, support/migration, project skills and
+changed OpenSpec activation contracts; historical release evidence stays historical.
+Strict documentation builds and existing fictional example evidence are recorded
+in progress. PlantUML source review is not rendered diagram QA.
+
+The next release stages are mandatory independent safety clearance of the finished
+exact activation SHA, final RC review, permitted registration and release gates,
+protected GitHub checks/merge, and public RC artifact verification. None is
+replaced by author-run tests or green CI. The local reconciliation above is
+complete as a disposition record, not a blanket pass of all client claims or
+readiness to publish. No real DB/API or absent private input is required or
+authorized merely to fill the disclosed gaps.
 
 ## Corrected budget candidate evidence — 2026-10-03
 

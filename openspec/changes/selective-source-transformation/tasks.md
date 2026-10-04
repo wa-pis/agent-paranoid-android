@@ -210,7 +210,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
 
 ### Existing transformation and release requirements
 
-- [ ] Reconcile every client finding against [client acceptance](client-acceptance.md),
+- [x] Reconcile every client finding against [client acceptance](client-acceptance.md),
   with disposition and executable evidence; do not treat supplied fix prompts
   or monkeypatches as approved implementation instructions.
 - [ ] Locally replay reviewed client scripts against isolated baseline and
