@@ -25,3 +25,7 @@ Shared `verify_audit_log` reads at most4097bytes before parsing. Synthetic LF/no
 ## F4/F5 remediation
 
 Folder exponent and rounded identifier forms now produce masked patterns without extrema. Cache format5 binds exact sorted scopes, preserves duplicate identity, verifies stored scopes and rejects format4. Tests cover default/allowed/changed permission, order, mismatch, repeated legitimate reuse and canonical privacy.89focused tests passed from writable temporary cwd; Ruff/focused mypy passed; independent review found no surviving route. Whole-project re-audit and RC gates remain pending.
+
+## F1 remediation
+
+Direct service tests prove sensitive targets, zero-multiplied dependencies, and aggregate sum/avg/count sensitive value operands fail before fetch. Existing safe formulas, aggregates and join-key paths pass.109tests, Ruff, focused mypy and independent static candidate review passed.

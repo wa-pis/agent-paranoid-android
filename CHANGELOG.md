@@ -56,6 +56,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Reject Trino formula and aggregate-mapping residuals over sensitive-name
+  value operands before executing a query.
+
 - Inspect canonical numeric forms in folder CSV profiling and bind cached
   source categories to the current field authorization; invalidate older caches.
 

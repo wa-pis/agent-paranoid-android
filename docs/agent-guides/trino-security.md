@@ -145,3 +145,5 @@ transformation work checkpoint, including immediately before publication. The
 generation deadline also applies. Detached parser failures are rechecked at the
 adapter boundary to retain typed deadline diagnostics; cleanup-incomplete errors
 retain precedence over deadline reporting.
+
+Rule residual queries reject sensitive-name target and arithmetic/value operands before execution. Formula dependencies share the existing name sensitivity classifier; aggregate mappings guard parent values and numeric child values. Relationship keys remain usable without returning their values. These checks do not claim content detection for innocuously named source columns.

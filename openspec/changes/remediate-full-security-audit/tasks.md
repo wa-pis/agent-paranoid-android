@@ -10,7 +10,7 @@
 
 ## Fixes (each requires regression, relevant docs and recorded checks)
 
-- [ ] F1: Trino rule residuals reject/suppress sensitive operands, including aggregate-mapping siblings.
+- [x] F1: Trino rule residuals reject/suppress sensitive operands, including aggregate-mapping siblings.
 - [ ] F2: SQL local categories retain physical sensitivity/identifier lineage through aliases and inspect numeric content.
 - [ ] F3: OpenAI provider request masks every local category literal and matching predicate; restore valid field-scoped response labels locally.
 - [x] F4: Folder profiling inspects canonical numeric forms before retaining numeric summaries.
@@ -47,3 +47,5 @@
 2026-10-05 F9 completed: bounded4097-byte reads; LF/no-LF oversized rejection and exact4096-byte authenticated-record compatibility. `pytest tests/test_audit.py -q -p no:cacheprovider`:16passed; Ruff --no-cache passed; focused mypy passed; strict OpenSpec passed. Fresh independent bypass review found no issue. Remaining F1–F8 and release gates stay open.
 
 2026-10-05 F4/F5 completed: reused canonical CSV privacy inspector; format5 cache binds sorted scopes and verifies stored permission; no metadata relabeling on hits.89focused profiling/category/budget tests pass from writable temporary cwd; Ruff, focused mypy and independent candidate review pass. Read-only worktree cache-permission failures were rerun from temporary cwd. F1/F2/F3/F6/F7/F8 remain; next priority Trino sensitive residuals. F9 commit51929db pushed.
+
+2026-10-05 F1 completed: shared Trino builders reject sensitive-name formula target/dependencies and aggregate parent/numeric child values before execution; keep join keys and count semantics.109Trino builder/service/MCP tests passed; Ruff, focused mypy and fresh candidate review passed. Innocuous source names cannot establish content sensitivity; documented existing classifier scope.
