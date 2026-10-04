@@ -15,7 +15,7 @@
 - [x] F3: OpenAI provider request masks every local category literal and matching predicate; restore valid field-scoped response labels locally.
 - [x] F4: Folder profiling inspects canonical numeric forms before retaining numeric summaries.
 - [x] F5: Cache identity/read authorization includes local-category policy; invalidate stale entries; test permission removal/change and predicates.
-- [ ] F6: Formula operators enforce operand/result work bounds before allocations, with safe numeric compatibility tests.
+- [x] F6: Formula operators enforce operand/result work bounds before allocations, with safe numeric compatibility tests.
 - [ ] F7: Parquet dataset reads enforce actual decoded bytes, cell sizes and cumulative dataset cells before list conversion.
 - [ ] F8: Single CSV profiling honors inherited MCP deadline through final publication and fails without trusted partial output.
 - [x] F9: Audit verification uses bounded line reads before parsing/authentication.
@@ -55,3 +55,5 @@
 Fresh independent read-only F2 candidate review found no concrete bypass or regression; reviewer independently ran181focused tests successfully.
 
 2026-10-05 F3 completed: OpenAI/GigaChat share field-scoped request projection and local response restoration. Independent review identified tuple in_values bypass; JSON-mode normalization and transport regression close it.143 advisor/provider tests pass; Ruff/mypy and strict OpenSpec pass. F6/F7/F8 and fresh full audit/release gates remain.
+
+2026-10-05 F6 completed: common evaluator checks operand/intermediate widths and sequence operation size before allocation; numeric/Decimal precision bounded.70focused expression/generation/constraint/business/exact-formula tests passed; Ruff and mypy passed. Fresh independent review found no surviving route (reviewer did not run tests; parent ran them with project Python). F7/F8 remain.

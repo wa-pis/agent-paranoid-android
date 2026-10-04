@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Bound formula operands and intermediate results; reject oversized string/byte repetition and concatenation before allocation.
+
 - Mask local category values and predicates before OpenAI transport using the shared provider privacy boundary.
 
 - Preserve physical SQL-column disclosure authorization through aliases; reject derived local categories and sensitive integer category values.

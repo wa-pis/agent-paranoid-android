@@ -79,3 +79,5 @@ empty text: only `None` is null, and empty strings participate in scalar foreign
 key membership and one-to-one cardinality. The shared relationship validator
 keeps its legacy generated-CSV default unless a caller explicitly selects
 `empty_string_is_null=False`.
+
+Ordinary formula evaluation enforces fixed per-operation resource caps independently of wall-clock checks: strings and bytes are limited to1,000,000elements; integers and Fraction components to16,384bits; Decimal coefficients, absolute exponents and arithmetic context precision to1,024. Sequence concatenation/repetition checks the prospective size before invoking the operator, including named operands and intermediate results. Built-in numeric arithmetic and bounded string/byte operations remain supported; list/tuple/bytearray and overloaded objects are not formula operands. Rejections contain no operand values. These caps complement dataset/output budgets rather than replacing them.

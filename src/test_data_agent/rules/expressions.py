@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import ast
 import operator
+import math
 from collections.abc import Callable
 from datetime import datetime
-from decimal import Decimal, DecimalException
+from decimal import Decimal, DecimalException, getcontext
 from fractions import Fraction
 from typing import Any
 
 from test_data_agent.core.decimal_units import decimal_from_units
-from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.limits import DEFAULT_MAX_INPUT_CELL_CHARS, GenerationBudget
 
 
 BinaryOperator = Callable[[Any, Any], Any]
@@ -28,6 +29,7 @@ UNARY_OPERATORS: dict[type[ast.unaryop], UnaryOperator] = {
 MAX_EXPRESSION_CHARS = 1_024
 MAX_EXPRESSION_NODES = 128
 MAX_EXACT_EXPRESSION_BITS = 16_384
+MAX_EXPRESSION_SEQUENCE_LENGTH = DEFAULT_MAX_INPUT_CELL_CHARS
 
 
 def comparable_number(value: Any) -> float | None:
@@ -210,18 +212,51 @@ def expression_constants(expression: str) -> list[Any]:
     ]
 
 
+def _bounded_operand(value: Any) -> Any:
+    valid = type(value) in (bool, type(None))
+    if type(value) in (str, bytes):
+        valid = len(value) <= MAX_EXPRESSION_SEQUENCE_LENGTH
+    elif type(value) is int:
+        valid = value.bit_length() <= MAX_EXACT_EXPRESSION_BITS
+    elif type(value) is float:
+        valid = math.isfinite(value)
+    elif type(value) is Fraction:
+        valid = max(value.numerator.bit_length(), value.denominator.bit_length()) <= MAX_EXACT_EXPRESSION_BITS
+    elif type(value) is Decimal:
+        parts = value.as_tuple()
+        valid = (value.is_finite() and len(parts.digits) <= MAX_EXPRESSION_CHARS
+                 and isinstance(parts.exponent, int) and abs(parts.exponent) <= MAX_EXPRESSION_CHARS)
+    if not valid:
+        raise ValueError("expression resource limit exceeded")
+    return value
+
+
+def _guard_operation(op: ast.operator | ast.unaryop, left: Any, right: Any = None) -> None:
+    if (type(left) is Decimal or type(right) is Decimal) and getcontext().prec > MAX_EXPRESSION_CHARS:
+        raise ValueError("expression resource limit exceeded")
+    if isinstance(op, ast.Add) and type(left) in (str, bytes) and type(left) is type(right):
+        if len(left) + len(right) > MAX_EXPRESSION_SEQUENCE_LENGTH:
+            raise ValueError("expression resource limit exceeded")
+    if isinstance(op, ast.Mult):
+        sequence, count = (left, right) if type(left) in (str, bytes) else (right, left)
+        if type(sequence) in (str, bytes) and type(count) in (int, bool):
+            if len(sequence) * max(count, 0) > MAX_EXPRESSION_SEQUENCE_LENGTH:
+                raise ValueError("expression resource limit exceeded")
+
+
 def eval_node(node: ast.AST, row: dict[str, Any]) -> Any:
     if isinstance(node, ast.Constant):
-        return node.value
+        return _bounded_operand(node.value)
     if isinstance(node, ast.Name):
-        return row.get(node.id)
+        return _bounded_operand(row.get(node.id))
     if isinstance(node, ast.BinOp) and type(node.op) in BINARY_OPERATORS:
-        return BINARY_OPERATORS[type(node.op)](
-            eval_node(node.left, row),
-            eval_node(node.right, row),
-        )
+        left, right = eval_node(node.left, row), eval_node(node.right, row)
+        _guard_operation(node.op, left, right)
+        return _bounded_operand(BINARY_OPERATORS[type(node.op)](left, right))
     if isinstance(node, ast.UnaryOp) and type(node.op) in UNARY_OPERATORS:
-        return UNARY_OPERATORS[type(node.op)](eval_node(node.operand, row))
+        operand = eval_node(node.operand, row)
+        _guard_operation(node.op, operand)
+        return _bounded_operand(UNARY_OPERATORS[type(node.op)](operand))
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         if node.func.id == "sum":
             field = expect_field_name(node.args[0])
