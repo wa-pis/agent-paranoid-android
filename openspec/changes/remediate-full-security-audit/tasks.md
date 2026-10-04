@@ -12,7 +12,7 @@
 
 - [x] F1: Trino rule residuals reject/suppress sensitive operands, including aggregate-mapping siblings.
 - [x] F2: SQL local categories retain physical sensitivity/identifier lineage through aliases and inspect numeric content.
-- [ ] F3: OpenAI provider request masks every local category literal and matching predicate; restore valid field-scoped response labels locally.
+- [x] F3: OpenAI provider request masks every local category literal and matching predicate; restore valid field-scoped response labels locally.
 - [x] F4: Folder profiling inspects canonical numeric forms before retaining numeric summaries.
 - [x] F5: Cache identity/read authorization includes local-category policy; invalidate stale entries; test permission removal/change and predicates.
 - [ ] F6: Formula operators enforce operand/result work bounds before allocations, with safe numeric compatibility tests.
@@ -53,3 +53,5 @@
 2026-10-05 F2: direct source/output category eligibility is retained in the validated query; unannotated plans fail closed. Integer category contents use the existing sensitive-content detector.202 SQL source/profiling/temporal/category tests passed; Ruff and focused mypy passed.
 
 Fresh independent read-only F2 candidate review found no concrete bypass or regression; reviewer independently ran181focused tests successfully.
+
+2026-10-05 F3 completed: OpenAI/GigaChat share field-scoped request projection and local response restoration. Independent review identified tuple in_values bypass; JSON-mode normalization and transport regression close it.143 advisor/provider tests pass; Ruff/mypy and strict OpenSpec pass. F6/F7/F8 and fresh full audit/release gates remain.

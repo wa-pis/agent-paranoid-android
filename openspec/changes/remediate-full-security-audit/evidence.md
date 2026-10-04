@@ -35,3 +35,7 @@ Direct service tests prove sensitive targets, zero-multiplied dependencies, and 
 PostgreSQL/Trino alias, identifier, quasi-identifier, cast and aggregate regression cases reject exact category query construction; direct benign aliases remain allowed. Unannotated plans reject before any category fetch. Synthetic numeric SSN, phone and card forms reject without value echo; small integers and booleans pass.202 focused tests, Ruff and focused mypy passed.
 
 Fresh independent read-only F2 candidate review found no concrete bypass or regression; reviewer independently ran181focused tests successfully.
+
+## F3 remediation
+
+Both optional adapters import a dependency-free shared category projection. Original source literals, typed categories and matching predicates are replaced before transport; restorations are local and field-scoped. Fingerprints and caller input remain unchanged. Invalid restored OpenAI proposals are recorded as redacted invalid-response failures before completed metadata. Unknown categorical predicates reject before transport. JSON-mode normalization closes the independent review's tuple in_values bypass and preserves Pydantic JSON serialization.143 offline advisor/OpenAI/GigaChat tests passed, including actual fake transport assertions, string/integer/boolean/null forms, tuple predicates and redacted restoration failures; existing GigaChat reordering/collision/cross-field regressions remain green. No live provider call or fresh whole-project audit performed.

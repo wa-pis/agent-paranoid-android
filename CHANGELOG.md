@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Mask local category values and predicates before OpenAI transport using the shared provider privacy boundary.
+
 - Preserve physical SQL-column disclosure authorization through aliases; reject derived local categories and sensitive integer category values.
 
 - Reject Trino formula and aggregate-mapping residuals over sensitive-name

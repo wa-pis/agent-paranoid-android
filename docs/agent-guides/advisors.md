@@ -35,3 +35,5 @@ their distributions. Replace every string, number, boolean, or null category
 and matching `equals`, `not_equals`, or `in_values` value with field-scoped
 labels before serialization. Reject values outside that field's categorical
 domain; numeric distribution bounds remain unchanged.
+
+OpenAI and GigaChat apply the same category projection immediately before transport. The original request and fingerprints remain local and unchanged. Unrepresented local categorical predicates reject before sending; invalid restored proposals produce redacted invalid-response errors. Provider byte budgets include the serialized labels.
