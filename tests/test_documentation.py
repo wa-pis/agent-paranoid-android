@@ -483,6 +483,8 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
         "fix-csv-generation-pipeline",
         "selective-source-transformation",
+        "fix-transformation-review-boundaries",
+        "remediate-full-security-audit",
     }
 
     transformation = changes / "selective-source-transformation"
