@@ -56,6 +56,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Inspect canonical numeric forms in folder CSV profiling and bind cached
+  source categories to the current field authorization; invalidate older caches.
+
 - Bound audit-log verification reads before parsing oversized records.
 
 - Apply one explicit replacement contract to all fields, including sensitive

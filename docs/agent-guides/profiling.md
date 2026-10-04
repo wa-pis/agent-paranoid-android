@@ -55,7 +55,7 @@ keys and omits lower-bound child distinct ratios from numeric evidence. Older
 profiles and other producers default to `unspecified`, not proven exact; reprofile
 old folder artifacts to obtain the new uncertainty metadata. This statistic is
 unrelated to the planned percentage of unchanged values after transformation.
-Cache format 4 invalidates older folder caches and recomputes their evidence,
+Cache format 5 invalidates older folder caches and recomputes their evidence,
 including repeated-identifier pool sizes.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
@@ -118,3 +118,5 @@ The normal flow is:
 3. generate synthetic data;
 4. validate it; and
 5. export the result.
+
+Folder numeric sensitivity inspects both exact canonical decimal and retained float representations. Cache reuse binds the sorted local-category field authorization and verifies it against the stored profile; changed permissions require fresh profiling.

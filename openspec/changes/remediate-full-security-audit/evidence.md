@@ -21,3 +21,7 @@ Canonical report sealed: Codex Security scan `7c5f98ba-72e6-4081-88a3-bee689b1d5
 ## F9 remediation
 
 Shared `verify_audit_log` reads at most4097bytes before parsing. Synthetic LF/no-LF oversized records fail on first bounded read; exact4096byte authenticated records pass.16audit tests, Ruff, focused mypy, strict OpenSpec and independent read-only candidate review pass. No full release gate or fresh whole-project audit yet.
+
+## F4/F5 remediation
+
+Folder exponent and rounded identifier forms now produce masked patterns without extrema. Cache format5 binds exact sorted scopes, preserves duplicate identity, verifies stored scopes and rejects format4. Tests cover default/allowed/changed permission, order, mismatch, repeated legitimate reuse and canonical privacy.89focused tests passed from writable temporary cwd; Ruff/focused mypy passed; independent review found no surviving route. Whole-project re-audit and RC gates remain pending.

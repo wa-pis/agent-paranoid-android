@@ -23,7 +23,6 @@ from test_data_agent.core.privacy import (
     LocalCategoryField,
     infer_sensitive_from_name,
     infer_sensitive_type_from_values,
-    infer_sensitive_value_type,
     mask_pattern,
     PrivacySettings,
     semantic_type_is_sensitive,
@@ -31,6 +30,7 @@ from test_data_agent.core.privacy import (
     validate_local_category_values,
 )
 from test_data_agent.csv_profiler import (
+    _csv_sensitive_value_type,
     detect_csv_dialect,
     detect_csv_encoding,
     infer_data_type,
@@ -308,7 +308,7 @@ class FieldAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < MAX_SEMANTIC_SAMPLE:
             self.semantic_sample.append(value)
-        detected_type = infer_sensitive_value_type(value)
+        detected_type = _csv_sensitive_value_type(value)
         if detected_type == "secret" or self.content_sensitive_type is None:
             self.content_sensitive_type = detected_type
         self.track_distinct(value)
@@ -428,7 +428,7 @@ class FieldAccumulator:
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
             patterns = Counter(
-                mask_pattern(value, infer_sensitive_value_type(value) or profile.semantic_type)
+                mask_pattern(value, _csv_sensitive_value_type(value) or profile.semantic_type)
                 for value in self.semantic_sample
             )
             return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}

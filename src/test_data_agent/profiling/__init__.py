@@ -40,10 +40,10 @@ def profile_example_folder(
             input_folder,
             cache_dir=cache_dir,
             rule_sample_rows=rule_sample_rows,
+            local_category_fields=local_category_fields,
         )
         if cached is not None:
             work_budget.check_deadline("cache load")
-            cached.local_category_fields = list(local_category_fields)
             return cached
 
     profile, rows_by_entity = _profile_schema_with_sample(
