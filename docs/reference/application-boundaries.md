@@ -9,9 +9,13 @@ The reviewed development activation candidate adds `transform-execute` and local
 `transform-approve` CLI entrances and the workspace consumer
 `execute_transformation`. They share fixed-snapshot application enforcement;
 MCP has no receipt issuer. Ordinary generation remains source-free. These
-additions have exact-SHA safety evidence in ActivationSafety-R3; the current
-development goldens include their registration. Final RC review and release
-gates remain required before public delivery.
+original additions have exact-SHA safety evidence in ActivationSafety-R3; the
+development goldens include their registration. That historical evidence does
+not clear the later coherent candidate or common-profile consumers. Their
+registration remains isolated, not enabled in the author checkout; current
+independent safety clearance, final RC review and release gates remain required
+before public delivery. See [MCP usage](../how-to/mcp.md#closed-common-profile-candidate)
+for the gated common-profile surface.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 

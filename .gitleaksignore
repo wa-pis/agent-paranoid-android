@@ -3,3 +3,5 @@
 6dec03860fb2cbb7150e93253519e12c3e3c595a:openspec/changes/selective-source-transformation/progress.md:generic-api-key:5461
 # Same prose repeated in the first explanation, removed in the next commit.
 0a4f451a9292ff24f0cd628448bec16cea659185:.gitleaksignore:generic-api-key:1
+# Authentication method names in acceptance prose; no credential.
+ac7f76f9a435c3c5f637b3940ee0ff782b1eddc8:openspec/changes/selective-source-transformation/progress.md:generic-api-key:38

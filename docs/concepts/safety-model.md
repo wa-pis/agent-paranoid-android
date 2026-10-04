@@ -109,7 +109,8 @@ query work, and wall-clock generation time.
 
 ## What The Project Guarantees
 
-For supported workflows and accepted inputs, the project is designed to:
+For supported synthetic-generation workflows and accepted inputs, the project
+is designed to:
 
 - avoid copying complete source rows;
 - avoid writing raw detected PII into safe profiles;
@@ -148,6 +149,11 @@ reviewing profiles or specifications.
 ## Acceptance Checklist
 
 Before publishing a generated dataset:
+
+This checklist applies to synthetic generation, not the gated mixed-origin
+transformation candidate. A transformed bundle must not be relabelled synthetic
+merely because validation passed: its action provenance and any matching local
+preservation receipt remain separate requirements.
 
 - manifest says `synthetic: true`;
 - manifest says `source_rows_copied: false`;

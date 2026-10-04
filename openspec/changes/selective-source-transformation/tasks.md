@@ -1,5 +1,25 @@
 # Tasks: selective-source-transformation
 
+## Corrected installed evidence checkpoint — 2026-10-04
+
+Closed implementation PR602 is draft at ac7f76f; author registration switches
+remain unapplied. Corrected isolated runtime3c00148 / installed wheel dd6b4ad2
+has current-artifact evidence for twelve typed routes/36 refusals, explicit
+temporal outputs, linked/composite keys/null mappings, interactive saved mappings
+through CLI and SDK stdio, six-method auth contracts and PostgreSQL diagnostics.
+See [current acceptance evidence](client-acceptance.md) and
+[route evidence](route-workflow-acceptance.md); no additional tests ran for this
+reconciliation. Older unchecked parent tasks below are acceptance gates, not
+claims that every listed implementation is absent. Historical accepted-main
+notes and earlier intake prerequisites are superseded only where dated current
+evidence explicitly supplies the same requirement, never by inference.
+
+Remaining local consolidation includes original-finding profiling/publication
+boundaries and final documentation/contract disposition. Independent exact-SHA
+clearance remains unavailable; activation, protected merge, final RC gates and
+public artifact acceptance stay open. No private/live result, native timestamp
+input, every-route scale or independent-review pass is implied.
+
 ## Owner-approved uniform mapping amendment — 2026-10-02
 
 - [x] Record explicit owner decision and successor ADR-0029; source membership

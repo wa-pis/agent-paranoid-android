@@ -3,6 +3,12 @@
 A successful command is not the end of the review. Use the artifacts in the
 bundle to decide whether the synthetic dataset is safe and useful.
 
+This page describes synthetic-generation bundles. The gated mixed-origin
+transformation candidate has a separate review contract: validation does not
+make its output synthetic, and action provenance and any required exact-snapshot
+local preservation receipt must also be checked. See
+[Selective Transformation](../reference/cli.md#implemented-rc-execution-candidate).
+
 ## Review Order
 
 1. Read `generation_manifest.json`.

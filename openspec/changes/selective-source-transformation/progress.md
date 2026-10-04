@@ -1,5 +1,163 @@
 # Implementation Progress
 
+## Gitleaks false-positive disposition — 2026-10-04 local
+
+- Existing run37159629080 generic-api-key finding points to ac7f76f progress.md
+  line38. CI's already-redacted Finding preserves surrounding prose; immutable
+  source identifies the hidden fragment as authentication method names, not a
+  credential. Static triage: not_actionable, high confidence; documentation-only
+  surface, no credential or runtime boundary crossing. No dynamic security
+  validation or independent safety clearance claimed.
+- Added only exact immutable commit/file/rule/line fingerprint to the existing
+  .gitleaksignore; reworded current prose to prevent the same textual trigger.
+  Scanner/workflow remain enabled and unchanged; no broad path/rule exclusion.
+  Licensing diagnosis superseded. Next signed documentation/triage batch and
+  normal CI; continue remaining local candidate documentation once this CI
+  blocker is cleared. Blocked independent review must not be retried.
+
+## Correction: CI licensing diagnosis was wrong — 2026-10-04 local
+
+- GitHub API confirms wa-pis owner type User. Exact fixed-message extraction
+  from run37159629080 says `No license key is required`, `6 commits scanned`,
+  `leaks found: 1`, `Leaks detected`. Previous substring filter accidentally
+  matched the negative licensing sentence; the licensing blocker below is false.
+- One scanner finding exists, not yet inspected or validated; no secret values
+  were printed. Automation remains paused pending safe finding triage rather
+  than license acquisition. No scanner bypass or blocked-review retry.
+
+## New external CI blocker — 2026-10-04 local
+
+- PR602 remains draft/open at ac7f76f. Read-only GitHub snapshot: no pending
+  checks; Secret history scan failed, other workflow runs succeeded.
+  Security run37159629080 filtered diagnostic: `license key is required`.
+  This is unavailable scanner licensing, not a validated secret finding.
+- No scanner bypass, workflow mutation, retry, activation, merge or release.
+  Per owner blocker rule pause automation pending configured Gitleaks licensing
+  or an explicitly agreed replacement check. Independent safety clearance also
+  remains unavailable; do not retry the blocked validation request.
+- Reviewed seven-file accumulated documentation/evidence diff; strict docs build
+  already passed. Changes remain uncommitted and preserved. Next after blocker
+  resolution: signed docs batch, remaining architecture reconciliation, then
+  mandatory clearance/release gates; no unchanged test repetition.
+
+## Output/architecture documentation boundaries — 2026-10-04 local
+
+- Read output-review page, application boundary inventory and MCP examples.
+  Qualified synthetic-bundle checklist separately from mixed-origin action
+  provenance/receipt review; clarified that historical ActivationSafety-R3
+  evidence does not clear the later coherent/common-profile candidate.
+- Ordinary MCP generation examples remain source-free and need no changes.
+- Accumulated public documentation: strict MkDocs build passed (0.35s), output
+  `/private/tmp/apa-docs-contracts-20261004`; git diff --check passed. No runtime
+  tests repeated for prose-only changes.
+  No runtime or policy change, registration activation or independent-review
+  retry. Next commit the documentation/evidence batch; architecture references still
+  need reconciliation before claiming the full documentation task complete.
+
+## MCP/safety documentation scope clarified — 2026-10-04 local
+
+- Read MCP candidate workflow, complete safety-model page, generator design
+  inventory and SQL troubleshooting sections. Found two scope ambiguities:
+  generation guarantees/checklist could be read as mixed-origin guarantees;
+  ordinary tool inventory omitted the separate gated candidate boundary.
+- Qualified synthetic-generation guarantees/checklist and linked isolated MCP
+  consumers, distinguishing DatasetSpec approval from preservation receipts.
+  Existing contracts unchanged; no public registration or safety-policy expansion.
+- Next inspect remaining architecture/manifests/examples and run strict docs
+  at the accumulated-documentation milestone. No test/gate repetition, external
+  DB/API, independent-review retry, merge or release.
+
+## Documentation contract audit started — 2026-10-04 local
+
+- Read README development boundary and CLI candidate sections against current
+  closed author registration and isolated capability evidence. They correctly
+  distinguish published1.5.0, isolated single/common execution, SAVE versus
+  controlling-TTY approval, exact bytes/digest, CLI result envelope and mandatory
+  independent clearance. Configuration references retain explicit limits and
+  auth prerequisites. No contradictory claim found in these inspected sections;
+  no need to change product semantics or repeat successful acceptance.
+- Initial glob/guessed documentation paths were absent; discover actual docs
+  paths with rg --files before continuing. This checkpoint is a partial audit,
+  not completion of the repository-wide documentation task or native-type scope.
+- Next inspect actual MCP/safety/troubleshooting/architecture/manifest references
+  and examples, reconcile any concrete mismatch, then publish accumulated docs.
+  New-head CI not queried; blocked review not retried; no activation/release.
+
+## Profiling/publication queue consolidated — 2026-10-04 local
+
+- Updated client acceptance queue with completed corrected-wheel profiling12,
+  category preflight7, path safeguards5, auth22, linked-key21 and wizard SDK2.
+  Added exact local-cost/harness exclusions rather than leave already-completed
+  work as the next task. No source or product policy change, checkbox closure,
+  test/CI repetition or private/live acceptance claim.
+- Next final documentation/contract consistency audit against closed author
+  switches and isolated candidate capabilities; then one accumulated docs update.
+  Independent clearance remains unavailable and cannot be substituted by author
+  checks; public activation, protected merge and RC publication remain gated.
+
+## Corrected installed publication identity safeguards — 2026-10-04 local
+
+- Read path-policy tests before selecting actual temporary-filesystem cases.
+  Corrected dd6b4ad2 installed wheel, Python3.14, test_io_path_policy.py,
+  -o pythonpath=. -q: regular/symlink reader, symlinked write parent, changed
+  destination inode, symlink publication destination and replaced-directory
+  cleanup selected:5 passed,16 deselected (0.21s).
+  No product monkeypatch or external input.
+- Excluded FIFO subprocess test because its harness forces source-checkout
+  PYTHONPATH; excluded atime/presence/mutation/swap simulations because they
+  patch product _stat_at. Existing historical unit evidence for these remains
+  distinct, not newly certified installed acceptance. Tests verify actual
+  filesystem substitutions do not overwrite replacement ownership or follow
+  unsafe links; this is not arbitrary crash/race/rollback completeness.
+- Next consolidate profiling/publication evidence and final docs disposition;
+  no source edits, repeated successful matrix/gates, review retry or release.
+
+## Corrected installed category preflight evidence — 2026-10-04 local
+
+- Initial filename lookup test_postgres_profiling.py was absent; discovered
+  actual test_postgres_profiler.py, then read selected cases and complete
+  synthetic-result/config helpers before execution. No absent-file pass claimed.
+- Corrected installed dd6b4ad2, Python3.14, -o pythonpath=. -q, selected numeric
+  summary reuse, invalid exact/category/wildcard scope and wildcard column budget:
+  7 passed,6 deselected (0.21s).
+  Explicit injected fictional fetch/client only, no product monkeypatch or DB.
+  Exact invalid scope rejects before connection/query; wildcard resolution uses
+  bounded metadata and rejects before aggregates. Two-table profiling uses
+  12 statements,13 with explicit category; numeric summaries share aggregates.
+- Next publication safeguard evidence and final documentation reconciliation.
+  Source unchanged; no scale/gate/CI replay, activation, merge or review retry.
+
+## Corrected installed query profiling cost/shape evidence — 2026-10-04 local
+
+- Read selected SQL-query profiling tests and their complete fake-result helpers.
+  Corrected installed dd6b4ad2, Python3.14, test_sql_query_profiling.py with
+  -o pythonpath=. -q and selection authorized_grouped_profile_is_wrapped_and_bounded,
+  default_profile_does_not_query_or_store_category_literals,
+  query_profile_statement_count_scales_with_fields,
+  trino_builders_use_explicit_outer_projection,
+  unsupported_type_fails_before_aggregates, backend_error_is_redacted:
+  12 passed,13 deselected (0.23s).
+- Explicit fictional callbacks only, no product monkeypatch or DB: both dialects
+  wrap grouped authorized queries; exhausted callback errors stay generic.
+  Three-field profiling uses five statements (six with explicit local category),
+  numeric summaries share column aggregates, default categories are not fetched,
+  outer projections are explicit and unsupported types fail before aggregates.
+  Statement counts are local executable evidence, not live scan bytes/latency.
+- Next category preflight/publication safeguards and final documentation
+  reconciliation; no repeated successful matrix/gates or review retry.
+
+## Task register reconciled with accumulated acceptance — 2026-10-04 local
+
+- Previous signed ac7f76f push completed to draftPR602; checkout was clean.
+  Read current task register and added one dated checkpoint linking corrected
+  installed evidence without closing composite parent/release checkboxes.
+  Explicitly separated historical intake/accepted-main notes from current
+  twelve-route, key/wizard, auth and diagnostic evidence. No test/CI repetition.
+- Next inspect remaining original-finding profiling cost/category preflight and
+  publication safeguards, then finalize documentation disposition. Exact-SHA
+  independent review stays unavailable; no retry/reroute, activation, merge or
+  release. Latest new-head CI not inspected this run and not declared green.
+
 ## Accumulated installed acceptance evidence publication — 2026-10-04 local
 
 - Consolidate three documentation files for draftPR602: corrected-wheel typed
@@ -34,8 +192,9 @@
 
 - Read test_trino_auth.py completely. Corrected dd6b4ad2 installed wheel,
   Python3.14, pytest tests/test_trino_auth.py -o pythonpath=. -q:
-  22 passed (0.21s). Basic/JWT runtime secret references, certificate reference
-  checks, explicit OAuth redirect, Kerberos/GSSAPI mutual non-delegating options,
+  22 passed (0.21s). Basic/JWT runtime references and certificate checks;
+  explicit OAuth redirect; mutual authentication without delegation for
+  Kerberos and GSSAPI;
   conflicting configuration rejection and detached value-free errors covered.
 - No network or real authentication: constructors are explicit injected driver
   fakes; HTTP dependency send and optional auth modules are dependency stubs,

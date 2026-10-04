@@ -11,12 +11,12 @@ or source-only test automatically certifies an installed release artifact.
 | 1–4, 8–9 | Identifier/domain44, CSV/date78, distinct/cache9 | Reconcile original finding dispositions; retain private-input gaps |
 | 5–6, 12 | Explicit category regression, saved-policy/TTY and finance scenario | Link approved sensitivity/preservation contract and wizard evidence; no blanket declassification |
 | 7, 10 | Timestamp offset, missing-bound warning and spec/profile routing | Monthly source-category fidelity remains a deferred proposal, not an agreed RC gate; explicit field formats do not imply monthly sampling. Installed routing diagnostics supplement the existing mode replay below. |
-| 11, 15–17 | Policy predicate/authorization/budget probes; historical bounded query counts | Bind safe connection diagnostics, early category limits and fictional adapter scan-budget evidence to current artifact |
+| 11, 15–17 | Corrected PostgreSQL client22, query profiling12 and table/category preflight7; policy predicate/authorization probes | Preserve local statement-count versus unmeasured live scan/latency distinction; reconcile final docs |
 | 13–14 | Declared FK counts/chains and validation | Separate inference/utility claims from conformance; unmeasured source fidelity remains unverified |
 | 18 | Owner scope correction | Keep internal formulas inactive; reconcile supported SQL expression/rejection evidence only |
-| 19 | Installed publication5 | Bind deterministic atime/path-swap/rollback and original-script provenance, without repeating unchanged successful adaptation |
-| 20–26 | Corrected doctor/mode9, SQL/units/temporal28, Decimal pipeline16, Parquet renderer/profile19 and metadata11 | Consolidate six-method auth and remaining interface compatibility; preserve live/native prerequisite limitations |
-| Transformation routes | Corrected typed twelve-route matrix,36 CLI refusals, temporal3, common CLI/MCP matrix and finance end-to-end1 | Consolidate remaining key/wizard and wire boundaries; no live query, native timestamp or scale-per-route claim |
+| 19 | Installed publication5 and actual path/identity safeguards5 | Keep historical atime/product-stub unit evidence separate; no universal crash/rollback claim |
+| 20–26 | Corrected doctor/mode9, SQL/units/temporal28, Decimal pipeline16, Parquet renderer/profile19, metadata11 and auth22 | Preserve live/native/system prerequisite limitations; final interface documentation/clearance remain open |
+| Transformation routes | Corrected typed twelve-route matrix,36 CLI refusals, temporal3, linked-key21, wizard SDK2, common CLI/MCP matrix and finance end-to-end1 | Final documented contract disposition; no live query, native timestamp or scale-per-route claim |
 | Release | Closed full gate2894, published draftPR602 | Final contract/docs disposition, mandatory independent clearance, protected CI and RC artifact verification |
 
 This queue is not a new product decision or a declaration that all client
@@ -25,6 +25,22 @@ databases to fill those gaps. Independent review is unavailable and must not be
 retried, rephrased or routed to another provider to evade the restriction.
 
 ## Corrected budget candidate evidence — 2026-10-03
+
+Findings15/17 corrected installed profiling evidence: selected query profiler
+cases12 passed/13 deselected (0.23s), table/category preflight7 passed/6 deselected
+(0.21s), Python3.14 with -o pythonpath=. -q. Explicit fictional fetch callbacks
+verify both dialects' grouped wrapping, shared numeric aggregates, default
+category non-disclosure and invalid exact scope before connection. Wildcards
+resolve bounded metadata before rejecting invalid scope/column budgets, without
+running aggregates. Query fixture uses5 statements/6 with local category;
+two-table fixture12/13. No measured live scan-byte/latency claim.
+
+Finding19 corrected installed actual-filesystem identity safeguards:5 passed,
+16 deselected (0.21s), selected test_io_path_policy.py. Unsafe symlink parent/
+destination, changed destination inode and replaced-directory cleanup refuse
+without overwriting replacement ownership. Excluded product _stat_at-patched
+simulations and FIFO subprocess forcing source PYTHONPATH; historical unit
+evidence remains historical. No arbitrary crash/race recovery pass implied.
 
 Finding11/adapter budget evidence on corrected installed wheel:22 PostgreSQL
 client cases passed (0.22s), Python3.14, tests/test_postgres_client.py with
