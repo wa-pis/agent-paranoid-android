@@ -5,11 +5,15 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
-- Monitor migration feedback for the generation-contract corrections released
-  in stable `1.3.2`.
+- Monitor migration feedback for stable `1.5.0`; do not assume future integration
+  feedback or claim unavailable private-data acceptance.
+- Prepare the isolated `1.6.0rc1` selective-transformation candidate: saved
+  behavior profiles, bounded one-to-one mappings, local approval boundaries and
+  fictional acceptance. Public activation and publication require independent
+  safety clearance and release gates; stable `1.6.0` is not authorized.
 - Run product-validation pilots against real development and analytics tasks.
 - Fix onboarding friction reported by external users.
-- Address confirmed `1.3.x` defects and routine dependency maintenance.
+- Address confirmed client defects and routine dependency maintenance.
 
 ## Next
 

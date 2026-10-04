@@ -1,5 +1,5 @@
 @startuml
-title Agent Paranoid Android Architecture
+title Agent Paranoid Android — Synthetic Generation Architecture
 
 skinparam shadowing false
 skinparam componentStyle rectangle
@@ -7,6 +7,14 @@ skinparam packageStyle rectangle
 skinparam defaultTextAlignment center
 
 actor "User / Agent" as User
+
+note left of User
+This diagram covers ordinary synthetic generation.
+The gated mixed-origin transformation candidate
+has separate snapshot, provenance and local
+preservation-receipt enforcement; it is not
+authorized by the agent approval gate below.
+end note
 
 package "Inputs" {
   file "Single CSV\n(potentially sensitive)" as SingleCsv

@@ -125,7 +125,9 @@ original reference root. It does not copy source snapshots or issue approval.
 Source/reference bytes are rechecked and the published profile reloaded; changed
 paths produce a new identity and require review. Publication failures leave no
 trusted approval; a post-publication revalidation failure may leave configuration
-requiring another review. Public interface parity/activation remain unfinished.
+requiring another review. Isolated CLI and installed SDK1/SDK2 stdio parity
+have executable acceptance evidence; public registration/activation remain gated
+on current independent safety clearance and final RC review.
 Shared profile limits accept only total-input and output bytes; other
 dimensions remain per-input policy settings.
 

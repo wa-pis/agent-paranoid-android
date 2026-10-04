@@ -177,7 +177,13 @@ amendments still require scoped review and executable checks before activation.
 ### Refreshed client intake (2026-09-24)
 
 Details, ordering and decisions: [feedback v2](feedback-2026-09-24-v2.md).
-All items below remain unverified until reproduced against the current candidate.
+This intake checklist predates the corrected installed evidence checkpoint above.
+Current-artifact results and disclosed gaps are recorded in client-acceptance.md;
+unchecked composite gates do not mean that all constituent checks remain unrun.
+In particular, corrected-wheel doctor/mode, predicate/units, exact DECIMAL,
+Parquet, auth, query/category budget, publication and linked-route evidence must
+not be rerun solely because these historical intake boxes are still unchecked.
+Final compatibility/clearance and unavailable private/live claims remain open.
 
 - [ ] Inspect new/changed harnesses; record package/version/SHA or wheel hash,
   extras, probe hashes and safe isolated baseline/candidate execution plans.

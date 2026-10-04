@@ -1,5 +1,5 @@
 @startuml
-title Review-First Agent Workflow
+title Review-First Synthetic Generation Workflow
 
 skinparam shadowing false
 skinparam sequenceMessageAlign center
@@ -69,6 +69,8 @@ note bottom of Workspace
 The workspace is the handoff contract:
 reviewable spec first, generation only
 after explicit approval.
+This generation approval is not a preservation
+receipt for the gated transformation candidate.
 end note
 
 @enduml

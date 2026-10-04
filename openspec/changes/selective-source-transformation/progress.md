@@ -1,5 +1,39 @@
 # Implementation Progress
 
+## Acceptance register consistency — 2026-10-04 local
+
+- Read current intake/release task sections, changelog Unreleased and planned
+  1.6.0rc1 release boundary. Corrected stale blanket-unverified intake wording:
+  dated corrected-wheel evidence supersedes constituent checks, not composite
+  compatibility/clearance gates or private/live gaps. No checkbox mass closure.
+- PR602 d813bb9 snapshot has no failed checks; Python3.11/3.13 still pending.
+  Do not rerun overlapping CI or infer completion. Architecture docs changes
+  already passed strict build; no runtime edits or repeated successful tests.
+- Next publish accumulated architecture/task reconciliation, then finish remaining
+  OpenSpec/quickstart contract disposition. Roadmap's stale1.3.x focus updated to
+  shipped1.5.0 and isolated1.6.0rc1 with unchanged clearance boundary. Strict
+  docs build passed (0.37s), `/private/tmp/apa-docs-roadmap-20261004`; diff check
+  passed. No PlantUML render or runtime replay claimed. Independent clearance stays
+  unavailable; no blocked-review retry, activation, merge or release.
+
+## Architecture reconciliation and CI checkpoint — 2026-10-04 local
+
+- Signed d813bb9 pushed to draftPR602, signature verified. CI snapshot: no
+  failures, including completed Secret history scan; Python3.11–3.14 and wheel
+  compatibility still pending. Licensing/false-positive blocker resolved, normal
+  automation resumed; do not infer independent safety clearance from CI.
+- Read complete three architecture diagrams and transformation implementation
+  inventory. Qualified diagram scope as ordinary synthetic generation and
+  distinguished generation approval from preservation receipts. Replaced stale
+  interface-parity-unfinished wording with existing isolated CLI/SDK evidence;
+  public activation remains gated. No runtime or product-policy changes.
+- Next check these changed documentation sources, reconcile final task/contract
+  disposition and prepare remaining local handoff. Strict MkDocs build passed
+  (0.39s), output `/private/tmp/apa-docs-architecture-20261004`; diff --check
+  passed. No configured PlantUML renderer found in the checked build/scripts;
+  diagram source reviewed, rendered diagram QA not claimed. No unchanged runtime tests,
+  independent-review retry, public activation, merge or release.
+
 ## Gitleaks false-positive disposition — 2026-10-04 local
 
 - Existing run37159629080 generic-api-key finding points to ac7f76f progress.md
