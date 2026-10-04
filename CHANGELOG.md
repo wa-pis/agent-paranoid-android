@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Read dataset Parquet in bounded batches; enforce cumulative decoded bytes, dictionary expansion, nested cells and cell sizes before Python row conversion.
+
 - Bound formula operands and intermediate results; reject oversized string/byte repetition and concatenation before allocation.
 
 - Mask local category values and predicates before OpenAI transport using the shared provider privacy boundary.
