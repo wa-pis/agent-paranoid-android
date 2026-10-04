@@ -75,6 +75,7 @@ def plan(
         else ("lake", "safe", "orders"),
         output_fields=("order_id", "state", "amount"),
         fingerprint="a" * 64,
+        safe_local_category_output_fields=frozenset({"state"}),
         sql=(
             'SELECT "order_id", "state", "amount" '
             'FROM "public"."orders" WHERE "state" = \'source-only\''
@@ -386,3 +387,14 @@ def test_schema_drift_and_aggregate_mismatch_fail_closed() -> None:
             describe_query=results.describe,
             fetch_query=invalid_counts,
         )
+
+
+def test_local_categories_fail_closed_without_authorized_lineage():
+    backend = FakeResults()
+    query_plan = replace(plan(), safe_local_category_output_fields=frozenset())
+    with pytest.raises(SqlQueryProfileError, match="not allowed"):
+        profile_validated_query(
+            query_plan, describe_query=backend.describe, fetch_query=backend.fetch,
+            local_category_fields=[LocalCategoryField(entity=query_plan.entity_name, field="state")],
+        )
+    assert not any("GROUP BY" in query.sql for query in backend.queries)

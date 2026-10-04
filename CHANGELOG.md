@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Preserve physical SQL-column disclosure authorization through aliases; reject derived local categories and sensitive integer category values.
+
 - Reject Trino formula and aggregate-mapping residuals over sensitive-name
   value operands before executing a query.
 

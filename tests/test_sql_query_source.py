@@ -355,3 +355,31 @@ def test_decorated_stars_fail_before_authorization(tmp_path, adapter, selection)
     table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
     with pytest.raises(SqlQuerySourceError, match="wildcard modifiers"):
         inspect_query_source(request(write_query(tmp_path, f"SELECT {selection} FROM {table}"), adapter=adapter))
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("projection,source,allowed", [
+    ("ssn AS state", "ssn", False),
+    ("customer_id AS state", "customer_id", False),
+    ("postal_code AS state", "postal_code", False),
+    ("status AS state", "status", True),
+    ("CAST(status AS VARCHAR) AS state", "status", False),
+    ("COUNT(status) AS state", "status", False),
+])
+def test_local_category_authorization_tracks_physical_projection(
+    tmp_path, adapter, projection, source, allowed,
+):
+    from test_data_agent.sql_query_profiling import (
+        SqlQueryProfileError, build_query_local_category_query,
+    )
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    query = authorize_query_source(
+        inspect_query_source(request(write_query(tmp_path, f"SELECT {projection} FROM {table}"), adapter=adapter)),
+        (QuerySourceColumn(source, "text", False),),
+    )
+    assert ("state" in query.safe_local_category_output_fields) is allowed
+    if allowed:
+        assert "GROUP BY" in build_query_local_category_query(query, "state").sql
+    else:
+        with pytest.raises(SqlQueryProfileError, match="not allowed"):
+            build_query_local_category_query(query, "state")

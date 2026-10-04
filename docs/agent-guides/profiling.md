@@ -120,3 +120,5 @@ The normal flow is:
 5. export the result.
 
 Folder numeric sensitivity inspects both exact canonical decimal and retained float representations. Cache reuse binds the sorted local-category field authorization and verifies it against the stored profile; changed permissions require fresh profiling.
+
+Exact local categories inspect integer values as decimal text for sensitive content, while retaining permitted small integers and booleans in their original types. Rejections do not include source values.

@@ -29,3 +29,9 @@ Folder exponent and rounded identifier forms now produce masked patterns without
 ## F1 remediation
 
 Direct service tests prove sensitive targets, zero-multiplied dependencies, and aggregate sum/avg/count sensitive value operands fail before fetch. Existing safe formulas, aggregates and join-key paths pass.109tests, Ruff, focused mypy and independent static candidate review passed.
+
+## F2 remediation
+
+PostgreSQL/Trino alias, identifier, quasi-identifier, cast and aggregate regression cases reject exact category query construction; direct benign aliases remain allowed. Unannotated plans reject before any category fetch. Synthetic numeric SSN, phone and card forms reject without value echo; small integers and booleans pass.202 focused tests, Ruff and focused mypy passed.
+
+Fresh independent read-only F2 candidate review found no concrete bypass or regression; reviewer independently ran181focused tests successfully.

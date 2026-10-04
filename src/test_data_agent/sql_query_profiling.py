@@ -156,6 +156,8 @@ def build_query_local_category_query(
 ) -> TrustedProfileQuery:
     if max_categories < 1 or max_categories > 100:
         raise SqlQueryProfileError("SQL query category budget is invalid")
+    if column not in plan.safe_local_category_output_fields:
+        raise SqlQueryProfileError("SQL query local category field is not allowed")
     safe = _allowed_output_column(plan, column)
     return TrustedProfileQuery(
         f"SELECT {safe} AS value, count(*) AS count "
@@ -194,6 +196,8 @@ def _local_categories(
             raise SqlQueryProfileError(
                 "SQL query local category field is outside the exact output allowlist"
             )
+        if category_field.field not in plan.safe_local_category_output_fields:
+            raise SqlQueryProfileError("SQL query local category field is not allowed")
         if category_field.field in selected or infer_sensitive_from_name(
             category_field.field
         ):

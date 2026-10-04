@@ -11,7 +11,7 @@
 ## Fixes (each requires regression, relevant docs and recorded checks)
 
 - [x] F1: Trino rule residuals reject/suppress sensitive operands, including aggregate-mapping siblings.
-- [ ] F2: SQL local categories retain physical sensitivity/identifier lineage through aliases and inspect numeric content.
+- [x] F2: SQL local categories retain physical sensitivity/identifier lineage through aliases and inspect numeric content.
 - [ ] F3: OpenAI provider request masks every local category literal and matching predicate; restore valid field-scoped response labels locally.
 - [x] F4: Folder profiling inspects canonical numeric forms before retaining numeric summaries.
 - [x] F5: Cache identity/read authorization includes local-category policy; invalidate stale entries; test permission removal/change and predicates.
@@ -49,3 +49,7 @@
 2026-10-05 F4/F5 completed: reused canonical CSV privacy inspector; format5 cache binds sorted scopes and verifies stored permission; no metadata relabeling on hits.89focused profiling/category/budget tests pass from writable temporary cwd; Ruff, focused mypy and independent candidate review pass. Read-only worktree cache-permission failures were rerun from temporary cwd. F1/F2/F3/F6/F7/F8 remain; next priority Trino sensitive residuals. F9 commit51929db pushed.
 
 2026-10-05 F1 completed: shared Trino builders reject sensitive-name formula target/dependencies and aggregate parent/numeric child values before execution; keep join keys and count semantics.109Trino builder/service/MCP tests passed; Ruff, focused mypy and fresh candidate review passed. Innocuous source names cannot establish content sensitivity; documented existing classifier scope.
+
+2026-10-05 F2: direct source/output category eligibility is retained in the validated query; unannotated plans fail closed. Integer category contents use the existing sensitive-content detector.202 SQL source/profiling/temporal/category tests passed; Ruff and focused mypy passed.
+
+Fresh independent read-only F2 candidate review found no concrete bypass or regression; reviewer independently ran181focused tests successfully.

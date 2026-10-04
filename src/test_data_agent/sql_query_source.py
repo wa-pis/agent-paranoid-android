@@ -11,7 +11,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from test_data_agent.core.privacy import infer_sensitive_from_name
+from test_data_agent.core.privacy import infer_sensitive_from_name, validate_local_category_field
 
 try:  # pragma: no cover - optional database extra.
     import sqlglot
@@ -124,6 +124,7 @@ class ValidatedSqlQuery:
     output_fields: tuple[str, ...]
     fingerprint: str
     sql: str = field(repr=False, compare=False)
+    safe_local_category_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
     safe_temporal_output_fields: frozenset[str] = field(default_factory=frozenset, repr=False)
     has_unmodeled_expressions: bool = False
 
@@ -315,6 +316,13 @@ def authorize_query_source(
         and not infer_sensitive_from_name(source)
         and not infer_sensitive_from_name(output)
     )
+    safe_local_category_output_fields = frozenset(
+        output
+        for projection, output in zip(statement.expressions, output_fields, strict=True)
+        if (source := _direct_source_field(projection)) is not None
+        and _local_category_field_is_safe(source)
+        and _local_category_field_is_safe(output)
+    )
     dialect = "postgres" if draft.request.adapter is SqlQueryAdapter.POSTGRES else "trino"
     canonical_sql = statement.sql(dialect=dialect, pretty=False)
     fingerprint = hashlib.sha256(
@@ -332,6 +340,7 @@ def authorize_query_source(
         fingerprint=fingerprint,
         sql=canonical_sql,
         safe_temporal_output_fields=safe_temporal_output_fields,
+        safe_local_category_output_fields=safe_local_category_output_fields,
         has_unmodeled_expressions=any(
             bool(projection.find(exp.AggFunc))
             or _direct_source_field(projection) is None and any(projection.find_all(exp.Column))
@@ -370,6 +379,14 @@ def _validate_aggregate_shape(statement: Any) -> None:
     # Grouping and MIN/MAX can reveal source values; aliases cannot declassify them.
     if any(infer_sensitive_from_name(column.name) for column in statement.find_all(exp.Column)):
         raise SqlQuerySourceError("SQL query aggregate source is sensitive")
+
+
+def _local_category_field_is_safe(name: str) -> bool:
+    try:
+        validate_local_category_field(field_name=name, semantic_type=None, sensitive=False)
+    except ValueError:
+        return False
+    return True
 
 
 def _direct_source_field(projection: Any) -> str | None:

@@ -121,17 +121,10 @@ class PrivacySettings(BaseModel):
     max_safe_categories: int = Field(default=20, ge=0)
 
 
-def validate_local_category_values(
-    *,
-    field_name: str,
-    semantic_type: str | None,
-    sensitive: bool,
-    values: Iterable[Any],
-    max_categories: int = 20,
-    max_value_length: int = 64,
+def validate_local_category_field(
+    *, field_name: str, semantic_type: str | None, sensitive: bool,
 ) -> None:
-    """Fail closed unless exact local values are bounded non-sensitive scalars."""
-
+    """Validate field eligibility without fetching exact values."""
     if sensitive or infer_sensitive_from_name(field_name):
         raise ValueError("local category field is sensitive")
     normalized_name = normalize_field_name(field_name)
@@ -153,6 +146,22 @@ def validate_local_category_values(
         "quasi-identifier",
     }:
         raise ValueError("local category semantic type is sensitive")
+
+
+def validate_local_category_values(
+    *,
+    field_name: str,
+    semantic_type: str | None,
+    sensitive: bool,
+    values: Iterable[Any],
+    max_categories: int = 20,
+    max_value_length: int = 64,
+) -> None:
+    """Fail closed unless exact local values are bounded non-sensitive scalars."""
+
+    validate_local_category_field(
+        field_name=field_name, semantic_type=semantic_type, sensitive=sensitive,
+    )
     if max_categories < 1 or max_value_length < 1:
         raise ValueError("local category limits must be positive")
 
@@ -175,7 +184,9 @@ def validate_local_category_values(
             raise ValueError("local category value length exceeds its limit")
         if isinstance(value, str) and _looks_like_local_free_text(value):
             raise ValueError("local category values contain free text")
-    if infer_sensitive_type_from_values(candidates) is not None:
+    if infer_sensitive_type_from_values(
+        str(value) if type(value) is int else value for value in candidates
+    ) is not None:
         raise ValueError("local category values contain sensitive content")
 
 
