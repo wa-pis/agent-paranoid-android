@@ -30,6 +30,9 @@
 - [x] R2: Common deterministic generation allocation preflight for direct/export/synthesis callers.
 - [x] R3: Bound cumulative folder inference evaluations and check deadlines inside loops.
 - [x] R4: Bound Parquet profiling nested logical content before Python conversion.
+- [x] Full gate at `b3045ee`:3019passed23skipped90.35%, strict docs pass.
+- [x] Complete fresh whole-project audit `603092fd-7dd0-4475-a9a9-1a7f9658f3ae` on immutable `b3045ee`; one medium deterministic-rule resource finding.
+- [x] R5: Bound native solver/validation and negative business-rule work across direct/workflow callers.
 - [ ] Repeat full gate and independent whole-project audit on the new final SHA.
 - [ ] Validate every new candidate; repair confirmed findings and repeat affected tests and full audit.
 - [ ] Record clean complete canonical audit; no open validated findings, deferred blocking candidate or skipped required checks.
@@ -72,3 +75,6 @@ Fresh independent read-only F2 candidate review found no concrete bypass or regr
 R1 complete: alias-reference expanded-node charge and scalar-byte graph accounting before construction; recursive references reject.142focused tests, Ruff/mypy/strictOpenSpec pass. Reviewer confirmed no unbounded DAG/cycle bypass. Alias-free syntax nodes are not charged against dataset cell allowance; bounded ordinary aliases and low-cell spec compatibility preserved.
 
 R2/R3/R4 implementation complete: generator shared output preflight plus pre-allocation string guard; one cumulative inference budget with captured MCP deadline across rules/relationships; shared Arrow logical checks before profile/read conversion.429focused generation/transformation tests,90Parquet/architecture tests,72budget/Arrow tests,6direct/export/synthesis triggers passed. Expanded run537passed with1Changelog-order failure; repaired and57docs/Parquet tests pass. Ruff,12module mypy and strictOpenSpec pass. Fresh candidate reviewer unavailable (agent thread limit); separate parent bypass/compatibility pass completed, including shared counters, dictionary/null/nested cases, helper callers and ordinary seeded output. Final full gate and fresh exact-SHA independent audit remain open.
+
+
+R5 implementation verified:453owning-package tests passed4skipped;41rule/condition tests passed after membership-cost accounting;24module mypy, Ruff and strictOpenSpec pass.14new bounded synthetic regressions cover inner native/aggregate expiry, direct helpers, cumulative exhaustion, empty-row dense graphs, pre-generation native rejection, quadratic FK/aggregate estimates and callback compatibility. Fresh candidate reviewer found callback arity regression, now covered and corrected. No confirmed surviving rule-scan bypass. Full gate and a fresh complete audit of the committed final SHA remain required; no RC permission implied by these checks.

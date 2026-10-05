@@ -8,6 +8,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.settings import GenerationMode, ValidationSettings
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.constraint_validator import validate_constraints
@@ -28,19 +29,25 @@ class DatasetValidationReport(BaseModel):
     settings: ValidationSettings = Field(default_factory=ValidationSettings)
 
 
-def validate_dataset(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> DatasetValidationReport:
+def validate_dataset(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> DatasetValidationReport:
+    budget = budget or GenerationBudget()
     settings = spec.validation_settings.model_copy(deep=True)
     validators: list[tuple[str, bool, Callable[[], list[str]]]] = [
         ("schema", settings.validate_schema, lambda: validate_schema(rows_by_entity, spec)),
         (
             "relationships",
             settings.validate_relationships,
-            lambda: validate_relationships(rows_by_entity, spec),
+            lambda: validate_relationships(rows_by_entity, spec, budget=budget),
         ),
         (
             "constraints",
             settings.validate_constraints,
-            lambda: validate_constraints(rows_by_entity, spec),
+            lambda: validate_constraints(rows_by_entity, spec, budget=budget),
         ),
         ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
     ]
@@ -76,9 +83,14 @@ class GenerationValidationError(ValueError):
 
 
 def assert_generated_dataset_valid(
-    rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec,
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
 ) -> None:
     """Enforce invariants independently of optional validation report settings."""
+    budget = budget or GenerationBudget()
+    budget.check("post-solve validation")
     assert_spec_safe(spec)
     if validate_generated_row_privacy(rows_by_entity, spec):
         raise GenerationValidationError("generated dataset failed post-solve privacy validation")
@@ -86,5 +98,5 @@ def assert_generated_dataset_valid(
         return
     if validate_schema(rows_by_entity, spec):
         raise GenerationValidationError("generated dataset failed post-solve type validation")
-    if validate_relationships(rows_by_entity, spec) or validate_constraints(rows_by_entity, spec):
+    if validate_relationships(rows_by_entity, spec, budget=budget) or validate_constraints(rows_by_entity, spec, budget=budget):
         raise GenerationValidationError("generated dataset failed post-solve constraint validation")

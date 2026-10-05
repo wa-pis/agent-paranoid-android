@@ -56,14 +56,22 @@ def parse_datetime(value: Any) -> datetime | None:
         return None
 
 
-def aggregate(field: str, rows: list[dict[str, Any]]) -> float:
+def aggregate(
+    field: str, rows: list[dict[str, Any]], *, budget: GenerationBudget | None = None
+) -> float:
+    budget = budget or GenerationBudget()
+    budget.consume_rule_work()
     if field == "*":
         return float(len(rows))
-    return sum(comparable_number(row.get(field)) or 0.0 for row in rows)
+    return sum(comparable_number(row.get(field)) or 0.0 for row in budget.iter_rule_work(rows))
 
 
-def safe_eval(expression: str, row: dict[str, Any]) -> Any:
-    return eval_node(parse_safe_expression(expression), row)
+def safe_eval(
+    expression: str, row: dict[str, Any], *, budget: GenerationBudget | None = None
+) -> Any:
+    budget = budget or GenerationBudget()
+    budget.consume_rule_work()
+    return eval_node(parse_safe_expression(expression), row, budget=budget)
 
 
 def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> Fraction:
@@ -244,23 +252,27 @@ def _guard_operation(op: ast.operator | ast.unaryop, left: Any, right: Any = Non
                 raise ValueError("expression resource limit exceeded")
 
 
-def eval_node(node: ast.AST, row: dict[str, Any]) -> Any:
+def eval_node(
+    node: ast.AST, row: dict[str, Any], *, budget: GenerationBudget | None = None
+) -> Any:
+    budget = budget or GenerationBudget()
+    budget.consume_rule_work()
     if isinstance(node, ast.Constant):
         return _bounded_operand(node.value)
     if isinstance(node, ast.Name):
         return _bounded_operand(row.get(node.id))
     if isinstance(node, ast.BinOp) and type(node.op) in BINARY_OPERATORS:
-        left, right = eval_node(node.left, row), eval_node(node.right, row)
+        left, right = eval_node(node.left, row, budget=budget), eval_node(node.right, row, budget=budget)
         _guard_operation(node.op, left, right)
         return _bounded_operand(BINARY_OPERATORS[type(node.op)](left, right))
     if isinstance(node, ast.UnaryOp) and type(node.op) in UNARY_OPERATORS:
-        operand = eval_node(node.operand, row)
+        operand = eval_node(node.operand, row, budget=budget)
         _guard_operation(node.op, operand)
         return _bounded_operand(UNARY_OPERATORS[type(node.op)](operand))
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
         if node.func.id == "sum":
             field = expect_field_name(node.args[0])
-            return aggregate(field, row.get("rows", []))
+            return aggregate(field, row.get("rows", []), budget=budget)
         if node.func.id == "count":
             return float(len(row.get("rows", [])))
     raise ValueError("unsupported expression")

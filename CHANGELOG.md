@@ -56,6 +56,10 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Bound native constraint solving and rule validation inside their loops; share
+  cumulative evaluation/deadline budgets and account for quadratic negative
+  foreign-key and aggregate work before application.
+
 - Apply shared allocation preflight to direct generation, SQL export and transformation synthesis; bound string construction before allocation.
 - Bound cumulative local inference work and check local/MCP deadlines inside rule and relationship loops.
 - Reuse pre-conversion nested Arrow inspection for Parquet profiles and dataset reads.

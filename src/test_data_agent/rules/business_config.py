@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.rules.contract import (
     validate_business_rule_literals,
@@ -42,7 +43,9 @@ def apply_and_validate_business_rules(
     mode: str,
     invalid_ratio: float,
     field_defaults: dict[str, dict[str, Any]] | None = None,
+    budget: GenerationBudget | None = None,
 ) -> BusinessValidationReport:
+    budget = budget or GenerationBudget()
     expected_rule_failures: dict[int, int] = {}
     apply_business_rules(
         rows_by_table,
@@ -52,11 +55,13 @@ def apply_and_validate_business_rules(
         invalid_ratio=invalid_ratio,
         field_defaults=field_defaults,
         expected_rule_failures=expected_rule_failures,
+        budget=budget,
     )
     return validate_business_rules(
         rows_by_table,
         rules,
         expected_rule_failures=expected_rule_failures,
+        budget=budget,
     )
 
 
@@ -68,6 +73,7 @@ def apply_and_validate_business_rules_from_path(
     mode: str,
     invalid_ratio: float,
     field_defaults: dict[str, dict[str, Any]] | None = None,
+    budget: GenerationBudget | None = None,
     spec: DatasetSpec | None = None,
 ) -> BusinessValidationReport | None:
     if rules_path is None:
@@ -83,6 +89,7 @@ def apply_and_validate_business_rules_from_path(
         mode=mode,
         invalid_ratio=invalid_ratio,
         field_defaults=field_defaults,
+        budget=budget,
     )
 
 
@@ -91,6 +98,8 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
         rows_by_table: dict[str, list[dict[str, Any]]],
         seed: int,
         spec: DatasetSpec,
+        *,
+        budget: GenerationBudget | None = None,
     ) -> BusinessValidationReport:
         validate_business_rules_for_spec(rules, spec)
         field_defaults = {
@@ -107,6 +116,7 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
             mode=spec.generation_settings.mode,
             invalid_ratio=spec.generation_settings.invalid_ratio,
             field_defaults=field_defaults,
+            budget=budget,
         )
 
     return apply_rules

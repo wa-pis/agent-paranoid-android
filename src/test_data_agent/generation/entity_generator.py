@@ -34,7 +34,7 @@ from test_data_agent.core.privacy import (
 )
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.generation.constraint_solver import solve_constraints
-from test_data_agent.generation.limits import estimate_dataset_output_bytes
+from test_data_agent.generation.limits import estimate_dataset_output_bytes, enforce_dataset_rule_work
 from test_data_agent.generation.semantic_provider import (
     SemanticValueProvider,
     SemanticValueRequest,
@@ -56,6 +56,7 @@ def generate_dataset(
     budget.check("generation allocation preflight")
     enforce_output_payload_size(estimate_dataset_output_bytes(spec), label="estimated generated data")
     budget.check("generation allocation preflight")
+    enforce_dataset_rule_work(spec, budget=budget)
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = create_faker(spec.generation_settings.locale)
     faker.seed_instance(seed)
@@ -90,9 +91,9 @@ def generate_dataset(
             )
         rows_by_entity[entity.name] = rows
     budget.check("constraint solving")
-    solve_constraints(rows_by_entity, spec, seed=seed)
+    solve_constraints(rows_by_entity, spec, seed=seed, budget=budget)
     budget.check("constraint solving")
-    assert_generated_dataset_valid(rows_by_entity, spec)
+    assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     return rows_by_entity
 
 

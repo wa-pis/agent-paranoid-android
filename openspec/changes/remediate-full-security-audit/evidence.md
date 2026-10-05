@@ -71,3 +71,44 @@ Formula/temporal/conditional/aggregate/relationship inference pass one explicit 
 Parquet profile and dataset read reuse core Arrow leaf walking and batch counters. Tests reject nested leaf count, depth, string length, cumulative batches and retained dictionary logical expansion before nested Python conversion; ordinary bounded composite remains sensitive. No native decoder peak-RSS promise.
 
 Checks:429focused generator/transformation tests;90Parquet/IO/architecture tests;72budget/Arrow tests;6direct/export/synthesis triggers. Expanded538-test run had537pass1Changelog duplicate/order failure; corrected existing Security heading and57docs/Parquet tests pass. Ruff src+new regressions, focused12module mypy and strictOpenSpec pass. Fresh candidate agent could not spawn (thread limit); parent performed separate read-only bypass/regression pass before final verification. No unresolved concrete candidate. Full gate/new exact-SHA audit still required.
+
+
+## Fresh full audit b3045ee and R5 candidate
+
+Full release gate:3019passed23skipped90.35%; strict docs passed. Scan
+`603092fd-7dd0-4475-a9a9-1a7f9658f3ae` completed on immutable
+`b3045ee55cfadf634f7443fd2c8800112993441e`:143production Python modules,
+21scripts,9CI workflows,18executable examples and5acceptance programs reviewed.
+Canonical report is retained in Codex Security. One medium/high-confidence
+finding: native solver/post-solve validation lacks inner work/deadline checks;
+negative business FK and aggregate scans have understated linear estimates.
+Bounded fake-clock probe performed12date parses after the first expired parse;
+4/8-row negative FK probes visited16/64parents for estimates8/16. No live data,
+DB or external AI calls. Empty Arrow containers were rejected as a candidate:
+the documented limit counts scalar leaves and makes no native-RSS guarantee.
+
+R5 candidate adds cumulative rule iteration/expression accounting to the existing
+explicit GenerationBudget, native preflight before row generation, actual-row
+business preflight with mode-aware quadratic bounds, and shared budgets through
+solver, mandatory/report validation and I/O callbacks. Direct APIs remain bounded.
+Resource exceptions escape broad formula handlers. Fresh independent candidate
+review confirmed one callback-arity regression; fixed independently selected
+2/3positional argument shape and explicit keyword-only budget forwarding.
+13new synthetic cap/deadline/direct/callback regressions pass. Earlier owning run
+303passed4skipped with4test-double signature failures; test doubles now implement
+GenerationBudget and explicit optional budget. Repaired52tests pass. Focused
+24module mypy and Ruff pass. Full gate, final candidate verification and fresh
+exact-SHA full audit remain mandatory; R5 is not marked complete yet.
+
+
+Final focused verification:453passed4skipped in30.40s, including architecture,
+documentation, native/business rules, expressions, I/O, batch transformation and
+request budgets. Membership costs now charge the predicate width within the
+same budget;41business/rule regressions pass after that adjustment.24module
+mypy and Ruff pass.14new cap/deadline/callback regressions include the confirmed
+original triggers and ordinary valid/seeded controls. Independent review's sole
+callback compatibility defect was repaired. Full release gate and fresh full
+exact-SHA security audit remain open.
+
+Standalone supplemental R5 fix report (sealed baseline scan unchanged):
+`/Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/artifacts-6228a9da09a5649cfa26589ce21af5175a4b834568b9b1ae7462ed21d12ee674/artifacts/fix_report.md`.

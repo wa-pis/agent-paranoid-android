@@ -85,3 +85,20 @@ Ordinary formula evaluation enforces fixed per-operation resource caps independe
 Common YAML loading rejects recursive aliases before construction. Expanded alias nodes share `TEST_DATA_AGENT_MAX_INPUT_CELLS`; expanded scalar bytes share `TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES`. Ordinary bounded acyclic aliases remain supported. Physical alias/depth ceilings still apply, and errors contain no input values. These checks precede model construction and JSON serialization.
 
 Every `generate_dataset` consumer performs the common output allocation estimate before Faker setup and row creation, including direct Python calls, PostgreSQL SQL export and transformation synthesis. Filesystem capacity checks remain in I/O workflows. String construction checks `TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS` before random-character allocation. These conservative payload estimates and cooperative deadlines do not promise an exact peak-RSS ceiling.
+
+
+Deterministic native constraints and business rules share an explicit
+`GenerationBudget` through generation, solving, business application and
+validation. Inner row, field, expression and relationship-graph loops check the
+cooperative deadline and charge cumulative work against
+`TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`. Direct Python entry points also
+create a bounded budget when none is supplied. Native rule amplification is
+estimated before row generation; business rule preflight uses actual supplied
+row counts. Mixed/negative FK and aggregate estimates conservatively include
+repeated parent/table scans for every possible selected row, even with a small
+invalid ratio. Budget failures escape formula error reporting and abort the
+workflow before trusted publication. Optional validation report settings do not
+disable mandatory post-solve rule checks. Explicit keyword-only budget support
+in business callbacks is optional; existing two/three-argument callbacks remain
+supported. These operation allowances are conservative cooperative controls,
+not CPU-instruction or peak-RSS guarantees.

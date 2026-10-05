@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Callable, Literal, cast
 
 from pydantic import BaseModel
 
@@ -125,19 +125,20 @@ def generate_dataset_bundle(
             rows_by_entity,
             effective_seed,
             effective_spec,
+            budget=budget,
         )
         if business_rules_applier is not None
         else None
     )
     budget.check("business rule application")
-    assert_generated_dataset_valid(rows_by_entity, effective_spec)
+    assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
     assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
         write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec)
+        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
         generation_valid = report.valid and business_report_is_valid(
             business_report,
@@ -272,9 +273,9 @@ def generate_single_entity_profile_artifacts(
         budget=budget,
     )
     budget.check("dataset generation")
-    assert_generated_dataset_valid(rows_by_entity, spec)
+    assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     assert_business_report_valid(business_report, spec.generation_settings.mode)
-    report = validate_dataset(rows_by_entity, spec)
+    report = validate_dataset(rows_by_entity, spec, budget=budget)
     budget.check("dataset validation")
     if output_path is None:
         write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
@@ -355,6 +356,7 @@ def generate_dataset_from_profile_artifacts(
             rows_by_entity,
             spec.generation_settings.seed or 0,
             spec,
+            budget=budget,
         )
         budget.check("business rule application")
     report = generate_single_entity_profile_artifacts(
@@ -410,6 +412,7 @@ def generate_dataset_from_csv_artifacts(
             rows_by_entity,
             seed,
             spec,
+            budget=budget,
         )
         budget.check("business rule application")
     assert_no_profiled_csv_rows(
@@ -457,7 +460,7 @@ def generate_dataset_review_artifacts(
             assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
         write_dataset_rows(rows_by_entity, output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec)
+        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
         write_dataset_review_bundle(profile, effective_spec, report, temp_folder)
         write_generation_manifest(
@@ -493,19 +496,27 @@ def invoke_business_rules_applier(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     seed: int,
     spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
 ) -> Any | None:
-    parameters = list(inspect.signature(applier).parameters.values())
-    if any(parameter.kind == inspect.Parameter.VAR_POSITIONAL for parameter in parameters):
-        return applier(rows_by_entity, seed, spec)
+    signature = inspect.signature(applier)
+    parameters = list(signature.parameters.values())
     positional = [
-        parameter
-        for parameter in parameters
-        if parameter.kind
-        in {inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD}
+        parameter for parameter in parameters
+        if parameter.kind in {
+            inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        }
     ]
-    if len(positional) >= 3:
-        return applier(rows_by_entity, seed, spec)
-    return applier(rows_by_entity, seed)
+    args = (rows_by_entity, seed, spec) if (
+        len(positional) >= 3
+        or any(parameter.kind == inspect.Parameter.VAR_POSITIONAL for parameter in parameters)
+    ) else (rows_by_entity, seed)
+    budget_parameter = signature.parameters.get("budget")
+    kwargs = {"budget": budget} if (
+        budget_parameter is not None
+        and budget_parameter.kind == inspect.Parameter.KEYWORD_ONLY
+    ) else {}
+    return cast(Callable[..., Any], applier)(*args, **kwargs)
 
 
 def result_is_valid(result: DatasetGenerationResult) -> bool:

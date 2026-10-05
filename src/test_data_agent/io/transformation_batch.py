@@ -238,8 +238,8 @@ def execute_batch(batch: TransformationBatch, *, expected_snapshot_sha256: str,
                     raise ValueError
                 children.add(values)
         scalar_spec = spec.model_copy(update={"relationships": scalar_relationships})
-        if (validate_schema(rows_by_entity, spec) or validate_relationships(rows_by_entity, scalar_spec, empty_string_is_null=False)
-                or validate_constraints(rows_by_entity, spec)):
+        if (validate_schema(rows_by_entity, spec) or validate_relationships(rows_by_entity, scalar_spec, empty_string_is_null=False, budget=budget)
+                or validate_constraints(rows_by_entity, spec, budget=budget)):
             raise ValueError
         budget.check("transformation batch complete")
         return tuple(results)

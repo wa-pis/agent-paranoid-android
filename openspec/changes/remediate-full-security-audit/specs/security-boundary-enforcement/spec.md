@@ -78,3 +78,27 @@ YAML loaders SHALL bound logical expanded nodes and bytes and reject cycles befo
 #### Scenario: Nested profile expansion
 - **WHEN** nested Parquet profile content exceeds logical cell or size bounds
 - **THEN** inspection rejects before nested Python materialization
+
+
+### Requirement: Deterministic Rule Work Is Bounded Across Callers
+Native constraints and business-rule application/validation SHALL enforce
+cumulative work allowances and cooperative deadlines inside their loops.
+Generation SHALL reject obvious native rule amplification before row creation.
+Negative FK and aggregate estimates SHALL include repeated row scans. Resource
+failures SHALL escape formula error reporting and prevent trusted publication.
+
+#### Scenario: Native temporal amplification
+- **WHEN** repeated constraints exceed estimated or actual evaluation limits
+- **THEN** direct generation/solving/validation reject within bounded work
+
+#### Scenario: Expiry during aggregate validation
+- **WHEN** the explicit budget expires inside an aggregate scan
+- **THEN** the resource failure propagates instead of becoming a validation result
+
+#### Scenario: Negative cross-table work
+- **WHEN** negative generation repeatedly scans parents or aggregate rows
+- **THEN** preflight accounts for quadratic work and inner scans consume one shared budget
+
+#### Scenario: Existing callback shape
+- **WHEN** a business callback accepts two or three positional arguments
+- **THEN** its argument shape remains supported with optional keyword-only budget propagation

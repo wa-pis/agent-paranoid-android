@@ -5,9 +5,9 @@ from __future__ import annotations
 import os
 import shutil
 import time
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 
 MAX_GENERATION_COUNT_ENV = "TEST_DATA_AGENT_MAX_GENERATION_COUNT"
@@ -63,8 +63,11 @@ class GenerationLimitError(ValueError):
     """Raised before generated output can exceed local resource budgets."""
 
 
+_RuleItem = TypeVar("_RuleItem")
+
+
 class GenerationBudget:
-    """Wall-clock budget checked at deterministic workflow boundaries."""
+    """Cooperative deadline and cumulative deterministic rule-work allowance."""
 
     def __init__(
         self,
@@ -77,12 +80,30 @@ class GenerationBudget:
             raise ValueError("generation time budget must be a finite positive number")
         self._clock = clock or time.monotonic
         self._started_at = self._clock()
+        self._rule_evaluations = 0
+        self._max_rule_evaluations = max_business_rule_evaluations()
 
     def check(self, stage: str) -> None:
         if self._clock() - self._started_at > self.max_seconds:
             raise GenerationLimitError(
                 f"generation exceeded the {self.max_seconds:g} second budget during {stage}"
             )
+
+    def consume_rule_work(self, count: int = 1) -> None:
+        """Charge cumulative deterministic rule work before the operation."""
+        self.check("deterministic rule evaluation")
+        self._rule_evaluations += count
+        if self._rule_evaluations > self._max_rule_evaluations:
+            raise GenerationLimitError(
+                f"deterministic rules exceeded {self._max_rule_evaluations} evaluations"
+            )
+
+    def iter_rule_work(self, items: Iterable[_RuleItem]) -> Iterator[_RuleItem]:
+        self.check("deterministic rule evaluation")
+        for item in items:
+            self.consume_rule_work()
+            yield item
+        self.check("deterministic rule evaluation")
 
 
 def max_generation_count() -> int:
