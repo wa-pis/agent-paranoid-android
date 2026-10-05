@@ -366,3 +366,16 @@ probe confirmed common-tool registration, strict=True and inherited1800s raw
 transport deadline. No production guards were patched for acceptance. Actual
 branch/main registration remains closed; inventories/full candidate checks and
 finished independent source review still required before activation.
+
+2026-10-05 current installed registration candidate acceptance: wheel SHA256
+2f1b6cad280c5c160f4114373899e8b00d1a92e5d11c5fdda1e51fa4d03930c8,
+base1d2a9a3 plus three proposed registration patches; still version1.5.0.
+Creation/runtime/inventory and nonpreserving stdio18passed; four preserving
+stdio cases failed in restricted sandbox before local confirmation. Unchanged
+wheel retested outside /dev/tty sandbox restriction: all6stdio cases passed,
+including direct/fallback preservation confirmations. No receipt/TTY guard
+changed. Installed OAuth tests6passed, including piped browser opt-in rejection
+before driver/artifact. Logs: isolated candidate acceptance.log and
+stdio-escalated.log. These focused results do not authorize activation or
+replace final whole-source audit, package/release gates. Private scale queue
+still9/12: supplied Trino CSV route running, two subsequent formats pending.
