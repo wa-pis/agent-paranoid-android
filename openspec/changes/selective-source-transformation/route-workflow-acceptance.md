@@ -1,5 +1,28 @@
 # Private saved-policy route acceptance — 2026-10-01
 
+## Fresh installed prospective candidate replay — 2026-10-06
+
+Exact audited source `6ef55a1d86e377ee442199fee60cec6b57c8b9a7`, built offline
+with pinned Hatchling and installed with no dependencies/network into an isolated
+target directory. Development wheel version remains1.5.0; SHA256
+`76fc927cc2372c832ea90e97f21600443fc7eec18c9d07d009049a021a86211e`.
+Python3.11, candidate-only PYTHONPATH; no product source-path fallback.
+
+Both harnesses were read completely before execution and ran unchanged:
+- `scripts/accept_transformation_routes.py --public`:12 typed routes passed,
+  including36 CLI refusal assertions for digest, output budget and overwrite.
+- `temporal-workflow-acceptance.py`:3 passed in1.86s, including explicit
+  timezone conversion and literal replacement.
+
+Logs and build identity: `/private/tmp/apa-r13-installed-a13c8a66/`;
+resume pointer `/private/tmp/apa-r13-installed-current.json`.
+All fixtures fictional; SQL inputs use injected Arrow streams and output SQL
+is never executed. MCP checks call the registered application function, not
+12-route SDK/wire parity. Current public registrations exist in the isolated
+prospective candidate only. This renews these specific installed checks after
+security fixes; it does not close all client1–26 evidence, scale acceptance,
+Python/extras matrices, documentation audit or final versionedRC release gates.
+
 ## Corrected installed twelve-route and temporal replay — 2026-10-04 local
 
 Read both complete harnesses before execution. Corrected isolated runtime

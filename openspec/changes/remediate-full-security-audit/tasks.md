@@ -433,3 +433,12 @@ no-liveDB instruction; do not trigger without explicit clearance. Continue
 synthetic offline acceptance/documentation work first. Version/tag, exactmain
 CI/Containers/Documentation/Security, Ubuntu hashes, signed manifest/tag and
 public verification remain mandatory; automation remains active.
+
+2026-10-06 fresh installed prospective acceptance after clean audit:
+offline wheel SHA25676fc927cc2372c832ea90e97f21600443fc7eec18c9d07d009049a021a86211e
+from exact6ef55a1, isolatedtarget/Python3.11. Unchanged reviewed route harness
+passed12typedroutes/36CLIrefusals; temporalharness3passed1.86s.
+Evidence selective-source-transformation/route-workflow-acceptance.md;
+/private/tmp/apa-r13-installed-current.json. No liveSQL/provider, no source
+fallback, no finalRC/artifact/matrix/scale clearance. Continue remaining client
+and documentation reconciliation; do not repeat these unchanged checks.

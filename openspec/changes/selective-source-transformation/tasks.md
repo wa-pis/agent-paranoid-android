@@ -1,8 +1,17 @@
 # Tasks: selective-source-transformation
 
-## Current security/configuration checkpoint — 2026-10-05
+## Current security/configuration checkpoint — 2026-10-06
 
-Clean full source audit at `28aa253` and full offline gate: 3043 passed, 23 skipped; final release SHA still needs renewed review. Current GitHub PR602 is OPEN draft at `d104cab`, superseding older closed/ac7f status notes. Its checks do not establish current-branch approval. Configurable generator MCP deadline is implemented and verified; all-route 1M × 100 acceptance remains open. Required CI uses a disposable synthetic Trino service; clarification of the live-DB restriction is pending before CI dispatch. No current RC clearance/publication claimed.
+Complete canonical source audit at composed `6ef55a1`:193 executable files,
+zero confirmed findings, no deferred coverage; offline gate3113passed19skipped.
+Fresh isolated installed development-wheel acceptance:12 typed routes,
+36 CLI refusals and3temporal tests passed on Python3.11; see route evidence.
+These are prospective activation checks, not final versionedRC clearance.
+All-route1M×100, full client/documentation acceptance and real release gates
+remain open. Required CI uses disposable syntheticTrino; explicit clearance
+of the no-liveDB restriction is pending before dispatch. No branch PR or
+current requiredapproval established. Historical PR602 checks are not approval
+of this branch. Final release SHA needs its own checks and independent review.
 
 ## Corrected installed evidence checkpoint — 2026-10-04
 
