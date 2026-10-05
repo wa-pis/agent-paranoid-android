@@ -53,3 +53,10 @@ lifecycle and temporary cleanup assertions passed. Ordinary profiling caps
 remain10,000rows/100,000cells. Per-job log: postgres-parquet.log under the
 queue root. Current private matrix8/12. Queue advanced to
 postgres-postgresql_sql, child PID84733. Poll retained state; no duplicate runs.
+
+2026-10-05 PostgreSQL → SQL target PASSED in the b249699 queue:1M ×100,
+100M cells,35,469,307 captured bytes,2,240,002,792 SQL artifact bytes,
+1575.730s. Every ordered INSERT/cell/schema/framing/COMMIT/EOF, replacement
+provenance, digest, worker lifecycle and temporary cleanup assertion passed.
+No SQL execution. Queue advanced to fictional Trino result → CSV; private
+fixture matrix9/12. Three Trino targets remain open; no network/server claims.

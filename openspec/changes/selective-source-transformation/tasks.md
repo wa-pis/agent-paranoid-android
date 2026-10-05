@@ -90,6 +90,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Prepare fictional supplied Trino-result harness through common authorization/capture, without network adapter/server/worker claims; three 2051 × 3 output smokes and PostgreSQL compatibility smoke passed. See sql-scale-acceptance.md; target proof stays open.
   - [x] Installed private Parquet → SQL 1M × 100 passed at 92bb1b6: full 100M-cell ordered SQL artifact/provenance/cleanup, 3398.476s, 2,140,502,692 bytes; no SQL execution. Current private fixture matrix 7/12; queue is running PostgreSQL → Parquet.
   - [x] Installed fictional PostgreSQL worker → Parquet 1M × 100 passed in b249699 queue: typed 100M-cell readback/provenance/digest/lifecycle/cleanup, 1602.427s, 17,493,375 bytes. Current private matrix8/12; PostgreSQL → SQL running.
+  - [x] Installed fictional PostgreSQL worker → SQL 1M ×100 passed in b249699 queue: 100M-cell ordered SQL text/provenance/digest/lifecycle/cleanup,1575.730s,2,240,002,792bytes; no SQL execution. Current private matrix9/12; fictional Trino result → CSV running.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.
@@ -350,3 +351,18 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   documentation tests and strict documentation build before the candidate.
 - [ ] Obtain independent security review and complete the required RC/release
   gates before shipping. Do not mark this proposal implemented beforehand.
+
+2026-10-05 current common activation preparation: isolated source copy at
+base1d2a9a3 is `/private/tmp/apa-current-common-candidate-sr4ui81v`, pointer
+`/private/tmp/apa-current-common-candidate.json`. Zero-context legacy MCP patch
+applied cleanly but misplaced its runtime strict_arguments addition after
+MCP deadline changes; compile alone did not detect the semantic error.
+Replaced proposed MCP patch with contextual factory-call hunks. New executable
+`tests/test_activation_patches.py` applies it to current source and verifies
+strict_arguments=True at both create_generator_mcp calls;1passed/Ruff pass.
+Isolated current startup deadline regressions2passed with disclosed test-factory
+adaptation (lambda accepts new registration keyword); separate actual-service
+probe confirmed common-tool registration, strict=True and inherited1800s raw
+transport deadline. No production guards were patched for acceptance. Actual
+branch/main registration remains closed; inventories/full candidate checks and
+finished independent source review still required before activation.

@@ -1,19 +1,36 @@
 diff --git a/src/test_data_agent/mcp_generator_server.py b/src/test_data_agent/mcp_generator_server.py
 --- a/src/test_data_agent/mcp_generator_server.py
 +++ b/src/test_data_agent/mcp_generator_server.py
-@@ -734,1 +734,3 @@
--    return [
+@@ -736,9 +736,11 @@
+     work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
+     budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
+ ) -> list[Callable[..., Any]]:
 +    from test_data_agent.mcp_transformation_candidate import _common_batch_tool
 +    tools = (*_GENERATOR_MCP_TOOLS, _common_batch_tool(workspace_root()))
-+    return [
-@@ -736,1 +738,1 @@
+     return [
+         with_query_work_budget(tool, work_limits, budget_provider=budget_provider)
 -        for tool in _GENERATOR_MCP_TOOLS
 +        for tool in tools
-@@ -761,1 +763,2 @@
+     ]
+
+
+@@ -763,7 +765,8 @@
+
+
+ mcp: Any = create_generator_mcp(
 -    generator_mcp_services(budget_provider=_current_transport_work_budget)
 +    generator_mcp_services(budget_provider=_current_transport_work_budget),
 +    strict_arguments=True,
-@@ -781,1 +784,2 @@
+ )
+
+
+@@ -796,7 +799,8 @@
+         generator_mcp_services(
+             work_limits=work_limits,
+             budget_provider=_current_transport_work_budget,
 -        )
 +        ),
 +        strict_arguments=True,
+     )
+     run_bounded_generator_mcp(
+         mcp,
