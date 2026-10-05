@@ -75,3 +75,16 @@ explicit; ordinary PostgreSQL profiling row/cell limits remain unchanged.
 10 × 3 smoke passed at 2MiB / 1MiB capture / 60s, including worker lifecycle,
 full readback and cleanup. Six invalid-budget startup checks and Ruff passed.
 This is harness validation, not target proof or live database evidence.
+
+Initial target run FAILED before capture: candidate
+`a14df8866b1ef4dbe5ac3d6d27959c94ee22a447`, installed wheel SHA-256
+`bcce6365fbb6724d2d583796a61567d99bbdc6c9a9e86eb7e02a5d65f156ae8e`
+(same runtime wheel as b49ceed; these commits change harness/docs only).
+Arguments: `--rows 1000000 --columns 100 --max-bytes 1073741824
+--capture-bytes 134217728 --max-seconds 3600`.
+Resumable state: `/private/tmp/apa-postgres-target-current.json`; PID 80533;
+log `/private/tmp/apa-postgres-target-a14df88-333utbsh/run.log`.
+The generated name field_cc was correctly classified as sensitive before
+opening the fictional stream. Fixture correction uses neutral numeric suffixes
+and checks all names against the existing classifier; no runtime guard changed.
+No live DB, public activation or all-route/RC clearance is implied.

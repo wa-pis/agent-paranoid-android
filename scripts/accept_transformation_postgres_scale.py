@@ -19,6 +19,7 @@ import pyarrow as pa
 import yaml
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.privacy import infer_sensitive_from_name
 from test_data_agent.core.transformation_policy import transformation_schema_fingerprint
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
@@ -47,7 +48,7 @@ class FictionalDriver:
         return self
 
     def execute(self, sql):
-        assert sql.startswith('SELECT "field_aa"') and sql.endswith(f"LIMIT {self.total + 1}")
+        assert sql.startswith(f'SELECT "{self.names[0]}"') and sql.endswith(f"LIMIT {self.total + 1}")
         assert "SELECT *" not in sql
         self.counters[3] += 1
 
@@ -82,7 +83,8 @@ def main() -> None:
         parser.error("max-seconds must be finite and positive")
     started = monotonic()
     budget = GenerationBudget(args.max_seconds)
-    names = tuple("field_" + chr(97 + i // 26) + chr(97 + i % 26) for i in range(args.columns))
+    names = tuple(f"field_{i:03d}" for i in range(args.columns))
+    assert not any(infer_sensitive_from_name(name) for name in names)
     max_bytes = args.max_bytes
     capture_bytes = args.capture_bytes
     counters = multiprocessing.get_context("spawn").RawArray("q", 6)
