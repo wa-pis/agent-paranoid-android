@@ -66,6 +66,9 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Bound ordinary Trino category projections before driver return and reject
+  oversized sentinels before publishing a category or sensitivity summary.
+
 - Bound local-category value projections in PostgreSQL table and PostgreSQL/Trino
   query profiling before driver allocation; reject oversized domains without
   filtering categories or truncating values.

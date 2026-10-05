@@ -113,3 +113,25 @@ PostgreSQL direct, environment and JDBC configuration SHALL default to `verify-f
 #### Scenario: Weak mode without acknowledgement
 - **WHEN** direct, environment or JDBC configuration selects `require`, `verify-ca`, or `disable` without local insecure opt-in
 - **THEN** configuration fails before password resolution or driver connection.
+
+### Requirement: Ordinary Trino categories are bounded before driver return
+
+Ordinary table profiling SHALL bound the same VARCHAR representation that it
+projects before returning category values to the driver. It SHALL preserve
+original grouping and counts, and SHALL reject an oversized-value NULL
+sentinel before classifying sensitivity or publishing a profile. It SHALL NOT
+truncate or filter oversized categories into an apparently complete summary.
+
+#### Scenario: Source category grows after aggregate profiling
+
+- **GIVEN** an authorized low-cardinality fictional string column
+- **WHEN** a value exceeds the input-cell character or UTF-8 representation bound
+- **THEN** the category query returns a bounded rejection sentinel
+- **AND** ordinary profiling fails with a value-free error before publication.
+
+#### Scenario: Bounded categories keep their counts
+
+- **GIVEN** bounded fictional Unicode and empty-string categories
+- **WHEN** ordinary Trino table profiling summarizes categories
+- **THEN** original grouping counts remain intact and source-free labels or
+  sensitive patterns retain the existing classification contract.

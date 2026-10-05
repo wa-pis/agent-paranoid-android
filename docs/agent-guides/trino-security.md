@@ -159,3 +159,12 @@ Rule residual queries reject sensitive-name target and arithmetic/value operands
 SQL-query exact local categories require an authorized direct physical-column projection. Both physical source and output names must pass the shared sensitive, identifier and quasi-identifier policy. Aliases cannot grant disclosure permission; derived expressions and manually constructed plans without explicit category authorization fail closed. This applies to PostgreSQL and Trino.
 
 PostgreSQL defaults to certificate and hostname verification (`verify-full`). All weaker TLS modes require explicit local insecure opt-in before password resolution or driver connection. JDBC and component configuration share this guard; driver errors never trigger a weaker-mode retry.
+
+Ordinary Trino table category summaries bound the projected VARCHAR inside
+the grouping query before driver return: at most
+`TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS` characters (default 1,000,000) and four
+times that many UTF-8 bytes. Guard and projection use the same representation,
+including CHAR conversion; grouping/counts retain the original column.
+Oversized values yield a NULL sentinel that rejects the whole profile before
+sensitivity classification. No truncation, filtering or incomplete summary
+is published. Existing cumulative result and query budgets still apply.

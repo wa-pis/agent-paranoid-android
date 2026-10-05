@@ -266,3 +266,48 @@ only from actual list despite activated golden fixture containing it.
 Compare full actual/expected contract; no runtime/API/golden change.
 Focused composed contract passes;4base contract/activation tests pass.
 New exact-SHA gate still required; no clean audit or RC claim.
+
+2026-10-06 full composed gate passed exact12528430e090060e6b79da1cf917e5044dfc2687:
+3088passed19skipped1warning188.48s90.50%; allreleasecheckstagespassed.
+Log /private/tmp/apa-r11-corrected-gcjkam5q/full-gate-final.log; actual
+CLI/MCP flags1, liveDBflags0. Fresh Standard scan
+e85d9c23-f678-4859-a2ab-fd121f4942c2 registered sameSHA, preflightready;
+r11_full_baseline independentwhole-source and r11_full_architecture running.
+Source /private/tmp/apa-r11-corrected-gcjkam5q immutable; pointer
+/private/tmp/apa-r11-coherent-current.json. Resume same scan, no gate repeat,
+no historicalreportreuse. Final audit/release clearances still incomplete.
+
+Fresh independent baseline/architecture started successfully. Additional
+focused worker spawn and existing preflightworker reuse hit actual host
+thread limit. Parent separate packet review fallback required; do not
+claim missing worker or review as complete. Same scan partial checkpoint
+persisted; e85d9c23 remains running.
+
+2026-10-06 current scan e85d9c23 validates one new LOW finding:
+normal default Trino profile_table_safe fetches full category strings before
+result-byte accounting (trino_query_builders.py130). Parent and independent
+architecture reviewer confirm; operational availability is conditional, no
+live DB or OOM demonstrated. R11 local-category bounds do not cover this
+sibling. Remediation pending; immutable12528430 stays unchanged for audit.
+Permutation candidate rejected by parent and independent baseline: accepted
+ADR0029/OpenSpec explicitly authorize applied mapped permutations; ordinary
+synthetic generation restrictions remain. Whole193-source baseline still
+running; canonical checkpoint partial, no clean audit or RC clearance.
+
+- [ ] R12: Bound normal Trino top-value projection and reject oversized sentinel;
+  focused regression, independent candidate review, docs/types/OpenSpec, commit/push.
+2026-10-06 R12 minimal candidate uses shared ordinary top-values SQL builder
+and summary gate. Guard/project same VARCHAR; counts/grouping unchanged.
+Independent prepatch investigator traced all callers. Initial184 focused
+tests and Ruff pass; added source-change sentinel publication regression.
+Final focused checks/reviewer pending. Frozen12528430 audit continues unchanged.
+
+2026-10-06 R12 candidate focused checks:185passed; Ruff, owning mypy,
+strict docs/OpenSpec and diff check pass. Fresh reviewer spawn and reuse
+both rejected by host thread limit. Parent separate candidate challenge
+checked all shared builder/summary callers, SQL guard/projection identity,
+NULL rejection before classification, Unicode/empty controls, unchanged
+grouping/counts and cumulative result budgets; no concrete surviving bypass
+identified. This fallback is not an independent reviewer claim. Native Trino
+semantics/live DB deliberately not exercised. Commit/push next; new composed
+gate and independent whole-source audit required before RC.

@@ -6,6 +6,7 @@ import ast
 from dataclasses import dataclass
 from typing import Any
 
+from test_data_agent.core.limits import max_input_cell_chars
 from test_data_agent.core.privacy import infer_sensitive_from_name
 
 from test_data_agent.trino_sql_policy import (
@@ -127,8 +128,12 @@ def build_top_values_query(
 ) -> TrinoQuery:
     safe_column = quote_identifier(column)
     safe_limit = bounded_limit(limit)
+    value = f"CAST({safe_column} AS varchar)"
+    max_chars = max_input_cell_chars()
     return TrinoQuery(
-        f"SELECT {safe_column} AS value, count(*) AS count "
+        f"SELECT CASE WHEN length({value}) <= {max_chars} "
+        f"AND length(to_utf8({value})) <= {4 * max_chars} "
+        f"THEN {value} ELSE NULL END AS value, count(*) AS count "
         f"FROM {qualified_table(catalog, schema, table)} "
         f"WHERE {safe_column} IS NOT NULL "
         f"GROUP BY {safe_column} "

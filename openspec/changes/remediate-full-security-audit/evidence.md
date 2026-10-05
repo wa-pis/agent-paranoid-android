@@ -212,3 +212,23 @@ category roundtrip/default metadata-only/count invariants remain covered.
 SQLGlot parses both dialects; earlier58tests/Ruff/mypy/docs/OpenSpec and
 independent reviewer clean for bounded driver-return control. Native DB
 execution remains intentionally unperformed; full composed gate/audit next.
+
+## R12 ordinary Trino category allocation (2026-10-06)
+
+Fresh scan `e85d9c23-f678-4859-a2ab-fd121f4942c2` at immutable
+`12528430e090060e6b79da1cf917e5044dfc2687` independently validates a
+LOW conditional availability issue: normal table category query returns an
+unbounded source string before driver/result-byte accounting. The frozen
+scan remains open until its independent whole-source validation finishes.
+
+Candidate bounds and returns the same VARCHAR representation in the shared
+builder, preserving original grouping/counts. Oversized NULL sentinels reject
+before summary classification/publication. Character ceiling reuses the
+existing input-cell setting; UTF-8 ceiling is four times that setting.
+Synthetic Unicode/empty/count controls and source-change sentinel regression
+pass with nearest Trino tests:185passed. Ruff, owning mypy, strict MkDocs,
+strict OpenSpec and diff check pass. Independent prepatch investigator
+completed. Candidate reviewer spawn/reuse unavailable due host thread limit;
+parent performed separate challenge pass, not independent approval. No live
+DB/provider/production inputs; native engine semantics remain unexecuted.
+This does not establish final release-SHA safety or release clearance.

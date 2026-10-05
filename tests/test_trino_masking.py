@@ -527,3 +527,39 @@ def test_safe_select_masks_custom_scalar_without_string_conversion():
     assert masker.run_safe_select(
         "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
     ) == [{"payload": ["[MASKED]", "[MASKED]"]}]
+
+
+@pytest.mark.parametrize("value", [None, "fictional-oversized", "🌱" * 9])
+def test_category_summary_rejects_sentinel_and_oversized_values(
+    monkeypatch: pytest.MonkeyPatch, value: object,
+) -> None:
+    from test_data_agent.core.limits import InputLimitError
+
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "8")
+    with pytest.raises(InputLimitError, match="^Trino category value exceeds the safe input limit$"):
+        summarize_top_values([{"value": "safe", "count": 3}, {"value": value, "count": 2}])
+
+
+def test_category_summary_accepts_unicode_boundary_and_empty_string(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "8")
+    assert summarize_top_values([
+        {"value": "🌱" * 8, "count": 3}, {"value": "", "count": 2},
+    ]) == {"top_values": [{"value": "category_1", "count": 3}, {"value": "category_2", "count": 2}]}
+
+
+def test_profile_column_rejects_oversized_projection_before_publication() -> None:
+    from test_data_agent.core.limits import InputLimitError
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        if "GROUP BY" in query.sql:
+            # Source changed after the aggregate; SQL returns a bounded sentinel.
+            return [{"value": None, "count": 2}]
+        return [{"row_count": 2, "non_null_count": 2, "approx_distinct_count": 1}]
+
+    masker = TrinoMasker(masker_config_allowlisted_columns(), fetch_query, reject_sql)
+    with pytest.raises(InputLimitError, match="safe input limit"):
+        masker.profile_column_safe(
+            "analytics", "safe_schema", "customers", "country_code", "varchar", False, 20,
+        )

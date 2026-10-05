@@ -18,7 +18,7 @@ from test_data_agent.core.privacy import (
     mask_value as mask_value,
     synthetic_category_distribution as synthetic_category_distribution,
 )
-from test_data_agent.core.limits import InputLimitError, max_input_cells, max_json_depth
+from test_data_agent.core.limits import InputLimitError, max_input_cell_chars, max_input_cells, max_json_depth
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
@@ -118,6 +118,12 @@ def _mask_returned_value(
 
 def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
     """Replace source categories with masked patterns or synthetic rank labels."""
+    max_chars = max_input_cell_chars()
+    if any(
+        not isinstance(row.get("value"), str) or len(row["value"]) > max_chars
+        for row in top_values
+    ):
+        raise InputLimitError("Trino category value exceeds the safe input limit")
     content_sensitive_type = infer_sensitive_type_from_values(
         row.get("value") for row in top_values
     )
