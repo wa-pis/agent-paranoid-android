@@ -396,7 +396,8 @@ def _direct_source_field(projection: Any) -> str | None:
 
 def _read_stable_query_file(path: Path, *, max_bytes: int) -> str:
     try:
-        with path.open("rb") as handle:
+        # Opening a FIFO must not wait for a writer before descriptor validation.
+        with os.fdopen(os.open(path, os.O_RDONLY | os.O_NONBLOCK), "rb") as handle:
             before = os.fstat(handle.fileno())
             if not stat.S_ISREG(before.st_mode):
                 raise SqlQuerySourceError("SQL query input must be a regular file")

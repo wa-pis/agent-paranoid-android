@@ -36,7 +36,8 @@ them through bounded metadata into a frozen explicit-column snapshot and never
 emit a projection star.
 
 `profile-query` is separate from normal table profiling and MCP caller SQL. It
-accepts one bounded local file, validates one fully qualified single-table
+accepts one bounded local regular file (special files reject without waiting
+for a FIFO writer), validates one fully qualified single-table
 `SELECT`, and executes only trusted no-row schema and aggregate wrappers.
 Query text, literals, backend errors, endpoints, and rows must not cross into
 profiles, generated data, logs, providers, or default MCP responses.

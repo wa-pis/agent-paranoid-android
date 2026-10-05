@@ -110,3 +110,19 @@ Threat model retained through Codex Security managed artifacts. Scan discovery
 incomplete; no clean finding conclusion or final RC clearance. Resume this same
 scan/worker next heartbeat; do not start another scan or repeat capacity checks.
 Active branch/main common registration remains closed; no release actions.
+
+R7 candidate confirmed: local profile-query FIFO opens before regular-file gate;
+synthetic frozen-source probe timed out1s and child was killed, no DB. Minimal
+O_NONBLOCK descriptor open before fstat retains regular/symlink compatibility.
+FIFO and FIFO-symlink regression plus ordinary linked-file control added.
+Independent fix investigator unavailable at thread cap; parent separate caller/
+compatibility pass performed. Verification underway; full audit remains open.
+
+R7 focused verification:137SQL source/adapter and76SQL profiling/documentation
+checks pass; FIFO and FIFO-symlink reject promptly, ordinary linked regular SQL
+control passes. Ruff/mypy/strict OpenSpec/docs/diff checks pass. Fresh fix-review
+spawn failed at thread cap; parent separate final caller/sibling/compatibility
+pass completed. Query opens preserve relative/regular-symlink behavior; byte,
+UTF-8 and identity checks unchanged. Full source scan9e541ae6 remains incomplete;
+BASELINE-1 nested-map keys and BASELINE-2 CSV formula candidates await parent
+validation. Managed discovery checkpoint retained. No RC or final-SHA clearance.

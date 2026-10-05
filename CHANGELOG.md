@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- SQL query inputs reject FIFOs before blocking reads; regular-file behavior remains unchanged.
+
 - Encode selective transformation Parquet output in 1024-row groups instead of retaining a second full normalized dataset; preserve timestamp-offset and source-reuse checks.
 
 - Retain intentionally invalid mixed/negative output and validation evidence

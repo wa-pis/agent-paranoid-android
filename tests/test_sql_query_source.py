@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
+import subprocess
+import sys
 
 import pytest
 
@@ -383,3 +386,37 @@ def test_local_category_authorization_tracks_physical_projection(
     else:
         with pytest.raises(SqlQueryProfileError, match="not allowed"):
             build_query_local_category_query(query, "state")
+
+
+@pytest.mark.parametrize("symlink", [False, True])
+def test_query_fifo_rejects_without_waiting_for_writer(tmp_path, symlink):
+    fifo = tmp_path / "fictional.sql"
+    os.mkfifo(fifo)
+    path = fifo
+    if symlink:
+        path = tmp_path / "linked.sql"
+        path.symlink_to(fifo)
+    import test_data_agent.sql_query_source as source
+
+    code = (
+        "from pathlib import Path; "
+        "from test_data_agent.sql_query_source import _read_stable_query_file, SqlQuerySourceError; "
+        "\ntry: _read_stable_query_file(Path(" + repr(str(path)) + "), max_bytes=1024)"
+        "\nexcept SqlQuerySourceError as error: print(str(error))"
+    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True,
+        text=True, timeout=3, cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(Path(source.__file__).resolve().parents[1]),
+             "PYTHONDONTWRITEBYTECODE": "1"})
+    assert result.returncode == 0
+    assert result.stdout.strip() == "SQL query input must be a regular file"
+    assert result.stderr == ""
+
+
+def test_query_regular_symlink_keeps_existing_compatibility(tmp_path):
+    from test_data_agent.sql_query_source import _read_stable_query_file
+
+    query = write_query(tmp_path, "SELECT amount FROM public.fictional_items")
+    link = tmp_path / "linked.sql"
+    link.symlink_to(query)
+    assert _read_stable_query_file(link, max_bytes=1024) == query.read_text()
