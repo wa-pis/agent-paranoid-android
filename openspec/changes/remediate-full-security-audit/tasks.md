@@ -19,13 +19,18 @@
 - [x] F7: Parquet dataset reads enforce actual decoded bytes, cell sizes and cumulative dataset cells before list conversion.
 - [x] F8: Single CSV profiling honors inherited MCP deadline through final publication and fails without trusted partial output.
 - [x] F9: Audit verification uses bounded line reads before parsing/authentication.
-- [ ] Commit/push only related changes and record exact fix SHAs.
-- [ ] Relevant CLI/MCP/direct-service regressions, lint/types, OpenSpec and documentation checks pass.
+- [x] Commit/push only related changes and record exact fix SHAs.
+- [x] Relevant CLI/MCP/direct-service regressions, lint/types, OpenSpec and documentation checks pass.
 
 ## Fresh full audit loop
 
-- [ ] Complete the full release gate on final source.
-- [ ] Independently re-audit the entire final project at exact immutable SHA, including all nine fix paths and siblings.
+- [x] Complete the full release gate on audit baseline `d4765cf` (2994 passed,23 skipped,90.29%; strict docs pass).
+- [x] Independently audit entire immutable `d4765cf`, including all nine fix paths and siblings; four new medium resource findings.
+- [x] R1: Bound expanded YAML alias nodes/bytes and reject cycles before model construction.
+- [ ] R2: Common deterministic generation allocation preflight for direct/export/synthesis callers.
+- [ ] R3: Bound cumulative folder inference evaluations and check deadlines inside loops.
+- [ ] R4: Bound Parquet profiling nested logical content before Python conversion.
+- [ ] Repeat full gate and independent whole-project audit on the new final SHA.
 - [ ] Validate every new candidate; repair confirmed findings and repeat affected tests and full audit.
 - [ ] Record clean complete canonical audit; no open validated findings, deferred blocking candidate or skipped required checks.
 
@@ -61,3 +66,7 @@ Fresh independent read-only F2 candidate review found no concrete bypass or regr
 2026-10-05 F7 completed:256-row batch gates cover actual bytes, retained-dictionary logical expansion, nested cell/depth/size and cumulative mixed-format counters before to_pylist.100focused reader/CLI/limits/workflow tests, Ruff, mypy and strict OpenSpec pass. Fresh independent review clean; reviewer14tests plus bounded map/fixed-list/binary/null-dictionary probes pass. Native Arrow allocation limitation documented. F8 remains.
 
 2026-10-05 F8 completed: captured invocation budget spans CSV rows/fields/finalization, row digests, generation and publication. Independent review reproduced post-replacement directory-fsync expiry; callback now checks completion and safely restores/removes the published profile. Bundle deadlines use existing rollback.299focused tests pass; final35atomic/deadline tests after backup-retention adjustment pass; Ruff/mypy/strict OpenSpec pass. All nine implementation fixes complete; full release gate and fresh exact-SHA audit remain mandatory.
+
+2026-10-05 fresh audit: scan `f929c897-48b4-406b-a746-90fd55dce79d`, immutable `d4765cf0fe92d10b458f08e2db282cd57901ba19`;141 production Python,21 scripts,9 CI workflows reviewed independently. Four medium resource findings validated with bounded synthetic probes. Canonical report retained in Codex Security; RC blocked. Fresh read-only boundary investigator completed; no source edits by reviewer.
+
+R1 complete: alias-reference expanded-node charge and scalar-byte graph accounting before construction; recursive references reject.142focused tests, Ruff/mypy/strictOpenSpec pass. Reviewer confirmed no unbounded DAG/cycle bypass. Alias-free syntax nodes are not charged against dataset cell allowance; bounded ordinary aliases and low-cell spec compatibility preserved.

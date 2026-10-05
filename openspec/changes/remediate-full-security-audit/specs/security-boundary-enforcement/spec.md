@@ -55,3 +55,26 @@ An RC SHALL be published only after all validated findings are fixed, the comple
 #### Scenario: Clean review and release gates
 - **WHEN** the exact release SHA has clean complete review and all required release/approval/signature/artifact gates pass
 - **THEN** automation may publish the unused 1.6.0 RC and verify its public artifacts without publishing stable
+
+### Requirement: Follow-up Allocation Boundaries Are Shared
+YAML loaders SHALL bound logical expanded nodes and bytes and reject cycles before construction. Deterministic generation SHALL bound per-value and cumulative allocation for every caller. Folder inference SHALL charge cumulative work and check deadlines within candidate and row loops. Parquet profiling SHALL bound nested logical values before Python conversion.
+
+#### Scenario: Bounded ordinary alias
+- **WHEN** YAML reuses a small acyclic mapping within logical limits
+- **THEN** ordinary alias semantics remain supported
+
+#### Scenario: Alias amplification
+- **WHEN** YAML aliases exceed logical input limits despite a small physical file
+- **THEN** parsing rejects before expanded model serialization
+
+#### Scenario: Direct synthesis allocation
+- **WHEN** direct generation, SQL export or transformation synthesis requests excessive string allocation
+- **THEN** the shared generator rejects before constructing rows
+
+#### Scenario: Combinatorial inference
+- **WHEN** folder inference exceeds its deadline or cumulative evaluation allowance
+- **THEN** mining stops within its inner loops without trusted profile publication
+
+#### Scenario: Nested profile expansion
+- **WHEN** nested Parquet profile content exceeds logical cell or size bounds
+- **THEN** inspection rejects before nested Python materialization

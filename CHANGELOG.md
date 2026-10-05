@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Security
+
+- Bound logical YAML alias expansion and reject recursive aliases before model construction, including private synthesis policies.
+
 ### Added
 
 - Prepare an isolated common saved-profile workflow for create/review/local
