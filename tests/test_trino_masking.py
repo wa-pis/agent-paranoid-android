@@ -338,11 +338,7 @@ def test_safe_select_masks_strings_in_nested_values() -> None:
 
     assert result == [
         {
-            "payload": {
-                "note": "[MASKED]",
-                "items": ["[MASKED]", 3],
-                "pair": ("[MASKED]", 4),
-            },
+            "payload": "[MASKED]",
             "count": 2,
         }
     ]
@@ -355,7 +351,7 @@ def test_safe_select_masks_strings_in_nested_values() -> None:
         (
             "TEST_DATA_AGENT_MAX_JSON_DEPTH",
             2,
-            {"outer": {"value": "hidden"}},
+            {1: {2: "hidden"}},
             "Trino safe-select result values must have depth <= 2",
         ),
         (
@@ -460,3 +456,21 @@ def test_masking_boundary_does_not_import_transport_or_client() -> None:
     assert "test_data_agent.mcp_trino_server" not in imported_modules
     assert "test_data_agent.mcp_trino_transport" not in imported_modules
     assert "test_data_agent.trino_client" not in imported_modules
+
+
+@pytest.mark.parametrize("key", ["fictional@example.test", "ordinary label", synthetic_secret()])
+def test_safe_select_masks_source_map_keys_without_collapsing_entries(key):
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": [{key: 1, "second": 2}], "count": 2}])
+    result = masker.run_safe_select(
+        "SELECT payload, count FROM analytics.safe_schema.customers LIMIT 1")
+    assert result == [{"payload": ["[MASKED]"], "count": 2}]
+    assert key not in str(result)
+
+
+def test_safe_select_retains_numeric_map_shape_and_masks_string_values():
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": {1: "fictional", 2: [3, "label"]}}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": {1: "[MASKED]", 2: [3, "[MASKED]"]}}]

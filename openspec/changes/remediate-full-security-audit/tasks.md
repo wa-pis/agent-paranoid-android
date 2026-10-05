@@ -126,3 +126,16 @@ pass completed. Query opens preserve relative/regular-symlink behavior; byte,
 UTF-8 and identity checks unchanged. Full source scan9e541ae6 remains incomplete;
 BASELINE-1 nested-map keys and BASELINE-2 CSV formula candidates await parent
 validation. Managed discovery checkpoint retained. No RC or final-SHA clearance.
+
+R8 implementation: safe-select map keys are source row contents; maps with
+string keys suppress entirely, avoiding key collisions and raw string leakage.
+Numeric-map compatibility and nested depth/cell controls remain tested.
+Regression verification underway; full scan and CSV formula candidate open.
+
+R8 focused verification:124masker/client/MCP tests passed, Ruff/mypy and
+strict OpenSpec/diff checks passed. String-map keys (including synthetic email,
+secret and ordinary labels) do not survive response; entire map is suppressed,
+so entries are not silently merged under a shared redacted key. Numeric maps,
+scalar summaries and bounded list/tuple/depth behavior remain compatible.
+Parent separate sibling/compatibility pass used after known thread-cap block;
+independent whole-source review remains incomplete, CSV formula candidate open.

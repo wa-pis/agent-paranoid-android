@@ -84,6 +84,9 @@ def _mask_returned_value(
     ):
         return mask_value(value)
     if isinstance(value, dict):
+        # Map keys are source contents, not trusted schema labels.
+        if any(isinstance(item, str) or looks_sensitive_value(item) for item in value):
+            return mask_value(value)
         return {
             nested_key: _mask_returned_value(
                 nested,
