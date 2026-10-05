@@ -26,6 +26,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--input-format", choices=("csv", "parquet"), default="csv")
     parser.add_argument("--output-format", choices=("csv", "parquet", "postgresql_sql"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
@@ -42,20 +43,36 @@ def main() -> None:
     names = ["field_" + chr(97 + i // 26) + chr(97 + i % 26) for i in range(args.columns)]
     with TemporaryDirectory(prefix="apa-scale-fictional-") as directory:
         root = Path(directory).resolve()
-        source_path = root / "items.csv"
-        with source_path.open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.writer(handle, lineterminator="\n")
-            writer.writerow(names)
-            for index in range(args.rows):
-                writer.writerow(["alpha" if index % 2 == 0 else "beta"] * args.columns)
+        source_path = root / ("items." + args.input_format)
+        if args.input_format == "csv":
+            with source_path.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.writer(handle, lineterminator="\n")
+                writer.writerow(names)
+                for index in range(args.rows):
+                    budget.check("scale fixture creation")
+                    writer.writerow(["alpha" if index % 2 == 0 else "beta"] * args.columns)
+        else:
+            import pyarrow as pa
+            import pyarrow.parquet as pq
+
+            schema = pa.schema([pa.field(name, pa.string(), nullable=False) for name in names])
+            with pq.ParquetWriter(source_path, schema) as writer:
+                for start in range(0, args.rows, 1024):
+                    budget.check("scale fixture creation")
+                    values = ["alpha" if index % 2 == 0 else "beta"
+                              for index in range(start, min(start + 1024, args.rows))]
+                    column = pa.array(values, type=pa.string())
+                    writer.write_table(pa.Table.from_arrays([column] * args.columns, schema=schema))
         def mapping(path: str) -> dict:
             return {"kind": "csv", "path": path, "source_columns": ["old"], "replacement_columns": ["new"]}
         (root / "global.csv").write_text("old,new\nalpha,omega\nbeta,theta\nomega,cascade\n", encoding="utf-8")
         (root / "column.csv").write_text("old,new\nalpha,first\nbeta,second\n", encoding="utf-8")
         policy = {"schema_version": "0.1", "schema_fingerprint": "0" * 64, "seed": 7,
+                  "input_format": args.input_format,
                   "resource_limits": {"max_input_rows": 1_000_000, "max_input_columns": 100,
                       "max_input_cells": 100_000_000, "max_input_file_bytes": max_bytes,
                       "max_total_input_bytes": max_bytes,
+                      "max_parquet_expanded_bytes": max_bytes,
                       "max_output_bytes": max_bytes},
                   "file_text_mapping": mapping("global.csv"), "fields": [
                       {"entity": "items", "field": name, "sensitivity": "non_sensitive",
@@ -137,9 +154,9 @@ def main() -> None:
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "output_bytes": output_bytes,
         "max_bytes": max_bytes, "max_seconds": args.max_seconds,
-        "output_format": args.output_format,
+        "input_format": args.input_format, "output_format": args.output_format,
         "elapsed_seconds": round(monotonic() - started, 3),
-        "scope": "private replacement-only CSV input; no public activation"}), flush=True)
+        "scope": "private replacement-only local file input; no public activation"}), flush=True)
 
 
 if __name__ == "__main__":

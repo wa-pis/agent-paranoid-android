@@ -108,3 +108,26 @@ The same fixture harness now supports `--output-format postgresql_sql` and
 checks the complete framing, declared TEXT schema, every ordered INSERT row,
 terminal COMMIT and EOF without executing SQL. 10 × 100 synthetic smoke passed
 (0.193s, 24,097 bytes), Ruff passed; target SQL artifact proof remains open.
+
+## CSV → SQL target — PASSED
+
+Candidate `2d878f7e3353dc11b6480f2d4bddf4792d03d642`; same installed runtime wheel as 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`), harness-only subsequent commits.
+Immutable copied harness SHA-256 `b7c9b3ddb5d47f03e42f45f940636a20539f795da27224bcd96c174483a9888f`.
+Arguments: `--rows 1000000 --columns 100 --output-format postgresql_sql
+--max-bytes 3221225472 --max-seconds 3600`. The explicit 3GiB byte ceiling
+accounts for repeated column names in each SQL INSERT statement.
+State `/private/tmp/apa-sql-target-current.json`; PID 82136;
+log `/private/tmp/apa-sql-target-2d878f7-78goihnx/run.log`. Poll before repeating. This checks SQL text artifacts
+without a database connection or execution; public/all-route/RC gates stay open.
+
+CSV → SQL target results: profile 291.552s; review cumulative 580.806s;
+complete 1435.367s. SQL artifact 2,140,502,692 bytes. All 1M ordered INSERT
+statements / 100M replaced cells, schema/framing/COMMIT/EOF, provenance,
+input digest and cleanup assertions passed. No SQL execution or live DB.
+
+The local-file harness now accepts `--input-format parquet`, creating the
+fictional input in 1024-row groups and explicitly configuring decoded-byte
+limits. Three 2051 × 3 Parquet-input readbacks (CSV, Parquet, PostgreSQL SQL
+outputs) passed, including provenance/cleanup; Ruff passed. These are small
+harness checks, not Parquet-input target proof.
