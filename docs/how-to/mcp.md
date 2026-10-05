@@ -52,7 +52,8 @@ Use the installed console commands:
     "test-data-agent-generator": {
       "command": "test-data-agent-mcp-generator",
       "env": {
-        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/synthetic-workspace"
+        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/synthetic-workspace",
+        "TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS": "120"
       }
     },
     "test-data-agent-trino": {

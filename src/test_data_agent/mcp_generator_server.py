@@ -6,6 +6,7 @@ import json
 import os
 import sys
 from collections.abc import Callable
+from dataclasses import replace
 from functools import partial
 from pathlib import Path
 from typing import Any, Literal
@@ -32,6 +33,7 @@ from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
     enforce_profile_payload_size,
     read_limited_text,
+    positive_float_env,
 )
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
@@ -69,6 +71,7 @@ from test_data_agent.version import __version__
 
 
 WORKSPACE_ROOT_ENV = "TEST_DATA_AGENT_WORKSPACE_ROOT"
+MCP_MAX_INVOCATION_SECONDS_ENV = "TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS"
 
 
 class WorkspacePathError(ValueError):
@@ -774,7 +777,20 @@ def main() -> int:
             file=sys.stderr,
         )
         return 69
-    work_limits = DEFAULT_QUERY_WORK_LIMITS
+    try:
+        work_limits = replace(
+            DEFAULT_QUERY_WORK_LIMITS,
+            max_invocation_seconds=positive_float_env(
+                MCP_MAX_INVOCATION_SECONDS_ENV,
+                DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds,
+            ),
+        )
+    except ValueError:
+        print(
+            f"{MCP_MAX_INVOCATION_SECONDS_ENV} must be a finite positive number",
+            file=sys.stderr,
+        )
+        return 78
     audit_logger_from_env("generator-mcp")
     mcp = create_generator_mcp(
         generator_mcp_services(

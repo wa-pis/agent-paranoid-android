@@ -80,6 +80,22 @@ profile is not a compatibility promise for the released `1.5.0` package.
 Values must be positive integers, except the two `*_SECONDS` values, which
 accept positive finite numbers. Invalid environment values fail closed.
 
+## Generator MCP Invocation Deadline
+
+`TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` defaults to `120` and accepts a
+finite positive number of seconds. Set it in the generator MCP client's `env`
+configuration and restart that server. The Compose generator service forwards
+the same variable from the shell or Compose `.env` file. Startup rejects invalid values with a
+value-free configuration error (exit 78). One captured value governs both the
+transport request context and service invocation; tool arguments cannot change it.
+
+For a reviewed longer run, for example set this value to `1800`. The independent
+`TEST_DATA_AGENT_MAX_GENERATION_SECONDS`, profiling and transformation byte/row/
+cell limits still apply; set the relevant limits explicitly too. This setting
+does not enlarge SQL access, raw frame, argument or response-byte ceilings and
+does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
+`TRINO_MAX_INVOCATION_SECONDS` setting.
+
 ## Private Transformation Input Limits (1.6 Development)
 
 These settings currently apply to private source-file acquisition, the transformation input decoder and

@@ -70,6 +70,12 @@ The generator receives only `/workspace` and `/audit`; it has no network:
 docker compose run --rm -T generator-mcp
 ```
 
+Set `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` in the shell or Compose `.env`
+file before starting generator MCP to configure its invocation deadline. The
+default is 120 seconds; finite positive values are required. Independent generation,
+profiling, transformation and container memory limits still apply.
+
+
 An MCP client can launch that command directly. Use an absolute Compose path:
 
 ```json

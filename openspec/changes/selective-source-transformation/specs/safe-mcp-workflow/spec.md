@@ -118,3 +118,15 @@ remain; it SHALL NOT delete unverified paths or authorize overwrite retries.
 - **WHEN** cleanup cannot confirm the identity of an invocation-owned artifact
 - **THEN** the error warns that output or staging may remain
 - **AND** local inspection is required before retrying without overwrite
+
+### Requirement: Generator MCP Deadline Is Operator Configurable
+Generator MCP SHALL capture a finite positive `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` at startup, default 120 seconds, and share it between transport and service budgets. Tool arguments SHALL NOT override this setting. Independent generation, profiling, transformation and payload limits SHALL remain enforced.
+
+#### Scenario: Reviewed longer invocation
+- **WHEN** the operator configures 1800 seconds and restarts generator MCP
+- **THEN** its transport and services receive the same 1800-second limit
+- **AND** their byte limits and independent local-work limits remain unchanged.
+
+#### Scenario: Invalid startup deadline
+- **WHEN** the setting is zero, negative, non-finite or malformed
+- **THEN** startup fails before registering/running tools or resolving audit material with a value-free error.

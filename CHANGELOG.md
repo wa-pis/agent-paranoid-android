@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
+
 - Prepare an isolated common saved-profile workflow for create/review/local
   approval/validate/execute, with explicit shared budgets, exact snapshot binding
   and metadata-only MCP consumption. Common public registration remains closed

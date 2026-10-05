@@ -75,6 +75,9 @@ def test_compose_keeps_generator_and_trino_boundaries_separate() -> None:
 
     generator = services["generator-mcp"]
     trino = services["trino-mcp"]
+    assert generator["environment"]["TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS"] == (
+        "${TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS:-120}"
+    )
     assert generator["network_mode"] == "none"
     assert "networks" not in generator
     assert {volume["target"] for volume in generator["volumes"]} == {

@@ -35,9 +35,9 @@
 - [x] R5: Bound native solver/validation and negative business-rule work across direct/workflow callers.
 - [x] Full gate at `3d0289b`:3033passed23skipped, strict docs pass; fresh complete scan `aeca366b-900c-4314-a0cf-cc27f15169b1` found PostgreSQL TLS identity issue.
 - [x] R6: Default PostgreSQL to full server identity verification; gate weaker direct/env/JDBC modes before credentials/connect, document migration and verify regressions.
-- [ ] Repeat full gate and independent whole-project audit on the new final SHA.
-- [ ] Validate every new candidate; repair confirmed findings and repeat affected tests and full audit.
-- [ ] Record clean complete canonical audit; no open validated findings, deferred blocking candidate or skipped required checks.
+- [x] Full gate and complete independent audit at `28aa253`:3043passed23skipped, strict docs pass; scan `5678a924-0708-46a5-9e57-a852f51946b4`, zero confirmed findings.
+- [x] Validate all audit candidates and repair confirmed F1–F9/R1–R6 findings.
+- [x] Record complete clean canonical source audit at `28aa253`; final release-SHA review and separate acceptance/release gates remain required.
 
 ## Conditional release
 
@@ -84,3 +84,5 @@ R5 implementation verified:453owning-package tests passed4skipped;41rule/conditi
 R6 investigation: fresh boundary worker unavailable (thread cap); separate parent pass traced direct/env/JDBC resolution and session validation before secret resolution. Existing allow_insecure is the shared exception control. Immutable full audit covers production, scripts, CI, examples, acceptance programs and dependency metadata; external dependency vulnerability/source review and live MITM are not claimed.
 
 R6 verified:237 PostgreSQL/SQL-source tests plus56 CLI/transform-isolation/temporal tests pass; Ruff,2module mypy, strict OpenSpec and docs pass. Fresh independent candidate review passed68tests and24fake-driver mode/opt-in cases, no surviving bypass/regression. Secure default reaches driver as verify-full; weaker modes reject before password resolution/connect unless explicit local opt-in. No live TLS handshake claimed. Full gate and new exact-SHA full audit remain open.
+
+2026-10-05 clean audit:143production Python,21scripts,9workflows,15executableexamples,5acceptance programs and shipped skills reviewed;237unique credited including structural lock metadata. No production/live/provider test or external dependency-CVE claim. Architecture worker unavailable; separate parent source mapping used. Plugin usage25,497,080total including24,680,576cached input is cumulative rollout accounting, not incremental scan cost. New capacity work must pass focused checks; final coherent RC SHA still needs full gate/audit.

@@ -1,5 +1,9 @@
 # Tasks: selective-source-transformation
 
+## Current security/configuration checkpoint — 2026-10-05
+
+Clean full source audit at `28aa253` and full offline gate: 3043 passed, 23 skipped; final release SHA still needs renewed review. Current GitHub PR602 is OPEN draft at `d104cab`, superseding older closed/ac7f status notes. Its checks do not establish current-branch approval. Configurable generator MCP deadline is implemented and verified; all-route 1M × 100 acceptance remains open. Required CI uses a disposable synthetic Trino service; clarification of the live-DB restriction is pending before CI dispatch. No current RC clearance/publication claimed.
+
 ## Corrected installed evidence checkpoint — 2026-10-04
 
 Closed implementation PR602 is draft at ac7f76f; author registration switches
@@ -74,6 +78,8 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
 
 - [ ] Support target 1,000,000 rows x100 columns across transformation routes;
   audit hidden constants, byte/time ceilings and SQL aggregate-budget coupling.
+  - [x] Replace fixed generator MCP 120-second deadline with finite operator configuration shared by transport/services; verify startup/invalid settings. Validation: 192 focused tests passed; Ruff, server mypy, both strict OpenSpec checks and strict documentation build passed. Parent boundary review confirmed a shared captured finite deadline, unchanged default/byte caps, and value-free startup errors. Full release gate and independent audit must cover the final candidate SHA.
+  - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.
 - [x] Preserve typed value-free limit errors through core, adapters, worker,
