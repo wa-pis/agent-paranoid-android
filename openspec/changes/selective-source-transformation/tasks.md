@@ -444,3 +444,14 @@ changes for coherent future activation; active branch inventory remains closed.
 Logs: focused-contract-repair.log,remaining-gate.log,schema-quickstart-gate.log
 under sr4ui81v. This is reconciled prospective gate evidence, not a green
 single final-SHA gate or independent safety clearance.
+
+2026-10-05 coherence preparation: refreshed CLI/OAuth proposal patches with
+context, avoiding --unidiff-zero. Four proposals apply sequentially with
+standard git apply to current9e7d8cb archive; coherent copy at
+/private/tmp/apa-coherent-registration-hjd3v1ez, pointer
+/private/tmp/apa-coherent-registration-current.json. Contract/docs53tests pass
+from candidate root. Initial invocation from active worktree read its relative
+fixtures and failed2checks; corrected cwd, no guard changes. Proposed public
+registration remains inactive. Next: freeze complete prospective source identity
+and obtain independent full-source review before activation; final RC gates stay
+open. Existing prospective gate evidence is retained without repeated scale runs.
