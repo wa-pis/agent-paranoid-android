@@ -85,6 +85,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Encode Parquet in 1024-row groups, preserving global timestamp offsets and one-shot source checks: 208 passed / 4 skipped owning regressions, mypy, Ruff, strict OpenSpec/docs; 2051 × 3 CSV → Parquet complete readback smoke passed. Target format proof remains open.
   - [x] Installed private CSV → Parquet 1M × 100 passed at 15cd2d4: 100M typed cells, complete readback/provenance/cleanup, 1488.050s, 17,398,511 output bytes.
   - [x] Installed private CSV → SQL artifact 1M × 100 passed at 2d878f7: all ordered INSERTs/cells/framing/readback/provenance/cleanup, 1435.367s, 2,140,502,692 bytes; no SQL execution.
+  - [x] Installed private Parquet → CSV 1M × 100 passed at b5640de: complete 100M-cell readback/provenance/cleanup, 1375.641s, 600,500,900 bytes. Matrix now records 5/12 private fictional target routes.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.

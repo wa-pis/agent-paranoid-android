@@ -131,3 +131,32 @@ fictional input in 1024-row groups and explicitly configuring decoded-byte
 limits. Three 2051 × 3 Parquet-input readbacks (CSV, Parquet, PostgreSQL SQL
 outputs) passed, including provenance/cleanup; Ruff passed. These are small
 harness checks, not Parquet-input target proof.
+
+## Parquet → CSV target — PASSED
+
+Candidate `b5640de2acdf0dde25da166062edd3ea7e47845b`; installed runtime wheel remains 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); subsequent changes are harness/docs only.
+Immutable harness SHA-256 `fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`.
+Arguments: `--rows 1000000 --columns 100 --input-format parquet
+--output-format csv --max-bytes 1073741824 --max-seconds 3600`.
+State `/private/tmp/apa-parquet-input-target-current.json`; PID 82466;
+log `/private/tmp/apa-parquet-input-target-b5640de-2y7b9w4m/run.log`. Poll before repeating; no all-route/RC clearance implied.
+
+Parquet → CSV target results: profile 320.714s; review cumulative 638.728s;
+complete 1375.641s; output 600,500,900 bytes. All 100M cells passed ordered
+readback, mapping precedence/non-cascade behavior, provenance, unchanged input
+digest and temporary input/output cleanup. Exact candidate/runtime/harness and
+budgets are retained above. No public activation or all-route claim.
+
+## Current private fictional 1M × 100 matrix
+
+| Input | CSV output | Parquet output | SQL artifact |
+|---|---|---|---|
+| CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
+| Parquet | PASS b5640de | OPEN | OPEN |
+| PostgreSQL fictional worker | PASS 611b781 | OPEN | OPEN |
+| Trino fictional result | OPEN | OPEN | OPEN |
+
+These are installed private fixture checks, not twelve-route public/CLI/MCP
+activation or live backend evidence. PostgreSQL details are in the companion
+postgres-scale-acceptance.md. Final source audit and release gates remain open.
