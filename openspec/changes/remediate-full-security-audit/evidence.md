@@ -171,3 +171,17 @@ lifecycle/provenance/readback/cleanup evidence in sql-scale-acceptance.md.
 Current private fixture matrix8/12. Fresh independent final-SHA source audit,
 public/client acceptance and actual release gates remain open; past clean28aa
 report is not proof of current/final SHA.
+
+2026-10-05 post-fix independent audit completed and sealed: exact
+2fcacae05ae9566e3a53aa69db24535463e12619, scan881daf8e.
+193 executable/config paths fully reviewed by independent baseline; additional
+SQL/support metadata inspected. Two open findings: R10 medium binary masking
+and R11 low category prefetch allocation. No live DB/provider/production data.
+Report: apa-postfix-coherent-kx37frd3/
+2fcacae05ae9566e3a53aa69db24535463e12619_20261005T184956Z_katt3gji/report.md
+under the Codex Security scan store. Category impact statically validated;
+binary path reproduced with synthetic actual driver/MCP serialization.
+Tests/inert prose/fixtures/upstream advisory coverage explicitly limited.
+Plugin usage35,364,290total/34,352,128cached is cumulative rollout accounting,
+not incremental cost of this scan. R10/R11 fixes and fresh exact-SHA audit
+remain required; no RC clearance. Existing full gate was not repeated.
