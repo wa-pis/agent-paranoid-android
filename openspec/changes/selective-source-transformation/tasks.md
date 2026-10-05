@@ -81,6 +81,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Replace fixed generator MCP 120-second deadline with finite operator configuration shared by transport/services; verify startup/invalid settings. Validation: 192 focused tests passed; Ruff, server mypy, both strict OpenSpec checks and strict documentation build passed. Parent boundary review confirmed a shared captured finite deadline, unchanged default/byte caps, and value-free startup errors. Full release gate and independent audit must cover the final candidate SHA.
   - [x] Make CSV acceptance byte/time ceilings explicit; 10 × 3 smoke and five invalid-budget startup checks passed. Target fixture exceeds the old fixed 512MiB; target proof remains open.
   - [x] Installed private CSV 1M × 100 passed at b49ceed: 100M cells, complete readback/provenance/cleanup, 1188.870s, explicit 1GiB / 3600s. See csv-scale-acceptance.md.
+  - [x] Installed fictional PostgreSQL worker → CSV 1M × 100 passed at 611b781: 100M cells, complete readback/provenance/cleanup, 1412.882s, explicit 1GiB / 128MiB capture / 3600s; ordinary profiling caps unchanged.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.

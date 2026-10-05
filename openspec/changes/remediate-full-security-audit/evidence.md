@@ -128,3 +128,14 @@ R6 candidate verified:237+56owning tests passed; Ruff/2module mypy/strictOpenSpe
 Calibration addendum: previous PostgreSQL finding has high impact/medium likelihood, hence medium severity under the scan matrix; sealed prior report remains unchanged. Supplemental `artifacts/postgres_tls_severity_addendum.md` records this correction; fix obligation unchanged.
 
 GitHub read-only reconciliation:main8670e56protected, activationPR601merged and ancestor of main/current branch. PR602 is OPEN draft atd104cab11edb12f3cf80b207b8a6bada66961712; earlier closed/ac7f notes are historical/stale. Its CI/approval is not proof for current branch; no PR exists for fix-transformation-review. Required CI starts disposable Trino with synthetic tpch.tiny; user clarification about live-DB prohibition is pending before triggering CI. No messages/comments/reviewer requests sent.
+
+2026-10-05 capacity follow-up: installed private CSV target passed at b49ceed
+(100M cells, 1188.870s); fictional isolated PostgreSQL-result → CSV target
+passed at 611b781 (100M cells, 1412.882s). Both exact wheel/harness/budget and
+full ordered readback/cleanup evidence are recorded in the selective-source
+scale documents. No live DB/provider call, public activation or all-route
+clearance. Full final-SHA gate/audit and required release gates remain open.
+Next capacity inspection: `io/transformation_parquet.py` currently collects
+all normalized rows before `Table.from_pylist`; target Parquet output has not
+been tested. Inspect bounded encoding and temporal single-offset semantics
+before any rewrite; do not repeat already passed CSV target runs.
