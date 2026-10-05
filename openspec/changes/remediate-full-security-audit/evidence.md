@@ -204,3 +204,11 @@ SQL structure, caller rejection and existing synthetic profiler tests;
 native database execution semantics not exercised under no-live-DB rule.
 Keep R11 open until stronger offline rejection/compatibility regressions
 and composed final gate are recorded. No release clearance.
+
+2026-10-06 R11 offline remediation checks complete:61 focused tests
+pass, including NULL projection rejection before publication for PGtable
+and PG/Trinoquery with source mutation after summary. Existing string
+category roundtrip/default metadata-only/count invariants remain covered.
+SQLGlot parses both dialects; earlier58tests/Ruff/mypy/docs/OpenSpec and
+independent reviewer clean for bounded driver-return control. Native DB
+execution remains intentionally unperformed; full composed gate/audit next.

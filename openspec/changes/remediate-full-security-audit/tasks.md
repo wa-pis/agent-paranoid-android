@@ -44,7 +44,7 @@
 - [x] Freeze prospective registration candidate `2fcacae05ae9566e3a53aa69db24535463e12619` from `15c5c40` plus four activation proposals; full offline gate:3068passed23skipped90.50%,191.96s.
 - [x] Complete independent whole-source scan `881daf8e-97bc-4cbb-8f6b-ee8874de8518` of this exact SHA; retain its canonical report.
 - [x] R10: Mask binary source representations on opt-in Trino returned-row values/map keys before MCP serialization; add synthetic regressions.
-- [ ] R11: Bound database local-category values in SQL before driver allocation for PostgreSQL table and PostgreSQL/Trino query-source routes; add offline regressions.
+- [x] R11: Bound database local-category values in SQL before driver allocation for PostgreSQL table and PostgreSQL/Trino query-source routes; add offline regressions.
 
 ## Conditional release
 
@@ -236,3 +236,11 @@ SQL structure, caller rejection and existing synthetic profiler tests;
 native database execution semantics not exercised under no-live-DB rule.
 Keep R11 open until stronger offline rejection/compatibility regressions
 and composed final gate are recorded. No release clearance.
+
+2026-10-06 R11 offline remediation checks complete:61 focused tests
+pass, including NULL projection rejection before publication for PGtable
+and PG/Trinoquery with source mutation after summary. Existing string
+category roundtrip/default metadata-only/count invariants remain covered.
+SQLGlot parses both dialects; earlier58tests/Ruff/mypy/docs/OpenSpec and
+independent reviewer clean for bounded driver-return control. Native DB
+execution remains intentionally unperformed; full composed gate/audit next.

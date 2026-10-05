@@ -396,3 +396,17 @@ def test_wildcard_snapshot_rejects_schema_drift_before_aggregate() -> None:
         query.sql.startswith("SELECT count(*) AS row_count FROM")
         for query in queries
     )
+
+
+
+def test_category_null_rejection_sentinel_prevents_table_profile():
+    results = SyntheticPostgresResults()
+
+    def fetch(query):
+        if "ELSE NULL END AS value" in query.sql:
+            return [{"value": None, "count": 2}]
+        return results.fetch(query)
+
+    with pytest.raises(ValueError, match="bounded scalars"):
+        PostgresProfiler(postgres_config(), fetch).profile(local_category_fields=[
+            LocalCategoryField(entity="warehouse.crm.customers", field="tier")])

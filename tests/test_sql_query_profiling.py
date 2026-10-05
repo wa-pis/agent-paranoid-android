@@ -416,3 +416,19 @@ def test_category_projection_bounds_values_in_same_statement(adapter):
     else:
         assert 'to_utf8(CAST("state" AS varchar))' in query.sql
         assert '<= 256' in query.sql
+
+
+@pytest.mark.parametrize("adapter", [SqlQueryAdapter.POSTGRES, SqlQueryAdapter.TRINO])
+def test_category_null_rejection_sentinel_prevents_profile_publication(adapter):
+    results = FakeResults()
+
+    def fetch(query):
+        if "GROUP BY" in query.sql:
+            # Source changed after the summary; bounded projection fails closed.
+            return [{"value": None, "count": 2}, {"value": "shipped", "count": 1}]
+        return results.fetch(query)
+
+    with pytest.raises(SqlQueryProfileError):
+        profile_validated_query(plan(adapter=adapter), describe_query=results.describe,
+            fetch_query=fetch, local_category_fields=(
+                LocalCategoryField(entity="warehouse.paid_orders", field="state"),))
