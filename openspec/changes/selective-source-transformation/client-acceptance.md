@@ -12,7 +12,7 @@ Four initial preservation failures were restricted /dev/tty sandbox failures;
 unchanged installed wheel passed with controlling-terminal access, no guard
 bypass. Twelve small fictional routes also passed --public transform-execute
 and workspace acceptance; this is not all-route transform-batch scale proof.
-Private installed capacity matrix11/12; last supplied Trino SQL route running.
+Private installed capacity matrix12/12 passed; no live SQL execution.
 No live DB/private-data evidence or clearance of the final RC SHA is implied.
 Current logs and exact scale bindings are recorded in tasks.md and
 csv-scale-acceptance.md. Historical evidence below remains historical.

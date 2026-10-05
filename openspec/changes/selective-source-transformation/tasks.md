@@ -398,3 +398,17 @@ and limitations in csv-scale-acceptance.md. Current isolated installed
 wheel2f1b6cad passed99additional wizard/configuration/receipt/linked-key/budget
 boundary tests (88deselected,11.33s); no production guard changes, DB or AI.
 Log: /private/tmp/apa-current-common-candidate-sr4ui81v/common-boundaries.log.
+
+2026-10-05 private fictional capacity matrix12/12 complete. Final supplied
+Trino result → SQL artifact100M cells passed1533.779s,2,240,002,792bytes;
+no SQL execution. Queue terminal status passed/current=null. Exact hashes,
+limits and scope in csv-scale-acceptance.md. Capacity parent remains open for
+its public-interface and final-candidate acceptance constituents; no copied
+clearance from historical audit or private scale runs.
+
+Current installed wheel2f1b6cad:50mode/ratio, exact-decimal dataset/units,
+Parquet profile and doctor contract tests passed9.65s, no skips; fictional
+fixtures/fake dependencies only. Log: isolated candidate client-contracts.log.
+Both OpenSpec changes validated strictly and strict docs built after completed
+capacity evidence updates (/private/tmp/apa-final-capacity-doc-build.log).
+These scoped results do not close final public-interface/source/release gates.
