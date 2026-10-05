@@ -6,6 +6,7 @@ capabilities remain separate from the registered execution contract.
 """
 
 import csv
+from test_data_agent.io.writers import neutralize_csv_cell
 import os
 from decimal import Decimal
 from datetime import date
@@ -319,8 +320,13 @@ def _replace_csv_snapshot(
         }).static_order())
         output = io.BytesIO()
 
-        def append_row(values: tuple[str, ...]) -> None:
+        def append_row(values: tuple[str, ...], *, headers: bool = False) -> None:
             budget.check("CSV replacement output")
+            if policy.output is None:
+                for name, value in zip(output_names, values, strict=True):
+                    if neutralize_csv_cell(value) != value:
+                        if headers or not isinstance(scalar(name, value), (int, float, Decimal)):
+                            raise ValueError
             row_buffer = io.StringIO(newline="")
             csv.writer(row_buffer, lineterminator="\n").writerow(values)
             encoded = row_buffer.getvalue().encode("utf-8")
@@ -331,7 +337,7 @@ def _replace_csv_snapshot(
 
         if any(looks_sensitive_value(name) for name in output_names):
             raise ValueError
-        append_row(output_names)
+        append_row(output_names, headers=True)
         def preserved(name: str, original: str, action: PreserveAction) -> str:
             origins[name] = "replacement" if action.format_temporal else "original"
             if policy.output is not None:

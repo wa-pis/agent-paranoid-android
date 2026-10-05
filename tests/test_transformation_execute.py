@@ -2038,3 +2038,10 @@ def test_synthesis_rejects_allocation_before_generating_rows(monkeypatch):
     module = import_module("test_data_agent.io.transformation_execute")
     with pytest.raises(module.TransformationExecutionError):
         execute(material)
+
+
+@pytest.mark.parametrize("target", ["=1+2", "+SUM(1,2)", "-SUM(1,2)", "@SUM(1,2)",
+                                    "  =1+2", "\t=1+2", "\r=1+2", "\n=1+2"])
+def test_csv_replacement_rejects_formula_capable_strings(target):
+    with pytest.raises(ValueError, match="^invalid CSV replacement$"):
+        execute(request(target=target))

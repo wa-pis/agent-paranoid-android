@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Reject spreadsheet formula-capable string cells and headers in transformation CSV output before publication, preserving exact accepted replacement text.
+
 - Mask entire safe-select maps with string keys to prevent leaking source data through nested keys.
 
 - SQL query inputs reject FIFOs before blocking reads; regular-file behavior remains unchanged.

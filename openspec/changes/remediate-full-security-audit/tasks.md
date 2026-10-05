@@ -139,3 +139,20 @@ so entries are not silently merged under a shared redacted key. Numeric maps,
 scalar summaries and bounded list/tuple/depth behavior remain compatible.
 Parent separate sibling/compatibility pass used after known thread-cap block;
 independent whole-source review remains incomplete, CSV formula candidate open.
+
+R9 candidate validated statically: transformation CSV writer bypasses ordinary
+neutralize_csv_cell. CSV-only shared append gate rejects unsafe string cells/
+headers rather than altering exact mappings; numeric scalars and typed output
+retain their existing contract. Eight formula-prefix regression cases added.
+Verification underway; complete independent audit/release gates remain open.
+
+R9 focused verification: frozen-source synthetic mapping reproduced an active
+formula CSV cell; new eight-prefix regressions reject with detached static error.
+307execution tests and279batch/Parquet/SQL/documentation tests pass,4existing
+optional skips. Negative numeric compatibility tests remain green; exact ordinary
+quoted/multiline/Unicode/empty replacement roundtrips unchanged. Ruff/mypy,
+strict OpenSpec/docs/diff checks pass. CSV-only gate leaves explicit typed
+Parquet/SQL encoding unchanged. Parent separate shared append/header/unmatched/
+synthesis/null-token review used under thread-cap limitation. Frozen scan stays
+unchanged and discovery continues with the same independent baseline worker;
+these fixes do not establish complete source-audit or final release clearance.

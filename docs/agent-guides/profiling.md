@@ -130,3 +130,8 @@ Single-file CSV profiling carries an explicit budget through preflight, row/cell
 Parquet metadata adapters now share the same pre-conversion Arrow leaf/depth/size and cumulative cell/decoded-byte checks as dataset readers. Bounded composites remain conservatively sensitive; limits fail before nested Python conversion. Native batch decode still precedes inspection and is not a peak-RSS guarantee.
 
 Folder formula, temporal, conditional, aggregate and relationship mining share one cumulative inference-evaluation allowance, using `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS` (default5,000,000). Candidate work and row comparisons are charged inside loops. Existing local and captured MCP deadlines are checked there; exhaustion returns no trusted profile/cache. Public mining helpers accept an optional explicit `LocalProfileBudget` and preserve their normal candidate ordering and confidence semantics.
+
+Transformation CSV output rejects formula-capable string cells and headers
+before publication instead of modifying exact replacement text. Valid numeric
+scalars retain numeric output, including negative values. Typed Parquet/SQL
+output is governed by its own scalar encoding contract.
