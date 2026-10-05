@@ -455,3 +455,10 @@ fixtures and failed2checks; corrected cwd, no guard changes. Proposed public
 registration remains inactive. Next: freeze complete prospective source identity
 and obtain independent full-source review before activation; final RC gates stay
 open. Existing prospective gate evidence is retained without repeated scale runs.
+
+2026-10-05 post-fix coherent test preparation: patch regression now roundtrips
+already composed or closed MCP source, retaining assertions at both real
+strict factory calls. Startup deadline fake factory explicitly accepts the
+new strict_arguments keyword.37closed-baseline patch/server tests and Ruff pass.
+No product guard or public registration changed. Next candidate includes all
+R7/R8/R9 fixes and four registration/contract proposals before final checks.

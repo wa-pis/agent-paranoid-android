@@ -61,7 +61,7 @@ def test_main_applies_shared_invocation_and_transport_budgets(
     monkeypatch.setattr(
         server,
         "create_generator_mcp",
-        lambda tools: runtime_mcp,
+        lambda tools, *, strict_arguments=False: runtime_mcp,
     )
 
     def fake_run(
