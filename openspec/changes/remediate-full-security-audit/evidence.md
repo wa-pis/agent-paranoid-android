@@ -156,3 +156,18 @@ mapping precedence, provenance/digest and cleanup. Owning publication/SQL
 regressions: 326 passed. SQL fixed-fixture artifact readback added to the
 same harness; 10 × 100 smoke and Ruff passed. No DB execution, no public
 activation or final-SHA audit clearance is implied.
+
+Current full offline release gate: exact5b49167;3052passed23skipped,
+90.50%,181.51s. Log `/private/tmp/apa-current-release-gate-5b49167.log`;
+coverage data `/private/tmp/apa-current-release-coverage`. Strict docs log
+`/private/tmp/apa-current-release-doc-build.log`, site
+`/private/tmp/apa-current-release-doc-site`; both strict OpenSpec checks passed.
+Operational checks: profile0.443569s/2,349,310bytes, generation0.683175s/
+2,580,524bytes, validation0.419112s/314,028bytes. Explicit disabled live DB
+integration flags; all existing release-script stages passed.
+PostgreSQL → Parquet target additionally passed in the b249699 queue:
+100M cells,1602.427s,17,493,375 output bytes; recorded wheel/harness and
+lifecycle/provenance/readback/cleanup evidence in sql-scale-acceptance.md.
+Current private fixture matrix8/12. Fresh independent final-SHA source audit,
+public/client acceptance and actual release gates remain open; past clean28aa
+report is not proof of current/final SHA.

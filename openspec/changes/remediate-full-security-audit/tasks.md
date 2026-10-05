@@ -86,3 +86,14 @@ R6 investigation: fresh boundary worker unavailable (thread cap); separate paren
 R6 verified:237 PostgreSQL/SQL-source tests plus56 CLI/transform-isolation/temporal tests pass; Ruff,2module mypy, strict OpenSpec and docs pass. Fresh independent candidate review passed68tests and24fake-driver mode/opt-in cases, no surviving bypass/regression. Secure default reaches driver as verify-full; weaker modes reject before password resolution/connect unless explicit local opt-in. No live TLS handshake claimed. Full gate and new exact-SHA full audit remain open.
 
 2026-10-05 clean audit:143production Python,21scripts,9workflows,15executableexamples,5acceptance programs and shipped skills reviewed;237unique credited including structural lock metadata. No production/live/provider test or external dependency-CVE claim. Architecture worker unavailable; separate parent source mapping used. Plugin usage25,497,080total including24,680,576cached input is cumulative rollout accounting, not incremental scan cost. New capacity work must pass focused checks; final coherent RC SHA still needs full gate/audit.
+
+2026-10-05 current offline gate at exact5b49167 after MCP deadline and
+batched Parquet encoding:3052passed23skipped, one existing Pydantic warning,
+90.50% coverage,181.51s. Lint/full production types/compile/dependency licenses
+and compatibility/direct privacy and SQL boundaries/operational budgets/schema
+freshness/quickstart all passed. Both strict OpenSpec changes and strict docs
+passed. TEST_TRINO_INTEGRATION=0 and TEST_POSTGRES_INTEGRATION=0 explicitly;
+no live DB/provider calls. This is not final release-SHA audit or exact-main CI
+clearance. Eight private fictional100M-cell routes are now confirmed; four
+remaining supplied SQL-result routes continue sequentially. Do not repeat
+passed checks without a new code change or a required final exact-SHA gate.

@@ -44,3 +44,12 @@ Queue checkpoint 2026-10-05: prerequisite Parquet → SQL terminal pass retained
 (3398.476s / 100M cells). Queue state is running `postgres-parquet`, child
 PID84146, no completed queue stages yet. Do not start another large target.
 Current complete private matrix is 7/12; no final release clearance.
+
+2026-10-05 queue checkpoint: PostgreSQL → Parquet target PASSED (candidate
+b249699 / recorded immutable wheel+harness above): 1M × 100, 100M cells,
+35,469,307 captured bytes, 17,493,375 output bytes, complete1602.427s.
+All typed ordered readback, 100% replacement provenance, input digest, child
+lifecycle and temporary cleanup assertions passed. Ordinary profiling caps
+remain10,000rows/100,000cells. Per-job log: postgres-parquet.log under the
+queue root. Current private matrix8/12. Queue advanced to
+postgres-postgresql_sql, child PID84733. Poll retained state; no duplicate runs.

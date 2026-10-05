@@ -154,7 +154,7 @@ budgets are retained above. No public activation or all-route claim.
 |---|---|---|---|
 | CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
 | Parquet | PASS b5640de | PASS cc3aedb | PASS 92bb1b6 |
-| PostgreSQL fictional worker | PASS 611b781 | OPEN | OPEN |
+| PostgreSQL fictional worker | PASS 611b781 | PASS b249699 | OPEN |
 | Trino fictional result | OPEN | OPEN | OPEN |
 
 These are installed private fixture checks, not twelve-route public/CLI/MCP

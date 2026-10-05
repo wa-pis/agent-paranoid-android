@@ -89,6 +89,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Installed private Parquet → Parquet 1M × 100 passed at cc3aedb: full 100M-cell typed readback/provenance/cleanup, 2169.105s, 17,398,511 bytes; current private fixture matrix 6/12.
   - [x] Prepare fictional supplied Trino-result harness through common authorization/capture, without network adapter/server/worker claims; three 2051 × 3 output smokes and PostgreSQL compatibility smoke passed. See sql-scale-acceptance.md; target proof stays open.
   - [x] Installed private Parquet → SQL 1M × 100 passed at 92bb1b6: full 100M-cell ordered SQL artifact/provenance/cleanup, 3398.476s, 2,140,502,692 bytes; no SQL execution. Current private fixture matrix 7/12; queue is running PostgreSQL → Parquet.
+  - [x] Installed fictional PostgreSQL worker → Parquet 1M × 100 passed in b249699 queue: typed 100M-cell readback/provenance/digest/lifecycle/cleanup, 1602.427s, 17,493,375 bytes. Current private matrix8/12; PostgreSQL → SQL running.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.
