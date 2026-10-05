@@ -155,7 +155,7 @@ budgets are retained above. No public activation or all-route claim.
 | CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
 | Parquet | PASS b5640de | PASS cc3aedb | PASS 92bb1b6 |
 | PostgreSQL fictional worker | PASS 611b781 | PASS b249699 | PASS b249699 |
-| Trino fictional result | PASS b249699 | OPEN | OPEN |
+| Trino fictional result | PASS b249699 | PASS b249699 | OPEN |
 
 These are installed private fixture checks, not twelve-route public/CLI/MCP
 activation or live backend evidence. PostgreSQL details are in the companion
@@ -213,3 +213,13 @@ State/log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/state.json and
 trino-csv.log. This exercises supplied-result authorization/capture/private
 publication, not a Trino driver, server, isolated worker or public scale route.
 Private fictional matrix10/12; Parquet running and SQL pending sequentially.
+
+## Supplied Trino result → Parquet target — PASSED
+
+Same b249699 queue, installed runtime/harness hashes and explicit1GiB,
+128MiB capture,3600s budgets as the Trino CSV target above. All100M cells
+passed typed ordered readback, mapping/provenance/digest/cleanup assertions.
+Capture17,207,555bytes; output17,493,375bytes; complete1582.527s.
+Log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/trino-parquet.log.
+Private fictional matrix11/12; final SQL artifact route running. No live
+Trino driver/server/worker or public scale route is exercised by this fixture.

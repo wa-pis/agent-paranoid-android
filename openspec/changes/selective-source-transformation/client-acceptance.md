@@ -1,5 +1,22 @@
 # Client Feedback And Acceptance Plan
 
+## Current isolated registration checkpoint — 2026-10-05
+
+Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth
+registration patches; installed wheel SHA256
+2f1b6cad280c5c160f4114373899e8b00d1a92e5d11c5fdda1e51fa4d03930c8.
+Active branch common registration remains closed; this is still1.5.0 metadata.
+Actual CLI creation/runtime/inventory18passed, actual MCP stdio6passed,
+OAuth6passed, and wizard/configuration/receipt/linked-key/budget99passed.
+Four initial preservation failures were restricted /dev/tty sandbox failures;
+unchanged installed wheel passed with controlling-terminal access, no guard
+bypass. Twelve small fictional routes also passed --public transform-execute
+and workspace acceptance; this is not all-route transform-batch scale proof.
+Private installed capacity matrix11/12; last supplied Trino SQL route running.
+No live DB/private-data evidence or clearance of the final RC SHA is implied.
+Current logs and exact scale bindings are recorded in tasks.md and
+csv-scale-acceptance.md. Historical evidence below remains historical.
+
 ## Owner release decision — 2026-10-04 local
 
 The owner cannot perform local acceptance on the full data volume available in

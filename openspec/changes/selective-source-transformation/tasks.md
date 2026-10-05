@@ -391,3 +391,10 @@ actual transform-review/transform-execute CLI and workspace execution,
 negative publication checks; no DB. Log: isolated candidate public-routes.log.
 This supplements current common-tool acceptance; it does not exercise all
 routes through transform-batch or establish public scale/activation clearance.
+
+2026-10-05 target matrix11/12: supplied Trino result → Parquet passed100M
+cells,1582.527s,17,493,375bytes; last SQL route running. Exact queue evidence
+and limitations in csv-scale-acceptance.md. Current isolated installed
+wheel2f1b6cad passed99additional wizard/configuration/receipt/linked-key/budget
+boundary tests (88deselected,11.33s); no production guard changes, DB or AI.
+Log: /private/tmp/apa-current-common-candidate-sr4ui81v/common-boundaries.log.
