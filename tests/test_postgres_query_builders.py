@@ -193,7 +193,9 @@ def test_local_category_candidates_require_qualified_explicit_field() -> None:
 
     assert query.parameters == (21,)
     assert query.sql == (
-        'SELECT "status" AS value, count(*) AS count FROM "public"."orders" '
+        'SELECT CASE WHEN length(CAST("status" AS text)) <= 64 '
+        'AND octet_length(CAST(to_json("status") AS text)) <= 1024 '
+        'THEN "status" ELSE NULL END AS value, count(*) AS count FROM "public"."orders" '
         'WHERE "status" IS NOT NULL GROUP BY "status" '
         "ORDER BY count DESC, value ASC LIMIT %s"
     )

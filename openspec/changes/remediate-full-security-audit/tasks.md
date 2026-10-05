@@ -219,3 +219,20 @@ r10_review found no surviving safe-select bypass/regression. Historical
 mask_row is a separate aggregate helper with no production safe-select
 caller; it is not this returned-row control. No production/live DB/provider
 execution. R11 and fresh composed exact-SHA full gate/audit remain open.
+
+2026-10-06 R11 candidate SQL CASE projects native category only under
+character and encoded-size bounds, otherwise NULL (existing scalar gate
+rejects); grouping/count/sentinel remain complete in same statement.
+PG to_json representation guard includes CHAR padding; Trino UTF8 byte
+guard. No separate preflight/race, truncation or category filtering.
+58 focused PGbuilder/profiler/query tests and Ruff passed. Independent
+r11_boundary complete, r11_review pending. R11 remains open; no live DB
+execution or final-SHA safety claim.
+
+2026-10-06 R11 independent candidate review found no concrete surviving
+bypass/regression. Owning mypy, strict docs/OpenSpec, diff check passed;
+SQLGlot parses both PostgreSQL/Trino CASE statements. Validation is offline
+SQL structure, caller rejection and existing synthetic profiler tests;
+native database execution semantics not exercised under no-live-DB rule.
+Keep R11 open until stronger offline rejection/compatibility regressions
+and composed final gate are recorded. No release clearance.

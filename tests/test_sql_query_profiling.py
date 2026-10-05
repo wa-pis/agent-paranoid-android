@@ -398,3 +398,21 @@ def test_local_categories_fail_closed_without_authorized_lineage():
             local_category_fields=[LocalCategoryField(entity=query_plan.entity_name, field="state")],
         )
     assert not any("GROUP BY" in query.sql for query in backend.queries)
+
+
+@pytest.mark.parametrize("adapter", [SqlQueryAdapter.POSTGRES, SqlQueryAdapter.TRINO])
+def test_category_projection_bounds_values_in_same_statement(adapter):
+    from dataclasses import replace
+    from test_data_agent.sql_query_profiling import build_query_local_category_query
+
+    query = build_query_local_category_query(replace(plan(), adapter=adapter), "state")
+    assert 'CASE WHEN' in query.sql
+    assert 'THEN "state" ELSE NULL END AS value' in query.sql
+    assert 'GROUP BY "state"' in query.sql
+    assert 'LIMIT 21' in query.sql
+    if adapter == SqlQueryAdapter.POSTGRES:
+        assert 'to_json("state")' in query.sql  # includes native CHAR padding
+        assert '<= 1024' in query.sql
+    else:
+        assert 'to_utf8(CAST("state" AS varchar))' in query.sql
+        assert '<= 256' in query.sql

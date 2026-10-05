@@ -67,7 +67,11 @@ generic exception, so a specific category is not guaranteed.
 PostgreSQL local-category requests are checked against explicit column allowlists
 before opening the profiling session or issuing queries. Wildcard configurations
 first resolve bounded metadata into a fixed column snapshot; category validation
-then runs before aggregate queries. Category count, value-content and disclosure
+then runs before aggregate queries. Category queries bound character and encoded representation sizes inside
+the same SQL statement before returning values. Oversized values produce a
+NULL rejection sentinel; grouping and counts remain complete. PostgreSQL
+also bounds the JSON representation to cover native CHAR padding.
+Category count, value-content and disclosure
 checks still apply, and these preflight checks do not grant preservation rights.
 
 PostgreSQL table profiling includes date/timestamp minima and maxima in the same

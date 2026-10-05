@@ -196,3 +196,11 @@ r10_review found no surviving safe-select bypass/regression. Historical
 mask_row is a separate aggregate helper with no production safe-select
 caller; it is not this returned-row control. No production/live DB/provider
 execution. R11 and fresh composed exact-SHA full gate/audit remain open.
+
+2026-10-06 R11 independent candidate review found no concrete surviving
+bypass/regression. Owning mypy, strict docs/OpenSpec, diff check passed;
+SQLGlot parses both PostgreSQL/Trino CASE statements. Validation is offline
+SQL structure, caller rejection and existing synthetic profiler tests;
+native database execution semantics not exercised under no-live-DB rule.
+Keep R11 open until stronger offline rejection/compatibility regressions
+and composed final gate are recorded. No release clearance.

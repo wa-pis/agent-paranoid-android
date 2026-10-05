@@ -159,8 +159,18 @@ def build_query_local_category_query(
     if column not in plan.safe_local_category_output_fields:
         raise SqlQueryProfileError("SQL query local category field is not allowed")
     safe = _allowed_output_column(plan, column)
+    if plan.adapter == SqlQueryAdapter.POSTGRES:
+        bounded = (
+            f"length(CAST({safe} AS text)) <= 64 "
+            f"AND octet_length(CAST(to_json({safe}) AS text)) <= 1024"
+        )
+    else:
+        bounded = (
+            f"length(CAST({safe} AS varchar)) <= 64 "
+            f"AND length(to_utf8(CAST({safe} AS varchar))) <= 256"
+        )
     return TrustedProfileQuery(
-        f"SELECT {safe} AS value, count(*) AS count "
+        f"SELECT CASE WHEN {bounded} THEN {safe} ELSE NULL END AS value, count(*) AS count "
         f"FROM ({plan.sql}) AS \"__apa_source\" "
         f"WHERE {safe} IS NOT NULL GROUP BY {safe} "
         f"ORDER BY count DESC, value ASC LIMIT {max_categories + 1}"
