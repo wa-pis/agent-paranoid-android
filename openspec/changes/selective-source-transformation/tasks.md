@@ -82,6 +82,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Make CSV acceptance byte/time ceilings explicit; 10 × 3 smoke and five invalid-budget startup checks passed. Target fixture exceeds the old fixed 512MiB; target proof remains open.
   - [x] Installed private CSV 1M × 100 passed at b49ceed: 100M cells, complete readback/provenance/cleanup, 1188.870s, explicit 1GiB / 3600s. See csv-scale-acceptance.md.
   - [x] Installed fictional PostgreSQL worker → CSV 1M × 100 passed at 611b781: 100M cells, complete readback/provenance/cleanup, 1412.882s, explicit 1GiB / 128MiB capture / 3600s; ordinary profiling caps unchanged.
+  - [x] Encode Parquet in 1024-row groups, preserving global timestamp offsets and one-shot source checks: 208 passed / 4 skipped owning regressions, mypy, Ruff, strict OpenSpec/docs; 2051 × 3 CSV → Parquet complete readback smoke passed. Target format proof remains open.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.

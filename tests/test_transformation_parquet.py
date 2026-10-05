@@ -83,3 +83,50 @@ def test_schema_and_source_cardinality_reject(columns, rows, source):
     with pytest.raises(ValueError):
         render_transformation_parquet(result, output, max_bytes=8192,
             budget=GenerationBudget(5), source_rows=None if source is None else iter(source))
+
+
+def test_batched_encoding_and_late_source_mismatch(monkeypatch):
+    import pyarrow as pa
+    from types import SimpleNamespace
+
+    lengths = []
+    original_table = pa.Table
+
+    def from_rows(rows, **kwargs):
+        lengths.append(len(rows))
+        return original_table.from_pylist(rows, **kwargs)
+
+    monkeypatch.setattr(pa, "Table", SimpleNamespace(from_pylist=from_rows))
+    output = ParquetOutput.model_validate({"format": "parquet", "fields": [
+        {"name": "value", "type": "string"}]})
+    result = CsvTransformationResult(b"", retention_summary_from_counts(0, 2051, 0),
+        ("value",), (("second",),) * 2051)
+    payload = render_transformation_parquet(result, output, max_bytes=65536,
+        budget=GenerationBudget(5), source_rows=iter([("first",)] * 2051))
+    assert lengths == [1024, 1024, 3]
+    parquet = pq.ParquetFile(io.BytesIO(payload))
+    assert parquet.num_row_groups == 3
+    assert parquet.read().to_pylist() == [{"value": "second"}] * 2051
+    with pytest.raises(ValueError, match="row count mismatch"):
+        render_transformation_parquet(result, output, max_bytes=65536,
+            budget=GenerationBudget(5), source_rows=iter([("first",)] * 2052))
+
+
+def test_timestamp_null_prefix_and_late_offset_change():
+    output = ParquetOutput.model_validate({"format": "parquet", "fields": [
+        {"name": "value", "type": "datetime", "nullable": True,
+         "temporal_type": {"type": "datetime", "format": "%Y-%m-%dT%H:%M:%S%z",
+                           "output_format": "%Y-%m-%dT%H:%M:%S.%f%z"}}]})
+    result = CsvTransformationResult(b"", retention_summary_from_counts(0, 1025, 0),
+        ("value",), ((None,),) * 1024 + (("2026-08-31T03:15:00+0400",),))
+    payload = render_transformation_parquet(result, output, max_bytes=65536,
+        budget=GenerationBudget(5))
+    table = pq.read_table(io.BytesIO(payload))
+    assert table.schema.field("value").type.tz == "+04:00"
+    assert table.column("value").null_count == 1024
+    assert table.column("value")[1024].as_py().utcoffset().total_seconds() == 14400
+    different_offset = CsvTransformationResult(b"", retention_summary_from_counts(0, 1025, 0), ("value",),
+        (("2026-08-31T03:15:00+0400",),) * 1024 + (("2026-08-31T03:15:00+0300",),))
+    with pytest.raises(ValueError, match="one explicit timestamp offset"):
+        render_transformation_parquet(different_offset, output, max_bytes=65536,
+            budget=GenerationBudget(5))

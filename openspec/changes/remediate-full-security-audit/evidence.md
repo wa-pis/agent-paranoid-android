@@ -139,3 +139,13 @@ Next capacity inspection: `io/transformation_parquet.py` currently collects
 all normalized rows before `Table.from_pylist`; target Parquet output has not
 been tested. Inspect bounded encoding and temporal single-offset semantics
 before any rewrite; do not repeat already passed CSV target runs.
+
+2026-10-05 Parquet capacity correction: removed the encoder's second full
+normalized row collection in favor of 1024-row ParquetWriter groups. Timestamp
+offsets are validated in a constant-storage first pass without consuming the
+one-shot source iterator; encoding performs full normalized/source validation.
+208 owning tests passed, 4 optional cases skipped; two new regressions cover
+batch lengths/full readback/late source mismatch and null-prefix/late offset
+change. Ruff, owning-module mypy, strict selective OpenSpec and strict docs
+passed. Synthetic 2051 × 3 private CSV → Parquet harness passed (0.144s).
+Full target format acceptance and final-SHA gate/audit remain open.

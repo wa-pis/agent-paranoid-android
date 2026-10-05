@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Encode selective transformation Parquet output in 1024-row groups instead of retaining a second full normalized dataset; preserve timestamp-offset and source-reuse checks.
+
 - Retain intentionally invalid mixed/negative output and validation evidence
   where the selected format can represent it; CLI routes report
   `validation_failed` and exit 1 rather than successful validation.

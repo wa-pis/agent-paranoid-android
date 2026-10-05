@@ -26,6 +26,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--output-format", choices=("csv", "parquet"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
     args = parser.parse_args()
@@ -60,6 +61,9 @@ def main() -> None:
                       {"entity": "items", "field": name, "sensitivity": "non_sensitive",
                        "behavior": {"action": "replace_text", **({"mapping": mapping("column.csv")} if i == 0 else {})}}
                       for i, name in enumerate(names)]}
+        if args.output_format == "parquet":
+            policy["output"] = {"format": "parquet", "fields": [
+                {"name": name, "type": "string"} for name in names]}
         source = SnapshotPart("source", "items", source_path.read_bytes())
         source_hash = hashlib.sha256(source.payload).hexdigest()
         profile = _profile_transformation_source(source, BehaviorPolicy.model_validate(policy),
@@ -75,28 +79,47 @@ def main() -> None:
                 max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget) as output:
             manifest = json.loads((output / "manifest.json").read_text())
             count = 0
-            with (output / "dataset.csv").open(newline="", encoding="utf-8") as handle:
-                reader = csv.reader(handle)
-                assert next(reader) == names
-                for index, row in enumerate(reader):
-                    budget.check("scale acceptance readback")
-                    expected = ["first" if index % 2 == 0 else "second"] + [
-                        "omega" if index % 2 == 0 else "theta"] * (args.columns - 1)
-                    assert row == expected, "ordered replacement readback mismatch"
-                    count += 1
+            filename = "dataset." + args.output_format
+            if args.output_format == "csv":
+                with (output / filename).open(newline="", encoding="utf-8") as handle:
+                    reader = csv.reader(handle)
+                    assert next(reader) == names
+                    for index, row in enumerate(reader):
+                        budget.check("scale acceptance readback")
+                        expected = ["first" if index % 2 == 0 else "second"] + [
+                            "omega" if index % 2 == 0 else "theta"] * (args.columns - 1)
+                        assert row == expected, "ordered replacement readback mismatch"
+                        count += 1
+            else:
+                import pyarrow as pa
+                import pyarrow.parquet as pq
+
+                parquet = pq.ParquetFile(output / filename)
+                assert parquet.schema_arrow.names == names
+                assert all(field.type == pa.string() and not field.nullable
+                           for field in parquet.schema_arrow)
+                for batch in parquet.iter_batches(batch_size=1024):
+                    budget.check("scale acceptance Parquet readback")
+                    for row in batch.to_pylist():
+                        budget.check("scale acceptance readback")
+                        expected = ["first" if count % 2 == 0 else "second"] + [
+                            "omega" if count % 2 == 0 else "theta"] * (args.columns - 1)
+                        assert [row[name] for name in names] == expected, "ordered replacement readback mismatch"
+                        count += 1
             assert count == args.rows
             assert manifest["origin"] == "transformed_mixed"
             assert manifest["provenance"]["output_cells"] == args.rows * args.columns
             assert manifest["provenance"]["replacement_percent"] == "100.00"
-            output_bytes = (output / "dataset.csv").stat().st_size
+            output_bytes = (output / filename).stat().st_size
             assert hashlib.sha256(source_path.read_bytes()).hexdigest() == source_hash
         assert not output.parent.exists(), "temporary publication not removed"
     assert not root.exists(), "fictional inputs not removed"
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "output_bytes": output_bytes,
         "max_bytes": max_bytes, "max_seconds": args.max_seconds,
+        "output_format": args.output_format,
         "elapsed_seconds": round(monotonic() - started, 3),
-        "scope": "private replacement-only CSV; no public activation"}), flush=True)
+        "scope": "private replacement-only CSV input; no public activation"}), flush=True)
 
 
 if __name__ == "__main__":

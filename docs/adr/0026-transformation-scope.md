@@ -30,3 +30,11 @@ Supersedes the earlier assistant-added formula release requirement, not source-f
 
 Only an explicit later feature decision can bring internal formula execution into the public transformation scope.
 
+
+Parquet typed output uses 1024-row encoding groups rather than retaining a
+second full normalized dataset. Timestamp fields first validate the complete
+single-offset contract without storing rows; encoding then performs the
+existing source-row comparison and cardinality checks. A late failure returns
+no publishable payload. Captured inputs, transformation result rows, encoded
+bytes and native Arrow allocations still have their existing budgets; this
+does not promise an exact peak-RSS ceiling.
