@@ -97,3 +97,16 @@ no live DB/provider calls. This is not final release-SHA audit or exact-main CI
 clearance. Eight private fictional100M-cell routes are now confirmed; four
 remaining supplied SQL-result routes continue sequentially. Do not repeat
 passed checks without a new code change or a required final exact-SHA gate.
+
+2026-10-05 independent pre-activation whole-source scan started:
+9e541ae6-3758-4101-9c75-a82a6f944303, immutable prospective Git SHA
+f6d8ba7bb7ff18e69b3a846029db464ba946ab22,918tracked files, derived from
+b7f743e plus four registration/contract proposals. Source root/pointer:
+/private/tmp/apa-frozen-registration-bwrb7ii0 and
+/private/tmp/apa-frozen-registration-current.json. Standard preflight ready
+with worker-capacity warning; baseline frozen_registration_baseline running.
+Extra focused worker spawn hit thread cap; parent handles boundary tracing.
+Threat model retained through Codex Security managed artifacts. Scan discovery
+incomplete; no clean finding conclusion or final RC clearance. Resume this same
+scan/worker next heartbeat; do not start another scan or repeat capacity checks.
+Active branch/main common registration remains closed; no release actions.
