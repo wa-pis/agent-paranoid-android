@@ -294,7 +294,7 @@ ADR0029/OpenSpec explicitly authorize applied mapped permutations; ordinary
 synthetic generation restrictions remain. Whole193-source baseline still
 running; canonical checkpoint partial, no clean audit or RC clearance.
 
-- [ ] R12: Bound normal Trino top-value projection and reject oversized sentinel;
+- [x] R12: Bound normal Trino top-value projection and reject oversized sentinel;
   focused regression, independent candidate review, docs/types/OpenSpec, commit/push.
 2026-10-06 R12 minimal candidate uses shared ordinary top-values SQL builder
 and summary gate. Guard/project same VARCHAR; counts/grouping unchanged.
@@ -406,3 +406,30 @@ a new1.6RCscope. Active54cfdefc/current6ef55a1 baseline continues unchanged;
 no duplicategate or premature source/version/tag activation. Finalrelease needs
 exactmainchecks, independentrequiredapproval, Ubuntuhashes/signatures and public
 verification; currentdocs/taskprogresscommit is not runtimeauditclearance.
+
+
+2026-10-06 current composed audit completed/sealed once:
+54cfdefc-304e-4131-a379-396572e8d4c5 at exact
+6ef55a1d86e377ee442199fee60cec6b57c8b9a7. Fresh independent baseline
+fully read all193 executable files; canonical coverage complete, deferred0,
+confirmed findings0. Parent architecture fallback remains explicitly disclosed.
+Canonical report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r13-coherent-6ysh69ml/6ef55a1d86e377ee442199fee60cec6b57c8b9a7_20261005T232846Z_xlvlt586/report.md
+Offline full gate3113passed19skipped90.54%; no repeated unchanged gate.
+Resume pointer now audit_completed_clean. This clears current source findings,
+including R12/R13/R14, for this composed SHA only. Version remains1.5.0 with
+prospective activation patches; it is not the final versioned RC identity.
+Tool usage22,900,506 cumulative rollout tokens including21,916,672cachedinput,
+across2threads; not incremental scan cost.
+
+Release readiness reconciliation: selective-source-transformation still has
+open refreshed client1–26/sectionE installed-package evidence, route capacity,
+contract and repository documentation acceptance. Historical accepted CSV
+activation does not establish current common registration or finalRC acceptance.
+Do not bulk-close these from the clean security audit. No published1.6RC or
+remote1.6tag was found; no open branch PR/required approval established.
+PR creation triggers disposable liveTrino CI and conflicts with current
+no-liveDB instruction; do not trigger without explicit clearance. Continue
+synthetic offline acceptance/documentation work first. Version/tag, exactmain
+CI/Containers/Documentation/Security, Ubuntu hashes, signed manifest/tag and
+public verification remain mandatory; automation remains active.
