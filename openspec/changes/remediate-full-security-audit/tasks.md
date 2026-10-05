@@ -156,3 +156,11 @@ Parquet/SQL encoding unchanged. Parent separate shared append/header/unmatched/
 synthesis/null-token review used under thread-cap limitation. Frozen scan stays
 unchanged and discovery continues with the same independent baseline worker;
 these fixes do not establish complete source-audit or final release clearance.
+
+2026-10-05 full offline gate at85edba4 passed afterR7/R8/R9.
+3068 passed, 23 skipped, 1 warning in 186.28s (0:03:06); Total coverage: 90.50%.
+Lint/types/compile/dependency-license/compatibility/privacy+SQL boundaries,
+operational budgets/schema/quickstart passed. Log:
+/private/tmp/apa-post-findings-85edba4-gate.log; DB flags both0.
+Independent frozen scan9e541ae6 continues remaining executable coverage;
+no final RC/public registration or exact-main GitHub clearance implied.
