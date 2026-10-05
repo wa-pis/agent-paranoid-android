@@ -1,7 +1,9 @@
-"""Fictional installed-candidate PostgreSQL capture -> review -> CSV acceptance.
+"""Fictional installed SQL capture -> review -> CSV/Parquet/SQL acceptance.
 
 No database connection, monkeypatch, receipt creation or public activation.
-The injected driver generates rows locally through the actual private worker.
+PostgreSQL uses an injected driver through the actual private worker.
+Trino uses a supplied Arrow stream through query authorization/capture only;
+its network adapter, server execution and worker supervision are not exercised.
 """
 
 import argparse
@@ -10,6 +12,7 @@ import hashlib
 import json
 import math
 import multiprocessing
+from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -24,6 +27,7 @@ from test_data_agent.core.transformation_policy import transformation_schema_fin
 from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
 from test_data_agent.io.transformation_publish import temporary_csv_publication
+from test_data_agent.io.transformation_query_capture import _capture_authorized_result
 from test_data_agent.io.transformation_source import _profile_transformation_source, prepare_csv_review_request
 from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
 from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryAdapter, SqlQueryProfileRequest
@@ -71,6 +75,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--adapter", choices=("postgres", "trino"), default="postgres")
     parser.add_argument("--output-format", choices=("csv", "parquet", "postgresql_sql"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--capture-bytes", type=int, default=64 * 1024 * 1024)
@@ -93,9 +98,10 @@ def main() -> None:
     with TemporaryDirectory(prefix="apa-postgres-scale-fictional-") as directory:
         root = Path(directory).resolve()
         query_path = root / "query.sql"
-        query_path.write_text("SELECT " + ", ".join(names) + " FROM public.items", encoding="utf-8")
+        table = "public.items" if args.adapter == "postgres" else "demo.public.items"
+        query_path.write_text("SELECT " + ", ".join(names) + " FROM " + table, encoding="utf-8")
         policy_data = {"schema_version": "0.1", "schema_fingerprint": "0" * 64,
-            "input_format": "postgres_query", "seed": 7,
+            "input_format": args.adapter + "_query", "seed": 7,
             "resource_limits": {"max_input_rows": 1_000_000, "max_input_columns": 100,
                 "max_input_cells": 100_000_000, "max_input_file_bytes": capture_bytes,
                 "max_total_input_bytes": max_bytes,
@@ -112,20 +118,53 @@ def main() -> None:
         policy_path = root / "behavior.yaml"
         policy_path.write_text(yaml.safe_dump(policy_data), encoding="utf-8")
         policy = load_behavior_policy_yaml(policy_path.read_bytes(), max_bytes=max_bytes, budget=budget)
-        config = PostgresConfig(source_id="fictional", host="fictional.invalid", port=5432,
-            database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
-            allowed_tables=frozenset({"public.items"}),
-            allowed_columns=frozenset("public.items." + name for name in names),
-            limits=PostgresProfileLimits(max_seconds=args.max_seconds))
-        capture = _PostgresCapture(
-            request=SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "fictional", "items", query_path),
-            config=config, source_columns=tuple(QuerySourceColumn(name, "text", False) for name in names),
-            schema=pa.schema([pa.field(name, pa.string(), nullable=False) for name in names]),
-            policy=policy, max_rows=args.rows, max_bytes=capture_bytes)
-        source = _capture_postgres_isolated(capture,
-            driver_factory=partial(FictionalDriver, args.rows, names, counters), max_seconds=args.max_seconds)
-        assert list(counters) == [args.rows, 1, 1, 1, 2, 1], "driver lifecycle/count mismatch"
-        assert {child.pid for child in multiprocessing.active_children()} == previous_children
+        schema = pa.schema([pa.field(name, pa.string(), nullable=False) for name in names])
+        columns = tuple(QuerySourceColumn(name, "text", False) for name in names)
+        config = None
+        if args.adapter == "postgres":
+            config = PostgresConfig(source_id="fictional", host="fictional.invalid", port=5432,
+                database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+                allowed_tables=frozenset({"public.items"}),
+                allowed_columns=frozenset("public.items." + name for name in names),
+                limits=PostgresProfileLimits(max_seconds=args.max_seconds))
+            capture = _PostgresCapture(
+                request=SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "fictional", "items", query_path),
+                config=config, source_columns=tuple(QuerySourceColumn(name, "text", False) for name in names),
+                schema=pa.schema([pa.field(name, pa.string(), nullable=False) for name in names]),
+                policy=policy, max_rows=args.rows, max_bytes=capture_bytes)
+            source = _capture_postgres_isolated(capture,
+                driver_factory=partial(FictionalDriver, args.rows, names, counters), max_seconds=args.max_seconds)
+            assert list(counters) == [args.rows, 1, 1, 1, 2, 1], "driver lifecycle/count mismatch"
+            assert {child.pid for child in multiprocessing.active_children()} == previous_children
+        else:
+            lifecycle = [0, 0]
+
+            @contextmanager
+            def stream(query):
+                assert query.adapter == "trino" and query.table == table
+                assert query.columns == names and query.max_rows == args.rows + 1
+                assert query.sql.startswith(f'SELECT "{names[0]}"')
+                assert query.sql.endswith(f"LIMIT {args.rows + 1}") and "SELECT *" not in query.sql
+
+                def batches():
+                    for start in range(0, args.rows, 1024):
+                        budget.check("fictional Trino stream")
+                        values = ["alpha" if index % 2 == 0 else "beta"
+                                  for index in range(start, min(start + 1024, args.rows))]
+                        column = pa.array(values, type=pa.string())
+                        lifecycle[0] += len(values)
+                        yield pa.RecordBatch.from_arrays([column] * args.columns, schema=schema)
+                try:
+                    yield batches()
+                finally:
+                    lifecycle[1] += 1
+
+            source = _capture_authorized_result(
+                SqlQueryProfileRequest(SqlQueryAdapter.TRINO, "fictional", "items", query_path),
+                allowed_tables=frozenset({table}), source_columns=columns, schema=schema,
+                policy=policy, max_rows=args.rows, max_bytes=capture_bytes, budget=budget, stream=stream)
+            assert lifecycle == [args.rows, 1], "fictional stream lifecycle/count mismatch"
+            assert {child.pid for child in multiprocessing.active_children()} == previous_children
         source_hash = hashlib.sha256(source.payload).hexdigest()
         print(json.dumps({"stage": "capture", "rows": args.rows, "captured_bytes": len(source.payload),
             "elapsed_seconds": round(monotonic() - started, 3)}), flush=True)
@@ -189,11 +228,11 @@ def main() -> None:
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "captured_bytes": len(source.payload), "output_bytes": output_bytes,
         "elapsed_seconds": round(monotonic() - started, 3),
-        "output_format": args.output_format,
+        "adapter": args.adapter, "output_format": args.output_format,
         "max_bytes": max_bytes, "capture_bytes_limit": capture_bytes, "max_seconds": args.max_seconds,
-        "profiling_result_rows_limit": config.limits.max_result_rows,
-        "profiling_result_cells_limit": config.limits.max_result_cells,
-        "scope": "fictional private PostgreSQL capture; no live database/public activation"}), flush=True)
+        "profiling_result_rows_limit": config.limits.max_result_rows if config else None,
+        "profiling_result_cells_limit": config.limits.max_result_cells if config else None,
+        "scope": "fictional private SQL capture; no live database/public activation"}), flush=True)
 
 
 if __name__ == "__main__":

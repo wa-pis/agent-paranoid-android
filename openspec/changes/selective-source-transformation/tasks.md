@@ -87,6 +87,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Installed private CSV → SQL artifact 1M × 100 passed at 2d878f7: all ordered INSERTs/cells/framing/readback/provenance/cleanup, 1435.367s, 2,140,502,692 bytes; no SQL execution.
   - [x] Installed private Parquet → CSV 1M × 100 passed at b5640de: complete 100M-cell readback/provenance/cleanup, 1375.641s, 600,500,900 bytes. Matrix now records 5/12 private fictional target routes.
   - [x] Installed private Parquet → Parquet 1M × 100 passed at cc3aedb: full 100M-cell typed readback/provenance/cleanup, 2169.105s, 17,398,511 bytes; current private fixture matrix 6/12.
+  - [x] Prepare fictional supplied Trino-result harness through common authorization/capture, without network adapter/server/worker claims; three 2051 × 3 output smokes and PostgreSQL compatibility smoke passed. See sql-scale-acceptance.md; target proof stays open.
   - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.

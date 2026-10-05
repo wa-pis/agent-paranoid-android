@@ -179,3 +179,14 @@ ordered batch readback, column/global precedence and non-cascade checks,
 The exact runtime wheel/harness and explicit 1GiB / 3600s limits are recorded
 above. Current private fictional target matrix is 6/12; remaining targets,
 public acceptance, final source audit and release gates stay open.
+
+## Parquet → SQL target — started, result pending
+
+Candidate `92bb1b615e75bddf5043768e96702176e1671753`; same installed runtime wheel 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
+`fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`. Arguments: `--rows 1000000 --columns 100
+--input-format parquet --output-format postgresql_sql --max-bytes 3221225472
+--max-seconds 3600`. State `/private/tmp/apa-parquet-sql-target-current.json`;
+PID 83384; log `/private/tmp/apa-parquet-sql-target-92bb1b6-ymaed_an/run.log`. Poll before repeating.
+Complete SQL text/schema/ordered INSERT/framing/provenance/digest/cleanup
+assertions enabled; no SQL execution or public/all-route/RC clearance.
