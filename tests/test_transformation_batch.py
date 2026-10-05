@@ -1094,7 +1094,7 @@ def test_isolated_common_contract_inventory():
     assert {key: value for key, value in actual.items() if key != "commands"} == {
         key: value for key, value in expected.items() if key != "commands"}
     tools = _mcp_tool_contract(mcp)
-    assert [tool for tool in tools if tool["name"] != "common_transformation"] == json.loads(
+    assert tools == json.loads(
         (fixtures / "mcp-generator-tools.json").read_bytes())
     common = [tool for tool in tools if tool["name"] == "common_transformation"]
     assert len(common) == 1

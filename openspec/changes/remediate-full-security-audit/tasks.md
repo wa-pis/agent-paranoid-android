@@ -259,3 +259,10 @@ duplicate Security changelog heading fixed with focused passing regression.
 Eight TTY/composition setup failures require correct actual-registration flags
 and authorized synthetic terminal access. Incorrect follow-up gate stopped.
 Do not audit/release a1374b0 as clean. Fresh composed candidate/gate next.
+
+2026-10-06 corrected composed0a472bb gate:1failed3087passed19skipped,
+90.50%,191.06s. Sole failure was test comparison filtering common tool
+only from actual list despite activated golden fixture containing it.
+Compare full actual/expected contract; no runtime/API/golden change.
+Focused composed contract passes;4base contract/activation tests pass.
+New exact-SHA gate still required; no clean audit or RC claim.
