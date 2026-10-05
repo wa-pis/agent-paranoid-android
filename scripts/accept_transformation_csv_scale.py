@@ -26,7 +26,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
-    parser.add_argument("--output-format", choices=("csv", "parquet"), default="csv")
+    parser.add_argument("--output-format", choices=("csv", "parquet", "postgresql_sql"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
     args = parser.parse_args()
@@ -61,9 +61,11 @@ def main() -> None:
                       {"entity": "items", "field": name, "sensitivity": "non_sensitive",
                        "behavior": {"action": "replace_text", **({"mapping": mapping("column.csv")} if i == 0 else {})}}
                       for i, name in enumerate(names)]}
-        if args.output_format == "parquet":
-            policy["output"] = {"format": "parquet", "fields": [
+        if args.output_format != "csv":
+            policy["output"] = {"format": args.output_format, "fields": [
                 {"name": name, "type": "string"} for name in names]}
+            if args.output_format == "postgresql_sql":
+                policy["output"]["table"] = "fictional_items"
         source = SnapshotPart("source", "items", source_path.read_bytes())
         source_hash = hashlib.sha256(source.payload).hexdigest()
         profile = _profile_transformation_source(source, BehaviorPolicy.model_validate(policy),
@@ -79,7 +81,7 @@ def main() -> None:
                 max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget) as output:
             manifest = json.loads((output / "manifest.json").read_text())
             count = 0
-            filename = "dataset." + args.output_format
+            filename = "dataset." + ("sql" if args.output_format == "postgresql_sql" else args.output_format)
             if args.output_format == "csv":
                 with (output / filename).open(newline="", encoding="utf-8") as handle:
                     reader = csv.reader(handle)
@@ -90,7 +92,7 @@ def main() -> None:
                             "omega" if index % 2 == 0 else "theta"] * (args.columns - 1)
                         assert row == expected, "ordered replacement readback mismatch"
                         count += 1
-            else:
+            elif args.output_format == "parquet":
                 import pyarrow as pa
                 import pyarrow.parquet as pq
 
@@ -106,6 +108,24 @@ def main() -> None:
                             "omega" if count % 2 == 0 else "theta"] * (args.columns - 1)
                         assert [row[name] for name in names] == expected, "ordered replacement readback mismatch"
                         count += 1
+            else:
+                # This fixed fictional fixture uses only simple alphabetic text.
+                # Check every emitted statement; never execute it against a DB.
+                columns = ", ".join(f'"{name}"' for name in names)
+                definitions = ", ".join(f'"{name}" TEXT NOT NULL' for name in names)
+                prefix = f'INSERT INTO "fictional_items" ({columns}) VALUES ('
+                with (output / filename).open(encoding="utf-8") as handle:
+                    assert handle.readline() == "BEGIN;\n"
+                    assert handle.readline() == "SET LOCAL standard_conforming_strings = on;\n"
+                    assert handle.readline() == f'CREATE TABLE "fictional_items" ({definitions});\n'
+                    for index in range(args.rows):
+                        budget.check("scale acceptance SQL readback")
+                        expected = ["first" if index % 2 == 0 else "second"] + [
+                            "omega" if index % 2 == 0 else "theta"] * (args.columns - 1)
+                        values = ", ".join(f"'{value}'" for value in expected)
+                        assert handle.readline() == prefix + values + ");\n", "ordered SQL readback mismatch"
+                        count += 1
+                    assert handle.readline() == "COMMIT;\n" and handle.read(1) == ""
             assert count == args.rows
             assert manifest["origin"] == "transformed_mixed"
             assert manifest["provenance"]["output_cells"] == args.rows * args.columns

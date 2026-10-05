@@ -85,3 +85,26 @@ non-cascade behavior, manifest/provenance, unchanged input digest and cleanup.
 Output: 600,500,900 bytes. The terminal JSON is retained in the log.
 This proves only the private CSV route against this exact isolated wheel;
 no public/all-route/RC pass is claimed.
+
+## CSV → Parquet target — PASSED
+
+Exact candidate `15cd2d4b11ea586ca3ed48b340c5fd04ff20a55f`; wheel SHA-256
+`f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`; immutable copied harness SHA-256
+`cc150354883378e625e8832d1855c224e7c7dfee682577673993b17886c2188a`. Arguments: `--rows 1000000 --columns 100
+--output-format parquet --max-bytes 1073741824 --max-seconds 3600`.
+State `/private/tmp/apa-parquet-target-current.json`; PID 81484;
+log `/private/tmp/apa-parquet-target-15cd2d4-1_i_azyj/run.log`. Full typed schema and batch readback, mapping precedence,
+provenance/input digest/cleanup assertions enabled. Poll before repeating.
+This is private fictional format acceptance, not public/RC clearance.
+
+CSV → Parquet results: profile 289.725s; review cumulative 581.644s;
+complete 1488.050s; output 17,398,511 bytes. All 100M cells passed ordered
+readback with explicit non-null Arrow string schema, per-column mapping
+precedence/non-cascade behavior, 100% replacement provenance, unchanged input
+digest and cleanup. This proves the private fictional CSV → Parquet route on
+the exact wheel above. 326 additional owning publication/SQL regressions passed.
+
+The same fixture harness now supports `--output-format postgresql_sql` and
+checks the complete framing, declared TEXT schema, every ordered INSERT row,
+terminal COMMIT and EOF without executing SQL. 10 × 100 synthetic smoke passed
+(0.193s, 24,097 bytes), Ruff passed; target SQL artifact proof remains open.

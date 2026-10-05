@@ -149,3 +149,10 @@ batch lengths/full readback/late source mismatch and null-prefix/late offset
 change. Ruff, owning-module mypy, strict selective OpenSpec and strict docs
 passed. Synthetic 2051 × 3 private CSV → Parquet harness passed (0.144s).
 Full target format acceptance and final-SHA gate/audit remain open.
+
+2026-10-05 installed private CSV → Parquet target passed at 15cd2d4:
+100M cells, 1488.050s, 17,398,511 encoded bytes; full typed ordered readback,
+mapping precedence, provenance/digest and cleanup. Owning publication/SQL
+regressions: 326 passed. SQL fixed-fixture artifact readback added to the
+same harness; 10 × 100 smoke and Ruff passed. No DB execution, no public
+activation or final-SHA audit clearance is implied.
