@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.privacy import (
@@ -85,7 +87,7 @@ def _mask_returned_value(
         return mask_value(value)
     if isinstance(value, dict):
         # Map keys are source contents, not trusted schema labels.
-        if any(isinstance(item, str) or looks_sensitive_value(item) for item in value):
+        if any(type(item) not in (bool, int, float, Decimal) for item in value):
             return mask_value(value)
         return {
             nested_key: _mask_returned_value(
@@ -109,7 +111,9 @@ def _mask_returned_value(
             )
             for nested in value
         )
-    return value
+    if type(value) in (type(None), bool, int, float, Decimal, date, datetime, time, timedelta):
+        return value
+    return mask_value(value)
 
 
 def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:

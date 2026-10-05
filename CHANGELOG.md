@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Security
+
+- Suppress binary and unsupported returned values and nonnumeric map keys on
+  opt-in Trino safe-select before MCP serialization. Numeric and temporal
+  scalar compatibility and existing depth/value budgets remain enforced.
+
 ### Added
 
 - Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.

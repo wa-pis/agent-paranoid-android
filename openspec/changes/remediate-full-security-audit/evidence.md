@@ -185,3 +185,14 @@ Tests/inert prose/fixtures/upstream advisory coverage explicitly limited.
 Plugin usage35,364,290total/34,352,128cached is cumulative rollout accounting,
 not incremental cost of this scan. R10/R11 fixes and fresh exact-SHA audit
 remain required; no RC clearance. Existing full gate was not repeated.
+
+2026-10-06 R10 remediation verified: shared returned-value exact scalar
+allowlist masks binary/unsupported leaves and nonnumeric map keys before
+serialization. 116 focused masking/MCP server/SDK roundtrip tests passed;
+Ruff, owning mypy, strict OpenSpec and diff check passed. New synthetic
+regressions cover binary representations, nesting, map keys, unsupported
+subclasses and preserved numeric/Decimal/temporal types. Independent
+r10_review found no surviving safe-select bypass/regression. Historical
+mask_row is a separate aggregate helper with no production safe-select
+caller; it is not this returned-row control. No production/live DB/provider
+execution. R11 and fresh composed exact-SHA full gate/audit remain open.

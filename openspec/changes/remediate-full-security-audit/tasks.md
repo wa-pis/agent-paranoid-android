@@ -43,7 +43,7 @@
 
 - [x] Freeze prospective registration candidate `2fcacae05ae9566e3a53aa69db24535463e12619` from `15c5c40` plus four activation proposals; full offline gate:3068passed23skipped90.50%,191.96s.
 - [x] Complete independent whole-source scan `881daf8e-97bc-4cbb-8f6b-ee8874de8518` of this exact SHA; retain its canonical report.
-- [ ] R10: Mask binary source representations on opt-in Trino returned-row values/map keys before MCP serialization; add synthetic regressions.
+- [x] R10: Mask binary source representations on opt-in Trino returned-row values/map keys before MCP serialization; add synthetic regressions.
 - [ ] R11: Bound database local-category values in SQL before driver allocation for PostgreSQL table and PostgreSQL/Trino query-source routes; add offline regressions.
 
 ## Conditional release
@@ -201,3 +201,21 @@ Tests/inert prose/fixtures/upstream advisory coverage explicitly limited.
 Plugin usage35,364,290total/34,352,128cached is cumulative rollout accounting,
 not incremental cost of this scan. R10/R11 fixes and fresh exact-SHA audit
 remain required; no RC clearance. Existing full gate was not repeated.
+
+2026-10-05 R10 candidate: exact scalar allowlist in shared returned-value
+masker; unsupported/binary leaves masked, only numeric map keys retained.
+35 focused tests pass, including real Pydantic JSON binary/nested/map-key
+regressions. Independent pre-patch boundary investigation completed; fresh
+bypass/compatibility review r10_review pending. R10 remains open until that
+review and owning checks complete; R11 unchanged. No RC or clean-SHA claim.
+
+2026-10-06 R10 remediation verified: shared returned-value exact scalar
+allowlist masks binary/unsupported leaves and nonnumeric map keys before
+serialization. 116 focused masking/MCP server/SDK roundtrip tests passed;
+Ruff, owning mypy, strict OpenSpec and diff check passed. New synthetic
+regressions cover binary representations, nesting, map keys, unsupported
+subclasses and preserved numeric/Decimal/temporal types. Independent
+r10_review found no surviving safe-select bypass/regression. Historical
+mask_row is a separate aggregate helper with no production safe-select
+caller; it is not this returned-row control. No production/live DB/provider
+execution. R11 and fresh composed exact-SHA full gate/audit remain open.

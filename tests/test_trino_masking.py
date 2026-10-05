@@ -474,3 +474,56 @@ def test_safe_select_retains_numeric_map_shape_and_masks_string_values():
     assert masker.run_safe_select(
         "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
     ) == [{"payload": {1: "[MASKED]", 2: [3, "[MASKED]"]}}]
+
+
+@pytest.mark.parametrize("payload", [b"fictional@example.test", bytearray(b"fictional@example.test"), memoryview(b"fictional@example.test"), b"\xff", [b"fictional@example.test"], (b"fictional@example.test",), {1: b"fictional@example.test"}])
+def test_safe_select_masks_binary_representations(payload):
+    from pydantic_core import to_json
+
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": payload, "count": 2}])
+    result = masker.run_safe_select(
+        "SELECT payload, count FROM analytics.safe_schema.customers LIMIT 1")
+    encoded = to_json(result)
+    assert b"fictional@example.test" not in encoded
+    assert b"[MASKED]" in encoded
+    assert result[0]["count"] == 2
+
+
+@pytest.mark.parametrize("key", [b"fictional@example.test", object()])
+def test_safe_select_masks_unsupported_map_keys(key):
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": {key: 1}}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": "[MASKED]"}]
+
+
+
+def test_safe_select_retains_supported_scalar_types():
+    from datetime import date, datetime, time, timedelta
+    from decimal import Decimal
+
+    values = [None, True, 3, 2.5, Decimal("1.25"), date(2020, 1, 1),
+              datetime(2020, 1, 1), time(12, 0), timedelta(days=2)]
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": values}])
+    result = masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1")
+    assert result == [{"payload": values}]
+    assert [type(value) for value in result[0]["payload"]] == [type(value) for value in values]
+
+
+def test_safe_select_masks_custom_scalar_without_string_conversion():
+    class Unknown:
+        def __str__(self):
+            raise AssertionError("must not stringify source value")
+
+    class SourceInt(int):
+        pass
+
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": [Unknown(), SourceInt(4)]}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": ["[MASKED]", "[MASKED]"]}]
