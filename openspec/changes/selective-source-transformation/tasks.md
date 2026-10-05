@@ -422,3 +422,12 @@ checks passed9.66s, including preserving direct/fallback confirmations.
 Logs in isolated candidate:remaining-client-contracts.log,sql-contracts.log,
 common-mcp2.log. SDK1 and SDK2 evidence are distinct. Current composition
 remains prospective, not activated or accepted as the final RC SHA.
+
+2026-10-05 prospective registration full offline gate started in isolated
+candidate sr4ui81v, base1d2a9a3 plus three registration patches. Fourteen
+public contract fixtures regenerated only there; existing disclosed factory
+fixture adaptation retained. Active branch/main untouched. Lint/types/compile,
+dependency checks and preliminary privacy/SQL tests pass; full3075-test suite
+running, both DB integration flags0. Session10127; candidate-state.json and
+full-gate.log in isolated root retain progress. Do not duplicate this run or
+claim final exact-SHA clearance; inspect terminal result first next heartbeat.
