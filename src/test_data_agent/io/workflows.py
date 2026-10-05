@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import inspect
-import json
 from pathlib import Path
 from typing import Any, Callable, Literal
 
@@ -27,6 +26,10 @@ from test_data_agent.core.limits import (
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
+from test_data_agent.generation.limits import (
+    estimate_dataset_output_bytes,
+    estimate_field_output_bytes as estimate_field_output_bytes,
+)
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
@@ -548,37 +551,6 @@ def prepare_generation_budget(spec: DatasetSpec, output_path: Path | None) -> Ge
         label="estimated generated data",
     )
     return generation_budget_for_invocation()
-
-
-def estimate_dataset_output_bytes(spec: DatasetSpec) -> int:
-    total = len(spec.model_dump_json().encode("utf-8")) * 2 + 65_536
-    for entity in spec.entities:
-        row_bytes = 2
-        for field in entity.fields:
-            row_bytes += len(field.name.encode("utf-8")) + estimate_field_output_bytes(field) + 8
-        total += entity.row_count * row_bytes * 2
-    return total
-
-
-def estimate_field_output_bytes(field: Any) -> int:
-    if field.is_identifier:
-        return len(field.name.encode("utf-8")) + 64
-    if field.sensitive:
-        return 128
-    if field.data_type != "string":
-        return 64
-    distribution = field.distribution or {}
-    if distribution.get("kind") == "categorical":
-        categories = distribution.get("categories") or []
-        return max(
-            (
-                len(json.dumps(category.get("value"), default=str).encode("utf-8"))
-                for category in categories
-            ),
-            default=16,
-        )
-    maximum = int(distribution.get("max_length", 12))
-    return max(1, maximum) + 4
 
 
 def make_temp_output_folder(output_folder: Path) -> Path:

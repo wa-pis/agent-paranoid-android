@@ -27,9 +27,9 @@
 - [x] Complete the full release gate on audit baseline `d4765cf` (2994 passed,23 skipped,90.29%; strict docs pass).
 - [x] Independently audit entire immutable `d4765cf`, including all nine fix paths and siblings; four new medium resource findings.
 - [x] R1: Bound expanded YAML alias nodes/bytes and reject cycles before model construction.
-- [ ] R2: Common deterministic generation allocation preflight for direct/export/synthesis callers.
-- [ ] R3: Bound cumulative folder inference evaluations and check deadlines inside loops.
-- [ ] R4: Bound Parquet profiling nested logical content before Python conversion.
+- [x] R2: Common deterministic generation allocation preflight for direct/export/synthesis callers.
+- [x] R3: Bound cumulative folder inference evaluations and check deadlines inside loops.
+- [x] R4: Bound Parquet profiling nested logical content before Python conversion.
 - [ ] Repeat full gate and independent whole-project audit on the new final SHA.
 - [ ] Validate every new candidate; repair confirmed findings and repeat affected tests and full audit.
 - [ ] Record clean complete canonical audit; no open validated findings, deferred blocking candidate or skipped required checks.
@@ -70,3 +70,5 @@ Fresh independent read-only F2 candidate review found no concrete bypass or regr
 2026-10-05 fresh audit: scan `f929c897-48b4-406b-a746-90fd55dce79d`, immutable `d4765cf0fe92d10b458f08e2db282cd57901ba19`;141 production Python,21 scripts,9 CI workflows reviewed independently. Four medium resource findings validated with bounded synthetic probes. Canonical report retained in Codex Security; RC blocked. Fresh read-only boundary investigator completed; no source edits by reviewer.
 
 R1 complete: alias-reference expanded-node charge and scalar-byte graph accounting before construction; recursive references reject.142focused tests, Ruff/mypy/strictOpenSpec pass. Reviewer confirmed no unbounded DAG/cycle bypass. Alias-free syntax nodes are not charged against dataset cell allowance; bounded ordinary aliases and low-cell spec compatibility preserved.
+
+R2/R3/R4 implementation complete: generator shared output preflight plus pre-allocation string guard; one cumulative inference budget with captured MCP deadline across rules/relationships; shared Arrow logical checks before profile/read conversion.429focused generation/transformation tests,90Parquet/architecture tests,72budget/Arrow tests,6direct/export/synthesis triggers passed. Expanded run537passed with1Changelog-order failure; repaired and57docs/Parquet tests pass. Ruff,12module mypy and strictOpenSpec pass. Fresh candidate reviewer unavailable (agent thread limit); separate parent bypass/compatibility pass completed, including shared counters, dictionary/null/nested cases, helper callers and ordinary seeded output. Final full gate and fresh exact-SHA independent audit remain open.

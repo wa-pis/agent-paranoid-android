@@ -4,10 +4,6 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-### Security
-
-- Bound logical YAML alias expansion and reject recursive aliases before model construction, including private synthesis policies.
-
 ### Added
 
 - Prepare an isolated common saved-profile workflow for create/review/local
@@ -59,6 +55,12 @@ All notable changes to this project are documented here.
   detection during publication and rollback.
 
 ### Security
+
+- Apply shared allocation preflight to direct generation, SQL export and transformation synthesis; bound string construction before allocation.
+- Bound cumulative local inference work and check local/MCP deadlines inside rule and relationship loops.
+- Reuse pre-conversion nested Arrow inspection for Parquet profiles and dataset reads.
+- Bound logical YAML alias expansion and reject recursive aliases before model construction, including private synthesis policies.
+
 
 - Carry inherited MCP deadlines through CSV profiling, generation and rollback-safe publication; reject expired profile output before atomic replacement.
 

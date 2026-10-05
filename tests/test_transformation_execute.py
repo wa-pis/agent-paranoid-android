@@ -2019,3 +2019,22 @@ def test_date_substitute_keeps_canonical_iso_text(kind):
         max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
     assert list(csv.reader(io.StringIO(execute(material).decode()))) == [
         ["flag", "code"], ["no", after[0]], ["yes", after[1]]]
+
+
+def test_synthesis_rejects_allocation_before_generating_rows(monkeypatch):
+    original = request(source_bytes=b"flag,code\ntrue,alpha\nfalse,beta\n")
+    source = next(part for part in original.parts if part.kind == "source")
+    policy = yaml.safe_load(next(part.payload for part in original.parts if part.kind == "policy"))
+    policy["fields"][1]["behavior"] = {"action": "synthesize", "generation_policy_ref": "gen.yaml"}
+    spec = {"schema_version": "1.1", "entities": [{"name": "items", "row_count": 2,
+        "fields": [{"name": "code", "data_type": "string", "distribution": {
+            "kind": "string_pattern", "min_length": 10**12, "max_length": 10**12}}]}]}
+    parts = tuple(part for part in original.parts if part.kind == "mapping" and part.name == "all.csv")
+    parts += (SnapshotPart("generation_policy", "gen.yaml", yaml.safe_dump(spec).encode()),)
+    material = prepare_csv_review_request(yaml.safe_dump(policy).encode(), source, parts,
+        max_total_bytes=8192, max_review_bytes=4096, budget=GenerationBudget(5))
+    monkeypatch.setattr("test_data_agent.generation.entity_generator.generate_row",
+                        lambda *a, **k: pytest.fail("synthesis allocated a row before preflight"))
+    module = import_module("test_data_agent.io.transformation_execute")
+    with pytest.raises(module.TransformationExecutionError):
+        execute(material)
