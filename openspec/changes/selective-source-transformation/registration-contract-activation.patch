@@ -1,0 +1,136 @@
+diff --git a/tests/test_contract_fixtures.py b/tests/test_contract_fixtures.py
+--- a/tests/test_contract_fixtures.py
++++ b/tests/test_contract_fixtures.py
+@@ -89,6 +89,7 @@
+     ]
+     assert {tool["name"] for tool in generator_tools} == {
+         "approve_dataset_plan",
++        "common_transformation",
+         "export_dataset",
+         "generate_dataset",
+         "infer_dataset_spec",
+diff --git a/docs/reference/application-boundaries.md b/docs/reference/application-boundaries.md
+--- a/docs/reference/application-boundaries.md
++++ b/docs/reference/application-boundaries.md
+@@ -399,3 +399,8 @@
+ See [Public Stability](stability.md) for change classification and the active
+ [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+ for the staged extraction plan.
++
++The prospective common registration adds `transform-batch` and
++`common_transformation`. Its reviewed saved-profile operations share the
++same application enforcement; only local controlling-TTY approval issues
++a preservation receipt. Candidate registration is not release clearance.
+diff --git a/tests/fixtures/contracts/cli-parser-surface.json b/tests/fixtures/contracts/cli-parser-surface.json
+--- a/tests/fixtures/contracts/cli-parser-surface.json
++++ b/tests/fixtures/contracts/cli-parser-surface.json
+@@ -29,6 +29,7 @@
+     "generate-from-csv",
+     "validate",
+     "generate-from-example",
++    "transform-batch",
+     "demo",
+     "doctor",
+     "audit-verify",
+diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/contracts/mcp-generator-tools.json
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -23,6 +23,89 @@
+     "output_schema": {
+       "additionalProperties": true,
+       "title": "approve_dataset_planDictOutput",
++      "type": "object"
++    }
++  },
++  {
++    "description": "Closed fictional common-profile consumer; no rows or approval issuer.",
++    "input_schema": {
++      "properties": {
++        "destination": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Destination"
++        },
++        "max_output_bytes": {
++          "title": "Max Output Bytes",
++          "type": "integer"
++        },
++        "max_review_bytes": {
++          "title": "Max Review Bytes",
++          "type": "integer"
++        },
++        "max_total_bytes": {
++          "title": "Max Total Bytes",
++          "type": "integer"
++        },
++        "operation": {
++          "enum": [
++            "review",
++            "validate",
++            "execute"
++          ],
++          "title": "Operation",
++          "type": "string"
++        },
++        "profile": {
++          "title": "Profile",
++          "type": "string"
++        },
++        "receipt": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Receipt"
++        },
++        "snapshot_sha256": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Snapshot Sha256"
++        }
++      },
++      "required": [
++        "operation",
++        "profile",
++        "max_total_bytes",
++        "max_review_bytes",
++        "max_output_bytes"
++      ],
++      "title": "common_transformationArguments",
++      "type": "object"
++    },
++    "name": "common_transformation",
++    "output_schema": {
++      "additionalProperties": true,
++      "title": "common_transformationDictOutput",
+       "type": "object"
+     }
+   },
+@@ -371,7 +454,7 @@
+           "type": "integer"
+         },
+         "invalid_ratio": {
+-          "default": 0,
++          "default": 0.0,
+           "title": "Invalid Ratio",
+           "type": "number"
+         },

@@ -431,3 +431,16 @@ dependency checks and preliminary privacy/SQL tests pass; full3075-test suite
 running, both DB integration flags0. Session10127; candidate-state.json and
 full-gate.log in isolated root retain progress. Do not duplicate this run or
 claim final exact-SHA clearance; inspect terminal result first next heartbeat.
+
+2026-10-05 prospective full gate completed with2stale contract failures,
+3050passed23skipped90.50%coverage180.38s. Failures: expected MCP inventory
+omitted common_transformation; application-boundary docs omitted prospective
+names. Corrected only isolated expected test/docs/fixtures;53focused tests
+pass. Operational budgets, schema freshness, quickstart and strict docs pass.
+Tail-run first failed due to missing original physical tmp-path normalization;
+restored original pwd -P, path guard unchanged, rerun passed. Product unchanged.
+Proposed registration-contract-activation.patch retains these fixture/docs/test
+changes for coherent future activation; active branch inventory remains closed.
+Logs: focused-contract-repair.log,remaining-gate.log,schema-quickstart-gate.log
+under sr4ui81v. This is reconciled prospective gate evidence, not a green
+single final-SHA gate or independent safety clearance.
