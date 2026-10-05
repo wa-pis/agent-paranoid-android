@@ -52,6 +52,15 @@ options in the URL fail before a connection is opened. This syntax is parsed
 into the existing Psycopg adapter; Java and JDBC drivers are not used. If both
 URL and component settings are present, explicitly supplied values must match.
 
+PostgreSQL connections now default to `verify-full`, which verifies the server
+certificate and configured hostname. Configure a trusted CA certificate through
+the Psycopg/libpq trust-root configuration (for example `PGSSLROOTCERT`) and use
+a hostname covered by the certificate. Existing installations using the former
+`require` default must configure trust before upgrading. Connection failure does
+not fall back to a weaker mode. Explicit `require`, `verify-ca`, or `disable`
+requires `POSTGRES_ALLOW_INSECURE=true` and is intended only for isolated local
+testing; these modes do not provide full server identity verification.
+
 The database role must already be read-only. The client also requests a
 read-only transaction, TLS, statement and lock timeouts, and bounded aggregate
 results. It accepts no arbitrary SQL and never profiles source rows.

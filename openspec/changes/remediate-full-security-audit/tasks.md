@@ -33,6 +33,8 @@
 - [x] Full gate at `b3045ee`:3019passed23skipped90.35%, strict docs pass.
 - [x] Complete fresh whole-project audit `603092fd-7dd0-4475-a9a9-1a7f9658f3ae` on immutable `b3045ee`; one medium deterministic-rule resource finding.
 - [x] R5: Bound native solver/validation and negative business-rule work across direct/workflow callers.
+- [x] Full gate at `3d0289b`:3033passed23skipped, strict docs pass; fresh complete scan `aeca366b-900c-4314-a0cf-cc27f15169b1` found PostgreSQL TLS identity issue.
+- [x] R6: Default PostgreSQL to full server identity verification; gate weaker direct/env/JDBC modes before credentials/connect, document migration and verify regressions.
 - [ ] Repeat full gate and independent whole-project audit on the new final SHA.
 - [ ] Validate every new candidate; repair confirmed findings and repeat affected tests and full audit.
 - [ ] Record clean complete canonical audit; no open validated findings, deferred blocking candidate or skipped required checks.
@@ -78,3 +80,7 @@ R2/R3/R4 implementation complete: generator shared output preflight plus pre-all
 
 
 R5 implementation verified:453owning-package tests passed4skipped;41rule/condition tests passed after membership-cost accounting;24module mypy, Ruff and strictOpenSpec pass.14new bounded synthetic regressions cover inner native/aggregate expiry, direct helpers, cumulative exhaustion, empty-row dense graphs, pre-generation native rejection, quadratic FK/aggregate estimates and callback compatibility. Fresh candidate reviewer found callback arity regression, now covered and corrected. No confirmed surviving rule-scan bypass. Full gate and a fresh complete audit of the committed final SHA remain required; no RC permission implied by these checks.
+
+R6 investigation: fresh boundary worker unavailable (thread cap); separate parent pass traced direct/env/JDBC resolution and session validation before secret resolution. Existing allow_insecure is the shared exception control. Immutable full audit covers production, scripts, CI, examples, acceptance programs and dependency metadata; external dependency vulnerability/source review and live MITM are not claimed.
+
+R6 verified:237 PostgreSQL/SQL-source tests plus56 CLI/transform-isolation/temporal tests pass; Ruff,2module mypy, strict OpenSpec and docs pass. Fresh independent candidate review passed68tests and24fake-driver mode/opt-in cases, no surviving bypass/regression. Secure default reaches driver as verify-full; weaker modes reject before password resolution/connect unless explicit local opt-in. No live TLS handshake claimed. Full gate and new exact-SHA full audit remain open.

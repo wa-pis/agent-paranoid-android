@@ -20,4 +20,4 @@ After a clean review, finish original transformation acceptance, exact-main chec
 
 ## Risks And Open Questions
 
-Native Parquet decoder allocation may precede Python checks; deployment memory containment remains relevant. PostgreSQL `sslmode=require` server-identity limitations and direct Python StringPattern budgets are hardening advice, not additional validated findings. No claim of absolute security or private-data acceptance follows from this audit.
+Native Parquet decoder allocation may precede Python checks; deployment memory containment remains relevant. The original audit treated PostgreSQL server-identity limitations as hardening advice. Fresh independent audit of `3d0289b` confirmed a remote credential boundary violation; this prior disposition did not establish operator risk acceptance. R6 defaults to `verify-full` and gates every weaker mode with the existing local insecure opt-in before credential resolution. Direct Python StringPattern budgets remain hardening advice. No claim of absolute security or private-data acceptance follows from this audit.

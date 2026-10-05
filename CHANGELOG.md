@@ -56,6 +56,8 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Default PostgreSQL connections to `verify-full`; require explicit local insecure opt-in for weaker TLS modes before resolving credentials. Configure a trusted CA and certificate hostname when migrating from the former `require` default.
+
 - Bound native constraint solving and rule validation inside their loops; share
   cumulative evaluation/deadline budgets and account for quadratic negative
   foreign-key and aggregate work before application.

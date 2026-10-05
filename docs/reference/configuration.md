@@ -243,8 +243,8 @@ The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 | `POSTGRES_DATABASE` | `postgres` | Database name |
 | `POSTGRES_USER` | `test_data_agent` | Existing read-only database role |
 | `POSTGRES_PASSWORD_ENV` | unset | Name of the environment variable containing the password |
-| `POSTGRES_SSLMODE` | `require` | `require`, `verify-ca`, `verify-full`, or explicitly approved local `disable` |
-| `POSTGRES_ALLOW_INSECURE` | `false` | Required with `POSTGRES_SSLMODE=disable`; local isolated testing only |
+| `POSTGRES_SSLMODE` | `verify-full` | Verify the certificate and configured hostname; weaker modes require explicit local opt-in |
+| `POSTGRES_ALLOW_INSECURE` | `false` | Required with `require`, `verify-ca`, or `disable`; local isolated testing only |
 | `POSTGRES_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
 | `POSTGRES_ALLOWED_TABLES` | required | Comma-separated `schema.table` allowlist |
 | `POSTGRES_ALLOWED_COLUMNS` | required | Comma-separated exact `schema.table.column` or table-qualified `schema.table.*` profiling selectors |

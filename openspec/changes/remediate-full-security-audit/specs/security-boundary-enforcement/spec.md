@@ -102,3 +102,14 @@ failures SHALL escape formula error reporting and prevent trusted publication.
 #### Scenario: Existing callback shape
 - **WHEN** a business callback accepts two or three positional arguments
 - **THEN** its argument shape remains supported with optional keyword-only budget propagation
+
+### Requirement: PostgreSQL Credentials Require Server Identity Verification
+PostgreSQL direct, environment and JDBC configuration SHALL default to `verify-full`. Modes without full server identity verification SHALL require explicit existing local insecure opt-in before resolving credentials or connecting. Connection errors SHALL NOT cause weaker-mode fallback.
+
+#### Scenario: Default remote configuration
+- **WHEN** no TLS mode is explicitly selected
+- **THEN** the driver receives `verify-full` and operators configure a trusted CA and certificate hostname.
+
+#### Scenario: Weak mode without acknowledgement
+- **WHEN** direct, environment or JDBC configuration selects `require`, `verify-ca`, or `disable` without local insecure opt-in
+- **THEN** configuration fails before password resolution or driver connection.

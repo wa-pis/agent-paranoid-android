@@ -149,3 +149,5 @@ retain precedence over deadline reporting.
 Rule residual queries reject sensitive-name target and arithmetic/value operands before execution. Formula dependencies share the existing name sensitivity classifier; aggregate mappings guard parent values and numeric child values. Relationship keys remain usable without returning their values. These checks do not claim content detection for innocuously named source columns.
 
 SQL-query exact local categories require an authorized direct physical-column projection. Both physical source and output names must pass the shared sensitive, identifier and quasi-identifier policy. Aliases cannot grant disclosure permission; derived expressions and manually constructed plans without explicit category authorization fail closed. This applies to PostgreSQL and Trino.
+
+PostgreSQL defaults to certificate and hostname verification (`verify-full`). All weaker TLS modes require explicit local insecure opt-in before password resolution or driver connection. JDBC and component configuration share this guard; driver errors never trigger a weaker-mode retry.

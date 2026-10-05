@@ -94,7 +94,7 @@ class PostgresConfig:
     allowed_tables: frozenset[str]
     allowed_columns: frozenset[str]
     password_env: str | None = None
-    sslmode: str = "require"
+    sslmode: str = "verify-full"
     allow_insecure: bool = False
     statement_timeout_ms: int = 30_000
     lock_timeout_ms: int = 5_000
@@ -130,7 +130,7 @@ class PostgresConfig:
             sslmode=_resolved_text_env(
                 "POSTGRES_SSLMODE",
                 endpoint.sslmode if endpoint is not None else None,
-                "require",
+                "verify-full",
                 normalize=str.lower,
             ),
             allow_insecure=_bool_env("POSTGRES_ALLOW_INSECURE"),
@@ -165,9 +165,10 @@ class PostgresConfig:
             raise PostgresConfigurationError(
                 "POSTGRES_SSLMODE must be require, verify-ca, verify-full, or disable"
             )
-        if self.sslmode == "disable" and not self.allow_insecure:
+        if self.sslmode != "verify-full" and not self.allow_insecure:
             raise PostgresConfigurationError(
-                "POSTGRES_SSLMODE=disable requires POSTGRES_ALLOW_INSECURE=true"
+                "POSTGRES_SSLMODE without full server identity verification "
+                "requires POSTGRES_ALLOW_INSECURE=true"
             )
         _bounded_positive(
             "POSTGRES_STATEMENT_TIMEOUT_MS", self.statement_timeout_ms, 3_600_000

@@ -112,3 +112,11 @@ exact-SHA security audit remain open.
 
 Standalone supplemental R5 fix report (sealed baseline scan unchanged):
 `/Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/artifacts-6228a9da09a5649cfa26589ce21af5175a4b834568b9b1ae7462ed21d12ee674/artifacts/fix_report.md`.
+
+## Fresh audit of 3d0289b and R6
+
+Full offline release gate:3033passed23skipped, strict docs pass. Complete independent whole-source audit `aeca366b-900c-4314-a0cf-cc27f15169b1` at `3d0289b4fce8bd66a4b6b671c5fcbef104e2fece` found one high-severity, medium-confidence PostgreSQL server identity issue. Remote endpoint impersonation is required; no DB writes/admin grants or live MITM test are assumed. Historical hardening disposition was considered and does not supply explicit accepted-risk policy. Fake-driver probe confirms require/password forwarding without opt-in, no network access.
+
+Canonical sealed report: `/Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/3d0289b4fce8bd66a4b6b671c5fcbef104e2fece_20261005T044617Z_srnb8et2/report.md`. Code remains unreleasable until R6 verification and a new complete audit. Audit usage returned by plugin is cumulative rollout accounting:24,950,525 total tokens including24,029,440 cached input tokens; not isolated incremental audit cost.
+
+R6 candidate verified:237+56owning tests passed; Ruff/2module mypy/strictOpenSpec/strictdocs passed. Fresh independent candidate reviewer68tests+24fake-driver mode cases passed. Implementation uses existing config validation before credential resolution, no driver fallback. No network/live handshake claimed. Full gate and fresh final-SHA audit pending.
