@@ -8,6 +8,7 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec, parse_dataset_spec_payload
 from test_data_agent.core.limits import (
+    bounded_directory_paths,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -20,6 +21,7 @@ from test_data_agent.core.parquet_limits import inspect_parquet_batch
 from test_data_agent.core.serialization import load_limited_json, load_limited_yaml
 from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
 from test_data_agent.migration import reject_removed_spec_payload
+from test_data_agent.profiling.budget import LocalProfileBudget
 
 
 def load_dataset_spec(path: Path) -> DatasetSpec:
@@ -49,7 +51,11 @@ def _is_dataset_profile_payload(payload: Any) -> bool:
 
 def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
-    input_paths = [path for path in sorted(input_folder.iterdir()) if path.suffix in {".csv", ".json", ".parquet"}]
+    budget = LocalProfileBudget()
+    input_paths = bounded_directory_paths(
+        input_folder, (".csv", ".json", ".parquet"),
+        lambda: budget.check_deadline("dataset inventory"),
+    )
     stems = [path.stem for path in input_paths]
     if len(stems) != len(set(stems)):
         raise ValueError("duplicate entity artifact names")

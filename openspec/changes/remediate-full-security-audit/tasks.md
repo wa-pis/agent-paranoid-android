@@ -311,3 +311,72 @@ grouping/counts and cumulative result budgets; no concrete surviving bypass
 identified. This fallback is not an independent reviewer claim. Native Trino
 semantics/live DB deliberately not exercised. Commit/push next; new composed
 gate and independent whole-source audit required before RC.
+
+2026-10-06 R12 committed/pushed7e339f9. Fresh composed candidate
+66fe5a8a1e87c57af4c21c89c5cb11fb5ff9e9fe in
+/private/tmp/apa-r12-coherent-jrkpnfvz: full offline gate running, session21415,
+full-gate.log; pointer /private/tmp/apa-r12-coherent-current.json.
+Actual CLI/MCP flags1, liveDBflags0, synthetic TTY authorized. Resume same
+gate; do not duplicate. Prior12528430 full-source scan final validation
+pending; new66fe5a8a requires independent audit after gate succeeds. RC closed.
+
+2026-10-06 exact66fe5a8a full gate passed3094tests19skipped1warning,
+189.61s,91% roundedcoverage; all releasecheckstagespass. Same log/pointer.
+New scan ee044df4-90f7-4be8-a1b2-8e3ec5fb5cdd registered at66fe5a8a;
+preflight pending, no source review or clean finding claim yet.
+Prior e85d9c23 completed/sealed once with oneLOWTrino finding. Independent
+baseline fullyread193 executablefiles; all3other candidates rejected with
+source-backed counterevidence. Workbench draft merge retained4stale deferred
+entries despite finalcloseddecisions and emptydeferred submission, so canonical
+coverage is partial. Do not treat this artifact as complete release clearance
+or edit its sealed files. Fresh66fe5a8a audit must reconcile all coverage.
+Canonicalreport:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r11-corrected-gcjkam5q/12528430e090060e6b79da1cf917e5044dfc2687_20261005T203156Z_j3_2zg1m/report.md
+Tool usage 28,879,772 total rollouttokens incl28,008,704cachedinput across5
+threads; cumulative rollout measurement, not incremental latestaudit cost.
+
+2026-10-06 ee044df4 preflightready;4hostslots warning, freshpreflightworker
+spawnfailedthreadlimit so parent ran exacthelperexit0. Freshbaseline/architecture
+spawn unavailable; existing r12_boundary independently audits whole current
+66fe5a8a (41/193files reported so far). Parent sequential current architecture
+fallback, not independent architecture claim; actualresources/mappings in
+canonical6fieldmodel. Parent fullyread both currentMCPtransport modules, no
+new confirmed defect. Scan discovery running, canonicalpartialcheckpoint;
+resume same scan/reviewer, no fullgate repeat. Not clean or releaseclearance.
+
+2026-10-06 current66fe5a8a audit validates2newLOWresource findings:
+R13 agent_source_fingerprint hashes growing regularinputs toEOF without
+actualperfile/cumulativebyte/deadline checks; stat/nofollow and boundedchunks
+do notclose this IO/CPU gap. R14 CSVfolder eagerglob/sort/list allocation
+precedes configuredfilecount rejection across planning/profiling/cache.
+Python3.11 pathlibselector locally inspected: it also eagerlylists scandir,
+so sortingafter Path.glob alone is insufficient; streaming os.scandir needed.
+Independent baseline and parent sourcevalidation agree; no live/privateinputs
+or measuredOOM. Canonicalcurrentcheckpoint retains2confirmed findings.
+- [ ] R13: Bound shared source-fingerprint actualbytes and local/inheriteddeadline; regressions/docs/OpenSpec and reviewer.
+- [ ] R14: Stream and bound CSVinventory before sorting/materialization across all consumers; regressions/docs/OpenSpec and reviewer.
+Currentwholebaseline final193 reconciliation pending. RC remainsclosed.
+Read-only GitHubcheck: no openPRforcodex/fix-transformation-review, no required
+independentapproval established. CIpull_request includes disposableliveTrino;
+do nottrigger under currentno-live-DB instruction without explicitclearance.
+
+
+2026-10-06 ee044df4 completed/sealed once: independent baseline193/193,
+canonicalcoverage complete, deferred0, twoLOW R13/R14. Report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r12-coherent-jrkpnfvz/66fe5a8a1e87c57af4c21c89c5cb11fb5ff9e9fe_20261005T212011Z_4ramze4l/report.md
+Tool reported8,073,944 cumulative rollouttokens incl7,905,280cachedinput,
+not incremental audit cost. R13/R14 implementation now in active worktree:
+actualbyte/deadline hash checks and common streaming/count-bound inventory,
+including discovered dataset-reader sibling. Initial42regressionspassed,
+1test setup fixed (required QueryWorkLimits fields). Finalfocused/review pending;
+immutable audited candidate unchanged, new fullgate/audit required after commit.
+
+2026-10-06 R13/R14 focused220passed; Ruff and owningmypy9modulespass,
+strictMkDocs/OpenSpec/diffcheckpass. Independent r12_boundary candidate
+review found eager default CLI/MCP autodetection and reset customcachedeadline;
+both patched with regression coverage, then independently source-reverified:
+no remaining concrete defect in reviewed paths. Review is not wholeSHAclearance.
+Shared inventory now covers datasetreader sibling and sourceautodetection;
+cache helpers accept optional keyword-only LocalProfileBudget to preserve caller
+clock. Cooperative checks do not preempt active filesystem operations.
+Commit/push followed by fresh composed fullgate and independent audit required.

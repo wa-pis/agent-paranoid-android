@@ -22,7 +22,9 @@ from test_data_agent.agent_contracts import (
     AgentStep,
 )
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.limits import enforce_input_files
+from test_data_agent.core.limits import (
+    InputLimitError, enforce_input_files, max_input_file_bytes, max_total_input_bytes,
+)
 from test_data_agent.generation import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     dataset_profile_fingerprint,
@@ -34,6 +36,7 @@ from test_data_agent.io.workflows import (
 )
 from test_data_agent.io.path_policy import open_regular_file
 from test_data_agent.profiling import profile_example_folder
+from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.workspace_store import (
     DEFAULT_AGENT_WORKSPACE_STORE,
@@ -145,21 +148,38 @@ class AgentPlanningService:
 def agent_source_fingerprint(request: AgentRequest) -> str | None:
     if request.source_type == AgentSourceType.PROFILE:
         return None
+    budget = LocalProfileBudget()
     paths = (
         [request.source_path]
         if request.source_type == AgentSourceType.CSV
-        else sorted(request.source_path.glob("*.csv"))
+        else bounded_csv_paths(request.source_path, budget)
     )
+    file_limit = max_input_file_bytes()
+    total_limit = max_total_input_bytes()
+    total_read = 0
     digest = hashlib.sha256(b"agent-source-v1\0")
     for path in enforce_input_files(paths):
+        budget.check_deadline("source fingerprint")
+        file_read = 0
         name = path.name.encode("utf-8")
         digest.update(len(name).to_bytes(8, "big"))
         digest.update(name)
         with open_regular_file(path) as handle:
-            while chunk := handle.read(1024 * 1024):
+            while True:
+                budget.check_deadline("source fingerprint")
+                chunk = handle.read(min(1024 * 1024, file_limit - file_read + 1,
+                                        total_limit - total_read + 1))
+                budget.check_deadline("source fingerprint")
+                if not chunk:
+                    break
+                file_read += len(chunk)
+                total_read += len(chunk)
+                if file_read > file_limit or total_read > total_limit:
+                    raise InputLimitError("agent source fingerprint input byte limit exceeded")
                 digest.update(len(chunk).to_bytes(8, "big"))
                 digest.update(chunk)
         digest.update((0).to_bytes(8, "big"))
+    budget.check_deadline("source fingerprint")
     return digest.hexdigest()
 
 
@@ -180,7 +200,7 @@ def validate_agent_source_fingerprint(
 def detect_agent_source_type(source: Path) -> AgentSourceType:
     resolved = source.expanduser().resolve(strict=True)
     if resolved.is_dir():
-        if any(path.is_file() and path.suffix == ".csv" for path in resolved.iterdir()):
+        if any(path.is_file() for path in bounded_csv_paths(resolved, LocalProfileBudget())):
             return AgentSourceType.CSV_FOLDER
         raise ValueError(
             "cannot detect agent source type: folder contains no CSV files; "

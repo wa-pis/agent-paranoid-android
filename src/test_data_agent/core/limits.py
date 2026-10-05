@@ -233,11 +233,34 @@ def enforce_row_count_limit(row_count: int, *, max_count: int | None = None) -> 
         raise ValueError(f"row_count must be <= {effective_max}")
 
 
-def enforce_input_files(paths: Iterable[Path]) -> list[Path]:
-    resolved_paths = list(paths)
+def bounded_input_paths(paths: Iterable[Path]) -> list[Path]:
     file_limit = max_input_files()
-    if len(resolved_paths) > file_limit:
-        raise InputLimitError(f"input contains more than {file_limit} files")
+    resolved_paths: list[Path] = []
+    for path in paths:
+        if len(resolved_paths) >= file_limit:
+            raise InputLimitError(f"input contains more than {file_limit} files")
+        resolved_paths.append(path)
+    return resolved_paths
+
+
+def bounded_directory_paths(
+    folder: Path, suffixes: tuple[str, ...], check_deadline: Callable[[], None],
+) -> list[Path]:
+    """Stream entries before count enforcement; sort only the bounded inventory."""
+    def matching_paths() -> Iterator[Path]:
+        check_deadline()
+        with os.scandir(folder) as entries:
+            for entry in entries:
+                check_deadline()
+                if os.path.normcase(entry.name).endswith(suffixes):
+                    yield folder / entry.name
+        check_deadline()
+
+    return sorted(bounded_input_paths(matching_paths()))
+
+
+def enforce_input_files(paths: Iterable[Path]) -> list[Path]:
+    resolved_paths = bounded_input_paths(paths)
     total_size = 0
     for path in resolved_paths:
         if path.is_symlink():

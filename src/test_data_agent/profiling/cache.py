@@ -15,6 +15,7 @@ from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.limits import read_limited_text
 from test_data_agent.core.serialization import load_limited_json
 from test_data_agent.io.path_policy import atomic_write_bytes
+from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
 
 
 DEFAULT_PROFILE_CACHE_DIR = Path(".test_data_agent_cache") / "profiles"
@@ -26,11 +27,15 @@ def csv_folder_fingerprint(
     input_folder: Path,
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    *,
+    budget: LocalProfileBudget | None = None,
 ) -> str:
     digest = hashlib.sha256()
     digest.update(str(rule_sample_rows).encode())
     digest.update(json.dumps(_category_policy(local_category_fields), separators=(",", ":")).encode())
-    for path in sorted(input_folder.glob("*.csv")):
+    budget = budget or LocalProfileBudget()
+    for path in budget.check_input_files(bounded_csv_paths(input_folder, budget)):
+        budget.check_deadline("cache fingerprint")
         stat = path.stat()
         digest.update(path.name.encode())
         digest.update(str(stat.st_size).encode())
@@ -51,8 +56,10 @@ def load_cached_profile(
     cache_dir: Path = DEFAULT_PROFILE_CACHE_DIR,
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    *,
+    budget: LocalProfileBudget | None = None,
 ) -> DatasetProfile | None:
-    fingerprint = csv_folder_fingerprint(input_folder, rule_sample_rows, local_category_fields)
+    fingerprint = csv_folder_fingerprint(input_folder, rule_sample_rows, local_category_fields, budget=budget)
     path = cache_path(cache_dir, fingerprint)
     if not path.exists():
         return None
@@ -70,8 +77,10 @@ def write_cached_profile(
     profile: DatasetProfile,
     cache_dir: Path = DEFAULT_PROFILE_CACHE_DIR,
     rule_sample_rows: int = DEFAULT_RULE_SAMPLE_ROWS,
+    *,
+    budget: LocalProfileBudget | None = None,
 ) -> Path:
-    fingerprint = csv_folder_fingerprint(input_folder, rule_sample_rows, profile.local_category_fields)
+    fingerprint = csv_folder_fingerprint(input_folder, rule_sample_rows, profile.local_category_fields, budget=budget)
     path = cache_path(cache_dir, fingerprint)
     payload = {
         "format_version": PROFILE_CACHE_FORMAT_VERSION,

@@ -16,6 +16,8 @@ from test_data_agent.core.limits import (
     DEFAULT_MAX_LOCAL_PROFILE_SECONDS,
     DEFAULT_MAX_TOTAL_INPUT_BYTES,
     InputLimitError,
+    bounded_input_paths,
+    bounded_directory_paths,
     enforce_input_cell_count,
     enforce_input_files,
     max_input_cells,
@@ -134,9 +136,10 @@ class LocalProfileBudget:
         self._sample_rows = attempted
 
     def check_input_files(self, paths: Iterable[Path]) -> list[Path]:
-        resolved = list(paths)
+        resolved = bounded_input_paths(paths)
         total_bytes = 0
         for path in resolved:
+            self.check_deadline("input preflight")
             if path.is_symlink():
                 raise InputLimitError(
                     f"symbolic link inputs are not allowed: {path.name!r}"
@@ -177,3 +180,9 @@ class LocalProfileBudget:
                 stage="local inference",
             )
         self._inference_evaluations = attempted
+
+
+def bounded_csv_paths(folder: Path, budget: LocalProfileBudget) -> list[Path]:
+    return bounded_directory_paths(
+        folder, (".csv",), lambda: budget.check_deadline("CSV inventory"),
+    )

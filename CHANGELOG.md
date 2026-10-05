@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Bound actual source-fingerprint bytes and local/MCP deadlines; stream folder inventories under file-count and time limits before sorting, including cache and dataset validation paths.
+
 - Reject spreadsheet formula-capable string cells and headers in transformation CSV output before publication, preserving exact accepted replacement text.
 
 - Mask entire safe-select maps with string keys to prevent leaking source data through nested keys.

@@ -135,3 +135,17 @@ Transformation CSV output rejects formula-capable string cells and headers
 before publication instead of modifying exact replacement text. Valid numeric
 scalars retain numeric output, including negative values. Typed Parquet/SQL
 output is governed by its own scalar encoding contract.
+
+CSV-folder inventory uses streaming directory enumeration, checks the local and
+captured invocation deadlines for every entry (including non-CSV entries),
+rejects the first matching file beyond the configured file count, and sorts
+only the bounded inventory. Cache fingerprints and agent fingerprints use the
+same inventory control. Dataset validation applies it to CSV/JSON/Parquet.
+Source byte fingerprinting charges actual per-file and aggregate bytes while
+reading, with deadline checks before and after each bounded read. Growing
+inputs fail closed; static inputs retain the existing fingerprint framing.
+These are cooperative checks and do not preempt an active filesystem operation.
+
+Cache fingerprint/load/write helpers accept an optional keyword-only
+`LocalProfileBudget`; folder profiling passes its existing budget through cache
+inventory. Default CLI/MCP source detection also uses bounded enumeration.

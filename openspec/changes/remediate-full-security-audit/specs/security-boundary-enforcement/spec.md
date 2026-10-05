@@ -135,3 +135,25 @@ truncate or filter oversized categories into an apparently complete summary.
 - **WHEN** ordinary Trino table profiling summarizes categories
 - **THEN** original grouping counts remain intact and source-free labels or
   sensitive patterns retain the existing classification contract.
+
+
+### Requirement: Source fingerprints and inventories remain resource bounded
+
+Source fingerprints SHALL charge actual per-file and cumulative read bytes and
+check local and captured invocation deadlines before and after each read.
+Folder inventories SHALL enumerate incrementally, check deadlines for all
+entries, reject the first matching path beyond the configured file count, and
+sort only the bounded inventory. Profiling, cache, planning and dataset loading
+SHALL share these controls without silently skipping invalid matching inputs.
+
+#### Scenario: Selected source grows after preflight
+
+- **WHEN** a synthetic CSV grows after its size preflight
+- **THEN** fingerprinting rejects actual byte or deadline exhaustion before publication
+- **AND** stable bounded inputs retain the existing digest framing.
+
+#### Scenario: Oversized or slow folder inventory
+
+- **WHEN** a selected folder exceeds its matching-file count or enumeration deadline
+- **THEN** enumeration stops, closes its directory handle, and returns no trusted profile or fingerprint
+- **AND** valid bounded folders retain deterministic filename ordering.

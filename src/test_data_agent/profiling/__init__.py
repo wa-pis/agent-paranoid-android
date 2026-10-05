@@ -7,6 +7,7 @@ from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.profiling.cache import DEFAULT_PROFILE_CACHE_DIR, load_cached_profile, write_cached_profile
 from test_data_agent.profiling.budget import (
     LocalProfileBudget,
+    bounded_csv_paths,
     LocalProfileDimension,
     LocalProfileLimitError,
     LocalProfileLimits,
@@ -33,7 +34,7 @@ def profile_example_folder(
 ) -> DatasetProfile:
     work_budget = budget or LocalProfileBudget()
     work_budget.check_sample_rows(rule_sample_rows)
-    work_budget.check_input_files(sorted(input_folder.glob("*.csv")))
+    work_budget.check_input_files(bounded_csv_paths(input_folder, work_budget))
     work_budget.check_deadline("cache lookup")
     if use_cache and cache_dir is not None:
         cached = load_cached_profile(
@@ -41,6 +42,7 @@ def profile_example_folder(
             cache_dir=cache_dir,
             rule_sample_rows=rule_sample_rows,
             local_category_fields=local_category_fields,
+            budget=work_budget,
         )
         if cached is not None:
             work_budget.check_deadline("cache load")
@@ -64,6 +66,7 @@ def profile_example_folder(
             profile,
             cache_dir=cache_dir,
             rule_sample_rows=rule_sample_rows,
+            budget=work_budget,
         )
     return profile
 
