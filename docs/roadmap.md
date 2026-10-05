@@ -17,6 +17,13 @@ prioritized from observed user needs and confirmed defects.
 
 ## Next
 
+- Plan batch-based dataset validation so CSV, JSON and Parquet rows do not all
+  remain in memory. Design bounded cross-table key and uniqueness checks,
+  preserve deterministic results and existing validation contracts, and measure
+  peak memory on synthetic scale fixtures. Create a separate OpenSpec change
+  before implementation. This future feature does not replace current resource
+  limits or expand the `1.6.0rc1` scope; confirmed safety defects still block RC.
+
 - Simplify CSV and database workflows using pilot feedback.
 - Publish runnable real-world examples and short case studies built from
   synthetic fixtures.

@@ -353,8 +353,8 @@ Python3.11 pathlibselector locally inspected: it also eagerlylists scandir,
 so sortingafter Path.glob alone is insufficient; streaming os.scandir needed.
 Independent baseline and parent sourcevalidation agree; no live/privateinputs
 or measuredOOM. Canonicalcurrentcheckpoint retains2confirmed findings.
-- [ ] R13: Bound shared source-fingerprint actualbytes and local/inheriteddeadline; regressions/docs/OpenSpec and reviewer.
-- [ ] R14: Stream and bound CSVinventory before sorting/materialization across all consumers; regressions/docs/OpenSpec and reviewer.
+- [x] R13: Bound shared source-fingerprint actualbytes and local/inheriteddeadline; regressions/docs/OpenSpec and reviewer.
+- [x] R14: Stream and bound CSVinventory before sorting/materialization across all consumers; regressions/docs/OpenSpec and reviewer.
 Currentwholebaseline final193 reconciliation pending. RC remainsclosed.
 Read-only GitHubcheck: no openPRforcodex/fix-transformation-review, no required
 independentapproval established. CIpull_request includes disposableliveTrino;
@@ -380,3 +380,29 @@ Shared inventory now covers datasetreader sibling and sourceautodetection;
 cache helpers accept optional keyword-only LocalProfileBudget to preserve caller
 clock. Cooperative checks do not preempt active filesystem operations.
 Commit/push followed by fresh composed fullgate and independent audit required.
+
+2026-10-06 R13/R14 committed/pushed a5f89f54eb5510c261511755bdc5cd6ad6ac909e.
+New composed immutable6ef55a1d86e377ee442199fee60cec6b57c8b9a7 at
+/private/tmp/apa-r13-coherent-6ysh69ml fullofflinegate passed3113tests,
+19skipped1warning181.74s,90.54%coverage; releasecheckallstagespass.
+Log full-gate.log; /private/tmp/apa-r13-coherent-current.json is resume pointer.
+Actual CLI/MCP flags1, liveDBflags0, syntheticTTY; do not repeat unchangedgate.
+New scan54cfdefc-304e-4131-a379-396572e8d4c5 preflightready, fresh-context
+independent r13_whole_baseline active, authoritative193file inventory
+143src21scripts9workflows15examples5acceptance. Currentcoveragepartial;
+no cleanclaim. Fresh architecture spawn failed hostthreadlimit; parentcurrent
+resourceconsumer mapping fallback, explicitly not independentarchitecture.
+Canonical checkpoint holds model and parentfullyread3files; baseline continues
+through contextcompaction. No historicalreport safetyreuse. Resume same scan,
+reviewer and pointer; no new scan unless sourcechanges. RC stillclosed pending
+full current audit and real exactmain/approval/signatures/publication gates.
+
+2026-10-06 user directs future-feature tracking plus continued fixes/RC work.
+Recorded batch-based dataset validation in docs/roadmap.md Next: avoid retaining
+all rows, bounded cross-table uniqueness/key checks, unchanged deterministic
+validation contracts, synthetic peak-memory evidence and separate OpenSpec.
+Deferred feature is not an excuse to leave confirmed security findings open or
+a new1.6RCscope. Active54cfdefc/current6ef55a1 baseline continues unchanged;
+no duplicategate or premature source/version/tag activation. Finalrelease needs
+exactmainchecks, independentrequiredapproval, Ubuntuhashes/signatures and public
+verification; currentdocs/taskprogresscommit is not runtimeauditclearance.
