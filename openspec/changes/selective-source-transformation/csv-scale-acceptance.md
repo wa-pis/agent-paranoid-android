@@ -60,3 +60,15 @@ Candidate full-run cumulative stage timings: profile68.522s, review135.900s.
 Residual work: SQL-result capture/worker budget propagation, public interface
 and activation review, full target1M x100/multi-route acceptance, documentation
 and final RC release gates. No hard RSS/wire guarantee is claimed.
+
+## Configurable target harness — 2026-10-05
+
+The CSV harness now accepts explicit `--max-bytes` and `--max-seconds`,
+retaining 512MiB / 1800s defaults. The selected byte budget applies both to
+saved per-file/total-input/output limits and to run limits. Invalid nonpositive,
+nonfinite time or oversized integer budgets fail before fixture creation.
+Small synthetic 10 × 3 scenario passed with 1MiB / 60s, plus five invalid-budget
+startup checks and Ruff. This is harness validation, not measured target proof.
+For 1M × 100, this fixture's CSV source is 550,000,900 bytes and replacement
+output is 600,500,900 bytes; both exceed 512MiB. Use an explicit sufficient
+byte budget instead of treating row/cell configuration as a byte-limit override.

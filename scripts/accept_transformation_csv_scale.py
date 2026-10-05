@@ -8,6 +8,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import monotonic
@@ -25,12 +26,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
+    parser.add_argument("--max-seconds", type=float, default=1800)
     args = parser.parse_args()
     if not 1 <= args.rows <= 1_000_000 or not 2 <= args.columns <= 100:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
+    if not 0 < args.max_bytes <= 2**63 - 1:
+        parser.error("max-bytes must be a positive signed 64-bit integer")
+    if not math.isfinite(args.max_seconds) or args.max_seconds <= 0:
+        parser.error("max-seconds must be finite and positive")
     started = monotonic()
-    budget = GenerationBudget(1800)
-    max_bytes = 512 * 1024 * 1024
+    budget = GenerationBudget(args.max_seconds)
+    max_bytes = args.max_bytes
     names = ["field_" + chr(97 + i // 26) + chr(97 + i % 26) for i in range(args.columns)]
     with TemporaryDirectory(prefix="apa-scale-fictional-") as directory:
         root = Path(directory).resolve()
@@ -47,6 +54,7 @@ def main() -> None:
         policy = {"schema_version": "0.1", "schema_fingerprint": "0" * 64, "seed": 7,
                   "resource_limits": {"max_input_rows": 1_000_000, "max_input_columns": 100,
                       "max_input_cells": 100_000_000, "max_input_file_bytes": max_bytes,
+                      "max_total_input_bytes": max_bytes,
                       "max_output_bytes": max_bytes},
                   "file_text_mapping": mapping("global.csv"), "fields": [
                       {"entity": "items", "field": name, "sensitivity": "non_sensitive",
@@ -86,6 +94,7 @@ def main() -> None:
     assert not root.exists(), "fictional inputs not removed"
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "output_bytes": output_bytes,
+        "max_bytes": max_bytes, "max_seconds": args.max_seconds,
         "elapsed_seconds": round(monotonic() - started, 3),
         "scope": "private replacement-only CSV; no public activation"}), flush=True)
 
