@@ -164,3 +164,17 @@ operational budgets/schema/quickstart passed. Log:
 /private/tmp/apa-post-findings-85edba4-gate.log; DB flags both0.
 Independent frozen scan9e541ae6 continues remaining executable coverage;
 no final RC/public registration or exact-main GitHub clearance implied.
+
+2026-10-05 frozen scan9e541ae6 completed/sealed once at exactf6d8ba7:
+143production modules+21scripts+9workflows+15executable examples+5acceptance
+programs=193independently fully reviewed executable/config paths, supporting
+metadata reviewed; tests/inert prose/upstream dependencies/live systems excluded,
+lock structural provenance only. Three findings:2medium(map keys/CSV formulas),
+1low(query FIFO), repaired later byabcda2f/85edba4/0e00b41 respectively.
+Canonical report: Codex Security scan directory
+apa-frozen-registration-bwrb7ii0/f6d8ba7bb7ff18e69b3a846029db464ba946ab22_20261005T170752Z_4zupoda7/report.md.
+No new finding beyond these three; report is vulnerable frozen-source evidence,
+not safety clearance for post-fix/RC SHA. Plugin usage30,584,767total,
+29,894,016cached is cumulative rollout accounting, not incremental scan cost.
+Next: coherent post-fix candidate registration/docs, required single final gate
+and independent whole-source exact-SHA review before release process.
