@@ -65,3 +65,13 @@ Remaining: public interface/activation review, other format routes and 1M ×100
 target acceptance, client evidence reconciliation and final RC gates. This
 private fictional checkpoint does not close those requirements. The previously
 accepted unchanged CSV-scale scenario was not repeated.
+
+## Configurable target harness — 2026-10-05
+
+The fictional-driver harness accepts `--max-bytes`, `--capture-bytes` and
+`--max-seconds`, retaining historical 512MiB / 64MiB / 1800s defaults.
+Per-file capture, total-input, decoded-input, output and worker time budgets are
+explicit; ordinary PostgreSQL profiling row/cell limits remain unchanged.
+10 × 3 smoke passed at 2MiB / 1MiB capture / 60s, including worker lifecycle,
+full readback and cleanup. Six invalid-budget startup checks and Ruff passed.
+This is harness validation, not target proof or live database evidence.

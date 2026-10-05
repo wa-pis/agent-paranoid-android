@@ -72,3 +72,16 @@ startup checks and Ruff. This is harness validation, not measured target proof.
 For 1M × 100, this fixture's CSV source is 550,000,900 bytes and replacement
 output is 600,500,900 bytes; both exceed 512MiB. Use an explicit sufficient
 byte budget instead of treating row/cell configuration as a byte-limit override.
+
+**Target run PASSED:** exact installed runtime
+`b49ceed5fc3d64698f4cfd4135b2958edd915512`, wheel SHA-256
+`bcce6365fbb6724d2d583796a61567d99bbdc6c9a9e86eb7e02a5d65f156ae8e`.
+Command: `--rows 1000000 --columns 100 --max-bytes 1073741824 --max-seconds 3600`.
+Local resumable state: `/private/tmp/apa-csv-target-current.json`;
+log: `/private/tmp/apa-csv-target-b49ceed-xi8v0xap/run.log`; PID 80161.
+Profile 286.211s; review cumulative 579.090s; full completion 1188.870s.
+All 100,000,000 cells passed ordered replacement readback, mapping precedence,
+non-cascade behavior, manifest/provenance, unchanged input digest and cleanup.
+Output: 600,500,900 bytes. The terminal JSON is retained in the log.
+This proves only the private CSV route against this exact isolated wheel;
+no public/all-route/RC pass is claimed.

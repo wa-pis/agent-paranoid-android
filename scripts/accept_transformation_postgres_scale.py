@@ -8,6 +8,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import multiprocessing
 from functools import partial
 from pathlib import Path
@@ -69,14 +70,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
+    parser.add_argument("--capture-bytes", type=int, default=64 * 1024 * 1024)
+    parser.add_argument("--max-seconds", type=float, default=1800)
     args = parser.parse_args()
     if not 1 <= args.rows <= 1_000_000 or not 2 <= args.columns <= 100:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
+    if not 0 < args.capture_bytes <= args.max_bytes <= 2**63 - 1:
+        parser.error("byte budgets must satisfy 0 < capture-bytes <= max-bytes <= 2**63 - 1")
+    if not math.isfinite(args.max_seconds) or args.max_seconds <= 0:
+        parser.error("max-seconds must be finite and positive")
     started = monotonic()
-    budget = GenerationBudget(1800)
+    budget = GenerationBudget(args.max_seconds)
     names = tuple("field_" + chr(97 + i // 26) + chr(97 + i % 26) for i in range(args.columns))
-    max_bytes = 512 * 1024 * 1024
-    capture_bytes = 64 * 1024 * 1024
+    max_bytes = args.max_bytes
+    capture_bytes = args.capture_bytes
     counters = multiprocessing.get_context("spawn").RawArray("q", 6)
     previous_children = {child.pid for child in multiprocessing.active_children()}
     with TemporaryDirectory(prefix="apa-postgres-scale-fictional-") as directory:
@@ -87,6 +95,7 @@ def main() -> None:
             "input_format": "postgres_query", "seed": 7,
             "resource_limits": {"max_input_rows": 1_000_000, "max_input_columns": 100,
                 "max_input_cells": 100_000_000, "max_input_file_bytes": capture_bytes,
+                "max_total_input_bytes": max_bytes,
                 "max_parquet_expanded_bytes": max_bytes, "max_output_bytes": max_bytes},
             "fields": [{"entity": "fictional.items", "field": name, "sensitivity": "non_sensitive",
                 "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
@@ -99,14 +108,14 @@ def main() -> None:
             database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
             allowed_tables=frozenset({"public.items"}),
             allowed_columns=frozenset("public.items." + name for name in names),
-            limits=PostgresProfileLimits(max_seconds=1800))
+            limits=PostgresProfileLimits(max_seconds=args.max_seconds))
         capture = _PostgresCapture(
             request=SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "fictional", "items", query_path),
             config=config, source_columns=tuple(QuerySourceColumn(name, "text", False) for name in names),
             schema=pa.schema([pa.field(name, pa.string(), nullable=False) for name in names]),
             policy=policy, max_rows=args.rows, max_bytes=capture_bytes)
         source = _capture_postgres_isolated(capture,
-            driver_factory=partial(FictionalDriver, args.rows, names, counters), max_seconds=1800)
+            driver_factory=partial(FictionalDriver, args.rows, names, counters), max_seconds=args.max_seconds)
         assert list(counters) == [args.rows, 1, 1, 1, 2, 1], "driver lifecycle/count mismatch"
         assert {child.pid for child in multiprocessing.active_children()} == previous_children
         source_hash = hashlib.sha256(source.payload).hexdigest()
@@ -142,6 +151,7 @@ def main() -> None:
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "captured_bytes": len(source.payload), "output_bytes": output_bytes,
         "elapsed_seconds": round(monotonic() - started, 3),
+        "max_bytes": max_bytes, "capture_bytes_limit": capture_bytes, "max_seconds": args.max_seconds,
         "profiling_result_rows_limit": config.limits.max_result_rows,
         "profiling_result_cells_limit": config.limits.max_result_cells,
         "scope": "fictional private PostgreSQL-to-CSV; no live database/public activation"}), flush=True)
