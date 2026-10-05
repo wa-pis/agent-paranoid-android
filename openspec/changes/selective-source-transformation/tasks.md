@@ -379,3 +379,15 @@ before driver/artifact. Logs: isolated candidate acceptance.log and
 stdio-escalated.log. These focused results do not authorize activation or
 replace final whole-source audit, package/release gates. Private scale queue
 still9/12: supplied Trino CSV route running, two subsequent formats pending.
+
+2026-10-05 supplied Trino result → CSV target passed:100M cells,1879.813s,
+600,001,000output bytes. Exact wheel/harness/budgets and limitations recorded
+in csv-scale-acceptance.md. Private matrix10/12; Parquet running, SQL pending.
+No live backend or public scale claim.
+
+Current isolated installed wheel2f1b6cad additionally passed
+scripts/accept_transformation_routes.py --public:12 small fictional routes,
+actual transform-review/transform-execute CLI and workspace execution,
+negative publication checks; no DB. Log: isolated candidate public-routes.log.
+This supplements current common-tool acceptance; it does not exercise all
+routes through transform-batch or establish public scale/activation clearance.

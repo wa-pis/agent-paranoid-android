@@ -155,7 +155,7 @@ budgets are retained above. No public activation or all-route claim.
 | CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
 | Parquet | PASS b5640de | PASS cc3aedb | PASS 92bb1b6 |
 | PostgreSQL fictional worker | PASS 611b781 | PASS b249699 | PASS b249699 |
-| Trino fictional result | OPEN | OPEN | OPEN |
+| Trino fictional result | PASS b249699 | OPEN | OPEN |
 
 These are installed private fixture checks, not twelve-route public/CLI/MCP
 activation or live backend evidence. PostgreSQL details are in the companion
@@ -197,3 +197,19 @@ complete 3398.476s, within the explicit 3600s cooperative budget. SQL output
 100% replacement provenance, unchanged input digest and temporary cleanup
 assertion passed. No SQL execution. Current private fictional matrix: 7/12.
 The remaining queue automatically advanced only after this terminal pass.
+
+## Supplied Trino result → CSV target — PASSED
+
+Sequential queue candidate b249699ab16f8aad7f220acb16542d505f9b4edf;
+installed runtime wheel SHA256
+f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb;
+copied harness SHA256
+93a3d8d38293b8c42a9e9996c327fc7fd4fbd96b5aa2ae33f949b5e9070cf0af.
+1,000,000 rows ×100 columns passed ordered readback, mapping precedence,
+non-cascade replacement, provenance, source digest and cleanup assertions.
+Capture17,207,555bytes; CSV600,001,000bytes; complete1879.813s.
+Explicit limits:1GiB input/output,128MiB capture,3600s.
+State/log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/state.json and
+trino-csv.log. This exercises supplied-result authorization/capture/private
+publication, not a Trino driver, server, isolated worker or public scale route.
+Private fictional matrix10/12; Parquet running and SQL pending sequentially.
