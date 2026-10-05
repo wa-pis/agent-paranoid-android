@@ -71,6 +71,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rows", type=int, default=300_000)
     parser.add_argument("--columns", type=int, default=50)
+    parser.add_argument("--output-format", choices=("csv", "parquet", "postgresql_sql"), default="csv")
     parser.add_argument("--max-bytes", type=int, default=512 * 1024 * 1024)
     parser.add_argument("--capture-bytes", type=int, default=64 * 1024 * 1024)
     parser.add_argument("--max-seconds", type=float, default=1800)
@@ -79,8 +80,8 @@ def main() -> None:
         parser.error("fixture supports 1..1000000 rows and 2..100 columns")
     if not 0 < args.capture_bytes <= args.max_bytes <= 2**63 - 1:
         parser.error("byte budgets must satisfy 0 < capture-bytes <= max-bytes <= 2**63 - 1")
-    if not math.isfinite(args.max_seconds) or args.max_seconds <= 0:
-        parser.error("max-seconds must be finite and positive")
+    if not math.isfinite(args.max_seconds) or not 0.1 <= args.max_seconds <= 3600:
+        parser.error("max-seconds must be finite and between 0.1 and 3600")
     started = monotonic()
     budget = GenerationBudget(args.max_seconds)
     names = tuple(f"field_{i:03d}" for i in range(args.columns))
@@ -103,6 +104,11 @@ def main() -> None:
                 "behavior": {"action": "substitute", "mapping": {"kind": "inline", "entries": [
                     {"original": ["alpha"], "replacement": ["omega"]},
                     {"original": ["beta"], "replacement": ["theta"]}]}}} for name in names]}
+        if args.output_format != "csv":
+            policy_data["output"] = {"format": args.output_format, "fields": [
+                {"name": name, "type": "string"} for name in names]}
+            if args.output_format == "postgresql_sql":
+                policy_data["output"]["table"] = "fictional_items"
         policy_path = root / "behavior.yaml"
         policy_path.write_text(yaml.safe_dump(policy_data), encoding="utf-8")
         policy = load_behavior_policy_yaml(policy_path.read_bytes(), max_bytes=max_bytes, budget=budget)
@@ -135,28 +141,59 @@ def main() -> None:
                 max_review_bytes=1024 * 1024, max_output_bytes=max_bytes, budget=budget) as output:
             manifest = json.loads((output / "manifest.json").read_text())
             count = 0
-            with (output / "dataset.csv").open(newline="", encoding="utf-8") as handle:
-                reader = csv.reader(handle)
-                assert next(reader) == list(names)
-                for index, row in enumerate(reader):
+            filename = "dataset." + ("sql" if args.output_format == "postgresql_sql" else args.output_format)
+            if args.output_format == "csv":
+                with (output / filename).open(newline="", encoding="utf-8") as handle:
+                    reader = csv.reader(handle)
+                    assert next(reader) == list(names)
+                    for index, row in enumerate(reader):
+                        budget.check("PostgreSQL scale acceptance readback")
+                        assert row == ["omega" if index % 2 == 0 else "theta"] * args.columns
+                        count += 1
+            elif args.output_format == "parquet":
+                import pyarrow.parquet as pq
+
+                parquet = pq.ParquetFile(output / filename)
+                assert parquet.schema_arrow.names == list(names)
+                assert all(field.type == pa.string() and not field.nullable
+                           for field in parquet.schema_arrow)
+                for batch in parquet.iter_batches(batch_size=1024):
                     budget.check("PostgreSQL scale acceptance readback")
-                    assert row == ["omega" if index % 2 == 0 else "theta"] * args.columns
-                    count += 1
+                    for row in batch.to_pylist():
+                        budget.check("PostgreSQL scale acceptance readback")
+                        assert [row[name] for name in names] == ["omega" if count % 2 == 0 else "theta"] * args.columns
+                        count += 1
+            else:
+                # Fixed fictional alphabetic literals only; never execute SQL.
+                columns = ", ".join(f'"{name}"' for name in names)
+                definitions = ", ".join(f'"{name}" TEXT NOT NULL' for name in names)
+                prefix = f'INSERT INTO "fictional_items" ({columns}) VALUES ('
+                with (output / filename).open(encoding="utf-8") as handle:
+                    assert handle.readline() == "BEGIN;\n"
+                    assert handle.readline() == "SET LOCAL standard_conforming_strings = on;\n"
+                    assert handle.readline() == f'CREATE TABLE "fictional_items" ({definitions});\n'
+                    for index in range(args.rows):
+                        budget.check("PostgreSQL scale acceptance SQL readback")
+                        values = ", ".join(["'omega'" if index % 2 == 0 else "'theta'"] * args.columns)
+                        assert handle.readline() == prefix + values + ");\n"
+                        count += 1
+                    assert handle.readline() == "COMMIT;\n" and handle.read(1) == ""
             assert count == args.rows
             assert manifest["origin"] == "transformed_mixed"
             assert manifest["provenance"]["output_cells"] == args.rows * args.columns
             assert manifest["provenance"]["replacement_percent"] == "100.00"
-            output_bytes = (output / "dataset.csv").stat().st_size
+            output_bytes = (output / filename).stat().st_size
             assert hashlib.sha256(source.payload).hexdigest() == source_hash
         assert not output.parent.exists(), "temporary publication not removed"
     assert not root.exists(), "fixture directory not removed"
     print(json.dumps({"status": "passed", "rows": args.rows, "columns": args.columns,
         "cells": args.rows * args.columns, "captured_bytes": len(source.payload), "output_bytes": output_bytes,
         "elapsed_seconds": round(monotonic() - started, 3),
+        "output_format": args.output_format,
         "max_bytes": max_bytes, "capture_bytes_limit": capture_bytes, "max_seconds": args.max_seconds,
         "profiling_result_rows_limit": config.limits.max_result_rows,
         "profiling_result_cells_limit": config.limits.max_result_cells,
-        "scope": "fictional private PostgreSQL-to-CSV; no live database/public activation"}), flush=True)
+        "scope": "fictional private PostgreSQL capture; no live database/public activation"}), flush=True)
 
 
 if __name__ == "__main__":

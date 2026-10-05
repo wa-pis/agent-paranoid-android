@@ -160,3 +160,14 @@ budgets are retained above. No public activation or all-route claim.
 These are installed private fixture checks, not twelve-route public/CLI/MCP
 activation or live backend evidence. PostgreSQL details are in the companion
 postgres-scale-acceptance.md. Final source audit and release gates remain open.
+
+## Parquet → Parquet target — started, result pending
+
+Candidate `cc3aedb8b59aec5ff6d926066ff96120a67f9cfe`; same installed runtime wheel 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
+`fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`. Arguments: `--rows 1000000 --columns 100
+--input-format parquet --output-format parquet --max-bytes 1073741824
+--max-seconds 3600`. State `/private/tmp/apa-parquet-roundtrip-current.json`;
+PID 82797; log `/private/tmp/apa-parquet-roundtrip-cc3aedb-fkydavo4/run.log`. Poll before repeating.
+All typed batch readback/provenance/digest/cleanup assertions enabled.
+No public/all-route/RC clearance implied.

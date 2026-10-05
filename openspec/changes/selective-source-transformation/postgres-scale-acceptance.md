@@ -105,3 +105,14 @@ Profiling limits remain 10,000 rows / 100,000 cells; explicit transformation
 limits admitted 1M rows / 100M cells. This is the fictional injected-driver
 private PostgreSQL-result → CSV route only, not live DB or public/all-route RC
 acceptance. The terminal JSON remains in the log above.
+
+## Remaining output harness checks — 2026-10-05
+
+The same fictional worker fixture now accepts `--output-format parquet` or
+`postgresql_sql`. 2051 × 3 multi-batch readback smokes passed: Parquet 0.493s
+/ 2,037 bytes; SQL full framing/every ordered INSERT/COMMIT/EOF checked without
+execution. Both retain schema/provenance/digest/lifecycle/cleanup assertions.
+Ruff passed. Harness time validation matches the existing isolated worker's
+0.1..3600s range before fixture creation. Target checks for these two outputs
+remain open. Do not start another large run while the recorded Parquet →
+Parquet target is still active.
