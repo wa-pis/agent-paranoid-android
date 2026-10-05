@@ -8,6 +8,9 @@ registration patches; installed wheel SHA256
 Active branch common registration remains closed; this is still1.5.0 metadata.
 Actual CLI creation/runtime/inventory18passed, actual MCP stdio6passed,
 OAuth6passed, and wizard/configuration/receipt/linked-key/budget99passed.
+Additional current installed contracts:50mode/decimal/doctor,60auth/typed/
+publication/temporal and134SQL source/adapter tests passed. MCP2.2.0 actual
+common stdio/inventory7passed separately; no live authentication claimed.
 Four initial preservation failures were restricted /dev/tty sandbox failures;
 unchanged installed wheel passed with controlling-terminal access, no guard
 bypass. Twelve small fictional routes also passed --public transform-execute

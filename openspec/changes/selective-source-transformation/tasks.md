@@ -412,3 +412,13 @@ fixtures/fake dependencies only. Log: isolated candidate client-contracts.log.
 Both OpenSpec changes validated strictly and strict docs built after completed
 capacity evidence updates (/private/tmp/apa-final-capacity-doc-build.log).
 These scoped results do not close final public-interface/source/release gates.
+
+2026-10-05 current isolated wheel2f1b6cad client compatibility:60auth,
+publication/physical-Parquet/golden-CSV/temporal tests passed5.37s;
+134SQL source/adapter predicate, aggregate, category-lineage/authorization
+checks passed0.36s. No live DB/provider calls. Existing offline MCP2.2.0
+installation at /private/tmp/apa-mcp2-tests.OKtla3:7actual common stdio/inventory
+checks passed9.66s, including preserving direct/fallback confirmations.
+Logs in isolated candidate:remaining-client-contracts.log,sql-contracts.log,
+common-mcp2.log. SDK1 and SDK2 evidence are distinct. Current composition
+remains prospective, not activated or accepted as the final RC SHA.
