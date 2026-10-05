@@ -23,3 +23,19 @@ Trino-result target proofs remain open; no all-route or RC clearance.
 
 Do not launch another large target while the recorded Parquet → SQL run in
 `csv-scale-acceptance.md` is active. Poll its retained log first.
+
+## Sequential target queue — result pending
+
+Exact fixture candidate `b249699ab16f8aad7f220acb16542d505f9b4edf`; unchanged installed runtime wheel
+15cd2d4, SHA-256 `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`.
+Copied harness SHA-256 `93a3d8d38293b8c42a9e9996c327fc7fd4fbd96b5aa2ae33f949b5e9070cf0af`; runner SHA-256
+`2324997a5b640b3eefd4c7d8e020e56f5004433fe9c5f7f36e8d737fd098027f`. State pointer
+`/private/tmp/apa-remaining-target-queue-current.json`; root `/private/tmp/apa-remaining-target-queue-xqs_7uxi`;
+runner PID 84062. Five remaining supplied SQL-result targets run sequentially:
+PostgreSQL → Parquet/SQL, then fictional Trino result → CSV/Parquet/SQL.
+Each uses 1M × 100, explicit 128MiB capture, 1GiB output/file (3GiB for SQL)
+and 3600s. It waits for the recorded Parquet → SQL terminal pass and stops at
+first failure. Read state.json and per-job logs before starting any new run;
+never duplicate an active or passed stage. No tests are claimed passed yet.
+No live DB/network adapter, public/RC activation, new source audit or release
+gate clearance is implied.
