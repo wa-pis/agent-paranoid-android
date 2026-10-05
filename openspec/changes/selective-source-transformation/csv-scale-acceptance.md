@@ -153,7 +153,7 @@ budgets are retained above. No public activation or all-route claim.
 | Input | CSV output | Parquet output | SQL artifact |
 |---|---|---|---|
 | CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
-| Parquet | PASS b5640de | OPEN | OPEN |
+| Parquet | PASS b5640de | PASS cc3aedb | OPEN |
 | PostgreSQL fictional worker | PASS 611b781 | OPEN | OPEN |
 | Trino fictional result | OPEN | OPEN | OPEN |
 
@@ -161,7 +161,7 @@ These are installed private fixture checks, not twelve-route public/CLI/MCP
 activation or live backend evidence. PostgreSQL details are in the companion
 postgres-scale-acceptance.md. Final source audit and release gates remain open.
 
-## Parquet → Parquet target — started, result pending
+## Parquet → Parquet target — PASSED
 
 Candidate `cc3aedb8b59aec5ff6d926066ff96120a67f9cfe`; same installed runtime wheel 15cd2d4
 (hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
@@ -171,3 +171,11 @@ Candidate `cc3aedb8b59aec5ff6d926066ff96120a67f9cfe`; same installed runtime whe
 PID 82797; log `/private/tmp/apa-parquet-roundtrip-cc3aedb-fkydavo4/run.log`. Poll before repeating.
 All typed batch readback/provenance/digest/cleanup assertions enabled.
 No public/all-route/RC clearance implied.
+
+Parquet → Parquet result: profile 327.437s; review cumulative 645.564s;
+complete 2169.105s; output 17,398,511 bytes. All 100M cells passed typed
+ordered batch readback, column/global precedence and non-cascade checks,
+100% replacement provenance, unchanged input digest and temporary cleanup.
+The exact runtime wheel/harness and explicit 1GiB / 3600s limits are recorded
+above. Current private fictional target matrix is 6/12; remaining targets,
+public acceptance, final source audit and release gates stay open.
