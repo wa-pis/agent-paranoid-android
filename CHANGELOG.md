@@ -4,16 +4,6 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-### Security
-
-- Bound local-category value projections in PostgreSQL table and PostgreSQL/Trino
-  query profiling before driver allocation; reject oversized domains without
-  filtering categories or truncating values.
-
-- Suppress binary and unsupported returned values and nonnumeric map keys on
-  opt-in Trino safe-select before MCP serialization. Numeric and temporal
-  scalar compatibility and existing depth/value budgets remain enforced.
-
 ### Added
 
 - Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
@@ -75,6 +65,15 @@ All notable changes to this project are documented here.
   detection during publication and rollback.
 
 ### Security
+
+- Bound local-category value projections in PostgreSQL table and PostgreSQL/Trino
+  query profiling before driver allocation; reject oversized domains without
+  filtering categories or truncating values.
+
+- Suppress binary and unsupported returned values and nonnumeric map keys on
+  opt-in Trino safe-select before MCP serialization. Numeric and temporal
+  scalar compatibility and existing depth/value budgets remain enforced.
+
 
 - Default PostgreSQL connections to `verify-full`; require explicit local insecure opt-in for weaker TLS modes before resolving credentials. Configure a trusted CA and certificate hostname when migrating from the former `require` default.
 

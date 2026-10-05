@@ -244,3 +244,18 @@ category roundtrip/default metadata-only/count invariants remain covered.
 SQLGlot parses both dialects; earlier58tests/Ruff/mypy/docs/OpenSpec and
 independent reviewer clean for bounded driver-return control. Native DB
 execution remains intentionally unperformed; full composed gate/audit next.
+
+2026-10-06 composed R10/R11 candidate frozen at
+a1374b0a5d290f942e3a872293815c3dcdd4e162 from ff76adf+four activation
+proposals. Full offline release gate running in
+/private/tmp/apa-r11-coherent-rcgm8w_g; state pointer
+/private/tmp/apa-r11-coherent-current.json; session7876, logfull-gate.log.
+Live integration flags disabled. Resume running gate, do not duplicate it.
+A fresh independent exact-SHA whole-source audit follows successful gate;
+old2fcacae report does not prove this candidate safe. RC remains closed.
+
+2026-10-06 composed a1374b0 gate failed:9failed3075passed23skipped;
+duplicate Security changelog heading fixed with focused passing regression.
+Eight TTY/composition setup failures require correct actual-registration flags
+and authorized synthetic terminal access. Incorrect follow-up gate stopped.
+Do not audit/release a1374b0 as clean. Fresh composed candidate/gate next.
