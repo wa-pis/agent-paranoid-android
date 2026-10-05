@@ -39,3 +39,8 @@ first failure. Read state.json and per-job logs before starting any new run;
 never duplicate an active or passed stage. No tests are claimed passed yet.
 No live DB/network adapter, public/RC activation, new source audit or release
 gate clearance is implied.
+
+Queue checkpoint 2026-10-05: prerequisite Parquet → SQL terminal pass retained
+(3398.476s / 100M cells). Queue state is running `postgres-parquet`, child
+PID84146, no completed queue stages yet. Do not start another large target.
+Current complete private matrix is 7/12; no final release clearance.

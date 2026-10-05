@@ -153,7 +153,7 @@ budgets are retained above. No public activation or all-route claim.
 | Input | CSV output | Parquet output | SQL artifact |
 |---|---|---|---|
 | CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
-| Parquet | PASS b5640de | PASS cc3aedb | OPEN |
+| Parquet | PASS b5640de | PASS cc3aedb | PASS 92bb1b6 |
 | PostgreSQL fictional worker | PASS 611b781 | OPEN | OPEN |
 | Trino fictional result | OPEN | OPEN | OPEN |
 
@@ -180,7 +180,7 @@ The exact runtime wheel/harness and explicit 1GiB / 3600s limits are recorded
 above. Current private fictional target matrix is 6/12; remaining targets,
 public acceptance, final source audit and release gates stay open.
 
-## Parquet → SQL target — started, result pending
+## Parquet → SQL target — PASSED
 
 Candidate `92bb1b615e75bddf5043768e96702176e1671753`; same installed runtime wheel 15cd2d4
 (hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
@@ -190,3 +190,10 @@ Candidate `92bb1b615e75bddf5043768e96702176e1671753`; same installed runtime whe
 PID 83384; log `/private/tmp/apa-parquet-sql-target-92bb1b6-ymaed_an/run.log`. Poll before repeating.
 Complete SQL text/schema/ordered INSERT/framing/provenance/digest/cleanup
 assertions enabled; no SQL execution or public/all-route/RC clearance.
+
+Parquet → SQL result: profile 634.379s; review cumulative 1390.157s;
+complete 3398.476s, within the explicit 3600s cooperative budget. SQL output
+2,140,502,692 bytes. Every ordered INSERT/cell, full schema/framing/COMMIT/EOF,
+100% replacement provenance, unchanged input digest and temporary cleanup
+assertion passed. No SQL execution. Current private fictional matrix: 7/12.
+The remaining queue automatically advanced only after this terminal pass.
