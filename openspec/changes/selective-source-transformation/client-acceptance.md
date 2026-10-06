@@ -863,8 +863,9 @@ candidate wheel SHA-256 is
 the adapted test SHA-256 is
 `b6cdd5c48eac4b1fba50e41192eae3b557d6d316ce5050ebbf6afc0803ed3587`.
 The installed candidate still advertises 1.5.0 and reuses development
-dependencies, so this is not clean or final-RC acceptance. One public contract
-gap remains: with intentionally invalid rows, spec CLI exits 1/status
+dependencies, so this is not clean or final-RC acceptance. Historical contract
+gap (resolved by the October2 decision and current installed mode evidence above):
+with intentionally invalid rows, spec CLI exits 1/status
 `validation_failed`, but profile/CSV exit 0/status `succeeded`; the owner has
 been asked to choose the uniform semantics before a runtime change.
 
@@ -916,3 +917,7 @@ readback, source-free summaries and 36 CLI refusal checks. SQL routes use local
 injected synthetic Arrow streams; no live database. These checks supplement
 findings23/24 and activation acceptance, without closing final-source safety,
 package/extras compatibility, remote authentication or publication gates.
+
+Post-seed installed safeguards suite:507passed26.82s (snapshot/decisions/report/
+execution/total limits/mapping/approval/source adapters). No live connections.
+Current author-source and prospective activation identities remain distinct.

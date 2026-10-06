@@ -322,7 +322,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   - [x] Complete saved-policy parity with executable paths.
     Installed registered-interface acceptance exercises actual inline/CSV wizard
     saves followed by execution; public route acceptance supplements readback.
-- [ ] Add a bounded, value-free system comment for each reviewed field: likely
+- [x] Add a bounded, value-free system comment for each reviewed field: likely
   data meaning, sensitivity rationale and uncertainty from safe profile
   evidence. Display it with the suggestion and explicit operator decision in
   the wizard and local CLI; never turn default `sensitive=false` into automatic
@@ -511,3 +511,11 @@ Final activation/source identity, remaining client gates and RC release gates op
 2026-10-06 same post-seed development wheel: installed typed/publication/policy
 suite56passed4.44s; public twelve-route synthetic acceptance passed with exact
 readback and36CLIrefusals. See client-acceptance.md; final candidate gates open.
+
+2026-10-06 installed activation safeguards: 507 tests passed26.82s for snapshot,
+decisions, report, execution, total limits, mappings, approval and source adapters
+on the post-seed development wheel. System-comment task reconciled with bounded
+allowlisted comments, explicit wizard decisions and approval snapshot binding
+(test_transformation_approval.py::test_review_comment_and_profile_evidence_are_snapshot_bound;
+policy redaction cases and current full author-source gate). This closes the
+comment implementation requirement, not activation or final RC certification.
