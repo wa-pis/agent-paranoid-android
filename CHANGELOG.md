@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Reject CSV rows wider than their header in the shared reader before retaining rows or profiling samples; preserve missing-field padding.
+
 - Preserve the safe cleanup-incomplete warning through common transformation CLI and MCP2 errors so operators can inspect retained artifacts before retrying.
 
 - Bound saved batch profile external recaptures to their admitted byte lengths before allocation; reject source growth before reading or publishing.

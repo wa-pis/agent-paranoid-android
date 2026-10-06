@@ -191,3 +191,12 @@ CLI and MCP error boundaries when retained artifact removal is unconfirmed.
 - **WHEN** publication fails and rollback cannot confirm artifact removal
 - **THEN** the operator receives a warning that output or staging may remain
 - **AND** the warning requests destination inspection before retrying without private cause details
+
+### Requirement: CSV row width enforcement
+The shared CSV dictionary reader SHALL reject surplus fields before returning
+a row to dataset loading, single-file profiling, snapshot profiling or folder profiling.
+
+#### Scenario: Narrow header with surplus cells
+- **WHEN** a CSV row contains more fields than its header
+- **THEN** a value-free input-limit error rejects the row before retention
+- **AND** existing missing-field padding remains supported

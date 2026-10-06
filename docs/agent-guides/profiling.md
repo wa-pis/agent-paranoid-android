@@ -162,3 +162,7 @@ allocation; exact byte comparison still rejects other mutations before publicati
 Common transformation CLI and MCP preserve the fixed cleanup-incomplete warning
 when publication rollback cannot confirm removal. Inspect the selected destination
 before retrying; private failure details remain suppressed.
+
+CSV rows wider than their header are rejected with a value-free input-limit
+error before retention or profiling. Missing fields retain existing null padding.
+This structural check does not establish a native CSV parser peak-memory bound.

@@ -801,3 +801,28 @@ Prior48ba122b auditc9b1f19c-b9d6-4ec9-80b7-0f7b2eb09181 sealed complete
 Canonical report:
 /Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r20-common-pbrhh_wg/48ba122b17e30e779da2b5702976f984c8c91400_20261006T213900Z_p5m3bvys/report.md
 No old report proof for newSHA; versionedRC/public gates remain open.
+
+New CSV width candidate confirmed synthetic-only on e6035b53: maxcells2/
+maxcolumns2 accepts1header100cells across load_dataset_rows/profile_csv/
+profile_example_folder, retains99overflow under None. Rectangular2x2 control
+rejects configured cells. Byte/token ceilings still enforced; no validity/PII claim.
+Evidence/private/tmp/csv-budget-offline-n4o8vbyx/result.json. Fresh defensive
+fix-boundary investigation active. Baseline worker reported67/67 but terminated
+with content-filter error; persisted ledger ends60/67, so coverage closure
+remains unverified, no complete/clean audit claim.
+
+CSV width remediation in progress at shared ScopedDictReader boundary: surplus
+restkey rejected before row return with fixed InputLimitError; missing cells
+remain padded. Shared reader regressions plus input-limit tests executing; fresh
+independent review active. Public-route regressions/docs/gate/audit still pending.
+
+CSV independent patch review77focusedpass, no blocker; retained/counting gap
+closed, parser row allocation still precedes structural rejection. Optional
+restkey collision addressed by list-valued surplus detection (existing explicit
+restkey kwarg unsupported; test sets property). Four public routes plus empty/
+quoted/missing/extra/restkey regressions8pass; Ruff pass. Docs/fullgate pending.
+
+CSV focused completion103passed3.25s (initial command nonexistent
+test_profiling.py collected nothing; corrected file list). Mypy/Ruff/diff/OpenSpec
+strict pass; documentation updated. Independent77tests/no blocker; allfour
+public route regressions included. Complete gate/new exactSHA audit required.
