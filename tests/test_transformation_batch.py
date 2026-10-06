@@ -900,6 +900,45 @@ def test_closed_configuration_only_profile_publication(tmp_path, case):
     assert not list(tmp_path.glob(".saved.*"))
 
 
+@pytest.mark.parametrize("growth", [1, 2000])
+def test_profile_save_rejects_source_growth_before_payload_read(tmp_path, monkeypatch, growth):
+    from contextlib import contextmanager
+    from test_data_agent.io import mapping_snapshot
+    from test_data_agent.io.transformation_batch_profile import save_batch_profile
+
+    save_fictional_batch_profile(tmp_path)
+    batch = load_batch_profile(tmp_path, "batch.yaml", max_total_bytes=32768,
+                              max_review_bytes=8192, budget=GenerationBudget(5))
+    source = tmp_path / "source-0.csv"
+    source.write_bytes(source.read_bytes() + b"1" * growth)
+    original_open = mapping_snapshot.open_regular_file
+    reads = []
+
+    class ObservedFile:
+        def __init__(self, handle):
+            self.handle = handle
+
+        def fileno(self):
+            return self.handle.fileno()
+
+        def read(self, size):
+            reads.append(size)
+            return self.handle.read(size)
+
+    @contextmanager
+    def observed_open(path):
+        with original_open(path) as handle:
+            yield ObservedFile(handle) if path == source else handle
+
+    monkeypatch.setattr(mapping_snapshot, "open_regular_file", observed_open)
+    with pytest.raises(TransformationBatchError):
+        save_batch_profile(tmp_path, "saved", batch, max_total_bytes=32768,
+                           max_review_bytes=8192, budget=GenerationBudget(5))
+    assert reads == []
+    assert not (tmp_path / "saved").exists()
+    assert not list(tmp_path.glob(".saved.*"))
+
+
 @pytest.mark.parametrize("case", ["validate", "execute", "stale", "missing_digest", "receipt_escape", "review_receipt", "mutated"])
 def test_shared_closed_workflow_review_consumer(tmp_path, case):
     from test_data_agent.io.transformation_batch_workflow import BatchWorkflowRequest, run_batch_workflow

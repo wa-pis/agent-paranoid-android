@@ -154,3 +154,7 @@ Transformation profile and policy files are captured below the trusted default
 or explicit session total-byte ceiling before YAML parsing. A larger run budget
 cannot raise this bootstrap file limit. After bounded parsing, explicit saved
 profile limits may raise the aggregate source budget; session limits still win.
+
+Saving a captured batch profile bounds every external recapture to its original
+admitted byte length. Growing sources or declarations are rejected before payload
+allocation; exact byte comparison still rejects other mutations before publication.

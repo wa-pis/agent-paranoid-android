@@ -714,3 +714,14 @@ Corrected bootstrapf524afe9 full offline gate3144passed19skipped1warning
 08cbbe4c-314f-4414-80f7-89d5c0b380bf launched exactSHA with fresh baseline,
 architecture and preflight workers. Required196 includes OpenSpec acceptance
 scripts; no old audit proof or versionedRC authorization inferred.
+
+R20 recapture confirmed on exact f524afe9: mutable source exceeds admitted
+per-file cap but is allocated under aggregate cap before stale equality rejects.
+Minimal correction caps every external recapture to immutable expected length;
+source growth regression verifies no payload read/no publication. Fresh reviewer
+and focused tests running. Whole independent baseline remains incomplete; no RC.
+
+R20 focused completion:186passed4skipped30.31s;51documentation tests,
+Ruff/diff/OpenSpec strict pass. Fresh independent reviewer:7focusedpass,
+no surviving recapture bypass; unchanged/empty/alias/role and total-limit semantics
+reviewed. Full frozen baseline remains in progress, corrected full gate/audit pending.

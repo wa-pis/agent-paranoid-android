@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Bound saved batch profile external recaptures to their admitted byte lengths before allocation; reject source growth before reading or publishing.
+
 - Enforce trusted bootstrap byte ceilings before reading transformation batch profiles and single-input policies, preserving saved source-budget overrides.
 
 - Detach formula and query-source parser exception state; omit rejected cell values from standalone business-validation reports.

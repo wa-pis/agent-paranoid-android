@@ -172,3 +172,13 @@ The system SHALL reject seeds outside signed 64-bit integer range before generat
 #### Scenario: Compatible bounded seed
 - **WHEN** generation uses an accepted seed, including a negative direct Python seed
 - **THEN** identifiers retain their existing formula and repeated generation is deterministic
+
+### Requirement: Saved profile recapture allocation
+The system SHALL bound each external saved-profile recapture to the byte length
+of its immutable admitted payload before allocation and SHALL reject changed
+bytes before publishing a profile.
+
+#### Scenario: Source grows after admission
+- **WHEN** a source grows after batch capture while remaining below the aggregate budget
+- **THEN** saving the batch rejects growth before reading the source payload
+- **AND** no saved profile is published

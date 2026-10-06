@@ -228,7 +228,7 @@ def save_batch_profile(root: Path, relative_destination: str, batch: Transformat
         consumed = 0
         limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "batch_input_run")
         for name, expected in external.items():
-            captured = read_mapping_snapshot(root, name, max_bytes=max_total_bytes,
+            captured = read_mapping_snapshot(root, name, max_bytes=min(max_total_bytes, len(expected)),
                 budget=budget, total_limit=limit, consumed_bytes=consumed)
             consumed += len(captured.payload)
             if captured.payload != expected:
