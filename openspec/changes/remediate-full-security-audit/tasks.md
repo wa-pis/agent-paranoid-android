@@ -684,3 +684,20 @@ Corrected6c9a918 gate3140passed19skipped1warning90.57%,191.78s,strictdocs
 pass. Fresh full Standard scan5c22b64c-130d-4f83-83be-52d4eac0b634 started
 with fresh independent baseline/architecture/preflight workers. No old report
 as proof. Version/tag/public release gates still separate.
+
+R19/ARCH-01 confirmed with synthetic160byte profile/default32/run256:
+caller budget bypassed default before capture. Shared profile capture helper
+now clamps unparsed batch/single policy bytes to trusted default/session ceiling;
+saved raised source ceilings resolve after parsing. Python3.11 focused219passed
+4skipped31.37s (initial run lacked subprocess PYTHONPATH; corrected explicit
+worktree path + localTTY). Ruff/mypy3files pass, fresh patch reviewer active.
+Python3.14 matrix unavailable: prior temporary venv now lacks pytest; no result
+claimed. Full candidate gate/new independent exactSHA audit remain required.
+
+R19 patch reviewer found no bootstrap bypass; recovery-origin compatibility
+corrected when run cap is tighter. Real saved-profile load with raised aggregate
+budget under smaller bootstrap cap passes;7selected plus36source/limit checks
+pass,51docs/Ruff/mypy pass. Temporary3.14 env lacks pyvenv.cfg; deferred to
+fresh package matrix. Author fix ready; complete corrected gate/audit required.
+Baseline receipt acceptance-path mismatch identified: reviewed tests acceptance
+files instead of five OpenSpec scripts; requested missing five before finalization.

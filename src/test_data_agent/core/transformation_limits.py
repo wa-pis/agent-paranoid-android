@@ -113,3 +113,18 @@ def resolve_input_limit(dimension: InputDimension, profile: TransformationInputL
         return EffectiveInputLimit(dimension, int(value), origin)
     raise ValueError(f"invalid resource setting: {setting if origin == 'session' else legacy}; "
         f"use a positive integer <= {2**63 - 1}; profile key resource_limits.{key}")
+
+
+def resolve_profile_capture_limit(run_cap: int | None, session: Mapping[str, str],
+                                  *, run_origin: str = "snapshot_run") -> EffectiveInputLimit:
+    """Bound unparsed profile bytes before saved source ceilings are known."""
+    bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, session)
+    if run_cap is None:
+        return bootstrap
+    if type(run_cap) is not int or run_cap < 1:
+        raise ValueError("invalid profile capture budget")
+    if bootstrap.origin != "default":
+        bootstrap.check(run_cap, requested=True)
+    if run_cap < bootstrap.value:
+        return EffectiveInputLimit(InputDimension.TOTAL_BYTES, run_cap, run_origin)
+    return bootstrap

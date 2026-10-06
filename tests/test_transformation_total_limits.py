@@ -97,3 +97,36 @@ def test_no_remaining_bytes_is_typed_exhaustion(tmp_path, reader):
         else:
             load_csv_source_snapshot(tmp_path / "fixture.csv", "items", **arguments)
     assert (error.value.amount, error.value.limit) == (12, 11)
+
+
+@pytest.mark.parametrize("route", ["batch", "single"])
+def test_profile_capture_default_rejects_before_parser(tmp_path, monkeypatch, route):
+    from test_data_agent.core import transformation_limits as limits
+    from test_data_agent.core.limits import GenerationBudget
+    from test_data_agent.io import transformation_batch_profile as batch
+    from test_data_agent.io import transformation_source as source
+
+    monkeypatch.setattr(limits, "resolve_input_limit", lambda *args:
+        limits.EffectiveInputLimit(InputDimension.TOTAL_BYTES, 32, "default"))
+    (tmp_path / "policy.yaml").write_bytes(b"#" + b"x" * 159)
+    def forbidden_parser(*args, **kwargs):
+        pytest.fail("oversized profile reached parser")
+    monkeypatch.setattr(batch, "_load_private_yaml", forbidden_parser)
+    monkeypatch.setattr(source, "load_behavior_policy_yaml", forbidden_parser)
+    with pytest.raises(TransformationLimitError) as caught:
+        if route == "batch":
+            batch.load_batch_profile(tmp_path, "policy.yaml", max_total_bytes=256,
+                max_review_bytes=256, budget=GenerationBudget())
+        else:
+            source.prepare_csv_review_from_paths(tmp_path / "missing.csv", "items", tmp_path,
+                "policy.yaml", max_total_bytes=256, max_review_bytes=256, budget=GenerationBudget())
+    assert (caught.value.amount, caught.value.limit, caught.value.origin) == (160, 32, "default")
+
+
+def test_profile_capture_default_allows_larger_saved_source_request(monkeypatch):
+    from test_data_agent.core import transformation_limits as limits
+    monkeypatch.setattr(limits, "resolve_input_limit", lambda *args:
+        limits.EffectiveInputLimit(InputDimension.TOTAL_BYTES, 32, "default"))
+    captured = limits.resolve_profile_capture_limit(256, {})
+    assert (captured.value, captured.origin) == (32, "default")
+    captured.check(20)

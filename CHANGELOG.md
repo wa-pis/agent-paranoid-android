@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Enforce trusted bootstrap byte ceilings before reading transformation batch profiles and single-input policies, preserving saved source-budget overrides.
+
 - Detach formula and query-source parser exception state; omit rejected cell values from standalone business-validation reports.
 
 - Replace malformed SQL parser and tokenizer diagnostics with a fixed detached error so query literals cannot enter direct errors or supported MCP responses.

@@ -149,3 +149,8 @@ These are cooperative checks and do not preempt an active filesystem operation.
 Cache fingerprint/load/write helpers accept an optional keyword-only
 `LocalProfileBudget`; folder profiling passes its existing budget through cache
 inventory. Default CLI/MCP source detection also uses bounded enumeration.
+
+Transformation profile and policy files are captured below the trusted default
+or explicit session total-byte ceiling before YAML parsing. A larger run budget
+cannot raise this bootstrap file limit. After bounded parsing, explicit saved
+profile limits may raise the aggregate source budget; session limits still win.

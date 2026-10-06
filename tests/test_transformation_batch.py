@@ -1818,3 +1818,19 @@ def test_saved_composite_relationship_uses_whole_tuple(tmp_path, case):
         expected = b"key_a,key_b\n11,12\n12,11\n" + (b"11,12\n" if case == "valid" else b"")
         assert (bundle / "input-1.csv").read_bytes() == expected
     assert not bundle.parent.exists()
+
+
+def test_saved_batch_raised_source_budget_preserves_bootstrap_file_cap(tmp_path, monkeypatch):
+    from test_data_agent.core import transformation_limits as limits
+    save_fictional_batch_profile(tmp_path)
+    profile_path = tmp_path / "batch.yaml"
+    profile = yaml.safe_load(profile_path.read_bytes())
+    profile["resource_limits"] = {"max_total_input_bytes": 32768}
+    profile_path.write_text(yaml.safe_dump(profile))
+    bootstrap_cap = len(profile_path.read_bytes()) + 1
+    assert sum(path.stat().st_size for path in tmp_path.iterdir() if path.is_file()) > bootstrap_cap
+    monkeypatch.setattr(limits, "resolve_input_limit", lambda *args:
+        limits.EffectiveInputLimit(limits.InputDimension.TOTAL_BYTES, bootstrap_cap, "default"))
+    batch = load_batch_profile(tmp_path, "batch.yaml", max_total_bytes=32768,
+        max_review_bytes=8192, budget=GenerationBudget(5))
+    assert len(batch.snapshot_sha256) == 64

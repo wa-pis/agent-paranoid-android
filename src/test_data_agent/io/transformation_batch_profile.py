@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS, GenerationBudget, GenerationLimitError
 from test_data_agent.core.transformation_snapshot import SnapshotPart
-from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationInputLimits, TransformationLimitError, resolve_input_limit
+from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationInputLimits, TransformationLimitError, resolve_input_limit, resolve_profile_capture_limit
 from test_data_agent.core.transformation_yaml import _load_private_yaml, load_behavior_policy_yaml
 from test_data_agent.core.transformation_policy import BehaviorPolicy, transformation_schema_fingerprint
 from test_data_agent.core.transformation_yaml import dump_behavior_policy_yaml
@@ -264,10 +264,7 @@ def save_batch_profile(root: Path, relative_destination: str, batch: Transformat
 def capture_batch_profile(root: Path, relative_path: str, *, max_total_bytes: int,
                           budget: GenerationBudget) -> bytes:
     """Apply configured session ceilings before capturing or parsing a profile."""
-    bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, os.environ)
-    if bootstrap.origin != "default":
-        bootstrap.check(max_total_bytes, requested=True)
-    limit = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "batch_input_run")
+    limit = resolve_profile_capture_limit(max_total_bytes, os.environ, run_origin="batch_input_run")
     return read_mapping_snapshot(root, relative_path, max_bytes=max_total_bytes,
         budget=budget, total_limit=limit).payload
 
