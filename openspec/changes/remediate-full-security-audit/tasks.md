@@ -701,3 +701,16 @@ pass,51docs/Ruff/mypy pass. Temporary3.14 env lacks pyvenv.cfg; deferred to
 fresh package matrix. Author fix ready; complete corrected gate/audit required.
 Baseline receipt acceptance-path mismatch identified: reviewed tests acceptance
 files instead of five OpenSpec scripts; requested missing five before finalization.
+
+R18candidate6c9a918 full audit5c22b64c-130d-4f83-83be-52d4eac0b634
+completed required196files plus5extra tests. Only confirmed mediumARCH-01/R19.
+Missing OpenSpec acceptance-path review completed before finalization. Report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r18-common-z36kwqm7/6c9a91838375f48496cefa33fd3ac76d671925f2_20261006T201302Z_857f3elr/report.md
+Corrected bootstrap candidatef524afe9fb703f005758e9c70fa8b6b6f2e664e2 frozen
+at /private/tmp/apa-r19-common-6h3qco7r; fullgate running, strictdocs pass.
+
+Corrected bootstrapf524afe9 full offline gate3144passed19skipped1warning
+90.57%,197.42s allstagesexit0; strictdocs pass. Fresh full Standard scan
+08cbbe4c-314f-4414-80f7-89d5c0b380bf launched exactSHA with fresh baseline,
+architecture and preflight workers. Required196 includes OpenSpec acceptance
+scripts; no old audit proof or versionedRC authorization inferred.
