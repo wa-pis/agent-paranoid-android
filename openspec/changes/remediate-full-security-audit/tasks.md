@@ -536,3 +536,10 @@ Built-in OpenAI/GigaChat already mask/restore, unchanged.51documentationtests
 pass0.49s with focused exampleguard regression. No externalcall, runtimechange
 or claim priorcleanSHA covers a newruntime. This is corrected integrationguidance,
 not an assertion arbitrary customclient code is made safe by packagewrapper.
+
+2026-10-06 advisor-reference sibling review found same unprojected request
+in two remaining externalcustom/JSON examples. Both now reject typed profile/
+baseline localcategory flags before call; JSON validates AdvisorExchange first.
+Documentationregression covers allthree affected pages;51passed0.48s.
+No runtime/providercall. Next finish remaining provider docs and architecture
+contract reconciliation; no newsourceaudit until finalruntimeidentitychanges.

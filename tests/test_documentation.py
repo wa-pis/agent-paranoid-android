@@ -1244,7 +1244,8 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
 
 
 def test_custom_advisor_docs_reject_unprojected_local_categories() -> None:
-    for path in ("docs/how-to/custom-advisor-provider.md", "docs/ai_integration.md"):
+    for path in ("docs/how-to/custom-advisor-provider.md", "docs/ai_integration.md",
+                 "docs/reference/advisor.md"):
         text = (ROOT / path).read_text()
         assert "profile.local_category_fields" in text
         assert "baseline_spec.local_category_fields" in text

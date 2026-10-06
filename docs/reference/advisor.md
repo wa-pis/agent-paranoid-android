@@ -37,6 +37,9 @@ from test_data_agent import (
 
 class ProviderClient:
     def complete(self, exchange: AdvisorExchange) -> dict[str, Any]:
+        if (exchange.request.profile.local_category_fields
+                or exchange.request.baseline_spec.local_category_fields):
+            raise ValueError("local categories require a provider-safe projection")
         return call_model_with_structured_output(
             trusted_instructions=exchange.trusted_instructions,
             untrusted_input=exchange.request.model_dump(mode="json"),
@@ -244,14 +247,24 @@ The exchange contains:
 - `response_json_schema`: the current Pydantic schema for
   `AdvisorProposal`.
 
-Keep those boundaries separate when calling a provider:
+A local exchange may retain explicitly approved category literals and matching
+predicates. Generic exchange validation does not mask them for an arbitrary
+remote client. Refuse local-category exchanges before transmission unless the
+adapter implements a tested projection and local response restoration; built-in
+OpenAI/GigaChat adapters perform that step. Keep trust channels separate:
+
 
 ```python
-exchange = load_json("advisor_exchange.json")
+from test_data_agent import AdvisorExchange
+
+exchange = AdvisorExchange.model_validate(load_json("advisor_exchange.json"))
+if (exchange.request.profile.local_category_fields
+        or exchange.request.baseline_spec.local_category_fields):
+    raise ValueError("local categories require a provider-safe projection")
 proposal = call_model_with_structured_output(
-    system_instructions=exchange["trusted_instructions"],
-    untrusted_input=exchange["request"],
-    response_schema=exchange["response_json_schema"],
+    system_instructions=exchange.trusted_instructions,
+    untrusted_input=exchange.request.model_dump(mode="json"),
+    response_schema=exchange.response_json_schema,
 )
 write_json("advisor_proposal.json", proposal)
 ```
