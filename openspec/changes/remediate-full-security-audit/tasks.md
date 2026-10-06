@@ -786,3 +786,18 @@ Core diagnostics committed/pushed2e04e84; immutable corrected composition
 8208ff gate stopped types: publisher implicit reexports rejected by mypy at
 CLI/MCP callers. Explicit same-name aliases preserve public exception identity;
 full mypy146sourcefiles/Ruff pass. No runtime change; full gate requires new freeze.
+
+Explicit reexport fix committed/pushed4715c38. Corrected immutable composition
+e6035b53fb620f2d1a59baaf433455463c27f9fd frozen at
+/private/tmp/apa-cleanup-final-4bhrewzl; fullgate running
+/private/tmp/apa-cleanup-final-release-gate.log; strictdocs pass.
+
+Correctede6035b53 full offline gate3150passed19skipped1warning200.82s,
+allstagesexit0; strictdocs pass. Fresh independent full Standard scan
+93b3a461-0b92-46bd-9003-6f7394111cba launched exactSHA with fresh whole
+baseline and architecture/preflight workers; newcorefile included inventory.
+Prior48ba122b auditc9b1f19c-b9d6-4ec9-80b7-0f7b2eb09181 sealed complete
+196/196 with1low cleanup-warning finding, repaired5428872/2e04e84/4715c38.
+Canonical report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r20-common-pbrhh_wg/48ba122b17e30e779da2b5702976f984c8c91400_20261006T213900Z_p5m3bvys/report.md
+No old report proof for newSHA; versionedRC/public gates remain open.
