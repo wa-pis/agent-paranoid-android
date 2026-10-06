@@ -8,6 +8,29 @@ explicit scope/provenance decisions govern conflicting earlier prose; old
 formula, retention and parser-status paragraphs do not create new authority or
 release blockers. ADRs do not activate the private execution path.
 
+## Current supported specification checkpoint — 2026-10-06
+
+The supported RC contract separates fixed-byte input decoding, shared field
+transformation/final validation and declared output encoding. CSV-named private
+helpers remain internal implementation details; native input is never routed
+through an intermediate CSV file. Twelve small installed typed routes exercise
+this separation. Versioned final public contracts and activation are separate
+release gates.
+
+Declared DECIMAL precision/scale, exact text transport, overflow refusal and
+approximate DOUBLE behavior retain their owning contract below. Replacement
+cannot silently round to a source value; impossible replacements reject before
+publication. Internal financial formula recomputation and its tolerances are
+excluded by ADR-0026. Existing historical private formula sections do not add
+an RC requirement or enable that action in registered execution.
+
+Snapshots bind source, policy, mappings, output schema and reviewed evidence.
+Saving references changes identity and requires fresh review; stale receipts
+reject. Domain mappings use shared scalar/composite keys. Temporary artifacts
+are removed after validation; retained publication is atomic and refuses
+existing destinations. Summaries, providers and errors contain no source rows
+or mapping literals. Exact final-source review remains required.
+
 ## Owner-confirmed client decisions — 2026-10-02
 
 Owner amendment after independent review R2-1: explicit `substitute` and

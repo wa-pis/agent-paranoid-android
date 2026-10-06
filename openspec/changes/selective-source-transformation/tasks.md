@@ -144,7 +144,7 @@ meaning; the reconciliation does not mark partial implementations complete.
 ## Specification
 
 - [x] Record owner-confirmed independent input/output format contract (2026-09-27).
-- [ ] Separate shared transformation/validation from CSV-specific parsing and
+- [x] Separate shared transformation/validation from CSV-specific parsing and
   rendering, retaining existing CSV regression evidence.
 - [x] Implement input adapters for CSV, Parquet and separately authorized bounded
   Trino/PostgreSQL query results; no SQL-file import or real DB access in tests.
@@ -193,10 +193,10 @@ amendments still require scoped review and executable checks before activation.
   - [x] Record owner decision separating closed development/tests from activation.
   - [ ] Independently review this development/activation clarification.
 - [ ] Finalize versioned field policy, CLI/API and mixed-origin artifact schema.
-- [ ] Specify exact decimals, precision/scale/rounding/overflow, approximate
+- [x] Specify exact decimals, precision/scale/rounding/overflow, approximate
   DOUBLE conversion and CSV round trips; preserve existing schema compatibility.
-- [ ] Define fixed-snapshot/replay semantics, mapping domains and state cleanup.
-- [ ] Define financial tolerances, impossible-replacement behavior and safe
+- [x] Define fixed-snapshot/replay semantics, mapping domains and state cleanup.
+- [x] Define financial tolerances, impossible-replacement behavior and safe
   aggregate disclosure. Keep user decisions above unchanged.
 
 ## Implementation And Acceptance
@@ -558,3 +558,12 @@ checks and9 registered/linked/finance cases supplement it. Unknown/sensitive
 fields require explicit decisions; receipts and drift guards stay independent.
 These implementation tasks close; common public activation/final contracts
 and exact-source review remain their own open gates.
+
+2026-10-06 specification/architecture reconciliation: current policy-contract
+checkpoint separates input/shared validation/output using transformation_input,
+transformation_execute/batch and transformation_output/parquet; CSV-named
+private helpers stay internal. Declared DECIMAL/DOUBLE, snapshot/domain/cleanup
+and infeasible replacement semantics specified and exercised by installed
+typed/batch/publication evidence above. Internal financial formulas excluded
+by ADR0026, no new tolerance requirement. Final public schema/activation/docs
+and exactRC review remain open.
