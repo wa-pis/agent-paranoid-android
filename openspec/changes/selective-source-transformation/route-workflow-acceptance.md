@@ -14,6 +14,13 @@ Both harnesses were read completely before execution and ran unchanged:
 - `temporal-workflow-acceptance.py`:3 passed in1.86s, including explicit
   timezone conversion and literal replacement.
 
+Additional unchanged, fully reviewed installed harnesses on the same artifact:
+`linked-domain-acceptance.py`:2 passed1.15s (shared composite domain and missing
+mapping rejection/cleanup); `finance-workflow-acceptance.py`:1 passed1.51s
+(fictional aggregate capture, missing-receipt refusal, actual localTTY approval,
+0600 receipt and typed replacement/readback). No database connection or product
+monkeypatch. These renew narrow checks, not complete relationship/finance scope.
+
 Logs and build identity: `/private/tmp/apa-r13-installed-a13c8a66/`;
 resume pointer `/private/tmp/apa-r13-installed-current.json`.
 All fixtures fictional; SQL inputs use injected Arrow streams and output SQL
