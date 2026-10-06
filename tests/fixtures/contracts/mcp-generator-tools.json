@@ -371,7 +371,7 @@
           "type": "integer"
         },
         "invalid_ratio": {
-          "default": 0,
+          "default": 0.0,
           "title": "Invalid Ratio",
           "type": "number"
         },

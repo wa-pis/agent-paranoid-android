@@ -4,10 +4,6 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-### Security
-
-- Reject seeds outside signed 64-bit range before generation allocation; persisted nonnegative seeds are capped at 2**63-1. Existing bounded seeds retain deterministic identifiers.
-
 ### Added
 
 - Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
@@ -71,6 +67,8 @@ All notable changes to this project are documented here.
   detection during publication and rollback.
 
 ### Security
+
+- Reject seeds outside signed 64-bit range before generation allocation; persisted nonnegative seeds are capped at 2**63-1. Existing bounded seeds retain deterministic identifiers.
 
 - Bound ordinary Trino category projections before driver return and reject
   oversized sentinels before publishing a category or sensitivity summary.

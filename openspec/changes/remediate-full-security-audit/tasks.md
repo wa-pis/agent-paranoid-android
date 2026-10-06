@@ -586,3 +586,7 @@ finding; 196 executable files covered by independent baseline/parent union.
 Tests/docs/dependency implementations not exhaustively reviewed. Canonical report:
 /Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/c5a04fab2e8b57dd11294673bc57ccdc516adbd6_20261006T065718Z_zagfrfk_/report.md
 R15 patch bounds seed before generator setup and caps persisted settings. Focused synthetic regressions:61passed; Ruff/mypy/OpenSpec strict/diff checks passed. Independent patch review found no bypass/regression. Schema regenerated. Full release gate and fresh exact-SHA audit remain pending.
+
+R15 first full gate:3119passed23skipped,90.55%,3 contract/changelog failures.
+Updated advisor/tool schema fixtures and merged existing Security heading;
+54 focused contract/documentation tests pass. Full gate rerun pending; no RC clearance.
