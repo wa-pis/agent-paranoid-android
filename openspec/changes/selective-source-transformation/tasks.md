@@ -216,9 +216,9 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   extras, probe hashes and safe isolated baseline/candidate execution plans.
 - [ ] Reproduce/fix 22: allowed AND/OR/nested predicates on both SQL adapters;
   retain forbidden-function, authorization and budget negative controls.
-- [ ] Reproduce/fix 25: all generation entrances honor documented explicit/omitted
+- [x] Reproduce/fix 25: all generation entrances honor documented explicit/omitted
   mode and ratio precedence; effective spec/manifest/report/exit reflect execution.
-- [ ] Reproduce/fix 20: doctor retains failed checks, distinguishes missing extras
+- [x] Reproduce/fix 20: doctor retains failed checks, distinguishes missing extras
   from capability failures and gives safe recovery hints without backend text.
 - [ ] Consolidate 21's October 2 approved six-method auth/secret-indirection
   implementation, local CLI opt-in and installed evidence into the final candidate;
@@ -486,3 +486,14 @@ remediate-full-security-audit/tasks.md. This completes source security evidence
 for the four composed activation proposals only; installed client acceptance,
 documentation reconciliation, final versioned identity and real release gates
 remain distinct. Future batch validation is tracked in roadmap, outside RC scope.
+
+2026-10-06 remaining-client reconciliation:20 and25 reproduction/fix tasks
+closed from existing explicitly installed doctor/mode evidence in client-acceptance.md,
+plus current author-source full gate3122passed23skipped at04704cd. No unchanged
+tests rerun or historical artifact relabeled finalRC. Doctor dependency/capability
+injections remain disclosed; real remote failures unverified. Final activated
+package/extras matrices and21/23/24/26 consolidation gates stay open.
+Current author-source clean scan67934951-4755-41b7-aa9b-26925754ed17 at04704cd
+is separate from older prospective runtime6ef55a1; it does not certify activation
+patches or a future versioned candidate. Next create coherent current prospective
+activation package, consume only affected acceptance, then final release identity.

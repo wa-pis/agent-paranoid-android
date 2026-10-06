@@ -1,6 +1,16 @@
 # Client Feedback And Acceptance Plan
 
-## Current security and installed acceptance — 2026-10-06
+## Current author-source checkpoint — 2026-10-06
+
+Author source04704cd04b963e5085ac5f507b054e40ed5239da passed the full offline
+gate3122tests/23skips/90.55%coverage and strictMkDocs. Independent whole-source
+scan67934951-4755-41b7-aa9b-26925754ed17 completed with zero confirmed findings;
+196executable files and13supporting fully reviewed. This is the seed-fixed author
+branch, not an activated/versionedRC or replacement for installed evidence below.
+Findings20/25 reproduction/fix tasks consume dated installed doctor/mode evidence;
+final package/extras/SDK compatibility remains required. No private/live claim.
+
+## Prospective security and installed acceptance — 2026-10-06
 
 Latest prospective source is `6ef55a1d86e377ee442199fee60cec6b57c8b9a7`:
 complete independent executable baseline193files, zero confirmed findings,
