@@ -32,7 +32,11 @@ This is a map of the codebase for the domain-agnostic generator.
 
 - `cache.py`
   Stores and loads safe profile JSON for large local CSV folders. The cache is
-  metadata-only and keyed by file names, sizes, and modification times.
+  metadata-only and keyed by file names, sizes, modification times, sampling
+  configuration and normalized field-scoped local-category policy. Cache reads
+  recheck that policy; changing or removing permission cannot reuse a broader
+  cached profile. Inventory is streamed and count-bounded before sorting, with
+  the caller's local/MCP deadline retained through fingerprinting.
 
 - `relationship_profiler.py`
   Infers parent/child relationships by checking whether child identifier values

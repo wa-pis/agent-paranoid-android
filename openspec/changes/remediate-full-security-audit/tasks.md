@@ -543,3 +543,13 @@ baseline localcategory flags before call; JSON validates AdvisorExchange first.
 Documentationregression covers allthree affected pages;51passed0.48s.
 No runtime/providercall. Next finish remaining provider docs and architecture
 contract reconciliation; no newsourceaudit until finalruntimeidentitychanges.
+
+2026-10-06 provider/semantic and architecture entrypoint review: no newruntime
+issue identified. Implementationmap cacheidentity description omitted sampling/
+categoryauthorization binding and streaming/deadline controls; corrected against
+cache.py commonpolicy/readchecks. Strict currentMkDocs/diffcheckpass after all
+recent provider/recovery/database docs amendments. Historicalrelease docs kept.
+Remaining large semanticarchitecture/reference inventory not claimedfullyread;
+continue coherent docs disposition before activation/versionedRC preparation.
+No repeatedtests/audit or externalcall. GitHubapproval/liveTrinoCI constraint
+remains unchanged and must not be silently waived.
