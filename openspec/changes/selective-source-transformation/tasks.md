@@ -191,7 +191,9 @@ amendments still require scoped review and executable checks before activation.
 - [ ] Review the new trust boundary and approve a scoped amendment to
   AGENTS.md, project safety policy and affected baseline specifications.
   - [x] Record owner decision separating closed development/tests from activation.
-  - [ ] Independently review this development/activation clarification.
+  - [x] Independently review this development/activation clarification.
+    Historical clarification reviewed at0e7dee5 in mergedPR576; see progress.md
+    and issuecomment5837209533. This does not certify current activation SHA.
 - [ ] Finalize versioned field policy, CLI/API and mixed-origin artifact schema.
 - [x] Specify exact decimals, precision/scale/rounding/overflow, approximate
   DOUBLE conversion and CSV round trips; preserve existing schema compatibility.
@@ -349,7 +351,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   No real SQL execution, private derive or final RC artifact claim.
 - [x] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping
   domains, deterministic replay and infeasible constraints.
-- [ ] Cover schema drift, sensitivity conflicts, leaks through reports/errors,
+- [x] Cover schema drift, sensitivity conflicts, leaks through reports/errors,
   provider isolation, budget exhaustion and output rollback.
 - [ ] Prove existing aggregate-only/source-free CLI, Python and MCP contracts
   remain unchanged with executable regression tests.
@@ -567,3 +569,11 @@ and infeasible replacement semantics specified and exercised by installed
 typed/batch/publication evidence above. Internal financial formulas excluded
 by ADR0026, no new tolerance requirement. Final public schema/activation/docs
 and exactRC review remain open.
+
+2026-10-06 safeguard coverage reconciliation: current author-source full gate
+plus clean whole-source audit at04704cd, post-seed installed507safeguards,
+batch and9registered cases cover schema/snapshot drift, sensitivity, disclosure,
+provider isolation, budgets and atomic rollback for supported operations.
+Generic arbitrary crash/race recovery remains unclaimed. HistoricalPR576
+clarification review reconciled separately; parent complete-current-source
+safety amendment and prospective common activation remain open.

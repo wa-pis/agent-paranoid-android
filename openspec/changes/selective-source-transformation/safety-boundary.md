@@ -6,7 +6,15 @@ below do not reinstate it. See [ADR-0026](../../../docs/adr/0026-transformation-
 All preservation, classification, exact-input approval, privacy and activation
 gates remain in force; see [ADR-0021](../../../docs/adr/0021-local-preservation-approval.md).
 
-This document proposes a scoped amendment, not an active exception to AGENTS.md.
+Historical stage note: the development/activation clarification was independently
+reviewed in PR576 at0e7dee5. PR601 subsequently registered the reviewed
+single-source CLI/MCP consumers. The common saved-profile CLI/MCP composition
+remains prospective and requires its own exact-source review; the remaining
+pre-activation descriptions below are historical where they describe the
+already registered single-source route. No earlier report certifies current
+common activation or the final release SHA.
+
+This document defines a scoped amendment, not dataset execution permission.
 Do not enable source-preserving execution until this boundary, matching baseline
 specifications and executable safety checks have received independent review.
 
