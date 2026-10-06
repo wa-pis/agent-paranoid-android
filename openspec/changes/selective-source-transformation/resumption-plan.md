@@ -1,3 +1,10 @@
+> Historical planning checkpoint: the implementation-status table and publisher
+> denial below describe September27 evidence. Current owner authorization,
+> implementation dispositions and post-seed installed evidence are recorded in
+> tasks.md and client-acceptance.md. Do not treat completed CSV/typed/publication
+> groundwork as missing, or this historical denial as a new permission request.
+> Public activation and final release gates remain separately pending.
+
 # Resume plan — 2026-09-26
 
 ## Current continuation — 2026-10-06

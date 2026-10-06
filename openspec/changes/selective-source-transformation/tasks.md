@@ -214,7 +214,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
 
 - [ ] Inspect new/changed harnesses; record package/version/SHA or wheel hash,
   extras, probe hashes and safe isolated baseline/candidate execution plans.
-- [ ] Reproduce/fix 22: allowed AND/OR/nested predicates on both SQL adapters;
+- [x] Reproduce/fix 22: allowed AND/OR/nested predicates on both SQL adapters;
   retain forbidden-function, authorization and budget negative controls.
 - [x] Reproduce/fix 25: all generation entrances honor documented explicit/omitted
   mode and ratio precedence; effective spec/manifest/report/exit reflect execution.
@@ -223,10 +223,10 @@ Final compatibility/clearance and unavailable private/live claims remain open.
 - [ ] Consolidate 21's October 2 approved six-method auth/secret-indirection
   implementation, local CLI opt-in and installed evidence into the final candidate;
   complete exact-SHA safety review before public activation. No live access.
-- [ ] Integrate 23 into exact-decimal contract and carry precision/scale through
+- [x] Integrate 23 into exact-decimal contract and carry precision/scale through
   agreed profile/spec/generation/transformation/exports without float
   intermediates; internal formulas are excluded by the owner scope correction.
-- [ ] Consolidate 24's declared Parquet physical/readback evidence with 25's
+- [x] Consolidate 24's declared Parquet physical/readback evidence with 25's
   October 2 invalid-result/exit decision; retain fail-closed incompatible typed output.
 - [ ] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
   implementation/evidence; finish final-candidate CLI/API compatibility gates.
@@ -519,3 +519,11 @@ allowlisted comments, explicit wizard decisions and approval snapshot binding
 (test_transformation_approval.py::test_review_comment_and_profile_evidence_are_snapshot_bound;
 policy redaction cases and current full author-source gate). This closes the
 comment implementation requirement, not activation or final RC certification.
+
+2026-10-06 remaining intake reconciliation:22 reproduction/fix closed using
+existing both-adapter boolean-predicate/forbidden-function regressions consumed
+by the clean04704cd full gate (no unchanged rerun).23 integration and24 physical/
+readback+mode consolidation closed by the same installed post-seed wheel's
+56 typed/policy tests,52 mode/boundary/SDK tests and12 public typed routes.
+This is executable implementation/intake evidence, not final RC acceptance.
+21/26 retain their explicit final-source safety/compatibility requirements.
