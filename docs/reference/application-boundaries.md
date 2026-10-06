@@ -362,9 +362,11 @@ functions as wrappers and injects the safe column summarizer from
 `trino_masking.py` now owns content-aware value masking, masked sensitive
 patterns, synthetic category-rank summaries, safe column-profile completion,
 and opt-in safe-select result masking. Aggregate profiles replace source
-categories with synthetic labels or masked patterns. Safe-select masking is
-heuristic: returned rows may retain allowed source values that are not
-classified as sensitive, so they are outside the source-literal-free guarantee
+categories with synthetic labels or masked patterns. Safe-select recursively
+masks every returned string, including binary source representations, and masks
+non-string fields or values recognized as sensitive. Allowed non-string source
+values may remain when the detector does not classify them as sensitive, so the
+returned rows are outside the source-literal-free guarantee
 for the default aggregate-only tools. `mcp_trino_server.py` retains the
 remaining tool functions and privacy helper imports as compatibility exports
 while delegating masking below the transport boundary.

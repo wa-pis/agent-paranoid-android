@@ -39,6 +39,15 @@ This renews these documented examples on installed artifact, not every example
 or finalRC identity. Source-free quickstart/mode/decimal documentation reviewed
 against existing contracts without new contradictions or scope amendments.
 
+### Second-runtime installed acceptance — 2026-10-06
+
+Same current development wheel76fc927c and candidate-only package root,
+Python3.14.2 from the isolated matrix environment. Reviewed mode/input-parity,
+physicalParquet, explicittemporal and linked-domain suites14passed13.21s.
+No sourcefallback/network. Log py314-installed.log under installedevidenceroot.
+This adds a second-runtime binding for these cases; it is not a complete
+Python3.11–3.14/extras/SDK matrix or final versionedRC package check.
+
 ## Current isolated registration checkpoint — 2026-10-05
 
 Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth
