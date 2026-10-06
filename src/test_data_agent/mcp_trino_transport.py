@@ -146,7 +146,7 @@ def _create_redacted_fast_mcp(
                     from test_data_agent.core.transformation_limits import TransformationLimitError
                     from test_data_agent.trino_work_budget import QueryWorkDimension
 
-                    from test_data_agent.io.transformation_publish import (
+                    from test_data_agent.core.transformation_errors import (
                         CLEANUP_INCOMPLETE_MESSAGE, TransformationCleanupError,
                     )
 

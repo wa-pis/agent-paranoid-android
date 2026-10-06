@@ -31,18 +31,9 @@ from test_data_agent.csv_profiler import validate_csv_headers
 from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
 
 
-class TransformationPublicationError(ValueError):
-    """Value-free failure in private temporary publication."""
-
-
-CLEANUP_INCOMPLETE_MESSAGE = (
-    "transformation publication failed; cleanup incomplete; output or staging may remain; "
-    "inspect the selected destination before retrying"
+from test_data_agent.core.transformation_errors import (
+    CLEANUP_INCOMPLETE_MESSAGE, TransformationCleanupError, TransformationPublicationError,
 )
-
-
-class TransformationCleanupError(TransformationPublicationError):
-    """Publication failed and artifact removal could not be confirmed."""
 
 
 def _publish_test_bundle(destination: Path, filename: str, payload: bytes,

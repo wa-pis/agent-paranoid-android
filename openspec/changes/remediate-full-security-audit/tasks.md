@@ -765,3 +765,15 @@ Cleanup focused completion:337CLI/publisher/SDK1 tests pass; actual cachedSDK2
 stdio1pass and independent review confirms fixed constant/no cause leakage.
 Natural common CLI post-rename fsync+rollback failure regression2pass, both
 closed/versioned, retained synthetic output and value-free warning verified.
+
+Corrected cleanup candidate19e346e5 fullgate failed architecture import guard:
+3149passed19skipped1failed90.69%,191.69s. Transport must not import publisher
+I/O. Shared safe diagnostic classes/constant moved to core/transformation_errors;
+publisher preserves existing imports via reexport. Focused architecture/SDK/publisher
+checks and fresh review running. Gate not passed; old scan completion schema
+rejected exclusion strings, leaving draft incomplete; no report clearance.
+
+Core diagnostic follow-up:341focused tests/Ruff pass; independent reviewer
+34architecture+actual cachedMCP2 stdio checks pass, exception identity and
+ValueError compatibility preserved. Focused mypy passes. Corrected fullgate
+and new immutable whole audit still required.
