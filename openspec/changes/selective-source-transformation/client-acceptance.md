@@ -906,3 +906,13 @@ Existing Pydantic rejected-status serializer warning remains disclosed. Build
 module unavailable; local pip wheel with no index/no isolation succeeded.
 This is development acceptance, not a final immutable activated SHA, final
 package matrix, Ubuntu artifact hash or security certification of activation.
+
+Post-seed same-wheel typed/publication matrix: 56 installed tests passed in
+4.44s (Parquet physical/readback, publication, exact DECIMAL, behavior files and
+unified mappings). `accept_transformation_routes.py --public` passed all twelve
+CSV/Parquet/offline PostgreSQL/Trino query-input × CSV/Parquet/SQL-output routes,
+including CLI/MCP review and registered execution, typed decimal/date/null
+readback, source-free summaries and 36 CLI refusal checks. SQL routes use local
+injected synthetic Arrow streams; no live database. These checks supplement
+findings23/24 and activation acceptance, without closing final-source safety,
+package/extras compatibility, remote authentication or publication gates.

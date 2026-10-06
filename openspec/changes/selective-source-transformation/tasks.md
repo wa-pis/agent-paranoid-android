@@ -507,3 +507,7 @@ Runtime activation, installed acceptance and final RC gates remain pending.
 source checks52passed/1skipped and isolated offline development-wheel checks
 52passed. Exact wheel hash and limits retained in client-acceptance.md.
 Final activation/source identity, remaining client gates and RC release gates open.
+
+2026-10-06 same post-seed development wheel: installed typed/publication/policy
+suite56passed4.44s; public twelve-route synthetic acceptance passed with exact
+readback and36CLIrefusals. See client-acceptance.md; final candidate gates open.
