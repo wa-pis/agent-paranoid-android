@@ -56,7 +56,7 @@ class ScopedDictReader(_DictReader):
         # DictReader consumes __next__ and line_num; stubs require the C reader type.
         self.reader = cast(Any, ScopedCSVReader(lines, max_chars=max_chars, check_size=check_size, **options))
 
-    def __next__(self) -> dict[str, str | None]:
+    def __next__(self) -> dict[str, Any]:
         row = super().__next__()
         if isinstance(row.get(self.restkey), list):
             raise InputLimitError("CSV row exceeds header width")

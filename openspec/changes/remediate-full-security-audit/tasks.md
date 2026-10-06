@@ -826,3 +826,7 @@ CSV focused completion103passed3.25s (initial command nonexistent
 test_profiling.py collected nothing; corrected file list). Mypy/Ruff/diff/OpenSpec
 strict pass; documentation updated. Independent77tests/no blocker; allfour
 public route regressions included. Complete gate/new exactSHA audit required.
+
+CSV candidatec02c955 fullgate stopped at full types: new narrow row annotation
+conflicts with existing folder sample typing. Preserve previous DictReader Any
+row contract; runtime checks unchanged. Full types rerun, no passed gate claim.
