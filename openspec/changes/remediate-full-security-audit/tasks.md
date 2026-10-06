@@ -610,3 +610,17 @@ fullofflinegate3127passed19skipped1warning90.54%,179.35s,allstagesexit0.
 Whole-source scan3efb4580-f64b-4d7e-8bd5-c4f0d171e744 running; dedicated
 preflightready, freshindependentbaselineactive, architecturethreadlimit→
 parentfallback. No finalRC/sourceapproval/version/tag/publication claim.
+
+
+2026-10-06 R16 common-candidate audit finding confirmed: sqlglot syntax diagnostics
+retain query literals/cause/context through parse_trino_statements and MCP1
+ToolError. Low CWE-209; no database execution needed. Frozen audited candidate
+3b9219a remains unchanged. Author-branch shared parser now raises fixed invalid
+SQL outside the parser exception handler, removing cause/context. Synthetic
+string/numeric malformed-query regressions and actual SDK response regression:
+Python3.11/MCP1 66passed; Python3.14/MCP2 66passed. Ruff no-cache passes.
+Fresh investigator/reviewer spawn attempts both hit retained agent-thread limit;
+parent separate source-to-sink/compatibility and bypass review performed instead.
+All direct callers use this shared parser; valid-query control passes. Full audit
+is still in progress, and corrected candidate full gate/new exact-SHA audit remain
+required. No RC clearance.

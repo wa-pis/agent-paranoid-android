@@ -162,3 +162,18 @@ def test_trino_server_keeps_sql_policy_compatibility_exports() -> None:
     assert mcp_trino_server.SqlSafetyError is SqlSafetyError
     assert mcp_trino_server.AllowlistError is AllowlistError
     assert mcp_trino_server.validate_safe_select is validate_safe_select
+
+
+@pytest.mark.parametrize("sql", [
+    "SELECT 'fictional_private_query_marker' FROM (",
+    "SELECT 424242424242 FROM (",
+])
+def test_sql_parser_failure_is_fixed_and_detached(sql: str) -> None:
+    from test_data_agent.trino_sql_policy import parse_trino_statements
+
+    with pytest.raises(SqlSafetyError) as caught:
+        parse_trino_statements(sql)
+
+    assert str(caught.value) == "invalid SQL"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None

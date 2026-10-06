@@ -1454,3 +1454,28 @@ def test_trino_transport_is_optional(
     monkeypatch.setattr(transport, "FastMCP", None)
 
     assert transport.create_trino_mcp(()) is None
+
+
+def test_sql_parser_diagnostic_does_not_reach_mcp_response() -> None:
+    if transport.FastMCP is None:
+        pytest.skip("installed MCP version does not provide FastMCP")
+    import anyio
+    import mcp.types as types
+    from test_data_agent.trino_sql_policy import parse_trino_statements
+
+    def parse_query(sql: str) -> str:
+        parse_trino_statements(sql)
+        return "valid"
+
+    mcp = transport.create_trino_mcp((parse_query,))
+    assert mcp is not None
+    request = types.CallToolRequest(
+        method="tools/call",
+        params=types.CallToolRequestParams(
+            name="parse_query",
+            arguments={"sql": "SELECT 'fictional_private_query_marker' FROM ("},
+        ),
+    )
+    result = anyio.run(call_tool_handler, mcp, request)
+    assert result.root.isError is True
+    assert "fictional_private_query_marker" not in result.root.model_dump_json()
