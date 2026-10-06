@@ -921,3 +921,16 @@ package/extras compatibility, remote authentication or publication gates.
 Post-seed installed safeguards suite:507passed26.82s (snapshot/decisions/report/
 execution/total limits/mapping/approval/source adapters). No live connections.
 Current author-source and prospective activation identities remain distinct.
+
+Post-seed batch validation and actual common-interface acceptance: installed
+batch suite initially176passed/4skipped/7failed24.47s; failures were controlling
+TTY approval unavailable under filesystem sandbox. Explicit actual-common
+CLI/MCP selection18passed/4failed9.64s, same TTY limitation. Repeated only
+TTY/stdio affected selection with authorized unrestricted execution:12passed
+(175deselected)9.64s, including all previously failing direct/fallback receipt
+cases. No product or fixture guards patched, no network/database/provider calls.
+Actual common parser/runtime/inventory and configuration-only creation checks
+passed; full source/golden gate remains separate. Batch core validates final
+schema/constraints and scalar/composite relationships before publication;
+optional validation flags cannot bypass it. Preserve these split-run results
+rather than reporting a fabricated single all-green batch invocation.

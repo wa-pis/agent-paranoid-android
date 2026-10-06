@@ -533,3 +533,8 @@ private fictional1M×100matrix12/12. Trino CSV1879.813s,Parquet1582.527s,
 SQL1533.779s; full readback/provenance/digest/cleanup. See hashed logs/state
 in sql-scale-acceptance.md. No repeat or new/runtime/publicRC claim; parent
 public/final-source capacity gates stay open.
+
+2026-10-06 installed batch/actual common acceptance recorded in client-acceptance.md:
+176passed4skipped7TTYfailures; actualcommon18passed4TTYfailures; authorized
+TTY/stdio-onlyrerun12passed resolves all failures without code adaptation.
+Finalsource/releasecertification remains pending.
