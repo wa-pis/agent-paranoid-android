@@ -125,12 +125,3 @@ diff --git a/tests/fixtures/contracts/mcp-generator-tools.json b/tests/fixtures/
        "type": "object"
      }
    },
-@@ -371,7 +454,7 @@
-           "type": "integer"
-         },
-         "invalid_ratio": {
--          "default": 0,
-+          "default": 0.0,
-           "title": "Invalid Ratio",
-           "type": "number"
-         },

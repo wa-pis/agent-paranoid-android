@@ -27,3 +27,16 @@ def test_common_mcp_patch_enables_strict_arguments_at_both_factories(tmp_path):
     for factory in factories:
         strict = [keyword.value for keyword in factory.keywords if keyword.arg == "strict_arguments"]
         assert len(strict) == 1 and isinstance(strict[0], ast.Constant) and strict[0].value is True
+
+
+def test_activation_patches_compose_with_current_contracts(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    archived = subprocess.run(["git", "archive", "HEAD"], cwd=root,
+                              check=True, capture_output=True)
+    subprocess.run(["tar", "-x", "-C", str(tmp_path)], input=archived.stdout,
+                   check=True, capture_output=True)
+    for filename in ("common-cli-activation.patch", "common-mcp-activation.patch",
+                     "oauth-browser-registration.patch", "registration-contract-activation.patch"):
+        patch = root / "openspec/changes/selective-source-transformation" / filename
+        subprocess.run(["git", "apply", str(patch)], cwd=tmp_path,
+                       check=True, capture_output=True)

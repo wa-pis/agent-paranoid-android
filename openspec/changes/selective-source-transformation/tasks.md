@@ -497,3 +497,8 @@ Current author-source clean scan67934951-4755-41b7-aa9b-26925754ed17 at04704cd
 is separate from older prospective runtime6ef55a1; it does not certify activation
 patches or a future versioned candidate. Next create coherent current prospective
 activation package, consume only affected acceptance, then final release identity.
+
+2026-10-06 activation patch reconciliation: removed the obsolete invalid_ratio
+0→0.0 fixture hunk, already present after R15 contract refresh. Added archive-based
+regression applying all four activation patches to current source; 2 tests pass.
+Runtime activation, installed acceptance and final RC gates remain pending.
