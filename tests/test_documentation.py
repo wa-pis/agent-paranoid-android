@@ -748,6 +748,10 @@ def test_query_examples_and_public_docs_match_runtime_contract() -> None:
     assert "source_fingerprint" in public_docs
     assert "query rows" in public_docs
     assert "SqlQueryProfileRequest" in public_docs
+    postgres_walkthrough = (ROOT / "docs" / "how-to" / "postgresql.md").read_text()
+    assert "public.orders.state,public.orders.amount" in postgres_walkthrough
+    assert "SELECT o.order_id, o.state, o.amount AS amount" in postgres_walkthrough
+    assert "automatic `infer-spec` rejects profiles with unsupported" in postgres_walkthrough
 
 
 def test_database_source_documentation_reconciliation_covers_all_layers() -> None:

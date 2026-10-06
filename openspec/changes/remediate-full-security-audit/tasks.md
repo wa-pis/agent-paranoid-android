@@ -516,3 +516,12 @@ same installed6ef55a1/wheel76fc927c in newtempoutputs with explicitPython,
 no sourcefallback or network. Currentartifact exampleevidence in clientacceptance;
 logs installedroot. No unchanged fullgate/scale/audit repeated. Completeallpage
 semantic audit and remaining releaseacceptance are not closed by twoexamples.
+
+2026-10-06 PostgreSQL/Trino walkthrough review found PostgreSQL example
+selected amount outside shownallowlist and fed derived amount*2 profile into
+infer-spec despite unsupported-expression refusal. Corrected example to allowed
+amount directalias; explain profiling-versus-generation dependency boundary.
+Focused documentationregression covers selector/query/explanation;50pass0.51s.
+No SQLpolicy/runtime relaxation, no liveexecution. Trino example only source
+reviewed under no-liveDB; live tutorial success not claimed. Continue remaining
+documentation/advisor/architecture disposition then finalcandidate preparation.

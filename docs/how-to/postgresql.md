@@ -23,7 +23,7 @@ export POSTGRES_PASSWORD_ENV=WAREHOUSE_PASSWORD
 export WAREHOUSE_PASSWORD='replace-in-your-shell'
 export POSTGRES_ALLOWED_SCHEMAS=public
 export POSTGRES_ALLOWED_TABLES=public.customers,public.orders
-export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state
+export POSTGRES_ALLOWED_COLUMNS=public.customers.customer_id,public.customers.status,public.orders.order_id,public.orders.customer_id,public.orders.state,public.orders.amount
 ```
 
 For an intentionally table-wide aggregate profile, an entry may instead use
@@ -104,11 +104,11 @@ test-data-agent export-postgres-sql out/dataset-spec.yaml \
 cmp out/generated.sql out/generated-second.sql
 ```
 
-To profile a reviewed derived relation without creating a database view, put
+To profile a reviewed relation without creating a database view, put
 one fully qualified single-table query in a local file:
 
 ```sql
-SELECT o.order_id, o.state, o.amount * 2 AS doubled_amount
+SELECT o.order_id, o.state, o.amount AS amount
 FROM public.orders AS o
 WHERE o.order_id < 999999
 ```
@@ -127,6 +127,12 @@ test-data-agent generate out/query-spec.yaml \
   --seed 12345 --output out/query-generated
 test-data-agent validate out/query-spec.yaml out/query-generated
 ```
+
+This generation walkthrough uses direct columns and aliases, all explicitly
+allowed above. A derived expression such as `amount * 2` can be profiled under
+the SQL policy, but automatic `infer-spec` rejects profiles with unsupported
+expression dependencies. Do not infer that the expression is translated into
+a generation formula; review a separate supported specification instead.
 
 The query is parsed locally and must stay inside the documented scalar,
 projection, and filter subset. A no-row schema probe and bounded aggregate
