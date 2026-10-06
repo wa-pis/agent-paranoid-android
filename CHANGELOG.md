@@ -34,6 +34,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Preserve the safe cleanup-incomplete warning through common transformation CLI and MCP2 errors so operators can inspect retained artifacts before retrying.
+
 - Bound saved batch profile external recaptures to their admitted byte lengths before allocation; reject source growth before reading or publishing.
 
 - Enforce trusted bootstrap byte ceilings before reading transformation batch profiles and single-input policies, preserving saved source-budget overrides.

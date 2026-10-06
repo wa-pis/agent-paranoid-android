@@ -1873,3 +1873,35 @@ def test_saved_batch_raised_source_budget_preserves_bootstrap_file_cap(tmp_path,
     batch = load_batch_profile(tmp_path, "batch.yaml", max_total_bytes=32768,
         max_review_bytes=8192, budget=GenerationBudget(5))
     assert len(batch.snapshot_sha256) == 64
+
+@pytest.mark.parametrize("versioned", [False, True])
+def test_common_cli_real_failed_rollback_warning(tmp_path, monkeypatch, capsys, versioned):
+    from test_data_agent.cli_transformation_candidate import _candidate_batch_main
+    from test_data_agent.io import path_policy, transformation_publish as publisher
+
+    save_fictional_batch_profile(tmp_path)
+    batch = load_batch_profile(tmp_path, "batch.yaml", max_total_bytes=32768,
+                              max_review_bytes=8192, budget=GenerationBudget(5))
+    destination = tmp_path / "output"
+    original_fsync = path_policy.os.fsync
+
+    def fail_after_rename(fd):
+        if destination.exists():
+            raise OSError("fictional-private-fsync-marker")
+        return original_fsync(fd)
+
+    def fail_rollback(path, identity, *, strict=False):
+        raise OSError("fictional-private-rollback-marker")
+
+    monkeypatch.setattr(path_policy.os, "fsync", fail_after_rename)
+    monkeypatch.setattr(publisher, "remove_tree_if_identity", fail_rollback)
+    assert _candidate_batch_main(["execute", str(tmp_path), "batch.yaml",
+        "--snapshot-sha256", batch.snapshot_sha256, "--destination", "output",
+        "--max-total-input-bytes", "32768", "--max-review-bytes", "8192",
+        "--max-output-bytes", "8192"], versioned_output=versioned) == 2
+    captured = capsys.readouterr()
+    message = json.loads(captured.out)["error"]["message"]
+    assert "cleanup incomplete" in message and "output or staging may remain" in message
+    assert "before retrying" in message and "fictional-private" not in captured.out
+    assert str(tmp_path) not in captured.out and not captured.err
+    assert (destination / "input-0.csv").read_bytes() == b"key\n11\n12\n"

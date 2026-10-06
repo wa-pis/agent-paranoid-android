@@ -143,6 +143,7 @@ def _candidate_batch_main(argv: list[str], *, versioned_output: bool = False) ->
     from test_data_agent.cli_contract import CliErrorCode
     from test_data_agent.cli_presenter import report_cli_error
     from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_publish import TransformationCleanupError
     from test_data_agent.io.transformation_batch_workflow import BatchWorkflowRequest, run_batch_workflow
 
     parser = _CandidateArgumentParser(prog="test-data-agent transform-batch" if versioned_output
@@ -167,7 +168,7 @@ def _candidate_batch_main(argv: list[str], *, versioned_output: bool = False) ->
             max_total_bytes=args.max_total_input_bytes, max_review_bytes=args.max_review_bytes,
             max_output_bytes=args.max_output_bytes)
         result = run_batch_workflow(request, budget=GenerationBudget())
-    except TransformationLimitError as error:
+    except (TransformationLimitError, TransformationCleanupError) as error:
         return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
     except (ValueError, OSError):
         return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,

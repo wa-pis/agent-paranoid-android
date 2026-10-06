@@ -738,3 +738,30 @@ executed separately with actual CLI/MCP flags:4passed. Remaining19skips
 match offline exclusions. Strictdocs pass. Fresh whole Standard audit
 c9b1f19c-b9d6-4ec9-80b7-0f7b2eb09181 started exactSHA with fresh independent
 baseline and architecture/preflight workers. No old clean proof/publicRC claim.
+
+R20candidate full baseline confirmed additional common-CLI diagnostic finding:
+TransformationCleanupError is swallowed by generic ValueError handling, hiding
+required cleanup-incomplete/artifacts-may-remain warning. Synthetic public
+dispatch fault injection reproduced safe generic envelope with omitted warning.
+Fresh independent fix-boundary investigator active; source publication cleanup
+remains enforced. Full audit continues; no clean/RC claim. Architecture reviewed
+without further confirmed finding; localTTY checks sandbox-blocked in worker
+while parent escalated focused/gate checks passed.
+
+Cleanup diagnostic fix in progress: shared common CLI now preserves typed
+cleanup warning before generic ValueError; closed/versioned regressions added.
+Fresh reviewer assessing MCP2 UnexpectedToolError sibling masking and test gaps.
+No claim of complete closure; focused CLI/publisher checks running. Previous
+f524afe9 independent baseline finished196/196, onlyR20; canonical sealing pending.
+
+Cleanup sibling validated experimentally: cached actualMCP2 suppresses typed
+warning; MCP1 retains it. Transport now reconstructs fixed canonical publisher
+warning for exact CleanupError cause, dropping private cause text/context.
+Fresh reviewer retesting cached SDK2; CLI natural publisher-failure regression
+still pending. Current48ba122b full baseline complete196/196, onlycleanup
+diagnostic finding. No clean report/release authorization claimed.
+
+Cleanup focused completion:337CLI/publisher/SDK1 tests pass; actual cachedSDK2
+stdio1pass and independent review confirms fixed constant/no cause leakage.
+Natural common CLI post-rename fsync+rollback failure regression2pass, both
+closed/versioned, retained synthetic output and value-free warning verified.

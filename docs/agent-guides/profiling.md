@@ -158,3 +158,7 @@ profile limits may raise the aggregate source budget; session limits still win.
 Saving a captured batch profile bounds every external recapture to its original
 admitted byte length. Growing sources or declarations are rejected before payload
 allocation; exact byte comparison still rejects other mutations before publication.
+
+Common transformation CLI and MCP preserve the fixed cleanup-incomplete warning
+when publication rollback cannot confirm removal. Inspect the selected destination
+before retrying; private failure details remain suppressed.

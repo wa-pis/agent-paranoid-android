@@ -35,6 +35,12 @@ class TransformationPublicationError(ValueError):
     """Value-free failure in private temporary publication."""
 
 
+CLEANUP_INCOMPLETE_MESSAGE = (
+    "transformation publication failed; cleanup incomplete; output or staging may remain; "
+    "inspect the selected destination before retrying"
+)
+
+
 class TransformationCleanupError(TransformationPublicationError):
     """Publication failed and artifact removal could not be confirmed."""
 
@@ -89,9 +95,7 @@ def _publish_test_artifacts(destination: Path, artifacts: tuple[tuple[str, bytes
                 raise ValueError("cleanup identity or removal not confirmed")
         except (OSError, ValueError):
             try:
-                raise TransformationCleanupError(
-                    "transformation publication failed; cleanup incomplete; output or staging may remain; "
-                    "inspect the selected destination before retrying")
+                raise TransformationCleanupError(CLEANUP_INCOMPLETE_MESSAGE)
             except TransformationCleanupError as error:
                 error.__context__ = None
                 raise

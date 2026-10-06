@@ -182,3 +182,12 @@ bytes before publishing a profile.
 - **WHEN** a source grows after batch capture while remaining below the aggregate budget
 - **THEN** saving the batch rejects growth before reading the source payload
 - **AND** no saved profile is published
+
+### Requirement: Cleanup warning transport
+The system SHALL preserve a value-free cleanup-incomplete warning across common
+CLI and MCP error boundaries when retained artifact removal is unconfirmed.
+
+#### Scenario: Publication and rollback fail
+- **WHEN** publication fails and rollback cannot confirm artifact removal
+- **THEN** the operator receives a warning that output or staging may remain
+- **AND** the warning requests destination inspection before retrying without private cause details
