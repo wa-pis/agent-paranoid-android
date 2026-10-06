@@ -169,6 +169,7 @@ Oversized values yield a NULL sentinel that rejects the whole profile before
 sensitivity classification. No truncation, filtering or incomplete summary
 is published. Existing cumulative result and query budgets still apply.
 
-SQL syntax failures use a fixed `invalid SQL` diagnostic detached from parser
+SQL syntax and tokenizer failures (including unterminated strings, quoted
+identifiers and block comments) use a fixed `invalid SQL` diagnostic detached from parser
 exception cause and context. Parser excerpts and query literals must never reach
 direct API errors or MCP responses, including the supported MCP 1 transport.

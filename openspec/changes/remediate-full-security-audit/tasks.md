@@ -645,3 +645,17 @@ No rerun needed without new changes. Fresh whole-source Standard audit
 032adb45-da11-4eea-b7a7-bb0427f76a75 started on this exact immutableSHA;
 fresh independent baseline, architecture and dedicated preflight workers active.
 No inherited clean-report proof, no versionedRC/public approval claim.
+
+2026-10-06 corrected-candidate audit: parent confirmed R16 lexical sibling.
+Unterminated SQL raises sqlglot TokenError (not ParseError), exposing literal
+prefix and retained cause/context. Actual MCP1 synthetic tool response confirms
+fictional_marker reflection; no DB/network. Fix-boundary investigator launched;
+full baseline continues. RC blocked; prior R16 fix incomplete for tokenizer errors.
+
+R16 lexical completion: shared catch includes ParseError and TokenError; fixed
+raise remains outside handler. Direct/API and actual transport regressions cover
+unterminated string, quoted identifier and block comment with padded markers.
+Python3.11/MCP1 and Python3.14/MCP2 each72passed; Ruff/mypy/diff/OpenSpec
+pass,51documentation tests pass. Fresh independent patch review found no
+surviving shared-parser bypass or regression. Current immutable audit continues;
+its additional formula-context candidate remains under validation, not fixed/closed.

@@ -1456,7 +1456,13 @@ def test_trino_transport_is_optional(
     assert transport.create_trino_mcp(()) is None
 
 
-def test_sql_parser_diagnostic_does_not_reach_mcp_response() -> None:
+@pytest.mark.parametrize("sql", [
+    "SELECT 'fictional_private_query_marker' FROM (",
+    "SELECT 'fictional_private_query_marker padding",
+    'SELECT "fictional_private_query_marker padding',
+    "SELECT /* fictional_private_query_marker padding",
+])
+def test_sql_parser_diagnostic_does_not_reach_mcp_response(sql: str) -> None:
     if transport.FastMCP is None:
         pytest.skip("installed MCP version does not provide FastMCP")
     import anyio
@@ -1473,7 +1479,7 @@ def test_sql_parser_diagnostic_does_not_reach_mcp_response() -> None:
         method="tools/call",
         params=types.CallToolRequestParams(
             name="parse_query",
-            arguments={"sql": "SELECT 'fictional_private_query_marker' FROM ("},
+            arguments={"sql": sql},
         ),
     )
     result = anyio.run(call_tool_handler, mcp, request)

@@ -34,7 +34,7 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
-- Replace malformed SQL parser diagnostics with a fixed detached error so query literals cannot enter direct errors or supported MCP responses.
+- Replace malformed SQL parser and tokenizer diagnostics with a fixed detached error so query literals cannot enter direct errors or supported MCP responses.
 
 - Bound actual source-fingerprint bytes and local/MCP deadlines; stream folder inventories under file-count and time limits before sorting, including cache and dataset validation paths.
 

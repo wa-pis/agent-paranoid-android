@@ -167,6 +167,9 @@ def test_trino_server_keeps_sql_policy_compatibility_exports() -> None:
 @pytest.mark.parametrize("sql", [
     "SELECT 'fictional_private_query_marker' FROM (",
     "SELECT 424242424242 FROM (",
+    "SELECT 'fictional_private_query_marker padding",
+    'SELECT "fictional_private_query_marker padding',
+    "SELECT /* fictional_private_query_marker padding",
 ])
 def test_sql_parser_failure_is_fixed_and_detached(sql: str) -> None:
     from test_data_agent.trino_sql_policy import parse_trino_statements
