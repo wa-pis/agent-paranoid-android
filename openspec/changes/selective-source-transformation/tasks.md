@@ -502,3 +502,8 @@ activation package, consume only affected acceptance, then final release identit
 0→0.0 fixture hunk, already present after R15 contract refresh. Added archive-based
 regression applying all four activation patches to current source; 2 tests pass.
 Runtime activation, installed acceptance and final RC gates remain pending.
+
+2026-10-06 post-seed prospective activation: four patches compose over f48677f;
+source checks52passed/1skipped and isolated offline development-wheel checks
+52passed. Exact wheel hash and limits retained in client-acceptance.md.
+Final activation/source identity, remaining client gates and RC release gates open.

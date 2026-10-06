@@ -892,3 +892,17 @@ confirm amount/threshold/unit and effective setting origin, concrete session
 override instructions and saved-profile key. Apply each documented override
 through the real interface and verify its effect. No product monkeypatch,
 silent truncation, implicit budget increase or raw input in error text.
+
+## Post-seed activation acceptance — 2026-10-06
+
+Prospective copy `/private/tmp/apa-seed-coherent-ln6d9q19` composes four activation
+patches over `f48677f29bef2d348b05e9162a752bba9fbfbca4`. Source contract, activation,
+SDK, OAuth and generation-boundary checks: 52 passed, 1 skipped in 1.33s.
+Offline development wheel (still 1.5.0) SHA256
+`dee16ae57bf4f5eacd824a7c53665c86bfe0642fcb26ca806c0652479afb6474`, installed
+without dependencies at `/private/tmp/apa-seed-activation-installed`: actual CLI
+mode, registration, bounded generation and MCP SDK tests 52 passed in 6.58s.
+Existing Pydantic rejected-status serializer warning remains disclosed. Build
+module unavailable; local pip wheel with no index/no isolation succeeded.
+This is development acceptance, not a final immutable activated SHA, final
+package matrix, Ubuntu artifact hash or security certification of activation.
