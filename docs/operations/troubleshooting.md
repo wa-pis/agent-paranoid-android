@@ -221,10 +221,11 @@ and seed into a new destination.
 
 Where an atomic state writer or staged bundle publication is used, replacement
 prevents readers from observing its partial state during normal operation.
-Standalone artifact commands are not one global transaction, and artifact
-files and parent directories are not flushed with `fsync`. A hard process
-stop, host or storage failure, or power loss can therefore leave staging data
-or lose a recent artifact. Use storage with the durability and backup
+Standalone artifact commands are not one global transaction. Shared atomic
+single-file writes and owned directory publication use `fsync`, but complete
+multi-file crash consistency is not guaranteed. A hard process stop, host or
+storage failure, or power loss can still leave staging data or an incomplete
+bundle. Use storage with the durability and backup
 guarantees required by the deployment.
 
 ## Input Limit Exceeded

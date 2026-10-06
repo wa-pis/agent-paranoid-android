@@ -1300,6 +1300,9 @@ def test_artifact_durability_contract_matches_implementation() -> None:
     assert "os.fsync(parent)" in shared_writer
     assert "shared single-file atomic writer" in normalized_operations.lower()
     assert "not a complete crash-consistency protocol" in normalized_operations
+    troubleshooting = " ".join((ROOT / "docs" / "operations" / "troubleshooting.md").read_text().split())
+    assert "owned directory publication use `fsync`" in troubleshooting
+    assert "complete multi-file crash consistency is not guaranteed" in troubleshooting
 
 
 def test_stable_promotion_contract_is_metadata_only() -> None:

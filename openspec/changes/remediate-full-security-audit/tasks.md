@@ -500,3 +500,12 @@ flushesparent. Complete bundlecrash-consistency remains unguaranteed; historical
 RC4/1.0 deferral retained as history. Documentationregression now checks shared
 writer, rather than inferring nofsync from three wrappermodules.50docstestspass
 0.49s/diffcheckpass. No runtimechange or newdurability/releasepromise.
+
+2026-10-06 migration/error/recovery docs review: generationmode publication,
+exit1/validation_failed and mixed-origin distinctions consistent. Found same
+stale nofsync statement split across lines in troubleshooting; updated to shared
+writer/ownedparent flush with unchanged nofullcrashconsistency guarantee.
+Regression now includes troubleshooting;50documentationtestspass0.48s.
+Historical pre1.0 release record unchanged. No runtime/security-source changes
+or repeatedaudit. Remaining fullsemantic documentation/contract disposition,
+publicroutecapacity and finalversioned identity/releasegates still open.
