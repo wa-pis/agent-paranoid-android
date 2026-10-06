@@ -248,3 +248,22 @@ or public activation acceptance. No new database/scaling acceptance claimed.
 - SHA-256: `2e413fe920c4f807ae0a92e7bf3ba4ca2c8b0869a257c4d24fc9457edaf9ecfb`
 - Installed target: `/private/tmp/apa-shared-candidate-wheel.6HPhU5/installed`
 - Harness: `tests/test_transformation_cli_candidate.py`, `tests/test_transformation_mcp_candidate.py`.
+
+## Registered SDK and packaged skill replay — 2026-10-06
+
+Same installed6ef55a1/wheel76fc927c/Python3.11, fully read unchanged harnesses.
+Registered-interface acceptance initially6passed1failed8.92s: all real SDK stdio
+execution, receipt refusals, localTTY approval, inline/CSV wizard and sensitive
+local mapping checks passed. Contract snapshot failed because the historical
+activation inventory omitted exactly transform-batch/common_transformation;
+no removed or changed MCP tools. Reconciled only these two reviewed prospective
+interfaces against composed candidate contract fixtures. Focused contract rerun
+1passed6deselected0.39s. No combined green rerun claimed; no runtime change.
+The expected-inventory amendment was temporarily staged only for focused replay
+and restored in the immutable audited source afterward (clean tracked status).
+
+Packaged skill harness2passed1skipped3.69s: deterministic synthetic generation,
+validation and replacement/refusal workflow pass. Actual unavailable historical
+baseline was not provided; that test skipped explicitly, no simulated baseline.
+Logs registered.log, contract-repair.log, skill.log under same installedroot.
+This is current MCP1.28.1 SDK evidence, not a full Python/SDK/extras matrix or RC.

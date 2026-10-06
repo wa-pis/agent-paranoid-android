@@ -449,3 +449,10 @@ harness1passed1.51s. Fictional injectedstream, no DB/provider/productmonkeypatch
 Evidence/logs in same route document and installedtempdirectory. These checks
 close no broad client/scale/release parent task. Next remaining intake is full
 registeredSDK/skillworkflow and originalfinding disposition reconciliation.
+
+2026-10-06 registered installedSDK intake:6behaviorcasespassed;1staleinventory
+failure resolved by adding only prospective transform-batch/common_transformation
+expectedentries. Focusedcontract1passed; no combinedgreen rerun claim.
+Packagedskill2passed1explicitbaseline-skip. No runtime/guardchange; auditedtemp
+source inventory restored, cleantrackedstatus. Routeevidence retains fullscope.
+Remaining fullmatrix/clientdispositions/docs/scale and realRCgates unchanged.
