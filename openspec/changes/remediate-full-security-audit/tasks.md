@@ -483,3 +483,13 @@ Next review documented mixed-origin artifact/decimal/snapshot/recovery contracts
 against current accepted dispositions, then reconcile broad task closures only
 where the exact stated requirement has evidence. Requiredhumanapproval and
 no-liveDB/TrinoCI clearance unchanged; no release/version/tag activation.
+
+2026-10-06 artifact/recovery documentation review found current review-output
+page incorrectly treating every failed validation as forbidden publication,
+contradicting owner-approved deliberate mixed/negative fixtures. Clarified valid
+synthetic acceptance versus retained controlled-negatives/exit1, typedParquet
+all-or-nothing rejection, privacy failure and separately labelled mixed-origin
+transformation/no-anonymity/no failedtransformationpublication. This changes docs
+only, not policy/runtime. Relevant50documentation tests and strictMkDocs pass;
+full allpageaudit remains open. Reviewed exactdecimal ADR/spec and safety
+snapshot/receipt/identitylimitedcleanup contracts; broad tasks not inferredclosed.

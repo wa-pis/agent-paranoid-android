@@ -19,7 +19,7 @@ local preservation receipt must also be checked. See
 
 ## Manifest Checks
 
-Require all of these conditions:
+For a valid synthetic dataset, require all of these conditions:
 
 ```json
 {
@@ -53,8 +53,18 @@ Also confirm:
 - temporal and formula constraints;
 - aggregate reconciliation.
 
-Do not treat a missing report as success. A failed report should block
-publication of the generated dataset.
+Do not treat a missing report as success. A failed valid-mode run is not an
+accepted dataset. Explicit mixed/negative test generation may retain intentionally
+invalid rows and their failed validation report in a supported output format;
+the CLI reports `validation_failed` and exit 1. Do not relabel that result valid.
+Incompatible typed Parquet values reject the entire export without partial
+publication. Privacy failures never authorize publication of source values.
+
+These synthetic manifest checks do not apply to the separately gated selective
+transformation candidate. Its bundle records mixed origin, action provenance
+and any exact-input preservation authority; it must not claim fully synthetic
+or anonymous output. Transformation validation failure prevents publication.
+See the [candidate execution contract](../reference/cli.md#implemented-rc-execution-candidate).
 
 ## Assurance Levels
 
