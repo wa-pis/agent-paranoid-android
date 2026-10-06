@@ -830,3 +830,11 @@ public route regressions included. Complete gate/new exactSHA audit required.
 CSV candidatec02c955 fullgate stopped at full types: new narrow row annotation
 conflicts with existing folder sample typing. Preserve previous DictReader Any
 row contract; runtime checks unchanged. Full types rerun, no passed gate claim.
+
+CSV typing committed/pushed3d79644. Corrected immutable composition
+268efc9a4f6a7e5fa3e87f21b4fd86be87f7634f at
+/private/tmp/apa-csv-final-e_grb0wz fullgate3158passed19skipped1warning189.95s,
+allstagesexit0; strictdocs pass. Fresh whole Standard scan
+e01b29fa-0b22-4589-a82f-cc30343ad322 started exactSHA with fresh independent
+baseline/architecture/preflight workers. Prior e6035b53 audit remains incomplete
+because last persisted receipts60/67; no old report as safety proof.
