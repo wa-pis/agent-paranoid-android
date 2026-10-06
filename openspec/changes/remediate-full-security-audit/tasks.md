@@ -671,3 +671,16 @@ R17/R18 focused completion: fresh reviewer275tests passed/no bypass or
 regression. Python3.14 matrix225passed after correcting test own-source
 traceback marker assertion; product behavior unchanged. Mypy3files/OpenSpec
 strict pass. Full corrected candidate gate and whole exactSHA audit pending.
+
+2026-10-06 exact0bd4bd58 full scan032adb45-da11-4eea-b7a7-bb0427f76a75
+completed196/196 executable files with3low diagnostic findings (TokenError,
+formula traceback, standalone raw-value report); canonical report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-r16-common-9415l7hn/0bd4bd58e32957a89c0c03f763b1686237b0cb30_20261006T190640Z_vx269tn0/report.md
+All three fixed on author branch9ebb583/8e6f8e2. Corrected frozen candidate
+6c9a91838375f48496cefa33fd3ac76d671925f2 at /private/tmp/apa-r18-common-z36kwqm7;
+full offline gate running, strictMkDocs passes. No prior report reused as proof.
+
+Corrected6c9a918 gate3140passed19skipped1warning90.57%,191.78s,strictdocs
+pass. Fresh full Standard scan5c22b64c-130d-4f83-83be-52d4eac0b634 started
+with fresh independent baseline/architecture/preflight workers. No old report
+as proof. Version/tag/public release gates still separate.
