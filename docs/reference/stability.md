@@ -39,11 +39,11 @@ The supported artifact contract distinguishes three properties:
 | --- | --- |
 | Atomic visibility | Completion-state and advisor-handoff files that use atomic writers are written beside the destination and replaced atomically. New folder, review, and agent-plan bundles are staged as siblings and published with one directory rename. Standalone artifact commands and multi-file updates are not covered by one global atomic transaction. |
 | Process-interruption recovery | Catchable failures and interactive cancellation remove staging data or roll back moved files. Single-entity generation publishes its manifest last, validates format/suffix agreement, and permits replacement only of the same complete manifest-owned bundle. Agent completion can stop between its separately atomic receipt and result markers; `agent-status` and `agent-recover` revalidate the unchanged generated bundle before completing metadata publication. |
-| Crash or power-loss durability | Not guaranteed. Artifact writers do not flush file contents and parent-directory metadata with `fsync`, so a hard process stop, kernel or host failure, storage failure, or power loss may leave staging data or lose a recently renamed artifact. |
+| Crash or power-loss durability | Not guaranteed. Shared atomic single-file writes and owned directory publication use `fsync`, but this does not make every artifact or multi-file bundle crash-consistent. A hard process stop, host or storage failure, or power loss may still leave staging data or an incomplete bundle. |
 
 A single-entity update inside an existing directory moves several files and is
 not one filesystem transaction; its rollback applies only while the process
-can handle the failure. The artifact `fsync` work is deferred until after 1.0
+can handle the failure. The historical complete artifact durability work was deferred until after 1.0
 and is not an RC4 or stable-1.0 release blocker because crash/power-loss
 durability is not part of the supported contract. See
 [Operational Resource Budgets](../operations/resource-budgets.md#artifact-persistence-contract)

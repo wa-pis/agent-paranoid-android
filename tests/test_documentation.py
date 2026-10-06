@@ -1294,7 +1294,12 @@ def test_artifact_durability_contract_matches_implementation() -> None:
     assert "repository maintainer owns the follow-up" in normalized_operations
     assert "before promising crash/power-loss durability" in normalized_operations
     for source in persistence_sources:
-        assert "fsync" not in source.read_text()
+        assert source.is_file()
+    shared_writer = (ROOT / "src" / "test_data_agent" / "io" / "path_policy.py").read_text()
+    assert "os.fsync(handle.fileno())" in shared_writer
+    assert "os.fsync(parent)" in shared_writer
+    assert "shared single-file atomic writer" in normalized_operations.lower()
+    assert "not a complete crash-consistency protocol" in normalized_operations
 
 
 def test_stable_promotion_contract_is_metadata_only() -> None:

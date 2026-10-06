@@ -493,3 +493,10 @@ transformation/no-anonymity/no failedtransformationpublication. This changes doc
 only, not policy/runtime. Relevant50documentation tests and strictMkDocs pass;
 full allpageaudit remains open. Reviewed exactdecimal ADR/spec and safety
 snapshot/receipt/identitylimitedcleanup contracts; broad tasks not inferredclosed.
+
+2026-10-06 persistence docs review corrected stale blanket no-fsync claim:
+shared path_policy atomicfile flushes content/parent and owned directorypublisher
+flushesparent. Complete bundlecrash-consistency remains unguaranteed; historical
+RC4/1.0 deferral retained as history. Documentationregression now checks shared
+writer, rather than inferring nofsync from three wrappermodules.50docstestspass
+0.49s/diffcheckpass. No runtimechange or newdurability/releasepromise.
