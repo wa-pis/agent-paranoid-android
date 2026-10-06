@@ -58,6 +58,18 @@ Log publication-installed.log under current installedroot. This renews the
 reviewed adaptation only; it does not retrospectively reproduce the original
 client timing script or certify universal race/crash recovery.
 
+### Current installed doctor evidence — 2026-10-06
+
+Same exact6ef55a1/wheel76fc927c/Python3.11. Reviewed selected doctor suite:
+5passed4deselected1.17s. One actual CLI invalid local Trino configuration case
+retains earlier dependency checks, marks capability failed and redacts the
+invalid marker. Four direct-service cases use explicitly injected importers/
+capability callbacks for missing versus broken dependencies and sanitized
+recovery; no real remote fault or product-policy bypass. Quickstart function
+monkeypatch test was deliberately not in installed selection; its deterministic
+unit evidence remains separately covered by full offline gate. Log
+ doctor-installed.log under installedroot. Final package/extras matrix remains open.
+
 ## Current isolated registration checkpoint — 2026-10-05
 
 Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth

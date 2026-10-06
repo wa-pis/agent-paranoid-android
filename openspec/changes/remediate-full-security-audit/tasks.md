@@ -569,3 +569,11 @@ per-finding decisions and datedactualartifact evidence; checked only historical
 reconciliation task, retaining every private/live/fidelity boundary and finalRC
 requirements. No blanket parentgate closure. Next contract/client20–26 and
 full documentation disposition; currentfinalSHA still absent, no version/tag.
+
+2026-10-06 currentinstalled finding20 doctor subset5passed4deselected1.17s:
+oneactualCLI configfailure + four explicit dependency/capability injections.
+Reportretention/missing-versus-broken/recovery/redaction verified; no remoteclaim.
+Quickstart productfunctionpatch excluded from installedselection, unitgate
+coverage remains distinct. Evidence currentclientregister; do not repeat.
+Continue remaining20–26 contract consolidation; broad finalcompatibility and
+activation/releasegates stillopen, no version/tag/publication change.
