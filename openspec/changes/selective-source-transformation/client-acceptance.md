@@ -48,6 +48,16 @@ No sourcefallback/network. Log py314-installed.log under installedevidenceroot.
 This adds a second-runtime binding for these cases; it is not a complete
 Python3.11–3.14/extras/SDK matrix or final versionedRC package check.
 
+### Current installed publication adaptation — 2026-10-06
+
+Same exact6ef55a1/wheel76fc927c/Python3.11, explicit installed-root import
+assertions. Fully reviewed unchanged test_client_publication_acceptance.py:
+5passed2.49s. Absent/empty destinations publish complete fictional10row output;
+filled destinations reject both overwrite selections and retain original files.
+Log publication-installed.log under current installedroot. This renews the
+reviewed adaptation only; it does not retrospectively reproduce the original
+client timing script or certify universal race/crash recovery.
+
 ## Current isolated registration checkpoint — 2026-10-05
 
 Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth

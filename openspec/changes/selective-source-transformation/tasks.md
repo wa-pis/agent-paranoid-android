@@ -230,8 +230,12 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   October 2 invalid-result/exit decision; retain fail-closed incompatible typed output.
 - [ ] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
   implementation/evidence; finish final-candidate CLI/API compatibility gates.
-- [ ] Reconcile refreshed 1–19 evidence: missing date bounds, SQL diagnostics and
+- [x] Reconcile refreshed 1–19 evidence: missing date bounds, SQL diagnostics and
   scan costs, formula dependencies, publication/overwrite and utility boundaries.
+  Evidence: client-acceptance.md per-finding disposition register and dated
+  corrected/current installed bindings. Monthly fidelity deferred; internal
+  formulas excluded by owner; statistical utility/live costs/private inputs
+  unverified. Closure is reconciliation, not blanket client or RC acceptance.
 - [ ] Extend candidate matrix to findings 1–26 and section E safeguards; record
   unavailable private/live cases honestly. Full scope and final RC gates unchanged.
 
