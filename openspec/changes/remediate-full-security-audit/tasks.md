@@ -777,3 +777,12 @@ Core diagnostic follow-up:341focused tests/Ruff pass; independent reviewer
 34architecture+actual cachedMCP2 stdio checks pass, exception identity and
 ValueError compatibility preserved. Focused mypy passes. Corrected fullgate
 and new immutable whole audit still required.
+
+Core diagnostics committed/pushed2e04e84; immutable corrected composition
+8208ff0b9aa5f27d89472948db2246dda18e09c5 at
+/private/tmp/apa-cleanup-core-2ps3b06n. Full offline release gate running
+/private/tmp/apa-cleanup-core-release-gate.log, strictdocs pass.
+
+8208ff gate stopped types: publisher implicit reexports rejected by mypy at
+CLI/MCP callers. Explicit same-name aliases preserve public exception identity;
+full mypy146sourcefiles/Ruff pass. No runtime change; full gate requires new freeze.
