@@ -604,3 +604,9 @@ This evidence-only update does not certify a new activated/versionedRC SHA.
 Next:remaining selective-source-transformation client/docs/activation acceptance,
 then exact final release identity/gates, required approval, Ubuntu hashes/signing.
 No version/tag/publication until those conditions close.
+
+2026-10-06 prospective common candidate3b9219a54339ccd66c5d5aa3405e5decf28763a1:
+fullofflinegate3127passed19skipped1warning90.54%,179.35s,allstagesexit0.
+Whole-source scan3efb4580-f64b-4d7e-8bd5-c4f0d171e744 running; dedicated
+preflightready, freshindependentbaselineactive, architecturethreadlimit→
+parentfallback. No finalRC/sourceapproval/version/tag/publication claim.
