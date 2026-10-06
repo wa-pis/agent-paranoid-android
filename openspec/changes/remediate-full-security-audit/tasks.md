@@ -471,3 +471,15 @@ no inflated21wirecaseclaim. Details/log in routeevidence and installedpointer.
 Docs contract sampled against operation/schema/receipt/workspace controls;
 full documentation audit is not closed by this targeted pass. No new confirmed
 runtimeissue; continue final contract/docs disposition, not another sameaudit.
+
+2026-10-06 docs/contract reconciliation checkpoint:50documentation tests
+passed0.46s on author closedbranch after currentevidence amendments; both
+OpenSpecchanges strictvalid. Sampled currentREADME/safety/configuration/CLI/MCP
+contracts consistently distinguish shipped1.5.0, prospectivecommon registration,
+localTTY issuer and workspaceconsumer/noapprovalboolean. Prior strictMkDocs
+pass retained; no duplicated runtimegate. Fullsemantic allpageaudit remains
+open; these tests check links/navigation/contracts/examples, not every proseclaim.
+Next review documented mixed-origin artifact/decimal/snapshot/recovery contracts
+against current accepted dispositions, then reconcile broad task closures only
+where the exact stated requirement has evidence. Requiredhumanapproval and
+no-liveDB/TrinoCI clearance unchanged; no release/version/tag activation.
