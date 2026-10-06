@@ -420,3 +420,13 @@ def test_query_regular_symlink_keeps_existing_compatibility(tmp_path):
     link = tmp_path / "linked.sql"
     link.symlink_to(query)
     assert _read_stable_query_file(link, max_bytes=1024) == query.read_text()
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_query_parser_error_detaches_context(tmp_path: Path, adapter: SqlQueryAdapter) -> None:
+    path = write_query(tmp_path, "SELECT 'fictional_private_query_marker padding")
+    with pytest.raises(SqlQuerySourceError) as caught:
+        inspect_query_source(request(path, adapter=adapter))
+    assert str(caught.value) == "SQL query syntax is invalid"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None

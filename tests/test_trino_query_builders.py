@@ -254,3 +254,20 @@ def test_top_values_bounds_the_projected_representation(monkeypatch: pytest.Monk
     assert 'WHERE "status" IS NOT NULL GROUP BY "status"' in query.sql
     assert "count(*) AS count" in query.sql
     assert query.sql.endswith("ORDER BY count DESC LIMIT 20")
+
+
+def test_formula_parser_error_detaches_expression() -> None:
+    import traceback
+
+    expression = "fictional_private_formula_marker + '"
+    with pytest.raises(SqlSafetyError) as caught:
+        build_formula_rule_profile_query(
+            "analytics", "safe", "items", "total",
+            expression, 0.0,
+        )
+    assert str(caught.value) == "formula expression is not valid arithmetic"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert "fictional_private_formula_marker" not in "".join(
+        traceback.format_exception(caught.value)
+    )

@@ -201,6 +201,8 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
     try:
         statements = sqlglot.parse(query_text, read=dialect)
     except Exception:
+        statements = None
+    if statements is None:
         raise SqlQuerySourceError("SQL query syntax is invalid") from None
     if len(statements) != 1 or not isinstance(statements[0], exp.Select):
         raise SqlQuerySourceError("SQL query must contain exactly one SELECT")

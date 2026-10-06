@@ -659,3 +659,15 @@ Python3.11/MCP1 and Python3.14/MCP2 each72passed; Ruff/mypy/diff/OpenSpec
 pass,51documentation tests pass. Fresh independent patch review found no
 surviving shared-parser bypass or regression. Current immutable audit continues;
 its additional formula-context candidate remains under validation, not fixed/closed.
+
+R17/R18 audit findings: formula SyntaxError chain exposes expression in direct
+API traceback; public standalone conditional allowed-values report embeds raw
+rejected cell. Query-source parser context retention hardened alongside shared
+parser diagnostics (ordinary traceback already suppressed). Minimal source
+changes plus regressions174passed; Ruff passes; fresh patch reviewer active.
+No remote/DB disclosure claim; full corrected gate/new audit still required.
+
+R17/R18 focused completion: fresh reviewer275tests passed/no bypass or
+regression. Python3.14 matrix225passed after correcting test own-source
+traceback marker assertion; product behavior unchanged. Mypy3files/OpenSpec
+strict pass. Full corrected candidate gate and whole exactSHA audit pending.

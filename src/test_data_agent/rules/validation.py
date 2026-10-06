@@ -179,7 +179,7 @@ def validate_conditional_allowed_values(
         if not condition_matches(row, rule.when, budget=budget):
             continue
         value = row.get(rule.field)
-        record_result(result, value in rule.allowed_values, f"{rule.table}[{index}].{rule.field}={value!r}")
+        record_result(result, value in rule.allowed_values, f"{rule.table}[{index}].{rule.field}: allowed_values")
     return result
 
 

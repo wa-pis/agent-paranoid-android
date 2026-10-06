@@ -173,3 +173,6 @@ SQL syntax and tokenizer failures (including unterminated strings, quoted
 identifiers and block comments) use a fixed `invalid SQL` diagnostic detached from parser
 exception cause and context. Parser excerpts and query literals must never reach
 direct API errors or MCP responses, including the supported MCP 1 transport.
+
+Formula syntax errors and local query-source parser failures also detach the
+original parser cause/context, preserving fixed value-free recovery messages.

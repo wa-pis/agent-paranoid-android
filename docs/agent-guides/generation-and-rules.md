@@ -107,3 +107,6 @@ Generation seeds are bounded before generator setup: persisted DatasetSpec seeds
 remain nonnegative and at most 2**63-1; direct Python generation also permits
 signed 64-bit negative seeds for compatibility. Oversized seeds fail closed
 without truncation or hashing, bounding synthetic identifier width.
+
+Business validation failure details contain rule location and condition only;
+conditional allowed-values failures never embed the rejected cell value.

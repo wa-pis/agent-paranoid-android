@@ -402,8 +402,10 @@ def build_formula_sql(expression: str) -> FormulaSql:
     consume_sql_formula_chars(expression)
     try:
         node = ast.parse(expression, mode="eval")
-    except SyntaxError as exc:
-        raise SqlSafetyError("formula expression is not valid arithmetic") from exc
+    except SyntaxError:
+        node = None
+    if node is None:
+        raise SqlSafetyError("formula expression is not valid arithmetic") from None
     consume_ast_work(node, child_nodes=ast.iter_child_nodes)
     columns: set[str] = set()
     extra_conditions: list[str] = []
