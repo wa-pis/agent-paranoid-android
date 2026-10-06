@@ -1243,6 +1243,14 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
     assert "local fakes" in support
 
 
+def test_custom_advisor_docs_reject_unprojected_local_categories() -> None:
+    for path in ("docs/how-to/custom-advisor-provider.md", "docs/ai_integration.md"):
+        text = (ROOT / path).read_text()
+        assert "profile.local_category_fields" in text
+        assert "baseline_spec.local_category_fields" in text
+        assert 'raise ValueError("local categories require a provider-safe projection")' in text
+
+
 def test_gigachat_documentation_matches_provider_boundary() -> None:
     guide = (ROOT / "docs" / "how-to" / "gigachat.md").read_text()
     configuration = (

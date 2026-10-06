@@ -83,6 +83,9 @@ class CustomAdvisorClient:
         validated = AdvisorExchange.model_validate(
             exchange.model_dump(mode="python")
         )
+        if (validated.request.profile.local_category_fields
+                or validated.request.baseline_spec.local_category_fields):
+            raise ValueError("local categories require a provider-safe projection")
         payload = self._transport.generate_json(
             trusted_instructions=validated.trusted_instructions,
             untrusted_input=validated.request.model_dump(mode="json"),
@@ -90,6 +93,14 @@ class CustomAdvisorClient:
         )
         return AdvisorProposal.model_validate(payload)
 ```
+
+The generic exchange wrapper validates proposals; it does not automatically
+mask locally approved categories for arbitrary clients. This minimal external
+adapter refuses such exchanges before transport. Built-in OpenAI/GigaChat
+adapters implement their own field-scoped projection and local restoration.
+Do not send a complete local exchange to a remote provider merely because its
+schema validates. Supporting local categories in another adapter requires an
+explicit tested projection/restoration contract, including matching predicates.
 
 Map the three arguments without changing their trust levels:
 

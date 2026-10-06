@@ -525,3 +525,14 @@ Focused documentationregression covers selector/query/explanation;50pass0.51s.
 No SQLpolicy/runtime relaxation, no liveexecution. Trino example only source
 reviewed under no-liveDB; live tutorial success not claimed. Continue remaining
 documentation/advisor/architecture disposition then finalcandidate preparation.
+
+2026-10-06 advisor documentation review found customexternal adapter templates
+serialized genericexchange.request unchanged. Generic ExchangeDatasetAdvisor
+validatescopy/proposal but does not apply built-in provider categoryprojection;
+localallowlisted literals can remain in genericrequest. Corrected both remote
+adapter templates to refuse profile/spec localcategoryflags beforetransport;
+externalJSONhandoff explicitly requires testedprojection/restoration or refusal.
+Built-in OpenAI/GigaChat already mask/restore, unchanged.51documentationtests
+pass0.49s with focused exampleguard regression. No externalcall, runtimechange
+or claim priorcleanSHA covers a newruntime. This is corrected integrationguidance,
+not an assertion arbitrary customclient code is made safe by packagewrapper.
