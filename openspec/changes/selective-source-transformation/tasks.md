@@ -577,3 +577,11 @@ provider isolation, budgets and atomic rollback for supported operations.
 Generic arbitrary crash/race recovery remains unclaimed. HistoricalPR576
 clarification review reconciled separately; parent complete-current-source
 safety amendment and prospective common activation remain open.
+
+2026-10-06 prospective common full gate at f13989c9660c62fe503387623738de2b5868b15c:
+3126passed19skipped1warning90.54%,181.32s;1test failed because new patch
+composition regression reapplied patches to an already composed archive.
+No runtime failure. Fixed regression to reverse composed proposals first,
+then reapply all four;2tests pass on closed source and2 on composed source,
+Ruff pass. Full gate incomplete until corrected candidate checks complete;
+no audit/version/publication clearance from this failed run.

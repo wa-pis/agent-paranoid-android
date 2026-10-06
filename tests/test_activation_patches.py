@@ -35,8 +35,15 @@ def test_activation_patches_compose_with_current_contracts(tmp_path):
                               check=True, capture_output=True)
     subprocess.run(["tar", "-x", "-C", str(tmp_path)], input=archived.stdout,
                    check=True, capture_output=True)
-    for filename in ("common-cli-activation.patch", "common-mcp-activation.patch",
-                     "oauth-browser-registration.patch", "registration-contract-activation.patch"):
-        patch = root / "openspec/changes/selective-source-transformation" / filename
+    patches = [root / "openspec/changes/selective-source-transformation" / filename
+               for filename in ("common-cli-activation.patch", "common-mcp-activation.patch",
+                                "oauth-browser-registration.patch", "registration-contract-activation.patch")]
+    applied = subprocess.run(["git", "apply", "--reverse", "--check", str(patches[0])],
+                             cwd=tmp_path, capture_output=True).returncode == 0
+    if applied:
+        for patch in reversed(patches):
+            subprocess.run(["git", "apply", "--reverse", str(patch)], cwd=tmp_path,
+                           check=True, capture_output=True)
+    for patch in patches:
         subprocess.run(["git", "apply", str(patch)], cwd=tmp_path,
                        check=True, capture_output=True)
