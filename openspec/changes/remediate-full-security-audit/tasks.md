@@ -725,3 +725,16 @@ R20 focused completion:186passed4skipped30.31s;51documentation tests,
 Ruff/diff/OpenSpec strict pass. Fresh independent reviewer:7focusedpass,
 no surviving recapture bypass; unchanged/empty/alias/role and total-limit semantics
 reviewed. Full frozen baseline remains in progress, corrected full gate/audit pending.
+
+R20 committed/pushed51f0c0b. Corrected immutable common composition
+48ba122b17e30e779da2b5702976f984c8c91400 frozen at
+/private/tmp/apa-r20-common-pbrhh_wg. Full offline gate running
+(log /private/tmp/apa-r20-common-release-gate.log); strict MkDocs pass.
+Prior f524afe9 whole baseline continues; corrected exactSHA full audit follows gate.
+
+R20 candidate48ba122b full gate exit0:3142passed23skipped1warning,
+90.57%,192.95s. Four activation-only checks lacked env flags in gate;
+executed separately with actual CLI/MCP flags:4passed. Remaining19skips
+match offline exclusions. Strictdocs pass. Fresh whole Standard audit
+c9b1f19c-b9d6-4ec9-80b7-0f7b2eb09181 started exactSHA with fresh independent
+baseline and architecture/preflight workers. No old clean proof/publicRC claim.
