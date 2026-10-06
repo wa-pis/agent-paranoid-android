@@ -934,3 +934,10 @@ passed; full source/golden gate remains separate. Batch core validates final
 schema/constraints and scalar/composite relationships before publication;
 optional validation flags cannot bypass it. Preserve these split-run results
 rather than reporting a fabricated single all-green batch invocation.
+
+Post-seed installed linked-domain, finance and registered-interface acceptance:
+9passed10.97s,1 historical registered_contract_delta deselected; contemporary
+contracts passed separately in52test source set. ActualTTY approval, direct/
+fallback receipts and saved wizard-policy execution tested, no product patch.
+Final declared key/schema/constraint validation inspected in batch.py240–242
+and execute.py500; optional flags do not disable final checks.

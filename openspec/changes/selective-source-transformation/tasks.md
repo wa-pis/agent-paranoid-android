@@ -288,7 +288,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   or an external model/integration benchmark.
 - [ ] Implement separately authorized read-only SQL-result access; preserve
   SQL allowlists and budgets without broadening default profiling/MCP.
-- [ ] Implement consistent key mapping; internal derived-value computation is
+- [x] Implement consistent key mapping; internal derived-value computation is
   excluded by the latest owner clarification (existing checks below historical).
   - [x] Reject malformed/aggregate derive expressions and dependency disagreement
     through bounded shared parsing before review/save; no evaluation yet.
@@ -329,7 +329,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   preservation. Save and bind the exact reviewed comment/evidence to approval;
   test unknown/conflicting cases, redaction, stale snapshots and save/load
   parity with the noninteractive policy.
-- [ ] Validate every final row and declared cross-row relationship before
+- [x] Validate every final row and declared cross-row relationship before
   atomic publication; reject conflicting policies.
 - [x] Implement the owner-confirmed three-origin report (2026-09-28): replacement,
   synthetic, original, based on executed cell actions rather than value equality.
@@ -347,7 +347,7 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   fictional driver stream through real SQL authorization, public CLI review/
   TTY approval/execute, exact decimal readback and missing-receipt rejection.
   No real SQL execution, private derive or final RC artifact claim.
-- [ ] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping
+- [x] Cover nulls, duplicates, zeros, rounding, composite keys, multiple mapping
   domains, deterministic replay and infeasible constraints.
 - [ ] Cover schema drift, sensitivity conflicts, leaks through reports/errors,
   provider isolation, budget exhaustion and output rollback.
@@ -538,3 +538,13 @@ public/final-source capacity gates stay open.
 176passed4skipped7TTYfailures; actualcommon18passed4TTYfailures; authorized
 TTY/stdio-onlyrerun12passed resolves all failures without code adaptation.
 Finalsource/releasecertification remains pending.
+
+2026-10-06 supported key/final-row/edge-case requirements reconciled: shared
+domain scalar/composite keys and full final schema/constraint/relationship
+validation precede publication independently of optional validation flags;
+installed batch results and507 execution/mapping/approval checks retained above.
+Installed registered interfaces+linked domains+fictional finance9passed10.97s,
+1 historical inventory assertion deliberately deselected (current golden
+contracts checked separately). RealTTY allowed; no guard patches/liveDB/AI.
+This closes supported implementation coverage, excludes internal formulas per
+owner, and leaves final contracts/docs/activation/capacity/RC gates open.
