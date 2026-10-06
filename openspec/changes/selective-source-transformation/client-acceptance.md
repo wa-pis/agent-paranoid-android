@@ -1,5 +1,31 @@
 # Client Feedback And Acceptance Plan
 
+## Current security and installed acceptance — 2026-10-06
+
+Latest prospective source is `6ef55a1d86e377ee442199fee60cec6b57c8b9a7`:
+complete independent executable baseline193files, zero confirmed findings,
+canonical coverage complete/deferred0; scan54cfdefc-304e-4131-a379-396572e8d4c5.
+The historical unavailable-review statements below describe earlier checkpoints;
+they do not supersede this completed scan or establish human GitHub approval.
+Offline gate3113passed19skipped. Current isolated wheel1.5.0 SHA256
+`76fc927cc2372c832ea90e97f21600443fc7eec18c9d07d009049a021a86211e`.
+
+Fresh installed Python3.11 checks:12typedroutes/36CLIrefusals, temporal3,
+linked2, finance/localTTY1; registeredSDK6behaviorcases plus focused repaired
+contract1 (no combinedgreen claim); packagedskills2passed/1baseline-skip.
+Mode/input parity and physicalParquet suites additionally9passed6.33s with
+explicit installed package-root binding, no sourcefallback. This renews selected
+findings24/25 entrance/physical-type evidence; it does not certify all findings.
+Full logs under /private/tmp/apa-r13-installed-a13c8a66; route evidence contains
+scope and harness adaptation. Strict current documentation build passed0.37s.
+No new all-route scale run, liveSQL/provider, native timestamp transformation,
+finalversionedRC or Python/SDK/extrasmatrix clearance is implied.
+
+Original per-finding disposition record and private-data waiver below remain
+applicable. Do not repeat implemented fixes or accepted unchanged scale runs.
+Next reconcile remaining contract/documentation requirements against these
+specific dispositions; public activation and real release gates stay open.
+
 ## Current isolated registration checkpoint — 2026-10-05
 
 Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth

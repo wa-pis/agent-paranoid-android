@@ -456,3 +456,10 @@ expectedentries. Focusedcontract1passed; no combinedgreen rerun claim.
 Packagedskill2passed1explicitbaseline-skip. No runtime/guardchange; auditedtemp
 source inventory restored, cleantrackedstatus. Routeevidence retains fullscope.
 Remaining fullmatrix/clientdispositions/docs/scale and realRCgates unchanged.
+
+2026-10-06 current installed mode/input-parity and physicalParquet acceptance
+9passed6.33s, explicitinstalledroot verified. Current strictMkDocs pass0.37s.
+Clientacceptance/resumption headings reconcile fresh completeaudit and current
+artifact with historical unavailable-review/zero-context notes; no broad task
+closure or new releasepermission. Originalper-finding decisions/privatewaiver
+remain; next contract/docs acceptance reconciliation, no repeatedscale/gate.
