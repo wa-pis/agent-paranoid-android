@@ -578,7 +578,7 @@ coverage remains distinct. Evidence currentclientregister; do not repeat.
 Continue remaining20–26 contract consolidation; broad finalcompatibility and
 activation/releasegates stillopen, no version/tag/publication change.
 
-- [ ] R15: Bound generation seed width before allocation, verify direct/persisted/override routes and deterministic compatibility.
+- [x] R15: Bound generation seed width before allocation, verify direct/persisted/override routes and deterministic compatibility.
 
 2026-10-06 full author-branch audit c5a04fab2e8b57dd11294673bc57ccdc516adbd6
 completed: scan cb641a96-caaa-4f9f-a1a8-310e545d8aeb, one medium seed allocation
@@ -590,3 +590,17 @@ R15 patch bounds seed before generator setup and caps persisted settings. Focuse
 R15 first full gate:3119passed23skipped,90.55%,3 contract/changelog failures.
 Updated advisor/tool schema fixtures and merged existing Security heading;
 54 focused contract/documentation tests pass. Full gate rerun pending; no RC clearance.
+
+2026-10-06 R15 closed at exact04704cd04b963e5085ac5f507b054e40ed5239da:
+full offline gate3122passed23skipped1warning90.55%,184.45s, strictMkDocs pass.
+Fresh complete independent Standard scan67934951-4755-41b7-aa9b-26925754ed17
+reports0validatedfindings;196/196executable inventory plus13supporting files.
+Canonical report:/Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/04704cd04b963e5085ac5f507b054e40ed5239da_20261006T102703Z_mppjl3c5/report.md
+Architecture worker actualthreadlimit:parent source-backed fallback recorded.
+Audit usage19,322,425rollouttokens including18,763,008cachedinput across2threads;
+cumulative measurement, not incremental auditcost. Tests/prose/dependency internals
+not exhaustively source-audited; hostedapproval/liveintegration not claimed.
+This evidence-only update does not certify a new activated/versionedRC SHA.
+Next:remaining selective-source-transformation client/docs/activation acceptance,
+then exact final release identity/gates, required approval, Ubuntu hashes/signing.
+No version/tag/publication until those conditions close.
