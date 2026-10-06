@@ -624,3 +624,16 @@ parent separate source-to-sink/compatibility and bypass review performed instead
 All direct callers use this shared parser; valid-query control passes. Full audit
 is still in progress, and corrected candidate full gate/new exact-SHA audit remain
 required. No RC clearance.
+
+
+2026-10-06 common-candidate3b9219a full audit finalized:
+scan3efb4580-f64b-4d7e-8bd5-c4f0d171e744,196/196 executable files,
+one low CWE-209 R16. Canonical report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/apa-final-common-8awwrjbo/3b9219a54339ccd66c5d5aa3405e5decf28763a1_20261006T123233Z__hjgz5jj/report.md
+R16 committed/pushed b1ce493; both SDK matrices66passed, mypy/Ruff/OpenSpec
+and51documentation tests pass. Frozen corrected composition:
+0bd4bd58e32957a89c0c03f763b1686237b0cb30 at /private/tmp/apa-r16-common-9415l7hn.
+Initial gate interrupted during pytest (no completion evidence); resumed offline
+gate log /private/tmp/apa-r16-common-release-gate-resumed.log. No repeated
+completed gate; no live DB/provider, version/tag or public-release claim.
+Corrected whole-source independent audit required after gate completion.
