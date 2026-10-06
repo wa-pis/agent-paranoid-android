@@ -157,3 +157,18 @@ SHALL share these controls without silently skipping invalid matching inputs.
 - **WHEN** a selected folder exceeds its matching-file count or enumeration deadline
 - **THEN** enumeration stops, closes its directory handle, and returns no trusted profile or fingerprint
 - **AND** valid bounded folders retain deterministic filename ordering.
+
+### Requirement: Bound generation seed width before allocation
+The system SHALL reject seeds outside signed 64-bit integer range before generator setup or row materialization. Persisted DatasetSpec seeds SHALL remain nonnegative and at most 2**63-1. Accepted seeds SHALL retain existing deterministic identifier formulas without truncation or hashing.
+
+#### Scenario: Oversized direct seed
+- **WHEN** a direct generator caller supplies a seed beyond signed 64-bit range
+- **THEN** generation fails with a value-free resource error before Faker setup and no rows are created
+
+#### Scenario: Oversized persisted or overridden seed
+- **WHEN** an oversized seed is loaded from DatasetSpec settings or supplied to a bundle workflow
+- **THEN** validation rejects it before output publication
+
+#### Scenario: Compatible bounded seed
+- **WHEN** generation uses an accepted seed, including a negative direct Python seed
+- **THEN** identifiers retain their existing formula and repeated generation is deterministic

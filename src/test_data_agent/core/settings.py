@@ -22,10 +22,14 @@ class OutputFormat(StrEnum):
     PARQUET = "parquet"
 
 
+MIN_GENERATION_SEED = -(1 << 63)
+MAX_GENERATION_SEED = (1 << 63) - 1
+
+
 class GenerationSettings(BaseModel):
     model_config = ConfigDict(validate_assignment=True)
 
-    seed: int | None = Field(default=None, ge=0)
+    seed: int | None = Field(default=None, ge=0, le=MAX_GENERATION_SEED)
     mode: GenerationMode = GenerationMode.VALID
     invalid_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
     output_format: OutputFormat = OutputFormat.JSON

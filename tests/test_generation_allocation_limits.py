@@ -50,3 +50,33 @@ def test_string_value_guard_precedes_random_allocation(monkeypatch):
 
 def test_ordinary_seeded_output_unchanged():
     assert generate_dataset(spec(), seed=7) == generate_dataset(spec(), seed=7)
+
+
+@pytest.mark.parametrize("seed", [10**3999, -(10**3999), 1 << 63, -(1 << 63) - 1, True, 1.5])
+def test_seed_width_rejected_before_generator_setup(monkeypatch, seed):
+    monkeypatch.setattr("test_data_agent.generation.entity_generator.create_faker",
+                        lambda *a, **k: pytest.fail("generator setup before seed rejection"))
+    with pytest.raises(GenerationLimitError, match="signed 64-bit"):
+        generate_dataset(spec(), seed=seed)
+
+
+def test_persisted_seed_and_override_reject_without_publication(tmp_path):
+    from pydantic import ValidationError
+    from test_data_agent.core.settings import GenerationSettings
+    from test_data_agent.io.workflows import generate_dataset_bundle
+
+    with pytest.raises(ValidationError):
+        GenerationSettings(seed=10**3999)
+    destination = tmp_path / "output"
+    with pytest.raises(ValidationError):
+        generate_dataset_bundle(spec(), output_folder=destination, seed=10**3999)
+    assert not destination.exists()
+
+
+@pytest.mark.parametrize("seed", [-(1 << 63), -2, 0, 7, (1 << 63) - 1])
+def test_bounded_seed_keeps_identifier_formula_and_replay(seed):
+    data = DatasetSpec.model_validate({"entities": [{"name": "items", "row_count": 2,
+        "fields": [{"name": "id", "data_type": "string", "is_identifier": True}]}]})
+    rows = generate_dataset(data, seed=seed)
+    assert rows == generate_dataset(data, seed=seed)
+    assert rows["items"][0]["id"] == f"synthetic_{seed * 1000000 + 1}"

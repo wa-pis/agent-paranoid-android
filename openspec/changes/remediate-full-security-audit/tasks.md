@@ -577,3 +577,12 @@ Quickstart productfunctionpatch excluded from installedselection, unitgate
 coverage remains distinct. Evidence currentclientregister; do not repeat.
 Continue remaining20–26 contract consolidation; broad finalcompatibility and
 activation/releasegates stillopen, no version/tag/publication change.
+
+- [ ] R15: Bound generation seed width before allocation, verify direct/persisted/override routes and deterministic compatibility.
+
+2026-10-06 full author-branch audit c5a04fab2e8b57dd11294673bc57ccdc516adbd6
+completed: scan cb641a96-caaa-4f9f-a1a8-310e545d8aeb, one medium seed allocation
+finding; 196 executable files covered by independent baseline/parent union.
+Tests/docs/dependency implementations not exhaustively reviewed. Canonical report:
+/Users/agrudin/.codex/state/plugins/codex-security/scans/agent-paranoid-android/c5a04fab2e8b57dd11294673bc57ccdc516adbd6_20261006T065718Z_zagfrfk_/report.md
+R15 patch bounds seed before generator setup and caps persisted settings. Focused synthetic regressions:61passed; Ruff/mypy/OpenSpec strict/diff checks passed. Independent patch review found no bypass/regression. Schema regenerated. Full release gate and fresh exact-SHA audit remain pending.

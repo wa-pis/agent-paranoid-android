@@ -32,7 +32,7 @@ from test_data_agent.core.privacy import (
     SYNTHETIC_PREFIX,
     is_sensitive_field,
 )
-from test_data_agent.core.settings import GenerationMode
+from test_data_agent.core.settings import GenerationMode, MIN_GENERATION_SEED, MAX_GENERATION_SEED
 from test_data_agent.generation.constraint_solver import solve_constraints
 from test_data_agent.generation.limits import estimate_dataset_output_bytes, enforce_dataset_rule_work
 from test_data_agent.generation.semantic_provider import (
@@ -51,6 +51,8 @@ def generate_dataset(
     budget: GenerationBudget | None = None,
     semantic_provider: SemanticValueProvider | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
+    if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
+        raise GenerationLimitError("seed must be a signed 64-bit integer")
     assert_spec_safe(spec)
     budget = budget or GenerationBudget()
     budget.check("generation allocation preflight")
