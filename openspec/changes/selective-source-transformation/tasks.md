@@ -298,12 +298,12 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   actual explicit mappings may permute source values in local output only.
   Identity-pair rules, unmatched-preserve receipts and source-free disclosure
   checks remain; executable mapped-cell coverage and exact-SHA R3 evidence apply.
-- [ ] Expose substitution as a specification-level action separate from synthesis;
+- [x] Expose substitution as a specification-level action separate from synthesis;
   test saved wizard-policy parity with noninteractive CLI and Python execution.
-- [ ] Expose substitution, mapping references and unmatched-value handling in
+- [x] Expose substitution, mapping references and unmatched-value handling in
   the versioned data behavior profile; test save/load and profile-to-spec
   round trips, conflict rejection and separation from observed evidence.
-- [ ] Add a profile-review wizard that saves explicit field decisions; bulk
+- [x] Add a profile-review wizard that saves explicit field decisions; bulk
   acceptance must not bypass unresolved sensitivity conflicts or schema drift.
   - [x] Closed common CSV creation/decision/save/resume scenario: required seed,
     unknown/drop-only initial proposals, per-field action/sensitivity prompts,
@@ -548,3 +548,13 @@ Installed registered interfaces+linked domains+fictional finance9passed10.97s,
 contracts checked separately). RealTTY allowed; no guard patches/liveDB/AI.
 This closes supported implementation coverage, excludes internal formulas per
 owner, and leaves final contracts/docs/activation/capacity/RC gates open.
+
+2026-10-06 policy/profile/wizard implementation reconciled: BehaviorPolicy0.1
+separates substitute from synthesize; saved BatchProfile0.1 retains explicit
+policy/mapping/generation references and validation spec, without changing
+observed evidence. Installed batch suite consumes save/load/conflict, decision
+wizard, blank-policy SAVE/reopen and execution parity; actual common creation
+checks and9 registered/linked/finance cases supplement it. Unknown/sensitive
+fields require explicit decisions; receipts and drift guards stay independent.
+These implementation tasks close; common public activation/final contracts
+and exact-source review remain their own open gates.

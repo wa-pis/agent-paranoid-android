@@ -249,7 +249,10 @@ The private value-free review renders a positive metadata/profile signal as
 `observed_sensitivity=sensitive` and no positive signal as `unknown`, never as
 observed non-sensitive. Its comment uses fixed phrases derived from bounded
 metadata; arbitrary semantic labels and source values are not echoed. This
-review projection does not yet create the versioned behavior profile or wizard.
+review projection supplies the decision wizard. Versioned behavior policies
+and saved batch profiles retain explicit decisions and references; creating or
+saving them does not issue approval or execute transformation. Common public
+registration remains subject to its separate activation gate.
 
 The shared core parses and validates decisions without reading a source, opening
 a mapping file, executing a formula or generating data. CLI, wizard and agent
@@ -304,8 +307,9 @@ The owner-approved target precedence is a matching per-column key first, then
 a file-wide match, then the declared unmatched policy. Match the original cell
 once; never feed replacement text into another rule. Duplicate keys within a
 single table still reject. Matcher, private approval-material preflight and
-value-free trace support this precedence; public output execution remains
-unavailable. The value-free review reports whether file and
+value-free trace support this precedence. Registered single-source execution
+consumes reviewed policies; common saved-profile registration remains a
+prospective activation with separate safety gates. The value-free review reports whether file and
 column rules are configured, without showing their literals. No cascade or
 implicit two-step replacement is permitted.
 For all fields, a reachable mapped replacement may equal another source value.
