@@ -527,3 +527,9 @@ readback+mode consolidation closed by the same installed post-seed wheel's
 56 typed/policy tests,52 mode/boundary/SDK tests and12 public typed routes.
 This is executable implementation/intake evidence, not final RC acceptance.
 21/26 retain their explicit final-source safety/compatibility requirements.
+
+2026-10-06 retained target queue reconciled: all five completed; historical
+private fictional1M×100matrix12/12. Trino CSV1879.813s,Parquet1582.527s,
+SQL1533.779s; full readback/provenance/digest/cleanup. See hashed logs/state
+in sql-scale-acceptance.md. No repeat or new/runtime/publicRC claim; parent
+public/final-source capacity gates stay open.

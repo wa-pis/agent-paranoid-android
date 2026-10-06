@@ -60,3 +60,23 @@ postgres-postgresql_sql, child PID84733. Poll retained state; no duplicate runs.
 provenance, digest, worker lifecycle and temporary cleanup assertion passed.
 No SQL execution. Queue advanced to fictional Trino result → CSV; private
 fixture matrix9/12. Three Trino targets remain open; no network/server claims.
+
+## Completed retained target queue — reconciled 2026-10-06
+
+The existing b249699 queue completed all five stages. No large workload was
+rerun. Together with prior retained proofs, the historical private fictional
+matrix is 12/12 at 1M ×100, each with complete100M-cell readback, replacement
+provenance, digest and temporary cleanup assertions. This is the previously
+recorded wheel/harness, not post-R15 runtime, public registration, live Trino
+or final RC evidence. Public scale and final-source gates remain open.
+
+| Remaining Trino fixture route | Seconds | Output bytes | Log SHA256 |
+| --- | ---: | ---: | --- |
+| trino-csv | 1879.813 | 600001000 | `083ddeca512bca63f877c170527f52d694bedd4ac7fb335fedc2c8495e9e3cdf` |
+| trino-parquet | 1582.527 | 17493375 | `f6d920e43c99e6ca29f2b4edceca7171626cde1e401dffaf5e2479e47e71b89e` |
+| trino-postgresql_sql | 1533.779 | 2240002792 | `12d8c14b1a0a1aa5d31bdeee3521ea55df12f918d7ee75a3ef52bcfb79b031e1` |
+
+State SHA256: `047bb1a816df744aef4dc2b087eae8ff25301835cb5e1ce975ccad1191e86440`.
+Captured Trino fixture bytes17,207,555; explicit128MiB capture,1GiB CSV/Parquet
+and3GiB SQL output/file ceilings;3600s. Profiling-limit nulls identify the
+supplied-result harness, not measured Trino driver/server capacity.
