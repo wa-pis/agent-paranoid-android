@@ -267,3 +267,17 @@ validation and replacement/refusal workflow pass. Actual unavailable historical
 baseline was not provided; that test skipped explicitly, no simulated baseline.
 Logs registered.log, contract-repair.log, skill.log under same installedroot.
 This is current MCP1.28.1 SDK evidence, not a full Python/SDK/extras matrix or RC.
+
+## Installed common CLI/MCP consumer replay — 2026-10-06
+
+Same exact runtime6ef55a1/wheel76fc927c, Python3.11/MCP1.28.1, installed-only
+PYTHONPATH, actual-common CLI/MCP flags1. Selected unchanged reviewed batch tests
+21passed166deselected13.25s. Six cases use real registered MCPstdio with temporary/
+retained output and direct/fallback/no preservation; actual controllingTTY CLI
+receipt, missing/stale/escape/unknown-argument refusals, value-free responses,
+source-free profile coexistence and output readback asserted. Three runtimeflag
+positions use actual CLI. Creation matrix has six actual versionedCLI cases and
+six explicitly private unversioned adapter controls; not21publicwirecases.
+Log common-installed.log under same installedroot. No DB/provider/productpatch.
+This renews installed common-consumer evidence after security fixes; scale per
+public route, supported SDK/Python matrix, complete docs and RC gates stay open.

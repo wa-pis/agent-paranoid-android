@@ -463,3 +463,11 @@ Clientacceptance/resumption headings reconcile fresh completeaudit and current
 artifact with historical unavailable-review/zero-context notes; no broad task
 closure or new releasepermission. Originalper-finding decisions/privatewaiver
 remain; next contract/docs acceptance reconciliation, no repeatedscale/gate.
+
+2026-10-06 installed common CLI/MCP selectedacceptance21passed166deselected
+13.25s, same exactruntime6ef55a1/wheel76fc927c/Python3.11/MCP1.28.1.
+Sixactualstdio, threeactualCLIflags, sixactualcreation plus sixprivatecontrols;
+no inflated21wirecaseclaim. Details/log in routeevidence and installedpointer.
+Docs contract sampled against operation/schema/receipt/workspace controls;
+full documentation audit is not closed by this targeted pass. No new confirmed
+runtimeissue; continue final contract/docs disposition, not another sameaudit.
