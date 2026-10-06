@@ -509,3 +509,10 @@ Regression now includes troubleshooting;50documentationtestspass0.48s.
 Historical pre1.0 release record unchanged. No runtime/security-source changes
 or repeatedaudit. Remaining fullsemantic documentation/contract disposition,
 publicroutecapacity and finalversioned identity/releasegates still open.
+
+2026-10-06 reviewed firstCSV/relatedTables/CLIworkflows source-free docs and
+unchanged quickstart/relational executable scripts. Both scripts passed on
+same installed6ef55a1/wheel76fc927c in newtempoutputs with explicitPython,
+no sourcefallback or network. Currentartifact exampleevidence in clientacceptance;
+logs installedroot. No unchanged fullgate/scale/audit repeated. Completeallpage
+semantic audit and remaining releaseacceptance are not closed by twoexamples.

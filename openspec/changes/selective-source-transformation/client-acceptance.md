@@ -26,6 +26,19 @@ applicable. Do not repeat implemented fixes or accepted unchanged scale runs.
 Next reconcile remaining contract/documentation requirements against these
 specific dispositions; public activation and real release gates stay open.
 
+### Installed documented examples — 2026-10-06
+
+Same exact6ef55a1 development wheel76fc927c/Python3.11, installed-only
+PYTHONPATH and explicit TDA_PYTHON. Fully reviewed unchanged
+examples/csv_quickstart/run.sh and examples/relational_csv/run.sh each exited0
+using their checked-in fictional inputs and new temporary destinations.
+Both profile/infer/generate/revalidate sequences completed; relational scenario
+includes reviewed business rules. Logs example-csv.log/example-relational.log
+under /private/tmp/apa-r13-installed-a13c8a66. No provider/DB/network.
+This renews these documented examples on installed artifact, not every example
+or finalRC identity. Source-free quickstart/mode/decimal documentation reviewed
+against existing contracts without new contradictions or scope amendments.
+
 ## Current isolated registration checkpoint — 2026-10-05
 
 Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth
