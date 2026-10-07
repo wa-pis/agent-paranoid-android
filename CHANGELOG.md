@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare bounded closed MCP SQL sessions that reuse one frozen capture across
+  requests, consume existing local CLI approval receipts and retain workspace
+  output. Expiry and server shutdown clean captures; cleanup failures refuse
+  further session work. Public registration remains gated.
+
 - Prepare a closed one-session SQL CLI candidate that reviews one frozen
   capture, uses existing local preservation approval and retains validated
   output after temporary-input cleanup. Trino capture capacity is scoped to

@@ -4,7 +4,7 @@ No production tool registration or approval issuer. Public activation requires t
 completed wiring's independent safety review and matching policy amendments.
 """
 
-from typing import Any, Literal
+from typing import Any, Literal, TYPE_CHECKING
 from pathlib import Path
 from collections.abc import Mapping
 from test_data_agent.io.transformation_batch_profile import BatchProfile
@@ -17,6 +17,9 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.io.transformation_publish import _execute_reviewed_test_from_paths, TransformationCleanupError
 from test_data_agent.trino_work_budget import QueryWorkBudget, current_query_work_budget
+
+if TYPE_CHECKING:
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
 
 
 class _McpTransformationBudget(GenerationBudget):
@@ -135,3 +138,69 @@ def _configured_query_tools(root: Path, profile: BatchProfile, *, references: Ma
                 max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
                 budget=budget) as (captured_root, _):
             yield _common_batch_tool(captured_root)
+
+
+
+def _configured_query_session_tool(sessions: "_ConfiguredQuerySessions") -> Callable[..., dict[str, object]]:
+    """Closed server-injected session consumer; MCP never issues local approval."""
+    from test_data_agent.io.transformation_batch import TransformationBatchError
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded
+
+    def configured_query_session(operation: Literal["open", "review", "validate", "execute", "close"],
+            handle: str | None = None, profile: str | None = None, references: str | None = None,
+            snapshot_sha256: str | None = None, destination: str | None = None,
+            max_total_bytes: int | None = None, max_review_bytes: int | None = None,
+            max_output_bytes: int | None = None) -> dict[str, object]:
+        try:
+            if operation == "open":
+                if (profile is None or references is None or handle is not None
+                        or snapshot_sha256 is not None or destination is not None
+                        or max_total_bytes is None or max_review_bytes is None or max_output_bytes is None):
+                    raise ValueError
+                return sessions.open(profile, references, max_total_bytes=max_total_bytes,
+                    max_review_bytes=max_review_bytes, max_output_bytes=max_output_bytes)
+            if (handle is None or profile is not None or references is not None
+                    or any(value is not None for value in (max_total_bytes, max_review_bytes, max_output_bytes))):
+                raise ValueError
+            return sessions.consume(handle, operation, snapshot_sha256=snapshot_sha256, destination=destination)
+        except (TransformationLimitError, TransformationCleanupError, QueryWorkBudgetExceeded):
+            raise
+        except Exception:
+            sessions.refuse(handle)
+            raise TransformationBatchError("invalid SQL session request") from None
+
+    return configured_query_session
+
+
+
+def _approve_configured_query_session_locally(sessions: "_ConfiguredQuerySessions", handle: str) -> int:
+    """Owning server's local console/UI action; this callable is NEVER an MCP tool.
+
+    Local operator supplies the opaque handle shown by review. The existing CLI
+    approval handler resolves the owned batch and obtains controlling-TTY consent.
+    After it returns, remote validate/execute can consume that exact receipt.
+    """
+    from test_data_agent.cli_transformation_candidate import _candidate_batch_approve_main
+    return _candidate_batch_approve_main(sessions.local_approval_arguments(handle))
+
+
+
+@contextmanager
+def _configured_query_session_server(root: Path, *, max_active: int,
+        max_cumulative_bytes: int, max_seconds: float) -> Iterator[Any | None]:
+    """Closed boot composition: one bounded session owner for one MCP server.
+
+    Keep this context around the server run; finally closes every owned capture.
+    A local console may use the returned tools' handoff descriptor with existing
+    CLI approve; approval issuance is never registered as an MCP tool.
+    """
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+    from test_data_agent.mcp_generator_transport import create_generator_mcp
+
+    sessions = _ConfiguredQuerySessions(root, max_active=max_active,
+        max_cumulative_bytes=max_cumulative_bytes, max_seconds=max_seconds)
+    try:
+        yield create_generator_mcp([_configured_query_session_tool(sessions)], strict_arguments=True)
+    finally:
+        sessions.close()

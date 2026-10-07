@@ -1007,3 +1007,21 @@ and cleanup. Current candidate evidence records exact artifact and synthetic
 stream limits. No more scale replays planned; public activation/final SHA,
 independent approval and release gates remain open. Candidate troubleshooting
 added; strict docs passed0.41s. No version/tag/publication performed.
+
+2026-10-08 MCP owned SQL session bridge is being implemented and independently
+reviewed in parallel. Closed CLI commit79a39bc remains the last committed
+checkpoint. Review identified cleanup-error propagation/shutdown completeness
+requirements; implementation is addressing them before acceptance. No new
+full gate, final-SHA audit, public activation or release claimed.
+
+2026-10-08 closed MCP SQL-session bridge passed41 synthetic session/workflow
+tests2.05s and full production mypy148modules. Independent focused review
+passed9 lifecycle regressions1.20s after cleanup-error propagation repair.
+Opaque cross-request handles retain one capture; existing local CLI receipts
+authorize exact snapshots; parent-workspace output survives owned cleanup.
+Public registration/server shutdown wiring and final whole-SHA audit remain
+open. Logs/private/tmp/apa-query-session-root-{tests,mypy}.log.
+
+2026-10-08 closed server boot context now closes sessions in finally; its
+additional regression passed with all10sessiontests1.21s and Ruff. Isolated
+public registration composition is next; author registration remains closed.

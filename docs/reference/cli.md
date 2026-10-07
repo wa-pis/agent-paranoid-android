@@ -331,6 +331,11 @@ remain unchanged. Metadata retains its existing row ceiling, and statement,
 scan, time and transport limits still apply. A caller cannot raise capture
 limits above effective transformation policy/session ceilings.
 
-The MCP preparation candidate returns metadata from an owned frozen session.
-A cross-request local-receipt and retained-output bridge remains an acceptance
-requirement; do not interpret this preparation helper as complete SQL parity.
+The closed MCP SQL-session candidate now retains one frozen capture across
+review, validation and execution requests. It returns an opaque handle, digest
+and metadata for local CLI approval; MCP cannot issue approval. Session expiry,
+active-count and lifetime byte admission are bounded. Execution consumes the
+existing exact local receipt and publishes to a new child of the owning
+workspace. Expiry, refusal and shutdown clean the owned capture; cleanup
+failures refuse further work. Public registration and server shutdown wiring
+remain acceptance requirements before SQL parity is claimed.
