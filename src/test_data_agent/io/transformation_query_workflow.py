@@ -203,3 +203,38 @@ def _temporary_configured_query_profile(root: Path, profile: BatchProfile, *,
                 max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
                 budget=budget) as captured:
             yield captured
+
+
+
+def _load_configured_query_references(root: Path, path: str, *, max_bytes: int,
+        budget: GenerationBudget) -> Mapping[str, _ConfiguredQueryReference]:
+    """Strict bounded reference-file schema; never connection configuration."""
+    from typing import Literal
+    from pydantic import BaseModel, ConfigDict, Field
+    from test_data_agent.core.transformation_yaml import _load_private_yaml
+
+    class Reference(BaseModel):
+        model_config = ConfigDict(extra="forbid", strict=True)
+        adapter: Literal["postgres", "trino"]
+        source_id: str = Field(min_length=1, max_length=256)
+        entity: str = Field(min_length=1, max_length=256)
+        query_file: str = Field(min_length=1, max_length=4096)
+        max_rows: int = Field(gt=0, lt=2**63 - 1)
+        max_bytes: int = Field(gt=0, le=2**63 - 1)
+        max_seconds: float = Field(ge=0.1, le=3600, allow_inf_nan=False)
+
+    class References(BaseModel):
+        model_config = ConfigDict(extra="forbid", strict=True)
+        schema_version: Literal["0.1"]
+        queries: dict[str, Reference] = Field(min_length=1, max_length=1000)
+
+    try:
+        data = read_mapping_snapshot(root, path, max_bytes=max_bytes, budget=budget).payload
+        parsed = References.model_validate(_load_private_yaml(data, max_bytes))
+        return {source: _ConfiguredQueryReference(SqlQueryAdapter(item.adapter), item.source_id,
+            item.entity, item.query_file, item.max_rows, item.max_bytes, item.max_seconds)
+            for source, item in parsed.queries.items()}
+    except (GenerationLimitError, TransformationLimitError):
+        raise
+    except Exception:
+        raise TransformationBatchError("invalid configured SQL reference file") from None

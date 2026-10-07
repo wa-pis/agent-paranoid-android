@@ -839,3 +839,15 @@ Logs/private/tmp/apa-configured-query-preparation{,-mypy}.log. This is NOTfull
 publicSQLlifecycle: selected parent output and localTTY receipt must remain
 in the same owned capture session. Nextincrement implements one-invocation
 CLI using existing receipt/publisher, without recapture or a new registry.
+
+2026-10-08 closed CLI query-execute now parses bounded savedreferences and
+completes one capture/review/localTTY receipt-if-preserving/validatedretained
+publication innewparentdestination; rawsnapshots expirefinally. Actualargv
+CSV/Parquet/SQL, receiptaccept/refuse and destinationrace regressions passed.
+Trino capturecapacity now explicitlyscoped policy/sessionchecked rows+overflow
+sentinel anddecodedDBbytes; metadataoriginalrowcap/profiledefaults/scan/time/
+statement/transportlimits retained. Combined99passed1.46s/fullmypy149/Ruff,
+independentreviewer21passed0.84s/noconfirmedscopedfinding; strictdocs0.40s.
+Logs/private/tmp/apa-configured-sql-complete{,-mypy}.log. No1Mreplayneeded.
+Publicregistration and MCPcross-requestreceipt/outputbridge remainopen; final
+wholeSHAaudit cannotreuse these scopedreviews.

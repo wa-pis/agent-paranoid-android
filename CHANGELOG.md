@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare a closed one-session SQL CLI candidate that reviews one frozen
+  capture, uses existing local preservation approval and retains validated
+  output after temporary-input cleanup. Trino capture capacity is scoped to
+  explicit transformation limits without changing ordinary profiling defaults.
+
 - Prepare closed PostgreSQL/Trino capture bindings for the common transformation
   workflow, with frozen policy checks, shared limits and owned temporary
   snapshots consumed by candidate CLI/MCP interfaces without reconnecting.

@@ -201,6 +201,9 @@ def test_configured_query_references_use_owned_files_and_environment(tmp_path, m
         assert _candidate_configured_query_review(root=tmp_path, profile=profile,
             references=refs, max_total_bytes=65536, max_review_bytes=32768) == 0
         assert len(calls) == 4
+        with pytest.raises(TransformationBatchError):
+            tool("review", "batch.yaml", 65536, 32768, 65536)
+        assert len(calls) == 4
         assert all(not path.exists() for path in paths)
         assert not list(tmp_path.glob("*.query"))
 
@@ -251,3 +254,192 @@ def test_configured_mcp_rejects_parent_workspace_before_capture(tmp_path, monkey
                 max_total_bytes=65536, max_review_bytes=32768):
             pytest.fail("outside workspace admitted")
     assert not calls
+
+
+@pytest.mark.parametrize("output_format", ["csv", "parquet", "postgresql_sql"])
+def test_configured_cli_retains_selected_output_and_expires_capture(tmp_path, monkeypatch, capsys, output_format):
+    from test_data_agent.io.transformation_query_workflow import _ConfiguredQueryReference
+    from test_data_agent.core.transformation_policy import BehaviorPolicy
+    profile, bindings, captures = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    config = next(iter(bindings.values())).config
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: config))
+    (tmp_path / "input.sql").write_text("SELECT status FROM public.orders")
+    refs = {key: _ConfiguredQueryReference(SqlQueryAdapter.POSTGRES, "warehouse",
+        binding.request.entity, "input.sql", 3, 16384, 10.0) for key, binding in bindings.items()}
+    if output_format != "csv":
+        for item in profile.inputs:
+            path = tmp_path / item.policy
+            raw = yaml.safe_load(path.read_bytes())
+            raw["output"] = {"format": output_format, "fields": [
+                {"name": "label", "type": "string"}, {"name": "measured", "type": "integer"}]}
+            if output_format == "postgresql_sql":
+                raw["output"]["table"] = "summary"
+            policy = BehaviorPolicy.model_validate(raw)
+            path.write_bytes(dump_behavior_policy_yaml(policy, max_bytes=65536, budget=GenerationBudget(5)))
+    paths = []
+    calls = []
+
+    def capture(binding, *, max_seconds):
+        calls.append(binding)
+        paths.append(binding.request.query_file)
+        return captures[binding.request.entity_name]
+
+    monkeypatch.setattr("test_data_agent.io.transformation_postgres_capture._capture_configured_postgres", capture)
+    monkeypatch.setattr("test_data_agent.io.transformation_batch_receipt.issue_batch_receipt",
+        lambda *a, **k: pytest.fail("substitution does not require approval"))
+    from test_data_agent.cli_transformation_candidate import _candidate_common_main
+    (tmp_path / "profile.yaml").write_text(yaml.safe_dump(profile.model_dump(mode="json", exclude_unset=True)))
+    (tmp_path / "references.yaml").write_text(yaml.safe_dump({"schema_version": "0.1", "queries": {
+        key: {"adapter": reference.adapter.value, "source_id": reference.source_id,
+            "entity": reference.entity, "query_file": reference.query_file,
+            "max_rows": reference.max_rows, "max_bytes": reference.max_bytes,
+            "max_seconds": reference.max_seconds} for key, reference in refs.items()}}))
+    assert _candidate_common_main(["query-execute", str(tmp_path), "profile.yaml", "references.yaml",
+        "selected", "--max-total-input-bytes", "65536", "--max-review-bytes", "32768",
+        "--max-output-bytes", "65536"]) == 0
+    assert len(calls) == 2 and all(not path.exists() for path in paths)
+    suffix = {"csv": "csv", "parquet": "parquet", "postgresql_sql": "sql"}[output_format]
+    outputs = list((tmp_path / "selected").glob(f"*.{suffix}"))
+    assert len(outputs) == 2
+    if output_format == "parquet":
+        assert pq.read_table(outputs[0]).to_pylist() == [{"label": "gamma", "measured": 8}, {"label": "delta", "measured": 7}]
+    else:
+        assert "gamma" in outputs[0].read_text()
+        assert "alpha" not in outputs[0].read_text()
+    assert "alpha" not in capsys.readouterr().out
+    assert not list(tmp_path.glob("*.query"))
+
+
+@pytest.mark.parametrize("fault", ["existing", "traversal", "symlink", "output_limit"])
+def test_configured_cli_destination_and_output_limits_refuse_before_capture(tmp_path, monkeypatch, fault):
+    from test_data_agent.cli_transformation_candidate import _candidate_configured_query_execute
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    profile, _, _ = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    calls = []
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: calls.append(True)))
+    destination = "selected"
+    cap = 65536
+    if fault == "existing":
+        (tmp_path / destination).mkdir()
+    elif fault == "traversal":
+        destination = "../selected"
+    elif fault == "symlink":
+        (tmp_path / destination).symlink_to(tmp_path / "missing")
+    else:
+        monkeypatch.setenv("TEST_DATA_AGENT_MAX_OUTPUT_BYTES", "1024")
+    with pytest.raises((ValueError, TransformationLimitError)):
+        _candidate_configured_query_execute(root=tmp_path, profile=profile, references={},
+            destination=destination, max_total_bytes=65536, max_review_bytes=32768,
+            max_output_bytes=cap)
+    assert not calls
+
+
+@pytest.mark.parametrize("approve", [False, True])
+def test_configured_cli_preservation_uses_existing_tty_receipt(tmp_path, monkeypatch, approve):
+    from test_data_agent.cli_transformation_candidate import _candidate_configured_query_execute
+    from test_data_agent.io.transformation_query_workflow import _ConfiguredQueryReference
+    from test_data_agent.core.transformation_policy import BehaviorPolicy
+    from test_data_agent.io.transformation_receipt import LocalReceiptError
+    profile, bindings, captures = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    config = next(iter(bindings.values())).config
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: config))
+    (tmp_path / "input.sql").write_text("SELECT status FROM public.orders")
+    refs = {key: _ConfiguredQueryReference(SqlQueryAdapter.POSTGRES, "warehouse",
+        binding.request.entity, "input.sql", 3, 16384, 10.0) for key, binding in bindings.items()}
+    path = tmp_path / profile.inputs[0].policy
+    raw = yaml.safe_load(path.read_bytes())
+    raw["fields"][0]["behavior"] = {"action": "preserve", "authorization_ref": "local", "comment": "Fictional local review"}
+    policy = BehaviorPolicy.model_validate(raw)
+    path.write_bytes(dump_behavior_policy_yaml(policy, max_bytes=65536, budget=GenerationBudget(5)))
+    paths, approvals = [], []
+
+    def capture(binding, *, max_seconds):
+        paths.append(binding.request.query_file)
+        return captures[binding.request.entity_name]
+
+    def refusal(batch, receipt, **kwargs):
+        approvals.append(batch.snapshot_sha256)
+        paths.append(receipt)
+        raise LocalReceiptError("local batch confirmation failed")
+
+    monkeypatch.setattr("test_data_agent.io.transformation_postgres_capture._capture_configured_postgres", capture)
+    if approve:
+        import os
+        from test_data_agent.io import transformation_batch_receipt as issuer
+        original_open = os.open
+        tty = tmp_path / "fictional-tty"
+        tty.write_bytes(b"")
+        def open_tty(path, flags, *args, **kwargs):
+            return original_open(tty if path == "/dev/tty" else path, flags, *args, **kwargs)
+        def confirmed(fd, review, digest):
+            assert fd >= 0 and digest == __import__("json").loads(review)["snapshot_sha256"]
+            approvals.append(digest)
+        monkeypatch.setattr(os, "open", open_tty)
+        monkeypatch.setattr(issuer, "_confirm_tty_fd", confirmed)
+        assert _candidate_configured_query_execute(root=tmp_path, profile=profile, references=refs,
+            destination="selected", max_total_bytes=65536, max_review_bytes=32768,
+            max_output_bytes=65536) == 0
+        assert "alpha" in (tmp_path / "selected" / "input-0.csv").read_text()
+        assert not list((tmp_path / "selected").glob("*receipt*"))
+    else:
+        monkeypatch.setattr("test_data_agent.io.transformation_batch_receipt.issue_batch_receipt", refusal)
+        monkeypatch.setattr("test_data_agent.io.transformation_batch._publish_retained_test_batch",
+            lambda *a, **k: pytest.fail("refused approval must not publish"))
+        with pytest.raises(LocalReceiptError):
+            _candidate_configured_query_execute(root=tmp_path, profile=profile, references=refs,
+                destination="selected", max_total_bytes=65536, max_review_bytes=32768,
+                max_output_bytes=65536)
+        assert not (tmp_path / "selected").exists()
+    assert len(approvals) == 1
+    assert all(not path.exists() for path in paths)
+
+
+def test_configured_cli_unknown_arguments_and_reference_secrets_are_redacted(tmp_path, capsys):
+    from test_data_agent.cli_transformation_candidate import _candidate_common_main
+    canary = "fictional-secret-should-not-reflect"
+    with pytest.raises(SystemExit):
+        _candidate_common_main(["query-execute", "--unknown=" + canary])
+    assert canary not in capsys.readouterr().err
+
+
+def test_configured_cli_reference_config_is_refused_without_reflecting_values(tmp_path, monkeypatch, capsys):
+    from test_data_agent.cli_transformation_candidate import _candidate_common_main
+    profile, _, _ = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    (tmp_path / "profile.yaml").write_text(yaml.safe_dump(profile.model_dump(mode="json", exclude_unset=True)))
+    canary = "fictional-secret-should-not-reflect"
+    (tmp_path / "references.yaml").write_text(yaml.safe_dump({"schema_version": "0.1", "queries": {
+        "capture0.query": {"adapter": "postgres", "source_id": "warehouse", "entity": "summary0",
+            "query_file": "input.sql", "max_rows": 3, "max_bytes": 16384, "max_seconds": 10.0,
+            "password": canary}}}))
+    calls = []
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: calls.append(True)))
+    assert _candidate_common_main(["query-execute", str(tmp_path), "profile.yaml", "references.yaml",
+        "selected", "--max-total-input-bytes", "65536", "--max-review-bytes", "32768",
+        "--max-output-bytes", "65536"]) != 0
+    output = capsys.readouterr()
+    assert canary not in output.out + output.err
+    assert not calls and not (tmp_path / "selected").exists()
+
+
+
+def test_configured_cli_refuses_destination_created_during_capture(tmp_path, monkeypatch):
+    from test_data_agent.cli_transformation_candidate import _candidate_configured_query_execute
+    from test_data_agent.io.transformation_query_workflow import _ConfiguredQueryReference
+    profile, bindings, captures = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    config = next(iter(bindings.values())).config
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: config))
+    (tmp_path / "input.sql").write_text("SELECT status FROM public.orders")
+    refs = {key: _ConfiguredQueryReference(SqlQueryAdapter.POSTGRES, "warehouse",
+        binding.request.entity, "input.sql", 3, 16384, 10.0) for key, binding in bindings.items()}
+    paths = []
+    def capture(binding, *, max_seconds):
+        paths.append(binding.request.query_file)
+        (tmp_path / "selected").mkdir(exist_ok=True)
+        return captures[binding.request.entity_name]
+    monkeypatch.setattr("test_data_agent.io.transformation_postgres_capture._capture_configured_postgres", capture)
+    with pytest.raises(ValueError, match="configured SQL destination changed"):
+        _candidate_configured_query_execute(root=tmp_path, profile=profile, references=refs,
+            destination="selected", max_total_bytes=65536, max_review_bytes=32768,
+            max_output_bytes=65536)
+    assert not list((tmp_path / "selected").iterdir())
+    assert all(not path.exists() for path in paths)

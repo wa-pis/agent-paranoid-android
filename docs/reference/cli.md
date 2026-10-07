@@ -304,3 +304,33 @@ Aliases:
 
 - `profile-csv-folder` is an alias for `profile-example`;
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
+
+
+### Closed configured SQL session candidate
+
+The unregistered common CLI candidate includes `query-execute` for a single
+owned session. It reads a saved batch profile and a bounded reference file,
+captures each configured query once, displays metadata review, requests the
+existing local controlling-TTY receipt when preservation requires it, and
+validates before retaining output in a new directory in the parent workspace.
+Captured inputs and session receipts expire on command completion or failure.
+This candidate is not an installed 1.5.0 command or a dataset approval.
+
+The reference file has `schema_version: "0.1"` and a `queries` mapping keyed by
+batch input source reference. Each entry contains `adapter` (`postgres` or
+`trino`), `source_id`, `entity`, `query_file`, `max_rows`, `max_bytes` and
+`max_seconds`. Query files are bounded relative workspace references. PostgreSQL
+source IDs must match administrator configuration; the configured Trino source
+ID is `trino`. Endpoints, credentials, callbacks and driver factories are not
+accepted in this file. Connection authority comes from existing administrator
+environment settings and allowlists.
+
+Capture-specific Trino row and cumulative decoded-result byte limits use the
+explicit authorized `max_rows` and `max_bytes`; ordinary profiling defaults
+remain unchanged. Metadata retains its existing row ceiling, and statement,
+scan, time and transport limits still apply. A caller cannot raise capture
+limits above effective transformation policy/session ceilings.
+
+The MCP preparation candidate returns metadata from an owned frozen session.
+A cross-request local-receipt and retained-output bridge remains an acceptance
+requirement; do not interpret this preparation helper as complete SQL parity.

@@ -227,6 +227,8 @@ def _candidate_batch_approve_main(argv: list[str], *, versioned_output: bool = F
 
 def _candidate_common_main(argv: list[str], *, versioned_output: bool = False) -> int:
     """Single closed workflow entry; never registered by the production CLI."""
+    if argv and argv[0] == "query-execute":
+        return _candidate_configured_query_command(argv[1:])
     if argv and argv[0] in {"review", "validate", "execute"}:
         return _candidate_batch_main(argv, versioned_output=versioned_output)
     if argv and argv[0] == "approve":
@@ -312,3 +314,103 @@ def _candidate_configured_query_review(*, root: Path, profile: BatchProfile,
         return _candidate_common_main(["review", str(captured_root), "batch.yaml",
             "--max-total-input-bytes", str(max_total_bytes), "--max-review-bytes",
             str(max_review_bytes), "--max-output-bytes", str(max_total_bytes)])
+
+
+
+def _candidate_configured_query_execute(*, root: Path, profile: BatchProfile,
+        references: Mapping[str, _ConfiguredQueryReference], destination: str,
+        max_total_bytes: int, max_review_bytes: int, max_output_bytes: int,
+        budget: GenerationBudget | None = None) -> int:
+    """Closed one-invocation review/TTY approval/execution on one frozen capture.
+
+    Only final validated artifacts survive in the chosen parent workspace.
+    Receipts and raw captured inputs remain owned temporary session files.
+    """
+    from test_data_agent.io.transformation_batch import review_batch, _publish_retained_test_batch
+    from test_data_agent.io.transformation_batch_receipt import issue_batch_receipt
+    from test_data_agent.io.transformation_query_workflow import _temporary_configured_query_profile
+
+    import stat
+    from test_data_agent.io.path_policy import path_identity, _parent_descriptor, _stat_at
+
+    relative = Path(destination)
+    if (not root.is_absolute() or not destination or relative.is_absolute()
+            or len(relative.parts) != 1 or relative.name in {".", ".."}
+            or (root / relative).exists() or (root / relative).is_symlink()
+            or type(max_review_bytes) is not int or max_review_bytes < 1
+            or type(max_output_bytes) is not int or max_output_bytes < 1):
+        raise ValueError("invalid configured SQL destination or limits") from None
+    parent_identity = path_identity(root)
+    if not stat.S_ISDIR(parent_identity.mode):
+        raise ValueError("invalid configured SQL workspace") from None
+    with _parent_descriptor(root / relative) as (parent, name):
+        if _stat_at(parent, name) is not None:
+            raise ValueError("configured SQL destination must be new") from None
+    resolve_input_limit(InputDimension.OUTPUT_BYTES, profile.resource_limits, os.environ).check(
+        max_output_bytes, requested=True)
+    budget = budget if budget is not None else GenerationBudget()
+    budget.check("configured SQL invocation")
+    with _temporary_configured_query_profile(root, profile, references=references,
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+            budget=budget) as (captured_root, batch):
+        review = review_batch(batch, max_total_bytes=max_total_bytes,
+            max_review_bytes=max_review_bytes, budget=budget)
+        _write_common_result({"status": "review_only", "review": json.loads(review)}, versioned_output=False)
+        needs_confirmation = any(field["preserves_original"]
+            for item in json.loads(review)["inputs"] for field in item["local_plan"]["fields"])
+        receipt = None
+        if needs_confirmation:
+            receipt = captured_root / "local-session-receipt.json"
+            issue_batch_receipt(batch, receipt, max_total_bytes=max_total_bytes,
+                max_review_bytes=max_review_bytes, budget=budget)
+        if path_identity(root) != parent_identity:
+            raise ValueError("configured SQL workspace changed") from None
+        with _parent_descriptor(root / relative) as (parent, name):
+            if _stat_at(parent, name) is not None:
+                raise ValueError("configured SQL destination changed") from None
+        summary = _publish_retained_test_batch(batch, root / relative,
+            expected_snapshot_sha256=batch.snapshot_sha256,
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+            max_output_bytes=max_output_bytes, budget=budget, receipt_path=receipt)
+    _write_common_result({"status": "closed_publication_completed", "summary": json.loads(summary)}, versioned_output=False)
+    return 0
+
+
+
+def _candidate_configured_query_command(argv: list[str]) -> int:
+    """Parseable closed SQL CLI; one invocation owns the complete row lifecycle."""
+    from test_data_agent.cli_contract import CliErrorCode
+    from test_data_agent.cli_presenter import report_cli_error
+    from test_data_agent.io.transformation_batch_profile import capture_batch_profile
+    from test_data_agent.core.transformation_yaml import _load_private_yaml
+    from test_data_agent.io.transformation_query_workflow import _load_configured_query_references
+    from test_data_agent.core.transformation_limits import TransformationLimitError
+    from test_data_agent.io.transformation_publish import TransformationCleanupError
+    from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded
+
+    parser = _CandidateArgumentParser(prog="closed-common-transform query-execute", json_errors=True)
+    parser.add_argument("root", type=Path)
+    parser.add_argument("profile")
+    parser.add_argument("references")
+    parser.add_argument("destination")
+    parser.add_argument("--max-total-input-bytes", type=int, required=True)
+    parser.add_argument("--max-review-bytes", type=int, required=True)
+    parser.add_argument("--max-output-bytes", type=int, required=True)
+    args = parser.parse_args(argv)
+    args.command, args.json_output, args.debug = "closed-query-execute", True, False
+    try:
+        root = args.root.absolute()
+        budget = GenerationBudget()
+        data = capture_batch_profile(root, args.profile,
+            max_total_bytes=args.max_total_input_bytes, budget=budget)
+        profile = BatchProfile.model_validate(_load_private_yaml(data, args.max_total_input_bytes))
+        references = _load_configured_query_references(root, args.references,
+            max_bytes=min(args.max_total_input_bytes, DEFAULT_MAX_PROFILE_PAYLOAD_BYTES), budget=budget)
+        return _candidate_configured_query_execute(root=root, profile=profile, references=references,
+            destination=args.destination, max_total_bytes=args.max_total_input_bytes,
+            max_review_bytes=args.max_review_bytes, max_output_bytes=args.max_output_bytes, budget=budget)
+    except (TransformationLimitError, TransformationCleanupError, QueryWorkBudgetExceeded) as error:
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
+    except (ValueError, OSError):
+        return report_cli_error(args, code=CliErrorCode.INVALID_INPUT,
+            message="invalid configured SQL invocation; no completion confirmed")
