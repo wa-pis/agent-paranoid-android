@@ -639,3 +639,11 @@ refuse before connect; authorized no-row schema must match output aliases.
 Synthetic success, schema drift and three pre-connect refusal regressions:
 5passed0.27s; Ruff passed. No live DB/public registration; metadata-to-Arrow
 conversion and owned-worker composition remain next, not complete SQL activation.
+
+2026-10-07 PostgreSQL native capture-schema increment: explicit scalar types,
+exact numeric/decimal(p,s) only at precision<=38, preserved widths/nullability;
+unbounded numeric, unsupported arrays/JSON and timestamps reject without coercion.
+8focused synthetic tests passed0.26s; Ruff passed. Closed helper only; real
+no-row descriptions must retain numeric precision/scale before composition.
+Timestamp support and worker-owned metadata/capture composition remain open;
+no new public capability or final SHA acceptance claimed.

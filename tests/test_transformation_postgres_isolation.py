@@ -390,3 +390,27 @@ def test_capture_metadata_uses_only_authorized_no_row_schema(tmp_path, monkeypat
         columns, result = _discover_postgres_capture_metadata(request, config, driver=object())
         assert columns[0].name == "status" and result[0].name == "label"
     assert events == ["closed"]
+
+
+@pytest.mark.parametrize("kind", ["numeric", "numeric(39,2)", "numeric(4,5)",
+    "numeric(8,-2)", "jsonb", "integer[]", "timestamp without time zone"])
+def test_capture_schema_refuses_lossy_or_unsupported_metadata(kind):
+    from test_data_agent.io.transformation_postgres_capture import _postgres_capture_schema
+    from test_data_agent.postgres_client import PostgresResultColumn
+
+    with pytest.raises(ValueError, match="unsupported PostgreSQL capture schema") as caught:
+        _postgres_capture_schema((PostgresResultColumn("value", kind, True),))
+    assert caught.value.__context__ is None
+
+
+def test_capture_schema_preserves_exact_decimal_width_and_nullability():
+    import pyarrow as pa
+    from test_data_agent.io.transformation_postgres_capture import _postgres_capture_schema
+    from test_data_agent.postgres_client import PostgresResultColumn
+
+    schema = _postgres_capture_schema((PostgresResultColumn("amount", "numeric(38, 6)", False),
+        PostgresResultColumn("count", "integer", True)))
+    assert schema.field("amount").type == pa.decimal128(38, 6)
+    assert schema.field("amount").nullable is False
+    assert schema.field("count").type == pa.int32()
+    assert schema.field("count").nullable is True
