@@ -44,3 +44,10 @@ decimal/date/null readback, value-free CLI/application-MCP review/execution,
 input integrity and cleanup checked. SQL inputs use injected synthetic Arrow
 streams; SQL outputs never execute. No DB, SDK-wire12route or scale claim.
 Log `/private/tmp/apa-final-current-routes.log`.
+
+2026-10-07 mandatory installed CSV scale:300000rows x50columns passed
+(15M cells),174.948s,90150450 output bytes. Explicit512MiB/1800s budgets;
+complete ordered readback, input digest, provenance and cleanup assertions.
+Exact268efc9a/wheel430e0405/Python3.11; log
+`/private/tmp/apa-final-current-scale300k.log`, exit0. Private replacement-only
+CSV route, not public/12route scale or peak-memory containment evidence.

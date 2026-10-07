@@ -945,3 +945,9 @@ read unchanged accept_transformation_csv_scale.py; explicit512MiB/1800s
 budgets, fictional temporary fixtures, no DB/provider/preservation receipt.
 Running session52436; log/private/tmp/apa-final-current-scale300k.log. Do not
 claim pass until full readback/cleanup and exit0. Target1M x100 remains separate.
+
+2026-10-07 mandatory300kx50 installed CSV scale passed174.948s/15Mcells;
+full readback/cleanup, exit0. Target1Mx100 CSV started using same reviewed
+harness/candidate with explicit1GiB input/output and1800s (512MiB would be
+below the fixture source size); no implicit escalation. Session12476; log
+/private/tmp/apa-final-current-scale1m.log. Other scale routes remain open.
