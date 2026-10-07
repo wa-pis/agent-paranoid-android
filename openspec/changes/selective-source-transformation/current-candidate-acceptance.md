@@ -73,3 +73,10 @@ passed. Same exact268efc9a/wheel430e0405/Python3.11. Log
 clock exceeded30minutes while harness monotonic elapsed stayed below1800s;
 clock/scheduling discrepancy is unresolved, not evidence of a deadline bypass.
 This passes the harness contract only; no hard wall-clock/RSS containment claim.
+
+2026-10-07 supplied synthetic Trino-result->CSV1Mx100 passed exit0,
+1320.548s harness monotonic elapsed,100Mcells,600001000output bytes; capture
+17207555bytes. Explicit2GiB/128MiB capture/3600s, exact268efc9a/wheel430e0405/
+Python3.11. Ordered full readback, source digest, provenance, stream lifecycle
+and cleanup passed. No database connection or live Trino adapter proof.
+Log `/private/tmp/apa-final-current-scale-trino1m-csv.log`.

@@ -984,3 +984,7 @@ installed exact268efc9a/wheel430e0405. Fully read unchanged SQL scale harness;
 injected fictional Arrow stream, no network/server. Explicit2GiB/128MiB
 capture/3600s; session34556 log/private/tmp/apa-final-current-scale-trino1m-csv.log.
 No pass yet; supplied-stream proof will not certify a live Trino adapter.
+
+2026-10-07 session34556 completed exit0:synthetic Trino-result->CSV1Mx100
+passed1320.548s/100Mcells with full readback/cleanup; current evidence updated.
+Remaining supplied Trino target outputs:Parquet and SQL artifact.
