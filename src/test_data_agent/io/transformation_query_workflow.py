@@ -135,3 +135,71 @@ def _temporary_query_batch_profile(root: Path, profile: BatchProfile, *,
             _captured_query_sources=captured,
             _captured_query_policies=policy_snapshots) as materialized:
         yield materialized
+
+
+@dataclass(frozen=True, repr=False)
+class _ConfiguredQueryReference:
+    """Value-free local reference; no endpoint, credentials or driver callback."""
+    adapter: SqlQueryAdapter
+    source_id: str
+    entity: str
+    query_file: str
+    max_rows: int
+    max_bytes: int
+    max_seconds: float
+
+
+@contextmanager
+def _temporary_configured_query_profile(root: Path, profile: BatchProfile, *,
+        references: Mapping[str, _ConfiguredQueryReference], max_total_bytes: int,
+        max_review_bytes: int, budget: GenerationBudget,
+        ) -> Iterator[tuple[Path, TransformationBatch]]:
+    """Closed CLI/MCP preparation; one capture, then frozen local consumers.
+
+    Connections come exclusively from existing administrator environment config.
+    Query files are bounded workspace snapshots, never arbitrary caller paths.
+    The returned root lives only for this context; do not persist row snapshots.
+    """
+    from tempfile import TemporaryDirectory
+    from test_data_agent.io.path_policy import atomic_write_bytes
+    from test_data_agent.sql_query_source import SqlQueryProfileLimits
+
+    with TemporaryDirectory(prefix="apa-owned-query-references-") as temporary:
+        bindings: dict[str, _QueryBatchInput] = {}
+        consumed = 0
+        try:
+            if not references or set(references) - {item.source for item in profile.inputs}:
+                raise ValueError
+            for index, (source, reference) in enumerate(references.items()):
+                if type(reference) is not _ConfiguredQueryReference or type(reference.adapter) is not SqlQueryAdapter:
+                    raise ValueError
+                limits = SqlQueryProfileLimits.from_env()
+                query = read_mapping_snapshot(root, reference.query_file,
+                    max_bytes=min(limits.max_query_bytes, max_total_bytes), budget=budget,
+                    total_limit=EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "batch_input_run"),
+                    consumed_bytes=consumed).payload
+                consumed += len(query)
+                query_path = Path(temporary).resolve() / f"query-{index}.sql"
+                atomic_write_bytes(query_path, query)
+                request = SqlQueryProfileRequest(reference.adapter, reference.source_id,
+                    reference.entity, query_path, limits)
+                request.validate()
+                config: PostgresConfig | TrinoConfig
+                if reference.adapter is SqlQueryAdapter.POSTGRES:
+                    config = PostgresConfig.from_env()
+                    if reference.source_id != config.source_id:
+                        raise ValueError
+                else:
+                    config = TrinoConfig.from_env()
+                    if reference.source_id != "trino":
+                        raise ValueError
+                bindings[source] = _QueryBatchInput(request, config, reference.max_rows,
+                    reference.max_bytes, reference.max_seconds)
+        except (GenerationLimitError, TransformationLimitError, QueryWorkBudgetExceeded):
+            raise
+        except Exception:
+            raise TransformationBatchError("invalid configured SQL reference") from None
+        with _temporary_query_batch_profile(root, profile, queries=bindings,
+                max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+                budget=budget) as captured:
+            yield captured

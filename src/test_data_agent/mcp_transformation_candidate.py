@@ -6,6 +6,9 @@ completed wiring's independent safety review and matching policy amendments.
 
 from typing import Any, Literal
 from pathlib import Path
+from collections.abc import Mapping
+from test_data_agent.io.transformation_batch_profile import BatchProfile
+from test_data_agent.io.transformation_query_workflow import _ConfiguredQueryReference
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 
@@ -117,3 +120,18 @@ def _common_batch_tool(root: Path) -> Callable[..., dict[str, object]]:
             return run_batch_workflow(request, budget=budget).metadata()
 
     return common_transformation
+
+
+@contextmanager
+def _configured_query_tools(root: Path, profile: BatchProfile, *, references: Mapping[str, _ConfiguredQueryReference],
+        max_total_bytes: int, max_review_bytes: int) -> Iterator[Callable[..., dict[str, object]]]:
+    """Closed server-owned preparation; review/execute never reconnect."""
+    from test_data_agent.io.transformation_query_workflow import _temporary_configured_query_profile
+    from test_data_agent.mcp_generator_server import resolve_workspace_path
+
+    root = resolve_workspace_path(str(root), must_exist=True, expect_directory=True)
+    with _mcp_transformation_budget() as budget:
+        with _temporary_configured_query_profile(root, profile, references=references,
+                max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+                budget=budget) as (captured_root, _):
+            yield _common_batch_tool(captured_root)

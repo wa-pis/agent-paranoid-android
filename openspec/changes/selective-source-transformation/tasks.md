@@ -829,3 +829,13 @@ dependency-manifest compatibility; output removed. Logs
 3216pass23skip90.53%; no unchangedsuite replay. This closes split local gate
 for frozen prospective composition plus recorded test-only repair, not final
 versionedRC/sourceaudit. Public SQL reference integration resumed in parallel.
+
+2026-10-07 configured SQL references prepared using existing administrator
+environment config only; bounded workspace query snapshots feed one owned
+common session. Closed CLI review is explicitly one-shot/expired on return;
+MCP parent workspace resolves before capture.20synthetic tests passed0.84s,
+fullmypy149modules passed/Ruff; focusedcontractreview no confirmedvulnerability.
+Logs/private/tmp/apa-configured-query-preparation{,-mypy}.log. This is NOTfull
+publicSQLlifecycle: selected parent output and localTTY receipt must remain
+in the same owned capture session. Nextincrement implements one-invocation
+CLI using existing receipt/publisher, without recapture or a new registry.

@@ -5,6 +5,9 @@ end-to-end evidence and independent review of the completed wiring.
 """
 
 from pathlib import Path
+from collections.abc import Mapping
+from test_data_agent.io.transformation_batch_profile import BatchProfile
+from test_data_agent.io.transformation_query_workflow import _ConfiguredQueryReference
 from typing import Never
 import argparse
 import json
@@ -288,3 +291,24 @@ def _candidate_batch_create_main(argv: list[str], *, versioned_output: bool = Fa
     _write_common_result({"status": "common_configuration_saved", "approved": False,
         "snapshot_sha256": saved.snapshot_sha256}, versioned_output=versioned_output)
     return 0
+
+
+
+def _candidate_configured_query_review(*, root: Path, profile: BatchProfile,
+        references: Mapping[str, _ConfiguredQueryReference], max_total_bytes: int, max_review_bytes: int) -> int:
+    """Closed trusted preparation followed by existing value-free CLI consumer.
+
+    Caller arguments cannot supply an endpoint, config or driver factory.
+    This one-shot review intentionally expires its snapshot on return; a review
+    receipt lifecycle must use an owned session, never silently recapture.
+    """
+    from test_data_agent.io.transformation_query_workflow import _temporary_configured_query_profile
+
+    if not isinstance(profile, BatchProfile) or not isinstance(references, Mapping):
+        raise ValueError("invalid configured SQL profile") from None
+    with _temporary_configured_query_profile(root, profile, references=references,
+            max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
+            budget=GenerationBudget()) as (captured_root, _):
+        return _candidate_common_main(["review", str(captured_root), "batch.yaml",
+            "--max-total-input-bytes", str(max_total_bytes), "--max-review-bytes",
+            str(max_review_bytes), "--max-output-bytes", str(max_total_bytes)])

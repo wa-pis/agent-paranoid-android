@@ -145,3 +145,109 @@ def test_remaining_generation_deadline_is_not_reset():
     now[0] = 11
     with pytest.raises(GenerationLimitError):
         budget.remaining_seconds()
+
+
+@pytest.mark.parametrize("fault", [None, "source", "traversal", "symlink", "missing"])
+def test_configured_query_references_use_owned_files_and_environment(tmp_path, monkeypatch, fault):
+    from test_data_agent.io.transformation_query_workflow import (
+        _ConfiguredQueryReference, _temporary_configured_query_profile,
+    )
+    from test_data_agent.mcp_transformation_candidate import _configured_query_tools
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
+    profile, bindings, captures = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    config = next(iter(bindings.values())).config
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: config))
+    query = tmp_path / "input.sql"
+    query.write_text("SELECT status FROM public.orders")
+    refs = {key: _ConfiguredQueryReference(SqlQueryAdapter.POSTGRES, "warehouse",
+        binding.request.entity, "input.sql", binding.max_rows, binding.max_bytes,
+        binding.max_seconds) for key, binding in bindings.items()}
+    key = next(iter(refs))
+    if fault == "source":
+        refs[key] = replace(refs[key], source_id="other")
+    elif fault == "traversal":
+        refs[key] = replace(refs[key], query_file="../input.sql")
+    elif fault == "symlink":
+        (tmp_path / "link.sql").symlink_to(query)
+        refs[key] = replace(refs[key], query_file="link.sql")
+    elif fault == "missing":
+        refs[key] = replace(refs[key], query_file="missing.sql")
+    calls = []
+    paths = []
+
+    def capture(binding, *, max_seconds):
+        calls.append(binding)
+        paths.append(binding.request.query_file)
+        assert binding.request.query_file.parent != tmp_path
+        assert binding.request.query_file.read_text() == query.read_text()
+        return captures[binding.request.entity_name]
+
+    monkeypatch.setattr("test_data_agent.io.transformation_postgres_capture._capture_configured_postgres", capture)
+    if fault is not None:
+        with pytest.raises(TransformationBatchError, match="invalid configured SQL reference"):
+            with _temporary_configured_query_profile(tmp_path, profile, references=refs,
+                    max_total_bytes=65536, max_review_bytes=32768, budget=GenerationBudget(30)):
+                pytest.fail("refused reference entered capture")
+        assert calls == []
+    else:
+        with _configured_query_tools(tmp_path, profile, references=refs,
+                max_total_bytes=65536, max_review_bytes=32768) as tool:
+            first = tool("review", "batch.yaml", 65536, 32768, 65536)
+            second = tool("review", "batch.yaml", 65536, 32768, 65536)
+            assert first == second
+            assert len(calls) == 2
+            assert "alpha" not in str(first)
+        from test_data_agent.cli_transformation_candidate import _candidate_configured_query_review
+        assert _candidate_configured_query_review(root=tmp_path, profile=profile,
+            references=refs, max_total_bytes=65536, max_review_bytes=32768) == 0
+        assert len(calls) == 4
+        assert all(not path.exists() for path in paths)
+        assert not list(tmp_path.glob("*.query"))
+
+
+@pytest.mark.parametrize("source_id", ["trino", "unregistered"])
+def test_configured_trino_reference_uses_deployment_config(tmp_path, monkeypatch, source_id):
+    from contextlib import contextmanager
+    from test_data_agent.io import transformation_query_workflow as workflow
+    from test_data_agent.trino_config import TrinoConfig
+    profile, bindings, _ = fixture(tmp_path, SqlQueryAdapter.TRINO)
+    (tmp_path / "query.sql").write_text("SELECT status FROM lake.safe.orders")
+    configured = next(iter(bindings.values())).config
+    monkeypatch.setattr(TrinoConfig, "from_env", classmethod(lambda cls: configured))
+    refs = {key: workflow._ConfiguredQueryReference(SqlQueryAdapter.TRINO, source_id,
+        binding.request.entity, "query.sql", 3, 16384, 10.0) for key, binding in bindings.items()}
+    seen = []
+
+    @contextmanager
+    def capture(root, profile, *, queries, **kwargs):
+        seen.extend(queries.values())
+        assert all(binding.config is configured for binding in queries.values())
+        yield root, None
+
+    monkeypatch.setattr(workflow, "_temporary_query_batch_profile", capture)
+    if source_id == "trino":
+        with workflow._temporary_configured_query_profile(tmp_path, profile, references=refs,
+                max_total_bytes=65536, max_review_bytes=32768, budget=GenerationBudget(30)):
+            assert len(seen) == 2
+    else:
+        with pytest.raises(TransformationBatchError, match="invalid configured SQL reference"):
+            with workflow._temporary_configured_query_profile(tmp_path, profile, references=refs,
+                    max_total_bytes=65536, max_review_bytes=32768, budget=GenerationBudget(30)):
+                pytest.fail("unknown deployment source entered capture")
+        assert not seen
+
+
+def test_configured_mcp_rejects_parent_workspace_before_capture(tmp_path, monkeypatch):
+    from test_data_agent.mcp_transformation_candidate import _configured_query_tools
+    from test_data_agent.mcp_generator_server import WorkspacePathError
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(workspace))
+    profile, _, _ = fixture(tmp_path, SqlQueryAdapter.POSTGRES)
+    calls = []
+    monkeypatch.setattr(PostgresConfig, "from_env", classmethod(lambda cls: calls.append(True)))
+    with pytest.raises(WorkspacePathError):
+        with _configured_query_tools(tmp_path, profile, references={},
+                max_total_bytes=65536, max_review_bytes=32768):
+            pytest.fail("outside workspace admitted")
+    assert not calls
