@@ -1,5 +1,15 @@
 # Client Feedback And Acceptance Plan
 
+## Current evidence index — 2026-10-07
+
+Use [current candidate acceptance](current-candidate-acceptance.md) for the latest
+exact composition, wheel hash, completed whole-source audit and installed
+Python/extras matrix. The dated checkpoints below retain historical evidence;
+words such as “latest” or “current” within them refer to their checkpoint only.
+They do not supersede the consolidated index or close final versioned RC gates.
+Mandatory synthetic Trino CI is owner-authorized; independent approval remains
+required. Private client data and external-provider execution remain unverified.
+
 ## Current author-source checkpoint — 2026-10-06
 
 Author source04704cd04b963e5085ac5f507b054e40ed5239da passed the full offline
