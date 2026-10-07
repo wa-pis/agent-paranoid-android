@@ -673,3 +673,9 @@ requires that same fingerprint before opening the result stream. A changed
 query file with the same output names rejects before result access.16focused
 metadata/worker/query-binding tests passed2.55s; no live DB. Public activation
 and final exact-SHA audit/gates remain open.
+
+2026-10-07 configured-entry regression verifies supplied source/output metadata
+is discarded before supervisor dispatch while explicit request/config/policy
+remain bound; driver factory cannot be selected by caller.1passed0.30s/Ruff.
+No live driver call. Temporal native input support and Trino-owned capture are
+still missing constituents; no final public SQL acceptance claimed.

@@ -485,3 +485,23 @@ def test_owned_metadata_failure_returns_no_snapshot_and_reaps_worker(tmp_path, f
         _capture_postgres_isolated(capture, driver_factory=partial(_metadata_driver, fault),
             max_seconds=2)
     assert {child.pid for child in multiprocessing.active_children()} == before
+
+
+def test_configured_entry_discards_untrusted_metadata_before_worker(monkeypatch, tmp_path):
+    from test_data_agent.io import transformation_postgres_capture as module
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    capture = module._PostgresCapture(request, _config(), kwargs["source_columns"],
+        kwargs["schema"], kwargs["policy"], 3, 16384)
+    expected = object()
+
+    def supervisor(actual, *, driver_factory, max_seconds):
+        assert actual.schema is None and actual.source_columns == ()
+        assert actual.request is request and actual.config is capture.config
+        assert actual.policy is capture.policy
+        assert driver_factory is module._configured_postgres_driver
+        assert max_seconds == 5
+        return expected
+
+    monkeypatch.setattr(module, "_capture_postgres_isolated", supervisor)
+    assert module._capture_configured_postgres(capture, max_seconds=5) is expected
