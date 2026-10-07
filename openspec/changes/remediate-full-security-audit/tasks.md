@@ -978,3 +978,9 @@ cleanup,1685.927s harness monotonic elapsed. Earlier over-budget note used
 process wall clock; final monotonic result is below1800s. Clock/scheduling
 discrepancy unresolved, no deadline defect confirmed.100Mcells/17398511bytes.
 Current acceptance updated; no repeat needed without artifact changes.
+
+2026-10-07 remaining Trino supplied-result target->CSV started1Mx100 on
+installed exact268efc9a/wheel430e0405. Fully read unchanged SQL scale harness;
+injected fictional Arrow stream, no network/server. Explicit2GiB/128MiB
+capture/3600s; session34556 log/private/tmp/apa-final-current-scale-trino1m-csv.log.
+No pass yet; supplied-stream proof will not certify a live Trino adapter.
