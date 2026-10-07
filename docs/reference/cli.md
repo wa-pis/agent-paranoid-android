@@ -166,6 +166,21 @@ or after operation arguments. Debug does not disclose rejected arguments.
 Controlling-TTY approval remains local-only; `create` and `SAVE` never issue a
 receipt. Installed isolated CLI/MCP acceptance is not public activation approval.
 
+For the isolated candidate, save the profile and field decisions, review the
+exact saved inputs, then validate against the returned digest. Obtain local
+approval only when the selected actions preserve values, and execute using that
+same digest and receipt. Editing an input, policy, mapping or output setting
+requires a fresh review; a receipt is not a reusable blanket approval. Agents
+can consume a matching receipt but cannot issue one.
+
+Migration from published 1.5.0 requires an explicitly accepted candidate;
+installing 1.5.0 does not expose `transform-batch`. Keep ordinary source-free
+generation workflows separate and retain their existing schemas. A transformed
+bundle may deliberately contain preserved or explicitly mapped source values;
+it is not an anonymity guarantee. Protect its destination as potentially
+sensitive and inspect the value-free action/provenance report before sharing.
+SQL output is a script artifact and is never executed by transformation.
+
 ### Edit Field Decisions Locally
 
 `transform-review SOURCE.csv POLICY.yaml --decide` edits an existing valid
