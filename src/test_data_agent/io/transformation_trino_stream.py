@@ -32,7 +32,7 @@ def _trino_result_stream(query: _ResultQuery, *, config: TrinoConfig,
         parts = query.table.split(".")
         if (type(query) is not _ResultQuery or query.adapter != "trino"
                 or query.source_id != source_id or len(parts) != 3
-                or parts[0] not in config.allowed_catalogs or parts[1] not in config.allowed_schemas
+                or parts[0] not in (config.allowed_catalogs or frozenset()) or parts[1] not in (config.allowed_schemas or frozenset())
                 or any(item.is_wildcard for item in selectors)
                 or not set(query.columns).issubset(allowed)
                 or not query.columns or query.max_rows > config.max_result_rows
@@ -92,8 +92,8 @@ def _discover_trino_capture_metadata(request: SqlQueryProfileRequest, *, config:
         config.validate_security()
         draft = inspect_query_source(request)
         if (request.adapter is not SqlQueryAdapter.TRINO or request.source_id != source_id
-                or draft.table_parts[0] not in config.allowed_catalogs
-                or draft.table_parts[1] not in config.allowed_schemas):
+                or draft.table_parts[0] not in (config.allowed_catalogs or frozenset())
+                or draft.table_parts[1] not in (config.allowed_schemas or frozenset())):
             raise ValueError
         selectors = _trino_table_selectors(config, draft.table_name)
         client = TrinoClient(config=config, driver=driver)

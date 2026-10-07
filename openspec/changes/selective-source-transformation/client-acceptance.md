@@ -2,9 +2,10 @@
 
 ## Current evidence index — 2026-10-07
 
-Use [current candidate acceptance](current-candidate-acceptance.md) for the latest
-exact composition, wheel hash, completed whole-source audit and installed
-Python/extras matrix. The dated checkpoints below retain historical evidence;
+Use [frozen candidate acceptance](current-candidate-acceptance.md) for the
+reviewed `268efc9a` composition, wheel hash and installed Python/extras matrix.
+Its completed whole-source audit does not cover subsequent author-branch SQL
+capture changes. Final-SHA checks and independent audit remain required. The dated checkpoints below retain historical evidence;
 words such as “latest” or “current” within them refer to their checkpoint only.
 They do not supersede the consolidated index or close final versioned RC gates.
 Mandatory synthetic Trino CI is owner-authorized; independent approval remains

@@ -747,3 +747,14 @@ three output regressions7 passed7.31s/Ruff. Log:
 /private/tmp/apa-trino-owned-output.log. This closes the private owned-driver
 output-path evidence increment only: public registration, full final-SHA gate
 and independent audit remain open; no new large-scale replay or live DB.
+
+2026-10-07 parallel focused source review of owned SQL at26180e7 found no
+confirmed security finding; not a full final-SHA audit. Activation limitations:
+Trino cumulative database-result budget stays4MiB, Trino timestamps unsupported,
+and work-budget refusals currently become generic capture errors. Frozen1M
+fixture evidence does not certify configured owned1M transport. Documentation
+now distinguishes frozen268efc9a from current runtime; strict docs passed0.40s.
+Root corrected four strict-type errors in streaming iterator/optional allowlists;
+full mypy148modules passed,79focused regressions passed0.83s/Ruff. Public
+registration and final release gates remain open. Parallel common SQL integration
+is in progress and not included in these checks.

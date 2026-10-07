@@ -1,4 +1,8 @@
-# Current synthetic candidate acceptance
+# Frozen synthetic candidate acceptance
+
+This record covers the frozen composition below, not the current author branch.
+Subsequent PostgreSQL and Trino capture changes require a new full release gate
+and independent whole-source audit at the final SHA.
 
 Exact reviewed composition: `268efc9a4f6a7e5fa3e87f21b4fd86be87f7634f`.
 Author runtime fixes: `fe69962` and `3d79644`, with four prospective activation patches.

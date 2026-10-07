@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from collections.abc import Callable, Iterable, Iterator, Sequence
+from collections.abc import Callable, Generator, Iterable, Iterator, Sequence
 from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
 from functools import cached_property
@@ -181,7 +181,7 @@ class TrinoClient:
                     consume_database_result_payload(description)
                     _check_invocation_deadline(budget)
                     convert_row = row_converter_factory(description)
-                    def rows() -> Iterator[RowT]:
+                    def rows() -> Generator[RowT, None, None]:
                         count = 0
                         while True:
                             _check_invocation_deadline(budget)
