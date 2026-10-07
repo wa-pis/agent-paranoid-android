@@ -12,6 +12,12 @@ pip install "agent-paranoid-android[trino]"
 pip install "agent-paranoid-android[mcp,trino]"
 ```
 
+Candidate authentication settings for Basic, JWT, Kerberos, GSSAPI, OAuth2
+and client certificates are documented in the
+[configuration reference](../reference/configuration.md#trino-connection). Follow its
+runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.
+Local contract tests do not establish remote authentication compatibility.
+
 Configure an explicit read-only scope:
 
 ```bash
