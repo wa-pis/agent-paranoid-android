@@ -1025,3 +1025,37 @@ open. Logs/private/tmp/apa-query-session-root-{tests,mypy}.log.
 2026-10-08 closed server boot context now closes sessions in finally; its
 additional regression passed with all10sessiontests1.21s and Ruff. Isolated
 public registration composition is next; author registration remains closed.
+
+2026-10-08 release prerequisites inspected read-only: active main protection
+ruleset19376395 requires signed commits, PR and Python3.11/Python3.12/Wheel
+smoke/Trino integration/CodeQL/Secret history scan/Dependency review, with no
+bypass actors. Approving-review count is0; independent release acceptance
+remains required by docs. Published latest1.5.0; matching1.6.0 tags absent.
+No merge, approval, variable, tag or release changed.
+
+2026-10-08 isolated SQL public composition prepared at/private/tmp/apa-sql-
+public-composition; additional activation patch SHA2560ca5a0a279bd6ded9b7ace
+349a644d90f507c72c488727f83cf51d51f8b67fd0.89focusedtests passed2.36s; full
+gate running log/private/tmp/apa-sql-public-release-gate.log. Independent
+review found import-time workspace validation diagnostic defect in prior
+common registration; correction is prepared separately while gate source
+remains frozen. No final gate/audit/activation pass claimed.
+
+2026-10-08 prospective full suite completed3250passed23skipped/91percent
+coverage188.25s;10failures:2activation-patch composability regressions and
+8controlling-TTY sandbox failures. Startup-fixed composition passed all13
+focused terminal cases outside sandbox11.35s; previously unrun operational
+budgets/schema freshness/quickstart/manifest compatibility also passed.
+Independent v2 activation review passed7tests1.51s and resolved import-time
+workspace diagnostic defect. Remaining2patch regressions are being updated
+for the additional SQL overlay; no full gate clearance claimed yet.
+Logs/private/tmp/apa-sql-public-{release-gate,tty-retry,unrun-gates}.log.
+
+2026-10-08 remaining2activation-patch regressions passed on both complete
+prospective composition0.84s and closed author0.70s. Complete5patch sequence
+applies/reverses/reapplies byte-identically. SQLv2 patch9d962c7251c4136b6b04
+bd87c15938bc6971980f678080f6e09be39247befa54 retained in OpenSpec, with
+test-only sequence repair. Split local release gate constituents now pass;
+23local integration skips remain mandatory synthetic CI obligations. Public
+contract/installed final artifact binding and final independent exact-SHA
+audit remain open; public registrations were not applied to author checkout.
