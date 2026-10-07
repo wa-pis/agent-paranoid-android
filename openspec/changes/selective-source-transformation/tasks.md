@@ -376,7 +376,13 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   inventory7passed verifies explicit prospective common addition. See
   [current candidate acceptance](current-candidate-acceptance.md). This closes
   this compatibility constituent, not versioned/public release gates.
-- [ ] Document user workflow, limitations, residual privacy risk and migration.
+- [x] Document user workflow, limitations, residual privacy risk and migration.
+  2026-10-07 reviewed docs/reference/cli.md common-profile workflow and
+  docs/concepts/safety-model.md: exact saved-byte review, fresh digest after
+  edits, separate local preservation receipt, agent consumption only, gated
+  registration, mixed-origin privacy limits and migration from shipped1.5.0.
+  Strict documentation build already passed after these documentation changes.
+  Whole-repository consistency and final release acceptance remain separate.
 - [ ] Audit all repository documentation for consistency: README, quickstarts,
   CLI help/reference, Python/MCP contracts, source adapters, configuration,
   privacy/security, architecture, manifests/reports, troubleshooting, examples,
