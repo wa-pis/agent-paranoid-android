@@ -960,3 +960,8 @@ finished; evidence in current candidate acceptance. Other routes remain open.
 300000rows x50columns, same fully reviewed harness/exact268efc9a/wheel430e0405
 Python3.11. Explicit512MiB/1800s, temporary synthetic files; session58182,
 log/private/tmp/apa-final-current-scale-parquet300k.log. No pass yet.
+
+2026-10-07 Parquet->Parquet300kx50 passed244.925s/15Mcells, exit0.
+Target1Mx100 Parquet started, explicit2GiB expanded/input/output/1800s budget
+(to accommodate decoded strings); log/private/tmp/apa-final-current-scale-parquet1m.log.
+No pass claimed before final readback/cleanup.

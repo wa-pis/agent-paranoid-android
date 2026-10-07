@@ -58,3 +58,9 @@ budgets; complete ordered readback, provenance, source integrity and cleanup.
 Same exact268efc9a/wheel430e0405/Python3.11; log
 `/private/tmp/apa-final-current-scale1m.log`. Private CSV replacement route
 only; other input/output scale routes and final versioned RC remain open.
+
+2026-10-07 installed Parquet->Parquet300000x50 passed244.925s/15Mcells,
+2594621 output bytes, exit0; declared string/non-null schema and every output
+cell, source digest, provenance and cleanup checked. Same exact candidate,
+wheel and Python3.11;512MiB/1800s; synthetic files only. Log
+`/private/tmp/apa-final-current-scale-parquet300k.log`. No cross-route scale claim.
