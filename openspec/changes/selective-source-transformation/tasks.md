@@ -353,8 +353,13 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   domains, deterministic replay and infeasible constraints.
 - [x] Cover schema drift, sensitivity conflicts, leaks through reports/errors,
   provider isolation, budget exhaustion and output rollback.
-- [ ] Prove existing aggregate-only/source-free CLI, Python and MCP contracts
+- [x] Prove existing aggregate-only/source-free CLI, Python and MCP contracts
   remain unchanged with executable regression tests.
+  Current exact268efc9a fullgate3158passed includes CLI parser/contracts, direct
+  privacy and MCP service/transport regressions; installed registered-interface
+  inventory7passed verifies explicit prospective common addition. See
+  [current candidate acceptance](current-candidate-acceptance.md). This closes
+  this compatibility constituent, not versioned/public release gates.
 - [ ] Document user workflow, limitations, residual privacy risk and migration.
 - [ ] Audit all repository documentation for consistency: README, quickstarts,
   CLI help/reference, Python/MCP contracts, source adapters, configuration,

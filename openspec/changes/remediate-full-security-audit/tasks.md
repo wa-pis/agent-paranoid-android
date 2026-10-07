@@ -912,3 +912,8 @@ codex/fix-transformation-review, so no independent required GitHub approval
 available. Do not trigger repository liveTrinoCI under no-liveDB constraint.
 Release remains blocked on established approval/exactmain gates plus remaining
 selectivepolicy/docs/finalversion acceptance. AI clean audit is not GitHubapproval.
+
+Reconciled source-free compatibility acceptance constituent using existing
+exact268efc9a fullgate and installed inventory evidence; no repeated tests.
+Release remains blocked; CI trino-integration job services uses actual Trino
+localhost and TEST_TRINO_INTEGRATION=1 on codePRs. No workflow modified/skipped.
