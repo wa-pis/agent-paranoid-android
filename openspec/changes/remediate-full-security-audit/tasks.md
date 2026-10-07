@@ -875,3 +875,16 @@ unavailable-baseline check rerun only with existing actual installed1.5.0
 baseline/private/tmp/apa-skill-baseline.TjzfRV:1passed0.50s. No simulated
 parser, no replacement generation; allfive acceptance harnesses now executed
 against installed candidate. Dependency isolation/versionedartifact gates remain.
+
+Fresh isolated installed base matrix Python3.11.15 passed check_installed_package
+with exact wheel430e0405... via cached offline dependency install;log
+/private/tmp/apa-final-base311-check.log. Initial sandbox uv cache denied;
+authorized escalation succeeded. Python3.12.13 offline resolution failed cached
+dependency availability (pydantic stable missing for interpreter);log
+/private/tmp/apa-final-base31213.log. No prerelease substitution/network used,
+3.13not executed because sequential matrix stopped. Matrix incomplete.
+
+Independent cached matrix follow-up:3.13base and3.11all extras also fail
+offline dependency resolution;logs/private/tmp/apa-final-base313-install.log
+and/private/tmp/apa-final-all311-install.log. No tests claimed for uninstalled
+environments; no prerelease/network substitution.3.11base remains passed.
