@@ -6,6 +6,11 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare closed PostgreSQL/Trino capture bindings for the common transformation
+  workflow, with frozen policy checks, shared limits and owned temporary
+  snapshots consumed by candidate CLI/MCP interfaces without reconnecting.
+  Public registration remains gated by acceptance.
+
 - Closed candidate Trino capture shares the owned SQL process supervisor with
   PostgreSQL, retaining cumulative metadata/capture budgets and bounded result
   IPC. Public transformation registration remains gated by acceptance.

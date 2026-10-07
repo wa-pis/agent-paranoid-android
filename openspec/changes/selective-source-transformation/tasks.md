@@ -767,3 +767,16 @@ Parallel integration still under development; full type gate pending its config
 union fixes. SECURITY scoped mapping amendment matches owner ADR0029; strict
 docs passed0.40s. Activation wording/actual registration reconciliation and
 final exact-SHA safety evidence still required; no composite task closed.
+
+2026-10-07 parallel SQL/common integration completed: trusted configured PG
+and Trino capture bindings produce frozen envelopes in the owned temporary
+common-profile workspace; existing candidate CLI/MCP review/validate consumers
+read them without reconnecting. Frozen policy bytes are rechecked; cumulative
+policy reads are bounded before allocation; shared total and every binding's
+scalar/configuration limits preflight before any capture. Reviewer-found late
+shared authorization P2 corrected and independently rechecked with no further
+confirmed finding. SQL/scope authorization remains per adapter, not an all-input
+no-connect guarantee.12focused tests passed0.67s,full mypy149modules/Ruff passed;
+earlier combined241passed10skipped. Logs/private/tmp/apa-common-query-integrated.log
+and/private/tmp/apa-common-query-final-mypy.log. Public registration/activation
+and full final-SHA gates still open; no live DB or new scale run.

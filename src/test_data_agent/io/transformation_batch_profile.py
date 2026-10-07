@@ -1,7 +1,7 @@
 """Closed local batch profile loader; references only, no source-row persistence."""
 from pathlib import Path
 import os
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
 from typing import Literal, TextIO
@@ -48,7 +48,9 @@ class BatchProfile(BaseModel):
 @contextmanager
 def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_bytes: int,
                             max_review_bytes: int, budget: GenerationBudget,
-                            create_csv_policies: bool = False, seed: int | None = None
+                            create_csv_policies: bool = False, seed: int | None = None,
+                            _captured_query_sources: Mapping[str, SnapshotPart] | None = None,
+                            _captured_query_policies: Mapping[str, bytes] | None = None
                             ) -> Iterator[tuple[Path, TransformationBatch]]:
     """Materialize explicit fictional candidate references; no user-file writes or approval."""
     valid = False
@@ -77,6 +79,20 @@ def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_byte
                        or path.parts[0] == "batch.yaml" for path in policy_paths)):
             raise ValueError
         captured: dict[str, bytes] = {}
+        query_sources = dict(_captured_query_sources or {})
+        query_policies = dict(_captured_query_policies or {})
+        if set(query_sources) != set(query_policies):
+            raise ValueError
+        if create_csv_policies and query_sources:
+            raise ValueError
+        forbidden = {profile.validation, *(item.policy for item in profile.inputs),
+                     *(path for item in profile.inputs for path in (*item.mappings, *item.generation_policies))}
+        if set(query_sources) - {item.source for item in profile.inputs} or set(query_sources) & forbidden:
+            raise ValueError
+        for path in query_sources:
+            relative = Path(path)
+            if relative.is_absolute() or ".." in relative.parts or not relative.parts:
+                raise ValueError
         # Existing policies determine each source ceiling before any source capture.
         if not create_csv_policies:
             for item in profile.inputs:
@@ -87,6 +103,16 @@ def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_byte
                     consumed += len(data)
                 policy = load_behavior_policy_yaml(captured[item.policy],
                     max_bytes=max_total_bytes, budget=budget)
+                if item.source in query_sources:
+                    source = query_sources[item.source]
+                    if captured[item.policy] != query_policies[item.source]:
+                        raise ValueError
+                    if (type(source) is not SnapshotPart or source.kind != "source"
+                            or source.name != item.entity
+                            or policy.input_format not in {"postgres_query", "trino_query"}):
+                        raise ValueError
+                    from test_data_agent.io.transformation_query_snapshot import _query_result_payload
+                    _query_result_payload(source.payload, policy.input_format)
                 input_limit = resolve_input_limit(InputDimension.BYTES, policy.resource_limits, os.environ)
                 previous = source_limits.get(item.source)
                 if previous is None or input_limit.value < previous.value:
@@ -100,6 +126,13 @@ def temporary_batch_profile(root: Path, profile: BatchProfile, *, max_total_byte
             if path in captured:
                 if path in source_limits:
                     source_limits[path].check(len(captured[path]))
+                continue
+            if path in query_sources:
+                data = query_sources[path].payload
+                source_limits[path].check(len(data))
+                consumed += len(data)
+                limit.check(consumed)
+                captured[path] = data
                 continue
             snapshot = read_mapping_snapshot(root, path, max_bytes=max_total_bytes,
                 budget=budget, total_limit=limit, consumed_bytes=consumed,

@@ -89,6 +89,11 @@ class GenerationBudget:
                 f"generation exceeded the {self.max_seconds:g} second budget during {stage}"
             )
 
+    def remaining_seconds(self) -> float:
+        """Remaining time in this invocation; child work must not reset it."""
+        self.check("remaining deadline")
+        return max(0.0, self.max_seconds - (self._clock() - self._started_at))
+
     def consume_rule_work(self, count: int = 1) -> None:
         """Charge cumulative deterministic rule work before the operation."""
         self.check("deterministic rule evaluation")
