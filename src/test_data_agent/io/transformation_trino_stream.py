@@ -11,6 +11,8 @@ from test_data_agent.io.transformation_postgres_stream import _native_capture_va
 from test_data_agent.sql_query_adapters import _trino_table_selectors
 from test_data_agent.trino_client import TrinoClient, _identity_row_converter
 from test_data_agent.trino_config import TrinoConfig
+from test_data_agent.sql_query_source import SqlQueryProfileRequest, QuerySourceColumn, ValidatedSqlQuery
+from test_data_agent.sql_query_profiling import QueryResultColumn
 
 
 @contextmanager
@@ -70,3 +72,45 @@ def _trino_result_stream(query: _ResultQuery, *, config: TrinoConfig,
         pass
     if not valid:
         raise ValueError("invalid Trino result stream") from None
+
+
+def _discover_trino_capture_metadata(request: SqlQueryProfileRequest, *, config: TrinoConfig,
+                                     source_id: str, driver: Any) -> tuple[tuple[QuerySourceColumn, ...], tuple[QueryResultColumn, ...], ValidatedSqlQuery]:
+    """Closed allowlisted discovery and no-row inspection under shared budgets."""
+    from test_data_agent.sql_query_adapters import _trino_source_columns, _trino_description_column
+    from test_data_agent.sql_query_source import SqlQueryAdapter, inspect_query_source, authorize_query_source
+    from test_data_agent.sql_query_profiling import build_no_row_schema_query
+    from test_data_agent.trino_query_builders import build_describe_table_query
+    from test_data_agent.trino_work_budget import query_work_limits_from_env, with_query_work_budget
+
+    valid = False
+    try:
+        config.validate_security()
+        draft = inspect_query_source(request)
+        if (request.adapter is not SqlQueryAdapter.TRINO or request.source_id != source_id
+                or draft.table_parts[0] not in config.allowed_catalogs
+                or draft.table_parts[1] not in config.allowed_schemas):
+            raise ValueError
+        selectors = _trino_table_selectors(config, draft.table_name)
+        client = TrinoClient(config=config, driver=driver)
+
+        def discover() -> tuple[tuple[QuerySourceColumn, ...], tuple[QueryResultColumn, ...], ValidatedSqlQuery]:
+            query = build_describe_table_query(*draft.table_parts)
+            columns = _trino_source_columns(client.fetch_dicts(query.sql, query.parameters), selectors)
+            plan = authorize_query_source(draft, columns)
+            rows, description = client.execute_query(build_no_row_schema_query(plan).sql)
+            metadata = tuple(_trino_description_column(item) for item in description)
+            if rows or tuple(item.name for item in metadata) != plan.output_fields:
+                raise ValueError
+            return columns, metadata, plan
+
+        result = with_query_work_budget(discover,
+            query_work_limits_from_env(deployment_profile=config.deployment_profile))()
+        valid = True
+    except (TransformationLimitError, QueryWorkBudgetExceeded):
+        raise
+    except Exception:
+        pass
+    if not valid:
+        raise ValueError("invalid Trino capture metadata") from None
+    return result

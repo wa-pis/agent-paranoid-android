@@ -443,3 +443,44 @@ def test_closed_trino_driver_capture_obeys_scope_and_native_types(tmp_path, faul
         assert driver.dbapi.connect_kwargs is None
     else:
         assert cursor.closed and driver.dbapi.connection.closed
+
+
+@pytest.mark.parametrize("fault", [None, "source", "scope", "names"])
+def test_trino_capture_metadata_is_allowlisted_and_contains_no_rows(tmp_path, fault):
+    from test_data_agent.io.transformation_trino_stream import _discover_trino_capture_metadata
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    request, _ = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.status"}))
+    if fault == "scope":
+        config = replace(config, allowed_catalogs=frozenset({"other"}))
+
+    class Cursor(FakeCursor):
+        def execute(self, sql, parameters):
+            self.row_offset = 0
+            if "information_schema.columns" in sql:
+                self.rows = [("status", "varchar", "NO")]
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+            else:
+                assert sql.endswith("WHERE FALSE")
+                self.rows = []
+                self.description = [("other" if fault == "names" else "label", "varchar"),
+                    ("measured", "bigint")]
+
+    cursor = Cursor([])
+    driver = FakeDriver(cursor)
+    if fault is None:
+        columns, metadata, plan = _discover_trino_capture_metadata(request,
+            config=config, source_id="warehouse", driver=driver)
+        assert columns[0].name == "status"
+        assert tuple(item.name for item in metadata) == plan.output_fields
+    else:
+        with pytest.raises(ValueError, match="invalid Trino capture metadata"):
+            _discover_trino_capture_metadata(request, config=config,
+                source_id="other" if fault == "source" else "warehouse", driver=driver)
+    if fault in {"source", "scope"}:
+        assert driver.dbapi.connect_kwargs is None
+    else:
+        assert cursor.closed and driver.dbapi.connection.closed

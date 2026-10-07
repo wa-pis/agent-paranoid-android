@@ -704,3 +704,10 @@ result-row cap increase. Streaming chunks preserve schema/nullability and reject
 coercion/drift; existing query time/scan/result work and cleanup remain active.
 66synthetic query-capture/client tests passed0.89s; no live DB. Trino-owned
 metadata/supervisor and public CLI/MCP composition remain unfinished.
+
+2026-10-07 closed Trino metadata discovery now reuses allowlisted schema query,
+shared statement/scan/result/deadline budget and trusted WHERE FALSE inspection.
+Source/catalog/schema refuse before connect; output alias drift and unexpected
+rows reject. Returned metadata is typed and bound to authorized query identity.
+4synthetic tests passed0.58s/Ruff. No DB. Owned supervisor/continuous capture
+budget and public registration still unfinished; not final SQL activation.
