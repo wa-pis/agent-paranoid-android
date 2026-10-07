@@ -37,3 +37,9 @@ labels before serialization. Reject values outside that field's categorical
 domain; numeric distribution bounds remain unchanged.
 
 OpenAI and GigaChat apply the same category projection immediately before transport. The original request and fingerprints remain local and unchanged. Unrepresented local categorical predicates reject before sending; invalid restored proposals produce redacted invalid-response errors. Provider byte budgets include the serialized labels.
+
+Imported field distributions must be empty metadata objects or declare a
+supported typed distribution kind. Nonempty opaque objects, missing kinds
+and unsupported kinds are rejected before advisor/provider serialization.
+The same contract applies to profiles and generation specifications; generic
+errors must not reproduce rejected source contents.

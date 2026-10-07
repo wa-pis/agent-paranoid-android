@@ -76,3 +76,9 @@ activation and final-SHA acceptance gates. See the
 [candidate CLI contract](cli.md#implemented-rc-execution-candidate) and
 [closed common-profile contract](cli.md#closed-common-profile-workflow-candidate).
 Command discovery is not dataset approval or a promise of released compatibility.
+
+Imported `FieldProfile` and `FieldSpec` distributions accept empty `{}` or a
+supported typed `kind`. Nonempty objects with missing, non-string or unknown
+kinds are rejected with a value-free diagnostic. Previously accepted opaque
+distribution dictionaries must be converted to supported metadata before use;
+they cannot be forwarded to advisor/provider requests.

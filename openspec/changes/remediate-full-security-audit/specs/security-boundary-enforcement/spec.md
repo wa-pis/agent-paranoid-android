@@ -200,3 +200,16 @@ a row to dataset loading, single-file profiling, snapshot profiling or folder pr
 - **WHEN** a CSV row contains more fields than its header
 - **THEN** a value-free input-limit error rejects the row before retention
 - **AND** existing missing-field padding remains supported
+
+### Requirement: Typed provider-bound distribution metadata
+
+Imported field profiles and specifications SHALL reject nonempty distribution
+objects without a supported string kind at their shared model boundary. Empty
+metadata SHALL remain valid. Provider adapters SHALL revalidate the request
+before transport, including profile and baseline specification mutations.
+
+#### Scenario: Opaque distribution contains synthetic source markers
+- **WHEN** imported or mutated metadata contains an unsupported or missing kind
+  and nested fictional source markers
+- **THEN** validation refuses before any provider SDK request
+- **AND** rendered errors do not contain the rejected marker values.

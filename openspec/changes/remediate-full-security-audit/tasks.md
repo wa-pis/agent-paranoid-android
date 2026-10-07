@@ -1078,3 +1078,18 @@ reconciliation passed51tests0.50s+strictMkDocs0.37s; retained patch f12f93f5
 eedb8d08d1a5732278f68499a87dc905567e81b55b2d29fece62361b. Preparing one
 isolated immutable prospective1.6.0rc1 composition for final version-bound
 checks and independent whole-source audit; no publicactivation/tag yet.
+
+2026-10-08 final exact906777b audit3b14ac5f-0579-462d-96f9-ba2f0cd4983e
+confirmed R12/CWE201: opaque unsupported distributions bypass non-sensitive
+profile checks and reach provider serialization. Independent baseline plus
+parent source validation; no external provider calls. Central FieldProfile/
+FieldSpec normalization now rejects nonempty missing/unsupported kinds while
+retaining{};22newregressions and191focusedtests passed7.52s. Fresh focused
+review pending. Frozen906777b remains unchanged and not cleared forrelease.
+Remaining whole-source audit continues before corrected candidate gate/audit.
+
+2026-10-08 independent focused R12fixreview passed22regressions plus143
+advisor/provider tests; checked extras across all10supported kinds and both
+field models. No further scoped finding. Public compatibility/guide/OpenSpec
+requirement updated; current906777b report remains a finding-bearing audit,
+not evidence for corrected finalSHA.

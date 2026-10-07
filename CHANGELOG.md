@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Security
+
+- Reject opaque or unsupported field distribution metadata before imported
+  profiles or specifications reach advisor/provider requests. Empty metadata
+  and supported typed distributions remain valid.
+
 ### Added
 
 - Prepare bounded closed MCP SQL sessions that reuse one frozen capture across
