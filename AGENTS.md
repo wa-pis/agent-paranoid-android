@@ -142,3 +142,17 @@ and focused tests.
 - Larger behavior, security, compatibility, or supply-chain changes require
   an OpenSpec change and should be treated as a release candidate when
   appropriate.
+
+
+### Configured SQL Session Extension
+
+The prospective 1.6 RC composition separately registers common saved-profile
+CLI/MCP consumers and configured SQL sessions. Read authority still comes from
+administrator configuration, allowlists and bounded read-only policy; it is
+not inferred from a transformation request. Capture once into owned snapshots;
+receipt issuance remains local controlling-TTY only, and subsequent consumers
+must use the exact same frozen batch without reconnecting. MCP metadata may
+include the narrow owned-root/fixed receipt-name/digest handoff, never source
+rows, query text or secrets. Enforce finite expiry, admission and shutdown
+cleanup. This extension requires independent review of the final complete
+activation SHA before public delivery; historical audits are not its approval.

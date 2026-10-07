@@ -48,8 +48,9 @@ source rows. Mapping paths in the policy are relative to the policy file's
 directory. Use `--table NAME` when the entity name differs from the source
 filename stem; `--json` wraps the same review in the standard CLI response.
 The policy's `input_format` selects CSV, Parquet or an already captured
-PostgreSQL/Trino query-result envelope. Query capture remains private; this
-review command neither reads a SQL script as data nor connects to a database.
+PostgreSQL/Trino query-result envelope. Configured query capture is a separate `transform-batch query-execute`
+operation; this review command neither imports SQL scripts as data nor connects
+to a database.
 Installed fictional candidate acceptance covers all four inputs and three outputs
 using the same saved policy and review digest, including public command execution.
 Native Parquet/captured-result input supports nullable strings, signed integers,
@@ -135,8 +136,9 @@ invalid initial policy or turn a sensitivity answer into approval.
 
 ### Closed common-profile workflow candidate
 
-The common multi-input workflow is not registered in the production CLI or MCP.
-Fictional isolated acceptance uses `_candidate_common_main` with these operations:
+The 1.6 RC composition registers `transform-batch` in the CLI and
+`common_transformation` in the running generator MCP server. Published 1.5.0
+does not provide these additions. Their operations are:
 
 | Operation | Required local arguments | Effect |
 | --- | --- | --- |
@@ -154,11 +156,11 @@ not approved decisions. `--edit-actions`/`--edit-formats` require `--decide`, an
 CSV creation with interactive decisions requires explicit action editing.
 Saving configuration changes reference paths and requires a fresh reviewed digest.
 Existing files, unsafe references and output destinations are not overwritten.
-No command above is a shipped command-discovery promise or authorization to use
-private data before final safety/activation gates.
+Registration describes this RC composition, not a published release or
+authorization to process a dataset; final exact-source safety and release gates
+remain required.
 
-The isolated activation candidate composes these operations under
-`transform-batch`, without enabling that command in the main checkout. Its
+The RC composition exposes these operations under `transform-batch`. Its
 machine-readable success and error responses use CLI schema version `1.0`;
 success metadata is inside `result`, not flattened into the envelope. Runtime
 `--json`/`--debug` flags are accepted before the command, before the operation,
@@ -306,15 +308,43 @@ Aliases:
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
 
 
-### Closed configured SQL session candidate
+### Configured SQL Sessions (1.6 RC)
 
-The unregistered common CLI candidate includes `query-execute` for a single
+`test-data-agent transform-batch query-execute` completes a single
 owned session. It reads a saved batch profile and a bounded reference file,
 captures each configured query once, displays metadata review, requests the
 existing local controlling-TTY receipt when preservation requires it, and
 validates before retaining output in a new directory in the parent workspace.
 Captured inputs and session receipts expire on command completion or failure.
-This candidate is not an installed 1.5.0 command or a dataset approval.
+This is not an installed 1.5.0 command or dataset approval. For example, with
+authorization to read the configured source and an authored batch profile:
+
+```bash
+test-data-agent transform-batch query-execute /path/to/workspace batch.yaml queries.yaml selected-output \
+  --max-total-input-bytes 67108864 --max-review-bytes 4194304 \
+  --max-output-bytes 67108864 --json
+```
+
+The saved reference file can contain this fictional entry; its key must match
+a batch input source and its entity must match that input policy:
+
+```yaml
+schema_version: "0.1"
+queries:
+  captured-orders.query:
+    adapter: trino
+    source_id: trino
+    entity: fictional_orders
+    query_file: orders.sql
+    max_rows: 1000
+    max_bytes: 8388608
+    max_seconds: 60.0
+```
+
+Success writes one schema-1.0 JSON envelope to stdout; bounded value-free review
+goes to stderr before execution. Preservation confirmation uses the controlling
+terminal, not stdin or an approval flag. SQL output remains an artifact file;
+this command never executes generated SQL.
 
 The reference file has `schema_version: "0.1"` and a `queries` mapping keyed by
 batch input source reference. Each entry contains `adapter` (`postgres` or
@@ -331,11 +361,14 @@ remain unchanged. Metadata retains its existing row ceiling, and statement,
 scan, time and transport limits still apply. A caller cannot raise capture
 limits above effective transformation policy/session ceilings.
 
-The closed MCP SQL-session candidate now retains one frozen capture across
+The registered runtime `configured_query_session` MCP tool retains one frozen capture across
 review, validation and execution requests. It returns an opaque handle, digest
 and metadata for local CLI approval; MCP cannot issue approval. Session expiry,
 active-count and lifetime byte admission are bounded. Execution consumes the
 existing exact local receipt and publishes to a new child of the owning
 workspace. Expiry, refusal and shutdown clean the owned capture; cleanup
-failures refuse further work. Public registration and server shutdown wiring
-remain acceptance requirements before SQL parity is claimed.
+failures refuse further work. The server owns the sessions and closes them in
+its shutdown handler, including transport failures. The module-level SDK object
+does not create sessions; custom embedding must explicitly inject and close its
+own session owner. See [MCP session operations](../how-to/mcp.md#configured-sql-sessions-16-rc)
+and [session settings](configuration.md#configured-sql-session-bounds-16-rc).

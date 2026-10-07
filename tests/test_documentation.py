@@ -126,9 +126,13 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == STABLE_VERSION
-    assert "Preview `" not in readme
-    assert "--pre" not in readme
+    if PROJECT_VERSION != STABLE_VERSION:
+        assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+", PROJECT_VERSION)
+        assert f"Prospective candidate `{PROJECT_VERSION}`" in readme
+        assert "not yet published" in readme
+    else:
+        assert "Preview `" not in readme
+        assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
     assert "statistical anonymity" in readme
@@ -1243,13 +1247,15 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
     assert "local fakes" in support
 
 
-def test_custom_advisor_docs_reject_unprojected_local_categories() -> None:
+def test_custom_advisor_docs_require_projected_wrapper_boundary() -> None:
     for path in ("docs/how-to/custom-advisor-provider.md", "docs/ai_integration.md",
                  "docs/reference/advisor.md"):
         text = (ROOT / path).read_text()
-        assert "profile.local_category_fields" in text
-        assert "baseline_spec.local_category_fields" in text
-        assert 'raise ValueError("local categories require a provider-safe projection")' in text
+        assert "ExchangeDatasetAdvisor" in text
+        assert "project" in text
+        assert "fingerprint" in text
+        assert "restor" in text
+        assert 'raise ValueError("local categories require a provider-safe projection")' not in text
 
 
 def test_gigachat_documentation_matches_provider_boundary() -> None:

@@ -263,3 +263,18 @@ successful validation does not prove anonymity.
 
 The existing helper tests cover only parts of these requirements. No task above
 is considered passed merely because isolated parsers or loaders passed review.
+
+
+## Prospective Configured SQL Session Contract — 2026-10-08
+
+The prospective 1.6 RC composition registers `transform-batch query-execute`
+and runtime `configured_query_session` consumers. This records their scoped
+contract; it is not final source review, publication clearance or dataset
+authorization. Administrator-configured allowlisted read-only access precedes
+a single owned capture. Review, local receipt issuance, validation and retained
+publication bind the same frozen source/policy/mapping bytes, never a reconnect.
+MCP may return only the narrow local approval descriptor (owned root, fixed
+profile/receipt names, digest and limits), not rows or query/configuration values.
+Only the existing controlling-TTY CLI issues receipts. Session admission, finite
+expiry and all-session shutdown cleanup are server-owned; failed cleanup
+refuses further work. Ordinary source-free generation remains unchanged.

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc1] - Prospective candidate
+
 ### Security
 
 - Project advisor-bound metadata through supported semantic fields before
@@ -18,39 +20,36 @@ All notable changes to this project are documented here.
 
 ### Added
 
-- Prepare bounded closed MCP SQL sessions that reuse one frozen capture across
-  requests, consume existing local CLI approval receipts and retain workspace
-  output. Expiry and server shutdown clean captures; cleanup failures refuse
-  further session work. Public registration remains gated.
-
-- Prepare a closed one-session SQL CLI candidate that reviews one frozen
+- Add `transform-batch query-execute` to the 1.6 RC composition to review one frozen
   capture, uses existing local preservation approval and retains validated
   output after temporary-input cleanup. Trino capture capacity is scoped to
   explicit transformation limits without changing ordinary profiling defaults.
 
-- Prepare closed PostgreSQL/Trino capture bindings for the common transformation
+- Add administrator-configured PostgreSQL/Trino capture for the common transformation
   workflow, with frozen policy checks, shared limits and owned temporary
   snapshots consumed by candidate CLI/MCP interfaces without reconnecting.
-  Public registration remains gated by acceptance.
+  The runtime generator MCP `configured_query_session` tool reuses the same
+  capture across requests, with local-only exact receipt issuance, bounded
+  expiry/admission and shutdown cleanup. Final release acceptance remains required.
 
 - Closed candidate Trino capture shares the owned SQL process supervisor with
   PostgreSQL, retaining cumulative metadata/capture budgets and bounded result
-  IPC. Public transformation registration remains gated by acceptance.
+  IPC; final release acceptance remains required.
 
-- Prepare a closed typed Trino transformation stream using the existing bounded client and shared strict native-value checks; public capture remains gated.
+- Bound typed Trino transformation streaming with the existing client and shared strict native-value checks.
 
-- Support exact UTC microsecond timestamp substitution in the closed native transformation candidate; naive timestamps and other Arrow timestamp encodings remain rejected.
+- Support exact UTC microsecond timestamp substitution in native transformation; naive timestamps and other Arrow timestamp encodings remain rejected.
 
-- Prepare a closed PostgreSQL transformation-capture path that resolves the
-  configured optional driver inside the existing supervised worker. Public SQL
-  capture remains gated; synthetic isolation tests do not certify live access.
+- Add a supervised PostgreSQL transformation-capture path that resolves the
+  configured optional driver inside the existing supervised worker. Synthetic
+  isolation tests do not certify live access.
 
 - Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
 
-- Prepare an isolated common saved-profile workflow for create/review/local
+- Add the common saved-profile workflow for create/review/local
   approval/validate/execute, with explicit shared budgets, exact snapshot binding
-  and metadata-only MCP consumption. Common public registration remains closed
-  pending the finished candidate's independent safety review and release gates.
+  and metadata-only MCP consumption in the 1.6 RC composition. Independent
+  final-SHA safety review and release gates remain required.
 
 - Add separately selected local transformation execution, controlling-terminal
   preservation approval, and a workspace-confined MCP execution consumer using

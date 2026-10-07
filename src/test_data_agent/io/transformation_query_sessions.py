@@ -1,4 +1,8 @@
-"""Closed instance-owned SQL sessions; metadata only, no approval issuer."""
+"""Instance-owned configured SQL sessions for runtime MCP composition.
+
+Sessions return metadata, reuse frozen captures and consume local receipts only;
+MCP cannot issue approval. Finite expiry and server shutdown clean owned inputs.
+"""
 from contextlib import ExitStack
 from dataclasses import dataclass
 import json

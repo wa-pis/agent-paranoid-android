@@ -12,7 +12,7 @@ MCP has no receipt issuer. Ordinary generation remains source-free. These
 original additions have exact-SHA safety evidence in ActivationSafety-R3; the
 development goldens include their registration. That historical evidence does
 not clear the later coherent candidate or common-profile consumers. Their
-registration remains isolated, not enabled in the author checkout; current
+registration is included in the prospective 1.6 RC composition; current
 independent safety clearance, final RC review and release gates remain required
 before public delivery. See [MCP usage](../how-to/mcp.md#closed-common-profile-candidate)
 for the gated common-profile surface.
@@ -401,3 +401,12 @@ Each refactor pull request must:
 See [Public Stability](stability.md) for change classification and the active
 [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
 for the staged extraction plan.
+
+The 1.6 RC composition adds `transform-batch`, including `query-execute`,
+and the running generator MCP server adds `common_transformation` and
+`configured_query_session`. Their operations share application enforcement;
+only local controlling-TTY approval issues a preservation receipt.
+`io/transformation_query_sessions.py` owns bounded frozen captures across MCP
+requests, expiry and shutdown cleanup; `mcp_generator_server:main` injects and
+closes that owner. The default module-level SDK object owns no SQL sessions.
+Registration is not dataset authorization or final release clearance.

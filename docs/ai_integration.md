@@ -138,9 +138,6 @@ from test_data_agent import (
 
 class ProviderClient:
     def complete(self, exchange: AdvisorExchange) -> dict:
-        if (exchange.request.profile.local_category_fields
-                or exchange.request.baseline_spec.local_category_fields):
-            raise ValueError("local categories require a provider-safe projection")
         return call_model_with_structured_output(
             trusted_instructions=exchange.trusted_instructions,
             untrusted_input=exchange.request.model_dump(mode="json"),
@@ -178,12 +175,14 @@ test-data-agent agent-advisor-request out/agent \
   --exchange > advisor_exchange.json
 ```
 
-Load the exchange locally. A generic exchange can contain explicitly approved
-local category literals and matching predicates. Do not transmit those exchanges
-unchanged: use a tested provider-safe projection with local restoration, or
-reject them before any external call. Built-in OpenAI/GigaChat adapters perform
-that projection; JSON handoff and arbitrary custom clients do not inherit it.
-For an exchange without local categories, map each part to the provider's API:
+Load the exchange locally. Exported documents can contain category literals,
+matching predicates and local generation metadata. Do not transmit them unchanged.
+`ExchangeDatasetAdvisor` projects the request for built-in and custom clients,
+recomputes its fingerprints, validates the projected proposal, restores retained
+local metadata under deterministic guards and validates the original request.
+Clients must echo the fingerprints they receive. Standalone JSON handoff must
+implement this tested projection and local restoration or refuse transmission.
+After projection, map each part to the provider's API:
 
 - send `trusted_instructions` through its system or developer instruction
   channel;

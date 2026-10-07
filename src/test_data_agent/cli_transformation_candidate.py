@@ -1,7 +1,8 @@
-"""Unregistered CLI candidate, exercised only on fictional temporary fixtures.
+"""CLI adapters for registered selective-transformation workflows.
 
-Not imported by CLI composition, package facade or MCP. Activation requires
-end-to-end evidence and independent review of the completed wiring.
+Runtime composition registers review, local approval, common saved profiles and
+configured-query execution. Preservation authority remains controlling-TTY local
+approval bound to the same frozen snapshot; publication remains release-gated.
 """
 
 from pathlib import Path
@@ -228,7 +229,7 @@ def _candidate_batch_approve_main(argv: list[str], *, versioned_output: bool = F
 def _candidate_common_main(argv: list[str], *, versioned_output: bool = False) -> int:
     """Single closed workflow entry; never registered by the production CLI."""
     if argv and argv[0] == "query-execute":
-        return _candidate_configured_query_command(argv[1:])
+        return _candidate_configured_query_command(argv[1:], versioned_output=versioned_output)
     if argv and argv[0] in {"review", "validate", "execute"}:
         return _candidate_batch_main(argv, versioned_output=versioned_output)
     if argv and argv[0] == "approve":
@@ -320,7 +321,7 @@ def _candidate_configured_query_review(*, root: Path, profile: BatchProfile,
 def _candidate_configured_query_execute(*, root: Path, profile: BatchProfile,
         references: Mapping[str, _ConfiguredQueryReference], destination: str,
         max_total_bytes: int, max_review_bytes: int, max_output_bytes: int,
-        budget: GenerationBudget | None = None) -> int:
+        budget: GenerationBudget | None = None, versioned_output: bool = False) -> int:
     """Closed one-invocation review/TTY approval/execution on one frozen capture.
 
     Only final validated artifacts survive in the chosen parent workspace.
@@ -355,7 +356,11 @@ def _candidate_configured_query_execute(*, root: Path, profile: BatchProfile,
             budget=budget) as (captured_root, batch):
         review = review_batch(batch, max_total_bytes=max_total_bytes,
             max_review_bytes=max_review_bytes, budget=budget)
-        _write_common_result({"status": "review_only", "review": json.loads(review)}, versioned_output=False)
+        if versioned_output:
+            import sys
+            print(json.dumps({"status": "review_only", "review": json.loads(review)}, sort_keys=True), file=sys.stderr)
+        else:
+            _write_common_result({"status": "review_only", "review": json.loads(review)}, versioned_output=False)
         needs_confirmation = any(field["preserves_original"]
             for item in json.loads(review)["inputs"] for field in item["local_plan"]["fields"])
         receipt = None
@@ -372,12 +377,12 @@ def _candidate_configured_query_execute(*, root: Path, profile: BatchProfile,
             expected_snapshot_sha256=batch.snapshot_sha256,
             max_total_bytes=max_total_bytes, max_review_bytes=max_review_bytes,
             max_output_bytes=max_output_bytes, budget=budget, receipt_path=receipt)
-    _write_common_result({"status": "closed_publication_completed", "summary": json.loads(summary)}, versioned_output=False)
+    _write_common_result({"status": "closed_publication_completed", "summary": json.loads(summary)}, versioned_output=versioned_output)
     return 0
 
 
 
-def _candidate_configured_query_command(argv: list[str]) -> int:
+def _candidate_configured_query_command(argv: list[str], *, versioned_output: bool = False) -> int:
     """Parseable closed SQL CLI; one invocation owns the complete row lifecycle."""
     from test_data_agent.cli_contract import CliErrorCode
     from test_data_agent.cli_presenter import report_cli_error
@@ -388,7 +393,10 @@ def _candidate_configured_query_command(argv: list[str]) -> int:
     from test_data_agent.io.transformation_publish import TransformationCleanupError
     from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded
 
-    parser = _CandidateArgumentParser(prog="closed-common-transform query-execute", json_errors=True)
+    parser = _CandidateArgumentParser(prog="test-data-agent transform-batch query-execute" if versioned_output
+        else "closed-common-transform query-execute", json_errors=True)
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--debug", action="store_true")
     parser.add_argument("root", type=Path)
     parser.add_argument("profile")
     parser.add_argument("references")
@@ -397,7 +405,7 @@ def _candidate_configured_query_command(argv: list[str]) -> int:
     parser.add_argument("--max-review-bytes", type=int, required=True)
     parser.add_argument("--max-output-bytes", type=int, required=True)
     args = parser.parse_args(argv)
-    args.command, args.json_output, args.debug = "closed-query-execute", True, False
+    args.command, args.json_output, args.debug = "transform-batch" if versioned_output else "closed-query-execute", True, False
     try:
         root = args.root.absolute()
         budget = GenerationBudget()
@@ -408,7 +416,7 @@ def _candidate_configured_query_command(argv: list[str]) -> int:
             max_bytes=min(args.max_total_input_bytes, DEFAULT_MAX_PROFILE_PAYLOAD_BYTES), budget=budget)
         return _candidate_configured_query_execute(root=root, profile=profile, references=references,
             destination=args.destination, max_total_bytes=args.max_total_input_bytes,
-            max_review_bytes=args.max_review_bytes, max_output_bytes=args.max_output_bytes, budget=budget)
+            max_review_bytes=args.max_review_bytes, max_output_bytes=args.max_output_bytes, budget=budget, versioned_output=versioned_output)
     except (TransformationLimitError, TransformationCleanupError, QueryWorkBudgetExceeded) as error:
         return report_cli_error(args, code=CliErrorCode.INVALID_INPUT, message=str(error))
     except (ValueError, OSError):

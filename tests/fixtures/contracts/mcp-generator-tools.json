@@ -27,6 +27,214 @@
     }
   },
   {
+    "description": "Closed fictional common-profile consumer; no rows or approval issuer.",
+    "input_schema": {
+      "properties": {
+        "destination": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Destination"
+        },
+        "max_output_bytes": {
+          "title": "Max Output Bytes",
+          "type": "integer"
+        },
+        "max_review_bytes": {
+          "title": "Max Review Bytes",
+          "type": "integer"
+        },
+        "max_total_bytes": {
+          "title": "Max Total Bytes",
+          "type": "integer"
+        },
+        "operation": {
+          "enum": [
+            "review",
+            "validate",
+            "execute"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile": {
+          "title": "Profile",
+          "type": "string"
+        },
+        "receipt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Receipt"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot Sha256"
+        }
+      },
+      "required": [
+        "operation",
+        "profile",
+        "max_total_bytes",
+        "max_review_bytes",
+        "max_output_bytes"
+      ],
+      "title": "common_transformationArguments",
+      "type": "object"
+    },
+    "name": "common_transformation",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "common_transformationDictOutput",
+      "type": "object"
+    }
+  },
+  {
+    "description": "",
+    "input_schema": {
+      "properties": {
+        "destination": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Destination"
+        },
+        "handle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Handle"
+        },
+        "max_output_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Output Bytes"
+        },
+        "max_review_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Review Bytes"
+        },
+        "max_total_bytes": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Total Bytes"
+        },
+        "operation": {
+          "enum": [
+            "open",
+            "review",
+            "validate",
+            "execute",
+            "close"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Profile"
+        },
+        "references": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "References"
+        },
+        "snapshot_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snapshot Sha256"
+        }
+      },
+      "required": [
+        "operation"
+      ],
+      "title": "configured_query_sessionArguments",
+      "type": "object"
+    },
+    "name": "configured_query_session",
+    "output_schema": {
+      "additionalProperties": true,
+      "title": "configured_query_sessionDictOutput",
+      "type": "object"
+    }
+  },
+  {
     "description": "Explicit local mixed-origin execution; cannot issue preservation receipts.\n\nRequires the reviewed snapshot digest and, for preservation, a matching\nreceipt issued by the separate controlling-TTY local approval operation.\nReturns bounded counts and digest metadata, never source or output rows.",
     "input_schema": {
       "properties": {

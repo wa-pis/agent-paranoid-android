@@ -380,15 +380,20 @@ def test_field_models_reject_invalid_distribution_bounds(distribution: dict) -> 
         FieldSpec(name="value", data_type=FieldType.STRING, distribution=distribution)
 
 
-def test_field_models_preserve_untyped_distribution_metadata() -> None:
+def test_field_models_require_typed_nonempty_distribution_metadata() -> None:
+    with pytest.raises(ValidationError, match="supported kind"):
+        FieldProfile(
+            name="legacy_metric",
+            data_type=FieldType.FLOAT,
+            distribution={"min_value": 1, "max_value": 9},
+        )
     field = FieldProfile(
-        name="legacy_metric",
-        data_type=FieldType.FLOAT,
-        distribution={"min_value": 1, "max_value": 9},
+        name="legacy_metric", data_type=FieldType.FLOAT,
+        distribution={"kind": "numeric", "min_value": 1, "max_value": 9},
     )
-
-    assert field.distribution == {"min_value": 1, "max_value": 9}
-    assert field.typed_distribution is None
+    assert field.distribution["min_value"] == 1
+    assert field.distribution["max_value"] == 9
+    assert field.typed_distribution is not None
 
 
 def test_privacy_policy_helpers_detect_and_mask_sensitive_values() -> None:

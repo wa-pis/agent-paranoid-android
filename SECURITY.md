@@ -100,3 +100,16 @@ The maintainer will acknowledge credible private reports as soon as practical,
 triage severity, and publish a fix with tests before discussing details
 publicly. If the issue affects users who may have generated unsafe artifacts,
 release notes should include clear remediation guidance.
+
+
+### Configured SQL Transformation Sessions
+
+The separately selected 1.6 RC query workflow captures one allowlisted read-only
+result using administrator configuration, then reviews and validates frozen
+local bytes without reconnecting. It does not expand ordinary profiling or
+source-free generation authority. MCP returns only metadata and consumes an
+existing exact local controlling-TTY receipt when preservation requires one;
+it cannot issue approval. Session handles expire without recapture, owned raw
+inputs/receipts are removed, and only validated selected output is retained.
+Cleanup failure refuses further work. Registration is not data access permission
+or final exact-SHA security/release clearance.

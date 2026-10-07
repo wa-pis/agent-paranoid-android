@@ -1,8 +1,8 @@
-"""Closed SQL/common workflow composition; no registration or dataset approval.
+"""Owned configured-SQL capture composition for CLI and MCP workflows.
 
-Only fictional development may materialize captured rows into this owned
-workspace. Existing CLI/MCP candidate consumers subsequently read the frozen
-snapshot and never reconnect during review, receipt consumption or execution.
+Configured read authority and shared limits govern captured rows in this temporary
+workspace. Consumers reuse the frozen snapshot without reconnecting during review,
+local receipt consumption, validation or execution.
 """
 from collections.abc import Iterator, Mapping
 from contextlib import contextmanager

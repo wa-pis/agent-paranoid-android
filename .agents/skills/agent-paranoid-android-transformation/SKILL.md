@@ -36,3 +36,16 @@ When an explicit interface is available:
 If the installed interface lacks any required review, approval, or safety
 step, stop and report the unavailable step. Offer the source-free synthetic
 workflow as a separate alternative, never as a silent substitute.
+
+
+For configured SQL, check that the installed `transform-batch query-execute`
+or MCP `configured_query_session` interface is actually present. Use only
+authorised administrator-configured sources and bounded workspace query
+references; never supply endpoints, credentials, arbitrary SQL or driver code.
+The CLI invocation captures/reviews/approves locally if required/publishes once.
+For MCP, open one session and retain its handle and exact digest. Let the local
+operator use its approval descriptor with the existing controlling-TTY CLI;
+this skill and MCP cannot approve. Review/validate/execute reuse the frozen
+snapshot. Expired handles require an explicit new capture and fresh review,
+not an automatic retry. Report cleanup failures and admission refusals; do not
+raise limits or restart the server to bypass them. Return only bounded metadata.

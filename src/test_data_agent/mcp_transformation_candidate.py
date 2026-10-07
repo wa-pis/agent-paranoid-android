@@ -1,7 +1,7 @@
-"""Unregistered workspace execution candidate; fictional test use only.
+"""Workspace adapters for registered selective-transformation MCP tools.
 
-No production tool registration or approval issuer. Public activation requires the
-completed wiring's independent safety review and matching policy amendments.
+Runtime composition injects validated workspace and bounded SQL-session ownership.
+Tools return metadata and consume exact local receipts; MCP never issues approval.
 """
 
 from typing import Any, Literal, TYPE_CHECKING

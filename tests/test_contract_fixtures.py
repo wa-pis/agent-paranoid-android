@@ -89,6 +89,8 @@ def test_public_contract_fixtures_remain_typed_and_row_free() -> None:
     ]
     assert {tool["name"] for tool in generator_tools} == {
         "approve_dataset_plan",
+        "common_transformation",
+        "configured_query_session",
         "export_dataset",
         "generate_dataset",
         "infer_dataset_spec",

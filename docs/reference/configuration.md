@@ -18,8 +18,8 @@ does not read provider credentials or test remote reachability.
 
 ## Closed common transformation profile
 
-This development candidate is unregistered and exercised only on fictional
-temporary roots. Its versioned reference profile combines two or more inputs
+The 1.6 RC composition registers the common CLI/MCP workflow; published 1.5.0
+does not include it. Its versioned reference profile combines two or more inputs
 with one independently reviewed DatasetSpec for final linked validation:
 
 ```yaml
@@ -47,7 +47,7 @@ Optional shared `resource_limits` supports only `max_total_input_bytes` and
 `max_output_bytes`; remaining dimensions stay in per-input behavior policies.
 Session precedence and explicit run-cap checks below still apply. Combined
 review bytes must fit `--max-review-bytes`; no truncation or implicit cap raise.
-The closed create/wizard saves only policies/spec/references, not source copies
+The local create/wizard saves only policies/spec/references, not source copies
 or receipts. Saving changes paths and therefore requires fresh review. See the
 [closed CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
 CSV proposals, local confirmation and retained-publication restrictions. This
@@ -98,10 +98,10 @@ does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
 
 ## Private Transformation Input Limits (1.6 Development)
 
-These settings currently apply to private source-file acquisition, the transformation input decoder and
-its policy-aware review preflight and CSV profiling/trace shape checks. They do not enable public execution, change
-source-free profiling/MCP budgets, or establish end-to-end capacity. Remaining
-pipeline caps still apply. The fictional private replacement-only CSV scenario
+These settings apply to transformation acquisition, decoding and policy-aware
+review preflight in the 1.6 RC composition, plus CSV profiling/trace shape checks.
+They do not change source-free profiling/MCP budgets or themselves establish
+end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
 [candidate evidence](https://github.com/wa-pis/agent-paranoid-android/blob/12e9e272c98ea469cbef92fe9fae49c518046461/openspec/changes/selective-source-transformation/csv-scale-acceptance.md).
 This does not certify public execution, SQL routes or the 1M × 100 target.
@@ -193,18 +193,19 @@ also counts the manifest: `bundle_run` names
 `temporary_csv_publication(max_output_bytes=...)`. A bundle over budget is
 rejected before publication. These share the output ceiling when invoked by
 the publisher; standalone renderers only receive their explicit run budget.
-Private fictional query capture uses the same transformation input ceilings:
+Configured query capture uses the same transformation input ceilings:
 `max_rows` / `max_bytes` must fit the effective row / input-file-byte limits
 before opening its stream. Runtime exhaustion names `query_rows_run` or
 `query_bytes_run` and the corresponding `_capture_authorized_result` argument.
 Captured bytes include the query envelope; decoded bytes have their own
 `max_parquet_expanded_bytes` ceiling. The resolved limits and their origins
-are bound into capture metadata. PostgreSQL's private stream uses these
+are bound into capture metadata. PostgreSQL's owned stream uses these
 authorized capture limits, not aggregate-profiling result-row/cell budgets;
 allowlists, read-only sessions and existing statement/time limits remain.
 The private process supervisor reconstructs only validated fixed-schema limit
 diagnostics after clean worker exit and cleanup, never driver exception text.
-This does not activate public execution or establish real-database evidence.
+The registered RC workflow uses these checks; synthetic isolation evidence
+does not establish live-database acceptance.
 
 The private replacement dry-run has the same checks. Its exhausted run budget
 reports origin `replacement_trace_run` and names
@@ -466,3 +467,29 @@ These accept `1`, `true`, `yes`, or `on` and their false equivalents.
 
 Do not enable either override for production or production-adjacent Trino.
 Plain HTTP is intended only for an isolated local integration environment.
+
+
+## Configured SQL Session Bounds (1.6 RC)
+
+The generator MCP entrypoint reads these administrator settings once at startup.
+They bound the instance-owned `configured_query_session` manager, not ordinary
+source-free profiling or database credentials. Published 1.5.0 has no session
+tool. Invalid settings or workspace paths stop startup with a fixed error and
+exit code 78.
+
+| Variable | Default | Accepted values and meaning |
+| --- | ---: | --- |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE` | `4` | Integer 1–32; maximum simultaneously owned sessions. |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_CUMULATIVE_BYTES` | `67108864` | Positive integer through 9223372036854775807; lifetime input-byte reservation ceiling for this server instance. |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_SECONDS` | `300` | Finite seconds 0.1–3600; session lifetime starts before capture and is never renewed by requests. |
+
+Each `open` reserves its explicit `max_total_bytes` before database work.
+Reservations are not refunded after failure, close or expiry. Per-input policy
+and transformation session ceilings still apply, as do SQL allowlists and
+statement, scan, invocation, transport and response budgets. Active operations
+are clamped to the session's remaining lifetime and request deadline.
+`max_review_bytes` must be positive and no greater than `max_total_bytes`; the
+output cap must fit the effective batch output ceiling. Expiry timers clean
+owned snapshots without requiring another request. The entrypoint also closes
+all sessions on normal or failed transport shutdown; cleanup failures refuse
+further work. See [the session workflow](../how-to/mcp.md#configured-sql-sessions-16-rc).

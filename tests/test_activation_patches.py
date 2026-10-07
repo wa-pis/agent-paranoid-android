@@ -11,6 +11,9 @@ def _compose_activation_patches(root: Path, destination: Path) -> None:
     sql = directory / "sql-query-public-activation.patch"
     if sql.exists():
         names.append(sql.name)
+    reconciliation = directory / "public-contract-reconciliation.patch"
+    if reconciliation.exists():
+        names.append(reconciliation.name)
     patches = [directory / name for name in names]
     # Handle both Git-style and unified patches, including newly created files.
     targets = {line[6:] for patch in patches for line in patch.read_text().splitlines()
@@ -40,8 +43,9 @@ def _compose_activation_patches(root: Path, destination: Path) -> None:
 
     # Unwind a fully composed SQL overlay before the four earlier registrations.
     # A four-patch copy and a closed author checkout remain valid starting points.
-    if len(patches) == 5 and applies(patches[-1], reverse=True):
-        apply(patches[-1], reverse=True)
+    for overlay in reversed(patches[4:]):
+        if applies(overlay, reverse=True):
+            apply(overlay, reverse=True)
     if applies(patches[0], reverse=True):
         for patch in reversed(patches[:4]):
             apply(patch, reverse=True)

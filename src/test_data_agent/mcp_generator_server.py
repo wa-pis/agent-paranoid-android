@@ -9,7 +9,10 @@ from collections.abc import Callable
 from dataclasses import replace
 from functools import partial
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
@@ -735,10 +738,19 @@ def generator_mcp_services(
     *,
     work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
     budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
+    query_sessions: "_ConfiguredQuerySessions | None" = None,
+    workspace: Path | None = None,
 ) -> list[Callable[..., Any]]:
+    from test_data_agent.mcp_transformation_candidate import _common_batch_tool
+    tools: tuple[Callable[..., Any], ...] = _GENERATOR_MCP_TOOLS
+    if workspace is not None:
+        tools = (*tools, _common_batch_tool(workspace))
+    if query_sessions is not None:
+        from test_data_agent.mcp_transformation_candidate import _configured_query_session_tool
+        tools = (*tools, _configured_query_session_tool(query_sessions))
     return [
         with_query_work_budget(tool, work_limits, budget_provider=budget_provider)
-        for tool in _GENERATOR_MCP_TOOLS
+        for tool in tools
     ]
 
 
@@ -763,7 +775,8 @@ def _current_transport_work_budget() -> QueryWorkBudget | None:
 
 
 mcp: Any = create_generator_mcp(
-    generator_mcp_services(budget_provider=_current_transport_work_budget)
+    generator_mcp_services(budget_provider=_current_transport_work_budget),
+    strict_arguments=True,
 )
 
 
@@ -792,20 +805,28 @@ def main() -> int:
         )
         return 78
     audit_logger_from_env("generator-mcp")
-    mcp = create_generator_mcp(
-        generator_mcp_services(
-            work_limits=work_limits,
-            budget_provider=_current_transport_work_budget,
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+    try:
+        configured_workspace = workspace_root()
+        sessions = _ConfiguredQuerySessions(configured_workspace,
+            max_active=int(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE", "4")),
+            max_cumulative_bytes=int(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_CUMULATIVE_BYTES", str(64 * 1024**2))),
+            max_seconds=float(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_SECONDS", "300")))
+    except (ValueError, OSError):
+        print("Invalid bounded SQL session configuration", file=sys.stderr)
+        return 78
+    try:
+        mcp = create_generator_mcp(
+            generator_mcp_services(work_limits=work_limits,
+                budget_provider=_current_transport_work_budget, query_sessions=sessions, workspace=configured_workspace),
+            strict_arguments=True,
         )
-    )
-    run_bounded_generator_mcp(
-        mcp,
-        max_payload_bytes=work_limits.raw_transport_payload_bytes,
-        request_context_factory=partial(
-            _new_transport_work_budget,
-            work_limits=work_limits,
-        ),
-    )
+        run_bounded_generator_mcp(
+            mcp, max_payload_bytes=work_limits.raw_transport_payload_bytes,
+            request_context_factory=partial(_new_transport_work_budget, work_limits=work_limits),
+        )
+    finally:
+        sessions.close()
     return 0
 
 

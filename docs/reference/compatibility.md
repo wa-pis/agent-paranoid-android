@@ -69,10 +69,12 @@ broader compatibility rules.
 ## Transformation Candidate Scope
 
 Published 1.5.0 compatibility does not include the 1.6 transformation candidate.
-The author branch registers a separately selected single-source local CLI/MCP
-consumer; ordinary generation APIs remain source-free. The saved-profile common
-workflow and configured SQL capture helpers remain private until their own
-activation and final-SHA acceptance gates. See the
+The 1.6 RC composition registers the single-source and saved-profile common
+CLI/MCP workflows plus configured SQL sessions. Ordinary generation APIs remain
+source-free. The running generator server adds `common_transformation` and
+`configured_query_session`; custom SDK embedding must explicitly inject its
+workspace/session owner and close that owner on shutdown. Final exact-SHA safety
+and release gates remain required. See the
 [candidate CLI contract](cli.md#implemented-rc-execution-candidate) and
 [closed common-profile contract](cli.md#closed-common-profile-workflow-candidate).
 Command discovery is not dataset approval or a promise of released compatibility.

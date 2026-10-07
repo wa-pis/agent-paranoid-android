@@ -10,6 +10,14 @@ Stable `1.5.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
+Prospective candidate `1.6.0rc1` is prepared for independent exact-commit
+acceptance; it is not yet published. Stable `1.5.0` remains the recommended
+release. After successful publication, the explicit candidate pin is:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.6.0rc1"
+```
+
 ## Install And Try It
 
 Python 3.11 or newer is required.

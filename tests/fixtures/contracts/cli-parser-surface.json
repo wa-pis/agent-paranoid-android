@@ -29,6 +29,7 @@
     "generate-from-csv",
     "validate",
     "generate-from-example",
+    "transform-batch",
     "demo",
     "doctor",
     "audit-verify",

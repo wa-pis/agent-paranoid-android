@@ -439,6 +439,11 @@ def register_dataset_commands(
         action="store_true",
         help="Allow replacing an existing profile JSON.",
     )
+    profile_query_parser.add_argument(
+        "--trino-oauth-browser", action="store_true",
+        help="Explicit local-terminal OAuth2 browser opt-in for Trino; never prints authentication URLs.",
+    )
+
     add_local_category_option(profile_query_parser)
 
     generate_csv_parser = subparsers.add_parser(
