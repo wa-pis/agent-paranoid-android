@@ -123,6 +123,13 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
 - [ ] Amend SQL baseline/docs; prove accepted and rejected shapes for PostgreSQL
   and Trino with fictional tests; independently safety-review the exact SHA
   before public activation. No internal formula engine or live DB access.
+  - [x] Reconcile baseline/docs and fictional accepted/rejected adapter coverage:
+    baseline `openspec/specs/sql-query-source-profiling/spec.md` and Trino guide
+    define policy1.1; `test_allowed_aggregate_sources`,
+    `test_aggregate_expansion_keeps_rejection_boundary`, column authorization
+    and AST budget tests are included in exact268efc9a fullgate3158passed.
+    Complete whole-source scan e01b29fa covers this composition with no findings.
+    Public activation/final versioned SHA acceptance remains open.
 
 ## Owner scope correction — 2026-09-28
 
