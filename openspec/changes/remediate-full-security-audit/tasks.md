@@ -955,3 +955,8 @@ below the fixture source size); no implicit escalation. Session12476; log
 2026-10-07 target1Mx100 installed CSV scale passed1237.135s/100Mcells,
 600500900 output bytes, complete readback/cleanup and exit0. Session12476
 finished; evidence in current candidate acceptance. Other routes remain open.
+
+2026-10-07 next installed scale constituent started:Parquet->Parquet
+300000rows x50columns, same fully reviewed harness/exact268efc9a/wheel430e0405
+Python3.11. Explicit512MiB/1800s, temporary synthetic files; session58182,
+log/private/tmp/apa-final-current-scale-parquet300k.log. No pass yet.
