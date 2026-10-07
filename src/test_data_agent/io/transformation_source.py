@@ -3,7 +3,7 @@
 import csv
 import os
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from test_data_agent.core.field import FieldProfile
 from collections.abc import Iterator, Sequence
 from pathlib import Path
@@ -274,7 +274,7 @@ def trace_csv_review_request(
             traced_cells = 0
             for row_ordinal, row in enumerate(reader, start=1):
                 budget.check("text trace")
-                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date, datetime))) for value in row.values()):
                     raise ValueError
                 for column_ordinal, column in enumerate(names, start=1):
                     if column in selected:

@@ -238,7 +238,8 @@ def _postgres_capture_schema(columns: tuple[PostgresResultColumn, ...]) -> Any:
     types = {"text": pa.string(), "character varying": pa.string(),
         "character": pa.string(), "smallint": pa.int16(), "integer": pa.int32(),
         "bigint": pa.int64(), "real": pa.float64(), "double precision": pa.float64(),
-        "boolean": pa.bool_(), "date": pa.date32()}
+        "boolean": pa.bool_(), "date": pa.date32(),
+        "timestamp with time zone": pa.timestamp("us", tz="UTC")}
     valid = False
     try:
         if (type(columns) is not tuple or not 0 < len(columns) <= DEFAULT_MAX_INPUT_COLUMNS

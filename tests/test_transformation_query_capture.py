@@ -375,3 +375,44 @@ def test_capture_rejects_query_change_after_metadata_before_stream(tmp_path):
         _capture_authorized_result(request, stream=forbidden,
             expected_query_sha256=plan.fingerprint, **kwargs)
     assert caught.value.__context__ is None
+
+
+def test_utc_timestamp_capture_replacement_keeps_microseconds(tmp_path):
+    from datetime import datetime, timezone
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    original = "2024-01-02T03:04:05.123456+00:00"
+    replacement = "2030-02-03T04:05:06.654321+00:00"
+    declaration = kwargs["policy"].model_dump(mode="json")
+    declaration["fields"][0]["behavior"]["mapping"]["entries"] = [
+        {"original": [original], "replacement": [replacement]}]
+    kwargs["policy"] = BehaviorPolicy.model_validate(declaration)
+    kwargs["schema"] = pa.schema([pa.field("label", pa.timestamp("us", tz="UTC"), nullable=False),
+        pa.field("measured", pa.int64(), nullable=False)])
+
+    @contextmanager
+    def stream(query):
+        yield iter([pa.RecordBatch.from_pylist([
+            {"label": datetime(2024, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc), "measured": 2}],
+            schema=kwargs["schema"])])
+
+    source = _capture_authorized_result(request, stream=stream, **kwargs)
+    profile = _profile_transformation_source(source, kwargs["policy"],
+        budget=GenerationBudget(5), max_bytes=16384)
+    policy = kwargs["policy"].model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    material = prepare_csv_review_request(yaml.safe_dump(policy.model_dump(mode="json")).encode(), source, (),
+        max_total_bytes=32768, max_review_bytes=8192, budget=GenerationBudget(5))
+    with temporary_csv_publication(material, max_total_bytes=32768, max_review_bytes=8192,
+            max_output_bytes=16384, budget=GenerationBudget(5)) as output:
+        assert list(csv.DictReader(io.StringIO((output / "dataset.csv").read_text()))) == [
+            {"label": replacement, "measured": "8"}]
+
+
+def test_timestamp_reuse_guard_compares_instants_without_string_coercion():
+    from datetime import datetime, timezone
+    from test_data_agent.io.transformation_input import same_native_value
+
+    original = datetime(2024, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc)
+    assert same_native_value(original, "2024-01-02T04:04:05.123456+01:00")
+    assert not same_native_value(original, "2024-01-02T03:04:05.123456")
+    assert not same_native_value(original, "fictional malformed timestamp")

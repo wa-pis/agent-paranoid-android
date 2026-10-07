@@ -8,7 +8,7 @@ Those remaining activation gates require separate evidence before real use.
 import math
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager, suppress
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -106,6 +106,9 @@ The query originates in capture authorization, not caller SQL or a receipt.
                         or (pa.types.is_float64(field.type) and type(value) is float and math.isfinite(value))
                         or (pa.types.is_boolean(field.type) and type(value) is bool)
                         or (pa.types.is_date32(field.type) and type(value) is date)
+                        or (pa.types.is_timestamp(field.type) and field.type.unit == "us"
+                            and field.type.tz == "UTC" and type(value) is datetime
+                            and value.tzinfo is not None and value.utcoffset() is not None)
                         or (pa.types.is_decimal128(field.type) and type(value) is Decimal and value.is_finite())
                     ):
                         raise ValueError

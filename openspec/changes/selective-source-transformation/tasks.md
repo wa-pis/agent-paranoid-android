@@ -679,3 +679,13 @@ is discarded before supervisor dispatch while explicit request/config/policy
 remain bound; driver factory cannot be selected by caller.1passed0.30s/Ruff.
 No live driver call. Temporal native input support and Trino-owned capture are
 still missing constituents; no final public SQL acceptance claimed.
+
+2026-10-07 closed native UTC timestamp substitution now preserves microseconds
+through typed query capture, source profile, exact mappings and CSV readback.
+PostgreSQL aware native datetime accepts only UTC microsecond Arrow schema;
+naive/no-zone metadata and other timestamp encodings remain rejected. Native
+preservation remains blocked; no timezone guessing or new public registration.
+Reuse comparison recognizes equivalent aware instants, rejects naive matching.
+SQL capture/isolation86passed30.87s; final timestamp2passed0.27s/Ruff.
+Initial end-to-end test exposed missing DATETIME mapping allowlist; repaired in
+shared execution before accepting the result. Trino capture/public wiring open.

@@ -9,7 +9,7 @@ import csv
 from test_data_agent.io.writers import neutralize_csv_cell
 import os
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from test_data_agent.io.transformation_input import source_reader, matching_text, same_native_value
 from test_data_agent.core.transformation_limits import InputDimension, TransformationLimitError, resolve_input_limit
 import io
@@ -100,7 +100,7 @@ def trace_csv_replacements(
             traced_cells = 0
             for row_number, row in enumerate(reader, 1):
                 budget.check("CSV replacement trace")
-                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date, datetime))) for value in row.values()):
                     raise ValueError
                 for column_number, name in enumerate(names, 1):
                     budget.check("CSV replacement trace cell")
@@ -162,7 +162,7 @@ def _replace_csv_snapshot(
         field_types.update({name: FieldType.DECIMAL for name in decimal_types})
 
         def scalar(name: str, value: Any) -> Any:
-            if policy.input_format != "csv" and type(value) is date:
+            if policy.input_format != "csv" and type(value) in (date, datetime):
                 return value.isoformat()
             if policy.input_format != "csv" and field_types[name] == FieldType.BOOLEAN:
                 if type(value) is bool:
@@ -242,7 +242,7 @@ def _replace_csv_snapshot(
             if isinstance(action, SubstituteAction):
                 if field_types[decision.field] == FieldType.BOOLEAN and policy.input_format == "csv":
                     raise ValueError
-                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL, FieldType.BOOLEAN) or not isinstance(
+                if field_types[decision.field] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DATETIME, FieldType.DECIMAL, FieldType.BOOLEAN) or not isinstance(
                         action.unmatched, (RejectUnmatched, PreserveAction, SynthesizeAction)):
                     raise ValueError
                 needs_receipt |= isinstance(action.unmatched, PreserveAction)
@@ -257,7 +257,7 @@ def _replace_csv_snapshot(
                         and isinstance(item.behavior.mapping, DomainMapping)
                         and item.behavior.mapping.name == declaration.name)
                     source_columns = tuple(name for _, name in members)
-                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DECIMAL, FieldType.BOOLEAN) for name in source_columns):
+                    if any(field_types[name] not in (FieldType.STRING, FieldType.INTEGER, FieldType.FLOAT, FieldType.DATE, FieldType.DATETIME, FieldType.DECIMAL, FieldType.BOOLEAN) for name in source_columns):
                         raise ValueError
                     declaration = domains[declaration.name]
                 shapes = tuple((decimal_types[name].precision, decimal_types[name].scale)
@@ -379,7 +379,7 @@ def _replace_csv_snapshot(
             null_fields: set[str] = set()
             coincident_zero_fields: set[str] = set()
             budget.check("CSV replacement")
-            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+            if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date, datetime))) for value in row.values()):
                 raise ValueError
             for name in decimal_types:
                 if row[name] != policy.csv_nulls.input_token:

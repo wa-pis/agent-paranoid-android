@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Support exact UTC microsecond timestamp substitution in the closed native transformation candidate; naive timestamps and other Arrow timestamp encodings remain rejected.
+
 - Prepare a closed PostgreSQL transformation-capture path that resolves the
   configured optional driver inside the existing supervised worker. Public SQL
   capture remains gated; synthetic isolation tests do not certify live access.
