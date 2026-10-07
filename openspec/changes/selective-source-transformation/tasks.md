@@ -689,3 +689,10 @@ Reuse comparison recognizes equivalent aware instants, rejects naive matching.
 SQL capture/isolation86passed30.87s; final timestamp2passed0.27s/Ruff.
 Initial end-to-end test exposed missing DATETIME mapping allowlist; repaired in
 shared execution before accepting the result. Trino capture/public wiring open.
+
+2026-10-07 Trino client now exposes an internal owned row iterator under the
+same authentication, concurrency, time/scan/result budgets and cleanup. Existing
+list-returning methods consume it unchanged; early exit closes the iterator,
+cursor and connection, preventing post-context reads. Oversized driver batches
+reject.21synthetic client tests passed/Ruff. No new caller SQL surface or live DB;
+typed Trino capture composition/public registration remain next.

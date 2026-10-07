@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import os
 
-from collections.abc import Callable, Iterable, Sequence
-from contextlib import closing
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
 from functools import cached_property
 from threading import BoundedSemaphore
@@ -108,6 +108,21 @@ class TrinoClient:
             Callable[[Any], RowT],
         ],
     ) -> tuple[list[RowT], list[Any]]:
+        with self._query_rows(sql, parameters, row_converter_factory=row_converter_factory) as result:
+            rows, description = result
+            return list(rows), description
+
+    @contextmanager
+    def _query_rows(
+        self,
+        sql: str,
+        parameters: Sequence[Any] | None,
+        *,
+        row_converter_factory: Callable[
+            [Sequence[Any]],
+            Callable[[Any], RowT],
+        ],
+    ) -> Iterator[tuple[Iterator[RowT], list[Any]]]:
         if self.driver is None:
             raise RuntimeError("trino package is not installed")
 
@@ -166,22 +181,29 @@ class TrinoClient:
                     consume_database_result_payload(description)
                     _check_invocation_deadline(budget)
                     convert_row = row_converter_factory(description)
-                    rows: list[RowT] = []
-                    while True:
-                        _check_invocation_deadline(budget)
-                        batch = cursor.fetchmany(1)
-                        _check_invocation_deadline(budget)
-                        if not batch:
-                            break
-                        if len(rows) >= self.config.max_result_rows:
-                            raise TrinoResultLimitError(
-                                "Trino result exceeds the client limit of "
-                                f"{self.config.max_result_rows} rows"
-                            )
-                        row = convert_row(batch[0])
-                        consume_database_result_payload(row)
-                        rows.append(row)
-                    return rows, description
+                    def rows() -> Iterator[RowT]:
+                        count = 0
+                        while True:
+                            _check_invocation_deadline(budget)
+                            batch = cursor.fetchmany(1)
+                            _check_invocation_deadline(budget)
+                            if not batch:
+                                return
+                            if len(batch) != 1 or count >= self.config.max_result_rows:
+                                raise TrinoResultLimitError(
+                                    "Trino result exceeds the client limit of "
+                                    f"{self.config.max_result_rows} rows"
+                                )
+                            row = convert_row(batch[0])
+                            consume_database_result_payload(row)
+                            count += 1
+                            yield row
+                    iterator = rows()
+                    try:
+                        yield iterator, description
+                    finally:
+                        iterator.close()
+                    return
                 except QueryWorkBudgetExceeded:
                     raise
                 except Exception as error:
