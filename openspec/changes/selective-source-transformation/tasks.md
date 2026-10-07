@@ -788,3 +788,14 @@ matches this scope rather than declaring all execution inactive. Strict docs
 passed0.40s. Full current runtime gate started at7ad4da0, synthetic/offline only:
 /private/tmp/apa-owned-sql-release-gate.log,session70761. No pass yet; subsequent
 activation/final release identity still require their exact-source checks.
+
+2026-10-07 prospective4patch composition fromexact7ad4da0 passed195unique
+contract/common tests incl14goldens and controlling-TTY receipts. Sandbox-only
+TTY refusals reran with terminal access. Compositiondigest
+4b0a65ffb6f53fe4d7ba9b5e1c93b40f3afbff10cc7b56a27feadfa30ae6af2d;
+/private/tmp/apa-current-activation-pointer.json. Authorregistrationuntouched.
+Currentauthor fullgate firstfailed15doctor tests/3202pass23skip because root
+strippedHomebrewPATH and psycopg could not import libpq; normalPATH import3.3.4
+confirmed. Retry preservesPATH, session45225/log
+/private/tmp/apa-owned-sql-release-gate-retry.log. Isolatedcomposition fullgate
+nowdispatched separately; nofinalpass/audit/activationclaim.
