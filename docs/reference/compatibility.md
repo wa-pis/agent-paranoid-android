@@ -65,3 +65,14 @@ release notes must identify the affected surface and safe replacement.
 Contract tests cover the CLI aliases, wrapper identity and behavior, and
 transitional summary access. See [Public Stability](stability.md) for the
 broader compatibility rules.
+
+## Transformation Candidate Scope
+
+Published 1.5.0 compatibility does not include the 1.6 transformation candidate.
+The author branch registers a separately selected single-source local CLI/MCP
+consumer; ordinary generation APIs remain source-free. The saved-profile common
+workflow and configured SQL capture helpers remain private until their own
+activation and final-SHA acceptance gates. See the
+[candidate CLI contract](cli.md#implemented-rc-execution-candidate) and
+[closed common-profile contract](cli.md#closed-common-profile-workflow-candidate).
+Command discovery is not dataset approval or a promise of released compatibility.

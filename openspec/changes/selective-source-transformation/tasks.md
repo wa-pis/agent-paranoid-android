@@ -780,3 +780,11 @@ no-connect guarantee.12focused tests passed0.67s,full mypy149modules/Ruff passed
 earlier combined241passed10skipped. Logs/private/tmp/apa-common-query-integrated.log
 and/private/tmp/apa-common-query-final-mypy.log. Public registration/activation
 and full final-SHA gates still open; no live DB or new scale run.
+
+2026-10-07 actual CLI/MCP registration reviewed: existing single-source local
+CLI and execute_transformation consumer are registered on author branch; common
+saved profiles/configured SQL remain private. AGENTS/compatibility wording now
+matches this scope rather than declaring all execution inactive. Strict docs
+passed0.40s. Full current runtime gate started at7ad4da0, synthetic/offline only:
+/private/tmp/apa-owned-sql-release-gate.log,session70761. No pass yet; subsequent
+activation/final release identity still require their exact-source checks.

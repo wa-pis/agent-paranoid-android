@@ -24,12 +24,16 @@ read only the guide that matches the files or behavior being changed.
 Do not weaken these guarantees without executable tests and, for a public
 behavior change, a matching OpenSpec/roadmap update.
 
-## Gated selective transformation (not active)
+## Selective transformation: registered local surface and gated extensions
 
 The separate opt-in transformation proposed for 1.6.0rc1 is not synthetic
-generation. It may eventually produce a labelled mixed-origin, one-to-one
-dataset, but these instructions do not enable that execution path. Existing
-generation, profiling, advisors and default MCP remain source-free.
+generation. The author branch registers the reviewed single-source local
+`transform-approve`/`transform-execute` CLI and `execute_transformation` MCP
+consumer (PR601); it produces labelled mixed-origin, one-to-one artifacts.
+This is not a shipped 1.5.0 capability or authorization of any dataset. The
+saved-profile common workflow and configured database capture remain private
+extensions pending their own activation gates. Existing generation, profiling
+and advisors remain source-free; MCP transformation returns no rows.
 
 Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
@@ -49,7 +53,7 @@ not implicit copying, source-free generation reuse, `preserve`, secrets in logs,
 errors, summaries, providers or MCP responses. Public activation still requires
 matching specifications, executable tests and independent exact-SHA safety review.
 
-This proposed exception remains disabled until matching baseline/OpenSpec
+New activation of this scoped exception remains gated until matching baseline/OpenSpec
 amendments, executable end-to-end safety tests, and independent safety review
 are complete. A policy declaration or private receipt helper is not execution
 authority. Do not route this behavior through source-free generation.
@@ -57,8 +61,8 @@ authority. Do not route this behavior through source-free generation.
 Development and activation are separate gates. Private implementation and
 isolated tests using only fictional inputs may be written and exercised before
 the final safety review; otherwise end-to-end evidence cannot be produced.
-Keep that implementation unavailable through public CLI/Python/MCP execution
-surfaces. Test outputs stay in bounded temporary test locations, never user
+Keep unreviewed extensions unavailable through public CLI/Python/MCP execution
+surfaces; this does not remove the already registered single-source surface. Test outputs stay in bounded temporary test locations, never user
 destinations. This permits no real data access or dataset approval. Passing
 end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
@@ -70,7 +74,7 @@ receipt issuance and matching-receipt consumption by noninteractive/workspace
 execution. Private `derive`, database capture and external APIs are not enabled
 by that contract. Preserve source-free entrances and disclosure budgets;
 enforce complete snapshot totals and identity-limited publication cleanup.
-These instructions still do not activate execution: registration must wait for
+These instructions do not activate new extensions: their registration must wait for
 matching baseline amendments, executable interface evidence and independent
 safety review of the exact activation SHA. A review of private code alone does
 not satisfy review of the policy amendment or public registration.
@@ -80,9 +84,9 @@ issuer, `transform-execute` as the CLI consumer and `execute_transformation`
 as the workspace-confined MCP consumer. Execution requires the exact reviewed
 snapshot digest; a new review digest does not validate an old receipt after
 any bound input changes. Never register an MCP issuer or accept an agent
-approval boolean. Registration may be materialized only in an isolated fictional
-candidate before review, never exposed publicly or used on real inputs. Public
-delivery requires independent safety review of this exact complete code/policy
+approval boolean. New registration may be materialized only in an isolated fictional
+candidate before its review, never exposed publicly or used on real inputs. Public
+delivery of changed activation requires independent safety review of this exact complete code/policy
 SHA and the executable gates above. Candidate help, receipts and acceptance
 are not dataset authorization or proof of completed review.
 
