@@ -80,3 +80,9 @@ This passes the harness contract only; no hard wall-clock/RSS containment claim.
 Python3.11. Ordered full readback, source digest, provenance, stream lifecycle
 and cleanup passed. No database connection or live Trino adapter proof.
 Log `/private/tmp/apa-final-current-scale-trino1m-csv.log`.
+
+2026-10-07 supplied Trino-result->Parquet1Mx100 passed exit0,1598.939s,
+100Mcells/17493375output bytes,17207555capture bytes. Same candidate/wheel/
+Python3.11 and2GiB/128MiB/3600s; full schema/cell readback, digest, lifecycle,
+provenance and cleanup. Synthetic Arrow stream only, no live adapter proof.
+Log `/private/tmp/apa-final-current-scale-trino1m-parquet.log`.

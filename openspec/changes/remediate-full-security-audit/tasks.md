@@ -994,3 +994,9 @@ previously fully reviewed unchanged SQL scale harness and exact268efc9a/
 wheel430e0405/Python3.11. Explicit2GiB/128MiB capture/3600s, no network.
 Session35698; log/private/tmp/apa-final-current-scale-trino1m-parquet.log.
 No pass yet; SQL artifact target is next, not concurrent resource pressure.
+
+2026-10-07 session35698 completed exit0:Trino-result->Parquet1Mx100
+passed1598.939s/full100Mcells. Final planned scale route Trino-result->SQL
+started, explicit4GiB/128MiB capture/3600s: historical SQL fixture output
+exceeds2GiB. Log/private/tmp/apa-final-current-scale-trino1m-sql.log;
+SQL is a temporary artifact, never executed. No additional scale scenarios.
