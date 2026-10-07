@@ -917,3 +917,9 @@ Reconciled source-free compatibility acceptance constituent using existing
 exact268efc9a fullgate and installed inventory evidence; no repeated tests.
 Release remains blocked; CI trino-integration job services uses actual Trino
 localhost and TEST_TRINO_INTEGRATION=1 on codePRs. No workflow modified/skipped.
+
+2026-10-07 owner explicitly authorized mandatory CI with real test Trino
+on synthetic data. The previous no-live-DB CI blocker is superseded for this
+job only; production access and external AI calls remain forbidden. Continue
+client/policy/docs acceptance before versioning; independent GitHub approval
+and all exact-main/signature/public verification gates remain mandatory.
