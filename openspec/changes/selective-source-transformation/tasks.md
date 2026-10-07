@@ -667,3 +667,9 @@ existing validated constructor. No live DB, public registration or RC clearance.
 schema drift both fail without a snapshot and leave no test-owned child;
 normal composed capture still passes.3focused tests passed2.45s; Ruff passed.
 No DB/provider calls or repeated scale tests. Public wiring remains open.
+
+2026-10-07 owned metadata now returns its validated query identity; capture
+requires that same fingerprint before opening the result stream. A changed
+query file with the same output names rejects before result access.16focused
+metadata/worker/query-binding tests passed2.55s; no live DB. Public activation
+and final exact-SHA audit/gates remain open.

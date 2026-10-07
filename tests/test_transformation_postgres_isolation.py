@@ -387,8 +387,9 @@ def test_capture_metadata_uses_only_authorized_no_row_schema(tmp_path, monkeypat
         with pytest.raises(ValueError, match="invalid PostgreSQL capture metadata"):
             _discover_postgres_capture_metadata(request, config, driver=object())
     else:
-        columns, result = _discover_postgres_capture_metadata(request, config, driver=object())
+        columns, result, plan = _discover_postgres_capture_metadata(request, config, driver=object())
         assert columns[0].name == "status" and result[0].name == "label"
+        assert plan.output_fields == ("label",)
     assert events == ["closed"]
 
 

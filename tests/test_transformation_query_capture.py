@@ -358,3 +358,20 @@ def test_postgres_batching_preserves_order_and_rejects_invalid_tail(tmp_path, in
         parquet = pq.ParquetFile(io.BytesIO(_query_result_payload(source.payload, "postgres_query")))
         assert parquet.metadata.num_row_groups == 3
     assert events == ["close", "rollback", "close"]
+
+
+def test_capture_rejects_query_change_after_metadata_before_stream(tmp_path):
+    from test_data_agent.sql_query_source import inspect_query_source, authorize_query_source
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    plan = authorize_query_source(inspect_query_source(request), kwargs["source_columns"])
+    request.query_file.write_text("SELECT status AS label, COUNT(*) AS measured FROM public.orders "
+        "WHERE status = 'fictional' GROUP BY status")
+
+    def forbidden(query):
+        pytest.fail("changed query must not open result stream")
+
+    with pytest.raises(ValueError, match="invalid bounded query capture") as caught:
+        _capture_authorized_result(request, stream=forbidden,
+            expected_query_sha256=plan.fingerprint, **kwargs)
+    assert caught.value.__context__ is None

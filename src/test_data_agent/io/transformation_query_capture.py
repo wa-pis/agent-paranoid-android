@@ -45,6 +45,7 @@ def _capture_authorized_result(
     source_columns: tuple[QuerySourceColumn, ...], schema: Any,
     stream: Callable[[_ResultQuery], AbstractContextManager[Iterator[Any]]],
     policy: BehaviorPolicy, max_rows: int, max_bytes: int, budget: GenerationBudget,
+    expected_query_sha256: str | None = None,
 ) -> SnapshotPart:
     """Authorize before callback; bind context/schema/ordered batches exactly.
 
@@ -78,6 +79,8 @@ def _capture_authorized_result(
         if draft.table_name not in allowed_tables:
             raise ValueError
         plan = authorize_query_source(draft, source_columns)
+        if expected_query_sha256 is not None and expected_query_sha256 != plan.fingerprint:
+            raise ValueError
         if (policy.input_format != f"{plan.adapter.value}_query"
                 or tuple(schema.names) != plan.output_fields
                 or any(item.entity != plan.entity_name for item in policy.fields)

@@ -22,7 +22,7 @@ from test_data_agent.core.transformation_policy import BehaviorPolicy, parse_beh
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
-from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryProfileRequest, inspect_query_source
+from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryProfileRequest, ValidatedSqlQuery
 from test_data_agent.postgres_config import PostgresConfig, with_resolved_postgres_columns
 from test_data_agent.postgres_client import PostgresResultColumn
 
@@ -50,6 +50,7 @@ def _capture_worker(
         if remaining <= 0:
             return
         driver = driver_factory()
+        expected_query_sha256 = None
         if capture.schema is None:
             # Discovery and row access share this owned process and deadline.
             if capture.config.limits.max_statements < 3:
@@ -57,10 +58,11 @@ def _capture_worker(
             config = replace(capture.config, limits=replace(capture.config.limits,
                 max_seconds=min(capture.config.limits.max_seconds, remaining),
                 max_statements=capture.config.limits.max_statements - 1))
-            columns, metadata = _discover_postgres_capture_metadata(
+            columns, metadata, plan = _discover_postgres_capture_metadata(
                 capture.request, config, driver=driver)
             schema = _postgres_capture_schema(metadata)
-            table = inspect_query_source(capture.request).table_name
+            table = ".".join(plan.table_parts)
+            expected_query_sha256 = plan.fingerprint
             config = with_resolved_postgres_columns(config, frozenset(
                 f"{table}.{item.name}" for item in columns))
             capture = replace(capture, config=config, source_columns=columns, schema=schema)
@@ -71,6 +73,7 @@ def _capture_worker(
             allowed_tables=capture.config.allowed_tables, source_columns=capture.source_columns,
             schema=capture.schema, policy=capture.policy, max_rows=capture.max_rows,
             max_bytes=capture.max_bytes, budget=GenerationBudget(remaining),
+            expected_query_sha256=expected_query_sha256,
             stream=partial(_postgres_result_stream, config=capture.config,
                 schema=capture.schema, driver=driver, getenv=os.getenv,
                 clock=time.monotonic))
@@ -192,7 +195,7 @@ def _capture_configured_postgres(
 
 def _discover_postgres_capture_metadata(
     request: SqlQueryProfileRequest, config: PostgresConfig, *, driver: Any,
-) -> tuple[tuple[QuerySourceColumn, ...], tuple[PostgresResultColumn, ...]]:
+) -> tuple[tuple[QuerySourceColumn, ...], tuple[PostgresResultColumn, ...], ValidatedSqlQuery]:
     """Closed bounded metadata discovery; never fetch the result rows."""
     from test_data_agent.postgres_client import PostgresClient
     from test_data_agent.postgres_query_builders import PostgresQuery
@@ -223,7 +226,7 @@ def _discover_postgres_capture_metadata(
         pass
     if not valid:
         raise ValueError("invalid PostgreSQL capture metadata") from None
-    return columns, result
+    return columns, result, plan
 
 
 def _postgres_capture_schema(columns: tuple[PostgresResultColumn, ...]) -> Any:
