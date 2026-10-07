@@ -923,3 +923,9 @@ on synthetic data. The previous no-live-DB CI blocker is superseded for this
 job only; production access and external AI calls remain forbidden. Continue
 client/policy/docs acceptance before versioning; independent GitHub approval
 and all exact-main/signature/public verification gates remain mandatory.
+
+2026-10-07 documentation reconciliation: current-candidate-acceptance now
+records synthetic Trino CI authorization; client-acceptance indexes the exact
+268efc9a evidence and explicitly dates older “current/latest” checkpoints.
+Strict MkDocs build passed (0.39s); selective-source-transformation strict
+OpenSpec validation passed. No runtime changes or repeated product tests.
