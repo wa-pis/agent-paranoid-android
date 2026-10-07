@@ -965,3 +965,10 @@ log/private/tmp/apa-final-current-scale-parquet300k.log. No pass yet.
 Target1Mx100 Parquet started, explicit2GiB expanded/input/output/1800s budget
 (to accommodate decoded strings); log/private/tmp/apa-final-current-scale-parquet1m.log.
 No pass claimed before final readback/cleanup.
+
+2026-10-07 target Parquet1Mx100 exceeded1800s wall time while still running.
+Native1s process sample shows active Python generator computation (not enough
+Python frames to attribute a function); no successful result. Cooperative
+budget is not a hard process cutoff. Sample/private/tmp/apa-parquet-scale-process-sample.txt;
+session30143 remains active. Treat this acceptance as pending/over-budget,
+not a pass or confirmed security finding; investigate before final clearance.
