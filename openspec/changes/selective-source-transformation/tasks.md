@@ -799,3 +799,14 @@ strippedHomebrewPATH and psycopg could not import libpq; normalPATH import3.3.4
 confirmed. Retry preservesPATH, session45225/log
 /private/tmp/apa-owned-sql-release-gate-retry.log. Isolatedcomposition fullgate
 nowdispatched separately; nofinalpass/audit/activationclaim.
+
+2026-10-07 current author runtime release gate retryPASSED exit0:
+3217passed23skipped/90.54%coverage199.19s; lint/fulltypes/compile/licenses/
+compatibility/directprivacy/resource/schema/quickstart complete. Log
+/private/tmp/apa-owned-sql-release-gate-retry.log. BothDB integrationsdisabled
+locally; requiredsyntheticTrinoCI remainsfuturegate. No more unchangedruntime
+replayneeded. Acceptance reconciliation: historicalscale/auth/metadata/harness
+constituents have proof; remaining concrete runtimeblocker is publicconfigured
+SQL references/capture contract, not anotherprivatehelper. Fourprospective
+patches exposecommonconsumer only. Finalactivation,installedversionedartifact,
+exactSHAaudit and requiredapproval remainopen.
