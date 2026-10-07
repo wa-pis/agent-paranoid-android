@@ -951,3 +951,7 @@ full readback/cleanup, exit0. Target1Mx100 CSV started using same reviewed
 harness/candidate with explicit1GiB input/output and1800s (512MiB would be
 below the fixture source size); no implicit escalation. Session12476; log
 /private/tmp/apa-final-current-scale1m.log. Other scale routes remain open.
+
+2026-10-07 target1Mx100 installed CSV scale passed1237.135s/100Mcells,
+600500900 output bytes, complete readback/cleanup and exit0. Session12476
+finished; evidence in current candidate acceptance. Other routes remain open.

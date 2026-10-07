@@ -51,3 +51,10 @@ complete ordered readback, input digest, provenance and cleanup assertions.
 Exact268efc9a/wheel430e0405/Python3.11; log
 `/private/tmp/apa-final-current-scale300k.log`, exit0. Private replacement-only
 CSV route, not public/12route scale or peak-memory containment evidence.
+
+2026-10-07 target installed CSV scale:1000000rows x100columns passed
+(100M cells),1237.135s,600500900 output bytes, exit0. Explicit1GiB/1800s
+budgets; complete ordered readback, provenance, source integrity and cleanup.
+Same exact268efc9a/wheel430e0405/Python3.11; log
+`/private/tmp/apa-final-current-scale1m.log`. Private CSV replacement route
+only; other input/output scale routes and final versioned RC remain open.
