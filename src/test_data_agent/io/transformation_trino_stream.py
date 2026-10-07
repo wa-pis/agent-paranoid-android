@@ -227,6 +227,14 @@ def _trino_capture_worker(capture: _TrinoCapture, driver_factory: Callable[[], A
             length.value = -2
         else:
             length.value = -1
+    except QueryWorkBudgetExceeded as error:
+        data = json.dumps([error.dimension.value, error.attempted, error.limit],
+            separators=(",", ":")).encode("ascii")
+        if len(data) < len(diagnostic):
+            diagnostic[:len(data)] = data
+            length.value = -3
+        else:
+            length.value = -1
     except BaseException:
         length.value = -1
 

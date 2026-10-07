@@ -758,3 +758,12 @@ Root corrected four strict-type errors in streaming iterator/optional allowlists
 full mypy148modules passed,79focused regressions passed0.83s/Ruff. Public
 registration and final release gates remain open. Parallel common SQL integration
 is in progress and not included in these checks.
+
+2026-10-07 owned Trino preserves typed QueryWorkBudgetExceeded through shared
+capture and bounded fixed-field IPC, without serializing backend messages.
+Synthetic refusal asserts cumulative statements3>2 and child reaping; isolation
+and capture suites66 passed8.11s/Ruff. Log/private/tmp/apa-trino-typed-refusal.log.
+Parallel integration still under development; full type gate pending its config
+union fixes. SECURITY scoped mapping amendment matches owner ADR0029; strict
+docs passed0.40s. Activation wording/actual registration reconciliation and
+final exact-SHA safety evidence still required; no composite task closed.

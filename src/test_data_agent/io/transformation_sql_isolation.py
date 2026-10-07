@@ -13,6 +13,7 @@ from test_data_agent.core.transformation_limits import (
 )
 from test_data_agent.core.transformation_policy import parse_behavior_policy
 from test_data_agent.core.transformation_snapshot import SnapshotPart
+from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded, QueryWorkDimension
 
 def _capture_sql_isolated(
     capture: Any, *, worker: Callable[..., None],
@@ -27,7 +28,7 @@ def _capture_sql_isolated(
     process = None
     cleanup_failed = False
     payload = None
-    limit_error = None
+    limit_error: TransformationLimitError | QueryWorkBudgetExceeded | None = None
     try:
         if (type(capture.max_bytes) is not int
                 or not 0 < capture.max_bytes <= 2**63 - 1
@@ -62,6 +63,11 @@ def _capture_sql_isolated(
                 bytes(diagnostic).split(b"\0", 1)[0])
             limit_error = TransformationLimitError(InputDimension(dimension), amount,
                 threshold, origin, requested=requested)
+        elif (not process.is_alive() and process.exitcode == 0
+                and length.value == -3 and time.monotonic() < work_deadline):
+            dimension, attempted, threshold = json.loads(bytes(diagnostic).split(b"\0", 1)[0])
+            limit_error = QueryWorkBudgetExceeded(dimension=QueryWorkDimension(dimension),
+                attempted=attempted, limit=threshold)
     except TransformationLimitError as error:
         limit_error = error
     except Exception:

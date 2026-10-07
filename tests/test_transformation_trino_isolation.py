@@ -100,3 +100,19 @@ def test_owned_trino_capture_review_and_exact_temporary_output(tmp_path, output_
             assert "VALUES ('gamma', 8);" in payload and "VALUES ('delta', 7);" in payload
             assert "alpha" not in payload and "beta" not in payload
     assert not destination.parent.exists()
+
+
+def test_owned_trino_statement_refusal_is_typed_and_reaped(tmp_path, monkeypatch):
+    from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded, QueryWorkDimension
+
+    monkeypatch.setenv("TRINO_MAX_INVOCATION_STATEMENTS", "2")
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}), allowed_table_columns=frozenset({"lake.safe.orders.*"}))
+    before = {child.pid for child in multiprocessing.active_children()}
+    with pytest.raises(QueryWorkBudgetExceeded) as caught:
+        _capture_trino_isolated(_TrinoCapture(request, config, "warehouse", kwargs["policy"], 3, 16384),
+            driver_factory=partial(_fictional_trino, None), max_seconds=10)
+    assert caught.value.dimension is QueryWorkDimension.STATEMENTS
+    assert caught.value.attempted == 3 and caught.value.limit == 2
+    assert {child.pid for child in multiprocessing.active_children()} <= before
