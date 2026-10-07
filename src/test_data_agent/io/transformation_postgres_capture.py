@@ -24,6 +24,7 @@ from test_data_agent.io.transformation_postgres_stream import _postgres_result_s
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
 from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryProfileRequest
 from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.postgres_client import PostgresResultColumn
 
 
 @dataclass(frozen=True, repr=False)
@@ -165,3 +166,39 @@ def _capture_configured_postgres(
     return _capture_postgres_isolated(
         capture, driver_factory=_configured_postgres_driver, max_seconds=max_seconds,
     )
+
+
+def _discover_postgres_capture_metadata(
+    request: SqlQueryProfileRequest, config: PostgresConfig, *, driver: Any,
+) -> tuple[tuple[QuerySourceColumn, ...], tuple[PostgresResultColumn, ...]]:
+    """Closed bounded metadata discovery; never fetch the result rows."""
+    from test_data_agent.postgres_client import PostgresClient
+    from test_data_agent.postgres_query_builders import PostgresQuery
+    from test_data_agent.sql_query_adapters import _postgres_source_columns
+    from test_data_agent.sql_query_profiling import build_no_row_schema_query
+    from test_data_agent.sql_query_source import (
+        SqlQueryAdapter, authorize_query_source, inspect_query_source,
+    )
+
+    valid = False
+    try:
+        config.validate()
+        draft = inspect_query_source(request)
+        if (request.adapter is not SqlQueryAdapter.POSTGRES
+                or request.source_id != config.source_id
+                or draft.table_name not in config.allowed_tables):
+            raise ValueError
+        with PostgresClient(config=config, driver=driver).session() as session:
+            columns = _postgres_source_columns(
+                config, draft.table_parts, session.fetch_aggregate_dicts,
+            )
+            plan = authorize_query_source(draft, columns)
+            result = session.describe_no_rows(PostgresQuery(build_no_row_schema_query(plan).sql))
+            if tuple(item.name for item in result) != plan.output_fields:
+                raise ValueError
+        valid = True
+    except Exception:
+        pass
+    if not valid:
+        raise ValueError("invalid PostgreSQL capture metadata") from None
+    return columns, result

@@ -632,3 +632,10 @@ module/factory or environment-driven connection discovery; public wiring remains
 closed. Invalid capture regression proves driver resolution never starts.
 Synthetic isolation suite29passed28.03s; Ruff passed without cache. No live DB.
 Runtime changed after268efc9a: its prior audit/gates do not certify this new SHA.
+
+2026-10-07 closed PostgreSQL metadata increment reuses bounded read-only
+PostgresClient and existing allowlisted column discovery. Source-id/adapter/table
+refuse before connect; authorized no-row schema must match output aliases.
+Synthetic success, schema drift and three pre-connect refusal regressions:
+5passed0.27s; Ruff passed. No live DB/public registration; metadata-to-Arrow
+conversion and owned-worker composition remain next, not complete SQL activation.

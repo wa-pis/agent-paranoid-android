@@ -309,3 +309,84 @@ def test_configured_capture_rejects_invalid_request_before_driver_resolution(mon
     monkeypatch.setattr(module, "_configured_postgres_driver", forbidden)
     with pytest.raises(ValueError, match="invalid isolated PostgreSQL capture"):
         module._capture_configured_postgres(object(), max_seconds=5)
+
+
+@pytest.mark.parametrize("fault", ["source", "table", "adapter"])
+def test_capture_metadata_rejects_unauthorized_request_before_connection(tmp_path, fault):
+    from dataclasses import replace
+    from test_data_agent.io.transformation_postgres_capture import _discover_postgres_capture_metadata
+    from test_data_agent.postgres_config import PostgresConfig
+    from test_data_agent.sql_query_source import SqlQueryAdapter, SqlQueryProfileRequest
+
+    query = tmp_path / "query.sql"
+    query.write_text("SELECT status FROM public.orders")
+    request = SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "warehouse", "orders", query)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.status"}))
+    if fault == "source":
+        request = replace(request, source_id="other")
+    elif fault == "table":
+        config = replace(config, allowed_tables=frozenset({"public.other"}),
+            allowed_columns=frozenset({"public.other.status"}))
+    else:
+        request = replace(request, adapter=SqlQueryAdapter.TRINO)
+
+    class ForbiddenDriver:
+        def connect(self, **kwargs):
+            pytest.fail("unauthorized metadata must not connect")
+
+    with pytest.raises(ValueError, match="invalid PostgreSQL capture metadata") as caught:
+        _discover_postgres_capture_metadata(request, config, driver=ForbiddenDriver())
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize("drift", [False, True])
+def test_capture_metadata_uses_only_authorized_no_row_schema(tmp_path, monkeypatch, drift):
+    from test_data_agent.io.transformation_postgres_capture import _discover_postgres_capture_metadata
+    from test_data_agent import postgres_client
+    from test_data_agent.postgres_config import PostgresConfig
+    from test_data_agent.sql_query_source import SqlQueryAdapter, SqlQueryProfileRequest
+
+    query = tmp_path / "query.sql"
+    query.write_text("SELECT status AS label FROM public.orders")
+    request = SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "warehouse", "orders", query)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.status"}))
+    events = []
+
+    class Session:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            events.append("closed")
+
+        def fetch_aggregate_dicts(self, query):
+            assert "pg_catalog.pg_attribute" in query.sql
+            return [{"column_name": "status", "data_type": "text", "is_nullable": True}]
+
+        def describe_no_rows(self, query):
+            assert query.sql.endswith("WHERE FALSE")
+            assert '"label"' in query.sql
+            return (postgres_client.PostgresResultColumn(
+                "other" if drift else "label", "text", True),)
+
+    class Client:
+        def __init__(self, **kwargs):
+            assert kwargs["config"] is config
+
+        def session(self):
+            return Session()
+
+    monkeypatch.setattr(postgres_client, "PostgresClient", Client)
+    if drift:
+        with pytest.raises(ValueError, match="invalid PostgreSQL capture metadata"):
+            _discover_postgres_capture_metadata(request, config, driver=object())
+    else:
+        columns, result = _discover_postgres_capture_metadata(request, config, driver=object())
+        assert columns[0].name == "status" and result[0].name == "label"
+    assert events == ["closed"]
