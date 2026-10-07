@@ -888,3 +888,20 @@ Independent cached matrix follow-up:3.13base and3.11all extras also fail
 offline dependency resolution;logs/private/tmp/apa-final-base313-install.log
 and/private/tmp/apa-final-all311-install.log. No tests claimed for uninstalled
 environments; no prerelease/network substitution.3.11base remains passed.
+
+Offline cache constrained retry still insufficient. Public stable dependency
+download is separate from synthetic offline test execution and does not contact
+DB/AI providers or transmit fixtures. Installed3.11all from wheel with stable
+known runtime constraints (no prerelease),log/private/tmp/apa-final-all311-resolved.log.
+Isolated all installed-package check running; test fixtures remain offline.
+
+Public stable dependency resolution unblocked base3.12.13/3.13.14 installed
+checks (bothpass);3.11all checkpassed. New real3.14.2base env built, installed
+check running. Fresh isolated gigachat/all matrix3.11–3.14 running
+logs/private/tmp/apa-final-{profile}{versiondigits}.log; no DB/provider calls.
+
+Unversioned exactwheel installed base/gigachat/all matrix now passes all12
+profiles on Python3.11.15/3.12.13/3.13.14/3.14.2; four gigachat doctor
+--require-extra checks pass. FakeSDK3.14 suite executing installedonly (initial
+collection lacked hypothesis, installed testdependency, no product changes).
+Still no finalversion/Ubuntuhash/signature/exactmainapproval/publicRC proof.
