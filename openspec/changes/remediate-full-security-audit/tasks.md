@@ -988,3 +988,9 @@ No pass yet; supplied-stream proof will not certify a live Trino adapter.
 2026-10-07 session34556 completed exit0:synthetic Trino-result->CSV1Mx100
 passed1320.548s/100Mcells with full readback/cleanup; current evidence updated.
 Remaining supplied Trino target outputs:Parquet and SQL artifact.
+
+2026-10-07 supplied Trino-result->Parquet target1Mx100 started using the
+previously fully reviewed unchanged SQL scale harness and exact268efc9a/
+wheel430e0405/Python3.11. Explicit2GiB/128MiB capture/3600s, no network.
+Session35698; log/private/tmp/apa-final-current-scale-trino1m-parquet.log.
+No pass yet; SQL artifact target is next, not concurrent resource pressure.
