@@ -929,3 +929,8 @@ records synthetic Trino CI authorization; client-acceptance indexes the exact
 268efc9a evidence and explicitly dates older “current/latest” checkpoints.
 Strict MkDocs build passed (0.39s); selective-source-transformation strict
 OpenSpec validation passed. No runtime changes or repeated product tests.
+
+2026-10-07 renewed installed local auth/Parquet decimal-profile constituents
+on exact268efc9a/wheel430e0405:24passed0.51s, Python3.11, candidate-only
+PYTHONPATH and pytest pythonpath disabled. No live backend/provider; final
+versioned interfaces, broader metadata and remote prerequisites remain open.

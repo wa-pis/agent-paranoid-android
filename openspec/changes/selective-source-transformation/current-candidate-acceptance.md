@@ -12,6 +12,7 @@ The wheel remains version `1.5.0`; it is not a published 1.6 release artifact.
 - Separate base, gigachat and all installation profiles passed on Python 3.11.15, 3.12.13, 3.13.14 and 3.14.2 (12 profiles).
 - Four isolated `doctor --require-extra gigachat` checks passed.
 - Installed Python 3.14 fake GigaChat SDK suite: 49 passed.
+- Installed Python 3.11 local auth and Parquet decimal-profile contracts: 24 passed (0.51s), 2026-10-07. Exact frozen-composition tests loaded through the candidate-only `PYTHONPATH`, with pytest source-path override disabled; no database/provider calls. This renews these local constituents, not remote authentication or final versioned CLI/API acceptance.
 
 All fixtures were synthetic; no database or AI provider calls occurred. Public stable dependency downloads supplied missing installation-cache entries. Tests used installed package code; the first workflow replay reused existing dependencies, while the later package profiles used separate environments.
 
