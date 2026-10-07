@@ -738,3 +738,12 @@ a user-selected factory. Synthetic Trino lifecycle + PostgreSQL lifecycle +
 shared query suites108 passed35.98s; Ruff/diff checks passed. Evidence:
 /private/tmp/apa-sql-owned-isolation.log. OS scheduling/reaping, worker RSS and
 wire bytes retain documented limits; public CLI/MCP activation still open.
+
+2026-10-07 owned Trino capture now has complete synthetic small-fixture
+capture->profile->review->temporary publication readback for CSV, Parquet and
+SQL artifacts. Explicit substitutions produce the exact expected two rows in
+all formats; SQL is never executed; temporary roots are removed. Lifecycle +
+three output regressions7 passed7.31s/Ruff. Log:
+/private/tmp/apa-trino-owned-output.log. This closes the private owned-driver
+output-path evidence increment only: public registration, full final-SHA gate
+and independent audit remain open; no new large-scale replay or live DB.
