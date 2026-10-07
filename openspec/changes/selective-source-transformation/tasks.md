@@ -239,6 +239,10 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   October 2 invalid-result/exit decision; retain fail-closed incompatible typed output.
 - [ ] Consolidate 26's October 2 approved unknown-metadata and bounded-sensitivity
   implementation/evidence; finish final-candidate CLI/API compatibility gates.
+  - [x] Renew installed unknown-metadata and bounded-sensitivity constituent:
+    exact268efc9a/wheel430e0405, source-adapter Parquet selection11passed0.27s;
+    Python3.11 candidate-only imports. Profiling guide reconciled; see current
+    candidate acceptance. Final versioned interfaces remain open.
 - [x] Reconcile refreshed 1–19 evidence: missing date bounds, SQL diagnostics and
   scan costs, formula dependencies, publication/overwrite and utility boundaries.
   Evidence: client-acceptance.md per-finding disposition register and dated

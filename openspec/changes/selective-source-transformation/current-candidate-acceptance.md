@@ -19,3 +19,11 @@ All fixtures were synthetic; no database or AI provider calls occurred. Public s
 These results replace neither current versioned client-script acceptance nor policy/documentation reconciliation, exact-main CI, Containers, Documentation and Security, required independent GitHub approval, Ubuntu distribution hashes, signed acceptance manifest/tag, nor public verification. Historical private scale results remain tied to their original artifact.
 
 As of this checkpoint there is no PR for `codex/fix-transformation-review`. On 2026-10-07 the owner explicitly authorized mandatory CI with real test Trino and synthetic data. This supersedes the earlier no-live-DB blocker for that CI job only; production access, other live databases and external AI calls remain prohibited. Independent GitHub approval and the remaining acceptance gates are still required. No approval, tag, publication or final release acceptance is claimed.
+
+2026-10-07 installed unknown-metadata/sensitivity constituent: frozen candidate
+`tests/test_source_adapters.py -k parquet` passed11/deselected8 in0.27s on
+Python3.11 with candidate-only PYTHONPATH and pytest source-path override
+disabled. Covers absent/null statistics, public unknown metrics, neutral-name
+sensitive content, oversized cells, conservative native values, deadline and
+pre-read row count. Profiling guide matches the unknown/fail-closed contract.
+No DB/provider calls; final versioned CLI/API compatibility remains open.
