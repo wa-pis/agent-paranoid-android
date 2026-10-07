@@ -905,3 +905,10 @@ profiles on Python3.11.15/3.12.13/3.13.14/3.14.2; four gigachat doctor
 --require-extra checks pass. FakeSDK3.14 suite executing installedonly (initial
 collection lacked hypothesis, installed testdependency, no product changes).
 Still no finalversion/Ubuntuhash/signature/exactmainapproval/publicRC proof.
+
+Installed3.14 fakeGigaChatSDK49passed6.33s; all12base/gigachat/all profiles
+and fourdoctor checks pass. Read-only GitHub check: no existing PR for
+codex/fix-transformation-review, so no independent required GitHub approval
+available. Do not trigger repository liveTrinoCI under no-liveDB constraint.
+Release remains blocked on established approval/exactmain gates plus remaining
+selectivepolicy/docs/finalversion acceptance. AI clean audit is not GitHubapproval.
