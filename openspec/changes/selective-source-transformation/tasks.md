@@ -389,6 +389,13 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   roadmap, OpenSpec baselines, changelog and release guidance. Update every
   affected page, preserve historical evidence as historical, and explicitly
   distinguish shipped from planned behavior.
+  2026-10-07 consistency constituent: reviewed roadmap and compatibility
+  inventory, plus transformation-boundary sections in output review, application
+  boundaries, MCP design and MCP how-to. They distinguish ordinary synthetic
+  manifests from gated mixed-origin output, local receipt issuance from MCP
+  consumption, and historical review from final activation clearance. No
+  contradictory activation claim found in these sections; whole-doc audit
+  and executable-example acceptance remain open.
 - [ ] Execute documented examples on fictional fixtures and validate links,
   documentation tests and strict documentation build before the candidate.
 - [ ] Obtain independent security review and complete the required RC/release
