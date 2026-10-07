@@ -398,6 +398,12 @@ Final compatibility/clearance and unavailable private/live claims remain open.
   and executable-example acceptance remain open.
 - [ ] Execute documented examples on fictional fixtures and validate links,
   documentation tests and strict documentation build before the candidate.
+  2026-10-07 reconciled existing exact268efc9a full-gate log: all five
+  tests/test_live_examples.py cases and44 documentation tests passed. Reviewed
+  CSV, relational CSV, output-format shell launchers, Python API script and
+  their README workflows against those assertions; SQL is generated, not
+  executed. Reused completed evidence without rerunning unchanged tests.
+  Installed final-version examples and remaining documentation audit stay open.
 - [ ] Obtain independent security review and complete the required RC/release
   gates before shipping. Do not mark this proposal implemented beforehand.
 
