@@ -298,3 +298,14 @@ def test_actual_supervisor_caller_cancellation_reaps_worker(tmp_path):
             harness.kill()
             harness.join(1)
         harness.close()
+
+
+def test_configured_capture_rejects_invalid_request_before_driver_resolution(monkeypatch):
+    from test_data_agent.io import transformation_postgres_capture as module
+
+    def forbidden():
+        pytest.fail("invalid capture must not load or connect a driver")
+
+    monkeypatch.setattr(module, "_configured_postgres_driver", forbidden)
+    with pytest.raises(ValueError, match="invalid isolated PostgreSQL capture"):
+        module._capture_configured_postgres(object(), max_seconds=5)

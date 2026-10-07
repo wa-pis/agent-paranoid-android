@@ -145,3 +145,23 @@ def _capture_postgres_isolated(
     if payload is None:
         raise ValueError("invalid isolated PostgreSQL capture")
     return SnapshotPart("source", capture.request.entity_name, payload)
+
+
+def _configured_postgres_driver() -> Any:
+    """Resolve the optional driver inside the owned worker, never from user input."""
+    import psycopg
+
+    return psycopg
+
+
+def _capture_configured_postgres(
+    capture: _PostgresCapture, *, max_seconds: float,
+) -> SnapshotPart:
+    """Closed configured-driver increment; public registration remains gated.
+
+    Explicit configuration and frozen metadata still come from the authorized
+    adapter. No environment-driven connection discovery or automatic fallback.
+    """
+    return _capture_postgres_isolated(
+        capture, driver_factory=_configured_postgres_driver, max_seconds=max_seconds,
+    )

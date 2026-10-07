@@ -625,3 +625,10 @@ No runtime failure. Fixed regression to reverse composed proposals first,
 then reapply all four;2tests pass on closed source and2 on composed source,
 Ruff pass. Full gate incomplete until corrected candidate checks complete;
 no audit/version/publication clearance from this failed run.
+
+2026-10-07 configured PostgreSQL driver increment: fixed trusted psycopg factory
+resolves only inside the existing isolated capture worker. No caller-selectable
+module/factory or environment-driven connection discovery; public wiring remains
+closed. Invalid capture regression proves driver resolution never starts.
+Synthetic isolation suite29passed28.03s; Ruff passed without cache. No live DB.
+Runtime changed after268efc9a: its prior audit/gates do not certify this new SHA.
