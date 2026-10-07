@@ -662,3 +662,8 @@ resolved columns through existing validation. Synthetic composed capture and
 isolation/query suites81passed28.72s; final one-read cleanup regression1passed.
 Initial composition failed on init=False resolved_columns; repaired using the
 existing validated constructor. No live DB, public registration or RC clearance.
+
+2026-10-07 owned metadata lifecycle acceptance: blocked metadata FETCH and
+schema drift both fail without a snapshot and leave no test-owned child;
+normal composed capture still passes.3focused tests passed2.45s; Ruff passed.
+No DB/provider calls or repeated scale tests. Public wiring remains open.

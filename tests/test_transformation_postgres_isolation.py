@@ -416,20 +416,25 @@ def test_capture_schema_preserves_exact_decimal_width_and_nullability():
     assert schema.field("count").nullable is True
 
 
-def _metadata_driver():
+def _metadata_driver(fault=None):
     from types import SimpleNamespace
 
     class Cursor:
         def execute(self, sql, parameters=()):
-            if "pg_catalog.pg_attribute" in sql:
+            self.metadata = "pg_catalog.pg_attribute" in sql
+            if self.metadata:
                 self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
                 self.rows = [("status", "text", True)]
             else:
-                self.description = [("label", SimpleNamespace(name="text"), None, None, None, None, True)]
+                self.description = [("other" if fault == "schema_drift" else "label",
+                    SimpleNamespace(name="text"), None, None, None, None, True)]
                 self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha",), ("beta",)]
 
         def fetchmany(self, size):
             assert size == 1
+            if self.metadata and fault == "metadata_fetch":
+                while True:
+                    time.sleep(1)
             return [self.rows.pop(0)] if self.rows else []
 
         def close(self):
@@ -464,3 +469,18 @@ def test_owned_worker_discovers_metadata_before_result_capture(tmp_path):
     source = _capture_postgres_isolated(capture, driver_factory=_metadata_driver, max_seconds=10)
     profile = _profile_transformation_source(source, policy, budget=GenerationBudget(5), max_bytes=16384)
     assert profile.source_type == "postgres_query"
+
+
+@pytest.mark.parametrize("fault", ["metadata_fetch", "schema_drift"])
+def test_owned_metadata_failure_returns_no_snapshot_and_reaps_worker(tmp_path, fault):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    request.query_file.write_text("SELECT status AS label FROM public.orders")
+    policy = kwargs["policy"].model_copy(update={"fields": kwargs["policy"].fields[:1]})
+    capture = _PostgresCapture(request, _config(), (), None, policy, 3, 16384)
+    before = {child.pid for child in multiprocessing.active_children()}
+    with pytest.raises(ValueError, match="invalid isolated PostgreSQL capture"):
+        _capture_postgres_isolated(capture, driver_factory=partial(_metadata_driver, fault),
+            max_seconds=2)
+    assert {child.pid for child in multiprocessing.active_children()} == before
