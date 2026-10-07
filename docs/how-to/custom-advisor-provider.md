@@ -83,9 +83,6 @@ class CustomAdvisorClient:
         validated = AdvisorExchange.model_validate(
             exchange.model_dump(mode="python")
         )
-        if (validated.request.profile.local_category_fields
-                or validated.request.baseline_spec.local_category_fields):
-            raise ValueError("local categories require a provider-safe projection")
         payload = self._transport.generate_json(
             trusted_instructions=validated.trusted_instructions,
             untrusted_input=validated.request.model_dump(mode="json"),
@@ -94,13 +91,18 @@ class CustomAdvisorClient:
         return AdvisorProposal.model_validate(payload)
 ```
 
-The generic exchange wrapper validates proposals; it does not automatically
-mask locally approved categories for arbitrary clients. This minimal external
-adapter refuses such exchanges before transport. Built-in OpenAI/GigaChat
-adapters implement their own field-scoped projection and local restoration.
-Do not send a complete local exchange to a remote provider merely because its
-schema validates. Supporting local categories in another adapter requires an
-explicit tested projection/restoration contract, including matching predicates.
+`ExchangeDatasetAdvisor` projects the request before calling any client. It
+replaces categorical values and matching predicates with field-scoped labels,
+omits local-only metadata, and recomputes both request fingerprints. It
+validates the response against that projected request, restores locally retained
+values and metadata under deterministic guards, then validates against the
+original request. Clients must echo the fingerprints they receive. Use this
+client through the wrapper shown above.
+
+Directly exported `agent-advisor-request` documents remain operator-local.
+Standalone clients that bypass the wrapper must refuse transmission or implement
+a tested provider-safe projection, fingerprint binding and local restoration.
+Model validation alone does not make a local exchange safe to transmit.
 
 Map the three arguments without changing their trust levels:
 
@@ -180,6 +182,10 @@ Create a real exchange from an awaiting-approval workspace:
 test-data-agent agent-advisor-request out/agent \
   --exchange > advisor_exchange.json
 ```
+
+With or without `--exchange`, this command exports the local contract; it does
+not invoke the wrapper projection. Do not transmit that file directly. Use
+`ExchangeDatasetAdvisor` or a tested standalone projection/restoration boundary.
 
 The external service must:
 

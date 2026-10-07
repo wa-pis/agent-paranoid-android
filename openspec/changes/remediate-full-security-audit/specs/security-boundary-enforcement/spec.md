@@ -213,3 +213,20 @@ before transport, including profile and baseline specification mutations.
   and nested fictional source markers
 - **THEN** validation refuses before any provider SDK request
 - **AND** rendered errors do not contain the rejected marker values.
+
+### Requirement: Semantic advisor metadata projection
+
+Provider-bound requests SHALL use a shared allowlisted semantic projection,
+including custom exchange clients. Opaque conditions, unused constraint data,
+identifier prefix/pattern contents and local auxiliary annotations SHALL NOT
+be transmitted. Supported dates and formulas SHALL use canonical forms.
+Local immutable metadata and original fingerprints SHALL be restored only
+after projected proposal invariants are validated; provider output SHALL NOT
+expand local authority.
+
+#### Scenario: Accepted typed metadata contains fictional private literals
+- **WHEN** an imported or mutated request contains fictional private markers
+  in accepted distribution strings or opaque constraint members
+- **THEN** fake provider request capture contains none of those markers
+- **AND** a valid unchanged projected proposal retains local immutable settings
+- **AND** a changed projected immutable contract is rejected before application.

@@ -6,6 +6,12 @@ All notable changes to this project are documented here.
 
 ### Security
 
+- Project advisor-bound metadata through supported semantic fields before
+  external transport; omit opaque condition members, unused constraint data,
+  identifier prefixes, pattern text and auxiliary local annotations. Canonical
+  dates and formulas retain their meaning. Local review fingerprints and
+  immutable settings remain bound when proposals return.
+
 - Reject opaque or unsupported field distribution metadata before imported
   profiles or specifications reach advisor/provider requests. Empty metadata
   and supported typed distributions remain valid.

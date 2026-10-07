@@ -1093,3 +1093,24 @@ advisor/provider tests; checked extras across all10supported kinds and both
 field models. No further scoped finding. Public compatibility/guide/OpenSpec
 requirement updated; current906777b report remains a finding-bearing audit,
 not evidence for corrected finalSHA.
+
+2026-10-08 corrected signed186471664c8e16d50a71dc18324e2b80d165099c
+passed fullgate3285tests/23local integration skips90.89%,12Python/extras,
+4fakeSDK suites and136installed tests. Evidence/private/tmp/apa-corrected-rc-
+preparation-evidence.json SHA25639a4f5254a664aab74125c5bf9bc88849bcba878
+76a6c69de973e927b5ac126f; Mac hashes are not Ubuntu publication evidence.
+Fresh independent scan1df1aeef-8e02-480e-b72d-1638726c0f6d confirms R13/CWE201:
+accepted condition extras/expected/expression and distribution prefix/date
+suffix/pattern text survive category-only provider projection. No external
+provider calls; same-family semantic projection remediation in progress.
+1864716 remains frozen and not cleared; prior906777 report sealed with R12
+and explicitly partial broader coverage, never evidence for corrected SHA.
+
+2026-10-08 R13shared semantic projection signed codecommit8e815516446f8271.
+Independent scoped review closed actualdate min/max and opaque semantic
+annotation misses:35regressions,15fakewire checks acrossOpenAI/GigaChat/custom
+exchange plus2mutation refusals. Effective200focused cases, Ruff/mypy pass.
+Projected fingerprints precede customclient; exactlocal metadata restoration
+requires unchanged projected invariants and original proposal validation.
+Customadapter/JSONhandoff guides reconciled; strictMkDocs/diffcheck pass.
+No external calls, no new finalSHA clearance; prospective rebuild/gate next.

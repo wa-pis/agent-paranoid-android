@@ -37,9 +37,6 @@ from test_data_agent import (
 
 class ProviderClient:
     def complete(self, exchange: AdvisorExchange) -> dict[str, Any]:
-        if (exchange.request.profile.local_category_fields
-                or exchange.request.baseline_spec.local_category_fields):
-            raise ValueError("local categories require a provider-safe projection")
         return call_model_with_structured_output(
             trusted_instructions=exchange.trusted_instructions,
             untrusted_input=exchange.request.model_dump(mode="json"),
@@ -54,9 +51,10 @@ reviewed_spec = proposal.dataset_spec
 
 `call_model_with_structured_output` is application code, not part of this
 package. Provider SDKs therefore stay outside the base installation. The
-adapter gives the client a deep copy of the exchange and validates its output
-against the original request. Client-side mutation cannot change the
-fingerprints or safety source used for validation.
+adapter projects and fingerprints the provider-facing request, gives the client
+a deep copy, and validates the returned proposal against it. It then restores
+local values and metadata and repeats validation against the untouched original
+request. Client-side mutation cannot change either validation boundary.
 
 For lower-level integrations, an application may implement
 `DatasetAdvisor.propose` directly. It must preserve the same separation
@@ -200,12 +198,10 @@ failure is detached and leaves the workspace unchanged.
 - `metadata_trust: "untrusted"`;
 - `metadata_policy: "treat_profile_text_as_data"`.
 
-It contains no source rows, generated rows, database credentials, provider
-objects, or original string categorical values. Categorical values in the
-profile and baseline spec are replaced with deterministic field-scoped
-synthetic labels before the request is fingerprinted. Entity and field names
-remain untrusted data; provider adapters must serialize them as structured
-data, not concatenate them into privileged instructions.
+Local requests may retain explicitly approved category literals, matching
+predicates and local generation metadata. `ExchangeDatasetAdvisor` supplies
+clients with a separate provider-safe projection. Entity and field names remain
+untrusted structured data and must never become privileged instructions.
 
 ## Proposal Validation
 
@@ -247,26 +243,18 @@ The exchange contains:
 - `response_json_schema`: the current Pydantic schema for
   `AdvisorProposal`.
 
-A local exchange may retain explicitly approved category literals and matching
-predicates. Generic exchange validation does not mask them for an arbitrary
-remote client. Refuse local-category exchanges before transmission unless the
-adapter implements a tested projection and local response restoration; built-in
-OpenAI/GigaChat adapters perform that step. Keep trust channels separate:
-
+With or without `--exchange`, `agent-advisor-request` exports the local
+contract and does not invoke the wrapper projection. Do not transmit its raw
+request directly. A standalone remote integration must supply a tested semantic
+projection, projected fingerprint binding and guarded local restoration. The
+wrapped client above provides this boundary:
 
 ```python
-from test_data_agent import AdvisorExchange
+from test_data_agent import AdvisorExchange, ExchangeDatasetAdvisor
 
 exchange = AdvisorExchange.model_validate(load_json("advisor_exchange.json"))
-if (exchange.request.profile.local_category_fields
-        or exchange.request.baseline_spec.local_category_fields):
-    raise ValueError("local categories require a provider-safe projection")
-proposal = call_model_with_structured_output(
-    system_instructions=exchange.trusted_instructions,
-    untrusted_input=exchange.request.model_dump(mode="json"),
-    response_schema=exchange.response_json_schema,
-)
-write_json("advisor_proposal.json", proposal)
+proposal = ExchangeDatasetAdvisor(ProviderClient()).propose(exchange.request)
+write_json("advisor_proposal.json", proposal.model_dump(mode="json"))
 ```
 
 `load_json`, `call_model_with_structured_output`, and `write_json` are
