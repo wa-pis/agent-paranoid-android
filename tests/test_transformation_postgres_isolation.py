@@ -414,3 +414,53 @@ def test_capture_schema_preserves_exact_decimal_width_and_nullability():
     assert schema.field("amount").nullable is False
     assert schema.field("count").type == pa.int32()
     assert schema.field("count").nullable is True
+
+
+def _metadata_driver():
+    from types import SimpleNamespace
+
+    class Cursor:
+        def execute(self, sql, parameters=()):
+            if "pg_catalog.pg_attribute" in sql:
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+                self.rows = [("status", "text", True)]
+            else:
+                self.description = [("label", SimpleNamespace(name="text"), None, None, None, None, True)]
+                self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha",), ("beta",)]
+
+        def fetchmany(self, size):
+            assert size == 1
+            return [self.rows.pop(0)] if self.rows else []
+
+        def close(self):
+            pass
+
+    class Driver:
+        def connect(self, **kwargs):
+            assert "default_transaction_read_only=on" in kwargs["options"]
+            return self
+
+        def cursor(self, **kwargs):
+            return Cursor()
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    return Driver()
+
+
+def test_owned_worker_discovers_metadata_before_result_capture(tmp_path):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.limits import GenerationBudget
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    request.query_file.write_text("SELECT status AS label FROM public.orders")
+    policy = kwargs["policy"].model_copy(update={"fields": kwargs["policy"].fields[:1]})
+    capture = _PostgresCapture(request, _config(), (), None, policy, 3, 16384)
+    source = _capture_postgres_isolated(capture, driver_factory=_metadata_driver, max_seconds=10)
+    profile = _profile_transformation_source(source, policy, budget=GenerationBudget(5), max_bytes=16384)
+    assert profile.source_type == "postgres_query"

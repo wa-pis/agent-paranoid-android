@@ -654,3 +654,11 @@ Absent shape stays numeric; malformed/incompatible declared shape rejects.
 Client/query-source suites164passed0.78s; Ruff passed. Guide updated. Native
 psycopg column precision/scale properties verified in installed SDK source.
 Public SQL capture/owned discovery composition and final exact-SHA gates open.
+
+2026-10-07 configured PostgreSQL worker now owns metadata discovery, exact schema
+conversion and result capture under one supervisor deadline. Configured entry
+ignores caller metadata; discovery reserves one statement for capture and freezes
+resolved columns through existing validation. Synthetic composed capture and
+isolation/query suites81passed28.72s; final one-read cleanup regression1passed.
+Initial composition failed on init=False resolved_columns; repaired using the
+existing validated constructor. No live DB, public registration or RC clearance.

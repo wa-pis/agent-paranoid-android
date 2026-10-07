@@ -10,7 +10,7 @@ import multiprocessing
 import os
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import partial
 from typing import Any
 
@@ -22,8 +22,8 @@ from test_data_agent.core.transformation_policy import BehaviorPolicy, parse_beh
 from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.io.transformation_postgres_stream import _postgres_result_stream
 from test_data_agent.io.transformation_query_capture import _capture_authorized_result
-from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryProfileRequest
-from test_data_agent.postgres_config import PostgresConfig
+from test_data_agent.sql_query_source import QuerySourceColumn, SqlQueryProfileRequest, inspect_query_source
+from test_data_agent.postgres_config import PostgresConfig, with_resolved_postgres_columns
 from test_data_agent.postgres_client import PostgresResultColumn
 
 
@@ -49,12 +49,30 @@ def _capture_worker(
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             return
+        driver = driver_factory()
+        if capture.schema is None:
+            # Discovery and row access share this owned process and deadline.
+            if capture.config.limits.max_statements < 3:
+                raise ValueError
+            config = replace(capture.config, limits=replace(capture.config.limits,
+                max_seconds=min(capture.config.limits.max_seconds, remaining),
+                max_statements=capture.config.limits.max_statements - 1))
+            columns, metadata = _discover_postgres_capture_metadata(
+                capture.request, config, driver=driver)
+            schema = _postgres_capture_schema(metadata)
+            table = inspect_query_source(capture.request).table_name
+            config = with_resolved_postgres_columns(config, frozenset(
+                f"{table}.{item.name}" for item in columns))
+            capture = replace(capture, config=config, source_columns=columns, schema=schema)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return
         source = _capture_authorized_result(capture.request,
             allowed_tables=capture.config.allowed_tables, source_columns=capture.source_columns,
             schema=capture.schema, policy=capture.policy, max_rows=capture.max_rows,
             max_bytes=capture.max_bytes, budget=GenerationBudget(remaining),
             stream=partial(_postgres_result_stream, config=capture.config,
-                schema=capture.schema, driver=driver_factory(), getenv=os.getenv,
+                schema=capture.schema, driver=driver, getenv=os.getenv,
                 clock=time.monotonic))
         if len(source.payload) > len(result) or time.monotonic() >= deadline:
             return
@@ -163,8 +181,12 @@ def _capture_configured_postgres(
     Explicit configuration and frozen metadata still come from the authorized
     adapter. No environment-driven connection discovery or automatic fallback.
     """
+    if type(capture) is not _PostgresCapture:
+        raise ValueError("invalid isolated PostgreSQL capture") from None
+    # Never accept caller-supplied source/output metadata on configured access.
     return _capture_postgres_isolated(
-        capture, driver_factory=_configured_postgres_driver, max_seconds=max_seconds,
+        replace(capture, source_columns=(), schema=None),
+        driver_factory=_configured_postgres_driver, max_seconds=max_seconds,
     )
 
 
