@@ -64,3 +64,12 @@ only; other input/output scale routes and final versioned RC remain open.
 cell, source digest, provenance and cleanup checked. Same exact candidate,
 wheel and Python3.11;512MiB/1800s; synthetic files only. Log
 `/private/tmp/apa-final-current-scale-parquet300k.log`. No cross-route scale claim.
+
+2026-10-07 target installed Parquet->Parquet1Mx100 completed exit0:
+100Mcells,17398511 output bytes,1685.927s harness monotonic elapsed, explicit
+2GiB/1800s. Full schema/cell readback, provenance, input digest and cleanup
+passed. Same exact268efc9a/wheel430e0405/Python3.11. Log
+`/private/tmp/apa-final-current-scale-parquet1m.log`. Observed process wall
+clock exceeded30minutes while harness monotonic elapsed stayed below1800s;
+clock/scheduling discrepancy is unresolved, not evidence of a deadline bypass.
+This passes the harness contract only; no hard wall-clock/RSS containment claim.

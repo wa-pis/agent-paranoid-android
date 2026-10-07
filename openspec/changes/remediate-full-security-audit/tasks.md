@@ -972,3 +972,9 @@ Python frames to attribute a function); no successful result. Cooperative
 budget is not a hard process cutoff. Sample/private/tmp/apa-parquet-scale-process-sample.txt;
 session30143 remains active. Treat this acceptance as pending/over-budget,
 not a pass or confirmed security finding; investigate before final clearance.
+
+2026-10-07 session30143 completed exit0:Parquet1Mx100 passed full readback/
+cleanup,1685.927s harness monotonic elapsed. Earlier over-budget note used
+process wall clock; final monotonic result is below1800s. Clock/scheduling
+discrepancy unresolved, no deadline defect confirmed.100Mcells/17398511bytes.
+Current acceptance updated; no repeat needed without artifact changes.
