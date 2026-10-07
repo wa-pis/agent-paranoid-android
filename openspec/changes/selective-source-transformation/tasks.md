@@ -100,7 +100,7 @@ consumes prior evidence; it is not a new test run or final RC acceptance.
   - [x] Installed private Parquet → SQL 1M × 100 passed at 92bb1b6: full 100M-cell ordered SQL artifact/provenance/cleanup, 3398.476s, 2,140,502,692 bytes; no SQL execution. Current private fixture matrix 7/12; queue is running PostgreSQL → Parquet.
   - [x] Installed fictional PostgreSQL worker → Parquet 1M × 100 passed in b249699 queue: typed 100M-cell readback/provenance/digest/lifecycle/cleanup, 1602.427s, 17,493,375 bytes. Current private matrix8/12; PostgreSQL → SQL running.
   - [x] Installed fictional PostgreSQL worker → SQL 1M ×100 passed in b249699 queue: 100M-cell ordered SQL text/provenance/digest/lifecycle/cleanup,1575.730s,2,240,002,792bytes; no SQL execution. Current private matrix9/12; fictional Trino result → CSV running.
-  - [ ] Complete remaining route scale acceptance; configuration alone is not proof.
+  - [x] Complete the private fictional 12/12 route scale matrix with full readback and cleanup; see sql-scale-acceptance.md and current-candidate-acceptance.md. This closes supplied-fixture scale work only; configured owned transport and the final installed release artifact require their own acceptance.
 - [x] Expose/document effective run/session and saved-profile resource settings,
   ranges and precedence without increasing source-free disclosure budgets.
 - [x] Preserve typed value-free limit errors through core, adapters, worker,
