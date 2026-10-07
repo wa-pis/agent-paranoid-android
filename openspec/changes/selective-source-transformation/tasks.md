@@ -696,3 +696,11 @@ list-returning methods consume it unchanged; early exit closes the iterator,
 cursor and connection, preventing post-context reads. Oversized driver batches
 reject.21synthetic client tests passed/Ruff. No new caller SQL surface or live DB;
 typed Trino capture composition/public registration remain next.
+
+2026-10-07 closed Trino typed-stream increment uses shared bounded client and
+shared strict PostgreSQL/Trino native-cell validation. Exact catalog/schema/
+column scope and source identity check before connect; no wildcard inference or
+result-row cap increase. Streaming chunks preserve schema/nullability and reject
+coercion/drift; existing query time/scan/result work and cleanup remain active.
+66synthetic query-capture/client tests passed0.89s; no live DB. Trino-owned
+metadata/supervisor and public CLI/MCP composition remain unfinished.

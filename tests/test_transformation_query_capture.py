@@ -416,3 +416,30 @@ def test_timestamp_reuse_guard_compares_instants_without_string_coercion():
     assert same_native_value(original, "2024-01-02T04:04:05.123456+01:00")
     assert not same_native_value(original, "2024-01-02T03:04:05.123456")
     assert not same_native_value(original, "fictional malformed timestamp")
+
+
+@pytest.mark.parametrize("fault", [None, "scope", "names", "native"])
+def test_closed_trino_driver_capture_obeys_scope_and_native_types(tmp_path, fault):
+    from test_data_agent.io.transformation_trino_stream import _trino_result_stream
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.other" if fault == "scope"
+            else "lake.safe.orders.status"}))
+    cursor = FakeCursor([("alpha", 2.5 if fault == "native" else 2), ("beta", 1)])
+    cursor.description = [("other" if fault == "names" else "label",), ("measured",)]
+    driver = FakeDriver(cursor)
+    stream = partial(_trino_result_stream, config=config, source_id="warehouse",
+        schema=kwargs["schema"], driver=driver)
+    if fault is None:
+        source = _capture_authorized_result(request, stream=stream, **kwargs)
+        assert source.kind == "source"
+    else:
+        with pytest.raises(ValueError, match="invalid bounded query capture"):
+            _capture_authorized_result(request, stream=stream, **kwargs)
+    if fault == "scope":
+        assert driver.dbapi.connect_kwargs is None
+    else:
+        assert cursor.closed and driver.dbapi.connection.closed

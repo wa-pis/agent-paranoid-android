@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare a closed typed Trino transformation stream using the existing bounded client and shared strict native-value checks; public capture remains gated.
+
 - Support exact UTC microsecond timestamp substitution in the closed native transformation candidate; naive timestamps and other Arrow timestamp encodings remain rejected.
 
 - Prepare a closed PostgreSQL transformation-capture path that resolves the
