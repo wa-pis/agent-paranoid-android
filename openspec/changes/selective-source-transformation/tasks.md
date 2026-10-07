@@ -728,3 +728,13 @@ of two refuses capture rather than resetting after metadata. Shared capture and
 Trino client suites79 passed0.61s/Ruff. Log/private/tmp/apa-trino-composed.log.
 This cooperative driver composition still needs process-owned supervision and
 public CLI/MCP registration; no live database, release gate or final audit claim.
+
+2026-10-07 Trino metadata and typed capture now execute in an owned spawn
+worker through the same extracted SQL process supervisor as PostgreSQL. Parent
+accepts bounded IPC only after clean child exit; blocked metadata/row reads are
+terminated and reaped; partial output and backend exception text cannot cross.
+Configured entry imports the fixed optional Trino driver in the child, never
+a user-selected factory. Synthetic Trino lifecycle + PostgreSQL lifecycle +
+shared query suites108 passed35.98s; Ruff/diff checks passed. Evidence:
+/private/tmp/apa-sql-owned-isolation.log. OS scheduling/reaping, worker RSS and
+wire bytes retain documented limits; public CLI/MCP activation still open.

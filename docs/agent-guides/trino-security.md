@@ -190,3 +190,9 @@ discovery and row capture, freezes wildcard selectors into explicit columns, and
 checks the query fingerprint again before row access. A new result statement
 must not reset cumulative metadata work. Process supervision and public
 registration remain separate acceptance requirements.
+
+The closed configured Trino capture runs metadata and row work in one owned
+spawn worker. Its shared SQL supervisor accepts bounded IPC only after a clean
+exit and terminates/reaps stalled work. This bounds parent waiting and result
+IPC; it does not certify a hard worker-memory or network-wire byte ceiling,
+and OS process operations can exceed deadlines during OS failure.

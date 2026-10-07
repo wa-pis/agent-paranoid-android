@@ -1,7 +1,8 @@
 """Closed typed Trino result stream; public capture registration remains gated."""
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Callable
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import Any
 
 from test_data_agent.core.limits import GenerationBudget
@@ -185,3 +186,68 @@ def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfi
 
     return with_query_work_budget(capture,
         query_work_limits_from_env(deployment_profile=config.deployment_profile))()
+
+
+@dataclass(frozen=True, repr=False)
+class _TrinoCapture:
+    request: SqlQueryProfileRequest
+    config: TrinoConfig
+    source_id: str
+    policy: BehaviorPolicy
+    max_rows: int
+    max_bytes: int
+
+
+def _trino_capture_worker(capture: _TrinoCapture, driver_factory: Callable[[], Any],
+                          deadline: float, result: Any, length: Any, diagnostic: Any) -> None:
+    import json
+    import os
+    import time
+
+    try:
+        with open(os.devnull, "wb") as sink:
+            os.dup2(sink.fileno(), 1)
+            os.dup2(sink.fileno(), 2)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return
+        source = _capture_trino_result(capture.request, config=capture.config,
+            source_id=capture.source_id, policy=capture.policy, max_rows=capture.max_rows,
+            max_bytes=capture.max_bytes, budget=GenerationBudget(remaining),
+            driver=driver_factory())
+        if len(source.payload) > len(result) or time.monotonic() >= deadline:
+            return
+        memoryview(result).cast("B")[:len(source.payload)] = source.payload
+        length.value = len(source.payload)
+    except TransformationLimitError as error:
+        data = json.dumps([error.dimension.value, error.amount, error.limit,
+            error.origin, error.code == "requested_above_limit"], separators=(",", ":")).encode("ascii")
+        if len(data) < len(diagnostic):
+            diagnostic[:len(data)] = data
+            length.value = -2
+        else:
+            length.value = -1
+    except BaseException:
+        length.value = -1
+
+
+def _capture_trino_isolated(capture: _TrinoCapture, *, driver_factory: Callable[[], Any],
+                            max_seconds: float) -> SnapshotPart:
+    from test_data_agent.io.transformation_sql_isolation import _capture_sql_isolated
+
+    if type(capture) is not _TrinoCapture:
+        raise ValueError("invalid isolated Trino capture") from None
+    return _capture_sql_isolated(capture, worker=_trino_capture_worker,
+        driver_factory=driver_factory, max_seconds=max_seconds, adapter="Trino")
+
+
+def _configured_trino_driver() -> Any:
+    import trino
+
+    return trino
+
+
+def _capture_configured_trino(capture: _TrinoCapture, *, max_seconds: float) -> SnapshotPart:
+    """Closed configured driver; no public registration or user-supplied factory."""
+    return _capture_trino_isolated(capture, driver_factory=_configured_trino_driver,
+        max_seconds=max_seconds)
