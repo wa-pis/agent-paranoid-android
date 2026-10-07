@@ -49,8 +49,10 @@ use read-only connection options and statement/lock/idle-transaction timeouts.
 Fetch one row at a time, reject native-type coercion and schema/null drift, and
 rollback/close on failure or cancellation. Tests use fictional drivers only.
 This bounds fetched row counts, not a single field's wire allocation; local
-deadlines cannot interrupt stalled transport. Transport-byte limits, cancellation
-under blocked I/O and backend work-budget evidence remain activation gates.
+deadlines cannot interrupt stalled transport. Bounded caller cancellation under blocked I/O and backend work-budget
+evidence remain activation gates. Exact wire-byte and hard worker-memory
+containment are unmeasured residual limits, not additional RC guarantees,
+under the owner capacity decision below and postgres-transport-notes.md.
 
 Private process supervisor now bounds ordinary caller waits across blocked
 driver calls using spawn, a fixed-size result channel and reserved terminate/
