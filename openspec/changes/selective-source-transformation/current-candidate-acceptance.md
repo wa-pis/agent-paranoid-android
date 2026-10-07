@@ -27,3 +27,10 @@ disabled. Covers absent/null statistics, public unknown metrics, neutral-name
 sensitive content, oversized cells, conservative native values, deadline and
 pre-read row count. Profiling guide matches the unknown/fail-closed contract.
 No DB/provider calls; final versioned CLI/API compatibility remains open.
+
+2026-10-07 installed OAuth local opt-in:6passed0.97s on the same frozen
+candidate/wheel and Python3.11. Explicit acceptance package root verifies the
+subprocess imports installed code; pipe rejection precedes driver/artifact.
+Other cases inject fictional terminal/browser callbacks; no browser or network
+authentication occurs. Trino how-to links the six-method configuration contract;
+strict documentation build passed0.39s after correcting the anchor.

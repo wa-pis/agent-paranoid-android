@@ -232,6 +232,11 @@ Final compatibility/clearance and unavailable private/live claims remain open.
 - [ ] Consolidate 21's October 2 approved six-method auth/secret-indirection
   implementation, local CLI opt-in and installed evidence into the final candidate;
   complete exact-SHA safety review before public activation. No live access.
+  - [x] Renew local installed auth/OAuth constituents on exact268efc9a:
+    auth plus decimal-profile24passed; OAuth6passed including verified installed
+    subprocess pipe refusal. Six-method configuration and how-to reconciled.
+    Complete scan e01b29fa covers composition; remote auth and final versioned
+    activation remain unverified, not inferred from these local checks.
 - [x] Integrate 23 into exact-decimal contract and carry precision/scale through
   agreed profile/spec/generation/transformation/exports without float
   intermediates; internal formulas are excluded by the owner scope correction.
