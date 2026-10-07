@@ -810,3 +810,11 @@ constituents have proof; remaining concrete runtimeblocker is publicconfigured
 SQL references/capture contract, not anotherprivatehelper. Fourprospective
 patches exposecommonconsumer only. Finalactivation,installedversionedartifact,
 exactSHAaudit and requiredapproval remainopen.
+
+2026-10-07 isolatedfullcomposition:3216passed23skipped90.53%/206.26s,one
+harnessfailure because gitarchiveHEAD requiresGit metadata absent infrozen
+copy. Existingreverse-patchlogicalreadyhandledappliedpatches; no runtimefailure
+confirmed. Testnowcopiesonlyexactpatchtargets toownedtmp, preserving closed/
+composedchecks; closed2tests passed/Ruff. Onlyfailedtest and unrunposttestgate
+steps willrerun, not3216unchangedchecks. Finalcompositionidentity mustrecord
+this test-only change beforeaudit; nofullgatepassclaimyet.

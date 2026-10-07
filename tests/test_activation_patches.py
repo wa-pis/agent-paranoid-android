@@ -31,13 +31,18 @@ def test_common_mcp_patch_enables_strict_arguments_at_both_factories(tmp_path):
 
 def test_activation_patches_compose_with_current_contracts(tmp_path):
     root = Path(__file__).resolve().parents[1]
-    archived = subprocess.run(["git", "archive", "HEAD"], cwd=root,
-                              check=True, capture_output=True)
-    subprocess.run(["tar", "-x", "-C", str(tmp_path)], input=archived.stdout,
-                   check=True, capture_output=True)
     patches = [root / "openspec/changes/selective-source-transformation" / filename
                for filename in ("common-cli-activation.patch", "common-mcp-activation.patch",
                                 "oauth-browser-registration.patch", "registration-contract-activation.patch")]
+    # Only patch targets are needed; prospective source copies may have no Git metadata.
+    targets = {line.split()[2].removeprefix("a/") for patch in patches
+               for line in patch.read_text().splitlines() if line.startswith("diff --git ")}
+    for target in targets:
+        relative = Path(target)
+        assert not relative.is_absolute() and ".." not in relative.parts
+        destination = tmp_path / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((root / relative).read_bytes())
     applied = subprocess.run(["git", "apply", "--reverse", "--check", str(patches[0])],
                              cwd=tmp_path, capture_output=True).returncode == 0
     if applied:
