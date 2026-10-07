@@ -1059,3 +1059,22 @@ test-only sequence repair. Split local release gate constituents now pass;
 23local integration skips remain mandatory synthetic CI obligations. Public
 contract/installed final artifact binding and final independent exact-SHA
 audit remain open; public registrations were not applied to author checkout.
+
+2026-10-08 prospective public contracts/help/registration passed17tests
+1.38s and installed development wheel SQL CLI/MCP lifecycle passed17tests
+1.95s; strictdocs/Ruff/types pass. Wheel8293030aad7b93af1433203edb91dfb430
+73285b0cd1236838de47340e999312 is development1.5.0, not RC/Ubuntu evidence.
+MCP golden delta reflects actual runtime workspace/session composition rather
+than unbound import-time SDK object. Broader small installed acceptance and
+public documentation reconciliation continue in parallel before freezing
+final source identity; unchanged large/baseline fixtures will not be replayed.
+
+2026-10-08 installed development composition accepted92targetedtests20.35s
+plus12small synthetic routes, real MCP stdio lifecycle and exact local CLI
+receipt handoff, packagedskills/demo/documented CSV JSON examples. Evidence
+/private/tmp/apa-installed-composition-acceptance.json SHA256cf3eb5fb0d956018
+40c6418608b58bf77953bb06ad7804af7482d116fdcbdc78. Docs-only public contract
+reconciliation passed51tests0.50s+strictMkDocs0.37s; retained patch f12f93f5
+eedb8d08d1a5732278f68499a87dc905567e81b55b2d29fece62361b. Preparing one
+isolated immutable prospective1.6.0rc1 composition for final version-bound
+checks and independent whole-source audit; no publicactivation/tag yet.
