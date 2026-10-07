@@ -934,3 +934,7 @@ OpenSpec validation passed. No runtime changes or repeated product tests.
 on exact268efc9a/wheel430e0405:24passed0.51s, Python3.11, candidate-only
 PYTHONPATH and pytest pythonpath disabled. No live backend/provider; final
 versioned interfaces, broader metadata and remote prerequisites remain open.
+
+2026-10-07 current installed typed12route acceptance passed with36 CLI
+refusals; exact candidate/harness identity and limitations recorded in current
+candidate acceptance. No repeat of prior-artifact proof or live DB execution.

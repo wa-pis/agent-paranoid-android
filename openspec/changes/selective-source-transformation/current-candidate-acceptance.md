@@ -34,3 +34,13 @@ subprocess imports installed code; pipe rejection precedes driver/artifact.
 Other cases inject fictional terminal/browser callbacks; no browser or network
 authentication occurs. Trino how-to links the six-method configuration contract;
 strict documentation build passed0.39s after correcting the anchor.
+
+2026-10-07 installed twelve-route replay: fully read unchanged harness
+`scripts/accept_transformation_routes.py --public` exited0 with all12routes
+and36 CLI negative assertions. Harness SHA256
+`b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57`;
+exact268efc9a/wheel430e0405/Python3.11, candidate-only PYTHONPATH. Exact
+decimal/date/null readback, value-free CLI/application-MCP review/execution,
+input integrity and cleanup checked. SQL inputs use injected synthetic Arrow
+streams; SQL outputs never execute. No DB, SDK-wire12route or scale claim.
+Log `/private/tmp/apa-final-current-routes.log`.
