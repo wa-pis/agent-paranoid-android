@@ -818,3 +818,14 @@ confirmed. Testnowcopiesonlyexactpatchtargets toownedtmp, preserving closed/
 composedchecks; closed2tests passed/Ruff. Onlyfailedtest and unrunposttestgate
 steps willrerun, not3216unchangedchecks. Finalcompositionidentity mustrecord
 this test-only change beforeaudit; nofullgatepassclaimyet.
+
+2026-10-07 resumed after interruption: isolated composition missing Git harness
+repaired test passes2cases; operational/schema steps already passed. Initial
+posttest smoke rejected /var symlink output. Only smoke rerun with resolved
+/private temporary path passes exact flags/seed/rowcounts/validation and
+dependency-manifest compatibility; output removed. Logs
+/private/tmp/apa-current-activation-harness-retry.log and
+/private/tmp/apa-current-activation-quickstart-retry.log. Runtime tests remain
+3216pass23skip90.53%; no unchangedsuite replay. This closes split local gate
+for frozen prospective composition plus recorded test-only repair, not final
+versionedRC/sourceaudit. Public SQL reference integration resumed in parallel.
