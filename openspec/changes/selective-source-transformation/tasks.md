@@ -647,3 +647,10 @@ unbounded numeric, unsupported arrays/JSON and timestamps reject without coercio
 no-row descriptions must retain numeric precision/scale before composition.
 Timestamp support and worker-owned metadata/capture composition remain open;
 no new public capability or final SHA acceptance claimed.
+
+2026-10-07 PostgreSQL no-row descriptions now retain validated driver numeric
+precision/scale, enabling exact capture-schema conversion without guessed bounds.
+Absent shape stays numeric; malformed/incompatible declared shape rejects.
+Client/query-source suites164passed0.78s; Ruff passed. Guide updated. Native
+psycopg column precision/scale properties verified in installed SDK source.
+Public SQL capture/owned discovery composition and final exact-SHA gates open.

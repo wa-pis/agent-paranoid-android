@@ -87,6 +87,9 @@ Declared `numeric(p,s)` in PostgreSQL or allowed query metadata carries only
 precision/scale into the profile; it does not authorize exact source extrema,
 raw values, a wider SQL subset or a larger scan budget. Unbounded `numeric`
 remains an explicitly approximate FLOAT inference, not exact DECIMAL evidence.
+PostgreSQL no-row result descriptions retain valid driver-declared numeric
+precision/scale as type metadata. Missing shape stays unbounded numeric;
+malformed or unsupported declared shapes fail closed rather than rounding.
 
 ## Enforcement
 

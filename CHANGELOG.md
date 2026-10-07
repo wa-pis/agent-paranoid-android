@@ -38,6 +38,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Retain validated PostgreSQL no-row result numeric precision/scale as metadata; reject malformed declared shapes without rounding or fetching rows.
+
 - Reject CSV rows wider than their header in the shared reader before retaining rows or profiling samples; preserve missing-field padding.
 
 - Preserve the safe cleanup-incomplete warning through common transformation CLI and MCP2 errors so operators can inspect retained artifacts before retrying.

@@ -393,3 +393,24 @@ def test_weak_tls_rejected_before_credential_resolution_or_connect(mode: str) ->
             pass
     assert requested_names == []
     assert driver.connect_kwargs == {}
+
+
+@pytest.mark.parametrize("precision,scale,expected", [(38, 6, "numeric(38,6)"),
+    (None, None, "numeric"), (8, 9, None), (True, 0, None)])
+def test_no_row_numeric_metadata_retains_only_valid_declared_shape(precision, scale, expected):
+    from types import SimpleNamespace
+
+    cursor = FakeCursor([])
+    cursor.description = [SimpleNamespace(name="amount", type_code=FakeTypeCode("numeric"),
+        precision=precision, scale=scale, null_ok=True)]
+    client = PostgresClient(postgres_config(password_env=None),
+        FakeDriver(FakeConnection([cursor])))
+    with client.session() as session:
+        if expected is None:
+            with pytest.raises(PostgresQueryError):
+                session.describe_no_rows(query("SELECT amount FROM safe_relation WHERE FALSE"))
+        else:
+            result = session.describe_no_rows(query("SELECT amount FROM safe_relation WHERE FALSE"))
+            assert result[0].data_type == expected
+    assert cursor.closed
+    assert cursor.fetch_sizes in ([1], [])
