@@ -484,3 +484,25 @@ def test_trino_capture_metadata_is_allowlisted_and_contains_no_rows(tmp_path, fa
         assert driver.dbapi.connect_kwargs is None
     else:
         assert cursor.closed and driver.dbapi.connection.closed
+
+
+@pytest.mark.parametrize("kind", ["array(varchar)", "decimal(39,2)", "decimal(8,9)",
+    "timestamp(9) with time zone", "varchar(999)", "varbinary"])
+def test_trino_capture_schema_rejects_unsupported_declarations(kind):
+    from test_data_agent.io.transformation_trino_stream import _trino_capture_schema
+    from test_data_agent.sql_query_profiling import QueryResultColumn
+
+    with pytest.raises(ValueError, match="unsupported Trino capture schema") as error:
+        _trino_capture_schema((QueryResultColumn("fictional", kind),))
+    assert error.value.__cause__ is None
+    assert kind not in str(error.value)
+
+
+def test_trino_capture_schema_retains_exact_decimal_and_integer_width():
+    from test_data_agent.io.transformation_trino_stream import _trino_capture_schema
+    from test_data_agent.sql_query_profiling import QueryResultColumn
+
+    schema = _trino_capture_schema((QueryResultColumn("amount", "decimal(38,6)", False),
+        QueryResultColumn("count", "tinyint", True)))
+    assert schema == pa.schema([pa.field("amount", pa.decimal128(38, 6), nullable=False),
+        pa.field("count", pa.int8(), nullable=True)])

@@ -114,3 +114,43 @@ def _discover_trino_capture_metadata(request: SqlQueryProfileRequest, *, config:
     if not valid:
         raise ValueError("invalid Trino capture metadata") from None
     return result
+
+
+def _trino_capture_schema(columns: tuple[QueryResultColumn, ...]) -> Any:
+    """Retain declared scalar types; ambiguous or composite types fail closed."""
+    import re
+    import pyarrow as pa
+    from test_data_agent.core.limits import DEFAULT_MAX_INPUT_COLUMNS
+
+    types = {"varchar": pa.string(), "tinyint": pa.int8(), "smallint": pa.int16(),
+        "integer": pa.int32(), "bigint": pa.int64(), "real": pa.float64(),
+        "double": pa.float64(), "boolean": pa.bool_(), "date": pa.date32()}
+    valid = False
+    try:
+        if (type(columns) is not tuple or not 0 < len(columns) <= DEFAULT_MAX_INPUT_COLUMNS
+                or any(type(item) is not QueryResultColumn for item in columns)
+                or len({item.name for item in columns}) != len(columns)):
+            raise ValueError
+        fields = []
+        for item in columns:
+            if (type(item.name) is not str or not item.name or len(item.name) > 256
+                    or type(item.data_type) is not str or len(item.data_type) > 128
+                    or type(item.nullable) is not bool):
+                raise ValueError
+            kind = types.get(item.data_type)
+            if kind is None:
+                match = re.fullmatch(r"decimal\(([0-9]{1,2}),\s*([0-9]{1,2})\)", item.data_type)
+                if match is None:
+                    raise ValueError
+                precision, scale = map(int, match.groups())
+                if not 1 <= precision <= 38 or not 0 <= scale <= precision:
+                    raise ValueError
+                kind = pa.decimal128(precision, scale)
+            fields.append(pa.field(item.name, kind, nullable=item.nullable))
+        result = pa.schema(fields)
+        valid = True
+    except Exception:
+        pass
+    if not valid:
+        raise ValueError("unsupported Trino capture schema") from None
+    return result

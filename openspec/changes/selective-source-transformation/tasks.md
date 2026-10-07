@@ -711,3 +711,11 @@ Source/catalog/schema refuse before connect; output alias drift and unexpected
 rows reject. Returned metadata is typed and bound to authorized query identity.
 4synthetic tests passed0.58s/Ruff. No DB. Owned supervisor/continuous capture
 budget and public registration still unfinished; not final SQL activation.
+
+2026-10-07 closed Trino capture schema retains signed integer widths and exact
+decimal128 precision/scale from owned no-row metadata. Unsupported composite,
+binary, bounded-character and temporal declarations fail closed without driver
+text; no guessed precision or timestamp truncation. Synthetic capture suite:
+56 passed0.82s; Ruff passed. Log/private/tmp/apa-trino-schema.log. Owned Trino
+supervision, continuous discovery/capture budget and public registration remain
+open; this private mapper does not close the composite SQL activation gate.

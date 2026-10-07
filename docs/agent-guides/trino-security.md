@@ -179,3 +179,8 @@ direct API errors or MCP responses, including the supported MCP 1 transport.
 
 Formula syntax errors and local query-source parser failures also detach the
 original parser cause/context, preserving fixed value-free recovery messages.
+
+The closed candidate Trino result-capture mapper retains declared scalar integer
+widths and decimal precision/scale. Unsupported declarations reject with a fixed
+error; they must not be coerced into text or rounded. This helper is not a public
+row-returning registration or proof of supervised capture acceptance.
