@@ -869,3 +869,9 @@ Additional temporal/finance/skill/linked-domain acceptance completed offline
 (log/private/tmp/apa-csv-final-installed-workflows.log); no liveDB/provider.
 Using installed wheel with existing3.11SDK1 dependencies, not full independent
 package matrix or versioned/publicRC proof.
+
+Installedworkflow exact wheel acceptance8passed1skip8.04s. Remaining skill
+unavailable-baseline check rerun only with existing actual installed1.5.0
+baseline/private/tmp/apa-skill-baseline.TjzfRV:1passed0.50s. No simulated
+parser, no replacement generation; allfive acceptance harnesses now executed
+against installed candidate. Dependency isolation/versionedartifact gates remain.
