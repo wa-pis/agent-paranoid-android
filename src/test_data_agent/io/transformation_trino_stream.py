@@ -85,7 +85,7 @@ def _discover_trino_capture_metadata(request: SqlQueryProfileRequest, *, config:
     from test_data_agent.sql_query_source import SqlQueryAdapter, inspect_query_source, authorize_query_source
     from test_data_agent.sql_query_profiling import build_no_row_schema_query
     from test_data_agent.trino_query_builders import build_describe_table_query
-    from test_data_agent.trino_work_budget import query_work_limits_from_env, with_query_work_budget
+    from test_data_agent.trino_work_budget import current_query_work_budget, query_work_limits_from_env, with_query_work_budget
 
     valid = False
     try:
@@ -108,8 +108,10 @@ def _discover_trino_capture_metadata(request: SqlQueryProfileRequest, *, config:
                 raise ValueError
             return columns, metadata, plan
 
+        active_budget = current_query_work_budget()
         result = with_query_work_budget(discover,
-            query_work_limits_from_env(deployment_profile=config.deployment_profile))()
+            (active_budget.limits if active_budget is not None
+             else query_work_limits_from_env(deployment_profile=config.deployment_profile)))()
         valid = True
     except (TransformationLimitError, QueryWorkBudgetExceeded):
         raise
@@ -160,6 +162,29 @@ def _trino_capture_schema(columns: tuple[QueryResultColumn, ...]) -> Any:
     return result
 
 
+def _trino_capture_limits(config: TrinoConfig, policy: BehaviorPolicy,
+                          max_rows: int, max_bytes: int) -> tuple[TrinoConfig, Any]:
+    """Explicit capture capacity; ordinary profiling configuration stays unchanged."""
+    import os
+    from dataclasses import replace
+    from test_data_agent.core.transformation_limits import InputDimension, resolve_input_limit
+    from test_data_agent.core.transformation_policy import parse_behavior_policy
+    from test_data_agent.trino_work_budget import query_work_limits_from_env
+
+    if (type(max_rows) is not int or not 0 < max_rows < 2**63 - 1
+            or type(max_bytes) is not int or not 0 < max_bytes <= 2**63 - 1):
+        raise ValueError("invalid Trino capture capacity") from None
+    config.validate_security()
+    parsed = parse_behavior_policy(policy)
+    for dimension, amount in ((InputDimension.ROWS, max_rows),
+                              (InputDimension.BYTES, max_bytes)):
+        resolve_input_limit(dimension, parsed.resource_limits, os.environ).check(amount, requested=True)
+    limits = query_work_limits_from_env(deployment_profile=config.deployment_profile)
+    # One extra row is an overflow sentinel; the shared capture rejects it.
+    return replace(config, max_result_rows=max_rows + 1), replace(
+        limits, database_result_bytes=max_bytes)
+
+
 def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfig,
                           source_id: str, policy: BehaviorPolicy, max_rows: int, max_bytes: int,
                           budget: GenerationBudget, driver: Any) -> SnapshotPart:
@@ -167,7 +192,9 @@ def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfi
     from dataclasses import replace
     from functools import partial
     from test_data_agent.io.transformation_query_capture import _capture_authorized_result
-    from test_data_agent.trino_work_budget import query_work_limits_from_env, with_query_work_budget
+    from test_data_agent.trino_work_budget import with_query_work_budget
+
+    capture_config, capture_limits = _trino_capture_limits(config, policy, max_rows, max_bytes)
 
     def capture() -> SnapshotPart:
         budget.check("Trino capture metadata")
@@ -176,7 +203,7 @@ def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfi
         budget.check("Trino capture metadata")
         schema = _trino_capture_schema(metadata)
         table = ".".join(plan.table_parts)
-        resolved = replace(config, allowed_table_columns=frozenset(
+        resolved = replace(capture_config, allowed_table_columns=frozenset(
             f"{table}.{column.name}" for column in columns))
         return _capture_authorized_result(request, allowed_tables=frozenset({table}),
             source_columns=columns, schema=schema, policy=policy, max_rows=max_rows,
@@ -184,8 +211,7 @@ def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfi
             stream=partial(_trino_result_stream, config=resolved, source_id=source_id,
                 schema=schema, driver=driver))
 
-    return with_query_work_budget(capture,
-        query_work_limits_from_env(deployment_profile=config.deployment_profile))()
+    return with_query_work_budget(capture, capture_limits)()
 
 
 @dataclass(frozen=True, repr=False)
