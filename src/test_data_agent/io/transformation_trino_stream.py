@@ -4,6 +4,9 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from typing import Any
 
+from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.core.transformation_policy import BehaviorPolicy
+from test_data_agent.core.transformation_snapshot import SnapshotPart
 from test_data_agent.core.transformation_limits import TransformationLimitError
 from test_data_agent.trino_work_budget import QueryWorkBudgetExceeded
 from test_data_agent.io.transformation_query_capture import _ResultQuery
@@ -154,3 +157,31 @@ def _trino_capture_schema(columns: tuple[QueryResultColumn, ...]) -> Any:
     if not valid:
         raise ValueError("unsupported Trino capture schema") from None
     return result
+
+
+def _capture_trino_result(request: SqlQueryProfileRequest, *, config: TrinoConfig,
+                          source_id: str, policy: BehaviorPolicy, max_rows: int, max_bytes: int,
+                          budget: GenerationBudget, driver: Any) -> SnapshotPart:
+    """Closed composition: metadata and rows consume one invocation budget."""
+    from dataclasses import replace
+    from functools import partial
+    from test_data_agent.io.transformation_query_capture import _capture_authorized_result
+    from test_data_agent.trino_work_budget import query_work_limits_from_env, with_query_work_budget
+
+    def capture() -> SnapshotPart:
+        budget.check("Trino capture metadata")
+        columns, metadata, plan = _discover_trino_capture_metadata(request,
+            config=config, source_id=source_id, driver=driver)
+        budget.check("Trino capture metadata")
+        schema = _trino_capture_schema(metadata)
+        table = ".".join(plan.table_parts)
+        resolved = replace(config, allowed_table_columns=frozenset(
+            f"{table}.{column.name}" for column in columns))
+        return _capture_authorized_result(request, allowed_tables=frozenset({table}),
+            source_columns=columns, schema=schema, policy=policy, max_rows=max_rows,
+            max_bytes=max_bytes, budget=budget, expected_query_sha256=plan.fingerprint,
+            stream=partial(_trino_result_stream, config=resolved, source_id=source_id,
+                schema=schema, driver=driver))
+
+    return with_query_work_budget(capture,
+        query_work_limits_from_env(deployment_profile=config.deployment_profile))()

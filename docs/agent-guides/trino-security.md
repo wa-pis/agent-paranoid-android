@@ -184,3 +184,9 @@ The closed candidate Trino result-capture mapper retains declared scalar integer
 widths and decimal precision/scale. Unsupported declarations reject with a fixed
 error; they must not be coerced into text or rounded. This helper is not a public
 row-returning registration or proof of supervised capture acceptance.
+
+Closed Trino capture composition shares one invocation budget between metadata
+discovery and row capture, freezes wildcard selectors into explicit columns, and
+checks the query fingerprint again before row access. A new result statement
+must not reset cumulative metadata work. Process supervision and public
+registration remain separate acceptance requirements.

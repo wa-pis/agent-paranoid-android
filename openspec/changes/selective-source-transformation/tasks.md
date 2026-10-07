@@ -719,3 +719,12 @@ text; no guessed precision or timestamp truncation. Synthetic capture suite:
 56 passed0.82s; Ruff passed. Log/private/tmp/apa-trino-schema.log. Owned Trino
 supervision, continuous discovery/capture budget and public registration remain
 open; this private mapper does not close the composite SQL activation gate.
+
+2026-10-07 closed Trino composition now discovers metadata, freezes wildcard
+authorization into explicit columns, builds native schema, binds capture to the
+discovered query fingerprint, and consumes one invocation budget throughout.
+Synthetic cumulative statement regression: three statements succeed; allowance
+of two refuses capture rather than resetting after metadata. Shared capture and
+Trino client suites79 passed0.61s/Ruff. Log/private/tmp/apa-trino-composed.log.
+This cooperative driver composition still needs process-owned supervision and
+public CLI/MCP registration; no live database, release gate or final audit claim.

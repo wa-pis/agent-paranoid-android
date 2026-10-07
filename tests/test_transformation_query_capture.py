@@ -506,3 +506,37 @@ def test_trino_capture_schema_retains_exact_decimal_and_integer_width():
         QueryResultColumn("count", "tinyint", True)))
     assert schema == pa.schema([pa.field("amount", pa.decimal128(38, 6), nullable=False),
         pa.field("count", pa.int8(), nullable=True)])
+
+
+@pytest.mark.parametrize("statements", [2, 3])
+def test_composed_trino_capture_keeps_one_statement_budget(tmp_path, monkeypatch, statements):
+    from test_data_agent.io.transformation_trino_stream import _capture_trino_result
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    monkeypatch.setenv("TRINO_MAX_INVOCATION_STATEMENTS", str(statements))
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.*"}))
+
+    class Cursor(FakeCursor):
+        def execute(self, sql, parameters):
+            self.row_offset = 0
+            if "information_schema.columns" in sql:
+                self.rows = [("status", "varchar", "NO")]
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+            else:
+                self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha", 2), ("beta", 1)]
+                self.description = [("label", "varchar"), ("measured", "bigint")]
+
+    cursor = Cursor([])
+    driver = FakeDriver(cursor)
+    arguments = dict(config=config, source_id="warehouse", policy=kwargs["policy"],
+        max_rows=3, max_bytes=16384, budget=GenerationBudget(5), driver=driver)
+    if statements == 3:
+        source = _capture_trino_result(request, **arguments)
+        assert source.payload
+    else:
+        with pytest.raises(ValueError):
+            _capture_trino_result(request, **arguments)
+    assert cursor.closed and driver.dbapi.connection.closed
