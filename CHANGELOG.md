@@ -6,6 +6,10 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Prepare a closed PostgreSQL transformation-capture path that resolves the
+  configured optional driver inside the existing supervised worker. Public SQL
+  capture remains gated; synthetic isolation tests do not certify live access.
+
 - Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
 
 - Prepare an isolated common saved-profile workflow for create/review/local

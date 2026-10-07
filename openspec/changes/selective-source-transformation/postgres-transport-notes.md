@@ -96,3 +96,20 @@ pre-allocation or isolated resource enforcement; explicit backend work limits;
 no partial snapshot/publication; exact context binding; independent safety review.
 If portability requires a new supported-platform or libpq-version restriction,
 obtain the owner's decision rather than silently changing compatibility.
+
+## Configured-driver increment — 2026-10-07
+
+`_capture_configured_postgres` selects only the fixed internal psycopg factory;
+optional-driver import occurs in the existing supervised child after capture
+preflight. Connection configuration remains explicit. This is a closed adapter
+increment, not public CLI/MCP registration or permission for real database use.
+The synthetic isolation suite passed29cases, including invalid-request refusal
+before driver resolution. No live database was contacted.
+
+The next public adapter must obtain source/output metadata through bounded
+allowlisted discovery, bind it and the query identity to the captured snapshot,
+and consume the resulting snapshot through the existing review/receipt workflow.
+Caller-provided Arrow schemas and source metadata from private fixtures are not
+sufficient authority for that discovery or public activation. Retain server
+read-only/time limits and current process cleanup; exact wire-byte and peak-RSS
+containment remain disclosed residual limitations under the owner decision.
