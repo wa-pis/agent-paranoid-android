@@ -938,3 +938,10 @@ versioned interfaces, broader metadata and remote prerequisites remain open.
 2026-10-07 current installed typed12route acceptance passed with36 CLI
 refusals; exact candidate/harness identity and limitations recorded in current
 candidate acceptance. No repeat of prior-artifact proof or live DB execution.
+
+2026-10-07 mandatory current-artifact CSV scale replay started:300000rows x50
+columns, exact268efc9a/wheel430e0405, Python3.11 installed-only imports. Fully
+read unchanged accept_transformation_csv_scale.py; explicit512MiB/1800s
+budgets, fictional temporary fixtures, no DB/provider/preservation receipt.
+Running session52436; log/private/tmp/apa-final-current-scale300k.log. Do not
+claim pass until full readback/cleanup and exit0. Target1M x100 remains separate.
