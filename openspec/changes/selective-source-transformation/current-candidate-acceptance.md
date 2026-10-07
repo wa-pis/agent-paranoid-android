@@ -86,3 +86,18 @@ Log `/private/tmp/apa-final-current-scale-trino1m-csv.log`.
 Python3.11 and2GiB/128MiB/3600s; full schema/cell readback, digest, lifecycle,
 provenance and cleanup. Synthetic Arrow stream only, no live adapter proof.
 Log `/private/tmp/apa-final-current-scale-trino1m-parquet.log`.
+
+2026-10-07 final planned supplied Trino-result->SQL target1Mx100 passed
+exit0:100Mcells,2240002792 output bytes,17207555capture bytes,1609.208s
+harness monotonic elapsed. Exact268efc9a/wheel430e0405/Python3.11;
+explicit4GiB output/input,128MiB capture,3600s. Full ordered SQL artifact
+readback, source digest, provenance and cleanup passed; SQL never executed.
+Log `/private/tmp/apa-final-current-scale-trino1m-sql.log`. Supplied synthetic
+stream acceptance does not certify live Trino or public activation. All planned
+additional scale replays now finished; historical routes retain their own
+artifact identities, not a claim of twelve scale routes on this wheel.
+
+Troubleshooting now documents candidate-only registration, fresh review after
+snapshot changes, separate local receipt issuance, budget refusals and retained
+cleanup evidence. Strict documentation build passed0.41s after this edit;
+log `/private/tmp/apa-docs-troubleshooting-check.log`.

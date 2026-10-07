@@ -1000,3 +1000,10 @@ passed1598.939s/full100Mcells. Final planned scale route Trino-result->SQL
 started, explicit4GiB/128MiB capture/3600s: historical SQL fixture output
 exceeds2GiB. Log/private/tmp/apa-final-current-scale-trino1m-sql.log;
 SQL is a temporary artifact, never executed. No additional scale scenarios.
+
+2026-10-07 session20578 finished exit0:final planned supplied Trino->SQL
+scale1Mx100 passed1609.208s/100Mcells/2240002792bytes with full readback
+and cleanup. Current candidate evidence records exact artifact and synthetic
+stream limits. No more scale replays planned; public activation/final SHA,
+independent approval and release gates remain open. Candidate troubleshooting
+added; strict docs passed0.41s. No version/tag/publication performed.
