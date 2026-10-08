@@ -4,6 +4,21 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Provide a generator-only MCP quickstart with fictional inputs, exact tool
+  calls, specification review, and corrective recovery guidance.
+
+### Changed
+
+- Clarify MCP planning, inspection, approval, and recovery descriptions so
+  assistants follow human review and workspace state before generating files.
+
+### Security
+
+- Detach unexpected MCP 1 runtime failures before returning tool errors, as
+  already done for MCP 2; keep safe cleanup and resource-budget diagnostics.
+
 ## [1.6.0rc1] - Prospective candidate
 
 ### Security

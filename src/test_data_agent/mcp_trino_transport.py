@@ -140,15 +140,21 @@ def _create_redacted_fast_mcp(
             except ToolError as exc:
                 if isinstance(exc.__cause__, ValidationError):
                     raise ToolError(_INVALID_TOOL_ARGUMENTS_MESSAGE) from None
-                if type(exc).__name__ == "UnexpectedToolError":
-                    # MCP 2 logs the cause traceback for unexpected errors.
-                    # Detach it before SDK logging can expose tool inputs.
-                    from test_data_agent.core.transformation_limits import TransformationLimitError
-                    from test_data_agent.trino_work_budget import QueryWorkDimension
+                from test_data_agent.core.transformation_errors import (
+                    CLEANUP_INCOMPLETE_MESSAGE, TransformationCleanupError,
+                )
+                from test_data_agent.core.transformation_limits import TransformationLimitError
 
-                    from test_data_agent.core.transformation_errors import (
-                        CLEANUP_INCOMPLETE_MESSAGE, TransformationCleanupError,
-                    )
+                if (type(exc).__name__ == "UnexpectedToolError"
+                        or isinstance(exc.__cause__, RuntimeError)
+                        or type(exc.__cause__) in {
+                            TransformationCleanupError, TransformationLimitError,
+                            QueryWorkBudgetExceeded,
+                        }):
+                    # MCP 1 embeds runtime failures in ToolError; MCP 2 uses
+                    # UnexpectedToolError and logs the cause traceback.
+                    # Detach either before tool inputs reach responses or logs.
+                    from test_data_agent.trino_work_budget import QueryWorkDimension
 
                     cause = exc.__cause__
                     if type(cause) is TransformationCleanupError:

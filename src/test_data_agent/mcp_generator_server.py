@@ -275,7 +275,7 @@ def plan_dataset(
     rule_sample_rows: int = 50_000,
     use_cache: bool = True,
 ) -> dict[str, Any]:
-    """Plan a review-first workflow from one bounded workspace source."""
+    """Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval."""
 
     source = resolve_workspace_path(source_path, must_exist=True)
     workspace = resolve_workspace_path(workspace_path)
@@ -345,7 +345,7 @@ def approve_dataset_plan(
     workspace_path: str,
     reviewed_spec_sha256: str,
 ) -> dict[str, Any]:
-    """Approve a reviewed agent plan and return artifact summaries, not rows."""
+    """Generate a planned synthetic dataset only after explicit human review of the exact current specification. Pass reviewed_spec_sha256 from inspect_dataset_plan after that review. A stale fingerprint is rejected. Returns validation summaries and artifact paths, not rows."""
 
     workspace = resolve_workspace_path(
         workspace_path,
@@ -386,7 +386,7 @@ def recover_dataset_plan(
     workspace_path: str,
     reviewed_spec_sha256: str,
 ) -> dict[str, Any]:
-    """Recover an interrupted approval without regenerating synthetic rows."""
+    """Recover an interrupted synthetic approval only when inspect_dataset_plan reports next_action recover. Pass the exact reviewed specification fingerprint. Retains published datasets without regenerating rows; inspect completed plans instead of retrying approval."""
 
     workspace = resolve_workspace_path(
         workspace_path,
@@ -424,7 +424,7 @@ def recover_dataset_plan(
 
 
 def inspect_dataset_plan(workspace_path: str) -> dict[str, Any]:
-    """Inspect a planned or completed agent workspace without changing it."""
+    """Read synthetic plan state without changing or approving it. Returns phase, next_action and review.current_spec_sha256. Use before human review, approval or recovery and after a lost response; completed plans need no regeneration."""
 
     workspace = resolve_workspace_path(
         workspace_path,
