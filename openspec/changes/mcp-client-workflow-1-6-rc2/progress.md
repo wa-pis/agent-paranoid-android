@@ -172,3 +172,109 @@
   mypy (150 files), Ruff, strict OpenSpec and diff checks passed.
 - Finding remains open until independent review of corrected exact SHA. Release
   held; rebuild artifacts and rerun full gate/CI because runtime changed.
+
+- Corrective signed commit eafb3d7 pushed to PR #607; independent reviewer
+  follow-up dispatched on that exact corrected candidate. Full gate is running
+  in exec session 42825, log /private/tmp/apa-rc2-corrected-release-gate.log.
+  Do not duplicate that gate; check/resume it on the next heartbeat.
+
+## 2026-10-09: Corrected Review Clear; Claude Setup Ready
+
+- APA-RC2-Reviewer independently re-reviewed exact corrected candidate
+  eafb3d771da16d354ad7f33d395feeebe2bfc84f. Previous P1 closed; no remaining
+  findings in reviewed RC2 diff. MCP1/Python3.11 and MCP2/Python3.13 independent
+  workflow/wire/transport suites each passed 58 tests. Exact application
+  ToolError preservation matches established contract; native subclasses and
+  other causes redact. AI review only, not human/GitHub approval.
+- Corrected full release gate session 42825 finished successfully. Log retained
+  at /private/tmp/apa-rc2-corrected-release-gate.log; do not rerun unchanged tree.
+- Built corrected local wheel and installed into
+  /private/tmp/apa-rc2-claude-env; pinned MCP 2.2.0 after initial resolution
+  selected 2.3.0. Installed package checks passed with mcp profile.
+- Added only apa-rc2-acceptance to Claude's existing config, retaining other
+  preferences. Dedicated root /private/tmp/apa-rc2-claude-workspace contains
+  fictional customers.csv. No DB/provider credentials configured.
+- Restarted Claude; settings visibly show apa-rc2-acceptance Running. Restart
+  applied its pending vendor update: installed UI now reports 1.46388.4.
+- Prepared but did NOT send a prompt requesting plan+inspect only, no rows,
+  no transformation and no approval before human spec review. User must send,
+  inspect actual generated spec locally, approve exact fingerprint and report
+  completion to establish genuine manual acceptance. Not claimed passed.
+- PR #607 fresh CI still pending; final-main binding, Ubuntu preflight and signed
+  acceptance manifest remain open. Next: inspect settled CI and consolidate
+  evidence, then merge and verify final-main review/artifacts.
+
+## 2026-10-09: Durable Review And Manual-Acceptance Records
+
+- Added review.md with initial P1, exact corrected SHA, independent closure,
+  reviewer identity, checks and explicit final-main limitations.
+- Added client-acceptance.md with the prepared Claude environment and concrete
+  human steps; all completion fields remain pending. Manual plan workspace does
+  not yet exist, so no manual test or human approval is claimed.
+- Current exact-head CI: 33 successes, four Python suites pending, no failures.
+  No merge or publication while checks are incomplete. No duplicate gate.
+
+## 2026-10-09: Final Main And Human Acceptance
+
+- PR #607 merged after 37 applicable green checks, four publication-only skips.
+  Final candidate main: 21f4a04ed4acd7c33caac9fda8c6c03b7f0501d1.
+- Worktree branch now codex/rc2-acceptance-evidence at that main SHA; evidence
+  edits remain uncommitted and must not alter the release source before tagging.
+- Independent APA-RC2-Reviewer explicitly cleared final main by tree equality
+  to reviewed corrected eafb3d7; full report recorded in review.md.
+- User confirmed genuine Claude completion; receipt, completed state, spec SHA,
+  counts, seed, validation and source-row disjointness independently checked.
+  Human acceptance completed; see client-acceptance.md. No source rows displayed.
+- Final exact-main local gate still running in session 2226, log
+  /private/tmp/apa-rc2-final-main-release-gate.log. No duplicate gate.
+- No-publish Ubuntu preflight dispatched:
+  https://github.com/wa-pis/agent-paranoid-android/actions/runs/37839244179
+- Next: collect final gates/preflight, download and rehash distributions, publish
+  independent AI source acceptance evidence, compose/validate signed manifest,
+  then authorized RC2 tag/publication/public checks. Stable remains unauthorized.
+
+## 2026-10-09: Final Main Gate Passed; Artifact Gates Pending
+
+- Exact final main 21f4a04e local full release gate passed: 3326 passed,
+  23 skipped, 91.03% coverage, 173.58 seconds coverage suite. Session 2226 closed.
+  Strict docs build passed before final merge; main Documentation gate passed.
+- Public independent AI source/human-client evidence recorded without changing
+  release source: https://github.com/wa-pis/agent-paranoid-android/issues/608
+- Exact-main Security, Containers and Documentation succeeded. CI run
+  37839132106 still has Python 3.11/3.12/3.14 coverage jobs pending; no failures.
+- Ubuntu no-publish preflight 37839244179 still running its release gate.
+- Next: wait for meaningful completion of CI and preflight, download artifact
+  release-preflight-21f4a04ed4acd7c33caac9fda8c6c03b7f0501d1, rehash both
+  distributions, build manifest using independent reviewer issue608 and passed
+  exact-main run URLs. Set RELEASE_ACCEPTED_COMMIT only after all acceptance
+  gates pass; then sign/verify/push immutable v1.6.0rc2 tag and track publication.
+- Preserve uncommitted post-release evidence docs; do not move main/source or
+  include those records in the tagged tree. Publish evidence PR after release.
+
+## 2026-10-09: Signed RC2 Publication Started
+
+- Final exact-main CI, Containers, Documentation and Security all passed.
+  No-publish Ubuntu preflight 37839244179 passed; distributions downloaded and
+  independently rehashed against ARTIFACT_SHA256.
+- Wheel SHA256: 1fa1da2dba508c7c6152bc0af590a3be209c5e298fbc58bb7cc9a1543c87ac28.
+- Sdist SHA256: 32bac1ff7c94c4d3bb1a78862783363ecb00db0155f9f12ed66937130647a41d.
+- Complete signed tag manifest binds new independent AI evidence issue608,
+  four passed exact-main gates, historical disposed findings and Ubuntu hashes.
+- Signed v1.6.0rc2 at 21f4a04ed4acd7c33caac9fda8c6c03b7f0501d1 passed
+  check_release_identity and check_release_acceptance including artifact hashes.
+  RELEASE_ACCEPTED_COMMIT set to exact SHA, immutable tag pushed successfully.
+- Publication is running; do not recreate tags or republish duplicate packages.
+  Next: inspect tag workflows, await GitHub/PyPI/container publication, dispatch
+  Verify Published Release with exact tag, and record successful public evidence.
+  Only after public verification and evidence completion disable this heartbeat.
+
+## 2026-10-09: Public RC2 Acceptance Passed
+
+- GitHub release 37840474596, signed containers 37840474599 and PyPI
+  publication 37841342683 succeeded for immutable v1.6.0rc2.
+- Verify Published Release 37842786407 passed all twelve jobs: checksums,
+  portable attestations, seven install profiles, documentation and three images.
+- Post-publication evidence records exact hashes, image digests, independent
+  AI review and genuine Claude Desktop human acceptance. All tasks verified.
+- Next: merge this documentation-only evidence PR after green checks, then
+  disable only mcp-1-6-0rc2 heartbeat. Stable 1.6.0 remains unauthorized.
