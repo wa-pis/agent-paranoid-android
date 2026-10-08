@@ -48,14 +48,14 @@
 
 ## Conditional release
 
-- [ ] Close remaining `selective-source-transformation` client/documentation/safety/activation acceptance tasks.
-- [ ] Select unused `1.6.0rc1` or next RC; update version metadata/changelog/docs consistently.
-- [ ] Review exact release SHA; complete release gate, strict docs and isolated package matrices.
-- [ ] Merge through established process with green exact-main CI, Containers, Documentation, Security and required GitHub approval.
-- [ ] Record Ubuntu-derived wheel/sdist hashes and exact accepted commit in valid signed acceptance manifest.
-- [ ] Set accepted-source variable and push allowed signed immutable RC tag.
-- [ ] Verify GitHub Release, PyPI, signed GHCR images, portable provenance and successful Verify Published Release.
-- [ ] Record public evidence; stop automation after success. Stable remains unauthorized.
+- [x] Close remaining `selective-source-transformation` client/documentation/safety/activation acceptance tasks.
+- [x] Select unused `1.6.0rc1` or next RC; update version metadata/changelog/docs consistently.
+- [x] Review exact release SHA; complete release gate, strict docs and isolated package matrices.
+- [x] Merge through established process with green exact-main CI, Containers, Documentation, Security and required GitHub approval.
+- [x] Record Ubuntu-derived wheel/sdist hashes and exact accepted commit in valid signed acceptance manifest.
+- [x] Set accepted-source variable and push allowed signed immutable RC tag.
+- [x] Verify GitHub Release, PyPI, signed GHCR images, portable provenance and successful Verify Published Release.
+- [x] Record public evidence; stop automation after success. Stable remains unauthorized.
 
 ## Progress
 
@@ -1126,3 +1126,25 @@ also hit0.2s admission timing in expiry test; runtime correctly refused
 slow capture. Test-only Event/Timer separation and deadline refusal regression
 prepared,11coverage tests passed; independent review pending. No release/tag
 or merge; corrected exactSHA gates/audit and existing approval still required.
+
+2026-10-08 exact7d32 corrected fullgate3322passed23local skips91%;
+complete fresh scan6887b369 zero findings; PR603 merged normally to
+68a20cf333b6d1bdbb02d36e64fb62ef929b2173. Exact-main CI37708975214,
+Containers37708975307, Documentation37708975239, Security37708975150
+and Ubuntu preflight37708997851 all passed (syntheticTrino included).
+Fresh complete exact-main scan29bd70cb-1039-4d1a-a8f6-a1eb3193bbdb
+sealed zero findings,332normalized currentfullread paths/zero productiongaps.
+Independent APA-Release-Reviewer AI-only acceptance recorded in issue604;
+not human approval. Ubuntu wheeldeb5378d845e8c133a2292fb0e90d1e019fe1e1
+c332063e209b0af10cda50fa8, sdiste67add4257fb5a0a193af5bfeb377394adf34
+fa9b84489bc844cbddc5c1c22e0 independently rehashed. Valid signed manifest/
+tag v1.6.0rc1 pushed; tag signatures/schema/artifacts checked. Release
+37711582305 and Containers37711582307 in progress; no public acceptance
+yet. Source/tag immutable; this post-tag evidence update is not released code.
+
+2026-10-08 public Verify Published Release37712402058 completed SUCCESS:
+GitHub/PyPI distributions, portable provenance, signatures, documentation,
+7public install profiles and all3GHCR images passed. Published1.6.0rc1
+exact68a20cf remains immutable; stable not authorized. Public evidence
+docs/release-evidence-1.6.0rc1.md recorded; heartbeatapa-security-fixes-audit-rc
+deleted after success. No more audits or release checks planned absent changes.
