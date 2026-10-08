@@ -128,8 +128,12 @@ def test_readme_is_a_focused_entrypoint() -> None:
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
     if PROJECT_VERSION != STABLE_VERSION:
         assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+", PROJECT_VERSION)
-        assert f"Prospective candidate `{PROJECT_VERSION}`" in readme
-        assert "not yet published" in readme
+        evidence = ROOT / "docs" / f"release-evidence-{PROJECT_VERSION}.md"
+        if evidence.is_file():
+            assert f"Candidate `{PROJECT_VERSION}` is published" in readme
+        else:
+            assert f"Prospective candidate `{PROJECT_VERSION}`" in readme
+            assert "not yet published" in readme
     else:
         assert "Preview `" not in readme
         assert "--pre" not in readme

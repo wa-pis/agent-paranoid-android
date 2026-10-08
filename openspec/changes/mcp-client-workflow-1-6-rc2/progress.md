@@ -84,3 +84,70 @@
   proof of acceptance.
 - Next: submit the focused signed PR, wait exact-head checks, run remaining
   release gates and obtain genuine manual client/final-SHA review evidence.
+
+## 2026-10-08: Main Integration And Full Gate In Progress
+
+- PR #606 first-head security, containers, documentation, wheel and dependency
+  jobs passed; Python suites were still running. No merge performed.
+- Fetched origin/main 24d744e2 and integrated it without conflicts in signed
+  merge 55c8919e6395b90fbc53477266516c83f7b82ddd; pushed the PR update.
+- Main now contains immutable RC1 public evidence. GitHub public verification
+  run 37712402058 is successful and headSha matches RC1 exact commit
+  68a20cf333b6d1bdbb02d36e64fb62ef929b2173. The annotated tag manifest names
+  that same commit. Baseline public acceptance is therefore confirmed.
+- Full local gate started with frozen lock and all/dev extras at integrated
+  commit 55c8919e. Log: `/private/tmp/apa-mcp-rc2-release-gate.log`;
+  exec session 62447. It is still running; do not start a duplicate gate.
+  Lint, types, dependency licenses/compatibility and 19 direct boundary checks
+  have passed; complete coverage-suite result is pending.
+- Next: resume/check gate session and new PR checks, fix any confirmed failure,
+  then commit this evidence with release-specific guidance. Manual assistant-
+  client evidence and independent final-candidate review remain open.
+
+## 2026-10-08: Full Gate Completed
+
+- Integrated implementation commit 55c8919e: full frozen all/dev release gate
+  passed, 3326 tests passed/23 skipped, 91.03% coverage, 185.51 seconds for
+  coverage suite. Operational budgets, schema freshness and quickstart passed.
+  This is implementation evidence, not the future final RC2 commit's gate.
+- RC1 signed manifest passes check_release_acceptance.py; direct verify-tag with
+  the repository allowlisted signers succeeds. check_release_identity.py was
+  intentionally inapplicable in the RC2 checkout (HEAD differs from RC1); no
+  identity success is claimed for that invocation.
+- Updated stale prospective-RC1 README/install claims and added RC2-specific
+  release guidance referencing the accepted RC1 baseline. Documentation checks
+  need to run before committing these edits.
+- Exact-head CI at 55c8919e: no failures; four Python jobs remain in progress.
+  No merge. Do not duplicate the completed local release gate.
+- Next: validate documentation, commit this evidence/guidance once pending CI
+  has settled, obtain fresh exact-head checks and merge PR when allowed.
+
+- Follow-up documentation validation: 51 passed, strict MkDocs, Ruff and diff
+  checks passed. README test now distinguishes published candidates with an
+  evidence page from prospective candidates without one. The isolated all/dev
+  environment lacks MkDocs; strict docs build used the existing docs interpreter.
+- Pending edits are documentation/evidence only. Avoid progress-only pushes
+  while current four Python CI suites are still running; consolidate them with
+  the checked release-guidance correction afterward.
+
+## 2026-10-09: Implementation Merged; RC2 Preparation
+
+- PR #606 merged after all 37 applicable exact-head checks passed, with four
+  publication-only skips. Accepted main merge:
+  45fff4fc151fdb47e4de02fd33d6018f27d70803.
+- Preparation branch: codex/release-1-6-rc2 in the same isolated worktree.
+- Prior RC1 policy/public acceptance and implementation gates are resolved.
+  Version metadata, lock package identity and prospective docs prepared for
+  1.6.0rc2 to obtain a concrete final artifact for remaining acceptance.
+  This preparation is not release clearance: final-commit checks, review,
+  preflight and genuine manual client acceptance remain mandatory before tag.
+- No runtime change in release preparation; original MCP implementation and
+  redaction behavior are retained from the accepted PR.
+- Next: validate/package preparation, open release PR, exact-main gates and
+  independent final-SHA review; provide concrete artifact for manual acceptance.
+
+- Preparation lock consistency, version-tag check, strict docs/OpenSpec and diff
+  checks passed. Initial focused test invocation used a nonexistent filename;
+  corrected to existing release suites. docs/index.md version mismatch was
+  caught and corrected before final checks. Local wheel/sdist built successfully;
+  these are not Ubuntu preflight hashes or published artifacts.

@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc2] - Prospective candidate
+
 ### Added
 
 - Provide a generator-only MCP quickstart with fictional inputs, exact tool

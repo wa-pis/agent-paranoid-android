@@ -11,12 +11,12 @@ Stable `1.5.0` retains the generation and validation corrections from `1.3.2`. R
 [migration notes](reference/generation-contract-migration.md) before regenerating
 existing fixtures.
 
-Prospective candidate `1.6.0rc1` is prepared for independent exact-commit
+Prospective candidate `1.6.0rc2` is prepared for independent exact-commit
 acceptance; it is not yet published. Stable `1.5.0` remains the recommended
 release. After successful publication, the explicit candidate pin is:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc1"
+python3 -m pip install "agent-paranoid-android==1.6.0rc2"
 ```
 
 ## Choose Your Starting Point
