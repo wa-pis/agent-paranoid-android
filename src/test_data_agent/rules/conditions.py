@@ -6,6 +6,8 @@ from typing import Annotated, Any, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from test_data_agent.core.limits import GenerationBudget
+
 
 class Condition(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
@@ -26,7 +28,11 @@ class Condition(BaseModel):
         return self
 
 
-def condition_matches(row: dict[str, Any], condition: Condition) -> bool:
+def condition_matches(
+    row: dict[str, Any], condition: Condition, *, budget: GenerationBudget | None = None,
+) -> bool:
+    if budget is not None:
+        budget.consume_rule_work(1 + len(condition.in_values or []))
     value = row.get(condition.field)
     if condition.equals is not None and value != condition.equals:
         return False

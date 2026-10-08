@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from test_data_agent.core.limits import (
+    GenerationBudget, GenerationLimitError, enforce_business_rule_evaluations,
+)
+from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
+
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -55,36 +60,42 @@ def validate_business_rules(
     rules: BusinessRules,
     *,
     expected_rule_failures: dict[int, int] | None = None,
+    budget: GenerationBudget | None = None,
 ) -> BusinessValidationReport:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    enforce_business_rule_evaluations(estimate_business_rule_evaluations_for_rows(
+        rules, {table: len(rows) for table, rows in rows_by_table.items()},
+    ))
     results: list[RuleResult] = []
-    for field_rule in rules.field_rules:
-        results.append(validate_field_rule(rows_by_table, field_rule))
-    for row_rule in rules.row_rules:
+    for field_rule in budget.iter_rule_work(rules.field_rules):
+        results.append(validate_field_rule(rows_by_table, field_rule, budget=budget))
+    for row_rule in budget.iter_rule_work(rules.row_rules):
         if isinstance(row_rule, ConditionalRequiredRule):
-            results.append(validate_conditional_required(rows_by_table, row_rule))
+            results.append(validate_conditional_required(rows_by_table, row_rule, budget=budget))
         elif isinstance(row_rule, ConditionalAllowedValuesRule):
             results.append(
-                validate_conditional_allowed_values(rows_by_table, row_rule)
+                validate_conditional_allowed_values(rows_by_table, row_rule, budget=budget)
             )
         elif isinstance(row_rule, TemporalOrderingRule):
-            results.append(validate_temporal_ordering(rows_by_table, row_rule))
+            results.append(validate_temporal_ordering(rows_by_table, row_rule, budget=budget))
         elif isinstance(row_rule, FormulaRule):
-            results.append(validate_formula(rows_by_table, row_rule))
-    for cross_table_rule in rules.cross_table_rules:
+            results.append(validate_formula(rows_by_table, row_rule, budget=budget))
+    for cross_table_rule in budget.iter_rule_work(rules.cross_table_rules):
         if isinstance(cross_table_rule, ForeignKeyRule):
-            results.append(validate_foreign_key(rows_by_table, cross_table_rule))
+            results.append(validate_foreign_key(rows_by_table, cross_table_rule, budget=budget))
         elif isinstance(cross_table_rule, AggregateFormulaRule):
             results.append(
-                validate_aggregate_formula(rows_by_table, cross_table_rule)
+                validate_aggregate_formula(rows_by_table, cross_table_rule, budget=budget)
             )
 
     truncate_report_errors(results)
     apply_violation_expectations(results, expected_rule_failures or {})
-    passed = sum(result.passed for result in results)
-    failed = sum(result.failed for result in results)
-    expected = sum(result.expected_violation_count for result in results)
-    unexpected = sum(result.unexpected_violation_count for result in results)
-    missing = sum(result.missing_expected_violation_count for result in results)
+    passed = sum(result.passed for result in budget.iter_rule_work(results))
+    failed = sum(result.failed for result in budget.iter_rule_work(results))
+    expected = sum(result.expected_violation_count for result in budget.iter_rule_work(results))
+    unexpected = sum(result.unexpected_violation_count for result in budget.iter_rule_work(results))
+    missing = sum(result.missing_expected_violation_count for result in budget.iter_rule_work(results))
     return BusinessValidationReport(
         valid=failed == 0,
         rule_count=rules.rule_count,
@@ -111,9 +122,16 @@ def apply_violation_expectations(
         result.missing_expected_violation_count = max(0, expected - result.failed)
 
 
-def validate_field_rule(rows_by_table: dict[str, list[dict[str, Any]]], rule: FieldRule) -> RuleResult:
+def validate_field_rule(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: FieldRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="field")
-    for index, row in enumerate(rows_by_table.get(rule.table, [])):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
         value = row.get(rule.field)
         errors = []
         if rule.required and value in (None, ""):
@@ -131,29 +149,50 @@ def validate_field_rule(rows_by_table: dict[str, list[dict[str, Any]]], rule: Fi
     return result
 
 
-def validate_conditional_required(rows_by_table: dict[str, list[dict[str, Any]]], rule: ConditionalRequiredRule) -> RuleResult:
+def validate_conditional_required(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: ConditionalRequiredRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="conditional_required")
-    for index, row in enumerate(rows_by_table.get(rule.table, [])):
-        if not condition_matches(row, rule.when):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
+        if not condition_matches(row, rule.when, budget=budget):
             continue
-        missing = [field for field in rule.required_fields if row.get(field) in (None, "")]
+        missing = [field for field in budget.iter_rule_work(rule.required_fields) if row.get(field) in (None, "")]
         record_result(result, not missing, f"{rule.table}[{index}] missing {missing}")
     return result
 
 
-def validate_conditional_allowed_values(rows_by_table: dict[str, list[dict[str, Any]]], rule: ConditionalAllowedValuesRule) -> RuleResult:
+def validate_conditional_allowed_values(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: ConditionalAllowedValuesRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="conditional_allowed_values")
-    for index, row in enumerate(rows_by_table.get(rule.table, [])):
-        if not condition_matches(row, rule.when):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
+        if not condition_matches(row, rule.when, budget=budget):
             continue
         value = row.get(rule.field)
-        record_result(result, value in rule.allowed_values, f"{rule.table}[{index}].{rule.field}={value!r}")
+        record_result(result, value in rule.allowed_values, f"{rule.table}[{index}].{rule.field}: allowed_values")
     return result
 
 
-def validate_temporal_ordering(rows_by_table: dict[str, list[dict[str, Any]]], rule: TemporalOrderingRule) -> RuleResult:
+def validate_temporal_ordering(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: TemporalOrderingRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="temporal_ordering")
-    for index, row in enumerate(rows_by_table.get(rule.table, [])):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
         start = parse_datetime(row.get(rule.start_field))
         end = parse_datetime(row.get(rule.end_field))
         ok = start is not None and end is not None and (start <= end if rule.allow_equal else start < end)
@@ -161,11 +200,20 @@ def validate_temporal_ordering(rows_by_table: dict[str, list[dict[str, Any]]], r
     return result
 
 
-def validate_formula(rows_by_table: dict[str, list[dict[str, Any]]], rule: FormulaRule) -> RuleResult:
+def validate_formula(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: FormulaRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="formula")
-    for index, row in enumerate(rows_by_table.get(rule.table, [])):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
         try:
-            expected = safe_eval(rule.expression, row)
+            expected = safe_eval(rule.expression, row, budget=budget)
+        except GenerationLimitError:
+            raise
         except Exception:
             record_result(result, False, "formula evaluation failed")
             continue
@@ -175,21 +223,37 @@ def validate_formula(rows_by_table: dict[str, list[dict[str, Any]]], rule: Formu
     return result
 
 
-def validate_foreign_key(rows_by_table: dict[str, list[dict[str, Any]]], rule: ForeignKeyRule) -> RuleResult:
+def validate_foreign_key(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: ForeignKeyRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="foreign_key")
-    parent_values = {row.get(rule.parent_field) for row in rows_by_table.get(rule.parent_table, [])}
-    for index, row in enumerate(rows_by_table.get(rule.child_table, [])):
+    parent_values = {row.get(rule.parent_field) for row in budget.iter_rule_work(rows_by_table.get(rule.parent_table, []))}
+    for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.child_table, []))):
         value = row.get(rule.child_field)
         record_result(result, value in parent_values, f"{rule.child_table}[{index}].{rule.child_field} missing parent")
     return result
 
 
-def validate_aggregate_formula(rows_by_table: dict[str, list[dict[str, Any]]], rule: AggregateFormulaRule) -> RuleResult:
+def validate_aggregate_formula(
+    rows_by_table: dict[str, list[dict[str, Any]]],
+    rule: AggregateFormulaRule,
+    *,
+    budget: GenerationBudget | None = None,
+) -> RuleResult:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     result = RuleResult(rule_type="aggregate_formula")
     rows = rows_by_table.get(rule.table, [])
-    actual = aggregate(rule.field, rows)
+    actual = aggregate(rule.field, rows, budget=budget)
     try:
-        expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows})
+        expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows}, budget=budget)
+    except GenerationLimitError:
+        raise
     except Exception:
         record_result(result, False, "aggregate formula evaluation failed")
         return result

@@ -316,10 +316,12 @@ approval and public verification, including the successful Parquet retry.
 
 ## Version And Tag
 
-### 1.6.0rc1 Candidate (planned)
+### 1.6.0rc1 Candidate (prospective exact-commit acceptance)
 
 The `selective-source-transformation` OpenSpec change plans `1.6.0rc1` only;
-stable `1.6.0` is not authorized. Do not bump the version, tag, or publish while
+stable `1.6.0` is not authorized. Candidate metadata is prepared only in the
+isolated prospective checkout for final audit; it does not authorize public
+activation or publication. Do not tag or publish while
 its safety-policy amendment, client acceptance, documentation audit, or release
 gates remain open. Keep source-preserving execution disabled until the scoped
 amendment, executable safety checks, and independent safety review are complete.

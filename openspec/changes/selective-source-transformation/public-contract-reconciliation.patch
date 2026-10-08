@@ -1,0 +1,186 @@
+--- a/docs/reference/application-boundaries.md
++++ b/docs/reference/application-boundaries.md
+@@ -12,7 +12,7 @@
+ original additions have exact-SHA safety evidence in ActivationSafety-R3; the
+ development goldens include their registration. That historical evidence does
+ not clear the later coherent candidate or common-profile consumers. Their
+-registration remains isolated, not enabled in the author checkout; current
++registration is included in the prospective 1.6 RC composition; current
+ independent safety clearance, final RC review and release gates remain required
+ before public delivery. See [MCP usage](../how-to/mcp.md#closed-common-profile-candidate)
+ for the gated common-profile surface.
+@@ -402,7 +402,11 @@
+ [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
+ for the staged extraction plan.
+ 
+-The prospective common registration adds `transform-batch` and
+-`common_transformation`. Its reviewed saved-profile operations share the
+-same application enforcement; only local controlling-TTY approval issues
+-a preservation receipt. Candidate registration is not release clearance.
++The 1.6 RC composition adds `transform-batch`, including `query-execute`,
++and the running generator MCP server adds `common_transformation` and
++`configured_query_session`. Their operations share application enforcement;
++only local controlling-TTY approval issues a preservation receipt.
++`io/transformation_query_sessions.py` owns bounded frozen captures across MCP
++requests, expiry and shutdown cleanup; `mcp_generator_server:main` injects and
++closes that owner. The default module-level SDK object owns no SQL sessions.
++Registration is not dataset authorization or final release clearance.
+--- a/src/test_data_agent/cli_transformation_candidate.py
++++ b/src/test_data_agent/cli_transformation_candidate.py
+@@ -1,7 +1,8 @@
+-"""Unregistered CLI candidate, exercised only on fictional temporary fixtures.
+-
+-Not imported by CLI composition, package facade or MCP. Activation requires
+-end-to-end evidence and independent review of the completed wiring.
++"""CLI adapters for registered selective-transformation workflows.
++
++Runtime composition registers review, local approval, common saved profiles and
++configured-query execution. Preservation authority remains controlling-TTY local
++approval bound to the same frozen snapshot; publication remains release-gated.
+ """
+ 
+ from pathlib import Path
+--- a/tests/fixtures/contracts/mcp-generator-tools.json
++++ b/tests/fixtures/contracts/mcp-generator-tools.json
+@@ -106,6 +106,131 @@
+     "output_schema": {
+       "additionalProperties": true,
+       "title": "common_transformationDictOutput",
++      "type": "object"
++    }
++  },
++  {
++    "description": "",
++    "input_schema": {
++      "properties": {
++        "destination": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Destination"
++        },
++        "handle": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Handle"
++        },
++        "max_output_bytes": {
++          "anyOf": [
++            {
++              "type": "integer"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Max Output Bytes"
++        },
++        "max_review_bytes": {
++          "anyOf": [
++            {
++              "type": "integer"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Max Review Bytes"
++        },
++        "max_total_bytes": {
++          "anyOf": [
++            {
++              "type": "integer"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Max Total Bytes"
++        },
++        "operation": {
++          "enum": [
++            "open",
++            "review",
++            "validate",
++            "execute",
++            "close"
++          ],
++          "title": "Operation",
++          "type": "string"
++        },
++        "profile": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Profile"
++        },
++        "references": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "References"
++        },
++        "snapshot_sha256": {
++          "anyOf": [
++            {
++              "type": "string"
++            },
++            {
++              "type": "null"
++            }
++          ],
++          "default": null,
++          "title": "Snapshot Sha256"
++        }
++      },
++      "required": [
++        "operation"
++      ],
++      "title": "configured_query_sessionArguments",
++      "type": "object"
++    },
++    "name": "configured_query_session",
++    "output_schema": {
++      "additionalProperties": true,
++      "title": "configured_query_sessionDictOutput",
+       "type": "object"
+     }
+   },
+--- a/tests/test_contract_fixtures.py
++++ b/tests/test_contract_fixtures.py
+@@ -90,6 +90,7 @@
+     assert {tool["name"] for tool in generator_tools} == {
+         "approve_dataset_plan",
+         "common_transformation",
++        "configured_query_session",
+         "export_dataset",
+         "generate_dataset",
+         "infer_dataset_spec",

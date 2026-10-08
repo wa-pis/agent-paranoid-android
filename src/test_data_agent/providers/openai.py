@@ -27,6 +27,11 @@ from test_data_agent.advisor import (
     validate_relationship_discovery_proposals,
 )
 
+from test_data_agent.providers.category_privacy import (
+    _provider_safe_request,
+    _restore_local_categories,
+)
+
 
 DEFAULT_OPENAI_MODEL = "gpt-5.6"
 DEFAULT_MAX_OUTPUT_TOKENS = 4_096
@@ -300,10 +305,12 @@ class OpenAIAdvisorClient:
         validated = AdvisorExchange.model_validate(
             exchange.model_dump(mode="python")
         )
+        provider_request, restorations = _provider_safe_request(validated.request)
         return self._complete_structured(
             trusted_instructions=validated.trusted_instructions,
             untrusted_description="profile metadata",
-            untrusted_json=validated.request.model_dump_json(),
+            untrusted_json=json.dumps(provider_request, ensure_ascii=False, allow_nan=False, separators=(",", ":")),
+            postprocess=lambda proposal: _restore_local_categories(proposal, restorations),
             response_model=AdvisorProposal,
             response_json_schema=validated.response_json_schema,
         )
@@ -316,6 +323,7 @@ class OpenAIAdvisorClient:
         untrusted_json: str,
         response_model: type[_ResponseModel],
         response_json_schema: dict[str, Any],
+        postprocess: Callable[[_ResponseModel], None] | None = None,
     ) -> StructuredCompletionResult[_ResponseModel]:
         started_at = self._clock()
         request_options: dict[str, Any] = {
@@ -421,6 +429,11 @@ class OpenAIAdvisorClient:
             parsed = response_model.model_validate_json(content)
         except ValidationError:
             pass
+        if parsed is not None and postprocess is not None:
+            try:
+                postprocess(parsed)
+            except Exception:
+                parsed = None
         if parsed is None:
             metadata = self._record_run_metadata(
                 request_bytes=request_size,

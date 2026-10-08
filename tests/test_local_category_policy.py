@@ -113,3 +113,19 @@ def test_empty_values_and_disabled_limits_fail_closed() -> None:
             values=["active"],
             max_categories=0,
         )
+
+
+@pytest.mark.parametrize("value", [912345678, 14155552671, 4111111111111111])
+def test_numeric_local_categories_do_not_hide_sensitive_content(value):
+    from test_data_agent.core.privacy import validate_local_category_values
+    with pytest.raises(ValueError, match="sensitive content") as caught:
+        validate_local_category_values(field_name="state", semantic_type=None,
+                                       sensitive=False, values=[value])
+    assert str(value) not in str(caught.value)
+
+
+@pytest.mark.parametrize("values", [[1, 2, 3], [False, True]])
+def test_small_numeric_and_boolean_local_categories_remain_allowed(values):
+    from test_data_agent.core.privacy import validate_local_category_values
+    validate_local_category_values(field_name="state", semantic_type=None,
+                                   sensitive=False, values=values)

@@ -31,10 +31,17 @@ def render_transformation_parquet(result: CsvTransformationResult, output: Parqu
                     self.tell() + len(data), max_bytes, "parquet_output_run")
             return super().write(data)
 
-    rows: list[dict[str, Any]] = []
-    for _, values in normalized_output_rows(result, output, budget=budget, source_rows=source_rows):
-        rows.append({item.name: int(value) if value is not None and item.type == "integer" else value
-                     for item, value in zip(output.fields, values, strict=True)})
+    # Discover timestamp offsets without retaining normalized rows or consuming
+    # the one-shot source iterator. The encoding pass enforces source reuse.
+    offsets: dict[str, str] = {}
+    if any(item.type == "datetime" for item in output.fields):
+        for _, values in normalized_output_rows(result, output, budget=budget):
+            for item, value in zip(output.fields, values, strict=True):
+                if item.type == "datetime" and value is not None:
+                    offset = value.strftime("%z")
+                    if len(offset) != 5 or offsets.get(item.name, offset) != offset:
+                        raise ValueError("Parquet requires one explicit timestamp offset")
+                    offsets[item.name] = offset
     types = {"string": pa.string(), "integer": pa.int64(), "float": pa.float64(),
              "boolean": pa.bool_(), "date": pa.date32()}
     fields = []
@@ -43,13 +50,10 @@ def render_transformation_parquet(result: CsvTransformationResult, output: Parqu
         if item.decimal_type:
             kind = pa.decimal128(item.decimal_type.precision, item.decimal_type.scale)
         elif item.type == "datetime":
-            offsets = {value.strftime("%z") for row in rows if (value := row[item.name]) is not None}
-            if len(offsets) > 1 or any(len(offset) != 5 for offset in offsets):
-                raise ValueError("Parquet requires one explicit timestamp offset")
             # All-null timestamps carry no instant to convert; retain declared target/source zone.
             temporal = item.temporal_type
             assert temporal is not None
-            offset = next(iter(offsets), None)
+            offset = offsets.get(item.name)
             zone = (f"{offset[:3]}:{offset[3:]}" if offset else
                     temporal.target_timezone or temporal.source_timezone)
             if zone is None:
@@ -60,9 +64,20 @@ def render_transformation_parquet(result: CsvTransformationResult, output: Parqu
         fields.append(pa.field(item.name, kind, nullable=item.nullable))
     try:
         budget.check("transformation Parquet encoding")
-        table = pa.Table.from_pylist(rows, schema=pa.schema(fields))
+        schema = pa.schema(fields)
         with BoundedBuffer() as buffer:
-            pq.write_table(table, buffer)
+            with pq.ParquetWriter(buffer, schema) as writer:
+                rows: list[dict[str, Any]] = []
+                for _, values in normalized_output_rows(result, output, budget=budget, source_rows=source_rows):
+                    rows.append({item.name: int(value) if value is not None and item.type == "integer" else value
+                                 for item, value in zip(output.fields, values, strict=True)})
+                    if len(rows) == 1024:
+                        budget.check("transformation Parquet batch")
+                        writer.write_table(pa.Table.from_pylist(rows, schema=schema))
+                        rows.clear()
+                if rows:
+                    budget.check("transformation Parquet batch")
+                    writer.write_table(pa.Table.from_pylist(rows, schema=schema))
             budget.check("transformation Parquet complete")
             return buffer.getvalue()
     except (pa.ArrowException, OverflowError):

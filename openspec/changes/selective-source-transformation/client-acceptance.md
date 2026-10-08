@@ -1,5 +1,362 @@
 # Client Feedback And Acceptance Plan
 
+## Current evidence index — 2026-10-07
+
+Use [frozen candidate acceptance](current-candidate-acceptance.md) for the
+reviewed `268efc9a` composition, wheel hash and installed Python/extras matrix.
+Its completed whole-source audit does not cover subsequent author-branch SQL
+capture changes. Final-SHA checks and independent audit remain required. The dated checkpoints below retain historical evidence;
+words such as “latest” or “current” within them refer to their checkpoint only.
+They do not supersede the consolidated index or close final versioned RC gates.
+Mandatory synthetic Trino CI is owner-authorized; independent approval remains
+required. Private client data and external-provider execution remain unverified.
+
+## Current author-source checkpoint — 2026-10-06
+
+Author source04704cd04b963e5085ac5f507b054e40ed5239da passed the full offline
+gate3122tests/23skips/90.55%coverage and strictMkDocs. Independent whole-source
+scan67934951-4755-41b7-aa9b-26925754ed17 completed with zero confirmed findings;
+196executable files and13supporting fully reviewed. This is the seed-fixed author
+branch, not an activated/versionedRC or replacement for installed evidence below.
+Findings20/25 reproduction/fix tasks consume dated installed doctor/mode evidence;
+final package/extras/SDK compatibility remains required. No private/live claim.
+
+## Prospective security and installed acceptance — 2026-10-06
+
+Latest prospective source is `6ef55a1d86e377ee442199fee60cec6b57c8b9a7`:
+complete independent executable baseline193files, zero confirmed findings,
+canonical coverage complete/deferred0; scan54cfdefc-304e-4131-a379-396572e8d4c5.
+The historical unavailable-review statements below describe earlier checkpoints;
+they do not supersede this completed scan or establish human GitHub approval.
+Offline gate3113passed19skipped. Current isolated wheel1.5.0 SHA256
+`76fc927cc2372c832ea90e97f21600443fc7eec18c9d07d009049a021a86211e`.
+
+Fresh installed Python3.11 checks:12typedroutes/36CLIrefusals, temporal3,
+linked2, finance/localTTY1; registeredSDK6behaviorcases plus focused repaired
+contract1 (no combinedgreen claim); packagedskills2passed/1baseline-skip.
+Mode/input parity and physicalParquet suites additionally9passed6.33s with
+explicit installed package-root binding, no sourcefallback. This renews selected
+findings24/25 entrance/physical-type evidence; it does not certify all findings.
+Full logs under /private/tmp/apa-r13-installed-a13c8a66; route evidence contains
+scope and harness adaptation. Strict current documentation build passed0.37s.
+No new all-route scale run, liveSQL/provider, native timestamp transformation,
+finalversionedRC or Python/SDK/extrasmatrix clearance is implied.
+
+Original per-finding disposition record and private-data waiver below remain
+applicable. Do not repeat implemented fixes or accepted unchanged scale runs.
+Next reconcile remaining contract/documentation requirements against these
+specific dispositions; public activation and real release gates stay open.
+
+### Installed documented examples — 2026-10-06
+
+Same exact6ef55a1 development wheel76fc927c/Python3.11, installed-only
+PYTHONPATH and explicit TDA_PYTHON. Fully reviewed unchanged
+examples/csv_quickstart/run.sh and examples/relational_csv/run.sh each exited0
+using their checked-in fictional inputs and new temporary destinations.
+Both profile/infer/generate/revalidate sequences completed; relational scenario
+includes reviewed business rules. Logs example-csv.log/example-relational.log
+under /private/tmp/apa-r13-installed-a13c8a66. No provider/DB/network.
+This renews these documented examples on installed artifact, not every example
+or finalRC identity. Source-free quickstart/mode/decimal documentation reviewed
+against existing contracts without new contradictions or scope amendments.
+
+### Second-runtime installed acceptance — 2026-10-06
+
+Same current development wheel76fc927c and candidate-only package root,
+Python3.14.2 from the isolated matrix environment. Reviewed mode/input-parity,
+physicalParquet, explicittemporal and linked-domain suites14passed13.21s.
+No sourcefallback/network. Log py314-installed.log under installedevidenceroot.
+This adds a second-runtime binding for these cases; it is not a complete
+Python3.11–3.14/extras/SDK matrix or final versionedRC package check.
+
+### Current installed publication adaptation — 2026-10-06
+
+Same exact6ef55a1/wheel76fc927c/Python3.11, explicit installed-root import
+assertions. Fully reviewed unchanged test_client_publication_acceptance.py:
+5passed2.49s. Absent/empty destinations publish complete fictional10row output;
+filled destinations reject both overwrite selections and retain original files.
+Log publication-installed.log under current installedroot. This renews the
+reviewed adaptation only; it does not retrospectively reproduce the original
+client timing script or certify universal race/crash recovery.
+
+### Current installed doctor evidence — 2026-10-06
+
+Same exact6ef55a1/wheel76fc927c/Python3.11. Reviewed selected doctor suite:
+5passed4deselected1.17s. One actual CLI invalid local Trino configuration case
+retains earlier dependency checks, marks capability failed and redacts the
+invalid marker. Four direct-service cases use explicitly injected importers/
+capability callbacks for missing versus broken dependencies and sanitized
+recovery; no real remote fault or product-policy bypass. Quickstart function
+monkeypatch test was deliberately not in installed selection; its deterministic
+unit evidence remains separately covered by full offline gate. Log
+ doctor-installed.log under installedroot. Final package/extras matrix remains open.
+
+## Current isolated registration checkpoint — 2026-10-05
+
+Prospective copy based on1d2a9a3 plus reviewed-in-preparation CLI/MCP/OAuth
+registration patches; installed wheel SHA256
+2f1b6cad280c5c160f4114373899e8b00d1a92e5d11c5fdda1e51fa4d03930c8.
+Active branch common registration remains closed; this is still1.5.0 metadata.
+Actual CLI creation/runtime/inventory18passed, actual MCP stdio6passed,
+OAuth6passed, and wizard/configuration/receipt/linked-key/budget99passed.
+Additional current installed contracts:50mode/decimal/doctor,60auth/typed/
+publication/temporal and134SQL source/adapter tests passed. MCP2.2.0 actual
+common stdio/inventory7passed separately; no live authentication claimed.
+Four initial preservation failures were restricted /dev/tty sandbox failures;
+unchanged installed wheel passed with controlling-terminal access, no guard
+bypass. Twelve small fictional routes also passed --public transform-execute
+and workspace acceptance; this is not all-route transform-batch scale proof.
+Private installed capacity matrix12/12 passed; no live SQL execution.
+No live DB/private-data evidence or clearance of the final RC SHA is implied.
+Current logs and exact scale bindings are recorded in tasks.md and
+csv-scale-acceptance.md. Historical evidence below remains historical.
+
+## Owner release decision — 2026-10-04 local
+
+The owner cannot perform local acceptance on the full data volume available in
+the closed segment and explicitly confirmed proceeding with 1.6.0rc1 without
+that private-data replay. It is not a release prerequisite. Use fictional local
+acceptance, including the recorded mandatory300,000 x50 workload, and disclose
+private inputs and real integrations as unverified, never passed.
+This decision does not authorize live access, waive independent safety clearance,
+final RC review, mandatory CI/release gates or public artifact verification, or
+authorize stable1.6.0. Do not ask for unavailable private data as a substitute
+for completing the agreed release process.
+
+## Consolidated local acceptance and release gates — 2026-10-04
+
+Use corrected runtime SHA3c00148 / wheel dd6b4ad2 evidence above and below;
+unchecked parent tasks are not all missing implementation. No historical pass
+or source-only test automatically certifies an installed release artifact.
+
+| Scope | Evidence already recorded | Disposition / remaining boundary |
+|---|---|---|
+| 1–4, 8–9 | Identifier/domain44, CSV/date78, distinct/cache9 | Reconcile original finding dispositions; retain private-input gaps |
+| 5–6, 12 | Explicit category regression, saved-policy/TTY and finance scenario | Link approved sensitivity/preservation contract and wizard evidence; no blanket declassification |
+| 7, 10 | Timestamp offset, missing-bound warning and spec/profile routing | Monthly source-category fidelity remains a deferred proposal, not an agreed RC gate; explicit field formats do not imply monthly sampling. Installed routing diagnostics supplement the existing mode replay below. |
+| 11, 15–17 | Corrected PostgreSQL client22, query profiling12 and table/category preflight7; policy predicate/authorization probes | Preserve local statement-count versus unmeasured live scan/latency distinction; reconcile final docs |
+| 13–14 | Declared FK counts/chains and validation | Separate inference/utility claims from conformance; unmeasured source fidelity remains unverified |
+| 18 | Owner scope correction | Keep internal formulas inactive; reconcile supported SQL expression/rejection evidence only |
+| 19 | Installed publication5 and actual path/identity safeguards5 | Keep historical atime/product-stub unit evidence separate; no universal crash/rollback claim |
+| 20–26 | Corrected doctor/mode9, SQL/units/temporal28, Decimal pipeline16, Parquet renderer/profile19, metadata11 and auth22 | Preserve live/native/system prerequisite limitations; final interface documentation/clearance remain open |
+| Transformation routes | Corrected typed twelve-route matrix,36 CLI refusals, temporal3, linked-key21, wizard SDK2, common CLI/MCP matrix and finance end-to-end1 | Final documented contract disposition; no live query, native timestamp or scale-per-route claim |
+| Release | Closed full gate2894, published draftPR602 | Final contract/docs disposition, mandatory independent clearance, protected CI and RC artifact verification |
+
+This queue is not a new product decision or a declaration that all client
+requirements passed. Private/live data remain unavailable; do not connect real
+databases to fill those gaps. Independent review is unavailable and must not be
+retried, rephrased or routed to another provider to evade the restriction.
+
+The existing [finding dispositions](#candidate-finding-dispositions--2026-10-02)
+remain the per-finding decision register. Current installed evidence supplements
+that register rather than copying historical passes to a new artifact:
+
+| Findings | Corrected-wheel evidence binding | Local disposition |
+|---|---|---|
+| 1–4, 8–9, 13 | Identifier/domain44, CSV/date78, distinct/cache9 and linked-key21 | Implemented bounded identifier/declared-link remedies; conservative content decisions retained. General inference, source orphan fidelity and private inputs are not passed. |
+| 5–6, 12 | Saved-policy/TTY and finance scenario; wizard SDK2 | Explicit local categories and exact-snapshot preservation authority, never blanket declassification. Fictional receipts authorize no real dataset. |
+| 7, 10 | Temporal3, CSV/date78, typed bounds and entrance/routing evidence | Explicit temporal formats and bounded fallback disclosure; monthly fidelity remains deferred, native timestamp transformation unsupported. |
+| 11, 15–17, 18, 22 | Client22, query12, category7, combined units/temporal/predicate28 | Authorized SQL and local statement counts only. Internal formula recomputation excluded; live cost/latency and private queries unverified. |
+| 14 | Existing deterministic constraint/relationship evidence | Conformance, not statistical/business utility or anonymity certification. |
+| 19 | Publication5 and actual filesystem identity5 | Reviewed adaptation distinct from unchanged original script and historical product-stub simulations; no universal crash recovery claim. |
+| 20–21, 23–26 | Doctor/mode9, auth22, Decimal16, renderer/profile19, metadata11; typed twelve-route matrix | Declared local contracts covered; optional/native/remote prerequisites and public-artifact compatibility are not inferred. |
+
+Offline skill-guided corrected-wheel acceptance additionally passed all three
+cases together; see [installed skill evidence](skill-workflow-acceptance.md).
+Documentation reconciliation covers current README/CLI/MCP/configuration/safety,
+output/architecture/roadmap, quickstarts, support/migration, project skills and
+changed OpenSpec activation contracts; historical release evidence stays historical.
+Strict documentation builds and existing fictional example evidence are recorded
+in progress. PlantUML source review is not rendered diagram QA.
+
+The next release stages are mandatory independent safety clearance of the finished
+exact activation SHA, final RC review, permitted registration and release gates,
+protected GitHub checks/merge, and public RC artifact verification. None is
+replaced by author-run tests or green CI. The local reconciliation above is
+complete as a disposition record, not a blanket pass of all client claims or
+readiness to publish. No real DB/API or absent private input is required or
+authorized merely to fill the disclosed gaps.
+
+## Corrected budget candidate evidence — 2026-10-03
+
+Findings15/17 corrected installed profiling evidence: selected query profiler
+cases12 passed/13 deselected (0.23s), table/category preflight7 passed/6 deselected
+(0.21s), Python3.14 with -o pythonpath=. -q. Explicit fictional fetch callbacks
+verify both dialects' grouped wrapping, shared numeric aggregates, default
+category non-disclosure and invalid exact scope before connection. Wildcards
+resolve bounded metadata before rejecting invalid scope/column budgets, without
+running aggregates. Query fixture uses5 statements/6 with local category;
+two-table fixture12/13. No measured live scan-byte/latency claim.
+
+Finding19 corrected installed actual-filesystem identity safeguards:5 passed,
+16 deselected (0.21s), selected test_io_path_policy.py. Unsafe symlink parent/
+destination, changed destination inode and replaced-directory cleanup refuse
+without overwriting replacement ownership. Excluded product _stat_at-patched
+simulations and FIFO subprocess forcing source PYTHONPATH; historical unit
+evidence remains historical. No arbitrary crash/race recovery pass implied.
+
+Finding11/adapter budget evidence on corrected installed wheel:22 PostgreSQL
+client cases passed (0.22s), Python3.14, tests/test_postgres_client.py with
+-o pythonpath=. -q. Explicit fictional driver/cursor/clock injection verifies
+safe static connection/SQLSTATE diagnostics, detached backend failures,
+read-only/timeouts, cumulative statement/result/deadline limits, missing-secret
+fail-before-connect and rejection of untrusted SQL strings. No product patch,
+live connection or measured remote performance; query-policy authorization and
+query-profiling cost evidence remain distinct.
+
+Finding21 corrected installed auth contract: test_trino_auth.py,22 passed
+(0.21s), Python3.14 with -o pythonpath=. -q. Six configured methods use runtime
+references/explicit injected constructors; OAuth token origin/TLS/deadline and
+value-free diagnostic negatives remain enforced. HTTP send and optional modules
+are disclosed dependency stubs, not product-policy patches or live authentication.
+No DB/API contacted; Kerberos/GSSAPI system prerequisites and remote success
+remain unverified. Author-run tests do not replace independent clearance.
+
+Corrected installed wizard-to-execution: registered-interface-acceptance.py,
+registered_wizard_saved_policy_execution only,2 passed,5 deselected (4.28s),
+Python3.14/MCP2 with -o pythonpath=. -q. Fictional inline/local CSV mapping
+entry stays hidden; SAVE records policy without receipt/output. Subsequent CLI
+and actual SDK stdio MCP execution agree on output rows and snapshot identity;
+source bytes unchanged and fixture values absent from review/status. No operator
+preservation approval, product monkeypatch, live backend or independent review.
+
+Corrected installed saved linked-key/mapping contract:21 passed,166 deselected
+(1.37s), selected test_transformation_batch.py cases with -o pythonpath=. -q.
+Fictional parent/child profiles cover inline/CSV null-versus-empty mappings,
+literal replacement, deterministic synthesis/fallback and generation-byte binding,
+shared CSV domain byte conflicts, final orphan rejection and composite tuple
+cardinality/incomplete-declaration negatives. Unbound receipt versions reject;
+no receipt issued, DB/API or product monkeypatch. This adds current-artifact
+evidence, not automatic relationship inference or independent safety review.
+
+Finding2 corrected installed distinct-overflow/cache suite passed nine cases
+(0.42s): lower-bound uncertainty after cap overflow, no false primary key,
+legacy fingerprint compatibility and stale-cache reprofile. Fictional data only;
+private inputs and final public RC remain unverified.
+
+Corrected-wheel finance end-to-end acceptance passed one scenario (1.52s):
+authorized fictional PostgreSQL aggregate stream -> captured source/saved policy
+-> CLI review -> missing-receipt rejection -> local controlling-TTY test approval
+-> execution and readback. Business combinations remain, identifiers map and
+Decimal amounts replace exactly. No real database or internal totals engine;
+this test receipt does not authorize any real dataset.
+
+Corrected-wheel CSV/date pipeline passed 78 cases (0.63s), one product-constant
+monkeypatch probe excluded: profile/spec/generation/CLI roundtrip, explicit local
+categories, timezone retention, missing-bound fallback disclosure and existing
+numeric/rare-secret controls. Monthly-date granularity and unmeasured utility
+remain separate; these results do not imply general source fidelity.
+
+Corrected installed identifier pool/domain suite passed 44 cases (0.39s).
+This supplies fictional evidence for findings1/4/8/9 and the declared-link part
+of13: fixed cardinality, synthetic sensitive identifiers, independent nullable
+domains, declared FK counts/chains and replay. General relationship inference,
+source orphan-rate fidelity and all selective mapping routes are not closed.
+
+Client19 reviewed installed publication adaptation passed five corrected-wheel
+cases (2.94s): absent/empty destination success and filled-directory rejection
+with/without overwrite, including output readback and old-byte preservation.
+Original supplied script and deterministic atime/path-swap evidence remain
+separate; this adaptation alone does not close the full finding.
+
+Corrected-wheel unknown Parquet metrics and bounded local sensitivity probes
+passed 11 cases (0.31s): missing metrics remain unknown, incomplete metadata
+cannot authorize inference, fictional native/string detection exposes no values,
+and cell/row/deadline limits reject. Environment overrides and explicit clock
+injection are test inputs, not product-function monkeypatch or live acceptance.
+
+Corrected-wheel declared decimal profile and private typed Parquet renderer
+passed 19 cases (0.37s), including nulls, decimal/date/timezone readback and
+byte/cardinality/reuse negatives. Renderer checks do not close entire mapping
+execution or the separate unknown-metadata/sensitivity acceptance requirement.
+
+Corrected installed Decimal pipeline subsequently passed 16 cases (1.53s):
+spec/generation/validation, CSV/JSON/Parquet/PostgreSQL export, actual CLI
+CSV/Parquet, saved precision/scale/nulls and rejection/publication negatives.
+This complements the units probes below, not proof of every transformation or
+mapping route. All fixtures were fictional; PostgreSQL export was local SQL text,
+not a database connection.
+
+On 4 October local time, corrected-wheel Decimal units, actual Parquet temporal
+CLI/readback and both-dialect SQL predicate/authorization/budget probes passed
+28 cases (1.10s). Decimal units do not prove the entire generation/export/
+transformation pipeline. SQL policy probes are not live adapter execution;
+native Parquet timestamp transformation remains outside implicit support.
+
+Exact isolated registration SHA: `3c00148c0d2afcf255e7355b6f52bb779d52f70a`.
+Its src tree matches this wheel build source, excluding generated bytecode caches.
+Explicit corrected-wheel client20/25 entrance acceptance subsequently passed nine
+cases (8.55s): actual failed local doctor configuration and explicit/embedded
+negative, mixed/default spec/profile/CSV generation with retained artifacts and
+deterministic replay. These do not close unrelated remaining client scope.
+
+Closed author candidate: signed commit
+`d038ec2dc162727ac9e1b381f6900ba69a1b9b7c`. Public registrations remain disabled.
+The corrected isolated development wheel has SHA256
+`dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db`
+and retains version 1.5.0; it is not a published release candidate.
+
+Explicit installed Python3.14/MCP2 checks passed 27 cases covering common CLI
+creation/runtime/contracts, retained MCP stdio and session/per-file limit
+rejections. Python3.11/MCP1 contract and retained stdio checks passed four cases.
+Installed doctor with --skip-smoke passed; network reachability and quickstart
+were not tested by that invocation. Earlier client20–26 wheel results below
+remain tied to their own artifacts, not automatically transferred to this wheel.
+
+The closed source milestone gate passed 2894 tests with 21 explicit skips and
+90.05% coverage, plus lint, types, compatibility, licenses, resource checks,
+schema freshness and fictional quickstart. This is author-run evidence, not
+independent safety review, live integration acceptance or public RC acceptance.
+Exact activation-tree materialization is complete at 3c00148; remaining client
+evidence reconciliation, mandatory independent clearance and public artifact
+verification remain open.
+See [progress](progress.md) for commands, boundaries and preserved artifacts.
+
+## Installed client20–26 evidence ledger — 2026-10-03
+
+All runs use fictional local inputs. Harnesses were inspected before execution;
+no product monkeypatch, live database, external API or private client inputs.
+Environment configuration and explicit clock/dependency injection are identified
+in [progress](progress.md), not presented as remote integration acceptance.
+
+| Finding | Wheel | Focused evidence | Still open |
+|---|---|---|---|
+| 20 doctor | dd6c0c6e | Actual local configuration failure: 1 passed; dependency-injected subset: 4 passed | Other quickstart failures, final compatibility |
+| 21 auth | dd6c0c6e / 9da73de5 | Six-method local dependency guards: 22 passed on earlier wheel; actual OAuth pipe guard: 1 passed on newer wheel | Remote login/native prerequisites, exact-SHA review |
+| 22 SQL | 9da73de5 | Both-dialect predicates, unauthorized columns and budget negatives: 17 passed | Adapter execution, private reproduction |
+| 23 decimal | 9da73de5 | Units, generation, exports, actual CLI, schema/readback and negatives: 33 passed | Remaining transformation/mapping scope |
+| 24 Parquet | 9da73de5 | Actual declared temporal CLI/readback: 1 passed | Native timestamp transformation is not implicitly supported |
+| 25 mode/exit | 9da73de5 | Negative override and mixed spec/profile/CSV deterministic replay: 4 passed; embedded negative with omitted override: 1 passed; default valid spec/profile/CSV: 3 passed; invalid artifacts retained, exit1 | Remaining entrances and final artifact gates |
+| 26 metadata | 9da73de5 | Unknown metrics, sensitivity and local byte/row/time boundaries: 11 passed | Final CLI/MCP compatibility |
+
+New OAuth-composed development wheel SHA256:
+`9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b`.
+It retains development version 1.5.0, not a published RC. Earlier wheel evidence
+below remains tied to its exact artifact; no automatic transfer of successful
+common-interface tests to the newer wheel. Main public registration is unchanged.
+The changed wheel was subsequently revalidated explicitly: actual common CLI/MCP
+creation/runtime/stdio matrix21passed14.31s on Python3.14/MCP2, read-only contract
+inventory1passed0.46s. These results are attached to9da73de5, not inferred from
+dd6c0c6e. Explicit newer-wheel Python3.11/MCP1 retained stdio and contract
+inventory checks subsequently passed4cases4.01s. The earlier MCP1 result remains
+historical; final compatibility gates must use the frozen candidate.
+Final coherent candidate gates, exact-SHA independent AI safety/RC reviews and
+public 1.6.0rc1 artifact verification remain required. Parent client tasks stay
+open until their remaining agreed scope is completed.
+
+## Installed common interface evidence — 2026-10-03
+
+Isolated development wheel SHA256
+dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3
+contains prospective actual common CLI/MCP composition. Main checkout registration
+is unchanged. Focused Python3.14/MCP2 acceptance18passed10.45s covers configuration
+save/reopen, schema1.0 CLI, runtime flags, controlling-TTY receipts, direct and
+fallback preservation, retained CLI/MCP output readback, ordinary CSV profiling
+and value-free rejection paths. Same wheel Python3.11/MCP1 wire3passed3.95s.
+These fictional cases do not certify client-private/live inputs, all formats at
+target scale, full project compatibility or final RC safety/release acceptance.
+No new independent review was launched for these helper-level changes.
+
 ## Amended replacement acceptance — 2026-10-02
 
 Owner-approved [ADR-0029](../../../docs/adr/0029-unified-replacement-contract.md)
@@ -147,8 +504,9 @@ executable evidence locations, not assertions that they were rerun today.
 Outstanding work is not hidden by this register: complete-candidate gates,
 exact-SHA independent safety review, GitHub-required checks and public RC artifact
 acceptance remain mandatory. Unapproved exceptions/proposals remain unsupported,
-not silently implemented or promoted into new scope. Finding 1's sensitive-semantic
-identifier subcase remains explicitly unfixed.
+not silently implemented or promoted into new scope. Finding 1's bounded
+synthetic-identifier remedy is implemented and reviewed as recorded above;
+final RC/package and unavailable private-data acceptance are not implied.
 
 ## Finding-specific verification boundaries
 
@@ -516,8 +874,9 @@ candidate wheel SHA-256 is
 the adapted test SHA-256 is
 `b6cdd5c48eac4b1fba50e41192eae3b557d6d316ce5050ebbf6afc0803ed3587`.
 The installed candidate still advertises 1.5.0 and reuses development
-dependencies, so this is not clean or final-RC acceptance. One public contract
-gap remains: with intentionally invalid rows, spec CLI exits 1/status
+dependencies, so this is not clean or final-RC acceptance. Historical contract
+gap (resolved by the October2 decision and current installed mode evidence above):
+with intentionally invalid rows, spec CLI exits 1/status
 `validation_failed`, but profile/CSV exit 0/status `succeeded`; the owner has
 been asked to choose the uniform semantics before a runtime change.
 
@@ -545,3 +904,51 @@ confirm amount/threshold/unit and effective setting origin, concrete session
 override instructions and saved-profile key. Apply each documented override
 through the real interface and verify its effect. No product monkeypatch,
 silent truncation, implicit budget increase or raw input in error text.
+
+## Post-seed activation acceptance — 2026-10-06
+
+Prospective copy `/private/tmp/apa-seed-coherent-ln6d9q19` composes four activation
+patches over `f48677f29bef2d348b05e9162a752bba9fbfbca4`. Source contract, activation,
+SDK, OAuth and generation-boundary checks: 52 passed, 1 skipped in 1.33s.
+Offline development wheel (still 1.5.0) SHA256
+`dee16ae57bf4f5eacd824a7c53665c86bfe0642fcb26ca806c0652479afb6474`, installed
+without dependencies at `/private/tmp/apa-seed-activation-installed`: actual CLI
+mode, registration, bounded generation and MCP SDK tests 52 passed in 6.58s.
+Existing Pydantic rejected-status serializer warning remains disclosed. Build
+module unavailable; local pip wheel with no index/no isolation succeeded.
+This is development acceptance, not a final immutable activated SHA, final
+package matrix, Ubuntu artifact hash or security certification of activation.
+
+Post-seed same-wheel typed/publication matrix: 56 installed tests passed in
+4.44s (Parquet physical/readback, publication, exact DECIMAL, behavior files and
+unified mappings). `accept_transformation_routes.py --public` passed all twelve
+CSV/Parquet/offline PostgreSQL/Trino query-input × CSV/Parquet/SQL-output routes,
+including CLI/MCP review and registered execution, typed decimal/date/null
+readback, source-free summaries and 36 CLI refusal checks. SQL routes use local
+injected synthetic Arrow streams; no live database. These checks supplement
+findings23/24 and activation acceptance, without closing final-source safety,
+package/extras compatibility, remote authentication or publication gates.
+
+Post-seed installed safeguards suite:507passed26.82s (snapshot/decisions/report/
+execution/total limits/mapping/approval/source adapters). No live connections.
+Current author-source and prospective activation identities remain distinct.
+
+Post-seed batch validation and actual common-interface acceptance: installed
+batch suite initially176passed/4skipped/7failed24.47s; failures were controlling
+TTY approval unavailable under filesystem sandbox. Explicit actual-common
+CLI/MCP selection18passed/4failed9.64s, same TTY limitation. Repeated only
+TTY/stdio affected selection with authorized unrestricted execution:12passed
+(175deselected)9.64s, including all previously failing direct/fallback receipt
+cases. No product or fixture guards patched, no network/database/provider calls.
+Actual common parser/runtime/inventory and configuration-only creation checks
+passed; full source/golden gate remains separate. Batch core validates final
+schema/constraints and scalar/composite relationships before publication;
+optional validation flags cannot bypass it. Preserve these split-run results
+rather than reporting a fabricated single all-green batch invocation.
+
+Post-seed installed linked-domain, finance and registered-interface acceptance:
+9passed10.97s,1 historical registered_contract_delta deselected; contemporary
+contracts passed separately in52test source set. ActualTTY approval, direct/
+fallback receipts and saved wizard-policy execution tested, no product patch.
+Final declared key/schema/constraint validation inspected in batch.py240–242
+and execute.py500; optional flags do not disable final checks.

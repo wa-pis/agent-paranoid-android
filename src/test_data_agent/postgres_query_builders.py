@@ -235,7 +235,9 @@ def build_local_category_candidates_query(
         )
     safe_table, safe_column = _qualified_column(config, schema, table, column)
     return PostgresQuery(
-        f"SELECT {safe_column} AS value, count(*) AS count FROM {safe_table} "
+        f"SELECT CASE WHEN length(CAST({safe_column} AS text)) <= 64 "
+        f"AND octet_length(CAST(to_json({safe_column}) AS text)) <= 1024 "
+        f"THEN {safe_column} ELSE NULL END AS value, count(*) AS count FROM {safe_table} "
         f"WHERE {safe_column} IS NOT NULL GROUP BY {safe_column} "
         "ORDER BY count DESC, value ASC LIMIT %s",
         (candidate_limit,),

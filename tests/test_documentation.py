@@ -126,9 +126,13 @@ def test_readme_is_a_focused_entrypoint() -> None:
     )
     assert "agent-paranoid-android[mcp,trino]" not in readme
     assert f"Stable `{STABLE_VERSION}` is the recommended release." in readme
-    assert PROJECT_VERSION == STABLE_VERSION
-    assert "Preview `" not in readme
-    assert "--pre" not in readme
+    if PROJECT_VERSION != STABLE_VERSION:
+        assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+", PROJECT_VERSION)
+        assert f"Prospective candidate `{PROJECT_VERSION}`" in readme
+        assert "not yet published" in readme
+    else:
+        assert "Preview `" not in readme
+        assert "--pre" not in readme
     assert "test-data-agent demo --output out/demo" in readme
     assert "source rows copied: no" in readme
     assert "statistical anonymity" in readme
@@ -483,6 +487,8 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
         "fix-csv-generation-pipeline",
         "selective-source-transformation",
+        "fix-transformation-review-boundaries",
+        "remediate-full-security-audit",
     }
 
     transformation = changes / "selective-source-transformation"
@@ -746,6 +752,10 @@ def test_query_examples_and_public_docs_match_runtime_contract() -> None:
     assert "source_fingerprint" in public_docs
     assert "query rows" in public_docs
     assert "SqlQueryProfileRequest" in public_docs
+    postgres_walkthrough = (ROOT / "docs" / "how-to" / "postgresql.md").read_text()
+    assert "public.orders.state,public.orders.amount" in postgres_walkthrough
+    assert "SELECT o.order_id, o.state, o.amount AS amount" in postgres_walkthrough
+    assert "automatic `infer-spec` rejects profiles with unsupported" in postgres_walkthrough
 
 
 def test_database_source_documentation_reconciliation_covers_all_layers() -> None:
@@ -1237,6 +1247,17 @@ def test_runtime_support_policy_covers_release_boundaries() -> None:
     assert "local fakes" in support
 
 
+def test_custom_advisor_docs_require_projected_wrapper_boundary() -> None:
+    for path in ("docs/how-to/custom-advisor-provider.md", "docs/ai_integration.md",
+                 "docs/reference/advisor.md"):
+        text = (ROOT / path).read_text()
+        assert "ExchangeDatasetAdvisor" in text
+        assert "project" in text
+        assert "fingerprint" in text
+        assert "restor" in text
+        assert 'raise ValueError("local categories require a provider-safe projection")' not in text
+
+
 def test_gigachat_documentation_matches_provider_boundary() -> None:
     guide = (ROOT / "docs" / "how-to" / "gigachat.md").read_text()
     configuration = (
@@ -1292,7 +1313,15 @@ def test_artifact_durability_contract_matches_implementation() -> None:
     assert "repository maintainer owns the follow-up" in normalized_operations
     assert "before promising crash/power-loss durability" in normalized_operations
     for source in persistence_sources:
-        assert "fsync" not in source.read_text()
+        assert source.is_file()
+    shared_writer = (ROOT / "src" / "test_data_agent" / "io" / "path_policy.py").read_text()
+    assert "os.fsync(handle.fileno())" in shared_writer
+    assert "os.fsync(parent)" in shared_writer
+    assert "shared single-file atomic writer" in normalized_operations.lower()
+    assert "not a complete crash-consistency protocol" in normalized_operations
+    troubleshooting = " ".join((ROOT / "docs" / "operations" / "troubleshooting.md").read_text().split())
+    assert "owned directory publication use `fsync`" in troubleshooting
+    assert "complete multi-file crash consistency is not guaranteed" in troubleshooting
 
 
 def test_stable_promotion_contract_is_metadata_only() -> None:

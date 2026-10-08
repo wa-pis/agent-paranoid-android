@@ -1,8 +1,10 @@
 # Generation Contract Corrections
 
-These corrections are planned for `1.3.2rc1`, followed by stable `1.3.2` after
-candidate acceptance. Until public release verification completes, use the
-existing stable release for the published installation instructions.
+The original generation corrections below describe an earlier upgrade, not the
+current release target. The current development target is `1.6.0rc1`; it is not
+yet publicly accepted or published, and stable `1.6.0` is not authorized by this
+candidate process. Use the published stable installation instructions until
+public candidate verification completes.
 
 ## Changed Results
 
@@ -37,6 +39,10 @@ rejects the entire export when an intentionally invalid value is incompatible
 with its declared physical type; no partial dataset or manifest is published,
 and an existing output remains unchanged. Row privacy remains mandatory in
 every mode.
+The 1.6 candidate CLI reports `validation_failed` with exit 1 for intentionally
+invalid results while retaining the representable output, manifest and report.
+Explicit mode/ratio overrides must be reflected in effective execution evidence;
+an invalid artifact is not a successful validation.
 Standalone `validate` now inspects row values when its privacy section is
 enabled, in addition to checking specification safety. CSV numeric values are
 interpreted using their declared numeric type before privacy classification.

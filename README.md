@@ -10,6 +10,14 @@ Stable `1.5.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
+Prospective candidate `1.6.0rc1` is prepared for independent exact-commit
+acceptance; it is not yet published. Stable `1.5.0` remains the recommended
+release. After successful publication, the explicit candidate pin is:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.6.0rc1"
+```
+
 ## Install And Try It
 
 Python 3.11 or newer is required.
@@ -77,6 +85,13 @@ regenerating existing fixtures.
 - [Troubleshooting](https://wa-pis.github.io/agent-paranoid-android/operations/troubleshooting/)
 
 ## Development
+
+The 1.6 development candidate includes an isolated saved-profile transformation
+workflow, not an available command in the published 1.5.0 package. Public common
+CLI/MCP activation remains gated by completed candidate checks and independent
+safety review. See the [candidate CLI contract](docs/reference/cli.md#closed-common-profile-workflow-candidate)
+and [acceptance evidence](openspec/changes/selective-source-transformation/client-acceptance.md).
+Ordinary generation remains source-free; agents cannot issue preservation approval.
 
 ```bash
 python3 -m pip install "uv==0.11.23"

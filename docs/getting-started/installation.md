@@ -1,5 +1,13 @@
 # Installation
 
+Prospective candidate `1.6.0rc1` is prepared for independent exact-commit
+acceptance; it is not yet published. Stable `1.5.0` remains the recommended
+release. After successful publication, the explicit candidate pin is:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.6.0rc1"
+```
+
 ## Requirements
 
 - Python 3.11 or newer

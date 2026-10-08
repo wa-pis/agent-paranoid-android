@@ -48,22 +48,27 @@ source rows. Mapping paths in the policy are relative to the policy file's
 directory. Use `--table NAME` when the entity name differs from the source
 filename stem; `--json` wraps the same review in the standard CLI response.
 The policy's `input_format` selects CSV, Parquet or an already captured
-PostgreSQL/Trino query-result envelope. Query capture remains private; this
-review command neither reads a SQL script as data nor connects to a database.
-Private fictional acceptance covers all four inputs and three outputs using
-the same saved policy, review digest and temporary execution path.
-For review-only exact-text plans, a single-file policy may declare a top-level
+PostgreSQL/Trino query-result envelope. Configured query capture is a separate `transform-batch query-execute`
+operation; this review command neither imports SQL scripts as data nor connects
+to a database.
+Installed fictional candidate acceptance covers all four inputs and three outputs
+using the same saved policy and review digest, including public command execution.
+Native Parquet/captured-result input supports nullable strings, signed integers,
+float64, BOOLEAN, date32 and declared decimal128. Native Arrow timestamps,
+nested types and unsupported numeric shapes fail closed; this is not a promise
+of arbitrary Parquet input support. Textual DATETIME output conversion is separate.
+For exact-text plans, a single-file policy may declare a top-level
 `file_text_mapping` and optional CSV `mapping` on each `replace_text` field.
 The review reports configured scopes but never shows mapping literals;
 matching field rules take priority over file-wide rules, without cascading.
-Duplicate keys within either table are rejected. These declarations do not enable
-replacement output.
+Duplicate keys within either table are rejected. Review itself never produces
+replacement output; execution consumes the separately reviewed snapshot.
 
 CSV review uses literal empty cells: an empty cell is a non-null string. A
 behavior policy may set `csv_nulls.input_token` to a nonempty explicit null
 marker; the marker is matched exactly and excluded from type inference. The
-private executor additionally uses `csv_nulls.output_token` for null output;
-this setting does not enable public execution. Source/output markers are
+executor additionally uses `csv_nulls.output_token` for null output.
+Setting a marker is not approval or execution. Source/output markers are
 separate from a mapping file's `null_token`. All settings are bound to the
 exact policy snapshot, so changing them invalidates existing approvals.
 The schema fingerprint must match this transformation-specific profile;
@@ -80,9 +85,9 @@ not copied. This is debugging metadata, not a preview of output or approval.
 Review alone does not authorize source preservation. The separate local
 approval and execution entrances below enforce the exact reviewed snapshot.
 
-### Execution candidate — not publicly enabled
+### Implemented RC execution candidate
 
-The isolated activation candidate uses the same saved policy and reviewed
+The registered RC implementation uses the same saved policy and reviewed
 `snapshot_sha256` for `transform-execute SOURCE POLICY DESTINATION
 --snapshot-sha256 SHA`. Output format comes from the policy; destination must
 be a new bundle, never an existing directory or an input file. Success reports
@@ -128,6 +133,55 @@ Saving decisions does not issue a preservation receipt. If the saved policy
 retains any eligible source field, separate local `transform-approve` remains
 mandatory before CLI or MCP execution. The wizard does not create or repair an
 invalid initial policy or turn a sensitivity answer into approval.
+
+### Closed common-profile workflow candidate
+
+The 1.6 RC composition registers `transform-batch` in the CLI and
+`common_transformation` in the running generator MCP server. Published 1.5.0
+does not provide these additions. Their operations are:
+
+| Operation | Required local arguments | Effect |
+| --- | --- | --- |
+| `create` | root, draft profile, configuration destination | Save policies/spec/references only; optional `--decide` invokes the local wizard. |
+| `review` | root, saved profile | Return a bounded value-free plan and exact digest. |
+| `approve` | root, saved profile, new receipt, `--snapshot-sha256` | Require fresh controlling-TTY confirmation; pipe/flag approval is rejected. |
+| `validate` | root, saved profile, `--snapshot-sha256` | Validate temporary output without retained publication. |
+| `execute` | root, saved profile, `--snapshot-sha256` | Execute temporarily, or retain a new direct-child bundle with `--destination`. |
+
+All operations require explicit `--max-total-input-bytes` and `--max-review-bytes`;
+review/validate/execute also require `--max-output-bytes`. Preservation consumers
+need `--receipt`. Creation from absent CSV policies requires
+`--create-csv-policies --seed INTEGER`; initial proposals are unknown/drop-only,
+not approved decisions. `--edit-actions`/`--edit-formats` require `--decide`, and
+CSV creation with interactive decisions requires explicit action editing.
+Saving configuration changes reference paths and requires a fresh reviewed digest.
+Existing files, unsafe references and output destinations are not overwritten.
+Registration describes this RC composition, not a published release or
+authorization to process a dataset; final exact-source safety and release gates
+remain required.
+
+The RC composition exposes these operations under `transform-batch`. Its
+machine-readable success and error responses use CLI schema version `1.0`;
+success metadata is inside `result`, not flattened into the envelope. Runtime
+`--json`/`--debug` flags are accepted before the command, before the operation,
+or after operation arguments. Debug does not disclose rejected arguments.
+Controlling-TTY approval remains local-only; `create` and `SAVE` never issue a
+receipt. Installed isolated CLI/MCP acceptance is not public activation approval.
+
+For the isolated candidate, save the profile and field decisions, review the
+exact saved inputs, then validate against the returned digest. Obtain local
+approval only when the selected actions preserve values, and execute using that
+same digest and receipt. Editing an input, policy, mapping or output setting
+requires a fresh review; a receipt is not a reusable blanket approval. Agents
+can consume a matching receipt but cannot issue one.
+
+Migration from published 1.5.0 requires an explicitly accepted candidate;
+installing 1.5.0 does not expose `transform-batch`. Keep ordinary source-free
+generation workflows separate and retain their existing schemas. A transformed
+bundle may deliberately contain preserved or explicitly mapped source values;
+it is not an anonymity guarantee. Protect its destination as potentially
+sensitive and inspect the value-free action/provenance report before sharing.
+SQL output is a script artifact and is never executed by transformation.
 
 ### Edit Field Decisions Locally
 
@@ -203,8 +257,11 @@ the current setting and `null` clears it. For example:
 
 `date` fields do not accept timezone settings. Explicit SAVE writes a validated
 policy atomically; it creates neither approval nor output data. This setting
-does not yet execute temporal conversion. Literal `replace_text` always ignores
-format/timezone metadata and emits its supplied replacement unchanged.
+does not itself execute temporal conversion. Literal `replace_text` always
+ignores field format/timezone metadata and supplies its replacement unchanged.
+A separately selected typed Parquet/SQL output may explicitly parse that result
+using its output field's `temporal_type`, including declared source/target
+timezones. CSV replacement output remains literal; no implicit UTC is applied.
 
 ## Database Sources And SQL
 
@@ -249,3 +306,69 @@ Aliases:
 
 - `profile-csv-folder` is an alias for `profile-example`;
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
+
+
+### Configured SQL Sessions (1.6 RC)
+
+`test-data-agent transform-batch query-execute` completes a single
+owned session. It reads a saved batch profile and a bounded reference file,
+captures each configured query once, displays metadata review, requests the
+existing local controlling-TTY receipt when preservation requires it, and
+validates before retaining output in a new directory in the parent workspace.
+Captured inputs and session receipts expire on command completion or failure.
+This is not an installed 1.5.0 command or dataset approval. For example, with
+authorization to read the configured source and an authored batch profile:
+
+```bash
+test-data-agent transform-batch query-execute /path/to/workspace batch.yaml queries.yaml selected-output \
+  --max-total-input-bytes 67108864 --max-review-bytes 4194304 \
+  --max-output-bytes 67108864 --json
+```
+
+The saved reference file can contain this fictional entry; its key must match
+a batch input source and its entity must match that input policy:
+
+```yaml
+schema_version: "0.1"
+queries:
+  captured-orders.query:
+    adapter: trino
+    source_id: trino
+    entity: fictional_orders
+    query_file: orders.sql
+    max_rows: 1000
+    max_bytes: 8388608
+    max_seconds: 60.0
+```
+
+Success writes one schema-1.0 JSON envelope to stdout; bounded value-free review
+goes to stderr before execution. Preservation confirmation uses the controlling
+terminal, not stdin or an approval flag. SQL output remains an artifact file;
+this command never executes generated SQL.
+
+The reference file has `schema_version: "0.1"` and a `queries` mapping keyed by
+batch input source reference. Each entry contains `adapter` (`postgres` or
+`trino`), `source_id`, `entity`, `query_file`, `max_rows`, `max_bytes` and
+`max_seconds`. Query files are bounded relative workspace references. PostgreSQL
+source IDs must match administrator configuration; the configured Trino source
+ID is `trino`. Endpoints, credentials, callbacks and driver factories are not
+accepted in this file. Connection authority comes from existing administrator
+environment settings and allowlists.
+
+Capture-specific Trino row and cumulative decoded-result byte limits use the
+explicit authorized `max_rows` and `max_bytes`; ordinary profiling defaults
+remain unchanged. Metadata retains its existing row ceiling, and statement,
+scan, time and transport limits still apply. A caller cannot raise capture
+limits above effective transformation policy/session ceilings.
+
+The registered runtime `configured_query_session` MCP tool retains one frozen capture across
+review, validation and execution requests. It returns an opaque handle, digest
+and metadata for local CLI approval; MCP cannot issue approval. Session expiry,
+active-count and lifetime byte admission are bounded. Execution consumes the
+existing exact local receipt and publishes to a new child of the owning
+workspace. Expiry, refusal and shutdown clean the owned capture; cleanup
+failures refuse further work. The server owns the sessions and closes them in
+its shutdown handler, including transport failures. The module-level SDK object
+does not create sessions; custom embedding must explicitly inject and close its
+own session owner. See [MCP session operations](../how-to/mcp.md#configured-sql-sessions-16-rc)
+and [session settings](configuration.md#configured-sql-session-bounds-16-rc).

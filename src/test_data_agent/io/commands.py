@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.trino_work_budget import generation_budget_for_invocation
+
 import argparse
 import json
 import sys
@@ -204,7 +206,7 @@ def validate_dataset_artifacts(
             "validate expects a dataset output folder; pass the folder containing generated entity files"
         )
     rows_by_entity = load_dataset_rows(rows_path)
-    report = validate_dataset(rows_by_entity, spec)
+    report = validate_dataset(rows_by_entity, spec, budget=generation_budget_for_invocation())
     if output_path is not None:
         ensure_file_output_available(output_path, overwrite=overwrite)
         write_json_artifact(report, output_path)

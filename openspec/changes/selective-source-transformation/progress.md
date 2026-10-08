@@ -1,5 +1,2334 @@
 # Implementation Progress
 
+## Owner removes private-volume release prerequisite — 2026-10-04 local
+
+- Owner states closed-segment volume cannot be replayed locally and confirms
+  proceeding with RC publication without that acceptance. Recorded in client
+  acceptance: fictional local evidence and mandatory300,000 x50 remain the basis;
+  private inputs/real integrations are unverified disclosures, not release blockers
+  or claimed passes. No real access or safety-policy exception granted.
+- Signed5ca2c87 handoff push completed to draftPR602. Checkout initially clean.
+  New decision is documentation-only; unchanged successful tests not repeated.
+- Independent safety clearance remains unavailable and cannot be retried/rerouted.
+  Automation stays PAUSED; next release action needs that external blocker removed,
+  then exact-SHA/final RC review, protected CI/merge and public RC artifact checks.
+  Stable1.6.0 remains unauthorized. No activation, merge or publication performed.
+
+## Local candidate handoff consolidated — 2026-10-04 local
+
+- Reused existing26-finding dispositions and added corrected-wheel evidence
+  bindings, local contract boundaries and remaining release gates. Closed only
+  the disposition-reconciliation task, not private/live reproduction or release
+  acceptance. Published-result, unsupported native types, statistical utility,
+  auth system prerequisites and arbitrary crash recovery remain unverified.
+- Current runtime evidence remains isolated3c00148 / wheel dd6b4ad2; author
+  registration stays closed. Source full gate2894 and mandatory fictional scale
+  evidence unchanged. Latest pushed d520000 CI completed without failures.
+- Accumulated quickstart/skill proof and handoff documentation await signed
+  publication. No runtime tests repeated; no new implementation/policy decision.
+- After this documentation handoff, the next mandatory forward step is independent
+  safety clearance, currently unavailable. Pause automation rather than invent
+  further helpers/retest unchanged evidence or repeat/reroute blocked validation.
+  Final RC review, activation, protected merge, release1.6.0rc1 and public artifact
+  acceptance stay open. Stable1.6.0 remains unauthorized.
+
+## Corrected offline skill-guided acceptance — 2026-10-04 local
+
+- Read complete project skills, support policy, migration guide and historical
+  offline skill evidence. No contract/document mismatch found. Historical wheel
+  alone did not certify corrected runtime; inspected full unchanged harness and
+  ran only its three cases against corrected installed dd6b4ad2 and actual
+  installed baseline1.5.0:3 passed (4.97s), Python3.14, -o pythonpath=. --no-cov -q.
+- Packaged offline skills/help, seeded generation/replay, explicit transformation
+  readback, missing-receipt refusal and absent-baseline-capability stop verified.
+  Fictional local files only, no product monkeypatch, DB/provider, real-data
+  approval or independent review. Current proof appended to skill acceptance.
+- Next publish accumulated quickstart/skill evidence and consolidate final
+  per-finding local dispositions versus clearance/public acceptance gaps.
+  PR602 d520000 last snapshot all completed without failures; no CI replay or
+  activation, merge/release, blocked-review retry or blanket RC readiness claim.
+
+## Quickstarts/OpenSpec consistency checkpoint — 2026-10-04 local
+
+- PR602 draft/open at signed d520000; completed CI snapshot has no pending or
+  failed checks. No workflow rerun, merge or release. Checkout initially clean.
+- Read installation, first-CSV and related-table quickstarts: stable1.5.0 pins,
+  fictional inputs and source-free manifest checks remain correct. Existing
+  successful example evidence is reused, not rerun without source changes.
+- Read transformation and common-MCP deltas against ADR0029, policy-contract
+  and corresponding baseline activation boundaries. Direct identity-pair rejection
+  remains intentional; allowing mapped permutations does not supersede it.
+  No new policy decision or contract mismatch found in these inspected sections.
+  No OpenSpec edit or repeat strict-validation run required for unchanged specs.
+- Next finish remaining integration-skill/support/migration document disposition
+  and coherent acceptance handoff. Independent review remains unavailable;
+  do not retry/rephrase/reroute it, activate public entrances or infer clearance
+  from author tests/green CI. Private/live/unsupported-native gaps remain disclosed.
+
+## Acceptance register consistency — 2026-10-04 local
+
+- Read current intake/release task sections, changelog Unreleased and planned
+  1.6.0rc1 release boundary. Corrected stale blanket-unverified intake wording:
+  dated corrected-wheel evidence supersedes constituent checks, not composite
+  compatibility/clearance gates or private/live gaps. No checkbox mass closure.
+- PR602 d813bb9 snapshot has no failed checks; Python3.11/3.13 still pending.
+  Do not rerun overlapping CI or infer completion. Architecture docs changes
+  already passed strict build; no runtime edits or repeated successful tests.
+- Next publish accumulated architecture/task reconciliation, then finish remaining
+  OpenSpec/quickstart contract disposition. Roadmap's stale1.3.x focus updated to
+  shipped1.5.0 and isolated1.6.0rc1 with unchanged clearance boundary. Strict
+  docs build passed (0.37s), `/private/tmp/apa-docs-roadmap-20261004`; diff check
+  passed. No PlantUML render or runtime replay claimed. Independent clearance stays
+  unavailable; no blocked-review retry, activation, merge or release.
+
+## Architecture reconciliation and CI checkpoint — 2026-10-04 local
+
+- Signed d813bb9 pushed to draftPR602, signature verified. CI snapshot: no
+  failures, including completed Secret history scan; Python3.11–3.14 and wheel
+  compatibility still pending. Licensing/false-positive blocker resolved, normal
+  automation resumed; do not infer independent safety clearance from CI.
+- Read complete three architecture diagrams and transformation implementation
+  inventory. Qualified diagram scope as ordinary synthetic generation and
+  distinguished generation approval from preservation receipts. Replaced stale
+  interface-parity-unfinished wording with existing isolated CLI/SDK evidence;
+  public activation remains gated. No runtime or product-policy changes.
+- Next check these changed documentation sources, reconcile final task/contract
+  disposition and prepare remaining local handoff. Strict MkDocs build passed
+  (0.39s), output `/private/tmp/apa-docs-architecture-20261004`; diff --check
+  passed. No configured PlantUML renderer found in the checked build/scripts;
+  diagram source reviewed, rendered diagram QA not claimed. No unchanged runtime tests,
+  independent-review retry, public activation, merge or release.
+
+## Gitleaks false-positive disposition — 2026-10-04 local
+
+- Existing run37159629080 generic-api-key finding points to ac7f76f progress.md
+  line38. CI's already-redacted Finding preserves surrounding prose; immutable
+  source identifies the hidden fragment as authentication method names, not a
+  credential. Static triage: not_actionable, high confidence; documentation-only
+  surface, no credential or runtime boundary crossing. No dynamic security
+  validation or independent safety clearance claimed.
+- Added only exact immutable commit/file/rule/line fingerprint to the existing
+  .gitleaksignore; reworded current prose to prevent the same textual trigger.
+  Scanner/workflow remain enabled and unchanged; no broad path/rule exclusion.
+  Licensing diagnosis superseded. Next signed documentation/triage batch and
+  normal CI; continue remaining local candidate documentation once this CI
+  blocker is cleared. Blocked independent review must not be retried.
+
+## Correction: CI licensing diagnosis was wrong — 2026-10-04 local
+
+- GitHub API confirms wa-pis owner type User. Exact fixed-message extraction
+  from run37159629080 says `No license key is required`, `6 commits scanned`,
+  `leaks found: 1`, `Leaks detected`. Previous substring filter accidentally
+  matched the negative licensing sentence; the licensing blocker below is false.
+- One scanner finding exists, not yet inspected or validated; no secret values
+  were printed. Automation remains paused pending safe finding triage rather
+  than license acquisition. No scanner bypass or blocked-review retry.
+
+## New external CI blocker — 2026-10-04 local
+
+- PR602 remains draft/open at ac7f76f. Read-only GitHub snapshot: no pending
+  checks; Secret history scan failed, other workflow runs succeeded.
+  Security run37159629080 filtered diagnostic: `license key is required`.
+  This is unavailable scanner licensing, not a validated secret finding.
+- No scanner bypass, workflow mutation, retry, activation, merge or release.
+  Per owner blocker rule pause automation pending configured Gitleaks licensing
+  or an explicitly agreed replacement check. Independent safety clearance also
+  remains unavailable; do not retry the blocked validation request.
+- Reviewed seven-file accumulated documentation/evidence diff; strict docs build
+  already passed. Changes remain uncommitted and preserved. Next after blocker
+  resolution: signed docs batch, remaining architecture reconciliation, then
+  mandatory clearance/release gates; no unchanged test repetition.
+
+## Output/architecture documentation boundaries — 2026-10-04 local
+
+- Read output-review page, application boundary inventory and MCP examples.
+  Qualified synthetic-bundle checklist separately from mixed-origin action
+  provenance/receipt review; clarified that historical ActivationSafety-R3
+  evidence does not clear the later coherent/common-profile candidate.
+- Ordinary MCP generation examples remain source-free and need no changes.
+- Accumulated public documentation: strict MkDocs build passed (0.35s), output
+  `/private/tmp/apa-docs-contracts-20261004`; git diff --check passed. No runtime
+  tests repeated for prose-only changes.
+  No runtime or policy change, registration activation or independent-review
+  retry. Next commit the documentation/evidence batch; architecture references still
+  need reconciliation before claiming the full documentation task complete.
+
+## MCP/safety documentation scope clarified — 2026-10-04 local
+
+- Read MCP candidate workflow, complete safety-model page, generator design
+  inventory and SQL troubleshooting sections. Found two scope ambiguities:
+  generation guarantees/checklist could be read as mixed-origin guarantees;
+  ordinary tool inventory omitted the separate gated candidate boundary.
+- Qualified synthetic-generation guarantees/checklist and linked isolated MCP
+  consumers, distinguishing DatasetSpec approval from preservation receipts.
+  Existing contracts unchanged; no public registration or safety-policy expansion.
+- Next inspect remaining architecture/manifests/examples and run strict docs
+  at the accumulated-documentation milestone. No test/gate repetition, external
+  DB/API, independent-review retry, merge or release.
+
+## Documentation contract audit started — 2026-10-04 local
+
+- Read README development boundary and CLI candidate sections against current
+  closed author registration and isolated capability evidence. They correctly
+  distinguish published1.5.0, isolated single/common execution, SAVE versus
+  controlling-TTY approval, exact bytes/digest, CLI result envelope and mandatory
+  independent clearance. Configuration references retain explicit limits and
+  auth prerequisites. No contradictory claim found in these inspected sections;
+  no need to change product semantics or repeat successful acceptance.
+- Initial glob/guessed documentation paths were absent; discover actual docs
+  paths with rg --files before continuing. This checkpoint is a partial audit,
+  not completion of the repository-wide documentation task or native-type scope.
+- Next inspect actual MCP/safety/troubleshooting/architecture/manifest references
+  and examples, reconcile any concrete mismatch, then publish accumulated docs.
+  New-head CI not queried; blocked review not retried; no activation/release.
+
+## Profiling/publication queue consolidated — 2026-10-04 local
+
+- Updated client acceptance queue with completed corrected-wheel profiling12,
+  category preflight7, path safeguards5, auth22, linked-key21 and wizard SDK2.
+  Added exact local-cost/harness exclusions rather than leave already-completed
+  work as the next task. No source or product policy change, checkbox closure,
+  test/CI repetition or private/live acceptance claim.
+- Next final documentation/contract consistency audit against closed author
+  switches and isolated candidate capabilities; then one accumulated docs update.
+  Independent clearance remains unavailable and cannot be substituted by author
+  checks; public activation, protected merge and RC publication remain gated.
+
+## Corrected installed publication identity safeguards — 2026-10-04 local
+
+- Read path-policy tests before selecting actual temporary-filesystem cases.
+  Corrected dd6b4ad2 installed wheel, Python3.14, test_io_path_policy.py,
+  -o pythonpath=. -q: regular/symlink reader, symlinked write parent, changed
+  destination inode, symlink publication destination and replaced-directory
+  cleanup selected:5 passed,16 deselected (0.21s).
+  No product monkeypatch or external input.
+- Excluded FIFO subprocess test because its harness forces source-checkout
+  PYTHONPATH; excluded atime/presence/mutation/swap simulations because they
+  patch product _stat_at. Existing historical unit evidence for these remains
+  distinct, not newly certified installed acceptance. Tests verify actual
+  filesystem substitutions do not overwrite replacement ownership or follow
+  unsafe links; this is not arbitrary crash/race/rollback completeness.
+- Next consolidate profiling/publication evidence and final docs disposition;
+  no source edits, repeated successful matrix/gates, review retry or release.
+
+## Corrected installed category preflight evidence — 2026-10-04 local
+
+- Initial filename lookup test_postgres_profiling.py was absent; discovered
+  actual test_postgres_profiler.py, then read selected cases and complete
+  synthetic-result/config helpers before execution. No absent-file pass claimed.
+- Corrected installed dd6b4ad2, Python3.14, -o pythonpath=. -q, selected numeric
+  summary reuse, invalid exact/category/wildcard scope and wildcard column budget:
+  7 passed,6 deselected (0.21s).
+  Explicit injected fictional fetch/client only, no product monkeypatch or DB.
+  Exact invalid scope rejects before connection/query; wildcard resolution uses
+  bounded metadata and rejects before aggregates. Two-table profiling uses
+  12 statements,13 with explicit category; numeric summaries share aggregates.
+- Next publication safeguard evidence and final documentation reconciliation.
+  Source unchanged; no scale/gate/CI replay, activation, merge or review retry.
+
+## Corrected installed query profiling cost/shape evidence — 2026-10-04 local
+
+- Read selected SQL-query profiling tests and their complete fake-result helpers.
+  Corrected installed dd6b4ad2, Python3.14, test_sql_query_profiling.py with
+  -o pythonpath=. -q and selection authorized_grouped_profile_is_wrapped_and_bounded,
+  default_profile_does_not_query_or_store_category_literals,
+  query_profile_statement_count_scales_with_fields,
+  trino_builders_use_explicit_outer_projection,
+  unsupported_type_fails_before_aggregates, backend_error_is_redacted:
+  12 passed,13 deselected (0.23s).
+- Explicit fictional callbacks only, no product monkeypatch or DB: both dialects
+  wrap grouped authorized queries; exhausted callback errors stay generic.
+  Three-field profiling uses five statements (six with explicit local category),
+  numeric summaries share column aggregates, default categories are not fetched,
+  outer projections are explicit and unsupported types fail before aggregates.
+  Statement counts are local executable evidence, not live scan bytes/latency.
+- Next category preflight/publication safeguards and final documentation
+  reconciliation; no repeated successful matrix/gates or review retry.
+
+## Task register reconciled with accumulated acceptance — 2026-10-04 local
+
+- Previous signed ac7f76f push completed to draftPR602; checkout was clean.
+  Read current task register and added one dated checkpoint linking corrected
+  installed evidence without closing composite parent/release checkboxes.
+  Explicitly separated historical intake/accepted-main notes from current
+  twelve-route, key/wizard, auth and diagnostic evidence. No test/CI repetition.
+- Next inspect remaining original-finding profiling cost/category preflight and
+  publication safeguards, then finalize documentation disposition. Exact-SHA
+  independent review stays unavailable; no retry/reroute, activation, merge or
+  release. Latest new-head CI not inspected this run and not declared green.
+
+## Accumulated installed acceptance evidence publication — 2026-10-04 local
+
+- Consolidate three documentation files for draftPR602: corrected-wheel typed
+  twelve-route/refusal/temporal evidence, linked keys/null/mapping contracts,
+  wizard CLI/SDK workflow, auth and PostgreSQL diagnostics, and remaining queue.
+  Entire diff inspected; strict MkDocs passed (0.35s), diff-check passed.
+- Runtime and registration unchanged; no repeated successful full gate, new
+  wheel, review request, activation, merge or release. Pre-update pushed51e57e5
+  CI already completed without pending/failed checks; new documentation head
+  must obtain its own CI, without manual duplicate dispatch.
+- Next reconcile final original-finding disposition and remaining profiling/
+  publication boundaries; preserve unavailable private/live data and mandatory
+  independent clearance as limitations, not passes.
+
+## Corrected installed PostgreSQL diagnostic/budget evidence — 2026-10-04 local
+
+- Read test_postgres_client.py completely before execution. Reused fictional
+  explicitly injected driver/cursor and clock fixtures, no product monkeypatch
+  or external database. Corrected dd6b4ad2 installed wheel, Python3.14,
+  pytest tests/test_postgres_client.py -o pythonpath=. -q:22 passed (0.22s).
+- Scope includes static connection/SQLSTATE categories and generic unknown
+  failures without backend text/context, late secret resolution and missing-secret
+  fail-before-connect, read-only/timeouts, metadata-only no-row inspection,
+  cumulative statement/result budgets, deadline before next statement and raw
+  string SQL refusal before cursor execution. This does not prove live backend
+  reachability, query profiling cost or unrestricted query authorization.
+- Next consolidate accumulated acceptance evidence and remaining original finding
+  dispositions in one documentation update for draftPR602. No source changes,
+  repeated CI, independent-review retry, public activation, merge or release.
+
+## Corrected installed authentication contract evidence — 2026-10-04 local
+
+- Read test_trino_auth.py completely. Corrected dd6b4ad2 installed wheel,
+  Python3.14, pytest tests/test_trino_auth.py -o pythonpath=. -q:
+  22 passed (0.21s). Basic/JWT runtime references and certificate checks;
+  explicit OAuth redirect; mutual authentication without delegation for
+  Kerberos and GSSAPI;
+  conflicting configuration rejection and detached value-free errors covered.
+- No network or real authentication: constructors are explicit injected driver
+  fakes; HTTP dependency send and optional auth modules are dependency stubs,
+  not product-policy monkeypatches. OAuth direct token origins reject before
+  transport; TLS/timeouts/shared invocation deadlines and suppressed driver
+  diagnostics checked. These are contract tests, not live driver/server acceptance
+  or independent safety review. Optional system prerequisites remain unverified.
+- Next finish bounded adapter diagnostic evidence and consolidate accumulated
+  documentation for draftPR602. Runtime unchanged; existing green CI snapshot
+  not queried again, public registration/merge/release remain gated.
+
+## Corrected installed wizard-to-CLI/MCP acceptance — 2026-10-04 local
+
+- Read registered-interface-acceptance.py completely before execution. Selected
+  only registered_wizard_saved_policy_execution: corrected dd6b4ad2 installed
+  wheel, Python3.14/MCP2, -o pythonpath=. -q:2 passed,5 deselected (4.28s).
+- Fictional inline YAML and local CSV mappings pass actual interactive decision/
+  action editing, hidden mapping entry and SAVE into the policy, then separate
+  CLI review/execute and actual MCP SDK stdio execute with full artifact readback.
+  Input bytes remain unchanged, review/status omit fixture values, and policy
+  saving creates neither receipt nor output. No preservation approval, sensitive
+  replacement replay, product monkeypatch, DB/API or independent review involved.
+- Existing PR602 latest read-only snapshot remains green/draft at51e57e5;
+  no duplicate GitHub query or CI dispatch. Source registration remains closed.
+  Next reconcile current-artifact six-method auth and bounded diagnostics, then
+  publish the accumulated documentation evidence in one focused update.
+
+## Corrected installed linked-key and mapping contract — 2026-10-04 local
+
+- Read selected tests and complete fixture helpers in test_transformation_batch.py
+  before execution. Corrected dd6b4ad2 installed wheel, Python3.14,
+  -o pythonpath=. -q, selection saved_linked_batch_distinguishes_empty_and_null,
+  saved_linked_batch_with_unlinked_replacements, shared_csv_domain_compares_its_exact_bytes,
+  linked_synthesis_fallback_validates_final_keys, batch_receipt_cannot_confirm_unbound_review,
+  saved_composite_relationship_uses_whole_tuple:21 passed,166 deselected (1.37s).
+- Fictional saved parent/child profiles verify inline/CSV null-versus-empty
+  mapping, literal replace_text, seeded synthesis/fallback and generation-byte
+  snapshot binding. Shared CSV domains reject conflicting bytes; final linked
+  synthetic keys reject orphans. Composite tuples reject incomplete declarations,
+  duplicate parents and one-to-one duplicate children. Unbound receipt versions
+  reject. No approval issuer, external connection or product monkeypatch used.
+- Complements twelve-route output evidence; not arbitrary source relationship
+  inference, public wire/scale-per-route or independent safety clearance.
+  Next consolidate installed wizard/auth and bounded adapter diagnostics, then
+  batch documentation evidence for PR602. Existing green CI snapshot unchanged;
+  no repeated CI, activation, merge, release or blocked-review request.
+
+## Corrected installed complete format matrix — 2026-10-04 local
+
+- Read complete existing route and temporal harnesses; reused without changes.
+  Corrected installed dd6b4ad2, Python3.14: accept_transformation_routes.py
+  --public passed all12 typed routes plus36 refusal assertions. Ordered rows,
+  exact Decimal/DATE/null/empty-string outputs, action provenance, CLI/MCP
+  application parity, immutable inputs and cleanup checked. No live DB/API,
+  product monkeypatch, new receipt or scale replay.
+- Sequential temporal-workflow-acceptance.py -o pythonpath=. -q:3 passed1.87s.
+  Literal CSV replacement remains literal; explicitly configured timezone
+  conversion produces typed Parquet/SQL text. No native timestamp input claim.
+  Updated route-workflow-acceptance.md with exact artifact and command evidence;
+  independent review and twelve-route MCP wire parity are not implied.
+- Read-only GitHub snapshot: draft PR602 OPEN at51e57e5, no pending or failed
+  checks. Initial sandbox network request failed; authorized read-only retry
+  succeeded, no CI dispatch/repetition. Author branch registration unchanged.
+- Next consolidate remaining key/wizard, auth and safe diagnostic evidence;
+  no blocked independent-review retry, activation, merge or release.
+
+## Routing diagnostic evidence and monthly-scope reconciliation — 2026-10-04 local
+
+- Existing finding7 disposition and historical policy notes classify automatic
+  monthly source-category fidelity as a deferred proposal, not an approved bug
+  fix. Explicit field format/output_format does not authorize monthly sampling.
+  Removed its misleading placement as an outstanding RC acceptance requirement;
+  no new temporal semantics or product code introduced. Original archive was
+  not reread this run; this reconciliation uses the recorded disposition.
+- Inspected both CLI input-selection regressions before running corrected
+  dd6b4ad2 installed package under Python3.14: tests/test_cli.py with selection
+  generate_without_input_shows_two_valid_forms or
+  generate_rejects_two_input_sources_with_help, -o pythonpath=. -q:
+  2 passed, 79 deselected (0.32s). Missing input and conflicting spec/profile
+  inputs return exit2 and supported recovery commands, without opening files.
+  Existing six installed valid/mixed spec/profile/CSV replays were not repeated.
+- Next reconcile remaining diagnostic/format-route evidence on this artifact.
+  PR602 remains draft; no independent-review retry, activation, merge or release.
+
+## Coherent remaining acceptance queue reconciled — 2026-10-04 local
+
+- Added grouped finding1–26/route/release queue to client-acceptance.md, linking
+  completed corrected-wheel evidence to specific remaining deliverables instead
+  of treating every unchecked parent task as absent implementation. No parent
+  checkbox closed, product scope changed or private/live fidelity pass invented.
+- Runtime unchanged, no repeated tests/CI, independent-review retry or rerouting.
+  Next review original monthly-date/mixed-input subcases and current-artifact
+  diagnostic/format-route evidence before selecting only missing scenarios.
+  PR602 draft, activation/merge/release still gated.
+
+## Corrected installed distinct-overflow/cache evidence — 2026-10-04 local
+
+- Previous read-only GitHub process53474 completed: PR602 OPEN/draft at51e57e5,
+  full Python matrix and CodeQL were still running in its returned snapshot;
+  no duplicated query/workflow was launched and no all-green new-SHA claim made.
+- Read tests/test_schema_distinct_overflow.py completely. Corrected dd6b4ad2
+  installed package, Python3.14: pytest tests/test_schema_distinct_overflow.py
+  -o pythonpath=. -q: 9 passed (0.42s), fictional temporary data, no monkeypatch.
+  Cap overflow reports lower-bound uncertainty, rejects false PK nomination,
+  preserves legacy fingerprints and reprofiles stale cache. This supplements
+  finding2 without claiming private data acceptance.
+- Next consolidate remaining diagnostics/utility/format-route disposition;
+  no runtime change, blocked-review retry, public activation, merge or release.
+
+## Consolidated evidence update for draft PR602 — 2026-10-04 local
+
+- Publish one documentation-only update for accumulated corrected-wheel CSV/date,
+  identifier domains and finance end-to-end evidence. Runtime src is unchanged;
+  tested isolated3c00148 and wheel dd6b4ad2 remain the exact runtime identities.
+- Pre-update pushed d2b139c CI is green; no manual workflow dispatch, duplicate
+  PR or repeated successful local suite. Independent review remains unavailable.
+  Draft/closed registration, no merge/release/version bump remain unchanged.
+- Next finish finding-by-finding disposition for remaining diagnostics, caps,
+  utility and full format-route evidence; retain private/live limitations rather
+  than manufacture passes or keep repeating isolated helper checkpoints.
+
+## Corrected installed finance mapping end-to-end — 2026-10-04 local
+
+- Read complete finance-workflow-acceptance.py before execution. Python3.14,
+  explicit corrected dd6b4ad2 installed PYTHONPATH in isolated3c00148 checkout:
+  pytest openspec/changes/selective-source-transformation/finance-workflow-acceptance.py
+  -o pythonpath=. -q: 1 passed (1.52s). Local PTY access authorized.
+- Fictional injected bounded PostgreSQL aggregate stream passes actual SUM/
+  GROUP BY authorization and capture -> saved policy -> CLI review -> missing
+  receipt rejection -> controlling-TTY test approval -> execute/readback.
+  Product/segment/bank combinations retained, identifiers mapped, exact decimal
+  amounts replaced; value-free summaries and source/policy bytes unchanged.
+- This is synthetic test-only receipt issuance, not agent approval of real data;
+  no real database, product monkeypatch, internal totals/formula execution or
+  independent review. Old wheel finance evidence remains historical. Next
+  consolidate remaining-route/client ledger and publish one evidence update to
+  draft PR602 after current unchanged green CI, not many helper PRs.
+
+## PR602 CI green; corrected CSV/date pipeline evidence — 2026-10-04 local
+
+- Read-only GitHub check query found no pending, running or failed checks at
+  pushed SHA d2b139cf5799da992d8fee4978a8c5d4233bd210: all reported checks are
+  SUCCESS or intentional SKIPPED. PR602 remains draft; no merge/release. These
+  CI security checks are not mandatory independent exact-SHA safety clearance.
+- Read existing date fallback and CSV pipeline harnesses fully. Corrected
+  installed dd6b4ad2 on Python3.14: pytest tests/test_date_fallback_disclosure.py
+  tests/test_csv_pipeline_regressions.py -o pythonpath=. -k 'not distinct_budget'
+  -q: 78 passed, 1 deselected (0.63s). Excluded product-constant monkeypatch.
+- Fictional profile -> spec -> generation/validation and CLI roundtrip, local
+  category opt-in, timestamp timezone retention, missing-bound fallback warning,
+  short patterns, numeric false-positive/rare-secret and value-free controls
+  covered. This does not prove monthly-date granularity, general utility fidelity,
+  live adapter behavior or every mapping route. Next reconcile remaining scope
+  and consolidate evidence once without overlapping CI or blocked review retry.
+
+## Corrected installed identifier cardinality/domain acceptance — 2026-10-04 local
+
+- Owner asked to continue. Read both existing fictional harnesses fully; reused
+  them unchanged, no new abstractions. Explicit corrected dd6b4ad2 installed
+  package on Python3.14: pytest tests/test_identifier_pool.py
+  tests/test_identifier_domains.py -o pythonpath=. -q: 44 passed (0.39s).
+- Findings1/4/8/9/13 narrower evidence: fixed four-key pools across CSV/folder/
+  aggregate inputs and output sizes2/100/1000, synthetic sensitive identifiers,
+  arbitrary-prefix negatives, nullable disjoint domains, declared FK row counts,
+  reversed chains/cycles and deterministic replay. No product monkeypatch/live
+  data. General inference and source orphan-rate fidelity remain unverified;
+  this does not prove every selective mapping execution route.
+- Next date-bound/diagnostic/cap evidence and full mapping scenario reconciliation;
+  PR602 remains draft, no blocked review retry or public activation/release.
+
+## Draft PR602 pushed; CI checkpoint — 2026-10-04 local
+
+- Owner-authorized signed closed branch pushed at
+  d2b139cf5799da992d8fee4978a8c5d4233bd210; draft PR
+  https://github.com/wa-pis/agent-paranoid-android/pull/602 created and attached.
+  Isolated registration SHA3c00148 is excluded; no merge or release.
+- Read-only CI checkpoint: documentation, dependency review, CodeQL, wheel
+  compatibility Python3.11–3.14 and minimum dependency profiles passed. Python
+  full-suite jobs were still running at first snapshot. Do not dispatch duplicate
+  CI or treat partial green checks as all required gates completed.
+- Continue available client1–19/mapping evidence; exact-SHA independent review
+  remains unavailable and was not retried/rerouted. CI security checks do not
+  replace that mandatory independent review.
+
+## Owner authorized closed-candidate PR preparation — 2026-10-04 local
+
+- Owner explicitly requested PRs. Prepare a draft PR from the closed coherent
+  branch with signed implementation and accumulated installed acceptance evidence.
+  Isolated 3c00148 registrations stay excluded; mandatory independent clearance
+  remains unavailable and no merge, public activation or release is authorized
+  by this preparation step. No security request retry or provider rerouting.
+- Local full gate and corrected-wheel focused results above remain evidence;
+  do not rerun unchanged successful checks or create duplicate PR/CI runs.
+  Next collect draft PR identity and GitHub checks, then continue remaining
+  client1–19/mapping evidence without claiming complete acceptance.
+
+## Corrected installed client19 publication adaptation — 2026-10-04 local
+
+- Read complete reviewed tests/test_client_publication_acceptance.py. Corrected
+  dd6b4ad2 installed import verified by subprocess, Python3.14, explicit package
+  root: pytest tests/test_client_publication_acceptance.py -o pythonpath=. -q:
+  5 passed (2.94s). Fictional data only, no product monkeypatch.
+- Absent/empty destinations succeed with schema/row/manifest readback; filled
+  destinations reject both with and without --overwrite and retain old bytes.
+  This reviewed adaptation does not replace original script or deterministic
+  atime/path-swap regression evidence, nor private input acceptance.
+- Corrected stale ledger sentence: isolated activation tree materialization is
+  complete at 3c00148, while reconciliation/independent clearance/public artifact
+  gates remain open. Next client1–19 date/cardinality/domain evidence; no review
+  retry, activation, merge or release.
+
+## Corrected installed Parquet unknown metrics/sensitivity — 2026-10-04 local
+
+- Located actual harness tests/test_source_adapters.py and inspected all selected
+  Parquet probes. Corrected installed dd6b4ad2, Python3.14, explicit PYTHONPATH:
+  pytest tests/test_source_adapters.py -o pythonpath=. -k parquet -q:
+  11 passed, 8 deselected (0.31s).
+- Missing null/unique metrics remain unknown, unsupported inference rejects;
+  complete null statistics are measured. Fictional string/native sensitivity
+  remains value-free; oversized cells, row count and local deadline reject.
+  Three probes change environment configuration; deadline uses explicit clock
+  injection. No product function/client monkeypatch, real DB or external API.
+- Existing wheel metadata/sensitivity behavior is now explicitly exercised on
+  corrected artifact, not inferred from old wheel. This is author acceptance,
+  not independent clearance. Next mapping/Decimal transformation and client1–19
+  ledger reconciliation; public activation and release remain closed.
+
+## Corrected installed Parquet typed output and decimal profile — 2026-10-04 local
+
+- Read both fictional harnesses completely. Corrected installed dd6b4ad2 on
+  Python3.14: pytest tests/test_parquet_decimal_profile.py
+  tests/test_transformation_parquet.py -o pythonpath=. -q: 19 passed (0.37s).
+  No product monkeypatch, external API/DB or repeated successful wheel tests.
+- Declared decimal precision/scale profiling without source-value bounds,
+  unsupported decimal256 precision rejection, typed/null/decimal/date/timezone
+  output readback, byte ceiling and normalized source/cardinality negatives
+  covered. This is private renderer evidence, not whole mapping execution.
+- Attempted test_file_profiling.py lookup found no such file; no test was run
+  or claimed from that path. Next locate actual unknown-metric/sensitivity
+  harness and reconcile remaining mapping/client1–19 evidence. No activation,
+  review retry, merge or release; exact isolated SHA remains 3c00148.
+
+## Corrected installed Decimal generation/export pipeline — 2026-10-04 local
+
+- Read complete tests/test_exact_decimal_dataset.py before execution. Selected
+  corrected dd6b4ad2 installed package explicitly through PYTHONPATH and
+  TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT; isolated candidate 3c00148 checkout.
+  Python3.14 pytest tests/test_exact_decimal_dataset.py -o pythonpath=. -q:
+  16 passed (1.53s), no skips, monkeypatch, live database or external API.
+- Exact spec -> generation -> validation -> CSV/JSON/Parquet/PostgreSQL export
+  readback, precision20/38 and scale2/16, actual CLI CSV/Parquet, saved decimal
+  schema/nulls, invalid range/shape and existing-artifact preservation covered.
+  Existing source-free sensitive-looking and unsupported-formula rejection
+  controls remain tested; this does not authorize internal formula activation.
+- No runtime edits or repeat of previously passed corrected-wheel units. Mapping/
+  transformation and unknown Parquet metrics evidence remain separate. Next
+  reconcile those with refreshed1–19; mandatory independent review still blocked.
+
+## Corrected wheel Decimal/Parquet/SQL focused acceptance — 2026-10-04 local
+
+- Reviewed selected existing fictional harnesses; excluded adapter tests that
+  monkeypatch product clients. Python3.14 imports corrected installed dd6b4ad2
+  package explicitly; temporal CLI probe verifies installed import provenance.
+- pytest tests/test_client_parquet_acceptance.py tests/test_exact_decimal_units.py
+  tests/test_sql_query_source.py -o pythonpath=.
+  -k 'decimal or installed_cli or boolean_predicate or unauthorized_column or file_byte_and_ast'
+  -q: 28 passed, 106 deselected (1.10s).
+- Covers exact decimal units/38-digit bounds/seeded sampling and invalid values;
+  actual Parquet generation physical temporal schema/readback; both SQL dialects'
+  AND/OR/nested predicates with forbidden functions, authorization and byte/AST
+  negatives. No live adapters, source row disclosure or independent review claim.
+  Decimal generation/export/transformation scope is not closed by units alone.
+- Next remaining client evidence reconciliation, especially Decimal pipeline,
+  unknown Parquet metrics and refreshed1–19. Public activation/release still gated.
+
+## Corrected wheel client20/25 entrances accepted — 2026-10-03
+
+- Exact isolated candidate 3c00148c0d2afcf255e7355b6f52bb779d52f70a is clean.
+  Reviewed installed-mode harness and actual doctor probe before execution.
+  Python3.14, PYTHONPATH and TEST_DATA_AGENT_ACCEPTANCE_PACKAGE_ROOT explicitly
+  select /private/tmp/apa-budget-installed.fiQPEX/installed (wheel dd6b4ad2).
+- pytest tests/test_client_mode_installed_acceptance.py tests/test_cli_doctor.py
+  -o pythonpath=. -k 'installed or actual_doctor' -q: 9 passed, 8 deselected,
+  8.55s. Fictional negative explicit/embedded mode, mixed/default spec/profile/CSV
+  replay and actual failed local doctor configuration covered on corrected wheel.
+  No product monkeypatch or external database/API. Earlier-wheel successes were
+  not reused as new-artifact execution evidence; parent acceptance remains open.
+- Next reconcile remaining decimal/Parquet/SQL/client1–19 scope; no duplicate
+  process, blocked review retry, public activation, merge or release.
+
+## Corrected isolated registration tree materialized — 2026-10-03
+
+- Closed documentation freeze 0c388c9; new detached candidate checkout
+  /private/tmp/apa-corrected-candidate.mIiVzx. Applied only the three existing
+  common CLI/MCP/OAuth patches with --unidiff-zero in that isolated checkout.
+- Compared its entire src tree with the tested dd6b4ad2 wheel build source:
+  exact match excluding generated __pycache__ directories. Initial comparison
+  stopped on those cache-only differences; no source discrepancy was found.
+  No rebuild or unchanged successful tests repeated. Candidate signed locally;
+  author registration remains closed, old d84b6a1 and incomplete scan preserved.
+- Next reconcile outstanding client scope against this exact source identity.
+  No independent review retry, push, merge, version bump or public activation.
+
+## Signed closed freeze and acceptance identity reconciled — 2026-10-03
+
+- Signed local freeze d038ec2dc162727ac9e1b381f6900ba69a1b9b7c verified against
+  repository release-signers. Author checkout was clean at this checkpoint;
+  no push, PR, merge, registration activation or release performed.
+- client-acceptance.md now distinguishes corrected wheel dd6b4ad2 from prior
+  client20–26 artifacts and records explicit installed compatibility and closed
+  full-gate evidence. Historical successes are not transferred automatically.
+  No successful tests were rerun and no blocked review was retried or rerouted.
+- Next: materialize the corrected exact isolated activation tree, preserving
+  d84b6a1 and its incomplete scan, then reconcile remaining client evidence.
+  Independent clearance remains unavailable; author checks cannot replace it.
+
+## Corrected closed candidate full milestone gate passed — 2026-10-03
+
+- Single scripts/check_release.sh process 96641 finished exit0. Lint, strict types
+  142 files, compile, 101 licenses and compatibility passed. Direct API privacy/
+  SQL boundary pre-gate: 19 passed (0.38s). Full suite: 2894 passed, 21 skipped,
+  178.40s, coverage 90.05% against required 85%. Live integration and isolated
+  activation-only skips remain explicit; not private/live acceptance claims.
+- Operational fictional profile/generate/validate checks passed: elapsed
+  0.306/0.664/0.419s, traced peaks 2348034/2579900/313060 bytes; existing budgets,
+  not new hard-RSS guarantees. DatasetSpec schema freshness passed. Quickstart
+  customers/orders25 each seed12345 passed synthetic/source-free/validation flags
+  and dependency manifest check. Temporary gate workspace removed by its owned
+  mktemp cleanup; source and isolated wheels untouched.
+- Ordinary candidate fixes, focused contracts/docs and installed acceptance are
+  ready for signed local freeze; public registration remains closed. No repeated
+  independent-review request or provider rerouting, no RC version bump or public
+  release. Next materialize corrected exact activation tree and reconcile full
+  client acceptance evidence; mandatory independent review remains unavailable.
+
+## Closed candidate milestone gate running — 2026-10-03
+
+- Inspected scripts/check_release.sh before execution. Single local gate running
+  in this checkout, exec session 96641; do not launch an overlapping gate/test run.
+  PATH selects Homebrew git; exported shell python3 function selects the existing
+  Python3.11 dependency runtime explicitly. Actual local TTY access authorized.
+- Lint passed, strict types 142 files passed, compilation passed, 101 dependency
+  licenses approved, compatibility policy check passed. Direct service boundary
+  tests/full coverage/resource/schema/quickstart steps still pending at launch.
+  This is not completed gates, independent review or publication permission.
+- Next collect this exact process completion and record outcome; no source changes
+  while it runs. Existing isolated wheel and old immutable scan remain preserved.
+
+## Registration replay corrected; installed MCP1 compatibility — 2026-10-03
+
+- Correction to previous checkpoint: activation patches are NOT stale. They
+  intentionally contain zero-context hunks; plain git apply rejected them because
+  --unidiff-zero was omitted. Read-only check with that option passed. Applied all
+  three common CLI/MCP/OAuth patches ONLY to /private/tmp/apa-registration-replay.AhP7qZ;
+  cli.py, cli_parser.py and mcp_generator_server.py exactly match the tested isolated
+  wheel source, verified by byte comparison. No author registration edits, new
+  source behavior, wheel rebuild or repeat of successful MCP2 checks. Resumption
+  instructions now explain isolated replay and preserve activation gates.
+- Same wheel dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db
+  on Python3.11/MCP1: actual common tool contract plus three retained stdio cases
+  (synthetic/direct/fallback) passed, four tests in 4.25s. Python3.14 installed
+  doctor --skip-smoke --json passed exit0/ok true; network reachability and quickstart
+  correctly untested/skipped. Wheel 342850 bytes, below existing 524288-byte ceiling.
+- Next: full local closed-candidate milestone gates and coherent evidence freeze,
+  retaining the unavailable independent review as a blocker for public activation.
+  No release version bump, push/PR, external API/DB, review retry or approval claim.
+
+## Updated installed common candidate accepted locally — 2026-10-03
+
+- Remaining affected source TTY issuer/wizard and MCP stdio cases: 19 passed
+  (12.12s). Strict documentation build passed (0.41s). These complement the
+  earlier 101 regressions, without repeating scale or blocked reviewer work.
+- Preserved all prior wheels and immutable review trees. Created isolated source
+  copy /private/tmp/apa-budget-installed.fiQPEX from current closed author tree.
+  Old common CLI activation patch failed to apply atomically; no partial patch
+  was retained. Composed ONLY known cli.py/cli_parser.py/mcp_generator_server.py
+  registration bytes from immutable d84b6a1 in this copy. Author public gates stay
+  closed. Offline build initially lacked sandbox cache access; authorized offline
+  build succeeded, with no dependency changes or external calls.
+- New development wheel (still 1.5.0, not RC publication) SHA256
+  dd6b4ad2f165787470aaec665995664e5e106940d026d9238f34b3e3b167d2db;
+  dist/agent_paranoid_android-1.5.0-py3-none-any.whl under that isolated copy.
+  Installed separately to installed/; Python3.14/MCP2 import provenance verified.
+  Actual CLI creation/runtime flags, contract inventory, common MCP stdio with
+  direct/fallback receipts and retained/temporary output, plus new configured-byte
+  precedence cases: 27 passed (17.86s), fictional data only, no product monkeypatch.
+- This is author artifact evidence, not independent approval or exact new SHA
+  review. Existing scan remains incomplete. Next reconcile stale activation patch
+  against the closed candidate and finish artifact evidence/compatibility before
+  freezing the corrected candidate; no public registration, push/merge or release.
+
+## Common workflow regressions and capture contract reconciled — 2026-10-03
+
+- Current branch codex/1-6-coherent-candidate retains only intended local changes;
+  read-only GitHub query confirms no PR for this branch. Initial sandbox network
+  failure was resolved by authorized read-only access, not an implementation blocker.
+- Affected saved-profile/configuration publication, shared workflow/CLI creation,
+  destination rejection, linked/null/composite relationships and receipt negatives:
+  70 passed (12.76s). Separate affected native CSV/Parquet/exact-decimal and injected
+  PostgreSQL/Trino capture/output cases: 31 passed (2.73s), using local fictional
+  inputs and actual local terminal approval where required. No real DB/API, product
+  monkeypatch, repeated scale gates or independent-review claims.
+- policy-contract now documents bootstrap-before-capture and independent per-source
+  descriptor/read limits; OpenSpec adds a common source-file ceiling scenario.
+  Strict OpenSpec validation and diff whitespace checks passed. Existing session
+  precedence, diagnostics, default budgets and public registration gates unchanged.
+- Next: complete remaining affected controlling-TTY/common MCP route regressions
+  and installed-candidate evidence at a new artifact identity. Old immutable review
+  candidate and blocked validation remain untouched; ordinary automation continues.
+
+## Automation resumed for ordinary development — 2026-10-03
+
+- Owner asked to enable automation; status ACTIVE, existing schedule preserved.
+  Saved instructions point to this working checkout and prioritize affected
+  workflow regressions, contracts/documentation and fictional acceptance.
+- Restricted independent validation remains unavailable and is not retried,
+  rephrased or rerouted. Author tests cannot replace clearance. Public activation,
+  merge/release remain gated. Pause again once only unavailable review work remains.
+
+## Per-source byte ceilings applied before capture — 2026-10-03
+
+- Ordinary implementation continued at owner's request, without rerunning or
+  rerouting restricted review. Shared snapshot reader accepts an optional typed
+  file-byte limit, checks descriptor size before reads and running size during
+  reads, retaining aggregate accounting, no-follow and mutation protections.
+- Batch loading parses each behavior policy before source capture. Profile
+  materialization captures/parses existing policies first, derives source ceilings
+  (strictest for repeated source paths), then captures sources. Draft policy mode
+  uses session/default file limits. Existing callers without the new argument keep
+  their behavior. No defaults, public registrations or safety exceptions changed.
+- Checks: 23 focused snapshot/batch/precedence cases passed (2.12s); 13 draft and
+  create-review-execute cases passed (0.93s), including new session draft ceiling.
+  Runnable fictional clock check proves per-file rejection precedes the read loop;
+  no product monkeypatch. Ruff passed; mypy three changed source files passed;
+  diff whitespace check passed. These are author checks, not independent clearance.
+- Next: reconcile focused contracts/acceptance evidence and run affected common
+  workflow regressions before freezing a new candidate. Old exact-SHA review and
+  immutable tree remain untouched; automation/public activation/release paused.
+
+## Owner resumed ordinary implementation — 2026-10-03
+
+- Owner requested development continue without contacting support. Restricted
+  validation request was not retried or rerouted; scan remains unfinished and
+  automation remains paused. Public activation/release still requires independent
+  clearance; this work is ordinary implementation, not that clearance.
+- Shared batch loading and CLI creation now use one profile capture helper
+  enforcing non-default session total-byte ceilings before file capture/parsing.
+  Explicit run ceilings above defaults remain allowed as in single-input routing.
+  Added two fictional missing-profile checks proving session-limit error precedence
+  without product monkeypatch; existing four session/profile precedence checks
+  included. Initial subprocess run imported another installed checkout; corrected
+  with explicit candidate PYTHONPATH. CLI invalid-input exit remains 2.
+- Next: complete per-input byte-limit capture ordering in shared materialization
+  and loading, preserve diagnostic origins, then relevant regression checks.
+
+## Independent validation blocked by platform safeguard — 2026-10-03
+
+- Validation worker Copernicus (01a100b2-2ac9-7b80-9f93-217e79edb993)
+  returned an error: request flagged for possible cybersecurity risk. No
+  validation result, reproduction or clearance was obtained. Four discovery
+  candidates remain unvalidated in existing scan
+  e67d85e8-dedd-4957-96a6-8755b1ef390b; immutable candidate SHA unchanged.
+- Automation PAUSED because mandatory independent safety review requires
+  unavailable platform access. No retry through another worker or rephrased
+  request to bypass the safeguard, no public activation, merge or release.
+- Owner action: request authorized-security access through the platform-provided
+  Daybreak status-and-access page, or resolve the platform restriction with
+  support. Resume existing validation only after access is available; retain
+  original scan, exact SHA and all four candidate dispositions.
+
+## Budget candidates under independent validation — 2026-10-03
+
+- Independent AI discovery reviewer Lyra (runtime nickname Erdos) completed all
+  19 assigned changed-source paths on exact d84b6a1bbd564480f7245685c94f361ec043fa42.
+  Four distinct CWE-400 candidates concern profile bootstrap/session ceilings
+  and source capture/per-input ceilings, each in shared loading and creation.
+  They claim excess reads before rejection, not unauthorized publication or new
+  hard-RSS/wire guarantees. Not yet validated findings or activation approval.
+- Recorded all four once in existing scan e67d85e8-dedd-4957-96a6-8755b1ef390b;
+  separate non-author validation dispatched for this complete candidate set.
+  No source edits, repeated gates, new scan, public activation or release.
+- Next: retain every validation disposition, then attack-path assessment for
+  surviving/deferred instances; fix confirmed defects before exact-SHA clearance.
+
+## Context model retained; changed-source discovery started — 2026-10-03
+
+Maxwell architecture result received; parent inspected material common workflow,
+destination publisher, MCP closure, review metadata and OAuth callback consumers.
+Per-scan model retained via plugin at artifacts/01_context/threat_model.md,
+digestccee75649d0e6359c793df9e271bdbba5c9383b453f40d01f5b4bd14fc0cdaff.
+Capability labels/public_execution_supported=false and non-atomic-no-replace
+publisher distinction retained as questions, not confirmed vulnerabilities.
+Inventory prepared/read in full:19 changed source files. Existing scan advanced
+to discovery0/19 and fresh independent read-only reviewer dispatched for all19;
+no code/test/network activity authorized. Next collect complete file coverage and
+candidate evidence, record once, validate before any approval or activation.
+
+## Independent architecture reviewer dispatched — 2026-10-03
+
+Existing scan remains threat_model after ready preflight; fresh-context
+non-author Maxwell /01a1009f-15e1-77b1-a01f-18ba5c8bc730 successfully dispatched
+for read-only source-backed architecture of exactd84b6a1 and changed trust
+boundaries. No application execution, tests, edits, delegation or external calls
+authorized to this worker. Request canonical six-field model, effective-resource
+rows and verified citations, hypotheses distinct from findings. Context-specific
+model required; shared cached model must not be read/replaced. Next collect and
+verify material facts, persist per-scan model via plugin, then changed-file
+discovery without duplicate reviewer. Daybreak advisory checked once: not_granted,
+warning displayed; advisory does not gate scan. Public activation remains closed.
+
+## Capability preflight ready — 2026-10-03
+
+Anscombe preflight worker completed exit0/status ready: delegated_workers,
+goal_tools and goals_enabled all pass, no unmet/unknown capability or required
+remediation. No persistent configuration edits or network. Exact projected
+helper checks published to existing scan; phase advanced separately to
+threat_model. This is infrastructure readiness, not safety findings/review
+approval. Next threat-model context and independent changed-file review for
+exactd84b6a1; preserve non-author read-only reviewer and no public activation.
+
+## Dedicated capability preflight dispatched — 2026-10-03
+
+Resumed existing scan e67d85e8-dedd-4957-96a6-8755b1ef390b, still preflight;
+immutable range8670e56..d84b6a1 unchanged. Dedicated read-only preflight worker
+Anscombe /01a10099-dea6-7530-9baf-c9b3188d68ec successfully spawned, pending
+result at bounded wait. Scope only capability helper, no substantive review,
+config remediation or product edits. Verified nativeV1 delegation and exposed
+goal tools supplied to first helper invocation, Homebrew-first PATH. Next collect
+this worker's result, publish every projected capability check to same scan,
+advance only if ready. Do not dispatch duplicate preflight/reviewer or claim
+independent safety approval. Public activation/release remain closed.
+
+## Owner resolved launcher blocker — 2026-10-03
+
+Owner reported Xcode license action complete. System Git now returns version
+successfully; exact isolated SHA remainsd84b6a1bbd564480f7245685c94f361ec043fa42.
+Retried the same target/range once: durable diff scan created successfully,
+scanIde67d85e8-dedd-4957-96a6-8755b1ef390b, phase preflight, not completed review.
+Automation resumed ACTIVE after confirmed safe next step. Reuse this scan only;
+do not launch duplicates. Next dedicated capability preflight worker, then
+independent non-author read-only safety review; public activation remains closed.
+
+## Safety scan launcher access blocker — 2026-10-03 UTC
+
+Security Diff Scan launcher rejected the exact isolated range8670e56..d84b6a1
+with `Review changes requires a non-bare Git worktree with a resolvable HEAD.`
+No scanId was returned; no review/preflight worker or substantive review started.
+Homebrew Git independently confirms non-bare=true worktree and resolvable exact
+HEAD (is-bare=false, is-inside-work-tree=true). System /usr/bin/git --version
+fails exit69 because Xcode license agreements have not been accepted. This is
+a suspected launcher environment cause, not a proven scan diagnostic. Do not
+invent a scan, replace it with shell-authored canonical evidence or claim review.
+Automation PAUSED under owner stopping rule. Required external action: make
+the scan launcher's Git usable (Homebrew-first process PATH, or owner-handled
+Xcode license acceptance), then retry the same exact target/range. Do not accept
+legal terms on the owner's behalf. Both signed candidate SHAs/checkouts and
+prior fictional acceptance retained; public activation/release still closed.
+
+## Exact isolated activation SHA materialized — 2026-10-03 UTC
+
+Closed coherent commit444fb3dd77f9605860893a6e5240e012b2853669 is signed;
+signature verified with repository release-signers (bare verification lacked local
+allowedSignersFile, explicit repository configuration succeeded). Main branch
+codex/1-6-coherent-candidate remains publicly unactivated. Separate detached
+checkout /private/tmp/apa-safety-candidate.a97hVv materializes only the committed
+common CLI/MCP and OAuth registration patches, using normal file patching.
+All3 resulting registration files match the tested OAuth-composed source copy
+byte-for-byte. Signed isolated activation SHA:
+d84b6a1bbd564480f7245685c94f361ec043fa42; signature verified. No push/PR/release.
+Available separate reviewer tools identified, no reviewer dispatched yet:
+security-diff-scan workflow preparation precedes review. Next configure that
+read-only review for this finished exact activation SHA and record independent
+identity/date/scope/findings/disposition/evidence. Do not review helpers, revive
+ed24f7b or duplicate active work; final exact-RC review remains separate.
+
+## Coherent closed candidate freeze — 2026-10-03 UTC
+
+Preparing one signed coherent implementation/documentation/contract/acceptance
+checkpoint on codex/1-6-coherent-candidate, separate from the merged PR601 branch.
+All current in-scope dirty files are retained together; public common/OAuth
+registration patches remain unapplied. Development version remains1.5.0, no tag,
+release, push, new PR or CI dispatch. Local milestone and installed composition
+evidence above remain exact-artifact scoped; the resulting commit is not itself
+review approval. CONTRIBUTING and release process inspected, including mandatory
+exact-main gates, Ubuntu no-publish artifact preflight, immutable signed manifest
+and public verification. Next capture/verify the signed SHA and prepare finished
+candidate safety-review scope including the isolated registration patches; final
+RC review/version/gates and any remaining task dispositions stay open.
+
+## OAuth-composed MCP1 compatibility — 2026-10-03 UTC
+
+Changed installed wheel9da73de5 now has explicit Python3.11/MCP1 evidence:
+3 retained stdio cases (synthetic-only/direct/fallback) plus read-only actual
+CLI/MCP contract inventory passed,4 tests in4.01s. Real local controlling-TTY
+receipt issuance/consumption, complete fictional artifact readback and negative
+authority/path checks use actual installed modules, not product monkeypatches.
+This complements21 common cases and inventory on Python3.14/MCP2; no automatic
+transfer from the older wheel, no external service or public registration.
+No process remains. Next coherent candidate freeze and finished exact-SHA safety
+review preparation; these focused compatibility checks are not a final RC gate.
+
+## Remaining-task evidence reconciliation — 2026-10-03 UTC
+
+Read full tasks inventory and current finding dispositions; no parent task
+closed from partial evidence. Updated client25 ledger with already completed
+embedded-negative/default cases and attached the new common21+inventory1 checks
+explicitly to wheel9da73de5. Older MCP1 result remains tied to its older wheel.
+Remaining coherent-candidate gates include frozen-artifact compatibility,
+complete documentation/contract reconciliation, exact-SHA independent safety/RC
+reviews and protected GitHub/release acceptance. Target1Mx100, private inputs and
+live backend utility/auth remain distinct from accepted fictional300000x50;
+no new scale promise or private-data pass. No tests repeated or product changes.
+Next finish frozen-candidate compatibility reconciliation before signed coherent
+candidate preparation; common/OAuth registration remains isolated only.
+
+## Composed contract inventory reconciled — 2026-10-03 UTC
+
+Inspected OAuth registration patch and existing parser-surface extractor: the
+golden records command names, aliases and agent-plan defaults, not profile-query
+options. Therefore no golden relaxation or rewrite is needed for OAuth opt-in.
+Actual installed wheel9da73de5 read-only CLI/MCP inventory passed:1 test in0.46s;
+only expected transform-batch/common_transformation additions, unchanged ordinary
+MCP tool schemas, exact common required fields/operation enum. OAuth flag itself
+has separate installed noninteractive rejection evidence recorded earlier.
+GitHub read-only check confirms PR601 MERGED at2d02edc33bae0015dd5f1956335d37795dafd608;
+initial sandbox network failure resolved with authorized read-only access.
+No new PR, CI, review, product edits or public activation. Next reconcile remaining
+full-scope task evidence and freeze the coherent candidate, not a helper commit.
+
+## OAuth-composed installed common workflow — 2026-10-03 UTC
+
+Revalidated changed installed wheel9da73de5 against actual CLI/MCP entry modules,
+Python3.14/MCP2:21 passed,161 deselected in14.31s. Includes12 creation cases,
+3 runtime-flag positions and6 stdio consumer cases across synthetic-only/direct/
+fallback preservation and retained publication. Real controlling-TTY approval,
+saved-profile review/validate/execute, complete fictional artifact readback and
+negative authority/path checks pass. No product monkeypatch, external database,
+provider calls or main public registration activation. Old wheel evidence not
+silently transferred. No test process remains. Next reconcile read-only contract
+inventory with the separately authorized OAuth registration delta, then freeze
+the coherent exact-SHA candidate for required independent safety/RC reviews.
+
+## Installed candidate quickstart milestone — 2026-10-03 UTC
+
+Actual CLI generate-from-example quickstart passed on installed wheel9da73de5
+with Python3.11, import provenance verified. Existing fictional example fixture,
+25 rows each customers/orders, seed12345, CSV output: manifest synthetic=true,
+source_rows_copied=false, validation_valid=true, correct counts/seed and valid
+report. Established dependency checker validates manifest normalized dependency
+digest and generator version evidence. Only agent-owned temporary artifacts
+created; TemporaryDirectory cleaned them on completion. No source fixtures
+changed, product monkeypatch or external calls. This is ordinary source-free
+quickstart, not common transformation activation/release approval. Next reconcile
+isolated activated common composition checks for the new wheel and freeze the
+coherent candidate; finished exact-SHA reviews remain required.
+
+## Local dependency and compile milestone gates — 2026-10-03 UTC
+
+Inspected both established dependency checkers fully. Compileall src/tests/scripts
+passed; repository dependency policy/metadata/lock/minimum-profile/CI/documentation
+consistency passed; local installed-environment license checker approved101
+distributions. These are offline metadata gates, not vulnerability-database,
+fresh-install or full minimum/latest runtime matrix claims. No dependencies
+installed, network accessed or policy changed. Existing source tests/static/docs/
+operational/schema/OpenSpec evidence retained without rerun. Next isolated
+activated-composition compatibility reconciliation and coherent candidate freeze;
+independent exact-SHA safety/RC reviews and publication remain pending.
+
+## Operational/schema/OpenSpec milestone gates — 2026-10-03 UTC
+
+Inspected established operational checker and schema exporter fully. Fictional
+2500-row representative source-free profile/generate/validate gate passed:
+0.278/0.616/0.386 seconds, traced peaks2348736/2579900/313060 bytes, below its
+existing15s/256MiB per-phase thresholds. This does not repeat or replace accepted
+300000x50 transformation acceptance, nor claim1Mx100/hardRSS guarantees.
+DatasetSpec schema exact serialized freshness passed without writing/overwriting
+the checked-in schema. Strict OpenSpec validation passed. No external access,
+new dependencies or public activation. Next dependency/license/compile and
+remaining isolated composition checks before coherent exact-SHA review.
+
+## Full pytest failures resolved by invocation environment — 2026-10-03 UTC
+
+Read lastfailed inventory; excluded its stale superseded review-test entry,
+selected exactly the10 failures from the full milestone. Repeated those only
+with Homebrew-first PATH and authorized unsandboxed local controlling-TTY access:
+10 passed in9.38s, no product edits or safety bypass. Release fixtures sign/verify
+their temporary fictional repositories; no project tag/release created. Real
+receipt/consumer tests pass with the intended terminal boundary. Combined source
+checkpoint:2878 initially passed +10 recovered,21 skipped; original measured
+coverage89.98%. This is split-run evidence, not a falsely reported single green
+full invocation or finished release gate. No process remains; public common/OAuth
+activation stays closed. Next remaining operational/schema/dependency gates and
+coherent exact-SHA candidate preparation, without repeating successful tests.
+
+## Closed candidate full pytest checkpoint — 2026-10-03 UTC
+
+Full source pytest/coverage milestone completed: 2878 passed, 21 skipped,
+10 failed in 159.79s; coverage89.98% exceeds85%. Not a green gate. Two release
+fixture failures invoke bare git and hit system git exit69: this invocation
+omitted the required Homebrew-first PATH. Eight remaining failures are real-TTY
+receipt/consumer tests under sandbox; their exact failure diagnostics require
+focused inspection before attribution. Main public registration remains closed;
+this source suite does not replace activated installed-wheel acceptance.
+No process remains active. Next inspect pytest lastfailed entries and rerun only
+failed scope with Homebrew-first PATH and appropriate local-TTY permissions;
+do not repeat2878 successful cases unchanged. No product fix, review or release
+claim inferred from this checkpoint.
+
+## Installed default mode across local inputs — 2026-10-03 UTC
+
+Extended existing subprocess replay harness with default selection, reusing
+spec/profile/CSV paths and leaving product untouched. New default cases against
+wheel9da73de5: 3 passed, 5 deselected in 2.66s; Ruff passed. Omitted mode/ratio
+yield valid/0, succeeded/exit0, complete200-row artifacts and valid reports;
+seed31 exact replay and unchanged authored spec verified. Earlier explicit mixed
+and embedded-negative cases not repeated. Local input mode matrix now has scoped
+evidence for explicit mixed, explicit/embedded negative and default valid;
+other entrances/format compatibility and final gates remain open. Next converge
+remaining full-scope candidate checks rather than issuing helper review/PR.
+
+## Current candidate static checkpoint — 2026-10-03 UTC
+
+Changed omitted-mode harness Ruff passed. Inspected established release checker
+without running its full network/dependency/full-test sequence prematurely.
+Current dirty candidate full src/tests/scripts Ruff passed; mypy passed all142
+source files. No overlapping process remains, no runtime acceptance repeated.
+These static checks do not replace finished candidate full release gates or
+isolated activated-wheel compatibility. Next complete remaining mode/default
+entrances and freeze coherent candidate for milestone gates and exact-SHA review.
+
+## Installed omitted-mode specification boundary — 2026-10-03 UTC
+
+Reused existing fictional subprocess harness, adding omitted CLI mode/ratio case
+with negative/1 stored in the specification. Changed harness only, not product.
+New case against wheel9da73de5: 1 passed, 4 deselected in 0.57s; previously accepted
+explicit/mixed cases not rerun. Embedded settings survive omitted flags, all12
+invalid rows/manifest/report retained, exit1, input specification unchanged and
+installed import provenance verified. Remaining profile/CSV defaults and other
+entrances still need consolidation. Next complete mode matrix and milestone
+candidate gates; no public activation or new review/PR.
+
+## Workflow generation/transformation boundary clarified — 2026-10-03 UTC
+
+Replaced ambiguous blanket unsupported-transformation wording in cli-workflows
+DECIMAL section with separate ordinary source-free generation and closed selected
+saved-profile transformation contracts. Exact-decimal financial formula exclusion
+remains, no implicit public command activation or source-row preservation added.
+Strict MkDocs passed in 0.37s after this change; diff whitespace check passed.
+No runtime behavior changed. Next finish uncovered mode entrances and candidate
+contract/documentation audit, then full coherent gates and exact-SHA review.
+
+## Candidate entry documentation reconciled — 2026-10-03 UTC
+
+README now distinguishes isolated common saved-profile workflow from published
+1.5.0 commands and points to contract/acceptance evidence; no public activation
+claim. Unreleased changelog records common gating, invalid-result/exit1 and
+unknown Parquet metadata semantics. Migration page no longer calls obsolete
+1.3.2rc1 the current planned target; historical corrections remain intact, current
+1.6.0rc1/public-verification boundary and no stable authorization are explicit.
+Strict MkDocs build passed in 0.37s; diff whitespace check passed. No runtime
+tests repeated. Existing cli-workflows decimal wording still needs focused
+reconciliation with separate selected transformation versus ordinary source-free
+generation; remaining entrances and full gates/review stay open.
+
+## Installed client evidence ledger reconciled — 2026-10-03 UTC
+
+Updated client-acceptance with exact-wheel client20–26 evidence and remaining
+scope. Earlier common-interface/auth/doctor evidence remains attached to dd6c0c6e;
+newer OAuth, SQL, decimal, Parquet, mode and unknown-metadata runs attach to
+9da73de5. No successful tests rerun or parent tasks falsely checked complete.
+Main registration, branch/HEAD and review/PR state unchanged. Next audit remaining
+README/quickstarts/migration/changelog candidate documentation, finish uncovered
+entrances, then coherent milestone gates and finished exact-SHA review.
+
+## Client26 installed unknown-metadata consolidation — 2026-10-03 UTC
+
+Inspected source-adapter Parquet harness before installed execution against
+wheel 9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b:
+11 passed, 8 deselected in 0.27s. Real fictional Parquet files, no product
+monkeypatch: tests change supported environment settings only and explicitly
+inject a clock into LocalProfileBudget. Missing null/distinct metrics remain
+unknown; generation inference refuses unknown null statistics. Complete row-group
+null counts remain measured. Neutral-name sensitive text and native numeric/binary
+content stay sensitive without values in profile JSON. Oversized cells, row cap
+and local deadline fail closed; explicit local1s is not generation300s. No live
+DB/API/private input. This is local Python API evidence, not incomplete-scan proof
+of safety or final CLI/MCP compatibility gates. Next consolidate client20–26
+evidence into acceptance matrix, audit remaining documentation and run coherent
+milestone gates before exact-SHA independent review/public activation.
+
+## Client23 installed exact-decimal consolidation — 2026-10-03 UTC
+
+Inspected three complete decimal harnesses before isolated installed execution:
+33 passed in 1.30s against wheel
+9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b.
+No product monkeypatch, external connection or private input. Exact 20,2 and
+38,16 bounds survive low Decimal context, seeded generation, validation and
+CSV/JSON/Parquet/PostgreSQL SQL rendering without binary-float intermediates.
+Actual CLI subprocesses verify installed provenance, decimal128 physical types,
+complete readback, CSV nulls, saved precision/scale and schema1.1 manifest.
+Parquet profiling retains declared precision/scale without source values/bounds;
+missing generation bounds and >38 precision fail closed. Overflow, noncanonical
+input, unsafe numeric-looking bounds/rows, injection and incompatible overwrite
+controls pass. Formula test proves rejection before float arithmetic; it does
+not activate the owner-excluded formula engine. This does not cover the remaining
+transformation/mapping scope or private client reproduction. Next unknown-metadata
+consolidation and remaining candidate docs/gates; final exact-SHA review open.
+
+## Client25 installed invalid-result and replay consolidation — 2026-10-03 UTC
+
+Inspected complete installed mode harness before running against isolated wheel
+9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b:
+4 passed in 3.08s. Actual subprocesses, import provenance checked, no product
+monkeypatch or external access. Explicit negative mode overrides valid spec and
+retains all 12 intentionally invalid rows, manifest and invalid report with exit1.
+Mixed 0.25 overrides valid spec/profile/CSV routes; each 200-row result replays
+exactly with seed31, retains invalid artifacts and reports validation_failed/exit1.
+Original specification remains unchanged. Evidence is fictional local CLI
+coverage, not all omitted-mode/provider/SQL/MCP entrances or private reproduction.
+Next finish remaining exact-decimal/unknown-metadata consolidation and coherent
+documentation/gates; public activation and final exact-SHA review remain open.
+
+## Client22 installed predicate and negative controls — 2026-10-03 UTC
+
+Inspected SQL source harness fully; excluded adapter tests that monkeypatch
+product clients. Ran pure installed query inspection/authorization against
+OAuth-composed wheel 9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b:
+17 passed, 101 deselected in 0.25s. Both PostgreSQL/Trino dialects accept AND,
+OR, nested IN/BETWEEN/IS NULL and NOT without misclassifying predicates as
+functions; random() remains rejected. Unauthorized-column and aggregate-column
+controls, file byte/AST/projected-column budgets and aggregate AST cap remain
+fail-closed. Fictional query files only, no client/connection or product
+monkeypatch. Evidence covers shared deterministic policy, not remote adapter
+execution/private feedback reproduction. Branch/HEAD unchanged; no new PR or
+overlapping review/CI dispatched. Next client23 exact-decimal and client25/26
+installed consolidation, then full coherent candidate gates/review.
+
+## Client21 installed OAuth composition corrected — 2026-10-03 UTC
+
+Applied existing gated OAuth registration patch only to isolated source copy
+apa-common-activation.YzFHgu; main public registration remains unchanged. Built
+separate dist-oauth/installed-oauth, preserving prior wheel and installation.
+Wheel SHA256 9da73de58349be6a76aa44cce1ca8a670b56eaa8a5462c4c09c115938dd6194b
+(development metadata 1.5.0, not a released RC). Actual installed subprocess
+OAuth opt-in pipe rejection: 1 passed, 5 deselected in 0.78s. Import provenance
+verified; expected local interactive guard, exit2, no profile artifact and no
+browser/network/database access. This closes the isolated composition omission
+below, not remote authentication or final exact-SHA review. Previous common
+CLI/MCP acceptance belongs to its earlier wheel and is not silently transferred
+to this changed wheel. Next consolidate client22–26 installed contracts, then
+coherent candidate milestone gates and independent review before activation.
+
+Inspected client24 fictional installed Parquet harness fully, then ran against
+the same OAuth-composed wheel: 1 passed in 0.72s. Actual CLI generation retains
+declared int64/date32[day]/timestamp[us], complete three-row readback and synthetic
+manifest; subprocess import provenance verified. This is declared generation
+typing evidence, not native timestamp transformation, private client reproduction
+or intentionally invalid-result acceptance. Diff whitespace check passed.
+
+## Client21 installed OAuth CLI boundary — 2026-10-03 UTC
+
+Inspected OAuth CLI harness before execution. Selected actual subprocess path,
+not product-monkeypatched TTY/browser unit cases. Installed wheel dd6c0c6e probe
+verifies import below isolated target. Scenario FAILED: isolated wheel has no
+gated --trino-oauth-browser flag; parser rejects unknown argument before intended
+TTY guard. No browser/network/DB call or profile publication. This is an isolated
+composition omission, not accepted OAuth boundary evidence or user blocker.
+Next materialize already agreed gated OAuth registration in isolated candidate,
+rebuild changed wheel and rerun this failed scope, then consolidate client22–26
+installed contracts before full gates and
+finished exact-SHA review. Public activation remains closed.
+
+## Client21 installed auth guards consolidation — 2026-10-03 UTC
+
+Inspected complete auth focused suite before running against isolated installed
+wheel dd6c0c6e: 22passed0.23s. It exercises six-method constructors via explicit fictional
+dependencies, env-only runtime secrets/certificate paths, missing/conflicting
+references, detached constructor failures, OAuth trusted local redirect, approved
+HTTPS origin, deadlines/shared invocation cap and diagnostic suppression. HTTP
+and optional Kerberos/GSSAPI stubs are dependency substitutions, not product
+guard monkeypatch or live authentication. No network calls. This consolidates
+local guard evidence only; remote six-method login, optional native prerequisites
+and final exact-SHA safety review remain unverified. Next installed local OAuth
+CLI boundary and client22–26 consolidation before full candidate gates.
+
+## Client20 actual local failure acceptance — 2026-10-03 UTC
+
+Added subprocess actual doctor failure check without product monkeypatch. A
+fictional invalid TRINO_DEPLOYMENT_PROFILE fails local deployment validation
+before Trino smoke; no network/database call. Installed wheel dd6c0c6e focused
+1passed1.03s: exit1/ok=false/schema1.0, prior dependency checks retained, explicit
+failed capability and safe remediation, rejected configuration marker absent
+from stdout/stderr. Test requires optional Trino extra and skips when unavailable;
+no dependency installation. Ruff passed. This supplements four dependency-injected
+checks, not private client reproduction or all quickstart failure modes. Next
+client21–26 final installed consolidation and documentation before full gates;
+public activation remains closed.
+
+## Client20 installed doctor subset — 2026-10-03 UTC
+
+Inspected doctor focused tests; selected four existing service tests using
+explicit dependency injection, not product monkeypatch. Installed isolated wheel
+dd6c0c6e: missing optional/required extra, broken import distinction, retained
+dependency/capability failures and sanitized recovery checks4passed0.23s. Actual
+installed doctor --skip-smoke --require-extra parquet --json returns schema1.0,
+ok=true/exit0, available extras and explicit skipped smoke/no network-tested
+claim. No live DB/provider/API. Quickstart-failure test uses product monkeypatch
+and was deliberately excluded from this acceptance subset; client20 full final
+consolidation remains open. Next add isolated actual failing-doctor evidence
+without monkeypatch, then client21–26 candidate consolidation. No public activation.
+
+## Executable prospective inventory contract — 2026-10-03 UTC
+
+Added opt-in isolated actual composition inventory test, using only read-only
+existing parser/tool helpers. It asserts exactly one new command/tool, unchanged
+CLI aliases/defaults and existing MCP descriptions/schemas, exact common required
+budget/profile fields and operation enum; no root/approved/issuer field.
+Installed wheel dd6c0c6e focused1passed0.52s; Ruff/diff-check passed. Main goldens
+unchanged. Strict runtime extra-argument rejection remains covered by installed
+wire evidence; schema inspection does not substitute for that enforcement.
+Next complete client20–26 final-candidate consolidation and remaining docs, then
+full candidate gates/finished exact-SHA review. Public activation remains closed.
+
+## Installed public inventory delta audit — 2026-10-03 UTC
+
+Read existing contract fixture builder before use. Full fixture builder uses
+product monkeypatches, so did not run it for isolated acceptance. Read-only
+parser/tool inventory helpers instead inspect installed wheel dd6c0c6e: CLI adds
+only transform-batch; MCP adds only common_transformation; all existing MCP
+descriptions/input/output schemas exactly match checked-in inventory. No source
+rows, providers or external DB calls; no golden files overwritten. Main fixtures
+still describe gated production registration. Next add focused prospective
+inventory checks (including aliases/defaults and strict common schema), then
+remaining candidate client/docs/full gates. This is not final activation review.
+
+## Acceptance/task evidence reconciliation — 2026-10-03 UTC
+
+Audited remaining task entries; common interface work remains a parent open item,
+not closed from helper evidence. Recorded two completed scoped substeps with the
+installed actual composition's exact wheel and SDK1/SDK2 counts in tasks and
+client acceptance; explicit remaining public golden inventories/full gates and
+finished exact-SHA review. Refreshed client20–26 and all-format target capacity
+remain open for final candidate consolidation, not declared passed by common
+workflow evidence. No unchanged runtime checks repeated. Next audit public
+contract inventories/goldens against prospective composition and finish remaining
+client/documentation gaps before full gates; no helper PR or duplicate review.
+
+## Common MCP documentation and OpenSpec parity — 2026-10-03 UTC
+
+MCP how-to now explicitly separates the closed common candidate from shipped
+registration: server-owned root, exact digest, explicit positive byte budgets,
+execute-only new direct-child destination, metadata-only responses, no receipt
+issuer or approval flags. OpenSpec safe-mcp-workflow adds common saved-profile
+consumer and retained-output scenarios with unchanged local authority/transport
+ceilings and final activation-review gate. OpenSpec strict, strict MkDocs0.36s
+and diff-check passed; no unchanged runtime tests rerun. Next audit remaining
+candidate task/doc/contract gaps, then coherent full gates and exact-SHA review.
+Public registration/release unchanged and closed.
+
+## Installed common SDK1 parity and CLI documentation — 2026-10-03 UTC
+
+Same isolated wheel dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3
+now exercises actual retained common MCP plus actual CLI controlling-TTY receipt
+on Python3.11/MCP1: 3passed3.95s, including direct/fallback preservation, ordinary
+CSV profiling, strict rejected arguments and full output readback. No rebuild,
+SDK2 repetition or scale rerun. CLI reference distinguishes prospective actual
+transform-batch composition, version1.0 result envelope and runtime flag positions
+from shipped registration; no activation approval implied. Next complete MCP
+reference/OpenSpec surface and remaining full candidate docs/contracts, then full
+gates and finished exact-SHA independent review. Public registration stays closed.
+
+## Installed isolated actual composition — 2026-10-03 UTC
+
+Built isolated source composition (both activation patches, unchanged main
+registration) as development1.5.0 wheel, not RC. Installed target
+/private/tmp/apa-common-activation.YzFHgu/installed; wheel SHA256
+dd6c0c6eb058ef65a6d0a0d33e1b1abba7158da6a648c91a01889ff1f06464a3.
+No dependencies downloaded, real services, product monkeypatch or public upload.
+Focused installed acceptance18passed10.45s covers actual common creation/reopen/versioned CLI,
+runtime flag positions, actual controlling-TTY direct/fallback approval and
+retained CLI/MCP consumption, ordinary CSV profiling and safe rejection paths.
+This does not replace full candidate gates, SDK1 matrix, documentation/contracts
+completion or independent finished exact-SHA safety/RC reviews. Next consolidate
+remaining public contracts/docs and run coherent full candidate gates before
+review/activation. Public activation/release remain closed.
+
+## Combined actual CLI/MCP source acceptance — 2026-10-03 UTC
+
+Both actual composition switches now exercised together in the isolated source
+copy: saved-profile controlling-TTY approval → actual CLI receipt consumption →
+actual MCP common review/validate/retained execute, direct and fallback preserve.
+Full ordered fictional outputs/provenance and missing receipt/stale/traversal/
+unknown arguments remain checked. Combined scenarios2passed3.69s. Extended
+actual MCP scenario also successfully calls existing profile_csv, checks its
+artifact and source-value-free response, beyond ordinary discovery/rejection.
+This is source-copy integration evidence, not installed wheel or final RC gates.
+Next build/install isolated composition and run its focused actual-entry suite;
+public registration/release remain closed pending finished exact-SHA review.
+
+## Actual isolated MCP composition — 2026-10-03 UTC
+
+Applied prospective MCP patch only to /private/tmp/apa-common-activation.YzFHgu,
+not main checkout. Actual python -m generator server initially exposed a real
+circular import: candidate's top-level workspace resolver imported server during
+registration. Moved resolver import to its existing single-input execution
+function; no policy/authority change. Actual server now discovers13tools, keeps
+ordinary profile_csv/generate_dataset/execute_transformation, rejects unknown
+ordinary-tool arguments without reflecting them, and runs common review→validate
+→retained execute with full fictional output readback and common rejection cases.
+Changed actual wire scenario1passed1.07s; Ruff/diff-check passed. Ordinary-tool
+successful execution and combined actual TTY/common wire still need acceptance;
+not installed wheel or independent safety review. Next consolidate those checks
+and materialize installed coherent candidate. Public activation remains closed.
+
+## Prospective MCP composition patch — 2026-10-03 UTC
+
+Extracted existing closed common callable as _common_batch_tool(root); test
+server reuses it unchanged. Prepared unapplied common-mcp-activation.patch:
+prospective actual generator services append this callable with server-owned
+workspace_root, wrap it in existing query work budget, and enable strict argument
+names for both actual server construction paths. No approval issuer/client root.
+Initial patch hunk count was malformed; corrected, git apply check passed.
+Ruff/mypy1module and changed closed retained wire scenario1passed1.05s;
+diff-check passed. Patch NOT yet applied to isolated source or accepted as actual
+MCP composition. Public registration unchanged. Next materialize this patch in
+isolated copy, test ordinary tools plus common wire through actual server, then
+installed coherent candidate and required exact-SHA reviews. No RC/public release.
+
+## Actual isolated common TTY approval — 2026-10-03 UTC
+
+Existing fictional saved-profile acceptance now optionally runs the actual
+isolated CLI module, not approval/execution helper dispatch. Harness establishes
+controlling PTY then runpy executes unchanged module; no product monkeypatch.
+Direct preservation and unmatched preservation fallback each confirm exact saved
+identity, issue local receipt with schema1.0 output, reject execution without
+receipt, execute with receipt, check aggregate provenance and retained full CSV
+readback. Existing closed MCP wire consumes the same receipt; it still has no
+issuer. Changed scenarios2passed3.73s with real controlling-TTY access. Ruff and
+diff-check passed. Actual MCP public composition not yet materialized; this is
+isolated source evidence, not installed activation or safety review. Next wire
+trusted-root MCP composition and consolidate installed actual CLI/MCP candidate.
+Main registration unchanged; no public activation/PR/release.
+
+## Actual isolated CLI error/runtime parity — 2026-10-03 UTC
+
+Versioned common parsers and runtime errors now identify the prospective public
+command test-data-agent transform-batch, not internal helper names. Existing
+closed caller names unchanged. Focused isolated actual entry-point checks cover
+--json/--debug before command, before operation and after operation arguments,
+plus four safe creation rejection paths: 7passed2.07s. Initial new assertion
+incorrectly read stderr; established JSON errors use stdout. Corrected harness,
+not product output routing. Ruff/mypy1module passed. Main CLI registration stays
+unchanged; only isolated source copy carries activation patch. No public
+activation/review/release. Next actual controlling-TTY approval scenario and MCP
+composition, then installed candidate acceptance; earlier success/scale checks
+not repeated without changes.
+
+## Isolated common CLI success envelope — 2026-10-03 UTC
+
+Prospective common dispatch now reuses CliSuccessResponse 1.0 through an explicit
+versioned_output option. Closed default callers retain their existing internal
+shape; child parsers accept documented --json/--debug without stripping arbitrary
+argument values. No stdout interception: local wizard/TTY authority unchanged.
+Activation patch updated, still unapplied to this checkout's actual CLI.
+Only isolated source copy /private/tmp/apa-common-activation.YzFHgu/src composes
+actual transform-batch dispatch. Fictional creation/reopen review/validation/
+retained execution and rejection scenarios: closed source12passed5.53s;
+actual isolated entry-point6passed2.96s, including success schema1.0 assertions.
+Ruff, mypy1module and diff-check passed. Not installed wheel acceptance, full
+candidate gates, independent safety review or public activation. Root-position
+runtime flags/error-command parity and actual TTY approval still need focused
+composition checks; MCP public composition remains open. Next finish those
+contracts, then installed actual-entry acceptance. No new PR/CI/review/release.
+
+## Isolated actual CLI composition draft — 2026-10-03 UTC
+
+Prepared unapplied common-cli-activation.patch (SHA256
+d9f02f269a4186af0eec66053c71d385bba50f353a9e1f18606239cb34207ef0), adding
+transform-batch discovery/dispatch to actual CLI composition. Applied only to
+an isolated source copy/private/tmp/apa-common-activation.YzFHgu/src, not this
+checkout or production registration; git apply check and real root/nested help
+passed. An initial relative copy command used the new empty directory and failed
+before any application; corrected to the explicit source path. No runtime
+monkeypatch, real DB/API or public activation. Existing common installed172 gate
+is prior evidence, not this changed composition's acceptance.
+Integration inspection found a concrete unresolved CLI contract: closed helpers
+emit internal flat JSON, while actual public CLI declares version1.0 success
+envelopes and --json semantics. The patch is NOT activation-ready or approved.
+Next compose the established presenter/envelope into prospective dispatch,
+handle documented runtime flags without leaking private args, and exercise actual
+installed entry-point creation/review/TTY/execute before full candidate gates.
+No user decision needed for this existing-contract integration defect; automation
+remains active. PR601 unchanged MERGED; no review/CI/RC.
+
+## Unified wizard and common installed milestone — 2026-10-03 UTC
+
+Real PTY now exercises _candidate_common_main create with absent CSV policies,
+explicit seed, per-field sensitivity/actions/hidden mappings and final SAVE.
+It saves configuration, reopens the new exact identity, runs unified review/
+validate/retained execute, checks full ordered output, unchanged original files
+and no receipt/approval prompt. Installed existing wheel6dcf2c0fc9897c63e4ba82ce2e1d12dc87fb10e249307c646b29c2c05239cd1b
+new scenario1passed0.68s; no product rebuild or guard monkeypatch.
+At this coherent common-workflow milestone the installed focused suite
+172passed25.20s on Python3.14/MCP2, including linked/composite validation,
+typed/native/query captures, receipt authority, CLI/MCP wire, config save/resume,
+retained publication and failures. Not a whole-project or final RC gate.
+Configuration reference now documents exact shared profile paths/identity/limits;
+scoped wizard subtask recorded without closing public activation. Ruff,
+strict MkDocs0.37s, OpenSpec strict and diff-check passed. PR601 unchanged MERGED.
+Next prepare coherent gated activation wiring for actual command/tool composition,
+amend remaining public contracts/docs, then full candidate gates and independent
+exact-SHA safety/RC reviews. No reviews of helper commits or repeated scale runs.
+
+## Unified closed common CLI entry — 2026-10-03 UTC
+
+Added unregistered _candidate_common_main dispatching create/review/approve/
+validate/execute to existing shared operations. Creation boundedly reads the
+typed draft, materializes existing or explicitly seeded CSV-only proposals,
+optionally runs the real local decision wizard, and saves configuration only.
+Edit flags require decide; SAVE never approves. New source subprocess checks
+6passed2.88s cover configuration→reopen review→validate→retained execute, blank
+CSV proposals, missing seed, traversal, piped wizard and unknown approval flag.
+Fresh installed development wheel/private/tmp/apa-common-entry.wS66Om/installed,
+SHA2566dcf2c0fc9897c63e4ba82ce2e1d12dc87fb10e249307c646b29c2c05239cd1b;
+same changed scenarios6passed2.96s. Ruff/mypy1module, strict MkDocs0.35s and
+diff-check passed. CLI reference records closed operation/argument semantics
+without presenting them as shipped command discovery. PR601 remains MERGED.
+Public registration/RC gates/reviews remain open. Next prove the unified create
+parser's interactive blank-policy wizard through real PTY and consolidate its
+candidate activation/docs/contracts; do not repeat accepted scale or helpers review.
+
+## Closed local common approval CLI scenario — 2026-10-03 UTC
+
+Scope audit found common approval still had only a Python TTY call in acceptance.
+Added unregistered _candidate_batch_approve_main delegating to the unchanged
+issuer: exact reviewed digest, positive explicit budgets and a new direct-child
+receipt below trusted root; no approval boolean, overwrite or MCP issuer.
+Saved-profile/real controlling-TTY/direct-and-fallback CLI→MCP retained scenarios
+now exercise this actual CLI parser, not direct receipt construction.
+Source scenarios2passed3.65s; detached piped APPROVE/stale/traversal/existing/unknown
+argument negatives5passed1.62s. Fresh installed development wheel at
+/private/tmp/apa-common-approval.N5JgmB/installed SHA256
+48bc63d3a9dcda46d8bf7f4dc2410947411a9408c899d85e945af96804876d90:
+same changed scope7passed5.04s on SDK2. Ruff/mypy1module, strict MkDocs0.36s and
+diff-check passed; implementation ownership updated. PR601 unchanged MERGED.
+No production registration/review/CI/public RC. Next materialize coherent common
+command/creation/approval wiring as a gated activation candidate and reconcile
+its full user contract before milestone gates/exact-SHA safety and RC reviews.
+
+## Installed retained typed-output acceptance — 2026-10-03 UTC
+
+Extended existing typed-output/readback tests through run_batch_workflow's
+retained consumer, using unchanged installed wheelad352c6d82a5c3de829f0296cca2d3a5b9fbdb01bbf95562cd53a8c5040789dc.
+Parquet/SQL-file valid/orphan/budget cases6passed0.69s; exact DECIMAL(8,2), native
+null versus empty-string cases2passed0.56s. Invalid batches leave no destination
+or staging; successful artifacts preserve declared physical types and exact
+999.99, while manifest excludes values. No product changes/rebuild or repeated
+unchanged temporary-route/CSV/scale checks. These are installed typed-consumer
+checks, not every-route SDK/wire parity or live database execution. Ruff/diff-check
+passed. Contract now explicitly distinguishes fictional retained test roots from
+public activation. PR601 unchanged MERGED; no review/CI duplicates.
+Next reconcile remaining common-profile activation/CLI documentation and finish
+candidate-level failure/contracts evidence before full gates and exact-SHA reviews.
+
+## Installed common retained-output scenario — 2026-10-03 UTC
+
+Wired optional destination through the same strict typed consumer and isolated
+CLI/MCP adapters. Only execute can retain output, only under a new direct-child
+name below the trusted root; review/validate, absolute/traversal/nested/empty and
+existing destinations reject before publication. Shared writer preserves exact
+review, common receipt, linked validation and aggregate output budgets. No
+issuer, rows or destination literals in returned metadata; registration unchanged.
+Extended saved-profile→real TTY→CLI/MCP stdio tests with retained output and exact
+full CSV readback for ordinary/direct/fallback scenarios. Source checks3passed4.24s.
+Fresh installed development wheel at /private/tmp/apa-common-retained.VVpbnG/installed,
+SHA256 ad352c6d82a5c3de829f0296cca2d3a5b9fbdb01bbf95562cd53a8c5040789dc:
+changed common consumer/CLI/MCP/negative scope32passed13.50s on SDK2.
+SDK1 retained scenarios3passed3.86s on the same installed wheel. PR601 confirmed
+unchanged MERGED at2d02edc33bae0015dd5f1956335d37795dafd608; no overlapping CI/review.
+Ruff/mypy3modules, strict MkDocs0.38s and diff-check passed; ownership/ADR0013
+reconciled. This closes a fictional retained CSV scenario, not all-format/common
+public activation, client-private evidence or RC readiness. Final exact-SHA reviews
+still deferred until coherent full candidate. Next extend retained typed-route
+and failure evidence, reconcile remaining common profile/docs/contracts, then
+candidate milestone gates; no intermediate PR/review or repeated scale run.
+
+## Closed retained bundle publication groundwork — 2026-10-03 UTC
+
+Added unregistered _publish_retained_test_batch for fictional temporary roots.
+It uses the existing fully validated, budgeted common bundle, reads its files
+with no-follow regular-file checks under the remaining aggregate byte budget,
+and publishes via existing descriptor-safe staging/rename and identity-safe
+cleanup. Returns only the value-free manifest. Extracted the existing writer's
+multi-artifact loop; single-input publication delegates without changed approval
+authority, rendering, output budgets or public registration.
+Six focused valid/existing-file/nonempty-folder/symlink/stale-digest/budget cases
+passed0.44s; prior user files remain intact and no staging survives those cases.
+Shared single-input executor/publication regressions298passed3.81s;
+Ruff/mypy2modules and diff-check passed. This source change is not yet in the
+installed wheel or shared CLI/MCP consumer, and is not completed interface parity.
+Next wire the same retained writer into the isolated typed common consumer and
+prove saved-profile/TTY/CLI/MCP retained output with fresh installed evidence.
+No intermediate review/CI, real DB/API or public activation; RC remains open.
+
+## Saved common profile → TTY receipt → CLI/MCP consumers — 2026-10-03 UTC
+
+Extended the real wire acceptance with direct and fallback non-sensitive
+preservation. Each fictional scenario saves configuration, reloads its new
+identity, obtains a version2 receipt through the actual controlling-terminal
+confirmation, and consumes it through real CLI subprocess and bounded MCP stdio.
+Both interfaces refuse preservation without the receipt; successful CLI metadata
+records original-cell counts[2,3], while source labels stay absent from terminal
+review/CLI/MCP responses. Exact files, including saved configuration and receipt,
+remain unchanged after consumers; no product monkeypatch or public registration.
+Reused the existing PTY loop in a test helper. Initial sandbox attempts refused
+confirmation before the prompt; actual controlling-TTY access under escalation
+passed, not a bypass. Installed unchanged wheel53e59a50619c6dc6dd6905efe3311660614432fd76503184aa0a5fff7cf5e91a:
+SDK2 new two scenarios2passed3.63s; SDK1 new scenarios plus changed PTY harness
+regressions8passed5.05s. Ruff/diff-check passed. No rebuild, CI or intermediate
+review. Retained transformed publication/common public registration and full RC
+scope remain open. Next implement the closed retained-publication consumer using
+existing atomic staging and preserve identical review/receipt/validation gates.
+
+## Installed SDK1 common wire parity — 2026-10-03 UTC
+
+Used the same installed wheel53e59a50619c6dc6dd6905efe3311660614432fd76503184aa0a5fff7cf5e91a
+with the existing Python3.11.2/MCP1.28.1 runtime; real bounded stdio common
+review/validate/execute and stale/traversal/unknown/private-input negatives
+1passed1.16s. No repeated unchanged SDK2 checks, package rebuild or SDK mutation.
+Reconciled implementation ownership and ADR0013: shared typed consumer, trusted
+server-side root, no issuer, metadata after temporary cleanup, and unregistered
+common interface explicitly distinguished from public activation/retained output.
+Full RC and retained common output/approval interface evidence remain open.
+Next complete the common saved-profile/receipt consumer scenario and remaining
+client/doc contracts before finished-candidate gates; no intermediate review.
+
+## Strict closed MCP consumer checkpoint — 2026-10-03 UTC
+
+Fixed the retained failing SDK2 stdio check: the existing redacted call_tool
+boundary now accepts optional explicit argument-name sets, derived from callable
+signatures by generator composition. Only the isolated common candidate opts in;
+production registration/default behavior and approval authority are unchanged.
+Unknown arguments fail before SDK parsing with a fixed source-free error, without
+mutating SDK models or adding approval fields. Real MCP wire scenario1passed1.09s;
+generator/Trino transport regressions60passed0.48s; Ruff/mypy3modules passed.
+Fresh development wheel installed at /private/tmp/apa-common-wire.Ou8lOG/installed,
+SHA256 53e59a50619c6dc6dd6905efe3311660614432fd76503184aa0a5fff7cf5e91a.
+Installed common CLI/MCP consumer checks13passed6.19s, including stale digest,
+traversal, budget, unknown/private inputs and unchanged fictional source files.
+Version remains1.5.0 development metadata, not RC. PR601 confirmed MERGED at
+2d02edc33bae0015dd5f1956335d37795dafd608; no duplicate review/CI or public activation.
+Next prove installed SDK1 wire parity and reconcile common interface ownership/
+client evidence before finished-candidate gates and exact-SHA independent reviews.
+
+## Isolated common CLI/MCP wiring — 2026-10-03 UTC
+
+Added unregistered _candidate_batch_main and _create_test_batch_mcp using the same
+typed run_batch_workflow and metadata serializer. CLI real subprocess review/
+validate/execute, stale/missing digest, budget and rejected private-argument
+checks6passed3.40s; Ruff/mypy3modules passed. Production parser/tool registration
+unchanged; no issuer added. MCP bounded stdio uses the existing request-context
+factory; a None factory was an invalid harness setup, corrected without product
+monkeypatch or budget changes. Real SDK2 wire scenario reaches valid operations
+and stale/traversal negatives, but its additional approved=true argument is
+silently ignored by SDK-generated argument parsing. This does not issue approval,
+yet violates explicit unknown-input rejection. The new wire check remains
+FAILING, not accepted or removed. Next enforce strict unknown-argument rejection
+at the isolated MCP boundary using supported SDK composition, then rerun changed
+wire/consumer scope and installed interface evidence. No external/user decision
+needed for this implementation defect; automation stays active. No review/CI/RC.
+
+## Closed shared consumer boundary — 2026-10-03 UTC
+
+Added typed internal BatchWorkflowRequest/Result and run_batch_workflow for common
+review/validate/execute composition, reusing exact profile capture and the same
+temporary final publication/validation. Review returns bounded exact review bytes;
+consumers require the reviewed digest and return only value-free manifest bytes
+after temporary cleanup, no row payloads/retained output or receipt issuer.
+Receipt references remain below the explicit root; review cannot consume receipts.
+Stale/missing digest, receipt traversal and corrupted typed requests fail with
+fixed detached errors. Seven focused checks passed; Ruff/mypy1module/diff-check
+passed. This is an unregistered internal boundary, not CLI/MCP parity or public
+artifact activation. Prior installed wheel predates this new module. Next wire
+prospective isolated CLI/MCP adapters to this same consumer and prove interface
+parity without changing production registration before final safety gates.
+
+## Installed closed creation/save/resume checkpoint — 2026-10-03 UTC
+
+Built fresh development wheel and installed --no-deps at
+/private/tmp/apa-common-resume.db8onR/installed; module path confirmed installed,
+not src. Installed common suite120passed8.90s covers blank CSV policy creation,
+real PTY explicit decisions, configuration-only save/reopen/execution, common
+approval authority, linked validation, supported typed routes and budget/privacy
+negatives. Wheel SHA256 ad0b0b0cc479bbe5071597a4cf1a4e442643bec61379503230972891acd3a9cd.
+Version remains1.5.0 development metadata, not RC/final reviewed SHA. Reconciled
+closed creation/save boundary in policy-contract and a scoped wizard subtask;
+full client/RC/interface tasks remain open. Strict MkDocs0.36s, OpenSpec strict
+and diff-check passed. PR601 unchanged MERGED, no duplicate
+review/CI, no real DB/API/public activation. Next finish common interface candidate
+and client findings1–26/docs evidence; obtain reviews only after candidate complete.
+
+## Closed saved configuration resume scenario — 2026-10-03 UTC
+
+Added private save_batch_profile using existing descriptor-safe staging/atomic
+directory publication. Publishes only behavior policies, validation-spec and
+common references under the original root: no source snapshot copy or receipt.
+Exact external source/reference bytes are checked before publication; published
+configuration is reloaded and compared with the expected new identity. Existing
+nonempty destination/traversal/stale-source failures preserve user files and
+discard staging. New paths change the digest and require fresh review/approval.
+Post-publication revalidation failure can leave configuration requiring review,
+never a trusted approval. All acceptance writes confined to fictional tmp roots.
+Real PTY blank-policy wizard now saves, exits its owned temporary root, reopens
+the retained configuration and executes final output (1passed0.60s). Focused
+publication/limit/session checks12passed1.59s; Ruff/mypy2modules passed. New budget
+negative exposed YAML parsing before byte-limit diagnosis; shared prepare_batch
+now checks total bound bytes before configuration parsing, preserving typed
+limit_exceeded rather than generic YAML refusal. Existing installed evidence
+predates these changes; next materialize updated common scenario, reconcile
+interface/docs/contracts and full client scope before finished-SHA reviews.
+PR601 unchanged MERGED; no public activation/review/CI/release.
+
+## Closed CSV creation without existing policies — 2026-10-03 UTC
+
+Extended owned temporary common-profile creation with explicit create_csv_policies
+and required integer seed. Exact captured CSV bytes supply ordered schema evidence;
+new policies contain unknown sensitivity/drop-only field proposals, not source
+literals or approval. Original policy files need not exist and are never written.
+Common wizard requires explicit action editing for this route; real PTY scenario
+creates both policies, chooses inline numeric mappings, reviews/SAVEs and reads
+back final outputs. Initial draft carries no shared mapping domains/relationships:
+those remain explicit configuration, not automatic inference. Seed omission,
+policy/source collision, traversal and absent action-decision mode fail closed.
+Focused changed creation/wizard checks18passed2.43s; Ruff/mypy1module/diff-check
+passed. Existing installed wheel predates this change. CSV-only draft creation:
+native/captured sources still require valid proposals; retained publication and
+interface activation remain unfinished. Next materialize coherent candidate and
+finish retained common-profile/interface contract with existing safety gates.
+
+## Installed closed common decision scenario — 2026-10-03 UTC
+
+Composed temporary_batch_decisions with the existing local per-input editor,
+owned fictional profile materialization, complete common value-free review,
+explicit final SAVE and post-display snapshot revalidation. All edits confined
+to temporary copies; cancel/detached input fail without changing original files.
+Starts from valid policy proposals, not blank policies. SAVE creates no receipt
+and cannot authorize preserve; existing common approval remains separate.
+Five real-PTY/noninteractive focused checks passed1.84s, including actual domain
+mapping edits, linked output readback and preservation refusal after SAVE.
+Ruff/mypy1module/diff-check passed. Fresh wheel installed --no-deps under
+/private/tmp/apa-common-wizard.N4YA9I/installed; installed batch suite109passed8.46s.
+Wheel SHA256 0f973604f3667c46feb7248050a148b183e053979a883d064115fdd5b77ab3ed,
+development version1.5.0, not RC/final reviewed SHA. No real DB/API/product
+monkeypatch, public registration, duplicate review or CI. PR601 remains merged.
+Next finish blank-policy creation/retained profile and common interface candidate
+plus client/docs reconciliation; independent reviews only on the finished SHA.
+
+## Closed creation diagnostic correction — 2026-10-03 UTC
+
+New corrupted-model negative exposed Pydantic serializer warnings containing
+the invalid field payload before validation. Closed creation now disables
+serializer warnings, still strictly revalidates the serialized typed contract,
+and raises its fixed failure outside the original exception handler so no
+private validation context survives. Reserved batch.yaml descendants also fail
+before capture/materialization. Seven focused creation-to-output checks passed
+without warnings; original files remain unchanged and consumer cleanup holds.
+Ruff/mypy1module passed. PR601 remains merged; no reviewer/CI/public activation.
+Next compose the still-unfinished explicit field-decision creation workflow and
+materialize installed candidate evidence; this correction does not complete RC.
+
+## Closed profile creation through final output — 2026-10-03 UTC
+
+Added temporary_batch_profile using existing typed common-profile models,
+restricted bounded reference capture, owned TemporaryDirectory and atomic file
+writers. Explicit fictional candidate configuration materializes separately from
+the original root, then loads through the same exact-snapshot review/execution
+boundary. No source/existing policy overwrite, approval or public registration.
+Serialization excludes unset inherited resource limits rather than inventing
+unsupported shared settings. Five focused creation/review/final linked-output
+checks passed0.43s: ordinary/configured limits, traversal/reserved-name rejection,
+consumer failure cleanup and original byte preservation. Ruff, mypy1module and
+diff-check passed. Interactive
+field-decision creation, retained profile publication and interface parity remain
+unfinished; this is not a complete wizard or reviewed RC. Next compose explicit
+field decisions into this closed creation scenario, then installed acceptance and
+client/docs reconciliation before exact finished-SHA reviews.
+
+## Implementation-map boundary reconciliation — 2026-10-03 UTC
+
+Read current ownership map and application boundaries; verified registered
+single-input parser commands and PR601 MERGED at its unchanged head. Corrected
+stale map claims denying source-preserving entrances and calling the decision
+editor read-only. Added explicit closed common-profile ownership, temporary-only
+publication and unfinished creation/interface status. No runtime activation,
+receipt-authority change, new review, CI or release. Diff-check and strict MkDocs
+build passed (0.37s). Next implement closed common
+creation without overwriting source/existing policy files; existing atomic policy
+writer intentionally replaces files and cannot be treated as create-only.
+
+## Common profile ignored-limit rejection — 2026-10-03 UTC
+
+Profile-creation trace found common resource_limits accepted all existing typed
+keys while only total-input/output byte ceilings were applied at that level.
+Added deterministic validation rejecting other explicitly supplied shared keys;
+per-input behavior-policy row/column/cell/file/character/expanded-byte limits
+remain supported and unchanged. No silent configuration, budget increase or
+source-free change. Six fictional unsupported-key negatives plus accepted
+shared ceilings/session precedence12passed1.50s; Ruff/mypy1module/diff-check
+passed. Wizard
+trace confirms current editor requires an existing valid per-input policy:
+complete common profile creation/interface workflow still pending, not claimed
+implemented. Current installed wheel predates this guard. Next finish that
+closed creation scenario with explicit field decisions and unchanged receipt
+authority, then client/docs reconciliation and exact final candidate reviews.
+
+## Installed common workflow/route checkpoint — 2026-10-03 UTC
+
+Materialized updated dirty candidate into a fresh local wheel and --no-deps
+installation at /private/tmp/apa-common-candidate.JoM2uV/installed; confirmed
+transformation_batch imports from that target, not src. Installed batch suite
+91passed6.51s covers common saved-profile/review/real controlling-TTY receipt,
+preserve/fallback, exact identity, shared profile/session limits, scalar/composite
+final validation, typed null/DECIMAL readback, native CSV/Parquet and authorized
+fictional query captures into three output encodings, temporary publication and
+cleanup. Ruff and mypy3batchmodules passed. No product monkeypatch or real DB/API.
+Wheel agent_paranoid_android-1.5.0-py3-none-any.whl SHA256:
+3d15ebe6a43e34958d91476648a944592bc3efcb215d78e09a74a1976820058a.
+This is development metadata, NOT 1.6.0rc1, final reviewed SHA, all client findings,
+live driver acceptance, full-scale route proof or public interface registration.
+PR601 remains MERGED; no duplicate reviewer/PR/CI started. Next finish common
+interface/profile-creation workflow and client/docs reconciliation into one
+complete candidate; then final exact-SHA safety/RC review, required gates/PR/CI
+and the separately authorized RC publication process. No version/tag/release.
+
+## Closed authorized captured-query common scenario — 2026-10-03 UTC
+
+Nine fictional scenarios exercise existing _capture_authorized_result with
+explicit allowlisted columns/table, bounded query wrappers and injected Arrow
+streams: PostgreSQL/PostgreSQL, PostgreSQL/Trino and Trino/Trino parent/child
+pairs across CSV/Parquet/PostgreSQL-SQL bundle outputs. Non-allowlisted capture
+fails before stream access. Exact captured envelopes are saved under the
+restricted profile root; final ordered key readback and temporary cleanup pass.
+Focused tests9passed0.79s; Ruff passed. Initial fixture omitted source-qualified
+entity identity; corrected policy/profile/final-spec identities to the existing
+fictional.entity capture contract, without product changes. No product
+monkeypatch, real DB/client connection, SQL execution or external API. This is
+private fictional capture/application evidence, not driver authentication/live
+backend guarantees or public multi-input registration. Next finish common
+interface/profile workflow candidate and full client/docs reconciliation, then
+materialize current installed candidate and exact finished-SHA safety/RC gates.
+
+## Closed native Parquet multi-input scenario — 2026-10-03 UTC
+
+Existing source reader already supports native Parquet in the saved common
+profile; no new adapter or dependency required. Six fictional scenarios exercise
+Parquet parent + CSV child and Parquet parent + Parquet child across declared
+CSV/Parquet/PostgreSQL-SQL outputs, with ordered key readback and temporary
+cleanup. Mutating native parent bytes changes common identity: old snapshot
+execution fails, and newly bound orphan-key execution also fails. Focused tests
+6passed0.78s; Ruff passed. No product monkeypatch, real database, SQL execution,
+public activation or inferred temporal/null equivalence. This does not establish
+full native scalar/size coverage, authorized query-source capture or public
+multi-input interface parity. Next complete authorized captured-query common
+scenario and interface candidate, reconcile client/docs scope, then current
+installed acceptance and finished exact-SHA safety/RC reviews/gates.
+
+## Common native-null/exact-decimal readback — 2026-10-03 UTC
+
+Added two fictional saved linked parent/child bundle scenarios with independent
+nullable labels and exact DECIMAL(8,2) replacement. Parquet readback checks native
+None versus empty string, exact Decimal values, precision/scale and ordered keys;
+SQL checks NUMERIC(8,2), NULL versus quoted empty string and exact base-ten
+literals. No SQL execution or real databases. Manifest excludes the test value;
+temporary storage is removed after readback. Focused tests2passed0.47s. Initial
+fixture used an invalid final decimal spec and an input/null declaration that
+failed existing preflight; corrected fixture to existing decimal_range contract
+and explicit input null marker, without changing product gates. No new runtime
+or safety-policy changes this checkpoint. Next finish native multi-input sources
+and common interface candidate, reconcile full client/docs scope, then materialize
+current installed candidate and final exact-SHA safety/RC reviews/gates.
+
+## Closed common typed output bundle — 2026-10-03 UTC
+
+Temporary batch publication now uses each exact bound behavior policy's declared
+CSV/Parquet/PostgreSQL-SQL output after unconditional linked final validation.
+Reuses existing typed renderers and fixed source-row normalized comparison gates;
+SQL is encoded only, never executed. All payloads and manifest share one byte
+budget and one temporary directory publication/cleanup; output suffixes and
+manifest artifact names match actual formats. Renderer budget errors use shared
+bundle counters; invalid typed rendering is detached at the closed boundary.
+Six fictional saved-profile scenarios cover native Parquet logical readback,
+ordered SQL statements, orphan rejection before publication and output exhaustion:
+6passed0.66s; Ruff/mypy1module passed before final detached-error guard. Corrected
+header-validator import during collection; no dependency or policy relaxation.
+Public entry remains unregistered. Current installed-wheel proof still predates
+this change. Next add typed/null/decimal multi-input route fidelity and finish
+common input/interface candidate plus client/docs reconciliation before exact
+finished-SHA safety/RC review. No release/version/tag/PR/reviewer started.
+
+## Closed shared profile/session byte ceilings — 2026-10-02 UTC
+
+Saved batch profile accepts existing typed resource_limits, with exact profile
+bytes snapshot-bound. Capture/preparation enforce shared total-input run request
+against the existing session/profile/default resolver; execution enforces the
+shared output request before processing inputs. Existing per-input policy limits
+remain independent. No defaults raised, no automatic budget increase/truncation
+and no source-free budget change. Fictional saved-profile success/identity and
+requested-over-ceiling failures plus capture/output controls13passed0.69s;
+isolated subprocess session override/rejection scenarios4passed1.30s. Ruff and
+mypy2modules passed. Full changed batch suite68passed5.05s, including real
+controlling-TTY receipt scenarios. No public
+registration, new reviewer/PR/CI or release. Previous installed wheel predates
+these runtime changes; do not reuse its hash as current candidate evidence.
+Next complete the remaining common input/output route and interface candidate,
+reconcile client/docs evidence, then exact finished-SHA safety/RC reviews and gates.
+
+## Shared output-budget diagnostic correction — 2026-10-02 UTC
+
+Audit found an inner CSV output_run failure during later batch input reported
+only that input's remaining byte slice, rather than the shared run amount/limit.
+Closed batch now translates only output_run exhaustion to batch_output_run,
+adding bytes already emitted and retaining the original shared run ceiling.
+Session/profile ceiling errors are re-raised unchanged; no limit increase,
+truncation, safety bypass or public activation. Three fictional boundary cases
+exercise first-input exhaustion, second-input exhaustion and exact prior-input
+boundary; with existing manifest-budget control4passed0.34s. Ruff and strict
+mypy1module passed. Previous installed wheel remains valid historical evidence
+but does not contain this correction; no unchanged installed suite repeated.
+Next continue saved profile/session shared limit plumbing and closed common
+route/interface candidate, then complete client/docs reconciliation and final
+exact-SHA safety/RC gates. No new PR/reviewer/CI or release started.
+
+## Saved linked-profile null/schema checkpoint — 2026-10-02 UTC
+
+Added four fictional saved-profile scenarios using linked parent/child keys and
+independent nullable string fields. Inline and CSV mappings distinguish empty
+string from explicit input null, serialize output null with its declared marker,
+and retain typed None through batch final validation. Non-nullable final specs
+reject the same results before bundle publication despite all optional report
+validation flags being false. Installed unchanged development wheel tests
+4passed0.50s; Ruff and Python3.11 compilation passed. Corrected a new test's
+Python3.12-only f-string syntax before completion. No runtime/dependency or
+safety-policy change; no nullable composite-key or temporal-equality inference.
+Updated relationship-validation-evidence with current closed installed coverage,
+retaining its earlier main audit as historical rather than contradictory status.
+PR601 remains MERGED; no duplicate review/CI/PR launched. Next complete common
+route/profile-limit/interface candidate and remaining client/docs reconciliation;
+public batch activation and final exact-SHA reviews remain pending.
+
+## Installed closed batch acceptance — 2026-10-02 UTC
+
+Built the current dirty candidate locally with the existing locked Python3.14
+build backend, without dependency resolution, version change or publication.
+Installed wheel with --no-deps into a fresh target; confirmed transformation_batch
+imports from that target, not src. Installed-wheel batch suite55passed3.59s,
+including saved-profile capture, common real controlling-TTY confirmation,
+direct/fallback preservation, exact review/snapshot binding, scalar/composite
+links, budgets, temporary atomic bundle and cleanup. No product monkeypatch,
+real database or external provider used. Wheel remains development version1.5.0,
+NOT an RC or final reviewed artifact. SHA256:
+075c5225f4fe22a0d470b0c8960e7f02d3806a795df4a5b7929b6acbcde9921d.
+Wheel /private/tmp/apa-batch-wheel.zB0bXS/agent_paranoid_android-1.5.0-py3-none-any.whl;
+isolated target /private/tmp/apa-batch-installed.wRLSgG. Initial unqualified
+no-isolation build lacked hatchling in its selected environment; selecting the
+existing locked runtime fixed it without installing or changing dependencies.
+No public batch entry registered; no new review/PR/tag/release started.
+Next reconcile common-workflow route/null/limit scope and client/documentation
+evidence into the complete candidate before final exact-SHA safety/RC reviews.
+
+## Closed common preservation end-to-end milestone — 2026-10-02 UTC
+
+Kept the public single-input signature/individual receipt contract unchanged;
+factored its existing engine into an internal implementation accepting only a
+common batch/receipt scope. At preservation use, revalidates exact common receipt
+and canonical input membership; no approval boolean, per-input receipt minting
+or eligibility/privacy/whole-row-copy bypass. Closed batch admits direct/fallback
+preserve only through that scope; any supplied common receipt is also verified
+before batch execution. Full common TTY review explicitly indicates closed
+preservation support, public execution remains unsupported/unregistered.
+Fictional saved parent/child profiles with repeated non-sensitive label cover
+real TTY, direct preserve, preserve fallback, absent receipt, stale/reordered
+snapshot/review, detached stdin, mode errors and public single-input rejection
+of common receipt. Milestone batch plus focused unchanged-contract public receipt
+and DECIMAL-preserve safety regressions67passed4.08s. Bundle now reuses existing
+transformed_mixed/not-anonymized label and aggregate executed-action provenance,
+charged to the same output budget; changed positive TTY/provenance controls
+3passed1.33s. Mypy3modules/Ruff/diff-check passed. Policy checkpoint reconciled.
+This is private fictional temporary acceptance, NOT independent safety review,
+public activation, client-data approval, installed RC or completed full scope.
+Next materialize installed isolated common-workflow acceptance, remaining null/
+route/limit and client/docs reconciliation, then one finished candidate exact-SHA
+reviews/gates/PR/release. No intermediate reviewer/PR/CI task launched.
+
+## Closed ordered composite relationship scenario — 2026-10-02 UTC
+
+Reused existing DatasetSpec component declarations plus shared ordered mapping
+domains instead of adding a second/public relationship model. Complete domain
+components and consistent relationship cardinality required at preflight. Final
+private rows are checked as whole non-null tuples: parent uniqueness, FK tuple
+membership and one-to-one child uniqueness, with explicit budget checks. Scalar
+relations still use the existing validator; optional reporting cannot disable
+either check. Saved-profile atomic scenarios cover valid many-to-one, cross-tuple
+orphan whose components individually exist, incomplete declaration, duplicate
+parent, valid one-to-one and duplicate one-to-one child:6passed0.44s. Initial
+mypy shadowed-local errors fixed without semantic changes; mypy/Ruff/diff-check
+passed. Common review explicitly labels ordered_tuple semantics and exact review
+receipt binding remains in effect; changed real-TTY/detached controls2passed0.78s.
+Null composite semantics remain closed and
+unclaimed, not a new public null contract. Next finish common preserve authority
+in isolation and remaining full client/docs/RC scope before exact-SHA reviews;
+no new PR/reviewer/CI or public activation.
+
+## Exact common review bytes in receipt — 2026-10-02 UTC
+
+Closed batch receipt version2 now binds review_sha256 of the exact TTY-displayed
+common plan as well as snapshot_sha256. This prevents accepting an older
+count-only/unbound review envelope when its input snapshot still matches.
+Individual/public receipt format unchanged; no preservation authority granted.
+Real saved-profile TTY scenario now checks valid exact review, altered review
+hash rejection, original restoration for remaining stale/mode/atomic controls,
+and detached stdin rejection:2passed0.87s. Dedicated correct-snapshot legacy
+envelope/wrong-review controls2passed0.28s. Valid receipt still fits existing
+256-byte read bound. Mypy/Ruff/diff-check passed. PR601 remains merged; no new
+PR/reviewer/CI launched. Next integrate verified common receipt authority without
+minting individual receipts in the isolated preserve scenario, finish approved
+composite relations, and reconcile complete RC scope before exact-SHA reviews.
+
+## Complete bounded common plan at TTY — 2026-10-02 UTC
+
+Common review now includes all existing canonical per-input field plans and
+input identities plus parent/child relationships by input ordinal/field, rather
+than only counts. Reuses source-free canonical review metadata/actions/sensitivity
+comments; no source cells, mapping entries or private domain names. Complete
+payload must fit one review budget even if each plan individually fits; no
+truncation. Updated valid/stale/small controls3passed0.30s; new combined-budget
+control1passed0.29s. Changed saved-profile real-TTY -> confirmation -> validated
+temporary bundle plus detached-stdin rejection2passed0.80s outside sandbox.
+Mypy/Ruff/diff-check passed. Schema entity/field metadata is intentionally visible
+as in existing local reviews; earlier count-only transcript evidence is historical.
+Receipt still grants no preservation/public execution authority. PR601 remains
+merged, no new PR/reviewer/CI started. Next finish common authority through
+verified receipt reuse without minting per-input receipts, then approved
+composite relations and full RC scope/docs/client reconciliation before reviews.
+
+## Bound synthesis fallback and final linked-key checks — 2026-10-02 UTC
+
+Closed batch now reuses existing bound-spec synthesis fallback without adding an
+artificial independent-only restriction. Saved common-profile independent
+unmatched-field scenario covers deterministic source-free replay, one-to-one
+counts, stale generation bytes, negative-mode and missing-file rejection:
+1passed0.41s. Fictional linked-key scenarios exercise fallback during actual
+parent/child output: matching synthetic keys accepted, mismatched orphan keys
+rejected before any result is returned despite optional validation flags being
+off:2passed0.33s. Preserve/direct or fallback still fail closed; no receipt
+authority shortcut, derive activation, new budget or public registration added.
+Mypy/Ruff/diff-check passed; policy checkpoint updated. Next finish common
+preservation plan review/authority and composite relationship support in the
+isolated candidate, then full client/docs reconciliation and final exact-SHA
+reviews/gates. No new PR or overlapping review/CI task launched.
+
+## Saved linked batch with independent synthesis — 2026-10-02 UTC
+
+Closed profile now captures explicitly referenced generation_policies through
+the same bounded no-follow snapshot reader. Closed batch admits independent
+direct SynthesizeAction and delegates to the existing source-free engine;
+linked FK fields still require shared domain bindings, no synthesis fallback,
+preserve authority or derive/public registration added. Exact generation bytes
+are bound through canonical inputs and common identity. Fictional saved-profile
+linked parent/child -> synthetic label -> validated atomic temporary bundle
+scenario passed, including deterministic replay, input row counts overriding
+999 requested rows, stale exact generation bytes, negative-mode rejection and
+missing generation-file rejection:1passed0.38s. Mypy2modules/Ruff/diff-check
+passed. Policy checkpoint reconciled. No new PR/reviewer/CI started; PR601 remains
+merged. Next complete common preservation review/authority and approved full
+relationship shapes in isolation, then unified scope/docs/client acceptance and
+final exact-SHA reviews/gates/release; RC readiness remains unclaimed.
+
+## Saved linked batch with inline/CSV/literal fields — 2026-10-02 UTC
+
+Closed batch now reuses the existing substitution/text engine for independent
+fields while linked relationship fields still require shared domain/component
+bindings. Reject fallback remains mandatory; direct/fallback preservation,
+synthesis/derive and public execution are not activated. Fictional saved-profile
+parent/child atomic scenarios cover shared linked keys plus independent inline,
+local CSV and literal replace_text (2026-08-31 stays literal text).
+These scenarios found a domain-conflict bug: comparing every mapping file made
+unrelated per-field maps appear to conflict with a shared inline domain. Fixed
+comparison to that domain's concrete definition/referenced CSV bytes only.
+Changed scenarios plus existing real domain conflict:4passed0.40s. Dedicated
+shared-CSV equal/conflicting-byte controls plus preservation rejection:
+4passed0.34s. Mypy/Ruff/diff-check passed. PR601 remains merged, no new PR/review
+or overlapping task started. Next complete approved synthesis and common
+preservation authority/full relationship shapes in the isolated candidate;
+whole RC documentation/contracts/acceptance and exact-SHA reviews remain open.
+
+## Saved common-profile closed end-to-end scenario — 2026-10-02 UTC
+
+Added private typed transformation_batch_profile using the existing restricted
+YAML parser, cumulative byte-limit and no-follow regular-file snapshot reader.
+Profile holds ordered local source/policy/mapping references plus validation path,
+not embedded rows. Exact profile bytes are now charged and bound in the batch
+identity, including revalidation during review/execution. No public registration.
+Fictional saved-profile valid/whitespace/traversal/symlink/unknown/budget controls:
+6passed0.42s. The real controlling-TTY test now loads the saved profile in a fresh
+subprocess, confirms common identity, verifies receipt and atomically reads both
+validated temporary outputs; detached stdin remains rejected:2passed0.83s outside
+sandbox. Duplicate/malformed YAML and other identity-affected batch controls:
+25passed0.74s. This is scoped acceptance, not a combined full-suite claim.
+Mypy2modules passed; Ruff/diff-check passed. Policy checkpoint updated to match
+closed receipt/profile capability. No monkeypatch, database or external API used.
+Next integrate the remaining approved action/relationship shapes and common
+preservation authority into the isolated candidate, then reconcile complete
+client/documentation scope before exact-SHA reviews/public activation/RC gates.
+
+## Ordered batch identity and confirmed temporary bundle — 2026-10-02 UTC
+
+Found and fixed an identity bug in the closed candidate: inputs were sorted for
+the digest although publication filenames use request indices. Common snapshot
+now binds input order; reordered requests require a different digest and cannot
+reuse the original confirmation receipt. Changed original/reordered atomic
+bundle controls2passed0.30s. Extended genuine controlling-TTY scenario verifies
+receipt, rejects reordered/stale material and permissive receipt mode, then reads
+both validated temporary CSV artifacts and bound manifest;1passed0.57s outside
+the sandbox. Temporary bundle is removed on exit. Ruff/diff-check passed.
+PR601 remains merged; no new PR/reviewer/process started. This is an in-memory
+closed candidate, not a saved common-profile/public batch acceptance. Next finish
+durable common profile loading through existing bounded filesystem primitives,
+then the unified saved-profile scenario; preservation remains unsupported here.
+
+## Common confirmation real-TTY acceptance — 2026-10-02 UTC
+
+New subprocess controls use fictional parent/child snapshots and the real receipt
+issuer, without product monkeypatches. Detached stdin containing APPROVE cannot
+create a receipt:1passed. Real controlling-TTY issuance, owner-only receipt,
+verification, stale validation bytes and permissive-mode rejection:1passed0.54s
+outside the sandbox; the initial sandbox run rejected /dev/tty access as expected.
+Ruff passed. No source/entity names in the TTY transcript. This receipt still
+confirms only the closed common snapshot, not preservation authority or public
+batch execution. Next finish a single saved common-profile -> review -> receipt
+-> atomic validated bundle scenario; no final RC readiness or review claimed.
+
+## Closed common confirmation receipt candidate — 2026-10-02 UTC
+
+Added private transformation_batch_receipt using the existing controlling-TTY
+confirmation and owner-only regular-file primitives, not a new boolean or caller-FD
+authority. Strict kind=transformation_batch envelope binds common snapshot and is
+incompatible with individual receipt format. Current common review explicitly
+states preservation unsupported; receipt does not grant per-input preservation.
+Wrong scope/digest/version and oversized-file controls5passed0.31s; mypy/Ruff/
+diff-check passed. No genuine positive TTY issuance or detached issuance acceptance
+claimed yet; no public registration, batch preserve wiring or retained publication.
+Next isolated real-TTY issuance/verification plus detached/stale/mode negatives,
+then finish one common-profile/review/execute/bundle scenario before activation.
+
+## Cross-input domain type compatibility — 2026-10-02 UTC
+
+Closed batch now checks each shared domain/component's bound source type and
+explicit decimal/temporal declaration across inputs, not only concrete mapping
+bytes. Implements existing policy-contract compatible-domain requirement; no
+implicit key coercion or DATETIME equivalence introduced. Added fictional
+decimal-shape mismatch whose individual reviews are valid but combined execution
+rejects before returning outputs. Changed valid/mismatch controls2passed0.30s;
+mypy/Ruff/diff-check passed. Other successful acceptance unchanged/not rerun.
+Next complete common operator receipt and full atomic batch scenario; candidate
+still private/unregistered and full RC readiness remains unclaimed.
+
+## Batch time-budget exception contract — 2026-10-02 UTC
+
+Batch preparation now checks the shared explicit time budget before canonical
+sub-work; preparation/execution/review preserve GenerationLimitError rather than
+wrapping it as generic batch input failure. Tightened the explicit-clock expired
+test to require that specific type:1passed; mypy/Ruff/diff-check passed. Existing
+inner single-input paths are not claimed fully audited for late timeout typing.
+No budgets increased or public behavior activated. Next finish common batch-bound
+operator receipt/atomic scenario, with timeout/cleanup controls on changed scope;
+full RC remains unfinished, no repeat of unchanged scale/route acceptance.
+
+## Common closed batch review — 2026-10-02 UTC
+
+Added bounded value-free review_batch: revalidates all canonical inputs and exact
+validation declaration, rejects stale stored identity, emits only shared digest,
+input/relationship counts and explicit review_only/not-approved/not-public flags.
+No entity/domain names, cells, receipt minting or preservation permission returned.
+New valid/stale/undersized-review controls3passed0.27s; mypy/Ruff/diff-check passed.
+Unchanged successful execution/scale checks not rerun. Next complete batch-bound
+local operator receipt and common profile/atomic bundle integration, keeping
+public registration disabled until finished exact-SHA safety/RC gates.
+
+## Batch string preservation branch controls — 2026-10-02 UTC
+
+Added2fictional controls that successfully prepare canonical multi-input review
+material and then reject direct string preserve or unmatched-preserve at the
+closed batch execution boundary, detached fixed errors and no returned output.
+Initial direct-preserve fixture had unused domain/all-preserved row and failed
+earlier preflight; corrected to mixed preserved/mapped fields and removed unused
+domain. Both corrected branches individually passed; Ruff/diff-check passed.
+No receipt bypass or preservation activation added. Next complete common batch
+review/receipt plus isolated retained-bundle scenario; full RC tasks still open.
+
+## Batch-origin regression completed — 2026-10-02 UTC
+
+Added dimension-guarded diagnostic regressions for all3new fixed batch origins:
+amount/threshold/bytes, exact supported private recovery command, no truncation
+or automatic increase, mismatched dimension rejects. Because the shared typed
+diagnostic constructor changed, ran the relevant input-limit module, not full
+gates:27passed2.53s; Ruff/diff-check passed. Other successful acceptance and scale
+checks unchanged/not repeated. Next string preservation/fallback branch controls,
+then batch-bound common review/receipt and retained atomic bundle integration.
+No new public entrances, review dispatch, commit/tag or release claim.
+
+## Batch budget diagnostics and cleanup controls — 2026-10-02 UTC
+
+New focused controls prove cleanup after caller failure, explicit clock-budget
+expiry, validation bytes counted toward combined input budget and manifest counted
+toward output budget. No product monkeypatch; expiry uses supported injected clock.
+First2controls passed; remaining2found batch-origin strings missing from typed
+diagnostic allowlist. Added fixed batch_input_run/batch_output_run/batch_bundle_run
+with dimension guards and actual supported private recovery commands. Corrected
+remaining2passed0.26s; mypy2modules/Ruff passed. No limits increased, no public
+registration or receipt authority changed. Next add origin guard regression and
+string preservation/fallback rejection at batch execution, then complete common
+review/receipt and retained atomic bundle scenario. Full scope remains unfinished.
+
+## Closed batch scenario with temporary atomic publication — 2026-10-02 UTC
+
+Completed private fictional parent/child substitution -> final validation ->
+one atomic temporary bundle -> readback -> cleanup scenario. Adapter has no
+caller-controlled/retained destination; both CSVs and bounded value-free manifest
+are published together only after final checks. Added per-row budget checkpoints
+and preserved typed input/output limit failures. Mypy found missing annotations
+and nullable conversion; corrected, now1module clean. Changed engine5focused
+checks passed0.33s; publication/preservation controls2passed after resolving
+macOS temporary-path symlinks. Preservation fixture rejected by existing stricter
+numeric preflight, not evidence of exercised batch preservation branch. No public
+registration, combined operator receipt or installed batch package claim.
+Ruff/diff-check passed. Next complete branch-specific negative/timeout/cleanup
+controls and batch-bound review/receipt before retained publication/activation;
+do not mark full multi-input RC scope complete from temporary substitution alone.
+
+## Closed multi-input parent/child candidate — 2026-10-02 UTC
+
+Added private io/transformation_batch.py and fictional focused tests. Batch
+identity binds canonical per-input snapshots and exact DatasetSpec1.1 validation
+bytes; total input/output bounds apply across the batch. Explicit shared-domain
+substitution only: reject other actions/fallbacks and conflicting concrete
+domains, require linked fields' domain/components to agree. Existing canonical
+single-input engine enforces cell safety. Final schema/relationship/constraint
+validators run regardless of optional reporting flags before any result returns.
+No public registration, receipt minting/reuse, preservation or publication.
+Five focused cases passed0.32s (valid deterministic replay, conflict, stale
+validation bytes, output budget and invalid parent/child); improved orphan case
+uses unique parents with genuinely missing child reference, focused1passed.
+Initial fixture lacked identifier flag on declared primary key; corrected fixture
+only, no product monkeypatch. Ruff/diff-check passed. Runtime candidate uses
+source tree, not the previously installed wheel; installed acceptance pending.
+This is not completed multi-input/public RC scope. Next add preservation/shape/
+domain-negative tests, explicit per-row validation budgets, typed limit errors,
+batch-bound review/receipt and one atomic bundle adapter before activation/review.
+
+## Cross-input execution boundary traced — 2026-10-02 UTC
+
+Canonical requests intentionally require exactly one source; execution rejects
+another entity's decisions. Recorded why concatenating requests or reusing an
+individual receipt cannot authorize a combined dataset. Shared source-free final
+validation also includes privacy checks incompatible with owner-approved explicit
+mapped values, so future transformation integration must reuse separate typed
+schema/relationship/constraint validators plus existing origin-aware safeguards.
+Relationship evidence now records exact binding and atomic-bundle requirements;
+no bypass/helper execution added. Corrected stale shared-engine module docstring
+after accepted PR601 registration, preserving private derive distinction.
+Next implement a closed multi-input bound candidate, not per-entity publication;
+cross-input task remains open. Docstring-only product change needs no runtime
+test repeat; diff-check remains the relevant check for this checkpoint.
+
+## Installed linked-tuple public CLI acceptance — 2026-10-02 UTC
+
+Added linked-domain-acceptance.py: saved composite domain with explicit ordered
+components, duplicate input keys, consistent tuple replacements, public CLI
+review/execute and CSV readback. Missing tuple rejects without publication;
+source/policy bytes unchanged. Installed wheel30a609b8/Python3.14.2:2passed1.23s,
+Ruff passed. Initial scalar-domain fixture incorrectly bound two fields to one
+component and was rejected at review; corrected fixture to supported composite
+components, no product guards patched. This proves only one-input linked tuples,
+not cross-input foreign-key validation. Full linked-key task remains pending.
+Next implement the approved cross-input execution boundary using explicit bound
+inputs/domains; retain unsupported-shape rejection until completed and reviewed.
+
+## Relationship/final-validation evidence audit — 2026-10-02 UTC
+
+Added relationship-validation-evidence.md with precise test anchors: composite
+domains bind typed ordered components across entities at approval; execution
+tests cover whole tuples inside one input; bound synthesis tests enforce final
+schema/uniqueness despite disabled reporting flags. These are not evidence of
+cross-input parent/child execution. Policy-contract explicitly keeps relationship
+execution/full composite-key validation pending and cross-input unsupported.
+Left linked-key, every-relationship and broad edge-case tasks unchecked; no
+formula rounding counted as SQL aggregate evidence. No runtime changes, tests
+rerun, new review or publication. Next trace approved relationship declarations
+and their executable boundary, then finish candidate scope rather than marking
+single-input/domain preflight as full referential-integrity acceptance.
+
+## Fictional financial aggregate workflow — 2026-10-02 UTC
+
+Added finance-workflow-acceptance.py: authorized single-table SUM/GROUP BY,
+bounded injected fictional driver stream, exact saved source/policy fingerprint,
+registered CLI review, real controlling-TTY approval and registered CLI execution.
+Readback verifies ordered product/segment/bank combinations preserved, mapped
+bucket identifiers and exact DECIMAL amounts replaced. Missing receipt rejects
+without publishing; fixed source/policy bytes unchanged and status/TTY transcript
+do not disclose fictional categories. No derive, totals recomputation, product
+monkeypatch, real database or external API.
+Installed candidate wheel30a609b8, Python3.14.2: focused acceptance1passed1.42s;
+Ruff/diff-check passed. Default sandbox TTY runs failed with sanitized approval
+error; identical isolated test with controlling-TTY permission passed. Harness
+SHA256ceed1b3b273f2c7bd8d655dea3b7bf82ccd68aeac0b32f2b1e4716954f0dea4c.
+This is installed fictional acceptance, not current RC publication or live SQL
+execution. Next finish remaining relationship/validation and capacity evidence,
+complete affected docs and consolidate one candidate PR before exact RC gates.
+
+## Remaining implementation evidence reconciliation — 2026-10-02 UTC
+
+Closed only existing implemented resource settings/typed-error/boundary checkpoint,
+inline/CSV mapping, bounded exact-text transformation, scoped typed substitution,
+saved-policy executable parity and action-based three-origin report tasks.
+Consumed accepted full-suite/SDK and installed milestone evidence, inspected
+test anchors for one-pass column precedence/value-free trace, strict model/domain
+round trips, nullable mapping, composite tuples and synthesis-origin guards.
+No successful tests or accepted300000x50 workloads were repeated. Task notes retain
+resource limits, supported-type exclusions and scale/public artifact distinctions.
+Historical pre-activation prose now explicitly dated as a superseded checkpoint.
+Finance aggregate fixture, final relationship/validation coverage, complete docs
+audit, full capacity audit and exact-RC gates remain unchecked; did not substitute
+the older private derive finance test for owner-approved aggregate-result scope.
+Next implement the missing fictional finance aggregate scenario using existing
+bounded interfaces/TTY authority, then finish remaining evidence/docs and one
+coherent candidate PR. No runtime safety change, review, tag/version/publication.
+
+## Adapter/task and current documentation reconciliation — 2026-10-02 UTC
+
+Configuration names registered CLI/MCP run limits rather than unregistered helpers;
+implementation map separates deterministic execution/output ownership, private
+derive/capture and registered entrances. ADR-0013 retains its historical checkpoint
+with dated implementation update. Changed-doc strict MkDocs passed0.36s, diff-check
+passed; no full tests/gates rerun or native timestamp expansion.
+Closed supported input/output and12-route tasks using existing installed typed/
+public acceptance plus36 refusal cases, with scale/SDK/crash limitations explicit.
+Accepted-main client register already includes reviewed finding1 remedy; did not
+overwrite it with older dirty-workflow wording. Historical checkpoints retained.
+Next remaining schema/limits/client/report/wizard evidence and affected docs,
+then coherent signed candidate PR and final RC gates. No version/tag/publication.
+
+## Native temporal boundary and CLI documentation reconciliation — 2026-10-02 UTC
+
+Focused strict MkDocs build passed after updating the safety-model link to the
+renamed execution section. First chosen locked Python environment lacked MkDocs;
+used existing primary documentation environment without installing anything.
+Initial strict build found the stale anchor, corrected link and inactive wording;
+final build0.38s passed, diff-check passed. No full gate rerun.
+
+Existing policy-contract explicitly excludes native timestamps/date text matching;
+the observed rejection is a documented implementation boundary, not a new owner
+decision or invented release blocker. Keep native timestamp acceptance unclaimed.
+Updated stale CLI reference that still described registered execution as disabled
+after merged #601: candidate registered commands, review versus execution,
+CSV null markers, accepted native type list and separate explicit typed temporal
+output parsing. It describes RC implementation, not a published1.6.0rc1.
+Implementation map native list now includes date32 and explicit timestamp/nested
+rejection. Remaining architecture/private wording requires broader reconciliation;
+no blanket docs audit completion, runtime change, repeated tests or release.
+Next finish documentation/contracts and remaining task evidence, then focused
+strict docs/OpenSpec checks for changed pages and coherent candidate PR.
+
+## Explicit temporal output acceptance — 2026-10-02 UTC
+
+Added installed saved-CSV-mapping → public review/execute temporal scenario:
+literal CSV output unchanged; Parquet/SQL explicit format and Samara→UTC readback.
+CSV/Parquet2 pass initially; corrected harness SQL serializer expectation and
+SQL1 passes focused rerun, no repeated successful scenarios. No runtime patch,
+new matching policy, implicit UTC, receipt, DB/API or scale rerun.
+Ruff/diff-check pass, identities/limitations in route-workflow-acceptance.md.
+Native Arrow timestamp input is currently rejected (confirmed adapter inspection),
+not passed by textual-output acceptance. Do not claim all native temporal inputs
+or implicitly equivalent DATETIME keys. Next reconcile this existing supported
+type boundary with published contracts and remaining RC checklist; finish coherent
+candidate docs/acceptance PR before exact final review/release. No version/tag.
+
+## Installed skill-guided workflows complete — 2026-10-02 UTC
+
+Added durable offline guided-caller acceptance for both installed portable skills:
+documented resource discovery, actual version/help, usage reviewed-spec seeded
+generation/validation/replay, separate transformation saved-policy review/public
+execution/readback, preserve-without-receipt rejection, actual public baseline1.5.0
+unavailable-command stop with no generation substitute. Three cases passed in
+separate focused runs; no claim of combined rerun, external agent benchmark or
+final RC. Read complete packaged skills and followed their separation/authority
+boundaries. Initial whitespace/case assertion corrected; missing old baseline
+restored in isolated no-deps target from published package after cache miss.
+No product monkeypatch, real DB/provider, approval impersonation or scale rerun.
+Ruff/diff-check pass; exact identities/results in skill-workflow-acceptance.md.
+Task added-local-acceptance checkbox closed, final RC gates remain open.
+Next explicit configured DATETIME route, remaining contracts/documentation
+reconciliation, then coherent signed candidate PR and final exact-SHA review.
+
+## Installed public-entry/refusal route acceptance — 2026-10-02 UTC
+
+Extended existing typed route harness with --public. All12 routes pass through
+public CLI transform-execute JSON and registered MCP application function,
+matching full artifact/readback/provenance and unchanged-input evidence.
+36 public CLI refusal cases (stale digest, one-byte budget, existing destination)
+leave no new destination/staging and preserve fictional existing artifact bytes;
+errors omit tested value markers. SDK wire acceptance is separate, not inferred.
+Corrected one harness private-versus-public JSON envelope assertion; no product
+change. Installed wheel still30a609b8; harness b8cf5366a5ec9716066dd83c0fcab1b19f7076b38038ed0da55a1c474f35fb57.
+Ruff/diff-check pass; detailed limitations in route-workflow-acceptance.md.
+DATETIME/key equality not silently broadened; next complete explicit configured
+temporal route and skill-guided offline acceptance, then candidate docs/gates.
+No scale rerun, external access, intermediate review, tag/version/publication.
+
+## Installed typed route acceptance — 2026-10-02 UTC
+
+Working checkout `/private/tmp/apa-amended-activation.RVGKRo` is accepted main
+8670e562 plus bounded acceptance/task documentation changes; original dirty
+workflow checkout remains preserved. Extended existing route harness `--typed`:
+all12 installed fictional CSV/Parquet/PostgreSQL-capture/Trino-capture to
+CSV/Parquet/SQL-file combinations passed for exact DECIMAL, DATE and nullable
+string versus empty string alongside replaced integer/string fields. Full ordered
+readback, fixed review digest/parity, closed interface artifact parity, action
+provenance, unchanged inputs and cleanup verified. No DB/API, product monkeypatch,
+large-scale rerun, version/tag/publication or intermediate AI review.
+Exact installed wheel/harness identities and two corrected harness/environment
+failures recorded in [route evidence](route-workflow-acceptance.md).
+Ruff and diff-check passed. Remaining route acceptance includes DATETIME and
+failure/public-interface coverage; next finish those and skill-guided offline
+workflow before final documentation reconciliation/exact-RC gates.
+
 ## Registration test-double follow-up — 2026-10-02
 
 PR #601 head 4208046 CI run 37034916010 failed minimum-MCP job 110930773667:
@@ -5827,3 +8156,29 @@ Broader transformation remains unfinished.
   Next: reconcile activation/baseline documentation and source-free boundaries,
   complete the amended isolated candidate, then milestone gates and independent
   review of the changed scope on its new exact SHA before public activation.
+
+
+## PR603 container security dependency correction — 2026-10-08
+
+Containers run `37704995872` on exact `3d49587939f6cf7ed076c617481c29d60ca2d8be`
+failed all three AMD64 targets at the unchanged Trivy fixable High/Critical gate.
+The shared Debian 12.15 runtime had PCRE2 `10.42-1+deb12u1`
+(CVE-2026-103111) and Perl `5.36.0-7+deb12u3`
+(CVE-2026-13221, CVE-2026-42496, CVE-2026-8376, CVE-2026-42497,
+CVE-2026-48962, CVE-2026-57432, CVE-2026-57433).
+Official Bookworm security indexes for AMD64 and ARM64 both provide fixed
+PCRE2 `10.42-1+deb12u2` and Perl `5.36.0-7+deb12u4`.
+The shared runtime install now pins both fixed versions and checks them with
+`dpkg --compare-versions`; the Python/uv digests and scanner policy stay intact.
+Perl-base is Debian Essential and is upgraded rather than force-removed.
+Failed logs: `/tmp/apa-containers-37704995872-failed.log`.
+Local image build/Trivy replay is unavailable: Docker CLI is present but no
+Docker daemon is running. Fresh all-target AMD64 scan and ARM64 validation on
+the corrected exact commit remain mandatory before acceptance; earlier source
+security review does not certify the changed image. No production, live DB or
+external AI call was used for this correction.
+
+Focused correction checks: `tests/test_containers.py` 10 passed (0.40s);
+Ruff with cache disabled passed; strict documentation build passed (0.34s);
+`git diff --check` passed. Pytest reported only a sandbox cache-write warning.
+No container image or scanner success is claimed from these source checks.

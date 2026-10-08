@@ -358,3 +358,185 @@ def test_postgres_batching_preserves_order_and_rejects_invalid_tail(tmp_path, in
         parquet = pq.ParquetFile(io.BytesIO(_query_result_payload(source.payload, "postgres_query")))
         assert parquet.metadata.num_row_groups == 3
     assert events == ["close", "rollback", "close"]
+
+
+def test_capture_rejects_query_change_after_metadata_before_stream(tmp_path):
+    from test_data_agent.sql_query_source import inspect_query_source, authorize_query_source
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    plan = authorize_query_source(inspect_query_source(request), kwargs["source_columns"])
+    request.query_file.write_text("SELECT status AS label, COUNT(*) AS measured FROM public.orders "
+        "WHERE status = 'fictional' GROUP BY status")
+
+    def forbidden(query):
+        pytest.fail("changed query must not open result stream")
+
+    with pytest.raises(ValueError, match="invalid bounded query capture") as caught:
+        _capture_authorized_result(request, stream=forbidden,
+            expected_query_sha256=plan.fingerprint, **kwargs)
+    assert caught.value.__context__ is None
+
+
+def test_utc_timestamp_capture_replacement_keeps_microseconds(tmp_path):
+    from datetime import datetime, timezone
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    original = "2024-01-02T03:04:05.123456+00:00"
+    replacement = "2030-02-03T04:05:06.654321+00:00"
+    declaration = kwargs["policy"].model_dump(mode="json")
+    declaration["fields"][0]["behavior"]["mapping"]["entries"] = [
+        {"original": [original], "replacement": [replacement]}]
+    kwargs["policy"] = BehaviorPolicy.model_validate(declaration)
+    kwargs["schema"] = pa.schema([pa.field("label", pa.timestamp("us", tz="UTC"), nullable=False),
+        pa.field("measured", pa.int64(), nullable=False)])
+
+    @contextmanager
+    def stream(query):
+        yield iter([pa.RecordBatch.from_pylist([
+            {"label": datetime(2024, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc), "measured": 2}],
+            schema=kwargs["schema"])])
+
+    source = _capture_authorized_result(request, stream=stream, **kwargs)
+    profile = _profile_transformation_source(source, kwargs["policy"],
+        budget=GenerationBudget(5), max_bytes=16384)
+    policy = kwargs["policy"].model_copy(update={"schema_fingerprint": transformation_schema_fingerprint(profile)})
+    material = prepare_csv_review_request(yaml.safe_dump(policy.model_dump(mode="json")).encode(), source, (),
+        max_total_bytes=32768, max_review_bytes=8192, budget=GenerationBudget(5))
+    with temporary_csv_publication(material, max_total_bytes=32768, max_review_bytes=8192,
+            max_output_bytes=16384, budget=GenerationBudget(5)) as output:
+        assert list(csv.DictReader(io.StringIO((output / "dataset.csv").read_text()))) == [
+            {"label": replacement, "measured": "8"}]
+
+
+def test_timestamp_reuse_guard_compares_instants_without_string_coercion():
+    from datetime import datetime, timezone
+    from test_data_agent.io.transformation_input import same_native_value
+
+    original = datetime(2024, 1, 2, 3, 4, 5, 123456, tzinfo=timezone.utc)
+    assert same_native_value(original, "2024-01-02T04:04:05.123456+01:00")
+    assert not same_native_value(original, "2024-01-02T03:04:05.123456")
+    assert not same_native_value(original, "fictional malformed timestamp")
+
+
+@pytest.mark.parametrize("fault", [None, "scope", "names", "native"])
+def test_closed_trino_driver_capture_obeys_scope_and_native_types(tmp_path, fault):
+    from test_data_agent.io.transformation_trino_stream import _trino_result_stream
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.other" if fault == "scope"
+            else "lake.safe.orders.status"}))
+    cursor = FakeCursor([("alpha", 2.5 if fault == "native" else 2), ("beta", 1)])
+    cursor.description = [("other" if fault == "names" else "label",), ("measured",)]
+    driver = FakeDriver(cursor)
+    stream = partial(_trino_result_stream, config=config, source_id="warehouse",
+        schema=kwargs["schema"], driver=driver)
+    if fault is None:
+        source = _capture_authorized_result(request, stream=stream, **kwargs)
+        assert source.kind == "source"
+    else:
+        with pytest.raises(ValueError, match="invalid bounded query capture"):
+            _capture_authorized_result(request, stream=stream, **kwargs)
+    if fault == "scope":
+        assert driver.dbapi.connect_kwargs is None
+    else:
+        assert cursor.closed and driver.dbapi.connection.closed
+
+
+@pytest.mark.parametrize("fault", [None, "source", "scope", "names"])
+def test_trino_capture_metadata_is_allowlisted_and_contains_no_rows(tmp_path, fault):
+    from test_data_agent.io.transformation_trino_stream import _discover_trino_capture_metadata
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    request, _ = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.status"}))
+    if fault == "scope":
+        config = replace(config, allowed_catalogs=frozenset({"other"}))
+
+    class Cursor(FakeCursor):
+        def execute(self, sql, parameters):
+            self.row_offset = 0
+            if "information_schema.columns" in sql:
+                self.rows = [("status", "varchar", "NO")]
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+            else:
+                assert sql.endswith("WHERE FALSE")
+                self.rows = []
+                self.description = [("other" if fault == "names" else "label", "varchar"),
+                    ("measured", "bigint")]
+
+    cursor = Cursor([])
+    driver = FakeDriver(cursor)
+    if fault is None:
+        columns, metadata, plan = _discover_trino_capture_metadata(request,
+            config=config, source_id="warehouse", driver=driver)
+        assert columns[0].name == "status"
+        assert tuple(item.name for item in metadata) == plan.output_fields
+    else:
+        with pytest.raises(ValueError, match="invalid Trino capture metadata"):
+            _discover_trino_capture_metadata(request, config=config,
+                source_id="other" if fault == "source" else "warehouse", driver=driver)
+    if fault in {"source", "scope"}:
+        assert driver.dbapi.connect_kwargs is None
+    else:
+        assert cursor.closed and driver.dbapi.connection.closed
+
+
+@pytest.mark.parametrize("kind", ["array(varchar)", "decimal(39,2)", "decimal(8,9)",
+    "timestamp(9) with time zone", "varchar(999)", "varbinary"])
+def test_trino_capture_schema_rejects_unsupported_declarations(kind):
+    from test_data_agent.io.transformation_trino_stream import _trino_capture_schema
+    from test_data_agent.sql_query_profiling import QueryResultColumn
+
+    with pytest.raises(ValueError, match="unsupported Trino capture schema") as error:
+        _trino_capture_schema((QueryResultColumn("fictional", kind),))
+    assert error.value.__cause__ is None
+    assert kind not in str(error.value)
+
+
+def test_trino_capture_schema_retains_exact_decimal_and_integer_width():
+    from test_data_agent.io.transformation_trino_stream import _trino_capture_schema
+    from test_data_agent.sql_query_profiling import QueryResultColumn
+
+    schema = _trino_capture_schema((QueryResultColumn("amount", "decimal(38,6)", False),
+        QueryResultColumn("count", "tinyint", True)))
+    assert schema == pa.schema([pa.field("amount", pa.decimal128(38, 6), nullable=False),
+        pa.field("count", pa.int8(), nullable=True)])
+
+
+@pytest.mark.parametrize("statements", [2, 3])
+def test_composed_trino_capture_keeps_one_statement_budget(tmp_path, monkeypatch, statements):
+    from test_data_agent.io.transformation_trino_stream import _capture_trino_result
+    from tests.test_trino_client import FakeCursor, FakeDriver, client_config
+
+    monkeypatch.setenv("TRINO_MAX_INVOCATION_STATEMENTS", str(statements))
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.TRINO)
+    config = replace(client_config(max_result_rows=4), allowed_catalogs=frozenset({"lake"}),
+        allowed_schemas=frozenset({"safe"}),
+        allowed_table_columns=frozenset({"lake.safe.orders.*"}))
+
+    class Cursor(FakeCursor):
+        def execute(self, sql, parameters):
+            self.row_offset = 0
+            if "information_schema.columns" in sql:
+                self.rows = [("status", "varchar", "NO")]
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+            else:
+                self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha", 2), ("beta", 1)]
+                self.description = [("label", "varchar"), ("measured", "bigint")]
+
+    cursor = Cursor([])
+    driver = FakeDriver(cursor)
+    arguments = dict(config=config, source_id="warehouse", policy=kwargs["policy"],
+        max_rows=3, max_bytes=16384, budget=GenerationBudget(5), driver=driver)
+    if statements == 3:
+        source = _capture_trino_result(request, **arguments)
+        assert source.payload
+    else:
+        with pytest.raises(ValueError):
+            _capture_trino_result(request, **arguments)
+    assert cursor.closed and driver.dbapi.connection.closed

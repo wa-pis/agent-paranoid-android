@@ -21,9 +21,11 @@ from test_data_agent.agent import build_agent_advisor_exchange
 from test_data_agent.io import load_dataset_spec
 from test_data_agent.mcp_generator_server import (
     generate_dataset,
-    mcp as generator_mcp,
+    generator_mcp_services,
     plan_trino_dataset,
 )
+from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+from test_data_agent.mcp_generator_transport import create_generator_mcp
 from test_data_agent.mcp_trino_server import trino_mcp_tools
 from test_data_agent.mcp_trino_transport import create_trino_mcp
 
@@ -116,7 +118,18 @@ def build_contract_fixtures(workspace_root: Path) -> dict[str, Any]:
             }
             with patch.dict(os.environ, {"TRINO_ENABLE_SAFE_SELECT": "false"}):
                 trino_mcp = create_trino_mcp(trino_mcp_tools())
-            generator_tools = _mcp_tool_contract(generator_mcp)
+            sessions = _ConfiguredQuerySessions(
+                workspace_root, max_active=1,
+                max_cumulative_bytes=64 * 1024 * 1024, max_seconds=300,
+            )
+            try:
+                generator_mcp = create_generator_mcp(
+                    generator_mcp_services(workspace=workspace_root, query_sessions=sessions),
+                    strict_arguments=True,
+                )
+                generator_tools = _mcp_tool_contract(generator_mcp)
+            finally:
+                sessions.close()
             trino_tools = _mcp_tool_contract(trino_mcp)
             boundary_compatibility = _boundary_compatibility_contract(
                 workspace_root,

@@ -13,9 +13,13 @@ from test_data_agent.core.distribution import DecimalRangeDistribution, FieldDis
 def _normalize_distribution(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError("distribution must be an object")
+    if not value:
+        return {}
+    if not isinstance(value.get("kind"), str):
+        raise ValueError("distribution must declare a supported kind")
     distribution = parse_distribution(value)
     if distribution is None:
-        return value
+        raise ValueError("distribution must declare a supported kind")
     return distribution.model_dump(mode="json")
 
 

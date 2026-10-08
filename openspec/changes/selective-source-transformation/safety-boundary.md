@@ -6,7 +6,15 @@ below do not reinstate it. See [ADR-0026](../../../docs/adr/0026-transformation-
 All preservation, classification, exact-input approval, privacy and activation
 gates remain in force; see [ADR-0021](../../../docs/adr/0021-local-preservation-approval.md).
 
-This document proposes a scoped amendment, not an active exception to AGENTS.md.
+Historical stage note: the development/activation clarification was independently
+reviewed in PR576 at0e7dee5. PR601 subsequently registered the reviewed
+single-source CLI/MCP consumers. The common saved-profile CLI/MCP composition
+remains prospective and requires its own exact-source review; the remaining
+pre-activation descriptions below are historical where they describe the
+already registered single-source route. No earlier report certifies current
+common activation or the final release SHA.
+
+This document defines a scoped amendment, not dataset execution permission.
 Do not enable source-preserving execution until this boundary, matching baseline
 specifications and executable safety checks have received independent review.
 
@@ -255,3 +263,18 @@ successful validation does not prove anonymity.
 
 The existing helper tests cover only parts of these requirements. No task above
 is considered passed merely because isolated parsers or loaders passed review.
+
+
+## Prospective Configured SQL Session Contract — 2026-10-08
+
+The prospective 1.6 RC composition registers `transform-batch query-execute`
+and runtime `configured_query_session` consumers. This records their scoped
+contract; it is not final source review, publication clearance or dataset
+authorization. Administrator-configured allowlisted read-only access precedes
+a single owned capture. Review, local receipt issuance, validation and retained
+publication bind the same frozen source/policy/mapping bytes, never a reconnect.
+MCP may return only the narrow local approval descriptor (owned root, fixed
+profile/receipt names, digest and limits), not rows or query/configuration values.
+Only the existing controlling-TTY CLI issues receipts. Session admission, finite
+expiry and all-session shutdown cleanup are server-owned; failed cleanup
+refuses further work. Ordinary source-free generation remains unchanged.

@@ -299,7 +299,7 @@ def _postgres_type_name(connection: Any, item: Any) -> str:
             type_code = None
     name = getattr(type_code, "name", None)
     if isinstance(name, str) and name:
-        return _POSTGRES_TYPE_ALIASES.get(name, name)
+        return _declared_description_type(name, item)
     try:
         type_info = connection.adapters.types.get(type_code)
     except (AttributeError, KeyError, TypeError):
@@ -307,7 +307,21 @@ def _postgres_type_name(connection: Any, item: Any) -> str:
     name = getattr(type_info, "name", None)
     if not isinstance(name, str) or not name:
         raise PostgresQueryError("PostgreSQL schema metadata is invalid")
-    return _POSTGRES_TYPE_ALIASES.get(name, name)
+    return _declared_description_type(name, item)
+
+
+def _declared_description_type(name: str, item: Any) -> str:
+    normalized = _POSTGRES_TYPE_ALIASES.get(name, name)
+    if normalized != "numeric":
+        return normalized
+    precision = getattr(item, "precision", None)
+    scale = getattr(item, "scale", None)
+    if precision is None and scale is None:
+        return normalized
+    if (type(precision) is not int or type(scale) is not int
+            or not 1 <= precision <= 1000 or not 0 <= scale <= precision):
+        raise PostgresQueryError("PostgreSQL decimal metadata is unsupported")
+    return f"numeric({precision},{scale})"
 
 
 def _description_nullable(item: Any) -> bool:

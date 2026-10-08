@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import socket
 import ssl
 
@@ -13,7 +13,11 @@ from test_data_agent.postgres_client import (
     PostgresConnectionError,
     PostgresQueryError,
 )
-from test_data_agent.postgres_config import PostgresConfig, PostgresProfileLimits
+from test_data_agent.postgres_config import (
+    PostgresConfig,
+    PostgresConfigurationError,
+    PostgresProfileLimits,
+)
 from test_data_agent.postgres_query_builders import PostgresQuery
 
 
@@ -131,7 +135,7 @@ def test_session_forces_read_only_timeouts_and_resolves_password_late() -> None:
         "port": 5432,
         "dbname": "analytics",
         "user": "profiler",
-        "sslmode": "require",
+        "sslmode": "verify-full",
         "connect_timeout": 4,
         "options": (
             "-c default_transaction_read_only=on "
@@ -370,3 +374,43 @@ def test_raw_sql_is_rejected_before_cursor_execution() -> None:
             session.fetch_aggregate_dicts("SELECT arbitrary_sql")  # type: ignore[arg-type]
 
     assert cursor.executions == []
+
+
+@pytest.mark.parametrize("mode", ["require", "verify-ca", "disable"])
+def test_weak_tls_rejected_before_credential_resolution_or_connect(mode: str) -> None:
+    driver = FakeDriver(FakeConnection([]))
+    requested_names: list[str] = []
+
+    def getenv(name: str) -> str | None:
+        requested_names.append(name)
+        return "synthetic-password"
+
+    client = PostgresClient(
+        replace(postgres_config(), sslmode=mode), driver, getenv=getenv
+    )
+    with pytest.raises(PostgresConfigurationError, match="ALLOW_INSECURE"):
+        with client.session():
+            pass
+    assert requested_names == []
+    assert driver.connect_kwargs == {}
+
+
+@pytest.mark.parametrize("precision,scale,expected", [(38, 6, "numeric(38,6)"),
+    (None, None, "numeric"), (8, 9, None), (True, 0, None)])
+def test_no_row_numeric_metadata_retains_only_valid_declared_shape(precision, scale, expected):
+    from types import SimpleNamespace
+
+    cursor = FakeCursor([])
+    cursor.description = [SimpleNamespace(name="amount", type_code=FakeTypeCode("numeric"),
+        precision=precision, scale=scale, null_ok=True)]
+    client = PostgresClient(postgres_config(password_env=None),
+        FakeDriver(FakeConnection([cursor])))
+    with client.session() as session:
+        if expected is None:
+            with pytest.raises(PostgresQueryError):
+                session.describe_no_rows(query("SELECT amount FROM safe_relation WHERE FALSE"))
+        else:
+            result = session.describe_no_rows(query("SELECT amount FROM safe_relation WHERE FALSE"))
+            assert result[0].data_type == expected
+    assert cursor.closed
+    assert cursor.fetch_sizes in ([1], [])

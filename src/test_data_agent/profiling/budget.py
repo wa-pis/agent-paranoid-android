@@ -11,17 +11,24 @@ from pathlib import Path
 
 from test_data_agent.core.limits import (
     DEFAULT_MAX_INPUT_CELLS,
+    DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS,
     DEFAULT_MAX_LOCAL_PROFILE_SAMPLE_ROWS,
     DEFAULT_MAX_LOCAL_PROFILE_SECONDS,
     DEFAULT_MAX_TOTAL_INPUT_BYTES,
     InputLimitError,
+    bounded_input_paths,
+    bounded_directory_paths,
     enforce_input_cell_count,
     enforce_input_files,
     max_input_cells,
+    max_business_rule_evaluations,
     max_local_profile_sample_rows,
     max_local_profile_seconds,
     max_total_input_bytes,
 )
+
+
+from test_data_agent.trino_work_budget import current_query_work_budget
 
 
 class LocalProfileDimension(StrEnum):
@@ -29,6 +36,7 @@ class LocalProfileDimension(StrEnum):
     SAMPLE_ROWS = "sample_rows"
     INPUT_BYTES = "input_bytes"
     INPUT_CELLS = "input_cells"
+    INFERENCE_EVALUATIONS = "inference_evaluations"
 
 
 class LocalProfileLimitError(InputLimitError):
@@ -58,11 +66,12 @@ class LocalProfileLimits:
     max_sample_rows: int = DEFAULT_MAX_LOCAL_PROFILE_SAMPLE_ROWS
     max_input_bytes: int = DEFAULT_MAX_TOTAL_INPUT_BYTES
     max_input_cells: int = DEFAULT_MAX_INPUT_CELLS
+    max_inference_evaluations: int = DEFAULT_MAX_BUSINESS_RULE_EVALUATIONS
 
     def __post_init__(self) -> None:
         if not isfinite(self.max_seconds) or self.max_seconds <= 0:
             raise ValueError("local profile max_seconds must be finite and positive")
-        for name in ("max_sample_rows", "max_input_bytes", "max_input_cells"):
+        for name in ("max_sample_rows", "max_input_bytes", "max_input_cells", "max_inference_evaluations"):
             if getattr(self, name) < 1:
                 raise ValueError(f"local profile {name} must be positive")
 
@@ -73,6 +82,7 @@ def default_local_profile_limits() -> LocalProfileLimits:
         max_sample_rows=max_local_profile_sample_rows(),
         max_input_bytes=max_total_input_bytes(),
         max_input_cells=max_input_cells(),
+        max_inference_evaluations=max_business_rule_evaluations(),
     )
 
 
@@ -88,10 +98,14 @@ class LocalProfileBudget:
         self.limits = limits or default_local_profile_limits()
         self._clock = clock
         self._started_at = clock()
+        self._request_budget = current_query_work_budget()
         self._sample_rows = 0
         self._input_cells = 0
+        self._inference_evaluations = 0
 
     def check_deadline(self, stage: str) -> None:
+        if self._request_budget is not None:
+            self._request_budget.check_invocation_deadline()
         elapsed = self._clock() - self._started_at
         if elapsed >= self.limits.max_seconds:
             raise LocalProfileLimitError(
@@ -122,9 +136,10 @@ class LocalProfileBudget:
         self._sample_rows = attempted
 
     def check_input_files(self, paths: Iterable[Path]) -> list[Path]:
-        resolved = list(paths)
+        resolved = bounded_input_paths(paths)
         total_bytes = 0
         for path in resolved:
+            self.check_deadline("input preflight")
             if path.is_symlink():
                 raise InputLimitError(
                     f"symbolic link inputs are not allowed: {path.name!r}"
@@ -154,3 +169,20 @@ class LocalProfileBudget:
             )
         enforce_input_cell_count(attempted, label="CSV folder")
         self._input_cells = attempted
+
+    def consume_inference_evaluation(self) -> None:
+        self.check_deadline("local inference")
+        attempted = self._inference_evaluations + 1
+        if attempted > self.limits.max_inference_evaluations:
+            raise LocalProfileLimitError(
+                LocalProfileDimension.INFERENCE_EVALUATIONS,
+                attempted=attempted, limit=self.limits.max_inference_evaluations,
+                stage="local inference",
+            )
+        self._inference_evaluations = attempted
+
+
+def bounded_csv_paths(folder: Path, budget: LocalProfileBudget) -> list[Path]:
+    return bounded_directory_paths(
+        folder, (".csv",), lambda: budget.check_deadline("CSV inventory"),
+    )

@@ -13,11 +13,6 @@ entities:
         semantic_type: email
       - name: summary
         data_type: string
-        distribution:
-          type: categorical
-          values:
-            - synthetic_login_issue
-            - synthetic_billing_question
       - name: resolved
         data_type: boolean
 generation_settings:

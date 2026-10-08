@@ -65,3 +65,22 @@ release notes must identify the affected surface and safe replacement.
 Contract tests cover the CLI aliases, wrapper identity and behavior, and
 transitional summary access. See [Public Stability](stability.md) for the
 broader compatibility rules.
+
+## Transformation Candidate Scope
+
+Published 1.5.0 compatibility does not include the 1.6 transformation candidate.
+The 1.6 RC composition registers the single-source and saved-profile common
+CLI/MCP workflows plus configured SQL sessions. Ordinary generation APIs remain
+source-free. The running generator server adds `common_transformation` and
+`configured_query_session`; custom SDK embedding must explicitly inject its
+workspace/session owner and close that owner on shutdown. Final exact-SHA safety
+and release gates remain required. See the
+[candidate CLI contract](cli.md#implemented-rc-execution-candidate) and
+[closed common-profile contract](cli.md#closed-common-profile-workflow-candidate).
+Command discovery is not dataset approval or a promise of released compatibility.
+
+Imported `FieldProfile` and `FieldSpec` distributions accept empty `{}` or a
+supported typed `kind`. Nonempty objects with missing, non-string or unknown
+kinds are rejected with a value-free diagnostic. Previously accepted opaque
+distribution dictionaries must be converted to supported metadata before use;
+they cannot be forwarded to advisor/provider requests.

@@ -1,6 +1,7 @@
 import csv
 import json
 import shutil
+from dataclasses import replace
 from collections.abc import Callable
 from pathlib import Path
 
@@ -31,9 +32,19 @@ def configure_workspace(monkeypatch: pytest.MonkeyPatch, root: Path) -> None:
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(root))
 
 
+@pytest.mark.parametrize("seconds", [None, "1800"])
 def test_main_applies_shared_invocation_and_transport_budgets(
     monkeypatch: pytest.MonkeyPatch,
+    seconds: str | None,
 ) -> None:
+    if seconds is None:
+        monkeypatch.delenv(server.MCP_MAX_INVOCATION_SECONDS_ENV, raising=False)
+    else:
+        monkeypatch.setenv(server.MCP_MAX_INVOCATION_SECONDS_ENV, seconds)
+    expected_limits = replace(
+        DEFAULT_QUERY_WORK_LIMITS,
+        max_invocation_seconds=120.0 if seconds is None else float(seconds),
+    )
     initial_mcp = object()
     runtime_mcp = object()
     service_arguments: dict[str, object] = {}
@@ -50,7 +61,7 @@ def test_main_applies_shared_invocation_and_transport_budgets(
     monkeypatch.setattr(
         server,
         "create_generator_mcp",
-        lambda tools: runtime_mcp,
+        lambda tools, *, strict_arguments=False: runtime_mcp,
     )
 
     def fake_run(
@@ -70,7 +81,7 @@ def test_main_applies_shared_invocation_and_transport_budgets(
     server.main()
 
     assert server.mcp is runtime_mcp
-    assert service_arguments["work_limits"] == DEFAULT_QUERY_WORK_LIMITS
+    assert service_arguments["work_limits"] == expected_limits
     assert service_arguments["budget_provider"] is server._current_transport_work_budget
     assert transport_arguments["mcp"] is runtime_mcp
     assert (
@@ -81,6 +92,7 @@ def test_main_applies_shared_invocation_and_transport_budgets(
     assert callable(factory)
     budget = factory(123)
     assert budget.snapshot().raw_transport_payload_bytes == 123
+    assert budget.limits == expected_limits
 
 
 def test_main_reports_missing_extra_without_traceback(monkeypatch, capsys) -> None:
@@ -1010,3 +1022,22 @@ def test_validate_dataset_rejects_tampered_business_validation_report(
 
     with pytest.raises(WorkspacePathError, match="bundle is incomplete or invalid"):
         validate_dataset("generated/dataset_spec.yaml", "generated")
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "nan", "inf", "-inf", "private-marker"])
+def test_invalid_mcp_deadline_fails_before_startup_without_value(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str], value: str,
+) -> None:
+    monkeypatch.setattr(server, "mcp", object())
+    monkeypatch.setenv(server.MCP_MAX_INVOCATION_SECONDS_ENV, value)
+
+    def unexpected(*args: object, **kwargs: object) -> None:
+        pytest.fail("invalid configuration reached startup")
+
+    monkeypatch.setattr(server, "audit_logger_from_env", unexpected)
+    monkeypatch.setattr(server, "create_generator_mcp", unexpected)
+    monkeypatch.setattr(server, "run_bounded_generator_mcp", unexpected)
+    assert server.main() == 78
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert output.err == f"{server.MCP_MAX_INVOCATION_SECONDS_ENV} must be a finite positive number\n"

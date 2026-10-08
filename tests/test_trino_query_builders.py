@@ -243,3 +243,31 @@ def test_server_keeps_query_builder_compatibility_exports() -> None:
         mcp_trino_server.build_formula_rule_profile_query
         is build_formula_rule_profile_query
     )
+
+
+def test_top_values_bounds_the_projected_representation(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "8")
+    query = build_top_values_query("analytics", "safe_schema", "customers", "status", 20)
+    value = 'CAST("status" AS varchar)'
+    assert f"CASE WHEN length({value}) <= 8" in query.sql
+    assert f"length(to_utf8({value})) <= 32 THEN {value} ELSE NULL END AS value" in query.sql
+    assert 'WHERE "status" IS NOT NULL GROUP BY "status"' in query.sql
+    assert "count(*) AS count" in query.sql
+    assert query.sql.endswith("ORDER BY count DESC LIMIT 20")
+
+
+def test_formula_parser_error_detaches_expression() -> None:
+    import traceback
+
+    expression = "fictional_private_formula_marker + '"
+    with pytest.raises(SqlSafetyError) as caught:
+        build_formula_rule_profile_query(
+            "analytics", "safe", "items", "total",
+            expression, 0.0,
+        )
+    assert str(caught.value) == "formula expression is not valid arithmetic"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None
+    assert "fictional_private_formula_marker" not in "".join(
+        traceback.format_exception(caught.value)
+    )

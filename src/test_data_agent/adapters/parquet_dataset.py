@@ -8,9 +8,9 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.limits import (
-    InputLimitError, enforce_input_files, enforce_parquet_metadata_limits,
-    max_input_cell_chars, max_parquet_expanded_bytes,
+    enforce_input_files, enforce_parquet_metadata_limits,
 )
+from test_data_agent.core.parquet_limits import inspect_parquet_batch
 from test_data_agent.core.privacy import infer_sensitive_from_name, infer_sensitive_value_type
 from test_data_agent.csv_profiler import CSVProfile, CSVColumnProfile
 from test_data_agent.adapters.csv_file import csv_profile_to_dataset_profile, csv_profile_to_dataset_spec
@@ -99,20 +99,18 @@ def _parquet_sensitive_columns(parquet_file: Any, *, budget: LocalProfileBudget 
     """Inspect bounded local values; retain only sensitivity flags, never rows."""
     flags = [infer_sensitive_from_name(field.name) for field in parquet_file.schema_arrow]
     budget = budget or LocalProfileBudget()
-    expanded_limit = max_parquet_expanded_bytes()
-    char_limit = max_input_cell_chars()
     expanded = 0
+    total_cells = 0
     for batch in parquet_file.iter_batches(batch_size=256):
         budget.check_deadline("Parquet sensitivity inspection")
-        expanded += batch.nbytes
-        if expanded > expanded_limit:
-            raise InputLimitError("Parquet sensitivity inspection exceeded expanded byte budget")
+        expanded, total_cells = inspect_parquet_batch(
+            batch, decoded_bytes=expanded, total_cells=total_cells,
+            check_deadline=budget.check_deadline,
+        )
         for index, column in enumerate(batch.columns):
             for scalar in column:
                 budget.check_deadline("Parquet sensitivity inspection")
                 value = scalar.as_py()
-                if isinstance(value, (str, bytes)) and len(value) > char_limit:
-                    raise InputLimitError("Parquet sensitivity inspection exceeded cell size budget")
                 # This representation is inspection-only, never native matching.
                 evidence = str(value) if type(value) in (int, float, Decimal) else value
                 # Binary/composite content is unsupported evidence, not proof of safety.

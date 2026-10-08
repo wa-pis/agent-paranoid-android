@@ -352,3 +352,25 @@ def test_local_candidate_tty_receipt_to_execution(tmp_path):
         assert receipt.read_bytes() == receipt_before
         if mode != "existing":
             assert not target.exists()
+
+@pytest.mark.parametrize("versioned", [False, True])
+def test_common_cli_preserves_cleanup_warning(tmp_path, monkeypatch, capsys, versioned):
+    from test_data_agent.cli_transformation_candidate import _candidate_batch_main
+    from test_data_agent.io import transformation_batch_workflow
+    from test_data_agent.io.transformation_publish import TransformationCleanupError
+
+    def fail(*args, **kwargs):
+        raise TransformationCleanupError(
+            "transformation publication failed; cleanup incomplete; output or staging may remain; "
+            "inspect the selected destination before retrying")
+
+    monkeypatch.setattr(transformation_batch_workflow, "run_batch_workflow", fail)
+    assert _candidate_batch_main(["execute", str(tmp_path), "batch.yaml",
+        "--max-total-input-bytes", "32768", "--max-review-bytes", "8192",
+        "--max-output-bytes", "8192"], versioned_output=versioned) == 2
+    captured = capsys.readouterr()
+    message = json.loads(captured.out)["error"]["message"]
+    assert "cleanup incomplete" in message
+    assert "output or staging may remain" in message
+    assert "before retrying" in message
+    assert not captured.err

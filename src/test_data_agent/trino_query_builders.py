@@ -6,6 +6,9 @@ import ast
 from dataclasses import dataclass
 from typing import Any
 
+from test_data_agent.core.limits import max_input_cell_chars
+from test_data_agent.core.privacy import infer_sensitive_from_name
+
 from test_data_agent.trino_sql_policy import (
     MAX_LIMIT,
     SqlSafetyError,
@@ -125,8 +128,12 @@ def build_top_values_query(
 ) -> TrinoQuery:
     safe_column = quote_identifier(column)
     safe_limit = bounded_limit(limit)
+    value = f"CAST({safe_column} AS varchar)"
+    max_chars = max_input_cell_chars()
     return TrinoQuery(
-        f"SELECT {safe_column} AS value, count(*) AS count "
+        f"SELECT CASE WHEN length({value}) <= {max_chars} "
+        f"AND length(to_utf8({value})) <= {4 * max_chars} "
+        f"THEN {value} ELSE NULL END AS value, count(*) AS count "
         f"FROM {qualified_table(catalog, schema, table)} "
         f"WHERE {safe_column} IS NOT NULL "
         f"GROUP BY {safe_column} "
@@ -196,6 +203,7 @@ def build_formula_rule_profile_query(
     safe_table = qualified_table(catalog, schema, table)
     safe_target = quote_identifier(target_field)
     formula = build_formula_sql(expression)
+    _require_non_sensitive_rule_operands(target_field, *formula.columns)
     safe_tolerance = require_non_negative_float(tolerance, "tolerance")
     checks = [f"{safe_target} IS NOT NULL"]
     checks.extend(
@@ -290,6 +298,10 @@ def build_aggregate_mapping_profile_query(
     if aggregate != "count" and not child_value_field:
         raise ValueError("child_value_field is required for numeric aggregates")
     safe_tolerance = require_non_negative_float(tolerance, "tolerance")
+    _require_non_sensitive_rule_operands(
+        parent_value_field,
+        *([child_value_field] if aggregate != "count" and child_value_field else []),
+    )
     parent = qualified_table(catalog, schema, parent_table)
     child = qualified_table(catalog, schema, child_table)
     parent_key_sql = quote_identifier(parent_key)
@@ -390,8 +402,10 @@ def build_formula_sql(expression: str) -> FormulaSql:
     consume_sql_formula_chars(expression)
     try:
         node = ast.parse(expression, mode="eval")
-    except SyntaxError as exc:
-        raise SqlSafetyError("formula expression is not valid arithmetic") from exc
+    except SyntaxError:
+        node = None
+    if node is None:
+        raise SqlSafetyError("formula expression is not valid arithmetic") from None
     consume_ast_work(node, child_nodes=ast.iter_child_nodes)
     columns: set[str] = set()
     extra_conditions: list[str] = []
@@ -444,3 +458,9 @@ def bounded_limit(limit: int) -> int:
     if limit < 1:
         raise ValueError("limit must be positive")
     return min(limit, MAX_LIMIT)
+
+
+
+def _require_non_sensitive_rule_operands(*columns: str) -> None:
+    if any(infer_sensitive_from_name(column) for column in columns):
+        raise SqlSafetyError("rule residuals over sensitive columns are not allowed")

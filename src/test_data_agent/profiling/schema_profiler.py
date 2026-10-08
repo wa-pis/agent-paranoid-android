@@ -23,7 +23,6 @@ from test_data_agent.core.privacy import (
     LocalCategoryField,
     infer_sensitive_from_name,
     infer_sensitive_type_from_values,
-    infer_sensitive_value_type,
     mask_pattern,
     PrivacySettings,
     semantic_type_is_sensitive,
@@ -31,6 +30,7 @@ from test_data_agent.core.privacy import (
     validate_local_category_values,
 )
 from test_data_agent.csv_profiler import (
+    _csv_sensitive_value_type,
     detect_csv_dialect,
     detect_csv_encoding,
     infer_data_type,
@@ -43,7 +43,7 @@ from test_data_agent.csv_profiler import (
     parse_int,
     validate_csv_headers,
 )
-from test_data_agent.profiling.budget import LocalProfileBudget
+from test_data_agent.profiling.budget import LocalProfileBudget, bounded_csv_paths
 
 MAX_DISTINCT_TRACKED = 10_000
 MAX_CATEGORY_TRACKED = 1_000
@@ -53,7 +53,7 @@ MAX_SEMANTIC_SAMPLE = 100
 
 def load_csv_folder(input_folder: Path, max_rows_per_entity: int | None = None) -> dict[str, list[dict[str, str]]]:
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
-    csv_paths = enforce_input_files(sorted(input_folder.glob("*.csv")))
+    csv_paths = enforce_input_files(bounded_csv_paths(input_folder, LocalProfileBudget()))
     total_rows = 0
     total_cells = 0
     for path in csv_paths:
@@ -184,7 +184,7 @@ def _profile_schema_with_sample(
     entities: list[EntityProfile] = []
     rows_by_entity: dict[str, list[dict[str, str]]] = {}
     budget.check_sample_rows(max_rows_per_entity)
-    csv_paths = budget.check_input_files(sorted(input_folder.glob("*.csv")))
+    csv_paths = budget.check_input_files(bounded_csv_paths(input_folder, budget))
     if not csv_paths:
         raise ValueError(f"no CSV files found in {input_folder}")
     total_rows = 0
@@ -308,7 +308,7 @@ class FieldAccumulator:
         self.non_null_count += 1
         if len(self.semantic_sample) < MAX_SEMANTIC_SAMPLE:
             self.semantic_sample.append(value)
-        detected_type = infer_sensitive_value_type(value)
+        detected_type = _csv_sensitive_value_type(value)
         if detected_type == "secret" or self.content_sensitive_type is None:
             self.content_sensitive_type = detected_type
         self.track_distinct(value)
@@ -428,7 +428,7 @@ class FieldAccumulator:
             return {"kind": "synthetic_identifier"}
         if profile.sensitive:
             patterns = Counter(
-                mask_pattern(value, infer_sensitive_value_type(value) or profile.semantic_type)
+                mask_pattern(value, _csv_sensitive_value_type(value) or profile.semantic_type)
                 for value in self.semantic_sample
             )
             return {"kind": "masked_patterns", "patterns": [{"pattern": pattern, "count": count} for pattern, count in patterns.most_common(10)]}

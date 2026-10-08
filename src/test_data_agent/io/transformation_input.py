@@ -3,7 +3,7 @@
 import io
 import math
 import os
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
 from dataclasses import dataclass, field
@@ -23,11 +23,11 @@ from test_data_agent.io.transformation_query_snapshot import _query_result_paylo
 @dataclass(repr=False)
 class NativeSourceRows:
     fieldnames: list[str]
-    rows: tuple[dict[str, str | int | float | Decimal | date | None], ...] = field(repr=False)
+    rows: tuple[dict[str, str | int | float | Decimal | date | datetime | None], ...] = field(repr=False)
     types: dict[str, FieldType] = field(repr=False)
     decimal_shapes: dict[str, tuple[int, int]] = field(default_factory=dict, repr=False)
 
-    def __iter__(self) -> Iterator[dict[str, str | int | float | Decimal | date | None]]:
+    def __iter__(self) -> Iterator[dict[str, str | int | float | Decimal | date | datetime | None]]:
         return iter(self.rows)
 
 
@@ -110,6 +110,8 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
                 types[item.name] = FieldType.BOOLEAN
             elif pa.types.is_date32(item.type):
                 types[item.name] = FieldType.DATE
+            elif pa.types.is_timestamp(item.type) and item.type.unit == "us" and item.type.tz == "UTC":
+                types[item.name] = FieldType.DATETIME
             elif pa.types.is_decimal128(item.type) and 0 <= item.type.scale <= item.type.precision <= 38:
                 types[item.name] = FieldType.DECIMAL
                 decimal_shapes[item.name] = (item.type.precision, item.type.scale)
@@ -137,7 +139,7 @@ def source_reader(source: SnapshotPart, policy: BehaviorPolicy, *, budget: Gener
             for row in batch.to_pylist():
                 budget.check("transformation Parquet input row")
                 if any(value is not None and (
-                        type(value) not in {str, int, float, bool, Decimal, date}
+                        type(value) not in {str, int, float, bool, Decimal, date, datetime}
                         or isinstance(value, float) and not math.isfinite(value))
                        for value in row.values()):
                     raise ValueError("unsupported Parquet source cell")
@@ -164,6 +166,11 @@ def matching_text(policy: BehaviorPolicy, name: str, value: Any) -> str:
 
 def same_native_value(original: Any, replacement: Any) -> bool:
     """Conservative reuse guard, not mapping-key or formatting semantics."""
+    if type(original) is datetime and isinstance(replacement, str):
+        try:
+            return original == datetime.fromisoformat(replacement)
+        except ValueError:
+            return False
     if type(original) is date and isinstance(replacement, str):
         try:
             return original == date.fromisoformat(replacement)

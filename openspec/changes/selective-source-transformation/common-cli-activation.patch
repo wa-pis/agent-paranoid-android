@@ -1,0 +1,26 @@
+diff --git a/src/test_data_agent/cli.py b/src/test_data_agent/cli.py
+--- a/src/test_data_agent/cli.py
++++ b/src/test_data_agent/cli.py
+@@ -186,3 +186,3 @@
+                              if argument not in {"--json", "--debug"}), None)
+-    transformation = selected_command in {"transform-execute", "transform-approve"}
++    transformation = selected_command in {"transform-execute", "transform-approve", "transform-batch"}
+     parser_type = _CandidateArgumentParser if transformation else HelpfulArgumentParser
+@@ -214,2 +214,10 @@
+
++    common = subparsers.add_parser(
++        "transform-batch", help="Review and execute a saved common transformation profile.",
++        description="Common profile workflow: create, review, approve, validate, execute. "
++                    "Only local controlling-TTY approve can issue a preservation receipt.",
++        formatter_class=PublicHelpFormatter,
++    )
++    common.add_argument("arguments", nargs="...", help="Common workflow operation and arguments.")
++
+     register_utility_commands(subparsers)
+@@ -238,2 +246,6 @@
+     args = parser.parse_args(arguments)
++    if args.command == "transform-batch":
++        from test_data_agent.cli_transformation_candidate import _candidate_common_main
++        return _candidate_common_main(args.arguments, versioned_output=True)
++
+     args.json_output = "--json" in arguments or getattr(args, "json_output", False)

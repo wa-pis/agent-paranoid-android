@@ -132,7 +132,7 @@ def validate_relationship_discovery_proposals(
 
 
 class AdvisorRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
 
     schema_version: Literal["1.0"] = "1.0"
     metadata_trust: Literal["untrusted"] = "untrusted"
@@ -169,7 +169,7 @@ class AdvisorProposal(BaseModel):
 
 
 class AdvisorExchange(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
 
     schema_version: Literal["1.0"] = "1.0"
     instructions_trust: Literal["trusted_static"] = "trusted_static"
@@ -236,9 +236,27 @@ class ExchangeDatasetAdvisor:
         validated_request = AdvisorRequest.model_validate(
             request.model_dump(mode="python")
         )
-        exchange = build_advisor_exchange(validated_request)
+        from test_data_agent.providers.category_privacy import (
+            _provider_safe_request, _restore_local_categories,
+        )
+
+        projected, restorations = _provider_safe_request(
+            validated_request, category_label_prefix="__apa_category"
+        )
+        projected["profile_sha256"] = dataset_profile_fingerprint(
+            DatasetProfile.model_validate(projected["profile"])
+        )
+        projected["baseline_spec_sha256"] = dataset_spec_fingerprint(
+            DatasetSpec.model_validate(projected["baseline_spec"])
+        )
+        safe_request = AdvisorRequest.model_validate(projected)
+        exchange = build_advisor_exchange(safe_request)
         payload = self._client.complete(exchange.model_copy(deep=True))
-        return validate_advisor_proposal(validated_request, payload)
+        proposal = validate_advisor_proposal(safe_request, payload)
+        _restore_local_categories(proposal, restorations)
+        proposal.profile_sha256 = validated_request.profile_sha256
+        proposal.baseline_spec_sha256 = validated_request.baseline_spec_sha256
+        return validate_advisor_proposal(validated_request, proposal)
 
 
 def build_advisor_request(

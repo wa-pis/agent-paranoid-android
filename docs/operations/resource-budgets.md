@@ -84,15 +84,16 @@ revalidates the existing checkpoint, spec fingerprint, manifest, report, and
 generated files before publishing missing completion metadata. Recovery does
 not regenerate rows.
 
-Artifact writers do not call `fsync` for file contents or parent-directory
-metadata. Therefore a hard stop, kernel or host crash, storage failure, or
-power loss can leave an abandoned staging directory or lose a recently written
-or renamed artifact. Atomic replacement prevents partial visibility for the
+The shared single-file atomic writer flushes file contents and parent-directory
+metadata with `fsync`; owned directory publication also flushes its parent.
+This is not a complete crash-consistency protocol for every artifact or multi-file
+bundle. A hard stop, kernel or host crash, storage failure, or power loss can
+still leave abandoned staging data or lose an incomplete bundle. Atomic replacement prevents partial visibility for the
 state transitions and new bundles that use it during normal operation; it does
 not cover every standalone artifact command or promise persistence across
 those failures.
 
-**Disposition:** artifact `fsync` support is deferred until after 1.0 and is
+**Historical disposition:** complete artifact durability was deferred until after 1.0 and is
 not release-blocking for RC4 or stable 1.0. The repository maintainer owns the
 follow-up. Revisit this decision before promising crash/power-loss durability,
 when deployment requirements demand it, after an artifact-loss incident, or

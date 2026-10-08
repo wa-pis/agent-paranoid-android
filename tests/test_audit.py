@@ -1,5 +1,6 @@
 import base64
 import json
+import io
 from pathlib import Path
 
 import pytest
@@ -241,3 +242,53 @@ def test_cli_verifies_audit_log(
 
     assert main(["audit-verify", str(log_path)]) == 0
     assert "Audit log verified: 2 records" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("newline", [b"", b"\n"])
+def test_audit_verification_bounds_reads_before_parsing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, newline: bytes,
+) -> None:
+    path = tmp_path / "oversized.jsonl"
+    payload = b"x" * (audit_module.MAX_AUDIT_RECORD_BYTES * 4) + newline
+    path.write_bytes(payload)
+    reads: list[int] = []
+
+    class BoundedReader(io.BytesIO):
+        def readline(self, size: int = -1) -> bytes:
+            assert size == audit_module.MAX_AUDIT_RECORD_BYTES + 1
+            reads.append(size)
+            return super().readline(size)
+
+        def __iter__(self):
+            raise AssertionError("unbounded record iteration")
+
+    reader = BoundedReader(payload)
+    original_open = Path.open
+
+    def open_reader(self: Path, *args, **kwargs):
+        if self == path and args == ("rb",):
+            return reader
+        return original_open(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", open_reader)
+    with pytest.raises(AuditVerificationError, match="record 1 exceeds 4096"):
+        verify_audit_log(path, AUDIT_KEY_BYTES)
+    assert reads == [audit_module.MAX_AUDIT_RECORD_BYTES + 1]
+
+
+@pytest.mark.parametrize("newline", [b"", b"\n"])
+def test_audit_verification_accepts_exact_record_limit(
+    tmp_path: Path, newline: bytes,
+) -> None:
+    path = tmp_path / "audit.jsonl"
+    logger = AuditLogger("generator-mcp", AuditSettings(
+        path=path, key=AUDIT_KEY_BYTES, actor=None, max_bytes=100_000,
+    ))
+    logger.record("operation", "started", "0" * 32)
+    record = path.read_bytes().rstrip(b"\n")
+    padding = audit_module.MAX_AUDIT_RECORD_BYTES - len(record) - len(newline)
+    path.write_bytes(record + b" " * padding + newline)
+    assert verify_audit_log(path, AUDIT_KEY_BYTES).record_count == 1
+    path.write_bytes(record + b" " * (padding + 1) + newline)
+    with pytest.raises(AuditVerificationError, match="exceeds 4096"):
+        verify_audit_log(path, AUDIT_KEY_BYTES)

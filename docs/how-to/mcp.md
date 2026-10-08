@@ -15,6 +15,26 @@ no network, while the Trino worker receives no generator workspace mount.
 
 ## Prepare A Workspace
 
+### Closed Common-Profile Candidate
+
+The 1.6 RC runtime adds `common_transformation` to the generator server.
+Published 1.5.0 does not include this tool; registration is not release clearance.
+It accepts `operation` (`review`, `validate`, `execute`), workspace-relative
+`profile`, and positive explicit `max_total_bytes`, `max_review_bytes`,
+`max_output_bytes`. Validation/execution require the exact reviewed
+`snapshot_sha256`. Preservation additionally requires a pre-existing local
+`receipt`; MCP cannot issue it. Optional `destination` is execute-only and names
+a new direct-child output bundle. Without it, execution is temporary.
+
+The workspace root comes from server configuration, never tool arguments.
+Responses contain value-free review/summary metadata, not output rows or mapping
+literals. Existing transport/work budgets still apply; these byte settings do
+not enlarge source-free profiling or serialized response budgets. Unknown
+arguments, including `root` and `approved`, are rejected without reflection.
+Configuration creation and human confirmation remain local CLI operations.
+Installed fictional acceptance with MCP SDK1/SDK2 is evidence for this candidate,
+not permission to activate it or process private data.
+
 ```bash
 mkdir -p /path/to/synthetic-workspace
 ```
@@ -32,7 +52,8 @@ Use the installed console commands:
     "test-data-agent-generator": {
       "command": "test-data-agent-mcp-generator",
       "env": {
-        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/synthetic-workspace"
+        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/synthetic-workspace",
+        "TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS": "120"
       }
     },
     "test-data-agent-trino": {
@@ -201,3 +222,52 @@ Preservation approval is never an MCP capability. This candidate's separate
 workspace execution consumer cannot issue local receipts, return rows or
 broaden source-free generator authority. Public delivery still requires the
 scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.
+
+
+## Configured SQL Sessions (1.6 RC)
+
+The running generator server registers `configured_query_session` with an
+instance-owned session manager. Use only an authorized administrator-configured
+PostgreSQL or Trino source. A saved batch profile and
+[bounded query references](../reference/cli.md#configured-sql-sessions-16-rc)
+are workspace files; tool arguments never select endpoints or credentials.
+
+| Operation | Arguments | Result and lifetime |
+| --- | --- | --- |
+| `open` | `profile`, `references`, positive `max_total_bytes`, `max_review_bytes`, `max_output_bytes` | Capture once; return metadata review, opaque `handle`, digest, expiry and local approval descriptor. |
+| `review` | `handle` | Reuse the same frozen batch; no database reconnection. |
+| `validate` | `handle`, exact `snapshot_sha256` | Validate temporary output; retain the session until expiry or close. |
+| `execute` | `handle`, exact `snapshot_sha256`, new direct-child `destination` | Verify any required local receipt, validate and publish; close the session. |
+| `close` | `handle` | Remove owned snapshots and receipts; the handle cannot be reused. |
+
+Responses contain review/summary metadata, never captured rows, query text,
+mapping literals or connection secrets. `local_approval` contains an owned
+temporary root, `batch.yaml`, a fixed receipt filename, digest and input/review
+limits. These references help the local operator invoke the existing CLI:
+
+```bash
+test-data-agent transform-batch approve /owned/root batch.yaml local-session-receipt.json \
+  --snapshot-sha256 REVIEWED_DIGEST \
+  --max-total-input-bytes REVIEWED_INPUT_LIMIT --max-review-bytes REVIEWED_REVIEW_LIMIT
+```
+
+Use the exact metadata values while the session is alive. The CLI opens the
+controlling terminal for confirmation; MCP has no approval operation or boolean.
+This descriptor itself grants no authority. Direct or fallback preservation
+requires a valid exact receipt; explicit mappings retain their separate safety
+checks. Changed local bytes cannot produce a receipt for the frozen batch.
+
+Expiry, refusal and shutdown remove owned inputs and receipts. Execution retains
+only the selected validated output bundle inside the parent workspace. Expired
+or closed handles refuse without silently recapturing. Start a new explicit
+session and review its new digest if another capture is needed. Cumulative byte
+admission is not refunded on close or failure; restart the owning server only
+after resolving the refusal and reviewing its configured limits.
+
+Cleanup failure returns a fixed incomplete-cleanup error and latches the owner
+unhealthy; further work refuses. Preserve the failure evidence and inspect local
+temporary storage before restarting. Default bounds and overrides are documented
+in [configuration](../reference/configuration.md#configured-sql-session-bounds-16-rc).
+The entrypoint closes all sessions in a shutdown handler even if transport fails.
+Custom SDK embedding must explicitly inject a session owner and close it; the
+module-level SDK object creates no SQL sessions.

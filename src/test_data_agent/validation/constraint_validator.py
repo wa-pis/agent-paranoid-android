@@ -7,34 +7,54 @@ from typing import Any
 
 from test_data_agent.core.constraint import ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.generation.limits import enforce_dataset_rule_work
+from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.expressions import parse_datetime, safe_eval
 
 
-def validate_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> list[str]:
+def validate_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[str]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    enforce_dataset_rule_work(spec, budget=budget,
+        row_counts={name: len(rows) for name, rows in rows_by_entity.items()})
     errors: list[str] = []
-    for constraint in spec.constraints:
+    for constraint in budget.iter_rule_work(spec.constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type == ConstraintType.FORMULA:
-            errors.extend(validate_formula(rows_by_entity, constraint))
+            errors.extend(validate_formula(rows_by_entity, constraint, budget=budget))
         elif constraint.type == ConstraintType.TEMPORAL:
-            errors.extend(validate_temporal(rows_by_entity, constraint))
+            errors.extend(validate_temporal(rows_by_entity, constraint, budget=budget))
         elif constraint.type == ConstraintType.CONDITIONAL_REQUIRED:
-            errors.extend(validate_conditional_required(rows_by_entity, constraint))
+            errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget))
         elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
-            errors.extend(validate_aggregate_mapping(rows_by_entity, spec, constraint))
+            errors.extend(validate_aggregate_mapping(rows_by_entity, spec, constraint, budget=budget))
     return errors
 
 
-def validate_formula(rows_by_entity: dict[str, list[dict[str, Any]]], constraint: Any) -> list[str]:
+def validate_formula(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    constraint: Any,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[str]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     if not constraint.expression or not constraint.fields:
         return []
     target = constraint.fields[0]
     errors: list[str] = []
-    for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
         try:
-            expected = safe_eval(constraint.expression, coerce_numeric_row(row))
+            expected = safe_eval(constraint.expression, coerce_numeric_row(row, budget=budget), budget=budget)
+        except GenerationLimitError:
+            raise
         except Exception:
             errors.append("formula evaluation failed")
             continue
@@ -44,12 +64,19 @@ def validate_formula(rows_by_entity: dict[str, list[dict[str, Any]]], constraint
     return errors
 
 
-def validate_temporal(rows_by_entity: dict[str, list[dict[str, Any]]], constraint: Any) -> list[str]:
+def validate_temporal(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    constraint: Any,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[str]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     if len(constraint.fields) < 2:
         return []
     start_field, end_field = constraint.fields[:2]
     errors: list[str] = []
-    for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
         start = parse_datetime(row.get(start_field))
         end = parse_datetime(row.get(end_field))
         if start is None or end is None or start > end:
@@ -57,24 +84,39 @@ def validate_temporal(rows_by_entity: dict[str, list[dict[str, Any]]], constrain
     return errors
 
 
-def validate_conditional_required(rows_by_entity: dict[str, list[dict[str, Any]]], constraint: Any) -> list[str]:
+def validate_conditional_required(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    constraint: Any,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[str]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     if not constraint.condition:
         return []
     condition = Condition(**constraint.condition)
     errors: list[str] = []
-    for index, row in enumerate(rows_by_entity.get(constraint.entity, [])):
-        if not condition_matches(row, condition):
+    for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
+        if not condition_matches(row, condition, budget=budget):
             continue
-        missing = [field for field in constraint.fields if row.get(field) in (None, "")]
+        missing = [field for field in budget.iter_rule_work(constraint.fields) if row.get(field) in (None, "")]
         if missing:
             errors.append(f"{constraint.entity}[{index}] missing conditional fields {missing}")
     return errors
 
 
-def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec, constraint: Any) -> list[str]:
+def validate_aggregate_mapping(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    constraint: Any,
+    *,
+    budget: GenerationBudget | None = None,
+) -> list[str]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     relationship = next(
         (
-            item for item in spec.relationships
+            item for item in budget.iter_rule_work(spec.relationships)
             if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
         ),
         None,
@@ -88,7 +130,7 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
     totals: dict[Any, float] = defaultdict(float)
     counts: dict[Any, int] = defaultdict(int)
     errors: list[str] = []
-    for index, child_row in enumerate(rows_by_entity.get(relationship.child_entity, [])):
+    for index, child_row in budget.iter_rule_work(enumerate(rows_by_entity.get(relationship.child_entity, []))):
         if constraint.aggregate == "count":
             totals[child_row.get(relationship.child_field)] += 1
             continue
@@ -104,7 +146,7 @@ def validate_aggregate_mapping(rows_by_entity: dict[str, list[dict[str, Any]]], 
         totals[key] += numeric_value
         counts[key] += 1
     parent_field = constraint.fields[0]
-    for index, parent_row in enumerate(rows_by_entity.get(relationship.parent_entity, [])):
+    for index, parent_row in budget.iter_rule_work(enumerate(rows_by_entity.get(relationship.parent_entity, []))):
         key = parent_row.get(relationship.parent_field)
         expected = totals.get(key, 0.0)
         if constraint.aggregate == "avg" and counts.get(key, 0):
@@ -120,9 +162,13 @@ def numbers_close(actual: Any, expected: Any, tolerance: float = 0.000001) -> bo
         return False
 
 
-def coerce_numeric_row(row: dict[str, Any]) -> dict[str, Any]:
+def coerce_numeric_row(
+    row: dict[str, Any], *, budget: GenerationBudget | None = None
+) -> dict[str, Any]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     coerced: dict[str, Any] = {}
-    for key, value in row.items():
+    for key, value in budget.iter_rule_work(row.items()):
         if isinstance(value, str):
             try:
                 number = float(value)

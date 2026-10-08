@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
+import subprocess
+import sys
 
 import pytest
 
@@ -355,3 +358,75 @@ def test_decorated_stars_fail_before_authorization(tmp_path, adapter, selection)
     table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
     with pytest.raises(SqlQuerySourceError, match="wildcard modifiers"):
         inspect_query_source(request(write_query(tmp_path, f"SELECT {selection} FROM {table}"), adapter=adapter))
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+@pytest.mark.parametrize("projection,source,allowed", [
+    ("ssn AS state", "ssn", False),
+    ("customer_id AS state", "customer_id", False),
+    ("postal_code AS state", "postal_code", False),
+    ("status AS state", "status", True),
+    ("CAST(status AS VARCHAR) AS state", "status", False),
+    ("COUNT(status) AS state", "status", False),
+])
+def test_local_category_authorization_tracks_physical_projection(
+    tmp_path, adapter, projection, source, allowed,
+):
+    from test_data_agent.sql_query_profiling import (
+        SqlQueryProfileError, build_query_local_category_query,
+    )
+    table = "public.orders" if adapter is SqlQueryAdapter.POSTGRES else "lake.safe.orders"
+    query = authorize_query_source(
+        inspect_query_source(request(write_query(tmp_path, f"SELECT {projection} FROM {table}"), adapter=adapter)),
+        (QuerySourceColumn(source, "text", False),),
+    )
+    assert ("state" in query.safe_local_category_output_fields) is allowed
+    if allowed:
+        assert "GROUP BY" in build_query_local_category_query(query, "state").sql
+    else:
+        with pytest.raises(SqlQueryProfileError, match="not allowed"):
+            build_query_local_category_query(query, "state")
+
+
+@pytest.mark.parametrize("symlink", [False, True])
+def test_query_fifo_rejects_without_waiting_for_writer(tmp_path, symlink):
+    fifo = tmp_path / "fictional.sql"
+    os.mkfifo(fifo)
+    path = fifo
+    if symlink:
+        path = tmp_path / "linked.sql"
+        path.symlink_to(fifo)
+    import test_data_agent.sql_query_source as source
+
+    code = (
+        "from pathlib import Path; "
+        "from test_data_agent.sql_query_source import _read_stable_query_file, SqlQuerySourceError; "
+        "\ntry: _read_stable_query_file(Path(" + repr(str(path)) + "), max_bytes=1024)"
+        "\nexcept SqlQuerySourceError as error: print(str(error))"
+    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True,
+        text=True, timeout=3, cwd=tmp_path,
+        env={**os.environ, "PYTHONPATH": str(Path(source.__file__).resolve().parents[1]),
+             "PYTHONDONTWRITEBYTECODE": "1"})
+    assert result.returncode == 0
+    assert result.stdout.strip() == "SQL query input must be a regular file"
+    assert result.stderr == ""
+
+
+def test_query_regular_symlink_keeps_existing_compatibility(tmp_path):
+    from test_data_agent.sql_query_source import _read_stable_query_file
+
+    query = write_query(tmp_path, "SELECT amount FROM public.fictional_items")
+    link = tmp_path / "linked.sql"
+    link.symlink_to(query)
+    assert _read_stable_query_file(link, max_bytes=1024) == query.read_text()
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_query_parser_error_detaches_context(tmp_path: Path, adapter: SqlQueryAdapter) -> None:
+    path = write_query(tmp_path, "SELECT 'fictional_private_query_marker padding")
+    with pytest.raises(SqlQuerySourceError) as caught:
+        inspect_query_source(request(path, adapter=adapter))
+    assert str(caught.value) == "SQL query syntax is invalid"
+    assert caught.value.__cause__ is None
+    assert caught.value.__context__ is None

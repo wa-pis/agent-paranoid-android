@@ -50,6 +50,7 @@ services:
       TEST_DATA_AGENT_AUDIT_LOG: /audit/generator.jsonl
       TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE: /run/secrets/generator_audit_hmac_key
       TEST_DATA_AGENT_WORKSPACE_ROOT: /workspace
+      TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS: "${TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS:-120}"
     secrets:
       - generator_audit_hmac_key
     volumes:

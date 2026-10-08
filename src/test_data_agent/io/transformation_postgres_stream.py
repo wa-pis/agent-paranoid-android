@@ -8,7 +8,7 @@ Those remaining activation gates require separate evidence before real use.
 import math
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager, suppress
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -100,14 +100,7 @@ The query originates in capture authorization, not caller SQL or a receipt.
                     if value is None:
                         if not field.nullable:
                             raise ValueError
-                    elif not (
-                        (pa.types.is_string(field.type) and type(value) is str)
-                        or (pa.types.is_signed_integer(field.type) and type(value) is int)
-                        or (pa.types.is_float64(field.type) and type(value) is float and math.isfinite(value))
-                        or (pa.types.is_boolean(field.type) and type(value) is bool)
-                        or (pa.types.is_date32(field.type) and type(value) is date)
-                        or (pa.types.is_decimal128(field.type) and type(value) is Decimal and value.is_finite())
-                    ):
+                    elif not _native_capture_value(value, field, pa):
                         raise ValueError
                     values[index].append(value)
                     buffered_bytes += 4 + 4 * len(value) if type(value) is str else 16
@@ -135,3 +128,20 @@ The query originates in capture authorization, not caller SQL or a receipt.
                 connection.close()
     if failed:
         raise ValueError("invalid PostgreSQL result stream")
+
+
+def _native_capture_value(value: Any, field: Any, pa: Any) -> bool:
+    """Shared strict native scalar acceptance; never coerce source values."""
+    if value is None:
+        return bool(field.nullable)
+    return (
+                        (pa.types.is_string(field.type) and type(value) is str)
+                        or (pa.types.is_signed_integer(field.type) and type(value) is int)
+                        or (pa.types.is_float64(field.type) and type(value) is float and math.isfinite(value))
+                        or (pa.types.is_boolean(field.type) and type(value) is bool)
+                        or (pa.types.is_date32(field.type) and type(value) is date)
+                        or (pa.types.is_timestamp(field.type) and field.type.unit == "us"
+                            and field.type.tz == "UTC" and type(value) is datetime
+                            and value.tzinfo is not None and value.utcoffset() is not None)
+                        or (pa.types.is_decimal128(field.type) and type(value) is Decimal and value.is_finite())
+    )

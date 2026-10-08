@@ -4,7 +4,52 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc1] - Prospective candidate
+
+### Security
+
+- Project advisor-bound metadata through supported semantic fields before
+  external transport; omit opaque condition members, unused constraint data,
+  identifier prefixes, pattern text and auxiliary local annotations. Canonical
+  dates and formulas retain their meaning. Local review fingerprints and
+  immutable settings remain bound when proposals return.
+
+- Reject opaque or unsupported field distribution metadata before imported
+  profiles or specifications reach advisor/provider requests. Empty metadata
+  and supported typed distributions remain valid.
+
 ### Added
+
+- Add `transform-batch query-execute` to the 1.6 RC composition to review one frozen
+  capture, uses existing local preservation approval and retains validated
+  output after temporary-input cleanup. Trino capture capacity is scoped to
+  explicit transformation limits without changing ordinary profiling defaults.
+
+- Add administrator-configured PostgreSQL/Trino capture for the common transformation
+  workflow, with frozen policy checks, shared limits and owned temporary
+  snapshots consumed by candidate CLI/MCP interfaces without reconnecting.
+  The runtime generator MCP `configured_query_session` tool reuses the same
+  capture across requests, with local-only exact receipt issuance, bounded
+  expiry/admission and shutdown cleanup. Final release acceptance remains required.
+
+- Closed candidate Trino capture shares the owned SQL process supervisor with
+  PostgreSQL, retaining cumulative metadata/capture budgets and bounded result
+  IPC; final release acceptance remains required.
+
+- Bound typed Trino transformation streaming with the existing client and shared strict native-value checks.
+
+- Support exact UTC microsecond timestamp substitution in native transformation; naive timestamps and other Arrow timestamp encodings remain rejected.
+
+- Add a supervised PostgreSQL transformation-capture path that resolves the
+  configured optional driver inside the existing supervised worker. Synthetic
+  isolation tests do not certify live access.
+
+- Configure the generator MCP invocation deadline with `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS`; transport and services capture the same finite setting at startup.
+
+- Add the common saved-profile workflow for create/review/local
+  approval/validate/execute, with explicit shared budgets, exact snapshot binding
+  and metadata-only MCP consumption in the 1.6 RC composition. Independent
+  final-SHA safety review and release gates remain required.
 
 - Add separately selected local transformation execution, controlling-terminal
   preservation approval, and a workspace-confined MCP execution consumer using
@@ -27,6 +72,36 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Retain validated PostgreSQL no-row result numeric precision/scale as metadata; reject malformed declared shapes without rounding or fetching rows.
+
+- Reject CSV rows wider than their header in the shared reader before retaining rows or profiling samples; preserve missing-field padding.
+
+- Preserve the safe cleanup-incomplete warning through common transformation CLI and MCP2 errors so operators can inspect retained artifacts before retrying.
+
+- Bound saved batch profile external recaptures to their admitted byte lengths before allocation; reject source growth before reading or publishing.
+
+- Enforce trusted bootstrap byte ceilings before reading transformation batch profiles and single-input policies, preserving saved source-budget overrides.
+
+- Detach formula and query-source parser exception state; omit rejected cell values from standalone business-validation reports.
+
+- Replace malformed SQL parser and tokenizer diagnostics with a fixed detached error so query literals cannot enter direct errors or supported MCP responses.
+
+- Bound actual source-fingerprint bytes and local/MCP deadlines; stream folder inventories under file-count and time limits before sorting, including cache and dataset validation paths.
+
+- Reject spreadsheet formula-capable string cells and headers in transformation CSV output before publication, preserving exact accepted replacement text.
+
+- Mask entire safe-select maps with string keys to prevent leaking source data through nested keys.
+
+- SQL query inputs reject FIFOs before blocking reads; regular-file behavior remains unchanged.
+
+- Encode selective transformation Parquet output in 1024-row groups instead of retaining a second full normalized dataset; preserve timestamp-offset and source-reuse checks.
+
+- Retain intentionally invalid mixed/negative output and validation evidence
+  where the selected format can represent it; CLI routes report
+  `validation_failed` and exit 1 rather than successful validation.
+- Keep absent Parquet null/distinct metrics unknown; bounded local sensitivity
+  inspection cannot turn an incomplete scan into proof of safety.
+
 - Accept exact synthetic identifier tokens on email, phone and SSN identifier
   fields without weakening ordinary sensitive-field format checks.
 - Inspect native numeric and binary Parquet sensitivity conservatively within
@@ -44,6 +119,50 @@ All notable changes to this project are documented here.
   detection during publication and rollback.
 
 ### Security
+
+- Reject seeds outside signed 64-bit range before generation allocation; persisted nonnegative seeds are capped at 2**63-1. Existing bounded seeds retain deterministic identifiers.
+
+- Bound ordinary Trino category projections before driver return and reject
+  oversized sentinels before publishing a category or sensitivity summary.
+
+- Bound local-category value projections in PostgreSQL table and PostgreSQL/Trino
+  query profiling before driver allocation; reject oversized domains without
+  filtering categories or truncating values.
+
+- Suppress binary and unsupported returned values and nonnumeric map keys on
+  opt-in Trino safe-select before MCP serialization. Numeric and temporal
+  scalar compatibility and existing depth/value budgets remain enforced.
+
+
+- Default PostgreSQL connections to `verify-full`; require explicit local insecure opt-in for weaker TLS modes before resolving credentials. Configure a trusted CA and certificate hostname when migrating from the former `require` default.
+
+- Bound native constraint solving and rule validation inside their loops; share
+  cumulative evaluation/deadline budgets and account for quadratic negative
+  foreign-key and aggregate work before application.
+
+- Apply shared allocation preflight to direct generation, SQL export and transformation synthesis; bound string construction before allocation.
+- Bound cumulative local inference work and check local/MCP deadlines inside rule and relationship loops.
+- Reuse pre-conversion nested Arrow inspection for Parquet profiles and dataset reads.
+- Bound logical YAML alias expansion and reject recursive aliases before model construction, including private synthesis policies.
+
+
+- Carry inherited MCP deadlines through CSV profiling, generation and rollback-safe publication; reject expired profile output before atomic replacement.
+
+- Read dataset Parquet in bounded batches; enforce cumulative decoded bytes, dictionary expansion, nested cells and cell sizes before Python row conversion.
+
+- Bound formula operands and intermediate results; reject oversized string/byte repetition and concatenation before allocation.
+
+- Mask local category values and predicates before OpenAI transport using the shared provider privacy boundary.
+
+- Preserve physical SQL-column disclosure authorization through aliases; reject derived local categories and sensitive integer category values.
+
+- Reject Trino formula and aggregate-mapping residuals over sensitive-name
+  value operands before executing a query.
+
+- Inspect canonical numeric forms in folder CSV profiling and bind cached
+  source categories to the current field authorization; invalidate older caches.
+
+- Bound audit-log verification reads before parsing oversized records.
 
 - Apply one explicit replacement contract to all fields, including sensitive
   mapped permutations. Keep sensitivity notes value-free and mapped values only

@@ -9,8 +9,8 @@ rows to shuffle, duplicate, or export.
 
 ## Trust Boundaries
 
-Selective transformation is a separate, currently gated mixed-origin surface,
-not synthetic generation. Its inactive [execution and approval contract](../reference/cli.md#execution-candidate-not-publicly-enabled)
+Selective transformation is a separate mixed-origin surface in the 1.6 RC composition,
+not synthetic generation. Its implemented RC [execution and approval contract](../reference/cli.md#implemented-rc-execution-candidate)
 requires local interactive approval of exact input/review bytes before any
 explicitly non-sensitive field can be preserved. Agent execution can only
 consume an existing matching receipt; it cannot issue or broaden approval.
@@ -109,7 +109,8 @@ query work, and wall-clock generation time.
 
 ## What The Project Guarantees
 
-For supported workflows and accepted inputs, the project is designed to:
+For supported synthetic-generation workflows and accepted inputs, the project
+is designed to:
 
 - avoid copying complete source rows;
 - avoid writing raw detected PII into safe profiles;
@@ -149,6 +150,11 @@ reviewing profiles or specifications.
 
 Before publishing a generated dataset:
 
+This checklist applies to synthetic generation, not the gated mixed-origin
+transformation candidate. A transformed bundle must not be relabelled synthetic
+merely because validation passed: its action provenance and any matching local
+preservation receipt remain separate requirements.
+
 - manifest says `synthetic: true`;
 - manifest says `source_rows_copied: false`;
 - deterministic validation passed;
@@ -159,3 +165,16 @@ Before publishing a generated dataset:
 
 See [Review The Output](../getting-started/review-output.md) for the practical
 review sequence.
+
+
+### Configured SQL Transformation Sessions
+
+The separately selected 1.6 RC query workflow captures one allowlisted read-only
+result using administrator configuration, then reviews and validates frozen
+local bytes without reconnecting. It does not expand ordinary profiling or
+source-free generation authority. MCP returns only metadata and consumes an
+existing exact local controlling-TTY receipt when preservation requires one;
+it cannot issue approval. Session handles expire without recapture, owned raw
+inputs/receipts are removed, and only validated selected output is retained.
+Cleanup failure refuses further work. Registration is not data access permission
+or final exact-SHA security/release clearance.

@@ -845,3 +845,21 @@ def test_expression_references_distinguishes_function_calls_from_same_named_fiel
     assert expression_references("sum + sum('input') + count + count()") == (
         {"sum", "count"}, {"input"}, {"sum", "count"},
     )
+
+
+def test_conditional_allowed_report_omits_rejected_cell() -> None:
+    marker = "fictional.private@example.invalid"
+    rules = business_rules_from_dict({"row_rules": [{
+        "type": "conditional_allowed_values", "table": "orders",
+        "field": "shipping_method", "when": {"field": "status", "equals": "paid"},
+        "allowed_values": ["ground"],
+    }]})
+    report = validate_business_rules({"orders": [
+        {"status": "paid", "shipping_method": marker},
+        {"status": "paid", "shipping_method": "ground"},
+        {"status": "cancelled", "shipping_method": marker},
+    ]}, rules)
+    assert report.rule_fail_count == 1
+    assert report.rule_pass_count == 1
+    assert report.results[0].errors == ["orders[0].shipping_method: allowed_values"]
+    assert marker not in report.model_dump_json()

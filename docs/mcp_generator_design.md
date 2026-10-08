@@ -58,6 +58,13 @@ patterns. Source rows and raw sensitive values do not cross it.
 
 ## Tool Logic
 
+The inventory below describes the ordinary generator/review surface. The
+isolated candidate additionally composes single-input and common-profile
+transformation consumers, documented in [MCP usage](how-to/mcp.md#closed-common-profile-candidate).
+Their registration remains gated in the author checkout. The ordinary
+`approve_dataset_plan` receipt is not a source-preservation receipt and cannot
+authorize transformation preservation; MCP has no preservation approval issuer.
+
 | Tool | Why it exists | Input | Written output | MCP response |
 | --- | --- | --- | --- | --- |
 | `review_transformation` | Review a saved local transformation policy through the shared CLI core | Workspace source snapshot, YAML policy, optional table name | None | Review-only metadata and snapshot SHA-256; no execution or approval receipt |

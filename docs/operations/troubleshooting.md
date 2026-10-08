@@ -98,6 +98,24 @@ metadata, schema drift, or budget exhaustion fails closed and leaves no
 profile. Errors intentionally omit SQL text, literals, endpoints, and backend
 messages; inspect the local reviewed file and allowlists instead.
 
+## Transformation Candidate Rejected
+
+The isolated development candidate is described in the
+[CLI workflow](../reference/cli.md#closed-common-profile-workflow-candidate).
+Published `1.5.0` does not register the common-profile command.
+
+If the snapshot no longer matches, review the saved inputs, policies and
+mappings again; validate and execute with the newly returned digest. A receipt
+for an earlier snapshot cannot authorize the changed one. When preservation is
+selected, obtain a matching receipt through the separate local terminal
+workflow; an agent or MCP client cannot issue one.
+
+For a budget refusal, inspect the declared input, review and output limits
+before selecting another bounded run. Do not interpret partial work or elapsed
+process time as successful acceptance. If cleanup is incomplete, inspect the
+reported retained artifacts before retrying into a new destination. Existing
+files are not permission to overwrite or resume a failed publication.
+
 ## GigaChat Advice Failed
 
 Check the fixed local category first: missing extra, authentication, scope,
@@ -221,10 +239,11 @@ and seed into a new destination.
 
 Where an atomic state writer or staged bundle publication is used, replacement
 prevents readers from observing its partial state during normal operation.
-Standalone artifact commands are not one global transaction, and artifact
-files and parent directories are not flushed with `fsync`. A hard process
-stop, host or storage failure, or power loss can therefore leave staging data
-or lose a recent artifact. Use storage with the durability and backup
+Standalone artifact commands are not one global transaction. Shared atomic
+single-file writes and owned directory publication use `fsync`, but complete
+multi-file crash consistency is not guaranteed. A hard process stop, host or
+storage failure, or power loss can still leave staging data or an incomplete
+bundle. Use storage with the durability and backup
 guarantees required by the deployment.
 
 ## Input Limit Exceeded

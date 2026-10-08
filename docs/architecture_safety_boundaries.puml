@@ -1,5 +1,5 @@
 @startuml
-title Safety Boundaries
+title Synthetic Generation Safety Boundaries
 
 skinparam shadowing false
 skinparam componentStyle rectangle
@@ -81,6 +81,9 @@ The LLM boundary is intentional:
 planning is advisory, while generation,
 validation, and safety checks are
 deterministic Python code.
+This diagram excludes the gated mixed-origin
+transformation candidate and its separate
+exact-snapshot local preservation receipt.
 end note
 
 @enduml

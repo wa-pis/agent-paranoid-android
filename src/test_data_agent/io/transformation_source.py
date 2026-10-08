@@ -3,7 +3,7 @@
 import csv
 import os
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from test_data_agent.core.field import FieldProfile
 from collections.abc import Iterator, Sequence
 from pathlib import Path
@@ -28,7 +28,7 @@ from test_data_agent.core.transformation_yaml import load_behavior_policy_yaml
 from test_data_agent.csv_profiler import _csv_reader_from_snapshot, _profile_csv_rows, profile_csv_bytes, validate_csv_headers
 from test_data_agent.io.mapping_snapshot import read_mapping_snapshot
 from test_data_agent.io.transformation_input import source_reader, matching_text
-from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationLimitError, resolve_input_limit
+from test_data_agent.core.transformation_limits import EffectiveInputLimit, InputDimension, TransformationLimitError, resolve_input_limit, resolve_profile_capture_limit
 from test_data_agent.csv_profiler import CSVColumnAccumulator, CSVProfile
 from test_data_agent.io.path_policy import open_regular_file
 
@@ -187,16 +187,12 @@ def prepare_csv_review_from_paths(
     try:
         if max_total_bytes is not None and (type(max_total_bytes) is not int or max_total_bytes < 1):
             raise ValueError
-        bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, os.environ)
-        if max_total_bytes is not None:
-            if bootstrap.origin != "default":
-                bootstrap.check(max_total_bytes, requested=True)
-            bootstrap = EffectiveInputLimit(InputDimension.TOTAL_BYTES, max_total_bytes, "snapshot_run")
+        bootstrap = resolve_profile_capture_limit(max_total_bytes, os.environ)
         policy_yaml = read_mapping_snapshot(
             policy_root, policy_path, max_bytes=bootstrap.value, budget=budget, total_limit=bootstrap,
         ).payload
         policy = load_behavior_policy_yaml(policy_yaml,
-            max_bytes=bootstrap.value, budget=budget)
+            max_bytes=max_total_bytes if max_total_bytes is not None else bootstrap.value, budget=budget)
         total_limit = resolve_input_limit(InputDimension.TOTAL_BYTES, policy.resource_limits, os.environ)
         if max_total_bytes is None:
             max_total_bytes = total_limit.value
@@ -278,7 +274,7 @@ def trace_csv_review_request(
             traced_cells = 0
             for row_ordinal, row in enumerate(reader, start=1):
                 budget.check("text trace")
-                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date))) for value in row.values()):
+                if set(row) != set(names) or any(type(value) is not str and not (policy.input_format != "csv" and (value is None or type(value) in (int, float, bool, Decimal, date, datetime))) for value in row.values()):
                     raise ValueError
                 for column_ordinal, column in enumerate(names, start=1):
                     if column in selected:

@@ -6,6 +6,7 @@ from pathlib import Path
 from collections.abc import Sequence
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.csv_profiler import CSVProfile, profile_csv
 from test_data_agent.adapters.legacy_profile import (
@@ -23,12 +24,14 @@ def csv_file_to_dataset_profile(
     table_name: str | None = None,
     *,
     local_category_fields: Sequence[LocalCategoryField] = (),
+    budget: GenerationBudget | None = None,
 ) -> DatasetProfile:
     return csv_profile_to_dataset_profile(
         profile_csv(
             path,
             table_name=table_name,
             local_category_fields=local_category_fields,
+            budget=budget,
         )
     )
 

@@ -16,6 +16,43 @@ an explicit CLI value. Use `COMMAND --help` to inspect CLI defaults and
 `doctor --json` for installed/local capability states. `doctor` deliberately
 does not read provider credentials or test remote reachability.
 
+## Closed common transformation profile
+
+The 1.6 RC composition registers the common CLI/MCP workflow; published 1.5.0
+does not include it. Its versioned reference profile combines two or more inputs
+with one independently reviewed DatasetSpec for final linked validation:
+
+```yaml
+schema_version: "0.1"
+validation: validation.yaml
+inputs:
+  - entity: fictional_parents
+    source: parents.csv
+    policy: parents-policy.yaml
+  - entity: fictional_children
+    source: children.csv
+    policy: children-policy.yaml
+    mappings: [keys.csv]
+```
+
+`mappings` and `generation_policies` list exact local reference paths to bind;
+they do not embed source rows. All paths are relative to the explicit reference
+root, not to each policy's directory, and must pass restricted no-follow reads.
+Entities must match their policies and final validation spec. Unknown/duplicate
+keys, conflicting links, unsafe references and budget exhaustion fail closed.
+Source, policies, mappings, generation policies, validation and exact profile
+bytes bind the reviewed digest, including order and whitespace.
+
+Optional shared `resource_limits` supports only `max_total_input_bytes` and
+`max_output_bytes`; remaining dimensions stay in per-input behavior policies.
+Session precedence and explicit run-cap checks below still apply. Combined
+review bytes must fit `--max-review-bytes`; no truncation or implicit cap raise.
+The local create/wizard saves only policies/spec/references, not source copies
+or receipts. Saving changes paths and therefore requires fresh review. See the
+[closed CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
+CSV proposals, local confirmation and retained-publication restrictions. This
+profile is not a compatibility promise for the released `1.5.0` package.
+
 ## Input And Generation Limits
 
 | Variable | Default | Purpose |
@@ -43,12 +80,28 @@ does not read provider credentials or test remote reachability.
 Values must be positive integers, except the two `*_SECONDS` values, which
 accept positive finite numbers. Invalid environment values fail closed.
 
+## Generator MCP Invocation Deadline
+
+`TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` defaults to `120` and accepts a
+finite positive number of seconds. Set it in the generator MCP client's `env`
+configuration and restart that server. The Compose generator service forwards
+the same variable from the shell or Compose `.env` file. Startup rejects invalid values with a
+value-free configuration error (exit 78). One captured value governs both the
+transport request context and service invocation; tool arguments cannot change it.
+
+For a reviewed longer run, for example set this value to `1800`. The independent
+`TEST_DATA_AGENT_MAX_GENERATION_SECONDS`, profiling and transformation byte/row/
+cell limits still apply; set the relevant limits explicitly too. This setting
+does not enlarge SQL access, raw frame, argument or response-byte ceilings and
+does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
+`TRINO_MAX_INVOCATION_SECONDS` setting.
+
 ## Private Transformation Input Limits (1.6 Development)
 
-These settings currently apply to private source-file acquisition, the transformation input decoder and
-its policy-aware review preflight and CSV profiling/trace shape checks. They do not enable public execution, change
-source-free profiling/MCP budgets, or establish end-to-end capacity. Remaining
-pipeline caps still apply. The fictional private replacement-only CSV scenario
+These settings apply to transformation acquisition, decoding and policy-aware
+review preflight in the 1.6 RC composition, plus CSV profiling/trace shape checks.
+They do not change source-free profiling/MCP budgets or themselves establish
+end-to-end capacity. Remaining pipeline caps still apply. The fictional private replacement-only CSV scenario
 passed 300,000 rows × 50 columns; see
 [candidate evidence](https://github.com/wa-pis/agent-paranoid-android/blob/12e9e272c98ea469cbef92fe9fae49c518046461/openspec/changes/selective-source-transformation/csv-scale-acceptance.md).
 This does not certify public execution, SQL routes or the 1M × 100 target.
@@ -84,7 +137,7 @@ introduced here. In PowerShell, use
 | `max_total_input_bytes` | `536870912` | combined snapshot bytes |
 | `max_input_cell_chars` | `1000000` | characters |
 | `max_parquet_expanded_bytes` | `536870912` | decoded/estimated expanded bytes |
-| `max_output_bytes` | `536870912` | private CSV output bytes |
+| `max_output_bytes` | `536870912` | transformation output bytes |
 
 Each key has a session variable named `TEST_DATA_AGENT_TRANSFORM_` followed by
 the uppercase key. Values must be positive integers no greater than
@@ -101,20 +154,21 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Public request boundaries still
-need integration. Increasing a decoder limit
+explicit per-run argument. Registered candidate CLI/MCP request boundaries
+retain typed value-free limit failures. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
 budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
 
 Transformation total-input accounting includes source, behavior policy,
 referenced mappings/generation policies, classification evidence and displayed
 review bytes. Read-only review resolves the same session/profile ceiling as the
-closed execution candidate; it does not silently request the default ceiling.
+registered execution candidate; it does not silently request the default ceiling.
 Set `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES` for the session or
-`resource_limits.max_total_input_bytes` in the saved behavior profile. The closed,
-unregistered CLI candidate additionally accepts `--max-total-input-bytes` and
-the unregistered workspace adapter accepts `max_total_input_bytes`; neither is
-an activated public execution command/tool. Smaller explicit run caps report
+`resource_limits.max_total_input_bytes` in the saved behavior profile. The
+registered `transform-execute` CLI additionally accepts `--max-total-input-bytes`
+and the workspace-scoped `execute_transformation` tool accepts
+`max_total_input_bytes`. These implemented RC interfaces do not issue approval.
+Smaller explicit run caps report
 `snapshot_run`; a run cap above the configured ceiling is rejected, not raised.
 
 Private CSV character limits reach parsing, sensitivity detection and profile
@@ -139,18 +193,19 @@ also counts the manifest: `bundle_run` names
 `temporary_csv_publication(max_output_bytes=...)`. A bundle over budget is
 rejected before publication. These share the output ceiling when invoked by
 the publisher; standalone renderers only receive their explicit run budget.
-Private fictional query capture uses the same transformation input ceilings:
+Configured query capture uses the same transformation input ceilings:
 `max_rows` / `max_bytes` must fit the effective row / input-file-byte limits
 before opening its stream. Runtime exhaustion names `query_rows_run` or
 `query_bytes_run` and the corresponding `_capture_authorized_result` argument.
 Captured bytes include the query envelope; decoded bytes have their own
 `max_parquet_expanded_bytes` ceiling. The resolved limits and their origins
-are bound into capture metadata. PostgreSQL's private stream uses these
+are bound into capture metadata. PostgreSQL's owned stream uses these
 authorized capture limits, not aggregate-profiling result-row/cell budgets;
 allowlists, read-only sessions and existing statement/time limits remain.
 The private process supervisor reconstructs only validated fixed-schema limit
 diagnostics after clean worker exit and cleanup, never driver exception text.
-This does not activate public execution or establish real-database evidence.
+The registered RC workflow uses these checks; synthetic isolation evidence
+does not establish live-database acceptance.
 
 The private replacement dry-run has the same checks. Its exhausted run budget
 reports origin `replacement_trace_run` and names
@@ -205,8 +260,8 @@ The `POSTGRES_MAX_TABLES`, `POSTGRES_MAX_COLUMNS`, `POSTGRES_MAX_STATEMENTS`,
 | `POSTGRES_DATABASE` | `postgres` | Database name |
 | `POSTGRES_USER` | `test_data_agent` | Existing read-only database role |
 | `POSTGRES_PASSWORD_ENV` | unset | Name of the environment variable containing the password |
-| `POSTGRES_SSLMODE` | `require` | `require`, `verify-ca`, `verify-full`, or explicitly approved local `disable` |
-| `POSTGRES_ALLOW_INSECURE` | `false` | Required with `POSTGRES_SSLMODE=disable`; local isolated testing only |
+| `POSTGRES_SSLMODE` | `verify-full` | Verify the certificate and configured hostname; weaker modes require explicit local opt-in |
+| `POSTGRES_ALLOW_INSECURE` | `false` | Required with `require`, `verify-ca`, or `disable`; local isolated testing only |
 | `POSTGRES_ALLOWED_SCHEMAS` | required | Comma-separated schema allowlist |
 | `POSTGRES_ALLOWED_TABLES` | required | Comma-separated `schema.table` allowlist |
 | `POSTGRES_ALLOWED_COLUMNS` | required | Comma-separated exact `schema.table.column` or table-qualified `schema.table.*` profiling selectors |
@@ -412,3 +467,29 @@ These accept `1`, `true`, `yes`, or `on` and their false equivalents.
 
 Do not enable either override for production or production-adjacent Trino.
 Plain HTTP is intended only for an isolated local integration environment.
+
+
+## Configured SQL Session Bounds (1.6 RC)
+
+The generator MCP entrypoint reads these administrator settings once at startup.
+They bound the instance-owned `configured_query_session` manager, not ordinary
+source-free profiling or database credentials. Published 1.5.0 has no session
+tool. Invalid settings or workspace paths stop startup with a fixed error and
+exit code 78.
+
+| Variable | Default | Accepted values and meaning |
+| --- | ---: | --- |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE` | `4` | Integer 1–32; maximum simultaneously owned sessions. |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_CUMULATIVE_BYTES` | `67108864` | Positive integer through 9223372036854775807; lifetime input-byte reservation ceiling for this server instance. |
+| `TEST_DATA_AGENT_QUERY_SESSION_MAX_SECONDS` | `300` | Finite seconds 0.1–3600; session lifetime starts before capture and is never renewed by requests. |
+
+Each `open` reserves its explicit `max_total_bytes` before database work.
+Reservations are not refunded after failure, close or expiry. Per-input policy
+and transformation session ceilings still apply, as do SQL allowlists and
+statement, scan, invocation, transport and response budgets. Active operations
+are clamped to the session's remaining lifetime and request deadline.
+`max_review_bytes` must be positive and no greater than `max_total_bytes`; the
+output cap must fit the effective batch output ceiling. Expiry timers clean
+owned snapshots without requiring another request. The entrypoint also closes
+all sessions on normal or failed transport shutdown; cleanup failures refuse
+further work. See [the session workflow](../how-to/mcp.md#configured-sql-sessions-16-rc).

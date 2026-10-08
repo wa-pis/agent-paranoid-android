@@ -507,3 +507,34 @@ def test_profiling_boundary_does_not_import_transport_or_client() -> None:
     assert "test_data_agent.mcp_trino_server" not in imported_modules
     assert "test_data_agent.mcp_trino_transport" not in imported_modules
     assert "test_data_agent.trino_client" not in imported_modules
+
+
+@pytest.mark.parametrize(("target", "expression"), [
+    ("ssn", "quantity * 0"),
+    ("amount", "ssn * 0"),
+    ("amount", "quantity + SSN * 0"),
+    ("tax_id", "quantity * 0"),
+])
+def test_formula_sensitive_operands_fail_before_execution(target, expression):
+    def fetch(_query):
+        raise AssertionError("sensitive residual query executed")
+    profiler = TrinoProfiler(profiler_config(), fetch)
+    with pytest.raises(ValueError, match="sensitive columns"):
+        profiler.profile_formula_rule("analytics", "safe_schema", "orders", target, expression)
+
+
+@pytest.mark.parametrize(("parent_value", "child_value", "aggregate"), [
+    ("ssn", None, "count"),
+    ("SSN", "amount", "sum"),
+    ("amount", "ssn", "sum"),
+    ("amount", "tax_id", "avg"),
+])
+def test_aggregate_sensitive_operands_fail_before_execution(parent_value, child_value, aggregate):
+    def fetch(_query):
+        raise AssertionError("sensitive residual query executed")
+    profiler = TrinoProfiler(profiler_config(), fetch)
+    with pytest.raises(ValueError, match="sensitive columns"):
+        profiler.profile_aggregate_mapping(
+            "analytics", "safe_schema", "customers", "customer_id", parent_value,
+            "orders", "customer_id", child_value, aggregate,
+        )

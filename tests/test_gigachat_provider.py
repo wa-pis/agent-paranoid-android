@@ -408,6 +408,13 @@ def test_gigachat_advisor_keeps_valid_unsafe_changes_fail_closed() -> None:
     exchange = safe_exchange()
     proposal = proposal_for(exchange).model_dump(mode="json")
     proposal["dataset_spec"]["privacy_settings"]["treat_unknown_as_sensitive"] = False
+    # The custom-client adapter binds the external exchange to its projection.
+    from test_data_agent.providers.category_privacy import _provider_safe_request
+    from test_data_agent.advisor import dataset_profile_fingerprint, dataset_spec_fingerprint
+    from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+    projected, _ = _provider_safe_request(exchange.request, category_label_prefix="__apa_category")
+    proposal["profile_sha256"] = dataset_profile_fingerprint(DatasetProfile.model_validate(projected["profile"]))
+    proposal["baseline_spec_sha256"] = dataset_spec_fingerprint(DatasetSpec.model_validate(projected["baseline_spec"]))
     client = GigaChatAdvisorClient(
         client=FakeGigaChat(completion(json.dumps(proposal)))
     )

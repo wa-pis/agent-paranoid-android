@@ -6,9 +6,13 @@ import json
 import os
 import sys
 from collections.abc import Callable
+from dataclasses import replace
 from functools import partial
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
 
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
@@ -32,6 +36,7 @@ from test_data_agent.core.limits import (
     enforce_business_rules_payload_size,
     enforce_profile_payload_size,
     read_limited_text,
+    positive_float_env,
 )
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io import (
@@ -69,6 +74,7 @@ from test_data_agent.version import __version__
 
 
 WORKSPACE_ROOT_ENV = "TEST_DATA_AGENT_WORKSPACE_ROOT"
+MCP_MAX_INVOCATION_SECONDS_ENV = "TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS"
 
 
 class WorkspacePathError(ValueError):
@@ -78,16 +84,18 @@ class WorkspacePathError(ValueError):
 def review_transformation(input_path: str, policy_path: str, table_name: str | None = None) -> dict[str, Any]:
     """Review fixed local snapshots; no execution, DB access or approval receipt."""
     from test_data_agent.core.limits import (
-        DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, GenerationBudget,
+        DEFAULT_MAX_PROFILE_PAYLOAD_BYTES,
     )
     from test_data_agent.io.transformation_source import prepare_csv_review_from_paths
+    from test_data_agent.mcp_transformation_candidate import _mcp_transformation_budget
 
     source = resolve_workspace_path(input_path, must_exist=True, expect_file=True)
     policy = resolve_workspace_path(policy_path, must_exist=True, expect_file=True)
     _require_suffix(policy, {".yaml", ".yml"}, "behavior policy")
-    request = prepare_csv_review_from_paths(source, table_name or source.stem,
-        policy.parent, policy.name, max_total_bytes=None,
-        max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=GenerationBudget())
+    with _mcp_transformation_budget() as budget:
+        request = prepare_csv_review_from_paths(source, table_name or source.stem,
+            policy.parent, policy.name, max_total_bytes=None,
+            max_review_bytes=DEFAULT_MAX_PROFILE_PAYLOAD_BYTES, budget=budget)
     return {"operation": "review_transformation", "status": "review_only",
             "snapshot_sha256": request.snapshot_sha256, "review": json.loads(request.review)}
 
@@ -730,10 +738,19 @@ def generator_mcp_services(
     *,
     work_limits: QueryWorkLimits = DEFAULT_QUERY_WORK_LIMITS,
     budget_provider: Callable[[], QueryWorkBudget | None] | None = None,
+    query_sessions: "_ConfiguredQuerySessions | None" = None,
+    workspace: Path | None = None,
 ) -> list[Callable[..., Any]]:
+    from test_data_agent.mcp_transformation_candidate import _common_batch_tool
+    tools: tuple[Callable[..., Any], ...] = _GENERATOR_MCP_TOOLS
+    if workspace is not None:
+        tools = (*tools, _common_batch_tool(workspace))
+    if query_sessions is not None:
+        from test_data_agent.mcp_transformation_candidate import _configured_query_session_tool
+        tools = (*tools, _configured_query_session_tool(query_sessions))
     return [
         with_query_work_budget(tool, work_limits, budget_provider=budget_provider)
-        for tool in _GENERATOR_MCP_TOOLS
+        for tool in tools
     ]
 
 
@@ -758,7 +775,8 @@ def _current_transport_work_budget() -> QueryWorkBudget | None:
 
 
 mcp: Any = create_generator_mcp(
-    generator_mcp_services(budget_provider=_current_transport_work_budget)
+    generator_mcp_services(budget_provider=_current_transport_work_budget),
+    strict_arguments=True,
 )
 
 
@@ -772,22 +790,43 @@ def main() -> int:
             file=sys.stderr,
         )
         return 69
-    work_limits = DEFAULT_QUERY_WORK_LIMITS
-    audit_logger_from_env("generator-mcp")
-    mcp = create_generator_mcp(
-        generator_mcp_services(
-            work_limits=work_limits,
-            budget_provider=_current_transport_work_budget,
+    try:
+        work_limits = replace(
+            DEFAULT_QUERY_WORK_LIMITS,
+            max_invocation_seconds=positive_float_env(
+                MCP_MAX_INVOCATION_SECONDS_ENV,
+                DEFAULT_QUERY_WORK_LIMITS.max_invocation_seconds,
+            ),
         )
-    )
-    run_bounded_generator_mcp(
-        mcp,
-        max_payload_bytes=work_limits.raw_transport_payload_bytes,
-        request_context_factory=partial(
-            _new_transport_work_budget,
-            work_limits=work_limits,
-        ),
-    )
+    except ValueError:
+        print(
+            f"{MCP_MAX_INVOCATION_SECONDS_ENV} must be a finite positive number",
+            file=sys.stderr,
+        )
+        return 78
+    audit_logger_from_env("generator-mcp")
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+    try:
+        configured_workspace = workspace_root()
+        sessions = _ConfiguredQuerySessions(configured_workspace,
+            max_active=int(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_ACTIVE", "4")),
+            max_cumulative_bytes=int(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_CUMULATIVE_BYTES", str(64 * 1024**2))),
+            max_seconds=float(os.environ.get("TEST_DATA_AGENT_QUERY_SESSION_MAX_SECONDS", "300")))
+    except (ValueError, OSError):
+        print("Invalid bounded SQL session configuration", file=sys.stderr)
+        return 78
+    try:
+        mcp = create_generator_mcp(
+            generator_mcp_services(work_limits=work_limits,
+                budget_provider=_current_transport_work_budget, query_sessions=sessions, workspace=configured_workspace),
+            strict_arguments=True,
+        )
+        run_bounded_generator_mcp(
+            mcp, max_payload_bytes=work_limits.raw_transport_payload_bytes,
+            request_context_factory=partial(_new_transport_work_budget, work_limits=work_limits),
+        )
+    finally:
+        sessions.close()
     return 0
 
 

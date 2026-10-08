@@ -42,7 +42,9 @@ class TransformationLimitError(InputLimitError):
         if (type(dimension) is not InputDimension or type(amount) is not int
                 or type(limit) is not int or not 0 <= amount <= 2**63 - 1
                 or not 0 < limit <= 2**63 - 1
-                or origin not in {"default", "profile", "session", "legacy_session", "snapshot_run", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run", "query_rows_run", "query_bytes_run"}
+                or origin not in {"default", "profile", "session", "legacy_session", "snapshot_run", "trace_run", "replacement_trace_run", "output_run", "bundle_run", "sql_output_run", "parquet_output_run", "query_rows_run", "query_bytes_run", "batch_input_run", "batch_output_run", "batch_bundle_run"}
+                or origin == "batch_input_run" and dimension is not InputDimension.TOTAL_BYTES
+                or origin in {"batch_output_run", "batch_bundle_run"} and dimension is not InputDimension.OUTPUT_BYTES
                 or origin == "snapshot_run" and dimension is not InputDimension.TOTAL_BYTES
                 or origin == "query_rows_run" and dimension is not InputDimension.ROWS
                 or origin == "query_bytes_run" and dimension is not InputDimension.BYTES
@@ -65,7 +67,10 @@ class TransformationLimitError(InputLimitError):
                             "output_run": "replace_csv_snapshot(max_output_bytes=...)",
                             "bundle_run": "temporary_csv_publication(max_output_bytes=...)",
                             "sql_output_run": "render_transformation_sql(max_bytes=...)",
-                            "parquet_output_run": "render_transformation_parquet(max_bytes=...)"}.get(origin)
+                            "parquet_output_run": "render_transformation_parquet(max_bytes=...)",
+                            "batch_input_run": "prepare_batch(max_total_bytes=...)",
+                            "batch_output_run": "execute_batch(max_output_bytes=...)",
+                            "batch_bundle_run": "temporary_batch_publication(max_output_bytes=...)"}.get(origin)
         recovery = (f"Run: increase {self.run_setting} within the session/profile ceiling. "
                     if self.run_setting else "")
         super().__init__(f"{self.code}: {dimension.value} {amount} > {limit} {self.unit} "
@@ -108,3 +113,18 @@ def resolve_input_limit(dimension: InputDimension, profile: TransformationInputL
         return EffectiveInputLimit(dimension, int(value), origin)
     raise ValueError(f"invalid resource setting: {setting if origin == 'session' else legacy}; "
         f"use a positive integer <= {2**63 - 1}; profile key resource_limits.{key}")
+
+
+def resolve_profile_capture_limit(run_cap: int | None, session: Mapping[str, str],
+                                  *, run_origin: str = "snapshot_run") -> EffectiveInputLimit:
+    """Bound unparsed profile bytes before saved source ceilings are known."""
+    bootstrap = resolve_input_limit(InputDimension.TOTAL_BYTES, None, session)
+    if run_cap is None:
+        return bootstrap
+    if type(run_cap) is not int or run_cap < 1:
+        raise ValueError("invalid profile capture budget")
+    if bootstrap.origin != "default":
+        bootstrap.check(run_cap, requested=True)
+    if run_cap < bootstrap.value:
+        return EffectiveInputLimit(InputDimension.TOTAL_BYTES, run_cap, run_origin)
+    return bootstrap

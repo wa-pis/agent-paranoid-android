@@ -30,6 +30,7 @@
       "generate-from-csv",
       "validate",
       "generate-from-example",
+      "transform-batch",
       "demo",
       "doctor",
       "audit-verify",
@@ -71,6 +72,89 @@
       "output_schema": {
         "additionalProperties": true,
         "title": "approve_dataset_planDictOutput",
+        "type": "object"
+      }
+    },
+    {
+      "description": "Closed fictional common-profile consumer; no rows or approval issuer.",
+      "input_schema": {
+        "properties": {
+          "destination": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Destination"
+          },
+          "max_output_bytes": {
+            "title": "Max Output Bytes",
+            "type": "integer"
+          },
+          "max_review_bytes": {
+            "title": "Max Review Bytes",
+            "type": "integer"
+          },
+          "max_total_bytes": {
+            "title": "Max Total Bytes",
+            "type": "integer"
+          },
+          "operation": {
+            "enum": [
+              "review",
+              "validate",
+              "execute"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "profile": {
+            "title": "Profile",
+            "type": "string"
+          },
+          "receipt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Receipt"
+          },
+          "snapshot_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Snapshot Sha256"
+          }
+        },
+        "required": [
+          "operation",
+          "profile",
+          "max_total_bytes",
+          "max_review_bytes",
+          "max_output_bytes"
+        ],
+        "title": "common_transformationArguments",
+        "type": "object"
+      },
+      "name": "common_transformation",
+      "output_schema": {
+        "additionalProperties": true,
+        "title": "common_transformationDictOutput",
         "type": "object"
       }
     },

@@ -482,3 +482,20 @@ def test_server_keeps_client_compatibility_exports() -> None:
     assert mcp_trino_server.TrinoClient is TrinoClient
     assert mcp_trino_server.TrinoResultLimitError is TrinoResultLimitError
     assert mcp_trino_server.rows_to_dicts is rows_to_dicts
+
+
+def test_owned_row_iterator_is_lazy_and_closes_on_early_consumer_exit():
+    from test_data_agent.trino_client import _identity_row_converter
+
+    cursor = FakeCursor([(1, "alpha"), (2, "beta")])
+    driver = FakeDriver(cursor)
+    client = TrinoClient(config=client_config(), driver=driver)
+    with client._query_rows("SELECT 1", None, row_converter_factory=_identity_row_converter) as result:
+        rows, description = result
+        assert description == cursor.description
+        assert cursor.fetch_sizes == []
+        assert next(rows) == (1, "alpha")
+        assert cursor.fetch_sizes == [1]
+    assert cursor.closed and driver.dbapi.connection.closed
+    assert list(rows) == []
+    assert cursor.fetch_sizes == [1]

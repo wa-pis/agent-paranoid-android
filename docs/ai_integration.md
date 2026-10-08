@@ -175,7 +175,14 @@ test-data-agent agent-advisor-request out/agent \
   --exchange > advisor_exchange.json
 ```
 
-Load the exchange locally and map each part to the provider's API:
+Load the exchange locally. Exported documents can contain category literals,
+matching predicates and local generation metadata. Do not transmit them unchanged.
+`ExchangeDatasetAdvisor` projects the request for built-in and custom clients,
+recomputes its fingerprints, validates the projected proposal, restores retained
+local metadata under deterministic guards and validates the original request.
+Clients must echo the fingerprints they receive. Standalone JSON handoff must
+implement this tested projection and local restoration or refuse transmission.
+After projection, map each part to the provider's API:
 
 - send `trusted_instructions` through its system or developer instruction
   channel;

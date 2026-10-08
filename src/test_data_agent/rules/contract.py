@@ -6,6 +6,7 @@ import math
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.settings import GenerationMode
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import enforce_business_rule_evaluations
@@ -224,8 +225,18 @@ def estimate_business_rule_evaluations(
     rules: BusinessRules,
     spec: DatasetSpec,
 ) -> int:
-    row_counts = {entity.name: entity.row_count for entity in spec.entities}
-    estimated = sum(
+    return estimate_business_rule_evaluations_for_rows(
+        rules, {entity.name: entity.row_count for entity in spec.entities},
+        mode=spec.generation_settings.mode,
+    )
+
+
+def estimate_business_rule_evaluations_for_rows(
+    rules: BusinessRules, row_counts: dict[str, int], *, mode: str = GenerationMode.VALID,
+) -> int:
+    negative = GenerationMode(mode) in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
+    estimated = rules.rule_count
+    estimated += sum(
         row_counts.get(field_rule.table, 0)
         * max(1, len(field_rule.allowed_values or []))
         for field_rule in rules.field_rules
@@ -248,11 +259,17 @@ def estimate_business_rule_evaluations(
             estimated += row_count
     for cross_table_rule in rules.cross_table_rules:
         if isinstance(cross_table_rule, ForeignKeyRule):
-            estimated += row_counts.get(cross_table_rule.parent_table, 0)
-            estimated += row_counts.get(cross_table_rule.child_table, 0)
+            parents = row_counts.get(cross_table_rule.parent_table, 0)
+            children = row_counts.get(cross_table_rule.child_table, 0)
+            estimated += parents + children
+            if negative:
+                estimated += 4 * parents * children
         elif isinstance(cross_table_rule, AggregateFormulaRule):
-            estimated += row_counts.get(cross_table_rule.table, 0)
-            estimated += expression_complexity(cross_table_rule.expression)
+            rows = row_counts.get(cross_table_rule.table, 0)
+            complexity = expression_complexity(cross_table_rule.expression)
+            estimated += rows * (1 + complexity)
+            if negative and cross_table_rule.field != "*":
+                estimated += rows * rows * (1 + complexity)
     if rules.scenarios:
         estimated += sum(row_counts.values()) * len(rules.scenarios)
         for table, row_count in row_counts.items():

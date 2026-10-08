@@ -298,3 +298,210 @@ def test_actual_supervisor_caller_cancellation_reaps_worker(tmp_path):
             harness.kill()
             harness.join(1)
         harness.close()
+
+
+def test_configured_capture_rejects_invalid_request_before_driver_resolution(monkeypatch):
+    from test_data_agent.io import transformation_postgres_capture as module
+
+    def forbidden():
+        pytest.fail("invalid capture must not load or connect a driver")
+
+    monkeypatch.setattr(module, "_configured_postgres_driver", forbidden)
+    with pytest.raises(ValueError, match="invalid isolated PostgreSQL capture"):
+        module._capture_configured_postgres(object(), max_seconds=5)
+
+
+@pytest.mark.parametrize("fault", ["source", "table", "adapter"])
+def test_capture_metadata_rejects_unauthorized_request_before_connection(tmp_path, fault):
+    from dataclasses import replace
+    from test_data_agent.io.transformation_postgres_capture import _discover_postgres_capture_metadata
+    from test_data_agent.postgres_config import PostgresConfig
+    from test_data_agent.sql_query_source import SqlQueryAdapter, SqlQueryProfileRequest
+
+    query = tmp_path / "query.sql"
+    query.write_text("SELECT status FROM public.orders")
+    request = SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "warehouse", "orders", query)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.status"}))
+    if fault == "source":
+        request = replace(request, source_id="other")
+    elif fault == "table":
+        config = replace(config, allowed_tables=frozenset({"public.other"}),
+            allowed_columns=frozenset({"public.other.status"}))
+    else:
+        request = replace(request, adapter=SqlQueryAdapter.TRINO)
+
+    class ForbiddenDriver:
+        def connect(self, **kwargs):
+            pytest.fail("unauthorized metadata must not connect")
+
+    with pytest.raises(ValueError, match="invalid PostgreSQL capture metadata") as caught:
+        _discover_postgres_capture_metadata(request, config, driver=ForbiddenDriver())
+    assert caught.value.__context__ is None
+
+
+@pytest.mark.parametrize("drift", [False, True])
+def test_capture_metadata_uses_only_authorized_no_row_schema(tmp_path, monkeypatch, drift):
+    from test_data_agent.io.transformation_postgres_capture import _discover_postgres_capture_metadata
+    from test_data_agent import postgres_client
+    from test_data_agent.postgres_config import PostgresConfig
+    from test_data_agent.sql_query_source import SqlQueryAdapter, SqlQueryProfileRequest
+
+    query = tmp_path / "query.sql"
+    query.write_text("SELECT status AS label FROM public.orders")
+    request = SqlQueryProfileRequest(SqlQueryAdapter.POSTGRES, "warehouse", "orders", query)
+    config = PostgresConfig(source_id="warehouse", host="fictional.invalid", port=5432,
+        database="fictional", user="fictional", allowed_schemas=frozenset({"public"}),
+        allowed_tables=frozenset({"public.orders"}),
+        allowed_columns=frozenset({"public.orders.status"}))
+    events = []
+
+    class Session:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            events.append("closed")
+
+        def fetch_aggregate_dicts(self, query):
+            assert "pg_catalog.pg_attribute" in query.sql
+            return [{"column_name": "status", "data_type": "text", "is_nullable": True}]
+
+        def describe_no_rows(self, query):
+            assert query.sql.endswith("WHERE FALSE")
+            assert '"label"' in query.sql
+            return (postgres_client.PostgresResultColumn(
+                "other" if drift else "label", "text", True),)
+
+    class Client:
+        def __init__(self, **kwargs):
+            assert kwargs["config"] is config
+
+        def session(self):
+            return Session()
+
+    monkeypatch.setattr(postgres_client, "PostgresClient", Client)
+    if drift:
+        with pytest.raises(ValueError, match="invalid PostgreSQL capture metadata"):
+            _discover_postgres_capture_metadata(request, config, driver=object())
+    else:
+        columns, result, plan = _discover_postgres_capture_metadata(request, config, driver=object())
+        assert columns[0].name == "status" and result[0].name == "label"
+        assert plan.output_fields == ("label",)
+    assert events == ["closed"]
+
+
+@pytest.mark.parametrize("kind", ["numeric", "numeric(39,2)", "numeric(4,5)",
+    "numeric(8,-2)", "jsonb", "integer[]", "timestamp without time zone"])
+def test_capture_schema_refuses_lossy_or_unsupported_metadata(kind):
+    from test_data_agent.io.transformation_postgres_capture import _postgres_capture_schema
+    from test_data_agent.postgres_client import PostgresResultColumn
+
+    with pytest.raises(ValueError, match="unsupported PostgreSQL capture schema") as caught:
+        _postgres_capture_schema((PostgresResultColumn("value", kind, True),))
+    assert caught.value.__context__ is None
+
+
+def test_capture_schema_preserves_exact_decimal_width_and_nullability():
+    import pyarrow as pa
+    from test_data_agent.io.transformation_postgres_capture import _postgres_capture_schema
+    from test_data_agent.postgres_client import PostgresResultColumn
+
+    schema = _postgres_capture_schema((PostgresResultColumn("amount", "numeric(38, 6)", False),
+        PostgresResultColumn("count", "integer", True)))
+    assert schema.field("amount").type == pa.decimal128(38, 6)
+    assert schema.field("amount").nullable is False
+    assert schema.field("count").type == pa.int32()
+    assert schema.field("count").nullable is True
+
+
+def _metadata_driver(fault=None):
+    from types import SimpleNamespace
+
+    class Cursor:
+        def execute(self, sql, parameters=()):
+            self.metadata = "pg_catalog.pg_attribute" in sql
+            if self.metadata:
+                self.description = [(name,) for name in ("column_name", "data_type", "is_nullable")]
+                self.rows = [("status", "text", True)]
+            else:
+                self.description = [("other" if fault == "schema_drift" else "label",
+                    SimpleNamespace(name="text"), None, None, None, None, True)]
+                self.rows = [] if sql.endswith("WHERE FALSE") else [("alpha",), ("beta",)]
+
+        def fetchmany(self, size):
+            assert size == 1
+            if self.metadata and fault == "metadata_fetch":
+                while True:
+                    time.sleep(1)
+            return [self.rows.pop(0)] if self.rows else []
+
+        def close(self):
+            pass
+
+    class Driver:
+        def connect(self, **kwargs):
+            assert "default_transaction_read_only=on" in kwargs["options"]
+            return self
+
+        def cursor(self, **kwargs):
+            return Cursor()
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    return Driver()
+
+
+def test_owned_worker_discovers_metadata_before_result_capture(tmp_path):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
+    from test_data_agent.io.transformation_source import _profile_transformation_source
+    from test_data_agent.core.limits import GenerationBudget
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    request.query_file.write_text("SELECT status AS label FROM public.orders")
+    policy = kwargs["policy"].model_copy(update={"fields": kwargs["policy"].fields[:1]})
+    capture = _PostgresCapture(request, _config(), (), None, policy, 3, 16384)
+    source = _capture_postgres_isolated(capture, driver_factory=_metadata_driver, max_seconds=10)
+    profile = _profile_transformation_source(source, policy, budget=GenerationBudget(5), max_bytes=16384)
+    assert profile.source_type == "postgres_query"
+
+
+@pytest.mark.parametrize("fault", ["metadata_fetch", "schema_drift"])
+def test_owned_metadata_failure_returns_no_snapshot_and_reaps_worker(tmp_path, fault):
+    from test_data_agent.io.transformation_postgres_capture import _PostgresCapture, _capture_postgres_isolated
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    request.query_file.write_text("SELECT status AS label FROM public.orders")
+    policy = kwargs["policy"].model_copy(update={"fields": kwargs["policy"].fields[:1]})
+    capture = _PostgresCapture(request, _config(), (), None, policy, 3, 16384)
+    before = {child.pid for child in multiprocessing.active_children()}
+    with pytest.raises(ValueError, match="invalid isolated PostgreSQL capture"):
+        _capture_postgres_isolated(capture, driver_factory=partial(_metadata_driver, fault),
+            max_seconds=2)
+    assert {child.pid for child in multiprocessing.active_children()} == before
+
+
+def test_configured_entry_discards_untrusted_metadata_before_worker(monkeypatch, tmp_path):
+    from test_data_agent.io import transformation_postgres_capture as module
+
+    request, kwargs = setup(tmp_path, SqlQueryAdapter.POSTGRES)
+    capture = module._PostgresCapture(request, _config(), kwargs["source_columns"],
+        kwargs["schema"], kwargs["policy"], 3, 16384)
+    expected = object()
+
+    def supervisor(actual, *, driver_factory, max_seconds):
+        assert actual.schema is None and actual.source_columns == ()
+        assert actual.request is request and actual.config is capture.config
+        assert actual.policy is capture.policy
+        assert driver_factory is module._configured_postgres_driver
+        assert max_seconds == 5
+        return expected
+
+    monkeypatch.setattr(module, "_capture_postgres_isolated", supervisor)
+    assert module._capture_configured_postgres(capture, max_seconds=5) is expected

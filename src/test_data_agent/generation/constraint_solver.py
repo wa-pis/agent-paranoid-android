@@ -8,6 +8,8 @@ from typing import Any
 
 from test_data_agent.core.constraint import Constraint, ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.generation.limits import enforce_dataset_rule_work
+from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.core.distribution import (
     CategoricalDistribution,
     NumericDistribution,
@@ -21,31 +23,49 @@ from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.expressions import expression_references, parse_datetime, safe_eval
 
 
-def solve_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec, seed: int) -> None:
-    apply_relationships(rows_by_entity, spec)
-    apply_formula_constraints(rows_by_entity, spec)
-    apply_temporal_constraints(rows_by_entity, spec)
-    apply_conditional_required_constraints(rows_by_entity, spec)
-    apply_aggregate_mapping_constraints(rows_by_entity, spec)
+def solve_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    seed: int,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    enforce_dataset_rule_work(spec, budget=budget,
+        row_counts={name: len(rows) for name, rows in rows_by_entity.items()})
+    apply_relationships(rows_by_entity, spec, budget=budget)
+    apply_formula_constraints(rows_by_entity, spec, budget=budget)
+    apply_temporal_constraints(rows_by_entity, spec, budget=budget)
+    apply_conditional_required_constraints(rows_by_entity, spec, budget=budget)
+    apply_aggregate_mapping_constraints(rows_by_entity, spec, budget=budget)
 
 
-def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    relationships = [r for r in spec.relationships if r.status != "rejected"]
+def apply_relationships(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    relationships = [r for r in budget.iter_rule_work(spec.relationships) if r.status != "rejected"]
     writers: dict[tuple[str, str], list[int]] = defaultdict(list)
-    for index, relationship in enumerate(relationships):
+    for index, relationship in budget.iter_rule_work(enumerate(relationships)):
         writers[relationship.child_entity, relationship.child_field].append(index)
     dependencies = {
-        index: [writer for writer in writers.get(
+        index: [writer for writer in budget.iter_rule_work(writers.get(
             (relationship.parent_entity, relationship.parent_field), []
-        ) if writer != index]
-        for index, relationship in enumerate(relationships)
+        )) if writer != index]
+        for index, relationship in budget.iter_rule_work(enumerate(relationships))
     }
-    groups = {index: index for index in dependencies}
+    groups = {index: index for index in budget.iter_rule_work(dependencies)}
     while True:
-        graph: dict[int, set[int]] = {group: set() for group in groups.values()}
-        for index, parents in dependencies.items():
+        budget.consume_rule_work()
+        graph: dict[int, set[int]] = {group: set() for group in budget.iter_rule_work(groups.values())}
+        for index, parents in budget.iter_rule_work(dependencies.items()):
             graph[groups[index]].update(
-                groups[parent] for parent in parents if groups[parent] != groups[index]
+                groups[parent] for parent in budget.iter_rule_work(parents) if groups[parent] != groups[index]
             )
         try:
             group_order = list(TopologicalSorter(graph).static_order())
@@ -55,19 +75,19 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
             cycle = set(exc.args[1])
             representative = min(cycle)
             groups = {index: representative if group in cycle else group
-                      for index, group in groups.items()}
+                      for index, group in budget.iter_rule_work(groups.items())}
     # Inside a cycle retain legacy input order and unconditional final validation.
-    order = [index for group in group_order for index in groups if groups[index] == group]
-    for index in order:
+    order = [index for group in budget.iter_rule_work(group_order) for index in budget.iter_rule_work(groups) if groups[index] == group]
+    for index in budget.iter_rule_work(order):
         relationship = relationships[index]
         parent_rows = rows_by_entity.get(relationship.parent_entity, [])
         child_rows = rows_by_entity.get(relationship.child_entity, [])
-        parent_values = [row.get(relationship.parent_field) for row in parent_rows if row.get(relationship.parent_field) is not None]
+        parent_values = [row.get(relationship.parent_field) for row in budget.iter_rule_work(parent_rows) if row.get(relationship.parent_field) is not None]
         if not parent_values:
             continue
         child_field = spec.entity(relationship.child_entity).field(relationship.child_field)
         child_rows = [
-            row for row in child_rows
+            row for row in budget.iter_rule_work(child_rows)
             if not (child_field.nullable and row.get(relationship.child_field) is None)
         ]
         if relationship.relationship_type == RelationshipType.ONE_TO_ONE and len(child_rows) > len(parent_values):
@@ -75,16 +95,20 @@ def apply_relationships(rows_by_entity: dict[str, list[dict[str, Any]]], spec: D
                 f"one_to_one relationship has more child rows than parent rows: "
                 f"{relationship.parent_entity}->{relationship.child_entity}"
             )
-        for index, child_row in enumerate(child_rows):
+        for index, child_row in budget.iter_rule_work(enumerate(child_rows)):
             if relationship.relationship_type == RelationshipType.ONE_TO_ONE:
                 child_row[relationship.child_field] = parent_values[index]
             else:
                 child_row[relationship.child_field] = parent_values[index % len(parent_values)]
 
 
-def ordered_formula_constraints(spec: DatasetSpec) -> list[Constraint]:
+def ordered_formula_constraints(
+    spec: DatasetSpec, *, budget: GenerationBudget | None = None
+) -> list[Constraint]:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     formulas: dict[tuple[str, str], Constraint] = {}
-    for constraint in spec.constraints:
+    for constraint in budget.iter_rule_work(spec.constraints):
         if constraint.type != ConstraintType.FORMULA or constraint.status == ConstraintStatus.REJECTED:
             continue
         key = (constraint.entity, constraint.fields[0])
@@ -92,31 +116,40 @@ def ordered_formula_constraints(spec: DatasetSpec) -> list[Constraint]:
             raise ValueError("duplicate formula target")
         formulas[key] = constraint
     dependencies: dict[tuple[str, str], list[tuple[str, str]]] = {}
-    for key, constraint in formulas.items():
+    for key, constraint in budget.iter_rule_work(formulas.items()):
         try:
             names, _, _ = expression_references(constraint.expression or "")
         except ValueError:
             raise ValueError("formula expression is invalid") from None
         dependencies[key] = sorted(
-            (constraint.entity, name) for name in names
+            (constraint.entity, name) for name in budget.iter_rule_work(names)
             if (constraint.entity, name) in formulas
         )
     try:
         order = list(TopologicalSorter(dependencies).static_order())
     except CycleError:
         raise ValueError("cyclic formula dependencies") from None
-    return [formulas[key] for key in order]
+    return [formulas[key] for key in budget.iter_rule_work(order)]
 
 
-def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
+def apply_formula_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
     allow_invalid_values = spec.generation_settings.mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE}
-    for constraint in ordered_formula_constraints(spec):
+    for constraint in budget.iter_rule_work(ordered_formula_constraints(spec, budget=budget)):
         assert constraint.expression is not None
         target = constraint.fields[0]
-        for row in rows_by_entity.get(constraint.entity, []):
+        for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
             failed = False
             try:
-                row[target] = safe_eval(constraint.expression, row)
+                row[target] = safe_eval(constraint.expression, row, budget=budget)
+            except GenerationLimitError:
+                raise
             except Exception:
                 if allow_invalid_values:
                     continue
@@ -125,43 +158,64 @@ def apply_formula_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], s
                 raise ValueError("formula evaluation failed")
 
 
-def apply_temporal_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    for constraint in spec.constraints:
+def apply_temporal_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    for constraint in budget.iter_rule_work(spec.constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.TEMPORAL or len(constraint.fields) < 2:
             continue
         start_field, end_field = constraint.fields[:2]
-        for row in rows_by_entity.get(constraint.entity, []):
+        for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
             start = parse_datetime(row.get(start_field))
             end = parse_datetime(row.get(end_field))
             if start is not None and (end is None or end < start):
                 row[end_field] = row[start_field]
 
 
-def apply_conditional_required_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    for constraint in spec.constraints:
+def apply_conditional_required_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    for constraint in budget.iter_rule_work(spec.constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.CONDITIONAL_REQUIRED or not constraint.condition:
             continue
         condition = Condition(**constraint.condition)
-        for row in rows_by_entity.get(constraint.entity, []):
-            if condition_matches(row, condition):
-                for field in constraint.fields:
+        for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
+            if condition_matches(row, condition, budget=budget):
+                for field in budget.iter_rule_work(constraint.fields):
                     if row.get(field) in (None, ""):
                         row[field] = default_value_for_field(spec.entity(constraint.entity).field(field))
 
 
-def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str, Any]]], spec: DatasetSpec) -> None:
-    for constraint in spec.constraints:
+def apply_aggregate_mapping_constraints(
+    rows_by_entity: dict[str, list[dict[str, Any]]],
+    spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
+) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("deterministic rule entry")
+    for constraint in budget.iter_rule_work(spec.constraints):
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type != ConstraintType.AGGREGATE_MAPPING or not constraint.target_entity:
             continue
         relationship = next(
             (
-                item for item in spec.relationships
+                item for item in budget.iter_rule_work(spec.relationships)
                 if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
             ),
             None,
@@ -171,7 +225,7 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         totals: dict[Any, float] = defaultdict(float)
         counts: dict[Any, int] = defaultdict(int)
         target_field = constraint.target_field
-        for child_row in rows_by_entity.get(relationship.child_entity, []):
+        for child_row in budget.iter_rule_work(rows_by_entity.get(relationship.child_entity, [])):
             key = child_row.get(relationship.child_field)
             if constraint.aggregate == "count":
                 totals[key] += 1
@@ -189,7 +243,7 @@ def apply_aggregate_mapping_constraints(rows_by_entity: dict[str, list[dict[str,
         parent_field = constraint.fields[0] if constraint.fields else None
         if parent_field is None:
             continue
-        for parent_row in rows_by_entity.get(relationship.parent_entity, []):
+        for parent_row in budget.iter_rule_work(rows_by_entity.get(relationship.parent_entity, [])):
             key = parent_row.get(relationship.parent_field)
             aggregate_value = totals.get(key, 0.0)
             if constraint.aggregate == "avg" and counts.get(key, 0):

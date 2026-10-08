@@ -65,3 +65,54 @@ Remaining: public interface/activation review, other format routes and 1M ×100
 target acceptance, client evidence reconciliation and final RC gates. This
 private fictional checkpoint does not close those requirements. The previously
 accepted unchanged CSV-scale scenario was not repeated.
+
+## Configurable target harness — 2026-10-05
+
+The fictional-driver harness accepts `--max-bytes`, `--capture-bytes` and
+`--max-seconds`, retaining historical 512MiB / 64MiB / 1800s defaults.
+Per-file capture, total-input, decoded-input, output and worker time budgets are
+explicit; ordinary PostgreSQL profiling row/cell limits remain unchanged.
+10 × 3 smoke passed at 2MiB / 1MiB capture / 60s, including worker lifecycle,
+full readback and cleanup. Six invalid-budget startup checks and Ruff passed.
+This is harness validation, not target proof or live database evidence.
+
+Initial target run FAILED before capture: candidate
+`a14df8866b1ef4dbe5ac3d6d27959c94ee22a447`, installed wheel SHA-256
+`bcce6365fbb6724d2d583796a61567d99bbdc6c9a9e86eb7e02a5d65f156ae8e`
+(same runtime wheel as b49ceed; these commits change harness/docs only).
+Arguments: `--rows 1000000 --columns 100 --max-bytes 1073741824
+--capture-bytes 134217728 --max-seconds 3600`.
+Resumable state: `/private/tmp/apa-postgres-target-current.json`; PID 80533;
+log `/private/tmp/apa-postgres-target-a14df88-333utbsh/run.log`.
+The generated name field_cc was correctly classified as sensitive before
+opening the fictional stream. Fixture correction uses neutral numeric suffixes
+and checks all names against the existing classifier; no runtime guard changed.
+No live DB, public activation or all-route/RC clearance is implied.
+
+Corrected 10 × 100 smoke passed at target budgets (0.693s), including full
+readback and lifecycle/cleanup. **Corrected target PASSED:**
+SHA `611b78178fea285b193fb3bc92dccdc2bd6a953a`, same installed runtime wheel above; immutable copied
+harness SHA-256 `522f638f67bb9c0ee1c66df8a0d5dfc1b0d174ad95960a6541384e5f0684bafa`.
+State `/private/tmp/apa-postgres-target-current.json`, PID 80658,
+log `/private/tmp/apa-postgres-target-611b781-5gvohx2q/run.log`. Poll this run before launching another.
+
+Target results: capture 81.850s / 35,469,307 encoded bytes; profile cumulative
+401.913s; review cumulative 724.378s; complete 1412.882s. Output CSV
+600,001,000 bytes. All 100,000,000 cells passed ordered readback, exact row
+count, 100% replacement provenance, unchanged captured digest and input/output
+cleanup; child lifecycle and no remaining worker assertions passed.
+Profiling limits remain 10,000 rows / 100,000 cells; explicit transformation
+limits admitted 1M rows / 100M cells. This is the fictional injected-driver
+private PostgreSQL-result → CSV route only, not live DB or public/all-route RC
+acceptance. The terminal JSON remains in the log above.
+
+## Remaining output harness checks — 2026-10-05
+
+The same fictional worker fixture now accepts `--output-format parquet` or
+`postgresql_sql`. 2051 × 3 multi-batch readback smokes passed: Parquet 0.493s
+/ 2,037 bytes; SQL full framing/every ordered INSERT/COMMIT/EOF checked without
+execution. Both retain schema/provenance/digest/lifecycle/cleanup assertions.
+Ruff passed. Harness time validation matches the existing isolated worker's
+0.1..3600s range before fixture creation. Target checks for these two outputs
+remain open. Do not start another large run while the recorded Parquet →
+Parquet target is still active.

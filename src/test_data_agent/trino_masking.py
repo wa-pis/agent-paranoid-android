@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 from typing import Any
 
 from test_data_agent.core.privacy import (
@@ -16,7 +18,7 @@ from test_data_agent.core.privacy import (
     mask_value as mask_value,
     synthetic_category_distribution as synthetic_category_distribution,
 )
-from test_data_agent.core.limits import InputLimitError, max_input_cells, max_json_depth
+from test_data_agent.core.limits import InputLimitError, max_input_cell_chars, max_input_cells, max_json_depth
 from test_data_agent.trino_config import TrinoConfig
 from test_data_agent.trino_query_builders import (
     TrinoQuery,
@@ -84,6 +86,9 @@ def _mask_returned_value(
     ):
         return mask_value(value)
     if isinstance(value, dict):
+        # Map keys are source contents, not trusted schema labels.
+        if any(type(item) not in (bool, int, float, Decimal) for item in value):
+            return mask_value(value)
         return {
             nested_key: _mask_returned_value(
                 nested,
@@ -106,11 +111,19 @@ def _mask_returned_value(
             )
             for nested in value
         )
-    return value
+    if type(value) in (type(None), bool, int, float, Decimal, date, datetime, time, timedelta):
+        return value
+    return mask_value(value)
 
 
 def summarize_top_values(top_values: list[dict[str, Any]]) -> dict[str, Any]:
     """Replace source categories with masked patterns or synthetic rank labels."""
+    max_chars = max_input_cell_chars()
+    if any(
+        not isinstance(row.get("value"), str) or len(row["value"]) > max_chars
+        for row in top_values
+    ):
+        raise InputLimitError("Trino category value exceeds the safe input limit")
     content_sensitive_type = infer_sensitive_type_from_values(
         row.get("value") for row in top_values
     )

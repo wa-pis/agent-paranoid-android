@@ -17,16 +17,16 @@ Trino separately retains its configured scan/time and measured payload budgets.
 Existing implementation guards must not be removed or relabelled as stronger
 guarantees. No new platform/dependency restriction has been authorized.
 
-Owner question: retain these existing measured budgets and honestly disclose
+Historical owner question (resolved by the capacity decision above): retain these existing measured budgets and honestly disclose
 unmeasured peak-memory/wire properties for 1.6, leaving hard OS/wire containment
 as a separately scoped enhancement, or explicitly add that stronger guarantee
-to this release? Automation paused pending this safety/scope clarification.
+to this release? At that checkpoint automation paused pending clarification; this is not a current blocker.
 No current runtime policy changed and no activation gate declared passed.
 
 Status: private supervisor plus fictional evidence; public capture remains inactive. No database contacted,
 no new minimum dependency requirement and no completed transport gate claimed.
 
-## Evidence
+## Historical transport assessment
 
 - Declared dependency is `psycopg>=3.2.0`; local inspected implementation is
   psycopg 3.3.4 (`connection_async.py`, `connection.py`, `waiting.py`).
@@ -61,7 +61,7 @@ Every tested child was reaped. This is not yet a production supervisor or eviden
 for uninterruptible kernel waits, Windows behavior, memory caps, wire-byte limits,
 or server-side termination. Do not reuse the startup allowance as a release SLA.
 
-## Private supervisor integration
+## Initial private supervisor integration (historical)
 
 `io/transformation_postgres_capture.py` calls the actual capture/stream path
 inside a spawned process. `_PostgresCapture` carries explicit typed inputs;
@@ -96,3 +96,42 @@ pre-allocation or isolated resource enforcement; explicit backend work limits;
 no partial snapshot/publication; exact context binding; independent safety review.
 If portability requires a new supported-platform or libpq-version restriction,
 obtain the owner's decision rather than silently changing compatibility.
+
+## Configured-driver increment — 2026-10-07
+
+`_capture_configured_postgres` selects only the fixed internal psycopg factory;
+optional-driver import occurs in the existing supervised child after capture
+preflight. Connection configuration remains explicit. This is a closed adapter
+increment, not public CLI/MCP registration or permission for real database use.
+The synthetic isolation suite passed29cases, including invalid-request refusal
+before driver resolution. No live database was contacted.
+
+The next public adapter must obtain source/output metadata through bounded
+allowlisted discovery, bind it and the query identity to the captured snapshot,
+and consume the resulting snapshot through the existing review/receipt workflow.
+Caller-provided Arrow schemas and source metadata from private fixtures are not
+sufficient authority for that discovery or public activation. Retain server
+read-only/time limits and current process cleanup; exact wire-byte and peak-RSS
+containment remain disclosed residual limitations under the owner decision.
+
+## Owned SQL capture checkpoint — 2026-10-07
+
+Author source `26180e7ea1e1421fc3e33fbc41f5b40ad1533214` now includes
+configured PostgreSQL and Trino factories inside an owned spawned worker. The
+shared SQL supervisor bounds returned IPC and terminates/reaps blocked driver
+operations. Owned discovery obtains source columns and no-row output metadata,
+rejects unsupported native types and alias drift, and binds capture to the
+authorized query fingerprint. Caller fixture metadata is not public authority.
+Trino discovery and streaming share one invocation work budget.
+
+Synthetic lifecycle and query regressions passed 108 cases; owned Trino
+capture → review → CSV, Parquet and SQL artifact tests check complete
+small-fixture readback and temporary-root cleanup. SQL artifacts were not
+executed and no live database was contacted. This supersedes the initial
+no-configured-driver statement above, while preserving its measured resource
+limitations: bounded IPC and process cleanup do not guarantee worker RSS,
+wire bytes, OS scheduling or immediate server-side termination.
+
+Public CLI/MCP registration, final versioned acceptance and independent review
+of the final exact SHA remain open. These private configured helpers and
+synthetic tests alone do not establish release readiness or live compatibility.

@@ -1,5 +1,28 @@
 ## ADDED Requirements
 
+### Requirement: Common saved-profile consumers preserve local authority
+
+The common CLI and generator MCP SHALL consume the same saved profile and exact
+reviewed identity. Generator MCP SHALL take its root from trusted server workspace
+configuration, require explicit positive input/review/output byte budgets, retain
+existing transport/work ceilings and reject unknown caller arguments without
+reflecting their values. MCP SHALL NOT create preservation receipts. Public
+registration SHALL remain gated by finished-candidate independent safety review.
+
+#### Scenario: Installed common workflow consumes a local receipt
+- **GIVEN** a fictional saved profile reviewed and confirmed through local controlling-TTY CLI
+- **WHEN** CLI or MCP validates or executes the exact reviewed snapshot
+- **THEN** preservation requires the existing bound receipt
+- **AND** missing or stale authority is rejected without exposing source values
+- **AND** MCP returns bounded review/summary metadata rather than output rows
+
+#### Scenario: Common output retention is explicit and bounded
+- **GIVEN** an execute request with a configured workspace and explicit byte budgets
+- **WHEN** destination names a new direct-child bundle
+- **THEN** validated output may be retained using the existing safe publication mechanism
+- **AND** review/validate destinations, unsafe paths and existing destinations are rejected
+- **AND** omission of destination retains no output bundle
+
 ### Requirement: Transformation Authority Is Separate From Generation
 
 Workspace transformation execution SHALL be a separately selected mixed-origin
@@ -95,3 +118,15 @@ remain; it SHALL NOT delete unverified paths or authorize overwrite retries.
 - **WHEN** cleanup cannot confirm the identity of an invocation-owned artifact
 - **THEN** the error warns that output or staging may remain
 - **AND** local inspection is required before retrying without overwrite
+
+### Requirement: Generator MCP Deadline Is Operator Configurable
+Generator MCP SHALL capture a finite positive `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` at startup, default 120 seconds, and share it between transport and service budgets. Tool arguments SHALL NOT override this setting. Independent generation, profiling, transformation and payload limits SHALL remain enforced.
+
+#### Scenario: Reviewed longer invocation
+- **WHEN** the operator configures 1800 seconds and restarts generator MCP
+- **THEN** its transport and services receive the same 1800-second limit
+- **AND** their byte limits and independent local-work limits remain unchanged.
+
+#### Scenario: Invalid startup deadline
+- **WHEN** the setting is zero, negative, non-finite or malformed
+- **THEN** startup fails before registering/running tools or resolving audit material with a value-free error.

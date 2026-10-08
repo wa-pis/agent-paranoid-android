@@ -7,10 +7,13 @@ from typing import Any
 
 import yaml
 from yaml.events import AliasEvent
+from yaml.nodes import MappingNode, ScalarNode, SequenceNode
 
 from test_data_agent.core.limits import (
     InputLimitError,
     max_json_depth,
+    max_input_cells,
+    max_input_file_bytes,
     max_yaml_aliases,
     max_yaml_depth,
 )
@@ -21,6 +24,8 @@ class LimitedSafeLoader(yaml.SafeLoader):
         super().__init__(stream)
         self.alias_count = 0
         self.composition_depth = 0
+        self._expanded_sizes: dict[int, tuple[int, int]] = {}
+        self._alias_nodes = 0
 
     def compose_node(self, parent: Any, index: Any) -> Any:
         event = self.peek_event()  # type: ignore[no-untyped-call]
@@ -32,7 +37,32 @@ class LimitedSafeLoader(yaml.SafeLoader):
         try:
             if self.composition_depth > max_yaml_depth():
                 raise ValueError(f"YAML input nesting exceeds {max_yaml_depth()} levels")
-            return super().compose_node(parent, index)
+            node = super().compose_node(parent, index)
+            if isinstance(event, AliasEvent):
+                if id(node) not in self._expanded_sizes:
+                    raise InputLimitError("recursive YAML aliases are not allowed")
+                self._alias_nodes += self._expanded_sizes[id(node)][0]
+                if self._alias_nodes > max_input_cells():
+                    raise InputLimitError("YAML logical expansion exceeds configured input limits")
+                return node
+            nodes, byte_count = 1, 0
+            if isinstance(node, ScalarNode):
+                byte_count = len(node.value.encode("utf-8"))
+                children = []
+            elif isinstance(node, SequenceNode):
+                children = node.value
+            elif isinstance(node, MappingNode):
+                children = [child for pair in node.value for child in pair]
+            else:
+                raise InputLimitError("unsupported YAML node")
+            for child in children:
+                child_nodes, child_bytes = self._expanded_sizes[id(child)]
+                nodes += child_nodes
+                byte_count += child_bytes
+            if byte_count > max_input_file_bytes():
+                raise InputLimitError("YAML logical expansion exceeds configured input limits")
+            self._expanded_sizes[id(node)] = nodes, byte_count
+            return node
         finally:
             self.composition_depth -= 1
 

@@ -24,13 +24,17 @@ from test_data_agent.core.distribution import (
 )
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
-from test_data_agent.core.limits import GenerationBudget, enforce_row_count_limit
+from test_data_agent.core.limits import (
+    GenerationBudget, GenerationLimitError, enforce_output_payload_size,
+    enforce_row_count_limit, max_input_cell_chars,
+)
 from test_data_agent.core.privacy import (
     SYNTHETIC_PREFIX,
     is_sensitive_field,
 )
-from test_data_agent.core.settings import GenerationMode
+from test_data_agent.core.settings import GenerationMode, MIN_GENERATION_SEED, MAX_GENERATION_SEED
 from test_data_agent.generation.constraint_solver import solve_constraints
+from test_data_agent.generation.limits import estimate_dataset_output_bytes, enforce_dataset_rule_work
 from test_data_agent.generation.semantic_provider import (
     SemanticValueProvider,
     SemanticValueRequest,
@@ -47,8 +51,14 @@ def generate_dataset(
     budget: GenerationBudget | None = None,
     semantic_provider: SemanticValueProvider | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
+    if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
+        raise GenerationLimitError("seed must be a signed 64-bit integer")
     assert_spec_safe(spec)
     budget = budget or GenerationBudget()
+    budget.check("generation allocation preflight")
+    enforce_output_payload_size(estimate_dataset_output_bytes(spec), label="estimated generated data")
+    budget.check("generation allocation preflight")
+    enforce_dataset_rule_work(spec, budget=budget)
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = create_faker(spec.generation_settings.locale)
     faker.seed_instance(seed)
@@ -83,9 +93,9 @@ def generate_dataset(
             )
         rows_by_entity[entity.name] = rows
     budget.check("constraint solving")
-    solve_constraints(rows_by_entity, spec, seed=seed)
+    solve_constraints(rows_by_entity, spec, seed=seed, budget=budget)
     budget.check("constraint solving")
-    assert_generated_dataset_valid(rows_by_entity, spec)
+    assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     return rows_by_entity
 
 
@@ -326,6 +336,8 @@ def synthetic_string(field: FieldSpec, typed_distribution: StringPatternDistribu
     else:
         min_length = int(distribution.get("min_length", 6))
         max_length = int(distribution.get("max_length", max(min_length, 12)))
+    if max_length > max_input_cell_chars():
+        raise GenerationLimitError("generated string exceeds configured cell size limit")
     if max_length == 0:
         if field.nullable:
             return ""

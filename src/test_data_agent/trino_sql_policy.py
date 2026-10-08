@@ -153,8 +153,11 @@ def parse_trino_statements(sql: str) -> list[exp.Expression]:
         )
     try:
         statements = sqlglot.parse(sql, read="trino")
-    except sqlglot.errors.ParseError as exc:
-        raise SqlSafetyError(f"invalid SQL: {exc}") from exc
+    except (sqlglot.errors.ParseError, sqlglot.errors.TokenError):
+        statements = None
+    if statements is None:
+        # Parser diagnostics contain query literals; detach all exception state.
+        raise SqlSafetyError("invalid SQL") from None
     parsed_statements: list[exp.Expression] = []
     for statement in statements:
         if statement is not None:

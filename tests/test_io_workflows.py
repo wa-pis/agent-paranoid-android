@@ -10,7 +10,7 @@ import pytest
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.field import FieldProfile, FieldSpec
-from test_data_agent.core.limits import GenerationLimitError
+from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.io.artifacts import validate_generation_bundle, write_json_artifact_atomic
 from test_data_agent.io.commands import write_generation_summary
@@ -746,7 +746,7 @@ def test_generate_dataset_bundle_does_not_leave_partial_output_on_validation_err
     )
     spec = infer_dataset_spec_artifact(profile, output_path=tmp_path / "dataset_spec.yaml", count=2)
 
-    def fail_validation(rows_by_entity, spec):
+    def fail_validation(rows_by_entity, spec, *, budget=None):
         raise RuntimeError("validation failed")
 
     monkeypatch.setattr("test_data_agent.io.workflows.validate_dataset", fail_validation)
@@ -792,7 +792,7 @@ def test_staged_workflows_remove_temp_output_when_time_budget_expires(
     tmp_path: Path,
     workflow: str,
 ) -> None:
-    class ExportDeadline:
+    class ExportDeadline(GenerationBudget):
         def check(self, stage: str) -> None:
             deadline_stage = (
                 "artifact publication" if workflow == "single" else "dataset export"

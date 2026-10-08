@@ -9,9 +9,13 @@ The reviewed development activation candidate adds `transform-execute` and local
 `transform-approve` CLI entrances and the workspace consumer
 `execute_transformation`. They share fixed-snapshot application enforcement;
 MCP has no receipt issuer. Ordinary generation remains source-free. These
-additions have exact-SHA safety evidence in ActivationSafety-R3; the current
-development goldens include their registration. Final RC review and release
-gates remain required before public delivery.
+original additions have exact-SHA safety evidence in ActivationSafety-R3; the
+development goldens include their registration. That historical evidence does
+not clear the later coherent candidate or common-profile consumers. Their
+registration is included in the prospective 1.6 RC composition; current
+independent safety clearance, final RC review and release gates remain required
+before public delivery. See [MCP usage](../how-to/mcp.md#closed-common-profile-candidate)
+for the gated common-profile surface.
 This page makes their ownership and the current architectural pressure visible
 in one place so each extraction can be reviewed against the same baseline.
 
@@ -358,9 +362,11 @@ functions as wrappers and injects the safe column summarizer from
 `trino_masking.py` now owns content-aware value masking, masked sensitive
 patterns, synthetic category-rank summaries, safe column-profile completion,
 and opt-in safe-select result masking. Aggregate profiles replace source
-categories with synthetic labels or masked patterns. Safe-select masking is
-heuristic: returned rows may retain allowed source values that are not
-classified as sensitive, so they are outside the source-literal-free guarantee
+categories with synthetic labels or masked patterns. Safe-select recursively
+masks every returned string, including binary source representations, and masks
+non-string fields or values recognized as sensitive. Allowed non-string source
+values may remain when the detector does not classify them as sensitive, so the
+returned rows are outside the source-literal-free guarantee
 for the default aggregate-only tools. `mcp_trino_server.py` retains the
 remaining tool functions and privacy helper imports as compatibility exports
 while delegating masking below the transport boundary.
@@ -395,3 +401,12 @@ Each refactor pull request must:
 See [Public Stability](stability.md) for change classification and the active
 [OpenSpec](https://github.com/wa-pis/agent-paranoid-android/blob/main/openspec/changes/application-boundaries-refactor/proposal.md)
 for the staged extraction plan.
+
+The 1.6 RC composition adds `transform-batch`, including `query-execute`,
+and the running generator MCP server adds `common_transformation` and
+`configured_query_session`. Their operations share application enforcement;
+only local controlling-TTY approval issues a preservation receipt.
+`io/transformation_query_sessions.py` owns bounded frozen captures across MCP
+requests, expiry and shutdown cleanup; `mcp_generator_server:main` injects and
+closes that owner. The default module-level SDK object owns no SQL sessions.
+Registration is not dataset authorization or final release clearance.

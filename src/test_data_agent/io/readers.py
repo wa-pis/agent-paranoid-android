@@ -8,6 +8,7 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec, parse_dataset_spec_payload
 from test_data_agent.core.limits import (
+    bounded_directory_paths,
     enforce_input_cell_count,
     enforce_input_column_count,
     enforce_input_files,
@@ -16,9 +17,11 @@ from test_data_agent.core.limits import (
     inspect_json_rows,
     read_limited_text,
 )
+from test_data_agent.core.parquet_limits import inspect_parquet_batch
 from test_data_agent.core.serialization import load_limited_json, load_limited_yaml
 from test_data_agent.csv_profiler import detect_csv_dialect, detect_csv_encoding, validate_csv_headers
 from test_data_agent.migration import reject_removed_spec_payload
+from test_data_agent.profiling.budget import LocalProfileBudget
 
 
 def load_dataset_spec(path: Path) -> DatasetSpec:
@@ -48,13 +51,18 @@ def _is_dataset_profile_payload(payload: Any) -> bool:
 
 def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
-    input_paths = [path for path in sorted(input_folder.iterdir()) if path.suffix in {".csv", ".json", ".parquet"}]
+    budget = LocalProfileBudget()
+    input_paths = bounded_directory_paths(
+        input_folder, (".csv", ".json", ".parquet"),
+        lambda: budget.check_deadline("dataset inventory"),
+    )
     stems = [path.stem for path in input_paths]
     if len(stems) != len(set(stems)):
         raise ValueError("duplicate entity artifact names")
     enforce_input_files(input_paths)
     total_rows = 0
     total_cells = 0
+    decoded_bytes = 0
     for path in input_paths:
         if path.suffix == ".csv":
             encoding = detect_csv_encoding(path)
@@ -97,7 +105,14 @@ def load_dataset_rows(input_folder: Path) -> dict[str, list[dict[str, Any]]]:
                 ) from exc
             parquet_file = pq.ParquetFile(path)
             enforce_parquet_metadata_limits(parquet_file.metadata, label=f"Parquet {path.name!r}")
-            total_rows += int(parquet_file.metadata.num_rows if parquet_file.metadata is not None else 0)
-            enforce_input_row_count(total_rows, label="dataset")
-            rows_by_entity[path.stem] = parquet_file.read().to_pylist()
+            rows = []
+            for batch in parquet_file.iter_batches(batch_size=256):
+                total_rows += batch.num_rows
+                enforce_input_row_count(total_rows, label="dataset")
+                # Arrow allocates a batch before this check; reject before Python rows.
+                decoded_bytes, total_cells = inspect_parquet_batch(
+                    batch, decoded_bytes=decoded_bytes, total_cells=total_cells,
+                )
+                rows.extend(batch.to_pylist())
+            rows_by_entity[path.stem] = rows
     return rows_by_entity

@@ -338,11 +338,7 @@ def test_safe_select_masks_strings_in_nested_values() -> None:
 
     assert result == [
         {
-            "payload": {
-                "note": "[MASKED]",
-                "items": ["[MASKED]", 3],
-                "pair": ("[MASKED]", 4),
-            },
+            "payload": "[MASKED]",
             "count": 2,
         }
     ]
@@ -355,7 +351,7 @@ def test_safe_select_masks_strings_in_nested_values() -> None:
         (
             "TEST_DATA_AGENT_MAX_JSON_DEPTH",
             2,
-            {"outer": {"value": "hidden"}},
+            {1: {2: "hidden"}},
             "Trino safe-select result values must have depth <= 2",
         ),
         (
@@ -460,3 +456,110 @@ def test_masking_boundary_does_not_import_transport_or_client() -> None:
     assert "test_data_agent.mcp_trino_server" not in imported_modules
     assert "test_data_agent.mcp_trino_transport" not in imported_modules
     assert "test_data_agent.trino_client" not in imported_modules
+
+
+@pytest.mark.parametrize("key", ["fictional@example.test", "ordinary label", synthetic_secret()])
+def test_safe_select_masks_source_map_keys_without_collapsing_entries(key):
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": [{key: 1, "second": 2}], "count": 2}])
+    result = masker.run_safe_select(
+        "SELECT payload, count FROM analytics.safe_schema.customers LIMIT 1")
+    assert result == [{"payload": ["[MASKED]"], "count": 2}]
+    assert key not in str(result)
+
+
+def test_safe_select_retains_numeric_map_shape_and_masks_string_values():
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": {1: "fictional", 2: [3, "label"]}}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": {1: "[MASKED]", 2: [3, "[MASKED]"]}}]
+
+
+@pytest.mark.parametrize("payload", [b"fictional@example.test", bytearray(b"fictional@example.test"), memoryview(b"fictional@example.test"), b"\xff", [b"fictional@example.test"], (b"fictional@example.test",), {1: b"fictional@example.test"}])
+def test_safe_select_masks_binary_representations(payload):
+    from pydantic_core import to_json
+
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": payload, "count": 2}])
+    result = masker.run_safe_select(
+        "SELECT payload, count FROM analytics.safe_schema.customers LIMIT 1")
+    encoded = to_json(result)
+    assert b"fictional@example.test" not in encoded
+    assert b"[MASKED]" in encoded
+    assert result[0]["count"] == 2
+
+
+@pytest.mark.parametrize("key", [b"fictional@example.test", object()])
+def test_safe_select_masks_unsupported_map_keys(key):
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": {key: 1}}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": "[MASKED]"}]
+
+
+
+def test_safe_select_retains_supported_scalar_types():
+    from datetime import date, datetime, time, timedelta
+    from decimal import Decimal
+
+    values = [None, True, 3, 2.5, Decimal("1.25"), date(2020, 1, 1),
+              datetime(2020, 1, 1), time(12, 0), timedelta(days=2)]
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": values}])
+    result = masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1")
+    assert result == [{"payload": values}]
+    assert [type(value) for value in result[0]["payload"]] == [type(value) for value in values]
+
+
+def test_safe_select_masks_custom_scalar_without_string_conversion():
+    class Unknown:
+        def __str__(self):
+            raise AssertionError("must not stringify source value")
+
+    class SourceInt(int):
+        pass
+
+    masker = TrinoMasker(config=masker_config(), fetch_query=reject_query,
+        fetch_sql=lambda _sql: [{"payload": [Unknown(), SourceInt(4)]}])
+    assert masker.run_safe_select(
+        "SELECT payload FROM analytics.safe_schema.customers LIMIT 1"
+    ) == [{"payload": ["[MASKED]", "[MASKED]"]}]
+
+
+@pytest.mark.parametrize("value", [None, "fictional-oversized", "🌱" * 9])
+def test_category_summary_rejects_sentinel_and_oversized_values(
+    monkeypatch: pytest.MonkeyPatch, value: object,
+) -> None:
+    from test_data_agent.core.limits import InputLimitError
+
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "8")
+    with pytest.raises(InputLimitError, match="^Trino category value exceeds the safe input limit$"):
+        summarize_top_values([{"value": "safe", "count": 3}, {"value": value, "count": 2}])
+
+
+def test_category_summary_accepts_unicode_boundary_and_empty_string(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS", "8")
+    assert summarize_top_values([
+        {"value": "🌱" * 8, "count": 3}, {"value": "", "count": 2},
+    ]) == {"top_values": [{"value": "category_1", "count": 3}, {"value": "category_2", "count": 2}]}
+
+
+def test_profile_column_rejects_oversized_projection_before_publication() -> None:
+    from test_data_agent.core.limits import InputLimitError
+
+    def fetch_query(query: TrinoQuery) -> list[dict[str, Any]]:
+        if "GROUP BY" in query.sql:
+            # Source changed after the aggregate; SQL returns a bounded sentinel.
+            return [{"value": None, "count": 2}]
+        return [{"row_count": 2, "non_null_count": 2, "approx_distinct_count": 1}]
+
+    masker = TrinoMasker(masker_config_allowlisted_columns(), fetch_query, reject_sql)
+    with pytest.raises(InputLimitError, match="safe input limit"):
+        masker.profile_column_safe(
+            "analytics", "safe_schema", "customers", "country_code", "varchar", False, 20,
+        )

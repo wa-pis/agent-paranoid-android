@@ -60,3 +60,178 @@ Candidate full-run cumulative stage timings: profile68.522s, review135.900s.
 Residual work: SQL-result capture/worker budget propagation, public interface
 and activation review, full target1M x100/multi-route acceptance, documentation
 and final RC release gates. No hard RSS/wire guarantee is claimed.
+
+## Configurable target harness — 2026-10-05
+
+The CSV harness now accepts explicit `--max-bytes` and `--max-seconds`,
+retaining 512MiB / 1800s defaults. The selected byte budget applies both to
+saved per-file/total-input/output limits and to run limits. Invalid nonpositive,
+nonfinite time or oversized integer budgets fail before fixture creation.
+Small synthetic 10 × 3 scenario passed with 1MiB / 60s, plus five invalid-budget
+startup checks and Ruff. This is harness validation, not measured target proof.
+For 1M × 100, this fixture's CSV source is 550,000,900 bytes and replacement
+output is 600,500,900 bytes; both exceed 512MiB. Use an explicit sufficient
+byte budget instead of treating row/cell configuration as a byte-limit override.
+
+**Target run PASSED:** exact installed runtime
+`b49ceed5fc3d64698f4cfd4135b2958edd915512`, wheel SHA-256
+`bcce6365fbb6724d2d583796a61567d99bbdc6c9a9e86eb7e02a5d65f156ae8e`.
+Command: `--rows 1000000 --columns 100 --max-bytes 1073741824 --max-seconds 3600`.
+Local resumable state: `/private/tmp/apa-csv-target-current.json`;
+log: `/private/tmp/apa-csv-target-b49ceed-xi8v0xap/run.log`; PID 80161.
+Profile 286.211s; review cumulative 579.090s; full completion 1188.870s.
+All 100,000,000 cells passed ordered replacement readback, mapping precedence,
+non-cascade behavior, manifest/provenance, unchanged input digest and cleanup.
+Output: 600,500,900 bytes. The terminal JSON is retained in the log.
+This proves only the private CSV route against this exact isolated wheel;
+no public/all-route/RC pass is claimed.
+
+## CSV → Parquet target — PASSED
+
+Exact candidate `15cd2d4b11ea586ca3ed48b340c5fd04ff20a55f`; wheel SHA-256
+`f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`; immutable copied harness SHA-256
+`cc150354883378e625e8832d1855c224e7c7dfee682577673993b17886c2188a`. Arguments: `--rows 1000000 --columns 100
+--output-format parquet --max-bytes 1073741824 --max-seconds 3600`.
+State `/private/tmp/apa-parquet-target-current.json`; PID 81484;
+log `/private/tmp/apa-parquet-target-15cd2d4-1_i_azyj/run.log`. Full typed schema and batch readback, mapping precedence,
+provenance/input digest/cleanup assertions enabled. Poll before repeating.
+This is private fictional format acceptance, not public/RC clearance.
+
+CSV → Parquet results: profile 289.725s; review cumulative 581.644s;
+complete 1488.050s; output 17,398,511 bytes. All 100M cells passed ordered
+readback with explicit non-null Arrow string schema, per-column mapping
+precedence/non-cascade behavior, 100% replacement provenance, unchanged input
+digest and cleanup. This proves the private fictional CSV → Parquet route on
+the exact wheel above. 326 additional owning publication/SQL regressions passed.
+
+The same fixture harness now supports `--output-format postgresql_sql` and
+checks the complete framing, declared TEXT schema, every ordered INSERT row,
+terminal COMMIT and EOF without executing SQL. 10 × 100 synthetic smoke passed
+(0.193s, 24,097 bytes), Ruff passed; target SQL artifact proof remains open.
+
+## CSV → SQL target — PASSED
+
+Candidate `2d878f7e3353dc11b6480f2d4bddf4792d03d642`; same installed runtime wheel as 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`), harness-only subsequent commits.
+Immutable copied harness SHA-256 `b7c9b3ddb5d47f03e42f45f940636a20539f795da27224bcd96c174483a9888f`.
+Arguments: `--rows 1000000 --columns 100 --output-format postgresql_sql
+--max-bytes 3221225472 --max-seconds 3600`. The explicit 3GiB byte ceiling
+accounts for repeated column names in each SQL INSERT statement.
+State `/private/tmp/apa-sql-target-current.json`; PID 82136;
+log `/private/tmp/apa-sql-target-2d878f7-78goihnx/run.log`. Poll before repeating. This checks SQL text artifacts
+without a database connection or execution; public/all-route/RC gates stay open.
+
+CSV → SQL target results: profile 291.552s; review cumulative 580.806s;
+complete 1435.367s. SQL artifact 2,140,502,692 bytes. All 1M ordered INSERT
+statements / 100M replaced cells, schema/framing/COMMIT/EOF, provenance,
+input digest and cleanup assertions passed. No SQL execution or live DB.
+
+The local-file harness now accepts `--input-format parquet`, creating the
+fictional input in 1024-row groups and explicitly configuring decoded-byte
+limits. Three 2051 × 3 Parquet-input readbacks (CSV, Parquet, PostgreSQL SQL
+outputs) passed, including provenance/cleanup; Ruff passed. These are small
+harness checks, not Parquet-input target proof.
+
+## Parquet → CSV target — PASSED
+
+Candidate `b5640de2acdf0dde25da166062edd3ea7e47845b`; installed runtime wheel remains 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); subsequent changes are harness/docs only.
+Immutable harness SHA-256 `fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`.
+Arguments: `--rows 1000000 --columns 100 --input-format parquet
+--output-format csv --max-bytes 1073741824 --max-seconds 3600`.
+State `/private/tmp/apa-parquet-input-target-current.json`; PID 82466;
+log `/private/tmp/apa-parquet-input-target-b5640de-2y7b9w4m/run.log`. Poll before repeating; no all-route/RC clearance implied.
+
+Parquet → CSV target results: profile 320.714s; review cumulative 638.728s;
+complete 1375.641s; output 600,500,900 bytes. All 100M cells passed ordered
+readback, mapping precedence/non-cascade behavior, provenance, unchanged input
+digest and temporary input/output cleanup. Exact candidate/runtime/harness and
+budgets are retained above. No public activation or all-route claim.
+
+## Current private fictional 1M × 100 matrix
+
+| Input | CSV output | Parquet output | SQL artifact |
+|---|---|---|---|
+| CSV | PASS b49ceed | PASS 15cd2d4 | PASS 2d878f7 |
+| Parquet | PASS b5640de | PASS cc3aedb | PASS 92bb1b6 |
+| PostgreSQL fictional worker | PASS 611b781 | PASS b249699 | PASS b249699 |
+| Trino fictional result | PASS b249699 | PASS b249699 | PASS b249699 |
+
+These are installed private fixture checks, not twelve-route public/CLI/MCP
+activation or live backend evidence. PostgreSQL details are in the companion
+postgres-scale-acceptance.md. Final source audit and release gates remain open.
+
+## Parquet → Parquet target — PASSED
+
+Candidate `cc3aedb8b59aec5ff6d926066ff96120a67f9cfe`; same installed runtime wheel 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
+`fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`. Arguments: `--rows 1000000 --columns 100
+--input-format parquet --output-format parquet --max-bytes 1073741824
+--max-seconds 3600`. State `/private/tmp/apa-parquet-roundtrip-current.json`;
+PID 82797; log `/private/tmp/apa-parquet-roundtrip-cc3aedb-fkydavo4/run.log`. Poll before repeating.
+All typed batch readback/provenance/digest/cleanup assertions enabled.
+No public/all-route/RC clearance implied.
+
+Parquet → Parquet result: profile 327.437s; review cumulative 645.564s;
+complete 2169.105s; output 17,398,511 bytes. All 100M cells passed typed
+ordered batch readback, column/global precedence and non-cascade checks,
+100% replacement provenance, unchanged input digest and temporary cleanup.
+The exact runtime wheel/harness and explicit 1GiB / 3600s limits are recorded
+above. Current private fictional target matrix is 6/12; remaining targets,
+public acceptance, final source audit and release gates stay open.
+
+## Parquet → SQL target — PASSED
+
+Candidate `92bb1b615e75bddf5043768e96702176e1671753`; same installed runtime wheel 15cd2d4
+(hash `f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb`); immutable copied harness
+`fbb61d2c1c273d64c3b7e57714b8400a4e4f4d1a1484f5fc021a318d8d8b38af`. Arguments: `--rows 1000000 --columns 100
+--input-format parquet --output-format postgresql_sql --max-bytes 3221225472
+--max-seconds 3600`. State `/private/tmp/apa-parquet-sql-target-current.json`;
+PID 83384; log `/private/tmp/apa-parquet-sql-target-92bb1b6-ymaed_an/run.log`. Poll before repeating.
+Complete SQL text/schema/ordered INSERT/framing/provenance/digest/cleanup
+assertions enabled; no SQL execution or public/all-route/RC clearance.
+
+Parquet → SQL result: profile 634.379s; review cumulative 1390.157s;
+complete 3398.476s, within the explicit 3600s cooperative budget. SQL output
+2,140,502,692 bytes. Every ordered INSERT/cell, full schema/framing/COMMIT/EOF,
+100% replacement provenance, unchanged input digest and temporary cleanup
+assertion passed. No SQL execution. Current private fictional matrix: 7/12.
+The remaining queue automatically advanced only after this terminal pass.
+
+## Supplied Trino result → CSV target — PASSED
+
+Sequential queue candidate b249699ab16f8aad7f220acb16542d505f9b4edf;
+installed runtime wheel SHA256
+f2bf7d5dfb90e328ada721e72acc74515b18ba565d0c07c745806e957fdc12eb;
+copied harness SHA256
+93a3d8d38293b8c42a9e9996c327fc7fd4fbd96b5aa2ae33f949b5e9070cf0af.
+1,000,000 rows ×100 columns passed ordered readback, mapping precedence,
+non-cascade replacement, provenance, source digest and cleanup assertions.
+Capture17,207,555bytes; CSV600,001,000bytes; complete1879.813s.
+Explicit limits:1GiB input/output,128MiB capture,3600s.
+State/log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/state.json and
+trino-csv.log. This exercises supplied-result authorization/capture/private
+publication, not a Trino driver, server, isolated worker or public scale route.
+Private fictional matrix10/12; Parquet running and SQL pending sequentially.
+
+## Supplied Trino result → Parquet target — PASSED
+
+Same b249699 queue, installed runtime/harness hashes and explicit1GiB,
+128MiB capture,3600s budgets as the Trino CSV target above. All100M cells
+passed typed ordered readback, mapping/provenance/digest/cleanup assertions.
+Capture17,207,555bytes; output17,493,375bytes; complete1582.527s.
+Log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/trino-parquet.log.
+Private fictional matrix11/12; final SQL artifact route running. No live
+Trino driver/server/worker or public scale route is exercised by this fixture.
+
+## Supplied Trino result → SQL artifact target — PASSED
+
+Same b249699 queue and installed runtime/harness hashes as the preceding
+Trino targets. Explicit output/input ceiling3GiB, capture128MiB,3600s.
+All100M cells passed ordered SQL framing/schema/INSERT/COMMIT/EOF, mapping,
+provenance, source digest and cleanup assertions; no SQL execution.
+Capture17,207,555bytes; output2,240,002,792bytes; complete1533.779s.
+Log: /private/tmp/apa-remaining-target-queue-xqs_7uxi/trino-postgresql_sql.log.
+Queue state is passed, current=null: all twelve private fictional target routes
+completed. This does not demonstrate native Trino driver/server/isolated worker,
+all-route public CLI/MCP scale acceptance or final RC-source safety clearance.

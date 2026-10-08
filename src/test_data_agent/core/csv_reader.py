@@ -5,7 +5,7 @@ from collections.abc import Callable, Iterable, Iterator
 from threading import RLock
 from typing import Any, TYPE_CHECKING, cast
 
-from test_data_agent.core.limits import max_input_cell_chars
+from test_data_agent.core.limits import InputLimitError, max_input_cell_chars
 
 _parser_lock = RLock()
 
@@ -55,3 +55,9 @@ class ScopedDictReader(_DictReader):
         super().__init__(lines, **options)
         # DictReader consumes __next__ and line_num; stubs require the C reader type.
         self.reader = cast(Any, ScopedCSVReader(lines, max_chars=max_chars, check_size=check_size, **options))
+
+    def __next__(self) -> dict[str, Any]:
+        row = super().__next__()
+        if isinstance(row.get(self.restkey), list):
+            raise InputLimitError("CSV row exceeds header width")
+        return row

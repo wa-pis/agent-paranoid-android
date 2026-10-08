@@ -131,14 +131,14 @@ def test_folder_profile_replaces_source_categories_without_losing_conditions(
         ],
     }
     assert conditional.condition == {"field": "segment", "equals": "category_1_1"}
-    assert profile.entity("events").field("metric").distribution == {
-        "kind": "numeric",
-        "min_value": 912345678.0,
-        "max_value": 912345682.0,
-        "p05": 912345678.2,
-        "p95": 912345681.8,
-        "scale_factor": 1.0,
+    metric = profile.entity("events").field("metric")
+    assert metric.sensitive
+    assert metric.distribution == {
+        "kind": "masked_patterns",
+        "patterns": [{"pattern": "ssn", "count": 5}],
     }
+    assert "912345678" not in serialized
+    assert "9.12345678e8" not in serialized
     assert rows_a == rows_b
     assert {row["segment"] for row in rows_a["events"]}.isdisjoint(
         {"opaque_alpha", "opaque_beta", "category_1"}
@@ -600,3 +600,71 @@ def copied_rows(generated: dict[str, list[dict]], source: dict[str, list[dict[st
         if generated_normalized & source_normalized:
             return True
     return False
+
+
+@pytest.mark.parametrize("value", ["123456789e0", "1.23456789e8", "123456788.999999999"])
+def test_folder_numeric_canonicalization_does_not_retain_identifier(tmp_path, value):
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "items.csv").write_text(f"measure\n{value}\n{value}\n")
+    profile = profile_example_folder(source, cache_dir=tmp_path / "cache")
+    field = profile.entity("items").field("measure")
+    assert field.sensitive
+    assert field.distribution["kind"] == "masked_patterns"
+    assert "min_value" not in field.distribution
+    assert value not in profile.model_dump_json()
+
+
+def test_folder_cache_rechecks_category_authorization(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "items.csv").write_text("status,kind\nready,blue\npaused,green\nready,blue\n")
+    cache = tmp_path / "cache"
+    scopes = (LocalCategoryField(entity="items", field="status"),)
+    allowed = profile_example_folder(source, cache_dir=cache, local_category_fields=scopes)
+    repeated = profile_example_folder(source, cache_dir=cache, local_category_fields=scopes)
+    assert repeated == allowed
+    default = profile_example_folder(source, cache_dir=cache)
+    changed = profile_example_folder(source, cache_dir=cache, local_category_fields=(
+        LocalCategoryField(entity="items", field="kind"),
+    ))
+    assert "ready" in allowed.model_dump_json()
+    assert "ready" not in default.model_dump_json()
+    assert "paused" not in default.model_dump_json()
+    assert "ready" not in changed.model_dump_json()
+    assert "blue" in changed.model_dump_json()
+    assert csv_folder_fingerprint(source) != csv_folder_fingerprint(source, local_category_fields=scopes)
+
+
+def test_folder_cache_rejects_policy_metadata_mismatch(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "items.csv").write_text("status\nready\npaused\n")
+    cache = tmp_path / "cache"
+    scopes = (LocalCategoryField(entity="items", field="status"),)
+    profile_example_folder(source, cache_dir=cache, local_category_fields=scopes)
+    path = cache / f"{csv_folder_fingerprint(source, local_category_fields=scopes)}.json"
+    payload = json.loads(path.read_text())
+    payload["profile"]["local_category_fields"] = []
+    path.write_text(json.dumps(payload))
+    assert load_cached_profile(source, cache_dir=cache, local_category_fields=scopes) is None
+
+
+
+def test_folder_cache_policy_order_and_legacy_format(tmp_path):
+    source = tmp_path / "source"
+    source.mkdir()
+    (source / "items.csv").write_text("status,kind\nready,blue\npaused,green\n")
+    scopes = (LocalCategoryField(entity="items", field="status"),
+              LocalCategoryField(entity="items", field="kind"))
+    fingerprint = csv_folder_fingerprint(source, local_category_fields=scopes)
+    assert fingerprint == csv_folder_fingerprint(source, local_category_fields=scopes[::-1])
+    assert fingerprint != csv_folder_fingerprint(source, local_category_fields=scopes + scopes[:1])
+    cache = tmp_path / "cache"
+    profile = profile_example_folder(source, cache_dir=cache, local_category_fields=scopes)
+    assert load_cached_profile(source, cache_dir=cache, local_category_fields=scopes[::-1]) == profile
+    path = cache / f"{fingerprint}.json"
+    payload = json.loads(path.read_text())
+    payload["format_version"] = 4
+    path.write_text(json.dumps(payload))
+    assert load_cached_profile(source, cache_dir=cache, local_category_fields=scopes) is None

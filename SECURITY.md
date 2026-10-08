@@ -4,6 +4,32 @@ Agent Paranoid Android is a safety-first synthetic data generation system. The
 most important security invariant is that generated outputs must never copy
 source rows, expose raw PII, or execute unrestricted SQL.
 
+## Gated Mixed-Origin Transformation
+
+The source-free generation invariant above remains unchanged. The separately
+selected transformation candidate produces labelled mixed-origin local artifacts,
+not synthetic datasets or a privacy guarantee. Its scoped contract is recorded
+in [ADR-0029](docs/adr/0029-unified-replacement-contract.md) and the
+[transformation safety boundary](openspec/changes/selective-source-transformation/safety-boundary.md).
+These documents do not authorize data access, dataset execution or registration.
+
+Explicit applied `substitute` and `replace_text` mappings may produce another
+source value, including sensitive mapped permutations. Equality with a source
+value alone is not a preservation action. Only deterministic evidence of an
+actually applied mapping selects this exception; unmatched or implicit copying
+receives no exemption. Direct `preserve` and preserve fallbacks still require
+non-sensitive field decisions, bounded comments and fresh local controlling-TTY
+receipts. Unknown, sensitive or conflicting preservation and default DECIMAL
+preservation remain blocked. Agents and MCP cannot issue approval.
+
+Sensitive mapped artifacts require local handling; field notes do not declassify
+their contents. Profiles, review, logs, exceptions, providers and MCP responses
+must remain value-free and resource-bounded. Existing generation entrances must
+never consume transformation authority. New public activation requires matching
+contracts, executable interface safety evidence and independent review of the
+exact activation SHA; earlier private-code or frozen-candidate audits are not
+approval of changed code.
+
 ## Supported Versions
 
 Security fixes target the current `main` branch until the project starts
@@ -74,3 +100,16 @@ The maintainer will acknowledge credible private reports as soon as practical,
 triage severity, and publish a fix with tests before discussing details
 publicly. If the issue affects users who may have generated unsafe artifacts,
 release notes should include clear remediation guidance.
+
+
+### Configured SQL Transformation Sessions
+
+The separately selected 1.6 RC query workflow captures one allowlisted read-only
+result using administrator configuration, then reviews and validates frozen
+local bytes without reconnecting. It does not expand ordinary profiling or
+source-free generation authority. MCP returns only metadata and consumes an
+existing exact local controlling-TTY receipt when preservation requires one;
+it cannot issue approval. Session handles expire without recapture, owned raw
+inputs/receipts are removed, and only validated selected output is retained.
+Cleanup failure refuses further work. Registration is not data access permission
+or final exact-SHA security/release clearance.

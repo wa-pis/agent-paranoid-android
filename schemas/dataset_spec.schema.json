@@ -276,6 +276,7 @@
         "seed": {
           "anyOf": [
             {
+              "maximum": 9223372036854775807,
               "minimum": 0,
               "type": "integer"
             },

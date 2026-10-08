@@ -222,7 +222,7 @@ def test_postgres_jdbc_url_accepts_equal_explicit_components(
     _set_required_env(monkeypatch)
     monkeypatch.setenv(
         "POSTGRES_JDBC_URL",
-        "jdbc:postgresql://postgres.internal:5433/analytics?sslmode=require",
+        "jdbc:postgresql://postgres.internal:5433/analytics?sslmode=verify-full",
     )
 
     config = PostgresConfig.from_env()
@@ -319,3 +319,40 @@ def test_postgres_jdbc_url_rejects_oversized_input(jdbc_url: str) -> None:
         "POSTGRES_JDBC_URL must be a credential-free PostgreSQL JDBC endpoint"
     )
     assert captured.value.__cause__ is None
+
+
+def test_postgres_secure_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.delenv("POSTGRES_SSLMODE", raising=False)
+    monkeypatch.delenv("POSTGRES_JDBC_URL", raising=False)
+    config = PostgresConfig.from_env()
+    assert config.sslmode == "verify-full"
+    assert PostgresConfig.__dataclass_fields__["sslmode"].default == "verify-full"
+
+
+@pytest.mark.parametrize("mode", ["require", "verify-ca", "disable"])
+@pytest.mark.parametrize("jdbc", [False, True])
+def test_weaker_postgres_tls_requires_explicit_opt_in(
+    monkeypatch: pytest.MonkeyPatch,
+    mode: str,
+    jdbc: bool,
+) -> None:
+    _set_required_env(monkeypatch)
+    monkeypatch.delenv("POSTGRES_SSLMODE", raising=False)
+    monkeypatch.delenv("POSTGRES_JDBC_URL", raising=False)
+    monkeypatch.delenv("POSTGRES_ALLOW_INSECURE", raising=False)
+    config = PostgresConfig.from_env()
+    with pytest.raises(PostgresConfigurationError, match="ALLOW_INSECURE"):
+        replace(config, sslmode=mode).validate()
+    replace(config, sslmode=mode, allow_insecure=True).validate()
+    if jdbc:
+        monkeypatch.setenv(
+            "POSTGRES_JDBC_URL",
+            f"jdbc:postgresql://postgres.internal:5433/analytics?sslmode={mode}",
+        )
+    else:
+        monkeypatch.setenv("POSTGRES_SSLMODE", mode)
+    with pytest.raises(PostgresConfigurationError, match="ALLOW_INSECURE"):
+        PostgresConfig.from_env()
+    monkeypatch.setenv("POSTGRES_ALLOW_INSECURE", "true")
+    assert PostgresConfig.from_env().sslmode == mode

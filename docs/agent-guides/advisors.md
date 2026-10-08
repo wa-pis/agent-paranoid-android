@@ -35,3 +35,22 @@ their distributions. Replace every string, number, boolean, or null category
 and matching `equals`, `not_equals`, or `in_values` value with field-scoped
 labels before serialization. Reject values outside that field's categorical
 domain; numeric distribution bounds remain unchanged.
+
+OpenAI and GigaChat apply the same category projection immediately before transport. The original request and fingerprints remain local and unchanged. Unrepresented local categorical predicates reject before sending; invalid restored proposals produce redacted invalid-response errors. Provider byte budgets include the serialized labels.
+
+Imported field distributions must be empty metadata objects or declare a
+supported typed distribution kind. Nonempty opaque objects, missing kinds
+and unsupported kinds are rejected before advisor/provider serialization.
+The same contract applies to profiles and generation specifications; generic
+errors must not reproduce rejected source contents.
+
+Provider-bound metadata uses a shared semantic projection. Opaque condition
+extras, unused constraint members, identifier prefix/pattern text and local
+auxiliary annotations are not provider input. Date bounds and formula syntax
+are canonicalized; represented categorical predicates still use field-scoped
+labels. Only established semantic classifications are provider metadata;
+unknown semantic annotations remain local. Schema identifiers remain
+confidential metadata, so operators must choose the recipient accordingly. Local immutable
+metadata and original fingerprints may be restored only after the returned
+proposal matches its projected immutable contract; projection cannot grant new
+proposal or approval authority. Custom exchange clients use the same boundary.

@@ -32,6 +32,9 @@ docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
 
 The Dockerfile uses digest-pinned Python and uv images, a frozen lockfile, and
 separate dependency sets. Final images run as UID/GID `65532` by default.
+The shared runtime layer installs fixed Bookworm PCRE2 and Perl packages and
+checks their versions during the build. Perl remains a Debian essential package;
+image scans continue to block fixable High and Critical findings.
 
 ## Prepare Compose
 
@@ -69,6 +72,12 @@ The generator receives only `/workspace` and `/audit`; it has no network:
 ```bash
 docker compose run --rm -T generator-mcp
 ```
+
+Set `TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS` in the shell or Compose `.env`
+file before starting generator MCP to configure its invocation deadline. The
+default is 120 seconds; finite positive values are required. Independent generation,
+profiling, transformation and container memory limits still apply.
+
 
 An MCP client can launch that command directly. Use an absolute Compose path:
 

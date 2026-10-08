@@ -22,6 +22,7 @@ from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_un
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import (
+    GenerationBudget,
     enforce_output_folder_size,
     enforce_output_payload_size,
 )
@@ -302,10 +303,15 @@ def safe_entity_artifact_path(output_folder: Path, entity_name: str, suffix: str
     return path
 
 
-def write_bounded_text(text: str, output: Path) -> None:
+def write_bounded_text(text: str, output: Path, *, budget: GenerationBudget | None = None) -> None:
     payload = text.encode("utf-8")
     enforce_output_payload_size(len(payload), label=f"output file {output.name!r}")
-    atomic_write_bytes(output, payload)
+    if budget is None:
+        atomic_write_bytes(output, payload)
+    else:
+        budget.check("profile serialization")
+        with atomic_binary_writer(output, check_publication=lambda: budget.check("profile publication")) as handle:
+            handle.write(payload)
 
 
 def write_single_entity_rows(

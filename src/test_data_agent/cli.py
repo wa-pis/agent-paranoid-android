@@ -184,7 +184,7 @@ def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
 
     selected_command = next((argument for argument in arguments
                              if argument not in {"--json", "--debug"}), None)
-    transformation = selected_command in {"transform-execute", "transform-approve"}
+    transformation = selected_command in {"transform-execute", "transform-approve", "transform-batch"}
     parser_type = _CandidateArgumentParser if transformation else HelpfulArgumentParser
     command_parser_type = (cast(type[HelpfulArgumentParser],
                                partial(_CandidateArgumentParser, json_errors=json_errors)) if transformation
@@ -212,6 +212,14 @@ def build_parser(argv: list[str] | None = None) -> HelpfulArgumentParser:
         generate_epilog=GENERATE_EPILOG,
     )
 
+    common = subparsers.add_parser(
+        "transform-batch", help="Review and execute a saved common transformation profile.",
+        description="Common profile workflow: create, review, approve, validate, execute, query-execute. "
+                    "Only local controlling-TTY approve can issue a preservation receipt.",
+        formatter_class=PublicHelpFormatter,
+    )
+    common.add_argument("arguments", nargs="...", help="Common workflow operation and arguments.")
+
     register_utility_commands(subparsers)
     register_agent_commands(subparsers)
     register_completion_command(subparsers)
@@ -236,6 +244,10 @@ def main(argv: list[str] | None = None) -> int:
     arguments = list(sys.argv[1:] if argv is None else argv)
     parser = build_parser(arguments)
     args = parser.parse_args(arguments)
+    if args.command == "transform-batch":
+        from test_data_agent.cli_transformation_candidate import _candidate_common_main
+        return _candidate_common_main(args.arguments, versioned_output=True)
+
     args.json_output = "--json" in arguments or getattr(args, "json_output", False)
     args.debug = "--debug" in arguments or getattr(args, "debug", False)
 

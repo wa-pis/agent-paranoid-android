@@ -125,6 +125,16 @@ Errors SHALL remain value-free across core, worker, CLI/Python/MCP boundaries.
   units, setting origin and supported session/profile recovery instructions
 - **AND** it neither increases the limit nor silently truncates the workload.
 
+#### Scenario: Common profile source exceeds its file ceiling
+
+- **GIVEN** a fictional regular source file inside the authorized root, with
+  size above its effective behavior-policy file-byte ceiling but below the
+  remaining common aggregate byte budget
+- **WHEN** common profile loading or local profile creation captures that source
+- **THEN** descriptor size is checked against the file ceiling before reading
+- **AND** the observed-limit error retains dimension, amount, threshold and
+  setting origin, without publishing a partial result or increasing limits.
+
 #### Scenario: Processing reaches a configured limit
 
 - **GIVEN** a transformation total snapshot budget configured through
@@ -604,3 +614,20 @@ values, sensitive aggregates or provider/database exception payloads.
 - **WHEN** execution cannot complete safely
 - **THEN** no partial dataset is published and a bounded diagnostic identifies
   the policy or limit category without disclosing input values.
+
+### Requirement: Bounded normalized Parquet encoding batches
+The system SHALL encode typed transformation Parquet output in batches of at
+most 1024 normalized rows without retaining a second complete normalized dataset.
+It SHALL preserve declared scalar types, source-row reuse/cardinality checks,
+output byte/time limits, and the single explicit timestamp-offset requirement.
+Existing captured input/result storage and native Arrow allocations remain
+subject to their existing contracts; this is not a peak-RSS guarantee.
+
+#### Scenario: Late source mismatch after full encoding batches
+- **WHEN** the source iterator contains a surplus row after two full batches
+- **THEN** encoding fails without returning a publishable Parquet payload
+
+#### Scenario: Timestamp offset appears after a null batch
+- **WHEN** the first 1024 timestamp values are null and a later value has an explicit offset
+- **THEN** the declared timestamp schema retains that offset
+- **AND** any different offset anywhere in the dataset causes failure

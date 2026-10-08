@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import inspect
-import json
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Callable, Literal, cast
 
 from pydantic import BaseModel
 
@@ -22,10 +21,15 @@ from test_data_agent.core.limits import (
     enforce_output_payload_size,
     enforce_row_count_limit,
     max_generation_count as configured_max_generation_count,
+    max_local_profile_seconds,
 )
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import GenerationMode, OutputFormat
 from test_data_agent.generation.entity_generator import generate_dataset
+from test_data_agent.generation.limits import (
+    estimate_dataset_output_bytes,
+    estimate_field_output_bytes as estimate_field_output_bytes,
+)
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
@@ -52,6 +56,7 @@ from test_data_agent.safety import (
     assert_no_profiled_csv_rows,
     assert_profile_safe,
 )
+from test_data_agent.trino_work_budget import generation_budget_for_invocation
 from test_data_agent.validation import DatasetValidationReport, validate_dataset
 from test_data_agent.validation.reconciliation import GenerationValidationError, assert_generated_dataset_valid
 
@@ -120,19 +125,20 @@ def generate_dataset_bundle(
             rows_by_entity,
             effective_seed,
             effective_spec,
+            budget=budget,
         )
         if business_rules_applier is not None
         else None
     )
     budget.check("business rule application")
-    assert_generated_dataset_valid(rows_by_entity, effective_spec)
+    assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
     assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
         write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec)
+        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
         generation_valid = report.valid and business_report_is_valid(
             business_report,
@@ -236,13 +242,16 @@ def write_csv_profile_artifact(
 ) -> DatasetProfile:
     ensure_paths_distinct(input_path, output_path)
     require_output_suffix(output_path, {".json"}, "profile output")
+    budget = generation_budget_for_invocation(max_seconds=max_local_profile_seconds())
+    budget.check("CSV profile preflight")
     profile = csv_file_to_dataset_profile(
         input_path,
         table_name=table_name,
         local_category_fields=local_category_fields,
+        budget=budget,
     )
     assert_profile_safe(profile)
-    write_dataset_profile_artifact(profile, output_path)
+    write_dataset_profile_artifact(profile, output_path, budget=budget)
     return profile
 
 
@@ -264,9 +273,9 @@ def generate_single_entity_profile_artifacts(
         budget=budget,
     )
     budget.check("dataset generation")
-    assert_generated_dataset_valid(rows_by_entity, spec)
+    assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     assert_business_report_valid(business_report, spec.generation_settings.mode)
-    report = validate_dataset(rows_by_entity, spec)
+    report = validate_dataset(rows_by_entity, spec, budget=budget)
     budget.check("dataset validation")
     if output_path is None:
         write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
@@ -303,6 +312,7 @@ def generate_single_entity_profile_artifacts(
             output_path.parent,
             primary_output_name=output_path.name,
             overwrite=overwrite,
+            budget=budget,
         )
     except BaseException:
         remove_tree(temp_folder, temp_identity)
@@ -346,6 +356,7 @@ def generate_dataset_from_profile_artifacts(
             rows_by_entity,
             spec.generation_settings.seed or 0,
             spec,
+            budget=budget,
         )
         budget.check("business rule application")
     report = generate_single_entity_profile_artifacts(
@@ -401,6 +412,7 @@ def generate_dataset_from_csv_artifacts(
             rows_by_entity,
             seed,
             spec,
+            budget=budget,
         )
         budget.check("business rule application")
     assert_no_profiled_csv_rows(
@@ -448,7 +460,7 @@ def generate_dataset_review_artifacts(
             assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
         write_dataset_rows(rows_by_entity, output_format, temp_folder, spec=effective_spec)
         budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec)
+        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
         write_dataset_review_bundle(profile, effective_spec, report, temp_folder)
         write_generation_manifest(
@@ -484,19 +496,27 @@ def invoke_business_rules_applier(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     seed: int,
     spec: DatasetSpec,
+    *,
+    budget: GenerationBudget | None = None,
 ) -> Any | None:
-    parameters = list(inspect.signature(applier).parameters.values())
-    if any(parameter.kind == inspect.Parameter.VAR_POSITIONAL for parameter in parameters):
-        return applier(rows_by_entity, seed, spec)
+    signature = inspect.signature(applier)
+    parameters = list(signature.parameters.values())
     positional = [
-        parameter
-        for parameter in parameters
-        if parameter.kind
-        in {inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD}
+        parameter for parameter in parameters
+        if parameter.kind in {
+            inspect.Parameter.POSITIONAL_ONLY, inspect.Parameter.POSITIONAL_OR_KEYWORD,
+        }
     ]
-    if len(positional) >= 3:
-        return applier(rows_by_entity, seed, spec)
-    return applier(rows_by_entity, seed)
+    args = (rows_by_entity, seed, spec) if (
+        len(positional) >= 3
+        or any(parameter.kind == inspect.Parameter.VAR_POSITIONAL for parameter in parameters)
+    ) else (rows_by_entity, seed)
+    budget_parameter = signature.parameters.get("budget")
+    kwargs = {"budget": budget} if (
+        budget_parameter is not None
+        and budget_parameter.kind == inspect.Parameter.KEYWORD_ONLY
+    ) else {}
+    return cast(Callable[..., Any], applier)(*args, **kwargs)
 
 
 def result_is_valid(result: DatasetGenerationResult) -> bool:
@@ -541,38 +561,7 @@ def prepare_generation_budget(spec: DatasetSpec, output_path: Path | None) -> Ge
         estimate_dataset_output_bytes(spec),
         label="estimated generated data",
     )
-    return GenerationBudget()
-
-
-def estimate_dataset_output_bytes(spec: DatasetSpec) -> int:
-    total = len(spec.model_dump_json().encode("utf-8")) * 2 + 65_536
-    for entity in spec.entities:
-        row_bytes = 2
-        for field in entity.fields:
-            row_bytes += len(field.name.encode("utf-8")) + estimate_field_output_bytes(field) + 8
-        total += entity.row_count * row_bytes * 2
-    return total
-
-
-def estimate_field_output_bytes(field: Any) -> int:
-    if field.is_identifier:
-        return len(field.name.encode("utf-8")) + 64
-    if field.sensitive:
-        return 128
-    if field.data_type != "string":
-        return 64
-    distribution = field.distribution or {}
-    if distribution.get("kind") == "categorical":
-        categories = distribution.get("categories") or []
-        return max(
-            (
-                len(json.dumps(category.get("value"), default=str).encode("utf-8"))
-                for category in categories
-            ),
-            default=16,
-        )
-    maximum = int(distribution.get("max_length", 12))
-    return max(1, maximum) + 4
+    return generation_budget_for_invocation()
 
 
 def make_temp_output_folder(output_folder: Path) -> Path:
@@ -590,6 +579,7 @@ def commit_single_entity_bundle(
     *,
     primary_output_name: str,
     overwrite: bool = False,
+    budget: GenerationBudget | None = None,
 ) -> None:
     output_identity, output_created = ensure_directory(output_folder)
     staged_paths = sorted(
@@ -620,11 +610,17 @@ def commit_single_entity_bundle(
     temp_identity = path_identity(temp_folder)
     try:
         for path in collisions:
+            if budget is not None:
+                budget.check("bundle publication")
             destination = output_folder / path.name
             replace_path(destination, rollback_folder / path.name)
         for path in staged_paths:
+            if budget is not None:
+                budget.check("bundle publication")
             destination = output_folder / path.name
             replace_path(path, destination)
+        if budget is not None:
+            budget.check("bundle publication complete")
     except BaseException:
         for path in reversed(staged_paths):
             destination = output_folder / path.name

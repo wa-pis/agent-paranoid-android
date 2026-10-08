@@ -11,17 +11,20 @@ from test_data_agent.core.dataset import DatasetProfile
 from test_data_agent.core.field import FieldType
 from test_data_agent.csv_profiler import parse_datetime_value, parse_float
 
+from test_data_agent.profiling.budget import LocalProfileBudget
+
 MIN_CONFIDENCE = 0.9
 
 
-def infer_constraints(profile: DatasetProfile, rows_by_entity: dict[str, list[dict[str, str]]]) -> list[Constraint]:
+def infer_constraints(profile: DatasetProfile, rows_by_entity: dict[str, list[dict[str, str]]], *, budget: LocalProfileBudget | None = None) -> list[Constraint]:
+    work_budget = budget or LocalProfileBudget()
     constraints: list[Constraint] = []
     for entity in profile.entities:
         rows = rows_by_entity.get(entity.name, [])
-        constraints.extend(infer_formula_constraints(entity.name, rows, numeric_fields(entity)))
-        constraints.extend(infer_temporal_constraints(entity.name, rows, temporal_fields(entity)))
-        constraints.extend(infer_conditional_required_constraints(entity.name, rows, entity.fields))
-    constraints.extend(infer_aggregate_mapping_constraints(profile))
+        constraints.extend(infer_formula_constraints(entity.name, rows, numeric_fields(entity), budget=work_budget))
+        constraints.extend(infer_temporal_constraints(entity.name, rows, temporal_fields(entity), budget=work_budget))
+        constraints.extend(infer_conditional_required_constraints(entity.name, rows, entity.fields, budget=work_budget))
+    constraints.extend(infer_aggregate_mapping_constraints(profile, budget=work_budget))
     return constraints
 
 
@@ -33,13 +36,15 @@ def temporal_fields(entity: Any) -> list[str]:
     return [field.name for field in entity.fields if field.data_type in {FieldType.DATE, FieldType.DATETIME}]
 
 
-def infer_formula_constraints(entity: str, rows: list[dict[str, str]], fields: list[str]) -> list[Constraint]:
+def infer_formula_constraints(entity: str, rows: list[dict[str, str]], fields: list[str], *, budget: LocalProfileBudget | None = None) -> list[Constraint]:
+    work_budget = budget or LocalProfileBudget()
     constraints: list[Constraint] = []
     for target in fields:
         sources = [field for field in fields if field != target]
         for left, right in combinations(sources, 2):
             for op, symbol in [(lambda a, b: a * b, "*"), (lambda a, b: a + b, "+")]:
-                confidence = formula_confidence(rows, target, left, right, op)
+                work_budget.consume_inference_evaluation()
+                confidence = formula_confidence(rows, target, left, right, op, budget=work_budget)
                 if confidence >= MIN_CONFIDENCE:
                     constraints.append(
                         Constraint(
@@ -54,10 +59,12 @@ def infer_formula_constraints(entity: str, rows: list[dict[str, str]], fields: l
     return constraints
 
 
-def formula_confidence(rows: list[dict[str, str]], target: str, left: str, right: str, op: Any) -> float:
+def formula_confidence(rows: list[dict[str, str]], target: str, left: str, right: str, op: Any, *, budget: LocalProfileBudget | None = None) -> float:
+    work_budget = budget or LocalProfileBudget()
     checked = 0
     matched = 0
     for row in rows:
+        work_budget.consume_inference_evaluation()
         target_value = parse_float(row.get(target, ""))
         left_value = parse_float(row.get(left, ""))
         right_value = parse_float(row.get(right, ""))
@@ -69,10 +76,12 @@ def formula_confidence(rows: list[dict[str, str]], target: str, left: str, right
     return matched / checked if checked else 0.0
 
 
-def infer_temporal_constraints(entity: str, rows: list[dict[str, str]], fields: list[str]) -> list[Constraint]:
+def infer_temporal_constraints(entity: str, rows: list[dict[str, str]], fields: list[str], *, budget: LocalProfileBudget | None = None) -> list[Constraint]:
+    work_budget = budget or LocalProfileBudget()
     constraints: list[Constraint] = []
     for start, end in combinations(fields, 2):
-        confidence = temporal_confidence(rows, start, end)
+        work_budget.consume_inference_evaluation()
+        confidence = temporal_confidence(rows, start, end, budget=work_budget)
         if confidence >= MIN_CONFIDENCE:
             constraints.append(
                 Constraint(
@@ -83,7 +92,7 @@ def infer_temporal_constraints(entity: str, rows: list[dict[str, str]], fields: 
                 )
             )
         else:
-            reverse = temporal_confidence(rows, end, start)
+            reverse = temporal_confidence(rows, end, start, budget=work_budget)
             if reverse >= MIN_CONFIDENCE:
                 constraints.append(
                     Constraint(
@@ -96,10 +105,12 @@ def infer_temporal_constraints(entity: str, rows: list[dict[str, str]], fields: 
     return constraints
 
 
-def temporal_confidence(rows: list[dict[str, str]], start: str, end: str) -> float:
+def temporal_confidence(rows: list[dict[str, str]], start: str, end: str, *, budget: LocalProfileBudget | None = None) -> float:
+    work_budget = budget or LocalProfileBudget()
     checked = 0
     matched = 0
     for row in rows:
+        work_budget.consume_inference_evaluation()
         start_value = parse_datetime_value(row.get(start, ""))
         end_value = parse_datetime_value(row.get(end, ""))
         if start_value is None or end_value is None:
@@ -110,7 +121,8 @@ def temporal_confidence(rows: list[dict[str, str]], start: str, end: str) -> flo
     return matched / checked if checked else 0.0
 
 
-def infer_conditional_required_constraints(entity: str, rows: list[dict[str, str]], fields: list[Any]) -> list[Constraint]:
+def infer_conditional_required_constraints(entity: str, rows: list[dict[str, str]], fields: list[Any], *, budget: LocalProfileBudget | None = None) -> list[Constraint]:
+    work_budget = budget or LocalProfileBudget()
     constraints: list[Constraint] = []
     categorical_fields = [
         field for field in fields
@@ -120,14 +132,28 @@ def infer_conditional_required_constraints(entity: str, rows: list[dict[str, str
     for condition_field in categorical_fields:
         values = [category.value for category in condition_field.typed_distribution.categories]
         for value in values:
-            scoped_rows = [row for row in rows if row.get(condition_field.name) == value]
+            work_budget.consume_inference_evaluation()
+            scoped_rows = []
+            for row in rows:
+                work_budget.consume_inference_evaluation()
+                if row.get(condition_field.name) == value:
+                    scoped_rows.append(row)
             if not scoped_rows:
                 continue
             for required_field in nullable_fields:
                 if required_field.name == condition_field.name:
                     continue
-                confidence = sum(bool(row.get(required_field.name, "").strip()) for row in scoped_rows) / len(scoped_rows)
-                global_presence = sum(bool(row.get(required_field.name, "").strip()) for row in rows) / len(rows) if rows else 0
+                work_budget.consume_inference_evaluation()
+                present = 0
+                for row in scoped_rows:
+                    work_budget.consume_inference_evaluation()
+                    present += bool(row.get(required_field.name, "").strip())
+                confidence = present / len(scoped_rows)
+                global_present = 0
+                for row in rows:
+                    work_budget.consume_inference_evaluation()
+                    global_present += bool(row.get(required_field.name, "").strip())
+                global_presence = global_present / len(rows) if rows else 0
                 if confidence >= MIN_CONFIDENCE and confidence - global_presence >= 0.2:
                     constraints.append(
                         Constraint(
@@ -141,7 +167,8 @@ def infer_conditional_required_constraints(entity: str, rows: list[dict[str, str
     return constraints
 
 
-def infer_aggregate_mapping_constraints(profile: DatasetProfile) -> list[Constraint]:
+def infer_aggregate_mapping_constraints(profile: DatasetProfile, *, budget: LocalProfileBudget | None = None) -> list[Constraint]:
+    work_budget = budget or LocalProfileBudget()
     constraints: list[Constraint] = []
     for relationship in profile.relationships:
         parent = profile.entity(relationship.parent_entity)
@@ -155,6 +182,7 @@ def infer_aggregate_mapping_constraints(profile: DatasetProfile) -> list[Constra
                 ("avg", f"{relationship.child_entity}_{child_field.name}_avg"),
             )
             for aggregate, parent_name in candidates:
+                work_budget.consume_inference_evaluation()
                 if parent_name.lower() in parent_names:
                     constraints.append(
                         Constraint(

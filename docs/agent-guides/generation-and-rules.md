@@ -73,3 +73,40 @@ Folder overflow and censored single-CSV counts cannot infer a fixed pool.
 Other aggregate profiles may supply approximate counts: these define the requested
 synthetic pool, not proof of exact source cardinality. Reprofile older artifacts
 to obtain pool metadata; no source-preservation permission is implied.
+
+Batch transformation relationship validation distinguishes logical null from
+empty text: only `None` is null, and empty strings participate in scalar foreign
+key membership and one-to-one cardinality. The shared relationship validator
+keeps its legacy generated-CSV default unless a caller explicitly selects
+`empty_string_is_null=False`.
+
+Ordinary formula evaluation enforces fixed per-operation resource caps independently of wall-clock checks: strings and bytes are limited to1,000,000elements; integers and Fraction components to16,384bits; Decimal coefficients, absolute exponents and arithmetic context precision to1,024. Sequence concatenation/repetition checks the prospective size before invoking the operator, including named operands and intermediate results. Built-in numeric arithmetic and bounded string/byte operations remain supported; list/tuple/bytearray and overloaded objects are not formula operands. Rejections contain no operand values. These caps complement dataset/output budgets rather than replacing them.
+
+Common YAML loading rejects recursive aliases before construction. Expanded alias nodes share `TEST_DATA_AGENT_MAX_INPUT_CELLS`; expanded scalar bytes share `TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES`. Ordinary bounded acyclic aliases remain supported. Physical alias/depth ceilings still apply, and errors contain no input values. These checks precede model construction and JSON serialization.
+
+Every `generate_dataset` consumer performs the common output allocation estimate before Faker setup and row creation, including direct Python calls, PostgreSQL SQL export and transformation synthesis. Filesystem capacity checks remain in I/O workflows. String construction checks `TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS` before random-character allocation. These conservative payload estimates and cooperative deadlines do not promise an exact peak-RSS ceiling.
+
+
+Deterministic native constraints and business rules share an explicit
+`GenerationBudget` through generation, solving, business application and
+validation. Inner row, field, expression and relationship-graph loops check the
+cooperative deadline and charge cumulative work against
+`TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`. Direct Python entry points also
+create a bounded budget when none is supplied. Native rule amplification is
+estimated before row generation; business rule preflight uses actual supplied
+row counts. Mixed/negative FK and aggregate estimates conservatively include
+repeated parent/table scans for every possible selected row, even with a small
+invalid ratio. Budget failures escape formula error reporting and abort the
+workflow before trusted publication. Optional validation report settings do not
+disable mandatory post-solve rule checks. Explicit keyword-only budget support
+in business callbacks is optional; existing two/three-argument callbacks remain
+supported. These operation allowances are conservative cooperative controls,
+not CPU-instruction or peak-RSS guarantees.
+
+Generation seeds are bounded before generator setup: persisted DatasetSpec seeds
+remain nonnegative and at most 2**63-1; direct Python generation also permits
+signed 64-bit negative seeds for compatibility. Oversized seeds fail closed
+without truncation or hashing, bounding synthetic identifier width.
+
+Business validation failure details contain rule location and condition only;
+conditional allowed-values failures never embed the rejected cell value.
