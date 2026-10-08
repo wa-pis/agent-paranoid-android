@@ -1,5 +1,17 @@
 # Tasks: selective-source-transformation
 
+## Published candidate checkpoint — 2026-10-08
+
+`v1.6.0rc1` published from exact main
+`68a20cf333b6d1bdbb02d36e64fb62ef929b2173` after fresh complete scan
+29bd70cb (zero confirmed findings), independent AI-only issue604 acceptance,
+all four exact-main gates and Ubuntu artifact preflight. GitHub Release,
+PyPI and signed containers succeeded. Public Verify Published Release
+37712402058 passed all package/documentation/container profiles; final public
+acceptance is complete and automation apa-security-fixes-audit-rc was deleted. See [published evidence](../../../docs/release-evidence-1.6.0rc1.md).
+Historical checkpoints below retain their original scope and are superseded
+only by the exact-current evidence; no new scale or live-provider claim.
+
 ## Current security/configuration checkpoint — 2026-10-06
 
 Complete canonical source audit at composed `6ef55a1`:193 executable files,
