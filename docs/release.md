@@ -334,6 +334,10 @@ Record the actual client/version, final candidate SHA, human specification
 review and resulting artifact checks before declaring manual client acceptance.
 Do not tag or publish while those candidate requirements remain open.
 
+RC2 publication completed at exact main `21f4a04ed4acd7c33caac9fda8c6c03b7f0501d1`.
+See [RC2 published evidence](release-evidence-1.6.0rc2.md) for acceptance,
+artifact hashes and public verification status.
+
 ### 1.5.0 Stable Promotion
 
 Stable `1.5.0` promotes candidate `1.5.0rc1` at
