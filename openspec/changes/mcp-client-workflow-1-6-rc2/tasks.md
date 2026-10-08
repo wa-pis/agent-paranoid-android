@@ -2,7 +2,7 @@
 
 ## 1. Baseline And Contracts
 
-- [ ] Identify the reviewed `1.6.0rc1` baseline and outstanding blockers without
+- [x] Identify the reviewed `1.6.0rc1` baseline and outstanding blockers without
   changing or bypassing the selective-transformation policy gates.
 - [x] Map existing MCP descriptions, response contracts, recovery states, and
   SDK tests; identify the smallest missing product and verification pieces.

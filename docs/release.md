@@ -316,19 +316,23 @@ approval and public verification, including the successful Parquet retry.
 
 ## Version And Tag
 
-### 1.6.0rc1 Candidate (prospective exact-commit acceptance)
+### 1.6.0rc2 MCP Workflow Candidate
 
-The `selective-source-transformation` OpenSpec change plans `1.6.0rc1` only;
-stable `1.6.0` is not authorized. Candidate metadata is prepared only in the
-isolated prospective checkout for final audit; it does not authorize public
-activation or publication. Do not tag or publish while
-its safety-policy amendment, client acceptance, documentation audit, or release
-gates remain open. Keep source-preserving execution disabled until the scoped
-amendment, executable safety checks, and independent safety review are complete.
-Review the final exact candidate SHA independently as AI evidence, not as a
-substitute for GitHub-required approval. Then follow the generic version, tag,
-artifact, and public-verification steps below. Use fictional data only; live
-database and external-provider checks are not implied by release approval.
+The `mcp-client-workflow-1-6-rc2` OpenSpec change targets the explicitly
+requested `1.6.0rc2`. It improves local MCP connection, tool guidance,
+fingerprint review and recovery, and corrects unexpected MCP 1 runtime-error
+reflection found during real-client interruption testing. Stable `1.6.0` is
+not authorized. This change does not expand source-preserving execution.
+
+The baseline `1.6.0rc1` completed public acceptance at exact commit
+`68a20cf333b6d1bdbb02d36e64fb62ef929b2173`; see
+[RC1 evidence](release-evidence-1.6.0rc1.md). Preserve its reviewed policy and
+security boundaries. RC2 requires fresh exact-commit gates, independent review,
+Ubuntu preflight hashes, signed acceptance manifest and public verification.
+Automated SDK approval of fictional fixtures is not manual human acceptance.
+Record the actual client/version, final candidate SHA, human specification
+review and resulting artifact checks before declaring manual client acceptance.
+Do not tag or publish while those candidate requirements remain open.
 
 ### 1.5.0 Stable Promotion
 

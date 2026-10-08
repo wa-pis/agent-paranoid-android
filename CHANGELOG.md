@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc2] - Prospective candidate
+
 ### Added
 
 - Provide a generator-only MCP quickstart with fictional inputs, exact tool
@@ -16,7 +18,7 @@ All notable changes to this project are documented here.
 
 ### Security
 
-- Detach unexpected MCP 1 runtime failures before returning tool errors, as
+- Detach unexpected MCP 1 failures before returning tool errors, as
   already done for MCP 2; keep safe cleanup and resource-budget diagnostics.
 
 ## [1.6.0rc1] - Prospective candidate
