@@ -1114,3 +1114,15 @@ Projected fingerprints precede customclient; exactlocal metadata restoration
 requires unchanged projected invariants and original proposal validation.
 Customadapter/JSONhandoff guides reconciled; strictMkDocs/diffcheck pass.
 No external calls, no new finalSHA clearance; prospective rebuild/gate next.
+
+2026-10-08 final candidate3d495879 fullgate3320passed23local skips91%;
+fresh complete independent scan5ad79daf-ae9b-4802-9016-319c35a8beca
+sealed zero findings,382current full-read paths/zero production source gaps.
+Canonical report retained; exact candidate pushed and PR603 created.
+CI syntheticTrino passed; Security/Documentation passed. Containers failed
+on8fixed OS CVEs in pinned Debian runtime; minimal shared PCRE2/Perl upgrade
+prepared, independently reviewed,10focusedtests+strictdocs passed. CI suite
+also hit0.2s admission timing in expiry test; runtime correctly refused
+slow capture. Test-only Event/Timer separation and deadline refusal regression
+prepared,11coverage tests passed; independent review pending. No release/tag
+or merge; corrected exactSHA gates/audit and existing approval still required.

@@ -50,6 +50,20 @@ def test_dockerfile_uses_digest_pinned_minimal_targets() -> None:
     assert "ARG APP_VERSION=" not in dockerfile
 
 
+def test_runtime_base_requires_fixed_bookworm_security_packages() -> None:
+    dockerfile = (ROOT / "Dockerfile").read_text()
+    runtime = dockerfile.split("FROM ${PYTHON_IMAGE} AS runtime-base", maxsplit=1)[1]
+
+    for package, fixed in (
+        ("libpcre2-8-0", "10.42-1+deb12u2"),
+        ("perl-base", "5.36.0-7+deb12u4"),
+    ):
+        assert f"{package}={fixed}" in runtime
+        assert f"dpkg-query -W -f='${{Version}}' {package})\" ge {fixed}" in runtime
+    assert "--only-upgrade" in runtime
+    assert "--allow-remove-essential" not in runtime
+    assert "rm -rf /var/lib/apt/lists/*" in runtime
+
 def test_container_versions_have_no_release_default() -> None:
     compose = (ROOT / "compose.yaml").read_text()
 

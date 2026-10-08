@@ -32,6 +32,9 @@ docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
 
 The Dockerfile uses digest-pinned Python and uv images, a frozen lockfile, and
 separate dependency sets. Final images run as UID/GID `65532` by default.
+The shared runtime layer installs fixed Bookworm PCRE2 and Perl packages and
+checks their versions during the build. Perl remains a Debian essential package;
+image scans continue to block fixable High and Critical findings.
 
 ## Prepare Compose
 

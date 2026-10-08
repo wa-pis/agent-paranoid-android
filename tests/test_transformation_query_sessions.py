@@ -2,7 +2,7 @@
 import json
 import os
 from pathlib import Path
-import time
+from threading import Event, Timer
 
 import pytest
 import yaml
@@ -135,18 +135,53 @@ def test_active_and_lifetime_byte_admission_is_not_reset_by_close(tmp_path, monk
 
 def test_expiry_timer_removes_owned_files_without_polling(tmp_path, monkeypatch):
     calls = prepare(tmp_path, monkeypatch)
-    sessions = _ConfiguredQuerySessions(tmp_path, max_active=1, max_cumulative_bytes=65536, max_seconds=0.2)
+    release, expired = Event(), Event()
+    delays = []
+
+    def short_timer(interval, callback, args):
+        # Admission has its normal budget; exercise the real background callback
+        # independently of filesystem/coverage speed on a loaded CI runner.
+        delays.append(interval)
+        def expire():
+            if release.wait(10):
+                try:
+                    callback(*args)
+                finally:
+                    expired.set()
+        return Timer(0.01, expire)
+
+    monkeypatch.setattr("test_data_agent.io.transformation_query_sessions.Timer", short_timer)
+    sessions = _ConfiguredQuerySessions(tmp_path, max_active=1, max_cumulative_bytes=65536, max_seconds=10)
     tool = _configured_query_session_tool(sessions)
     try:
         opened = open_session(tool)
         owned = Path(opened["local_approval"]["root"])
-        end = time.monotonic() + 2
-        while owned.exists() and time.monotonic() < end:
-            time.sleep(0.02)
+        assert owned.exists() and len(delays) == 1 and 0 < delays[0] <= 10
+        release.set()
+        assert expired.wait(10), "background expiry callback did not complete"
         assert not owned.exists()
         with pytest.raises(TransformationBatchError):
             tool("review", handle=opened["handle"])
         assert len(calls) == 2
+    finally:
+        release.set()
+        sessions.close()
+
+
+def test_expired_deadline_refuses_and_cleans_without_timer_callback(tmp_path, monkeypatch):
+    calls = prepare(tmp_path, monkeypatch)
+    monkeypatch.setattr(Timer, "start", lambda self: None)
+    sessions = _ConfiguredQuerySessions(tmp_path, max_active=1, max_cumulative_bytes=65536, max_seconds=10)
+    tool = _configured_query_session_tool(sessions)
+    try:
+        opened = open_session(tool)
+        owned = Path(opened["local_approval"]["root"])
+        deadline = sessions._sessions[opened["handle"]].deadline
+        monkeypatch.setattr("test_data_agent.io.transformation_query_sessions.monotonic", lambda: deadline + 1)
+        with pytest.raises(TransformationBatchError):
+            tool("review", handle=opened["handle"])
+        assert not owned.exists()
+        assert not sessions._sessions and len(calls) == 2
     finally:
         sessions.close()
 

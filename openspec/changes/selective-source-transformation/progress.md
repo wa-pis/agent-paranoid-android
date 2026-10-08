@@ -8156,3 +8156,29 @@ Broader transformation remains unfinished.
   Next: reconcile activation/baseline documentation and source-free boundaries,
   complete the amended isolated candidate, then milestone gates and independent
   review of the changed scope on its new exact SHA before public activation.
+
+
+## PR603 container security dependency correction — 2026-10-08
+
+Containers run `37704995872` on exact `3d49587939f6cf7ed076c617481c29d60ca2d8be`
+failed all three AMD64 targets at the unchanged Trivy fixable High/Critical gate.
+The shared Debian 12.15 runtime had PCRE2 `10.42-1+deb12u1`
+(CVE-2026-103111) and Perl `5.36.0-7+deb12u3`
+(CVE-2026-13221, CVE-2026-42496, CVE-2026-8376, CVE-2026-42497,
+CVE-2026-48962, CVE-2026-57432, CVE-2026-57433).
+Official Bookworm security indexes for AMD64 and ARM64 both provide fixed
+PCRE2 `10.42-1+deb12u2` and Perl `5.36.0-7+deb12u4`.
+The shared runtime install now pins both fixed versions and checks them with
+`dpkg --compare-versions`; the Python/uv digests and scanner policy stay intact.
+Perl-base is Debian Essential and is upgraded rather than force-removed.
+Failed logs: `/tmp/apa-containers-37704995872-failed.log`.
+Local image build/Trivy replay is unavailable: Docker CLI is present but no
+Docker daemon is running. Fresh all-target AMD64 scan and ARM64 validation on
+the corrected exact commit remain mandatory before acceptance; earlier source
+security review does not certify the changed image. No production, live DB or
+external AI call was used for this correction.
+
+Focused correction checks: `tests/test_containers.py` 10 passed (0.40s);
+Ruff with cache disabled passed; strict documentation build passed (0.34s);
+`git diff --check` passed. Pytest reported only a sandbox cache-write warning.
+No container image or scanner success is claimed from these source checks.
