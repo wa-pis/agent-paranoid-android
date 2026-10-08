@@ -13,6 +13,113 @@ For process and dependency isolation, use the separate hardened images in
 [Container Deployment](../operations/containers.md). The generator example has
 no network, while the Trino worker receives no generator workspace mount.
 
+## Generator-Only Quickstart
+
+Install the optional MCP support in a dedicated environment. Use the version
+selected in [Installation](../getting-started/installation.md); for a candidate,
+install its reviewed wheel instead of assuming it is already published.
+
+```bash
+python3 -m venv /path/to/mcp-env
+/path/to/mcp-env/bin/python -m pip install "agent-paranoid-android[mcp]"
+mkdir -p /path/to/synthetic-workspace
+```
+
+Desktop clients may not inherit your shell's PATH. Configure the absolute
+executable path and restart the client after changing its configuration:
+
+```json
+{
+  "mcpServers": {
+    "test-data-agent-generator": {
+      "command": "/path/to/mcp-env/bin/test-data-agent-mcp-generator",
+      "env": {
+        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/synthetic-workspace"
+      }
+    }
+  }
+}
+```
+
+Replace both absolute paths with your own. The client should discover
+`plan_dataset`, `inspect_dataset_plan`, `approve_dataset_plan`, and
+`recover_dataset_plan`. This local workflow requires no database or AI-provider
+credentials. The `mcpServers` example applies to clients supporting that
+configuration format; use your client's equivalent server settings otherwise.
+
+Create `customers.csv` inside the workspace with this fictional fixture:
+
+```csv
+customer_id,email,status
+1,alice@example.com,active
+2,bob@example.com,paused
+```
+
+Ask your assistant: "Plan four synthetic customers from customers.csv with seed
+81. Show me the specification for review before generating files."
+The corresponding `plan_dataset` arguments are:
+
+```json
+{
+  "source_path": "customers.csv",
+  "workspace_path": "agent/customers",
+  "source_type": "csv",
+  "count": 4,
+  "seed": 81,
+  "output_format": "csv",
+  "table_name": "customers"
+}
+```
+
+The response has `approval_required: true` and `spec_path`. No generated dataset
+exists yet. Open the spec artifact locally and review field types, privacy,
+relationships, count, and seed. Inspection is a read-only operation:
+
+```json
+{"workspace_path": "agent/customers"}
+```
+
+Call `inspect_dataset_plan` with those arguments. After a human reviews and
+explicitly approves the exact current specification, call
+`approve_dataset_plan` with:
+
+```json
+{
+  "workspace_path": "agent/customers",
+  "reviewed_spec_sha256": "<review.current_spec_sha256 from inspection>"
+}
+```
+
+Replace the placeholder with the actual fingerprint. If the specification
+changes, inspect and review it again; a copied fingerprint is not human approval.
+The approval response should report `row_counts: {"customers": 4}`,
+`validation_valid: true`, and paths to output, manifest, validation report, and
+approval receipt. Inspect the same workspace again to confirm `phase: completed`.
+Report these summaries and paths; do not attach or inline dataset rows.
+
+### Corrective Next Steps
+
+- Missing executable or MCP extra: check the absolute path, install `[mcp]`
+  into that environment, and restart the client.
+- Rejected workspace path: move the input inside the configured root and use
+  relative paths. Do not expand permissions to bypass the boundary.
+- Non-empty planning directory: select a new workspace; inspect an existing
+  plan instead of overwriting it.
+- Stale review fingerprint: inspect, review the changed specification, and
+  obtain renewed human approval before submitting its current fingerprint.
+- Interrupted approval or a lost response: inspect first. If `phase` is
+  `completed`, report the existing result. If `next_action` is `recover`, call
+  `recover_dataset_plan` with the workspace and reviewed fingerprint. Recovery
+  retains published outputs without generating another dataset. If inspection
+  requests review and approval, follow that state instead.
+- Fixed argument-validation or transport-limit error: correct arguments against
+  the discovered tool schema or reduce request size. Do not disable budgets or
+  expect rejected values to be reflected in error messages.
+
+Add Trino only for database profiling, using the separate configuration and
+[Safe Trino Sequence](#safe-trino-sequence) below. Do not give the generator
+server database credentials.
+
 ## Prepare A Workspace
 
 ### Closed Common-Profile Candidate

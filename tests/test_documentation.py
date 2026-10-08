@@ -489,6 +489,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "selective-source-transformation",
         "fix-transformation-review-boundaries",
         "remediate-full-security-audit",
+        "mcp-client-workflow-1-6-rc2",
     }
 
     transformation = changes / "selective-source-transformation"

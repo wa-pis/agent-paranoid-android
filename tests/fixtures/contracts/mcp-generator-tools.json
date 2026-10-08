@@ -1,6 +1,6 @@
 [
   {
-    "description": "Approve a reviewed agent plan and return artifact summaries, not rows.",
+    "description": "Generate a planned synthetic dataset only after explicit human review of the exact current specification. Pass reviewed_spec_sha256 from inspect_dataset_plan after that review. A stale fingerprint is rejected. Returns validation summaries and artifact paths, not rows.",
     "input_schema": {
       "properties": {
         "reviewed_spec_sha256": {
@@ -548,7 +548,7 @@
     }
   },
   {
-    "description": "Inspect a planned or completed agent workspace without changing it.",
+    "description": "Read synthetic plan state without changing or approving it. Returns phase, next_action and review.current_spec_sha256. Use before human review, approval or recovery and after a lost response; completed plans need no regeneration.",
     "input_schema": {
       "properties": {
         "workspace_path": {
@@ -570,7 +570,7 @@
     }
   },
   {
-    "description": "Plan a review-first workflow from one bounded workspace source.",
+    "description": "Start a synthetic dataset plan from a workspace CSV, CSV folder or safe profile. Use a new or empty agent workspace and explicit count and seed. Returns spec paths and summaries without generating rows; inspect the plan and obtain human review before approval.",
     "input_schema": {
       "properties": {
         "count": {
@@ -753,7 +753,7 @@
     }
   },
   {
-    "description": "Recover an interrupted approval without regenerating synthetic rows.",
+    "description": "Recover an interrupted synthetic approval only when inspect_dataset_plan reports next_action recover. Pass the exact reviewed specification fingerprint. Retains published datasets without regenerating rows; inspect completed plans instead of retrying approval.",
     "input_schema": {
       "properties": {
         "reviewed_spec_sha256": {

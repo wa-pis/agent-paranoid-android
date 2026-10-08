@@ -5,6 +5,9 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
+- Prepare the local MCP assistant workflow for `1.6.0rc2`: simple connection,
+  explicit specification review, state-driven recovery, and real-client acceptance.
+
 - Monitor migration feedback for stable `1.5.0`; do not assume future integration
   feedback or claim unavailable private-data acceptance.
 - Prepare the isolated `1.6.0rc1` selective-transformation candidate: saved

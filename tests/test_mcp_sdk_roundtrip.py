@@ -1,5 +1,6 @@
 """Real stdio SDK coverage; no database or external network is used."""
 import json
+import os
 import selectors
 import subprocess
 import sys
@@ -29,6 +30,7 @@ run_bounded_mcp(server, max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transpor
         process = subprocess.Popen(
             [sys.executable, "-c", program], stdin=subprocess.PIPE,
             stdout=subprocess.PIPE, stderr=errors, text=True,
+            env={**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")},
         )
         assert process.stdin is not None and process.stdout is not None
 
@@ -56,18 +58,16 @@ run_bounded_mcp(server, max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transpor
                 payload = json.dumps(response)
                 assert ("shared-budget" if request_id == 2 else "Tool arguments failed validation") in payload
                 assert "synthetic-invalid-argument" not in payload
-            # Only SDK 2 changes unexpected-error logging; test its full wire path.
-            from importlib.metadata import version
-            if int(version("mcp").split(".")[0]) >= 2:
-                send({"jsonrpc": "2.0", "id": 4, "method": "tools/call",
-                      "params": {"name": "probe", "arguments": {"limit": -1}}})
-                assert "Tool execution failed" in json.dumps(receive())
-                send({"jsonrpc": "2.0", "id": 5, "method": "tools/call",
-                      "params": {"name": "probe", "arguments": {"limit": -2}}})
-                cleanup_payload = json.dumps(receive())
-                assert "cleanup incomplete" in cleanup_payload
-                assert "before retrying" in cleanup_payload
-                assert "synthetic-private-cleanup-marker" not in cleanup_payload
+            # Both supported SDK majors must detach unexpected runtime failures.
+            send({"jsonrpc": "2.0", "id": 4, "method": "tools/call",
+                  "params": {"name": "probe", "arguments": {"limit": -1}}})
+            assert "Tool execution failed" in json.dumps(receive())
+            send({"jsonrpc": "2.0", "id": 5, "method": "tools/call",
+                  "params": {"name": "probe", "arguments": {"limit": -2}}})
+            cleanup_payload = json.dumps(receive())
+            assert "cleanup incomplete" in cleanup_payload
+            assert "before retrying" in cleanup_payload
+            assert "synthetic-private-cleanup-marker" not in cleanup_payload
             process.stdin.close()
             assert process.wait(timeout=10) == 0
             errors.seek(0)
