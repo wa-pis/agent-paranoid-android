@@ -151,3 +151,24 @@
   corrected to existing release suites. docs/index.md version mismatch was
   caught and corrected before final checks. Local wheel/sdist built successfully;
   these are not Ubuntu preflight hashes or published artifacts.
+
+## 2026-10-09: Independent AI Review And Corrective Slice
+
+- User chose Claude Desktop for genuine manual acceptance. App is available;
+  no acceptance run, config change or human spec review has occurred yet.
+- Exact preparation 5ce70b6 wheel installed in an isolated MCP profile and passed
+  package checks and doctor. This artifact is superseded by the correction below.
+- Independent read-only AI reviewer APA-RC2-Reviewer reviewed exact
+  5ce70b65814a4a5740cfa4bf8af4aac981ebb18a against accepted RC1, all diff hunks,
+  boundaries and release documentation. This is AI review, not human approval.
+- P1 unresolved on that SHA: SDK 1 OSError (and other native exception types)
+  still reflected arbitrary error text. Reviewer reproduced fictional OSError
+  sentinel; SDK1 Python3.11 and SDK2 Python3.13 acceptance each passed 5 existing
+  tests, demonstrating the missing exception-class coverage rather than clearance.
+- Corrective slice now redacts all native exception causes, including ValueError,
+  retaining explicit application ToolError messages and only reconstructed exact
+  cleanup/limit diagnostics. Added OSError and ValueError wire/log sentinels.
+- MCP 2 focused tests: 69 passed; MCP 1 focused tests: 69 passed; full production
+  mypy (150 files), Ruff, strict OpenSpec and diff checks passed.
+- Finding remains open until independent review of corrected exact SHA. Release
+  held; rebuild artifacts and rerun full gate/CI because runtime changed.

@@ -146,14 +146,10 @@ def _create_redacted_fast_mcp(
                 from test_data_agent.core.transformation_limits import TransformationLimitError
 
                 if (type(exc).__name__ == "UnexpectedToolError"
-                        or isinstance(exc.__cause__, RuntimeError)
-                        or type(exc.__cause__) in {
-                            TransformationCleanupError, TransformationLimitError,
-                            QueryWorkBudgetExceeded,
-                        }):
-                    # MCP 1 embeds runtime failures in ToolError; MCP 2 uses
-                    # UnexpectedToolError and logs the cause traceback.
-                    # Detach either before tool inputs reach responses or logs.
+                        or (exc.__cause__ is not None and type(exc.__cause__) is not ToolError)):
+                    # SDK 1 embeds arbitrary exceptions; SDK 2 logs unexpected
+                    # causes. Only explicit application ToolError text is trusted.
+                    # Detach native exception text before responses or SDK logs.
                     from test_data_agent.trino_work_budget import QueryWorkDimension
 
                     cause = exc.__cause__

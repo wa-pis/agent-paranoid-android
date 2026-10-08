@@ -16,6 +16,10 @@ from test_data_agent.trino_work_budget import QueryWorkBudget, DEFAULT_QUERY_WOR
 def probe(limit: int) -> str:
     budget = server.get_context().request_context.request
     assert isinstance(budget, QueryWorkBudget)
+    if limit == -3:
+        raise OSError("synthetic-private-os-marker")
+    if limit == -4:
+        raise ValueError("synthetic-private-value-marker")
     if limit == -2:
         from test_data_agent.io.transformation_publish import TransformationCleanupError
         raise TransformationCleanupError("synthetic-private-cleanup-marker")
@@ -68,6 +72,10 @@ run_bounded_mcp(server, max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transpor
             assert "cleanup incomplete" in cleanup_payload
             assert "before retrying" in cleanup_payload
             assert "synthetic-private-cleanup-marker" not in cleanup_payload
+            for request_id, value in [(6, -3), (7, -4)]:
+                send({"jsonrpc": "2.0", "id": request_id, "method": "tools/call",
+                      "params": {"name": "probe", "arguments": {"limit": value}}})
+                assert "Tool execution failed" in json.dumps(receive())
             process.stdin.close()
             assert process.wait(timeout=10) == 0
             errors.seek(0)
@@ -75,6 +83,8 @@ run_bounded_mcp(server, max_payload_bytes=DEFAULT_QUERY_WORK_LIMITS.raw_transpor
             assert "synthetic-invalid-argument" not in logs
             assert "synthetic-private-tool-marker" not in logs
             assert "synthetic-private-cleanup-marker" not in logs
+            assert "synthetic-private-os-marker" not in logs
+            assert "synthetic-private-value-marker" not in logs
         finally:
             if process.poll() is None:
                 process.kill()

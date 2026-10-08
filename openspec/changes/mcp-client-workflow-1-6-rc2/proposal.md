@@ -28,7 +28,7 @@ planning, review, approval, inspection, and recovery sequence.
   extras, workspace rejection, and bounded transport errors.
 - Exercise the documented workflow through the actual MCP client and stdio
   server using fictional fixtures and explicit seeds.
-- Detach unexpected RuntimeError causes in MCP 1 as in MCP 2, after real-client
+- Detach unexpected native exception causes in MCP 1 as in MCP 2, after real-client
   interruption testing exposed reflected exception text; retain curated cleanup
   and budget diagnostics and add executable cross-major regression coverage.
 - Prepare documentation and exact-commit acceptance criteria for `1.6.0rc2`.

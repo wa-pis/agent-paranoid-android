@@ -18,7 +18,7 @@ All notable changes to this project are documented here.
 
 ### Security
 
-- Detach unexpected MCP 1 runtime failures before returning tool errors, as
+- Detach unexpected MCP 1 failures before returning tool errors, as
   already done for MCP 2; keep safe cleanup and resource-budget diagnostics.
 
 ## [1.6.0rc1] - Prospective candidate

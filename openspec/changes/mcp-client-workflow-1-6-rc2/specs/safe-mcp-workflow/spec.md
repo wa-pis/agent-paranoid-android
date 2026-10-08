@@ -77,7 +77,7 @@ MCP workflow improvements SHALL target `1.6.0rc2` with acceptance evidence bound
 
 ### Requirement: Interrupted Runtime Failures Are Redacted Across SDK Majors
 
-The MCP transport SHALL detach unexpected RuntimeError causes before responses
+The MCP transport SHALL detach unexpected native exception causes before responses
 or SDK logging on both supported SDK major versions, retaining only reconstructed
 safe cleanup and resource-budget diagnostics.
 
