@@ -19,6 +19,10 @@ signed acceptance and public verification complete.
   `validation_report.json.valid` label the result. Consumers must inspect these
   fields before using a bundle. Ordinary valid generation still fails before
   publication on invariant violations.
+- CSV relationship inference requires matching descriptive field names and
+  types plus bounded overlap evidence. Generic `id`/`key`/`uuid` and competing
+  parent domains require explicit reviewed links. Cache format 6 recomputes old
+  inferred bindings; saved profiles must be reprofiled to obtain this correction.
 - Relationships refer to exact entity/field pairs. Active bindings require
   matching field types and at most one parent binding per child field. Rejected
   bindings are ignored. Independently generated specifications do not imply

@@ -125,3 +125,41 @@ def test_help_infer_example_uses_profile_json(capsys):
     output = capsys.readouterr().out
     assert "infer-spec out/profile.json" in output
     assert "infer-spec data.csv" not in output
+
+
+@pytest.mark.parametrize("fields", [("customer_id", "product_id"), ("id", "id")])
+def test_overlapping_unrelated_identifiers_are_not_inferred(tmp_path, fields):
+    from test_data_agent.profiling import profile_example_folder
+    for entity, field in zip(("customer", "product"), fields, strict=True):
+        (tmp_path / f"{entity}.csv").write_text(f"{field}\n1\n2\n3\n")
+    profile = profile_example_folder(tmp_path, cache_dir=None)
+    assert profile.relationships == []
+
+
+def test_ambiguous_parent_domains_require_explicit_binding(tmp_path):
+    from test_data_agent.profiling import profile_example_folder
+    for entity in ("product", "archive"):
+        (tmp_path / f"{entity}.csv").write_text("product_id\n1\n2\n3\n")
+    (tmp_path / "deal.csv").write_text("deal_id,product_id\n10,1\n11,1\n12,2\n13,3\n")
+    profile = profile_example_folder(tmp_path, cache_dir=None)
+    assert not any(r.child_entity == "deal" for r in profile.relationships)
+
+
+def test_old_relationship_cache_is_reprofiled(tmp_path):
+    import json
+    from test_data_agent.profiling import profile_example_folder
+    from test_data_agent.profiling.cache import PROFILE_CACHE_FORMAT_VERSION
+    source = tmp_path / "input"
+    source.mkdir()
+    (source / "customer.csv").write_text("customer_id\n1\n2\n3\n")
+    (source / "product.csv").write_text("product_id\n1\n2\n3\n")
+    cache = tmp_path / "cache"
+    profile_example_folder(source, cache_dir=cache)
+    path = next(cache.glob("*.json"))
+    payload = json.loads(path.read_text())
+    payload["format_version"] = PROFILE_CACHE_FORMAT_VERSION - 1
+    payload["profile"]["relationships"] = [{"parent_entity": "customer",
+        "parent_field": "customer_id", "child_entity": "product", "child_field": "product_id", "confidence": 1}]
+    path.write_text(json.dumps(payload))
+    assert profile_example_folder(source, cache_dir=cache).relationships == []
+    assert json.loads(path.read_text())["format_version"] == PROFILE_CACHE_FORMAT_VERSION

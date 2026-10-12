@@ -15,6 +15,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Avoid false CSV links between unrelated identifiers sharing numeric values,
+  require matching descriptive field names/types and explicit review for
+  ambiguous parent domains, and invalidate previous folder profile caches.
 - Reject conflicting child-field relationship bindings and incompatible field
   types before generation. Report zero checks when no active links are declared.
 - Accept and preserve bounded literal SQL `LIMIT` values from 1 through 1000

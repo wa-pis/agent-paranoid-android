@@ -55,7 +55,7 @@ keys and omits lower-bound child distinct ratios from numeric evidence. Older
 profiles and other producers default to `unspecified`, not proven exact; reprofile
 old folder artifacts to obtain the new uncertainty metadata. This statistic is
 unrelated to the planned percentage of unchanged values after transformation.
-Cache format 5 invalidates older folder caches and recomputes their evidence,
+Cache format 6 invalidates older folder caches and recomputes their evidence,
 including repeated-identifier pool sizes.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
@@ -166,3 +166,8 @@ before retrying; private failure details remain suppressed.
 CSV rows wider than their header are rejected with a value-free input-limit
 error before retention or profiling. Missing fields retain existing null padding.
 This structural check does not establish a native CSV parser peak-memory bound.
+
+CSV folder relationship inference uses matching descriptive identifier names
+and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
+and ambiguous parent domains require explicit reviewed relationships. Cache
+format 6 invalidates older inferred bindings; reprofile saved artifacts.

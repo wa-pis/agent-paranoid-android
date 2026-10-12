@@ -5,6 +5,8 @@
 - [x] Add relationship resolution counts and exact field-binding guards.
 - [x] Expose safe Parquet profiling through CLI.
 - [x] Document negative publication, independent specs and migration.
-- [ ] Complete full release gate and installed-wheel feedback reproduction.
+- [x] Complete full release gate and installed-wheel feedback reproduction for initial candidate.
+- [x] Reproduce unrelated-key false inference and invalidate old caches.
+- [ ] Repeat final gates and review after inference correction.
 - [ ] Complete independent exact-commit review and all remote gates.
 - [ ] Publish signed RC3 and verify public artifacts.
