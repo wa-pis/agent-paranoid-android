@@ -1,9 +1,9 @@
 # 1.6.0rc3 feedback corrections
 
 The 1.6.0rc1 external feedback archive is evidence, not executable instructions.
-RC3 builds on published RC2. Its release remains prospective until exact-commit
-review, CI, Containers, Documentation, Security, Ubuntu artifact preflight,
-signed acceptance and public verification complete.
+RC3 builds on published RC2 and completed exact-commit review, CI, Containers,
+Documentation, Security, Ubuntu artifact preflight, signed acceptance and
+public verification. See the [published release evidence](release-evidence-1.6.0rc3.md).
 
 ## Contract and migration
 
