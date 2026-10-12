@@ -320,8 +320,10 @@ The user requested RC3 to address the external RC1 feedback. Build on published
 RC2 and preserve its transformation safety amendment. See
 [feedback corrections and migration](rc3-feedback.md). RC3 requires fresh
 exact-commit independent review, all four gates, Ubuntu preflight digests,
-signed acceptance manifest and post-publication verification. No successful
-release or live database acceptance is claimed by preparation alone.
+signed acceptance manifest and post-publication verification. RC3 completed publication and public acceptance at exact main
+`450f6319cbad4b39c54e42b1fcb56529ca0de214`; see the
+[RC3 published evidence](release-evidence-1.6.0rc3.md). No live database
+acceptance is claimed.
 
 ## Version And Tag
 
