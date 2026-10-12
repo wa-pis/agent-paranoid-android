@@ -314,6 +314,15 @@ Stable `1.4.0` completed these requirements at exact commit
 [1.4.0 published evidence](release-evidence-1.4.0.md) for hashes, signed images,
 approval and public verification, including the successful Parquet retry.
 
+## 1.6.0rc3 Feedback Candidate
+
+The user requested RC3 to address the external RC1 feedback. Build on published
+RC2 and preserve its transformation safety amendment. See
+[feedback corrections and migration](rc3-feedback.md). RC3 requires fresh
+exact-commit independent review, all four gates, Ubuntu preflight digests,
+signed acceptance manifest and post-publication verification. No successful
+release or live database acceptance is claimed by preparation alone.
+
 ## Version And Tag
 
 ### 1.6.0rc2 MCP Workflow Candidate

@@ -150,6 +150,8 @@ def _validate_relationship_references(
     relationships: list[Relationship],
 ) -> None:
     fields = _entity_fields(entities)
+    field_types = {(e.name, f.name): f.data_type for e in entities for f in e.fields}
+    child_targets: set[tuple[str, str]] = set()
     for relationship in relationships:
         for entity_name, field_name in (
             (relationship.parent_entity, relationship.parent_field),
@@ -159,6 +161,15 @@ def _validate_relationship_references(
                 raise ValueError(f"relationship references unknown entity: {entity_name!r}")
             if field_name not in fields[entity_name]:
                 raise ValueError(f"relationship references unknown field: {entity_name!r}.{field_name!r}")
+
+        if relationship.status == "rejected":
+            continue
+        target = (relationship.child_entity, relationship.child_field)
+        if target in child_targets:
+            raise ValueError("multiple active relationships target the same child field")
+        child_targets.add(target)
+        if field_types[relationship.parent_entity, relationship.parent_field] != field_types[target]:
+            raise ValueError("relationship parent and child fields must have the same data type")
 
 
 def _validate_constraint_references(

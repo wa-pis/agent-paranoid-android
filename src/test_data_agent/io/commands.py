@@ -95,6 +95,8 @@ def generate_dataset_command(
 ) -> int:
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
+    if getattr(args, "overwrite", False):
+        raise ValueError("--overwrite is supported only with --profile or generate-from-csv; DatasetSpec generation requires a new or empty output folder")
     output_format = None if args.output_format is None else OutputFormat(args.output_format)
     return generate_dataset_from_spec_path(
         args.spec,
@@ -234,6 +236,20 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
         f"({len(spec.entities)} entities)",
         file=sys.stderr,
     )
+    return 0
+
+
+def profile_parquet_command(args: argparse.Namespace) -> int:
+    from test_data_agent.adapters.parquet_dataset import parquet_file_to_dataset_profile
+    from test_data_agent.safety import assert_profile_safe
+
+    ensure_paths_distinct(args.input, args.output)
+    require_output_suffix(args.output, {".json"}, "profile output")
+    ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
+    profile = parquet_file_to_dataset_profile(args.input, table_name=args.table)
+    assert_profile_safe(profile)
+    write_dataset_profile_artifact(profile, args.output)
+    write_profile_summary(args.output)
     return 0
 
 

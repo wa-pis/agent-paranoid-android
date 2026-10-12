@@ -4,6 +4,35 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc3] - Prospective candidate
+
+### Added
+
+- Profile one Parquet file from the CLI with `profile-parquet`, then infer a
+  generation specification from its safe JSON metadata.
+- Report declared relationship counts, reference resolution and parent-key
+  cardinality without exposing key values.
+
+### Fixed
+
+- Avoid false CSV links between unrelated identifiers sharing numeric values,
+  require matching descriptive field names/types and explicit review for
+  ambiguous parent domains, and invalidate previous folder profile caches.
+- Reject conflicting child-field relationship bindings and incompatible field
+  types before generation. Report zero checks when no active links are declared.
+- Accept and preserve bounded literal SQL `LIMIT` values from 1 through 1000
+  in the single-table query profiling subset.
+- Explain that `--overwrite` applies to single-entity file bundles and reject
+  it for DatasetSpec folder generation instead of ignoring it.
+
+### Migration
+
+- Dataset generation now rejects the previously ineffective `edge` and
+  `load_test` modes. Use `valid`, `mixed` or `negative`; use `--count` for load volume.
+- Independent specifications do not imply cross-table links. Declare links in
+  one DatasetSpec and generate the entities together.
+
+
 ## [1.6.0rc2] - Prospective candidate
 
 ### Added

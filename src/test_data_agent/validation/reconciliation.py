@@ -12,7 +12,7 @@ from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.settings import GenerationMode, ValidationSettings
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.constraint_validator import validate_constraints
-from test_data_agent.validation.relationship_validator import validate_relationships
+from test_data_agent.validation.relationship_validator import RelationshipMetrics, validate_relationships
 from test_data_agent.validation.schema_validator import validate_schema
 
 
@@ -21,6 +21,8 @@ class ValidationSection(BaseModel):
     passed: int = 0
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
+    checked: int | None = Field(default=None, exclude_if=lambda value: value is None)
+    relationship_metrics: list[RelationshipMetrics] | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class DatasetValidationReport(BaseModel):
@@ -37,12 +39,13 @@ def validate_dataset(
 ) -> DatasetValidationReport:
     budget = budget or GenerationBudget()
     settings = spec.validation_settings.model_copy(deep=True)
+    metrics: list[RelationshipMetrics] = []
     validators: list[tuple[str, bool, Callable[[], list[str]]]] = [
         ("schema", settings.validate_schema, lambda: validate_schema(rows_by_entity, spec)),
         (
             "relationships",
             settings.validate_relationships,
-            lambda: validate_relationships(rows_by_entity, spec, budget=budget),
+            lambda: validate_relationships(rows_by_entity, spec, budget=budget, metrics=metrics),
         ),
         (
             "constraints",
@@ -56,6 +59,10 @@ def validate_dataset(
         if not enabled:
             continue
         result = section(name, validator())
+        if name == "relationships":
+            result.checked = len(metrics)
+            result.passed = sum(item.valid for item in metrics)
+            result.relationship_metrics = metrics
         sections.append(result)
         if settings.fail_fast and result.failed:
             break

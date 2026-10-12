@@ -54,6 +54,8 @@ def generate_dataset(
     if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
         raise GenerationLimitError("seed must be a signed 64-bit integer")
     assert_spec_safe(spec)
+    if spec.generation_settings.mode in {GenerationMode.EDGE, GenerationMode.LOAD_TEST}:
+        raise ValueError("edge and load_test are not supported by dataset generation; use valid, mixed or negative and set count for load volume")
     budget = budget or GenerationBudget()
     budget.check("generation allocation preflight")
     enforce_output_payload_size(estimate_dataset_output_bytes(spec), label="estimated generated data")

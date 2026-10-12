@@ -150,6 +150,13 @@ def run_dataset_command(
         print(json.dumps(result, ensure_ascii=True, indent=2))
         return 0
 
+    if args.command == "profile-parquet":
+        from test_data_agent.io.commands import profile_parquet_command
+        DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
+            "pyarrow", extra="parquet", purpose="Parquet profiling",
+        )
+        return profile_parquet_command(args)
+
     if args.command == "profile-postgres":
         driver = DEFAULT_CLI_DEPENDENCY_RESOLVER.require_module(
             "psycopg",

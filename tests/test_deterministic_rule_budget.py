@@ -61,7 +61,8 @@ def test_native_amplification_rejected_before_generation(monkeypatch):
 
 def test_empty_dense_relationship_graph_is_bounded(monkeypatch):
     monkeypatch.setenv("TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS", "20")
-    spec = DatasetSpec(entities=[EntitySpec(name="nodes", row_count=1,
+    # Bypass binding validation to exercise the service budget on hostile objects.
+    spec = DatasetSpec.model_construct(entities=[EntitySpec(name="nodes", row_count=1,
         fields=[FieldSpec(name="id", data_type="integer")])], relationships=[
         Relationship(parent_entity="nodes", parent_field="id", child_entity="nodes",
             child_field="id", confidence=1) for _ in range(5)])

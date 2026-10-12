@@ -161,6 +161,7 @@ _ALLOWED_NODE_NAMES = frozenset(
         "LT",
         "Like",
         "Literal",
+        "Limit",
         "Lower",
         "Mod",
         "Mul",
@@ -226,6 +227,13 @@ def inspect_query_source(request: SqlQueryProfileRequest) -> QuerySourceDraft:
                 "profile permitted tables separately"
             )
         raise SqlQuerySourceError("SQL query contains a forbidden operation")
+    limit = statement.args.get("limit")
+    if limit is not None:
+        value = limit.expression
+        if (not isinstance(value, exp.Literal) or not value.is_int
+                or not 1 <= int(value.this) <= 1000
+                or limit.args.get("limit_options") is not None):
+            raise SqlQuerySourceError("SQL query LIMIT must be an integer between 1 and 1000")
     for node in nodes:
         if (
             isinstance(node, exp.Func)

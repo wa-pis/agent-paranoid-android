@@ -51,6 +51,14 @@ def test_client_publication_contract(tmp_path: Path, state: str, overwrite: bool
         command.append("--overwrite")
     result = subprocess.run(command, cwd=tmp_path, env=env, capture_output=True,
                             text=True, timeout=30)
+    if overwrite:
+        assert result.returncode == 2
+        assert "--overwrite is supported only" in result.stderr
+        if state == "filled":
+            assert (output / "old.csv").read_text(encoding="utf-8") == "id\n1\n"
+        else:
+            assert not output.exists() or not list(output.iterdir())
+        return
     if state == "filled":
         assert result.returncode == 2
         assert sorted(path.name for path in output.iterdir()) == ["old.csv"]
