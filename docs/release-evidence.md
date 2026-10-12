@@ -6,6 +6,9 @@ historical releases remain available without occupying the main navigation.
 
 | Version | Evidence |
 | --- | --- |
+| `1.6.0rc3` | [Accepted feedback candidate](release-evidence-1.6.0rc3.md) |
+| `1.6.0rc2` | [Accepted MCP candidate](release-evidence-1.6.0rc2.md) |
+| `1.6.0rc1` | [Accepted release candidate](release-evidence-1.6.0rc1.md) |
 | `1.5.0` | [Stable](release-evidence-1.5.0.md) |
 | `1.5.0rc1` | [Accepted release candidate](release-evidence-1.5.0rc1.md) |
 | `1.4.0` | [Stable minor release](release-evidence-1.4.0.md) |
