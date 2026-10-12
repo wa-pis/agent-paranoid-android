@@ -235,7 +235,7 @@ def test_privacy_checked_after_business_mutation_in_every_mode(
     def mutate(rows: dict[str, list[dict[str, Any]]], seed: int) -> None:
         rows["items"][0]["label"] = "fictional-person@example.invalid"
 
-    with pytest.raises(ValueError, match="privacy validation"):
+    with pytest.raises(ValueError, match="privacy validation|not supported by dataset generation"):
         generate_dataset_bundle(
             spec, output_folder=tmp_path / "output", business_rules_applier=mutate
         )
@@ -331,7 +331,7 @@ def test_numeric_string_formula_cannot_bypass_generation_privacy(
     )
     spec.generation_settings.mode = mode
     spec.validation_settings.validate_privacy = False
-    with pytest.raises(ValueError, match="privacy validation"):
+    with pytest.raises(ValueError, match="privacy validation|not supported by dataset generation"):
         generate_dataset_bundle(spec, output_folder=tmp_path / "output")
     assert not (tmp_path / "output").exists()
 

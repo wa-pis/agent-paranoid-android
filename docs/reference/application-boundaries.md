@@ -89,7 +89,7 @@ Public operations:
 `transform-review` entry was added for the 1.6 candidate after the original
 1.0 baseline:
 
-- `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`,
+- `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`, `profile-parquet`,
   `transform-review`, `transform-execute`, `transform-approve`,
   `profile-postgres`, `profile-query`
 - `generate-from-csv`, `validate`, `generate-from-example`

@@ -21,6 +21,7 @@
     "profile-example",
     "infer-spec",
     "profile-csv",
+    "profile-parquet",
     "transform-execute",
     "transform-approve",
     "transform-review",

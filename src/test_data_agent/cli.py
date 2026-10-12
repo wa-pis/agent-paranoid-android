@@ -78,6 +78,10 @@ Quick start:
     test-data-agent generate dataset_spec.yaml \\
       --seed 12345 --format csv --output out/generated
 
+  Profile CSV metadata and infer a specification:
+    test-data-agent profile-csv data.csv --output out/profile.json
+    test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml
+
 Learn more:
   test-data-agent examples
   test-data-agent COMMAND --help
@@ -123,6 +127,9 @@ Common workflows
      --output out/generated
 
 6. Safe profile metadata
+
+   test-data-agent profile-csv data/customers.csv --output out/profile.json
+   test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml
 
    test-data-agent generate --profile profile.json \\
      --count 100 \\

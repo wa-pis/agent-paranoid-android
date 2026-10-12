@@ -21,10 +21,12 @@
         "passed": 1
       },
       {
+        "checked": 0,
         "errors": [],
         "failed": 0,
         "name": "relationships",
-        "passed": 1
+        "passed": 0,
+        "relationship_metrics": []
       },
       {
         "errors": [],

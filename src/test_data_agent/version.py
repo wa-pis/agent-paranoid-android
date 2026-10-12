@@ -1,3 +1,3 @@
 """Package version kept in sync with project metadata."""
 
-__version__ = "1.6.0rc2"
+__version__ = "1.6.0rc3"

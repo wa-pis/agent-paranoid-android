@@ -128,8 +128,6 @@ generation_settings:
         (["--mode", "negative", "--invalid-ratio", "1"], "negative", 1.0, True),
         (["--invalid-ratio", "0"], "mixed", 0.0, False),
         (["--mode", "valid", "--invalid-ratio", "0"], "valid", 0.0, False),
-        (["--mode", "edge", "--invalid-ratio", "0"], "edge", 0.0, False),
-        (["--mode", "load_test", "--invalid-ratio", "0"], "load_test", 0.0, False),
     ],
 )
 def test_generate_spec_mode_options_match_rows_and_artifacts(

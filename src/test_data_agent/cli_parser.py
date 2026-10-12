@@ -235,13 +235,13 @@ def register_dataset_commands(
     generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
     generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
-    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], metavar="MODE", help="Override saved generation mode; profiles default to valid.")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], help="Dataset modes: valid, mixed, negative; edge/load_test are unsupported.")
     generate_parser.add_argument("--invalid-ratio", type=ratio, help="Override saved invalid share for mixed/negative modes, between 0 and 1.")
     generate_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed. Reuse it to reproduce the same output.")
     generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
     generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
     generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
-    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity bundle.")
+    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity file bundle (--profile only for generate).")
 
     postgres_sql_parser = subparsers.add_parser(
         "export-postgres-sql",
@@ -319,6 +319,15 @@ def register_dataset_commands(
     profile_csv_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
     profile_csv_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_csv_parser)
+
+    parquet_parser = subparsers.add_parser(
+        "profile-parquet", help="Create a safe metadata profile from one Parquet file.",
+        formatter_class=PublicHelpFormatter,
+    )
+    parquet_parser.add_argument("input", type=Path, help="Source Parquet file; rows are not retained.")
+    parquet_parser.add_argument("--table", type=str, help="Table/entity name.")
+    parquet_parser.add_argument("--output", "-o", type=Path, required=True, help="Profile JSON to write.")
+    parquet_parser.add_argument("--overwrite", action="store_true", help="Replace an existing profile JSON.")
 
     from test_data_agent.cli_transformation_candidate import _add_execution_arguments
 
