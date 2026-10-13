@@ -6,11 +6,12 @@
 - [x] Verify tests, public contracts, schema and full release gate.
 - [x] Complete local implementation review and document remaining limits.
 
-Full release gate: 3359 passed, 23 skipped, 91.03%. Final focused suite: 98 passed.
-Strict typing, lint, schema/contract freshness and MkDocs passed. Independent
-reviewer calls were unavailable due provider capacity; no independent approval
-is claimed. A fresh RC acceptance is required before publication.
+Final exact-main release gate: 3365 passed, 23 skipped. Strict typing, lint,
+schema/contract freshness, strict MkDocs and installed-wheel regressions passed.
+Independent AI-only exact-main approval, all four hosted gates and fresh Ubuntu
+artifact hashes are recorded in [RC4 evidence](../../../docs/release-evidence-1.6.0rc4.md).
 
-- [ ] Accept final exact RC4 commit with independent review and remote gates.
-- [ ] Run Ubuntu preflight, sign acceptance manifest/tag and publish RC4.
-- [ ] Verify public packages/containers, record evidence and stop automation.
+- [x] Accept final exact RC4 commit with independent review and remote gates.
+- [x] Run Ubuntu preflight, sign acceptance manifest/tag and publish RC4.
+- [x] Verify public packages/containers and record evidence.
+- [x] Stop automation after successful public acceptance.

@@ -1,6 +1,6 @@
 # Installation
 
-Prospective candidate `1.6.0rc4` is in preparation. Candidate `1.6.0rc3` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc3/). See the [RC3 release evidence](../release-evidence-1.6.0rc3.md).
+Candidate `1.6.0rc4` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc4/). See the [RC4 release evidence](../release-evidence-1.6.0rc4.md).
 Stable `1.5.0` remains the recommended release. The explicit candidate pin is:
 
 ```bash
