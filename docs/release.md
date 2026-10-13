@@ -321,7 +321,9 @@ load_test behavior. See [generation modes and replacement](reference/generation-
 and the `generation-modes-and-folder-overwrite` OpenSpec change. RC3 remains
 immutable. RC4 requires fresh exact-commit independent review, all four main
 gates, Ubuntu artifact preflight, signed acceptance and public verification.
-Preparation alone is not publication.
+RC4 completed publication and public acceptance at exact main
+`e62a28b75b710afa541aa15b12b5c6fe1f1ecaac`; see the
+[RC4 published evidence](release-evidence-1.6.0rc4.md).
 
 ## 1.6.0rc3 Feedback Candidate
 

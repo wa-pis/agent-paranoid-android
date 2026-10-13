@@ -10,9 +10,9 @@ Stable `1.5.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
-Prospective candidate `1.6.0rc4` implements folder overwrite and generation modes; it is not yet published.
-Candidate `1.6.0rc3` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc3/) ([feedback corrections](docs/rc3-feedback.md)).
-See the [RC3 release evidence](docs/release-evidence-1.6.0rc3.md).
+Candidate `1.6.0rc4` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc4/).
+It implements [folder overwrite and generation modes](docs/reference/generation-modes.md).
+See the [RC4 release evidence](docs/release-evidence-1.6.0rc4.md).
 Stable `1.5.0` remains the recommended release. The explicit candidate pin is:
 
 ```bash
