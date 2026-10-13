@@ -4,7 +4,7 @@ These additions are prepared for prospective `1.6.0rc4`, following published RC3
 
 `edge` generates valid lower and upper numeric/decimal/date/time bounds,
 zero when in range, both allowed booleans, all declared categories and string
-length boundaries. Nullable fields with a positive null ratio include null cases.
+length boundaries. Numeric bounds include the declared `scale_factor`, as in normal generation. Nullable fields with a positive null ratio include null cases.
 Identifiers remain synthetic; constraint solving preserves declared uniqueness,
 foreign keys, formulas and business rules, which can replace a field boundary
 when it conflicts with another invariant. Row count stays unchanged: small
