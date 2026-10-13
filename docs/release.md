@@ -314,6 +314,15 @@ Stable `1.4.0` completed these requirements at exact commit
 [1.4.0 published evidence](release-evidence-1.4.0.md) for hashes, signed images,
 approval and public verification, including the successful Parquet retry.
 
+## 1.6.0rc4 Generation Modes Candidate
+
+The user requested RC4 after implementing full folder overwrite, edge and
+load_test behavior. See [generation modes and replacement](reference/generation-modes.md)
+and the `generation-modes-and-folder-overwrite` OpenSpec change. RC3 remains
+immutable. RC4 requires fresh exact-commit independent review, all four main
+gates, Ubuntu artifact preflight, signed acceptance and public verification.
+Preparation alone is not publication.
+
 ## 1.6.0rc3 Feedback Candidate
 
 The user requested RC3 to address the external RC1 feedback. Build on published

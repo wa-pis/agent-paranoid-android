@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import random
 import string
+import math
 from datetime import datetime, timedelta
 from typing import Any
 
 from faker import Faker
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.decimal_units import sample_decimal
+from test_data_agent.core.decimal_units import sample_decimal, decimal_from_units, decimal_to_units
 from test_data_agent.core.distribution import (
     BooleanDistribution,
     CategoricalDistribution,
@@ -54,8 +55,10 @@ def generate_dataset(
     if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
         raise GenerationLimitError("seed must be a signed 64-bit integer")
     assert_spec_safe(spec)
-    if spec.generation_settings.mode in {GenerationMode.EDGE, GenerationMode.LOAD_TEST}:
-        raise ValueError("edge and load_test are not supported by dataset generation; use valid, mixed or negative and set count for load volume")
+    spec = spec.model_copy(deep=True)
+    if spec.generation_settings.mode == GenerationMode.LOAD_TEST:
+        for entity in spec.entities:
+            entity.row_count *= spec.generation_settings.load_multiplier
     budget = budget or GenerationBudget()
     budget.check("generation allocation preflight")
     enforce_output_payload_size(estimate_dataset_output_bytes(spec), label="estimated generated data")
@@ -154,8 +157,12 @@ def generate_field_value(
     identifier_domain: int = 0,
     identifier_domain_count: int = 1,
 ) -> Any:
-    if allow_null and field.nullable and rng.random() < field.null_ratio:
-        return None
+    if allow_null and field.nullable:
+        if mode == GenerationMode.EDGE:
+            if field.null_ratio > 0 and row_index % 4 == 3:
+                return None
+        elif rng.random() < field.null_ratio:
+            return None
     if should_generate_invalid_value(field, rng, mode=mode, invalid_ratio=invalid_ratio):
         return invalid_value_for_type(field.data_type)
     if field.is_identifier:
@@ -165,6 +172,8 @@ def generate_field_value(
         )
     if field.sensitive and field.data_type == FieldType.STRING:
         return synthetic_sensitive_value(field, faker)
+    if mode == GenerationMode.EDGE:
+        return edge_field_value(field, row_index, rng)
     if (
         semantic_provider is not None
         and field.data_type != FieldType.DECIMAL
@@ -211,6 +220,60 @@ def generate_field_value(
     if field.data_type == FieldType.DATETIME:
         return ranged_datetime(datetime_distribution, distribution, rng, date_only=False)
     return synthetic_string(field, string_distribution, rng)
+
+
+def edge_field_value(field: FieldSpec, row_index: int, rng: random.Random) -> Any:
+    """Cycle valid boundaries; constraint solving retains relational invariants."""
+    distribution = field.typed_distribution
+    if isinstance(distribution, CategoricalDistribution) and distribution.categories:
+        return distribution.categories[row_index % len(distribution.categories)].value
+    if field.data_type in {FieldType.INTEGER, FieldType.FLOAT}:
+        low: int | float = 0
+        high: int | float = 1000
+        if isinstance(distribution, NumericDistribution):
+            low = distribution.min_value if distribution.min_value is not None else low
+            high = distribution.max_value if distribution.max_value is not None else high
+        elif isinstance(distribution, NumericShapeDistribution):
+            bound = 9.0 * 10.0 ** distribution.max_abs_magnitude
+            low = -bound if distribution.has_negative else 0
+            high = bound if distribution.has_positive else 0
+        if field.data_type == FieldType.INTEGER:
+            low, high = math.ceil(low), math.floor(high)
+            if low > high:
+                raise ValueError("integer range contains no valid integer")
+        values = [low, high]
+        if low <= 0 <= high:
+            values.append(0)
+        return values[row_index % len(values)]
+    if isinstance(distribution, DecimalRangeDistribution):
+        low_units = decimal_to_units(distribution.min, precision=distribution.precision, scale=distribution.scale)
+        high_units = decimal_to_units(distribution.max, precision=distribution.precision, scale=distribution.scale)
+        units = [low_units, high_units]
+        if low_units <= 0 <= high_units:
+            units.append(0)
+        return decimal_from_units(units[row_index % len(units)], precision=distribution.precision, scale=distribution.scale)
+    if field.data_type == FieldType.BOOLEAN:
+        if isinstance(distribution, BooleanDistribution) and distribution.true_ratio in (0, 1):
+            return bool(distribution.true_ratio)
+        return bool(row_index % 2)
+    if field.data_type in {FieldType.DATE, FieldType.DATETIME}:
+        bounds = distribution if isinstance(distribution, (DateRangeDistribution, DateTimeRangeDistribution)) else None
+        low_date = (bounds.min if bounds is not None else None) or "2020-01-01"
+        high_date = (bounds.max if bounds is not None else None) or "2025-01-01"
+        selected = low_date if row_index % 2 == 0 else high_date
+        fixed = {"min": selected, "max": selected}
+        return ranged_datetime(None, fixed, rng, date_only=field.data_type == FieldType.DATE)
+    pattern = distribution if isinstance(distribution, StringPatternDistribution) else None
+    low_length = pattern.min_length if pattern is not None else 6
+    high_length = pattern.max_length if pattern is not None else 12
+    length = low_length if row_index % 2 == 0 else high_length
+    if length == 0:
+        if field.nullable:
+            return ""
+        if high_length == 0:
+            raise ValueError("required string field cannot have zero maximum length")
+    fixed_pattern = StringPatternDistribution(min_length=max(1, length), max_length=max(1, length))
+    return synthetic_string(field, fixed_pattern, rng)
 
 
 def synthetic_identifier(

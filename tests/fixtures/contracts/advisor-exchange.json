@@ -495,6 +495,12 @@
             "title": "Invalid Ratio",
             "type": "number"
           },
+          "load_multiplier": {
+            "default": 10,
+            "minimum": 1,
+            "title": "Load Multiplier",
+            "type": "integer"
+          },
           "locale": {
             "anyOf": [
               {

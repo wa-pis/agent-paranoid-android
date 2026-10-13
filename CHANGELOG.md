@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc4] - Prospective candidate
+
+### Added
+
+- Generate valid boundary cases with `edge` and bounded load datasets with `load_test` (default ×10; explicit count overrides).
+- Replace complete DatasetSpec output folders with `--overwrite`, preserving previous output when generation or publication fails.
+
 ## [1.6.0rc3] - 2026-10-13
 
 ### Added

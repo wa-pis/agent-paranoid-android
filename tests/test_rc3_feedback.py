@@ -69,24 +69,23 @@ def test_invalid_field_bindings_rejected(invalid):
 
 
 @pytest.mark.parametrize("mode", ["edge", "load_test"])
-def test_unimplemented_dataset_modes_fail_before_publication(tmp_path, mode):
+def test_dataset_modes_publish_valid_linked_data(tmp_path, mode):
     spec = linked_spec()
     spec.generation_settings.mode = mode
-    with pytest.raises(ValueError, match="not supported"):
-        generate_dataset_bundle(spec, output_folder=tmp_path / "output", seed=8)
-    assert not (tmp_path / "output").exists()
+    result = generate_dataset_bundle(spec, output_folder=tmp_path / "output", seed=8)
+    assert result.validation.valid
+    assert result.row_counts == ({"product": 30, "deal": 60} if mode == "load_test" else {"product": 3, "deal": 6})
 
 
-def test_spec_overwrite_is_explicit_and_preserves_existing_files(tmp_path, capsys):
+def test_spec_overwrite_replaces_complete_folder(tmp_path):
     spec = tmp_path / "spec.json"
     spec.write_text(linked_spec().model_dump_json())
     out = tmp_path / "out"
     out.mkdir()
-    (out / "keep.txt").write_text("fictional")
-    assert main(["generate", str(spec), "--output", str(out), "--overwrite"]) == 2
-    assert "--overwrite is supported only" in capsys.readouterr().err
-    assert (out / "keep.txt").read_text() == "fictional"
-    assert list(out.iterdir()) == [out / "keep.txt"]
+    (out / "obsolete.txt").write_text("fictional")
+    assert main(["generate", str(spec), "--output", str(out), "--overwrite"]) == 0
+    assert not (out / "obsolete.txt").exists()
+    assert (out / "generation_manifest.json").exists()
 
 
 @pytest.mark.parametrize("adapter", list(SqlQueryAdapter))

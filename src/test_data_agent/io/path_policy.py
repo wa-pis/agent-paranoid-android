@@ -225,9 +225,11 @@ def make_staging_directory(destination: Path) -> Path:
     raise FileExistsError("could not allocate staging directory")
 
 
-def publish_directory(source: Path, destination: Path) -> PathIdentity:
+def publish_directory(source: Path, destination: Path, *, overwrite: bool = False) -> PathIdentity:
     if source.parent.absolute() != destination.parent.absolute():
         raise ValueError("staging and output folders must share a parent")
+    if overwrite and not shutil.rmtree.avoids_symlink_attacks:
+        raise ValueError("secure directory cleanup is unavailable")
     with _parent_descriptor(destination) as (parent, destination_name):
         source_name = source.name
         source_stat = _stat_at(parent, source_name)
@@ -241,8 +243,8 @@ def publish_directory(source: Path, destination: Path) -> PathIdentity:
                 destination_name, _flags(directory=True), dir_fd=parent
             )
             try:
-                if os.listdir(output_descriptor):
-                    raise ValueError("generation output folder must be empty")
+                if os.listdir(output_descriptor) and not overwrite:
+                    raise ValueError("generation output folder must be empty; use --overwrite to replace it")
                 if _identity(os.fstat(output_descriptor)) != _identity(destination_stat):
                     raise ValueError("output path changed during publication")
             finally:
@@ -251,11 +253,40 @@ def publish_directory(source: Path, destination: Path) -> PathIdentity:
             raise ValueError("staging path changed during publication")
         if _publication_version(_stat_at(parent, destination_name)) != _publication_version(destination_stat):
             raise ValueError("output path changed during publication")
-        os.replace(source_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
-        published = _stat_at(parent, destination_name)
-        if published is None:
-            raise ValueError("output publication did not complete")
-        os.fsync(parent)
+        if not overwrite:
+            os.replace(source_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
+            published = _stat_at(parent, destination_name)
+            if published is None:
+                raise ValueError("output publication did not complete")
+            os.fsync(parent)
+            return _identity(published)
+        backup_name = None
+        if overwrite and destination_stat is not None:
+            backup_name = f".{destination_name}.{secrets.token_hex(8)}.rollback"
+            os.rename(destination_name, backup_name, src_dir_fd=parent, dst_dir_fd=parent)
+        published = None
+        try:
+            if backup_name is not None and _stat_at(parent, destination_name) is not None:
+                raise ValueError("output path changed during publication")
+            os.replace(source_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
+            published = _stat_at(parent, destination_name)
+            if published is None:
+                raise ValueError("output publication did not complete")
+            os.fsync(parent)
+        except BaseException:
+            current = _stat_at(parent, destination_name)
+            if current is not None and _identity(current) == _identity(source_stat):
+                shutil.rmtree(destination_name, dir_fd=parent)
+                current = None
+            if backup_name is not None and current is None:
+                os.rename(backup_name, destination_name, src_dir_fd=parent, dst_dir_fd=parent)
+            raise
+        if backup_name is not None:
+            try:
+                shutil.rmtree(backup_name, dir_fd=parent)
+            except OSError:
+                # Publication succeeded; cleanup must not trigger deletion of new output.
+                pass
         return _identity(published)
 
 
