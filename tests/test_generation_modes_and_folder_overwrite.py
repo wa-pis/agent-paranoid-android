@@ -183,3 +183,12 @@ def test_custom_load_multiplier_and_profile_count(tmp_path):
         "fields": [{"name": "quantity", "data_type": "integer"}]}]})
     prepared = build_dataset_spec_from_profile(profile, count=7, seed=5, mode="load_test")
     assert len(generate_dataset(prepared, seed=5)["item"]) == 7
+
+
+@pytest.mark.parametrize("data_type", ["integer", "float"])
+def test_edge_respects_numeric_scale_factor(data_type):
+    spec = DatasetSpec.model_validate({"generation_settings": {"mode": "edge"},
+        "entities": [{"name": "item", "row_count": 2, "fields": [{"name": "amount",
+            "data_type": data_type, "distribution": {"kind": "numeric", "min_value": 10,
+            "max_value": 20, "scale_factor": 2}}]}]})
+    assert {row["amount"] for row in generate_dataset(spec, seed=1)["item"]} == {20, 40}

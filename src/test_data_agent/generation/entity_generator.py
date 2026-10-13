@@ -233,6 +233,8 @@ def edge_field_value(field: FieldSpec, row_index: int, rng: random.Random) -> An
         if isinstance(distribution, NumericDistribution):
             low = distribution.min_value if distribution.min_value is not None else low
             high = distribution.max_value if distribution.max_value is not None else high
+            low *= distribution.scale_factor
+            high *= distribution.scale_factor
         elif isinstance(distribution, NumericShapeDistribution):
             bound = 9.0 * 10.0 ** distribution.max_abs_magnitude
             low = -bound if distribution.has_negative else 0
