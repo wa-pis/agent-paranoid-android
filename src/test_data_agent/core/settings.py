@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, model_serializer
 
 
 class GenerationMode(StrEnum):
@@ -34,7 +35,15 @@ class GenerationSettings(BaseModel):
     invalid_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
     output_format: OutputFormat = OutputFormat.JSON
     locale: str | None = None
-    load_multiplier: int = Field(default=10, strict=True, ge=1, exclude_if=lambda value: value == 10)
+    load_multiplier: int = Field(default=10, strict=True, ge=1)
+
+
+    @model_serializer(mode="wrap")
+    def serialize_settings(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        if self.load_multiplier == 10:
+            payload.pop("load_multiplier", None)
+        return payload
 
 
 class ValidationSettings(BaseModel):

@@ -10,3 +10,7 @@ Full release gate: 3359 passed, 23 skipped, 91.03%. Final focused suite: 98 pass
 Strict typing, lint, schema/contract freshness and MkDocs passed. Independent
 reviewer calls were unavailable due provider capacity; no independent approval
 is claimed. A fresh RC acceptance is required before publication.
+
+- [ ] Accept final exact RC4 commit with independent review and remote gates.
+- [ ] Run Ubuntu preflight, sign acceptance manifest/tag and publish RC4.
+- [ ] Verify public packages/containers, record evidence and stop automation.

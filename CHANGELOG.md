@@ -4,6 +4,8 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0rc4] - Prospective candidate
+
 ### Added
 
 - Generate valid boundary cases with `edge` and bounded load datasets with `load_test` (default ×10; explicit count overrides).
