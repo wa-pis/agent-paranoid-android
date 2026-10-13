@@ -85,6 +85,7 @@ def generate_dataset_bundle(
     mode: str | None = None,
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
+    overwrite: bool = False,
 ) -> DatasetGenerationResult:
     effective_spec = spec.model_copy(deep=True)
     if mode is not None or invalid_ratio is not None:
@@ -107,6 +108,11 @@ def generate_dataset_bundle(
             raise ValueError(f"count must be <= {max_count}")
         for entity in effective_spec.entities:
             entity.row_count = count
+    if effective_spec.generation_settings.mode == GenerationMode.LOAD_TEST:
+        if count is None:
+            for entity in effective_spec.entities:
+                entity.row_count *= effective_spec.generation_settings.load_multiplier
+        effective_spec.generation_settings.load_multiplier = 1
     enforce_generation_row_count_limits(effective_spec, max_count=max_count)
     effective_seed = effective_spec.generation_settings.seed if seed is None else seed
     if effective_seed is None:
@@ -160,7 +166,10 @@ def generate_dataset_bundle(
         )
         enforce_output_folder_size(temp_folder)
         budget.check("artifact publication")
-        commit_temp_output_folder(temp_folder, output_folder)
+        if overwrite:
+            publish_directory(temp_folder, output_folder, overwrite=True)
+        else:
+            commit_temp_output_folder(temp_folder, output_folder)
     except BaseException:
         cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
         raise
@@ -185,6 +194,7 @@ def generate_dataset_artifacts(
     mode: str | None = None,
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
+    overwrite: bool = False,
 ) -> int:
     result = generate_dataset_bundle(
         spec,
@@ -195,6 +205,7 @@ def generate_dataset_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
+        overwrite=overwrite,
     )
     return 0 if result_is_valid(result) else 1
 
@@ -217,6 +228,8 @@ def build_dataset_spec_from_profile(
     if output_format is not None:
         spec.generation_settings.output_format = output_format
     apply_dataset_mode_options(spec, mode=mode, invalid_ratio=invalid_ratio)
+    if spec.generation_settings.mode == GenerationMode.LOAD_TEST:
+        spec.generation_settings.load_multiplier = 1
     enforce_generation_row_count_limits(spec)
     return spec
 

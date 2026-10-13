@@ -235,13 +235,13 @@ def register_dataset_commands(
     generate_parser.add_argument("spec", nargs="?", type=Path, help="Reviewed DatasetSpec YAML/JSON.")
     generate_parser.add_argument("--profile", type=Path, help="Safe profile JSON to generate from instead of a spec file.")
     generate_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
-    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], help="Dataset modes: valid, mixed, negative; edge/load_test are unsupported.")
+    generate_parser.add_argument("--mode", choices=[item.value for item in CoreGenerationMode], help="Dataset modes: valid, mixed, negative, edge (valid boundaries), load_test (10x volume; --count overrides).")
     generate_parser.add_argument("--invalid-ratio", type=ratio, help="Override saved invalid share for mixed/negative modes, between 0 and 1.")
     generate_parser.add_argument("--seed", type=non_negative_int, help="Deterministic seed. Reuse it to reproduce the same output.")
     generate_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], dest="output_format", help="Output format for generated rows.")
     generate_parser.add_argument("--output", "-o", type=Path, help="Output folder for DatasetSpec generation, or output file for --profile.")
     generate_parser.add_argument("--business-rules", type=Path, help="Optional YAML/JSON business rules to enforce and validate.")
-    generate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing single-entity file bundle (--profile only for generate).")
+    generate_parser.add_argument("--overwrite", action="store_true", help="Replace the complete output folder or an existing single-entity file bundle.")
 
     postgres_sql_parser = subparsers.add_parser(
         "export-postgres-sql",

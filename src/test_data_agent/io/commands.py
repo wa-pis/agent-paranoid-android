@@ -72,7 +72,10 @@ def generate_dataset_from_spec_path(
     mode: str | None = None,
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
+    overwrite: bool = False,
 ) -> int:
+    if output_folder.resolve() in spec_path.resolve().parents:
+        raise ValueError("output folder must not contain the input specification")
     spec = load_dataset_spec(spec_path)
     exit_code = generate_dataset_artifacts(
         spec,
@@ -83,6 +86,7 @@ def generate_dataset_from_spec_path(
         mode=mode,
         invalid_ratio=invalid_ratio,
         business_rules_applier=business_rules_applier,
+        overwrite=overwrite,
     )
     write_generation_summary(output_folder)
     return exit_code
@@ -95,8 +99,6 @@ def generate_dataset_command(
 ) -> int:
     if args.output is None:
         raise SystemExit("dataset generation requires --output folder")
-    if getattr(args, "overwrite", False):
-        raise ValueError("--overwrite is supported only with --profile or generate-from-csv; DatasetSpec generation requires a new or empty output folder")
     output_format = None if args.output_format is None else OutputFormat(args.output_format)
     return generate_dataset_from_spec_path(
         args.spec,
@@ -107,6 +109,7 @@ def generate_dataset_command(
         mode=getattr(args, "mode", None),
         invalid_ratio=getattr(args, "invalid_ratio", None),
         business_rules_applier=business_rules_applier,
+        overwrite=getattr(args, "overwrite", False),
     )
 
 
@@ -123,6 +126,8 @@ def export_postgres_sql_command(args: argparse.Namespace) -> int:
             raise ValueError(f"count must be <= {max_generation_count()}")
         for entity in spec.entities:
             entity.row_count = args.count
+        if spec.generation_settings.mode == "load_test":
+            spec.generation_settings.load_multiplier = 1
     seed = args.seed
     if seed is None:
         seed = spec.generation_settings.seed

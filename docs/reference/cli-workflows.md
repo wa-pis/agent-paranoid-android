@@ -179,3 +179,6 @@ manifest, format, or sibling-file checks do not match.
 The local-category selector does not bypass sensitive-name, content,
 cardinality, value-length, destination, or resource checks. Exact approved
 values remain local and are replaced before external-provider requests.
+
+See [generation modes and folder replacement](generation-modes.md) for the
+post-RC3 edge boundaries, load multiplier and complete-folder overwrite contract.

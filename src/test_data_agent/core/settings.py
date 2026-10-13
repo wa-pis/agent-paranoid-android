@@ -34,6 +34,7 @@ class GenerationSettings(BaseModel):
     invalid_ratio: float = Field(default=0.0, ge=0.0, le=1.0)
     output_format: OutputFormat = OutputFormat.JSON
     locale: str | None = None
+    load_multiplier: int = Field(default=10, strict=True, ge=1, exclude_if=lambda value: value == 10)
 
 
 class ValidationSettings(BaseModel):

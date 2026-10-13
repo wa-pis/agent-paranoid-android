@@ -300,6 +300,8 @@ def prepare_spec_for_approval(spec: DatasetSpec, request: AgentRequest) -> None:
         mode=request.mode.value,
         invalid_ratio=request.invalid_ratio,
     )
+    if spec.generation_settings.mode == "load_test":
+        spec.generation_settings.load_multiplier = 1
     enforce_generation_row_count_limits(spec)
 
 

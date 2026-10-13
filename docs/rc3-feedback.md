@@ -5,6 +5,9 @@ RC3 builds on published RC2 and completed exact-commit review, CI, Containers,
 Documentation, Security, Ubuntu artifact preflight, signed acceptance and
 public verification. See the [published release evidence](release-evidence-1.6.0rc3.md).
 
+The following describes the immutable RC3 contract. Subsequent development implements
+folder replacement and both modes; see [generation modes](reference/generation-modes.md).
+
 ## Contract and migration
 
 - `generate SPEC --overwrite` now fails with a recovery hint. Folder generation
