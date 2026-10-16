@@ -10,10 +10,11 @@ prioritized from observed user needs and confirmed defects.
   sources and formats. Track implementation and evidence in OpenSpec
   `source-output-contract-parity`.
 
-- Complete `1.6.0rc5` acceptance for the shared source/output contract, portable
+- Monitor `1.6.0rc5` feedback for the shared source/output contract, portable
   business rules and MCP permissions. The frozen runtime passed exact-main
-  automated gates; actual Codex full-specification human acceptance and signed
-  publication remain open. See [RC5 status](rc5-release-status.md).
+  automated gates and actual Codex full-current-specification human acceptance;
+  publication workflows and public verification passed.
+  See [RC5 status](rc5-release-status.md).
 
 - Monitor migration feedback for stable `1.5.0`; do not assume future integration
   feedback or claim unavailable private-data acceptance.

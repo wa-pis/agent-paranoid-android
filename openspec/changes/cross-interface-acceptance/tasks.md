@@ -3,8 +3,10 @@
 Checked execution tasks below describe the frozen `408ec527` runtime campaign,
 including explicitly documented `2eecfd69` runs on its byte-identical wheel.
 See `docs/acceptance-evidence-1.6.0rc5.md`. They do not assert fresh execution
-on the newly versioned RC5 source. Manual tasks remain open; the `rc5-release`
-change tracks exact-RC5 gates and publication separately.
+on the newly versioned RC5 source. The actual-client human task below records
+its later exact-RC5 evidence explicitly; the transformation/session campaign
+remains open. The `rc5-release` change tracks exact-RC5 gates and publication
+separately.
 
 ## Plan recorded
 
@@ -29,11 +31,11 @@ change tracks exact-RC5 gates and publication separately.
 - [x] Run Python/dependency installation profiles and actual workloads in all three container targets on AMD64/ARM64.
 - [x] Run isolated fictional PostgreSQL/Trino acquisition-to-artifact cases with real restricted readers; record them separately from mocked acquisition.
 - [ ] Run the separately gated transformation/session campaign; obtain actual human local-terminal evidence where required, never agent-issued approval.
-- [ ] Record an actual assistant-client/version run with fictional data and human spec review; automated SDK tests do not satisfy it.
+- [x] Record actual Codex CLI `0.162.0-alpha.17.2` fictional-data execution, full current-specification human review and new consent on RC5 main `890925afdff68e97cafe38a28605d2874c9dad79`; manual evidence SHA-256 `22105ba0a2dcd9ed7654898c669832c7eee2c85969c79542ad23aa2f61db1270` records completed plan/artifact checks and explicit UI/client-exit observation limits. Automated SDK tests do not supply this consent.
 
 ## Close only with evidence
 
 - [ ] Fix confirmed failures and repeat affected cases; bind the final report and full gate to the final SHA.
 - [ ] Publish the value-free coverage ledger, environment list, hashes, run links, explicit failures/blocks/N/A reasons and manual acceptance evidence.
 - [ ] Confirm no required cases are failed, blocked or silently skipped before declaring this campaign complete.
-- [ ] If a release is subsequently authorized, perform all existing independent review, exact-main gates, preflight, signed acceptance and public verification; this campaign does not replace them.
+- [x] Complete the separately authorized RC5 release's independent review, exact-main gates, preflight, signed acceptance and public verification on main `890925afdff68e97cafe38a28605d2874c9dad79`; see `docs/release-evidence-1.6.0rc5.md`. This does not close the separately gated transformation/session campaign.

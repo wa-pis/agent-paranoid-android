@@ -2,9 +2,11 @@
 
 ## Status and identities
 
-The historical automated runtime campaign passed before RC5 preparation. Human
-Codex acceptance and RC5 publication remain open. This document records what
-actually ran, without treating a previous artifact as a newly built RC5 wheel.
+The historical automated runtime campaign passed before RC5 preparation. Actual
+Codex and current-specification human acceptance passed on the exact RC5 main
+candidate. Publication workflows and public verification passed.
+See the [publication evidence](release-evidence-1.6.0rc5.md). This document
+records what actually ran, without treating a previous artifact as a newly built RC5 wheel.
 The [plan](acceptance-matrix.md) and [release process](release.md) still apply.
 
 ## Exact RC5 candidate checkpoint
@@ -13,8 +15,8 @@ On 2026-10-16, [PR #623](https://github.com/wa-pis/agent-paranoid-android/pull/6
 merged as frozen main `890925afdff68e97cafe38a28605d2874c9dad79`. Its tree
 `a2f57bba64603b4ae2a39c97f958c506315e630c` matches repaired reference
 `cd4f1cdba042862909fc9ccfe06fc52e4389e622`. The following are candidate checks;
-RC5 remains untagged and unpublished. Later documentation commits do not change
-these source identities or inherit their results.
+public release verification passed separately. Later documentation commits do not
+change these source identities or inherit their results.
 
 | Exact-main check | Result and evidence |
 | --- | --- |
@@ -49,14 +51,42 @@ All 162 wheel members, including 157 package files, match the Ubuntu wheel in
 content; only ZIP timestamps differ. The macOS hash is not the publication
 preflight hash.
 
-An actual Codex CLI `0.162.0-alpha.17.2` planning call was observed. The final
-authored specification was installed afterward. Earlier consent predating that
-file does not approve it. The existing conversation can be
-[resumed](how-to/mcp.md#resume-an-existing-synthetic-plan), but resume/configuration
-preflight and mocked launcher checks are preparation only. Fresh actual-client
-inspection, full current-file human review, new specific consent, generation,
-validation, artifact verification and client completion remain unresolved.
-No signed acceptance/tag, publication or public-release verification is claimed.
+## Actual Codex and human specification acceptance
+
+On 2026-10-16, the actual Codex CLI `0.162.0-alpha.17.2` conversation continued
+with its existing fictional plan. After the authored specification was installed,
+the client inspected it and displayed the complete current file and its hash.
+The human then explicitly attested full-file review and gave new specific consent
+before generation. Earlier consent predating that file was excluded. Before
+approval, the client inspected and reread the unchanged file. The observed
+sequence then completed `approve_dataset_plan`, `validate_dataset` and a final
+`inspect_dataset_plan` reporting phase `completed`.
+
+| Manual acceptance binding | Value |
+| --- | --- |
+| Exact source | `890925afdff68e97cafe38a28605d2874c9dad79` |
+| Reviewed specification byte SHA-256 | `b691f8c82d2f0d28f8a70064ba414f269846ae88f98b781d06364a6ba97254e2` |
+| Reviewed typed specification SHA-256 | `2e299faba7ac1dac3f18a385922c709f4294f3de5d77ac7fa8ba1b0a0eef365d` |
+| Manual evidence SHA-256 | `22105ba0a2dcd9ed7654898c669832c7eee2c85969c79542ad23aa2f61db1270` |
+| Final observation SHA-256 | `59da184f674d6f90433e6b8596b35b4fe90492fb2292bb59d85b823822bd70d7` |
+| Artifact audit SHA-256 | `425e5d066f09626995d257e15655e30fdf00aa9280ed9d1e1858f5d53074f719` |
+
+The accepted result contained two synthetic customer rows and five synthetic
+order rows. Validation and the separate artifact audit passed for primary/foreign
+keys, native constraints, exact DECIMAL values and six business rules. The final
+inspection reported `source_rows_copied: false`. This manual result uses the
+separate macOS wheel identified above.
+
+The evidence records the actual user self-attestation after complete current-file
+display; automated observation alone does not prove human reading. The same
+conversation continued without a second planning call, but the exact resume
+command and resumed binary version were not independently captured beyond the
+preserved client metadata. Separate trust/tool UI prompts and normal interactive
+exit/disconnect were not captured. No process bound to the acceptance MCP
+environment remained at the final observation; that does not establish a normal
+client exit status. No transformation or preservation authority was exercised.
+Public release acceptance passed separately; publication facts are
+recorded in the [release evidence](release-evidence-1.6.0rc5.md).
 
 ## Historical campaign identities
 
@@ -136,10 +166,11 @@ failed; they are outside that baseline and distinct from the successful live
 database and installed-process tests. Owned database/container resources were
 cleaned up. Temporary fictional test fixtures are retained with local evidence.
 
-Actual Codex inspection, exact-specification human review and client completion
-require their own evidence beyond the observed planning call. Automated SDK/PTY
-cases do not provide human approval. Permission to publish RC5 does not close
-this step. The current exact-main gates and Ubuntu hashes above do not replace
-signed acceptance, publication or post-publication verification. The separately
-gated transformation/session campaign also remains open; this ordinary synthetic
-run grants no preservation authority or claim of complete campaign acceptance.
+Actual Codex inspection, current-specification human review, new consent and the
+completed synthetic plan are recorded above, with explicit UI and client-exit
+observation limits. Automated SDK/PTY cases and permission to publish RC5 do not
+provide that dataset consent. The current exact-main gates, Ubuntu hashes and
+manual result do not replace publication or post-publication verification. The
+separately gated transformation/session campaign also remains open; this ordinary
+synthetic run grants no preservation authority or claim of complete campaign
+acceptance.

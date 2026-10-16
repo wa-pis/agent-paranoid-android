@@ -1,10 +1,12 @@
 # Installation
 
-Candidate `1.6.0rc5` is being prepared; publication and manual acceptance remain
-pending. See the [acceptance evidence](../acceptance-evidence-1.6.0rc5.md) and
+Candidate `1.6.0rc5` is published; post-publication verification passed.
+Actual Codex and current-specification human acceptance passed. See the
+[acceptance evidence](../acceptance-evidence-1.6.0rc5.md),
+[publication evidence](../release-evidence-1.6.0rc5.md) and
 [release status](../rc5-release-status.md).
 Published [RC4](../release-evidence-1.6.0rc4.md) remains immutable.
-Stable `1.5.0` remains the recommended release. After RC5 publication, its exact pin is:
+Stable `1.5.0` remains the recommended release. The exact RC5 pin is:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.6.0rc5"

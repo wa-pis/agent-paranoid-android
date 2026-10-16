@@ -89,6 +89,7 @@ nav:
       - Final Acceptance Matrix: acceptance-matrix.md
       - RC5 Release Status: rc5-release-status.md
       - Cross-Interface Acceptance Evidence: acceptance-evidence-1.6.0rc5.md
+      - RC5 Publication Evidence: release-evidence-1.6.0rc5.md
       - Release Process: release.md
       - Manual Release Runbook: manual-release-runbook.md
       - Release Evidence: release-evidence.md

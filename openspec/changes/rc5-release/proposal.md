@@ -33,7 +33,12 @@ Frozen runtime main `890925afdff68e97cafe38a28605d2874c9dad79` passed the full
 gate, independent AI source review, all four main workflows and fresh Ubuntu
 no-publish artifact/hash checks. `docs/acceptance-evidence-1.6.0rc5.md` keeps
 those results separate from the historical campaign and later documentation.
-Actual current-specification Codex human acceptance remains open; resuming the
-prepared plan requires fresh inspection, full-file review and new consent.
-Signed acceptance, publication and public verification remain required. The
-five-minute continuation stops after successful public verification.
+Actual current-specification Codex human acceptance passed after fresh inspection,
+complete file display and new human consent, followed by generation, validation,
+completed-plan inspection and a separate artifact audit. The evidence discloses
+unobserved separate trust/tool UI prompts and normal client exit/disconnect;
+the separate transformation/session campaign remains open. Signed-tag publication
+workflows passed for GitHub, PyPI and all three container targets. Public
+verification passed on the first attempt with all 12 jobs. Release-specific
+acceptance is complete; the five-minute continuation was paused after verified
+publication.

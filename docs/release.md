@@ -332,15 +332,25 @@ have since completed for frozen main
 records their identities and limits. A later documentation commit does not
 inherit these results as its own exact-commit execution evidence.
 
-Actual Codex full-specification human acceptance is still required. If its
-client closes after planning, [resume the existing synthetic plan](how-to/mcp.md#resume-an-existing-synthetic-plan)
-with the same connection and tool policy; do not recreate or delete the plan.
-Fresh inspection and human consent must follow preparation and display of the
-full current specification. Resume preflight, an early consent phrase or a
-finished assistant turn does not prove completed manual acceptance. Signed
-acceptance, tagging, publication and public-artifact verification remain open.
+Actual Codex full-current-specification human acceptance passed for that frozen
+main. Fresh inspection, full-file display and new specific human consent preceded
+generation; validation, completed-plan inspection and a separate artifact audit
+passed. The [manual acceptance record](acceptance-evidence-1.6.0rc5.md#actual-codex-and-human-specification-acceptance)
+preserves the exact specification hashes and the limits: separate trust/tool UI
+prompts and normal interactive exit/disconnect were not captured.
+
+For a client interrupted after planning,
+[resume the existing synthetic plan](how-to/mcp.md#resume-an-existing-synthetic-plan)
+with the same connection and tool policy. Resume preflight, an early consent
+phrase or a finished assistant turn does not replace current-file review and
+new consent. Signed-tag publication workflows have passed for GitHub, PyPI and
+all three container targets; [publication evidence](release-evidence-1.6.0rc5.md)
+records the source binding and distribution hashes. Public-artifact verification
+passed on its first attempt with all 12 jobs: Python-package/documentation, all
+seven installation profiles and all three container targets. RC5 publication and
+release-specific public acceptance are complete.
 Permission to publish a release does not approve a dataset or issue local
-preservation authority. RC5 is not yet published.
+preservation authority; the separate transformation/session campaign remains open.
 
 ## 1.6.0rc4 Generation Modes Candidate
 

@@ -3,9 +3,11 @@
 ## Status and trigger
 
 Planned at the owner's request on 2026-10-16. The automated campaign completed
-on the recorded `408ec527` baseline; actual Codex and exact-specification human
-acceptance remain open. The owner subsequently authorized RC5 preparation and
-publication subject to acceptance; see the separate `rc5-release` change.
+on the recorded `408ec527` baseline. Actual Codex and current-specification human
+acceptance subsequently passed for RC5 main `890925afdff68e97cafe38a28605d2874c9dad79`,
+with the UI/client-exit observation limits recorded in the evidence. The owner
+authorized RC5 preparation and publication subject to acceptance; see the separate
+`rc5-release` change.
 Earlier successful checks remain historical evidence, not acceptance of a later
 SHA. See `docs/acceptance-evidence-1.6.0rc5.md` for identities and limits.
 
@@ -37,7 +39,9 @@ rules, tiny CSV DECIMAL serialization and signed maximum-scale DECIMAL parsing.
 Executable installed-interface runners, a finite measured option covering array
 and hardened container workloads accompany the tests. Retained identifier-prefix
 metadata is now distinguished from an effective generation control. Completion
-remains conditional on the final evidence and manual gates.
+remains conditional on the separately gated transformation/session campaign and
+the final coverage and release evidence; the synthetic manual run does not close
+those steps.
 
 ## Safety and compatibility
 
