@@ -220,3 +220,7 @@ policy. These MCP servers do not need OpenAI/GigaChat API credentials for the
 workflows above and expose no advisor tool. Provider integration, shell/CLI
 access and arbitrary file-reading tools are separate capabilities with their
 own permissions; enabling MCP does not grant or constrain them.
+
+The planned [final acceptance campaign](../acceptance-matrix.md) will exercise
+this inventory through installed stdio clients, permissions, failures and
+deployment workloads. The plan does not claim those runs have completed.

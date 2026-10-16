@@ -90,4 +90,6 @@ Multi-entity profile generation writes a complete folder in any of the four
 formats. Neither route discards entities or applies load scaling twice.
 
 See [CLI workflows](cli-workflows.md), [generation modes](generation-modes.md),
-and [profiles and specs](../concepts/profiles-and-specs.md).
+and [profiles and specs](../concepts/profiles-and-specs.md). The planned
+[final acceptance campaign](../acceptance-matrix.md) extends this core matrix
+to installed interfaces, option interactions and deployment evidence.

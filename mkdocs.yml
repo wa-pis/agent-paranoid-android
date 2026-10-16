@@ -86,6 +86,7 @@ nav:
       - Open Decisions And Discrepancies: adr/open-questions.md
       - Architecture: agent_design.md
       - Development: development.md
+      - Final Acceptance Matrix: acceptance-matrix.md
       - Release Process: release.md
       - Manual Release Runbook: manual-release-runbook.md
       - Release Evidence: release-evidence.md

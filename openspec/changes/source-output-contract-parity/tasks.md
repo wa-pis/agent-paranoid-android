@@ -6,6 +6,11 @@
 - [x] Verify distribution/settings/mode/rule parity, privacy, budgets and legacy compatibility.
 - [x] Update documentation, schemas/contracts and run strict OpenSpec plus full project gates.
 
+Final combined acceptance across installed interfaces, all option families and
+deployments is separately planned in `cross-interface-acceptance`; its pending
+tasks are not satisfied by the completed implementation checks below. See
+`docs/acceptance-matrix.md` for the campaign sequence and evidence requirements.
+
 
 ## Evidence
 

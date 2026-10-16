@@ -57,6 +57,7 @@ REQUIRED_NAV_DOCS = {
     "known-issues.md",
     "roadmap.md",
     "development.md",
+    "acceptance-matrix.md",
     "release.md",
     "release-evidence.md",
     "security-history.md",
@@ -500,6 +501,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "generation-modes-and-folder-overwrite",
         "rc4-external-feedback",
         "source-output-contract-parity",
+        "cross-interface-acceptance",
     }
 
     transformation = changes / "selective-source-transformation"
