@@ -115,7 +115,7 @@ production-adjacent data or an AI client.
 The prospective stable `1.6.0` release uses `DatasetSpec` as the generation and
 validation contract across Python, CLI, MCP, approved agent workflows and all
 output formats. It retains accepted RC1–RC5 behavior, including exact DECIMAL
-rules, `edge` and `load_test` modes, atomic folder replacement and shared
+rules, `edge` and `load_test` modes, folder replacement with rollback and shared
 business-rule validation. Promotion changes only version and release metadata;
 its exact stable commit requires fresh release checks before publication.
 
