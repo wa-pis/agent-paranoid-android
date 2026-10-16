@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.io.csv_encoding import encode_csv_cell, is_formula_cell
+
 import csv
 import json
 import math
@@ -47,7 +49,7 @@ def json_decimal(value: Any) -> str:
     raise TypeError("JSON output contains unsupported value")
 
 
-def rows_to_csv(rows: list[dict[str, Any]]) -> str:
+def rows_to_csv(rows: list[dict[str, Any]], *, typed: bool = False) -> str:
     if not rows:
         return ""
 
@@ -55,11 +57,11 @@ def rows_to_csv(rows: list[dict[str, Any]]) -> str:
     fieldnames = list(rows[0])
     fieldname_set = set(fieldnames)
     writer = csv.writer(handle)
-    writer.writerow([neutralize_csv_cell(name) for name in fieldnames])
+    writer.writerow([encode_csv_cell(name) if typed else neutralize_csv_cell(name) for name in fieldnames])
     for row in rows:
         if set(row) - fieldname_set:
             raise ValueError("CSV rows must share one schema")
-        writer.writerow([neutralize_csv_cell(row.get(name)) for name in fieldnames])
+        writer.writerow([encode_csv_cell(row.get(name)) if typed else neutralize_csv_cell(row.get(name)) for name in fieldnames])
     return handle.getvalue()
 
 
@@ -67,8 +69,7 @@ def neutralize_csv_cell(value: Any) -> Any:
     """Prevent string cells from being interpreted as spreadsheet formulas."""
     if not isinstance(value, str) or not value:
         return value
-    stripped = value.lstrip(" \t\r\n")
-    if value[0] in "\t\r\n" or (stripped and stripped[0] in "=+-@"):
+    if is_formula_cell(value):
         return "'" + value
     return value
 
@@ -125,6 +126,7 @@ def sql_literal(value: Any) -> str:
 
 def write_parquet(
     rows: list[dict[str, Any]], output: Path, *, fields: list[FieldSpec] | None = None,
+    allow_invalid: bool = False,
 ) -> None:
     try:
         import pyarrow as pa
@@ -142,7 +144,7 @@ def write_parquet(
             raise ValueError("Parquet rows have incompatible field types") from None
     else:
         try:
-            table = typed_parquet_table(rows, fields, pa)
+            table = typed_parquet_table(rows, fields, pa, allow_invalid=allow_invalid)
         except (ValueError, TypeError, OverflowError, pa.ArrowException):
             raise ValueError("Parquet rows do not match declared field types") from None
 
@@ -155,7 +157,31 @@ def write_parquet(
         )
 
 
-def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa: Any) -> Any:
+def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa: Any,
+                        *, allow_invalid: bool = False) -> Any:
+    # Only explicitly requested negative datasets can carry malformed scalar cells.
+    # A marked Arrow string column stores JSON scalars when its declared type cannot.
+    # Ordinary typed columns keep their native Arrow schema and strict checks.
+    if allow_invalid:
+        arrays = []
+        schema_fields = []
+        names = {field.name for field in fields}
+        if any(set(row) != names for row in rows):
+            raise ValueError("Parquet row schema differs from declared fields")
+        for field in fields:
+            cells = [{field.name: row[field.name]} for row in rows]
+            try:
+                column = typed_parquet_table(cells, [field], pa)
+                arrow_field = column.schema.field(field.name)
+                array = column.column(field.name)
+            except (ValueError, TypeError, OverflowError, pa.ArrowException):
+                from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY, encode_scalar
+                arrow_field = pa.field(field.name, pa.string(), nullable=True,
+                                       metadata={SCALAR_ENCODING_KEY: b"json-v1"})
+                array = pa.array([encode_scalar(row[field.name]) for row in rows], type=pa.string())
+            arrays.append(array)
+            schema_fields.append(arrow_field)
+        return pa.Table.from_arrays(arrays, schema=pa.schema(schema_fields))
     names = {field.name for field in fields}
     if len(names) != len(fields) or any(set(row) != names for row in rows):
         raise ValueError("Parquet row schema differs from declared fields")
@@ -218,7 +244,13 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                 for row in converted if (value := row[field.name]) is not None
             }
             if len(offsets) > 1:
-                raise ValueError("mixed timestamp timezones")
+                # A single Arrow timestamp timezone cannot retain per-cell offsets.
+                from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY, encode_scalar
+                for row in converted:
+                    row[field.name] = encode_scalar(row[field.name])
+                schema_fields.append(pa.field(field.name, pa.string(), nullable=field.nullable,
+                                              metadata={SCALAR_ENCODING_KEY: b"json-v1"}))
+                continue
             offset = next(iter(offsets), None)
             if offset is not None and len(offset) != 5:
                 raise ValueError("unsupported timestamp timezone")
@@ -229,6 +261,18 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
             if not isinstance(distribution, DecimalRangeDistribution):
                 raise ValueError("decimal field requires exact range")
             arrow_type = pa.decimal128(distribution.precision, distribution.scale)
+        elif field.data_type == FieldType.INTEGER and any(
+            row[field.name] is not None and not -(2**63) <= row[field.name] < 2**63
+            for row in converted
+        ):
+            # INTEGER has no int64 limit in DatasetSpec. Preserve wide values exactly.
+            from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY
+            for row in converted:
+                if row[field.name] is not None:
+                    row[field.name] = str(row[field.name])
+            schema_fields.append(pa.field(field.name, pa.string(), nullable=field.nullable,
+                                          metadata={SCALAR_ENCODING_KEY: b"integer-text-v1"}))
+            continue
         else:
             arrow_type = arrow_types[field.data_type]
         schema_fields.append(pa.field(field.name, arrow_type, nullable=field.nullable))
@@ -272,7 +316,7 @@ def write_dataset_rows(
     for entity_name, rows in rows_by_entity.items():
         if output_format == DatasetOutputFormat.CSV:
             write_bounded_text(
-                rows_to_csv(rows),
+                rows_to_csv(rows, typed=spec is not None),
                 safe_entity_artifact_path(root, entity_name, ".csv"),
             )
         elif output_format == DatasetOutputFormat.JSON:
@@ -291,6 +335,7 @@ def write_dataset_rows(
                 rows,
                 safe_entity_artifact_path(root, entity_name, ".parquet"),
                 fields=entity.fields if entity is not None else None,
+                allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"},
             )
         enforce_output_folder_size(root)
 
@@ -331,7 +376,7 @@ def write_single_entity_rows(
         raise SystemExit("single-entity output requires exactly one generated entity")
     rows = next(iter(rows_by_entity.values()))
     if output_format == DatasetOutputFormat.CSV:
-        text = rows_to_csv(rows)
+        text = rows_to_csv(rows, typed=spec is not None)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
             print(text)
@@ -356,4 +401,5 @@ def write_single_entity_rows(
         if output is None:
             raise SystemExit("Parquet output requires --output")
         fields = spec.entities[0].fields if spec is not None else None
-        write_parquet(rows, output, fields=fields)
+        write_parquet(rows, output, fields=fields,
+                      allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"})

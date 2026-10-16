@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.limits import GenerationBudget
@@ -23,15 +23,31 @@ class ValidationSection(BaseModel):
     passed: int = 0
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
-    checked: int | None = Field(default=None, exclude_if=lambda value: value is None)
-    relationship_metrics: list[RelationshipMetrics] | None = Field(default=None, exclude_if=lambda value: value is None)
+    checked: int | None = Field(default=None)
+    relationship_metrics: list[RelationshipMetrics] | None = Field(default=None)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("checked", "relationship_metrics"):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 class DatasetValidationReport(BaseModel):
     valid: bool
     sections: list[ValidationSection]
     settings: ValidationSettings = Field(default_factory=ValidationSettings)
-    business_validation: BusinessValidationReport | None = Field(default=None, exclude_if=lambda value: value is None)
+    business_validation: BusinessValidationReport | None = Field(default=None)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("business_validation",):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 def validate_dataset(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from test_data_agent.csv_profiler import parse_bool, parse_date_value, parse_datetime_value
 from typing import Any, TYPE_CHECKING
 from collections import defaultdict
 from collections.abc import Iterator
@@ -26,7 +27,27 @@ def numeric_row(
     result = dict(row)
     for field in budget.iter_rule_work(entity.fields):
         value = result.get(field.name)
-        if not isinstance(value, str) or value == "":
+        if value is None:
+            continue
+        if value == "" and (field.data_type != FieldType.STRING):
+            result[field.name] = None
+            continue
+        if field.data_type == FieldType.DATE:
+            parsed_date = parse_date_value(str(value))
+            if parsed_date is not None:
+                result[field.name] = parsed_date.isoformat()
+            continue
+        if field.data_type == FieldType.DATETIME:
+            parsed_datetime = parse_datetime_value(str(value))
+            if parsed_datetime is not None:
+                result[field.name] = parsed_datetime.isoformat()
+            continue
+        if field.data_type == FieldType.BOOLEAN:
+            parsed_bool = parse_bool(str(value))
+            if parsed_bool is not None:
+                result[field.name] = parsed_bool
+            continue
+        if not isinstance(value, str):
             continue
         try:
             if field.data_type == FieldType.DECIMAL:

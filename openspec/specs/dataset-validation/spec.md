@@ -25,6 +25,12 @@ SHALL pass only for nullable child fields. Required identifiers SHALL reject nul
 or empty values even when they are not the primary key. String-pattern bounds
 SHALL be checked against the complete supplied value.
 
+#### Scenario: A rejected rule is retained for review
+
+- **WHEN** a reviewed relationship or constraint has rejected status
+- **THEN** validation skips that rule without treating it as an active invariant
+- **AND** active schema and nullable-reference checks still apply
+
 ### Requirement: Schema Validation
 
 Dataset validation SHALL check generated rows against the effective

@@ -57,8 +57,11 @@ Do not treat a missing report as success. A failed valid-mode run is not an
 accepted dataset. Explicit mixed/negative test generation may retain intentionally
 invalid rows and their failed validation report in a supported output format;
 the CLI reports `validation_failed` and exit 1. Do not relabel that result valid.
-Incompatible typed Parquet values reject the entire export without partial
-publication. Privacy failures never authorize publication of source values.
+Parquet negative datasets use explicitly marked scalar columns when malformed
+cells cannot fit native Arrow types. The bundle reader restores those cells for
+validation; their report remains invalid. Ordinary incompatible typed values
+still reject the entire export without partial publication. Keep the specification,
+manifest and encoding metadata described in the [source/output matrix](../reference/source-output-matrix.md). Privacy failures never authorize publication of source values.
 
 These synthetic manifest checks do not apply to the separately gated selective
 transformation candidate. Its bundle records mixed origin, action provenance

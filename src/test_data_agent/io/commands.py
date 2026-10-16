@@ -175,12 +175,15 @@ def generate_dataset_from_profile_command(
         raise SystemExit("--seed is required with --profile")
     if args.output is not None:
         ensure_paths_distinct(args.profile, args.output)
-        ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
 
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("--profile expects a dataset profile, not a dataset spec")
     profile = loaded
+    if args.output is not None and len(profile.entities) != 1 and args.output.resolve() in args.profile.resolve().parents:
+        raise ValueError("output folder must not contain the input profile")
+    if args.output is not None and len(profile.entities) == 1:
+        ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
 
     try:
         report, business_report = generate_dataset_from_profile_artifacts(
@@ -199,7 +202,8 @@ def generate_dataset_from_profile_command(
     if should_fail_generation(report, business_report, args.mode or "valid"):
         write_generation_errors(report, business_report)
         return 1
-    write_generation_summary(args.output.parent if args.output is not None else Path.cwd())
+    write_generation_summary((args.output if len(profile.entities) != 1 else args.output.parent)
+                             if args.output is not None else Path.cwd())
     return 0
 
 

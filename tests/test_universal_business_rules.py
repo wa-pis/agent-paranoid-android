@@ -115,8 +115,7 @@ def test_portable_rules_roundtrip_and_manifest(tmp_path, format_name):
     from test_data_agent.io.readers import load_dataset_spec
 
     saved = load_dataset_spec(tmp_path / format_name / "dataset_spec.yaml")
-    if format_name != "sql":
-        assert validate_dataset(load_dataset_rows(tmp_path / format_name), saved).valid
+    assert validate_dataset(load_dataset_rows(tmp_path / format_name), saved).valid
 
 
 def test_native_decimal_formula_and_unrelated_constraints():
@@ -278,7 +277,8 @@ def test_agent_reviewed_spec_preserves_embedded_rules(tmp_path):
 
 
 @pytest.mark.parametrize("kind", ["sum", "avg", "count"])
-def test_native_decimal_aggregate_rounding_and_revalidation(tmp_path, kind):
+@pytest.mark.parametrize("format_name", ["csv", "json", "parquet", "sql"])
+def test_native_decimal_aggregate_rounding_and_revalidation(tmp_path, kind, format_name):
     from test_data_agent.core.field import FieldSpec
     from test_data_agent.core.entity import EntitySpec
     from test_data_agent.core.constraint import Constraint
@@ -337,7 +337,7 @@ def test_native_decimal_aggregate_rounding_and_revalidation(tmp_path, kind):
     from test_data_agent.core.settings import OutputFormat
 
     generate_dataset_bundle(
-        spec, output_folder=tmp_path / kind, seed=7, output_format=OutputFormat.CSV
+        spec, output_folder=tmp_path / kind, seed=7, output_format=OutputFormat(format_name)
     )
     assert validate_dataset(load_dataset_rows(tmp_path / kind), spec).valid
 

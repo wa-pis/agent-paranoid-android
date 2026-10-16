@@ -69,6 +69,7 @@ nav:
       - Dependency Compatibility: reference/dependency-compatibility.md
       - Compatibility Surfaces: reference/compatibility.md
       - Configuration: reference/configuration.md
+      - Source And Output Matrix: reference/source-output-matrix.md
       - DatasetSpec: dataset_profile_and_spec.md
       - Advisor API: reference/advisor.md
       - MCP Tools: mcp_examples.md

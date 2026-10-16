@@ -1,5 +1,9 @@
 # Generation, validation, and business-rules guide
 
+All sources and output adapters share the [source/output contract](../reference/source-output-matrix.md).
+Implement and test source/format additions through the same reviewed DatasetSpec
+and deterministic rule engine.
+
 Read this guide for generation models, validators, foreign keys, formulas,
 scenarios, invalid cases, or cross-table behavior.
 

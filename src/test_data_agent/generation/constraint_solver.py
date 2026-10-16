@@ -196,7 +196,8 @@ def apply_conditional_required_constraints(
             continue
         condition = Condition(**constraint.condition)
         for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
-            if condition_matches(row, condition, budget=budget):
+            if condition_matches(numeric_row(row, spec.entity(constraint.entity), budget=budget),
+                                 condition, budget=budget):
                 for field in budget.iter_rule_work(constraint.fields):
                     if row.get(field) in (None, ""):
                         row[field] = default_value_for_field(spec.entity(constraint.entity).field(field))

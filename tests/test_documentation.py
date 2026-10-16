@@ -497,6 +497,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "rc3-external-feedback",
         "generation-modes-and-folder-overwrite",
         "rc4-external-feedback",
+        "source-output-contract-parity",
     }
 
     transformation = changes / "selective-source-transformation"

@@ -19,6 +19,9 @@ Stable `1.5.0` remains the recommended release. The explicit candidate pin is:
 python3 -m pip install "agent-paranoid-android==1.6.0rc4"
 ```
 
+See the [source/output matrix](docs/reference/source-output-matrix.md) for the
+common reviewed DatasetSpec, field types, settings and business-rule contract.
+
 ## Install And Try It
 
 Python 3.11 or newer is required.

@@ -32,7 +32,7 @@ def validate_constraints(
         elif constraint.type == ConstraintType.TEMPORAL:
             errors.extend(validate_temporal(rows_by_entity, constraint, budget=budget))
         elif constraint.type == ConstraintType.CONDITIONAL_REQUIRED:
-            errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget))
+            errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget, spec=spec))
         elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
             errors.extend(validate_aggregate_mapping(rows_by_entity, spec, constraint, budget=budget))
     return errors
@@ -94,6 +94,7 @@ def validate_conditional_required(
     constraint: Any,
     *,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -102,7 +103,8 @@ def validate_conditional_required(
     condition = Condition(**constraint.condition)
     errors: list[str] = []
     for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
-        if not condition_matches(row, condition, budget=budget):
+        if not condition_matches(numeric_row(row, spec.entity(constraint.entity), budget=budget)
+                                 if spec is not None else row, condition, budget=budget):
             continue
         missing = [field for field in budget.iter_rule_work(constraint.fields) if row.get(field) in (None, "")]
         if missing:

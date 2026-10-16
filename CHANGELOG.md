@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- A documented source/output matrix with one reviewed DatasetSpec contract for every source, field type, setting and business rule.
+- Revalidation of generated SQL INSERT bundles without executing SQL, and multi-entity saved-profile generation in all output formats.
+
 - Reviewed exact DECIMAL inference ranges and field-scoped numeric measure semantics.
 - Coarse numeric zero/subunit prevalence, formula check-only mode, assignment audit counts, and null/range conditions.
 - Portable business rules in DatasetSpec across Python, CLI, MCP, agent workflows and all output formats.
@@ -13,6 +16,11 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Preserve null versus empty text and spreadsheet-safe strings in marked CSV bundles; retain custom output filenames through manifest entity mappings.
+- Normalize boolean/date operands consistently for reloaded business and native conditional rules.
+- Preserve wide integer identifiers, mixed timestamp offsets and explicit malformed negative cells in marked Parquet scalar encodings.
+
+- Restore provider schema generation on the minimum supported Pydantic 2.7.
 - Preserve Trino DB-API decimal precision/scale and small FLOAT generation values.
 - Report formula assignments outside reviewed numeric generation bounds.
 - Reset saved invalid ratios for explicit valid/edge/load mode overrides and show CSV mode choices.

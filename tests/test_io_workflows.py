@@ -51,31 +51,19 @@ def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path
 
 
 @pytest.mark.parametrize("mode", ["mixed", "negative"])
-def test_invalid_parquet_rejects_entire_dataset_without_replacing_output(
-    tmp_path: Path, mode: str,
-) -> None:
+def test_invalid_parquet_roundtrips_explicit_malformed_cells(tmp_path: Path, mode: str) -> None:
+    from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
+    from test_data_agent.validation import validate_dataset
     pytest.importorskip("pyarrow.parquet")
-    spec = DatasetSpec(entities=[
-        EntitySpec(name="accounts", row_count=2, fields=[
-            FieldSpec(name="id", data_type="integer", is_identifier=True),
-        ]),
-        EntitySpec(name="orders", row_count=2, fields=[
-            FieldSpec(name="amount", data_type="integer"),
-        ]),
-    ])
+    spec = DatasetSpec(entities=[EntitySpec(name="orders", row_count=2,
+        fields=[FieldSpec(name="amount", data_type="integer")])])
     output = tmp_path / "generated"
-    output.mkdir()
-    (output / "previous.txt").write_text("fictional previous artifact")
-
-    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
-        generate_dataset_bundle(
-            spec, output_folder=output, output_format=OutputFormat.PARQUET,
-            mode=mode, invalid_ratio=1.0, seed=7,
-        )
-
-    assert {path.name for path in output.iterdir()} == {"previous.txt"}
-    assert (output / "previous.txt").read_text() == "fictional previous artifact"
-    assert not list(tmp_path.glob(".generated.*"))
+    result = generate_dataset_bundle(spec, output_folder=output,
+        output_format=OutputFormat.PARQUET, mode=mode, invalid_ratio=1.0, seed=7)
+    assert not result.validation.valid
+    assert all(row["amount"] == "not-a-number" for row in load_dataset_rows(output)["orders"])
+    assert not validate_dataset(load_dataset_rows(output), load_dataset_spec(output / "dataset_spec.yaml")).valid
+    assert json.loads((output / "generation_manifest.json").read_text())["validation_valid"] is False
 
 
 def test_fractional_invalid_ratio_replays_spec_rows_and_effective_rules(tmp_path: Path) -> None:

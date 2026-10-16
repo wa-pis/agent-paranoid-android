@@ -87,19 +87,15 @@ def test_parquet_declared_schema_keeps_type_without_values(
     assert pq.read_table(output).num_rows == len(rows)
 
 
-def test_parquet_rejects_mixed_timestamp_offsets_without_partial_file(tmp_path: Path) -> None:
-    pytest.importorskip("pyarrow.parquet")
+def test_parquet_preserves_mixed_timestamp_offsets_with_explicit_encoding(tmp_path: Path) -> None:
+    from test_data_agent.io.readers import load_dataset_rows
+    pq = pytest.importorskip("pyarrow.parquet")
     output = tmp_path / "rows.parquet"
-
-    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
-        write_parquet(
-            [{"at": "2024-01-01T01:00:00+01:00"},
-             {"at": "2024-01-01T02:00:00+02:00"}],
-            output,
-            fields=[FieldSpec(name="at", data_type="datetime")],
-        )
-
-    assert not output.exists()
+    rows = [{"at": "2024-01-01T01:00:00+01:00"},
+            {"at": "2024-01-01T02:00:00+02:00"}]
+    write_parquet(rows, output, fields=[FieldSpec(name="at", data_type="datetime")])
+    assert pq.read_schema(output).field("at").metadata[b"apa.scalar_encoding"] == b"json-v1"
+    assert load_dataset_rows(tmp_path)["rows"] == rows
 
 
 def test_parquet_without_spec_rejects_mixed_types_instead_of_stringifying(tmp_path: Path) -> None:

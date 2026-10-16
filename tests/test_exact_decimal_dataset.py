@@ -302,7 +302,9 @@ def test_fictional_cli_csv_keeps_decimal_schema_and_nulls(tmp_path: Path):
     assert result.returncode == 0, "fictional exact DECIMAL CSV generation failed"
     with (output / "fictional_items.csv").open(newline="") as handle:
         rows = list(csv.DictReader(handle))
-    assert rows == [{"amount": "9007199254740993.25", "optional_amount": ""}] * 2
+    assert rows == [{"amount": "9007199254740993.25", "optional_amount": r"\N"}] * 2
+    from test_data_agent.io.readers import load_dataset_rows
+    assert all(row["optional_amount"] is None for row in load_dataset_rows(output)["fictional_items"])
     saved = yaml.safe_load((output / "dataset_spec.yaml").read_text())
     amount, optional = saved["entities"][0]["fields"]
     assert (saved["schema_version"], amount["data_type"],
