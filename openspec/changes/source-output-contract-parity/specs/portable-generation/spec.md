@@ -38,12 +38,13 @@ unmarked artifacts SHALL retain their documented interpretation.
   revalidation rejects a missing or modified report.
 
 #### Scenario: Formula and range literals retain privacy checks
-- WHEN a formula constant or numeric bound targets a sensitive field, or an
+- WHEN a row/aggregate formula constant or numeric bound targets a sensitive field, or an
   unbound rule contains a raw-looking sensitive range endpoint
 - THEN common rule admission rejects it before row mutation or publication on
   every interface and output, even with optional validation disabled.
 - AND the reviewed DECIMAL numeric_measure exception remains scoped to eligible
   non-sensitive fields and never overrides a sensitive name, flag or semantic type.
+- AND quoted field-name arguments in aggregate calls retain their metadata role.
 
 ### Requirement: Complete profiles and negative artifacts
 A multi-entity safe profile SHALL reach the same bundle engine as a reviewed spec.

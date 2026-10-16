@@ -238,6 +238,17 @@ def expression_constants(expression: str) -> list[Any]:
     ]
 
 
+def aggregate_expression_constants(expression: str) -> list[Any]:
+    tree = parse_safe_expression(expression)
+    field_names = {
+        child.args[0] for child in ast.walk(tree)
+        if isinstance(child, ast.Call) and isinstance(child.func, ast.Name)
+        and child.func.id == "sum"
+    }
+    return [child.value for child in ast.walk(tree)
+            if isinstance(child, ast.Constant) and child not in field_names]
+
+
 def _bounded_operand(value: Any) -> Any:
     valid = type(value) in (bool, type(None))
     if type(value) in (str, bytes):

@@ -14,6 +14,7 @@ from test_data_agent.core.limits import enforce_business_rule_evaluations
 from test_data_agent.core.privacy import is_sensitive_field, looks_sensitive_value
 from test_data_agent.rules.conditions import Condition
 from test_data_agent.rules.expressions import (
+    aggregate_expression_constants,
     expression_complexity,
     expression_constants,
     expression_references,
@@ -164,10 +165,13 @@ def validate_business_rules_for_spec(
                     "aggregate rule references unknown field: "
                     f"{cross_table_rule.table}.{cross_table_rule.field}"
                 )
-            if cross_table_rule.expected is not None and cross_table_rule.field != "*":
-                _validate_literals([cross_table_rule.expected], entity.field(cross_table_rule.field), "aggregate expected value", decimal_shape=False)
-            elif cross_table_rule.expected is not None:
-                _validate_unbound_literals([cross_table_rule.expected], "*", "aggregate expected value")
+            constants = aggregate_expression_constants(cross_table_rule.expression)
+            if cross_table_rule.expected is not None:
+                constants.append(cross_table_rule.expected)
+            if cross_table_rule.field != "*":
+                _validate_literals(constants, entity.field(cross_table_rule.field), "aggregate formula", decimal_shape=False)
+            else:
+                _validate_unbound_literals(constants, "*", "aggregate formula")
             names, aggregate_fields, _ = expression_references(
                 cross_table_rule.expression
             )
@@ -244,8 +248,11 @@ def validate_business_rule_literals(rules: BusinessRules) -> None:
                     f"{table}.{field_name} scenario value",
                 )
     for rule in rules.cross_table_rules:
-        if isinstance(rule, AggregateFormulaRule) and rule.expected is not None:
-            _validate_unbound_literals([rule.expected], rule.field, "aggregate expected value")
+        if isinstance(rule, AggregateFormulaRule):
+            constants = aggregate_expression_constants(rule.expression)
+            if rule.expected is not None:
+                constants.append(rule.expected)
+            _validate_unbound_literals(constants, rule.field, "aggregate formula")
 
 
 def estimate_business_rule_evaluations(

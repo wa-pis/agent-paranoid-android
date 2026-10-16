@@ -93,7 +93,8 @@ def test_generator_stdio_lower_level_synthetic_tools_and_profile_handoff(tmp_pat
     asyncio.run(asyncio.wait_for(run(), timeout=40))
 
 
-def test_generator_stdio_formula_privacy_refuses_every_publication_format(tmp_path):
+@pytest.mark.parametrize("rule_kind", ["row", "aggregate"])
+def test_generator_stdio_formula_privacy_refuses_every_publication_format(tmp_path, rule_kind):
     (tmp_path / "spec.json").write_text(json.dumps({
         "entities": [{"name": "records", "row_count": 1, "fields": [{
             "name": "phone", "data_type": "integer", "sensitive": True,
@@ -101,7 +102,9 @@ def test_generator_stdio_formula_privacy_refuses_every_publication_format(tmp_pa
                              "max_value": 9, "scale_factor": 2},
         }]}],
         "business_rules": {"row_rules": [{"type": "formula", "table": "records",
-            "field": "phone", "expression": "123456789"}]},
+            "field": "phone", "expression": "123456789"}]} if rule_kind == "row" else {
+                "cross_table_rules": [{"type": "aggregate_formula", "table": "records",
+                    "field": "phone", "expression": "123456789"}]},
         "validation_settings": {"validate_privacy": False},
     }))
     parameters = StdioServerParameters(command=sys.executable,

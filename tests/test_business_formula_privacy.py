@@ -15,7 +15,7 @@ from test_data_agent.rules.contract import (
 from test_data_agent.rules.models import BusinessRules
 
 
-def _spec(*, data_type="integer", mode="assign", **field_options):
+def _spec(*, data_type="integer", mode="assign", rule_kind="row", **field_options):
     field = {
         "name": "quantity",
         "data_type": data_type,
@@ -24,12 +24,16 @@ def _spec(*, data_type="integer", mode="assign", **field_options):
         },
         **field_options,
     }
+    rules = {"row_rules": [{
+        "type": "formula", "table": "records", "field": field["name"],
+        "expression": "123456789", "mode": mode,
+    }]} if rule_kind == "row" else {"cross_table_rules": [{
+        "type": "aggregate_formula", "table": "records", "field": field["name"],
+        "expression": "123456789",
+    }]}
     return DatasetSpec.model_validate({
         "entities": [{"name": "records", "row_count": 1, "fields": [field]}],
-        "business_rules": {"row_rules": [{
-            "type": "formula", "table": "records", "field": field["name"],
-            "expression": "123456789", "mode": mode,
-        }]},
+        "business_rules": rules,
         "validation_settings": {
             "validate_schema": False, "validate_constraints": False,
             "validate_relationships": False, "validate_privacy": False,
@@ -51,10 +55,11 @@ def test_formula_literal_sensitive_target_is_rejected(data_type, mode, field_opt
 
 @pytest.mark.parametrize("interface", ["bundle", "cli", "mcp"])
 @pytest.mark.parametrize("output_format", list(OutputFormat))
+@pytest.mark.parametrize("rule_kind", ["row", "aggregate"])
 def test_formula_privacy_refusal_never_publishes(
-    tmp_path, monkeypatch, capsys, interface, output_format,
+    tmp_path, monkeypatch, capsys, interface, output_format, rule_kind,
 ):
-    spec = _spec(name="phone", sensitive=True)
+    spec = _spec(name="phone", sensitive=True, rule_kind=rule_kind)
     source = tmp_path / "spec.json"
     source.write_text(spec.model_dump_json())
     output = tmp_path / "output"
@@ -106,6 +111,12 @@ def test_typed_numeric_bounds_keep_sensitive_target_veto(bound, data_type):
         "when": {"field": "phone", "lte": "123456789"}, "required_fields": ["amount"]}]},
     {"cross_table_rules": [{"type": "aggregate_formula", "table": "records",
         "field": "amount", "expression": "sum('amount')", "expected": "123456789"}]},
+    {"cross_table_rules": [{"type": "aggregate_formula", "table": "records",
+        "field": "phone", "expression": "123456789"}]},
+    {"cross_table_rules": [{"type": "aggregate_formula", "table": "records",
+        "field": "amount", "expression": "sum('amount') + '123456789'"}]},
+    {"cross_table_rules": [{"type": "aggregate_formula", "table": "records",
+        "field": "*", "expression": "count() + '123456789'"}]},
 ])
 def test_unbound_rule_bounds_are_rejected_before_mutation(tmp_path, rules):
     from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
@@ -129,3 +140,27 @@ def test_aggregate_count_expected_has_no_numeric_measure_exception():
     }]})
     with pytest.raises(BusinessRuleContractError, match="sensitive value"):
         validate_business_rules_for_spec(spec.business_rules, spec)
+
+
+@pytest.mark.parametrize("field_options", [
+    {"name": "phone"}, {"sensitive": True}, {"semantic_type": "phone"},
+])
+@pytest.mark.parametrize("data_type", ["integer", "float"])
+def test_aggregate_expression_constants_retain_typed_privacy_veto(data_type, field_options):
+    spec = _spec(rule_kind="aggregate", data_type=data_type, **field_options)
+    with pytest.raises(BusinessRuleContractError, match="sensitive field values") as error:
+        validate_business_rules_for_spec(spec.business_rules, spec)
+    assert "123456789" not in str(error.value)
+
+
+def test_aggregate_field_references_are_metadata_and_numeric_measure_stays_scoped():
+    from test_data_agent.rules.contract import validate_business_rule_literals
+
+    spec = _spec(rule_kind="aggregate", name="phone", sensitive=True)
+    spec.business_rules.cross_table_rules[0].expression = "sum('phone')"
+    validate_business_rules_for_spec(spec.business_rules, spec)
+    validate_business_rule_literals(spec.business_rules)
+    measure = _spec(rule_kind="aggregate", data_type="decimal", semantic_type="numeric_measure",
+                    distribution={"kind": "decimal_range", "precision": 12, "scale": 2,
+                                  "min": "0", "max": "9999999999.99"})
+    validate_business_rules_for_spec(measure.business_rules, measure)

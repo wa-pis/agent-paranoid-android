@@ -34,11 +34,12 @@ integer units and exports Parquet `decimal128`, never binary FLOAT. Automatic pr
 formulas and aggregate mappings use bounded rational arithmetic, with one
 ROUND_HALF_UP rounding at the target scale and precision overflow rejection.
 Sensitive DECIMAL ranges remain disallowed.
-Formula constants, numeric bounds and condition range endpoints retain literal
+Row and aggregate formula constants, numeric bounds and condition range endpoints retain literal
 privacy checks before assignment or comparison, including schema-less rule-file
 calls. Sensitive names, semantics and flags veto typed literal targets even when
 optional validation reports are disabled. Only reviewed DECIMAL `numeric_measure`
 fields retain their existing scoped numeric-literal exception.
+Quoted field references in aggregate calls remain metadata rather than literal values.
 Recognizable phone/card-like DECIMAL bounds and final values fail closed even
 when optional validation reporting is disabled. Do not treat a declared numeric
 type as permission to bypass content checks. Explicit reviewed `numeric_measure`
