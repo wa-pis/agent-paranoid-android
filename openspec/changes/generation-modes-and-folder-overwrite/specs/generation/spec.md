@@ -12,9 +12,18 @@ Relationships, business rules, privacy and bounded resource checks SHALL remain 
 ### Requirement: Recoverable folder overwrite
 The generation adapter SHALL stage a complete replacement before publication
 and SHALL restore previous output if publication fails. It SHALL reject symlink
-destinations and output containing the input spec. Without overwrite nonempty
+destinations and folder replacements containing an input spec or business-rule
+file, including path aliases. Single-file and stdout publication SHALL protect
+input rule files from collisions with generated data and control artifacts.
+Without overwrite nonempty
 folders SHALL remain unchanged.
 
 #### Scenario: Publication failure
 - WHEN replacement fails after old output moves to backup
 - THEN old output is restored and no partial replacement is visible.
+
+#### Scenario: Rule input is inside the destination
+- WHEN folder overwrite would remove an input business-rule file, or generated
+  artifacts would replace that file or its symlink/hardlink alias
+- THEN admission rejects the request before publication and preserves the input
+  and existing bundle.

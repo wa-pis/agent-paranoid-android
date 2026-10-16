@@ -26,6 +26,17 @@ unmarked artifacts SHALL retain their documented interpretation.
 - WHEN a generated SQL bundle is revalidated
 - THEN only bounded generated INSERT data is decoded and no SQL is executed.
 
+#### Scenario: Publication retains the invocation budget
+- WHEN generated rows undergo mandatory writer reconciliation
+- THEN the writer charges the same cumulative work allowance and deadline as
+  generation and validation, refusing before publication if either is exhausted.
+- AND standalone writers create a bounded allowance when no caller budget is supplied.
+
+#### Scenario: Reviewed-agent reports are integrity protected
+- WHEN a reviewed agent publishes a bundle with a business-validation report
+- THEN the generation manifest includes that report's hash, and bundle
+  revalidation rejects a missing or modified report.
+
 #### Scenario: Formula and range literals retain privacy checks
 - WHEN a formula constant or numeric bound targets a sensitive field, or an
   unbound rule contains a raw-looking sensitive range endpoint

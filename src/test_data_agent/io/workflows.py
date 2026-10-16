@@ -158,7 +158,7 @@ def generate_dataset_bundle(
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
-        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
+        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec, budget=budget)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
@@ -315,7 +315,7 @@ def generate_single_entity_profile_artifacts(
     report = validate_dataset(rows_by_entity, spec, budget=budget)
     budget.check("dataset validation")
     if output_path is None:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec, budget=budget)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -332,7 +332,7 @@ def generate_single_entity_profile_artifacts(
     temp_identity = path_identity(temp_folder)
     temp_output_path = temp_folder / output_path.name
     try:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec, budget=budget)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -697,8 +697,36 @@ def cleanup_failed_folder_publication(
 
 
 def ensure_paths_distinct(first: Path, second: Path) -> None:
+    first, second = first.expanduser(), second.expanduser()
     if first.resolve(strict=False) == second.resolve(strict=False):
         raise ValueError("input and output paths must be different")
+    if first.exists() and second.exists() and first.samefile(second):
+        raise ValueError("input and output paths must be different")
+
+
+def ensure_input_outside_output_folder(input_path: Path, output_folder: Path) -> None:
+    input_path, output_folder = input_path.expanduser(), output_folder.expanduser()
+    if (
+        output_folder.absolute() in input_path.absolute().parents
+        or output_folder.resolve(strict=False) in input_path.resolve(strict=False).parents
+    ):
+        raise ValueError("output folder must not contain the input business rules")
+
+
+def ensure_rules_distinct_from_single_entity_output(
+    rules_path: Path,
+    output_path: Path | None,
+    *,
+    profile_artifact_name: str,
+) -> None:
+    output_folder = Path.cwd() if output_path is None else output_path.parent
+    if output_path is not None:
+        ensure_paths_distinct(rules_path, output_path)
+    for artifact_name in (
+        profile_artifact_name, "dataset_spec.json", "validation_report.json",
+        "business_validation_report.json", "generation_manifest.json",
+    ):
+        ensure_paths_distinct(rules_path, output_folder / artifact_name)
 
 
 def ensure_folders_distinct(source_folder: Path, output_folder: Path) -> None:

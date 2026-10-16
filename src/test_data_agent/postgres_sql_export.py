@@ -14,7 +14,7 @@ from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_uni
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
-from test_data_agent.core.limits import enforce_output_payload_size
+from test_data_agent.core.limits import GenerationBudget, enforce_output_payload_size
 from test_data_agent.csv_profiler import (
     parse_bool,
     parse_date_value,
@@ -34,6 +34,8 @@ class PostgresSqlExportError(ValueError):
 def render_postgres_sql(
     spec: DatasetSpec,
     rows_by_entity: Mapping[str, Sequence[Mapping[str, Any]]],
+    *,
+    budget: GenerationBudget | None = None,
 ) -> str:
     """Render one transaction containing deterministic PostgreSQL DDL and rows."""
 
@@ -47,7 +49,7 @@ def render_postgres_sql(
         raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset") from None
     if validate_generated_row_privacy(normalized_rows, spec, parse_numeric_strings=True):
         raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset")
-    if not validate_dataset(normalized_rows, spec).valid:
+    if not validate_dataset(normalized_rows, spec, budget=budget).valid:
         raise PostgresSqlExportError("PostgreSQL SQL export requires a valid dataset")
     entities = {entity.name: entity for entity in spec.entities}
     order = _dependency_order(spec)
@@ -64,12 +66,14 @@ def write_postgres_sql(
     spec: DatasetSpec,
     rows_by_entity: Mapping[str, Sequence[Mapping[str, Any]]],
     output: Path,
+    *,
+    budget: GenerationBudget | None = None,
 ) -> None:
     """Atomically publish a complete PostgreSQL SQL file."""
 
     if output.suffix.lower() != ".sql":
         raise PostgresSqlExportError("PostgreSQL SQL output must use a .sql suffix")
-    payload = render_postgres_sql(spec, rows_by_entity).encode("utf-8")
+    payload = render_postgres_sql(spec, rows_by_entity, budget=budget).encode("utf-8")
     enforce_output_payload_size(len(payload), label="PostgreSQL SQL output")
     atomic_write_bytes(output, payload)
 

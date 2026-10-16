@@ -972,11 +972,11 @@ def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
         count=1,
     )
 
-    def exhaust_folder(rows, output_format, output_folder: Path, *, spec) -> None:
+    def exhaust_folder(rows, output_format, output_folder: Path, *, spec, budget) -> None:
         (output_folder / "partial.tmp").write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 
-    def exhaust_single(rows, output_format, output_path: Path, *, spec) -> None:
+    def exhaust_single(rows, output_format, output_path: Path, *, spec, budget) -> None:
         output_path.write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 

@@ -40,6 +40,7 @@ from test_data_agent.io import (
     write_generation_summary,
 )
 from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path, load_business_rules, make_business_rules_applier
+from test_data_agent.io.workflows import ensure_input_outside_output_folder, ensure_paths_distinct, ensure_rules_distinct_from_single_entity_output
 from test_data_agent.io.transformation_source import (
     prepare_csv_review_from_paths, trace_csv_review_request,
 )
@@ -68,6 +69,19 @@ def run_dataset_command(
     """Run one dataset command, or return ``None`` when it is not dataset-owned."""
 
     business_rules_applier = business_rules_applier or apply_business_rules_from_args
+    rules_path = getattr(args, "business_rules", None)
+    output = getattr(args, "output", None)
+    if rules_path is not None and output is not None:
+        ensure_paths_distinct(rules_path, output)
+        if args.command == "generate-from-csv":
+            ensure_rules_distinct_from_single_entity_output(
+                rules_path, output, profile_artifact_name="csv_profile.json",
+            )
+        elif (
+            args.command == "generate" and args.profile is None
+            or args.command in {"generate-from-example", "generate-from-csv-folder"}
+        ):
+            ensure_input_outside_output_folder(rules_path, output)
 
     def apply_rules(
         rows_by_entity: dict[str, list[dict[str, Any]]],

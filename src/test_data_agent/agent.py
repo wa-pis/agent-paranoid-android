@@ -203,11 +203,13 @@ def generate_agent_dataset(
             rows_by_entity,
             source_sha256=review.source_sha256,
         )
-        write_dataset_rows(rows_by_entity, request.output_format, temp_folder, spec=spec)
+        write_dataset_rows(rows_by_entity, request.output_format, temp_folder, spec=spec, budget=budget)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, spec, budget=budget)
         budget.check("dataset validation")
         write_dataset_review_artifacts(profile, spec, report, temp_folder)
+        if business_reports:
+            write_json_artifact(business_reports[0], temp_folder / "business_validation_report.json")
         row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
         write_generation_manifest(
             spec,
@@ -218,8 +220,6 @@ def generate_agent_dataset(
             output_folder=temp_folder,
             business_report=business_reports[0] if business_reports else None,
         )
-        if business_reports:
-            write_json_artifact(business_reports[0], temp_folder / "business_validation_report.json")
         checkpoint = AgentCompletionCheckpoint(
             plan_id=review.plan_id,
             profile_sha256=review.profile_sha256,

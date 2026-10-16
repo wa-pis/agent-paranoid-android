@@ -234,6 +234,7 @@ def test_cli_mcp_and_validation_use_the_same_embedded_rules(tmp_path, monkeypatc
 
 
 def test_agent_reviewed_spec_preserves_embedded_rules(tmp_path):
+    import hashlib
     import yaml
     from test_data_agent.agent import (
         plan_agent_request,
@@ -241,6 +242,7 @@ def test_agent_reviewed_spec_preserves_embedded_rules(tmp_path):
         approve_agent_workspace,
     )
     from test_data_agent.agent_contracts import AgentRequest
+    from test_data_agent.io.artifacts import validate_generation_bundle
 
     source = tmp_path / "input.csv"
     source.write_text("base_amount,total\n2,0\n3,1\n")
@@ -274,6 +276,14 @@ def test_agent_reviewed_spec_preserves_embedded_rules(tmp_path):
         (workspace / "generated" / "generation_manifest.json").read_text()
     )
     assert manifest["business_validation"]["assigned_row_count"] == 3
+    business_report = workspace / "generated" / "business_validation_report.json"
+    assert manifest["reproducibility"]["output_sha256"][business_report.name] == (
+        hashlib.sha256(business_report.read_bytes()).hexdigest()
+    )
+    validate_generation_bundle(workspace / "generated")
+    business_report.unlink()
+    with pytest.raises(ValueError, match="generation bundle is incomplete or invalid"):
+        validate_generation_bundle(workspace / "generated")
 
 
 @pytest.mark.parametrize("kind", ["sum", "avg", "count"])

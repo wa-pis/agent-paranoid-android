@@ -58,7 +58,11 @@ product of every possible option value or rule combination.
 ## Output representations and revalidation
 
 Generated bundles retain their reviewed specification and manifest. Use those
-artifacts together when revalidating; physical representations differ between
+artifacts together: business-validation reports are included in manifest hashes,
+including reviewed-agent generation. Folder overwrite refuses an input rule file
+inside the replaced folder; single-file and stdout routes also refuse rule-file
+collisions with their generated artifacts, including filesystem aliases.
+Retain them together when revalidating; physical representations differ between
 formats, while schema-aware operands retain the same rule semantics. Validation
 normalizes operands without modifying the supplied rows.
 

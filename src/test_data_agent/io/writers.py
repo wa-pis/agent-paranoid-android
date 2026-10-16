@@ -306,10 +306,11 @@ def write_dataset_rows(
     output_folder: Path,
     *,
     spec: DatasetSpec | None = None,
+    budget: GenerationBudget | None = None,
 ) -> None:
     if spec is not None and spec.business_rules is not None:
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
-        assert_generated_dataset_valid(rows_by_entity, spec)
+        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     root = output_folder.absolute()
     if any(name in RESERVED_ENTITY_ARTIFACT_BASENAMES for name in rows_by_entity):
         raise ValueError("reserved entity name")
@@ -368,10 +369,11 @@ def write_single_entity_rows(
     output: Path | None,
     *,
     spec: DatasetSpec | None = None,
+    budget: GenerationBudget | None = None,
 ) -> None:
     if spec is not None and spec.business_rules is not None:
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
-        assert_generated_dataset_valid(rows_by_entity, spec)
+        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     if len(rows_by_entity) != 1:
         raise SystemExit("single-entity output requires exactly one generated entity")
     rows = next(iter(rows_by_entity.values()))

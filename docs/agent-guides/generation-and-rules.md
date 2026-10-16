@@ -102,7 +102,12 @@ Every `generate_dataset` consumer performs the common output allocation estimate
 
 Deterministic native constraints and business rules share an explicit
 `GenerationBudget` through generation, solving, business application and
-validation. Inner row, field, expression and relationship-graph loops check the
+validation, including mandatory writer reconciliation before publication.
+Writers and the PostgreSQL SQL renderer accept the caller's keyword-only
+`budget`; standalone writer calls
+create a bounded allowance when none is supplied. An adapter must not restart
+the invocation allowance or deadline at the export boundary.
+Inner row, field, expression and relationship-graph loops check the
 cooperative deadline and charge cumulative work against
 `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`. Direct Python entry points also
 create a bounded budget when none is supplied. Native rule amplification is

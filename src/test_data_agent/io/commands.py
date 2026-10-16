@@ -29,7 +29,9 @@ from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     ensure_empty_output_folder,
     ensure_folders_distinct,
+    ensure_input_outside_output_folder,
     ensure_paths_distinct,
+    ensure_rules_distinct_from_single_entity_output,
     require_output_suffix,
     commit_temp_output_folder,
     generate_dataset_artifacts,
@@ -151,7 +153,7 @@ def export_postgres_sql_command(args: argparse.Namespace) -> int:
             raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
         spec.business_rules = load_business_rules(rules_path)
     rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
-    write_postgres_sql(spec, rows_by_entity, args.output)
+    write_postgres_sql(spec, rows_by_entity, args.output, budget=budget)
     print(
         "Wrote PostgreSQL SQL: "
         f"{display_untrusted_text(str(args.output), limit=240)}",
@@ -180,6 +182,14 @@ def generate_dataset_from_profile_command(
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("--profile expects a dataset profile, not a dataset spec")
     profile = loaded
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        if len(profile.entities) == 1:
+            ensure_rules_distinct_from_single_entity_output(
+                rules_path, args.output, profile_artifact_name="profile.json",
+            )
+        elif args.output is not None:
+            ensure_input_outside_output_folder(rules_path, args.output)
     if args.output is not None and len(profile.entities) != 1 and args.output.resolve() in args.profile.resolve().parents:
         raise ValueError("output folder must not contain the input profile")
     if args.output is not None and len(profile.entities) == 1:
