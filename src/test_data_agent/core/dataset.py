@@ -12,6 +12,7 @@ from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.privacy import LocalCategoryField, PrivacyRule, PrivacySettings
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, ValidationSettings
+from test_data_agent.rules.models import BusinessRules
 
 
 LEGACY_DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
@@ -77,6 +78,7 @@ class DatasetSpec(BaseModel):
     entities: list[EntitySpec] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
+    business_rules: BusinessRules | None = Field(default=None, exclude_if=lambda value: value is None)
     privacy_rules: list[PrivacyRule] = Field(default_factory=list)
     privacy_settings: PrivacySettings = Field(default_factory=PrivacySettings)
     local_category_fields: list[LocalCategoryField] = Field(default_factory=list)

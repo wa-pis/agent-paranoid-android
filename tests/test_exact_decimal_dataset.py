@@ -196,13 +196,13 @@ def test_decimal_scientific_notation_cannot_hide_card_digits():
             render_postgres_sql(spec, rows)
 
 
-def test_exact_decimal_formula_is_rejected_before_float_arithmetic():
+def test_cyclic_exact_decimal_formula_is_rejected_before_arithmetic():
     spec = _spec()
     spec.constraints = [Constraint(
         type=ConstraintType.FORMULA, entity="fictional_items",
         fields=["synthetic_amount"], expression="synthetic_amount * 1.1", confidence=1.0,
     )]
-    with pytest.raises(SpecSafetyError, match="exact decimal constraints"):
+    with pytest.raises(ValueError, match="cyclic formula dependencies"):
         generate_dataset(spec, seed=17)
 
 

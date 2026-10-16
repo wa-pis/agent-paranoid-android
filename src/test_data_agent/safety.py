@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
-from test_data_agent.core.constraint import ConstraintStatus
 from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS, value_matches_decimal
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
@@ -89,17 +88,6 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
 
     if spec.privacy_settings.allow_raw_sensitive_values:
         raise SpecSafetyError("dataset spec cannot allow raw sensitive values")
-
-    decimal_entities = {
-        entity.name for entity in spec.entities
-        if any(field.data_type == FieldType.DECIMAL for field in entity.fields)
-    }
-    if any(
-        constraint.status != ConstraintStatus.REJECTED
-        and (constraint.entity in decimal_entities or constraint.target_entity in decimal_entities)
-        for constraint in spec.constraints
-    ):
-        raise SpecSafetyError("exact decimal constraints are not yet supported")
 
     for entity in spec.entities:
         for field in entity.fields:

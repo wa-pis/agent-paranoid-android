@@ -1559,7 +1559,7 @@ def test_documented_negative_cli_and_mcp_examples_match(
             "--output",
             str(cli_output),
         ]
-    ) == 0
+    ) == 1
 
     monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(workspace))
     mcp_result = generate_dataset_mcp(

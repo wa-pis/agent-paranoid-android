@@ -26,10 +26,10 @@ The generator must:
 
 Reviewed DatasetSpec `1.1` can generate exact `decimal_range` fields with
 precision at most 38 and explicit base-ten bounds. This source-free path uses
-integer units and exports Parquet `decimal128`, never binary FLOAT. It does not
-make automatic profiling or formulas exact: active constraints on entities
-containing DECIMAL currently fail closed pending a separately tested formula
-rounding contract. Sensitive DECIMAL ranges remain disallowed.
+integer units and exports Parquet `decimal128`, never binary FLOAT. Automatic profiling still does not infer exact source bounds. Ordinary DECIMAL
+formulas and aggregate mappings use bounded rational arithmetic, with one
+ROUND_HALF_UP rounding at the target scale and precision overflow rejection.
+Sensitive DECIMAL ranges remain disallowed.
 Recognizable phone/card-like DECIMAL bounds and final values fail closed even
 when optional validation reporting is disabled. Do not treat a declared numeric
 type as permission to bypass content checks. Explicit reviewed `numeric_measure`

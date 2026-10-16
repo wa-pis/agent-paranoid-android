@@ -3,23 +3,24 @@
 from __future__ import annotations
 
 from typing import Annotated, Any, Self
-import math
 
 from pydantic import BaseModel, ConfigDict, Field, model_serializer, model_validator
 
 from test_data_agent.core.limits import GenerationBudget
+from test_data_agent.rules.expressions import exact_number
+from decimal import Decimal
 
 
 class Condition(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True, hide_input_in_errors=True)
 
     field: Annotated[str, Field(min_length=1, max_length=255)]
     equals: Any | None = None
     not_equals: Any | None = None
     in_values: Annotated[list[Any], Field(min_length=1, max_length=1_000)] | None = None
 
-    gte: float | None = Field(default=None, allow_inf_nan=False)
-    lte: float | None = Field(default=None, allow_inf_nan=False)
+    gte: float | str | None = None
+    lte: float | str | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -38,8 +39,11 @@ class Condition(BaseModel):
             or self.in_values is not None or self.gte is not None or self.lte is not None
         ):
             raise ValueError("condition must define equals, not_equals, in_values, gte, or lte")
-        if self.gte is not None and self.lte is not None and self.gte > self.lte:
+        if self.gte is not None and self.lte is not None and exact_number(self.gte) > exact_number(self.lte):
             raise ValueError("condition lower bound must not exceed upper bound")
+        for value in (self.gte, self.lte):
+            if value is not None:
+                exact_number(value)
         return self
 
     @model_serializer(mode="wrap")
@@ -60,19 +64,28 @@ def condition_matches(
     if budget is not None:
         budget.consume_rule_work(1 + len(condition.in_values or []))
     value = row.get(condition.field)
-    if "equals" in condition.model_fields_set and value != condition.equals:
+    if "equals" in condition.model_fields_set and not scalar_equal(value, condition.equals):
         return False
-    if "not_equals" in condition.model_fields_set and value == condition.not_equals:
+    if "not_equals" in condition.model_fields_set and scalar_equal(value, condition.not_equals):
         return False
-    if condition.in_values is not None and value not in condition.in_values:
+    if condition.in_values is not None and not any(scalar_equal(value, item) for item in condition.in_values):
         return False
     if condition.gte is not None or condition.lte is not None:
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
+        try:
+            number = exact_number(value)
+        except (ValueError, TypeError, ArithmeticError):
             return False
-        if isinstance(value, float) and not math.isfinite(value):
+        if condition.gte is not None and number < exact_number(condition.gte):
             return False
-        if condition.gte is not None and not value >= condition.gte:
-            return False
-        if condition.lte is not None and not value <= condition.lte:
+        if condition.lte is not None and number > exact_number(condition.lte):
             return False
     return True
+
+
+def scalar_equal(actual: Any, expected: Any) -> bool:
+    if isinstance(actual, Decimal) or isinstance(expected, Decimal):
+        try:
+            return exact_number(actual) == exact_number(expected)
+        except (ValueError, TypeError, ArithmeticError):
+            return False
+    return bool(actual == expected)

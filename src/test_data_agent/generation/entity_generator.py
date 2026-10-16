@@ -6,7 +6,10 @@ import random
 import string
 import math
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from test_data_agent.rules.validation import BusinessValidationReport
 
 from faker import Faker
 
@@ -51,6 +54,7 @@ def generate_dataset(
     *,
     budget: GenerationBudget | None = None,
     semantic_provider: SemanticValueProvider | None = None,
+    business_reports: list[BusinessValidationReport] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     if type(seed) is not int or not MIN_GENERATION_SEED <= seed <= MAX_GENERATION_SEED:
         raise GenerationLimitError("seed must be a signed 64-bit integer")
@@ -64,6 +68,9 @@ def generate_dataset(
     enforce_output_payload_size(estimate_dataset_output_bytes(spec), label="estimated generated data")
     budget.check("generation allocation preflight")
     enforce_dataset_rule_work(spec, budget=budget)
+    if spec.business_rules is not None:
+        from test_data_agent.rules.contract import validate_business_rules_for_spec
+        validate_business_rules_for_spec(spec.business_rules, spec)
     rows_by_entity: dict[str, list[dict[str, Any]]] = {}
     faker = create_faker(spec.generation_settings.locale)
     faker.seed_instance(seed)
@@ -90,7 +97,8 @@ def generate_dataset(
                     rng,
                     faker,
                     seed,
-                    mode=mode,
+                    # Rule-controlled negative cases require a valid formula baseline.
+                    mode=GenerationMode.VALID if spec.business_rules is not None and mode in {GenerationMode.NEGATIVE, GenerationMode.MIXED} else mode,
                     invalid_ratio=invalid_ratio,
                     semantic_provider=semantic_provider,
                     identifier_domains=identifier_domains,
@@ -100,6 +108,20 @@ def generate_dataset(
     budget.check("constraint solving")
     solve_constraints(rows_by_entity, spec, seed=seed, budget=budget)
     budget.check("constraint solving")
+    if spec.business_rules is not None:
+        from test_data_agent.rules.business_config import apply_and_validate_business_rules
+        from test_data_agent.generation.constraint_solver import default_value_for_field
+        report = apply_and_validate_business_rules(
+            rows_by_entity, spec.business_rules, seed=seed, mode=mode,
+            invalid_ratio=spec.generation_settings.invalid_ratio, spec=spec, budget=budget,
+            field_defaults={entity.name: {field.name: default_value_for_field(field) for field in entity.fields} for entity in spec.entities},
+        )
+        if business_reports is not None:
+            business_reports.append(report)
+        if not report.valid and mode not in {GenerationMode.MIXED, GenerationMode.NEGATIVE}:
+            raise ValueError("generated dataset failed business-rule validation")
+        if mode in {GenerationMode.MIXED, GenerationMode.NEGATIVE} and not report.expectations_met:
+            raise ValueError("generated dataset has unexpected business-rule violations")
     assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     return rows_by_entity
 

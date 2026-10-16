@@ -42,3 +42,21 @@ CLI help and diagnostics SHALL state supported modes, output path meaning, order
 #### Scenario: Explicit invalid ratio remains invalid
 - WHEN edge mode is requested with an explicit nonzero invalid ratio
 - THEN generation refuses the incompatible request before publishing output.
+
+### Requirement: Rules travel with the reviewed specification
+DatasetSpec SHALL accept typed business_rules. Every deterministic generation consumer, including direct Python, CLI, MCP and reviewed agent workspaces, SHALL apply and validate these rules with the same seed and budget. Validators and exporters SHALL verify supplied rows without reassigning them. Omitted rules SHALL preserve legacy behavior and serialization.
+
+#### Scenario: Format and interface parity
+- WHEN one reviewed specification contains formula, conditional and aggregate rules
+- THEN generation applies them once and validation checks them across CSV, JSON, Parquet and SQL, including after reload.
+
+### Requirement: Exact decimal rule arithmetic
+Ordinary DECIMAL formula assignments and aggregate mappings SHALL use bounded rational arithmetic and a single HALF_UP rounding at the declared target scale, with precision overflow rejected. Aggregate-only business checks SHALL compare bounded exact totals and expressions without reassigning rows or imposing a single-row precision limit on a total. Comparisons SHALL preserve decimal distinctions beyond FLOAT precision. Mixed FLOAT operands SHALL use their finite decimal text representation explicitly; source decimal values SHALL never pass through FLOAT. This ordinary rule contract SHALL NOT authorize or change selective transformation.
+
+#### Scenario: High-precision decimal formula
+- WHEN a decimal amount above 2**53 is multiplied by a fractional literal
+- THEN assignment and validation agree exactly at the declared target scale under any ambient decimal context.
+
+#### Scenario: Decimal constraint on an unrelated field
+- WHEN an entity contains a decimal measure and a constraint on another field
+- THEN the constraint is applied and validated rather than rejecting the entire entity.

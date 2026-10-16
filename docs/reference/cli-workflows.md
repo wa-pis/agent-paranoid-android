@@ -153,14 +153,16 @@ empty in CSV. Keep that companion specification when reusing the export;
 the manifest binds it by fingerprint.
 Version `1.0` remains readable but cannot declare `decimal`. Parquet and
 declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
-and scale; they do not infer a runnable exact range. Financial formulas remain
-unsupported for exact-decimal generation. Ordinary generation never preserves
+and scale; they do not infer a runnable exact range. Reviewed ordinary DECIMAL
+formulas and aggregates use bounded exact arithmetic with one HALF_UP rounding
+at the declared target scale. See the [rule contract](../rc4-external-feedback.md#business-rules-across-interfaces). Ordinary generation never preserves
 source rows. The separately selected transformation candidate has its own
 [saved-profile contract](cli.md#closed-common-profile-workflow-candidate), exact
 typed mappings and local approval boundary; its common public registration is
 not enabled by these generation commands. Bare SQL `numeric`
 without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
-Sensitive DECIMAL ranges and formula constraints are rejected before generation.
+Sensitive DECIMAL ranges remain rejected before generation; explicit numeric
+measure semantics retain sensitive-name, flag and classification vetoes.
 
 Folder generation requires a new or empty destination. Single-entity output
 suffixes must match the selected format. Overwrite fails closed when ownership,

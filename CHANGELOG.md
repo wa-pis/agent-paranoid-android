@@ -8,7 +8,8 @@ All notable changes to this project are documented here.
 
 - Reviewed exact DECIMAL inference ranges and field-scoped numeric measure semantics.
 - Coarse numeric zero/subunit prevalence, formula check-only mode, assignment audit counts, and null/range conditions.
-- Business rules for PostgreSQL SQL export.
+- Portable business rules in DatasetSpec across Python, CLI, MCP, agent workflows and all output formats.
+- Exact DECIMAL formulas, bounds, conditions and aggregates, including native constraints, target-scale HALF_UP rounding and revalidation.
 
 ### Fixed
 

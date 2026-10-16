@@ -39,8 +39,6 @@ from test_data_agent.io.workflows import (
     infer_dataset_spec_artifact,
     make_temp_output_folder,
     write_csv_profile_artifact,
-    invoke_business_rules_applier,
-    assert_business_report_valid,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.postgres_client import PostgresClient, PostgresClientError
@@ -49,8 +47,7 @@ from test_data_agent.postgres_profiler import PostgresProfileError, dataset_prof
 from test_data_agent.postgres_sql_export import write_postgres_sql
 from test_data_agent.core.field import FieldSpec
 from test_data_agent.core.serialization import load_limited_yaml
-from test_data_agent.rules.business_config import load_business_rules, make_business_rules_applier
-from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
+from test_data_agent.rules.business_config import load_business_rules
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.sql_query_adapters import (
     profile_postgres_query_source,
@@ -147,15 +144,13 @@ def export_postgres_sql_command(args: argparse.Namespace) -> int:
         seed = 0
     spec.generation_settings.seed = seed
     budget = generation_budget_for_invocation()
-    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
     rules_path = getattr(args, "business_rules", None)
     if rules_path is not None:
-        report = invoke_business_rules_applier(
-            make_business_rules_applier(load_business_rules(rules_path)),
-            rows_by_entity, seed, spec, budget=budget,
-        )
-        assert_business_report_valid(report, spec.generation_settings.mode)
-        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
+        ensure_paths_distinct(rules_path, args.output)
+        if spec.business_rules is not None:
+            raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
+        spec.business_rules = load_business_rules(rules_path)
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
     write_postgres_sql(spec, rows_by_entity, args.output)
     print(
         "Wrote PostgreSQL SQL: "
@@ -227,8 +222,15 @@ def validate_dataset_artifacts(
     *,
     output_path: Path | None = None,
     overwrite: bool = False,
+    business_rules_path: Path | None = None,
 ) -> DatasetValidationReport:
     spec = load_dataset_spec(spec_path)
+    if business_rules_path is not None:
+        if output_path is not None:
+            ensure_paths_distinct(business_rules_path, output_path)
+        if spec.business_rules is not None:
+            raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
+        spec.business_rules = load_business_rules(business_rules_path)
     if not rows_path.is_dir():
         raise ValueError(
             "validate expects a dataset output folder; pass the folder containing generated entity files"
@@ -265,8 +267,12 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
             )
         except (ValidationError, ValueError):
             raise ValueError("reviewed decimal mapping is invalid; expected ENTITY.FIELD to exact decimal FieldSpec") from None
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        ensure_paths_distinct(rules_path, args.output)
     spec = infer_dataset_spec_artifact(
         loaded, output_path=args.output, count=args.count, decimal_fields=decimal_fields,
+        business_rules=load_business_rules(rules_path) if rules_path is not None else None,
     )
     print(
         "Wrote dataset spec: "
@@ -465,6 +471,7 @@ def generate_dataset_from_example_artifacts(
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
     local_category_fields: tuple[LocalCategoryField, ...] = (),
+    business_rules_path: Path | None = None,
 ) -> int:
     ensure_folders_distinct(input_folder, output_folder)
     ensure_empty_output_folder(output_folder)
@@ -478,6 +485,8 @@ def generate_dataset_from_example_artifacts(
     temp_folder = make_temp_output_folder(output_folder)
     try:
         spec = infer_dataset_spec(profile, count=count)
+        if business_rules_path is not None:
+            spec.business_rules = load_business_rules(business_rules_path)
         result = generate_dataset_review_artifacts(
             profile,
             spec,
@@ -496,6 +505,7 @@ def generate_dataset_from_example_artifacts(
 def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
     exit_code = generate_dataset_from_example_artifacts(
         args.input_folder,
+        business_rules_path=getattr(args, "business_rules", None),
         output_folder=args.output,
         seed=args.seed,
         count=args.count,

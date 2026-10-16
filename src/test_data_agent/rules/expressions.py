@@ -12,7 +12,7 @@ from fractions import Fraction
 from typing import Any
 
 from test_data_agent.core.decimal_units import decimal_from_units
-from test_data_agent.core.limits import DEFAULT_MAX_INPUT_CELL_CHARS, GenerationBudget
+from test_data_agent.core.limits import DEFAULT_MAX_INPUT_CELL_CHARS, GenerationBudget, GenerationLimitError
 
 
 BinaryOperator = Callable[[Any, Any], Any]
@@ -40,9 +40,10 @@ def comparable_number(value: Any) -> float | None:
 
 
 def numbers_close(actual: Any, expected: Any, tolerance: float) -> bool:
-    actual_number = comparable_number(actual)
-    expected_number = comparable_number(expected)
-    return actual_number is not None and expected_number is not None and abs(actual_number - expected_number) <= tolerance
+    try:
+        return abs(exact_number(actual) - exact_number(expected)) <= exact_number(tolerance)
+    except (ValueError, TypeError, ArithmeticError):
+        return False
 
 
 def parse_datetime(value: Any) -> datetime | None:
@@ -74,7 +75,7 @@ def safe_eval(
     return eval_node(parse_safe_expression(expression), row, budget=budget)
 
 
-def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: GenerationBudget) -> Fraction:
+def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: GenerationBudget, allow_float: bool = False) -> Fraction:
     """Bounded rational arithmetic shared by integer and decimal results."""
     try:
         budget.check("exact expression")
@@ -90,6 +91,8 @@ def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: Genera
                         or not isinstance(parts.exponent, int)
                         or abs(parts.exponent) > MAX_EXPRESSION_CHARS):
                     raise ValueError
+            elif allow_float and type(value) is float and math.isfinite(value):
+                value = Decimal(str(value))
             else:
                 raise ValueError
             return Fraction(value)
@@ -103,6 +106,20 @@ def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: Genera
                 result = number(Decimal(literal))
             elif isinstance(node, ast.Name):
                 result = number(row[node.id])
+            elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                rows = row["rows"]
+                if node.func.id == "count":
+                    result = Fraction(len(rows))
+                elif node.func.id == "sum":
+                    field = expect_field_name(node.args[0])
+                    result = Fraction()
+                    for item in budget.iter_rule_work(rows):
+                        value = item.get(field)
+                        if value is not None:
+                            result += number(value)
+                            _bounded_operand(result)
+                else:
+                    raise ValueError
             elif isinstance(node, ast.BinOp) and type(node.op) in BINARY_OPERATORS:
                 result = BINARY_OPERATORS[type(node.op)](evaluate(node.left), evaluate(node.right))
             elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
@@ -116,6 +133,8 @@ def _eval_exact_fraction(expression: str, row: dict[str, Any], *, budget: Genera
         result = evaluate(tree)
         budget.check("exact expression result")
         return result
+    except GenerationLimitError:
+        raise
     except (ValueError, TypeError, KeyError, ArithmeticError, DecimalException):
         pass
     try:
@@ -135,16 +154,15 @@ def eval_exact_integer(expression: str, row: dict[str, Any], *, budget: Generati
 
 def eval_exact_decimal(
     expression: str, row: dict[str, Any], *, precision: int, scale: int,
-    budget: GenerationBudget,
+    budget: GenerationBudget, allow_float: bool = False,
 ) -> Decimal:
     """Apply HALF_UP once, after exact arithmetic, with declared-width checks."""
     try:
         decimal_from_units(0, precision=precision, scale=scale)
-        result = _eval_exact_fraction(expression, row, budget=budget)
-        units, remainder = divmod(abs(result.numerator) * 10**scale, result.denominator)
-        units += int(2 * remainder >= result.denominator)
-        budget.check("exact expression result")
-        return decimal_from_units(-units if result < 0 else units, precision=precision, scale=scale)
+        result = _eval_exact_fraction(expression, row, budget=budget, allow_float=allow_float)
+        return decimal_from_fraction(result, precision=precision, scale=scale, budget=budget)
+    except GenerationLimitError:
+        raise
     except (ValueError, TypeError, KeyError, ArithmeticError, DecimalException):
         pass
     try:
@@ -282,3 +300,43 @@ def expect_field_name(node: ast.AST) -> str:
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
         return node.value
     raise ValueError("aggregate field name must be a string literal")
+
+
+def exact_number(value: Any) -> Fraction:
+    """Finite bounded numeric input; FLOAT means its existing decimal text value."""
+    if type(value) is str:
+        if len(value) > MAX_EXPRESSION_CHARS:
+            raise ValueError("invalid numeric rule value")
+        try:
+            value = Decimal(value)
+        except DecimalException:
+            raise ValueError("invalid numeric rule value") from None
+    elif type(value) is float:
+        if not math.isfinite(value):
+            raise ValueError("invalid numeric rule value")
+        value = Decimal(str(value))
+    if type(value) not in (int, Decimal, Fraction):
+        raise ValueError("invalid numeric rule value")
+    return Fraction(_bounded_operand(value))
+
+
+def exact_aggregate(expression: str, rows: list[dict[str, Any]], *, budget: GenerationBudget) -> Fraction:
+    return _eval_exact_fraction(expression, {"rows": rows}, budget=budget, allow_float=True)
+
+
+def decimal_from_fraction(result: Fraction, *, precision: int, scale: int, budget: GenerationBudget) -> Decimal:
+    decimal_from_units(0, precision=precision, scale=scale)
+    _bounded_operand(result)
+    units, remainder = divmod(abs(result.numerator) * 10**scale, result.denominator)
+    units += int(2 * remainder >= result.denominator)
+    budget.check("exact numeric result")
+    return decimal_from_units(-units if result < 0 else units, precision=precision, scale=scale)
+
+
+def exact_sum(field: str, rows: list[dict[str, Any]], *, budget: GenerationBudget) -> Fraction:
+    result = Fraction()
+    for row in budget.iter_rule_work(rows):
+        if row.get(field) is not None:
+            result += exact_number(row[field])
+            _bounded_operand(result)
+    return result

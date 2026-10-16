@@ -15,6 +15,9 @@ from test_data_agent.adapters import (
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.field import FieldSpec
+from test_data_agent.rules.validation import BusinessValidationReport
+from test_data_agent.rules.models import BusinessRules
+from test_data_agent.rules.business_config import embed_configured_business_rules
 from test_data_agent.core.limits import (
     GenerationBudget,
     enforce_output_capacity,
@@ -124,8 +127,11 @@ def generate_dataset_bundle(
     effective_spec.generation_settings.seed = effective_seed
     effective_spec.generation_settings.output_format = effective_output_format
 
+    if embed_configured_business_rules(effective_spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(effective_spec, output_folder)
-    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget)
+    embedded_reports: list[BusinessValidationReport] = []
+    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget, business_reports=embedded_reports)
     budget.check("dataset generation")
     business_report = (
         invoke_business_rules_applier(
@@ -138,6 +144,7 @@ def generate_dataset_bundle(
         if business_rules_applier is not None
         else None
     )
+    business_report = business_report or (embedded_reports[0] if embedded_reports else None)
     budget.check("business rule application")
     assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
     assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
@@ -242,9 +249,14 @@ def infer_dataset_spec_artifact(
     output_path: Path,
     count: int | None = None,
     decimal_fields: dict[str, FieldSpec] | None = None,
+    business_rules: BusinessRules | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
     spec = infer_dataset_spec(profile, count=count, decimal_fields=decimal_fields)
+    if business_rules is not None:
+        from test_data_agent.rules.contract import validate_business_rules_for_spec
+        validate_business_rules_for_spec(business_rules, spec)
+        spec.business_rules = business_rules
     write_dataset_spec_artifact(spec, output_path)
     return spec
 
@@ -283,13 +295,16 @@ def generate_single_entity_profile_artifacts(
     overwrite: bool = False,
 ) -> DatasetValidationReport:
     budget = budget or prepare_generation_budget(spec, output_path or Path.cwd())
+    embedded_reports: list[BusinessValidationReport] = []
     rows_by_entity = rows_by_entity or generate_dataset(
         spec,
         seed=spec.generation_settings.seed or 0,
         budget=budget,
+        business_reports=embedded_reports,
     )
     budget.check("dataset generation")
     assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
+    business_report = business_report or (embedded_reports[0] if embedded_reports else None)
     assert_business_report_valid(business_report, spec.generation_settings.mode)
     report = validate_dataset(rows_by_entity, spec, budget=budget)
     budget.check("dataset validation")
@@ -358,14 +373,18 @@ def generate_dataset_from_profile_artifacts(
         invalid_ratio=invalid_ratio,
     )
     require_output_format_suffix(output_path, spec.generation_settings.output_format)
+    if embed_configured_business_rules(spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(spec, output_path)
+    embedded_reports: list[BusinessValidationReport] = []
     rows_by_entity = generate_dataset(
         spec,
         seed=spec.generation_settings.seed or 0,
         budget=budget,
+        business_reports=embedded_reports,
     )
     budget.check("dataset generation")
-    business_report = None
+    business_report = embedded_reports[0] if embedded_reports else None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
             business_rules_applier,
@@ -418,10 +437,13 @@ def generate_dataset_from_csv_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
+    if embed_configured_business_rules(spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(spec, output_path)
-    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
+    embedded_reports: list[BusinessValidationReport] = []
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget, business_reports=embedded_reports)
     budget.check("dataset generation")
-    business_report = None
+    business_report = embedded_reports[0] if embedded_reports else None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
             business_rules_applier,
@@ -467,7 +489,8 @@ def generate_dataset_review_artifacts(
     effective_spec.generation_settings.output_format = output_format
     enforce_generation_row_count_limits(effective_spec)
     budget = prepare_generation_budget(effective_spec, output_folder)
-    rows_by_entity = generate_dataset(effective_spec, seed=seed, budget=budget)
+    embedded_reports: list[BusinessValidationReport] = []
+    rows_by_entity = generate_dataset(effective_spec, seed=seed, budget=budget, business_reports=embedded_reports)
     budget.check("dataset generation")
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
@@ -479,12 +502,15 @@ def generate_dataset_review_artifacts(
         report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
         write_dataset_review_bundle(profile, effective_spec, report, temp_folder)
+        if embedded_reports:
+            write_json_artifact(embedded_reports[0], temp_folder / "business_validation_report.json")
         write_generation_manifest(
             effective_spec,
             seed=seed,
             output_format=output_format,
             row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
             validation_valid=report.valid,
+            business_report=embedded_reports[0] if embedded_reports else None,
             output_folder=temp_folder,
         )
         enforce_output_folder_size(temp_folder)

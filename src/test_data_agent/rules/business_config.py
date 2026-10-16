@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -45,8 +46,11 @@ def apply_and_validate_business_rules(
     invalid_ratio: float,
     field_defaults: dict[str, dict[str, Any]] | None = None,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> BusinessValidationReport:
     budget = budget or GenerationBudget()
+    if spec is not None:
+        validate_business_rules_for_spec(rules, spec)
     expected_rule_failures: dict[int, int] = {}
     apply_business_rules(
         rows_by_table,
@@ -57,18 +61,22 @@ def apply_and_validate_business_rules(
         field_defaults=field_defaults,
         expected_rule_failures=expected_rule_failures,
         budget=budget,
+        spec=spec,
     )
     report = validate_business_rules(
         rows_by_table,
         rules,
         expected_rule_failures=expected_rule_failures,
         budget=budget,
+        spec=spec,
     )
     for index, rule in enumerate(rules.row_rules, start=len(rules.field_rules)):
         if isinstance(rule, FormulaRule):
             report.results[index].application = rule.mode
             if rule.mode == "assign":
                 report.results[index].assigned_row_count = len(rows_by_table.get(rule.table, []))
+    if spec is not None and mode not in {"mixed", "negative"}:
+        _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
     return report
 
 
@@ -87,8 +95,11 @@ def apply_and_validate_business_rules_from_path(
         return None
     budget = budget or GenerationBudget()
     rules = load_business_rules(rules_path)
-    validate_business_rule_literals(rules)
+    if spec is None:
+        validate_business_rule_literals(rules)
     if spec is not None:
+        if spec.business_rules is not None:
+            raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
         validate_business_rules_for_spec(rules, spec)
     report = apply_and_validate_business_rules(
         rows_by_table,
@@ -98,20 +109,26 @@ def apply_and_validate_business_rules_from_path(
         invalid_ratio=invalid_ratio,
         field_defaults=field_defaults,
         budget=budget,
+        spec=spec,
     )
-    if spec is not None and mode not in {"mixed", "negative"}:
-        _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
+    if spec is not None:
+        spec.business_rules = rules
     return report
 
 
-def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
-    def apply_rules(
+@dataclass(frozen=True)
+class ConfiguredBusinessRulesApplier:
+    rules: BusinessRules
+
+    def __call__(
+        self,
         rows_by_table: dict[str, list[dict[str, Any]]],
         seed: int,
         spec: DatasetSpec,
         *,
         budget: GenerationBudget | None = None,
     ) -> BusinessValidationReport:
+        rules = self.rules
         budget = budget or GenerationBudget()
         validate_business_rules_for_spec(rules, spec)
         field_defaults = {
@@ -129,12 +146,25 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
             invalid_ratio=spec.generation_settings.invalid_ratio,
             field_defaults=field_defaults,
             budget=budget,
+            spec=spec,
         )
-        if spec.generation_settings.mode not in {"mixed", "negative"}:
-            _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
+        spec.business_rules = rules
         return report
 
-    return apply_rules
+
+def make_business_rules_applier(rules: BusinessRules) -> ConfiguredBusinessRulesApplier:
+    return ConfiguredBusinessRulesApplier(rules)
+
+
+def embed_configured_business_rules(spec: DatasetSpec, applier: Any) -> bool:
+    """Route configured rules through generation; retain custom callback compatibility."""
+    if not isinstance(applier, ConfiguredBusinessRulesApplier):
+        return False
+    if spec.business_rules is not None:
+        raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
+    validate_business_rules_for_spec(applier.rules, spec)
+    spec.business_rules = applier.rules.model_copy(deep=True)
+    return True
 
 
 def _report_assigned_numeric_bounds(

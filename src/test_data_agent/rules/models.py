@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 from typing import Annotated, Any, Literal, Self, TypeAlias
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_serializer, model_validator
 
 from test_data_agent.core.limits import max_business_rules_bytes, read_limited_text
 from test_data_agent.core.serialization import load_limited_yaml
 from test_data_agent.rules.conditions import Condition
+from test_data_agent.rules.expressions import exact_number as _rule_number
 
 
 MAX_BUSINESS_RULE_COUNT = 1_000
@@ -25,9 +26,18 @@ RuleValues: TypeAlias = Annotated[list[Any], Field(min_length=1, max_length=MAX_
 class StrictRuleModel(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
+        hide_input_in_errors=True,
         allow_inf_nan=False,
         str_strip_whitespace=True,
     )
+
+    @model_serializer(mode="wrap")
+    def serialize(self, handler: Any) -> dict[str, Any]:
+        result: dict[str, Any] = handler(self)
+        # Unspecified tolerance is type-dependent; preserve that intent on reload.
+        if "tolerance" in type(self).model_fields and "tolerance" not in self.model_fields_set:
+            result.pop("tolerance", None)
+        return result
 
 
 class FieldRule(StrictRuleModel):
@@ -35,15 +45,18 @@ class FieldRule(StrictRuleModel):
     field: RuleIdentifier
     required: bool = False
     allowed_values: RuleValues | None = None
-    min_value: float | None = None
-    max_value: float | None = None
+    min_value: float | str | None = None
+    max_value: float | str | None = None
 
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
+        for value in (self.min_value, self.max_value):
+            if value is not None:
+                _rule_number(value)
         if (
             self.min_value is not None
             and self.max_value is not None
-            and self.min_value > self.max_value
+            and _rule_number(self.min_value) > _rule_number(self.max_value)
         ):
             raise ValueError("field rule min_value must be <= max_value")
         return self
@@ -97,7 +110,7 @@ class AggregateFormulaRule(StrictRuleModel):
     table: RuleIdentifier
     field: RuleIdentifier
     expression: Annotated[str, Field(min_length=1, max_length=1_024)]
-    expected: float | int | None = None
+    expected: float | int | str | None = None
     tolerance: float = Field(default=0.000001, ge=0)
 
 

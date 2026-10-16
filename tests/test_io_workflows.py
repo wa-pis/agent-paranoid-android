@@ -483,7 +483,7 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
     input_path.write_text("order_id,status\n1,new\n")
     monkeypatch.setattr(
         "test_data_agent.io.workflows.generate_dataset",
-        lambda spec, seed, budget: {"orders": [{"order_id": "1", "status": "new"}]},
+        lambda spec, seed, budget, business_reports: {"orders": [{"order_id": "1", "status": "new"}]},
     )
 
     with pytest.raises(SourceRowReuseError):
@@ -509,7 +509,7 @@ def test_generate_dataset_from_csv_binds_no_copy_check_to_profiled_rows(
     input_path.write_text("order_id,status\n1,new\n")
     replacement.write_text("order_id,status\n2,shipped\n")
 
-    def replace_source(spec, seed, budget):
+    def replace_source(spec, seed, budget, business_reports):
         replacement.replace(input_path)
         return {"orders": [{"order_id": "1", "status": "new"}]}
 

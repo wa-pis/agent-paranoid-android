@@ -301,6 +301,7 @@ def register_dataset_commands(
     infer_spec_parser.add_argument("profile", type=Path, help="Safe profile JSON.")
     infer_spec_parser.add_argument("--output", "-o", type=Path, required=True, help="DatasetSpec YAML/JSON to write.")
     infer_spec_parser.add_argument("--count", type=positive_int, help="Override row count per entity in the inferred spec.")
+    infer_spec_parser.add_argument("--business-rules", type=Path, help="Embed typed business rules in the inferred specification for review and all generation interfaces.")
     infer_spec_parser.add_argument("--decimal-fields", type=Path, help="Reviewed JSON/YAML mapping ENTITY.FIELD to exact decimal FieldSpec with synthetic bounds.")
     infer_spec_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing spec file.")
 
@@ -496,6 +497,7 @@ def register_dataset_commands(
     )
     validate_parser.add_argument("spec", type=Path, help="DatasetSpec YAML/JSON.")
     validate_parser.add_argument("rows", type=Path, help="Generated output folder.")
+    validate_parser.add_argument("--business-rules", type=Path, help="Validate rules without modifying the supplied rows; embedded rules are used by default.")
     validate_parser.add_argument("--output", "-o", type=Path, help="Validation report JSON to write.")
     validate_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing validation report.")
 
@@ -515,6 +517,7 @@ def register_dataset_commands(
     )
     generate_example_parser.add_argument("input_folder", type=Path, help="Folder containing one CSV file per table.")
     generate_example_parser.add_argument("--output", "-o", type=Path, required=True, help="Output folder for generated tables and review artifacts.")
+    generate_example_parser.add_argument("--business-rules", type=Path, help="Embed, apply and validate reviewed business rules for every output format.")
     generate_example_parser.add_argument("--seed", type=non_negative_int, required=True, help="Deterministic seed for the same ordered spec and environment; changing entity order changes output.")
     generate_example_parser.add_argument("--count", type=positive_int, help="Override generated row count per entity.")
     generate_example_parser.add_argument("--format", choices=[item.value for item in CoreOutputFormat], required=True, dest="output_format", help="Output format for generated rows.")

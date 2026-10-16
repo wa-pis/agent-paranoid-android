@@ -183,6 +183,301 @@
   "response_format": "json_schema",
   "response_json_schema": {
     "$defs": {
+      "AggregateFormulaRule": {
+        "additionalProperties": false,
+        "properties": {
+          "expected": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Expected"
+          },
+          "expression": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Expression",
+            "type": "string"
+          },
+          "field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          },
+          "tolerance": {
+            "default": 1e-06,
+            "minimum": 0,
+            "title": "Tolerance",
+            "type": "number"
+          },
+          "type": {
+            "const": "aggregate_formula",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "field",
+          "expression"
+        ],
+        "title": "AggregateFormulaRule",
+        "type": "object"
+      },
+      "BusinessRules": {
+        "additionalProperties": false,
+        "properties": {
+          "cross_table_rules": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "aggregate_formula": "#/$defs/AggregateFormulaRule",
+                  "foreign_key": "#/$defs/ForeignKeyRule"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ForeignKeyRule"
+                },
+                {
+                  "$ref": "#/$defs/AggregateFormulaRule"
+                }
+              ]
+            },
+            "maxItems": 1000,
+            "title": "Cross Table Rules",
+            "type": "array"
+          },
+          "field_rules": {
+            "items": {
+              "$ref": "#/$defs/FieldRule"
+            },
+            "maxItems": 1000,
+            "title": "Field Rules",
+            "type": "array"
+          },
+          "row_rules": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "conditional_allowed_values": "#/$defs/ConditionalAllowedValuesRule",
+                  "conditional_required": "#/$defs/ConditionalRequiredRule",
+                  "formula": "#/$defs/FormulaRule",
+                  "temporal_ordering": "#/$defs/TemporalOrderingRule"
+                },
+                "propertyName": "type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/ConditionalRequiredRule"
+                },
+                {
+                  "$ref": "#/$defs/ConditionalAllowedValuesRule"
+                },
+                {
+                  "$ref": "#/$defs/TemporalOrderingRule"
+                },
+                {
+                  "$ref": "#/$defs/FormulaRule"
+                }
+              ]
+            },
+            "maxItems": 1000,
+            "title": "Row Rules",
+            "type": "array"
+          },
+          "scenarios": {
+            "items": {
+              "$ref": "#/$defs/ScenarioRule"
+            },
+            "maxItems": 1000,
+            "title": "Scenarios",
+            "type": "array"
+          }
+        },
+        "title": "BusinessRules",
+        "type": "object"
+      },
+      "Condition": {
+        "additionalProperties": false,
+        "properties": {
+          "equals": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Equals"
+          },
+          "field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "gte": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Gte"
+          },
+          "in_values": {
+            "anyOf": [
+              {
+                "items": {},
+                "maxItems": 1000,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "In Values"
+          },
+          "lte": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Lte"
+          },
+          "not_equals": {
+            "anyOf": [
+              {},
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Not Equals"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "title": "Condition",
+        "type": "object"
+      },
+      "ConditionalAllowedValuesRule": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_values": {
+            "items": {},
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Allowed Values",
+            "type": "array"
+          },
+          "field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          },
+          "type": {
+            "const": "conditional_allowed_values",
+            "title": "Type",
+            "type": "string"
+          },
+          "when": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "field",
+          "when",
+          "allowed_values"
+        ],
+        "title": "ConditionalAllowedValuesRule",
+        "type": "object"
+      },
+      "ConditionalRequiredRule": {
+        "additionalProperties": false,
+        "properties": {
+          "required_fields": {
+            "items": {
+              "maxLength": 255,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Required Fields",
+            "type": "array"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          },
+          "type": {
+            "const": "conditional_required",
+            "title": "Type",
+            "type": "string"
+          },
+          "when": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "when",
+          "required_fields"
+        ],
+        "title": "ConditionalRequiredRule",
+        "type": "object"
+      },
       "Constraint": {
         "properties": {
           "aggregate": {
@@ -310,6 +605,17 @@
       },
       "DatasetSpec": {
         "properties": {
+          "business_rules": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/BusinessRules"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "constraints": {
             "items": {
               "$ref": "#/$defs/Constraint"
@@ -406,6 +712,79 @@
         "title": "EntitySpec",
         "type": "object"
       },
+      "FieldRule": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_values": {
+            "anyOf": [
+              {
+                "items": {},
+                "maxItems": 1000,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Allowed Values"
+          },
+          "field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "max_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Max Value"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Min Value"
+          },
+          "required": {
+            "default": false,
+            "title": "Required",
+            "type": "boolean"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          }
+        },
+        "required": [
+          "table",
+          "field"
+        ],
+        "title": "FieldRule",
+        "type": "object"
+      },
       "FieldSpec": {
         "properties": {
           "data_type": {
@@ -474,6 +853,100 @@
         ],
         "title": "FieldType",
         "type": "string"
+      },
+      "ForeignKeyRule": {
+        "additionalProperties": false,
+        "properties": {
+          "child_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Child Field",
+            "type": "string"
+          },
+          "child_table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Child Table",
+            "type": "string"
+          },
+          "parent_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Parent Field",
+            "type": "string"
+          },
+          "parent_table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Parent Table",
+            "type": "string"
+          },
+          "type": {
+            "const": "foreign_key",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "child_table",
+          "child_field",
+          "parent_table",
+          "parent_field"
+        ],
+        "title": "ForeignKeyRule",
+        "type": "object"
+      },
+      "FormulaRule": {
+        "additionalProperties": false,
+        "properties": {
+          "expression": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Expression",
+            "type": "string"
+          },
+          "field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Field",
+            "type": "string"
+          },
+          "mode": {
+            "default": "assign",
+            "enum": [
+              "assign",
+              "check"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          },
+          "tolerance": {
+            "default": 1e-06,
+            "minimum": 0,
+            "title": "Tolerance",
+            "type": "number"
+          },
+          "type": {
+            "const": "formula",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "field",
+          "expression"
+        ],
+        "title": "FormulaRule",
+        "type": "object"
       },
       "GenerationMode": {
         "enum": [
@@ -736,6 +1209,86 @@
         ],
         "title": "RelationshipType",
         "type": "string"
+      },
+      "ScenarioRule": {
+        "additionalProperties": false,
+        "properties": {
+          "field_values": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "propertyNames": {
+                "maxLength": 255,
+                "minLength": 1
+              },
+              "type": "object"
+            },
+            "maxProperties": 100,
+            "propertyNames": {
+              "maxLength": 255,
+              "minLength": 1
+            },
+            "title": "Field Values",
+            "type": "object"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "weight": {
+            "exclusiveMinimum": 0,
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "weight"
+        ],
+        "title": "ScenarioRule",
+        "type": "object"
+      },
+      "TemporalOrderingRule": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_equal": {
+            "default": true,
+            "title": "Allow Equal",
+            "type": "boolean"
+          },
+          "end_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "End Field",
+            "type": "string"
+          },
+          "start_field": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Start Field",
+            "type": "string"
+          },
+          "table": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Table",
+            "type": "string"
+          },
+          "type": {
+            "const": "temporal_ordering",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "table",
+          "start_field",
+          "end_field"
+        ],
+        "title": "TemporalOrderingRule",
+        "type": "object"
       },
       "ValidationSettings": {
         "properties": {

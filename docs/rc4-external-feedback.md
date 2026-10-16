@@ -14,14 +14,14 @@ this change.
 | High-scale synthetic decimal amounts look sensitive | Explicit field-scoped `numeric_measure` permits exact reviewed DECIMAL measures. Sensitive names, flags, identifiers and privacy classification veto the policy. Defaults stay conservative. |
 | Formula reports green after rewriting its target | Default `assign` is explicit in the report with assigned-row counts. `check` validates without assigning. Neither mode proves business intent. |
 | Formula silently exceeds the generation domain | Report checked numeric assignments and violations of the generation range (including its scale factor) independently of business-rule validity. |
-| Null/range conditions unavailable | Support explicit `equals: null`, `not_equals: null`, and finite inclusive `gte`/`lte` for integer/float fields. |
+| Null/range conditions unavailable | Support explicit `equals: null`, `not_equals: null`, and finite inclusive `gte`/`lte` for integer/float/decimal fields. |
 | SQL export ignores business rules | Accept `export-postgres-sql --business-rules`; apply the same typed rules and mandatory checks before writing. |
 | Saved invalid ratio causes confusing mode errors | An explicit non-negative mode override resets a saved ratio unless a ratio is explicitly supplied. Invalid explicit combinations still fail. |
 | Negative output exists despite exit status 1 | Intentional invalid artifacts retain validation evidence. The nonzero status means validation failed, not that publication was rolled back. |
 | JSON-looking output path becomes a directory | DatasetSpec `generate --output` names a bundle directory, regardless of suffix. |
 | Entity reordering changes seeded output | Reproducibility requires the same ordered specification, seed and environment; entity streams are indexed by order. |
 | Dictionary names/category values are replaced | Source-free generation intentionally does not copy source labels. Local categories require the existing explicit qualified-field policy, e.g. `--local-category warehouse.public.orders.status` with the complete profile entity identity. |
-| Native constraints on DECIMAL | Remain fail-closed pending an exact rounding and reconciliation contract. |
+| Native constraints on DECIMAL | Supported with bounded exact arithmetic and a declared target-scale rounding contract. |
 
 ## Reviewed decimal inference
 
@@ -80,3 +80,46 @@ Coarse numeric prevalence is aggregate metadata, not a reconstruction of source
 rows or a promise of exact frequencies. FLOAT generation remains approximate;
 reviewed DECIMAL bounds are the exact-value path. Missing legacy prevalence
 metadata retains the previous shape behavior.
+
+## Business rules across interfaces
+
+`DatasetSpec.business_rules` carries the reviewed rules with the specification.
+Python generation, CLI, MCP and approved agent workspaces use the same engine.
+CSV, JSON, Parquet and PostgreSQL SQL output retain the same rule semantics;
+validation and export check existing rows without reassigning formula targets.
+`infer-spec --business-rules rules.yaml` embeds rules, and `validate
+--business-rules rules.yaml` checks an existing dataset without modifying it.
+Generation from examples also accepts `--business-rules`. Supply either embedded
+rules or an external rule file/payload; competing rule sources are rejected.
+
+For example, a specification can contain:
+
+```yaml
+business_rules:
+  row_rules:
+    - type: formula
+      table: items
+      field: total
+      expression: base_amount * 0.5
+      mode: assign
+```
+
+DECIMAL formulas use bounded rational arithmetic and round once using
+`ROUND_HALF_UP` to the target's declared scale. Precision overflow and violations
+of explicit decimal bounds fail validation. Aggregate-only business checks compare
+exact totals and expressions without assigning rows or imposing a single-row
+precision limit on their sum. Native aggregate mappings (`sum`,
+`avg`, `count`) use the same target rounding. FLOAT operands keep their existing
+finite decimal text representation; this does not recover precision already
+lost in a FLOAT input. DECIMAL formula and aggregate comparisons default to zero
+tolerance; an explicitly supplied `tolerance` overrides this and survives saving
+and reloading. Quote exact bounds and aggregate expected values to avoid YAML
+FLOAT conversion. Conditions and allowed values compare DECIMAL values exactly.
+
+Business checks remain mandatory when optional report sections are disabled.
+With reviewed business rules, mixed/negative modes construct a valid formula
+baseline and then inject the planned rule violations, preserving expected-failure
+accounting across embedded and external rules. They produce intentional invalid artifacts with evidence;
+standalone validation reports those violations and CLI generation returns a
+nonzero status when the combined validation fails. All modes retain privacy and
+resource limits. Ordinary synthetic rules confer no transformation authority.

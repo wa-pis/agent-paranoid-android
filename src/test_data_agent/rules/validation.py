@@ -7,7 +7,12 @@ from test_data_agent.core.limits import (
 )
 from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.rules.typed_values import numeric_row, formula_value
 
 from pydantic import BaseModel, Field
 
@@ -22,8 +27,8 @@ from test_data_agent.rules.models import (
     TemporalOrderingRule,
     business_rules_fingerprint,
 )
-from test_data_agent.rules.conditions import condition_matches
-from test_data_agent.rules.expressions import aggregate, comparable_number, numbers_close, parse_datetime, safe_eval
+from test_data_agent.rules.conditions import condition_matches, scalar_equal
+from test_data_agent.rules.expressions import numbers_close, parse_datetime, exact_number, exact_sum, exact_aggregate
 
 
 MAX_REPORTED_RULE_ERRORS = 100
@@ -65,12 +70,18 @@ def validate_business_rules(
     *,
     expected_rule_failures: dict[int, int] | None = None,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> BusinessValidationReport:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     enforce_business_rule_evaluations(estimate_business_rule_evaluations_for_rows(
         rules, {table: len(rows) for table, rows in rows_by_table.items()},
     ))
+    if spec is not None:
+        rows_by_table = {
+            entity.name: [numeric_row(row, entity, budget=budget) for row in budget.iter_rule_work(rows_by_table.get(entity.name, []))]
+            for entity in budget.iter_rule_work(spec.entities)
+        }
     results: list[RuleResult] = []
     for field_rule in budget.iter_rule_work(rules.field_rules):
         results.append(validate_field_rule(rows_by_table, field_rule, budget=budget))
@@ -84,13 +95,13 @@ def validate_business_rules(
         elif isinstance(row_rule, TemporalOrderingRule):
             results.append(validate_temporal_ordering(rows_by_table, row_rule, budget=budget))
         elif isinstance(row_rule, FormulaRule):
-            results.append(validate_formula(rows_by_table, row_rule, budget=budget))
+            results.append(validate_formula(rows_by_table, row_rule, budget=budget, target=spec.entity(row_rule.table).field(row_rule.field) if spec is not None else None))
     for cross_table_rule in budget.iter_rule_work(rules.cross_table_rules):
         if isinstance(cross_table_rule, ForeignKeyRule):
             results.append(validate_foreign_key(rows_by_table, cross_table_rule, budget=budget))
         elif isinstance(cross_table_rule, AggregateFormulaRule):
             results.append(
-                validate_aggregate_formula(rows_by_table, cross_table_rule, budget=budget)
+                validate_aggregate_formula(rows_by_table, cross_table_rule, budget=budget, target=spec.entity(cross_table_rule.table).field(cross_table_rule.field) if spec is not None and cross_table_rule.field != "*" else None)
             )
 
     truncate_report_errors(results)
@@ -140,14 +151,17 @@ def validate_field_rule(
         errors = []
         if rule.required and value in (None, ""):
             errors.append("required")
-        if rule.allowed_values is not None and value not in (None, "") and value not in rule.allowed_values:
+        if rule.allowed_values is not None and value not in (None, "") and not any(scalar_equal(value, item) for item in rule.allowed_values):
             errors.append("allowed_values")
-        number = comparable_number(value)
+        try:
+            number = exact_number(value)
+        except (ValueError, TypeError, ArithmeticError):
+            number = None
         if value not in (None, "") and rule.min_value is not None:
-            if number is None or number < rule.min_value:
+            if number is None or exact_number(number) < exact_number(rule.min_value):
                 errors.append("min_value")
         if value not in (None, "") and rule.max_value is not None:
-            if number is None or number > rule.max_value:
+            if number is None or exact_number(number) > exact_number(rule.max_value):
                 errors.append("max_value")
         record_result(result, not errors, f"{rule.table}[{index}].{rule.field}: {', '.join(errors)}")
     return result
@@ -183,7 +197,7 @@ def validate_conditional_allowed_values(
         if not condition_matches(row, rule.when, budget=budget):
             continue
         value = row.get(rule.field)
-        record_result(result, value in rule.allowed_values, f"{rule.table}[{index}].{rule.field}: allowed_values")
+        record_result(result, any(scalar_equal(value, item) for item in rule.allowed_values), f"{rule.table}[{index}].{rule.field}: allowed_values")
     return result
 
 
@@ -209,20 +223,21 @@ def validate_formula(
     rule: FormulaRule,
     *,
     budget: GenerationBudget | None = None,
+    target: FieldSpec | None = None,
 ) -> RuleResult:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     result = RuleResult(rule_type="formula")
     for index, row in budget.iter_rule_work(enumerate(rows_by_table.get(rule.table, []))):
         try:
-            expected = safe_eval(rule.expression, row, budget=budget)
+            expected = formula_value(rule.expression, row, target, budget=budget)
         except GenerationLimitError:
             raise
         except Exception:
             record_result(result, False, "formula evaluation failed")
             continue
         actual = row.get(rule.field)
-        ok = numbers_close(actual, expected, rule.tolerance)
+        ok = numbers_close(actual, expected, 0 if target is not None and target.data_type == "decimal" and "tolerance" not in rule.model_fields_set else rule.tolerance)
         record_result(result, ok, "formula mismatch")
     return result
 
@@ -248,14 +263,15 @@ def validate_aggregate_formula(
     rule: AggregateFormulaRule,
     *,
     budget: GenerationBudget | None = None,
+    target: FieldSpec | None = None,
 ) -> RuleResult:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     result = RuleResult(rule_type="aggregate_formula")
     rows = rows_by_table.get(rule.table, [])
-    actual = aggregate(rule.field, rows, budget=budget)
     try:
-        expected = rule.expected if rule.expected is not None else safe_eval(rule.expression, {"rows": rows}, budget=budget)
+        actual = len(rows) if rule.field == "*" else exact_sum(rule.field, rows, budget=budget)
+        expected = rule.expected if rule.expected is not None else exact_aggregate(rule.expression, rows, budget=budget)
     except GenerationLimitError:
         raise
     except Exception:
@@ -263,7 +279,7 @@ def validate_aggregate_formula(
         return result
     record_result(
         result,
-        numbers_close(actual, expected, rule.tolerance),
+        numbers_close(actual, expected, 0 if target is not None and target.data_type == "decimal" and "tolerance" not in rule.model_fields_set else rule.tolerance),
         "aggregate formula mismatch",
     )
     return result

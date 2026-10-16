@@ -129,3 +129,8 @@ installing this package does not silently register skills with other agents.
 
 Details for reviewed decimal inference, rule auditing and numeric profile limits:
 [RC4 feedback corrections](docs/rc4-external-feedback.md).
+
+Business rules can travel in `DatasetSpec.business_rules` across Python, CLI, MCP,
+approved agent workspaces and every output format. DECIMAL formulas and aggregate mappings
+use exact arithmetic with one target-scale HALF_UP rounding. See
+[portable business rules](docs/rc4-external-feedback.md#business-rules-across-interfaces).

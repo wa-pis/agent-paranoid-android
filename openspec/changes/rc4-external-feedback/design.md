@@ -6,4 +6,6 @@
 - Privacy defaults intentionally reject ambiguous decimal phone/card/secret-looking values. A narrow explicit numeric_measure semantic, vetoed by sensitive identity/name/policy, allows synthetic high-scale amounts without granting source-row access.
 - Formula assignment and validation both exist; arbitrary formulas cannot be judged for business intent. Separate check-only mode and report assignment counts rather than claiming semantic correctness.
 - Distribution limits are generation parameters historically; new post-rule checks must cover changed numeric values without falsely asserting the source distribution was preserved.
-- Exact decimal native constraints/rounding, EAV reshaping, unrestricted JOINs, raw dictionary names and automatic sensitivity declassification are not silently enabled by feedback.
+- EAV reshaping, unrestricted JOINs, raw dictionary names and automatic sensitivity declassification are not silently enabled by feedback.
+
+- Follow-up: DatasetSpec carries typed business rules into shared generation, validation and export. DECIMAL formulas and aggregates use bounded rational arithmetic, one target-scale HALF_UP rounding, overflow rejection and exact default comparison. Explicit tolerance intent survives serialization.
