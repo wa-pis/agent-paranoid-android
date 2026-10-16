@@ -19,6 +19,7 @@
 - [x] Record explicit stable authorization and select the publicly verified RC5 runtime without changing prior evidence identities.
 - [x] Align stable version/maturity, root lock version, consolidated changelog and release-facing documentation.
 - [x] Review every promotion hunk against `v1.6.0rc5`; retain identical runtime, dependencies, schemas, fixtures, workflows and behavioral/safety tests (apart from the permitted release-version assertion).
+- [x] Reconcile only the documentation target of the archival activation overlay after the architecture-page update; retain every executable patch hunk and both composition tests unchanged.
 - [ ] Complete the outstanding fictional transformation/session campaign for this full stable release, binding installed-artifact results and actual human local-terminal evidence wherever required; retain historical RC5 identities without reopening completed gates.
 - [ ] Freeze stable source, complete the full exact-commit gate and strict documentation/OpenSpec checks.
 - [ ] Obtain independent approval of the exact final main SHA and all four main workflow gates.
