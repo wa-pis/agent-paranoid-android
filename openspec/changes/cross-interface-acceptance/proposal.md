@@ -2,11 +2,12 @@
 
 ## Status and trigger
 
-Planned at the owner's request on 2026-10-16. Execute after the current feedback,
-source/output parity and MCP documentation work is complete, before declaring
-that work accepted or preparing its next release. This change records the plan;
-it does not claim that the campaign has run. Earlier successful checks remain
-historical evidence, not acceptance of a later SHA.
+Planned at the owner's request on 2026-10-16. The automated campaign completed
+on the recorded `408ec527` baseline; actual Codex and exact-specification human
+acceptance remain open. The owner subsequently authorized RC5 preparation and
+publication subject to acceptance; see the separate `rc5-release` change.
+Earlier successful checks remain historical evidence, not acceptance of a later
+SHA. See `docs/acceptance-evidence-1.6.0rc5.md` for identities and limits.
 
 ## Why
 

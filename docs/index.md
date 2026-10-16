@@ -11,11 +11,16 @@ Stable `1.5.0` retains the generation and validation corrections from `1.3.2`. R
 [migration notes](reference/generation-contract-migration.md) before regenerating
 existing fixtures.
 
-Candidate `1.6.0rc4` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc4/). See the [RC4 release evidence](release-evidence-1.6.0rc4.md).
-Stable `1.5.0` remains the recommended release. The explicit candidate pin is:
+Candidate `1.6.0rc5` is being prepared with the
+[RC4 feedback corrections](rc4-external-feedback.md), shared source/output
+contract and MCP permission reference. See the
+[acceptance evidence](acceptance-evidence-1.6.0rc5.md) and
+[release status](rc5-release-status.md).
+Published [RC4](release-evidence-1.6.0rc4.md) remains immutable.
+Stable `1.5.0` remains the recommended release. After RC5 publication, its exact pin is:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc4"
+python3 -m pip install "agent-paranoid-android==1.6.0rc5"
 ```
 
 ## Choose Your Starting Point

@@ -502,6 +502,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
         "rc4-external-feedback",
         "source-output-contract-parity",
         "cross-interface-acceptance",
+        "rc5-release",
     }
 
     transformation = changes / "selective-source-transformation"

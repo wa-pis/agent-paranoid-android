@@ -1,5 +1,11 @@
 # Tasks
 
+Checked execution tasks below describe the frozen `408ec527` runtime campaign,
+including explicitly documented `2eecfd69` runs on its byte-identical wheel.
+See `docs/acceptance-evidence-1.6.0rc5.md`. They do not assert fresh execution
+on the newly versioned RC5 source. Manual tasks remain open; the `rc5-release`
+change tracks exact-RC5 gates and publication separately.
+
 ## Plan recorded
 
 - [x] Audit current matrix, interface applicability, test suites and CI profiles.
@@ -8,20 +14,20 @@
 
 ## Prepare after implementation stabilizes
 
-- [ ] Freeze the candidate SHA, clean checkout, wheel/sdist hashes and environment inventory.
+- [x] Freeze the candidate SHA, clean checkout, wheel/sdist hashes and environment inventory.
 - [x] Build the expected case ledger from schemas, parser, discovery and supported routes; map existing coverage and identify missing cases.
 - [x] Add missing installed CLI/Python/stdio MCP cases and report actual coverage against that ledger.
 - [x] Prepare fictional related-table fixtures, expected invalid outcomes, private temporary workspaces and disposable read-only DB identities.
 
 ## Execute the campaign
 
-- [ ] Rerun full project, schema, documentation, OpenSpec and contract gates on the frozen SHA; classify every skip.
-- [ ] Execute every source × output × mode composition through installed Python, CLI and MCP; record acquisition handoffs honestly.
-- [ ] Run all field/distribution/settings/relationship/constraint/business-rule families, boundary values, compatible pairs and named high-risk interactions.
-- [ ] Exercise real MCP 1/2 discovery, every tool/operation, review/recovery, permission refusals, redaction, audit, budgets, disconnect and teardown.
-- [ ] Verify CLI/Python direct entry points, aliases, errors, override precedence, folder overwrite and failure rollback.
-- [ ] Run Python/dependency installation profiles and actual workloads in all three container targets on AMD64/ARM64.
-- [ ] Run isolated fictional PostgreSQL/Trino acquisition-to-artifact cases with real restricted readers; record them separately from mocked acquisition.
+- [x] Rerun full project, schema, documentation, OpenSpec and contract gates on the frozen SHA; classify every skip.
+- [x] Execute every source × output × mode composition through installed Python, CLI and MCP; record acquisition handoffs honestly.
+- [x] Run all field/distribution/settings/relationship/constraint/business-rule families, boundary values, compatible pairs and named high-risk interactions.
+- [x] Exercise real MCP 1/2 discovery, every tool/operation, review/recovery, permission refusals, redaction, audit, budgets, disconnect and teardown.
+- [x] Verify CLI/Python direct entry points, aliases, errors, override precedence, folder overwrite and failure rollback.
+- [x] Run Python/dependency installation profiles and actual workloads in all three container targets on AMD64/ARM64.
+- [x] Run isolated fictional PostgreSQL/Trino acquisition-to-artifact cases with real restricted readers; record them separately from mocked acquisition.
 - [ ] Run the separately gated transformation/session campaign; obtain actual human local-terminal evidence where required, never agent-issued approval.
 - [ ] Record an actual assistant-client/version run with fictional data and human spec review; automated SDK tests do not satisfy it.
 

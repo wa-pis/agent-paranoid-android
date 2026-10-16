@@ -314,6 +314,23 @@ Stable `1.4.0` completed these requirements at exact commit
 [1.4.0 published evidence](release-evidence-1.4.0.md) for hashes, signed images,
 approval and public verification, including the successful Parquet retry.
 
+## 1.6.0rc5 Feedback And Interface Parity Candidate
+
+The owner requested `1.6.0rc5` after the RC4 feedback corrections, shared
+source/output contract, portable business rules and MCP permission documentation.
+See [the feedback disposition](rc4-external-feedback.md),
+[cross-interface acceptance evidence](acceptance-evidence-1.6.0rc5.md) and
+[RC5 release status](rc5-release-status.md). The `rc5-release` OpenSpec
+change records the authorized release scope. Published RC3 and RC4 stay immutable.
+
+Earlier runtime campaign results retain their actual commit and artifact
+identities; they do not constitute exact-RC5 release gates. Complete actual
+Codex client evidence and human inspection of the exact reviewed specification,
+then obtain independent exact-main review, all four exact-main gates, fresh
+Ubuntu no-publish hashes, signed acceptance and public-artifact verification.
+Permission to publish a release does not approve a dataset or issue local
+preservation authority. RC5 is not yet published.
+
 ## 1.6.0rc4 Generation Modes Candidate
 
 The user requested RC4 after implementing full folder overwrite, edge and

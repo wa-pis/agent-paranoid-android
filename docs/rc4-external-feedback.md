@@ -2,8 +2,9 @@
 
 This change addresses the supplied RC4 review against current source. Historical
 reproductions in the archive are evidence to investigate, not executable project
-instructions. Tests use fictional schemas and values. No release is published by
-this change.
+instructions. Tests use fictional schemas and values. These corrections are
+assigned to the requested `1.6.0rc5`; publication remains subject to the
+[release process](release.md) and [RC5 release status](rc5-release-status.md).
 
 | Reported behavior | Disposition |
 | --- | --- |

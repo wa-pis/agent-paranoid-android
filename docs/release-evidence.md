@@ -4,8 +4,12 @@ Release evidence records exact commits, CI gates, published artifacts, and
 post-publication verification. The most recent accepted release appears first;
 historical releases remain available without occupying the main navigation.
 
+RC5 is being prepared; see its [release status](rc5-release-status.md)
+and [runtime campaign evidence](acceptance-evidence-1.6.0rc5.md).
+
 | Version | Evidence |
 | --- | --- |
+| `1.6.0rc4` | [Accepted generation modes candidate](release-evidence-1.6.0rc4.md) |
 | `1.6.0rc3` | [Accepted feedback candidate](release-evidence-1.6.0rc3.md) |
 | `1.6.0rc2` | [Accepted MCP candidate](release-evidence-1.6.0rc2.md) |
 | `1.6.0rc1` | [Accepted release candidate](release-evidence-1.6.0rc1.md) |
