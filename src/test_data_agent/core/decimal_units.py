@@ -16,6 +16,23 @@ class ExactDecimalError(ValueError):
     """Value-free invalid exact-decimal input."""
 
 
+def decimal_to_text(value: Decimal) -> str:
+    """Bound fixed-point expansion before constructing exact decimal text."""
+    if not value.is_finite():
+        raise ExactDecimalError("invalid decimal value")
+    sign, digits, exponent = value.as_tuple()
+    assert isinstance(exponent, int)
+    digit_count = len(digits)
+    fixed_length = sign + (
+        digit_count + exponent if exponent >= 0
+        else digit_count + 1 if digit_count + exponent > 0
+        else 2 - exponent
+    )
+    if fixed_length > MAX_DECIMAL_DIGITS + 3:
+        raise ExactDecimalError("invalid decimal value")
+    return format(value, "f")
+
+
 def _check_shape(precision: int, scale: int) -> None:
     if (
         type(precision) is not int or not 1 <= precision <= MAX_DECIMAL_DIGITS
@@ -57,7 +74,7 @@ def round_decimal_result(value: Decimal, *, precision: int, scale: int) -> Decim
     try:
         rounded = value.quantize(Decimal((0, (1,), -scale)),
                                  context=Context(prec=MAX_DECIMAL_DIGITS, rounding=ROUND_HALF_UP))
-        units = decimal_to_units(format(rounded, "f"), precision=precision, scale=scale)
+        units = decimal_to_units(decimal_to_text(rounded), precision=precision, scale=scale)
         return decimal_from_units(units, precision=precision, scale=scale)
     except (DecimalException, ExactDecimalError):
         pass
@@ -80,13 +97,13 @@ def sample_decimal(
 def value_matches_decimal(
     value: Any, *, precision: int, scale: int, low: str | None = None, high: str | None = None,
 ) -> bool:
-    if isinstance(value, Decimal):
-        text = format(value, "f")
-    elif isinstance(value, str):
-        text = value
-    else:
-        return False
     try:
+        if isinstance(value, Decimal):
+            text = decimal_to_text(value)
+        elif isinstance(value, str):
+            text = value
+        else:
+            return False
         units = decimal_to_units(text, precision=precision, scale=scale)
         if low is not None and units < decimal_to_units(low, precision=precision, scale=scale):
             return False

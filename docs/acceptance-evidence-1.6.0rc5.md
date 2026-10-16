@@ -2,7 +2,7 @@
 
 ## Status and identities
 
-The automated runtime campaign passed before the RC5 version change. Human
+The historical automated runtime campaign passed before RC5 preparation. Human
 Codex acceptance and RC5 publication remain open. This document records what
 actually ran, without treating a previous artifact as a newly built RC5 wheel.
 The [plan](acceptance-matrix.md) and [release process](release.md) still apply.
@@ -22,6 +22,12 @@ definitions were checked for equivalence. Reports retain their real execution
 SHA. The full source gate and corrected isolated test ran on `408ec527`.
 GitHub's comparison between that head and the CI merge commit has no changed
 files. These are earlier runtime proofs, not fresh RC5 release gates or hashes.
+Independent RC5 review subsequently found unbounded DECIMAL fixed-point
+formatting in typed Parquet and its controlled-invalid fallback. The correction
+uses one bounded converter across validation and output adapters. That runtime
+change supersedes any version-only equivalence: the installed matrix and full
+release gates must run again on the corrected RC5 candidate. Results below
+remain the historical campaign baseline, not acceptance of the correction.
 
 ## Results
 

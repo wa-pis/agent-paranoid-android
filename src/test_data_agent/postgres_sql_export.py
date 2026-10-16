@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_units
+from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_text, decimal_to_units
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
@@ -124,8 +124,8 @@ def postgres_literal(
     if field_type == FieldType.DECIMAL:
         if type(value) not in {Decimal, str} or precision is None or scale is None:
             raise PostgresSqlExportError("PostgreSQL decimal value is invalid")
-        text = format(value, "f") if isinstance(value, Decimal) else value
         try:
+            text = decimal_to_text(value) if isinstance(value, Decimal) else value
             decimal_to_units(text, precision=precision, scale=scale)
         except ExactDecimalError:
             raise PostgresSqlExportError("PostgreSQL decimal value is invalid") from None

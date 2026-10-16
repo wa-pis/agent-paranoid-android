@@ -20,7 +20,7 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import RESERVED_ENTITY_ARTIFACT_BASENAMES, DatasetSpec
-from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
+from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_text, decimal_to_units
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import (
@@ -45,7 +45,7 @@ def dataset_spec_to_json(spec: DatasetSpec) -> str:
 
 def json_decimal(value: Any) -> str:
     if isinstance(value, Decimal) and value.is_finite():
-        return format(value, "f")
+        return decimal_to_text(value)
     raise TypeError("JSON output contains unsupported value")
 
 
@@ -119,7 +119,7 @@ def sql_literal(value: Any) -> str:
     if isinstance(value, Decimal):
         if not value.is_finite():
             raise ValueError("SQL output does not support non-finite decimals")
-        return format(value, "f")
+        return decimal_to_text(value)
     escaped = str(value).replace("'", "''")
     return f"'{escaped}'"
 
@@ -213,7 +213,7 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                 if not isinstance(distribution, DecimalRangeDistribution) or type(value) not in {Decimal, str}:
                     raise TypeError("decimal field has incompatible value")
                 units = decimal_to_units(
-                    format(value, "f") if isinstance(value, Decimal) else value,
+                    decimal_to_text(value) if isinstance(value, Decimal) else value,
                     precision=distribution.precision, scale=distribution.scale,
                 )
                 if not (

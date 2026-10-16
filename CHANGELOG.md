@@ -32,6 +32,7 @@ All notable changes to this project are documented here.
 ### Security
 
 - Apply sensitive-target and rule-literal checks to row and aggregate formulas even when optional reports are disabled.
+- Reject excessive DECIMAL text expansion before validation or CSV, JSON, Parquet and SQL serialization, including controlled-invalid Parquet cells.
 
 See [RC4 feedback disposition](docs/rc4-external-feedback.md) for contracts and limits.
 

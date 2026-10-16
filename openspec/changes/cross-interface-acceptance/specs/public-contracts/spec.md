@@ -47,6 +47,15 @@ safe-profile/reviewed-specification handoffs.
 - **THEN** the bounded plain-text parser admits the sign without consuming digit precision
 - **AND** out-of-precision, exponent-form and oversized inputs remain rejected
 
+#### Scenario: Decimal text expansion exceeds the supported width
+
+- **GIVEN** a Decimal scalar has an unbounded exponent or a non-finite value
+- **WHEN** validation or CSV, JSON, Parquet or SQL serialization handles it
+- **THEN** the shared decimal conversion rejects before fixed-point text allocation
+- **AND** typed Parquet and its controlled-invalid fallback enforce the same bound
+- **AND** rejection contains no cell value and publishes no partial output
+- **AND** valid signed scale-38 values retain their exact representation
+
 ### Requirement: Acceptance Evidence Separates Execution And Authority
 
 Acceptance evidence SHALL bind results to the exact commit, built artifacts and

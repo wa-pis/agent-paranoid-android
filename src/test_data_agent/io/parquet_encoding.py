@@ -7,6 +7,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
+from test_data_agent.core.decimal_units import decimal_to_text
 from test_data_agent.core.serialization import load_limited_json
 
 SCALAR_ENCODING_KEY = b"apa.scalar_encoding"
@@ -14,7 +15,7 @@ SCALAR_ENCODING_KEY = b"apa.scalar_encoding"
 
 def encode_scalar(value: Any) -> str:
     if isinstance(value, Decimal):
-        value = format(value, "f")
+        value = decimal_to_text(value)
     elif isinstance(value, date | datetime):
         value = value.isoformat()
     if value is not None and type(value) not in {str, int, float, bool}:

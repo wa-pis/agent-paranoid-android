@@ -40,6 +40,11 @@ calls. Sensitive names, semantics and flags veto typed literal targets even when
 optional validation reports are disabled. Only reviewed DECIMAL `numeric_measure`
 fields retain their existing scoped numeric-literal exception.
 Quoted field references in aggregate calls remain metadata rather than literal values.
+Decimal validation and CSV, JSON, Parquet and SQL serialization share a
+fixed-point text bound of 41 characters, covering sign, leading zero, decimal
+point and 38 fractional digits. Non-finite values and excessive expansion fail
+before formatting, including controlled-invalid Parquet fallback cells. This
+does not relax declared precision, scale or range checks.
 Recognizable phone/card-like DECIMAL bounds and final values fail closed even
 when optional validation reporting is disabled. Do not treat a declared numeric
 type as permission to bypass content checks. Explicit reviewed `numeric_measure`
