@@ -93,6 +93,40 @@ def test_generator_stdio_lower_level_synthetic_tools_and_profile_handoff(tmp_pat
     asyncio.run(asyncio.wait_for(run(), timeout=40))
 
 
+def test_generator_stdio_formula_privacy_refuses_every_publication_format(tmp_path):
+    (tmp_path / "spec.json").write_text(json.dumps({
+        "entities": [{"name": "records", "row_count": 1, "fields": [{
+            "name": "phone", "data_type": "integer", "sensitive": True,
+            "distribution": {"kind": "numeric", "min_value": 1,
+                             "max_value": 9, "scale_factor": 2},
+        }]}],
+        "business_rules": {"row_rules": [{"type": "formula", "table": "records",
+            "field": "phone", "expression": "123456789"}]},
+        "validation_settings": {"validate_privacy": False},
+    }))
+    parameters = StdioServerParameters(command=sys.executable,
+        args=["-m", "test_data_agent.mcp_generator_server"],
+        env=_environment(tmp_path), cwd=str(Path(__file__).resolve().parents[1]))
+
+    async def run():
+        with (tmp_path / "stderr.log").open("w+") as errors:
+            async with stdio_client(parameters, errlog=errors) as (reader, writer):
+                async with ClientSession(reader, writer, read_timeout_seconds=_timeout()) as client:
+                    await client.initialize()
+                    for tool in ("generate_dataset", "export_dataset"):
+                        for output_format in ("csv", "json", "parquet", "sql"):
+                            output = f"{tool}-{output_format}"
+                            result = await client.call_tool(tool, {"spec_path": "spec.json",
+                                "output_folder": output, "output_format": output_format})
+                            assert result.model_dump(by_alias=True)["isError"]
+                            assert "123456789" not in result.model_dump_json()
+                            assert not (tmp_path / output).exists()
+            errors.seek(0)
+            assert "123456789" not in errors.read()
+
+    asyncio.run(asyncio.wait_for(run(), timeout=40))
+
+
 @pytest.mark.parametrize("row_opt_in", [False, True])
 def test_trino_stdio_all_aggregate_tools_with_standin_and_authenticated_audit(tmp_path, row_opt_in):
     """Exercise real transport/dispatch, with an explicitly fictional profiler."""
