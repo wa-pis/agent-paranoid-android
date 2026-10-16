@@ -29,6 +29,11 @@ Do not bypass repository protections or change published RC3/RC4 tags.
 
 ## Status
 
-Release preparation is in progress. Prior campaign evidence is documented in
-`docs/acceptance-evidence-1.6.0rc5.md`; exact-RC5 gates and public verification
-remain required. The five-minute continuation stops after public verification.
+Frozen runtime main `890925afdff68e97cafe38a28605d2874c9dad79` passed the full
+gate, independent AI source review, all four main workflows and fresh Ubuntu
+no-publish artifact/hash checks. `docs/acceptance-evidence-1.6.0rc5.md` keeps
+those results separate from the historical campaign and later documentation.
+Actual current-specification Codex human acceptance remains open; resuming the
+prepared plan requires fresh inspection, full-file review and new consent.
+Signed acceptance, publication and public verification remain required. The
+five-minute continuation stops after successful public verification.

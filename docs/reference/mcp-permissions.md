@@ -106,6 +106,13 @@ client must obtain that review before calling approval. Advanced direct
 generation tools do not enforce this planning sequence. Do not automatically
 allow them to bypass the review-first client policy.
 
+Resuming an existing client conversation adds no rights. Restore its existing
+workspace, installation, connection and narrow tool policy, then
+[inspect the saved plan and review the full current specification](../how-to/mcp.md#resume-an-existing-synthetic-plan)
+before new dataset consent. Client tool prompts, operating-system access and
+dataset review remain separate; an earlier consent phrase or successful resume
+preflight does not establish current-specification review.
+
 Preservation receipts must be issued by the separate human local CLI through
 its controlling terminal. MCP has no preservation approval tool or `approved`
 boolean. A hash, tool-call confirmation or database grant cannot replace the

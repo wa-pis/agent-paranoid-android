@@ -105,14 +105,57 @@ The approval response should report `row_counts: {"customers": 4}`,
 approval receipt. Inspect the same workspace again to confirm `phase: completed`.
 Report these summaries and paths; do not attach or inline dataset rows.
 
+### Resume An Existing Synthetic Plan
+
+If the client closes after planning, keep the agent workspace and resume the
+same conversation through the client's normal session-resume action. Restore
+the same verified installation, workspace root, MCP connection and tool filter.
+Keep the existing model, authentication, sandbox and confirmation policy. Run
+only one copy of that client session.
+
+For the Codex CLI, the upstream client command is `codex resume SESSION_ID`;
+replace `SESSION_ID` with the existing conversation's identifier. This is a
+Codex command, not an Agent Paranoid Android option. If the original launch
+supplied MCP settings only for that invocation, reapply those same settings
+through the reviewed client launcher when resuming. A bare resume command does
+not establish that the required server and tool filter were restored.
+
+Continue with `inspect_dataset_plan` for the existing workspace. Do not replay
+`plan_dataset`, delete the plan, or choose a new workspace merely to clear a
+non-empty-directory refusal. A launcher refusing to create a second plan does
+not establish that the package or final-commit checks failed.
+
+When the phase is `awaiting_approval`:
+
+1. Inspect the current plan and make the entire current `dataset_spec.yaml`
+   available for the human to open and read. Check both its file bytes and
+   `review.current_spec_sha256` against the specification being reviewed.
+2. Obtain fresh, explicit human consent for that exact current specification.
+   A model's summary, copied fingerprint, bootstrap prompt, general release
+   authorization or consent sent before the final specification was prepared
+   does not complete this review.
+3. Immediately before approval, inspect and check the same file again. Changed
+   bytes require another full-file view and renewed consent.
+4. Call `approve_dataset_plan` with the unchanged reviewed fingerprint, then
+   `validate_dataset` and inspect the completed workspace. Report validation,
+   counts and artifact paths without returning rows.
+
+Client-session resume and `recover_dataset_plan` are different operations.
+For an interrupted approval, follow the state returned by inspection: report
+an existing `completed` result, use recovery only when `next_action` requests
+it, and stop for inspection on an unexpected state. Resuming a conversation
+does not itself approve a dataset or authorize preservation. See the
+[permission boundaries](../reference/mcp-permissions.md#choose-a-client-policy-and-check-it).
+
 ### Corrective Next Steps
 
 - Missing executable or MCP extra: check the absolute path, install `[mcp]`
   into that environment, and restart the client.
 - Rejected workspace path: move the input inside the configured root and use
   relative paths. Do not expand permissions to bypass the boundary.
-- Non-empty planning directory: select a new workspace; inspect an existing
-  plan instead of overwriting it.
+- Non-empty planning directory: inspect the existing plan and
+  [resume its review](#resume-an-existing-synthetic-plan). Use a new workspace
+  only when deliberately starting a separate dataset.
 - Stale review fingerprint: inspect, review the changed specification, and
   obtain renewed human approval before submitting its current fingerprint.
 - Interrupted approval or a lost response: inspect first. If `phase` is

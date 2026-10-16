@@ -24,3 +24,12 @@ substitute for human review of a particular dataset specification.
 - **WHEN** publication readiness is assessed
 - **THEN** RC5 remains unpublished until the required step is resolved
 - **AND** existing release tags and repository protections remain unchanged
+
+#### Scenario: A prepared manual plan is resumed
+
+- **GIVEN** an actual client created a plan and the final specification was prepared afterward
+- **WHEN** the human resumes that existing client conversation
+- **THEN** the existing plan is inspected without replaying planning or deleting its workspace
+- **AND** the full current specification is made available for human review before new specific consent
+- **AND** consent predating that specification, resume preflight and automated checks do not close manual acceptance
+- **AND** approval, validation, artifact verification and actual client completion remain separately evidenced
