@@ -140,7 +140,8 @@ agent workspace or dataset artifact.
 
 The experimental GigaChat adapter uses the official `gigachat` Python SDK
 directly; it does not require GigaChain or LangChain. It is included in
-stable `1.5.0` through the explicit `gigachat` extra. Follow
+stable `1.5.0` through the explicit `gigachat` extra and retained in prospective
+stable `1.6.0` after verified publication; see [release status](../1.6.0-release-status.md). Follow
 [Use The GigaChat Advisor](../how-to/gigachat.md) for installation,
 authentication, and the CLI workflow.
 

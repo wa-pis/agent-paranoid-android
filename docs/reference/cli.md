@@ -1,5 +1,12 @@
 # CLI Command Index
 
+Stable `1.6.0` is being prepared from the publicly accepted `1.6.0rc5`
+runtime with the same commands and safety boundaries. Existing “RC” headings
+and anchors identify that baseline. Stable publication still requires the
+exact-commit release gates; see the
+[1.6.0 release status](../1.6.0-release-status.md). The separate
+transformation/session acceptance campaign remains open.
+
 Generation retains supported intentionally invalid output and its validation
 report, but returns exit `1` / JSON status `validation_failed` when validation
 fails, including `mixed` and `negative` modes. Spec, profile and CSV inputs use
@@ -185,8 +192,9 @@ same digest and receipt. Editing an input, policy, mapping or output setting
 requires a fresh review; a receipt is not a reusable blanket approval. Agents
 can consume a matching receipt but cannot issue one.
 
-Migration from published 1.5.0 requires an explicitly accepted candidate;
-installing 1.5.0 does not expose `transform-batch`. Keep ordinary source-free
+Migration from published `1.5.0` uses an explicitly accepted release from the
+1.6 line; the prepared stable promotion retains the RC5 command contract.
+Installing `1.5.0` does not expose `transform-batch`. Keep ordinary source-free
 generation workflows separate and retain their existing schemas. A transformed
 bundle may deliberately contain preserved or explicitly mapped source values;
 it is not an anonymity guarantee. Protect its destination as potentially

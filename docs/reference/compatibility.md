@@ -4,6 +4,12 @@ This inventory covers aliases and wrappers retained while the package
 converges on its `1.0` public API. New code should use the canonical surface,
 but retained entries remain tested for their stated window.
 
+Stable `1.6.0` preparation promotes the publicly accepted `1.6.0rc5` runtime
+without changing these compatibility contracts. Its exact-commit review,
+release gates and publication remain separate requirements; see the
+[release status](../1.6.0-release-status.md). References to `1.5.0` below describe
+the earlier stable release, not an exclusion from the prepared `1.6.0` scope.
+
 ## Command Aliases
 
 | Retained command | Canonical command | Status | Support window |
@@ -68,16 +74,18 @@ broader compatibility rules.
 
 ## Transformation Candidate Scope
 
-Published 1.5.0 compatibility does not include the 1.6 transformation candidate.
-The 1.6 RC composition registers the single-source and saved-profile common
+Published `1.5.0` does not include the transformation workflows accepted in
+`1.6.0rc5` and retained by the prepared `1.6.0` promotion.
+That composition registers the single-source and saved-profile common
 CLI/MCP workflows plus configured SQL sessions. Ordinary generation APIs remain
 source-free. The running generator server adds `common_transformation` and
 `configured_query_session`; custom SDK embedding must explicitly inject its
 workspace/session owner and close that owner on shutdown. Final exact-SHA safety
 and release gates remain required. See the
-[candidate CLI contract](cli.md#implemented-rc-execution-candidate) and
-[closed common-profile contract](cli.md#closed-common-profile-workflow-candidate).
-Command discovery is not dataset approval or a promise of released compatibility.
+[single-source CLI contract](cli.md#implemented-rc-execution-candidate) and
+[common-profile contract](cli.md#closed-common-profile-workflow-candidate).
+Command discovery is not dataset approval or completion of the separate
+transformation/session acceptance campaign.
 
 Imported `FieldProfile` and `FieldSpec` distributions accept empty `{}` or a
 supported typed `kind`. Nonempty objects with missing, non-string or unknown

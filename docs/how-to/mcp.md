@@ -1,5 +1,12 @@
 # Connect An MCP Client
 
+Stable `1.6.0` is being prepared from the publicly accepted `1.6.0rc5`
+runtime. The workflows below describe that unchanged composition; headings
+labelled “1.6 RC” retain their existing links. Check the
+[1.6.0 release status](../1.6.0-release-status.md) and installation guide before
+selecting a package. Preparation does not establish stable publication or close
+the separate transformation/session acceptance campaign.
+
 The project exposes two MCP servers with separate trust boundaries:
 
 - the generator's ordinary file tools use one workspace; configured SQL

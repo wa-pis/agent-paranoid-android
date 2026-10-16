@@ -6,6 +6,12 @@ inventory and completed extraction remain the historical baseline; current
 contract fixtures include later reviewed additions. This inventory does not
 declare internal modules public or approve a contract change.
 
+Stable `1.6.0` preparation retains this accepted RC5 runtime and ownership map.
+References to the “1.6 RC” composition remain valid for that unchanged promotion;
+they do not establish stable publication or close the separate
+transformation/session acceptance campaign. See the
+[release status](../1.6.0-release-status.md).
+
 The golden fixtures under `tests/fixtures/contracts/` remain authoritative.
 The original reviewed activation added `transform-execute` and local
 `transform-approve` CLI entrances and the workspace consumer

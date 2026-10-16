@@ -16,11 +16,17 @@ evidence inputs include:
 - a bounded sample or safe profile with representative distributions;
 - a short description of the business invariants that must reconcile.
 
-In stable 1.5.0, user-facing source paths are CSV files or folders, validated
-safe profiles, and optional PostgreSQL and Trino integrations. PostgreSQL uses
-mandatory schema/table/column allowlists and bounded aggregate profiling; see
-the [PostgreSQL workflow](../how-to/postgresql.md). SQL DDL, Django models, and
-SQLAlchemy models are not first-class CLI inputs.
+CSV files or folders, validated safe profiles and optional PostgreSQL and Trino
+integrations are available in stable `1.5.0`. Prospective stable `1.6.0` retains
+these and the accepted RC5 `profile-parquet` route for one Parquet file with the
+optional `parquet` extra, followed by reviewed spec inference or an authored
+`DatasetSpec`; see [release status](../1.6.0-release-status.md). Unknown null
+statistics require an authored spec; exact DECIMAL inference requires reviewed
+bounds. PostgreSQL uses mandatory schema/table/column
+allowlists and bounded aggregate profiling; see the
+[PostgreSQL workflow](../how-to/postgresql.md) and
+[source/output matrix](../reference/source-output-matrix.md). SQL DDL, Django
+models and SQLAlchemy models are not first-class CLI inputs.
 
 The output is a fresh synthetic dataset for development, integration tests,
 analytics changes, forecasting, or budgeting experiments. It is not a masked

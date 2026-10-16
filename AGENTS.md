@@ -36,6 +36,12 @@ transformation/session acceptance campaign remains open, as recorded in
 `docs/acceptance-evidence-1.6.0rc5.md`. Existing generation, profiling and
 advisors remain source-free; MCP transformation returns no rows.
 
+Stable `1.6.0` preparation promotes this publicly accepted RC5 runtime through
+version and documentation changes only; see `docs/1.6.0-release-status.md`.
+The new stable commit still requires independent exact-SHA review and every
+release gate before publication. This promotion does not approve a dataset,
+activate an extension or close the separate transformation/session campaign.
+
 Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
 evidence, a bounded operator comment, and fresh interactive local-CLI approval
