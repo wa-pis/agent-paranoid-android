@@ -66,12 +66,18 @@ category literals, preserve-as-is, caller SQL stars, row-returning tools,
 provider payloads, default MCP literals, logs, or errors. Exact table-column
 entries retain their existing bounded category-summary policy.
 
-Start the Trino MCP server only after `doctor` reports valid configuration:
+Check that the Trino capability is installed, then start the MCP server:
 
 ```bash
 test-data-agent doctor --require-extra trino
 test-data-agent-mcp-trino
 ```
+
+`doctor` checks the installed driver, safe-SQL support and configured deployment
+budget profile using a local smoke check. It does not validate the selected
+endpoint, authentication or catalog/schema allowlists, or contact Trino.
+Server startup and tool calls enforce their respective configuration and access
+checks; a successful local doctor check does not prove database access.
 
 The explicit opt-in `run_safe_select` surface is disabled by default. Enabling
 it is a separate row-privacy contract: every string is recursively masked, but

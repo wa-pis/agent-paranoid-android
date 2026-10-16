@@ -161,7 +161,8 @@ python -m pip show agent-paranoid-android
 
 ## Output Already Exists
 
-Folder bundles require a new or empty directory. Choose a new path:
+Folder workflows without overwrite support require a new or empty directory.
+For example, choose a new path for `generate-from-example`:
 
 ```bash
 test-data-agent generate-from-example data/example_dataset \
@@ -171,12 +172,15 @@ test-data-agent generate-from-example data/example_dataset \
   --output out/run-002
 ```
 
-Use `--overwrite` only for commands that explicitly support replacing a
-single-file output or the same complete manifest-owned single-entity bundle.
-A different primary filename or format, invalid or missing manifest, stale
-sidecar, or unrelated sibling is rejected before replacement. Use a new output
-folder instead of deleting evidence from an incomplete or mixed bundle. Never
-point output at a source file or source folder.
+DatasetSpec `generate --overwrite` replaces the entire output folder, including
+obsolete files, after generation and validation. Review the destination first;
+see [folder replacement and rollback](../reference/generation-modes.md).
+
+Single-entity file bundles use separate ownership checks. A different primary
+filename or format, invalid or missing manifest, stale sidecar, or unrelated
+sibling is rejected before replacement. Use a new output folder instead of
+deleting evidence from an incomplete or mixed file bundle. Never point output
+at a source file or source folder.
 
 ## Missing Optional Dependency
 

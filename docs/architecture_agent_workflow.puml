@@ -12,8 +12,8 @@ participant "agent.py\nplan_agent_request" as PlanAgent
 participant "Safe Profiling\nCSV / folder / profile" as Profiling
 participant "Spec Planner\nDatasetProfile -> DatasetSpec" as SpecPlanner
 database "Agent Workspace\nagent_request.json\nagent_plan.json\nprofile.json\ndataset_spec.yaml" as Workspace
-participant "CLI\nagent-review / agent-advise" as ReviewCli
-participant "CLI\nagent-approve / agent-recover" as ApproveCli
+participant "CLI agent-review / agent-advise\nMCP inspect_dataset_plan" as ReviewCli
+participant "CLI agent-approve / agent-recover\nMCP approve_dataset_plan / recover_dataset_plan" as ApproveCli
 participant "agent.py\napprove / recover" as ApproveAgent
 participant "Synthetic Generator\nseeded deterministic" as Generator
 participant "Safety Checks\nPII + source-row reuse" as Safety
@@ -29,7 +29,10 @@ PlanAgent -> SpecPlanner : infer reviewable spec
 SpecPlanner --> PlanAgent : DatasetSpec
 PlanAgent -> Workspace : write request, plan,\nprofile, spec
 PlanAgent --> Ai : awaiting_approval\nartifact paths
-Ai --> User : summarize spec\nask for approval
+Ai -> ReviewCli : inspect current plan and fingerprint
+ReviewCli -> Workspace : load current DatasetSpec
+ReviewCli --> Ai : metadata checklist + exact fingerprint
+Ai --> User : show complete current spec\nand request explicit review/consent
 
 User -> Workspace : review or edit\ndataset_spec.yaml
 opt provider advice requested
@@ -40,10 +43,16 @@ opt provider advice requested
   ReviewCli -> Workspace : validate + persist proposal
   ReviewCli --> User : review required again\nnew fingerprint
 end
-User -> ApproveCli : approve workspace
-ApproveCli -> ApproveAgent : workspace path
+opt specification changed during review
+  Ai -> ReviewCli : inspect the saved current plan again
+  ReviewCli -> Workspace : reload exact current DatasetSpec
+  ReviewCli --> Ai : updated fingerprint
+  Ai --> User : present full current spec again\nand request fresh consent
+end
+User -> ApproveCli : explicit current-spec approval\n+ reviewed fingerprint
+ApproveCli -> ApproveAgent : workspace path +\nreviewed_spec_sha256
 ApproveAgent -> Workspace : load reviewed request,\nprofile, DatasetSpec
-ApproveAgent -> Generator : generate rows\nfrom spec + seed
+ApproveAgent -> Generator : verify unchanged fingerprint; generate\nfrom spec + seed + embedded business rules
 Generator --> ApproveAgent : synthetic rows
 ApproveAgent -> Safety : verify no source rows copied\nwhen CSV source exists
 Safety --> ApproveAgent : safety ok
@@ -70,7 +79,7 @@ The workspace is the handoff contract:
 reviewable spec first, generation only
 after explicit approval.
 This generation approval is not a preservation
-receipt for the gated transformation candidate.
+receipt for the separate transformation workflow.
 end note
 
 @enduml

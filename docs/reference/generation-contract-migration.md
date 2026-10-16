@@ -1,10 +1,9 @@
 # Generation Contract Corrections
 
 The original generation corrections below describe an earlier upgrade, not the
-current release target. The current development target is `1.6.0rc1`; it is not
-yet publicly accepted or published, and stable `1.6.0` is not authorized by this
-candidate process. Use the published stable installation instructions until
-public candidate verification completes.
+current release target. Candidate `1.6.0rc5` is published and publicly verified;
+see its [release evidence](../release-evidence-1.6.0rc5.md). Stable `1.5.0` remains
+the recommended release; stable `1.6.0` is not authorized by this candidate process.
 
 ## Changed Results
 
@@ -34,12 +33,13 @@ rule mutations are checked again before publication. Failures preserve existing
 output and do not publish a new successful bundle.
 
 Explicit mixed and negative generation still publish controlled-invalid data
-with validation evidence for formats that can represent those rows. Parquet
-rejects the entire export when an intentionally invalid value is incompatible
-with its declared physical type; no partial dataset or manifest is published,
-and an existing output remains unchanged. Row privacy remains mandatory in
-every mode.
-The 1.6 candidate CLI reports `validation_failed` with exit 1 for intentionally
+with validation evidence. RC5 Parquet uses explicitly marked scalar columns
+when intentionally malformed cells cannot fit native Arrow types. The bundle
+reader restores those cells for validation; consumers reading Parquet directly
+must inspect the `apa.scalar_encoding` field metadata. Ordinary valid-mode
+values incompatible with declared types still reject the whole export without
+partial publication. Row privacy remains mandatory in every mode.
+The RC5 CLI reports `validation_failed` with exit 1 for intentionally
 invalid results while retaining the representable output, manifest and report.
 Explicit mode/ratio overrides must be reflected in effective execution evidence;
 an invalid artifact is not a successful validation.

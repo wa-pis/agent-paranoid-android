@@ -114,8 +114,12 @@ does not authorize any other field or any external-provider destination.
 
 CSV opt-in preservation currently accepts string enums with at most 20 values,
 each at most 64 characters, after the same content checks used for other local
-category sources. Repeated non-sensitive string ID fields use synthetic
-categories by default; their source identifiers are not preserved.
+category sources. Repeated low-cardinality string ID columns can remain
+categorical and use synthetic category labels. Fields classified as identifiers
+use a fixed synthetic key pool when a bounded repeated distinct count is
+available: only the count is carried forward, not source keys or their
+frequencies. Generated string identifiers use `synthetic_` plus an ASCII integer.
+Censored distinct counts do not infer a pool; source identifiers are not preserved.
 
 Distinct counting retains at most 100,000 SHA-256 fingerprints per column,
 separately from the bounded raw frequency sample. Below that limit it detects
