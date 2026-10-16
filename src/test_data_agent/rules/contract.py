@@ -261,17 +261,21 @@ def estimate_business_rule_evaluations_for_rows(
             estimated += row_count * expression_complexity(row_rule.expression)
         else:
             estimated += row_count
+    if negative:
+        # Baseline and before/after row audits account for collateral failures.
+        # Rule dispatch visits every local rule for each selected row.
+        estimated += 3 * estimated + 2 * rules.rule_count * sum(row_counts.values())
     for cross_table_rule in rules.cross_table_rules:
         if isinstance(cross_table_rule, ForeignKeyRule):
             parents = row_counts.get(cross_table_rule.parent_table, 0)
             children = row_counts.get(cross_table_rule.child_table, 0)
-            estimated += parents + children
+            estimated += (3 if negative else 1) * (parents + children)
             if negative:
                 estimated += 4 * parents * children
         elif isinstance(cross_table_rule, AggregateFormulaRule):
             rows = row_counts.get(cross_table_rule.table, 0)
             complexity = expression_complexity(cross_table_rule.expression)
-            estimated += rows * (1 + complexity)
+            estimated += (3 if negative else 1) * rows * (1 + complexity)
             if negative and cross_table_rule.field != "*":
                 estimated += rows * rows * (1 + complexity)
     if rules.scenarios:

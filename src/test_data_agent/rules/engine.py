@@ -37,6 +37,14 @@ from test_data_agent.rules.models import (
     TemporalOrderingRule,
 )
 from test_data_agent.rules.scenarios import apply_scenarios
+from test_data_agent.rules.validation import (
+    validate_business_rules,
+    validate_conditional_allowed_values,
+    validate_conditional_required,
+    validate_field_rule,
+    validate_formula,
+    validate_temporal_ordering,
+)
 
 
 @dataclass(frozen=True)
@@ -103,6 +111,7 @@ def apply_business_rules(
             ratio,
             expected_rule_failures=expected_rule_failures,
             budget=budget,
+            spec=spec,
         )
     if spec is not None:
         for entity in budget.iter_rule_work(spec.entities):
@@ -208,9 +217,15 @@ def inject_invalid_cases(
     *,
     expected_rule_failures: dict[int, int] | None = None,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    baseline = validate_business_rules(rows_by_table, rules, budget=budget, spec=spec)
+    if not baseline.valid:
+        raise ValueError("controlled invalid generation requires a valid business-rule baseline")
+    # Cross-table rules are audited only twice, not for every mutated row.
+    cross_rules = rules.model_copy(update={"field_rules": [], "row_rules": [], "scenarios": []})
     for table, rows in budget.iter_rule_work(rows_by_table.items()):
         cases = invalid_cases_for_table(table, rules, budget=budget)
         if not cases:
@@ -220,6 +235,10 @@ def inject_invalid_cases(
             if rng.random() > invalid_ratio:
                 continue
             case = cases[case_index]
+            before = (
+                local_rule_failures(row, table, rules, budget=budget, spec=spec)
+                if expected_rule_failures is not None else {}
+            )
             apply_invalid_case(row, case, rows_by_table, budget=budget)
             if expected_rule_failures is not None:
                 if case.kind == "aggregate_formula":
@@ -228,7 +247,51 @@ def inject_invalid_cases(
                     expected_rule_failures[case.rule_index] = (
                         expected_rule_failures.get(case.rule_index, 0) + 1
                     )
+                after = local_rule_failures(row, table, rules, budget=budget, spec=spec)
+                for rule_index, failed in budget.iter_rule_work(after.items()):
+                    if rule_index != case.rule_index and failed and not before[rule_index]:
+                        expected_rule_failures[rule_index] = expected_rule_failures.get(rule_index, 0) + 1
             case_index = (case_index + 1) % len(cases)
+    if rules.cross_table_rules and expected_rule_failures is not None:
+        cross_after = validate_business_rules(rows_by_table, cross_rules, budget=budget, spec=spec)
+        offset = len(rules.field_rules) + len(rules.row_rules)
+        for index, (before_result, after_result) in budget.iter_rule_work(enumerate(zip(
+            baseline.results[offset:], cross_after.results, strict=True,
+        ))):
+            # Never authorize a cross-table failure present before injection.
+            if before_result.failed == 0 and after_result.failed:
+                rule_index = offset + index
+                expected_rule_failures[rule_index] = max(
+                    expected_rule_failures.get(rule_index, 0), after_result.failed,
+                )
+
+
+def local_rule_failures(
+    row: dict[str, Any], table: str, rules: BusinessRules, *,
+    budget: GenerationBudget, spec: DatasetSpec | None,
+) -> dict[int, int]:
+    """Evaluate only this row, retaining original rule indices and typed arithmetic."""
+    entity = spec.entity(table) if spec is not None else None
+    values = {table: [numeric_row(row, entity, budget=budget) if entity is not None else row]}
+    failures = {}
+    for index, field_rule in budget.iter_rule_work(enumerate(rules.field_rules)):
+        if field_rule.table == table:
+            failures[index] = validate_field_rule(values, field_rule, budget=budget).failed
+    offset = len(rules.field_rules)
+    for index, rule in budget.iter_rule_work(enumerate(rules.row_rules)):
+        if rule.table != table:
+            continue
+        if isinstance(rule, ConditionalRequiredRule):
+            result = validate_conditional_required(values, rule, budget=budget)
+        elif isinstance(rule, ConditionalAllowedValuesRule):
+            result = validate_conditional_allowed_values(values, rule, budget=budget)
+        elif isinstance(rule, TemporalOrderingRule):
+            result = validate_temporal_ordering(values, rule, budget=budget)
+        else:
+            result = validate_formula(values, rule, budget=budget,
+                                      target=entity.field(rule.field) if entity is not None else None)
+        failures[offset + index] = result.failed
+    return failures
 
 
 def invalid_cases_for_table(

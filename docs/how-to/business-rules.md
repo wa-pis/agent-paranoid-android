@@ -111,6 +111,16 @@ violations change only the configured concrete numeric field. Count-style
 aggregate rules with `field: "*"` are validation-only because changing row
 counts would also break the dataset shape.
 
+One selected invalid mutation can break several overlapping rules. The engine
+audits the affected row before and after mutation and includes newly broken
+local rules in the expected counts. Cross-table rules are checked before and
+after the injection pass; newly broken rules with a valid baseline are also
+counted. Injection requires a valid business-rule baseline and refuses an
+already invalid baseline before introducing negative cases. Standalone
+validation still reports unplanned failures as unexpected. An injection
+that does not break its selected rule still reports a missing expected failure.
+These audits share the normal work and deadline budgets.
+
 The business validation report compares expected and observed violations per
 rule. `unexpected_violation_count` identifies failures that were not selected
 by controlled invalid generation; `missing_expected_violation_count` identifies
