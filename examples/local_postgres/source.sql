@@ -23,6 +23,9 @@ INSERT INTO public.orders VALUES
     (103, 2, 'shipped', NULL, FALSE),
     (104, 3, 'paid', 17.75, FALSE);
 
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE TEMPORARY ON DATABASE apa_source FROM PUBLIC;
+
 GRANT CONNECT ON DATABASE apa_source TO apa_reader;
 GRANT USAGE ON SCHEMA public TO apa_reader;
 GRANT SELECT ON public.customers, public.orders TO apa_reader;

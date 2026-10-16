@@ -18,7 +18,13 @@ required.
 Pull requests build and run every target on both architectures. ARM64 checks
 use QEMU only as CI execution support; the resulting image still reports
 `arm64` and must pass the same non-root, read-only, network-isolated health
-contract as the native AMD64 validation.
+contract as the native AMD64 validation. Both architectures also run actual
+installed CLI generation, validation and seeded replay in JSON, CSV and SQL;
+generator MCP profiling, inference, generation, validation and export over
+stdio; and Trino MCP discovery plus an excluded-catalog refusal before network
+access. Evidence records the source commit and image digest. The minimal images
+also prove a safe missing-Parquet-extra refusal. Live database acquisition is a
+separate disposable-database campaign, not a health-check claim.
 
 ## Build Locally
 

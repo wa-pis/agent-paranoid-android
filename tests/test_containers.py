@@ -264,3 +264,39 @@ def test_container_health_rejects_root_and_unexpected_dependency(
     )
     with pytest.raises(ContainerHealthError, match="unexpected modules: trino"):
         container_health.check_container_health("cli")
+
+
+def test_container_workloads_run_in_both_architecture_jobs() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/containers.yml").read_text())
+    for job, platform in (("validate", "linux/amd64"), ("validate-arm64", "linux/arm64")):
+        steps = workflow["jobs"][job]["steps"]
+        workload = next(step for step in steps if "scripts/accept_container_workloads.py" in step.get("run", ""))
+        assert f"--platform {platform}" in workload["run"]
+        assert "--target ${{ matrix.target }}" in workload["run"]
+
+
+def test_container_workload_launcher_preserves_runtime_restrictions() -> None:
+    from scripts.accept_container_workloads import container_arguments
+
+    command = container_arguments("fictional:image", "generator-mcp", "linux/arm64", "fictional-test")
+    assert command[:4] == ["docker", "run", "--rm", "-i"]
+    for required in ("--read-only", "--network", "none", "--cap-drop", "ALL", "--security-opt", "no-new-privileges", "--memory", "512m"):
+        assert required in command
+    assert "--privileged" not in command
+    assert "--volume" not in command
+    assert "--publish" not in command
+    assert "/workspace:size=1g,nosuid,nodev,uid=65532,gid=65532" in command
+
+
+def test_postgres_acquisition_ci_uses_installed_package_and_disposable_examples() -> None:
+    workflow = yaml.safe_load((ROOT / ".github/workflows/ci.yml").read_text())
+    job = workflow["jobs"]["postgres-integration"]
+    assert job["env"]["TEST_POSTGRES_INTEGRATION"] == "1"
+    assert job["env"]["TDA_PYTHON"] == "${{ github.workspace }}/.venv/bin/python"
+    commands = "\n".join(step.get("run", "") for step in job["steps"])
+    assert "--no-editable --no-build-isolation" in commands
+    assert "tests/integration/test_postgres_query_example.py" in commands
+    assert "--junitxml=postgres-integration.xml" in commands
+    source = (ROOT / "examples/local_postgres/source.sql").read_text()
+    assert "REVOKE CREATE ON SCHEMA public FROM PUBLIC" in source
+    assert "REVOKE TEMPORARY ON DATABASE apa_source FROM PUBLIC" in source

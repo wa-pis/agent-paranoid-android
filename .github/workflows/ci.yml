@@ -322,6 +322,56 @@ jobs:
       - name: Run dependency contract tests
         run: .venv/bin/python -m pytest ${{ matrix.test-paths }}
 
+  postgres-integration:
+    name: PostgreSQL integration
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TEST_POSTGRES_INTEGRATION: "1"
+      TDA_PYTHON: ${{ github.workspace }}/.venv/bin/python
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "0.11.23"
+          enable-cache: true
+          prune-cache: true
+
+      - name: Prepare disposable PostgreSQL tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql postgresql-client
+          echo "$(pg_config --bindir)" >> "${GITHUB_PATH}"
+
+      - name: Install locked package without editable imports
+        run: |
+          uv sync --frozen --all-extras --python python --no-install-project
+          uv sync --frozen --all-extras --python python --no-editable --no-build-isolation
+
+      - name: Run four fictional PostgreSQL acquisition routes
+        run: >-
+          uv run --no-sync python -m pytest -m integration
+          tests/integration/test_postgres_query_example.py
+          --junitxml=postgres-integration.xml
+
+      - name: Save PostgreSQL integration evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: postgres-integration
+          path: postgres-integration.xml
+          if-no-files-found: warn
+
   trino-integration:
     name: Trino integration
     needs: changes

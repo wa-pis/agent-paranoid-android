@@ -30,7 +30,10 @@ final campaign covering these layers and their interactions.
 - Bind a value-free acceptance report to one exact commit and built artifacts.
 
 The executable sequence and completion criteria are in
-`docs/acceptance-matrix.md`. Implementation and execution tasks remain open.
+`docs/acceptance-matrix.md`. Execution is in progress. The campaign found and
+repairs negative/mixed collateral accounting for overlapping local and aggregate
+rules; executable acceptance runners and hardened container workloads accompany
+the tests. Completion remains conditional on the final evidence and manual gates.
 
 ## Safety and compatibility
 

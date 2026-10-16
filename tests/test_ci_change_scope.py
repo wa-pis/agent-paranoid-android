@@ -84,6 +84,7 @@ def test_heavy_workflow_jobs_use_change_scope() -> None:
             "package",
             "package-compatibility",
             "trino-integration",
+            "postgres-integration",
         },
         "containers.yml": {"validate", "validate-arm64"},
         "security.yml": {"dependency-review", "secrets"},

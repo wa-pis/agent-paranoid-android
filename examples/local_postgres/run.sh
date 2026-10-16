@@ -52,6 +52,16 @@ if psql -h 127.0.0.1 -p "$PORT" -U apa_reader -d apa_source \
   exit 1
 fi
 
+for statement in \
+  'CREATE TABLE public.unapproved_write (id INTEGER);' \
+  'CREATE TEMPORARY TABLE unapproved_temp (id INTEGER);'; do
+  if psql -h 127.0.0.1 -p "$PORT" -U apa_reader -d apa_source \
+    -v ON_ERROR_STOP=1 -c "$statement" >/dev/null 2>&1; then
+    echo "Read-only profiling role unexpectedly accepted DDL" >&2
+    exit 1
+  fi
+done
+
 mkdir -p "$OUTPUT"
 export POSTGRES_SOURCE_ID=warehouse
 export POSTGRES_USER=apa_reader
@@ -111,7 +121,7 @@ profile = json.load(open(sys.argv[1], encoding="utf-8"))
 entities = {entity["name"]: entity for entity in profile["entities"]}
 if "warehouse.orders_query" in entities:
     fields = {field["name"]: field for field in entities["warehouse.orders_query"]["fields"]}
-    assert list(fields) == ["order_id", "customer_id", "state", "doubled_amount", "expedited"]
+    assert list(fields) == ["order_id", "customer_id", "state", "source_amount", "expedited"]
     assert len(profile["source_fingerprint"]) == 64
     assert profile["source_policy_version"] == "1.1"
     assert "999999" not in json.dumps(profile, sort_keys=True)
@@ -149,7 +159,7 @@ else
   fi
   POLICY="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
     -c "SELECT bool_and(state = ANY (ARRAY['new','paid','shipped'])) FROM \"warehouse.public.orders\";" \
-    -c "SELECT bool_and(status LIKE 'syn_%') FROM \"warehouse.public.customers\";")"
+    -c "SELECT bool_and(status NOT IN ('active', 'paused')) FROM \"warehouse.public.customers\";")"
   if [[ "$POLICY" != $'t\nt' ]]; then
     echo "Selective local-value policy check failed" >&2
     exit 1

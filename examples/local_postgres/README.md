@@ -42,6 +42,9 @@ Python Psycopg adapter, mandatory exact allowlists, the same fixed seed, and the
 same disposable synthetic databases; no Java or JDBC driver is involved.
 The wildcard launcher changes only the column authorization syntax. Executed
 profiling SQL still enumerates quoted columns and never uses a projection star.
+The query uses direct physical-column projections (including an alias), so automatic
+specification inference can preserve its supported metadata contract. Source-dependent
+expressions require a separately authored specification and are not inferred.
 The query launcher records only a SHA-256 query fingerprint and policy version
 in its profile. It never writes query text, query literals, backend messages,
 endpoints, or result rows to artifacts.
@@ -51,7 +54,8 @@ Requirements are `initdb`, `pg_ctl`, `psql`, and either the installed
 `POSTGRES_EXAMPLE_PORT` when port `55432` is unavailable.
 
 The script uses trust authentication only inside the temporary localhost-only
-cluster. It proves that the profiling role cannot insert, applies mandatory
+cluster. It revokes public schema-creation and temporary-table rights and proves that
+the profiling role cannot insert or create regular/temporary tables, applies mandatory
 schema/table/column allowlists and narrow resource budgets, and enables exact
 values only for the reviewed synthetic `orders.state` enum. The customer
 status field remains synthetic.
