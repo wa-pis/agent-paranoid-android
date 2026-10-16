@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from test_data_agent.profiling.numeric_shape import shape_prevalence, prevalence_sql
+
+
 import re
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
@@ -143,7 +146,7 @@ def build_query_numeric_shape_query(
         f"count(DISTINCT {safe}) AS distinct_count, "
         f"{negative} AS has_negative, {positive} AS has_positive, "
         f"max(CASE WHEN {safe} = 0 THEN NULL ELSE {magnitude} END) "
-        "AS max_abs_magnitude "
+        f"AS max_abs_magnitude, {prevalence_sql(safe, magnitude)} "
         f"FROM ({plan.sql}) AS \"__apa_source\""
     )
 
@@ -280,11 +283,13 @@ def _profile_column(
         has_negative = _as_bool(summary.get("has_negative"))
         has_positive = _as_bool(summary.get("has_positive"))
         magnitude = summary.get("max_abs_magnitude")
-        if magnitude is not None and (has_negative or has_positive):
+        prevalence = shape_prevalence(summary, non_null_count)
+        if magnitude is not None and (has_negative or has_positive) or prevalence.get("zero_ratio") == 1.0:
             result["numeric_shape"] = {
-                "max_abs_magnitude": _bounded_magnitude(magnitude),
+                "max_abs_magnitude": _bounded_magnitude(magnitude) if magnitude is not None else 0,
                 "has_negative": has_negative,
                 "has_positive": has_positive,
+                **prevalence,
             }
     if local_category_field is not None:
         category_rows = fetch_query(

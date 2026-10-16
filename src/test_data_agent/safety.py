@@ -12,7 +12,7 @@ from typing import Any
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.constraint import ConstraintStatus
-from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS
+from test_data_agent.core.decimal_units import MAX_DECIMAL_DIGITS, value_matches_decimal
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldType
 from test_data_agent.core.limits import (
@@ -112,7 +112,9 @@ def assert_spec_safe(spec: DatasetSpec) -> None:
                 continue
 
             kind = str(field.distribution.get("kind", ""))
-            if kind == "decimal_range" and isinstance(
+            if field.semantic_type == "numeric_measure" and sensitive:
+                raise SpecSafetyError("numeric_measure conflicts with sensitive privacy classification")
+            if field.semantic_type != "numeric_measure" and kind == "decimal_range" and isinstance(
                 field.typed_distribution, DecimalRangeDistribution
             ) and any(
                 _decimal_sensitive_value_type(bound) is not None
@@ -331,6 +333,19 @@ def validate_generated_row_privacy(
                 if parse_numeric_strings and isinstance(value, str) and (
                     field.data_type == FieldType.INTEGER and parse_int(value) is not None
                     or field.data_type == FieldType.FLOAT and parse_float(value) is not None
+                ):
+                    continue
+                if (
+                    field.semantic_type == "numeric_measure"
+                    and not _spec_field_is_sensitive(spec, entity.name, field.name)
+                    and field.data_type == FieldType.DECIMAL
+                    and (isinstance(value, Decimal) or parse_numeric_strings and isinstance(value, str))
+                    and isinstance(field.typed_distribution, DecimalRangeDistribution)
+                    and value_matches_decimal(
+                        value, precision=field.typed_distribution.precision,
+                        scale=field.typed_distribution.scale,
+                        low=field.typed_distribution.min, high=field.typed_distribution.max,
+                    )
                 ):
                     continue
                 detected = (

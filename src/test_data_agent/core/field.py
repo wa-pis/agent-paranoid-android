@@ -8,6 +8,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from test_data_agent.core.distribution import DecimalRangeDistribution, FieldDistribution, parse_distribution
+from test_data_agent.core.privacy import is_sensitive_field
 
 
 def _normalize_distribution(value: Any) -> dict[str, Any]:
@@ -92,6 +93,11 @@ class FieldSpec(BaseModel):
 
     @model_validator(mode="after")
     def validate_decimal_contract(self) -> FieldSpec:
+        if self.semantic_type == "numeric_measure" and (
+            self.data_type not in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}
+            or self.sensitive or self.is_identifier or is_sensitive_field(self.name)
+        ):
+            raise ValueError("numeric_measure requires a non-sensitive non-identifier numeric field")
         exact = isinstance(self.typed_distribution, DecimalRangeDistribution)
         if (self.data_type == FieldType.DECIMAL) != exact:
             raise ValueError("decimal fields require an exact decimal_range distribution")

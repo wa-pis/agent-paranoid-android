@@ -603,6 +603,10 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
     assert result.business_validation is not None
     assert manifest["validation_valid"] is True
     assert manifest["business_validation"] == {
+        "assigned_row_count": 0,
+        "checked_formula_count": 0,
+        "distribution_bounds_checked_count": 0,
+        "distribution_bounds_violation_count": 0,
         "rules_sha256": "a" * 64,
         "rule_count": 2,
         "rule_pass_count": 0,

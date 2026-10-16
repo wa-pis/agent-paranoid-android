@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.distribution import NumericDistribution
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.generation.constraint_solver import default_value_for_field
 from test_data_agent.rules.contract import (
@@ -14,7 +15,7 @@ from test_data_agent.rules.contract import (
     validate_business_rules_for_spec,
 )
 from test_data_agent.rules.engine import apply_business_rules
-from test_data_agent.rules.models import BusinessRules, business_rules_from_dict, load_business_rules
+from test_data_agent.rules.models import BusinessRules, FormulaRule, business_rules_from_dict, load_business_rules
 from test_data_agent.rules.validation import BusinessValidationReport, validate_business_rules
 
 BusinessRulesApplier = Callable[
@@ -57,12 +58,18 @@ def apply_and_validate_business_rules(
         expected_rule_failures=expected_rule_failures,
         budget=budget,
     )
-    return validate_business_rules(
+    report = validate_business_rules(
         rows_by_table,
         rules,
         expected_rule_failures=expected_rule_failures,
         budget=budget,
     )
+    for index, rule in enumerate(rules.row_rules, start=len(rules.field_rules)):
+        if isinstance(rule, FormulaRule):
+            report.results[index].application = rule.mode
+            if rule.mode == "assign":
+                report.results[index].assigned_row_count = len(rows_by_table.get(rule.table, []))
+    return report
 
 
 def apply_and_validate_business_rules_from_path(
@@ -78,11 +85,12 @@ def apply_and_validate_business_rules_from_path(
 ) -> BusinessValidationReport | None:
     if rules_path is None:
         return None
+    budget = budget or GenerationBudget()
     rules = load_business_rules(rules_path)
     validate_business_rule_literals(rules)
     if spec is not None:
         validate_business_rules_for_spec(rules, spec)
-    return apply_and_validate_business_rules(
+    report = apply_and_validate_business_rules(
         rows_by_table,
         rules,
         seed=seed,
@@ -91,6 +99,9 @@ def apply_and_validate_business_rules_from_path(
         field_defaults=field_defaults,
         budget=budget,
     )
+    if spec is not None and mode not in {"mixed", "negative"}:
+        _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
+    return report
 
 
 def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
@@ -101,6 +112,7 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
         *,
         budget: GenerationBudget | None = None,
     ) -> BusinessValidationReport:
+        budget = budget or GenerationBudget()
         validate_business_rules_for_spec(rules, spec)
         field_defaults = {
             entity.name: {
@@ -109,7 +121,7 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
             }
             for entity in spec.entities
         }
-        return apply_and_validate_business_rules(
+        report = apply_and_validate_business_rules(
             rows_by_table,
             rules,
             seed=seed,
@@ -118,5 +130,33 @@ def make_business_rules_applier(rules: BusinessRules) -> BusinessRulesApplier:
             field_defaults=field_defaults,
             budget=budget,
         )
+        if spec.generation_settings.mode not in {"mixed", "negative"}:
+            _report_assigned_numeric_bounds(rows_by_table, rules, spec, report, budget=budget)
+        return report
 
     return apply_rules
+
+
+def _report_assigned_numeric_bounds(
+    rows: dict[str, list[dict[str, Any]]], rules: BusinessRules, spec: DatasetSpec, report: BusinessValidationReport,
+    *, budget: GenerationBudget | None,
+) -> None:
+    """Report generation-domain drift separately from explicit business constraints."""
+    budget = budget or GenerationBudget()
+    for rule in budget.iter_rule_work(rules.row_rules):
+        if not isinstance(rule, FormulaRule) or rule.mode != "assign":
+            continue
+        field = next(field for field in budget.iter_rule_work(spec.entity(rule.table).fields) if field.name == rule.field)
+        distribution = field.typed_distribution
+        if not isinstance(distribution, NumericDistribution) or field.is_identifier:
+            continue
+        for row in budget.iter_rule_work(rows.get(rule.table, [])):
+            value = row.get(rule.field)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                continue  # The unconditional schema validator handles wrong types.
+            report.distribution_bounds_checked_count += 1
+            if (
+                distribution.min_value is not None and value < distribution.min_value * distribution.scale_factor
+                or distribution.max_value is not None and value > distribution.max_value * distribution.scale_factor
+            ):
+                report.distribution_bounds_violation_count += 1

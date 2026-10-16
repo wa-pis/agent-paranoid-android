@@ -32,6 +32,8 @@ MAX_TOTAL_REPORTED_RULE_ERRORS = 1_000
 
 class RuleResult(BaseModel):
     rule_type: str
+    application: str | None = None
+    assigned_row_count: int = Field(default=0, ge=0)
     passed: int = 0
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
@@ -42,6 +44,8 @@ class RuleResult(BaseModel):
 
 
 class BusinessValidationReport(BaseModel):
+    distribution_bounds_checked_count: int = Field(default=0, ge=0)
+    distribution_bounds_violation_count: int = Field(default=0, ge=0)
     valid: bool
     rule_count: int
     rules_sha256: str

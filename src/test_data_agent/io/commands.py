@@ -12,13 +12,15 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlsplit
 
+from pydantic import TypeAdapter, ValidationError
+
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
-from test_data_agent.core.limits import max_generation_count
+from test_data_agent.core.limits import max_generation_count, read_limited_text
 from test_data_agent.generation import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import validate_generation_bundle, write_dataset_profile_artifact, write_json_artifact
@@ -37,12 +39,18 @@ from test_data_agent.io.workflows import (
     infer_dataset_spec_artifact,
     make_temp_output_folder,
     write_csv_profile_artifact,
+    invoke_business_rules_applier,
+    assert_business_report_valid,
 )
 from test_data_agent.profiling import profile_example_folder
 from test_data_agent.postgres_client import PostgresClient, PostgresClientError
 from test_data_agent.postgres_config import PostgresConfig
 from test_data_agent.postgres_profiler import PostgresProfileError, dataset_profile_from_postgres
 from test_data_agent.postgres_sql_export import write_postgres_sql
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.serialization import load_limited_yaml
+from test_data_agent.rules.business_config import load_business_rules, make_business_rules_applier
+from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.sql_query_adapters import (
     profile_postgres_query_source,
@@ -128,13 +136,26 @@ def export_postgres_sql_command(args: argparse.Namespace) -> int:
             entity.row_count = args.count
         if spec.generation_settings.mode == "load_test":
             spec.generation_settings.load_multiplier = 1
+    if spec.generation_settings.mode == "load_test":
+        for entity in spec.entities:
+            entity.row_count *= spec.generation_settings.load_multiplier
+        spec.generation_settings.load_multiplier = 1
     seed = args.seed
     if seed is None:
         seed = spec.generation_settings.seed
     if seed is None:
         seed = 0
     spec.generation_settings.seed = seed
-    rows_by_entity = generate_dataset(spec, seed=seed)
+    budget = generation_budget_for_invocation()
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        report = invoke_business_rules_applier(
+            make_business_rules_applier(load_business_rules(rules_path)),
+            rows_by_entity, seed, spec, budget=budget,
+        )
+        assert_business_report_valid(report, spec.generation_settings.mode)
+        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     write_postgres_sql(spec, rows_by_entity, args.output)
     print(
         "Wrote PostgreSQL SQL: "
@@ -234,7 +255,19 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
             "spec to generate. Do not remove privacy settings merely to force "
             "profile parsing."
         )
-    spec = infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
+    decimal_path = getattr(args, "decimal_fields", None)
+    decimal_fields = None
+    if decimal_path is not None:
+        ensure_paths_distinct(decimal_path, args.output)
+        try:
+            decimal_fields = TypeAdapter(dict[str, FieldSpec]).validate_python(
+                load_limited_yaml(read_limited_text(decimal_path))
+            )
+        except (ValidationError, ValueError):
+            raise ValueError("reviewed decimal mapping is invalid; expected ENTITY.FIELD to exact decimal FieldSpec") from None
+    spec = infer_dataset_spec_artifact(
+        loaded, output_path=args.output, count=args.count, decimal_fields=decimal_fields,
+    )
     print(
         "Wrote dataset spec: "
         f"{display_untrusted_text(str(args.output), limit=240)} "
@@ -538,6 +571,13 @@ def write_generation_summary(artifact_folder: Path) -> None:
     )
     validation = "passed" if manifest.get("validation_valid") else "failed"
     copied = "yes" if manifest.get("source_rows_copied") else "no"
+    business = manifest.get("business_validation") or {}
+    drift = business.get("distribution_bounds_violation_count", 0)
+    if drift:
+        print(f"Numeric generation-bound drift after assignments: {drift} cells; explicit business constraints are reported separately", file=sys.stderr)
+    rules = manifest.get("effective_rules") or {}
+    if validation == "failed" and rules.get("generation_mode") in {"mixed", "negative"}:
+        print("Published controlled-invalid artifacts with validation evidence; exit status reflects failed validation", file=sys.stderr)
     print(
         "Generated synthetic dataset: "
         f"{display_untrusted_text(str(artifact_folder), limit=240)} | "

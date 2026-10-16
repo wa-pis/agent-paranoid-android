@@ -76,6 +76,7 @@ class TemporalOrderingRule(StrictRuleModel):
 
 
 class FormulaRule(StrictRuleModel):
+    mode: Literal["assign", "check"] = "assign"
     type: Literal["formula"]
     table: RuleIdentifier
     field: RuleIdentifier

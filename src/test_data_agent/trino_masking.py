@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.profiling.numeric_shape import shape_prevalence
+
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -171,7 +173,7 @@ class TrinoMasker:
     ) -> dict[str, Any]:
         check_allowlist(catalog=catalog, schema=schema, config=self.config)
         sensitive = infer_sensitive_from_name(column)
-        sensitive_numeric = sensitive and is_numeric_trino_type(data_type)
+        sensitive_numeric = is_numeric_trino_type(data_type) and (sensitive or data_type.lower().startswith("decimal"))
         aggregate_rows = self.fetch_query(
             build_sensitive_numeric_shape_query(catalog, schema, table, column)
             if sensitive_numeric
@@ -204,15 +206,17 @@ class TrinoMasker:
                 for key, value in aggregates.items()
                 if key not in profile
                 and key
-                not in {"max_abs_magnitude", "has_negative", "has_positive"}
+                not in {"max_abs_magnitude", "has_negative", "has_positive", "zero_count", "subunit_count", "min_subunit_magnitude"}
                 and value is not None
             }
         )
-        if sensitive_numeric and aggregates.get("max_abs_magnitude") is not None:
+        prevalence = shape_prevalence(aggregates, non_null_count) if sensitive_numeric else {}
+        if sensitive_numeric and (aggregates.get("max_abs_magnitude") is not None or prevalence.get("zero_ratio") == 1.0):
             profile["numeric_shape"] = {
-                "max_abs_magnitude": int(aggregates["max_abs_magnitude"]),
+                "max_abs_magnitude": int(aggregates["max_abs_magnitude"] or 0),
                 "has_negative": bool(aggregates.get("has_negative", False)),
                 "has_positive": bool(aggregates.get("has_positive", False)),
+                **prevalence,
             }
         approx_distinct = int(profile.get("approx_distinct_count") or 0)
         if (

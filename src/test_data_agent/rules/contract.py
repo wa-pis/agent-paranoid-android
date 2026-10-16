@@ -336,7 +336,9 @@ def _validate_condition_literals(
     field: FieldSpec,
     table: str,
 ) -> None:
-    values = [condition.equals, condition.not_equals]
+    if (condition.gte is not None or condition.lte is not None) and field.data_type not in {FieldType.INTEGER, FieldType.FLOAT}:
+        raise BusinessRuleContractError("range condition requires an integer or float field")
+    values = [condition.equals, condition.not_equals, condition.gte, condition.lte]
     if condition.in_values is not None:
         values.extend(condition.in_values)
     _validate_literals(

@@ -274,7 +274,7 @@ row_rules:
     rules = load_business_rules(rules_path)
     rows_by_table = {"orders": [{"quantity": 2, "total": 10}]}
 
-    with pytest.raises(ValueError, match="^formula evaluation failed$") as raised:
+    with pytest.raises(ValueError, match="^formula evaluation failed for orders.total$") as raised:
         apply_business_rules(rows_by_table, rules, seed=7, mode="valid", invalid_ratio=0.0)
 
     assert raised.value.__cause__ is None

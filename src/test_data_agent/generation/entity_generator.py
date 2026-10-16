@@ -206,7 +206,8 @@ def generate_field_value(
     if field.data_type == FieldType.INTEGER:
         return int(round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0, default_max=1000)))
     if field.data_type == FieldType.FLOAT:
-        return round(ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0), 6)
+        value = ranged_number(numeric_distribution, numeric_shape, distribution, rng, default_min=0.0, default_max=1000.0)
+        return value if numeric_shape is not None and numeric_shape.subunit_ratio else round(value, 6)
     if field.data_type == FieldType.DECIMAL:
         assert isinstance(typed_distribution, DecimalRangeDistribution)
         return sample_decimal(
@@ -336,6 +337,15 @@ def ranged_number(
         high = typed_distribution.p95 if typed_distribution.p95 is not None else typed_distribution.max_value
         scale_factor = typed_distribution.scale_factor
     elif numeric_shape is not None:
+        if numeric_shape.zero_ratio is not None or numeric_shape.subunit_ratio is not None:
+            pick = rng.random()
+            if pick < (numeric_shape.zero_ratio or 0):
+                return 0.0
+            if pick < (numeric_shape.zero_ratio or 0) + (numeric_shape.subunit_ratio or 0):
+                lower = 10.0 ** (numeric_shape.min_subunit_magnitude or -1)
+                upper = min(0.999999, 9.0 * 10.0 ** numeric_shape.max_abs_magnitude)
+                value = rng.uniform(lower, max(lower, upper))
+                return -value if numeric_shape.has_negative and (not numeric_shape.has_positive or rng.random() < 0.5) else value
         bound = 9.0 * (10.0**numeric_shape.max_abs_magnitude)
         low = -bound if numeric_shape.has_negative else 0.0
         high = bound if numeric_shape.has_positive else 0.0

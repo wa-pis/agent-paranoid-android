@@ -81,11 +81,26 @@ class NumericShapeDistribution(BaseModel):
     max_abs_magnitude: int = Field(ge=-308, le=307)
     has_negative: bool = False
     has_positive: bool = False
+    zero_ratio: float | None = Field(default=None, ge=0.0, le=1.0, allow_inf_nan=False)
+    subunit_ratio: float | None = Field(default=None, ge=0.0, le=1.0, allow_inf_nan=False)
+    min_subunit_magnitude: int | None = Field(default=None, ge=-308, le=-1)
+
+    @model_serializer(mode="wrap")
+    def serialize(self, handler: Any) -> dict[str, Any]:
+        result: dict[str, Any] = handler(self)
+        for key in ("zero_ratio", "subunit_ratio", "min_subunit_magnitude"):
+            if getattr(self, key) is None:
+                result.pop(key, None)
+        return result
 
     @model_validator(mode="after")
     def validate_nonzero_shape(self) -> NumericShapeDistribution:
-        if not self.has_negative and not self.has_positive:
+        if not self.has_negative and not self.has_positive and self.zero_ratio != 1.0:
             raise ValueError("numeric shape must include a non-zero sign")
+        if (self.zero_ratio or 0) + (self.subunit_ratio or 0) > 1.0:
+            raise ValueError("numeric prevalence ratios exceed one")
+        if self.subunit_ratio and self.min_subunit_magnitude is None:
+            raise ValueError("subunit prevalence requires its coarse lower magnitude")
         return self
 
 

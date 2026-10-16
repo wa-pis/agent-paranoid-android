@@ -14,6 +14,7 @@ from test_data_agent.adapters import (
 )
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.field import FieldSpec
 from test_data_agent.core.limits import (
     GenerationBudget,
     enforce_output_capacity,
@@ -93,7 +94,8 @@ def generate_dataset_bundle(
             effective_spec,
             mode=mode or effective_spec.generation_settings.mode.value,
             invalid_ratio=(
-                effective_spec.generation_settings.invalid_ratio
+                (effective_spec.generation_settings.invalid_ratio
+                 if mode is None or mode in {"mixed", "negative"} else 0.0)
                 if invalid_ratio is None else invalid_ratio
             ),
         )
@@ -239,9 +241,10 @@ def infer_dataset_spec_artifact(
     *,
     output_path: Path,
     count: int | None = None,
+    decimal_fields: dict[str, FieldSpec] | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
-    spec = infer_dataset_spec(profile, count=count)
+    spec = infer_dataset_spec(profile, count=count, decimal_fields=decimal_fields)
     write_dataset_spec_artifact(spec, output_path)
     return spec
 

@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Added
+
+- Reviewed exact DECIMAL inference ranges and field-scoped numeric measure semantics.
+- Coarse numeric zero/subunit prevalence, formula check-only mode, assignment audit counts, and null/range conditions.
+- Business rules for PostgreSQL SQL export.
+
+### Fixed
+
+- Preserve Trino DB-API decimal precision/scale and small FLOAT generation values.
+- Report formula assignments outside reviewed numeric generation bounds.
+- Reset saved invalid ratios for explicit valid/edge/load mode overrides and show CSV mode choices.
+
+See [RC4 feedback disposition](docs/rc4-external-feedback.md) for contracts and limits.
+
 ## [1.6.0rc4] - 2026-10-13
 
 ### Added

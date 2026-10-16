@@ -126,3 +126,6 @@ python -c 'from importlib.resources import files; print(files("test_data_agent")
 
 Point the agent at the selected skill directory using its own configuration;
 installing this package does not silently register skills with other agents.
+
+Details for reviewed decimal inference, rule auditing and numeric profile limits:
+[RC4 feedback corrections](docs/rc4-external-feedback.md).

@@ -27,6 +27,10 @@ from test_data_agent.version import __version__
 
 
 class BusinessValidationManifest(BaseModel):
+    distribution_bounds_checked_count: int = Field(default=0, ge=0)
+    distribution_bounds_violation_count: int = Field(default=0, ge=0)
+    assigned_row_count: int = Field(default=0, ge=0)
+    checked_formula_count: int = Field(default=0, ge=0)
     rules_sha256: str | None = None
     rule_count: int = Field(default=0, ge=0)
     rule_pass_count: int = Field(default=0, ge=0)
@@ -342,6 +346,10 @@ def business_validation_manifest(
     if report is None:
         return None
     return BusinessValidationManifest(
+        distribution_bounds_checked_count=getattr(report, "distribution_bounds_checked_count", 0),
+        distribution_bounds_violation_count=getattr(report, "distribution_bounds_violation_count", 0),
+        assigned_row_count=sum(getattr(result, "assigned_row_count", 0) for result in getattr(report, "results", [])),
+        checked_formula_count=sum(getattr(result, "application", None) == "check" for result in getattr(report, "results", [])),
         rules_sha256=getattr(report, "rules_sha256", None),
         rule_count=int(getattr(report, "rule_count", 0)),
         rule_pass_count=int(getattr(report, "rule_pass_count", 0)),

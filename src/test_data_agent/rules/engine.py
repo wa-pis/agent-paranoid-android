@@ -151,6 +151,8 @@ def apply_valid_defaults(
                 if start is not None and (end is None or start > end):
                     row[row_rule.end_field] = row.get(row_rule.start_field)
         elif isinstance(row_rule, FormulaRule):
+            if row_rule.mode == "check":
+                continue
             for row in budget.iter_rule_work(rows_by_table.get(row_rule.table, [])):
                 failed = False
                 try:
@@ -160,7 +162,7 @@ def apply_valid_defaults(
                 except Exception:
                     failed = True
                 if failed:
-                    raise ValueError("formula evaluation failed")
+                    raise ValueError(f"formula evaluation failed for {row_rule.table}.{row_rule.field}")
 
 
 def apply_edge_cases(

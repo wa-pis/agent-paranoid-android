@@ -32,8 +32,10 @@ containing DECIMAL currently fail closed pending a separately tested formula
 rounding contract. Sensitive DECIMAL ranges remain disallowed.
 Recognizable phone/card-like DECIMAL bounds and final values fail closed even
 when optional validation reporting is disabled. Do not treat a declared numeric
-type as permission to bypass content checks; ambiguous legitimate amounts may
-require a later, separately approved field-scoped policy.
+type as permission to bypass content checks. Explicit reviewed `numeric_measure`
+DECIMAL fields may use the bounded policy described in
+[RC4 feedback disposition](../rc4-external-feedback.md); sensitive names, flags,
+identifiers and privacy classification veto it. Profiles never assign it automatically.
 
 After constraint solving, valid-mode generation also performs unconditional
 schema/type and recognizable-PII checks before returning rows to any export or
