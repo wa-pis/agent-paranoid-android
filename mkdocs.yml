@@ -73,6 +73,7 @@ nav:
       - DatasetSpec: dataset_profile_and_spec.md
       - Advisor API: reference/advisor.md
       - MCP Tools: mcp_examples.md
+      - MCP Permissions: reference/mcp-permissions.md
   - Operations:
       - Troubleshooting: operations/troubleshooting.md
       - Known Issues: known-issues.md

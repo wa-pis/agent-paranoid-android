@@ -218,92 +218,35 @@ protocol, wire-field tables, adapter template, and required contract tests.
 
 ## MCP Mode
 
-The default aggregate-only tools on the Trino server are read-only and
-source-literal-free:
+Follow [Connect An MCP Client](how-to/mcp.md) for dedicated-environment
+installation, absolute executable paths, a narrow workspace and client settings.
+Use [MCP Permissions](reference/mcp-permissions.md) as the complete tool and
+rights inventory, including runtime-owned and optional capabilities.
 
-```bash
-python3 -m test_data_agent.mcp_trino_server
-```
+The two console commands are `test-data-agent-mcp-generator` and
+`test-data-agent-mcp-trino`. Both use stdio; they require no inbound MCP port
+or MCP OAuth scope. Client permission to invoke tools, the process user's
+filesystem/network rights, database grants and human review are separate.
 
-Its tools are:
+The default aggregate-only Trino tools return metadata and summaries, not source
+rows. The optional `run_safe_select` is registered only when
+`TRINO_ENABLE_SAFE_SELECT=true`. It masks strings and recognized sensitive
+values, but other source values may remain; never treat its rows as anonymous,
+relay them to an LLM or use them as generated output.
 
-- `list_catalogs`
-- `list_schemas`
-- `list_tables`
-- `describe_table`
-- `profile_table`
-- `profile_table_safe`
-- `profile_column`
-- `profile_foreign_key`
-- `profile_temporal_ordering`
-- `profile_formula_rule`
-- `profile_conditional_required`
-- `profile_conditional_allowed_values`
-- `profile_aggregate_mapping`
+Ordinary synthetic generator tools need only the selected workspace and no
+database/provider credentials. The separate transformation and configured SQL
+session tools have additional rights and activation gates documented in the
+permission reference. Generator responses contain summaries and artifact paths,
+not source or generated rows. `export_dataset` generates fresh data from a spec;
+it does not convert arbitrary source-row files.
 
-The explicit opt-in row-returning tools are not registered by default.
-`run_safe_select` is available only when `TRINO_ENABLE_SAFE_SELECT=true`; it
-masks every returned string, including heuristic false negatives, and masks
-recognized sensitive non-string fields or values. Other non-string source
-values may remain, so it is outside the source-literal-free guarantee for the
-default aggregate-only tools and must not be treated as anonymous.
-
-The generator server exposes the local synthetic pipeline:
-
-```bash
-python3 -m test_data_agent.mcp_generator_server
-```
-
-Its tools are:
-
-- `profile_csv`
-- `infer_dataset_spec`
-- `plan_dataset`
-- `plan_trino_dataset`
-- `inspect_dataset_plan`
-- `approve_dataset_plan`
-- `recover_dataset_plan`
-- `generate_dataset`
-- `validate_dataset`
-- `export_dataset`
-
-`export_dataset` generates fresh data from a spec in the requested format. It
-does not accept or convert arbitrary row files.
-
-Example MCP client configuration:
-
-```json
-{
-  "mcpServers": {
-    "test-data-agent-trino": {
-      "command": "python3",
-      "args": ["-m", "test_data_agent.mcp_trino_server"],
-      "cwd": "/path/to/agent-paranoid-android",
-      "env": {
-        "TRINO_HOST": "trino.example.internal",
-        "TRINO_PORT": "443",
-        "TRINO_USER": "your_user",
-        "TRINO_HTTP_SCHEME": "https",
-        "TRINO_ALLOWED_CATALOGS": "hive,iceberg",
-        "TRINO_ALLOWED_SCHEMAS": "dev,test,staging"
-      }
-    },
-    "test-data-agent-generator": {
-      "command": "python3",
-      "args": ["-m", "test_data_agent.mcp_generator_server"],
-      "cwd": "/path/to/agent-paranoid-android",
-      "env": {
-        "TEST_DATA_AGENT_WORKSPACE_ROOT": "/path/to/agent-paranoid-android"
-      }
-    }
-  }
-}
-```
-
-Use a narrower workspace root in production-like environments. Every generator
-tool path must remain below that root. Absolute or relative paths that escape it
-are rejected, including escapes through existing symlinks. Output files must be
-new, and generation folders must be new or empty.
+The workspace setting confines application tool paths, not all process access.
+Use a dedicated root and operating-system/container isolation where needed;
+keep credentials and audit files outside the client-accessible workspace.
+Direct `generate_dataset` and `export_dataset` have no planning approval
+argument, so configure human confirmation in the client before enabling them.
+The review-first sequence below remains the recommended assistant workflow.
 
 ## Recommended AI Workflow
 

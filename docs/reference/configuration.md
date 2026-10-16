@@ -322,9 +322,15 @@ and zero-retry budgets. See [Use The GigaChat Advisor](../how-to/gigachat.md).
 
 ## Generator MCP
 
+See [MCP Permissions](mcp-permissions.md) for the tool-by-tool rights matrix.
+These settings constrain application behavior; they do not grant operating-system
+access, database privileges or human approval. Ordinary MCP tool paths use the
+workspace; audit/authentication files and owned runtime temporary storage have
+separate configured locations.
+
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `TEST_DATA_AGENT_WORKSPACE_ROOT` | Recommended | Bounds every MCP input and output path |
+| `TEST_DATA_AGENT_WORKSPACE_ROOT` | Recommended | Bounds generator workspace tool paths; does not sandbox the process or relocate audit/authentication/runtime temporary files |
 | `TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES` | Optional | Maximum inline safe profile size; defaults to 4 MiB |
 | `TEST_DATA_AGENT_AUDIT_LOG` | Optional | Enables a shared HMAC-authenticated JSONL audit log |
 | `TEST_DATA_AGENT_AUDIT_HMAC_KEY` | Required with audit log | Base64 key containing at least 32 random bytes |
@@ -342,7 +348,9 @@ non-linked, at most 4096 bytes, and not group- or world-writable.
 ## Trino MCP
 
 The default aggregate-only tools are source-literal-free. The explicit opt-in
-row-returning tools are configured separately:
+row-returning tools are configured separately. Both servers use stdio, with no
+MCP HTTP listener or per-tool OAuth scopes. Trino database authentication and
+client tool-confirmation policy remain separate:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -419,6 +427,14 @@ When `TRINO_ALLOWED_TABLE_COLUMNS` is set, table profiling uses only its exact
 selectors plus metadata-expanded columns from a matching table wildcard. The
 request fails before aggregate work when metadata is empty, malformed,
 duplicated, inconsistent, or over the invocation column budget.
+
+This selector is not a universal per-tool ACL: metadata discovery,
+count/cardinality tools, rule probes and optional `run_safe_select` do not apply
+it. The optional row tool checks catalog/schema scope and SQL safety, not this
+column list. Restrict the database identity's actual table/column grants
+independently. Catalog and schema
+allowlists are independent sets, not allowed catalog/schema pairs. See
+[Trino tool rights](mcp-permissions.md#trino-tool-rights).
 
 ## Trino Invocation Limits
 

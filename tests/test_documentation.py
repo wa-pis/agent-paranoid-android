@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import tomllib
@@ -48,6 +49,7 @@ REQUIRED_NAV_DOCS = {
     "reference/stability.md",
     "reference/support-policy.md",
     "reference/configuration.md",
+    "reference/mcp-permissions.md",
     "operations/troubleshooting.md",
     "operations/resource-budgets.md",
     "operations/audit-logging.md",
@@ -1132,6 +1134,58 @@ def test_ai_guidance_matches_safe_public_contract() -> None:
     assert "explicit human approval" in prompts
     assert "do not return source or generated rows in chat" in prompts.lower()
     assert "untrusted data" in prompts
+
+
+@pytest.mark.parametrize("server", ["generator", "trino"])
+def test_mcp_permission_inventory_covers_discovered_tools(server: str) -> None:
+    reference = (ROOT / "docs/reference/mcp-permissions.md").read_text()
+    section = reference.split(f"## {server.title()} Tool Rights\n", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    rows = re.findall(r"^\| `([a-z_]+)` \| (.+) \|$", section, re.MULTILINE)
+    discovered = json.loads(
+        (ROOT / f"tests/fixtures/contracts/mcp-{server}-tools.json").read_text()
+    )
+    expected = {tool["name"] for tool in discovered}
+    if server == "trino":
+        expected.add("run_safe_select")
+    assert {name for name, _ in rows} == expected
+    assert len(rows) == len(expected), "each tool needs one rights entry"
+    column_count = 3 if server == "generator" else 2
+    for name, cells in rows:
+        assert len(cells.split(" | ")) == column_count, name
+        assert all(cell.strip() for cell in cells.split(" | ")), name
+
+
+def test_mcp_permission_example_uses_valid_narrow_trino_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from test_data_agent.trino_config import TrinoConfig, parse_env_bool
+
+    reference = (ROOT / "docs/reference/mcp-permissions.md").read_text()
+    examples = re.findall(r"```json\n(.*?)\n```", reference, re.DOTALL)
+    assert len(examples) == 1
+    settings = json.loads(examples[0])
+    for key in tuple(os.environ):
+        if key.startswith("TRINO_"):
+            monkeypatch.delenv(key)
+    for key, value in settings.items():
+        monkeypatch.setenv(key, value)
+    config = TrinoConfig.from_env()
+    assert config.allowed_catalogs == frozenset({"hive"})
+    assert config.allowed_schemas == frozenset({"test_data"})
+    assert config.allowed_table_columns == frozenset({
+        "hive.test_data.customers.customer_id", "hive.test_data.customers.status",
+    })
+    assert not parse_env_bool("TRINO_ENABLE_SAFE_SELECT")
+    assert not config.allow_unrestricted and not config.allow_insecure_http
+    assert config.http_scheme == "https"
+
+    for entrypoint in (
+        "docs/how-to/mcp.md", "docs/ai_integration.md", "docs/mcp_examples.md",
+        "docs/reference/configuration.md",
+    ):
+        assert "mcp-permissions.md" in (ROOT / entrypoint).read_text()
 
 
 def test_trino_mcp_docs_define_default_privacy_boundary() -> None:

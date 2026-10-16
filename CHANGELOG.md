@@ -6,6 +6,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- MCP permission reference with the complete tool inventory, filesystem/network/database rights, client review policy and local preservation approval boundaries.
 - A documented source/output matrix with one reviewed DatasetSpec contract for every source, field type, setting and business rule.
 - Revalidation of generated SQL INSERT bundles without executing SQL, and multi-entity saved-profile generation in all output formats.
 

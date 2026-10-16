@@ -2,7 +2,10 @@
 
 These examples show the intended safe shape of MCP workflows. Tool responses
 return summaries, paths, row counts, validation status, and manifest context,
-not source rows or generated rows.
+not source rows or generated rows. The optional `run_safe_select` row tool is
+outside these workflows. Use [MCP Permissions](reference/mcp-permissions.md)
+for the complete tool list, resource rights and approval requirements, and
+[Connect An MCP Client](how-to/mcp.md) for installation and client configuration.
 
 ## Local CSV Folder To Synthetic Dataset
 
