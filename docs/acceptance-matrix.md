@@ -192,6 +192,14 @@ source rows to enter synthetic output or default MCP responses.
 - Actual assistant-client/version smoke with fictional data and human spec
   review, including connection settings, supported client tool policy and final
   artifact checks. Do not replace this with an automated SDK claim.
+  When continuing an existing prepared plan, resume the same conversation and
+  inspect its workspace instead of replaying planning. Record actual session/tool
+  event references and the current full-file byte and semantic hashes. Human
+  review and specific consent must follow preparation and display of that exact
+  current file; earlier consent is not reusable. Reinspect before approval,
+  validate the result and verify artifacts and the client's own process teardown.
+  Configuration preflight, mocked launcher checks and an assistant's completed
+  turn do not prove actual resume, human tool confirmation or normal client exit.
 
 ## Run entry points and evidence
 

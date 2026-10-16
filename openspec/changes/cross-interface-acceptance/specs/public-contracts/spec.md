@@ -63,6 +63,16 @@ environment. It SHALL distinguish mocked acquisition, disposable fictional live
 databases, automated SDK execution, actual human client review and separately
 gated transformation authority. Missing required execution SHALL remain blocked.
 
+#### Scenario: An existing synthetic plan is continued in an actual client
+
+- **GIVEN** a prepared plan remains after its interactive client closes
+- **WHEN** the existing conversation is resumed with the same connection and tool policy
+- **THEN** the client inspects that workspace without replaying planning or deleting evidence
+- **AND** the full current specification is available for human review before fresh specific consent
+- **AND** actual event references and exact-file hashes bind review and consent before approval
+- **AND** client resume is distinct from state-requested dataset recovery
+- **AND** configuration preflight, model summaries and assistant turn completion do not establish human review or process teardown
+
 #### Scenario: An installation or integration cannot run
 
 - **GIVEN** a required case lacks dependencies, environment or actual execution

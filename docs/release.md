@@ -324,12 +324,33 @@ See [the feedback disposition](rc4-external-feedback.md),
 change records the authorized release scope. Published RC3 and RC4 stay immutable.
 
 Earlier runtime campaign results retain their actual commit and artifact
-identities; they do not constitute exact-RC5 release gates. Complete actual
-Codex client evidence and human inspection of the exact reviewed specification,
-then obtain independent exact-main review, all four exact-main gates, fresh
-Ubuntu no-publish hashes, signed acceptance and public-artifact verification.
+identities; they do not constitute exact-RC5 release gates. Fresh local gates,
+independent AI review, all four main workflows and Ubuntu no-publish hash checks
+have since completed for frozen main
+`890925afdff68e97cafe38a28605d2874c9dad79`; the
+[candidate checkpoint](acceptance-evidence-1.6.0rc5.md#exact-rc5-candidate-checkpoint)
+records their identities and limits. A later documentation commit does not
+inherit these results as its own exact-commit execution evidence.
+
+Actual Codex full-current-specification human acceptance passed for that frozen
+main. Fresh inspection, full-file display and new specific human consent preceded
+generation; validation, completed-plan inspection and a separate artifact audit
+passed. The [manual acceptance record](acceptance-evidence-1.6.0rc5.md#actual-codex-and-human-specification-acceptance)
+preserves the exact specification hashes and the limits: separate trust/tool UI
+prompts and normal interactive exit/disconnect were not captured.
+
+For a client interrupted after planning,
+[resume the existing synthetic plan](how-to/mcp.md#resume-an-existing-synthetic-plan)
+with the same connection and tool policy. Resume preflight, an early consent
+phrase or a finished assistant turn does not replace current-file review and
+new consent. Signed-tag publication workflows have passed for GitHub, PyPI and
+all three container targets; [publication evidence](release-evidence-1.6.0rc5.md)
+records the source binding and distribution hashes. Public-artifact verification
+passed on its first attempt with all 12 jobs: Python-package/documentation, all
+seven installation profiles and all three container targets. RC5 publication and
+release-specific public acceptance are complete.
 Permission to publish a release does not approve a dataset or issue local
-preservation authority. RC5 is not yet published.
+preservation authority; the separate transformation/session campaign remains open.
 
 ## 1.6.0rc4 Generation Modes Candidate
 

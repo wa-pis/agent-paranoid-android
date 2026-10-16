@@ -10,11 +10,11 @@ Stable `1.5.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
-Prospective candidate `1.6.0rc5` is not yet published. It includes [RC4 feedback corrections](docs/rc4-external-feedback.md),
+Candidate `1.6.0rc5` is published. It includes [RC4 feedback corrections](docs/rc4-external-feedback.md),
 shared source/output contract and MCP permission reference. See the
-[acceptance evidence](docs/acceptance-evidence-1.6.0rc5.md) and [release status](docs/rc5-release-status.md).
-Published [RC4](docs/release-evidence-1.6.0rc4.md) remains immutable; stable `1.5.0` remains recommended.
-After RC5 publication, its exact pin is:
+[acceptance evidence](docs/acceptance-evidence-1.6.0rc5.md), [publication evidence](docs/release-evidence-1.6.0rc5.md) and [release status](docs/rc5-release-status.md).
+Post-publication verification passed. Published [RC4](docs/release-evidence-1.6.0rc4.md) remains immutable; stable `1.5.0` remains recommended.
+The exact RC5 pin is:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.6.0rc5"

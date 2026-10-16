@@ -10,15 +10,20 @@ prioritized from observed user needs and confirmed defects.
   sources and formats. Track implementation and evidence in OpenSpec
   `source-output-contract-parity`.
 
-- Prepare the local MCP assistant workflow for `1.6.0rc2`: simple connection,
-  explicit specification review, state-driven recovery, and real-client acceptance.
+- Monitor `1.6.0rc5` feedback for the shared source/output contract, portable
+  business rules and MCP permissions. The frozen runtime passed exact-main
+  automated gates and actual Codex full-current-specification human acceptance;
+  publication workflows and public verification passed.
+  See [RC5 status](rc5-release-status.md).
 
 - Monitor migration feedback for stable `1.5.0`; do not assume future integration
   feedback or claim unavailable private-data acceptance.
-- Prepare the isolated `1.6.0rc1` selective-transformation candidate: saved
-  behavior profiles, bounded one-to-one mappings, local approval boundaries and
-  fictional acceptance. Public activation and publication require independent
-  safety clearance and release gates; stable `1.6.0` is not authorized.
+- Continue the separately gated transformation/session acceptance campaign:
+  saved behavior profiles, bounded one-to-one mappings, local approval boundaries
+  and fictional acceptance. Published RC evidence remains historical; the RC5
+  synthetic-client check does not close this campaign or issue preservation
+  authority. Changed activation needs its own safety clearance and release gates;
+  stable `1.6.0` is not authorized.
 - Run product-validation pilots against real development and analytics tasks.
 - Fix onboarding friction reported by external users.
 - Address confirmed client defects and routine dependency maintenance.

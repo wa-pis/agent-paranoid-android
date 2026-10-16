@@ -2,10 +2,93 @@
 
 ## Status and identities
 
-The historical automated runtime campaign passed before RC5 preparation. Human
-Codex acceptance and RC5 publication remain open. This document records what
-actually ran, without treating a previous artifact as a newly built RC5 wheel.
+The historical automated runtime campaign passed before RC5 preparation. Actual
+Codex and current-specification human acceptance passed on the exact RC5 main
+candidate. Publication workflows and public verification passed.
+See the [publication evidence](release-evidence-1.6.0rc5.md). This document
+records what actually ran, without treating a previous artifact as a newly built RC5 wheel.
 The [plan](acceptance-matrix.md) and [release process](release.md) still apply.
+
+## Exact RC5 candidate checkpoint
+
+On 2026-10-16, [PR #623](https://github.com/wa-pis/agent-paranoid-android/pull/623)
+merged as frozen main `890925afdff68e97cafe38a28605d2874c9dad79`. Its tree
+`a2f57bba64603b4ae2a39c97f958c506315e630c` matches repaired reference
+`cd4f1cdba042862909fc9ccfe06fc52e4389e622`. The following are candidate checks;
+public release verification passed separately. Later documentation commits do not
+change these source identities or inherit their results.
+
+| Exact-main check | Result and evidence |
+| --- | --- |
+| Full local gate | 4197 passed, 23 classified skips, no failures, 91.49% coverage; schema, lint/types, compile, licenses/dependencies, budgets and quickstart passed. |
+| Documentation and OpenSpec | Strict MkDocs passed; all 30 then-current OpenSpec items passed strict validation. |
+| CI | [Main workflow](https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245358): Python 3.11–3.14 each passed 4197 tests with 23 skips; coverage 91.49%, 91.49%, 91.49%, 91.44%. Eighteen installed package profiles, four PostgreSQL routes and six Trino routes passed. |
+| Containers | [Main workflow](https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245187): six actual hardened workloads across three targets and AMD64/ARM64 passed. |
+| Documentation | [Main workflow](https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245368) passed. |
+| Security | [Main workflow](https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923245355) passed. |
+| Installed matrices | Fresh exact-main runner/fixture: 600/600 logical cells on each of MCP 1.30.0 and 2.2.0, two seeded repeats per cell; workers completed and MCP processes were reaped. |
+| Independent AI source review | Exact-main technical approval recorded in [PR #623](https://github.com/wa-pis/agent-paranoid-android/pull/623), subject to separate manual and release gates. Decision record SHA-256: `2ff4128de6dfe767f878b0347d61db38b4cf328276fcf08bcb4cb5eb6f4f030b`. This is not human dataset consent or a GitHub-required human approval. |
+| Ubuntu no-publish preflight | [Exact-main run](https://github.com/wa-pis/agent-paranoid-android/actions/runs/38923785970) passed with Python 3.12.15: 4197 passed, 23 skips, build and installed-wheel checks. Downloaded wheel/sdist hashes were independently verified. |
+
+The focused SDK suites ran separately on `cd4f1cdba042862909fc9ccfe06fc52e4389e622`:
+847 passed and six legacy combinations excluded per SDK. Their 24 referenced
+test/configuration files and all 157 package payloads were verified identical
+at main. Those focused results retain their actual `cd4f1cdb` execution identity;
+they are not described as fresh main execution. The 600-cell matrices above
+were rerun for main. Their acquisition and finite-coverage limits remain those
+described below.
+
+Ubuntu publication-preflight artifacts:
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `agent_paranoid_android-1.6.0rc5-py3-none-any.whl` | `969f969d57c0c87784cf7708d165507d8c3cd34eb41dccccaff43bdd08dea6d1` |
+| `agent_paranoid_android-1.6.0rc5.tar.gz` | `d2011e802d64157e9351805e94f97e2202b4c52a7c14511f6b6973b1079d3ae8` |
+
+The separate macOS manual-client wheel has SHA-256
+`b32e459cd7a346bba2dc47e2caf61760c7fb8d35327cd486d286667389551368`.
+All 162 wheel members, including 157 package files, match the Ubuntu wheel in
+content; only ZIP timestamps differ. The macOS hash is not the publication
+preflight hash.
+
+## Actual Codex and human specification acceptance
+
+On 2026-10-16, the actual Codex CLI `0.162.0-alpha.17.2` conversation continued
+with its existing fictional plan. After the authored specification was installed,
+the client inspected it and displayed the complete current file and its hash.
+The human then explicitly attested full-file review and gave new specific consent
+before generation. Earlier consent predating that file was excluded. Before
+approval, the client inspected and reread the unchanged file. The observed
+sequence then completed `approve_dataset_plan`, `validate_dataset` and a final
+`inspect_dataset_plan` reporting phase `completed`.
+
+| Manual acceptance binding | Value |
+| --- | --- |
+| Exact source | `890925afdff68e97cafe38a28605d2874c9dad79` |
+| Reviewed specification byte SHA-256 | `b691f8c82d2f0d28f8a70064ba414f269846ae88f98b781d06364a6ba97254e2` |
+| Reviewed typed specification SHA-256 | `2e299faba7ac1dac3f18a385922c709f4294f3de5d77ac7fa8ba1b0a0eef365d` |
+| Manual evidence SHA-256 | `22105ba0a2dcd9ed7654898c669832c7eee2c85969c79542ad23aa2f61db1270` |
+| Final observation SHA-256 | `59da184f674d6f90433e6b8596b35b4fe90492fb2292bb59d85b823822bd70d7` |
+| Artifact audit SHA-256 | `425e5d066f09626995d257e15655e30fdf00aa9280ed9d1e1858f5d53074f719` |
+
+The accepted result contained two synthetic customer rows and five synthetic
+order rows. Validation and the separate artifact audit passed for primary/foreign
+keys, native constraints, exact DECIMAL values and six business rules. The final
+inspection reported `source_rows_copied: false`. This manual result uses the
+separate macOS wheel identified above.
+
+The evidence records the actual user self-attestation after complete current-file
+display; automated observation alone does not prove human reading. The same
+conversation continued without a second planning call, but the exact resume
+command and resumed binary version were not independently captured beyond the
+preserved client metadata. Separate trust/tool UI prompts and normal interactive
+exit/disconnect were not captured. No process bound to the acceptance MCP
+environment remained at the final observation; that does not establish a normal
+client exit status. No transformation or preservation authority was exercised.
+Public release acceptance passed separately; publication facts are
+recorded in the [release evidence](release-evidence-1.6.0rc5.md).
+
+## Historical campaign identities
 
 | Identity | Value |
 | --- | --- |
@@ -25,11 +108,12 @@ files. These are earlier runtime proofs, not fresh RC5 release gates or hashes.
 Independent RC5 review subsequently found unbounded DECIMAL fixed-point
 formatting in typed Parquet and its controlled-invalid fallback. The correction
 uses one bounded converter across validation and output adapters. That runtime
-change supersedes any version-only equivalence: the installed matrix and full
-release gates must run again on the corrected RC5 candidate. Results below
-remain the historical campaign baseline, not acceptance of the correction.
+change superseded version-only equivalence and required fresh installed-matrix
+and full release gates on the corrected RC5 candidate. The candidate checkpoint
+above records those reruns. Results below remain the historical campaign
+baseline, not acceptance of the correction.
 
-## Results
+## Historical campaign results
 
 | Check | Result and scope |
 | --- | --- |
@@ -82,8 +166,11 @@ failed; they are outside that baseline and distinct from the successful live
 database and installed-process tests. Owned database/container resources were
 cleaned up. Temporary fictional test fixtures are retained with local evidence.
 
-Actual Codex plan/inspect calls, exact-specification human review and clean
-client completion require their own evidence. Automated SDK/PTY cases do not
-provide human approval. Permission to publish RC5 does not close this step.
-RC5 requires its own exact-main gates, Ubuntu hashes, signed acceptance and
-post-publication verification before the campaign or release is declared complete.
+Actual Codex inspection, current-specification human review, new consent and the
+completed synthetic plan are recorded above, with explicit UI and client-exit
+observation limits. Automated SDK/PTY cases and permission to publish RC5 do not
+provide that dataset consent. The current exact-main gates, Ubuntu hashes and
+manual result do not replace publication or post-publication verification. The
+separately gated transformation/session campaign also remains open; this ordinary
+synthetic run grants no preservation authority or claim of complete campaign
+acceptance.
