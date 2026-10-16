@@ -23,7 +23,13 @@ class MaskedPattern(BaseModel):
 
 class SyntheticIdentifierDistribution(BaseModel):
     kind: Literal["synthetic_identifier"] = "synthetic_identifier"
-    prefix: str | None = None
+    prefix: str | None = Field(
+        default=None,
+        description=(
+            "Legacy metadata reserved for compatibility; does not control generated "
+            "identifiers. String identifiers always use synthetic_ plus an ASCII integer."
+        ),
+    )
     pool_size: int | None = Field(default=None, strict=True, ge=1)
 
     @model_serializer(mode="wrap")

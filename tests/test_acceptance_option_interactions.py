@@ -55,9 +55,18 @@ def _run_interface(spec, interface, output_format, root, monkeypatch, count=None
         )
         from test_data_agent.agent_contracts import AgentRequest
         input_path = root / "fictional.csv"
-        input_path.write_text("base_amount,total\n2,0\n3,1\n")
+        source_type = "csv"
+        if len(spec.entities) > 1:
+            source_type = "csv_folder"
+            input_path = root / "fictional_sources"
+            input_path.mkdir()
+            for entity in spec.entities:
+                (input_path / f"{entity.name}.csv").write_text(
+                    "pid,label\n1,fictional_source_only\n2,fictional_source_only\n")
+        else:
+            input_path.write_text("base_amount,total\n2,0\n3,1\n")
         workspace = root / "agent"
-        plan_agent_request(AgentRequest(source_type="csv", source_path=input_path,
+        plan_agent_request(AgentRequest(source_type=source_type, source_path=input_path,
             workspace=workspace, table_name="items", count=3, seed=7,
             output_format=output_format))
         spec.generation_settings.seed = 7
@@ -122,6 +131,51 @@ def test_foreign_key_load_expansion_and_explicit_count(
     assert {name: len(values) for name, values in rows.items()} == expected
     assert {row["pid"] for row in rows["children"]} <= {row["pid"] for row in rows["parents"]}
     assert validate_dataset(rows, load_dataset_spec(output / "dataset_spec.yaml")).valid
+
+
+@pytest.mark.parametrize("interface", ["bundle", "cli", "mcp", "reviewed_agent"])
+@pytest.mark.parametrize("output_format", list(OutputFormat))
+def test_every_business_rule_family_is_portable(
+    tmp_path, monkeypatch, capsys, interface, output_format,
+):
+    if output_format is OutputFormat.PARQUET:
+        pytest.importorskip("pyarrow")
+    spec = DatasetSpec.model_validate({"entities": [
+        {"name": "parents", "row_count": 2, "primary_key": "pid", "fields": [
+            {"name": "pid", "data_type": "string", "is_identifier": True}]},
+        {"name": "items", "row_count": 4, "fields": [
+            {"name": "pid", "data_type": "string", "is_identifier": True},
+            {"name": "quantity", "data_type": "integer", "distribution": {"kind": "numeric", "min_value": 2, "max_value": 2}},
+            {"name": "total", "data_type": "integer"},
+            {"name": "assigned", "data_type": "integer"},
+            {"name": "active", "data_type": "boolean", "distribution": {"kind": "boolean", "true_ratio": 1}},
+            {"name": "label", "data_type": "string"},
+            {"name": "start", "data_type": "date", "distribution": {"kind": "date_range", "min": "2024-01-02", "max": "2024-01-02"}},
+            {"name": "end", "data_type": "date", "distribution": {"kind": "date_range", "min": "2024-01-04", "max": "2024-01-04"}}]}],
+        "relationships": [{"parent_entity": "parents", "parent_field": "pid", "child_entity": "items", "child_field": "pid", "confidence": 1}],
+        "constraints": [{"type": "formula", "entity": "items", "fields": ["total"], "expression": "quantity * 2", "confidence": 1}],
+        "business_rules": {
+            "field_rules": [{"table": "items", "field": "quantity", "required": True, "min_value": 2, "max_value": 2}],
+            "row_rules": [
+                {"type": "conditional_required", "table": "items", "when": {"field": "active", "equals": True}, "required_fields": ["label"]},
+                {"type": "conditional_allowed_values", "table": "items", "field": "label", "when": {"field": "quantity", "gte": 2}, "allowed_values": ["ready"]},
+                {"type": "temporal_ordering", "table": "items", "start_field": "start", "end_field": "end", "allow_equal": False},
+                {"type": "formula", "table": "items", "field": "assigned", "expression": "quantity * 2"},
+                {"type": "formula", "table": "items", "field": "total", "expression": "quantity * 2", "mode": "check"}],
+            "cross_table_rules": [
+                {"type": "foreign_key", "parent_table": "parents", "parent_field": "pid", "child_table": "items", "child_field": "pid"},
+                {"type": "aggregate_formula", "table": "items", "field": "assigned", "expression": "sum('quantity') * 2"}],
+            "scenarios": [{"name": "ready", "weight": 1, "field_values": {"items": {"label": "ready"}}}]}})
+    output = _run_interface(spec, interface, output_format, tmp_path, monkeypatch)
+    rows = load_dataset_rows(output)
+    assert validate_dataset(rows, load_dataset_spec(output / "dataset_spec.yaml")).valid
+    assert {row["pid"] for row in rows["items"]} <= {row["pid"] for row in rows["parents"]}
+    assert all(int(row["quantity"]) == 2 and int(row["total"]) == 4
+               and int(row["assigned"]) == 4 and row["label"] == "ready"
+               and row["start"] < row["end"] for row in rows["items"])
+    manifest = json.loads((output / "generation_manifest.json").read_text())
+    assert manifest["business_validation"]["rule_count"] == 9
+    assert manifest["business_validation"]["expectations_met"]
 
 
 @pytest.mark.parametrize("mode", ["negative", "mixed"])

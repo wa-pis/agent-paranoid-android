@@ -27,7 +27,8 @@ def _check_shape(precision: int, scale: int) -> None:
 def decimal_to_units(value: str, *, precision: int, scale: int) -> int:
     """Parse plain decimal text without float conversion or rounding."""
     _check_shape(precision, scale)
-    if type(value) is not str or len(value) > MAX_DECIMAL_DIGITS + 2 or not _DECIMAL_TEXT.fullmatch(value):
+    # A negative scale-38 fraction needs sign + leading zero + dot + 38 digits.
+    if type(value) is not str or len(value) > MAX_DECIMAL_DIGITS + 3 or not _DECIMAL_TEXT.fullmatch(value):
         raise ExactDecimalError("invalid decimal value")
     negative = value.startswith("-")
     whole, _, fractional = value.lstrip("-").partition(".")

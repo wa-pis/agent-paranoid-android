@@ -71,6 +71,8 @@ including when their field has email, phone or SSN semantics. Identifier generat
 takes precedence over semantic formatting. Privacy validation recognizes only that
 exact token on identifier fields, not arbitrary prefixed sensitive text; ordinary
 non-identifier sensitive fields still use their semantic synthetic formats.
+The optional distribution `prefix` is retained legacy metadata and does not
+change this namespace or insert source text into generated identifiers.
 Fewer output rows or nulls can leave some pool members unused. Source frequencies
 are not reproduced, and declared relationship constraints still take precedence.
 Repeated-key pools are not nominated as primary keys; an explicit primary key

@@ -23,6 +23,30 @@ safe-profile/reviewed-specification handoffs.
 - **THEN** missing required coverage fails the inventory check
 - **AND** compatible pairs, boundaries and relevant high-risk interactions receive cases
 
+#### Scenario: An identifier distribution retains a legacy prefix
+
+- **GIVEN** a reviewed specification includes `synthetic_identifier.prefix`
+- **WHEN** synthetic identifiers are generated or the option inventory is reconciled
+- **THEN** the property is documented as retained metadata, not a generation control
+- **AND** string tokens keep the mandatory `synthetic_` plus ASCII integer namespace
+- **AND** the supplied prefix is never copied into generated values
+
+#### Scenario: A tiny exact decimal is exported as CSV
+
+- **GIVEN** a valid reviewed DECIMAL field produces a value represented internally with an exponent
+- **WHEN** a typed synthetic CSV bundle is written and independently reloaded
+- **THEN** the CSV numeric cell uses exact plain decimal notation
+- **AND** standalone validation preserves the declared precision and scale
+- **AND** arbitrary exponent-form input strings do not gain new parsing permission
+- **AND** formatting rejects unbounded exponents and non-finite values before expanding text
+
+#### Scenario: A signed exact decimal uses the maximum scale
+
+- **GIVEN** a reviewed DECIMAL field declares precision 38 and scale 38
+- **WHEN** the smallest or largest fractional magnitude is parsed with either sign
+- **THEN** the bounded plain-text parser admits the sign without consuming digit precision
+- **AND** out-of-precision, exponent-form and oversized inputs remain rejected
+
 ### Requirement: Acceptance Evidence Separates Execution And Authority
 
 Acceptance evidence SHALL bind results to the exact commit, built artifacts and
