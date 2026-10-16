@@ -7,6 +7,8 @@ PORT="${POSTGRES_EXAMPLE_PORT:-55432}"
 WORK="$(mktemp -d "${TMPDIR:-/tmp}/apa-postgres-example.XXXXXX")"
 DATA="$WORK/data"
 LOG="$WORK/postgres.log"
+STAGE=bootstrap
+trap 'echo "APA_POSTGRES_EXAMPLE_FAILURE stage=$STAGE" >&2' ERR
 
 if [[ -e "$OUTPUT" ]]; then
   echo "Output already exists: $OUTPUT" >&2
@@ -35,8 +37,9 @@ cleanup() {
 trap cleanup EXIT
 
 initdb -D "$DATA" --no-locale --encoding=UTF8 --auth=trust >/dev/null
-pg_ctl -D "$DATA" -l "$LOG" -o "-p $PORT -h 127.0.0.1" -w start >/dev/null
+pg_ctl -D "$DATA" -l "$LOG" -o "-p $PORT -h 127.0.0.1 -k ''" -w start >/dev/null
 
+STAGE=source_fixture
 psql -h 127.0.0.1 -p "$PORT" -d postgres -v ON_ERROR_STOP=1 \
   -c 'CREATE DATABASE apa_source;' \
   -c 'CREATE DATABASE apa_target;' \
@@ -44,6 +47,7 @@ psql -h 127.0.0.1 -p "$PORT" -d postgres -v ON_ERROR_STOP=1 \
 psql -h 127.0.0.1 -p "$PORT" -d apa_source -v ON_ERROR_STOP=1 \
   -f "$ROOT/source.sql" >/dev/null
 
+STAGE=read_only_grants
 if psql -h 127.0.0.1 -p "$PORT" -U apa_reader -d apa_source \
   -v ON_ERROR_STOP=1 \
   -c "INSERT INTO public.customers VALUES (99, 'active', '2026-08-11');" \
@@ -90,6 +94,7 @@ export POSTGRES_MAX_RESULT_ROWS=500
 export POSTGRES_MAX_RESULT_CELLS=5000
 export POSTGRES_MAX_SECONDS=30
 
+STAGE=profile
 if [[ "${POSTGRES_EXAMPLE_USE_QUERY:-false}" == "true" ]]; then
   "${CLI[@]}" profile-query "$ROOT/query.sql" \
     --adapter postgres \
@@ -102,17 +107,22 @@ else
     --local-category warehouse.public.orders.state \
     --output "$OUTPUT/profile.json"
 fi
+STAGE=infer
 "${CLI[@]}" infer-spec "$OUTPUT/profile.json" \
   --output "$OUTPUT/dataset_spec.yaml"
+STAGE=generate
 "${CLI[@]}" generate "$OUTPUT/dataset_spec.yaml" \
   --seed 12345 --output "$OUTPUT/generated"
+STAGE=validate
 "${CLI[@]}" validate "$OUTPUT/dataset_spec.yaml" "$OUTPUT/generated"
+STAGE=export
 "${CLI[@]}" export-postgres-sql "$OUTPUT/dataset_spec.yaml" \
   --seed 12345 --output "$OUTPUT/generated.sql"
 "${CLI[@]}" export-postgres-sql "$OUTPUT/dataset_spec.yaml" \
   --seed 12345 --output "$OUTPUT/generated-second.sql"
 cmp "$OUTPUT/generated.sql" "$OUTPUT/generated-second.sql"
 
+STAGE=profile_assertions
 "$PYTHON" - "$OUTPUT/profile.json" <<'PY'
 import json
 import sys
@@ -137,9 +147,11 @@ assert values == {"new", "paid", "shipped"}
 assert customers["status"]["distribution"] == {}
 PY
 
+STAGE=import
 psql -h 127.0.0.1 -p "$PORT" -d apa_target -v ON_ERROR_STOP=1 \
   -f "$OUTPUT/generated.sql" >/dev/null
 
+STAGE=output_assertions
 if [[ "${POSTGRES_EXAMPLE_USE_QUERY:-false}" == "true" ]]; then
   COUNTS="$(psql -h 127.0.0.1 -p "$PORT" -d apa_target -At -v ON_ERROR_STOP=1 \
     -c 'SELECT count(*) FROM "warehouse.orders_query";')"

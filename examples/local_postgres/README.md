@@ -54,9 +54,12 @@ Requirements are `initdb`, `pg_ctl`, `psql`, and either the installed
 `POSTGRES_EXAMPLE_PORT` when port `55432` is unavailable.
 
 The script uses trust authentication only inside the temporary localhost-only
-cluster. It revokes public schema-creation and temporary-table rights and proves that
-the profiling role cannot insert or create regular/temporary tables, applies mandatory
-schema/table/column allowlists and narrow resource budgets, and enables exact
+cluster. Unix sockets are disabled so it works without access to system-owned
+socket directories. Integration failures report only a fixed execution stage,
+not captured database or driver messages. It revokes public schema-creation and
+temporary-table rights and proves that the profiling role cannot insert or
+create regular/temporary tables, applies mandatory schema/table/column allowlists
+and narrow resource budgets, and enables exact
 values only for the reviewed synthetic `orders.state` enum. The customer
 status field remains synthetic.
 
