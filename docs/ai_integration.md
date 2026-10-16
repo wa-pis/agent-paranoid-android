@@ -44,16 +44,18 @@ Install the base package for CLI workflows:
 python3 -m pip install agent-paranoid-android
 ```
 
-Add only the integrations the AI client needs:
+Add only the integrations the AI client needs. The exact 1.6.0 pin below applies
+only after verified publication; see [release status](1.6.0-release-status.md).
 
 ```bash
 python3 -m pip install "agent-paranoid-android[mcp,trino]"
 python3 -m pip install "agent-paranoid-android[openai]"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.5.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
 ```
 
 The experimental GigaChat adapter is included in stable `1.5.0` as an explicit
-opt-in. OpenAI remains the default provider. Follow
+opt-in and retained in prospective stable `1.6.0`. OpenAI remains the default
+provider. Follow
 [Use The GigaChat Advisor](how-to/gigachat.md) before configuring credentials.
 
 ## Agent Mode

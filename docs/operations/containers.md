@@ -3,6 +3,18 @@
 Container images are an optional deployment path for isolated CLI and MCP
 workers. PyPI remains the normal installation path for local Python use.
 
+## Release Status
+
+Stable `1.6.0` is in preparation. Its versioned image tags are not yet published;
+do not infer their availability from a source checkout or an accepted RC5 image.
+Until verified stable publication, `1.5.0` remains the published stable release.
+The [RC5 container evidence](../release-evidence-1.6.0rc5.md) remains bound to RC5.
+
+After verified 1.6.0 publication, select an exact version tag such as
+`ghcr.io/wa-pis/agent-paranoid-android-cli:1.6.0`, then resolve and verify its
+immutable digest before use. The stable tag also updates the mutable `1.6`, `1`
+and `latest` aliases; none provides immutable version identity.
+
 ## Published Images
 
 | Image | Entrypoint | Installed surface |

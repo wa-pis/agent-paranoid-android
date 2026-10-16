@@ -6,19 +6,19 @@ Deterministic synthetic test data from CSV and database metadata, without
 copying source rows. Use the CLI or Python library to profile structure, review
 a `DatasetSpec`, generate reproducible datasets, and validate the result.
 
-Stable `1.5.0` is the recommended release. Read the
-[documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
-workflows and configuration.
-
-Candidate `1.6.0rc5` is published. It includes [RC4 feedback corrections](docs/rc4-external-feedback.md),
-shared source/output contract and MCP permission reference. See the
-[acceptance evidence](docs/acceptance-evidence-1.6.0rc5.md), [publication evidence](docs/release-evidence-1.6.0rc5.md) and [release status](docs/rc5-release-status.md).
-Post-publication verification passed. Published [RC4](docs/release-evidence-1.6.0rc4.md) remains immutable; stable `1.5.0` remains recommended.
-The exact RC5 pin is:
+Stable `1.6.0` is in preparation and is not yet published. Until verified
+publication, stable `1.5.0` remains the published recommended release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc5"
+python3 -m pip install "agent-paranoid-android==1.5.0"
 ```
+
+After verified publication: Stable `1.6.0` is the recommended release. The
+installation commands below apply only after that publication. This promotion
+retains the accepted RC5 runtime; [RC5 acceptance](docs/acceptance-evidence-1.6.0rc5.md)
+and [RC5 publication evidence](docs/release-evidence-1.6.0rc5.md) remain historical
+records, not verification of the new stable commit. Read the
+[documentation](https://wa-pis.github.io/agent-paranoid-android/) for full workflows.
 
 See the [source/output matrix](docs/reference/source-output-matrix.md) for the
 common reviewed DatasetSpec, field types, settings and business-rule contract.
@@ -27,10 +27,10 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 Python 3.11 or newer is required.
 
-The commands below install the exact stable release.
+After verified 1.6.0 publication, install the exact stable release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.5.0"
+python3 -m pip install "agent-paranoid-android==1.6.0"
 test-data-agent demo --output out/demo
 ```
 
@@ -77,9 +77,9 @@ database, Parquet, MCP, or AI support only when you need it; see
 The project does not certify statistical anonymity, protection from every
 re-identification attack, or cross-environment byte identity.
 
-Stable `1.5.0` retains the generation and validation corrections from `1.3.2`;
-see [migration notes](docs/reference/generation-contract-migration.md) before
-regenerating existing fixtures.
+Stable `1.6.0` includes the accepted RC1–RC5 generation, validation and business-rule
+changes. Read the [migration notes](docs/reference/generation-contract-migration.md)
+before regenerating existing fixtures.
 
 ## Choose A Guide
 
@@ -91,8 +91,8 @@ regenerating existing fixtures.
 
 ## Development
 
-Published RC5 registers saved-profile transformation CLI/MCP workflows; stable
-1.5.0 does not include them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
+The accepted RC5 runtime includes saved-profile transformation CLI/MCP workflows;
+the prospective stable 1.6.0 retains them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
 and [acceptance limits](docs/acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
 The separate transformation/session acceptance campaign remains open.
 Registration grants no dataset permission: preservation still requires exact local

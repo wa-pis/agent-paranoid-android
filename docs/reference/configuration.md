@@ -3,9 +3,13 @@
 Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 
-Stable `1.5.0` includes the JDBC-style endpoint, qualified column wildcard,
-and SQL query source settings documented below. Existing component settings
-and exact allowlists remain supported.
+Stable `1.6.0` preparation retains the publicly accepted `1.6.0rc5` runtime and
+the settings below without changing their defaults or permissions. See the
+[release status](../1.6.0-release-status.md) for publication readiness; sections
+labelled “1.6 RC” describe the accepted promotion baseline. Historical stable
+`1.5.0` includes the JDBC-style endpoint, qualified column wildcard and SQL query
+source settings, but not the later transformation/session consumers. Existing
+component settings and exact allowlists remain supported.
 
 All byte values are integer bytes unless stated otherwise.
 

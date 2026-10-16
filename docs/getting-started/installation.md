@@ -1,16 +1,18 @@
 # Installation
 
-Candidate `1.6.0rc5` is published; post-publication verification passed.
-Actual Codex and current-specification human acceptance passed. See the
-[acceptance evidence](../acceptance-evidence-1.6.0rc5.md),
-[publication evidence](../release-evidence-1.6.0rc5.md) and
-[release status](../rc5-release-status.md).
-Published [RC4](../release-evidence-1.6.0rc4.md) remains immutable.
-Stable `1.5.0` remains the recommended release. The exact RC5 pin is:
+Stable `1.6.0` is in preparation and is not yet published. Until verified
+publication, stable `1.5.0` remains the published recommended release:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc5"
+python3 -m pip install "agent-paranoid-android==1.5.0"
 ```
+
+All 1.6.0 installation commands and recommendations below apply only after
+verified publication. The accepted RC5 runtime is the stable promotion source;
+its [acceptance evidence](../acceptance-evidence-1.6.0rc5.md),
+[publication evidence](../release-evidence-1.6.0rc5.md) and
+[release status](../rc5-release-status.md) remain historical candidate records.
+They do not replace checks of the new stable commit.
 
 ## Requirements
 
@@ -24,14 +26,14 @@ existing environments to upgrade. The notice and release-gate rules for
 changing this matrix are defined in
 [Runtime And Integration Support](../reference/support-policy.md).
 
-Stable `1.5.0` retains the generation-contract corrections from `1.3.2`. Read the
+Stable `1.6.0` retains the accepted RC1–RC5 generation and validation changes. Read the
 [migration notes](../reference/generation-contract-migration.md) before
 regenerating existing fixtures.
 
 ## Install From PyPI
 
-The stable release is `1.5.0`; the commands below pin that exact version for
-reproducible installation.
+After verified publication: The stable release is `1.6.0`; the commands below
+pin that exact version for reproducible installation.
 
 Create an isolated environment:
 
@@ -41,19 +43,19 @@ Create an isolated environment:
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android==1.5.0"
+python3 -m pip install "agent-paranoid-android==1.6.0"
 ```
 
 The base package supports CSV, JSON, and deterministic PostgreSQL SQL export.
 Add only the source and format integrations you need:
 
 ```bash
-python3 -m pip install "agent-paranoid-android[parquet]==1.5.0"
-python3 -m pip install "agent-paranoid-android[mcp]==1.5.0"
-python3 -m pip install "agent-paranoid-android[mcp,trino]==1.5.0"
-python3 -m pip install "agent-paranoid-android[postgres]==1.5.0"
-python3 -m pip install "agent-paranoid-android[openai]==1.5.0"
-python3 -m pip install "agent-paranoid-android[gigachat]==1.5.0"
+python3 -m pip install "agent-paranoid-android[parquet]==1.6.0"
+python3 -m pip install "agent-paranoid-android[mcp]==1.6.0"
+python3 -m pip install "agent-paranoid-android[mcp,trino]==1.6.0"
+python3 -m pip install "agent-paranoid-android[postgres]==1.6.0"
+python3 -m pip install "agent-paranoid-android[openai]==1.6.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
 ```
 
 The CI dependency ceilings are intentionally small enough to catch accidental
@@ -77,7 +79,7 @@ The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
 `test-data-agent doctor --require-extra all` to verify that full environment.
 
-The experimental GigaChat adapter is included in `1.5.0` through its
+The experimental GigaChat adapter is retained in `1.6.0` through its
 explicit `gigachat` extra. Follow
 [Use The GigaChat Advisor](../how-to/gigachat.md) for authentication, mandatory
 TLS verification, and the review-first workflow. The default provider remains
@@ -85,8 +87,10 @@ OpenAI.
 
 ## Accepted Candidate Baseline
 
-Stable `1.5.0` is the recommended default. It promotes the accepted
-`1.5.0rc1` runtime without further behavior or dependency changes.
+After verified publication: Stable `1.6.0` is the recommended default. It promotes
+the accepted `1.6.0rc5` runtime without further behavior or dependency changes.
+The stable commit requires fresh exact-commit checks and artifact verification;
+RC5 evidence remains bound to RC5.
 Add an optional extra to the same exact stable pin only when needed.
 
 ### Windows PowerShell
@@ -95,7 +99,7 @@ Add an optional extra to the same exact stable pin only when needed.
 py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install "agent-paranoid-android==1.5.0"
+python -m pip install "agent-paranoid-android==1.6.0"
 ```
 
 Run the self-contained environment check:

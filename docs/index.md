@@ -7,23 +7,25 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
-Stable `1.5.0` retains the generation and validation corrections from `1.3.2`. Review the
+Stable `1.6.0` is in preparation and is not yet published. Until verified
+publication, stable `1.5.0` remains the published recommended release:
+
+```bash
+python3 -m pip install "agent-paranoid-android==1.5.0"
+```
+
+The 1.6.0 installation instructions below take effect only after verified
+publication. Stable `1.6.0` promotes the accepted RC5 runtime without new
+behavior or dependency changes. Review the
 [migration notes](reference/generation-contract-migration.md) before regenerating
 existing fixtures.
 
-Candidate `1.6.0rc5` is published with the
-[RC4 feedback corrections](rc4-external-feedback.md), shared source/output
-contract and MCP permission reference. See the
+Published RC5 includes the [RC4 feedback corrections](rc4-external-feedback.md),
+shared source/output contract and MCP permission reference. Its
 [acceptance evidence](acceptance-evidence-1.6.0rc5.md),
 [publication evidence](release-evidence-1.6.0rc5.md) and
-[release status](rc5-release-status.md).
-Post-publication verification passed.
-Published [RC4](release-evidence-1.6.0rc4.md) remains immutable.
-Stable `1.5.0` remains the recommended release. The exact RC5 pin is:
-
-```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc5"
-```
+[release status](rc5-release-status.md) remain historical candidate records;
+they do not verify the new stable commit.
 
 ## Choose Your Starting Point
 
@@ -66,10 +68,11 @@ introduced.
 
 ## Five-Minute Check
 
-Install the exact stable release and run the self-contained smoke test:
+After verified 1.6.0 publication, install the exact stable release and run the
+self-contained smoke test:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.5.0"
+python3 -m pip install "agent-paranoid-android==1.6.0"
 test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
@@ -109,8 +112,13 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The current stable `1.5.0` release uses `DatasetSpec` as the generation and
-validation contract for the CLI and Python API. It promotes the accepted
-`1.5.0rc1` runtime, including CSV generation corrections, MCP 2 and OpenAI 3
-compatibility, and container hardening. The stable promotion itself changes
-only version and documentation metadata.
+The prospective stable `1.6.0` release uses `DatasetSpec` as the generation and
+validation contract across Python, CLI, MCP, approved agent workflows and all
+output formats. It retains accepted RC1–RC5 behavior, including exact DECIMAL
+rules, `edge` and `load_test` modes, folder replacement with rollback and shared
+business-rule validation. Promotion changes only version and release metadata;
+its exact stable commit requires fresh release checks before publication.
+
+Selective transformation remains a separate opt-in mixed-origin workflow.
+Registration does not approve a dataset or complete the broader
+[transformation/session campaign](acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).

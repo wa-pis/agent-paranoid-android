@@ -2,6 +2,12 @@
 
 This is a map of the codebase for the domain-agnostic generator.
 
+Stable `1.6.0` preparation retains the publicly accepted `1.6.0rc5` runtime
+described here. Existing “1.6 RC” sections map that unchanged implementation;
+they do not establish stable publication or complete the broader
+transformation/session acceptance campaign. See the
+[release status](1.6.0-release-status.md).
+
 ## Core Models
 
 `src/test_data_agent/core/`

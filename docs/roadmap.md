@@ -10,6 +10,11 @@ prioritized from observed user needs and confirmed defects.
   sources and formats. Track implementation and evidence in OpenSpec
   `source-output-contract-parity`.
 
+- Prepare the owner-authorized stable `1.6.0` promotion of the accepted
+  `1.6.0rc5` runtime, including the accepted changes since `1.5.0`. Complete fresh
+  exact-source release gates and public verification before recommending stable
+  `1.6.0`; see [stable status](1.6.0-release-status.md).
+
 - Monitor `1.6.0rc5` feedback for the shared source/output contract, portable
   business rules and MCP permissions. The frozen runtime passed exact-main
   automated gates and actual Codex full-current-specification human acceptance;
@@ -22,8 +27,8 @@ prioritized from observed user needs and confirmed defects.
   saved behavior profiles, bounded one-to-one mappings, local approval boundaries
   and fictional acceptance. Published RC evidence remains historical; the RC5
   synthetic-client check does not close this campaign or issue preservation
-  authority. Changed activation needs its own safety clearance and release gates;
-  stable `1.6.0` is not authorized.
+  authority. Changed activation needs its own safety clearance and release gates.
+  Stable authorization does not close this campaign or expand preservation rights.
 - Run product-validation pilots against real development and analytics tasks.
 - Fix onboarding friction reported by external users.
 - Address confirmed client defects and routine dependency maintenance.

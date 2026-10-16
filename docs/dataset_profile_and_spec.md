@@ -147,7 +147,9 @@ the compact profile JSON, not a downloaded copy of the source table.
 
 The query-source workflow introduced in stable `1.5.0` profiles one reviewed
 PostgreSQL or Trino query as a virtual entity. Its `source_type` is `postgres_query` or
-`trino_query`. In RC5, the profile records a stable `source_fingerprint`,
+`trino_query`. It is retained in prospective stable `1.6.0` after verified
+publication; see [release status](1.6.0-release-status.md). Since RC5, the profile
+records a stable `source_fingerprint`,
 `source_policy_version: "1.1"`, and ordinary safe entity metadata and aggregates.
 This source-policy version is separate from DatasetSpec's schema version;
 older query fingerprints remain historical evidence.

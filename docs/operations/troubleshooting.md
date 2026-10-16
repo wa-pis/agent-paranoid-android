@@ -47,12 +47,15 @@ package or a problem with deployment credentials.
 `doctor --require-extra gigachat` uses a local fake SDK client to verify strict
 structured-response mapping and cleanup. It does not read
 `GIGACHAT_CREDENTIALS` or `GIGACHAT_ACCESS_TOKEN`, obtain a token, or contact
-GigaChat. Install stable `1.5.0` with the `gigachat` extra.
+GigaChat. After verified publication, install prospective stable `1.6.0` with
+the `gigachat` extra; until then, `1.5.0` remains the published stable release.
+See [release status](../1.6.0-release-status.md).
 
 ## JDBC-Style URL Rejected
 
 JDBC-style endpoint input, qualified column wildcards, and `profile-query` are
-available in stable `1.5.0`.
+available in stable `1.5.0` and retained in prospective stable `1.6.0` after
+verified publication.
 
 Use only the documented credential-free PostgreSQL or Trino shape. Keep users,
 password references, tokens, roles, headers, proxies, session properties,
@@ -100,9 +103,11 @@ messages; inspect the local reviewed file and allowlists instead.
 
 ## Transformation Candidate Rejected
 
-The isolated development candidate is described in the
-[CLI workflow](../reference/cli.md#closed-common-profile-workflow-candidate).
-Published `1.5.0` does not register the common-profile command.
+The published RC5 runtime already registers the common-profile CLI/MCP
+workflow; prospective stable `1.6.0` retains it unchanged after verified
+publication. See the [CLI workflow](../reference/cli.md#common-profile-workflow-16-rc).
+Published `1.5.0` does not include this command. Registration grants no dataset
+permission and does not complete the broader transformation/session campaign.
 
 If the snapshot no longer matches, review the saved inputs, policies and
 mappings again; validate and execute with the newly returned digest. A receipt

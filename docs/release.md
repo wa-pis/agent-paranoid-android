@@ -66,6 +66,28 @@ call is optional manual evidence and must use only the fictional fixture.
 
 ## RC6 To Stable Promotion
 
+### Current 1.6.0 promotion
+
+The owner authorized stable `1.6.0` on 2026-10-16, selecting publicly verified
+`v1.6.0rc5`, commit `890925afdff68e97cafe38a28605d2874c9dad79`, as the accepted
+runtime. Documentation consistency fixes at main
+`304e75d7f998fae6c8d58595a432880ac9da1531` may accompany its version-only
+promotion. Apply the permitted-hunk policy below directly against `v1.6.0rc5`.
+This authorization supersedes earlier pending-authorization status; all fresh
+stable gates, independent exact-main review, artifact hashes and signed
+acceptance remain required. See [stable status](1.6.0-release-status.md).
+
+RC5 human and automated evidence retains its original source/artifact identity.
+For this requested full stable release, complete the outstanding fictional
+transformation/session campaign, binding its installed-artifact results and
+genuine local-terminal human steps before declaring the combined work accepted.
+It remains open while those results are missing; version promotion cannot close
+it, manufacture human preservation consent or broaden runtime activation. This
+does not reopen completed historical RC5 gates. Any behavior correction first
+needs a newly accepted RC.
+
+### Historical promotion baselines
+
 The historical 1.0.0 RC6 baseline is the exact commit named by the annotated
 `v1.0.0rc6` tag after the public-package, documentation, container,
 attestation, signature, integration, invocation-hardening, and

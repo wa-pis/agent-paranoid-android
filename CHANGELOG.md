@@ -4,9 +4,72 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## [1.6.0] - 2026-10-16
+
+Stable promotion of the publicly verified `1.6.0rc5` runtime, including the
+accepted changes since `1.5.0`. Publication is pending the
+[stable release gates](docs/1.6.0-release-status.md). The RC entries below retain
+their original history; the final behavior is summarized here.
+
+### Added
+
+- One reviewed DatasetSpec contract across ten source routes, CSV/JSON/Parquet/SQL
+  output, all seven field types, generation settings and portable business rules.
+  Saved multi-entity profiles can generate every supported output; generated SQL
+  INSERT bundles can be revalidated without executing SQL.
+- DatasetSpec `1.1` exact DECIMAL generation up to precision 38, profile inference,
+  bounds, formulas and aggregates, including target-scale HALF_UP rounding.
+  Legacy `1.0` specifications remain readable.
+- Valid boundary generation with `edge`, bounded `load_test` generation (default
+  ×10; an explicit count sets the exact volume), and complete output-folder
+  replacement with rollback on handled generation/publication failures.
+- CLI `profile-parquet`, clearer relationship diagnostics, and explicit rejection
+  of conflicting links and incompatible field types.
+- Portable embedded business rules across Python, CLI, MCP and reviewed agent
+  workflows, with formula assign/check modes, assignment audit counts and
+  null/range conditions.
+- MCP tool/permission documentation, specification inspection and recovery
+  guidance, plus configurable bounded invocation deadlines.
+- Separately selected one-to-one transformation and common saved-profile
+  workflows, with local-terminal preservation approval and workspace-confined
+  MCP consumers. Configured PostgreSQL/Trino sessions capture once, consume frozen
+  snapshots without reconnecting, and enforce expiry, admission and cleanup.
+  Their [separate acceptance campaign](docs/acceptance-matrix.md) remains explicit;
+  synthetic generation never inherits permission to copy source rows.
+
 ### Fixed
 
-- Align RC5 guides on DatasetSpec 1.1, folder replacement, portable business rules and registered CLI/MCP workflows, retaining local approval requirements and legacy artifact distinctions.
+- Avoid inferred relationships between unrelated identifier domains; enforce
+  declared bindings, reference resolution and parent-key cardinality.
+- Preserve exact decimals, wide identifiers, null versus empty text, timestamp
+  offsets and deliberately invalid cells through supported artifact round trips.
+- Preserve input specifications/rule files during folder replacement, honor
+  explicit mode/count overrides, and retain cumulative validation/output budgets.
+- Align RC5 guides on DatasetSpec 1.1, folder replacement, portable business rules
+  and registered CLI/MCP workflows, retaining local approval requirements and
+  legacy artifact distinctions.
+
+### Security
+
+- Project only supported safe metadata into advisor requests and reject opaque
+  distribution metadata; preserve fingerprint binding and local review.
+- Bound DECIMAL expansion, parsing, rule work, serialization and database access;
+  redact backend errors and enforce sensitive-target/rule-literal checks even
+  when optional reports are disabled.
+- Require verified PostgreSQL TLS by default. Local insecure access remains an
+  explicit opt-in; no agent or MCP operation can issue preservation consent.
+
+### Migration
+
+- Regenerate fixtures affected by changed seeded string identifiers or independent
+  key domains; reproducibility is bound to the recorded version and environment.
+- Read marked CSV bundles with `backslash-null-v1` decoding and marked Parquet
+  scalar columns using `apa.scalar_encoding` metadata. Direct format readers must
+  honor those encodings to restore nulls and controlled-invalid values correctly.
+- Mixed/negative CLI generation retains representable controlled-invalid output
+  with `validation_failed` and exit 1; valid/edge/load generation still fails
+  closed on unexpected violations. Review the
+  [migration guide](docs/reference/generation-contract-migration.md).
 
 ## [1.6.0rc5] - 2026-10-16
 

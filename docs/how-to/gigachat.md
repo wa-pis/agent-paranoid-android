@@ -10,17 +10,19 @@ LangChain are not required for this single structured request.
 !!! note "Release status"
 
     The adapter is included in stable `1.5.0` through the explicit `gigachat`
-    extra.
+    extra and retained in prospective stable `1.6.0`. The pin below applies only
+    after verified publication; see [release status](../1.6.0-release-status.md).
 
 ## Install The Stable Release
 
-Create an isolated environment and pin the exact stable release:
+After verified 1.6.0 publication, create an isolated environment and pin the
+exact stable release:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install "agent-paranoid-android[gigachat]==1.5.0"
+python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
 test-data-agent doctor --require-extra gigachat
 ```
 
