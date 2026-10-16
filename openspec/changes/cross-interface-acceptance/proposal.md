@@ -32,8 +32,11 @@ final campaign covering these layers and their interactions.
 The executable sequence and completion criteria are in
 `docs/acceptance-matrix.md`. Execution is in progress. The campaign found and
 repairs negative/mixed collateral accounting for overlapping local and aggregate
-rules; executable acceptance runners and hardened container workloads accompany
-the tests. Completion remains conditional on the final evidence and manual gates.
+rules, tiny CSV DECIMAL serialization and signed maximum-scale DECIMAL parsing.
+Executable installed-interface runners, a finite measured option covering array
+and hardened container workloads accompany the tests. Retained identifier-prefix
+metadata is now distinguished from an effective generation control. Completion
+remains conditional on the final evidence and manual gates.
 
 ## Safety and compatibility
 

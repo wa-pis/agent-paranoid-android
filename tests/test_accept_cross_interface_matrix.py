@@ -6,6 +6,7 @@ from pathlib import Path
 from decimal import Decimal
 import sys
 from typing import Any
+import pytest
 
 from scripts import accept_cross_interface_matrix as campaign
 
@@ -51,15 +52,16 @@ def test_controller_preserves_virtualenv_interpreter_symlink(monkeypatch: Any,
     output = tmp_path / "evidence.json"
     captured: list[str] = []
 
-    def complete(command: list[str], workspace: Path, timeout: float) -> bool:
+    def complete(command: list[str], workspace: Path, timeout: float) -> tuple[bool, int]:
         captured.extend(command)
         assert workspace != Path.cwd()
         assert timeout > 0
         report = json.loads(output.read_text())
         for case in report["cases"]:
             case["status"] = "passed"
+        report.update(worker_complete=True, mcp_teardown="process_reaped")
         campaign.save_report(output, report)
-        return False
+        return False, 0
 
     monkeypatch.setattr(campaign, "supervise", complete)
     monkeypatch.setattr(sys, "argv", ["accept-matrix", "--python", str(python),
@@ -69,6 +71,32 @@ def test_controller_preserves_virtualenv_interpreter_symlink(monkeypatch: Any,
     assert captured[0] == str(python)
     assert captured[0] != str(python.resolve())
     assert json.loads(output.read_text())["is_full_logical_matrix"] is False
+
+
+@pytest.mark.parametrize(("returncode", "completed", "teardown", "reason"), [
+    (1, True, "process_reaped", "worker_exit_failed"),
+    (0, False, "process_reaped", "worker_completion_missing"),
+    (0, True, None, "mcp_teardown_missing"),
+])
+def test_all_passed_cells_cannot_hide_incomplete_worker(
+    monkeypatch: Any, tmp_path: Path, returncode: int, completed: bool,
+    teardown: str | None, reason: str,
+) -> None:
+    output = tmp_path / "evidence.json"
+
+    def crash(command: list[str], workspace: Path, timeout: float) -> tuple[bool, int]:
+        report = json.loads(output.read_text())
+        for case in report["cases"]:
+            case["status"] = "passed"
+        report.update(worker_complete=completed, mcp_teardown=teardown)
+        campaign.save_report(output, report)
+        return False, returncode
+
+    monkeypatch.setattr(campaign, "supervise", crash)
+    monkeypatch.setattr(sys, "argv", ["accept-matrix", "--package-root", str(tmp_path),
+        "--sha", "a" * 40, "--output", str(output), "--source", "csv", "--mode", "valid"])
+    assert campaign.main() == 1
+    assert json.loads(output.read_text())["campaign_error"] == reason
 
 
 def test_evidence_counts_preserve_unexecuted_cells(tmp_path: Path) -> None:

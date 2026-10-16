@@ -300,3 +300,35 @@ def test_postgres_acquisition_ci_uses_installed_package_and_disposable_examples(
     source = (ROOT / "examples/local_postgres/source.sql").read_text()
     assert "REVOKE CREATE ON SCHEMA public FROM PUBLIC" in source
     assert "REVOKE TEMPORARY ON DATABASE apa_source FROM PUBLIC" in source
+
+
+def test_container_stdio_deadline_covers_partial_frames() -> None:
+    import sys
+    import time
+    from scripts.accept_container_workloads import StdioClient
+
+    program = "import sys,time;sys.stdin.buffer.readline();sys.stdout.buffer.write(b'{\"jsonrpc\":');sys.stdout.buffer.flush();time.sleep(2)"
+    client = StdioClient([sys.executable, "-c", program])
+    client.response_timeout = 0.1
+    started = time.monotonic()
+    try:
+        with pytest.raises(TimeoutError, match="response deadline exceeded"):
+            client.request("fixture", {})
+        assert time.monotonic() - started < 1
+    finally:
+        client.process.kill()
+        client.close()
+
+
+def test_container_stdio_rejects_oversized_frames() -> None:
+    import sys
+    from scripts.accept_container_workloads import StdioClient
+
+    program = "import sys;sys.stdin.buffer.readline();sys.stdout.buffer.write(b'x'*2048+b'\\n');sys.stdout.buffer.flush()"
+    client = StdioClient([sys.executable, "-c", program])
+    client.frame_limit = 1024
+    try:
+        with pytest.raises(ValueError, match="response frame limit exceeded"):
+            client.request("fixture", {})
+    finally:
+        client.close()

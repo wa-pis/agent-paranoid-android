@@ -1,6 +1,6 @@
 # Final Acceptance Matrix Plan
 
-**Status: planned, not executed.** Run after the current feedback corrections,
+**Status: execution in progress; final acceptance remains open.** Run after the current feedback corrections,
 source/output parity and MCP documentation are finished, before declaring their
 combined result accepted or preparing the next release. The implementation
 agent owns preparation and execution; actual human review remains the operator's
@@ -8,6 +8,38 @@ step. Track completion in OpenSpec change `cross-interface-acceptance`.
 
 Existing successful tests are a starting point. They do not establish completed
 acceptance of all interfaces, options or a later commit.
+
+## Executable campaign
+
+`scripts/accept_cross_interface_matrix.py` runs the 600 logical handoff cells
+against an installed wheel, with two seeded repeats per cell. Supply the isolated
+interpreter, installed package directory, exact candidate SHA and a new evidence
+JSON path. Its worker must complete successfully and reap the MCP server before
+the controller accepts the result. Bind the externally supplied SHA to the actual
+wheel/sdist hashes in the final evidence; a package path alone is not that proof.
+
+Acquisition is prepared once per route and an independently authored reviewed
+specification then exercises shared generation semantics. Database aggregates in
+this matrix are fictional stand-ins. Separate disposable PostgreSQL and Trino
+integration runs establish live acquisition; the 600 cells do not represent 600
+independent live profiling/inference runs.
+
+`tests/test_acceptance_option_pairs.py` defines a finite covering array over nine
+representative option axes, with explicit compatibility constraints. Its current
+52 behavioral cases cover all 464 feasible pairs among 18,560 feasible
+combinations. The ledger records its chosen values and limits. It does not claim
+all values of every model property or all triples. Boundary, option-family,
+all-rule-family, publication and safety cases live in the companion
+`test_acceptance_option_families.py`, `test_acceptance_option_interactions.py` and
+`test_negative_rule_overlap.py` suites. The lexical property/flag inventory is
+navigation evidence, not a behavioral coverage measurement. Retained metadata
+such as identifier prefixes is distinguished from effective generation controls.
+
+`scripts/accept_container_workloads.py` runs actual hardened CLI/stdio workloads;
+the container workflow saves their evidence for all three targets on both
+architectures. The CI PostgreSQL and Trino jobs exercise fictional restricted
+readers independently of the aggregate stand-ins. Record their exact SHA,
+dependency versions and real versus emulated architecture in the final ledger.
 
 ## Coverage and sequence
 

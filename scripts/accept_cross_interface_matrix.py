@@ -94,7 +94,7 @@ def stop_owned_process(pid: int, requested_signal: int) -> None:
         pass
 
 
-def supervise(command: list[str], workspace: Path, timeout: float) -> bool:
+def supervise(command: list[str], workspace: Path, timeout: float) -> tuple[bool, int]:
     """Bound worker waiting and clean the SDK's separate server kill scope."""
     timed_out = False
     with (workspace / "worker-stdout").open("w") as out, (workspace / "worker-stderr").open("w") as err:
@@ -119,7 +119,7 @@ def supervise(command: list[str], workspace: Path, timeout: float) -> bool:
                 # The server uses only local generation in this runner. Kill any
                 # surviving admitted kill scope before deleting its workspace.
                 stop_owned_process(pid, signal.SIGKILL)
-    return timed_out
+    return timed_out, process.returncode
 
 
 def check_bundle(folder: Path, expected_spec: Any, source_marker: str) -> dict[str, Any]:
@@ -342,25 +342,28 @@ async def run_campaign(args: argparse.Namespace, report: dict[str, Any]) -> None
         args=["-I", "-c", bootstrap, str(pid_path), str(console)],
         cwd=str(workspace), env=clean_environment(workspace))
     stderr_path = workspace / "server-stderr"
-    with stderr_path.open("w") as errors:
-        async with stdio_client(server, errlog=errors) as (read, write):
-            sdk_timeout: Any = (timedelta(seconds=args.timeout)
-                               if int(version("mcp").split(".")[0]) == 1 else args.timeout)
-            async with ClientSession(read, write, read_timeout_seconds=sdk_timeout) as client:
-                await asyncio.wait_for(client.initialize(), timeout=args.timeout)
-                tools = (await asyncio.wait_for(client.list_tools(), timeout=args.timeout)).tools
-                report["mcp_tools"] = sorted(tool.name for tool in tools)
-                require({"generate_dataset", "validate_dataset"} <= set(report["mcp_tools"]),
-                        "mcp_discovery_missing_generation")
-                await execute(client)
-    require("source-marker" not in bounded_text(stderr_path), "mcp_stderr_source_disclosure")
-    require(pid_path.is_file(), "mcp_pid_missing")
     try:
-        os.kill(int(pid_path.read_text()), 0)
-    except ProcessLookupError:
-        report["mcp_teardown"] = "process_reaped"
-    else:
-        raise AcceptanceFailure("mcp_process_not_reaped")
+        with stderr_path.open("w") as errors:
+            async with stdio_client(server, errlog=errors) as (read, write):
+                sdk_timeout: Any = (timedelta(seconds=args.timeout)
+                                   if int(version("mcp").split(".")[0]) == 1 else args.timeout)
+                async with ClientSession(read, write, read_timeout_seconds=sdk_timeout) as client:
+                    await asyncio.wait_for(client.initialize(), timeout=args.timeout)
+                    tools = (await asyncio.wait_for(client.list_tools(), timeout=args.timeout)).tools
+                    report["mcp_tools"] = sorted(tool.name for tool in tools)
+                    require({"generate_dataset", "validate_dataset"} <= set(report["mcp_tools"]),
+                            "mcp_discovery_missing_generation")
+                    await execute(client)
+    finally:
+        if pid_path.is_file():
+            try:
+                os.kill(int(pid_path.read_text()), 0)
+            except ProcessLookupError:
+                report["mcp_teardown"] = "process_reaped"
+                # A reaped PID must never remain eligible for supervisor cleanup.
+                pid_path.unlink()
+    require(report.get("mcp_teardown") == "process_reaped", "mcp_process_not_reaped")
+    require("source-marker" not in bounded_text(stderr_path), "mcp_stderr_source_disclosure")
 
 
 def parser() -> argparse.ArgumentParser:
@@ -393,6 +396,7 @@ def main() -> int:
         try:
             asyncio.run(asyncio.wait_for(run_campaign(args, report),
                                         timeout=max(1.0, args.campaign_timeout - 10)))
+            report["worker_complete"] = True
         except BaseException as exc:
             report["campaign_error"] = (str(exc) if type(exc) is AcceptanceFailure
                                         else type(exc).__name__)
@@ -422,10 +426,17 @@ def main() -> int:
                    "--timeout", str(args.timeout), "--campaign-timeout", str(args.campaign_timeout)]
         for field in ("source", "output_format", "mode", "interface"):
             command.extend(["--" + field.replace("_", "-"), *getattr(args, field)])
-        if supervise(command, workspace, args.campaign_timeout):
-            report = json.loads(args.output.read_text())
+        timed_out, returncode = supervise(command, workspace, args.campaign_timeout)
+        report = json.loads(args.output.read_text())
+        if timed_out:
             report["campaign_error"] = "campaign_timeout"
-            save_report(args.output, report)
+        elif returncode != 0:
+            report.setdefault("campaign_error", "worker_exit_failed")
+        elif not report.get("worker_complete"):
+            report["campaign_error"] = "worker_completion_missing"
+        elif "mcp" in args.interface and report.get("mcp_teardown") != "process_reaped":
+            report["campaign_error"] = "mcp_teardown_missing"
+        save_report(args.output, report)
     report = json.loads(args.output.read_text())
     print(json.dumps({"sha": args.sha, "counts": report["counts"],
                       "scope": report["scope"], "campaign_error": report.get("campaign_error")}))

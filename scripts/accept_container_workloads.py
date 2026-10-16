@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import selectors
 import subprocess
 import time
@@ -72,20 +73,34 @@ def container_arguments(image: str, target: str, platform: str, name: str) -> li
 class StdioClient:
     def __init__(self, command: list[str]) -> None:
         self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                        stderr=subprocess.DEVNULL, text=True)
+                                        stderr=subprocess.DEVNULL)
         self.sequence = 0
+        self.response_timeout = 90.0
+        self.frame_limit = 1024 * 1024
+        self.buffer = bytearray()
 
     def request(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
         self.sequence += 1
         assert self.process.stdin is not None and self.process.stdout is not None
         message = {'jsonrpc': '2.0', 'id': self.sequence, 'method': method, 'params': params}
-        self.process.stdin.write(json.dumps(message) + '\n')
+        self.process.stdin.write((json.dumps(message) + '\n').encode())
         self.process.stdin.flush()
+        deadline = time.monotonic() + self.response_timeout
         with selectors.DefaultSelector() as selector:
             selector.register(self.process.stdout, selectors.EVENT_READ)
-            if not selector.select(timeout=90):
-                raise TimeoutError('container MCP response deadline exceeded')
-        response: dict[str, Any] = json.loads(self.process.stdout.readline())
+            while b'\n' not in self.buffer:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0 or not selector.select(timeout=remaining):
+                    raise TimeoutError('container MCP response deadline exceeded')
+                chunk = os.read(self.process.stdout.fileno(), min(65536, self.frame_limit + 1 - len(self.buffer)))
+                if not chunk:
+                    raise EOFError('container MCP response channel closed')
+                self.buffer.extend(chunk)
+                if len(self.buffer) > self.frame_limit:
+                    raise ValueError('container MCP response frame limit exceeded')
+        line, _, remainder = self.buffer.partition(b'\n')
+        self.buffer = bytearray(remainder)
+        response: dict[str, Any] = json.loads(line)
         assert response.get('id') == self.sequence, 'unexpected MCP response'
         return response
 
@@ -94,7 +109,7 @@ class StdioClient:
                                                'clientInfo': {'name': 'fictional-container-acceptance', 'version': '1'}})
         assert 'result' in response
         assert self.process.stdin is not None
-        self.process.stdin.write(json.dumps({'jsonrpc': '2.0', 'method': 'notifications/initialized'}) + '\n')
+        self.process.stdin.write((json.dumps({'jsonrpc': '2.0', 'method': 'notifications/initialized'}) + '\n').encode())
         self.process.stdin.flush()
 
     def call(self, name: str, arguments: dict[str, Any], *, expect_error: bool = False) -> dict[str, Any]:
@@ -161,7 +176,7 @@ def main() -> None:
     started = time.monotonic()
     record: dict[str, Any] = {'target': args.target, 'platform': args.platform, 'image': args.image}
     try:
-        inspect = subprocess.run(['docker', 'image', 'inspect', args.image], capture_output=True, text=True, check=True)
+        inspect = subprocess.run(['docker', 'image', 'inspect', args.image], capture_output=True, text=True, check=True, timeout=30)
         image = json.loads(inspect.stdout)[0]
         assert image['Config']['User'] == '65532:65532'
         assert image['Architecture'] == args.platform.split('/')[1]

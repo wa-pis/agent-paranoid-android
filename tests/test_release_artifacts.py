@@ -238,11 +238,15 @@ def test_workflow_actions_are_pinned_to_full_commit_shas() -> None:
 
 def test_setup_uv_keeps_cache_pruning_enabled() -> None:
     workflows = sorted((ROOT / ".github" / "workflows").glob("*.yml"))
-    workflow_text = "\n".join(path.read_text() for path in workflows)
-
-    setup_count = workflow_text.count("uses: astral-sh/setup-uv@")
-    assert setup_count == 13
-    assert workflow_text.count("prune-cache: true") == setup_count
+    setup_steps = [
+        step
+        for path in workflows
+        for job in yaml.safe_load(path.read_text())["jobs"].values()
+        for step in job.get("steps", [])
+        if step.get("uses", "").startswith("astral-sh/setup-uv@")
+    ]
+    assert setup_steps
+    assert all(step.get("with", {}).get("prune-cache") is True for step in setup_steps)
 
 
 def test_release_preflight_builds_exact_artifacts_without_publish_permissions() -> None:

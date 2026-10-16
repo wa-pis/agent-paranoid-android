@@ -9,9 +9,9 @@
 ## Prepare after implementation stabilizes
 
 - [ ] Freeze the candidate SHA, clean checkout, wheel/sdist hashes and environment inventory.
-- [ ] Build the expected case ledger from schemas, parser, discovery and supported routes; map existing coverage and identify missing cases.
-- [ ] Add missing installed CLI/Python/stdio MCP cases and report actual coverage against that ledger.
-- [ ] Prepare fictional related-table fixtures, expected invalid outcomes, private temporary workspaces and disposable read-only DB identities.
+- [x] Build the expected case ledger from schemas, parser, discovery and supported routes; map existing coverage and identify missing cases.
+- [x] Add missing installed CLI/Python/stdio MCP cases and report actual coverage against that ledger.
+- [x] Prepare fictional related-table fixtures, expected invalid outcomes, private temporary workspaces and disposable read-only DB identities.
 
 ## Execute the campaign
 
