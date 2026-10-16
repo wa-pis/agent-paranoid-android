@@ -168,15 +168,20 @@ does not itself approve a dataset or authorize preservation. See the
   expect rejected values to be reflected in error messages.
 
 Add Trino only for database profiling, using the separate configuration and
-[Safe Trino Sequence](#safe-trino-sequence) below. Do not give the generator
-server database credentials.
+[Safe Trino Sequence](#safe-trino-sequence) below. Keep database credentials in
+the Trino server for that aggregate-profile-to-synthetic workflow. The separately
+configured SQL transformation session has its own connection requirements.
 
 ## Prepare A Workspace
 
-### Closed Common-Profile Candidate
+<a id="closed-common-profile-candidate"></a>
 
-The 1.6 RC runtime adds `common_transformation` to the generator server.
-Published 1.5.0 does not include this tool; registration is not release clearance.
+### Common-Profile Workflow (1.6 RC)
+
+Published `1.6.0rc5` registers `common_transformation` in the generator console
+server. Stable `1.5.0` does not include this tool. Registration does not grant
+access to a dataset or complete the separately gated transformation/session
+acceptance campaign.
 It accepts `operation` (`review`, `validate`, `execute`), workspace-relative
 `profile`, and positive explicit `max_total_bytes`, `max_review_bytes`,
 `max_output_bytes`. Validation/execution require the exact reviewed
@@ -190,8 +195,8 @@ literals. Existing transport/work budgets still apply; these byte settings do
 not enlarge source-free profiling or serialized response budgets. Unknown
 arguments, including `root` and `approved`, are rejected without reflection.
 Configuration creation and human confirmation remain local CLI operations.
-Installed fictional acceptance with MCP SDK1/SDK2 is evidence for this candidate,
-not permission to activate it or process private data.
+Installed fictional acceptance with MCP SDK1/SDK2 does not authorize private
+data access or issue a local preservation receipt.
 
 ```bash
 mkdir -p /path/to/synthetic-workspace
@@ -253,10 +258,10 @@ It reads a fixed local snapshot in the format selected by the saved policy and
 returns `review_only`, `snapshot_sha256` and the same value-free review as CLI
 `transform-review`. Referenced mapping files stay local to the policy directory.
 The tool writes no artifacts, creates no approval receipt, executes no
-transformation and connects to no database. Public transformation execution
-remains gated; normal generator operations below remain source-free.
+transformation and connects to no database. It is separate from ordinary
+source-free generator operations.
 
-The isolated activation candidate additionally registers `execute_transformation`
+The published `1.6.0rc5` generator also registers `execute_transformation`
 with workspace-relative `input_path`, `policy_path`, new `output_path`, mandatory
 `snapshot_sha256`, optional `table_name`/existing `receipt_path`, and optional
 `max_total_input_bytes`/`max_output_bytes` run caps. It consumes the same exact
@@ -271,10 +276,11 @@ Preservation requires a matching receipt issued separately by the human local
 controlling-terminal CLI. There is no MCP receipt issuer or approval flag.
 Changed inputs invalidate receipts; workspace escapes, existing destinations,
 unsupported actions and budget violations fail closed without copying fallback.
-This isolated candidate registers the consumer; the released 1.5.0 package
-does not. Public delivery requires installed acceptance, matching safety/spec
-documentation and independent exact-SHA safety review. A receipt never
-authorizes database access or external APIs.
+Stable `1.5.0` does not include this consumer. Its registration does not complete
+the broader transformation/session acceptance campaign or authorize a dataset.
+Changed public activation still requires matching contracts, executable safety
+evidence and independent exact-SHA review. A receipt never authorizes database
+access or external APIs.
 
 1. Put a CSV file, CSV folder, or safe profile below the workspace root.
 2. Call `plan_dataset` with that source, a new agent workspace, count, seed,
@@ -292,8 +298,10 @@ planning approval argument; configure the client's confirmation policy before
 enabling these writing tools. Permission to invoke `approve_dataset_plan` is
 not evidence that the human reviewed the displayed specification.
 
-For business rules, provide exactly one of `business_rules_path` or a bounded
-structured `business_rules_payload`.
+For the planning/approval workflow, embed `business_rules` in the reviewed
+DatasetSpec. Direct `generate_dataset` and `export_dataset` calls can instead
+provide `business_rules_path` or a bounded structured `business_rules_payload`.
+Use one rule source: external rules cannot be combined with embedded rules.
 
 Generator MCP reads newline-framed requests through the same bounded transport
 used by Trino MCP. Each request receives a fresh non-resettable budget. The
@@ -389,9 +397,9 @@ The server rejects:
 See [MCP Tools](../mcp_examples.md) and
 [Configuration](../reference/configuration.md) for details.
 
-Preservation approval is never an MCP capability. This candidate's separate
+Preservation approval is never an MCP capability. The registered separate
 workspace execution consumer cannot issue local receipts, return rows or
-broaden source-free generator authority. Public delivery still requires the
+broaden source-free generator authority. Changed public activation requires the
 scoped safety review and executable evidence specified by ADR-0020 and ADR-0021.
 
 

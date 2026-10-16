@@ -15,7 +15,10 @@ synthetic providers rather than source values. No invalid values are intentional
 `load_test` multiplies each entity's requested row count by
 `generation_settings.load_multiplier` (default 10). Explicit CLI `--count` or
 Python bundle `count` supplies the exact row count without multiplication.
-Profile/CSV generation requires an explicit count and uses that count exactly.
+Direct `generate-from-csv` and `generate --profile` require an explicit count
+and use it exactly. The `generate-from-example` folder shortcut permits an
+omitted count and then uses the inferred per-entity profile counts; use a
+reviewed DatasetSpec to select `load_test` for that staged workflow.
 Generation remains seeded and valid; all row, payload, disk and execution
 budgets apply before allocation. An oversized request fails rather than truncates.
 This mode produces data for load testing; it does not send traffic or run a benchmark.

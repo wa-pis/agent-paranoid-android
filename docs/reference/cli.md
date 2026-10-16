@@ -32,6 +32,7 @@ Use these focused references for task detail:
 | --- | --- | --- |
 | `demo` | Run the offline fictional example | Synthetic CSV bundle |
 | `profile-csv` | Profile one CSV into safe metadata | Profile JSON |
+| `profile-parquet` | Profile one Parquet file into safe metadata | Profile JSON |
 | `profile-example` | Profile a folder with one CSV per entity | Profile JSON |
 | `infer-spec` | Infer a reviewable `DatasetSpec` | YAML or JSON spec |
 | `generate-from-csv` | Run the complete single-table workflow | Data file and review artifacts |
@@ -73,8 +74,10 @@ separate from a mapping file's `null_token`. All settings are bound to the
 exact policy snapshot, so changing them invalidates existing approvals.
 The schema fingerprint must match this transformation-specific profile;
 ordinary source-free profiling still treats empty cells as missing values.
-A profile-creation wizard for this contract is not yet available. Review never
-silently repairs a stale fingerprint or approves the revised policy.
+Single-source review requires an existing valid policy. The separate
+`transform-batch create --create-csv-policies` workflow can prepare common-profile
+CSV policy proposals; it does not approve their decisions. Review never silently
+repairs a stale fingerprint or approves the revised policy.
 
 Add `--trace` to the same read-only command for up to 50 row/column/rule
 ordinal events plus match counts. It reads only the fixed snapshot (at most
@@ -118,13 +121,14 @@ counters and supported recovery keys. Cleanup-incomplete errors require local
 inspection of destination/staging before retry; they do not permit overwrite.
 Database capture and private `derive` are not enabled by this entrance.
 
-These commands are registered in this isolated candidate, not in the released
-1.5.0 package. Public delivery requires the matching safety/spec amendment,
-installed-candidate gates and independent exact-SHA safety review. Neither
-command discovery nor passing fictional acceptance authorizes a dataset;
-ordinary generation stays source-free.
+Published `1.6.0rc5` includes these registered commands; stable `1.5.0` does not.
+The separately gated transformation/session acceptance campaign remains open;
+see the [current evidence and limits](../acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
+Command discovery, fictional tests and release acceptance do not authorize a
+dataset. Changed activation still requires its safety/spec and exact-source
+review gates; ordinary generation stays source-free.
 
-In the isolated candidate, the existing decision wizard feeds this same
+The existing decision wizard feeds this same
 execution contract: edit an already reviewable policy with `transform-review
 SOURCE POLICY --decide --edit-actions`, save with `SAVE`, then review the saved
 bytes again and use that digest for execution. Inline and local CSV substitution
@@ -134,9 +138,11 @@ retains any eligible source field, separate local `transform-approve` remains
 mandatory before CLI or MCP execution. The wizard does not create or repair an
 invalid initial policy or turn a sensitivity answer into approval.
 
-### Closed common-profile workflow candidate
+<a id="closed-common-profile-workflow-candidate"></a>
 
-The 1.6 RC composition registers `transform-batch` in the CLI and
+### Common profile workflow (1.6 RC)
+
+Published `1.6.0rc5` registers `transform-batch` in the CLI and
 `common_transformation` in the running generator MCP server. Published 1.5.0
 does not provide these additions. Their operations are:
 
@@ -147,18 +153,22 @@ does not provide these additions. Their operations are:
 | `approve` | root, saved profile, new receipt, `--snapshot-sha256` | Require fresh controlling-TTY confirmation; pipe/flag approval is rejected. |
 | `validate` | root, saved profile, `--snapshot-sha256` | Validate temporary output without retained publication. |
 | `execute` | root, saved profile, `--snapshot-sha256` | Execute temporarily, or retain a new direct-child bundle with `--destination`. |
+| `query-execute` | root, saved profile, configured query references, new destination | Capture once, review and complete the separate [configured SQL workflow](#configured-sql-sessions-16-rc). |
 
 All operations require explicit `--max-total-input-bytes` and `--max-review-bytes`;
-review/validate/execute also require `--max-output-bytes`. Preservation consumers
-need `--receipt`. Creation from absent CSV policies requires
+review/validate/execute/query-execute also require `--max-output-bytes`.
+Saved-profile `validate`/`execute` need `--receipt` when preserving values;
+`query-execute` obtains any required receipt locally within its owning session.
+Creation from absent CSV policies requires
 `--create-csv-policies --seed INTEGER`; initial proposals are unknown/drop-only,
 not approved decisions. `--edit-actions`/`--edit-formats` require `--decide`, and
 CSV creation with interactive decisions requires explicit action editing.
 Saving configuration changes reference paths and requires a fresh reviewed digest.
 Existing files, unsafe references and output destinations are not overwritten.
-Registration describes this RC composition, not a published release or
-authorization to process a dataset; final exact-source safety and release gates
-remain required.
+Registration is distinct from authorization to process a dataset and from the
+still-open transformation/session acceptance campaign. The
+[RC5 release record](../release-evidence-1.6.0rc5.md) records completed release
+gates without closing that campaign or issuing preservation authority.
 
 The RC composition exposes these operations under `transform-batch`. Its
 machine-readable success and error responses use CLI schema version `1.0`;
@@ -166,9 +176,9 @@ success metadata is inside `result`, not flattened into the envelope. Runtime
 `--json`/`--debug` flags are accepted before the command, before the operation,
 or after operation arguments. Debug does not disclose rejected arguments.
 Controlling-TTY approval remains local-only; `create` and `SAVE` never issue a
-receipt. Installed isolated CLI/MCP acceptance is not public activation approval.
+receipt. Isolated CLI/MCP checks alone do not approve changed public activation.
 
-For the isolated candidate, save the profile and field decisions, review the
+Save the profile and field decisions, review the
 exact saved inputs, then validate against the returned digest. Obtain local
 approval only when the selected actions preserve values, and execute using that
 same digest and receipt. Editing an input, policy, mapping or output setting
@@ -312,9 +322,10 @@ Aliases:
 
 `test-data-agent transform-batch query-execute` completes a single
 owned session. It reads a saved batch profile and a bounded reference file,
-captures each configured query once, displays metadata review, requests the
-existing local controlling-TTY receipt when preservation requires it, and
-validates before retaining output in a new directory in the parent workspace.
+captures each configured query once and displays metadata review. When
+preservation requires it, the command requests fresh controlling-TTY confirmation,
+then issues and consumes an owned temporary receipt for that frozen session.
+It validates before retaining output in a new directory in the parent workspace.
 Captured inputs and session receipts expire on command completion or failure.
 This is not an installed 1.5.0 command or dataset approval. For example, with
 authorization to read the configured source and an authored batch profile:

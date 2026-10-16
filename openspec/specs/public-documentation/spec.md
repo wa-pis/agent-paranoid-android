@@ -12,6 +12,10 @@ contracts.
 Every public documentation layer SHALL describe the same shipped JDBC URL,
 qualified wildcard, and SQL query source contracts as CLI help, Python models,
 configuration validation, safety policy, and runnable examples.
+The same reconciliation applies to the supported generation, artifact and
+CLI/MCP contracts. Current guides distinguish published stable and candidate
+versions, registered execution surfaces, dataset authorization and unfinished
+acceptance campaigns; historical evidence keeps its original source identity.
 
 #### Scenario: Feature is not yet implemented
 
@@ -30,6 +34,25 @@ configuration validation, safety policy, and runnable examples.
   the same behavior and terminology
 - **AND** all displayed commands and imports are verified against an installed
   package
+
+#### Scenario: Registered candidate surface has remaining acceptance work
+
+- **GIVEN** a published candidate registers a CLI command or MCP tool and a
+  separate acceptance campaign remains incomplete
+- **WHEN** current usage, configuration and architecture pages are reconciled
+- **THEN** they identify the installed surface and its actual arguments without
+  describing it as unregistered or claiming the separate campaign passed
+- **AND** registration and release acceptance do not grant dataset permission
+  or replace required local preservation approval
+
+#### Scenario: Current artifacts differ from a historical representation
+
+- **GIVEN** a supported schema or manifest-marked output representation changes
+- **WHEN** current examples and migration guidance are checked
+- **THEN** examples parse under their declared schema and agree on logical
+  values, format markers and overwrite behavior
+- **AND** legacy unmarked artifacts and historical release evidence retain
+  their explicitly documented contracts
 
 ### Requirement: Documentation Preserves Database Safety Boundaries
 

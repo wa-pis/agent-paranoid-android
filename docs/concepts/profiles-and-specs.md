@@ -94,7 +94,8 @@ provider or MCP, or supplied to generation.
 - primary keys and relationships;
 - distributions and constraints;
 - privacy annotations;
-- generation settings and schema version.
+- structured business rules;
+- generation and validation settings and schema version.
 
 Infer a spec:
 
@@ -133,8 +134,10 @@ the workflow, but it is not the only validator.
 
 ## Versioning
 
-The current `DatasetSpec` contract uses `schema_version: "1.0"`. Keep the
-schema version, package version, `spec_sha256`,
+Newly constructed `DatasetSpec` files use `schema_version: "1.1"`; version
+`1.0` remains supported, and serialized files without a version load as `1.0`
+for compatibility. Exact DECIMAL fields require `1.1`. Keep the schema version,
+package version, `spec_sha256`,
 `business_validation.rules_sha256`, and seed with any dataset that must be
 reproduced later.
 

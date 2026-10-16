@@ -145,11 +145,12 @@ the compact profile JSON, not a downloaded copy of the source table.
 
 ### SQL Query Source Profile
 
-Stable `1.5.0` can profile one reviewed PostgreSQL or Trino query as a
-virtual entity. The resulting `source_type` is `postgres_query` or
-`trino_query`; the profile records a stable `source_fingerprint` and
-`source_policy_version: "1.0"` alongside ordinary safe entity metadata and
-aggregates.
+The query-source workflow introduced in stable `1.5.0` profiles one reviewed
+PostgreSQL or Trino query as a virtual entity. Its `source_type` is `postgres_query` or
+`trino_query`. In RC5, the profile records a stable `source_fingerprint`,
+`source_policy_version: "1.1"`, and ordinary safe entity metadata and aggregates.
+This source-policy version is separate from DatasetSpec's schema version;
+older query fingerprints remain historical evidence.
 
 The fingerprint identifies the validated query shape without serializing the
 SQL. Query text, literals, physical endpoints, backend messages, and query
@@ -202,33 +203,37 @@ the profile, but it is intended for generation.
 Small example:
 
 ```yaml
-schema_version: '1.0'
+schema_version: '1.1'
 entities:
 - name: customers
-  row_count: 1000
+  row_count: 2
+  primary_key: customer_id
   fields:
   - name: customer_id
-    data_type: string
-    nullable: false
-    null_ratio: 0.0
-    sensitive: false
-    semantic_type: null
+    data_type: integer
     is_identifier: true
-    distribution:
-      kind: synthetic_identifier
-  - name: email
-    data_type: string
-    nullable: false
-    null_ratio: 0.0
-    sensitive: true
-    semantic_type: email
-    is_identifier: false
-    distribution:
-      kind: masked_patterns
-      patterns:
-      - pattern: email
-        count: 3
-  primary_key: customer_id
+    distribution: {kind: synthetic_identifier}
+- name: orders
+  row_count: 3
+  primary_key: order_id
+  fields:
+  - name: order_id
+    data_type: integer
+    is_identifier: true
+    distribution: {kind: synthetic_identifier}
+  - name: customer_id
+    data_type: integer
+    is_identifier: true
+    distribution: {kind: synthetic_identifier}
+  - name: quantity
+    data_type: integer
+    distribution: {kind: numeric, min_value: 1, max_value: 4}
+  - name: unit_price
+    data_type: decimal
+    distribution: {kind: decimal_range, precision: 4, scale: 2, min: '1.00', max: '5.00'}
+  - name: amount
+    data_type: decimal
+    distribution: {kind: decimal_range, precision: 5, scale: 2, min: '0.00', max: '20.00'}
 
 relationships:
 - parent_entity: customers
@@ -246,13 +251,24 @@ constraints:
   expression: quantity * unit_price
   confidence: 1.0
   status: inferred
+
+generation_settings:
+  seed: 12345
+  output_format: json
 ```
 
 `schema_version` is the serialized contract version and is independent from the
-Python package version. Version `1.0` validates unique entity/field names and
-checks that relationships, constraints, primary keys, and scoped privacy rules
-refer to fields that exist. Older specs without the key load as `1.0` for
-backward compatibility.
+Python package version. New specifications default to `1.1`; exact DECIMAL
+fields require it. Both supported versions validate unique entity/field names
+and check that relationships, constraints, primary keys, and scoped privacy
+rules refer to fields that exist. Older serialized specs without the key load
+as `1.0` for backward compatibility.
+
+Business rules can be embedded as `business_rules` in the reviewed spec or
+supplied as a reviewed YAML/JSON rule file. Generation and validation settings
+travel with the same spec across sources and output formats. See the
+[source/output contract](reference/source-output-matrix.md) and
+[business-rule workflow](how-to/business-rules.md).
 
 ## What You Can Edit
 

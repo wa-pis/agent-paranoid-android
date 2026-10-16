@@ -9,7 +9,7 @@ the Python package version.
 | Schema version | Status | First package release |
 |---|---|---|
 | `1.0` | Supported | `0.3.0` |
-| `1.1` | Supported in candidate branch | Planned `1.6.0rc1` |
+| `1.1` | Supported in published RC5 | `1.6.0rc1` |
 
 Files without `schema_version` are interpreted as `1.0` for compatibility with
 early project artifacts. New files always include the field.

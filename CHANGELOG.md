@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Fixed
+
+- Align RC5 guides on DatasetSpec 1.1, folder replacement, portable business rules and registered CLI/MCP workflows, retaining local approval requirements and legacy artifact distinctions.
+
 ## [1.6.0rc5] - 2026-10-16
 
 ### Added

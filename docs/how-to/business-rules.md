@@ -97,8 +97,11 @@ test-data-agent generate out/rules/dataset_spec.yaml \
   --output out/rules/mixed_cases
 ```
 
-`mixed` introduces the requested share of invalid values.
-`negative` intentionally makes generated values invalid. Keep these datasets
+With business rules, `mixed` uses seeded random row selection at the requested
+invalid ratio and attempts an eligible rule violation for each selected row.
+The ratio is not an exact count of failed cells or rules. `negative` attempts
+eligible violations for every row; it does not make every field invalid, and
+tables without an applicable mutation can remain valid. Keep these datasets
 clearly separated from valid fixtures and review the validation report rather
 than expecting it to pass.
 

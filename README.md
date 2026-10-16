@@ -91,12 +91,12 @@ regenerating existing fixtures.
 
 ## Development
 
-The 1.6 development candidate includes an isolated saved-profile transformation
-workflow, not an available command in the published 1.5.0 package. Public common
-CLI/MCP activation remains gated by completed candidate checks and independent
-safety review. See the [candidate CLI contract](docs/reference/cli.md#closed-common-profile-workflow-candidate)
-and [acceptance evidence](openspec/changes/selective-source-transformation/client-acceptance.md).
-Ordinary generation remains source-free; agents cannot issue preservation approval.
+Published RC5 registers saved-profile transformation CLI/MCP workflows; stable
+1.5.0 does not include them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
+and [acceptance limits](docs/acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
+The separate transformation/session acceptance campaign remains open.
+Registration grants no dataset permission: preservation still requires exact local
+approval. Ordinary generation remains source-free; agents cannot issue that approval.
 
 ```bash
 python3 -m pip install "uv==0.11.23"

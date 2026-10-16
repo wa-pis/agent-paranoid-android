@@ -137,7 +137,7 @@ and trust-channel guidance.
 | `--invalid-ratio R` | Invalid share from `0` to `1` for applicable modes |
 | `--business-rules PATH` | Reviewed YAML or JSON rule file |
 | `--output PATH` | Output file or new output directory |
-| `--overwrite` | Replace one valid manifest-owned target |
+| `--overwrite` | Replace a complete DatasetSpec output folder, or the same valid manifest-owned single-entity file bundle |
 
 Parquet output from a reviewed specification uses declared integer, float,
 boolean, string, date and timestamp Arrow types, including nullable fields.
@@ -169,9 +169,16 @@ without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
 Sensitive DECIMAL ranges remain rejected before generation; explicit numeric
 measure semantics retain sensitive-name, flag and classification vetoes.
 
-Folder generation requires a new or empty destination. Single-entity output
-suffixes must match the selected format. Overwrite fails closed when ownership,
-manifest, format, or sibling-file checks do not match.
+DatasetSpec folder generation requires a new or empty destination unless
+`--overwrite` is set. With that flag it replaces the complete folder, including
+obsolete files, after generation and validation finish. Staging and a backup
+support rollback on publication failure; this is not a concurrent-reader atomic
+exchange. Symlinks and folders containing the input spec or rule file are refused.
+`generate-from-example` still requires a new or empty destination.
+
+Single-entity output suffixes must match the selected format. Its separate
+file-bundle overwrite requires matching ownership, manifest, format and sibling
+files. These checks do not impose manifest ownership on complete-folder replacement.
 
 ## Profiling Options
 

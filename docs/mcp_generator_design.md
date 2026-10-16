@@ -49,7 +49,10 @@ Trino or CSV
 Safe profile metadata
     |
     v
-DatasetSpec 1.0
+DatasetSpec 1.1 (legacy 1.0 remains readable)
+    |
+    v
+Human review + fresh consent for the exact current spec
     |
     v
 Deterministic generator
@@ -86,10 +89,14 @@ to export production data.
 1. The AI calls allowlisted metadata and aggregate profiling tools in
    `mcp_trino_server.py`.
 2. The Trino server returns a compact safe profile payload.
-3. The AI passes that payload directly to `infer_dataset_spec` as
-   `profile_payload`.
-4. The generator server validates the profile and writes a versioned spec.
-5. The AI reviews or edits the spec, then requests generation.
+3. The AI passes that payload to `plan_trino_dataset` as `profile_payload`,
+   with an explicit workspace, count and seed.
+4. The generator server validates the profile, writes a versioned spec and
+   stops before generation.
+5. The client inspects the plan, presents the full current `dataset_spec.yaml`
+   for human review and obtains fresh, explicit consent for that exact file.
+6. After rechecking the file and fingerprint, it calls `approve_dataset_plan`
+   with `reviewed_spec_sha256` from `inspect_dataset_plan`.
 
 No local copy of the source table is required.
 
@@ -99,11 +106,17 @@ No local copy of the source table is required.
 2. `plan_dataset` detects a CSV file or folder and invokes safe profiling.
 3. Sensitive columns retain masked patterns, never raw top values.
 4. The agent writes a reviewable generation contract and stops for approval.
-5. Approved generation uses distributions and a seed, not source-row
-   shuffling.
+5. The client inspects the plan, presents the full current specification and
+   obtains fresh, explicit human consent. It rechecks the file and fingerprint
+   before calling `approve_dataset_plan` with that reviewed fingerprint.
+6. Approved generation uses distributions and a seed, not source-row
+   shuffling. Editing the file requires another review and new consent; a
+   summary or fingerprint alone is not human specification acceptance.
 
 The lower-level `profile_csv` and `infer_dataset_spec` tools remain available
-when a client needs explicit control over intermediate artifacts.
+when a client needs explicit control over intermediate artifacts. These are
+lower-level operations, rather than the persisted review-first plan lifecycle.
+See [MCP usage](how-to/mcp.md) for the consent and resume procedure.
 
 Direct CSV and example-folder workflows compare complete generated rows against
 the source before writing output. An exact match stops generation without
@@ -136,8 +149,11 @@ audit configuration prevents tool execution. See
 ### Safe Profiles
 
 Fields marked sensitive, or inferred as sensitive from their name or semantic
-type, may use only masked-pattern or synthetic-identifier distributions. Raw
-categorical distributions for such fields are rejected.
+type, may use masked-pattern or synthetic-identifier distributions. Sensitive
+integer/float fields also support coarse `numeric_shape` or a `numeric`
+distribution with a non-identity scale factor. Raw categorical distributions
+for sensitive fields are rejected; exact sensitive Trino extrema and percentiles
+are not accepted as safe profiles.
 
 Implementation: `src/test_data_agent/safety.py` and
 `src/test_data_agent/generation/planner.py`.
@@ -157,25 +173,34 @@ counts, versions, and validation results. This keeps large payloads out of the
 model context and reduces the chance of accidental disclosure in prompts,
 logs, or chat history.
 
-Business-rule generation follows the same boundary. The response contains a
-rule fingerprint, rule/pass fail counts, validity, truncation status, and the
-path to `business_validation_report.json`. Row-level errors remain in the
-bounded workspace artifact.
+Business-rule generation follows the same boundary. Direct `generate_dataset`
+and `export_dataset` responses include the rule fingerprint, rule/pass fail
+counts, validity, truncation status and `business_validation_report_path`.
+`approve_dataset_plan` returns its compact generation summary and bundle paths;
+the rule summary and report remain in the hashed workspace bundle rather than
+separate response keys. Bounded, value-free rule diagnostics remain in that
+artifact.
 
 ### Structured Business Rules
 
-`generate_dataset` and `export_dataset` accept at most one workspace
-`business_rules_path` or inline `business_rules_payload`. Rule models forbid
+Business rules may be embedded in the reviewed `DatasetSpec`, so the same
+rules reach deterministic generation, review-first approval, validation and
+export regardless of the source or output adapter. `generate_dataset` and
+`export_dataset` also accept one workspace `business_rules_path` or inline
+`business_rules_payload` when the spec has no embedded rules. Combining rule
+sources is rejected; supplied rules are saved in the effective spec.
+Rule models forbid
 unknown fields, cap list and expression sizes, and permit only constants,
 field names, basic arithmetic, and explicit `sum`/`count` aggregate helpers.
 The server also rejects requests whose DatasetSpec row counts and rule set
 would exceed the configured estimated evaluation budget.
 
 Before generation, `rules/contract.py` verifies every entity and field
-reference against the DatasetSpec. It rejects values assigned to sensitive
-fields and raw-looking emails, phones, SSNs, payment data, credentials, or
-tokens in otherwise neutral rule literals. No output folder is published when
-this boundary fails.
+reference against the DatasetSpec. Literal assignments and comparisons against
+sensitive fields fail closed. Other literals undergo the shared content, size
+and type checks, including exact DECIMAL shape validation and its explicitly
+reviewed non-sensitive `numeric_measure` handling. No output folder is
+published when this boundary fails.
 
 ### Provenance Manifest
 
@@ -193,8 +218,10 @@ Every generated bundle includes `generation_manifest.json` with:
 - `source_rows_copied: false`
 
 The MCP validation tool requires this manifest and checks that its fingerprint
-matches the supplied effective spec. This prevents validating a bundle against
-an unrelated contract.
+matches the supplied effective spec. Manifest output hashes also bind the data,
+validation artifacts and any `business_validation_report.json`; missing or
+changed bound artifacts fail validation. This prevents validating a bundle
+against an unrelated contract or accepting a deleted rule report.
 
 Implementation: `src/test_data_agent/io/artifacts.py`.
 
@@ -207,10 +234,12 @@ without publishing output.
 ## Why DatasetSpec Is Versioned
 
 `DatasetSpec` is the contract between the AI planner and deterministic code.
-The serialized `schema_version: "1.0"` lets future versions evolve without
-silently changing old contracts.
+Newly constructed specs use `schema_version: "1.1"`; readers explicitly support
+both `1.0` and `1.1`. The serialized version permits evolution without silently
+changing old contracts. Exact `decimal` fields require `1.1` and their declared
+precision/scale and `decimal_range`; they cannot be silently read as floats.
 
-Version 1.0 validates:
+Both supported versions validate:
 
 - unique entity and field names
 - valid primary-key references
@@ -247,7 +276,10 @@ generated/orders_run/
 ```
 
 There is one data file per entity. The extension is selected by the requested
-CSV, JSON, or Parquet format.
+CSV, JSON, SQL, or Parquet format. `plan_dataset` exposes CSV, JSON and Parquet
+selection; `plan_trino_dataset` and direct generation/export also accept SQL.
+See the
+[source/output matrix](reference/source-output-matrix.md) for interface details.
 
 ## Module Ownership
 
@@ -263,6 +295,11 @@ CSV, JSON, or Parquet format.
 - `scripts/run_ai_demo.py`: local profile-to-CSV demonstration.
 
 ## Alternatives Intentionally Rejected
+
+These restrictions describe the ordinary aggregate-profile-to-synthetic
+pipeline. Separately registered mixed-origin transformation consumers remain
+behind their distinct snapshot, classification and local-receipt contracts;
+this pipeline grants them no source-preservation authority.
 
 - One MCP server with both database credentials and broad filesystem access.
 - Arbitrary unrestricted SQL tools.

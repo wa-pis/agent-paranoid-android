@@ -16,9 +16,11 @@ an explicit CLI value. Use `COMMAND --help` to inspect CLI defaults and
 `doctor --json` for installed/local capability states. `doctor` deliberately
 does not read provider credentials or test remote reachability.
 
-## Closed common transformation profile
+<a id="closed-common-transformation-profile"></a>
 
-The 1.6 RC composition registers the common CLI/MCP workflow; published 1.5.0
+## Common Transformation Profile (1.6 RC)
+
+Published `1.6.0rc5` registers the common CLI/MCP workflow; stable `1.5.0`
 does not include it. Its versioned reference profile combines two or more inputs
 with one independently reviewed DatasetSpec for final linked validation:
 
@@ -49,9 +51,11 @@ Session precedence and explicit run-cap checks below still apply. Combined
 review bytes must fit `--max-review-bytes`; no truncation or implicit cap raise.
 The local create/wizard saves only policies/spec/references, not source copies
 or receipts. Saving changes paths and therefore requires fresh review. See the
-[closed CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
+[common-profile CLI workflow](cli.md#closed-common-profile-workflow-candidate) for draft
 CSV proposals, local confirmation and retained-publication restrictions. This
-profile is not a compatibility promise for the released `1.5.0` package.
+profile is not a compatibility promise for stable `1.5.0`. Registration grants
+no dataset authority or local preservation approval and does not close the
+separately gated transformation/session acceptance campaign.
 
 ## Input And Generation Limits
 
@@ -96,7 +100,9 @@ does not enlarge SQL access, raw frame, argument or response-byte ceilings and
 does not establish measured 1M × 100 capacity. Trino MCP keeps its separate
 `TRINO_MAX_INVOCATION_SECONDS` setting.
 
-## Private Transformation Input Limits (1.6 Development)
+<a id="private-transformation-input-limits-16-development"></a>
+
+## Transformation Input Limits (1.6 RC)
 
 These settings apply to transformation acquisition, decoding and policy-aware
 review preflight in the 1.6 RC composition, plus CSV profiling/trace shape checks.
@@ -154,7 +160,7 @@ instead of being silently capped. If the trace exhausts its smaller per-run
 budget, `limit_exceeded` reports origin `trace_run` and explicitly names
 `trace_csv_review_request(max_cells=...)` as the parameter to increase within
 the session/profile ceiling. Changing only the ceiling does not change that
-explicit per-run argument. Registered candidate CLI/MCP request boundaries
+explicit per-run argument. Registered 1.6 RC CLI/MCP request boundaries
 retain typed value-free limit failures. Increasing a decoder limit
 does not override the explicit total-input budget, downstream work/output
 budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not a peak-RSS promise.
@@ -162,7 +168,7 @@ budgets, or explicit SQL capture run arguments. Expanded-byte accounting is not 
 Transformation total-input accounting includes source, behavior policy,
 referenced mappings/generation policies, classification evidence and displayed
 review bytes. Read-only review resolves the same session/profile ceiling as the
-registered execution candidate; it does not silently request the default ceiling.
+registered execution workflow; it does not silently request the default ceiling.
 Set `TEST_DATA_AGENT_TRANSFORM_MAX_TOTAL_INPUT_BYTES` for the session or
 `resource_limits.max_total_input_bytes` in the saved behavior profile. The
 registered `transform-execute` CLI additionally accepts `--max-total-input-bytes`
@@ -171,7 +177,7 @@ and the workspace-scoped `execute_transformation` tool accepts
 Smaller explicit run caps report
 `snapshot_run`; a run cap above the configured ceiling is rejected, not raised.
 
-Private CSV character limits reach parsing, sensitivity detection and profile
+Transformation CSV character limits reach parsing, sensitivity detection and profile
 finalization. Internal CSV readers coordinate the stdlib process-global field
 limit for each record and restore its previous value even on failure. Each
 reader keeps its own limit; source-free readers retain legacy/default limits.
@@ -179,13 +185,13 @@ External code directly changing `csv.field_size_limit` is outside this
 coordination. On parser overflow, the reported amount is the first forbidden
 character (`limit + 1`), not the length of an unread remainder of the field.
 
-Private CSV execution uses `resource_limits.max_output_bytes` or
+Transformation CSV execution uses `resource_limits.max_output_bytes` or
 `TEST_DATA_AGENT_TRANSFORM_MAX_OUTPUT_BYTES` as the output ceiling, distinct
 from input-file bytes. Its explicit `max_output_bytes` run argument must fit
 that ceiling; it is no longer silently capped at 128 MiB. Actual exhaustion
 reports origin `output_run`, the encoded byte count (including CSV header and
 quoting), and `replace_csv_snapshot(max_output_bytes=...)`. Partial output is
-not returned. Private SQL/Parquet encoding checks its `max_bytes` run argument
+not returned. Transformation SQL/Parquet encoding checks its `max_bytes` run argument
 and reports `sql_output_run` / `parquet_output_run` with the corresponding
 `render_transformation_sql(max_bytes=...)` /
 `render_transformation_parquet(max_bytes=...)` recovery parameter. Publication
@@ -376,7 +382,7 @@ catalog or schema identifier to 255 characters.
 | `TRINO_PORT` | `8080` | Trino port |
 | `TRINO_USER` | `test_data_agent` | Trino user |
 | `TRINO_HTTP_SCHEME` | `https` | `https` or explicitly allowed `http` |
-| `TRINO_AUTH_METHOD` | `none` | Candidate methods: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
+| `TRINO_AUTH_METHOD` | `none` | Optional methods in the 1.6 RC runtime: `basic`, `jwt`, `kerberos`, `gssapi`, `oauth2`, `certificate`; authenticated connections require HTTPS and certificate verification |
 | `TRINO_AUTH_SECRET_ENV` | unset | Name of a runtime environment variable containing the Basic password or JWT, not the secret itself |
 | `TRINO_AUTH_CERTIFICATE_ENV` | unset | Name of a runtime environment variable containing the client certificate path |
 | `TRINO_AUTH_KEY_ENV` | unset | Name of a runtime environment variable containing the private-key path |
@@ -392,20 +398,20 @@ catalog or schema identifier to 255 characters.
 | `TRINO_QUERY_MAX_SCAN_PHYSICAL_BYTES` | `1GB` | Trino physical scan budget |
 | `TRINO_DEPLOYMENT_PROFILE` | `trusted-local` | `trusted-local` permits an unset cumulative scan ceiling; `shared-hardened` requires a finite `TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES` |
 
-Candidate Kerberos/GSSAPI methods require their driver's optional
+The 1.6 RC Kerberos/GSSAPI methods require their driver's optional
 `requests_kerberos` / `requests_gssapi` dependencies and existing runtime
-credentials. They use mutual authentication without delegation. The isolated
-candidate's `profile-query --adapter trino --trino-oauth-browser` explicitly opts
+credentials. They use mutual authentication without delegation.
+`profile-query --adapter trino --trino-oauth-browser` explicitly opts
 into opening the configured Trino HTTPS authentication route at a local terminal
 when `TRINO_AUTH_METHOD=oauth2`. It never prints authentication URLs; pipes reject
-before connection. This flag remains in an unapplied registration patch until
-the complete candidate's safety gate. MCP never installs a browser callback.
+before connection. This flag is registered in `1.6.0rc5`; MCP never installs a
+browser callback.
 Python applications can explicitly supply their own trusted redirect callback.
 The auth object is reused within one client; OAuth token caching remains the
 driver's implementation, including its optional operating-system keyring backend.
 These local checks do not prove remote reachability or authorize live access.
 
-The candidate OAuth2 HTTP adapter also guards the driver's direct token polling:
+The 1.6 RC OAuth2 HTTP adapter also guards the driver's direct token polling:
 requests must target the configured HTTPS Trino host and port, use verified TLS,
 and fit the remaining invocation/request deadline. Environment proxies and netrc
 are not inherited. Other token-server origins fail closed; this is not evidence

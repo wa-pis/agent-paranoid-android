@@ -105,9 +105,12 @@ Inspect generated data for domain usefulness, but do not compare or publish raw
 source rows during that review. For sensitive domains, perform review in the
 same protected environment as the source data.
 
-CSV export prefixes string cells and headers that could be interpreted as
-spreadsheet formulas with a single quote. Numeric values, including negative
-numbers, remain numeric. Artifact names supplied through public workflows must
+Current CSV bundles declare `csv_encoding: backslash-null-v1` in their manifest.
+String cells and headers that could be spreadsheet formulas receive a reversible
+`\F` marker; null is `\N`, empty text stays empty, and literal leading backslashes
+are doubled. Numeric values, including negative numbers, remain numeric. Keep
+the manifest for schema-aware bundle decoding; legacy unmarked CSV retains its
+previous interpretation. Artifact names supplied through public workflows must
 be one safe filename component; separators and parent-directory components are
 rejected before any artifact is written. Formula failures expose only fixed
 local reasons, never expressions, values, or nested exception text.

@@ -45,7 +45,7 @@ Agent --> Generation : approved phase
 Agent --> Validation : approved phase
 Agent --> Safety : source-row reuse check
 GeneratorMcp --> Profiling : profile_csv
-GeneratorMcp --> Agent : plan_dataset /\nplan_trino_dataset
+GeneratorMcp --> Agent : plan / inspect / approve / recover\nexact reviewed fingerprint for approval
 GeneratorMcp --> Generation : generate_dataset /\nexport_dataset
 GeneratorMcp --> Validation : validate_dataset
 TrinoMcp --> Trino : default aggregate-only metadata\nexplicit opt-in rows may contain source values
@@ -81,8 +81,8 @@ The LLM boundary is intentional:
 planning is advisory, while generation,
 validation, and safety checks are
 deterministic Python code.
-This diagram excludes the gated mixed-origin
-transformation candidate and its separate
+This diagram excludes mixed-origin
+transformation and its separate
 exact-snapshot local preservation receipt.
 end note
 

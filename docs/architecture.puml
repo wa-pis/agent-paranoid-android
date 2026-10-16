@@ -10,7 +10,7 @@ actor "User / Agent" as User
 
 note left of User
 This diagram covers ordinary synthetic generation.
-The gated mixed-origin transformation candidate
+The separate mixed-origin transformation workflow
 has separate snapshot, provenance and local
 preservation-receipt enforcement; it is not
 authorized by the agent approval gate below.
@@ -18,8 +18,11 @@ end note
 
 package "Inputs" {
   file "Single CSV\n(potentially sensitive)" as SingleCsv
+  file "Single Parquet\n(potentially sensitive)" as SingleParquet
   folder "Example Dataset Folder\n*.csv per entity" as ExampleFolder
   database "Trino\n(read-only)" as Trino
+  database "PostgreSQL\n(read-only profiling)" as Postgres
+  artifact "Saved Safe DatasetProfile\nincluding permitted query profiles" as SavedProfile
   artifact "DatasetSpec\nYAML / JSON" as DatasetSpecFile
   artifact "Business Rules\nYAML / JSON" as RuleFile
 }
@@ -81,9 +84,9 @@ package "Domain-Agnostic Dataset Flow" {
 }
 
 package "Business Rule Layer" {
-  component "business_rules.py\nRule Models + Loader" as RuleModels
-  component "rules_engine.py\nScenarios + controlled invalid cases" as RulesEngine
-  component "business_validator.py\nExecutable business validation" as BusinessValidator
+  component "rules/models.py + business_config.py\nRule Models + Loader" as RuleModels
+  component "rules/engine.py\nShared rules, scenarios + controlled invalid cases" as RulesEngine
+  component "rules/validation.py\nExecutable business validation" as BusinessValidator
   artifact "Business Validation Report" as BusinessReport
 }
 
@@ -91,12 +94,14 @@ package "Outputs" {
   file "CSV" as CsvOut
   file "JSON" as JsonOut
   file "Parquet" as ParquetOut
+  file "SQL INSERT bundle\nartifact only, no database writes" as SqlOut
   artifact "Artifacts\nprofile.json / csv_profile.json\ndataset_spec.json / dataset_spec.yaml\nvalidation_report.json\nbusiness_validation_report.json" as Artifacts
   artifact "Generation Manifest\nversion, spec hash, seed, format,\nrow counts, validation, provenance" as Manifest
 }
 
 User --> Cli : runs commands
 User --> GeneratorMcp : MCP synthetic workflow
+User --> TrinoMcp : MCP metadata/profiling calls
 User --> DatasetSpecFile : writes/reviews
 User --> RuleFile : optional rules
 
@@ -115,10 +120,17 @@ AgentLayer --> AgentBundle : writes final result
 
 Cli --> CsvProfiler : profile-csv /\ngenerate-from-csv
 SingleCsv --> CsvProfiler
+SingleParquet --> DatasetProfile : bounded local profiling\nvia adapters/parquet_dataset.py
+SavedProfile --> ProfileSafety : validate safe profile metadata
+SavedProfile --> DatasetProfile
+Cli --> Postgres : bounded allowlisted aggregate profiling
+Postgres --> DatasetProfile : safe metadata only
 CsvProfiler --> PiiMasking
 CsvProfiler --> DatasetProfile : safe metadata only
 
-Cli --> TrinoMcp : MCP metadata/profiling calls
+Cli --> SqlSafety : validate bounded query source
+Cli --> Trino : direct read-only aggregate\nquery profiling
+Trino --> DatasetProfile : safe query profile metadata
 TrinoMcp --> SqlSafety
 TrinoMcp --> Trino : allowed read-only queries
 TrinoMcp --> PiiMasking
@@ -137,8 +149,7 @@ SchemaProfiler --> FieldModels
 SchemaProfiler --> EntityModels
 SchemaProfiler --> DatasetModels
 SchemaProfiler --> PiiMasking
-SchemaProfiler --> DistributionProfiler
-DistributionProfiler --> DatasetProfile
+SchemaProfiler --> DatasetProfile
 SchemaProfiler --> RelationshipProfiler
 RelationshipProfiler --> RelationshipModel
 RelationshipProfiler --> DatasetProfile
@@ -166,17 +177,21 @@ ConstraintValidator --> Reconciliation
 Reconciliation --> DatasetReport
 
 RuleFile --> RuleModels
+DatasetSpec --> RuleModels : embedded business_rules\ncommon to every source/interface
 RuleModels --> RulesEngine
-DatasetRows --> RulesEngine : optional CLI flow
+EntityGenerator --> RulesEngine : shared deterministic application\nbefore export
+RulesEngine --> DatasetRows
 RulesEngine --> BusinessValidator
 BusinessValidator --> BusinessReport
 
 Cli --> CsvOut
 Cli --> JsonOut
 Cli --> ParquetOut
+Cli --> SqlOut
 DatasetRows --> CsvOut
 DatasetRows --> JsonOut
 DatasetRows --> ParquetOut
+DatasetRows --> SqlOut
 DatasetProfile --> Artifacts
 DatasetSpec --> Artifacts
 DatasetReport --> Artifacts
@@ -223,8 +238,9 @@ end note
 note right of ApprovalGate
   The agent layer can prepare safe metadata
   and specs, but generation waits until a
-  human or calling client explicitly approves
-  the reviewed workspace.
+  human reviews the full current specification.
+  The calling client passes its exact reviewed
+  fingerprint; changed specifications reject.
 end note
 
 @enduml

@@ -26,14 +26,15 @@ behavior change, a matching OpenSpec/roadmap update.
 
 ## Selective transformation: registered local surface and gated extensions
 
-The separate opt-in transformation proposed for 1.6.0rc1 is not synthetic
-generation. The author branch registers the reviewed single-source local
+The separate opt-in transformation in the 1.6 RC line is not synthetic
+generation. Published 1.6.0rc5 registers the reviewed single-source local
 `transform-approve`/`transform-execute` CLI and `execute_transformation` MCP
-consumer (PR601); it produces labelled mixed-origin, one-to-one artifacts.
-This is not a shipped 1.5.0 capability or authorization of any dataset. The
-saved-profile common workflow and configured database capture remain private
-extensions pending their own activation gates. Existing generation, profiling
-and advisors remain source-free; MCP transformation returns no rows.
+consumer, plus common saved-profile and configured SQL session consumers.
+These produce labelled mixed-origin, one-to-one artifacts. They are not shipped
+1.5.0 capabilities or authorization of any dataset; the broader
+transformation/session acceptance campaign remains open, as recorded in
+`docs/acceptance-evidence-1.6.0rc5.md`. Existing generation, profiling and
+advisors remain source-free; MCP transformation returns no rows.
 
 Before any source value may be retained by `preserve` or a preserve fallback, require an
 explicit per-field non-sensitive decision, no positive/conflicting sensitivity
@@ -62,7 +63,7 @@ Development and activation are separate gates. Private implementation and
 isolated tests using only fictional inputs may be written and exercised before
 the final safety review; otherwise end-to-end evidence cannot be produced.
 Keep unreviewed extensions unavailable through public CLI/Python/MCP execution
-surfaces; this does not remove the already registered single-source surface. Test outputs stay in bounded temporary test locations, never user
+surfaces; this does not remove the already registered consumers. Test outputs stay in bounded temporary test locations, never user
 destinations. This permits no real data access or dataset approval. Passing
 end-to-end tests and independent review of the implementation are prerequisites
 for activation, not prerequisites for writing the implementation and its tests.
@@ -79,7 +80,7 @@ matching baseline amendments, executable interface evidence and independent
 safety review of the exact activation SHA. A review of private code alone does
 not satisfy review of the policy amendment or public registration.
 
-The concrete candidate names `transform-approve` as the local-only
+The single-source contract names `transform-approve` as the local-only
 issuer, `transform-execute` as the CLI consumer and `execute_transformation`
 as the workspace-confined MCP consumer. Execution requires the exact reviewed
 snapshot digest; a new review digest does not validate an old receipt after
@@ -146,7 +147,7 @@ and focused tests.
 
 ### Configured SQL Session Extension
 
-The prospective 1.6 RC composition separately registers common saved-profile
+The published 1.6.0rc5 composition separately registers common saved-profile
 CLI/MCP consumers and configured SQL sessions. Read authority still comes from
 administrator configuration, allowlists and bounded read-only policy; it is
 not inferred from a transformation request. Capture once into owned snapshots;
@@ -154,5 +155,5 @@ receipt issuance remains local controlling-TTY only, and subsequent consumers
 must use the exact same frozen batch without reconnecting. MCP metadata may
 include the narrow owned-root/fixed receipt-name/digest handoff, never source
 rows, query text or secrets. Enforce finite expiry, admission and shutdown
-cleanup. This extension requires independent review of the final complete
-activation SHA before public delivery; historical audits are not its approval.
+cleanup. Changed public activation requires independent review of the final
+complete activation SHA before delivery; historical audits are not its approval.

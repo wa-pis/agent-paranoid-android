@@ -25,8 +25,11 @@ TEST_DATA_AGENT_WORKSPACE_ROOT=/path/to/workspace \
    same fingerprint.
 
 Advanced clients may still call `profile_csv`, `infer_dataset_spec`,
-`generate_dataset`, and `validate_dataset` separately. Structured business
-rules currently use that lower-level generation path.
+`generate_dataset`, and `validate_dataset` separately. Embedded
+`DatasetSpec.business_rules` also work through the reviewed planning/approval
+sequence: edit the planned spec, then inspect and obtain human approval of its
+new fingerprint. Direct generation tools additionally accept an external rules
+file or inline rule payload; do not combine those with embedded rules.
 
 Expected final report:
 
@@ -38,9 +41,12 @@ synthetic: true
 source rows copied: false
 ```
 
-For a rule-driven run, the response also includes a compact
-`business_validation` object and `business_validation_report_path`. The
-manifest stores the same summary and the SHA-256 fingerprint of the normalized
+For a rule-driven `generate_dataset` or `export_dataset` call, the response also
+includes a compact `business_validation` object and
+`business_validation_report_path`. The planning/approval workflow writes
+`business_validation_report.json` inside its generated bundle; its approval
+response returns the bundle and manifest paths. In both workflows the manifest
+stores the business-validation summary and SHA-256 fingerprint of the normalized
 rule contract.
 
 For a reproducible controlled-invalid example, copy
