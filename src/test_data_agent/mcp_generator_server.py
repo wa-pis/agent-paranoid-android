@@ -662,6 +662,8 @@ def load_mcp_business_rules(
             raise ValueError("business rules payload must be JSON-compatible") from exc
         enforce_business_rules_payload_size(len(serialized))
         rules = business_rules_from_dict(rules_payload or {})
+    if spec.business_rules is not None:
+        raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
     validate_business_rules_for_spec(rules, spec)
     return rules
 

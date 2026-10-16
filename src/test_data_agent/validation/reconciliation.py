@@ -5,11 +5,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.settings import GenerationMode, ValidationSettings
+from test_data_agent.rules.validation import BusinessValidationReport, validate_business_rules
+from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.constraint_validator import validate_constraints
 from test_data_agent.validation.relationship_validator import RelationshipMetrics, validate_relationships
@@ -21,14 +23,31 @@ class ValidationSection(BaseModel):
     passed: int = 0
     failed: int = 0
     errors: list[str] = Field(default_factory=list)
-    checked: int | None = Field(default=None, exclude_if=lambda value: value is None)
-    relationship_metrics: list[RelationshipMetrics] | None = Field(default=None, exclude_if=lambda value: value is None)
+    checked: int | None = Field(default=None)
+    relationship_metrics: list[RelationshipMetrics] | None = Field(default=None)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("checked", "relationship_metrics"):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 class DatasetValidationReport(BaseModel):
     valid: bool
     sections: list[ValidationSection]
     settings: ValidationSettings = Field(default_factory=ValidationSettings)
+    business_validation: BusinessValidationReport | None = Field(default=None)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("business_validation",):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 def validate_dataset(
@@ -66,7 +85,15 @@ def validate_dataset(
         sections.append(result)
         if settings.fail_fast and result.failed:
             break
+    business = None
+    if spec.business_rules is not None:
+        validate_business_rules_for_spec(spec.business_rules, spec)
+        business = validate_business_rules(rows_by_entity, spec.business_rules, budget=budget, spec=spec)
+        sections.append(ValidationSection(name="business_rules", passed=business.rule_pass_count,
+                                          failed=business.rule_fail_count, checked=business.rule_count,
+                                          errors=[error for result in business.results for error in result.errors]))
     return DatasetValidationReport(
+        business_validation=business,
         valid=not any(item.failed for item in sections),
         sections=sections,
         settings=settings,
@@ -105,5 +132,9 @@ def assert_generated_dataset_valid(
         return
     if validate_schema(rows_by_entity, spec):
         raise GenerationValidationError("generated dataset failed post-solve type validation")
+    if spec.business_rules is not None:
+        validate_business_rules_for_spec(spec.business_rules, spec)
+        if not validate_business_rules(rows_by_entity, spec.business_rules, budget=budget, spec=spec).valid:
+            raise GenerationValidationError("generated dataset failed post-solve business-rule validation")
     if validate_relationships(rows_by_entity, spec, budget=budget) or validate_constraints(rows_by_entity, spec, budget=budget):
         raise GenerationValidationError("generated dataset failed post-solve constraint validation")

@@ -41,7 +41,10 @@ Parquet `decimal128(p,s)` and declared PostgreSQL/allowed-query
 `numeric(p,s)` retain schema-only precision and scale (up to 38 digits) in
 `DatasetProfile`; no decimal source values or extrema are retained. A profile
 cannot supply exact generation bounds on its own: infer-spec requires a human
-to provide a reviewed `decimal_range` in DatasetSpec 1.1. Higher declared
+to provide a reviewed `decimal_range` in DatasetSpec 1.1 or an explicit
+`infer-spec --decimal-fields` mapping. Coarse numeric profiles may include
+`zero_ratio`, `subunit_ratio` and `min_subunit_magnitude`; these are aggregate
+prevalence and orders, never exact decimal bounds. Higher declared
 precision fails closed. Unbounded SQL `numeric` retains its legacy approximate
 FLOAT path and must not be presented as exact financial evidence.
 

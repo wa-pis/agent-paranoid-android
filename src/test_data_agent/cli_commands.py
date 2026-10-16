@@ -39,7 +39,8 @@ from test_data_agent.io import (
     validate_dataset_artifacts,
     write_generation_summary,
 )
-from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path
+from test_data_agent.rules.business_config import apply_and_validate_business_rules_from_path, load_business_rules, make_business_rules_applier
+from test_data_agent.io.workflows import ensure_input_outside_output_folder, ensure_paths_distinct, ensure_rules_distinct_from_single_entity_output
 from test_data_agent.io.transformation_source import (
     prepare_csv_review_from_paths, trace_csv_review_request,
 )
@@ -68,6 +69,19 @@ def run_dataset_command(
     """Run one dataset command, or return ``None`` when it is not dataset-owned."""
 
     business_rules_applier = business_rules_applier or apply_business_rules_from_args
+    rules_path = getattr(args, "business_rules", None)
+    output = getattr(args, "output", None)
+    if rules_path is not None and output is not None:
+        ensure_paths_distinct(rules_path, output)
+        if args.command == "generate-from-csv":
+            ensure_rules_distinct_from_single_entity_output(
+                rules_path, output, profile_artifact_name="csv_profile.json",
+            )
+        elif (
+            args.command == "generate" and args.profile is None
+            or args.command in {"generate-from-example", "generate-from-csv-folder"}
+        ):
+            ensure_input_outside_output_folder(rules_path, output)
 
     def apply_rules(
         rows_by_entity: dict[str, list[dict[str, Any]]],
@@ -76,15 +90,21 @@ def run_dataset_command(
     ) -> Any | None:
         return business_rules_applier(rows_by_entity, args, seed, spec)
 
+    configured_applier = (
+        make_business_rules_applier(load_business_rules(args.business_rules))
+        if args.command in {"generate", "generate-from-csv"} and getattr(args, "business_rules", None) is not None
+        else apply_rules
+    )
+
     if args.command == "generate":
         if args.profile is not None:
             return generate_dataset_from_profile_command(
                 args,
-                business_rules_applier=apply_rules,
+                business_rules_applier=configured_applier,
             )
         return generate_dataset_command(
             args,
-            business_rules_applier=apply_rules,
+            business_rules_applier=configured_applier,
         )
 
     if args.command == "export-postgres-sql":
@@ -184,7 +204,7 @@ def run_dataset_command(
     if args.command == "generate-from-csv":
         return generate_dataset_from_csv_command(
             args,
-            business_rules_applier=apply_rules,
+            business_rules_applier=configured_applier,
         )
 
     if args.command == "validate":
@@ -193,6 +213,7 @@ def run_dataset_command(
             args.rows,
             output_path=args.output,
             overwrite=args.overwrite,
+            business_rules_path=getattr(args, "business_rules", None),
         )
         return write_validation_result(report, args.output)
 

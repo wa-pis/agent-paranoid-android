@@ -193,7 +193,9 @@ def generate_agent_dataset(
     budget = prepare_generation_budget(spec, output_folder)
     temp_folder = make_temp_output_folder(output_folder)
     try:
-        rows_by_entity = generate_dataset(spec, seed=request.seed, budget=budget)
+        from test_data_agent.rules.validation import BusinessValidationReport
+        business_reports: list[BusinessValidationReport] = []
+        rows_by_entity = generate_dataset(spec, seed=request.seed, budget=budget, business_reports=business_reports)
         budget.check("dataset generation")
         assert_agent_source_not_copied(
             request,
@@ -201,11 +203,13 @@ def generate_agent_dataset(
             rows_by_entity,
             source_sha256=review.source_sha256,
         )
-        write_dataset_rows(rows_by_entity, request.output_format, temp_folder, spec=spec)
+        write_dataset_rows(rows_by_entity, request.output_format, temp_folder, spec=spec, budget=budget)
         budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, spec)
+        report = validate_dataset(rows_by_entity, spec, budget=budget)
         budget.check("dataset validation")
         write_dataset_review_artifacts(profile, spec, report, temp_folder)
+        if business_reports:
+            write_json_artifact(business_reports[0], temp_folder / "business_validation_report.json")
         row_counts = {name: len(rows) for name, rows in rows_by_entity.items()}
         write_generation_manifest(
             spec,
@@ -214,6 +218,7 @@ def generate_agent_dataset(
             row_counts=row_counts,
             validation_valid=report.valid,
             output_folder=temp_folder,
+            business_report=business_reports[0] if business_reports else None,
         )
         checkpoint = AgentCompletionCheckpoint(
             plan_id=review.plan_id,

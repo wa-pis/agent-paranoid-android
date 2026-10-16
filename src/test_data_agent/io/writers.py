@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.io.csv_encoding import encode_csv_cell, is_formula_cell
+
 import csv
 import json
 import math
@@ -18,7 +20,7 @@ from typing import Any
 import yaml
 
 from test_data_agent.core.dataset import RESERVED_ENTITY_ARTIFACT_BASENAMES, DatasetSpec
-from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_units
+from test_data_agent.core.decimal_units import decimal_from_units, decimal_to_text, decimal_to_units
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.limits import (
@@ -43,11 +45,11 @@ def dataset_spec_to_json(spec: DatasetSpec) -> str:
 
 def json_decimal(value: Any) -> str:
     if isinstance(value, Decimal) and value.is_finite():
-        return format(value, "f")
+        return decimal_to_text(value)
     raise TypeError("JSON output contains unsupported value")
 
 
-def rows_to_csv(rows: list[dict[str, Any]]) -> str:
+def rows_to_csv(rows: list[dict[str, Any]], *, typed: bool = False) -> str:
     if not rows:
         return ""
 
@@ -55,11 +57,11 @@ def rows_to_csv(rows: list[dict[str, Any]]) -> str:
     fieldnames = list(rows[0])
     fieldname_set = set(fieldnames)
     writer = csv.writer(handle)
-    writer.writerow([neutralize_csv_cell(name) for name in fieldnames])
+    writer.writerow([encode_csv_cell(name) if typed else neutralize_csv_cell(name) for name in fieldnames])
     for row in rows:
         if set(row) - fieldname_set:
             raise ValueError("CSV rows must share one schema")
-        writer.writerow([neutralize_csv_cell(row.get(name)) for name in fieldnames])
+        writer.writerow([encode_csv_cell(row.get(name)) if typed else neutralize_csv_cell(row.get(name)) for name in fieldnames])
     return handle.getvalue()
 
 
@@ -67,8 +69,7 @@ def neutralize_csv_cell(value: Any) -> Any:
     """Prevent string cells from being interpreted as spreadsheet formulas."""
     if not isinstance(value, str) or not value:
         return value
-    stripped = value.lstrip(" \t\r\n")
-    if value[0] in "\t\r\n" or (stripped and stripped[0] in "=+-@"):
+    if is_formula_cell(value):
         return "'" + value
     return value
 
@@ -118,14 +119,18 @@ def sql_literal(value: Any) -> str:
     if isinstance(value, Decimal):
         if not value.is_finite():
             raise ValueError("SQL output does not support non-finite decimals")
-        return format(value, "f")
+        return decimal_to_text(value)
     escaped = str(value).replace("'", "''")
     return f"'{escaped}'"
 
 
 def write_parquet(
     rows: list[dict[str, Any]], output: Path, *, fields: list[FieldSpec] | None = None,
+    allow_invalid: bool = False,
+    budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("Parquet export")
     try:
         import pyarrow as pa
         import pyarrow.parquet as pq
@@ -142,11 +147,12 @@ def write_parquet(
             raise ValueError("Parquet rows have incompatible field types") from None
     else:
         try:
-            table = typed_parquet_table(rows, fields, pa)
+            table = typed_parquet_table(rows, fields, pa, allow_invalid=allow_invalid)
         except (ValueError, TypeError, OverflowError, pa.ArrowException):
             raise ValueError("Parquet rows do not match declared field types") from None
 
-    with atomic_binary_writer(output) as handle:
+    budget.check("Parquet serialization")
+    with atomic_binary_writer(output, check_publication=lambda: budget.check("Parquet publication")) as handle:
         pq.write_table(table, handle)
         handle.flush()
         enforce_output_payload_size(
@@ -155,7 +161,31 @@ def write_parquet(
         )
 
 
-def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa: Any) -> Any:
+def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa: Any,
+                        *, allow_invalid: bool = False) -> Any:
+    # Only explicitly requested negative datasets can carry malformed scalar cells.
+    # A marked Arrow string column stores JSON scalars when its declared type cannot.
+    # Ordinary typed columns keep their native Arrow schema and strict checks.
+    if allow_invalid:
+        arrays = []
+        schema_fields = []
+        names = {field.name for field in fields}
+        if any(set(row) != names for row in rows):
+            raise ValueError("Parquet row schema differs from declared fields")
+        for field in fields:
+            cells = [{field.name: row[field.name]} for row in rows]
+            try:
+                column = typed_parquet_table(cells, [field], pa)
+                arrow_field = column.schema.field(field.name)
+                array = column.column(field.name)
+            except (ValueError, TypeError, OverflowError, pa.ArrowException):
+                from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY, encode_scalar
+                arrow_field = pa.field(field.name, pa.string(), nullable=True,
+                                       metadata={SCALAR_ENCODING_KEY: b"json-v1"})
+                array = pa.array([encode_scalar(row[field.name]) for row in rows], type=pa.string())
+            arrays.append(array)
+            schema_fields.append(arrow_field)
+        return pa.Table.from_arrays(arrays, schema=pa.schema(schema_fields))
     names = {field.name for field in fields}
     if len(names) != len(fields) or any(set(row) != names for row in rows):
         raise ValueError("Parquet row schema differs from declared fields")
@@ -183,7 +213,7 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                 if not isinstance(distribution, DecimalRangeDistribution) or type(value) not in {Decimal, str}:
                     raise TypeError("decimal field has incompatible value")
                 units = decimal_to_units(
-                    format(value, "f") if isinstance(value, Decimal) else value,
+                    decimal_to_text(value) if isinstance(value, Decimal) else value,
                     precision=distribution.precision, scale=distribution.scale,
                 )
                 if not (
@@ -218,7 +248,13 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
                 for row in converted if (value := row[field.name]) is not None
             }
             if len(offsets) > 1:
-                raise ValueError("mixed timestamp timezones")
+                # A single Arrow timestamp timezone cannot retain per-cell offsets.
+                from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY, encode_scalar
+                for row in converted:
+                    row[field.name] = encode_scalar(row[field.name])
+                schema_fields.append(pa.field(field.name, pa.string(), nullable=field.nullable,
+                                              metadata={SCALAR_ENCODING_KEY: b"json-v1"}))
+                continue
             offset = next(iter(offsets), None)
             if offset is not None and len(offset) != 5:
                 raise ValueError("unsupported timestamp timezone")
@@ -229,6 +265,18 @@ def typed_parquet_table(rows: list[dict[str, Any]], fields: list[FieldSpec], pa:
             if not isinstance(distribution, DecimalRangeDistribution):
                 raise ValueError("decimal field requires exact range")
             arrow_type = pa.decimal128(distribution.precision, distribution.scale)
+        elif field.data_type == FieldType.INTEGER and any(
+            row[field.name] is not None and not -(2**63) <= row[field.name] < 2**63
+            for row in converted
+        ):
+            # INTEGER has no int64 limit in DatasetSpec. Preserve wide values exactly.
+            from test_data_agent.io.parquet_encoding import SCALAR_ENCODING_KEY
+            for row in converted:
+                if row[field.name] is not None:
+                    row[field.name] = str(row[field.name])
+            schema_fields.append(pa.field(field.name, pa.string(), nullable=field.nullable,
+                                          metadata={SCALAR_ENCODING_KEY: b"integer-text-v1"}))
+            continue
         else:
             arrow_type = arrow_types[field.data_type]
         schema_fields.append(pa.field(field.name, arrow_type, nullable=field.nullable))
@@ -262,25 +310,35 @@ def write_dataset_rows(
     output_folder: Path,
     *,
     spec: DatasetSpec | None = None,
+    budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("dataset export")
+    if spec is not None and spec.business_rules is not None:
+        from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
+        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     root = output_folder.absolute()
     if any(name in RESERVED_ENTITY_ARTIFACT_BASENAMES for name in rows_by_entity):
         raise ValueError("reserved entity name")
     for entity_name, rows in rows_by_entity.items():
+        budget.check("entity export")
         if output_format == DatasetOutputFormat.CSV:
             write_bounded_text(
-                rows_to_csv(rows),
+                rows_to_csv(rows, typed=spec is not None),
                 safe_entity_artifact_path(root, entity_name, ".csv"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.JSON:
             write_bounded_text(
                 json.dumps(rows, indent=2, sort_keys=True, default=json_decimal),
                 safe_entity_artifact_path(root, entity_name, ".json"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.SQL:
             write_bounded_text(
                 rows_to_sql(entity_name, rows),
                 safe_entity_artifact_path(root, entity_name, ".sql"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.PARQUET:
             entity = spec.entity(entity_name) if spec is not None else None
@@ -288,6 +346,8 @@ def write_dataset_rows(
                 rows,
                 safe_entity_artifact_path(root, entity_name, ".parquet"),
                 fields=entity.fields if entity is not None else None,
+                allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"},
+                budget=budget,
             )
         enforce_output_folder_size(root)
 
@@ -320,34 +380,45 @@ def write_single_entity_rows(
     output: Path | None,
     *,
     spec: DatasetSpec | None = None,
+    budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("single-entity export")
+    if spec is not None and spec.business_rules is not None:
+        from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
+        assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
     if len(rows_by_entity) != 1:
         raise SystemExit("single-entity output requires exactly one generated entity")
     rows = next(iter(rows_by_entity.values()))
     if output_format == DatasetOutputFormat.CSV:
-        text = rows_to_csv(rows)
+        text = rows_to_csv(rows, typed=spec is not None)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text)
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.JSON:
         text = json.dumps(rows, indent=2, sort_keys=True, default=json_decimal)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text)
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.SQL:
         entity_name = next(iter(rows_by_entity))
         text = rows_to_sql(entity_name, rows)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text, end="")
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.PARQUET:
         if output is None:
             raise SystemExit("Parquet output requires --output")
         fields = spec.entities[0].fields if spec is not None else None
-        write_parquet(rows, output, fields=fields)
+        write_parquet(rows, output, fields=fields,
+                      allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"},
+                      budget=budget)

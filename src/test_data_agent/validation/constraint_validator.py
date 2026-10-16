@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Any
 
 from test_data_agent.core.constraint import ConstraintStatus, ConstraintType
@@ -10,7 +9,8 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.generation.limits import enforce_dataset_rule_work
 from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.rules.conditions import Condition, condition_matches
-from test_data_agent.rules.expressions import parse_datetime, safe_eval
+from test_data_agent.rules.expressions import parse_datetime, safe_eval, numbers_close
+from test_data_agent.rules.typed_values import formula_value, numeric_row, aggregate_mapping_values
 
 
 def validate_constraints(
@@ -28,11 +28,11 @@ def validate_constraints(
         if constraint.status == ConstraintStatus.REJECTED:
             continue
         if constraint.type == ConstraintType.FORMULA:
-            errors.extend(validate_formula(rows_by_entity, constraint, budget=budget))
+            errors.extend(validate_formula(rows_by_entity, constraint, budget=budget, spec=spec))
         elif constraint.type == ConstraintType.TEMPORAL:
             errors.extend(validate_temporal(rows_by_entity, constraint, budget=budget))
         elif constraint.type == ConstraintType.CONDITIONAL_REQUIRED:
-            errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget))
+            errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget, spec=spec))
         elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
             errors.extend(validate_aggregate_mapping(rows_by_entity, spec, constraint, budget=budget))
     return errors
@@ -43,6 +43,7 @@ def validate_formula(
     constraint: Any,
     *,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -52,14 +53,18 @@ def validate_formula(
     errors: list[str] = []
     for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
         try:
-            expected = safe_eval(constraint.expression, coerce_numeric_row(row, budget=budget), budget=budget)
+            expected = (
+                formula_value(constraint.expression, numeric_row(row, spec.entity(constraint.entity), budget=budget),
+                              spec.entity(constraint.entity).field(target), budget=budget)
+                if spec is not None else safe_eval(constraint.expression, coerce_numeric_row(row, budget=budget), budget=budget)
+            )
         except GenerationLimitError:
             raise
         except Exception:
             errors.append("formula evaluation failed")
             continue
         actual = row.get(target)
-        if not numbers_close(actual, expected):
+        if not numbers_close(actual, expected, 0 if spec is not None and spec.entity(constraint.entity).field(target).data_type == "decimal" else 0.000001):
             errors.append("formula mismatch")
     return errors
 
@@ -89,6 +94,7 @@ def validate_conditional_required(
     constraint: Any,
     *,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -97,7 +103,8 @@ def validate_conditional_required(
     condition = Condition(**constraint.condition)
     errors: list[str] = []
     for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
-        if not condition_matches(row, condition, budget=budget):
+        if not condition_matches(numeric_row(row, spec.entity(constraint.entity), budget=budget)
+                                 if spec is not None else row, condition, budget=budget):
             continue
         missing = [field for field in budget.iter_rule_work(constraint.fields) if row.get(field) in (None, "")]
         if missing:
@@ -114,53 +121,13 @@ def validate_aggregate_mapping(
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
-    relationship = next(
-        (
-            item for item in budget.iter_rule_work(spec.relationships)
-            if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
-        ),
-        None,
-    )
-    if relationship is None:
-        return ["aggregate mapping requires an active relationship"]
-    if not constraint.fields:
-        return []
-    if constraint.aggregate != "count" and not constraint.target_field:
-        return []
-    totals: dict[Any, float] = defaultdict(float)
-    counts: dict[Any, int] = defaultdict(int)
-    errors: list[str] = []
-    for index, child_row in budget.iter_rule_work(enumerate(rows_by_entity.get(relationship.child_entity, []))):
-        if constraint.aggregate == "count":
-            totals[child_row.get(relationship.child_field)] += 1
-            continue
-        value = child_row.get(constraint.target_field)
-        if value is None:
-            continue
-        try:
-            numeric_value = float(value)
-        except (TypeError, ValueError):
-            errors.append(f"{relationship.child_entity}[{index}].{constraint.target_field} aggregate value is not numeric")
-            continue
-        key = child_row.get(relationship.child_field)
-        totals[key] += numeric_value
-        counts[key] += 1
-    parent_field = constraint.fields[0]
-    for index, parent_row in budget.iter_rule_work(enumerate(rows_by_entity.get(relationship.parent_entity, []))):
-        key = parent_row.get(relationship.parent_field)
-        expected = totals.get(key, 0.0)
-        if constraint.aggregate == "avg" and counts.get(key, 0):
-            expected /= counts[key]
-        if not numbers_close(parent_row.get(parent_field), expected):
-            errors.append(f"{relationship.parent_entity}[{index}].{parent_field} aggregate mismatch")
-    return errors
-
-def numbers_close(actual: Any, expected: Any, tolerance: float = 0.000001) -> bool:
     try:
-        return abs(float(actual) - float(expected)) <= tolerance
-    except (TypeError, ValueError):
-        return False
-
+        return ["aggregate mismatch" for row, expected in aggregate_mapping_values(rows_by_entity, spec, constraint, budget=budget)
+                if not numbers_close(row.get(constraint.fields[0]), expected, 0 if spec.entity(constraint.entity).field(constraint.fields[0]).data_type == "decimal" else 0.000001)]
+    except GenerationLimitError:
+        raise
+    except (ValueError, ArithmeticError):
+        return ["aggregate value is not numeric or aggregate mapping evaluation failed"]
 
 def coerce_numeric_row(
     row: dict[str, Any], *, budget: GenerationBudget | None = None

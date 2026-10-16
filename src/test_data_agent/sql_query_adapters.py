@@ -226,6 +226,12 @@ def _trino_description_column(item: Any) -> QueryResultColumn:
     except (IndexError, TypeError):
         raise SqlQueryProfileError("Trino schema metadata is invalid") from None
     type_name = getattr(type_code, "name", None) or str(type_code)
+    if type_name.lower() in {"decimal", "numeric"} and len(item) > 5:
+        precision, scale = item[4], item[5]
+        if precision is not None or scale is not None:
+            if type(precision) is not int or type(scale) is not int or not 1 <= precision <= 38 or not 0 <= scale <= precision:
+                raise SqlQueryProfileError("Trino decimal schema metadata is invalid")
+            type_name = f"decimal({precision},{scale})"
     if not isinstance(name, str) or not name or not type_name:
         raise SqlQueryProfileError("Trino schema metadata is invalid")
     return QueryResultColumn(name=name, data_type=type_name, nullable=nullable is not False)

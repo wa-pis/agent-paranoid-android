@@ -51,31 +51,19 @@ def test_generated_parquet_uses_declared_date_and_timestamp_types(tmp_path: Path
 
 
 @pytest.mark.parametrize("mode", ["mixed", "negative"])
-def test_invalid_parquet_rejects_entire_dataset_without_replacing_output(
-    tmp_path: Path, mode: str,
-) -> None:
+def test_invalid_parquet_roundtrips_explicit_malformed_cells(tmp_path: Path, mode: str) -> None:
+    from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
+    from test_data_agent.validation import validate_dataset
     pytest.importorskip("pyarrow.parquet")
-    spec = DatasetSpec(entities=[
-        EntitySpec(name="accounts", row_count=2, fields=[
-            FieldSpec(name="id", data_type="integer", is_identifier=True),
-        ]),
-        EntitySpec(name="orders", row_count=2, fields=[
-            FieldSpec(name="amount", data_type="integer"),
-        ]),
-    ])
+    spec = DatasetSpec(entities=[EntitySpec(name="orders", row_count=2,
+        fields=[FieldSpec(name="amount", data_type="integer")])])
     output = tmp_path / "generated"
-    output.mkdir()
-    (output / "previous.txt").write_text("fictional previous artifact")
-
-    with pytest.raises(ValueError, match="^Parquet rows do not match declared field types$"):
-        generate_dataset_bundle(
-            spec, output_folder=output, output_format=OutputFormat.PARQUET,
-            mode=mode, invalid_ratio=1.0, seed=7,
-        )
-
-    assert {path.name for path in output.iterdir()} == {"previous.txt"}
-    assert (output / "previous.txt").read_text() == "fictional previous artifact"
-    assert not list(tmp_path.glob(".generated.*"))
+    result = generate_dataset_bundle(spec, output_folder=output,
+        output_format=OutputFormat.PARQUET, mode=mode, invalid_ratio=1.0, seed=7)
+    assert not result.validation.valid
+    assert all(row["amount"] == "not-a-number" for row in load_dataset_rows(output)["orders"])
+    assert not validate_dataset(load_dataset_rows(output), load_dataset_spec(output / "dataset_spec.yaml")).valid
+    assert json.loads((output / "generation_manifest.json").read_text())["validation_valid"] is False
 
 
 def test_fractional_invalid_ratio_replays_spec_rows_and_effective_rules(tmp_path: Path) -> None:
@@ -483,7 +471,7 @@ def test_generate_dataset_from_csv_stops_before_write_when_source_row_is_reused(
     input_path.write_text("order_id,status\n1,new\n")
     monkeypatch.setattr(
         "test_data_agent.io.workflows.generate_dataset",
-        lambda spec, seed, budget: {"orders": [{"order_id": "1", "status": "new"}]},
+        lambda spec, seed, budget, business_reports: {"orders": [{"order_id": "1", "status": "new"}]},
     )
 
     with pytest.raises(SourceRowReuseError):
@@ -509,7 +497,7 @@ def test_generate_dataset_from_csv_binds_no_copy_check_to_profiled_rows(
     input_path.write_text("order_id,status\n1,new\n")
     replacement.write_text("order_id,status\n2,shipped\n")
 
-    def replace_source(spec, seed, budget):
+    def replace_source(spec, seed, budget, business_reports):
         replacement.replace(input_path)
         return {"orders": [{"order_id": "1", "status": "new"}]}
 
@@ -603,6 +591,10 @@ def test_generation_manifest_includes_business_validation_status(tmp_path: Path)
     assert result.business_validation is not None
     assert manifest["validation_valid"] is True
     assert manifest["business_validation"] == {
+        "assigned_row_count": 0,
+        "checked_formula_count": 0,
+        "distribution_bounds_checked_count": 0,
+        "distribution_bounds_violation_count": 0,
         "rules_sha256": "a" * 64,
         "rule_count": 2,
         "rule_pass_count": 0,
@@ -980,11 +972,11 @@ def test_staged_workflows_remove_partial_output_on_disk_exhaustion(
         count=1,
     )
 
-    def exhaust_folder(rows, output_format, output_folder: Path, *, spec) -> None:
+    def exhaust_folder(rows, output_format, output_folder: Path, *, spec, budget) -> None:
         (output_folder / "partial.tmp").write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 
-    def exhaust_single(rows, output_format, output_path: Path, *, spec) -> None:
+    def exhaust_single(rows, output_format, output_path: Path, *, spec, budget) -> None:
         output_path.write_text("incomplete")
         raise OSError(errno.ENOSPC, "No space left on device")
 

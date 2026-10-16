@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from test_data_agent.core.dataset import DatasetSpec
+if TYPE_CHECKING:
+    from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.field import FieldSpec, FieldType
@@ -13,6 +14,7 @@ from test_data_agent.core.limits import enforce_business_rule_evaluations
 from test_data_agent.core.privacy import is_sensitive_field, looks_sensitive_value
 from test_data_agent.rules.conditions import Condition
 from test_data_agent.rules.expressions import (
+    aggregate_expression_constants,
     expression_complexity,
     expression_constants,
     expression_references,
@@ -39,7 +41,6 @@ def validate_business_rules_for_spec(
     if rules.rule_count == 0:
         raise BusinessRuleContractError("business rules must not be empty")
 
-    validate_business_rule_literals(rules)
     entities = {entity.name: entity for entity in spec.entities}
     enforce_business_rule_evaluations(
         estimate_business_rule_evaluations(rules, spec)
@@ -47,6 +48,12 @@ def validate_business_rules_for_spec(
 
     for field_rule in rules.field_rules:
         field = _require_field(entities, field_rule.table, field_rule.field)
+        _validate_literals(
+            [value for value in (field_rule.min_value, field_rule.max_value) if value is not None],
+            field,
+            f"{field_rule.table}.{field_rule.field} bounds",
+            decimal_shape=False,
+        )
         if field_rule.allowed_values is not None:
             _validate_literals(
                 field_rule.allowed_values,
@@ -55,7 +62,7 @@ def validate_business_rules_for_spec(
             )
         if (
             (field_rule.min_value is not None or field_rule.max_value is not None)
-            and field.data_type not in {FieldType.INTEGER, FieldType.FLOAT}
+            and field.data_type not in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}
         ):
             raise BusinessRuleContractError(
                 "numeric bounds require a numeric field: "
@@ -103,7 +110,7 @@ def validate_business_rules_for_spec(
                 row_rule.table,
                 row_rule.field,
             )
-            if target_field.data_type not in {FieldType.INTEGER, FieldType.FLOAT}:
+            if target_field.data_type not in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}:
                 raise BusinessRuleContractError(
                     "row formula requires a numeric target field: "
                     f"{row_rule.table}.{row_rule.field}"
@@ -122,12 +129,18 @@ def validate_business_rules_for_spec(
                         "formula references unknown field: "
                         f"{row_rule.table}.{field_name}"
                     )
-            for value in expression_constants(row_rule.expression):
+            constants = expression_constants(row_rule.expression)
+            for value in constants:
                 if not isinstance(value, (int, float)) or isinstance(value, bool):
                     raise BusinessRuleContractError(
                         "row formula constants must be numeric: "
                         f"{row_rule.table}.{row_rule.field}"
                     )
+            _validate_literals(
+                constants, target_field,
+                f"{row_rule.table}.{row_rule.field} formula",
+                decimal_shape=False,
+            )
 
     for cross_table_rule in rules.cross_table_rules:
         if isinstance(cross_table_rule, ForeignKeyRule):
@@ -152,6 +165,13 @@ def validate_business_rules_for_spec(
                     "aggregate rule references unknown field: "
                     f"{cross_table_rule.table}.{cross_table_rule.field}"
                 )
+            constants = aggregate_expression_constants(cross_table_rule.expression)
+            if cross_table_rule.expected is not None:
+                constants.append(cross_table_rule.expected)
+            if cross_table_rule.field != "*":
+                _validate_literals(constants, entity.field(cross_table_rule.field), "aggregate formula", decimal_shape=False)
+            else:
+                _validate_unbound_literals(constants, "*", "aggregate formula")
             names, aggregate_fields, _ = expression_references(
                 cross_table_rule.expression
             )
@@ -183,6 +203,11 @@ def validate_business_rules_for_spec(
 def validate_business_rule_literals(rules: BusinessRules) -> None:
     for field_rule in rules.field_rules:
         _validate_unbound_literals(
+            [value for value in (field_rule.min_value, field_rule.max_value) if value is not None],
+            field_rule.field,
+            f"{field_rule.table}.{field_rule.field} bounds",
+        )
+        _validate_unbound_literals(
             field_rule.allowed_values or [],
             field_rule.field,
             f"{field_rule.table}.{field_rule.field} allowed_values",
@@ -192,7 +217,10 @@ def validate_business_rule_literals(rules: BusinessRules) -> None:
             row_rule,
             (ConditionalRequiredRule, ConditionalAllowedValuesRule),
         ):
-            condition_values = [row_rule.when.equals, row_rule.when.not_equals]
+            condition_values = [
+                row_rule.when.equals, row_rule.when.not_equals,
+                row_rule.when.gte, row_rule.when.lte,
+            ]
             condition_values.extend(row_rule.when.in_values or [])
             _validate_unbound_literals(
                 [value for value in condition_values if value is not None],
@@ -219,6 +247,12 @@ def validate_business_rule_literals(rules: BusinessRules) -> None:
                     field_name,
                     f"{table}.{field_name} scenario value",
                 )
+    for rule in rules.cross_table_rules:
+        if isinstance(rule, AggregateFormulaRule):
+            constants = aggregate_expression_constants(rule.expression)
+            if rule.expected is not None:
+                constants.append(rule.expected)
+            _validate_unbound_literals(constants, rule.field, "aggregate formula")
 
 
 def estimate_business_rule_evaluations(
@@ -257,17 +291,21 @@ def estimate_business_rule_evaluations_for_rows(
             estimated += row_count * expression_complexity(row_rule.expression)
         else:
             estimated += row_count
+    if negative:
+        # Baseline and before/after row audits account for collateral failures.
+        # Rule dispatch visits every local rule for each selected row.
+        estimated += 3 * estimated + 2 * rules.rule_count * sum(row_counts.values())
     for cross_table_rule in rules.cross_table_rules:
         if isinstance(cross_table_rule, ForeignKeyRule):
             parents = row_counts.get(cross_table_rule.parent_table, 0)
             children = row_counts.get(cross_table_rule.child_table, 0)
-            estimated += parents + children
+            estimated += (3 if negative else 1) * (parents + children)
             if negative:
                 estimated += 4 * parents * children
         elif isinstance(cross_table_rule, AggregateFormulaRule):
             rows = row_counts.get(cross_table_rule.table, 0)
             complexity = expression_complexity(cross_table_rule.expression)
-            estimated += rows * (1 + complexity)
+            estimated += (3 if negative else 1) * rows * (1 + complexity)
             if negative and cross_table_rule.field != "*":
                 estimated += rows * rows * (1 + complexity)
     if rules.scenarios:
@@ -336,13 +374,16 @@ def _validate_condition_literals(
     field: FieldSpec,
     table: str,
 ) -> None:
-    values = [condition.equals, condition.not_equals]
+    if (condition.gte is not None or condition.lte is not None) and field.data_type not in {FieldType.INTEGER, FieldType.FLOAT, FieldType.DECIMAL}:
+        raise BusinessRuleContractError("range condition requires an integer, float, or decimal field")
+    values = [condition.equals, condition.not_equals, condition.gte, condition.lte]
     if condition.in_values is not None:
         values.extend(condition.in_values)
     _validate_literals(
         [value for value in values if value is not None],
         field,
         f"{table}.{condition.field} condition",
+        decimal_shape=False,
     )
 
 
@@ -350,6 +391,8 @@ def _validate_literals(
     values: list[Any],
     field: FieldSpec,
     label: str,
+    *,
+    decimal_shape: bool = True,
 ) -> None:
     sensitive_target = field.sensitive or is_sensitive_field(
         field.name,
@@ -368,6 +411,18 @@ def _validate_literals(
             raise BusinessRuleContractError(
                 f"business rule values must be finite: {label}"
             )
+        if value is not None and field.data_type == FieldType.DECIMAL:
+            from test_data_agent.core.distribution import DecimalRangeDistribution
+            from test_data_agent.core.decimal_units import value_matches_decimal
+            exact = field.typed_distribution
+            from test_data_agent.rules.expressions import exact_number
+            exact_number(value)
+            if decimal_shape and (not isinstance(exact, DecimalRangeDistribution) or not value_matches_decimal(
+                str(value), precision=exact.precision, scale=exact.scale,
+            )):
+                raise BusinessRuleContractError("decimal rule values require exact supported decimal text")
+            if field.semantic_type == "numeric_measure":
+                continue
         if looks_sensitive_value(value):
             raise BusinessRuleContractError(
                 f"business rules contain a raw-looking sensitive value: {label}"

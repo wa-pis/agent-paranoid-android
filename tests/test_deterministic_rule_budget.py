@@ -109,7 +109,17 @@ def test_direct_negative_injection_cannot_bypass_cumulative_cap(monkeypatch):
     import random
     monkeypatch.setenv("TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS", "10")
     with pytest.raises(GenerationLimitError, match="evaluations"):
-        inject_invalid_cases(fk_rows(8), foreign_key_rules(), random.Random(1), 1)
+        inject_invalid_cases(fk_rows(2), foreign_key_rules(), random.Random(1), 1)
+
+
+def test_direct_negative_baseline_preflight_rejects_before_mutation(monkeypatch):
+    import random
+    monkeypatch.setenv("TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS", "10")
+    rows = fk_rows(8)
+    original = deepcopy(rows)
+    with pytest.raises(InputLimitError, match="estimated evaluations"):
+        inject_invalid_cases(rows, foreign_key_rules(), random.Random(1), 1)
+    assert rows == original
 
 
 @pytest.mark.parametrize("entry", ["expression", "validator", "engine"])

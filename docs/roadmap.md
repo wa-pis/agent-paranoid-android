@@ -5,6 +5,11 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
+- Enforce the complete [source/output matrix](reference/source-output-matrix.md):
+  one reviewed DatasetSpec, all field types/options and business rules across
+  sources and formats. Track implementation and evidence in OpenSpec
+  `source-output-contract-parity`.
+
 - Prepare the local MCP assistant workflow for `1.6.0rc2`: simple connection,
   explicit specification review, state-driven recovery, and real-client acceptance.
 

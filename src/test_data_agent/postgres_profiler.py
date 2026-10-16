@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.profiling.numeric_shape import shape_prevalence
+
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, replace
 from datetime import date, datetime
@@ -301,11 +303,13 @@ class PostgresProfiler:
             has_negative = _as_bool(summary.get("has_negative"))
             has_positive = _as_bool(summary.get("has_positive"))
             magnitude = summary.get("max_abs_magnitude")
-            if magnitude is not None and (has_negative or has_positive):
+            prevalence = shape_prevalence(summary, non_null_count)
+            if magnitude is not None and (has_negative or has_positive) or prevalence.get("zero_ratio") == 1.0:
                 result["numeric_shape"] = {
-                    "max_abs_magnitude": _bounded_magnitude(magnitude),
+                    "max_abs_magnitude": _bounded_magnitude(magnitude) if magnitude is not None else 0,
                     "has_negative": has_negative,
                     "has_positive": has_positive,
+                    **prevalence,
                 }
         if local_category_field is not None:
             category_rows = self.fetch_query(

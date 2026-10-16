@@ -80,6 +80,7 @@ rather than guessing a new product/security policy.
 | [ADR-0011](0011-review-first-agent.md) | Use a review-first, recoverable agent state machine |
 | [ADR-0012](0012-provider-boundary.md) | Keep providers optional, untrusted and advisory |
 | [ADR-0013](0013-interface-parity.md) | Share application policy across CLI, Python and MCP |
+| [ADR-0030](0030-source-output-parity.md) | Use one generation contract across the source/output matrix |
 | [ADR-0014](0014-filesystem-publication.md) | Validate fixed inputs and publish completed artifacts safely |
 
 ### Operations and delivery

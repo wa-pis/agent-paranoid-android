@@ -183,7 +183,8 @@ def test_numeric_shape_does_not_select_exact_extrema() -> None:
     assert "max_abs_magnitude" in query.sql
     assert "has_negative" in query.sql
     assert "has_positive" in query.sql
-    assert " min(" not in query.sql.lower()
+    assert 'min("customer_id")' not in query.sql.lower()
+    assert "AS min_subunit_magnitude" in query.sql
     assert ' max("customer_id")' not in query.sql.lower()
 
 

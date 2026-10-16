@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.profiling.numeric_shape import prevalence_sql
+
 from dataclasses import dataclass
 
 from test_data_agent.core.privacy import LocalCategoryField, infer_sensitive_from_name
@@ -201,7 +203,7 @@ def build_numeric_shape_query(
         f"bool_or({safe_column} < 0) AS has_negative, "
         f"bool_or({safe_column} > 0) AS has_positive, "
         f"max(CASE WHEN {safe_column} = 0 THEN NULL ELSE {magnitude} END) "
-        f"AS max_abs_magnitude FROM {safe_table}"
+        f"AS max_abs_magnitude, {prevalence_sql(safe_column, magnitude)} FROM {safe_table}"
     )
 
 

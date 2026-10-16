@@ -7,21 +7,24 @@ import random
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from decimal import Decimal, localcontext, Context
 from test_data_agent.core.limits import (
     GenerationBudget, GenerationLimitError, enforce_business_rule_evaluations,
 )
 from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
 
-from typing import Any, Literal
+from typing import Any, Literal, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from test_data_agent.core.dataset import DatasetSpec
+
+from test_data_agent.rules.typed_values import numeric_row, formula_value
 
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
 from test_data_agent.rules.expressions import (
-    aggregate,
-    comparable_number,
     numbers_close,
     parse_datetime,
-    safe_eval,
 )
 from test_data_agent.rules.models import (
     AggregateFormulaRule,
@@ -34,6 +37,14 @@ from test_data_agent.rules.models import (
     TemporalOrderingRule,
 )
 from test_data_agent.rules.scenarios import apply_scenarios
+from test_data_agent.rules.validation import (
+    validate_business_rules,
+    validate_conditional_allowed_values,
+    validate_conditional_required,
+    validate_field_rule,
+    validate_formula,
+    validate_temporal_ordering,
+)
 
 
 @dataclass(frozen=True)
@@ -73,6 +84,7 @@ def apply_business_rules(
     expected_rule_failures: dict[int, int] | None = None,
     *,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -81,7 +93,11 @@ def apply_business_rules(
     ))
     rng = random.Random(seed)
     apply_scenarios(rows_by_table, rules.scenarios, seed, budget=budget)
-    apply_valid_defaults(rows_by_table, rules, field_defaults=field_defaults, budget=budget)
+    if spec is not None:
+        for entity in budget.iter_rule_work(spec.entities):
+            for row in budget.iter_rule_work(rows_by_table.get(entity.name, [])):
+                row.update(numeric_row(row, entity, budget=budget))
+    apply_valid_defaults(rows_by_table, rules, field_defaults=field_defaults, budget=budget, spec=spec)
 
     selected_mode = GenerationMode(mode)
     if selected_mode == GenerationMode.EDGE:
@@ -95,7 +111,12 @@ def apply_business_rules(
             ratio,
             expected_rule_failures=expected_rule_failures,
             budget=budget,
+            spec=spec,
         )
+    if spec is not None:
+        for entity in budget.iter_rule_work(spec.entities):
+            for row in budget.iter_rule_work(rows_by_table.get(entity.name, [])):
+                row.update(numeric_row(row, entity, budget=budget))
     return rows_by_table
 
 
@@ -105,6 +126,7 @@ def apply_valid_defaults(
     *,
     field_defaults: Mapping[str, Mapping[str, Any]] | None = None,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -151,16 +173,22 @@ def apply_valid_defaults(
                 if start is not None and (end is None or start > end):
                     row[row_rule.end_field] = row.get(row_rule.start_field)
         elif isinstance(row_rule, FormulaRule):
+            if row_rule.mode == "check":
+                continue
             for row in budget.iter_rule_work(rows_by_table.get(row_rule.table, [])):
                 failed = False
                 try:
-                    row[row_rule.field] = safe_eval(row_rule.expression, row, budget=budget)
+                    entity = spec.entity(row_rule.table) if spec is not None else None
+                    row[row_rule.field] = formula_value(
+                        row_rule.expression, numeric_row(row, entity, budget=budget) if entity is not None else row,
+                        entity.field(row_rule.field) if entity is not None else None, budget=budget,
+                    )
                 except GenerationLimitError:
                     raise
                 except Exception:
                     failed = True
                 if failed:
-                    raise ValueError("formula evaluation failed")
+                    raise ValueError(f"formula evaluation failed for {row_rule.table}.{row_rule.field}")
 
 
 def apply_edge_cases(
@@ -189,9 +217,15 @@ def inject_invalid_cases(
     *,
     expected_rule_failures: dict[int, int] | None = None,
     budget: GenerationBudget | None = None,
+    spec: DatasetSpec | None = None,
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
+    baseline = validate_business_rules(rows_by_table, rules, budget=budget, spec=spec)
+    if not baseline.valid:
+        raise ValueError("controlled invalid generation requires a valid business-rule baseline")
+    # Cross-table rules are audited only twice, not for every mutated row.
+    cross_rules = rules.model_copy(update={"field_rules": [], "row_rules": [], "scenarios": []})
     for table, rows in budget.iter_rule_work(rows_by_table.items()):
         cases = invalid_cases_for_table(table, rules, budget=budget)
         if not cases:
@@ -201,6 +235,10 @@ def inject_invalid_cases(
             if rng.random() > invalid_ratio:
                 continue
             case = cases[case_index]
+            before = (
+                local_rule_failures(row, table, rules, budget=budget, spec=spec)
+                if expected_rule_failures is not None else {}
+            )
             apply_invalid_case(row, case, rows_by_table, budget=budget)
             if expected_rule_failures is not None:
                 if case.kind == "aggregate_formula":
@@ -209,7 +247,51 @@ def inject_invalid_cases(
                     expected_rule_failures[case.rule_index] = (
                         expected_rule_failures.get(case.rule_index, 0) + 1
                     )
+                after = local_rule_failures(row, table, rules, budget=budget, spec=spec)
+                for rule_index, failed in budget.iter_rule_work(after.items()):
+                    if rule_index != case.rule_index and failed and not before[rule_index]:
+                        expected_rule_failures[rule_index] = expected_rule_failures.get(rule_index, 0) + 1
             case_index = (case_index + 1) % len(cases)
+    if rules.cross_table_rules and expected_rule_failures is not None:
+        cross_after = validate_business_rules(rows_by_table, cross_rules, budget=budget, spec=spec)
+        offset = len(rules.field_rules) + len(rules.row_rules)
+        for index, (before_result, after_result) in budget.iter_rule_work(enumerate(zip(
+            baseline.results[offset:], cross_after.results, strict=True,
+        ))):
+            # Never authorize a cross-table failure present before injection.
+            if before_result.failed == 0 and after_result.failed:
+                rule_index = offset + index
+                expected_rule_failures[rule_index] = max(
+                    expected_rule_failures.get(rule_index, 0), after_result.failed,
+                )
+
+
+def local_rule_failures(
+    row: dict[str, Any], table: str, rules: BusinessRules, *,
+    budget: GenerationBudget, spec: DatasetSpec | None,
+) -> dict[int, int]:
+    """Evaluate only this row, retaining original rule indices and typed arithmetic."""
+    entity = spec.entity(table) if spec is not None else None
+    values = {table: [numeric_row(row, entity, budget=budget) if entity is not None else row]}
+    failures = {}
+    for index, field_rule in budget.iter_rule_work(enumerate(rules.field_rules)):
+        if field_rule.table == table:
+            failures[index] = validate_field_rule(values, field_rule, budget=budget).failed
+    offset = len(rules.field_rules)
+    for index, rule in budget.iter_rule_work(enumerate(rules.row_rules)):
+        if rule.table != table:
+            continue
+        if isinstance(rule, ConditionalRequiredRule):
+            result = validate_conditional_required(values, rule, budget=budget)
+        elif isinstance(rule, ConditionalAllowedValuesRule):
+            result = validate_conditional_allowed_values(values, rule, budget=budget)
+        elif isinstance(rule, TemporalOrderingRule):
+            result = validate_temporal_ordering(values, rule, budget=budget)
+        else:
+            result = validate_formula(values, rule, budget=budget,
+                                      target=entity.field(rule.field) if entity is not None else None)
+        failures[offset + index] = result.failed
+    return failures
 
 
 def invalid_cases_for_table(
@@ -355,8 +437,12 @@ def force_condition_match(
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
     candidates = []
-    if condition.equals is not None:
+    if "equals" in condition.model_fields_set:
         candidates.append(condition.equals)
+    if condition.gte is not None:
+        candidates.append(condition.gte)
+    if condition.lte is not None:
+        candidates.append(condition.lte)
     if condition.in_values:
         candidates.extend(condition.in_values)
     candidates.extend([row.get(condition.field), "__condition_match__"])
@@ -381,21 +467,30 @@ def value_outside(
     return value
 
 
-def value_below(bound: float | None) -> float | str:
+def value_below(bound: float | str | None) -> Decimal | float | str:
     if bound is None:
         raise ValueError("minimum bound is required")
+    if isinstance(bound, str):
+        with localcontext(Context(prec=80)):
+            return Decimal(bound) - Decimal(1).scaleb(min(0, int(Decimal(bound).as_tuple().exponent)))
     value = math.nextafter(bound, -math.inf)
     return value if math.isfinite(value) else "__invalid__"
 
 
-def value_above(bound: float | None) -> float | str:
+def value_above(bound: float | str | None) -> Decimal | float | str:
     if bound is None:
         raise ValueError("maximum bound is required")
+    if isinstance(bound, str):
+        with localcontext(Context(prec=80)):
+            return Decimal(bound) + Decimal(1).scaleb(min(0, int(Decimal(bound).as_tuple().exponent)))
     value = math.nextafter(bound, math.inf)
     return value if math.isfinite(value) else "__invalid__"
 
 
-def perturbed_formula_value(value: Any, tolerance: float) -> float | str:
+def perturbed_formula_value(value: Any, tolerance: float) -> Decimal | float | str:
+    if isinstance(value, Decimal):
+        with localcontext(Context(prec=80)):
+            return value + max(Decimal(1), Decimal(str(tolerance)) * 2)
     if not isinstance(value, (int, float)) or isinstance(value, bool):
         return "__invalid__"
     delta = max(1.0, tolerance * 2)
@@ -460,28 +555,21 @@ def break_aggregate_formula(
 ) -> None:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
-    actual = aggregate(rule.field, rows, budget=budget)
+    from test_data_agent.rules.expressions import exact_aggregate, exact_number, exact_sum
     try:
-        expected = (
-            rule.expected
-            if rule.expected is not None
-            else safe_eval(rule.expression, {"rows": rows}, budget=budget)
-        )
-    except GenerationLimitError:
-        raise
-    except Exception:
-        return
-    current = comparable_number(row.get(rule.field)) or 0.0
-    delta = max(1.0, rule.tolerance * 2)
-    for candidate in budget.iter_rule_work((current + delta, current - delta)):
-        changed_actual = actual - current + candidate
-        if math.isfinite(candidate) and not numbers_close(
-            changed_actual,
-            expected,
-            rule.tolerance,
-        ):
+        actual = exact_sum(rule.field, rows, budget=budget)
+        expected = exact_number(rule.expected) if rule.expected is not None else exact_aggregate(rule.expression, rows, budget=budget)
+        current_value = row.get(rule.field)
+        current = exact_number(current_value)
+        candidate = perturbed_formula_value(current_value, rule.tolerance)
+        changed_actual = actual - current + exact_number(candidate)
+        if not numbers_close(changed_actual, expected, rule.tolerance):
             row[rule.field] = candidate
             return
+    except GenerationLimitError:
+        raise
+    except (ValueError, TypeError, ArithmeticError):
+        pass
     row[rule.field] = "__invalid__"
 
 

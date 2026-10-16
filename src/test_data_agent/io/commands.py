@@ -12,13 +12,15 @@ from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import urlsplit
 
+from pydantic import TypeAdapter, ValidationError
+
 from test_data_agent.adapters import load_profile_or_spec
 from test_data_agent.cli_contract import CliExternalServiceError
 from test_data_agent.cli_text import display_untrusted_text
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
 from test_data_agent.core.privacy import LocalCategoryField
 from test_data_agent.core.settings import OutputFormat
-from test_data_agent.core.limits import max_generation_count
+from test_data_agent.core.limits import max_generation_count, read_limited_text
 from test_data_agent.generation import generate_dataset
 from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import validate_generation_bundle, write_dataset_profile_artifact, write_json_artifact
@@ -27,7 +29,9 @@ from test_data_agent.io.readers import load_dataset_rows, load_dataset_spec
 from test_data_agent.io.workflows import (
     ensure_empty_output_folder,
     ensure_folders_distinct,
+    ensure_input_outside_output_folder,
     ensure_paths_distinct,
+    ensure_rules_distinct_from_single_entity_output,
     require_output_suffix,
     commit_temp_output_folder,
     generate_dataset_artifacts,
@@ -43,6 +47,9 @@ from test_data_agent.postgres_client import PostgresClient, PostgresClientError
 from test_data_agent.postgres_config import PostgresConfig
 from test_data_agent.postgres_profiler import PostgresProfileError, dataset_profile_from_postgres
 from test_data_agent.postgres_sql_export import write_postgres_sql
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.core.serialization import load_limited_yaml
+from test_data_agent.rules.business_config import load_business_rules
 from test_data_agent.safety import assert_profile_safe
 from test_data_agent.sql_query_adapters import (
     profile_postgres_query_source,
@@ -128,14 +135,25 @@ def export_postgres_sql_command(args: argparse.Namespace) -> int:
             entity.row_count = args.count
         if spec.generation_settings.mode == "load_test":
             spec.generation_settings.load_multiplier = 1
+    if spec.generation_settings.mode == "load_test":
+        for entity in spec.entities:
+            entity.row_count *= spec.generation_settings.load_multiplier
+        spec.generation_settings.load_multiplier = 1
     seed = args.seed
     if seed is None:
         seed = spec.generation_settings.seed
     if seed is None:
         seed = 0
     spec.generation_settings.seed = seed
-    rows_by_entity = generate_dataset(spec, seed=seed)
-    write_postgres_sql(spec, rows_by_entity, args.output)
+    budget = generation_budget_for_invocation()
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        ensure_paths_distinct(rules_path, args.output)
+        if spec.business_rules is not None:
+            raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
+        spec.business_rules = load_business_rules(rules_path)
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
+    write_postgres_sql(spec, rows_by_entity, args.output, budget=budget)
     print(
         "Wrote PostgreSQL SQL: "
         f"{display_untrusted_text(str(args.output), limit=240)}",
@@ -159,12 +177,23 @@ def generate_dataset_from_profile_command(
         raise SystemExit("--seed is required with --profile")
     if args.output is not None:
         ensure_paths_distinct(args.profile, args.output)
-        ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
 
     loaded = load_profile_or_spec(args.profile)
     if isinstance(loaded, DatasetSpec):
         raise SystemExit("--profile expects a dataset profile, not a dataset spec")
     profile = loaded
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        if len(profile.entities) == 1:
+            ensure_rules_distinct_from_single_entity_output(
+                rules_path, args.output, profile_artifact_name="profile.json",
+            )
+        elif args.output is not None:
+            ensure_input_outside_output_folder(rules_path, args.output)
+    if args.output is not None and len(profile.entities) != 1 and args.output.resolve() in args.profile.resolve().parents:
+        raise ValueError("output folder must not contain the input profile")
+    if args.output is not None and len(profile.entities) == 1:
+        ensure_file_output_available(args.output, overwrite=getattr(args, "overwrite", False))
 
     try:
         report, business_report = generate_dataset_from_profile_artifacts(
@@ -183,7 +212,8 @@ def generate_dataset_from_profile_command(
     if should_fail_generation(report, business_report, args.mode or "valid"):
         write_generation_errors(report, business_report)
         return 1
-    write_generation_summary(args.output.parent if args.output is not None else Path.cwd())
+    write_generation_summary((args.output if len(profile.entities) != 1 else args.output.parent)
+                             if args.output is not None else Path.cwd())
     return 0
 
 
@@ -206,8 +236,15 @@ def validate_dataset_artifacts(
     *,
     output_path: Path | None = None,
     overwrite: bool = False,
+    business_rules_path: Path | None = None,
 ) -> DatasetValidationReport:
     spec = load_dataset_spec(spec_path)
+    if business_rules_path is not None:
+        if output_path is not None:
+            ensure_paths_distinct(business_rules_path, output_path)
+        if spec.business_rules is not None:
+            raise ValueError("business rules are already embedded in the reviewed spec; use one rule source")
+        spec.business_rules = load_business_rules(business_rules_path)
     if not rows_path.is_dir():
         raise ValueError(
             "validate expects a dataset output folder; pass the folder containing generated entity files"
@@ -234,7 +271,23 @@ def infer_dataset_spec_command(args: argparse.Namespace) -> int:
             "spec to generate. Do not remove privacy settings merely to force "
             "profile parsing."
         )
-    spec = infer_dataset_spec_artifact(loaded, output_path=args.output, count=args.count)
+    decimal_path = getattr(args, "decimal_fields", None)
+    decimal_fields = None
+    if decimal_path is not None:
+        ensure_paths_distinct(decimal_path, args.output)
+        try:
+            decimal_fields = TypeAdapter(dict[str, FieldSpec]).validate_python(
+                load_limited_yaml(read_limited_text(decimal_path))
+            )
+        except (ValidationError, ValueError):
+            raise ValueError("reviewed decimal mapping is invalid; expected ENTITY.FIELD to exact decimal FieldSpec") from None
+    rules_path = getattr(args, "business_rules", None)
+    if rules_path is not None:
+        ensure_paths_distinct(rules_path, args.output)
+    spec = infer_dataset_spec_artifact(
+        loaded, output_path=args.output, count=args.count, decimal_fields=decimal_fields,
+        business_rules=load_business_rules(rules_path) if rules_path is not None else None,
+    )
     print(
         "Wrote dataset spec: "
         f"{display_untrusted_text(str(args.output), limit=240)} "
@@ -432,6 +485,7 @@ def generate_dataset_from_example_artifacts(
     use_cache: bool = True,
     rule_sample_rows: int = 50_000,
     local_category_fields: tuple[LocalCategoryField, ...] = (),
+    business_rules_path: Path | None = None,
 ) -> int:
     ensure_folders_distinct(input_folder, output_folder)
     ensure_empty_output_folder(output_folder)
@@ -445,6 +499,8 @@ def generate_dataset_from_example_artifacts(
     temp_folder = make_temp_output_folder(output_folder)
     try:
         spec = infer_dataset_spec(profile, count=count)
+        if business_rules_path is not None:
+            spec.business_rules = load_business_rules(business_rules_path)
         result = generate_dataset_review_artifacts(
             profile,
             spec,
@@ -463,6 +519,7 @@ def generate_dataset_from_example_artifacts(
 def generate_dataset_from_example_command(args: argparse.Namespace) -> int:
     exit_code = generate_dataset_from_example_artifacts(
         args.input_folder,
+        business_rules_path=getattr(args, "business_rules", None),
         output_folder=args.output,
         seed=args.seed,
         count=args.count,
@@ -538,6 +595,13 @@ def write_generation_summary(artifact_folder: Path) -> None:
     )
     validation = "passed" if manifest.get("validation_valid") else "failed"
     copied = "yes" if manifest.get("source_rows_copied") else "no"
+    business = manifest.get("business_validation") or {}
+    drift = business.get("distribution_bounds_violation_count", 0)
+    if drift:
+        print(f"Numeric generation-bound drift after assignments: {drift} cells; explicit business constraints are reported separately", file=sys.stderr)
+    rules = manifest.get("effective_rules") or {}
+    if validation == "failed" and rules.get("generation_mode") in {"mixed", "negative"}:
+        print("Published controlled-invalid artifacts with validation evidence; exit status reflects failed validation", file=sys.stderr)
     print(
         "Generated synthetic dataset: "
         f"{display_untrusted_text(str(artifact_folder), limit=240)} | "

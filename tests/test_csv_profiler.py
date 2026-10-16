@@ -217,9 +217,12 @@ def test_generate_from_csv_cli_writes_csv_json_parquet_and_reports(tmp_path) -> 
     assert "alice@example.com" not in (csv_output.parent / "csv_profile.json").read_text()
 
     invalid_parquet = tmp_path / "invalid_parquet" / "customers.parquet"
-    assert main([*mixed_args, "--format", "parquet", "--output", str(invalid_parquet)]) == 2
-    assert not invalid_parquet.exists()
-    assert not (invalid_parquet.parent / "generation_manifest.json").exists()
+    assert main([*mixed_args, "--format", "parquet", "--output", str(invalid_parquet)]) == 1
+    from test_data_agent.io.readers import load_dataset_rows
+    assert invalid_parquet.exists()
+    manifest = json.loads((invalid_parquet.parent / "generation_manifest.json").read_text())
+    assert manifest["validation_valid"] is False
+    assert load_dataset_rows(invalid_parquet.parent)["customers"] == json_rows
 
 
 def test_parquet_preserves_homogeneous_scalar_types(tmp_path: Path) -> None:

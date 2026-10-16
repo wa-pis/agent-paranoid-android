@@ -48,6 +48,7 @@ def json_payload_to_dataset_spec(
     if (
         "schema_version" in payload
         or "privacy_rules" in payload
+        or "business_rules" in payload
         or "privacy_settings" in payload
         or "generation_settings" in payload
         or "validation_settings" in payload
@@ -96,6 +97,7 @@ def load_profile_or_spec(path: Path) -> DatasetProfile | DatasetSpec:
     if (
         "schema_version" in payload
         or "privacy_rules" in payload
+        or "business_rules" in payload
         or "privacy_settings" in payload
         or "generation_settings" in payload
         or "validation_settings" in payload

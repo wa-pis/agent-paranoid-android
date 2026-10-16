@@ -1,5 +1,9 @@
 # Generation, validation, and business-rules guide
 
+All sources and output adapters share the [source/output contract](../reference/source-output-matrix.md).
+Implement and test source/format additions through the same reviewed DatasetSpec
+and deterministic rule engine.
+
 Read this guide for generation models, validators, foreign keys, formulas,
 scenarios, invalid cases, or cross-table behavior.
 
@@ -26,14 +30,27 @@ The generator must:
 
 Reviewed DatasetSpec `1.1` can generate exact `decimal_range` fields with
 precision at most 38 and explicit base-ten bounds. This source-free path uses
-integer units and exports Parquet `decimal128`, never binary FLOAT. It does not
-make automatic profiling or formulas exact: active constraints on entities
-containing DECIMAL currently fail closed pending a separately tested formula
-rounding contract. Sensitive DECIMAL ranges remain disallowed.
+integer units and exports Parquet `decimal128`, never binary FLOAT. Automatic profiling still does not infer exact source bounds. Ordinary DECIMAL
+formulas and aggregate mappings use bounded rational arithmetic, with one
+ROUND_HALF_UP rounding at the target scale and precision overflow rejection.
+Sensitive DECIMAL ranges remain disallowed.
+Row and aggregate formula constants, numeric bounds and condition range endpoints retain literal
+privacy checks before assignment or comparison, including schema-less rule-file
+calls. Sensitive names, semantics and flags veto typed literal targets even when
+optional validation reports are disabled. Only reviewed DECIMAL `numeric_measure`
+fields retain their existing scoped numeric-literal exception.
+Quoted field references in aggregate calls remain metadata rather than literal values.
+Decimal validation and CSV, JSON, Parquet and SQL serialization share a
+fixed-point text bound of 41 characters, covering sign, leading zero, decimal
+point and 38 fractional digits. Non-finite values and excessive expansion fail
+before formatting, including controlled-invalid Parquet fallback cells. This
+does not relax declared precision, scale or range checks.
 Recognizable phone/card-like DECIMAL bounds and final values fail closed even
 when optional validation reporting is disabled. Do not treat a declared numeric
-type as permission to bypass content checks; ambiguous legitimate amounts may
-require a later, separately approved field-scoped policy.
+type as permission to bypass content checks. Explicit reviewed `numeric_measure`
+DECIMAL fields may use the bounded policy described in
+[RC4 feedback disposition](../rc4-external-feedback.md); sensitive names, flags,
+identifiers and privacy classification veto it. Profiles never assign it automatically.
 
 After constraint solving, valid-mode generation also performs unconditional
 schema/type and recognizable-PII checks before returning rows to any export or
@@ -65,6 +82,8 @@ including when their field has email, phone or SSN semantics. Identifier generat
 takes precedence over semantic formatting. Privacy validation recognizes only that
 exact token on identifier fields, not arbitrary prefixed sensitive text; ordinary
 non-identifier sensitive fields still use their semantic synthetic formats.
+The optional distribution `prefix` is retained legacy metadata and does not
+change this namespace or insert source text into generated identifiers.
 Fewer output rows or nulls can leave some pool members unused. Source frequencies
 are not reproduced, and declared relationship constraints still take precedence.
 Repeated-key pools are not nominated as primary keys; an explicit primary key
@@ -89,7 +108,14 @@ Every `generate_dataset` consumer performs the common output allocation estimate
 
 Deterministic native constraints and business rules share an explicit
 `GenerationBudget` through generation, solving, business application and
-validation. Inner row, field, expression and relationship-graph loops check the
+validation, including mandatory writer reconciliation before publication.
+Writers and the PostgreSQL SQL renderer accept the caller's keyword-only
+`budget`; standalone writer calls
+create a bounded allowance when none is supplied. An adapter must not restart
+the invocation allowance or deadline at the export boundary.
+Deadline admission and publication checks also apply without business rules or
+optional validation reports, including stdout, Parquet and PostgreSQL SQL export.
+Inner row, field, expression and relationship-graph loops check the
 cooperative deadline and charge cumulative work against
 `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`. Direct Python entry points also
 create a bounded budget when none is supplied. Native rule amplification is

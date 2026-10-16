@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.io.csv_encoding import CSV_ENCODING
+
 import hashlib
 import importlib.metadata
 import json
@@ -10,7 +12,7 @@ import re
 from pathlib import Path, PurePosixPath
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
@@ -27,6 +29,10 @@ from test_data_agent.version import __version__
 
 
 class BusinessValidationManifest(BaseModel):
+    distribution_bounds_checked_count: int = Field(default=0, ge=0)
+    distribution_bounds_violation_count: int = Field(default=0, ge=0)
+    assigned_row_count: int = Field(default=0, ge=0)
+    checked_formula_count: int = Field(default=0, ge=0)
     rules_sha256: str | None = None
     rule_count: int = Field(default=0, ge=0)
     rule_pass_count: int = Field(default=0, ge=0)
@@ -82,6 +88,16 @@ class GenerationManifest(BaseModel):
     reproducibility: ReproducibilityEvidence | None = None
     synthetic: Literal[True] = True
     source_rows_copied: Literal[False] = False
+    entity_artifacts: dict[str, str] | None = Field(default=None)
+    csv_encoding: Literal["backslash-null-v1"] | None = Field(default=None)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("entity_artifacts", "csv_encoding"):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 def write_json_artifact(payload: Any, output: Path) -> None:
@@ -146,6 +162,7 @@ def write_dataset_generation_artifacts(
         ),
         business_report=business_report,
         output_folder=artifact_dir,
+        entity_artifacts={spec.entities[0].name: output.name} if output is not None else None,
     )
 
 
@@ -162,10 +179,13 @@ def write_generation_manifest(
     validation_valid: bool,
     output_folder: Path,
     business_report: Any | None = None,
+    entity_artifacts: dict[str, str] | None = None,
 ) -> GenerationManifest:
     spec_sha256 = dataset_spec_fingerprint(spec)
     business_validation = business_validation_manifest(business_report)
     manifest = GenerationManifest(
+        entity_artifacts=entity_artifacts,
+        csv_encoding=CSV_ENCODING if output_format == OutputFormat.CSV else None,
         dataset_spec_schema_version=spec.schema_version,
         spec_sha256=spec_sha256,
         seed=seed,
@@ -342,6 +362,10 @@ def business_validation_manifest(
     if report is None:
         return None
     return BusinessValidationManifest(
+        distribution_bounds_checked_count=getattr(report, "distribution_bounds_checked_count", 0),
+        distribution_bounds_violation_count=getattr(report, "distribution_bounds_violation_count", 0),
+        assigned_row_count=sum(getattr(result, "assigned_row_count", 0) for result in getattr(report, "results", [])),
+        checked_formula_count=sum(getattr(result, "application", None) == "check" for result in getattr(report, "results", [])),
         rules_sha256=getattr(report, "rules_sha256", None),
         rule_count=int(getattr(report, "rule_count", 0)),
         rule_pass_count=int(getattr(report, "rule_pass_count", 0)),

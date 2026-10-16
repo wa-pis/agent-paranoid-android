@@ -201,6 +201,17 @@ snapshot-bound before execution. Source-free generation/export stays separate.
 - `reconciliation.py`
   Combines validation sections into a single report.
 
+## Dataset artifacts
+
+`src/test_data_agent/io/workflows.py` owns the common reviewed-spec bundle,
+profile handoff, validation and staged publication. `io/writers.py` and
+`io/readers.py` handle output representations and bounded reloading.
+`io/csv_encoding.py` declares reversible manifest-bound CSV scalars;
+`io/parquet_encoding.py` declares marked Parquet scalar encodings;
+`io/sql_rows.py` decodes only generated INSERT data and never executes SQL.
+`rules/typed_values.py` normalizes schema-aware validation operands in the core.
+The [source/output matrix](reference/source-output-matrix.md) records coverage.
+
 ## CLI
 
 `src/test_data_agent/cli.py`

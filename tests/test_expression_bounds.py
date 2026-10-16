@@ -96,7 +96,7 @@ def test_all_formula_services_reject_before_allocation(monkeypatch):
     assert validate_formula(rows, constraint) == ["formula evaluation failed"]
     rules = business_rules_from_dict({"row_rules": [{"type": "formula", "table": "orders",
                                                    "field": "value", "expression": formula}]})
-    with pytest.raises(ValueError, match="^formula evaluation failed$"):
+    with pytest.raises(ValueError, match="^formula evaluation failed for orders.value$"):
         apply_business_rules(rows, rules, seed=7, mode="valid", invalid_ratio=0.0)
     report = validate_business_rules(rows, rules)
     assert [error for result in report.results for error in result.errors] == ["formula evaluation failed"]

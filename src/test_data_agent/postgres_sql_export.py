@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from test_data_agent.core.dataset import DatasetSpec
-from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_units
+from test_data_agent.core.decimal_units import ExactDecimalError, decimal_to_text, decimal_to_units
 from test_data_agent.core.entity import EntitySpec
 from test_data_agent.core.distribution import DecimalRangeDistribution
 from test_data_agent.core.field import FieldSpec, FieldType
-from test_data_agent.core.limits import enforce_output_payload_size
+from test_data_agent.core.limits import GenerationBudget, enforce_output_payload_size
 from test_data_agent.csv_profiler import (
     parse_bool,
     parse_date_value,
@@ -22,7 +22,7 @@ from test_data_agent.csv_profiler import (
     parse_float,
     parse_int,
 )
-from test_data_agent.io.path_policy import atomic_write_bytes
+from test_data_agent.io.path_policy import atomic_binary_writer
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.reconciliation import validate_dataset
 
@@ -34,9 +34,13 @@ class PostgresSqlExportError(ValueError):
 def render_postgres_sql(
     spec: DatasetSpec,
     rows_by_entity: Mapping[str, Sequence[Mapping[str, Any]]],
+    *,
+    budget: GenerationBudget | None = None,
 ) -> str:
     """Render one transaction containing deterministic PostgreSQL DDL and rows."""
 
+    budget = budget or GenerationBudget()
+    budget.check("PostgreSQL SQL render")
     normalized_rows = {
         entity: [dict(row) for row in rows]
         for entity, rows in rows_by_entity.items()
@@ -47,7 +51,7 @@ def render_postgres_sql(
         raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset") from None
     if validate_generated_row_privacy(normalized_rows, spec, parse_numeric_strings=True):
         raise PostgresSqlExportError("PostgreSQL SQL export requires a safe dataset")
-    if not validate_dataset(normalized_rows, spec).valid:
+    if not validate_dataset(normalized_rows, spec, budget=budget).valid:
         raise PostgresSqlExportError("PostgreSQL SQL export requires a valid dataset")
     entities = {entity.name: entity for entity in spec.entities}
     order = _dependency_order(spec)
@@ -55,23 +59,32 @@ def render_postgres_sql(
     statements.extend(_create_table(entities[name]) for name in order)
     statements.extend(_foreign_key_statements(spec))
     for name in order:
+        budget.check("PostgreSQL SQL entity render")
         statements.extend(_insert_statements(entities[name], normalized_rows[name]))
     statements.append("COMMIT;")
-    return "\n\n".join(statements) + "\n"
+    payload = "\n\n".join(statements) + "\n"
+    budget.check("PostgreSQL SQL render completion")
+    return payload
 
 
 def write_postgres_sql(
     spec: DatasetSpec,
     rows_by_entity: Mapping[str, Sequence[Mapping[str, Any]]],
     output: Path,
+    *,
+    budget: GenerationBudget | None = None,
 ) -> None:
     """Atomically publish a complete PostgreSQL SQL file."""
 
+    budget = budget or GenerationBudget()
+    budget.check("PostgreSQL SQL export")
     if output.suffix.lower() != ".sql":
         raise PostgresSqlExportError("PostgreSQL SQL output must use a .sql suffix")
-    payload = render_postgres_sql(spec, rows_by_entity).encode("utf-8")
+    payload = render_postgres_sql(spec, rows_by_entity, budget=budget).encode("utf-8")
     enforce_output_payload_size(len(payload), label="PostgreSQL SQL output")
-    atomic_write_bytes(output, payload)
+    budget.check("PostgreSQL SQL serialization")
+    with atomic_binary_writer(output, check_publication=lambda: budget.check("PostgreSQL SQL publication")) as handle:
+        handle.write(payload)
 
 
 def quote_postgres_identifier(value: str) -> str:
@@ -111,8 +124,8 @@ def postgres_literal(
     if field_type == FieldType.DECIMAL:
         if type(value) not in {Decimal, str} or precision is None or scale is None:
             raise PostgresSqlExportError("PostgreSQL decimal value is invalid")
-        text = format(value, "f") if isinstance(value, Decimal) else value
         try:
+            text = decimal_to_text(value) if isinstance(value, Decimal) else value
             decimal_to_units(text, precision=precision, scale=scale)
         except ExactDecimalError:
             raise PostgresSqlExportError("PostgreSQL decimal value is invalid") from None

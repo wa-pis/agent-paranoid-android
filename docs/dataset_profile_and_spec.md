@@ -104,11 +104,30 @@ Common distribution kinds:
 - `synthetic_identifier`
 - `masked_patterns`
 - `numeric`
+- `decimal_range`
+- `numeric_shape`
 - `boolean`
 - `date_range`
 - `datetime_range`
 - `categorical`
 - `string_pattern`
+
+For `synthetic_identifier`, `pool_size` controls the synthetic key pool. The
+optional `prefix` property is legacy metadata retained for compatibility, not a
+generation control. String identifiers always use `synthetic_` followed by an
+ASCII integer; a supplied prefix is never copied into generated values.
+`masked_patterns` describes safe profiling evidence, not literal templates to
+copy into output. Sensitive values use their synthetic semantic formatter.
+Typed CSV bundles write exact DECIMAL values in plain fixed-point notation,
+including very small values, so standalone validation can restore their declared
+precision and scale without accepting exponent-form source strings.
+Declared precision 38, scale 38 supports both signs, including the smallest
+nonzero unit and the largest fractional magnitude. The optional minus sign is
+not part of the declared digit precision; values outside that precision and
+oversized text still fail the bounded exact parser.
+CSV formatting checks the exact-decimal width and finiteness before expanding a
+Decimal exponent; unbounded or non-finite direct values fail with a value-free
+error.
 
 ### Large Input Behavior
 

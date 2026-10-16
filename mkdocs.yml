@@ -69,9 +69,11 @@ nav:
       - Dependency Compatibility: reference/dependency-compatibility.md
       - Compatibility Surfaces: reference/compatibility.md
       - Configuration: reference/configuration.md
+      - Source And Output Matrix: reference/source-output-matrix.md
       - DatasetSpec: dataset_profile_and_spec.md
       - Advisor API: reference/advisor.md
       - MCP Tools: mcp_examples.md
+      - MCP Permissions: reference/mcp-permissions.md
   - Operations:
       - Troubleshooting: operations/troubleshooting.md
       - Known Issues: known-issues.md
@@ -84,6 +86,7 @@ nav:
       - Open Decisions And Discrepancies: adr/open-questions.md
       - Architecture: agent_design.md
       - Development: development.md
+      - Final Acceptance Matrix: acceptance-matrix.md
       - Release Process: release.md
       - Manual Release Runbook: manual-release-runbook.md
       - Release Evidence: release-evidence.md

@@ -1119,20 +1119,33 @@ def test_isolated_common_cli_runtime_flags(position):
     assert payload["error"]["command"] == "test-data-agent transform-batch"
 
 
-def test_isolated_common_contract_inventory():
+def test_isolated_common_contract_inventory(tmp_path, monkeypatch):
     if (os.environ.get("APA_TEST_ACTUAL_COMMON_CLI") != "1"
             or os.environ.get("APA_TEST_ACTUAL_COMMON_MCP") != "1"):
         pytest.skip("requires isolated actual CLI/MCP composition")
     from scripts.contract_fixtures import _cli_parser_surface, _mcp_tool_contract
-    from test_data_agent.mcp_generator_server import mcp
+    from test_data_agent.io.transformation_query_sessions import _ConfiguredQuerySessions
+    from test_data_agent.mcp_generator_server import generator_mcp_services
+    from test_data_agent.mcp_generator_transport import create_generator_mcp
 
+    monkeypatch.setenv("TEST_DATA_AGENT_WORKSPACE_ROOT", str(tmp_path))
     fixtures = Path("tests/fixtures/contracts")
     expected = json.loads((fixtures / "cli-parser-surface.json").read_bytes())
     actual = _cli_parser_surface()
     assert set(actual["commands"]) == set(expected["commands"]) | {"transform-batch"}
     assert {key: value for key, value in actual.items() if key != "commands"} == {
         key: value for key, value in expected.items() if key != "commands"}
-    tools = _mcp_tool_contract(mcp)
+    sessions = _ConfiguredQuerySessions(
+        tmp_path, max_active=1, max_cumulative_bytes=64 * 1024 * 1024, max_seconds=300,
+    )
+    try:
+        mcp = create_generator_mcp(
+            generator_mcp_services(workspace=tmp_path, query_sessions=sessions),
+            strict_arguments=True,
+        )
+        tools = _mcp_tool_contract(mcp)
+    finally:
+        sessions.close()
     assert tools == json.loads(
         (fixtures / "mcp-generator-tools.json").read_bytes())
     common = [tool for tool in tools if tool["name"] == "common_transformation"]

@@ -363,6 +363,6 @@ def test_active_aggregate_cannot_use_rejected_relationship(tmp_path: Path) -> No
             confidence=1,
         )
     ]
-    with pytest.raises(ValueError, match="constraint validation"):
+    with pytest.raises(ValueError, match="active relationship"):
         generate_dataset_bundle(spec, output_folder=tmp_path / "output")
     assert not (tmp_path / "output").exists()

@@ -1,7 +1,9 @@
 # Generator MCP Design Rationale
 
 This document explains what the AI integration does, why its boundaries exist,
-and where each responsibility lives in the codebase.
+and where each responsibility lives in the codebase. Use
+[MCP Permissions](reference/mcp-permissions.md) for the complete current tool
+inventory and required process, database and review rights.
 
 ## Objective
 
@@ -26,12 +28,19 @@ used for profiling.
 The integration deliberately separates source inspection from generation:
 
 - `mcp_trino_server.py` has read-only access to an allowlisted Trino surface.
-- `mcp_generator_server.py` has access only to a configured local workspace.
+- the ordinary synthetic tools in `mcp_generator_server.py` use a configured
+  local workspace and need no database connection.
 
 This separation follows least privilege. Database credentials do not need to be
 available to the generator, and the Trino server does not need permission to
 write output files. A compromised or mistaken tool call therefore has a smaller
 blast radius.
+
+The separate configured SQL transformation session can capture an authorized
+database into owned temporary snapshots. It requires additional adapter,
+network, database and storage rights plus its own activation acceptance; it is
+outside the aggregate-profile-to-synthetic pipeline below. A local process
+inherits its OS user's rights; the workspace setting alone is not a sandbox.
 
 ```text
 Trino or CSV
@@ -58,25 +67,13 @@ patterns. Source rows and raw sensitive values do not cross it.
 
 ## Tool Logic
 
-The inventory below describes the ordinary generator/review surface. The
-isolated candidate additionally composes single-input and common-profile
-transformation consumers, documented in [MCP usage](how-to/mcp.md#closed-common-profile-candidate).
-Their registration remains gated in the author checkout. The ordinary
+The [generator rights table](reference/mcp-permissions.md#generator-tool-rights)
+describes all 14 console-registered tools, their inputs, effects and approvals.
+The console entrypoint owns the workspace and session lifetime; the module-level
+SDK object has only the 12 base tools. Transformation activation/release
+acceptance is separate from registration. The ordinary
 `approve_dataset_plan` receipt is not a source-preservation receipt and cannot
 authorize transformation preservation; MCP has no preservation approval issuer.
-
-| Tool | Why it exists | Input | Written output | MCP response |
-| --- | --- | --- | --- | --- |
-| `review_transformation` | Review a saved local transformation policy through the shared CLI core | Workspace source snapshot, YAML policy, optional table name | None | Review-only metadata and snapshot SHA-256; no execution or approval receipt |
-| `profile_csv` | Convert a potentially sensitive CSV into reusable safe metadata | Workspace CSV path | Profile JSON | Counts and paths only |
-| `infer_dataset_spec` | Turn safe observations into an explicit generation contract | Profile path or inline profile payload | DatasetSpec JSON/YAML | Contract summary |
-| `plan_dataset` | Build a review-first workspace from a local supported source | Workspace CSV, CSV folder, or safe profile path | Profile, DatasetSpec, and plan | Plan summary and review paths |
-| `plan_trino_dataset` | Build a review-first agent workspace from safe Trino metadata | `profile_table_safe` payload and generation settings | Profile, DatasetSpec, and plan | Plan summary and review paths |
-| `inspect_dataset_plan` | Recompute the current effective-spec fingerprint without changing the workspace | Planned or completed workspace | None | Phase, review state, and safe summary |
-| `approve_dataset_plan` | Continue only after the exact DatasetSpec fingerprint is reviewed | Planned workspace and reviewed SHA-256 | Synthetic bundle and approval receipt | Row counts, receipt, validation, and manifest paths |
-| `generate_dataset` | Run deterministic generation and validation | DatasetSpec, seed, count, optional format and structured rules | Synthetic bundle | Row counts and compact validation summaries |
-| `validate_dataset` | Recheck a generated bundle without exposing its rows | Matching spec and generated folder | Optional report JSON | Validation report |
-| `export_dataset` | Produce another supported format safely | DatasetSpec, seed, count, required format and optional structured rules | Fresh synthetic bundle | Row counts and compact validation summaries |
 
 `export_dataset` intentionally regenerates data from a `DatasetSpec`. It does
 not accept arbitrary row files, because a generic conversion tool could be used
@@ -116,9 +113,11 @@ including the matched values in the error.
 
 ### Workspace Boundary
 
-Every generator MCP path is resolved against
+Ordinary generator MCP tool paths are resolved against
 `TEST_DATA_AGENT_WORKSPACE_ROOT`. Paths outside that root are rejected after
 resolution, which also blocks traversal through existing symlinks.
+Owned runtime temporary storage and separately configured audit/authentication
+files have different locations; see [minimum process rights](reference/mcp-permissions.md#minimum-process-rights).
 
 MCP output files must be new, and generation folders must be new or empty. This
 prevents accidental overwrites and avoids mixing a new synthetic dataset with

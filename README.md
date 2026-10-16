@@ -10,14 +10,18 @@ Stable `1.5.0` is the recommended release. Read the
 [documentation](https://wa-pis.github.io/agent-paranoid-android/) for complete
 workflows and configuration.
 
-Candidate `1.6.0rc4` is published on [PyPI](https://pypi.org/project/agent-paranoid-android/1.6.0rc4/).
-It implements [folder overwrite and generation modes](docs/reference/generation-modes.md).
-See the [RC4 release evidence](docs/release-evidence-1.6.0rc4.md).
-Stable `1.5.0` remains the recommended release. The explicit candidate pin is:
+Prospective candidate `1.6.0rc5` is not yet published. It includes [RC4 feedback corrections](docs/rc4-external-feedback.md),
+shared source/output contract and MCP permission reference. See the
+[acceptance evidence](docs/acceptance-evidence-1.6.0rc5.md) and [release status](docs/rc5-release-status.md).
+Published [RC4](docs/release-evidence-1.6.0rc4.md) remains immutable; stable `1.5.0` remains recommended.
+After RC5 publication, its exact pin is:
 
 ```bash
-python3 -m pip install "agent-paranoid-android==1.6.0rc4"
+python3 -m pip install "agent-paranoid-android==1.6.0rc5"
 ```
+
+See the [source/output matrix](docs/reference/source-output-matrix.md) for the
+common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 ## Install And Try It
 
@@ -126,3 +130,11 @@ python -c 'from importlib.resources import files; print(files("test_data_agent")
 
 Point the agent at the selected skill directory using its own configuration;
 installing this package does not silently register skills with other agents.
+
+Details for reviewed decimal inference, rule auditing and numeric profile limits:
+[RC4 feedback corrections](docs/rc4-external-feedback.md).
+
+Business rules can travel in `DatasetSpec.business_rules` across Python, CLI, MCP,
+approved agent workspaces and every output format. DECIMAL formulas and aggregate mappings
+use exact arithmetic with one target-scale HALF_UP rounding. See
+[portable business rules](docs/rc4-external-feedback.md#business-rules-across-interfaces).

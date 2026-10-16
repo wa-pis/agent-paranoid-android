@@ -2,12 +2,20 @@
 
 The project exposes two MCP servers with separate trust boundaries:
 
-- the generator server reads and writes only inside one workspace;
+- the generator's ordinary file tools use one workspace; configured SQL
+  transformation sessions additionally own private temporary captures;
 - the Trino server's default aggregate-only tools provide allowlisted,
   read-only metadata and profiling.
 
 Start with the generator server. Add Trino only when database profiling is
 required.
+
+Before enabling tools, use [MCP Permissions](../reference/mcp-permissions.md)
+for the complete tool inventory, required filesystem/network/database rights,
+client confirmation policy, and separate transformation approval requirements.
+These are stdio servers: the client launches a local process; no inbound port
+or MCP OAuth scope is required. Client tool approval, operating-system access,
+database grants and human dataset review are separate controls.
 
 For process and dependency isolation, use the separate hardened images in
 [Container Deployment](../operations/containers.md). The generator example has
@@ -147,7 +155,10 @@ mkdir -p /path/to/synthetic-workspace
 ```
 
 Inputs, safe profiles, reviewed specs, rules, and outputs used through generator
-MCP tools must remain below this directory.
+file tools must remain below this directory. Server-owned temporary storage,
+audit logs and authentication files have separate administrator-configured
+locations. The workspace setting is an application path boundary, not an
+operating-system sandbox.
 
 ## MCP Client Configuration
 
@@ -180,6 +191,13 @@ Use the installed console commands:
   }
 }
 ```
+
+Give the Trino identity only the required metadata and SELECT access through
+database grants; no write or administration rights are needed. Catalog/schema
+allowlists do not create those grants. `TRINO_ALLOWED_TABLE_COLUMNS` narrows
+safe table profiling, but is not a universal per-tool ACL for metadata, counts,
+rule probes or optional `run_safe_select`. Use database grants for strict
+table/column isolation; see the [permission matrix](../reference/mcp-permissions.md#trino-tool-rights).
 
 Do not place a password or token directly in a committed MCP configuration.
 Use the client's secret mechanism or an environment injected by the runtime.
@@ -226,7 +244,10 @@ authorizes database access or external APIs.
 
 Use `profile_csv`, `infer_dataset_spec`, `generate_dataset`, and
 `validate_dataset` separately when an advanced client needs control over each
-pipeline stage.
+pipeline stage. Direct `generate_dataset` and `export_dataset` do not require a
+planning approval argument; configure the client's confirmation policy before
+enabling these writing tools. Permission to invoke `approve_dataset_plan` is
+not evidence that the human reviewed the displayed specification.
 
 For business rules, provide exactly one of `business_rules_path` or a bounded
 structured `business_rules_payload`.

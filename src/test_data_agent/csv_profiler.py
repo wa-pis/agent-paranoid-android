@@ -19,7 +19,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, model_serializer
 from test_data_agent.core.csv_reader import ScopedDictReader
 
 from test_data_agent.core.limits import (
@@ -106,8 +106,8 @@ class CSVSourceRowDigests:
 class CSVColumnProfile(BaseModel):
     name: str
     data_type: str
-    decimal_precision: int | None = Field(default=None, exclude_if=lambda value: value is None)
-    decimal_scale: int | None = Field(default=None, exclude_if=lambda value: value is None)
+    decimal_precision: int | None = Field(default=None)
+    decimal_scale: int | None = Field(default=None)
     nullable: bool
     null_count: int | None
     null_ratio: float | None
@@ -124,6 +124,14 @@ class CSVColumnProfile(BaseModel):
     max_date: str | None = None
     min_timestamp: str | None = None
     max_timestamp: str | None = None
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("decimal_precision", "decimal_scale"):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
 
 class CSVProfile(BaseModel):

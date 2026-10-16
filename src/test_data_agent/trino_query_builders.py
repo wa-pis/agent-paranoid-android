@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from test_data_agent.profiling.numeric_shape import prevalence_sql
+
 import ast
 from dataclasses import dataclass
 from typing import Any
@@ -114,7 +116,7 @@ def build_sensitive_numeric_shape_query(
         f"max(CASE WHEN {safe_column} = 0 THEN NULL ELSE {magnitude} END) "
         "AS max_abs_magnitude, "
         f"count_if({safe_column} < 0) > 0 AS has_negative, "
-        f"count_if({safe_column} > 0) > 0 AS has_positive "
+        f"count_if({safe_column} > 0) > 0 AS has_positive, {prevalence_sql(safe_column, magnitude)} "
         f"FROM {safe_table}"
     )
 

@@ -11,7 +11,7 @@ from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.generation.limits import enforce_dataset_rule_work
 from test_data_agent.core.limits import GenerationBudget, GenerationLimitError
 from test_data_agent.core.distribution import (
-    CategoricalDistribution,
+    CategoricalDistribution, DecimalRangeDistribution,
     NumericDistribution,
     DateRangeDistribution,
     DateTimeRangeDistribution,
@@ -20,7 +20,8 @@ from test_data_agent.core.field import FieldSpec, FieldType
 from test_data_agent.core.relationship import RelationshipType
 from test_data_agent.core.settings import GenerationMode
 from test_data_agent.rules.conditions import Condition, condition_matches
-from test_data_agent.rules.expressions import expression_references, parse_datetime, safe_eval
+from test_data_agent.rules.typed_values import formula_value, numeric_row, aggregate_mapping_values
+from test_data_agent.rules.expressions import expression_references, parse_datetime
 
 
 def solve_constraints(
@@ -147,7 +148,8 @@ def apply_formula_constraints(
         for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
             failed = False
             try:
-                row[target] = safe_eval(constraint.expression, row, budget=budget)
+                row[target] = formula_value(constraint.expression, numeric_row(row, spec.entity(constraint.entity), budget=budget),
+                                            spec.entity(constraint.entity).field(target), budget=budget)
             except GenerationLimitError:
                 raise
             except Exception:
@@ -194,7 +196,8 @@ def apply_conditional_required_constraints(
             continue
         condition = Condition(**constraint.condition)
         for row in budget.iter_rule_work(rows_by_entity.get(constraint.entity, [])):
-            if condition_matches(row, condition, budget=budget):
+            if condition_matches(numeric_row(row, spec.entity(constraint.entity), budget=budget),
+                                 condition, budget=budget):
                 for field in budget.iter_rule_work(constraint.fields):
                     if row.get(field) in (None, ""):
                         row[field] = default_value_for_field(spec.entity(constraint.entity).field(field))
@@ -213,42 +216,9 @@ def apply_aggregate_mapping_constraints(
             continue
         if constraint.type != ConstraintType.AGGREGATE_MAPPING or not constraint.target_entity:
             continue
-        relationship = next(
-            (
-                item for item in budget.iter_rule_work(spec.relationships)
-                if item.status != "rejected" and item.parent_entity == constraint.entity and item.child_entity == constraint.target_entity
-            ),
-            None,
-        )
-        if relationship is None:
-            continue
-        totals: dict[Any, float] = defaultdict(float)
-        counts: dict[Any, int] = defaultdict(int)
-        target_field = constraint.target_field
-        for child_row in budget.iter_rule_work(rows_by_entity.get(relationship.child_entity, [])):
-            key = child_row.get(relationship.child_field)
-            if constraint.aggregate == "count":
-                totals[key] += 1
-                continue
-            if target_field is None:
-                continue
-            value = child_row.get(target_field)
-            if value is None:
-                continue
-            try:
-                totals[key] += float(value)
-            except (TypeError, ValueError):
-                continue
-            counts[key] += 1
-        parent_field = constraint.fields[0] if constraint.fields else None
-        if parent_field is None:
-            continue
-        for parent_row in budget.iter_rule_work(rows_by_entity.get(relationship.parent_entity, [])):
-            key = parent_row.get(relationship.parent_field)
-            aggregate_value = totals.get(key, 0.0)
-            if constraint.aggregate == "avg" and counts.get(key, 0):
-                aggregate_value /= counts[key]
-            parent_row[parent_field] = normalize_number(aggregate_value)
+        for parent, value in aggregate_mapping_values(rows_by_entity, spec, constraint, budget=budget,
+                                                     skip_invalid=spec.generation_settings.mode in {"negative", "mixed"}):
+            parent[constraint.fields[0]] = value
 
 def normalize_number(value: float) -> int | float:
     rounded = round(value, 6)
@@ -273,6 +243,9 @@ def default_value_for_field(field: FieldSpec) -> Any:
             ),
             0,
         )
+    if isinstance(distribution, DecimalRangeDistribution):
+        from decimal import Decimal
+        return Decimal(distribution.min)
     if isinstance(distribution, DateRangeDistribution):
         return distribution.min or "2000-01-01"
     if isinstance(distribution, DateTimeRangeDistribution):

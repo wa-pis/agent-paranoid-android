@@ -68,7 +68,9 @@ test-data-agent generate --profile profile.json \
 
 `generate` accepts exactly one of a `DatasetSpec` path or `--profile`. Spec
 generation writes a dataset folder. Single-table profile generation writes one
-data file and requires `--count` and `--seed`.
+data file and requires `--count` and `--seed`. Multi-table profile generation
+writes the complete output folder. All sources share the
+[source/output matrix](source-output-matrix.md).
 
 ## Database Sources
 
@@ -140,27 +142,32 @@ and trust-channel guidance.
 Parquet output from a reviewed specification uses declared integer, float,
 boolean, string, date and timestamp Arrow types, including nullable fields.
 Timestamp offsets are preserved when one consistent offset is available.
-Rows that cannot fit the declared type, including intentionally invalid mixed
-values, fail before publication; they are never silently converted into an
-all-string column. A reviewed `DatasetSpec` version `1.1` may declare a
+Wide integer identifiers, mixed timestamp offsets and explicitly requested
+malformed negative cells use marked scalar encodings where native Arrow types
+cannot retain their logical values. The bundle reader restores them for validation;
+negative datasets remain invalid. Ordinary incompatible typed values still fail
+before publication. See the [output representations](source-output-matrix.md#output-representations-and-revalidation). A reviewed `DatasetSpec` version `1.1` may declare a
 `decimal` field with a required `decimal_range` distribution containing
 `precision` (1–38), `scale` (0–precision), and exact plain-text `min`/`max`
 bounds. Generation uses seeded base-ten integer units; CSV/JSON render decimal
 text, PostgreSQL SQL uses `NUMERIC(p,s)`, and Parquet uses `decimal128(p,s)`.
 CSV is not self-describing: the generated directory's `dataset_spec.yaml`
-records the DECIMAL precision, scale and nullability, while null cells are
-empty in CSV. Keep that companion specification when reusing the export;
-the manifest binds it by fingerprint.
+records the DECIMAL precision, scale and nullability. The manifest declares the
+reversible CSV null/text encoding: null is `\N`, while an empty cell is empty text.
+Keep both companions when reusing the export; the manifest binds the specification
+by fingerprint. Legacy unmarked CSV keeps its previous interpretation.
 Version `1.0` remains readable but cannot declare `decimal`. Parquet and
 declared PostgreSQL/query `numeric(p,s)` profiles retain only schema precision
-and scale; they do not infer a runnable exact range. Financial formulas remain
-unsupported for exact-decimal generation. Ordinary generation never preserves
+and scale; they do not infer a runnable exact range. Reviewed ordinary DECIMAL
+formulas and aggregates use bounded exact arithmetic with one HALF_UP rounding
+at the declared target scale. See the [rule contract](../rc4-external-feedback.md#business-rules-across-interfaces). Ordinary generation never preserves
 source rows. The separately selected transformation candidate has its own
 [saved-profile contract](cli.md#closed-common-profile-workflow-candidate), exact
 typed mappings and local approval boundary; its common public registration is
 not enabled by these generation commands. Bare SQL `numeric`
 without `(p,s)` still uses approximate FLOAT semantics, not exact evidence.
-Sensitive DECIMAL ranges and formula constraints are rejected before generation.
+Sensitive DECIMAL ranges remain rejected before generation; explicit numeric
+measure semantics retain sensitive-name, flag and classification vetoes.
 
 Folder generation requires a new or empty destination. Single-entity output
 suffixes must match the selected format. Overwrite fails closed when ownership,

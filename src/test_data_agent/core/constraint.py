@@ -60,7 +60,7 @@ class Constraint(BaseModel):
                 raise ValueError("constraint condition requires a field")
             if not any(
                 key in self.condition
-                for key in ("equals", "not_equals", "in_values")
+                for key in ("equals", "not_equals", "in_values", "gte", "lte")
             ):
                 raise ValueError("constraint condition requires a predicate")
         return self

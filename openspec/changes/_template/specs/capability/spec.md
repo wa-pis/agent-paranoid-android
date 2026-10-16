@@ -16,7 +16,12 @@ The system SHALL <new behavior>.
 
 ### Requirement: <Existing behavior>
 
-Update the existing requirement here when behavior changes.
+The system SHALL <updated existing behavior>.
+
+#### Scenario: <updated scenario name>
+
+- **WHEN** <action affected by the change>
+- **THEN** <updated expected outcome>
 
 ## REMOVED Requirements
 

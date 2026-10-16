@@ -14,6 +14,10 @@ from test_data_agent.adapters import (
 )
 from test_data_agent.csv_profiler import profile_csv_with_row_digests
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.field import FieldSpec
+from test_data_agent.rules.validation import BusinessValidationReport
+from test_data_agent.rules.models import BusinessRules
+from test_data_agent.rules.business_config import embed_configured_business_rules
 from test_data_agent.core.limits import (
     GenerationBudget,
     enforce_output_capacity,
@@ -34,7 +38,6 @@ from test_data_agent.generation.planner import infer_dataset_spec
 from test_data_agent.io.artifacts import (
     write_dataset_generation_artifacts,
     write_dataset_profile_artifact,
-    write_dataset_review_artifacts as write_dataset_review_bundle,
     write_dataset_spec_artifact,
     write_dataset_validation_report,
     write_generation_manifest,
@@ -86,14 +89,21 @@ def generate_dataset_bundle(
     invalid_ratio: float | None = None,
     business_rules_applier: BusinessRulesApplier | None = None,
     overwrite: bool = False,
+    profile: DatasetProfile | None = None,
+    source_folder: Path | None = None,
 ) -> DatasetGenerationResult:
+    if profile is not None:
+        assert_profile_safe(profile)
+    if source_folder is not None:
+        ensure_folders_distinct(source_folder, output_folder)
     effective_spec = spec.model_copy(deep=True)
     if mode is not None or invalid_ratio is not None:
         apply_dataset_mode_options(
             effective_spec,
             mode=mode or effective_spec.generation_settings.mode.value,
             invalid_ratio=(
-                effective_spec.generation_settings.invalid_ratio
+                (effective_spec.generation_settings.invalid_ratio
+                 if mode is None or mode in {"mixed", "negative"} else 0.0)
                 if invalid_ratio is None else invalid_ratio
             ),
         )
@@ -122,8 +132,11 @@ def generate_dataset_bundle(
     effective_spec.generation_settings.seed = effective_seed
     effective_spec.generation_settings.output_format = effective_output_format
 
+    if embed_configured_business_rules(effective_spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(effective_spec, output_folder)
-    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget)
+    embedded_reports: list[BusinessValidationReport] = []
+    rows_by_entity = generate_dataset(effective_spec, seed=effective_seed, budget=budget, business_reports=embedded_reports)
     budget.check("dataset generation")
     business_report = (
         invoke_business_rules_applier(
@@ -136,13 +149,16 @@ def generate_dataset_bundle(
         if business_rules_applier is not None
         else None
     )
+    business_report = business_report or (embedded_reports[0] if embedded_reports else None)
     budget.check("business rule application")
+    if source_folder is not None:
+        assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
     assert_generated_dataset_valid(rows_by_entity, effective_spec, budget=budget)
     assert_business_report_valid(business_report, effective_spec.generation_settings.mode)
     temp_folder = make_temp_output_folder(output_folder)
     temp_identity = path_identity(temp_folder)
     try:
-        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec)
+        write_dataset_rows(rows_by_entity, effective_output_format, temp_folder, spec=effective_spec, budget=budget)
         budget.check("dataset export")
         report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
         budget.check("dataset validation")
@@ -150,6 +166,8 @@ def generate_dataset_bundle(
             business_report,
             effective_spec.generation_settings.mode,
         )
+        if profile is not None:
+            write_dataset_profile_artifact(profile, temp_folder / "profile.json")
         write_dataset_spec_artifact(effective_spec, temp_folder / "dataset_spec.yaml")
         write_dataset_validation_report(report, temp_folder)
         if business_report is not None:
@@ -220,9 +238,6 @@ def build_dataset_spec_from_profile(
     invalid_ratio: float = 0.0,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
-    if len(profile.entities) != 1:
-        raise ValueError("--profile generation currently requires exactly one entity profile")
-
     spec = infer_dataset_spec(profile, count=count)
     spec.generation_settings.seed = seed
     if output_format is not None:
@@ -239,9 +254,15 @@ def infer_dataset_spec_artifact(
     *,
     output_path: Path,
     count: int | None = None,
+    decimal_fields: dict[str, FieldSpec] | None = None,
+    business_rules: BusinessRules | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
-    spec = infer_dataset_spec(profile, count=count)
+    spec = infer_dataset_spec(profile, count=count, decimal_fields=decimal_fields)
+    if business_rules is not None:
+        from test_data_agent.rules.contract import validate_business_rules_for_spec
+        validate_business_rules_for_spec(business_rules, spec)
+        spec.business_rules = business_rules
     write_dataset_spec_artifact(spec, output_path)
     return spec
 
@@ -280,18 +301,21 @@ def generate_single_entity_profile_artifacts(
     overwrite: bool = False,
 ) -> DatasetValidationReport:
     budget = budget or prepare_generation_budget(spec, output_path or Path.cwd())
+    embedded_reports: list[BusinessValidationReport] = []
     rows_by_entity = rows_by_entity or generate_dataset(
         spec,
         seed=spec.generation_settings.seed or 0,
         budget=budget,
+        business_reports=embedded_reports,
     )
     budget.check("dataset generation")
     assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
+    business_report = business_report or (embedded_reports[0] if embedded_reports else None)
     assert_business_report_valid(business_report, spec.generation_settings.mode)
     report = validate_dataset(rows_by_entity, spec, budget=budget)
     budget.check("dataset validation")
     if output_path is None:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, output_path, spec=spec, budget=budget)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -308,7 +332,7 @@ def generate_single_entity_profile_artifacts(
     temp_identity = path_identity(temp_folder)
     temp_output_path = temp_folder / output_path.name
     try:
-        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec)
+        write_single_entity_rows(rows_by_entity, spec.generation_settings.output_format, temp_output_path, spec=spec, budget=budget)
         write_dataset_generation_artifacts(
             profile,
             spec,
@@ -354,15 +378,26 @@ def generate_dataset_from_profile_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
+    if len(spec.entities) != 1:
+        if output_path is None:
+            raise ValueError("multi-entity profile generation requires an output folder")
+        result = generate_dataset_bundle(spec, output_folder=output_path, seed=seed,
+                                         count=count, business_rules_applier=business_rules_applier,
+                                         profile=profile, overwrite=overwrite)
+        return result.validation, result.business_validation
     require_output_format_suffix(output_path, spec.generation_settings.output_format)
+    if embed_configured_business_rules(spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(spec, output_path)
+    embedded_reports: list[BusinessValidationReport] = []
     rows_by_entity = generate_dataset(
         spec,
         seed=spec.generation_settings.seed or 0,
         budget=budget,
+        business_reports=embedded_reports,
     )
     budget.check("dataset generation")
-    business_report = None
+    business_report = embedded_reports[0] if embedded_reports else None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
             business_rules_applier,
@@ -415,10 +450,13 @@ def generate_dataset_from_csv_artifacts(
         mode=mode,
         invalid_ratio=invalid_ratio,
     )
+    if embed_configured_business_rules(spec, business_rules_applier):
+        business_rules_applier = None
     budget = prepare_generation_budget(spec, output_path)
-    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget)
+    embedded_reports: list[BusinessValidationReport] = []
+    rows_by_entity = generate_dataset(spec, seed=seed, budget=budget, business_reports=embedded_reports)
     budget.check("dataset generation")
-    business_report = None
+    business_report = embedded_reports[0] if embedded_reports else None
     if business_rules_applier is not None:
         business_report = invoke_business_rules_applier(
             business_rules_applier,
@@ -455,42 +493,10 @@ def generate_dataset_review_artifacts(
     seed: int,
     source_folder: Path | None = None,
 ) -> int:
-    assert_profile_safe(profile)
-    if source_folder is not None:
-        ensure_folders_distinct(source_folder, output_folder)
-    ensure_empty_output_folder(output_folder)
-    effective_spec = spec.model_copy(deep=True)
-    effective_spec.generation_settings.seed = seed
-    effective_spec.generation_settings.output_format = output_format
-    enforce_generation_row_count_limits(effective_spec)
-    budget = prepare_generation_budget(effective_spec, output_folder)
-    rows_by_entity = generate_dataset(effective_spec, seed=seed, budget=budget)
-    budget.check("dataset generation")
-    temp_folder = make_temp_output_folder(output_folder)
-    temp_identity = path_identity(temp_folder)
-    try:
-        if source_folder is not None:
-            assert_no_csv_folder_source_rows(source_folder, rows_by_entity)
-        write_dataset_rows(rows_by_entity, output_format, temp_folder, spec=effective_spec)
-        budget.check("dataset export")
-        report = validate_dataset(rows_by_entity, effective_spec, budget=budget)
-        budget.check("dataset validation")
-        write_dataset_review_bundle(profile, effective_spec, report, temp_folder)
-        write_generation_manifest(
-            effective_spec,
-            seed=seed,
-            output_format=output_format,
-            row_counts={name: len(rows) for name, rows in rows_by_entity.items()},
-            validation_valid=report.valid,
-            output_folder=temp_folder,
-        )
-        enforce_output_folder_size(temp_folder)
-        budget.check("artifact publication")
-        commit_temp_output_folder(temp_folder, output_folder)
-    except BaseException:
-        cleanup_failed_folder_publication(temp_folder, output_folder, temp_identity)
-        raise
-    return 0 if report.valid else 1
+    result = generate_dataset_bundle(spec, output_folder=output_folder,
+                                     output_format=output_format, seed=seed,
+                                     profile=profile, source_folder=source_folder)
+    return 0 if result_is_valid(result) else 1
 
 
 def assert_business_report_valid(report: Any | None, mode: GenerationMode) -> None:
@@ -691,8 +697,36 @@ def cleanup_failed_folder_publication(
 
 
 def ensure_paths_distinct(first: Path, second: Path) -> None:
+    first, second = first.expanduser(), second.expanduser()
     if first.resolve(strict=False) == second.resolve(strict=False):
         raise ValueError("input and output paths must be different")
+    if first.exists() and second.exists() and first.samefile(second):
+        raise ValueError("input and output paths must be different")
+
+
+def ensure_input_outside_output_folder(input_path: Path, output_folder: Path) -> None:
+    input_path, output_folder = input_path.expanduser(), output_folder.expanduser()
+    if (
+        output_folder.absolute() in input_path.absolute().parents
+        or output_folder.resolve(strict=False) in input_path.resolve(strict=False).parents
+    ):
+        raise ValueError("output folder must not contain the input business rules")
+
+
+def ensure_rules_distinct_from_single_entity_output(
+    rules_path: Path,
+    output_path: Path | None,
+    *,
+    profile_artifact_name: str,
+) -> None:
+    output_folder = Path.cwd() if output_path is None else output_path.parent
+    if output_path is not None:
+        ensure_paths_distinct(rules_path, output_path)
+    for artifact_name in (
+        profile_artifact_name, "dataset_spec.json", "validation_report.json",
+        "business_validation_report.json", "generation_manifest.json",
+    ):
+        ensure_paths_distinct(rules_path, output_folder / artifact_name)
 
 
 def ensure_folders_distinct(source_folder: Path, output_folder: Path) -> None:

@@ -54,6 +54,9 @@ def enforce_dataset_rule_work(
         entity.name: entity.row_count for entity in spec.entities
     }
     estimated = len(spec.constraints) + len(spec.relationships)
+    if spec.business_rules is not None:
+        from test_data_agent.rules.contract import estimate_business_rule_evaluations_for_rows
+        estimated += estimate_business_rule_evaluations_for_rows(spec.business_rules, counts, mode=spec.generation_settings.mode)
     for constraint in spec.constraints:
         budget.check("rule work preflight")
         if constraint.status == ConstraintStatus.REJECTED:

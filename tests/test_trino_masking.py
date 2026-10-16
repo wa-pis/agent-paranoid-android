@@ -280,7 +280,7 @@ def test_masker_suppresses_sensitive_numeric_summaries_at_query_boundary() -> No
     }
     assert all(
         expression not in queries[0].sql
-        for expression in ("min(", "approx_percentile(")
+        for expression in ('min("tax_id")', 'max("tax_id")', "approx_percentile(")
     )
 
 

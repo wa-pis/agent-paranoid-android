@@ -5,13 +5,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator, model_serializer
 
 from test_data_agent.core.constraint import Constraint
 from test_data_agent.core.entity import EntityProfile, EntitySpec
 from test_data_agent.core.privacy import LocalCategoryField, PrivacyRule, PrivacySettings
 from test_data_agent.core.relationship import Relationship
 from test_data_agent.core.settings import GenerationSettings, ValidationSettings
+from test_data_agent.rules.models import BusinessRules
 
 
 LEGACY_DATASET_SPEC_SCHEMA_VERSION: Literal["1.0"] = "1.0"
@@ -77,11 +78,20 @@ class DatasetSpec(BaseModel):
     entities: list[EntitySpec] = Field(default_factory=list)
     relationships: list[Relationship] = Field(default_factory=list)
     constraints: list[Constraint] = Field(default_factory=list)
+    business_rules: BusinessRules | None = Field(default=None)
     privacy_rules: list[PrivacyRule] = Field(default_factory=list)
     privacy_settings: PrivacySettings = Field(default_factory=PrivacySettings)
     local_category_fields: list[LocalCategoryField] = Field(default_factory=list)
     generation_settings: GenerationSettings = Field(default_factory=GenerationSettings)
     validation_settings: ValidationSettings = Field(default_factory=ValidationSettings)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
+        payload: dict[str, Any] = handler(self)
+        for name in ("business_rules",):
+            if getattr(self, name) is None:
+                payload.pop(name, None)
+        return payload
 
     @model_validator(mode="after")
     def validate_contract(self) -> DatasetSpec:

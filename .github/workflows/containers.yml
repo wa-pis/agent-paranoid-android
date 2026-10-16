@@ -127,6 +127,22 @@ jobs:
             "${IMAGE}" \
             -m test_data_agent.container_health "${TARGET}"
 
+      - name: Exercise hardened container workloads
+        run: >-
+          python3 scripts/accept_container_workloads.py
+          --image agent-paranoid-android:${{ matrix.target }}-test
+          --target ${{ matrix.target }}
+          --platform linux/amd64
+          --report container-workload-${{ matrix.target }}-amd64.json
+
+      - name: Save AMD64 workload evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: container-workload-${{ matrix.target }}-amd64
+          path: container-workload-${{ matrix.target }}-amd64.json
+          if-no-files-found: warn
+
       - name: Scan image for release-blocking vulnerabilities
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -224,6 +240,22 @@ jobs:
             --entrypoint python \
             "${IMAGE}" \
             -m test_data_agent.container_health "${TARGET}"
+
+      - name: Exercise hardened ARM64 workloads
+        run: >-
+          python3 scripts/accept_container_workloads.py
+          --image agent-paranoid-android:${{ matrix.target }}-arm64-test
+          --target ${{ matrix.target }}
+          --platform linux/arm64
+          --report container-workload-${{ matrix.target }}-arm64.json
+
+      - name: Save ARM64 workload evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: container-workload-${{ matrix.target }}-arm64
+          path: container-workload-${{ matrix.target }}-arm64.json
+          if-no-files-found: warn
 
   release-gate:
     name: Verify release tag

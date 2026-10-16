@@ -107,7 +107,8 @@ def test_profile_builders_are_bounded_aggregate_queries() -> None:
     assert all("SELECT *" not in query.sql.upper() for query in queries)
 
     sensitive_numeric = queries[3]
-    assert "min(" not in sensitive_numeric.sql
+    assert 'min("tax_number")' not in sensitive_numeric.sql
+    assert "AS min_subunit_magnitude" in sensitive_numeric.sql
     assert "approx_percentile(" not in sensitive_numeric.sql
     assert "max_abs_magnitude" in sensitive_numeric.sql
     assert queries[4].sql.endswith("LIMIT 20")
