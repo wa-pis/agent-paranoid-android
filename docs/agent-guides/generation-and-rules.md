@@ -108,6 +108,8 @@ Writers and the PostgreSQL SQL renderer accept the caller's keyword-only
 `budget`; standalone writer calls
 create a bounded allowance when none is supplied. An adapter must not restart
 the invocation allowance or deadline at the export boundary.
+Deadline admission and publication checks also apply without business rules or
+optional validation reports, including stdout, Parquet and PostgreSQL SQL export.
 Inner row, field, expression and relationship-graph loops check the
 cooperative deadline and charge cumulative work against
 `TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS`. Direct Python entry points also

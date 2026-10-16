@@ -31,6 +31,8 @@ unmarked artifacts SHALL retain their documented interpretation.
 - THEN the writer charges the same cumulative work allowance and deadline as
   generation and validation, refusing before publication if either is exhausted.
 - AND standalone writers create a bounded allowance when no caller budget is supplied.
+- AND deadline checks remain active without business rules or optional validation
+  reports, including before stdout and atomic file publication.
 
 #### Scenario: Reviewed-agent reports are integrity protected
 - WHEN a reviewed agent publishes a bundle with a business-validation report

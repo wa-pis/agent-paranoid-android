@@ -127,7 +127,10 @@ def sql_literal(value: Any) -> str:
 def write_parquet(
     rows: list[dict[str, Any]], output: Path, *, fields: list[FieldSpec] | None = None,
     allow_invalid: bool = False,
+    budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("Parquet export")
     try:
         import pyarrow as pa
         import pyarrow.parquet as pq
@@ -148,7 +151,8 @@ def write_parquet(
         except (ValueError, TypeError, OverflowError, pa.ArrowException):
             raise ValueError("Parquet rows do not match declared field types") from None
 
-    with atomic_binary_writer(output) as handle:
+    budget.check("Parquet serialization")
+    with atomic_binary_writer(output, check_publication=lambda: budget.check("Parquet publication")) as handle:
         pq.write_table(table, handle)
         handle.flush()
         enforce_output_payload_size(
@@ -308,6 +312,8 @@ def write_dataset_rows(
     spec: DatasetSpec | None = None,
     budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("dataset export")
     if spec is not None and spec.business_rules is not None:
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
         assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
@@ -315,20 +321,24 @@ def write_dataset_rows(
     if any(name in RESERVED_ENTITY_ARTIFACT_BASENAMES for name in rows_by_entity):
         raise ValueError("reserved entity name")
     for entity_name, rows in rows_by_entity.items():
+        budget.check("entity export")
         if output_format == DatasetOutputFormat.CSV:
             write_bounded_text(
                 rows_to_csv(rows, typed=spec is not None),
                 safe_entity_artifact_path(root, entity_name, ".csv"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.JSON:
             write_bounded_text(
                 json.dumps(rows, indent=2, sort_keys=True, default=json_decimal),
                 safe_entity_artifact_path(root, entity_name, ".json"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.SQL:
             write_bounded_text(
                 rows_to_sql(entity_name, rows),
                 safe_entity_artifact_path(root, entity_name, ".sql"),
+                budget=budget,
             )
         elif output_format == DatasetOutputFormat.PARQUET:
             entity = spec.entity(entity_name) if spec is not None else None
@@ -337,6 +347,7 @@ def write_dataset_rows(
                 safe_entity_artifact_path(root, entity_name, ".parquet"),
                 fields=entity.fields if entity is not None else None,
                 allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"},
+                budget=budget,
             )
         enforce_output_folder_size(root)
 
@@ -371,6 +382,8 @@ def write_single_entity_rows(
     spec: DatasetSpec | None = None,
     budget: GenerationBudget | None = None,
 ) -> None:
+    budget = budget or GenerationBudget()
+    budget.check("single-entity export")
     if spec is not None and spec.business_rules is not None:
         from test_data_agent.validation.reconciliation import assert_generated_dataset_valid
         assert_generated_dataset_valid(rows_by_entity, spec, budget=budget)
@@ -381,27 +394,31 @@ def write_single_entity_rows(
         text = rows_to_csv(rows, typed=spec is not None)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text)
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.JSON:
         text = json.dumps(rows, indent=2, sort_keys=True, default=json_decimal)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text)
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.SQL:
         entity_name = next(iter(rows_by_entity))
         text = rows_to_sql(entity_name, rows)
         if output is None:
             enforce_output_payload_size(len(text.encode("utf-8")), label="standard output")
+            budget.check("standard output publication")
             print(text, end="")
             return
-        write_bounded_text(text, output)
+        write_bounded_text(text, output, budget=budget)
     elif output_format == DatasetOutputFormat.PARQUET:
         if output is None:
             raise SystemExit("Parquet output requires --output")
         fields = spec.entities[0].fields if spec is not None else None
         write_parquet(rows, output, fields=fields,
-                      allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"})
+                      allow_invalid=spec is not None and spec.generation_settings.mode in {"mixed", "negative"},
+                      budget=budget)

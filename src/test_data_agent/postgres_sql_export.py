@@ -22,7 +22,7 @@ from test_data_agent.csv_profiler import (
     parse_float,
     parse_int,
 )
-from test_data_agent.io.path_policy import atomic_write_bytes
+from test_data_agent.io.path_policy import atomic_binary_writer
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
 from test_data_agent.validation.reconciliation import validate_dataset
 
@@ -39,6 +39,8 @@ def render_postgres_sql(
 ) -> str:
     """Render one transaction containing deterministic PostgreSQL DDL and rows."""
 
+    budget = budget or GenerationBudget()
+    budget.check("PostgreSQL SQL render")
     normalized_rows = {
         entity: [dict(row) for row in rows]
         for entity, rows in rows_by_entity.items()
@@ -57,9 +59,12 @@ def render_postgres_sql(
     statements.extend(_create_table(entities[name]) for name in order)
     statements.extend(_foreign_key_statements(spec))
     for name in order:
+        budget.check("PostgreSQL SQL entity render")
         statements.extend(_insert_statements(entities[name], normalized_rows[name]))
     statements.append("COMMIT;")
-    return "\n\n".join(statements) + "\n"
+    payload = "\n\n".join(statements) + "\n"
+    budget.check("PostgreSQL SQL render completion")
+    return payload
 
 
 def write_postgres_sql(
@@ -71,11 +76,15 @@ def write_postgres_sql(
 ) -> None:
     """Atomically publish a complete PostgreSQL SQL file."""
 
+    budget = budget or GenerationBudget()
+    budget.check("PostgreSQL SQL export")
     if output.suffix.lower() != ".sql":
         raise PostgresSqlExportError("PostgreSQL SQL output must use a .sql suffix")
     payload = render_postgres_sql(spec, rows_by_entity, budget=budget).encode("utf-8")
     enforce_output_payload_size(len(payload), label="PostgreSQL SQL output")
-    atomic_write_bytes(output, payload)
+    budget.check("PostgreSQL SQL serialization")
+    with atomic_binary_writer(output, check_publication=lambda: budget.check("PostgreSQL SQL publication")) as handle:
+        handle.write(payload)
 
 
 def quote_postgres_identifier(value: str) -> str:
