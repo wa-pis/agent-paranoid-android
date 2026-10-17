@@ -7,15 +7,10 @@ It is designed for cases where realistic schema, relationships, distributions,
 and business rules matter, but source rows and raw PII must not appear in the
 generated output.
 
-Stable `1.6.0` is in preparation and is not yet published. Until verified
-publication, stable `1.5.0` remains the published recommended release:
+Stable `1.6.0` is the recommended release. Its signed source, packages and
+containers passed [public verification](release-evidence-1.6.0.md).
 
-```bash
-python3 -m pip install "agent-paranoid-android==1.5.0"
-```
-
-The 1.6.0 installation instructions below take effect only after verified
-publication. Stable `1.6.0` promotes the accepted RC5 runtime without new
+Stable `1.6.0` promotes the accepted RC5 runtime without new
 behavior or dependency changes. Review the
 [migration notes](reference/generation-contract-migration.md) before regenerating
 existing fixtures.
@@ -68,7 +63,7 @@ introduced.
 
 ## Five-Minute Check
 
-After verified 1.6.0 publication, install the exact stable release and run the
+Install the exact stable release and run the
 self-contained smoke test:
 
 ```bash
@@ -112,12 +107,12 @@ production-adjacent data or an AI client.
 
 ## Project Status
 
-The prospective stable `1.6.0` release uses `DatasetSpec` as the generation and
+Stable `1.6.0` uses `DatasetSpec` as the generation and
 validation contract across Python, CLI, MCP, approved agent workflows and all
 output formats. It retains accepted RC1–RC5 behavior, including exact DECIMAL
 rules, `edge` and `load_test` modes, folder replacement with rollback and shared
 business-rule validation. Promotion changes only version and release metadata;
-its exact stable commit requires fresh release checks before publication.
+its exact stable commit passed fresh release checks and public verification.
 
 Selective transformation remains a separate opt-in mixed-origin workflow.
 Registration does not approve a dataset or complete the broader

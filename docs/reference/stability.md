@@ -27,8 +27,8 @@ reference explicitly documents them.
 
 Credential-free JDBC-style endpoint input, qualified column wildcards,
 `profile-query`, and the top-level `SqlQueryProfileRequest` query-profiling
-exports are supported in stable `1.5.0` and retained in prospective stable
-`1.6.0` after verified publication; see [release status](../1.6.0-release-status.md).
+exports are supported in stable `1.5.0` and retained in stable
+`1.6.0`; see [release status](../1.6.0-release-status.md).
 Existing component configuration, exact allowlists, PostgreSQL profiling and
 Trino safety boundaries remain supported under their documented policies.
 

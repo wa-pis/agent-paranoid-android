@@ -88,6 +88,7 @@ nav:
       - Development: development.md
       - Final Acceptance Matrix: acceptance-matrix.md
       - Stable 1.6.0 Release Status: 1.6.0-release-status.md
+      - Stable 1.6.0 Publication Evidence: release-evidence-1.6.0.md
       - RC5 Release Status: rc5-release-status.md
       - Cross-Interface Acceptance Evidence: acceptance-evidence-1.6.0rc5.md
       - RC5 Publication Evidence: release-evidence-1.6.0rc5.md

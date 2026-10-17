@@ -8,8 +8,7 @@ boundaries.
 
 Exact component and database allowlist workflows, credential-free JDBC-style
 endpoint input, qualified column wildcards and reviewed aggregate-only SQL query
-sources are already available in stable `1.5.0`. They remain in prospective
-stable `1.6.0` after verified publication; see [release status](../1.6.0-release-status.md).
+sources are already available in stable `1.5.0`. They remain in stable `1.6.0`; see [release status](../1.6.0-release-status.md).
 
 ## Quick Comparison
 

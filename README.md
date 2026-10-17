@@ -6,15 +6,10 @@ Deterministic synthetic test data from CSV and database metadata, without
 copying source rows. Use the CLI or Python library to profile structure, review
 a `DatasetSpec`, generate reproducible datasets, and validate the result.
 
-Stable `1.6.0` is in preparation and is not yet published. Until verified
-publication, stable `1.5.0` remains the published recommended release:
+Stable `1.6.0` is the recommended release. Its signed source, packages and
+containers passed [public verification](docs/release-evidence-1.6.0.md).
 
-```bash
-python3 -m pip install "agent-paranoid-android==1.5.0"
-```
-
-After verified publication: Stable `1.6.0` is the recommended release. The
-installation commands below apply only after that publication. This promotion
+This promotion
 retains the accepted RC5 runtime; [RC5 acceptance](docs/acceptance-evidence-1.6.0rc5.md)
 and [RC5 publication evidence](docs/release-evidence-1.6.0rc5.md) remain historical
 records, not verification of the new stable commit. Read the
@@ -27,7 +22,7 @@ common reviewed DatasetSpec, field types, settings and business-rule contract.
 
 Python 3.11 or newer is required.
 
-After verified 1.6.0 publication, install the exact stable release:
+Install the exact stable release:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.6.0"
@@ -92,9 +87,10 @@ before regenerating existing fixtures.
 ## Development
 
 The accepted RC5 runtime includes saved-profile transformation CLI/MCP workflows;
-the prospective stable 1.6.0 retains them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
-and [acceptance limits](docs/acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
-The separate transformation/session acceptance campaign remains open.
+stable 1.6.0 retains them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
+and [acceptance limits](docs/release-evidence-1.6.0.md).
+The finite fictional transformation/session campaign completed for stable 1.6.0;
+see its [evidence and limits](docs/release-evidence-1.6.0.md).
 Registration grants no dataset permission: preservation still requires exact local
 approval. Ordinary generation remains source-free; agents cannot issue that approval.
 

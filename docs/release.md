@@ -86,6 +86,12 @@ it, manufacture human preservation consent or broaden runtime activation. This
 does not reopen completed historical RC5 gates. Any behavior correction first
 needs a newly accepted RC.
 
+Stable `1.6.0` completed this process at exact main
+`258c035c22408becf17ab090635710a50dda8ccc`; see the
+[stable release evidence](release-evidence-1.6.0.md) for hashes, independent
+review, genuine local-terminal fictional acceptance and successful public
+verification. Prior RC evidence remains bound to its historical source.
+
 ### Historical promotion baselines
 
 The historical 1.0.0 RC6 baseline is the exact commit named by the annotated

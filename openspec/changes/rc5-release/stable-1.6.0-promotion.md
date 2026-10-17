@@ -35,3 +35,12 @@ Broader/private/live-provider acceptance is not implied by stable publication.
 
 Status is maintained in `docs/1.6.0-release-status.md` and the stable section of
 this change's tasks. The existing RC5 tasks retain their historical meaning.
+
+## Completed outcome
+
+Stable `1.6.0` was published and publicly verified on 2026-10-17 from exact main
+`258c035c22408becf17ab090635710a50dda8ccc`. All required gates and the fictional
+installed-artifact/local-terminal campaign passed. Public verification run
+`39018919261` succeeded on attempt1 with all12 jobs.
+`docs/release-evidence-1.6.0.md` and its value-free ledger preserve source,
+artifacts, environments, individual cases and explicit historical/manual limits.

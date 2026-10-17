@@ -4,11 +4,11 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-## [1.6.0] - 2026-10-16
+## [1.6.0] - 2026-10-17
 
 Stable promotion of the publicly verified `1.6.0rc5` runtime, including the
-accepted changes since `1.5.0`. Publication is pending the
-[stable release gates](docs/1.6.0-release-status.md). The RC entries below retain
+accepted changes since `1.5.0`. Signed publication and public verification
+completed; see [stable evidence](docs/release-evidence-1.6.0.md). The RC entries below retain
 their original history; the final behavior is summarized here.
 
 ### Added

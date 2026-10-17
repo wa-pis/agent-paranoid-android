@@ -17,7 +17,7 @@ evidence inputs include:
 - a short description of the business invariants that must reconcile.
 
 CSV files or folders, validated safe profiles and optional PostgreSQL and Trino
-integrations are available in stable `1.5.0`. Prospective stable `1.6.0` retains
+integrations are available in stable `1.5.0`. Stable `1.6.0` retains
 these and the accepted RC5 `profile-parquet` route for one Parquet file with the
 optional `parquet` extra, followed by reviewed spec inference or an authored
 `DatasetSpec`; see [release status](../1.6.0-release-status.md). Unknown null

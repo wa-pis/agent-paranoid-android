@@ -10,12 +10,12 @@ LangChain are not required for this single structured request.
 !!! note "Release status"
 
     The adapter is included in stable `1.5.0` through the explicit `gigachat`
-    extra and retained in prospective stable `1.6.0`. The pin below applies only
-    after verified publication; see [release status](../1.6.0-release-status.md).
+    extra and retained in stable `1.6.0`; see
+    [release status](../1.6.0-release-status.md).
 
 ## Install The Stable Release
 
-After verified 1.6.0 publication, create an isolated environment and pin the
+Create an isolated environment and pin the
 exact stable release:
 
 ```bash
