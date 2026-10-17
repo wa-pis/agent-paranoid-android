@@ -39,8 +39,8 @@ cleanup are covered by separate operational-readiness gates.
 ## Database Source Budgets
 
 The JDBC-style endpoint, qualified wildcard, and SQL query source budgets in
-this section apply to stable `1.5.0` and are retained for prospective stable
-`1.6.0` after verified publication; see [release status](../1.6.0-release-status.md).
+this section apply to stable `1.5.0` and are retained in stable
+`1.6.0`; see [release status](../1.6.0-release-status.md).
 
 Database-source configuration and profiling have independent limits before
 generation begins:

@@ -1,11 +1,10 @@
 # CLI Command Index
 
-Stable `1.6.0` is being prepared from the publicly accepted `1.6.0rc5`
+Stable `1.6.0` promotes the publicly accepted `1.6.0rc5`
 runtime with the same commands and safety boundaries. Existing “RC” headings
-and anchors identify that baseline. Stable publication still requires the
-exact-commit release gates; see the
-[1.6.0 release status](../1.6.0-release-status.md). The separate
-transformation/session acceptance campaign remains open.
+and anchors identify that baseline. Exact-commit gates, public verification and
+the finite fictional transformation/session campaign completed; see the
+[1.6.0 release evidence](../release-evidence-1.6.0.md) for bindings and limits.
 
 Generation retains supported intentionally invalid output and its validation
 report, but returns exit `1` / JSON status `validation_failed` when validation
@@ -128,9 +127,9 @@ counters and supported recovery keys. Cleanup-incomplete errors require local
 inspection of destination/staging before retry; they do not permit overwrite.
 Database capture and private `derive` are not enabled by this entrance.
 
-Published `1.6.0rc5` includes these registered commands; stable `1.5.0` does not.
-The separately gated transformation/session acceptance campaign remains open;
-see the [current evidence and limits](../acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
+Stable `1.6.0` retains these commands from `1.6.0rc5`; stable `1.5.0` does not include them.
+The finite fictional transformation/session campaign completed for stable;
+see the [current evidence and limits](../release-evidence-1.6.0.md).
 Command discovery, fictional tests and release acceptance do not authorize a
 dataset. Changed activation still requires its safety/spec and exact-source
 review gates; ordinary generation stays source-free.
@@ -149,7 +148,7 @@ invalid initial policy or turn a sensitivity answer into approval.
 
 ### Common profile workflow (1.6 RC)
 
-Published `1.6.0rc5` registers `transform-batch` in the CLI and
+Stable `1.6.0` retains the RC5 `transform-batch` registration in the CLI and
 `common_transformation` in the running generator MCP server. Published 1.5.0
 does not provide these additions. Their operations are:
 
@@ -193,7 +192,7 @@ requires a fresh review; a receipt is not a reusable blanket approval. Agents
 can consume a matching receipt but cannot issue one.
 
 Migration from published `1.5.0` uses an explicitly accepted release from the
-1.6 line; the prepared stable promotion retains the RC5 command contract.
+1.6 line; stable 1.6.0 retains the RC5 command contract.
 Installing `1.5.0` does not expose `transform-batch`. Keep ordinary source-free
 generation workflows separate and retain their existing schemas. A transformed
 bundle may deliberately contain preserved or explicitly mapped source values;

@@ -1,14 +1,9 @@
 # Installation
 
-Stable `1.6.0` is in preparation and is not yet published. Until verified
-publication, stable `1.5.0` remains the published recommended release:
+Stable `1.6.0` is the recommended release. Its signed source, packages and
+containers passed [public verification](../release-evidence-1.6.0.md).
 
-```bash
-python3 -m pip install "agent-paranoid-android==1.5.0"
-```
-
-All 1.6.0 installation commands and recommendations below apply only after
-verified publication. The accepted RC5 runtime is the stable promotion source;
+The accepted RC5 runtime is the stable promotion source;
 its [acceptance evidence](../acceptance-evidence-1.6.0rc5.md),
 [publication evidence](../release-evidence-1.6.0rc5.md) and
 [release status](../rc5-release-status.md) remain historical candidate records.
@@ -32,7 +27,7 @@ regenerating existing fixtures.
 
 ## Install From PyPI
 
-After verified publication: The stable release is `1.6.0`; the commands below
+The stable release is `1.6.0`; the commands below
 pin that exact version for reproducible installation.
 
 Create an isolated environment:
@@ -87,9 +82,9 @@ OpenAI.
 
 ## Accepted Candidate Baseline
 
-After verified publication: Stable `1.6.0` is the recommended default. It promotes
+Stable `1.6.0` is the recommended default. It promotes
 the accepted `1.6.0rc5` runtime without further behavior or dependency changes.
-The stable commit requires fresh exact-commit checks and artifact verification;
+The stable commit passed fresh exact-commit checks and artifact verification;
 RC5 evidence remains bound to RC5.
 Add an optional extra to the same exact stable pin only when needed.
 

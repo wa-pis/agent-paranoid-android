@@ -1,8 +1,10 @@
 # Final Acceptance Matrix Plan
 
-**Status: execution in progress; final acceptance remains open.** Run after the current feedback corrections,
-source/output parity and MCP documentation are finished, before declaring their
-combined result accepted or preparing the next release. The implementation
+**Status: finite campaign completed for stable 1.6.0.**
+[Final evidence and limitations](release-evidence-1.6.0.md) and the
+[value-free case ledger](release-ledger-1.6.0.json) bind the results to exact
+main `258c035c22408becf17ab090635710a50dda8ccc` and its Ubuntu wheel.
+The sequence below remains the repeatable acceptance plan for future changes. The implementation
 agent owns preparation and execution; actual human review remains the operator's
 step. Track completion in OpenSpec change `cross-interface-acceptance`.
 

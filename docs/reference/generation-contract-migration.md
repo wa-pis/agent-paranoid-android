@@ -3,9 +3,8 @@
 The original generation corrections below describe an earlier upgrade, not the
 current release target. Candidate `1.6.0rc5` is published and publicly verified;
 see its [release evidence](../release-evidence-1.6.0rc5.md). The owner has authorized
-stable `1.6.0` as a version/documentation-only promotion of that runtime. Until
-the [stable publication gates](../1.6.0-release-status.md) complete, `1.5.0` remains
-the recommended published stable release. The changes below are retained in the
+stable `1.6.0` as a version/documentation-only promotion of that runtime. Stable `1.6.0` has completed
+[public verification](../release-evidence-1.6.0.md) and is the recommended release. The changes below are retained in the
 promotion; its package version does not change DatasetSpec schema `1.1`.
 
 ## Changed Results
