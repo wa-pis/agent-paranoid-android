@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Paranoid Android: Transformation"
+  short_description: "Review mixed-origin transformations and local approval"
+  default_prompt: "Use $agent-paranoid-android-transformation to review my local transformation policy and explain the required operator approval."

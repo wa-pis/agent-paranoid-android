@@ -492,6 +492,7 @@ def test_completed_openspec_changes_are_archived_and_baselined() -> None:
     }
     assert active == {
         "_template", "openai-3-sdk-compatibility", "mcp-2-sdk-compatibility",
+        "refresh-agent-guidance",
         "fix-csv-generation-pipeline",
         "selective-source-transformation",
         "fix-transformation-review-boundaries",

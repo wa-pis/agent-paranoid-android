@@ -45,6 +45,9 @@ def test_dockerfile_uses_digest_pinned_minimal_targets() -> None:
     assert dockerfile.count("/app/.venv /app/.venv") == 3
     assert "COPY .agents/skills ./.agents/skills" in dockerfile
     assert "!.agents/skills/**" in dockerignore
+    assert "COPY prompts ./prompts" in dockerfile
+    assert "!prompts\n" in dockerignore
+    assert "!prompts/**" in dockerignore
     assert "/app/.venv /opt/venv" not in dockerfile
     assert "ARG APP_VERSION\n" in dockerfile
     assert "ARG APP_VERSION=" not in dockerfile

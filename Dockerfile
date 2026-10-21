@@ -17,6 +17,7 @@ COPY --from=uv /uv /uvx /usr/local/bin/
 COPY pyproject.toml uv.lock README.md LICENSE ./
 COPY src ./src
 COPY .agents/skills ./.agents/skills
+COPY prompts ./prompts
 
 FROM build-base AS cli-builder
 RUN --mount=type=cache,target=/root/.cache/uv \

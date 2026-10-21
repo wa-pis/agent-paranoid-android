@@ -117,12 +117,7 @@ def main(argv: list[str] | None = None) -> None:
     )
     if not demo_fixture.is_file():
         raise SystemExit("installed wheel is missing the bundled demo fixture")
-    for skill in (
-        "agent-paranoid-android-usage",
-        "agent-paranoid-android-transformation",
-    ):
-        if not files("test_data_agent").joinpath("skills", skill, "SKILL.md").is_file():
-            raise SystemExit(f"installed wheel is missing bundled skill: {skill}")
+    verify_installed_agent_resources()
 
     scripts = {
         entry.name: entry.value
@@ -189,14 +184,43 @@ def requirement_extras(requirement: str) -> set[str]:
     )
 
 
+BUNDLED_AGENT_RESOURCES = (
+    "skills/agent-paranoid-android-usage/SKILL.md",
+    "skills/agent-paranoid-android-usage/agents/openai.yaml",
+    "skills/agent-paranoid-android-transformation/SKILL.md",
+    "skills/agent-paranoid-android-transformation/agents/openai.yaml",
+    "skills/agent-paranoid-android-transformation/references/sessions.md",
+    "prompts/README.md",
+    "prompts/system.md",
+    "prompts/developer.md",
+    "prompts/user_template.md",
+    "prompts/user_template_csv.md",
+    "prompts/user_template_csv_folder.md",
+    "prompts/user_template_profile.md",
+    "prompts/user_template_transformation.md",
+)
+
+
+def verify_installed_agent_resources() -> None:
+    """Require complete offline instructions, including skill dependencies."""
+    root = files("test_data_agent")
+    for relative_path in BUNDLED_AGENT_RESOURCES:
+        resource = root.joinpath(*relative_path.split("/"))
+        if not resource.is_file() or not resource.read_text(encoding="utf-8").strip():
+            raise SystemExit(f"installed wheel is missing agent guidance: {relative_path}")
+
+
 def verify_installed_skill_discovery(entrypoint: Path | None = None) -> None:
     """Exercise offline capability discovery prescribed by the bundled skills."""
     cli = entrypoint or Path(sys.executable).with_name("test-data-agent")
+    commands = (
+        "demo", "profile-csv", "profile-example", "profile-parquet",
+        "profile-postgres", "profile-query", "infer-spec", "generate", "validate",
+        "agent-plan", "agent-review", "agent-status", "agent-approve", "agent-recover",
+        "transform-review", "transform-approve", "transform-execute", "transform-batch",
+    )
     for arguments in (("--version",), ("--help",),
-                      ("profile-csv", "--help"), ("infer-spec", "--help"),
-                      ("generate", "--help"), ("validate", "--help"),
-                      ("transform-review", "--help"), ("transform-execute", "--help"),
-                      ("transform-approve", "--help")):
+                      *((command, "--help") for command in commands)):
         completed = subprocess.run([cli, *arguments], capture_output=True,
                                    text=True, check=False, timeout=30)
         if completed.returncode != 0 or not completed.stdout.strip():
