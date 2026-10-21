@@ -11,6 +11,11 @@ All notable changes to this project are documented here.
   include prompt templates alongside complete skill metadata and references;
   see [agent guidance](prompts/README.md).
 
+### Security
+
+- Update the locked certifi CA bundle to 2026.10.19 to resolve
+  PYSEC-2026-4320; retain verified TLS and the existing dependency ranges.
+
 ## [1.6.0] - 2026-10-17
 
 Stable promotion of the publicly verified `1.6.0rc5` runtime, including the

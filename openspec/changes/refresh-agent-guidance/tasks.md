@@ -7,4 +7,7 @@
 - [x] Include prompts in wheels and verify the complete installed inventory.
 - [x] Validate skills, runtime command/schema alignment and installed wheel smoke.
 
+- [x] Include prompts in the Docker build context and regression checks.
+- [x] Resolve locked certifi advisory and pass audit/compatibility checks.
+
 No runtime activation or dataset authorization is requested by these tasks.
