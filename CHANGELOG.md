@@ -4,6 +4,13 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Changed
+
+- Refresh agent prompts and both portable skills for current CLI/MCP planning,
+  exact-spec review, recovery and local transformation approval. Wheels now
+  include prompt templates alongside complete skill metadata and references;
+  see [agent guidance](prompts/README.md).
+
 ## [1.6.0] - 2026-10-17
 
 Stable promotion of the publicly verified `1.6.0rc5` runtime, including the

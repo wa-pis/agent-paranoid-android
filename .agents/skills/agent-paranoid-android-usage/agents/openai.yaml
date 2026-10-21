@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Paranoid Android: Synthetic Data"
+  short_description: "Profile, review and generate synthetic test data"
+  default_prompt: "Use $agent-paranoid-android-usage to prepare a reviewable synthetic dataset plan from my local input."
