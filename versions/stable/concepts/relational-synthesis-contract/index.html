@@ -134,7 +134,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1ec90ca6ff3d010b9472f15936567df5868bdb8c
+  <br>Documentation f3f33e6a719a7a35d17c70ce449c4e620e685306
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -288,6 +288,29 @@ the effective distribution in <code>dataset_spec.yaml</code>.</p>
 that invariant successfully. Failed or unsupported checks must block valid
 publication or appear as explicit controlled-invalid evidence. The manifest,
 effective spec, and validation reports form the review record.</p>
+<h2 id="validation-utility-evidence">Validation utility evidence<a class="headerlink" href="#validation-utility-evidence" title="Permanent link">&para;</a></h2>
+<p><code>validation_report.json</code> and direct <code>validate_dataset</code> results include additive
+<code>utility</code> evidence bound to the canonical <code>spec_sha256</code> used by generation
+manifests. Older saved reports without this field remain readable.</p>
+<ul>
+<li><code>active_relationships</code> and <code>active_temporal_constraints</code> exclude rejected
+  declarations. Their check status is <code>executed</code>, <code>not_declared</code>, or <code>not_run</code>.
+  Disabled sections and sections skipped by fail-fast are not executed.</li>
+<li>Relationship sections retain generated parent distinct-key counts, checked,
+  resolved and null references. A measured resolution ratio of zero differs
+  from <code>null</code> when there are no non-null references to check. These counts
+  describe generated key domains, not source domains.</li>
+<li><code>temporal_metrics</code> records entity, start/end field, checked row count and
+  failed row count for each active native temporal constraint. Empty data has
+  zero observations; business-rule evidence stays in <code>business_validation</code>.</li>
+<li><code>unmodeled_relationship_count</code>, <code>source_orphan_ratio</code> and <code>source_fanout</code>
+  remain <code>null</code>; <code>source_temporal_fidelity</code> is <code>unmeasured</code>. Source data is not
+  inspected by this validator. A valid report proves only the enabled declared
+  checks, never complete relationship discovery or measured source fidelity.</li>
+</ul>
+<p>Evidence contains metadata and counts, not key values or temporal endpoints.
+Collection shares the existing generation work and deadline budget and does
+not add a second scan of generated rows or change seeded generation.</p>
               
 
             </div>
