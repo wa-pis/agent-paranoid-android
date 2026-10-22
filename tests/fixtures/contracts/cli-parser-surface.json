@@ -19,6 +19,7 @@
     "generate",
     "export-postgres-sql",
     "profile-example",
+    "discover-relationships",
     "infer-spec",
     "profile-csv",
     "profile-parquet",
