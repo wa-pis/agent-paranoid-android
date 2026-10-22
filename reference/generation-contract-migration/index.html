@@ -133,7 +133,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation 1ec90ca6ff3d010b9472f15936567df5868bdb8c
+  <br>Documentation f3f33e6a719a7a35d17c70ce449c4e620e685306
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -192,6 +192,20 @@ the operation fails; revise the specification rather than consuming partial
 output. Numeric sampling remains uniform between configured bounds and foreign
 key assignment remains round-robin among non-null child rows. These are not
 claims of preserving correlations or source fan-out distributions.</p>
+<h2 id="additive-validation-utility-evidence">Additive validation utility evidence<a class="headerlink" href="#additive-validation-utility-evidence" title="Permanent link">&para;</a></h2>
+<p>New reports add <code>utility</code> with the canonical effective-spec hash, active native
+relationship/temporal declaration counts and executed/not-declared/not-run status.
+Temporal metrics add generated checked/failing row counts. Existing validity,
+settings, section errors and relationship metrics retain their semantics. Old
+saved reports without <code>utility</code> remain accepted. JSON consumers that enforce
+exact keys must admit this new optional field.</p>
+<p>Generated row values, DatasetSpec versions and existing profile/spec hashes are
+unchanged. Serialized validation reports and their manifest output digests do
+change. Compare replayed rows separately from report byte identity across this
+upgrade; the new contract fixtures record the intentional report changes.
+Unknown source fidelity, fan-out and missing relationship coverage remain
+unknown. No source queries, new authorization, dependency, package publication
+or completed release-candidate acceptance is implied.</p>
               
 
             </div>
