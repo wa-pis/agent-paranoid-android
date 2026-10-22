@@ -133,3 +133,17 @@ The example removes its container on success or failure and leaves only the
 safe profile, reviewed spec, generated rows, validation report, manifest, and a
 bounded result summary. See [Configuration](../reference/configuration.md) and
 [MCP Tools](../mcp_examples.md) for the full limits and tool contracts.
+
+## Authentication failures
+
+For a failed connection, record the installed package version and selected
+`TRINO_AUTH_METHOD` locally. Share only those details when investigating a failure;
+do not share passwords, tokens, connection URLs or raw driver responses.
+A reported HTTP 401 alone does not identify a configuration or compatibility issue.
+
+SQL-query profiling converts untyped HTTP 401/403 and TLS failures into the fixed
+`SQL query source profiling failed` error, without retaining the original
+exception cause or context. The CLI keeps its `external_service` category and
+leaves an existing output artifact unchanged. MCP returns its fixed Trino error
+and records value-free audit diagnostics. These boundaries do not establish
+successful authentication against a particular server.
