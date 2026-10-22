@@ -61,10 +61,10 @@
 -`cli-parser-surface.json` tracks these 26 commands; the read-only
 -`transform-review` entry was added for the 1.6 candidate after the original
 -1.0 baseline:
-+`cli-parser-surface.json` tracks these 28 commands, including the transformation
++`cli-parser-surface.json` tracks these 29 commands, including the transformation
 +entrances added after the original 1.0 baseline:
 
- - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `profile-csv`, `profile-parquet`,
+ - `generate`, `export-postgres-sql`, `profile-example`, `infer-spec`, `discover-relationships`, `profile-csv`, `profile-parquet`,
    `transform-review`, `transform-execute`, `transform-approve`,
    `profile-postgres`, `profile-query`
 +- `transform-batch` (create, review, approve, validate, execute and configured
