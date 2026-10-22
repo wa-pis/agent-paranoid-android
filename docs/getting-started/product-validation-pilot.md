@@ -1,5 +1,7 @@
 # Product Validation Pilot
 
+English · [Русский](../ru/getting-started/product-validation-pilot.md)
+
 Use this guide when you want to evaluate the product with a real development or
 analytics task. It is intentionally shorter than a production rollout: the goal
 is to learn whether the generated dataset is useful and whether the review flow

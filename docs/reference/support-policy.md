@@ -1,5 +1,7 @@
 # Runtime And Integration Support
 
+English · [Русский](../ru/reference/support-policy.md)
+
 This policy defines which Python runtimes, optional capabilities, and model
 provider adapters the project supports. It complements the
 [Public Stability](stability.md) contract map; it does not make internal

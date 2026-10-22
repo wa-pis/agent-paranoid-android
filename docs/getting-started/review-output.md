@@ -1,5 +1,7 @@
 # Review The Output
 
+English · [Русский](../ru/getting-started/review-output.md)
+
 A successful command is not the end of the review. Use the artifacts in the
 bundle to decide whether the synthetic dataset is safe and useful.
 

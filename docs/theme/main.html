@@ -3,18 +3,57 @@
 {{ super() }}
 {% if (page and page.meta.historical) or (config.extra.documentation and config.extra.documentation.status == 'Development / not stable') %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
+{% block site_name %}
+{% if page and page.file.src_uri.startswith('ru/') %}
+<a href="{{ 'ru/' | url }}" class="icon icon-home">{{ config.site_name }}</a>
+{% else %}{{ super() }}{% endif %}
+{% endblock %}
+{% block mobile_nav %}
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="{{ ('ru/' if page and page.file.src_uri.startswith('ru/') else '') | url }}">{{ config.site_name }}</a>
+{% endblock %}
+{% block site_nav %}
+{% set russian = page and page.file.src_uri.startswith('ru/') %}
+<div lang="{{ 'ru' if russian else 'en' }}">
+{% for section in nav %}
+  {% if section.title == 'Русский' %}
+    {% if russian %}
+      {% for section in section.children %}{% include 'language-navigation.html' %}{% endfor %}
+    {% endif %}
+  {% elif not russian %}
+    {% include 'language-navigation.html' %}
+  {% endif %}
+{% endfor %}
+</div>
+{% endblock %}
 {% block content %}
+{% set russian = page and page.file.src_uri.startswith('ru/') %}
+{% if page %}
+{% set english_url = page.url[3:] if russian else page.url %}
+{% set russian_url = 'ru/' ~ english_url %}
+{% set translated = russian_url in config.extra.page_urls.values() %}
+<nav class="language-switch" aria-label="Language / Язык">
+  {% if russian %}
+    {% if english_url in config.extra.page_urls.values() %}<a href="{{ english_url | url }}" hreflang="en" lang="en">English</a>{% else %}<a href="{{ '' | url }}" hreflang="en" lang="en">English (home)</a>{% endif %}
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  {% else %}
+    <strong lang="en" aria-current="true">English</strong> ·
+    <a href="{{ (russian_url if translated else 'ru/') | url }}" hreflang="ru" lang="ru">{{ 'Русский' if translated else 'Русский (главная)' }}</a>
+  {% endif %}
+</nav>
+{% endif %}
+<div lang="{{ 'ru' if russian else 'en' }}">
 {% if config.extra.documentation %}
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>{% if (page and page.meta.historical) %}Historical / maintainer material{% else %}{{ config.extra.documentation.status }}{% endif %}</strong> · Package {{ config.extra.documentation.package_version }}
   <br>Documentation {{ config.extra.documentation.documentation_revision }}
-  <br><a href="{{ config.extra.stable_selector | url }}">Stable version selector</a> · <a href="{{ 'downloads/' | url }}">Downloads</a>
+  <br><a href="{{ config.extra.stable_selector | url }}">Stable version selector</a> · <a href="{{ ('ru/downloads/' if russian else 'downloads/') | url }}">{{ 'Скачать' if russian else 'Downloads' }}</a>
 </aside>
 {% endif %}
 {% if page and page.url == 'handbook/' %}
-<section class="handbook-cover"><h1>{{ config.site_name }}</h1><p>User Handbook</p><p>{{ config.site_description }}</p></section>
+<section class="handbook-cover"><h1>{{ config.site_name }}</h1><p>User Handbook / Руководство пользователя</p><p>{{ config.site_description }}</p></section>
 <nav class="handbook-contents" aria-label="Handbook contents">
-<h1>Contents</h1>
+<h1>Contents / Содержание</h1>
 {% for section in page.toc if section.children %}
 <h2><a href="{{ section.url }}">{{ section.title }}</a></h2>
 <ul>{% for chapter in section.children %}<li><a href="{{ chapter.url }}">{{ chapter.title }}</a></li>{% endfor %}</ul>
@@ -22,4 +61,5 @@
 </nav>
 {% endif %}
 {{ super() }}
+</div>
 {% endblock %}

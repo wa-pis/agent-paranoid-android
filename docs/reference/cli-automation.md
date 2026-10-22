@@ -1,5 +1,7 @@
 # CLI Automation And JSON
 
+English · [Русский](../ru/reference/cli-automation.md)
+
 Every core command accepts `--json`. Success writes one versioned
 `CliSuccessResponse` to stdout and leaves stderr empty:
 

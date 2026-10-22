@@ -1,0 +1,15 @@
+{% set navlevel = 1 %}
+{% if section.is_section %}
+<p class="caption"><span class="caption-text">{{ section.title }}</span></p>
+<ul{% if section.active %} class="current"{% endif %}>
+  {% for nav_item in section.children %}
+  <li class="toctree-l1{% if nav_item.active %} current{% endif %}">{% include 'nav.html' %}</li>
+  {% endfor %}
+</ul>
+{% else %}
+<ul{% if section.active %} class="current"{% endif %}>
+  <li class="toctree-l1{% if section.active %} current{% endif %}">
+    {% set nav_item = section %}{% include 'nav.html' %}
+  </li>
+</ul>
+{% endif %}

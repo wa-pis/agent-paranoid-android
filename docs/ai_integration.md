@@ -1,5 +1,7 @@
 # AI Integration
 
+English · [Русский](ru/ai_integration.md)
+
 Model-specific Python integrations should implement the provider-neutral
 [`AdvisorExchangeClient`](reference/advisor.md) contract and use
 `ExchangeDatasetAdvisor`. The client receives static trusted instructions,

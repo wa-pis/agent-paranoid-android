@@ -1,5 +1,7 @@
 # Run In Containers
 
+English · [Русский](../ru/operations/containers.md)
+
 Container images are an optional deployment path for isolated CLI and MCP
 workers. PyPI remains the normal installation path for local Python use.
 

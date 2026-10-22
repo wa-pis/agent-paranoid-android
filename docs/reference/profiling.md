@@ -1,5 +1,7 @@
 # CSV Profiling Details
 
+English · [Русский](../ru/reference/profiling.md)
+
 For the complete task, follow [First CSV Dataset](../getting-started/first-csv.md).
 For profile fields, use [Profiles And Specs](../concepts/profiles-and-specs.md).
 These details describe bounded evidence and do not authorize source-value reuse.

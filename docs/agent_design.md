@@ -1,5 +1,7 @@
 # Agent Design
 
+English · [Русский](ru/agent_design.md)
+
 The agent layer is a safe orchestration boundary over the existing deterministic
 pipeline. It plans work, writes review artifacts, waits for approval, and then
 calls deterministic generation and validation code.

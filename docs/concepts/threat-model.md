@@ -1,5 +1,7 @@
 # Threat Model
 
+English · [Русский](../ru/concepts/threat-model.md)
+
 This model covers supported CSV, Python, CLI, MCP, Trino, advisor, generation,
 validation, and export workflows. The primary security objective is to prevent
 source rows, raw detected PII, and secrets from crossing into generated output,

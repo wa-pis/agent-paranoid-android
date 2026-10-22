@@ -1,5 +1,7 @@
 # MCP Audit Logging
 
+English · [Русский](../ru/operations/audit-logging.md)
+
 Shared MCP deployments can enable an append-only, HMAC-SHA256 authenticated
 JSONL audit log. Logging is disabled unless both the path and key are set.
 

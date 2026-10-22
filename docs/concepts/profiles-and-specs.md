@@ -1,5 +1,7 @@
 # Profiles And Specs
 
+English · [Русский](../ru/concepts/profiles-and-specs.md)
+
 Profiles and specifications have different roles.
 
 ## Safe Profile

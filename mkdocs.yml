@@ -15,13 +15,14 @@ hooks:
   - scripts/documentation_hooks.py
 
 plugins:
-  - search
+  - search:
+      lang: [en, ru]
   - mike:
       alias_type: copy
       deploy_prefix: versions
       version_selector: false
   - print-site:
-      print_page_title: User Handbook
+      print_page_title: User Handbook / Руководство пользователя
       print_page_basename: handbook
       add_cover_page: false
       add_table_of_contents: false
@@ -32,6 +33,10 @@ plugins:
         - downloads.md
         - versions.md
         - roadmap.md
+        - ru/history.md
+        - ru/downloads.md
+        - ru/versions.md
+        - ru/roadmap.md
 
 markdown_extensions:
   - admonition
@@ -85,3 +90,32 @@ nav:
       - Versions: versions.md
       - Roadmap: roadmap.md
   - History And Maintenance: history.md
+  - Русский:
+      - Начало:
+        - Обзор: ru/index.md
+        - Установка: ru/getting-started/installation.md
+        - Первый набор CSV: ru/getting-started/first-csv.md
+        - Связанные таблицы: ru/getting-started/related-tables.md
+        - Проверить результат: ru/getting-started/review-output.md
+      - Инструкции:
+        - Бизнес-правила: ru/how-to/business-rules.md
+        - Профилирование PostgreSQL: ru/how-to/postgresql.md
+        - Профилирование Trino: ru/how-to/trino.md
+        - Трансформация локальных данных: ru/how-to/transformation.md
+      - Интеграции:
+        - MCP-клиент: ru/how-to/mcp.md
+        - AI-клиент: ru/ai_integration.md
+        - Контейнеры: ru/operations/containers.md
+      - Справочник:
+        - Индекс справочника: ru/reference/index.md
+        - Выбрать подход: ru/concepts/choosing-an-approach.md
+        - Профили и спецификации: ru/concepts/profiles-and-specs.md
+        - Модель безопасности: ru/concepts/safety-model.md
+      - Помощь:
+        - Диагностика: ru/operations/troubleshooting.md
+        - Известные проблемы: ru/known-issues.md
+      - Документация:
+        - Скачать: ru/downloads.md
+        - Версии: ru/versions.md
+        - Дорожная карта: ru/roadmap.md
+      - История и сопровождение: ru/history.md
