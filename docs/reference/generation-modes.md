@@ -23,6 +23,11 @@ Generation remains seeded and valid; all row, payload, disk and execution
 budgets apply before allocation. An oversized request fails rather than truncates.
 This mode produces data for load testing; it does not send traffic or run a benchmark.
 
+`valid`, `edge` and `load_test` reject a nonzero `--invalid-ratio`. Omit
+`--invalid-ratio` for these modes (an explicit zero is also accepted), or select
+`mixed`/`negative` when invalid values are intentional. Rejected combinations
+exit 2 before publishing output; they do not modify the input specification.
+
 DatasetSpec `generate --overwrite` replaces the entire destination folder,
 including obsolete files. Without the flag, nonempty folders are rejected.
 Generation, rules and validation finish before replacing existing output.

@@ -5,6 +5,13 @@ prioritized from observed user needs and confirmed defects.
 
 ## Now
 
+- Process external stable `1.6.0` feedback through the
+  [OpenSpec work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6):
+  reviewed numeric CSV profiling, authenticated Trino access, relational planning
+  and utility evidence, bounded statistics and actionable CLI diagnostics.
+  Preserve conservative privacy defaults and read-only database budgets. Start
+  with reproduced failures; do not reopen corrected historical harness findings.
+
 - Enforce the complete [source/output matrix](reference/source-output-matrix.md):
   one reviewed DatasetSpec, all field types/options and business rules across
   sources and formats. Track implementation and evidence in OpenSpec

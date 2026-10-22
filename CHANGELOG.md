@@ -17,6 +17,11 @@ All notable changes to this project are documented here.
   include prompt templates alongside complete skill metadata and references;
   see [agent guidance](prompts/README.md).
 
+### Fixed
+
+- Generation option errors now explain that valid, edge and load-test modes
+  reject a nonzero invalid ratio and offer removing the ratio as a recovery.
+
 ### Security
 
 - Update the locked certifi CA bundle to 2026.10.19 to resolve
