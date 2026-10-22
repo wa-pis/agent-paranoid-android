@@ -13,6 +13,20 @@ available: only the count is carried forward, not source keys or their
 frequencies. Generated string identifiers use `synthetic_` plus an ASCII integer.
 Censored distinct counts do not infer a pool; source identifiers are not preserved.
 
+Repeated-key pool evidence differs by source:
+
+| Source | Pool evidence and limits |
+| --- | --- |
+| Single CSV / CSV folder | A complete bounded distinct count can supply a pool; censored or overflow counts cannot. |
+| PostgreSQL table / PostgreSQL or Trino query profile | Aggregate distinct counts can supply a pool for a repeated identifier. A declared PostgreSQL primary key uses fresh unique identifiers instead. |
+| Trino aggregate / legacy JSON profile | A supplied positive repeated distinct count can size the synthetic pool; approximate input remains approximate evidence about the source. |
+| Parquet | Distinctness is currently unknown, even with row-group statistics. No pool or primary key is inferred from it. Missing null statistics also block automatic spec inference. |
+
+A pool fixes the available synthetic domain, not the original key frequencies
+or source row mappings. Smaller output counts and nulls can leave pool members
+unused. Independent identifier domains remain separate; reviewed foreign keys
+bind generated child values to generated parent keys.
+
 Distinct counting retains at most 100,000 SHA-256 fingerprints per column,
 separately from the bounded raw frequency sample. Below that limit it detects
 duplicates even beyond 1,000 categories. At the limit it reports a conservative

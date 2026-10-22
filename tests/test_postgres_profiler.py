@@ -533,3 +533,28 @@ def test_inconsistent_primary_key_metadata_fails_closed_before_aggregates(
     with pytest.raises(PostgresProfileError, match="primary-key metadata is invalid"):
         profiler.profile()
     assert not any("count(*)" in query.sql for query in results.queries)
+
+
+def test_postgres_non_primary_identifier_retains_repeated_key_pool() -> None:
+    from test_data_agent.generation import generate_dataset, infer_dataset_spec
+    from test_data_agent.validation import validate_dataset
+
+    profiler, _ = declared_key_profiler([], key_name="event_id", include_tier=False)
+
+    def fetch(query: PostgresQuery) -> list[dict[str, object]]:
+        rows = profiler.fetch_query(query)
+        for row in rows:
+            for name, value in (("row_count", 100), ("non_null_count", 100), ("distinct_count", 4)):
+                if name in row:
+                    row[name] = value
+        return rows
+
+    profile = PostgresProfiler(profiler.config, fetch).profile()
+    entity = profile.entities[0]
+    assert entity.primary_key_candidates == []
+    assert entity.field("event_id").distribution["pool_size"] == 4
+    spec = infer_dataset_spec(profile, count=200)
+    generated = generate_dataset(spec, seed=7)
+    assert len({row["event_id"] for row in generated[entity.name]}) == 4
+    assert generated == generate_dataset(spec, seed=7)
+    assert validate_dataset(generated, spec).valid

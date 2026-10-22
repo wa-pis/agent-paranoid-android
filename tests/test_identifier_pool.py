@@ -13,7 +13,7 @@ from test_data_agent.safety import validate_generated_row_privacy
 
 
 @pytest.mark.parametrize("count", [2, 100, 1000])
-@pytest.mark.parametrize("route", ["csv", "folder", "aggregate"])
+@pytest.mark.parametrize("route", ["csv", "folder", "aggregate", "trino", "json"])
 def test_fixed_key_pool_across_output_sizes(tmp_path, count, route):
     source = tmp_path / "events.csv"
     source.write_text("run_id\n" + "\n".join(["11", "22", "33", "44"] * 25) + "\n")
@@ -22,7 +22,13 @@ def test_fixed_key_pool_across_output_sizes(tmp_path, count, route):
     elif route == "folder":
         profile = profile_schema(tmp_path)
     else:
-        profile = legacy_profile_to_dataset_profile({
+        from test_data_agent.adapters.json_profile import json_payload_to_dataset_profile
+        from test_data_agent.adapters.trino_profile import trino_profile_to_dataset_profile
+
+        adapter = {"aggregate": legacy_profile_to_dataset_profile,
+                   "trino": trino_profile_to_dataset_profile,
+                   "json": json_payload_to_dataset_profile}[route]
+        profile = adapter({
             "table": "events", "row_count": 100,
             "columns": [{"name": "run_id", "data_type": "integer", "approx_distinct_count": 4}],
         })
@@ -118,3 +124,48 @@ def test_censored_csv_count_does_not_create_a_pool():
                      "approx_distinct_count": MAX_DISTINCT_DIGESTS - 1}],
     }, source_type="csv")
     assert "pool_size" not in profile.entities[0].fields[0].distribution
+
+
+@pytest.mark.parametrize("distinct", [None, 0])
+def test_unknown_or_empty_distinct_count_does_not_invent_identifier_pool(distinct):
+    profile = legacy_profile_to_dataset_profile({
+        "table": "events", "row_count": 100,
+        "columns": [{"name": "run_id", "data_type": "integer",
+                     "approx_distinct_count": distinct}],
+    })
+    assert "pool_size" not in profile.entities[0].field("run_id").distribution
+    assert profile.entities[0].primary_key_candidates == []
+    assert (profile.entities[0].field("run_id").unique_ratio is None) == (distinct is None)
+
+
+def test_folder_distinct_overflow_cannot_infer_a_pool(tmp_path):
+    from test_data_agent.profiling.schema_profiler import MAX_DISTINCT_TRACKED
+
+    (tmp_path / "events.csv").write_text(
+        "run_id\n" + "\n".join(str(i) for i in range(MAX_DISTINCT_TRACKED + 1)) + "\n"
+    )
+    profile = profile_schema(tmp_path)
+    field = profile.entities[0].field("run_id")
+    assert field.unique_ratio_kind == "lower_bound"
+    assert "pool_size" not in field.distribution
+    assert profile.entities[0].primary_key_candidates == []
+
+
+@pytest.mark.parametrize("statistics", [True, False])
+def test_parquet_unknown_distinctness_never_claims_pool_or_primary_key(tmp_path, statistics):
+    from test_data_agent.adapters.parquet_dataset import parquet_file_to_dataset_profile
+
+    pa = pytest.importorskip("pyarrow")
+    pq = pytest.importorskip("pyarrow.parquet")
+    path = tmp_path / "events.parquet"
+    pq.write_table(pa.table({"run_id": [11, 22, 33, 44] * 25}), path,
+                   write_statistics=statistics)
+    profile = parquet_file_to_dataset_profile(path)
+    field = profile.entities[0].field("run_id")
+    assert field.unique_ratio is None
+    assert "pool_size" not in field.distribution
+    assert profile.entities[0].primary_key_candidates == []
+    if not statistics:
+        assert field.null_ratio is None
+        with pytest.raises(ValueError, match="unknown null statistics"):
+            infer_dataset_spec(profile)
