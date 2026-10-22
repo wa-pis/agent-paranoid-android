@@ -37,3 +37,16 @@ successful source-fidelity check.
 #### Scenario: Declared scalar key has an unsupported generation type
 - **WHEN** a declared PostgreSQL primary key has a type other than INTEGER or STRING
 - **THEN** profiling requests a reviewed generation specification instead of inferring incompatible synthetic identifiers
+
+#### Scenario: Repeated identifier count is available
+- **GIVEN** a supported adapter profiles a repeated identifier with an available positive distinct count
+- **WHEN** a reviewed specification requests more generated rows
+- **THEN** the existing synthetic pool size is retained through adapter normalization and specification serialization
+- **AND** generation is deterministic without source keys or source row mappings
+- **AND** an approximate source count does not become a claim of exact source cardinality
+
+#### Scenario: Distinctness evidence is unavailable or censored
+- **GIVEN** a Parquet profile with unknown distinctness or a CSV profile whose distinct tracker is censored or overflowed
+- **WHEN** synthetic generation is planned
+- **THEN** no fixed pool is inferred from that unavailable or censored evidence
+- **AND** it cannot certify a primary key

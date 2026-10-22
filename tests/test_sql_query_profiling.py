@@ -432,3 +432,27 @@ def test_category_null_rejection_sentinel_prevents_profile_publication(adapter):
         profile_validated_query(plan(adapter=adapter), describe_query=results.describe,
             fetch_query=fetch, local_category_fields=(
                 LocalCategoryField(entity="warehouse.paid_orders", field="state"),))
+
+
+@pytest.mark.parametrize("adapter", list(SqlQueryAdapter))
+def test_query_repeated_identifier_pool_survives_larger_generation(adapter):
+    results = FakeResults()
+
+    def fetch(query: TrustedProfileQuery) -> list[dict[str, object]]:
+        rows = results.fetch(query)
+        if 'count("order_id")' in query.sql:
+            rows = [{**row, "distinct_count": 2} for row in rows]
+        return rows
+
+    profile = profile_validated_query(
+        plan(adapter=adapter), describe_query=results.describe, fetch_query=fetch,
+    )
+    entity = profile.entities[0]
+    assert entity.primary_key_candidates == []
+    assert entity.field("order_id").distribution["pool_size"] == 2
+    spec = infer_dataset_spec(profile, count=20)
+    generated = generate_dataset(spec, seed=7)
+    assert len({row["order_id"] for row in generated[entity.name]}) == 2
+    assert generated == generate_dataset(spec, seed=7)
+    assert validate_dataset(generated, spec).valid
+    assert all("GROUP BY" not in query.sql for query in results.queries)
