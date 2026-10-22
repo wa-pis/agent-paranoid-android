@@ -1,7 +1,7 @@
 # Tasks
 - [x] R1: Verify repeated-key pool coverage across adapters and exact/unknown/censored count cases with synthetic profiles.
 - [x] R2: Verify metadata PK names not ending in id; explicitly support or reject composite PKs without selecting a component silently.
-- [ ] R3: Specify additive per-entity sizing and total row budgets; retain --count compatibility and reject oversized plans before allocation.
+- [x] R3: Specify additive per-entity sizing and total row budgets; retain --count compatibility and reject oversized plans before allocation.
 - [ ] R4: Reuse metadata-only relationship discovery as reviewable candidates; test ambiguous names, absent parents, different domains and unauthorized tables.
 - [ ] R5: Add utility/coverage evidence for declared checks, unmodeled relationships, key-domain size and temporal evidence; distinguish unknown from measured zero.
 - [ ] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
@@ -36,3 +36,17 @@
   independent domains and undersized primary-key rejection tests are retained.
 - This verification changes no runtime behavior, schema or seeded output.
   Parquet cardinality collection remains separate bounded-statistics work.
+
+## R3 implementation evidence
+
+- Additive per-entity sizing is available on direct inference, its artifact
+  service and `infer-spec`; global `--count` semantics and omitted-count defaults
+  are retained. Specific overrides take precedence; ambiguity rejects.
+- An explicit optional total-row planning ceiling rejects before field inference
+  or spec publication. It is not persisted; later count/load changes require
+  renewed review, with runtime row/byte/work budgets still enforced as before.
+- Synthetic tests cover precedence, defaults, strict counts, unknown/duplicate
+  names, no profile mutation, unchanged existing output on ceiling rejection,
+  spec serialization and deterministic unequal parent/child generation with
+  nullable foreign keys and validation. R8 remains open for its broader CLI and
+  empty-relation acceptance matrix.

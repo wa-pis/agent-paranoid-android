@@ -254,11 +254,16 @@ def infer_dataset_spec_artifact(
     *,
     output_path: Path,
     count: int | None = None,
+    entity_counts: dict[str, int] | None = None,
+    max_total_rows: int | None = None,
     decimal_fields: dict[str, FieldSpec] | None = None,
     business_rules: BusinessRules | None = None,
 ) -> DatasetSpec:
     assert_profile_safe(profile)
-    spec = infer_dataset_spec(profile, count=count, decimal_fields=decimal_fields)
+    spec = infer_dataset_spec(
+        profile, count=count, decimal_fields=decimal_fields,
+        entity_counts=entity_counts, max_total_rows=max_total_rows,
+    )
     if business_rules is not None:
         from test_data_agent.rules.contract import validate_business_rules_for_spec
         validate_business_rules_for_spec(business_rules, spec)

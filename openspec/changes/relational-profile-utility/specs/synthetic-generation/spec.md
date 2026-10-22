@@ -50,3 +50,22 @@ successful source-fidelity check.
 - **WHEN** synthetic generation is planned
 - **THEN** no fixed pool is inferred from that unavailable or censored evidence
 - **AND** it cannot certify a primary key
+
+#### Scenario: A reviewed plan requests unequal entity sizes
+- **GIVEN** a profile and explicit positive per-entity row counts
+- **WHEN** inference resolves requested sizes
+- **THEN** exact-name overrides take precedence over the existing global count
+- **AND** unspecified entities retain the global or profile-based count
+- **AND** neither profile metadata nor source key values are modified
+- **AND** declared relationships still bind independently generated keys
+
+#### Scenario: A planning ceiling rejects an oversized specification
+- **GIVEN** an explicit positive total-row planning ceiling
+- **WHEN** resolved entity counts exceed it
+- **THEN** inference rejects before field inference and specification publication
+- **AND** the ceiling is not represented as a persisted runtime guarantee
+- **AND** later generation count overrides or load multiplication require renewed size review
+
+#### Scenario: Entity sizing input is ambiguous or invalid
+- **WHEN** a CLI override repeats an entity, refers to an unknown entity or supplies a nonpositive/noninteger count
+- **THEN** inference rejects without publishing a spec or reflecting rejected values
