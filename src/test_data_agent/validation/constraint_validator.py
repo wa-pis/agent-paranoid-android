@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import BaseModel, Field
+
 from test_data_agent.core.constraint import ConstraintStatus, ConstraintType
 from test_data_agent.core.dataset import DatasetSpec
 from test_data_agent.generation.limits import enforce_dataset_rule_work
@@ -13,11 +15,20 @@ from test_data_agent.rules.expressions import parse_datetime, safe_eval, numbers
 from test_data_agent.rules.typed_values import formula_value, numeric_row, aggregate_mapping_values
 
 
+class TemporalMetrics(BaseModel):
+    entity: str
+    start_field: str
+    end_field: str
+    checked_rows: int = Field(ge=0)
+    failed_rows: int = Field(ge=0)
+
+
 def validate_constraints(
     rows_by_entity: dict[str, list[dict[str, Any]]],
     spec: DatasetSpec,
     *,
     budget: GenerationBudget | None = None,
+    temporal_metrics: list[TemporalMetrics] | None = None,
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -30,7 +41,7 @@ def validate_constraints(
         if constraint.type == ConstraintType.FORMULA:
             errors.extend(validate_formula(rows_by_entity, constraint, budget=budget, spec=spec))
         elif constraint.type == ConstraintType.TEMPORAL:
-            errors.extend(validate_temporal(rows_by_entity, constraint, budget=budget))
+            errors.extend(validate_temporal(rows_by_entity, constraint, budget=budget, metrics=temporal_metrics))
         elif constraint.type == ConstraintType.CONDITIONAL_REQUIRED:
             errors.extend(validate_conditional_required(rows_by_entity, constraint, budget=budget, spec=spec))
         elif constraint.type == ConstraintType.AGGREGATE_MAPPING:
@@ -74,6 +85,7 @@ def validate_temporal(
     constraint: Any,
     *,
     budget: GenerationBudget | None = None,
+    metrics: list[TemporalMetrics] | None = None,
 ) -> list[str]:
     budget = budget or GenerationBudget()
     budget.check("deterministic rule entry")
@@ -81,11 +93,18 @@ def validate_temporal(
         return []
     start_field, end_field = constraint.fields[:2]
     errors: list[str] = []
+    checked_rows = 0
     for index, row in budget.iter_rule_work(enumerate(rows_by_entity.get(constraint.entity, []))):
+        checked_rows += 1
         start = parse_datetime(row.get(start_field))
         end = parse_datetime(row.get(end_field))
         if start is None or end is None or start > end:
             errors.append(f"{constraint.entity}[{index}] temporal ordering failed")
+    if metrics is not None:
+        metrics.append(TemporalMetrics(
+            entity=constraint.entity, start_field=start_field, end_field=end_field,
+            checked_rows=checked_rows, failed_rows=len(errors),
+        ))
     return errors
 
 

@@ -396,3 +396,20 @@ mapping without an active relationship SHALL fail validation.
 - **WHEN** an explicit negative or mixed mode is requested
 - **THEN** invalid rows remain available with their validation evidence
 - **AND** unsafe row values still prevent publication.
+
+### Requirement: Unequal Relational Sizes Have Executable Acceptance
+
+Seeded generation SHALL preserve declared unequal entity counts and nullable
+foreign-key behavior consistently through direct and CLI entry points.
+
+#### Scenario: Parent and child counts differ with nullable keys
+- **WHEN** reviewed parent and child sizes differ and child keys are all null or all non-null
+- **THEN** direct and CLI seeded runs have identical rows and exact declared counts
+- **AND** non-null child references resolve to generated parent keys
+- **AND** independent identifier domains remain disjoint and input specs remain unchanged
+
+#### Scenario: Supplied relations are empty
+- **WHEN** direct or CLI validation receives empty parent or child relations
+- **THEN** relationship metrics distinguish no references from a real orphan
+- **AND** schema validation still rejects mismatch with positive declared row counts
+- **AND** validation does not mutate supplied files

@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_serializer
 
 from test_data_agent.core.dataset import DatasetSpec
+from test_data_agent.core.constraint import ConstraintType
+from test_data_agent.core.fingerprints import model_fingerprint
 from test_data_agent.core.limits import GenerationBudget
 from test_data_agent.core.settings import GenerationMode, ValidationSettings
 from test_data_agent.rules.validation import BusinessValidationReport, validate_business_rules
 from test_data_agent.rules.contract import validate_business_rules_for_spec
 from test_data_agent.safety import SpecSafetyError, assert_spec_safe, validate_generated_row_privacy
-from test_data_agent.validation.constraint_validator import validate_constraints
+from test_data_agent.validation.constraint_validator import TemporalMetrics, validate_constraints
 from test_data_agent.validation.relationship_validator import RelationshipMetrics, validate_relationships
 from test_data_agent.validation.schema_validator import validate_schema
 
@@ -35,16 +37,31 @@ class ValidationSection(BaseModel):
         return payload
 
 
+class ValidationUtilityEvidence(BaseModel):
+    spec_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    evidence_scope: Literal["generated_dataset"] = "generated_dataset"
+    active_relationships: int = Field(ge=0)
+    relationship_checks: Literal["executed", "not_declared", "not_run"]
+    active_temporal_constraints: int = Field(ge=0)
+    temporal_checks: Literal["executed", "not_declared", "not_run"]
+    temporal_metrics: list[TemporalMetrics] = Field(default_factory=list)
+    unmodeled_relationship_count: None = None
+    source_orphan_ratio: None = None
+    source_fanout: None = None
+    source_temporal_fidelity: Literal["unmeasured"] = "unmeasured"
+
+
 class DatasetValidationReport(BaseModel):
     valid: bool
     sections: list[ValidationSection]
     settings: ValidationSettings = Field(default_factory=ValidationSettings)
     business_validation: BusinessValidationReport | None = Field(default=None)
+    utility: ValidationUtilityEvidence | None = None
 
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
-        for name in ("business_validation",):
+        for name in ("business_validation", "utility"):
             if getattr(self, name) is None:
                 payload.pop(name, None)
         return payload
@@ -59,6 +76,7 @@ def validate_dataset(
     budget = budget or GenerationBudget()
     settings = spec.validation_settings.model_copy(deep=True)
     metrics: list[RelationshipMetrics] = []
+    temporal_metrics: list[TemporalMetrics] = []
     validators: list[tuple[str, bool, Callable[[], list[str]]]] = [
         ("schema", settings.validate_schema, lambda: validate_schema(rows_by_entity, spec)),
         (
@@ -69,7 +87,7 @@ def validate_dataset(
         (
             "constraints",
             settings.validate_constraints,
-            lambda: validate_constraints(rows_by_entity, spec, budget=budget),
+            lambda: validate_constraints(rows_by_entity, spec, budget=budget, temporal_metrics=temporal_metrics),
         ),
         ("privacy", settings.validate_privacy, lambda: validate_privacy(spec) or validate_generated_row_privacy(rows_by_entity, spec, parse_numeric_strings=True)),
     ]
@@ -92,7 +110,27 @@ def validate_dataset(
         sections.append(ValidationSection(name="business_rules", passed=business.rule_pass_count,
                                           failed=business.rule_fail_count, checked=business.rule_count,
                                           errors=[error for result in business.results for error in result.errors]))
+    active_relationships = sum(
+        item.status != "rejected" for item in budget.iter_rule_work(spec.relationships)
+    )
+    active_temporal = sum(
+        item.status != "rejected" and item.type == ConstraintType.TEMPORAL
+        for item in budget.iter_rule_work(spec.constraints)
+    )
+    executed = {item.name for item in sections}
+    utility = ValidationUtilityEvidence(
+        spec_sha256=model_fingerprint(spec),
+        active_relationships=active_relationships,
+        relationship_checks=("not_declared" if not active_relationships else
+                             "executed" if "relationships" in executed else "not_run"),
+        active_temporal_constraints=active_temporal,
+        temporal_checks=("not_declared" if not active_temporal else
+                         "executed" if "constraints" in executed else "not_run"),
+        temporal_metrics=temporal_metrics,
+    )
+    budget.check("validation evidence")
     return DatasetValidationReport(
+        utility=utility,
         business_validation=business,
         valid=not any(item.failed for item in sections),
         sections=sections,

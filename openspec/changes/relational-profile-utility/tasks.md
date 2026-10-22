@@ -3,10 +3,10 @@
 - [x] R2: Verify metadata PK names not ending in id; explicitly support or reject composite PKs without selecting a component silently.
 - [x] R3: Specify additive per-entity sizing and total row budgets; retain --count compatibility and reject oversized plans before allocation.
 - [x] R4: Reuse metadata-only relationship discovery as reviewable candidates; test ambiguous names, absent parents, different domains and unauthorized tables.
-- [ ] R5: Add utility/coverage evidence for declared checks, unmodeled relationships, key-domain size and temporal evidence; distinguish unknown from measured zero.
+- [x] R5: Add utility/coverage evidence for declared checks, unmodeled relationships, key-domain size and temporal evidence; distinguish unknown from measured zero.
 - [ ] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
 - [ ] R7: Evaluate EAV conditional-formula/pivot requests and record support or an explicit separate proposal.
-- [ ] R8: Exercise unequal parent/child sizes, nullable keys, empty relations and deterministic replay through CLI and direct services.
+- [x] R8: Exercise unequal parent/child sizes, nullable keys, empty relations and deterministic replay through CLI and direct services.
 - [ ] R9: Update synthetic-generation/dataset-validation baselines, docs, contracts and candidate migration evidence.
 
 ## R2 implementation evidence
@@ -67,3 +67,31 @@
   no source values, unchanged generation and work/candidate/report limits.
 - Report kind rejects DatasetSpec parsing and CLI generation; an expired
   deadline at atomic publication rolls back instead of replacing an existing report.
+
+## R5 implementation evidence
+
+- Add optional typed hash-bound utility evidence to validation reports, retaining
+  old report parsing and all existing validity/section semantics.
+- Active declared check counts and executed/not-declared/not-run statuses account
+  for rejected declarations, disabled sections and fail-fast. Existing generated
+  relationship metrics expose key-domain counts and zero-versus-unknown ratios.
+- Temporal observation/failure counts collect inside the existing budgeted scan;
+  no source values, second row scan or generation change is introduced.
+- Source orphan/fan-out/temporal fidelity and unmodeled relationship counts are
+  explicitly unmeasured. Synthetic tests cover empty data, actual zero resolution,
+  temporal failures, disabled/skipped/rejected declarations, legacy parsing,
+  canonical hash agreement, changed-spec mismatch and deterministic CLI replay.
+- Update generated report/MCP contract fixtures and relational guidance. Complete
+  release-candidate gates remain tracked in R9 and the umbrella change.
+
+## R8 acceptance evidence
+
+- A synthetic direct/CLI matrix covers both larger-child and larger-parent
+  tables with zero/all-null child keys, independent identifier domains, exact
+  declared sizes, no spec mutation and deterministic replay with one seed.
+- Header-only CSV tables and empty direct rows retain identical relationship
+  metrics: no checked references gives no ratio; a real orphan fails. Schema
+  validation still rejects row-count mismatch with positive declarations, so
+  an empty dataset cannot be misrepresented as a fully valid generated bundle.
+- Validation leaves input files unchanged. This adds acceptance coverage, not
+  zero-row generation support or relaxed schema/relationship enforcement.

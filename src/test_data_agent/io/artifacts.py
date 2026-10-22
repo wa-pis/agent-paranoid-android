@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field, model_serializer
 from faker.config import DEFAULT_LOCALE
 
 from test_data_agent.core.dataset import DatasetProfile, DatasetSpec
+from test_data_agent.core.fingerprints import model_fingerprint
 from test_data_agent.core.limits import GenerationBudget, max_input_file_bytes, max_output_bytes
 from test_data_agent.core.settings import GenerationMode, OutputFormat, ValidationSettings
 from test_data_agent.io.writers import (
@@ -398,29 +399,6 @@ def dataset_spec_fingerprint(spec: DatasetSpec) -> str:
 def dataset_profile_fingerprint(profile: DatasetProfile) -> str:
     return model_fingerprint(profile)
 
-
-def model_fingerprint(model: BaseModel) -> str:
-    payload = model.model_dump(mode="json")
-
-    # Compatibility: keep previous fingerprints stable for persisted contracts when
-    # the newly added local_category_fields feature is absent from external payloads.
-    if isinstance(model, (DatasetProfile, DatasetSpec)):
-        payload = dict(payload)
-        if payload.get("local_category_fields", None) == []:
-            payload.pop("local_category_fields", None)
-    if isinstance(model, DatasetProfile):
-        if payload.get("has_unmodeled_expressions") is None:
-            payload.pop("has_unmodeled_expressions", None)
-        # Unspecified carries no new evidence; preserve pre-metadata plan hashes.
-        for entity in payload["entities"]:
-            for field in entity["fields"]:
-                if field.get("unique_ratio_kind") == "unspecified":
-                    field.pop("unique_ratio_kind")
-
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
-        "utf-8"
-    )
-    return hashlib.sha256(canonical).hexdigest()
 
 
 def write_dataset_review_artifacts(
