@@ -6,9 +6,10 @@ Source:
 
 Requirements:
 
+* fresh agent workspace: {workspace_path}
 * row count: {count}
 * output format: {csv/json/parquet}
-* mode: {valid/mixed/negative/edge/load_test}
+* mode: {valid/mixed/negative}
 * invalid ratio: {invalid_ratio}
 * seed: {seed}
 * preserve approximate distributions: yes
@@ -17,8 +18,9 @@ Requirements:
 * expose PII: no
 
 Use the CSV only for schema inference, aggregate profiling, safe
-distributions, and masked patterns. First create a reviewable DatasetSpec and
-stop for my explicit approval. After approval, generate fully synthetic data
+distributions, and masked patterns. First create a reviewable DatasetSpec,
+show its current fingerprint, and stop for my explicit human approval
+of that exact specification. After approval, generate fully synthetic data
 and validate it. Return paths for:
 
 * CSV profile

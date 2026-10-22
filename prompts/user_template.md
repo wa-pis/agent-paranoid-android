@@ -8,10 +8,11 @@ Source:
 
 Requirements:
 
+* fresh agent workspace: {workspace_path}
 * row count: {count}
 * output format: {csv/json/parquet}
-* mode: {valid/mixed/negative/edge/load_test}
-* invalid ratio: {invalid_ratio}
+* mode: {valid}
+* invalid ratio: 0
 * seed: {seed}
 * preserve approximate distributions: yes
 * preserve referential integrity: {yes/no}
@@ -20,7 +21,12 @@ Requirements:
 * expose PII: no
 
 Use the database only for schema, metadata, aggregate profiling, safe
-distributions, and masked patterns. First create a reviewable DatasetSpec and
-stop for my explicit approval. After approval, generate fully synthetic data
+distributions, and masked patterns. First create a reviewable DatasetSpec,
+show its current fingerprint, and stop for my explicit human approval
+of that exact specification. After approval, generate fully synthetic data
 and validate it. Return artifact paths, manifest facts, and validation status;
 do not return source or generated rows in chat.
+
+The MCP Trino planner starts in valid mode and has no mode/invalid-ratio
+arguments. For other modes, edit the pending spec before my human review;
+do not invent planner parameters.

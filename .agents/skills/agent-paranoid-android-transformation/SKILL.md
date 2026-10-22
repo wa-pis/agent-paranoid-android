@@ -1,51 +1,54 @@
 ---
 name: agent-paranoid-android-transformation
-description: Help users request selective one-to-one data transformation while preserving sensitive-data and local-approval boundaries.
+description: Review and execute explicitly requested one-to-one mixed-origin data transformations with Agent Paranoid Android, including local preservation approval and configured frozen sessions. Does not provide source-free synthetic generation or grant dataset access.
 ---
 
 # Selective transformation
 
-Use this skill when a user wants a one-to-one output with some source values
-retained and other values transformed. This is not synthetic generation.
-Check the installed CLI help or MCP tool list for an explicit transformation
-interface. If none exists, say it is unavailable in this installation; do
-not approximate it with `generate`, a custom script, or unrestricted SQL.
-This skill works offline and does not activate a proposed feature.
-If `transform-review` is installed, it can display a value-free local review
-and snapshot digest only. Its presence does not imply approval or an executable
-transformation command; check those capabilities separately before proceeding.
+Use only installed transformation interfaces. Inspect the package version and
+CLI help or MCP tool list. The registered single-source names are CLI
+`transform-review`, `transform-approve`, `transform-execute`, and MCP
+`review_transformation`, `execute_transformation`; availability depends on the
+installation. Review alone is not execution or approval authority. Missing
+capabilities must stop the dependent step. Never emulate transformation with
+`generate`, custom source-row scripts or unrestricted SQL. Skills do not
+activate extensions or authorize datasets.
 
-When an explicit interface is available:
+## Local single-source workflow
 
-1. Request a value-free per-field profile for human review. The system's
-   comment should explain the likely meaning of each field, why it may be
-   sensitive, and uncertainty, without showing cell values.
-2. Treat `sensitive: true` as requiring transformation. An explicitly reviewed
-   `sensitive: false` is only a candidate for preservation, not permission by
-   itself. Unknown or conflicting classifications fail closed.
-3. Let the user review field actions and any private inline YAML or local CSV
-   mapping. Never send source values or mapping entries to an external model,
-   default MCP response, log, or public summary.
-4. Preservation requires the product's trusted local interactive CLI approval
-   of the exact plan, classification, source and mapping bytes. An agent or
-   MCP client may consume a valid matching receipt only if that installed
-   interface explicitly supports it; neither may create the receipt.
-5. Report only bounded, value-free validation and output summaries. A
-   preservation percentage is not permission to disclose values or copy rows.
+1. Use local input/policy/mapping paths and a fresh output destination inside
+   the allowed workspace. Request value-free per-field review and retain the
+   exact displayed snapshot digest. Do not load source cells or mapping entries
+   into chat, a provider request, logs or default MCP responses.
+2. Review field actions and sensitivity uncertainty. Direct preservation or a
+   preserve fallback requires an explicit per-field non-sensitive decision,
+   no positive/conflicting sensitivity evidence, and a bounded operator comment.
+   Unknown, sensitive and disputed fields remain blocked; DECIMAL preservation
+   remains blocked by default. A `sensitive: false` flag alone is not approval.
+3. Explicit `substitute` / `replace_text` mappings follow the installed reviewed
+   contract uniformly across fields. A replacement equalling another fixed
+   source value alone does not make it preservation or prohibit a sensitive
+   permutation. Sensitivity stays a value-free field note. This never authorizes
+   implicit copying, direct preserve or disclosure of mapping literals.
+4. When preserving, hand off the exact local review to the operator for fresh
+   controlling-TTY `transform-approve`. The operator must review the bound plan,
+   source bytes, classification and mapping bytes. Agents and MCP cannot issue
+   approval, simulate a TTY, create receipts or supply an approval boolean.
+5. A supported `transform-execute` / `execute_transformation` consumer uses the
+   exact reviewed snapshot digest and, for preservation, the matching locally
+   issued receipt. Inspect installed help/schema for actual argument names.
+   Changed source, policy/classification or mapping bytes require fresh review
+   and fresh local approval when preserving; a new digest cannot validate an
+   old receipt. Never bypass a failed binding check.
+6. Report bounded, value-free validation, counts and artifact paths. Label the
+   output mixed-origin and one-to-one, never fully synthetic. Do not return
+   source or output rows, mapping literals, secrets or backend exception text.
+   A reported unchanged percentage grants no disclosure or copying permission.
 
-If the installed interface lacks any required review, approval, or safety
-step, stop and report the unavailable step. Offer the source-free synthetic
-workflow as a separate alternative, never as a silent substitute.
+Saved multi-source profiles and configured SQL sessions have a separate
+capture/expiry workflow. Read [references/sessions.md](references/sessions.md)
+only for those requests. Do not open a database session for a local-file task.
 
-
-For configured SQL, check that the installed `transform-batch query-execute`
-or MCP `configured_query_session` interface is actually present. Use only
-authorised administrator-configured sources and bounded workspace query
-references; never supply endpoints, credentials, arbitrary SQL or driver code.
-The CLI invocation captures/reviews/approves locally if required/publishes once.
-For MCP, open one session and retain its handle and exact digest. Let the local
-operator use its approval descriptor with the existing controlling-TTY CLI;
-this skill and MCP cannot approve. Review/validate/execute reuse the frozen
-snapshot. Expired handles require an explicit new capture and fresh review,
-not an automatic retry. Report cleanup failures and admission refusals; do not
-raise limits or restart the server to bypass them. Return only bounded metadata.
+If a necessary review, approval or safety capability is unavailable, explain
+which step cannot proceed. Offer source-free synthetic generation as a separate
+alternative only; do not silently change the user's intended outcome.
