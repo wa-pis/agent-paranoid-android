@@ -1,5 +1,7 @@
 # Safety Model
 
+English · [Русский](../ru/concepts/safety-model.md)
+
 The central invariant is:
 
 > Generated output must contain newly generated values, not copied source rows.

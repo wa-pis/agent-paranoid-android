@@ -1,5 +1,7 @@
 # Transform Local Data
 
+English · [Русский](../ru/how-to/transformation.md)
+
 Use selective transformation when each output row must correspond to an input
 row. Unlike synthetic generation, the result has mixed origin and may contain
 explicitly replaced or approved preserved source values. Treat the destination

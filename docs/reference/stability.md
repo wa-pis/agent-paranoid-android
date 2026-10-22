@@ -1,5 +1,7 @@
 # Public Stability
 
+English · [Русский](../ru/reference/stability.md)
+
 This page defines the supported integration surfaces at and after the `1.0`
 compatibility baseline. "Supported" means changes are reviewed against the
 listed contract gate and announced when migration is required. It does not

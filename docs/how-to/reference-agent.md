@@ -1,5 +1,7 @@
 # Run The Reference Agent
 
+English · [Русский](../ru/how-to/reference-agent.md)
+
 [`examples/reference_agent.py`](https://github.com/wa-pis/agent-paranoid-android/blob/main/examples/reference_agent.py)
 is a runnable application-layer example built only from the public Python API.
 It demonstrates the complete review-first flow without a provider SDK,

@@ -1,5 +1,7 @@
 # DatasetSpec Compatibility
 
+English · [Русский](../ru/concepts/dataset-spec-compatibility.md)
+
 `DatasetSpec.schema_version` versions the serialized YAML and JSON contract
 between planners, reviewers, generators, and validators. It is separate from
 the Python package version.

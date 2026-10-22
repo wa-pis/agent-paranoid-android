@@ -97,3 +97,25 @@ excluding history, roadmap and documentation administration. The Markdown ZIP
 preserves the full documentation source tree so reference links remain reusable;
 historical pages keep their original provenance. The site ZIP contains one
 selected version, without recursively including other versions or its own ZIP.
+
+
+## Russian Edition
+
+`docs/ru/` mirrors current user-guide paths. Keep translated command blocks and
+review gates synchronized with their English counterpart; untranslated specialist
+API tutorials and historical records must be labelled English rather than
+presented as translated content. `docs/ru/quality-report.md` records example and
+build evidence, including checks that were not run.
+
+The existing theme switches to the Russian navigation for `ru/` pages. Its
+English / Русский links resolve within the current mike version; a missing
+counterpart falls back to the other language's home with an explicit label.
+Markdown language links also work in the repository. Built-in search indexes
+both English and Russian, while the history classification normalizes `ru/`.
+No new localization plugin or runtime dependency is required.
+
+The combined PDF/HTML handbook is bilingual. Print-site and the export chapter
+manifest exclude history, roadmap, downloads and versions for both languages.
+Markdown and offline-site ZIPs include both editions. Do not make language
+switches point to the unversioned production root: that would silently change
+the package version when reading an older guide.

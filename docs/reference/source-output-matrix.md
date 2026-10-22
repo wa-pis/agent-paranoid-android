@@ -1,5 +1,7 @@
 # Source and output matrix
 
+English · [Русский](../ru/reference/source-output-matrix.md)
+
 Every supported source supplies safe evidence for the same reviewed DatasetSpec.
 The source and output format do not select different field, setting or business-rule
 languages. Profile what is available, review or author the full specification,

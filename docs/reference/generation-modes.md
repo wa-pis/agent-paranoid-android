@@ -1,5 +1,7 @@
 # Generation modes and folder replacement
 
+English · [Русский](../ru/reference/generation-modes.md)
+
 These modes are available in stable `1.6.0`.
 
 `edge` generates valid lower and upper numeric/decimal/date/time bounds,

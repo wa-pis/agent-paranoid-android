@@ -33,3 +33,7 @@ body:has(#print-site-page) .wy-nav-content { max-width: 100%; }
   .handbook-contents ul { margin-bottom: 6pt; }
   #print-site-page pre code { display: block; font-size: 8pt; }
 }
+
+.language-switch { margin: 0 0 1em; text-align: right; }
+.language-switch a { text-decoration: underline; }
+@media print { .language-switch { display: none; } }

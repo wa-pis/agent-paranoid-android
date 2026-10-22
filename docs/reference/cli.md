@@ -1,5 +1,7 @@
 # CLI Command Index
 
+English · [Русский](../ru/reference/cli.md)
+
 This reference describes stable `1.6.0`. For complete tasks start with
 [the user guide](../index.md) or [Transform Local Data](../how-to/transformation.md).
 Historical anchors are retained so existing links keep working.

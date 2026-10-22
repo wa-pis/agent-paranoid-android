@@ -1,5 +1,7 @@
 # CLI Workflows
 
+English · [Русский](../ru/reference/cli-workflows.md)
+
 ## Offline Demo
 
 ```bash

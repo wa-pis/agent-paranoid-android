@@ -1,5 +1,7 @@
 # Known Issues
 
+English · [Русский](ru/known-issues.md)
+
 Stable `1.6.0` completed [public verification](release-evidence-1.6.0.md).
 External acceptance feedback was reconciled against current main on 2026-10-22;
 the [feedback work plan](https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6)

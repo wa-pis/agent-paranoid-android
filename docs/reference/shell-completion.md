@@ -1,5 +1,7 @@
 # Shell Completion
 
+English · [Русский](../ru/reference/shell-completion.md)
+
 Generate completion from the installed parser so commands, aliases, and options
 match the exact package version:
 

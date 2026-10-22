@@ -1,5 +1,7 @@
 # First CSV Dataset
 
+English · [Русский](../ru/getting-started/first-csv.md)
+
 This tutorial profiles one CSV file, infers a generation specification,
 generates new values, and validates the result.
 

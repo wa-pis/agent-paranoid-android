@@ -1,5 +1,7 @@
 # Installation
 
+English · [Русский](../ru/getting-started/installation.md)
+
 Stable `1.6.0` is the recommended release. Its signed source, packages and
 containers passed [public verification](../release-evidence-1.6.0.md).
 

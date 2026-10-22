@@ -16,6 +16,7 @@ from mkdocs.plugins import event_priority
 
 
 def is_history(source: str) -> bool:
+    source = source.removeprefix("ru/")
     name = Path(source).name
     return (
         source.startswith(("adr/", "release-history/", "agent-guides/"))
@@ -74,7 +75,7 @@ def on_nav(nav, config, files):
     config.extra["historical_urls"] = {
         file.url
         for file in files.documentation_pages()
-        if is_history(file.src_uri) or file.src_uri == "history.md"
+        if is_history(file.src_uri) or file.src_uri.removeprefix("ru/") == "history.md"
     }
     config.extra["page_urls"] = {
         get_page_key(file.url): file.url for file in files.documentation_pages()
@@ -83,7 +84,7 @@ def on_nav(nav, config, files):
 
 def on_page_markdown(markdown, page, config, files):
     page.meta["historical"] = (
-        is_history(page.file.src_uri) or page.file.src_uri == "history.md"
+        is_history(page.file.src_uri) or page.file.src_uri.removeprefix("ru/") == "history.md"
     )
     return markdown
 
@@ -206,7 +207,7 @@ def on_post_build(config):
     chapters = [
         page.file.src_uri
         for page in config.extra["navigation_pages"]
-        if page.file.src_uri
+        if page.file.src_uri.removeprefix("ru/")
         not in {"history.md", "downloads.md", "versions.md", "roadmap.md"}
     ]
     with zipfile.ZipFile(

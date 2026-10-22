@@ -1,5 +1,7 @@
 # Related Tables
 
+English · [Русский](../ru/getting-started/related-tables.md)
+
 Use this workflow when a folder contains one CSV file per related table.
 The file stem becomes the entity name.
 

@@ -1,5 +1,7 @@
 # Compatibility Surfaces
 
+English · [Русский](../ru/reference/compatibility.md)
+
 This inventory covers aliases and wrappers retained while the package
 converges on its `1.0` public API. New code should use the canonical surface,
 but retained entries remain tested for their stated window.

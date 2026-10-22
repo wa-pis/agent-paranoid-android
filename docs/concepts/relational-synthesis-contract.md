@@ -1,5 +1,7 @@
 # Relational Synthesis Contract
 
+English · [Русский](../ru/concepts/relational-synthesis-contract.md)
+
 Relational synthesis preserves reviewed, executable structure. It does not
 reconstruct source rows, identifiers, totals, or rare values.
 

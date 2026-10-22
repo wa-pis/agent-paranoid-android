@@ -1,5 +1,7 @@
 # Connect An MCP Client
 
+English · [Русский](../ru/how-to/mcp.md)
+
 These workflows describe stable `1.6.0`. Start with a workspace-confined
 server and enable only tools required for your task. For local preservation
 approval use [Transform Local Data](transformation.md); MCP cannot issue it.
