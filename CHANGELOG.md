@@ -19,6 +19,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- CSV profiling no longer admits NaN, infinity or overflowing exponents as
+  numeric statistics; mixed columns retain conservative type and privacy checks.
 - Generation option errors now explain that valid, edge and load-test modes
   reject a nonzero invalid ratio and offer removing the ratio as a recovery.
 

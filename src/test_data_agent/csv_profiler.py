@@ -10,6 +10,7 @@ import csv
 import hashlib
 import io
 import json
+import math
 import re
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
@@ -640,7 +641,8 @@ def parse_int(value: str) -> int | None:
 
 def parse_float(value: str) -> float | None:
     try:
-        return float(value)
+        parsed = float(value)
+        return parsed if math.isfinite(parsed) else None
     except ValueError:
         return None
 

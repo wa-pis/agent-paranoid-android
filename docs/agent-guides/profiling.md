@@ -6,6 +6,13 @@ schema inference.
 Treat every input file as potentially sensitive. Profiling may retain only
 metadata and bounded evidence needed to build a generation specification.
 
+CSV floating-point parsing accepts finite results only. NaN, infinity and
+overflowing exponent text do not form a valid numeric distribution. Reprofile
+affected files; do not treat a previous nonfinite statistic as numeric evidence.
+Positive numeric text can still be phone-like or sensitive. A numeric majority
+does not suppress a late phone, card or secret. Reviewed `numeric_measure` is
+a generation-spec contract, not authorization to declassify a CSV profile.
+
 Parquet profiles represent unavailable null and distinctness statistics as
 `null`, not zero. Unknown distinctness cannot nominate a primary key or supply
 relationship-confidence evidence.
@@ -58,8 +65,8 @@ keys and omits lower-bound child distinct ratios from numeric evidence. Older
 profiles and other producers default to `unspecified`, not proven exact; reprofile
 old folder artifacts to obtain the new uncertainty metadata. This statistic is
 unrelated to the planned percentage of unchanged values after transformation.
-Cache format 6 invalidates older folder caches and recomputes their evidence,
-including repeated-identifier pool sizes.
+Cache format 7 invalidates older folder caches and recomputes their evidence,
+including finite numeric statistics and repeated-identifier pool sizes.
 Unspecified metadata is omitted from canonical profile fingerprints to preserve
 saved-plan compatibility; explicit exact/lower-bound evidence remains hash-bound.
 
@@ -173,4 +180,4 @@ This structural check does not establish a native CSV parser peak-memory bound.
 CSV folder relationship inference uses matching descriptive identifier names
 and field types. Numeric overlap alone is insufficient. Generic id/key/uuid
 and ambiguous parent domains require explicit reviewed relationships. Cache
-format 6 invalidates older inferred bindings; reprofile saved artifacts.
+format 7 invalidates older inferred bindings; reprofile saved artifacts.

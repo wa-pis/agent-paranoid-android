@@ -184,3 +184,21 @@ Formula syntax is a bounded arithmetic subset, not Python or SQL. Rule payload
 size, expression complexity, and estimated row/rule evaluations are limited.
 
 See [Configuration](../reference/configuration.md) for adjustable limits.
+
+## Generation ranges and business invariants
+
+A field's distribution describes sampling. A formula in `assign` mode computes
+and replaces its target; its result may leave that sampling range. The report
+records assignment-domain checks and violations separately from business-rule
+validity. Declare a field rule with `min_value`/`max_value` when the result must
+obey an invariant. Formula `check` mode validates existing values without
+assigning them; use it when replacement would hide the condition you intend to
+test. The complete runnable reference linked above includes both modes and
+conditional predicates, including null and inclusive range checks.
+
+Scenario weights are relative probabilities, not exact row quotas or predicates
+that automatically bind a scenario to source rows. A passing rule report checks
+declared rules; it does not establish source fidelity or discover missing rules.
+Entity-attribute-value inputs are not automatically pivoted into business fields.
+Model the desired entities and declare relationships/rules explicitly before
+using the generation command above.
