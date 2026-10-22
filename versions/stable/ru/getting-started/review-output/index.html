@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/ru/getting-started/review-output/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Проверить результат - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u041f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442";
+        var mkdocs_page_input_path = "ru/getting-started/review-output.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/ru/getting-started/review-output/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Проверить результат</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Что получится в результате</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Предварительные требования</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1">Шаг 1. Выполните повторную валидацию</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2">Шаг 2. Прочитайте итоговые флаги</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Проверка результата</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">Как читать артефакты</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_9">Следующий шаг</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_10">Выбрать формат результата</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_11">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_12">Что получится в результате</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_13">Предварительные требования</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_14">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1_1">Шаг 1. Сгенерируйте все форматы</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2_1">Шаг 2. Проверьте доступные для чтения форматы</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_15">Проверка результата</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_16">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#160">Физическое представление в 1.6.0</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_17">Различия форматов</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_18">Следующий шаг</a>
+    </li>
+        </ul>
+    </li>
+    </ul></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Начало</li>
+      <li class="breadcrumb-item active">Проверить результат</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/getting-started/review-output.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../getting-started/review-output/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Проверить результат<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../getting-started/review-output/">English</a> · Русский</p>
+<h2 id="_2">Для чего это нужно<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Валидация сверяет данные с DatasetSpec; manifest помогает восстановить условия генерации. Это обязательные технические проверки перед использованием фикстуры, но предметную полезность оценивает человек.</p>
+<h2 id="_3">Что получится в результате<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Повторный отчёт valid=true и подтверждённое число строк.</p>
+<h2 id="_4">Предварительные требования<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Выполните <a href="../first-csv/">CSV-генерацию</a>, не изменяйте её spec и файлы. Команды выполняйте в корне того же checkout.</p>
+<h2 id="_5">Пошаговое выполнение<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="1">Шаг 1. Выполните повторную валидацию<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Создайте отдельный отчёт, сохранив первоначальный.</p>
+<p><strong>Где выполнить:</strong> Терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent validate out/ru-csv/dataset_spec.json out/ru-csv --output out/ru-csv-revalidation.json
+</code></pre>
+<p><strong>Что должно произойти:</strong> Сверены типы, связи, ограничения и privacy.</p>
+<p><strong>Как проверить:</strong> Код 0, valid=true в новом JSON.</p>
+<p><strong>Если не получилось:</strong> Код 1 означает нарушение; прочитайте errors. Код 2 означает ошибку входов/параметров.</p>
+<h3 id="2">Шаг 2. Прочитайте итоговые флаги<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Проверьте manifest автоматически.</p>
+<p><strong>Где выполнить:</strong> Тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python -c &quot;import json; from pathlib import Path; p=Path('out/ru-csv'); m=json.loads((p/'generation_manifest.json').read_text()); assert m['synthetic'] is True and m['source_rows_copied'] is False and m['validation_valid'] is True and m['seed']==12345; print('manifest: ok')&quot;
+</code></pre>
+<p><strong>Что должно произойти:</strong> Флаги прошли проверку.</p>
+<p><strong>Как проверить:</strong> Код 0.</p>
+<p><strong>Если не получилось:</strong> При false или отсутствующем поле остановите передачу набора и проверьте версию артефакта.</p>
+<h2 id="_6">Проверка результата<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>Проверьте, что в отчёте включены schema, relationships, constraints, privacy. Не считайте отсутствие секции успешной проверкой. Дополнительно оцените нужные диапазоны, null, распределения и полноту правил для вашей задачи. При business-rules прочитайте также business_validation_report.json: validate использует embedded business_rules или явно переданный --business-rules и не изменяет проверяемые строки. Сверьте также отдельный бизнес-отчёт.</p>
+<h2 id="_7">Типичные ошибки<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Код 1</td>
+<td>Данные не соответствуют spec</td>
+<td>Прочитайте ошибки секций; проверьте, что spec именно от этого набора.</td>
+</tr>
+<tr>
+<td>valid=true, но нужного свойства нет</td>
+<td>Свойство не формализовано или проверка отключена</td>
+<td>Добавьте проверяемое правило; включите соответствующую validation_settings.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">Как читать артефакты<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Артефакт</th>
+<th>Что проверять</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>csv_profile.json / profile.json</td>
+<td>Сущности, типы, чувствительность, границы наблюдений</td>
+</tr>
+<tr>
+<td>dataset_spec.json / dataset_spec.yaml</td>
+<td>Итоговый контракт; счётчики, поля, ключи, правила</td>
+</tr>
+<tr>
+<td>validation_report.json</td>
+<td><code>valid</code>, включённые секции, errors</td>
+</tr>
+<tr>
+<td>generation_manifest.json</td>
+<td>seed, синтетичность, отсутствие копирования строк, результаты проверок, окружение</td>
+</tr>
+<tr>
+<td>business_validation_report.json</td>
+<td>При правилах: valid и ожидаемые/наблюдаемые нарушения</td>
+</tr>
+</tbody>
+</table>
+<p><code>mixed</code> и <code>negative</code> могут намеренно создавать ошибки. Для них проверяют <code>expectations_met</code>, <code>unexpected_violation_count</code>, <code>missing_expected_violation_count</code>, а не требуют обычное <code>valid=true</code>. В <code>valid</code> ожидается отсутствие нарушений. В 1.6.0 при неуспешной валидации generate возвращает exit code 1 / JSON status validation_failed даже для mixed/negative, сохраняя намеренно неверные артефакты и отчёты. Код 1 не означает rollback. Приватность остаётся обязательной: её нарушение блокирует публикацию.</p>
+<h2 id="_9">Следующий шаг<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p><a href="../../concepts/safety-model/">Безопасность данных</a>.</p>
+<h2 id="_10">Выбрать формат результата<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h3 id="_11">Для чего это нужно<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>Выберите формат, который принимает ваша тестовая система. Генерируемые файлы содержат новые строки; экспорт SQL не читает и не выгружает исходные строки.</p>
+<h3 id="_12">Что получится в результате<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p>CSV, JSON, SQL, Parquet и отдельный PostgreSQL DDL+INSERT из одного spec.</p>
+<h3 id="_13">Предварительные требования<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h3>
+<p>Установлен Python 3.11+ и пакет проекта. Терминал открыт в корне репозитория <code>agent-paranoid-android</code>; виртуальное окружение активно. Входы — только вымышленные файлы из репозитория. Папка назначения новая; есть права чтения входов и записи результата. Для команд ниже используйте macOS/Linux; в PowerShell вводите каждую команду одной строкой без <code>\</code>. Дополнительно установлен extra parquet; Bash для готового скрипта.</p>
+<h3 id="_14">Пошаговое выполнение<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<h4 id="1_1">Шаг 1. Сгенерируйте все форматы<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> Запустите существующий сценарий форматов.</p>
+<p><strong>Где выполнить:</strong> macOS/Linux, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">bash examples/output_formats/run.sh out/ru-formats
+</code></pre>
+<p><strong>Что должно произойти:</strong> Созданы подпапки csv, json, sql, parquet и postgres.sql.</p>
+<p><strong>Как проверить:</strong> В каждой подпапке есть manifest и validation_report.json.</p>
+<p><strong>Если не получилось:</strong> Если PyArrow отсутствует, установите .[parquet] в активное окружение; повторите в новой папке.</p>
+<h4 id="2_1">Шаг 2. Проверьте доступные для чтения форматы<a class="headerlink" href="#2_1" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> Повторите валидацию CSV, JSON, SQL и Parquet по тому же spec.</p>
+<p><strong>Где выполнить:</strong> Корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-formats/csv
+test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-formats/json
+test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-formats/sql
+test-data-agent validate examples/output_formats/dataset_spec.yaml out/ru-formats/parquet
+</code></pre>
+<p><strong>Что должно произойти:</strong> Прочитаны экспортированные данные.</p>
+<p><strong>Как проверить:</strong> Каждая команда возвращает 0.</p>
+<p><strong>Если не получилось:</strong> SQL-папка должна содержать именно сгенерированный INSERT bundle с manifest. Произвольный SQL и отдельный PostgreSQL DDL-файл не принимаются.</p>
+<h3 id="_15">Проверка результата<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<p>В manifest каждого набора проверьте synthetic=true, source_rows_copied=false и validation_valid=true. SQL здесь только сформирован; его исполнение на сервере в этом аудите не проверялось.</p>
+<h3 id="_16">Типичные ошибки<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Отсутствует pyarrow / missing_dependency</td>
+<td>Не установлен extra parquet</td>
+<td>Установите <code>.[parquet]</code> и проверьте doctor --require-extra parquet.</td>
+</tr>
+<tr>
+<td>SQL не читается validate</td>
+<td>Передан произвольный SQL или DDL export</td>
+<td>Передайте папку с созданным проектом INSERT bundle и manifest; validate не выполняет SQL.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="160">Физическое представление в 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h3>
+<p>CSV bundle объявляет в manifest <code>csv_encoding: backslash-null-v1</code>: <code>\N</code> — null, пустая ячейка — пустая строка, начальный обратный слеш удваивается. Формулы и опасные для spreadsheet строки/заголовки экранируются <code>\F</code>. Сохраняйте manifest вместе с CSV для обратимого чтения; не применяйте это декодирование к старым немаркированным CSV.</p>
+<p>DECIMAL хранится точной строкой в CSV/JSON и decimal128 в Parquet. Для широких integer, смешанных timezone offsets и malformed negative cells Parquet может использовать маркированные строковые представления; при прямом чтении проверяйте <code>apa.scalar_encoding</code> или используйте bundle reader. Native decode одного Arrow batch предшествует проверке payload: лимит expanded bytes не гарантирует верхнюю границу памяти процесса.</p>
+<p>В 1.6.0 validate читает ограниченную грамматику созданных INSERT bundles без исполнения SQL и без подключения к БД. DDL, функции, комментарии и произвольные SQL-скрипты этим не разрешаются.</p>
+<h3 id="_17">Различия форматов<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Формат</th>
+<th>Файлы</th>
+<th>Ограничения</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>csv</td>
+<td><code>&lt;entity&gt;.csv</code></td>
+<td>Текстовое представление; типы задаются spec</td>
+</tr>
+<tr>
+<td>json</td>
+<td><code>&lt;entity&gt;.json</code></td>
+<td>Строки сущности в JSON</td>
+</tr>
+<tr>
+<td>parquet</td>
+<td><code>&lt;entity&gt;.parquet</code></td>
+<td>Нужен PyArrow; отдельное optional extra</td>
+</tr>
+<tr>
+<td>sql</td>
+<td><code>&lt;entity&gt;.sql</code></td>
+<td>Кавычки и INSERT; без CREATE TABLE</td>
+</tr>
+<tr>
+<td>export-postgres-sql</td>
+<td>Один <code>.sql</code></td>
+<td>Транзакция, CREATE TABLE, FK и INSERT; PostgreSQL</td>
+</tr>
+</tbody>
+</table>
+<p>Для одного формата выполните <code>test-data-agent generate examples/output_formats/dataset_spec.yaml --seed 271828 --format csv --output out/ru-one-format</code>. Команда сверена с parser; эквивалентный вызов исполняется скриптом выше.</p>
+<p><code>export-postgres-sql</code> создаёт файл, но не подключается к целевой БД. Сам файл содержит операции записи. Перед его исполнением человек должен проверить целевой сервер, базу, роли и SQL; используйте отдельную пустую тестовую БД. Создание файла не является разрешением на его исполнение.</p>
+<h3 id="_18">Следующий шаг<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h3>
+<p><a href="./">Валидация</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../related-tables/" class="btn btn-neutral float-left" title="Связанные таблицы"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../how-to/business-rules/" class="btn btn-neutral float-right" title="Бизнес-правила">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../related-tables/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../how-to/business-rules/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

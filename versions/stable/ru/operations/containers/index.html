@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/ru/operations/containers/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Контейнеры - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u041a\u043e\u043d\u0442\u0435\u0439\u043d\u0435\u0440\u044b";
+        var mkdocs_page_input_path = "ru/operations/containers.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/ru/operations/containers/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Контейнеры</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Локальная сборка</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#audit">Audit и проверка образа</a>
+    </li>
+    </ul></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Интеграции</li>
+      <li class="breadcrumb-item active">Контейнеры</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/operations/containers.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../operations/containers/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Работа в контейнерах<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../operations/containers/">English</a> · Русский</p>
+<p>Контейнеры — отдельный способ запуска CLI/MCP worker. Для локального Python обычный путь — PyPI. Образы 1.6.0 опубликованы с <a href="../../../release-evidence-1.6.0/">проверяемыми digest/signature</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Образ GHCR, префикс ghcr.io/wa-pis/</th>
+<th>Entrypoint</th>
+<th>Возможности</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>agent-paranoid-android-cli</td>
+<td>test-data-agent</td>
+<td>Core CSV/JSON</td>
+</tr>
+<tr>
+<td>agent-paranoid-android-generator-mcp</td>
+<td>test-data-agent-mcp-generator</td>
+<td>Core + MCP</td>
+</tr>
+<tr>
+<td>agent-paranoid-android-trino-mcp</td>
+<td>test-data-agent-mcp-trino</td>
+<td>Core + MCP + Trino/SQLGlot</td>
+</tr>
+</tbody>
+</table>
+<p>Выберите tag 1.6.0, затем разрешите и проверьте immutable digest. Latest, 1 и 1.6 — mutable aliases. Публикуются linux/amd64 и linux/arm64; PyArrow не входит, для Parquet используйте Python extra.</p>
+<h2 id="_2">Локальная сборка<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Из корня checkout можно собрать только нужный target; Docker-выполнение здесь не проверялось:</p>
+<pre><code class="language-bash">docker build --target cli -t agent-paranoid-android:cli .
+docker build --target generator-mcp -t agent-paranoid-android:generator-mcp .
+docker build --target trino-mcp -t agent-paranoid-android:trino-mcp .
+</code></pre>
+<p>Compose использует non-root UID/GID (по умолчанию 65532), read-only root, dropped capabilities, no-new-privileges, конечные CPU/memory/process/tmp limits и не публикует ports. Writable workspace/audit mounts и отдельные owner-only secret files готовятся администратором. CONTAINER_UID/GID не могут быть нулевыми. Не коммитьте workspace, audit и secrets.</p>
+<p>Generator получает /workspace и /audit без network. Он подходит для synthetic/local-file работы и не может молча получить DB capture access. Trino worker имеет outbound network, узкие HTTPS allowlists и read-only роль; generator workspace ему не монтируется.</p>
+<p>MCP client запускает docker compose run --rm -T generator-mcp через stdio. Это не HTTP endpoint. Deadline TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS по умолчанию 120 секунд; остальные budgets остаются независимыми.</p>
+<h2 id="audit">Audit и проверка образа<a class="headerlink" href="#audit" title="Permanent link">&para;</a></h2>
+<p>У workers разные ключи и audit mounts. Key file передаётся через /run/secrets, не image metadata или открытый client config. Перед rotation остановите соответствующего writer.</p>
+<p>Перед запуском проверьте digest через Cosign, GitHub attestation и SBOM по точным командам <a href="../../../operations/containers/#verify-a-published-image">оригинального руководства — English</a>. Они требуют опубликованного digest, не placeholder. Health проверяет только локальные dependencies, non-root, workspace и configuration; он не соединяется с Trino и не читает набор.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../ai_integration/" class="btn btn-neutral float-left" title="AI-клиент"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../reference/" class="btn btn-neutral float-right" title="Индекс справочника">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../../ai_integration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

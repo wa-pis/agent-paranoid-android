@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/ru/how-to/mcp/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>MCP-клиент - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "MCP-\u043a\u043b\u0438\u0435\u043d\u0442";
+        var mkdocs_page_input_path = "ru/how-to/mcp.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/ru/how-to/mcp/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">MCP-клиент</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Что получится в результате</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Предварительные требования</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1">Шаг 1. Создайте отдельную рабочую папку</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2">Шаг 2. Добавьте сервер в клиент</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-sdk">Шаг 3. Проверьте локальный SDK</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Проверка результата</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">Безопасная последовательность инструментов</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">Следующий шаг</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#160">Отдельные инструменты трансформации 1.6.0</a>
+    </li>
+    </ul></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Интеграции</li>
+      <li class="breadcrumb-item active">MCP-клиент</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/how-to/mcp.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../how-to/mcp/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="mcp-">Подключить MCP-клиент<a class="headerlink" href="#mcp-" title="Permanent link">&para;</a></h1>
+<p><a href="../../../how-to/mcp/">English</a> · Русский</p>
+<h2 id="_1">Для чего это нужно<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>MCP позволяет клиенту вызывать генератор и получать сводки и пути к артефактам. Разделяйте процесс генерации с файловым workspace и процесс чтения Trino.</p>
+<h2 id="_2">Что получится в результате<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Клиент видит инструменты generator; профиль и spec остаются внутри заданной папки.</p>
+<h2 id="_3">Предварительные требования<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Установлен extra mcp; для Trino также trino. Нужен MCP-клиент с поддержкой stdio (обмена сообщениями через стандартные потоки). Конкретный интерфейс клиента не проверен выполнением. Проверка SDK и регистрации выполняется локальными тестами.</p>
+<h2 id="_4">Пошаговое выполнение<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="1">Шаг 1. Создайте отдельную рабочую папку<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Создайте out/ru-mcp из корня проекта и узнайте её абсолютный путь.</p>
+<p><strong>Где выполнить:</strong> Терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python -c &quot;from pathlib import Path; p=Path('out/ru-mcp'); p.mkdir(parents=True, exist_ok=False); print(p.resolve())&quot;
+</code></pre>
+<p><strong>Что должно произойти:</strong> Напечатан абсолютный путь.</p>
+<p><strong>Как проверить:</strong> Это обычная новая папка; не домашняя папка целиком и не корень диска.</p>
+<p><strong>Если не получилось:</strong> Если папка есть, выберите новое имя. Не используйте широкую область доступа.</p>
+<h3 id="2">Шаг 2. Добавьте сервер в клиент<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> В конфигурации своего клиента замените оба placeholder на полученные реальные абсолютные пути. Путь command — исполняемый файл из вашего окружения.</p>
+<p><strong>Где выполнить:</strong> Локальный конфигурационный файл MCP-клиента.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-json">{
+  &quot;mcpServers&quot;: {
+    &quot;test-data-agent-generator&quot;: {
+      &quot;command&quot;: &quot;/ABSOLUTE/PATH/.venv-ru/bin/test-data-agent-mcp-generator&quot;,
+      &quot;env&quot;: {&quot;TEST_DATA_AGENT_WORKSPACE_ROOT&quot;: &quot;/ABSOLUTE/PATH/out/ru-mcp&quot;}
+    }
+  }
+}
+</code></pre>
+<p><strong>Что должно произойти:</strong> При запуске клиента поднимается generator stdio server.</p>
+<p><strong>Как проверить:</strong> В списке инструментов клиента есть plan_dataset и inspect_dataset_plan.</p>
+<p><strong>Если не получилось:</strong> На Windows command указывает на .venv-ru\Scripts\test-data-agent-mcp-generator.exe. Проверьте синтаксис клиента, extra и права; не вставляйте secrets в JSON.</p>
+<h3 id="3-sdk">Шаг 3. Проверьте локальный SDK<a class="headerlink" href="#3-sdk" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> Проверьте доступность generator tool registration.</p>
+<p><strong>Где выполнить:</strong> Терминал с активным окружением.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra mcp
+</code></pre>
+<p><strong>Что должно произойти:</strong> Проверка локального MCP проходит без запуска внешнего сервиса.</p>
+<p><strong>Как проверить:</strong> Код 0; это не проверка конфигурации конкретного клиента.</p>
+<p><strong>Если не получилось:</strong> Если missing_dependency, установите .[mcp] тем же интерпретатором.</p>
+<h2 id="_5">Проверка результата<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>Положите только разрешённый синтетический CSV в workspace. В клиенте сначала вызовите plan_dataset, затем inspect_dataset_plan; генерация должна ждать review точного spec. Инструменты, аргументы и JSON-примеры: <a href="../../../mcp_examples/">MCP Tools</a>.</p>
+<h2 id="_6">Типичные ошибки<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tool arguments failed validation</code></td>
+<td>Аргументы не соответствуют схеме</td>
+<td>Запросите tools/list; исправьте типы, не повторяйте чувствительный payload в чате.</td>
+</tr>
+<tr>
+<td><code>Invalid request parameters</code></td>
+<td>Некорректный MCP/JSON-RPC запрос</td>
+<td>Используйте совместимый SDK и корректную схему.</td>
+</tr>
+<tr>
+<td><code>unsafe filesystem path</code></td>
+<td>Путь вне workspace или symlink</td>
+<td>Перенесите разрешённый файл в обычную папку workspace.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">Безопасная последовательность инструментов<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<ol>
+<li><code>plan_dataset</code>: источник внутри workspace, новый agent workspace, count, seed, format.</li>
+<li><code>inspect_dataset_plan</code>: прочитать checklist и <code>review.current_spec_sha256</code>.</li>
+<li>Человек проверяет <code>dataset_spec.yaml</code> и именно этот fingerprint.</li>
+<li><code>approve_dataset_plan</code>: передать одобренный <code>reviewed_spec_sha256</code>.</li>
+<li>Проверить manifest и validation; сообщить только сводку и пути.</li>
+</ol>
+<p>Для Trino сначала <code>profile_table_safe</code>, затем <code>plan_trino_dataset</code> и тот же review. Другие этапы доступны отдельно: <code>profile_csv</code>, <code>infer_dataset_spec</code>, <code>generate_dataset</code>, <code>validate_dataset</code>. Наличие низкоуровневого инструмента не отменяет согласованную политику review.</p>
+<p>Trino <strong>default aggregate-only</strong> инструменты возвращают метаданные без исходных литералов. Отдельный <strong>explicit opt-in</strong> <code>run_safe_select</code> включается через <code>TRINO_ENABLE_SAFE_SELECT</code>; он маскирует строки, но может сохранять нечувствительные нестроковые значения источника. Такой результат не является анонимным или source-free; его нельзя передавать LLM или использовать как сгенерированные данные. Не включайте этот инструмент для описанного workflow.</p>
+<p>Generator ограничивает пути workspace, но это не sandbox процесса. Используйте отдельного системного пользователя/контейнер для недоверенных клиентов. Значения по умолчанию: frame 1 MiB, response 4 MiB, 32 active requests; Trino дополнительно ограничивает работу и параллельность. См. <a href="./">границы MCP</a> и <a href="../../../operations/audit-logging/">аудит</a>.</p>
+<h2 id="_8">Следующий шаг<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p><a href="../../ai_integration/">AI workflow</a>.</p>
+<h2 id="160">Отдельные инструменты трансформации 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>
+<p>Generator MCP также регистрирует <code>execute_transformation</code>, <code>common_transformation</code> и <code>configured_query_session</code>. Они возвращают ограниченные метаданные и пути, не строки. Наличие инструмента не разрешает обработку набора или сохранение source values. MCP и агент не выдают preservation receipts: человек делает это отдельно в local controlling-TTY. Capture использует согласованные read-only scopes; исполнение должно потреблять тот же frozen batch без повторного подключения. См. <a href="../transformation/">трансформацию</a> и <a href="./">MCP contract</a>.</p>
+<p><code>TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS</code> по умолчанию 120 секунд задаётся server-side; tool arguments его не расширяют. Независимые лимиты генерации, ввода/вывода и правил остаются в силе.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../transformation/" class="btn btn-neutral float-left" title="Трансформация локальных данных"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../ai_integration/" class="btn btn-neutral float-right" title="AI-клиент">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../transformation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../ai_integration/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

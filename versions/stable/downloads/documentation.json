@@ -1,7 +1,7 @@
 {
   "package_version": "1.6.0",
   "package_commit": "258c035c22408becf17ab090635710a50dda8ccc",
-  "documentation_revision": "f3f33e6a719a7a35d17c70ce449c4e620e685306",
+  "documentation_revision": "bc4ff8693833169f3b8f6993528b176eaa8da49d",
   "status": "Maintained stable guidance",
   "chapters": [
     "index.md",
@@ -21,13 +21,31 @@
     "concepts/profiles-and-specs.md",
     "concepts/safety-model.md",
     "operations/troubleshooting.md",
-    "known-issues.md"
+    "known-issues.md",
+    "ru/index.md",
+    "ru/getting-started/installation.md",
+    "ru/getting-started/first-csv.md",
+    "ru/getting-started/related-tables.md",
+    "ru/getting-started/review-output.md",
+    "ru/how-to/business-rules.md",
+    "ru/how-to/postgresql.md",
+    "ru/how-to/trino.md",
+    "ru/how-to/transformation.md",
+    "ru/how-to/mcp.md",
+    "ru/ai_integration.md",
+    "ru/operations/containers.md",
+    "ru/reference/index.md",
+    "ru/concepts/choosing-an-approach.md",
+    "ru/concepts/profiles-and-specs.md",
+    "ru/concepts/safety-model.md",
+    "ru/operations/troubleshooting.md",
+    "ru/known-issues.md"
   ],
-  "index_sha256": "c7fbc30e94038094473be42918e891e6ebe4d4a4718359e7997cb3ba0866e251",
+  "index_sha256": "bf2557f2aee096800b95f710b3ecdf7be6859a9f8e9fcf18ebfbdfd9059b3f9b",
   "sha256": {
-    "handbook.pdf": "ff1a53a0408c112615673540198c3f215f258ba392dd62940d8c5ec64cbcd0e7",
-    "handbook.html": "ce15d4864092d5340780f01176df8afa80cd1bda848ecf808f8eb3b8c5d19611",
-    "handbook.md.zip": "211ba373fca337800312fd50c2aa9edede29817a81b1c5d63ffb91b353f369b3",
-    "site.zip": "8383390149527ff1c486440301d27a73e7c278a4daeeb01044e6fe65820c0c89"
+    "handbook.pdf": "0b88926a918dad1da786ba63a67b9a90024d966a4aba31578ff5263edb1cc454",
+    "handbook.html": "72712c87e4e5680e9aa317e5dadf09794d3c3ff554a1b64cc2f90fd885480bd3",
+    "handbook.md.zip": "d566324ee446d58fb274ad75d995a57536a590ebce8aa14e202b83e6f275d583",
+    "site.zip": "0cbb4e318ff5e6d07416754718f2be7dee3f24917fed956c1d92a8c6d9f8ee2d"
   }
 }

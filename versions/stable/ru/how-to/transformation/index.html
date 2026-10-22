@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/versions/1.6.0/ru/how-to/transformation/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Трансформация локальных данных - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+        <link href="../../../css/version-select.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0422\u0440\u0430\u043d\u0441\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f \u043b\u043e\u043a\u0430\u043b\u044c\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445";
+        var mkdocs_page_input_path = "ru/how-to/transformation.md";
+        var mkdocs_page_url = "/agent-paranoid-android/versions/1.6.0/ru/how-to/transformation/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Трансформация локальных данных</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Что получится в результате</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">Предварительные требования</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-policy">Шаг 1. Подготовьте вымышленный источник и policy</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-review">Шаг 2. Получите review без значений</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3">Шаг 3. Выполните только явные замены</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">Проверка результата</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">Когда нужен человек</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_9">Следующий шаг</a>
+    </li>
+    </ul></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Инструкции</li>
+      <li class="breadcrumb-item active">Трансформация локальных данных</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/how-to/transformation.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../how-to/transformation/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Трансформация локальных данных<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../how-to/transformation/">English</a> · Русский</p>
+<h2 id="_2">Для чего это нужно<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Используйте эту opt-in операцию, когда нужна обработка один к одному по явной policy: drop, synthesize, substitute, replace_text и разрешённое preserve. Выход имеет смешанное происхождение (mixed-origin); его нельзя выдавать за полностью синтетический или анонимный набор.</p>
+<h2 id="_3">Что получится в результате<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>В примере — value-free review, точный snapshot digest и новая локальная таблица с двумя явно заданными заменами. Сохранение source values и issuance receipt здесь не выполняются.</p>
+<h2 id="_4">Предварительные требования<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Базовая установка 1.6.0, активное окружение, терминал в корне checkout на macOS/Linux. Папки out/ru-transform и out/ru-transform-output не существуют. Только вымышленные данные ниже. Политика и schema fingerprint рассчитаны именно для этих bytes и entity items; для другого источника они не подходят. Bash heredoc на Windows заменяется локальным Python-файлом; Windows-выполнение не проверено.</p>
+<h2 id="_5">Пошаговое выполнение<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="1-policy">Шаг 1. Подготовьте вымышленный источник и policy<a class="headerlink" href="#1-policy" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> запишите три небольших локальных файла без реальных данных.</p>
+<p><strong>Где выполнить:</strong> терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python - &lt;&lt;'PYCODE'
+from pathlib import Path
+p = Path('out/ru-transform')
+p.mkdir(parents=True, exist_ok=False)
+(p / 'items.csv').write_bytes(b'status\nready\nwaiting\n')
+(p / 'map.csv').write_bytes(b'old,new\nready,done\nwaiting,pending\n')
+(p / 'policy.yaml').write_text(&quot;&quot;&quot;schema_version: '0.1'
+schema_fingerprint: bcc0d673c3991184ddadf0acdffeb759fd65f53b4ec65b6367bc3cfd5fdb72cc
+seed: 7
+fields:
+  - entity: items
+    field: status
+    sensitivity: non_sensitive
+    behavior:
+      action: substitute
+      mapping:
+        kind: csv
+        path: map.csv
+        source_columns: [old]
+        replacement_columns: [new]
+&quot;&quot;&quot;, encoding='utf-8')
+PYCODE
+</code></pre>
+<p><strong>Что должно произойти:</strong> создана ограниченная policy с явными replacement values в локальном mapping. Ни одна ветка не разрешает preserve fallback.</p>
+<p><strong>Как проверить:</strong> файлы в одной папке; map.csv задаётся относительно policy, не текущего shell.</p>
+<p><strong>Если не получилось:</strong> выберите новую папку; не подставляйте неизвестный источник под этот fingerprint.</p>
+<h3 id="2-review">Шаг 2. Получите review без значений<a class="headerlink" href="#2-review" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> прочитайте fixed snapshot; сохраните JSON только в новый файл.</p>
+<p><strong>Где выполнить:</strong> корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent transform-review out/ru-transform/items.csv out/ru-transform/policy.yaml --trace --json &gt; out/ru-transform/review.json
+</code></pre>
+<p><strong>Что должно произойти:</strong> result.status=review_only; review содержит решения полей, digest и ordinal trace без literals.</p>
+<p><strong>Как проверить:</strong> код 0; snapshot_sha256 имеет 64 hex-символа; receipt не создан.</p>
+<p><strong>Если не получилось:</strong> не используйте перенаправленный JSON после ненулевого кода. Проверьте policy, schema, пути и бюджеты; не выдавайте новый hash за старое approval.</p>
+<h3 id="3">Шаг 3. Выполните только явные замены<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
+<p><strong>Что сделать:</strong> используйте digest только что проверенного фиксированного плана. Этот пример не содержит preserve, поэтому preservation receipt не нужен.</p>
+<p><strong>Где выполнить:</strong> корень checkout; policy, mapping и source после review не менялись.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python - &lt;&lt;'PYCODE'
+import json
+import subprocess
+from pathlib import Path
+p = Path('out/ru-transform')
+r = json.loads((p / 'review.json').read_text())['result']
+assert r['status'] == 'review_only'
+subprocess.run([
+    'test-data-agent', 'transform-execute', str(p / 'items.csv'),
+    str(p / 'policy.yaml'), 'out/ru-transform-output',
+    '--snapshot-sha256', r['snapshot_sha256'],
+    '--max-total-input-bytes', '8192', '--max-output-bytes', '8192', '--json',
+], check=True)
+PYCODE
+</code></pre>
+<p><strong>Что должно произойти:</strong> создан mixed-origin bundle; summary содержит transformation_completed и provenance, не строки.</p>
+<p><strong>Как проверить:</strong> код 0; digest соответствует review; replacement counters отражают две ячейки, original — ноль. Не требуйте synthetic=true от transformation manifest.</p>
+<p><strong>Если не получилось:</strong> при изменении любого bound input нужен новый review; не переиспользуйте receipt или digest. Cleanup-incomplete требует локальной проверки staging/output, а не overwrite.</p>
+<h2 id="_6">Проверка результата<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>Прочитайте value-free report/provenance созданного bundle. Подтвердите ноль original и две replacement ячейки. Не отправляйте transformed rows в AI: explicit mapping может законно совпадать с другими source values, включая sensitive permutations, а mixed-origin output остаётся потенциально чувствительным.</p>
+<h2 id="_7">Типичные ошибки<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stale snapshot / invalid transformation request</td>
+<td>После review изменились source/policy/mapping bytes</td>
+<td>Получите новый review; сохранение требует нового local approval</td>
+</tr>
+<tr>
+<td>Требуется receipt</td>
+<td>Выбрано preserve либо preserve fallback</td>
+<td>Остановитесь для человека в local controlling-TTY</td>
+</tr>
+<tr>
+<td>Cleanup incomplete</td>
+<td>Не подтверждено полное удаление staging/output</td>
+<td>Проверьте состояние локально; не перезаписывайте результат</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">Когда нужен человек<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p><code>transform-approve SOURCE POLICY RECEIPT --snapshot-sha256 SHA</code> выдаёт receipt только после свежего ввода APPROVE в управляющем локальном терминале. Агент и MCP не могут вводить это за человека, подменять подтверждение флагом/pipe или имитировать терминал. Receipt привязан к exact source, policy, classification и mapping bytes. Sensitive/unknown/disputed поля не разрешены для preserve; DECIMAL preservation по умолчанию заблокирован. Локальный wizard <code>transform-review --decide</code> и SAVE сохраняют policy, но не создают receipt.</p>
+<p><code>transform-batch</code> объединяет минимум два входа и независимо проверенный validation spec. create сохраняет references/policies, review выдаёт digest, approve — local-only receipt, validate проверяет временный выход, execute может сохранить новый direct-child bundle. Обязательны явные input/review/output caps согласно справке. <code>common_transformation</code> MCP использует ту же границу; <code>configured_query_session</code>/<code>transform-batch query-execute</code> отдельно захватывают разрешённые SQL results один раз и потребляют frozen batch без reconnect. Нет MCP receipt issuer.</p>
+<h2 id="_9">Следующий шаг<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p><a href="../../reference/cli/">Полная справка CLI</a>, <a href="../../../reference/cli/#common-profile-workflow-16-rc">публичный контракт</a> и <a href="../../concepts/safety-model/">границы безопасности</a>. Локальный review и explicit replacement пример проверены; интерактивный preserve и live SQL session в этом аудите не выполнялись.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../trino/" class="btn btn-neutral float-left" title="Профилирование Trino"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../mcp/" class="btn btn-neutral float-right" title="MCP-клиент">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../trino/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../mcp/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+      <script src="../../../js/version-select.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
