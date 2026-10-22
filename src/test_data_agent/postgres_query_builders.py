@@ -94,7 +94,7 @@ def build_primary_keys_query(
     columns = _allowed_columns_for_table(config, schema, table)
     return PostgresQuery(
         "SELECT con.conname AS constraint_name, a.attname AS column_name, "
-        "key.position AS ordinal_position "
+        "key.position AS ordinal_position, cardinality(con.conkey) AS key_column_count "
         "FROM pg_catalog.pg_constraint AS con "
         "JOIN pg_catalog.pg_class AS c ON c.oid = con.conrelid "
         "JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace "

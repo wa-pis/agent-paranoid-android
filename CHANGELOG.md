@@ -25,6 +25,11 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- PostgreSQL profiling recognizes declared integer/string primary keys without
+  an `id` suffix and generates fresh synthetic keys. Composite keys, including
+  partially allowlisted keys, reject before aggregate scans; unsupported native
+  key types require a reviewed specification.
+
 - CSV profiling no longer admits NaN, infinity or overflowing exponents as
   numeric statistics; mixed columns retain conservative type and privacy checks.
 - Generation option errors now explain that valid, edge and load-test modes

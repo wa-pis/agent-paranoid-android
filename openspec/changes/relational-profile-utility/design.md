@@ -13,3 +13,11 @@ pass the explicit spec. Any utility report must make that distinction visible.
 Add explicit per-entity counts rather than repurposing --count as a scale factor.
 Review EAV conditional-rule and pivot requirements as separate capabilities; the
 intake does not make unimplemented domain operations mandatory in generation.
+
+R2 implementation uses the existing catalog query to return total key arity
+without expanding column authorization. Composite keys fail before aggregate
+queries, including partial projections. Declared scalar INTEGER/STRING keys use
+the existing synthetic identifier distribution; sensitivity and native type are
+retained. Other types reject with a reviewed-spec recovery rather than generating
+string tokens under an incompatible native type. No composite-key model or
+source-key mapping is introduced. Existing saved profiles require reprofiling.

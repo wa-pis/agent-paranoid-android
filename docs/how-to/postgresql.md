@@ -37,6 +37,19 @@ wildcard into a frozen, sorted explicit-column snapshot. Profiling queries
 enumerate quoted column identifiers; they never execute `SELECT *`. Bare,
 schema-wide, table-name, embedded, or over-budget wildcards fail closed.
 
+Declared single-column integer and string primary keys are recognized regardless
+of their name (for example, `ticket_no` or `record_code`). Generation uses fresh
+synthetic identifiers; it does not preserve source keys. Sensitive key fields
+retain their sensitivity classification. Reprofile saved artifacts to obtain
+this metadata behavior.
+
+Composite primary keys are currently unsupported: profiling rejects them before
+aggregate scans, including when the column allowlist exposes only part of the
+key. It never treats one component as a complete unique key. Other primary-key
+types require an independently reviewed generation specification. Review the
+complete relational constraints explicitly when authoring that specification;
+automatic inference does not support composite uniqueness.
+
 If a platform portal supplies a JDBC endpoint, replace only the separate host,
 port, database, and TLS settings with a credential-free JDBC-style URL:
 

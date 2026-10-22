@@ -134,6 +134,7 @@ class SyntheticPostgresResults:
                 return [
                     {
                         "constraint_name": "customers_pkey",
+                        "key_column_count": 1,
                         "column_name": "id",
                         "ordinal_position": 1,
                     }
@@ -410,3 +411,125 @@ def test_category_null_rejection_sentinel_prevents_table_profile():
     with pytest.raises(ValueError, match="bounded scalars"):
         PostgresProfiler(postgres_config(), fetch).profile(local_category_fields=[
             LocalCategoryField(entity="warehouse.crm.customers", field="tier")])
+
+
+def declared_key_profiler(
+    key_rows: list[dict[str, object]], *, key_name: str = "ticket_no",
+    key_type: str = "bigint", include_tier: bool = True,
+) -> tuple[PostgresProfiler, SyntheticPostgresResults]:
+    results = SyntheticPostgresResults(omit_orders=True)
+    allowed_names = {key_name, "tier"} if include_tier else {key_name}
+    config = replace(
+        postgres_config(), allowed_schemas=frozenset({"crm"}),
+        allowed_tables=frozenset({"crm.customers"}),
+        allowed_columns=frozenset(f"crm.customers.{name}" for name in allowed_names),
+    )
+
+    def fetch(query: PostgresQuery) -> list[dict[str, object]]:
+        if "con.contype = 'p'" in query.sql:
+            results.queries.append(query)
+            return key_rows
+        if "con.contype = 'f'" in query.sql:
+            results.queries.append(query)
+            return []
+        rows = results.fetch(query)
+        if "pg_catalog.format_type" in query.sql:
+            return [
+                {**row, "column_name": key_name, "data_type": key_type}
+                if row["column_name"] == "id" else row
+                for row in rows
+                if row["column_name"] == "id" or include_tier
+            ]
+        return rows
+
+    return PostgresProfiler(config, fetch), results
+
+
+@pytest.mark.parametrize(
+    "name,data_type,sensitive",
+    [("ticket_no", "bigint", False), ("record_code", "text", False), ("email", "text", True)],
+)
+def test_declared_primary_key_generates_without_identifier_name_suffix(
+    name: str, data_type: str, sensitive: bool,
+) -> None:
+    from test_data_agent.generation.entity_generator import generate_dataset
+    from test_data_agent.generation.planner import infer_dataset_spec
+    from test_data_agent.validation.reconciliation import validate_dataset
+
+    profiler, _ = declared_key_profiler(
+        [{"column_name": name, "ordinal_position": 1, "key_column_count": 1}],
+        key_name=name, key_type=data_type,
+    )
+    profile = profiler.profile()
+    entity = profile.entities[0]
+    key = entity.field(name)
+    assert entity.primary_key_candidates == [name]
+    assert key.is_identifier
+    assert key.sensitive is sensitive
+    assert key.distribution["kind"] == "synthetic_identifier"
+    spec = infer_dataset_spec(profile, count=7)
+    assert spec.entities[0].primary_key == name
+    rows = generate_dataset(spec, seed=42)
+    assert rows == generate_dataset(spec, seed=42)
+    assert len({row[name] for row in rows[entity.name]}) == 7
+    assert validate_dataset(rows, spec).valid
+    if data_type == "text":
+        assert all(str(row[name]).startswith("synthetic_") for row in rows[entity.name])
+
+
+@pytest.mark.parametrize("include_tier,position", [(True, 1), (False, 1), (False, 2)])
+def test_composite_primary_key_rejects_before_aggregates(
+    include_tier: bool, position: int,
+) -> None:
+    key_rows: list[dict[str, object]] = [
+        {"column_name": "ticket_no", "ordinal_position": position, "key_column_count": 2},
+    ]
+    if include_tier:
+        key_rows.append({"column_name": "tier", "ordinal_position": 2, "key_column_count": 2})
+    profiler, results = declared_key_profiler(key_rows, include_tier=include_tier)
+    with pytest.raises(PostgresProfileError, match="composite primary keys are unsupported"):
+        profiler.profile()
+    assert not any("count(*)" in query.sql for query in results.queries)
+
+
+@pytest.mark.parametrize("count", [None, True, 0, -1, 1.5, "private-value"])
+def test_invalid_primary_key_size_rejects_without_aggregates_or_value_disclosure(
+    count: object,
+) -> None:
+    profiler, results = declared_key_profiler(
+        [{"column_name": "ticket_no", "ordinal_position": 1, "key_column_count": count}],
+    )
+    with pytest.raises(PostgresProfileError) as error:
+        profiler.profile()
+    assert "private-value" not in str(error.value)
+    assert not any("count(*)" in query.sql for query in results.queries)
+
+
+def test_unsupported_native_primary_key_type_requires_reviewed_spec() -> None:
+    profiler, _ = declared_key_profiler(
+        [{"column_name": "ticket_no", "ordinal_position": 1, "key_column_count": 1}],
+        key_type="boolean",
+    )
+    with pytest.raises(PostgresProfileError, match="primary-key type is unsupported"):
+        profiler.profile()
+
+
+@pytest.mark.parametrize("key_rows", [
+    [{"column_name": "ticket_no", "ordinal_position": 2, "key_column_count": 1}],
+    [{"column_name": "unauthorized", "ordinal_position": 1, "key_column_count": 1}],
+    [
+        {"column_name": "ticket_no", "ordinal_position": 1, "key_column_count": 1},
+        {"column_name": "ticket_no", "ordinal_position": 1, "key_column_count": 1},
+    ],
+    [
+        {"column_name": "ticket_no", "ordinal_position": 1, "key_column_count": 1},
+        {"column_name": "tier", "ordinal_position": 1, "key_column_count": 1},
+    ],
+])
+def test_inconsistent_primary_key_metadata_fails_closed_before_aggregates(
+    key_rows: list[dict[str, object]],
+) -> None:
+    profiler, results = declared_key_profiler(key_rows)
+    with pytest.raises(PostgresProfileError, match="primary-key metadata is invalid"):
+        profiler.profile()
+    assert not any("count(*)" in query.sql for query in results.queries)
