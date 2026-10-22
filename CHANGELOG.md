@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Versioned documentation on GitHub Pages using mike, with separate development
+  guidance and PDF, standalone HTML, Markdown and offline-site downloads.
+  Documentation revisions remain distinct from package versions.
 - Complete annotated business-rules example with a runnable DatasetSpec,
   condition/formula/aggregate/scenario reference and a generated standalone
   JSON Schema checked against the runtime contract.
@@ -16,9 +19,14 @@ All notable changes to this project are documented here.
   exact-spec review, recovery and local transformation approval. Wheels now
   include prompt templates alongside complete skill metadata and references;
   see [agent guidance](prompts/README.md).
+- Shorter task-oriented documentation, a dedicated transformation guide, and
+  historical release/RC material behind a maintenance index. Existing URLs and
+  legacy anchors remain available.
 
 ### Security
 
+- Update the locked OpenTelemetry API to 1.45.1 to resolve CVE-2026-114603
+  in bounded tracestate parsing; retain the existing optional dependency ranges.
 - Update the locked certifi CA bundle to 2026.10.19 to resolve
   PYSEC-2026-4320; retain verified TLS and the existing dependency ranges.
 

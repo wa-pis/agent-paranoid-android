@@ -17,8 +17,10 @@ lists known discrepancies without inventing new release blockers.
 
 Before proposing a release, follow the [Release Process](release.md).
 
-For the current source/output, business-rule and MCP work, complete the planned
-[Final Acceptance Matrix](acceptance-matrix.md) after implementation stabilizes.
-It separates existing unit coverage from installed CLI/Python/MCP, option,
-permission, container and disposable-database acceptance. OpenSpec change
-`cross-interface-acceptance` tracks the outstanding campaign; it is not yet run.
+The finite installed-interface and fictional transformation/session acceptance
+for stable 1.6.0 completed with [recorded limits](release-evidence-1.6.0.md).
+Use the [acceptance matrix](acceptance-matrix.md) to plan new changes; prior
+results do not approve later code or any dataset.
+
+For versioned builds and offline exports, see
+[Publishing Documentation](development/documentation.md).

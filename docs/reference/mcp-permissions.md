@@ -3,7 +3,7 @@
 Use this reference to decide which MCP tools a client may call and which local
 resources each server process needs. Start with the
 [generator-only quickstart](../how-to/mcp.md#generator-only-quickstart).
-The tables describe the current 1.6 RC implementation; installed versions can
+The tables describe stable `1.6.0`; installed versions can
 expose fewer tools. Check the installed version and its `tools/list` response.
 Discovery is an inventory, not authorization to use a dataset or activate a
 gated transformation extension.

@@ -9,11 +9,10 @@ a `DatasetSpec`, generate reproducible datasets, and validate the result.
 Stable `1.6.0` is the recommended release. Its signed source, packages and
 containers passed [public verification](docs/release-evidence-1.6.0.md).
 
-This promotion
-retains the accepted RC5 runtime; [RC5 acceptance](docs/acceptance-evidence-1.6.0rc5.md)
-and [RC5 publication evidence](docs/release-evidence-1.6.0rc5.md) remain historical
-records, not verification of the new stable commit. Read the
-[documentation](https://wa-pis.github.io/agent-paranoid-android/) for full workflows.
+Read the [documentation](https://wa-pis.github.io/agent-paranoid-android/)
+for task guides, [offline downloads](docs/downloads.md), and
+[versioned documentation](docs/versions.md). Historical evidence lives in
+[History And Maintenance](docs/history.md).
 
 See the [source/output matrix](docs/reference/source-output-matrix.md) for the
 common reviewed DatasetSpec, field types, settings and business-rule contract.
@@ -86,13 +85,10 @@ before regenerating existing fixtures.
 
 ## Development
 
-The accepted RC5 runtime includes saved-profile transformation CLI/MCP workflows;
-stable 1.6.0 retains them. See the [CLI contract](docs/reference/cli.md#common-profile-workflow-16-rc)
-and [acceptance limits](docs/release-evidence-1.6.0.md).
-The finite fictional transformation/session campaign completed for stable 1.6.0;
-see its [evidence and limits](docs/release-evidence-1.6.0.md).
-Registration grants no dataset permission: preservation still requires exact local
-approval. Ordinary generation remains source-free; agents cannot issue that approval.
+For selective replacement and preservation, use
+[Transform Local Data](docs/how-to/transformation.md). Registration grants no
+dataset permission: preservation requires exact local approval, which agents
+cannot issue. Ordinary generation remains source-free.
 
 ```bash
 python3 -m pip install "uv==0.11.23"
@@ -127,10 +123,8 @@ python -c 'from importlib.resources import files; print(files("test_data_agent")
 Point the agent at the selected skill directory using its own configuration;
 installing this package does not silently register skills with other agents.
 
-Details for reviewed decimal inference, rule auditing and numeric profile limits:
-[RC4 feedback corrections](docs/rc4-external-feedback.md).
-
 Business rules can travel in `DatasetSpec.business_rules` across Python, CLI, MCP,
 approved agent workspaces and every output format. DECIMAL formulas and aggregate mappings
 use exact arithmetic with one target-scale HALF_UP rounding. See
-[portable business rules](docs/rc4-external-feedback.md#business-rules-across-interfaces).
+[business rules](docs/how-to/business-rules.md) and the
+[source/output contract](docs/reference/source-output-matrix.md).

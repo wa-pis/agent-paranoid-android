@@ -1,11 +1,8 @@
 # Generation Contract Corrections
 
-The original generation corrections below describe an earlier upgrade, not the
-current release target. Candidate `1.6.0rc5` is published and publicly verified;
-see its [release evidence](../release-evidence-1.6.0rc5.md). The owner has authorized
-stable `1.6.0` as a version/documentation-only promotion of that runtime. Stable `1.6.0` has completed
-[public verification](../release-evidence-1.6.0.md) and is the recommended release. The changes below are retained in the
-promotion; its package version does not change DatasetSpec schema `1.1`.
+These corrections are included in stable `1.6.0`. Regenerate affected fixtures
+and review differences when upgrading. Package version and DatasetSpec schema
+version are separate; the current specification schema is `1.1`.
 
 ## Changed Results
 
@@ -35,7 +32,7 @@ rule mutations are checked again before publication. Failures preserve existing
 output and do not publish a new successful bundle.
 
 Explicit mixed and negative generation still publish controlled-invalid data
-with validation evidence. RC5 Parquet uses explicitly marked scalar columns
+with validation evidence. Parquet uses explicitly marked scalar columns
 when intentionally malformed cells cannot fit native Arrow types. The bundle
 reader restores those cells for validation; consumers reading Parquet directly
 must inspect the `apa.scalar_encoding` field metadata. Ordinary valid-mode

@@ -1,70 +1,16 @@
 # Agent Paranoid Android
 
-Agent Paranoid Android generates deterministic synthetic test datasets from
-CSV structure, safe profile metadata, or a reviewed `DatasetSpec`.
+Create repeatable test datasets with useful relationships and business rules,
+without copying source rows. Start with a file, safe database metadata, or an
+explicit specification, then review the plan before generating fresh values.
 
-It is designed for cases where realistic schema, relationships, distributions,
-and business rules matter, but source rows and raw PII must not appear in the
-generated output.
+<a id="project-status"></a>
 
-Stable `1.6.0` is the recommended release. Its signed source, packages and
-containers passed [public verification](release-evidence-1.6.0.md).
-
-Stable `1.6.0` promotes the accepted RC5 runtime without new
-behavior or dependency changes. Review the
-[migration notes](reference/generation-contract-migration.md) before regenerating
-existing fixtures.
-
-Published RC5 includes the [RC4 feedback corrections](rc4-external-feedback.md),
-shared source/output contract and MCP permission reference. Its
-[acceptance evidence](acceptance-evidence-1.6.0rc5.md),
-[publication evidence](release-evidence-1.6.0rc5.md) and
-[release status](rc5-release-status.md) remain historical candidate records;
-they do not verify the new stable commit.
-
-## Choose Your Starting Point
-
-| I have | Start here |
-| --- | --- |
-| One CSV file | [First CSV Dataset](getting-started/first-csv.md) |
-| A folder of related CSV files | [Related Tables](getting-started/related-tables.md) |
-| A PostgreSQL database | [PostgreSQL Workflow](how-to/postgresql.md) |
-| A Trino coordinator | [Trino Workflow](how-to/trino.md) |
-| A safe profile or `DatasetSpec` | [Profiles And Specs](concepts/profiles-and-specs.md) |
-
-## Advanced Integrations
-
-[AI](ai_integration.md), [MCP](how-to/mcp.md),
-[Containers](operations/containers.md), and
-[Custom providers](how-to/custom-advisor-provider.md)
-
-## The Safe Workflow
-
-1. Profile source structure and bounded aggregate metadata.
-2. Review the inferred `DatasetSpec` and any business rules.
-3. Generate fresh values from an explicit seed.
-4. Validate schema, relationships, constraints, and business rules.
-5. Review `generation_manifest.json` before accepting the dataset.
-
-The generated bundle reports:
-
-```json
-{
-  "synthetic": true,
-  "source_rows_copied": false,
-  "seed": 12345,
-  "validation_valid": true
-}
-```
-
-These fields are evidence produced by deterministic checks. They are not a
-replacement for reviewing the inferred specification when a new data domain is
-introduced.
+Stable `1.6.0` is the recommended release.
+Use the CLI below or the runnable
+[Python API example](https://github.com/wa-pis/agent-paranoid-android/tree/v1.6.0/examples/python_api).
 
 ## Five-Minute Check
-
-Install the exact stable release and run the
-self-contained smoke test:
 
 ```bash
 python3 -m pip install "agent-paranoid-android==1.6.0"
@@ -72,48 +18,67 @@ test-data-agent doctor
 test-data-agent demo --output out/demo
 ```
 
-A healthy installation ends with:
+The demo uses a bundled fictional fixture. After installation it needs no
+network, database or AI provider. A healthy installation reports:
 
 ```text
 quickstart smoke: ok
 doctor passed
 ```
 
-Continue with [First CSV Dataset](getting-started/first-csv.md) to create and
-inspect a complete synthetic output bundle.
+## Choose Your Starting Point
 
-Use `--json` on core commands for one versioned automation document, or
-`test-data-agent completion SHELL` to generate completion for bash, zsh, fish,
-or PowerShell from the installed command inventory.
+| I have | Start here |
+| --- | --- |
+| One CSV file | [First CSV Dataset](getting-started/first-csv.md) |
+| Related CSV files | [Related Tables](getting-started/related-tables.md) |
+| PostgreSQL | [PostgreSQL Workflow](how-to/postgresql.md) |
+| Trino | [Trino Workflow](how-to/trino.md) |
+| A safe profile or a plan | [Profiles And Specs](concepts/profiles-and-specs.md) |
 
-## Safety Boundaries
+<a id="the-safe-workflow"></a>
 
-The project intentionally refuses:
+## Generation Or Transformation?
 
-- copying or shuffling source rows;
-- raw PII or secret values in profiles and rule literals;
-- unrestricted SQL or write operations through Trino tools;
-- output paths that overwrite source input;
-- unbounded input, output, rule, query, or generation work.
+**Synthetic generation** creates new rows from a reviewed `DatasetSpec`. Use it
+for valid, boundary, load or controlled-invalid test cases. The normal process
+is profile, review the specification, generate, validate, then
+[review the output](getting-started/review-output.md).
 
-Exact source literals are disabled by default. A field-scoped local allowlist
-may retain only a reviewed bounded non-sensitive business enum or constant in
-local profiles, deterministic generation, and local SQL export. It never
-authorizes source rows, PII, secrets, identifiers, free text, external-provider
-payloads, or default MCP responses.
+**Selective transformation** keeps one-to-one correspondence with input rows
+and applies explicit field actions. Its result has mixed origin. Source-value
+preservation requires a non-sensitive field decision and fresh local-terminal
+approval of the exact inputs and plan; agents and MCP cannot issue it.
+Start with [Transform Local Data](how-to/transformation.md).
 
-Read [Safety Model](concepts/safety-model.md) before connecting the project to
-production-adjacent data or an AI client.
+## Rules And Formats
 
-## Project Status
+Use [business rules](how-to/business-rules.md) for formulas, field conditions,
+foreign keys and aggregate checks. The
+[source/output matrix](reference/source-output-matrix.md) shows routes to CSV,
+JSON, Parquet and generated SQL. SQL export writes a file, not a database.
 
-Stable `1.6.0` uses `DatasetSpec` as the generation and
-validation contract across Python, CLI, MCP, approved agent workflows and all
-output formats. It retains accepted RC1–RC5 behavior, including exact DECIMAL
-rules, `edge` and `load_test` modes, folder replacement with rollback and shared
-business-rule validation. Promotion changes only version and release metadata;
-its exact stable commit passed fresh release checks and public verification.
+## Advanced Integrations
 
-Selective transformation remains a separate opt-in mixed-origin workflow.
-Registration does not approve a dataset or complete the broader
-[transformation/session campaign](acceptance-evidence-1.6.0rc5.md#coverage-limits-and-unresolved-steps).
+[AI](ai_integration.md), [MCP](how-to/mcp.md),
+[Containers](operations/containers.md), and
+[Custom providers](how-to/custom-advisor-provider.md)
+
+<a id="safety-boundaries"></a>
+
+## Before Sharing A Dataset
+
+Review the specification, validation reports and `generation_manifest.json`.
+For a valid synthetic dataset expect `synthetic: true`,
+`source_rows_copied: false` and `validation_valid: true`.
+These checks do not certify statistical anonymity or detect every sensitive
+value. Explicit mixed/negative datasets can intentionally fail validation.
+
+Database access remains allowlisted, read-only and bounded. AI receives safe
+metadata, never raw PII, secrets or source rows. See the
+[Safety Model](concepts/safety-model.md) and
+[Troubleshooting](operations/troubleshooting.md).
+
+For offline reading use [Downloads](downloads.md). For another release use
+[Documentation Versions](versions.md). Maintainer and release records live in
+[History And Maintenance](history.md).
