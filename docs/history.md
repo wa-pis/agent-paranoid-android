@@ -1,5 +1,7 @@
 # History And Maintenance
 
+English · [Русский](ru/history.md)
+
 This section is for release investigation and contributors. To use the current
 package, start with [the user guide](index.md). Historical evidence retains its
 original source, version and acceptance scope; it does not approve later code,

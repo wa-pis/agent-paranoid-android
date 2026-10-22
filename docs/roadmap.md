@@ -1,5 +1,7 @@
 # Roadmap
 
+English · [Русский](ru/roadmap.md)
+
 These are directions, not committed dates. Priorities follow user feedback and
 confirmed defects. Stable `1.6.0` is already published and publicly verified;
 completed work belongs in [release history](history.md), not this list.

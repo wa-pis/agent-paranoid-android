@@ -1,5 +1,7 @@
 # Add Business Rules
 
+English · [Русский](../ru/how-to/business-rules.md)
+
 Use structured YAML or JSON when generated rows must satisfy domain rules.
 The deterministic rule engine applies and validates the rules; an LLM is not
 the enforcement mechanism.

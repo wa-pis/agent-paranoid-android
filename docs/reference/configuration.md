@@ -1,5 +1,7 @@
 # Configuration
 
+English · [Русский](../ru/reference/configuration.md)
+
 Defaults are conservative. Raise limits only after reviewing expected data
 volume, available resources, and the trust level of the input.
 

@@ -1,5 +1,7 @@
 # Dataset Profile And Spec Reference
 
+English · [Русский](ru/dataset_profile_and_spec.md)
+
 This document describes the two main artifacts in the domain-agnostic pipeline:
 
 - `DatasetProfile` JSON

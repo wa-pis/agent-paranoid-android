@@ -19,6 +19,9 @@ All notable changes to this project are documented here.
   inference plans before specification publication. The same options are
   available on the direct inference and artifact APIs.
 
+- Add Russian documentation under `docs/ru/`, page language switching and
+  bilingual handbook exports, retaining verified 1.6.0 examples.
+
 - Versioned documentation on GitHub Pages using mike, with separate development
   guidance and PDF, standalone HTML, Markdown and offline-site downloads.
   Documentation revisions remain distinct from package versions.

@@ -1,5 +1,7 @@
 # Domain-Agnostic Dataset Workflow
 
+English · [Русский](ru/domain_agnostic_workflow.md)
+
 This compatibility page retains existing section links. Current instructions
 now have a single owner for each task, rather than a second copy of commands.
 

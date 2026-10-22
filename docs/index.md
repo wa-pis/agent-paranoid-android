@@ -1,5 +1,7 @@
 # Agent Paranoid Android
 
+English · [Русский](ru/index.md)
+
 Create repeatable test datasets with useful relationships and business rules,
 without copying source rows. Start with a file, safe database metadata, or an
 explicit specification, then review the plan before generating fresh values.

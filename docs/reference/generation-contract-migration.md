@@ -1,5 +1,7 @@
 # Generation Contract Corrections
 
+English · [Русский](../ru/reference/generation-contract-migration.md)
+
 These corrections are included in stable `1.6.0`. Regenerate affected fixtures
 and review differences when upgrading. Package version and DatasetSpec schema
 version are separate; the current specification schema is `1.1`.

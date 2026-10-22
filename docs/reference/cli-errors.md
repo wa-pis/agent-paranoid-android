@@ -1,5 +1,7 @@
 # CLI Errors And Exit Codes
 
+English · [Русский](../ru/reference/cli-errors.md)
+
 Without `--json`, expected failures use concise stderr text and include a
 recovery command when one is available. User-controlled values, provider
 responses, source literals, and credentials are bounded or omitted.

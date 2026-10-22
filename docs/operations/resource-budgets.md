@@ -1,5 +1,7 @@
 # Operational Resource Budgets
 
+English · [Русский](../ru/operations/resource-budgets.md)
+
 The release gate exercises profiling, deterministic multi-entity generation,
 and validation against checked-in time and peak-allocation ceilings. Its input
 is created locally from synthetic identifiers and low-cardinality categories;

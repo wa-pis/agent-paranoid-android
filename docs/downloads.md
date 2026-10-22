@@ -1,5 +1,7 @@
 # Downloads
 
+English · [Русский](ru/downloads.md)
+
 Published builds provide:
 
 - <a href="handbook.pdf">PDF handbook</a>: read, print or share the user guide.

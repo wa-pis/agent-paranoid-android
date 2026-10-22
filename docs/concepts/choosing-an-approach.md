@@ -1,5 +1,7 @@
 # Choose An Approach
 
+English · [Русский](../ru/concepts/choosing-an-approach.md)
+
 Agent Paranoid Android is for teams that need deterministic test datasets from
 bounded CSV, PostgreSQL, or Trino evidence without copying source rows. Its
 primary interfaces are the CLI and Python library. Database clients, MCP, and

@@ -17,6 +17,8 @@ for task guides, [offline downloads](docs/downloads.md), and
 See the [source/output matrix](docs/reference/source-output-matrix.md) for the
 common reviewed DatasetSpec, field types, settings and business-rule contract.
 
+[Русская документация](docs/ru/index.md)
+
 ## Install And Try It
 
 Python 3.11 or newer is required.
