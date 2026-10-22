@@ -1,7 +1,7 @@
 {
   "package_version": "1.6.0",
   "package_commit": "258c035c22408becf17ab090635710a50dda8ccc",
-  "documentation_revision": "f3f33e6a719a7a35d17c70ce449c4e620e685306",
+  "documentation_revision": "bc4ff8693833169f3b8f6993528b176eaa8da49d",
   "status": "Maintained stable guidance",
   "chapters": [
     "index.md",
@@ -21,13 +21,31 @@
     "concepts/profiles-and-specs.md",
     "concepts/safety-model.md",
     "operations/troubleshooting.md",
-    "known-issues.md"
+    "known-issues.md",
+    "ru/index.md",
+    "ru/getting-started/installation.md",
+    "ru/getting-started/first-csv.md",
+    "ru/getting-started/related-tables.md",
+    "ru/getting-started/review-output.md",
+    "ru/how-to/business-rules.md",
+    "ru/how-to/postgresql.md",
+    "ru/how-to/trino.md",
+    "ru/how-to/transformation.md",
+    "ru/how-to/mcp.md",
+    "ru/ai_integration.md",
+    "ru/operations/containers.md",
+    "ru/reference/index.md",
+    "ru/concepts/choosing-an-approach.md",
+    "ru/concepts/profiles-and-specs.md",
+    "ru/concepts/safety-model.md",
+    "ru/operations/troubleshooting.md",
+    "ru/known-issues.md"
   ],
-  "index_sha256": "666ab37eeb65f53a8cbcaf2b908807ad408af14af3c0e1ac67d9f7f3313fdfde",
+  "index_sha256": "12e164f1a78da3248f72b13a24b0b307d1658c5bf9628a50d3cbcbec2865c0ff",
   "sha256": {
-    "handbook.pdf": "96b5d9d0d75cc5db9a83e4eec1da19ce80693d53a8b0adade0b22fc6c101994b",
-    "handbook.html": "a261c397e4246c283fe493130abcd68ffe5da3f12bb7058ecde0c30e96e9f037",
-    "handbook.md.zip": "0c791e9f3a5569d81abe3cf16ece51ce0fdc9cd040cb5282ffb3f61faa3a2925",
-    "site.zip": "f34edf52c9edabd1dd8a61feeb31c1e29c8af0f0d41a70f7a34b1108da90efe8"
+    "handbook.pdf": "48f95f01ccfad21b9fa2556ba0564f91e85b19399d24b278af2f2df752bdd5bc",
+    "handbook.html": "d9d634b41c1c48fcf2a2097ed7d68bf08f60c56267dce8883af4aabbdb15b38c",
+    "handbook.md.zip": "2a58c2fa488853777974b4817345a9407828945a1a2e0ad7e17fe865b104d461",
+    "site.zip": "cbf3e951fc1e75895a2f2a15e9390c68273673684deb2e6eeb2c67490c190b91"
   }
 }

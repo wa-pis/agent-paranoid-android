@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/ru/operations/troubleshooting/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Диагностика - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0414\u0438\u0430\u0433\u043d\u043e\u0441\u0442\u0438\u043a\u0430";
+        var mkdocs_page_input_path = "ru/operations/troubleshooting.md";
+        var mkdocs_page_url = "/agent-paranoid-android/ru/operations/troubleshooting/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul class="current">
+  
+  <li class="toctree-l1 current"><a class="reference internal current" href="#">Диагностика</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_2">Что делать при неизвестной ошибке</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">Локальная диагностика</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#_4">Для чего это нужно</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_5">Что получится в результате</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_6">Предварительные требования</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_7">Пошаговое выполнение</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#1">Шаг 1. Сопоставьте пути и версию</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#2">Шаг 2. Запустите локальные проверки</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#3">Шаг 3. Проверьте нужное расширение</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_8">Проверка результата</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_9">Типичные ошибки</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_10">После прерванного одобрения</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#_11">Следующий шаг</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_12">Вопросы и ответы</a>
+    </li>
+    </ul></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Русский</li>
+          <li class="breadcrumb-item">Помощь</li>
+      <li class="breadcrumb-item active">Диагностика</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/operations/troubleshooting.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../operations/troubleshooting/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Распространённые ошибки<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../operations/troubleshooting/">English</a> · Русский</p>
+<p>Точные фиксированные сообщения приведены в кавычках кода. Там, где текст зависит от операции/ОС, указан симптом или стабильный JSON error code; это не выдуманный вывод терминала.</p>
+<table>
+<thead>
+<tr>
+<th>Ошибка / симптом</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>command not found</code> / команда не найдена</td>
+<td>Другое окружение или пакет не установлен</td>
+<td>Активируйте нужное окружение; проверьте <code>python -m pip --version</code> и путь команды</td>
+</tr>
+<tr>
+<td>Версия установленной команды отличается от checkout 1.6.0</td>
+<td>Установленная копия отстаёт от исходников</td>
+<td>Установите checkout в отдельное окружение; не выдавайте тест старой копии за тест исходников</td>
+</tr>
+<tr>
+<td><code>unsafe filesystem path</code></td>
+<td>Symlink, конфликт входа/выхода или путь за границей</td>
+<td>Используйте новую обычную папку; <code>/tmp</code> на macOS — symlink, канонический путь <code>/private/tmp</code></td>
+</tr>
+<tr>
+<td><code>Output already exists:</code></td>
+<td>Пример защищает результат от перезаписи</td>
+<td>Выберите новое имя; не удаляйте пользовательский результат</td>
+</tr>
+<tr>
+<td><code>input_not_found</code></td>
+<td>Путь относительно другой рабочей папки</td>
+<td>Перейдите в корень checkout; проверьте наличие входа без публикации его содержимого</td>
+</tr>
+<tr>
+<td><code>missing_dependency</code> / код 69</td>
+<td>Нет optional extra</td>
+<td>Установите нужный extra тем же Python; повторите doctor --require-extra</td>
+</tr>
+<tr>
+<td><code>invalid_arguments</code></td>
+<td>Не хватает обязательного флага или значение не в диапазоне</td>
+<td>Выполните COMMAND --help, задайте count&gt;0, seed≥0, ratio в [0,1]</td>
+</tr>
+<tr>
+<td><code>configuration</code></td>
+<td>Нет allowlist, неверный бюджет, конфликт JDBC/component settings</td>
+<td>Исправьте конкретный scope/число; не ослабляйте TLS или политику</td>
+</tr>
+<tr>
+<td><code>external_service</code></td>
+<td>БД/провайдер недоступен</td>
+<td>Проверьте разрешённый endpoint, сеть, TLS, права и квоту через администратора; не печатайте secrets</td>
+</tr>
+<tr>
+<td><code>Tool arguments failed validation</code></td>
+<td>MCP-аргументы не соответствуют схеме</td>
+<td>Используйте tools/list и типы аргументов; отклонённый payload не пересылайте</td>
+</tr>
+<tr>
+<td><code>Invalid request parameters</code></td>
+<td>Некорректный типизированный MCP запрос</td>
+<td>Исправьте клиент/SDK и формат JSON-RPC</td>
+</tr>
+<tr>
+<td><code>Trino request failed</code></td>
+<td>Безопасно скрытая ошибка backend</td>
+<td>Проверьте scope, доступность и бюджеты без раскрытия сообщения драйвера</td>
+</tr>
+<tr>
+<td>generate вернул 1 и оставил output</td>
+<td>Намеренный mixed/negative не прошёл валидацию</td>
+<td>Проверьте validation_failed и отчёты expected/observed; не считайте файл успешным valid-набором.</td>
+</tr>
+<tr>
+<td>validate вернул 1</td>
+<td>Есть нарушения контракта</td>
+<td>Прочитайте validation_report; для negative сопоставьте ожидаемые нарушения</td>
+</tr>
+<tr>
+<td><code>io_failure</code> / код 74</td>
+<td>Нет прав, места или ошибка файловой системы</td>
+<td>Выберите доступный каталог, проверьте диск и резерв, сохраните входы</td>
+</tr>
+<tr>
+<td><code>recovery_required</code></td>
+<td>Одобрение прервалось после публикации набора</td>
+<td>Прочитайте agent-status; используйте только предложенный agent-recover с проверенным fingerprint</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">Что делать при неизвестной ошибке<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Остановите повторные записи. Сохраните только безопасные метаданные: версию, команду без секретов, код завершения, фазу и счётчики. Воспроизведите на вымышленных входах. Не публикуйте исходный CSV, SQL с литералами, profile/spec своего домена, <code>.env</code>, DSN, полный environment или необработанный traceback.</p>
+<p>Далее: <a href="./">пошаговая диагностика</a>, <a href="./">FAQ</a>.</p>
+<h2 id="_3">Локальная диагностика<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="_4">Для чего это нужно<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>Проверьте окружение и маленький синтетический пример прежде, чем разбирать подключение к внешнему сервису. Так можно отличить локальную ошибку от сетевой.</p>
+<h3 id="_5">Что получится в результате<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>Безопасная сводка версии и локальных возможностей без чтения credentials.</p>
+<h3 id="_6">Предварительные требования<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>Открыт терминал в корне checkout, активно нужное окружение; права на временные файлы. Для чтения doctor report не нужен доступ к БД.</p>
+<h3 id="_7">Пошаговое выполнение<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h4 id="1">Шаг 1. Сопоставьте пути и версию<a class="headerlink" href="#1" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> Покажите путь к интерпретатору и исполняемой команде.</p>
+<p><strong>Где выполнить:</strong> Терминал, корень checkout.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">python -c &quot;import sys, shutil; print(sys.executable); print(shutil.which('test-data-agent'))&quot;
+test-data-agent --version
+</code></pre>
+<p><strong>Что должно произойти:</strong> Видны пути текущего окружения и версия пакета.</p>
+<p><strong>Как проверить:</strong> Оба пути принадлежат ожидаемому окружению; версия соответствует checkout.</p>
+<p><strong>Если не получилось:</strong> Если нет, активируйте нужный venv и установите пакет туда. Не печатайте весь environment.</p>
+<h4 id="2">Шаг 2. Запустите локальные проверки<a class="headerlink" href="#2" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> Выполните doctor; JSON-режим удобен для автоматизации.</p>
+<p><strong>Где выполнить:</strong> Тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent doctor
+test-data-agent doctor --json
+</code></pre>
+<p><strong>Что должно произойти:</strong> Проверены базовые импорты и smoke generation.</p>
+<p><strong>Как проверить:</strong> Обе команды возвращают 0.</p>
+<p><strong>Если не получилось:</strong> Если extra не установлен, установите только нужный; необязательное отсутствие без require-extra не означает поломку базы.</p>
+<h4 id="3">Шаг 3. Проверьте нужное расширение<a class="headerlink" href="#3" title="Permanent link">&para;</a></h4>
+<p><strong>Что сделать:</strong> В примере проверяется Parquet; замените его на нужное extra из справки.</p>
+<p><strong>Где выполнить:</strong> Тот же терминал.</p>
+<p><strong>Команда или пример:</strong></p>
+<pre><code class="language-bash">test-data-agent doctor --require-extra parquet
+</code></pre>
+<p><strong>Что должно произойти:</strong> Проверена локальная работоспособность Parquet, включая временный round trip.</p>
+<p><strong>Как проверить:</strong> Код 0.</p>
+<p><strong>Если не получилось:</strong> Установите .[parquet]. Успех для postgres/openai не проверяет сетевой доступ или credentials.</p>
+<h3 id="_8">Проверка результата<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>Если doctor проходит, а рабочий вход нет, повторите с вымышленной фикстурой из CSV-инструкции. Если она проходит, проверяйте форму входа, spec и лимиты; при БД отдельно проверяйте разрешённое подключение с администратором.</p>
+<h3 id="_9">Типичные ошибки<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ошибка</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>doctor прошёл, сервис недоступен</td>
+<td>Doctor намеренно офлайн</td>
+<td>Проверьте сеть/роль/квоту в согласованном сервисном сценарии.</td>
+</tr>
+<tr>
+<td>Код 70</td>
+<td>Внутренняя ошибка</td>
+<td>Составьте минимальный синтетический reproducer; debug не публикуйте без review.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_10">После прерванного одобрения<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h3>
+<p>Выполните <code>test-data-agent agent-status out/ru-agent --json</code>. Если фаза <code>recovery_required</code>, проверьте сохранённые spec/manifest и выполните точную next action из статуса с одобренным SHA-256. <code>agent-recover</code> перепроверяет имеющийся набор и дописывает completion metadata; он не генерирует строки заново. Этот сценарий не воспроизводился вручную в аудите; код и focused tests существуют. Не используйте recover для произвольной повреждённой папки.</p>
+<h3 id="_11">Следующий шаг<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p><a href="./">Типичные ошибки</a>.</p>
+<h2 id="_12">Вопросы и ответы<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<p><strong>Нужен ли AI?</strong> Нет. Демо, CSV, DatasetSpec, детерминированная генерация и валидация работают без provider.</p>
+<p><strong>Нужна ли база?</strong> Нет. Начните с вымышленного CSV. База — отдельный read-only источник метаданных.</p>
+<p><strong>Чем генерация отличается от обезличивания?</strong> Генератор создаёт новые значения. Он не переписывает каждую исходную строку и не сохраняет карту исходный ID → новый ID.</p>
+<p><strong>Можно ли считать синтетический набор анонимным?</strong> Автоматически нельзя. Проверьте spec, разрешённые литералы, редкие комбинации и политику назначения. Система не даёт сертификата статистической анонимности.</p>
+<p><strong>Почему статус стал другим после правки spec?</strong> Approval относится к точному fingerprint. После правки нужен новый review; старый отпечаток не одобряет новый файл.</p>
+<p><strong>Почему один seed не дал прежние байты на другой машине?</strong> Помимо seed важны вход, spec и порядок entities в нём, count, mode, locale, версия проекта, зависимости и сериализатор. Сравнивайте в одинаковом записанном окружении.</p>
+<p><strong>Где результат?</strong> У generate-from-csv <code>--output</code> — файл с соседними артефактами; у generate из spec — папка набора. Manifest указывает условия генерации. См. <a href="../../getting-started/review-output/">форматы</a>.</p>
+<p><strong>Что означает validation passed?</strong> Только выполнение включённых проверок по данному spec. Не доказано, что сам spec описывает все нужные свойства.</p>
+<p><strong>Можно ли использовать реальные status?</strong> В синтетической генерации — только через отдельный field-scoped local-category после review нечувствительного ограниченного enum и content checks. Разрешение не распространяется на ID, текст, PII, строки или внешний AI. Сохранение ячеек один к одному относится к отдельной mixed-origin трансформации с policy и local receipt; см. ниже.</p>
+<p><strong>Можно ли сделать JOIN в profile-query?</strong> Нет. Поддерживается ограниченное чтение одной таблицы; не добавляйте обход через unrestricted SQL.</p>
+<p><strong>Можно ли импортировать SQL?</strong> Проект создаёт SQL-файл. Выполнение — отдельная операция записи в согласованную одноразовую БД с человеческим review. В этом аудите SQL не исполнялся.</p>
+<p><strong>Что такое selective transformation?</strong> Отдельный публичный opt-in workflow 1.6.0 с policy, snapshot digest и mixed-origin output. CLI и MCP consumers существуют; preservation требует точного локального подтверждения человеком, которое агент выдать не может. См. <a href="../../how-to/transformation/">инструкцию</a>.</p>
+<p><strong>Как повторить пример?</strong> Используйте новую папку, тот же вход, параметры и окружение. Не применяйте overwrite или удаление предыдущих результатов без необходимости.</p>
+<p>Далее: <a href="../../concepts/safety-model/">ограничения</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../concepts/safety-model/" class="btn btn-neutral float-left" title="Модель безопасности"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../known-issues/" class="btn btn-neutral float-right" title="Известные проблемы">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+      <span><a href="../../concepts/safety-model/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../../known-issues/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

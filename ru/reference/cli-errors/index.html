@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/ru/reference/cli-errors/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Ошибки CLI и коды завершения - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u041e\u0448\u0438\u0431\u043a\u0438 CLI \u0438 \u043a\u043e\u0434\u044b \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0438\u044f";
+        var mkdocs_page_input_path = "ru/reference/cli-errors.md";
+        var mkdocs_page_url = "/agent-paranoid-android/ru/reference/cli-errors/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Ошибки CLI и коды завершения</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/reference/cli-errors.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../reference/cli-errors/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="cli">Ошибки CLI и коды завершения<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h1>
+<p><a href="../../../reference/cli-errors/">English</a> · Русский</p>
+<p>Без --json ожидаемые ошибки дают короткое сообщение stderr и доступный recovery action. Потенциально чувствительные значения ограничиваются или исключаются.</p>
+<table>
+<thead>
+<tr>
+<th>Код</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Успех; вызов без команды также возвращает 0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Validation failed, в том числе для намеренного negative output</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Неверные arguments, input, path, safety/resource checks или configuration</td>
+</tr>
+<tr>
+<td>69</td>
+<td>Недоступная optional dependency или external service</td>
+</tr>
+<tr>
+<td>70</td>
+<td>Неожиданная внутренняя ошибка; --debug только при безопасном отображении деталей</td>
+</tr>
+<tr>
+<td>74</td>
+<td>Ошибка I/O операционной системы</td>
+</tr>
+<tr>
+<td>130</td>
+<td>Ctrl+C; сначала выполняется доступный staging cleanup/rollback</td>
+</tr>
+</tbody>
+</table>
+<p>JSON error.code: invalid_arguments, input_not_found, invalid_path, invalid_input, configuration, missing_dependency, external_service, io_failure, internal_error, cancelled.</p>
+<h2 id="approval">Прерванный approval<a class="headerlink" href="#approval" title="Permanent link">&para;</a></h2>
+<p>Agent-status только читает workspace. Если bundle уже опубликован, а completion metadata отсутствует, статус recovery_required сообщает точную команду agent-recover с reviewed-spec-sha256. Выполняйте только действие для текущего состояния и ранее одобренного fingerprint.</p>
+<p>Recovery повторно проверяет checkpoint, fingerprints, manifest, rows и source-row non-reuse; новые строки не генерирует. Не исправляйте workspace вручную и не запускайте approve вслепую. См. <a href="../../operations/troubleshooting/">диагностику</a>.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

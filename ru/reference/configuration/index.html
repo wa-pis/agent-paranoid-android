@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/ru/reference/configuration/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Справочник конфигурации - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u0421\u043f\u0440\u0430\u0432\u043e\u0447\u043d\u0438\u043a \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0446\u0438\u0438";
+        var mkdocs_page_input_path = "ru/reference/configuration.md";
+        var mkdocs_page_url = "/agent-paranoid-android/ru/reference/configuration/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../how-to/mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Справочник конфигурации</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/reference/configuration.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../reference/configuration/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="_1">Справочник конфигурации<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p><a href="../../../reference/configuration/">English</a> · Русский</p>
+<p>Код: <code>core/dataset.py</code>, <code>core/field.py</code>, <code>core/entity.py</code>, <code>core/settings.py</code>, <code>limits.py</code>, <code>postgres_config.py</code>, <code>trino_config.py</code>. JSON Schema: <a href="https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/dataset_spec.schema.json">dataset_spec.schema.json</a>. Версия пакета 1.6.0 и DatasetSpec <code>schema_version: "1.1"</code> — разные версии. Совместимость с 1.0 сохраняется без decimal; при импорте payload без schema_version используется legacy 1.0, тогда как новый Python DatasetSpec по умолчанию создаёт 1.1. Указывайте версию явно.</p>
+<h2 id="datasetspec">DatasetSpec<a class="headerlink" href="#datasetspec" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Ключ</th>
+<th>Тип / значение по умолчанию</th>
+<th>Назначение и проверка</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema_version</td>
+<td>строка <code>"1.1"</code>; совместимая <code>"1.0"</code></td>
+<td>decimal требует 1.1; при импорте без ключа действует legacy 1.0</td>
+</tr>
+<tr>
+<td>entities</td>
+<td>список EntitySpec</td>
+<td>Таблицы; имена не дублируются</td>
+</tr>
+<tr>
+<td>entities[].name</td>
+<td>непустая строка</td>
+<td>Имя сущности; служебные имена артефактов зарезервированы</td>
+</tr>
+<tr>
+<td>entities[].row_count</td>
+<td>целое &gt;0</td>
+<td>Число генерируемых строк</td>
+</tr>
+<tr>
+<td>entities[].primary_key</td>
+<td>строка или null</td>
+<td>Поле существует и имеет is_identifier=true</td>
+</tr>
+<tr>
+<td>entities[].fields</td>
+<td>список FieldSpec</td>
+<td>Поля с неповторяющимися именами</td>
+</tr>
+<tr>
+<td>fields[].name</td>
+<td>строка</td>
+<td>Имя столбца</td>
+</tr>
+<tr>
+<td>fields[].data_type</td>
+<td>integer/float/decimal/boolean/string/date/datetime</td>
+<td>Поддерживаемые скалярные типы</td>
+</tr>
+<tr>
+<td>fields[].nullable</td>
+<td>bool, false</td>
+<td>Разрешён ли null</td>
+</tr>
+<tr>
+<td>fields[].null_ratio</td>
+<td>число [0,1], 0</td>
+<td>Доля null; согласуйте с nullable</td>
+</tr>
+<tr>
+<td>fields[].sensitive</td>
+<td>bool, false</td>
+<td>Поле требует защиты</td>
+</tr>
+<tr>
+<td>fields[].semantic_type</td>
+<td>строка или null</td>
+<td>Семантика; например email</td>
+</tr>
+<tr>
+<td>fields[].is_identifier</td>
+<td>bool, false</td>
+<td>Синтетический идентификатор</td>
+</tr>
+<tr>
+<td>fields[].distribution</td>
+<td>объект, {}</td>
+<td>Типизированное правило распределения</td>
+</tr>
+<tr>
+<td>relationships</td>
+<td>список, []</td>
+<td>Проверяемые ссылки parent/child</td>
+</tr>
+<tr>
+<td>constraints</td>
+<td>список, []</td>
+<td>Структурированные ограничения</td>
+</tr>
+<tr>
+<td>business_rules</td>
+<td>объект BusinessRules или null</td>
+<td>Встроенные правила, общие для интерфейсов и форматов</td>
+</tr>
+<tr>
+<td>privacy_rules</td>
+<td>список, []</td>
+<td>Явные правила приватности; ссылки должны существовать</td>
+</tr>
+<tr>
+<td>privacy_settings</td>
+<td>объект</td>
+<td>Политика приватности</td>
+</tr>
+<tr>
+<td>local_category_fields</td>
+<td>список, []</td>
+<td>Отдельные локально разрешённые нечувствительные категории</td>
+</tr>
+<tr>
+<td>generation_settings</td>
+<td>объект</td>
+<td>Параметры генерации ниже</td>
+</tr>
+<tr>
+<td>validation_settings</td>
+<td>объект</td>
+<td>Какие секции включить в отчёт</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>generation_settings</th>
+<th>По умолчанию</th>
+<th>Ограничение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seed</td>
+<td>null</td>
+<td>Целое 0…2**63-1 для сохранённого spec; укажите явно</td>
+</tr>
+<tr>
+<td>mode</td>
+<td>valid</td>
+<td>valid, mixed, negative, edge, load_test</td>
+</tr>
+<tr>
+<td>invalid_ratio</td>
+<td>0.0</td>
+<td>От 0 до 1; имеет смысл для отрицательных режимов</td>
+</tr>
+<tr>
+<td>output_format</td>
+<td>json</td>
+<td>csv, json, sql, parquet</td>
+</tr>
+<tr>
+<td>load_multiplier</td>
+<td>10</td>
+<td>Целое ≥1; масштаб load_test при отсутствии явного count</td>
+</tr>
+<tr>
+<td>locale</td>
+<td>null</td>
+<td>Окружение генерации; фиксируйте вместе с зависимостями</td>
+</tr>
+</tbody>
+</table>
+<p>В <code>validation_settings</code> <code>validate_schema</code>, <code>validate_relationships</code>, <code>validate_constraints</code>, <code>validate_privacy</code> по умолчанию true, <code>fail_fast</code> — false. Не отключайте секции для получения положительного результата. Обязательные post-solve type/privacy проверки генератора не отменяются настройками отчёта.</p>
+<p><code>synthetic_identifier</code> может задавать <code>pool_size</code> — положительное целое число синтетических ключей для повторяемого ID. Для primary key pool не может быть меньше row_count. Это число, а не сохранённая карта реальных идентификаторов. Типы распределений и полные вложенные модели: <a href="../../dataset_profile_and_spec/">DatasetProfile и DatasetSpec</a>.</p>
+<h2 id="_2">Приоритет<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Явный CLI override меняет соответствующий параметр spec: count, seed, mode, invalid_ratio, format. Если override не задан, используются сохранённые настройки и defaults конкретного пути. Значения defaults команд перечислены в <a href="../cli/">CLI</a>; для <code>generate</code> не переносите defaults сокращённой CSV-команды по догадке. Переменные окружения управляют только перечисленными в коде интеграциями и бюджетами; они сами по себе не включают AI.</p>
+<h2 id="_3">Основные локальные бюджеты<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Байты — целые байты; время — секунды. Значения должны быть положительными, время — конечным. Превышение означает остановку, а не разрешение частичного доверенного результата.</p>
+<table>
+<thead>
+<tr>
+<th>Переменная</th>
+<th style="text-align: right;">По умолчанию</th>
+<th>Что ограничивает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TEST_DATA_AGENT_MAX_GENERATION_COUNT</td>
+<td style="text-align: right;">100000</td>
+<td>Строк на сущность</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_FILE_BYTES</td>
+<td style="text-align: right;">134217728</td>
+<td>Байт на входной файл</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_TOTAL_INPUT_BYTES</td>
+<td style="text-align: right;">536870912</td>
+<td>Суммарный вход</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_ROWS</td>
+<td style="text-align: right;">1000000</td>
+<td>Входных строк</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_COLUMNS</td>
+<td style="text-align: right;">1000</td>
+<td>Столбцов</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_CELLS</td>
+<td style="text-align: right;">10000000</td>
+<td>Ячеек</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_FILES</td>
+<td style="text-align: right;">100</td>
+<td>Файлов</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_INPUT_CELL_CHARS</td>
+<td style="text-align: right;">1000000</td>
+<td>Символов в ячейке/строке JSON</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_PARQUET_EXPANDED_BYTES</td>
+<td style="text-align: right;">536870912</td>
+<td>Оценка распакованного Parquet</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_YAML_ALIASES</td>
+<td style="text-align: right;">50</td>
+<td>YAML aliases</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_YAML_DEPTH</td>
+<td style="text-align: right;">100</td>
+<td>Глубина YAML</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_JSON_DEPTH</td>
+<td style="text-align: right;">100</td>
+<td>Глубина JSON</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_BUSINESS_RULES_BYTES</td>
+<td style="text-align: right;">1048576</td>
+<td>Размер правил</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS</td>
+<td style="text-align: right;">5000000</td>
+<td>Оценка строк × правил</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_OUTPUT_BYTES</td>
+<td style="text-align: right;">536870912</td>
+<td>Полный выходной bundle</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MIN_FREE_DISK_BYTES</td>
+<td style="text-align: right;">134217728</td>
+<td>Резерв диска</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_GENERATION_SECONDS</td>
+<td style="text-align: right;">300</td>
+<td>Время генерации</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SECONDS</td>
+<td style="text-align: right;">120</td>
+<td>Время профиля папки</td>
+</tr>
+<tr>
+<td>TEST_DATA_AGENT_MAX_LOCAL_PROFILE_SAMPLE_ROWS</td>
+<td style="text-align: right;">1000000</td>
+<td>Общая выборка для правил</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">Интеграционные настройки<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Группа</th>
+<th>Обязательные / ключевые настройки</th>
+<th>Безопасный смысл</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Generator MCP</td>
+<td>TEST_DATA_AGENT_WORKSPACE_ROOT</td>
+<td>Явный узкий корень; без настройки используется cwd</td>
+</tr>
+<tr>
+<td>MCP deadline</td>
+<td>TEST_DATA_AGENT_MCP_MAX_INVOCATION_SECONDS=120</td>
+<td>Конечные положительные секунды, server-side настройка</td>
+</tr>
+<tr>
+<td>Inline profile</td>
+<td>TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES</td>
+<td>По умолчанию 4 MiB, не безграничный payload</td>
+</tr>
+<tr>
+<td>MCP audit</td>
+<td>TEST_DATA_AGENT_AUDIT_LOG; TEST_DATA_AGENT_AUDIT_HMAC_KEY либо TEST_DATA_AGENT_AUDIT_HMAC_KEY_FILE</td>
+<td>Ровно один источник ключа, base64 ≥32 случайных байт; key file ≤4096 байт без ссылок и групповой/общей записи</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>POSTGRES_ALLOWED_SCHEMAS, POSTGRES_ALLOWED_TABLES, POSTGRES_ALLOWED_COLUMNS</td>
+<td>Обязательные явные scopes</td>
+</tr>
+<tr>
+<td>PostgreSQL endpoint</td>
+<td>POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DATABASE, POSTGRES_USER, POSTGRES_SSLMODE либо POSTGRES_JDBC_URL</td>
+<td>URL без credentials, конфликтующие компоненты отклоняются</td>
+</tr>
+<tr>
+<td>PostgreSQL secret</td>
+<td>POSTGRES_PASSWORD_ENV</td>
+<td>Имя runtime переменной с паролем, не пароль</td>
+</tr>
+<tr>
+<td>PostgreSQL work</td>
+<td>POSTGRES_MAX_TABLES=100, POSTGRES_MAX_COLUMNS=1000, POSTGRES_MAX_STATEMENTS=1500, POSTGRES_MAX_RESULT_ROWS=10000, POSTGRES_MAX_RESULT_CELLS=100000, POSTGRES_MAX_SECONDS=120</td>
+<td>Бюджеты одного профиля</td>
+</tr>
+<tr>
+<td>PostgreSQL timeout</td>
+<td>POSTGRES_STATEMENT_TIMEOUT_MS=30000, POSTGRES_LOCK_TIMEOUT_MS=5000</td>
+<td>Миллисекунды; роль отдельно должна быть read-only</td>
+</tr>
+<tr>
+<td>Trino scope</td>
+<td>TRINO_ALLOWED_CATALOGS, TRINO_ALLOWED_SCHEMAS, TRINO_ALLOWED_TABLE_COLUMNS</td>
+<td>Первые два обязательны по умолчанию; для query-source обязателен также столбцовый scope</td>
+</tr>
+<tr>
+<td>Trino endpoint</td>
+<td>TRINO_HOST, TRINO_PORT, TRINO_USER, TRINO_HTTP_SCHEME либо TRINO_JDBC_URL</td>
+<td>По умолчанию HTTPS; JDBC URL без секретов</td>
+</tr>
+<tr>
+<td>Trino work</td>
+<td>TRINO_MAX_INVOCATION_PROFILED_COLUMNS=100, TRINO_MAX_INVOCATION_STATEMENTS=150, TRINO_MAX_INVOCATION_SECONDS=120</td>
+<td>Общие бюджеты вызова, включая вложенные helpers</td>
+</tr>
+<tr>
+<td>Trino hardened</td>
+<td>TRINO_DEPLOYMENT_PROFILE=shared-hardened и конечный TRINO_MAX_INVOCATION_ESTIMATED_SCAN_BYTES</td>
+<td>Нужна явная оценка суммарного scan</td>
+</tr>
+<tr>
+<td>Query file</td>
+<td>SQL_QUERY_MAX_BYTES=65536, SQL_QUERY_MAX_AST_NODES=500, SQL_QUERY_MAX_AST_DEPTH=32, SQL_QUERY_MAX_PROJECTED_COLUMNS=100</td>
+<td>Локальный разбор ограниченного SQL</td>
+</tr>
+<tr>
+<td>OpenAI</td>
+<td>OPENAI_API_KEY</td>
+<td>Runtime secret только после согласования передачи</td>
+</tr>
+<tr>
+<td>GigaChat</td>
+<td>GIGACHAT_CREDENTIALS либо GIGACHAT_ACCESS_TOKEN, GIGACHAT_SCOPE, GIGACHAT_CA_BUNDLE_FILE</td>
+<td>Ровно один credential, обязательный TLS; experimental</td>
+</tr>
+</tbody>
+</table>
+<p>Полный перечень параметров подключения, per-query scan/time limits, допустимых единиц, audit actor/size и transport budgets сохранён в <a href="./">расширенном справочнике</a>. Перед изменением конкретного интеграционного параметра прочитайте его строку там; значения из разных единиц не взаимозаменяемы. Не включайте insecure/unrestricted overrides ради обхода ошибки.</p>
+<p>Проверка локальной конфигурации: <a href="../../operations/troubleshooting/">диагностика</a>. Проверка результата: <a href="../../getting-started/review-output/">валидация</a>.</p>
+<h2 id="160">Режимы и точные значения 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h2>
+<p><code>edge</code> создаёт валидные границы, но constraints и business rules могут заменить отдельную границу; маленький count не покрывает всё. <code>load_test</code> умножает row_count на load_multiplier (по умолчанию 10); явный --count задаёт точное число без умножения. Повторяемость требует тот же порядок entities в spec, seed и окружение. Python core дополнительно поддерживает signed 64-bit отрицательный seed для совместимости; сохранённый spec — только 0…2**63-1.</p>
+<p><code>decimal</code> требует schema_version 1.1 и distribution.kind=decimal_range с precision≤38, scale и строковыми min/max. <code>numeric_measure</code> разрешён только для явно проверенной нечувствительной numeric меры; sensitive flags, names и identifiers имеют veto. Пример: <a href="../source-output-matrix/">DECIMAL</a>.</p>
+<p>Трансформация использует отдельные BehaviorPolicy/BatchProfile schema_version 0.1; их нельзя подавать вместо DatasetSpec. <code>resource_limits</code> и TEST_DATA_AGENT_TRANSFORM_* настраивают её acquisition/decoding, а run caps могут понижать, не молча расширять session/profile ceilings. Полный перечень и единицы: <a href="../../../reference/configuration/#private-transformation-input-limits-16-development">transformation input limits</a>. Receipt и точный snapshot не заменяются переменной окружения.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

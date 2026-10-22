@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://wa-pis.github.io/agent-paranoid-android/ru/how-to/reference-agent/" />
+      <link rel="shortcut icon" href="../../../img/favicon.ico" />
+    <title>Операционная карта для AI-агента - Agent Paranoid Android</title>
+    <link rel="stylesheet" href="../../../css/theme.css" />
+    <link rel="stylesheet" href="../../../css/theme_extra.css" />
+        <link href="../../../css/print-site.css" rel="stylesheet" />
+        <link href="../../../css/print-site-readthedocs.css" rel="stylesheet" />
+        <link href="../../../stylesheets/handbook.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "\u041e\u043f\u0435\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u0430\u044f \u043a\u0430\u0440\u0442\u0430 \u0434\u043b\u044f AI-\u0430\u0433\u0435\u043d\u0442\u0430";
+        var mkdocs_page_input_path = "ru/how-to/reference-agent.md";
+        var mkdocs_page_url = "/agent-paranoid-android/ru/how-to/reference-agent/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../../js/html5shiv.min.js"></script>
+    <![endif]-->
+ 
+
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+
+<a href="../../" class="icon icon-home">Agent Paranoid Android</a>
+
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+<div lang="ru">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+
+<p class="caption"><span class="caption-text">Начало</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../">Обзор</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/installation/">Установка</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-csv/">Первый набор CSV</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/related-tables/">Связанные таблицы</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/review-output/">Проверить результат</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Инструкции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../business-rules/">Бизнес-правила</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Профилирование PostgreSQL</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../trino/">Профилирование Trino</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Трансформация локальных данных</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Интеграции</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../mcp/">MCP-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../ai_integration/">AI-клиент</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/containers/">Контейнеры</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Справочник</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../reference/">Индекс справочника</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/choosing-an-approach/">Выбрать подход</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/profiles-and-specs/">Профили и спецификации</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../concepts/safety-model/">Модель безопасности</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Помощь</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../operations/troubleshooting/">Диагностика</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../known-issues/">Известные проблемы</a></li>
+  
+</ul>
+
+
+<p class="caption"><span class="caption-text">Документация</span></p>
+<ul>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../downloads/">Скачать</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../versions/">Версии</a></li>
+  
+  <li class="toctree-l1"><a class="reference internal" href="../../roadmap/">Дорожная карта</a></li>
+  
+</ul>
+
+
+<ul>
+  <li class="toctree-l1">
+    <a class="reference internal" href="../../history/">История и сопровождение</a>
+  </li>
+</ul>
+
+    
+  
+
+</div>
+
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+<i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+<a href="../../">Agent Paranoid Android</a>
+
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../.." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Операционная карта для AI-агента</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/wa-pis/agent-paranoid-android/edit/main/docs/ru/how-to/reference-agent.md">Edit on wa-pis/agent-paranoid-android</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+
+
+
+
+<nav class="language-switch" aria-label="Language / Язык">
+  
+    <a href="../../../how-to/reference-agent/" hreflang="en" lang="en">English</a>
+    · <strong lang="ru" aria-current="true">Русский</strong>
+  
+</nav>
+
+<div lang="ru">
+
+<aside class="documentation-identity" aria-label="Documentation version">
+  <strong>Maintained stable guidance</strong> · Package 1.6.0
+  <br>Documentation bc4ff8693833169f3b8f6993528b176eaa8da49d
+  <br><a href="../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Скачать</a>
+</aside>
+
+
+
+                <h1 id="ai-">Операционная карта для AI-агента<a class="headerlink" href="#ai-" title="Permanent link">&para;</a></h1>
+<p><a href="../../../how-to/reference-agent/">English</a> · Русский</p>
+<p>Этот раздел — база инструкций, а не новый API или автоматическое разрешение на операции. <code>AGENTS.md</code> репозитория и явный scope пользователя остаются обязательными. YAML workflows на соседней странице являются документационным форматом.</p>
+<table>
+<thead>
+<tr>
+<th>Запрос</th>
+<th>Инструкция</th>
+<th>Успешное завершение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Проверить установку</td>
+<td><a href="../../getting-started/installation/">Первый запуск</a></td>
+<td>Doctor и manifest демо проверены</td>
+</tr>
+<tr>
+<td>Создать данные по CSV</td>
+<td><a href="../../getting-started/first-csv/">CSV</a>, workflow plan_csv_review</td>
+<td>Spec проверен человеком, данные прошли валидацию</td>
+</tr>
+<tr>
+<td>Связанные таблицы</td>
+<td><a href="../../getting-started/related-tables/">Основной процесс</a></td>
+<td>Проверены значения контрактов и foreign keys</td>
+</tr>
+<tr>
+<td>Применить правила</td>
+<td><a href="../business-rules/">Бизнес-правила</a></td>
+<td>Проверен отдельный бизнес-отчёт</td>
+</tr>
+<tr>
+<td>Прочитать БД</td>
+<td><a href="../postgresql/">Базы</a></td>
+<td>Только allowlisted агрегаты и reviewable spec</td>
+</tr>
+<tr>
+<td>Подключить MCP</td>
+<td><a href="../mcp/">MCP</a></td>
+<td>Узкий workspace и совместимый stdio-клиент</td>
+</tr>
+<tr>
+<td>Обратиться к AI</td>
+<td><a href="../../ai_integration/">AI</a></td>
+<td>Согласованная передача метаданных, proposal validation и повторный review</td>
+</tr>
+<tr>
+<td>Явная mixed-origin трансформация</td>
+<td><a href="../transformation/">Отдельная трансформация</a></td>
+<td>Точный snapshot, разрешённые действия и provenance; local receipt только от человека</td>
+</tr>
+<tr>
+<td>Ошибка/прерывание</td>
+<td><a href="../../operations/troubleshooting/">Диагностика</a></td>
+<td>Безопасный статус и проверенный next action</td>
+</tr>
+</tbody>
+</table>
+<h2 id="workflow">До выбора workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Уточните вход, формат, count, seed и назначение. Не читайте вне разрешённых путей.</li>
+<li>Сопоставьте установленную версию и checkout. Проверьте <code>COMMAND --help</code> этой версии.</li>
+<li>Проверьте наличие входов и новую выходную папку без печати строк. Считайте возможную PII чувствительной.</li>
+<li>Проверьте extras локально. Не запускайте сеть для «проверки доступности» без разрешённого endpoint/scope.</li>
+<li>Выполните <a href="./">workflow</a> до границы согласования. Сформируйте конкретный spec/checklist, а затем запросите требуемый review.</li>
+</ol>
+<p>Не нужно запрашивать повторное разрешение для уже авторизованного локального обратимого действия. Но общее поручение «сгенерировать» не одобряет любой fingerprint: review-first протокол требует конкретный проверенный контракт. Новый spec, source bytes, provider destination или более широкий доступ требуют пересмотра соответствующего согласования.</p>
+<h2 id="_1">Отчёт пользователю<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Сообщите число строк на сущность, seed, путь к файлам, validation status и ограничения. Не печатайте строки, секреты, SQL literals, provider prompts или необработанные ошибки. Указывайте «Не проверено выполнением», если ограничились чтением кода. Не объявляйте задачу завершённой при непроверенном manifest или нарушениях без оговорённого negative-сценария.</p>
+<p>Дополнительные обязательные <a href="./">правила безопасности</a>.</p>
+<h2 id="workflows-ai-">Workflows для AI-агента<a class="headerlink" href="#workflows-ai-" title="Permanent link">&para;</a></h2>
+<p>Это YAML-описания операций для чтения агентом, не конфигурация исполняемого workflow engine. Пути относительно корня checkout. Входы, scope и новая папка проверяются до чтения. Секреты не передаются как inputs. При каждом ненулевом exit code прекратите зависимые действия; используйте <a href="../../operations/troubleshooting/">диагностику</a>.</p>
+<h3 id="_2">Локальная демонстрация<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<pre><code class="language-yaml">workflow_id: offline_demo
+title: &quot;Проверить локальную установку&quot;
+description: &quot;Создать и проверить встроенный синтетический набор&quot;
+preconditions:
+  - &quot;Python &gt;=3.11; версия команды соответствует проверяемому пакету&quot;
+  - &quot;Пользователь разрешил локальную запись; out/ru-demo не существует&quot;
+inputs:
+  - name: output_folder
+    type: path
+    required: true
+steps:
+  - id: doctor
+    action: &quot;test-data-agent doctor&quot;
+    verification: &quot;exit code 0; smoke пройден&quot;
+    on_failure: &quot;Исправить окружение; не обращаться к внешним системам&quot;
+  - id: generate
+    action: &quot;test-data-agent demo --output out/ru-demo&quot;
+    verification: &quot;exit code 0; 12 customers; manifest и validation существуют&quot;
+    on_failure: &quot;Сохранить безопасную ошибку; выбрать новый output при конфликте&quot;
+  - id: verify
+    action: &quot;Прочитать локально manifest и validation_report&quot;
+    verification: &quot;synthetic=true; source_rows_copied=false; validation_valid=true; seed=20260801; report.valid=true&quot;
+    on_failure: &quot;Не принимать набор; прекратить передачу&quot;
+expected_outputs:
+  - &quot;out/ru-demo/customers.csv&quot;
+  - &quot;out/ru-demo/dataset_spec.json&quot;
+  - &quot;out/ru-demo/generation_manifest.json&quot;
+  - &quot;out/ru-demo/validation_report.json&quot;
+requires_human_approval: false
+</code></pre>
+<p><code>requires_human_approval: false</code> означает отсутствие дополнительного approval внутри уже разрешённой локальной демонстрации. Оно не расширяет разрешения пользователя.</p>
+<h3 id="csv-review">CSV с точным review перед генерацией<a class="headerlink" href="#csv-review" title="Permanent link">&para;</a></h3>
+<pre><code class="language-yaml">workflow_id: plan_csv_review
+title: &quot;Создать CSV через проверенный план&quot;
+description: &quot;Подготовить spec, получить review точного отпечатка, затем сгенерировать и проверить&quot;
+preconditions:
+  - &quot;Разрешён вход examples/csv_quickstart/customers.csv и запись out/ru-agent&quot;
+  - &quot;Вход вымышленный; workspace не существует; seed=12345 и count=25 согласованы&quot;
+inputs:
+  - name: source_csv
+    type: path
+    required: true
+  - name: workspace
+    type: path
+    required: true
+  - name: reviewed_spec_sha256
+    type: string
+    required: false
+steps:
+  - id: plan
+    action: &quot;test-data-agent agent-plan examples/csv_quickstart/customers.csv --workspace out/ru-agent --count 25 --seed 12345 --format csv&quot;
+    verification: &quot;exit code 0; phase awaiting_approval; spec записан, данные ещё не созданы&quot;
+    on_failure: &quot;Не продолжать; проверить путь, бюджеты и вход&quot;
+  - id: review
+    action: &quot;test-data-agent agent-review out/ru-agent --json; локально проверить dataset_spec.yaml&quot;
+    verification: &quot;Проверены поля, sensitive, identifiers, диапазоны, связи; записан review.current_spec_sha256&quot;
+    on_failure: &quot;Уточнить предметную область; после правок повторить review&quot;
+  - id: approval_gate
+    action: &quot;Показать человеку конкретный spec/checklist и fingerprint; получить review этого fingerprint&quot;
+    verification: &quot;Согласование относится к текущему spec; source bytes не изменились&quot;
+    on_failure: &quot;Остановиться до генерации; не считать молчание одобрением&quot;
+  - id: approve
+    action: &quot;Выполнить agent-approve out/ru-agent с --reviewed-spec-sha256, равным одобренному значению&quot;
+    verification: &quot;exit code 0; статус сообщает завершение; manifest synthetic=true, source_rows_copied=false, validation_valid=true&quot;
+    on_failure: &quot;Прочитать agent-status; при recovery_required использовать только его проверенный next action&quot;
+  - id: validate
+    action: &quot;Взять путь готовой папки из agent-status и выполнить validate с reviewed dataset_spec.yaml&quot;
+    verification: &quot;exit code 0; report.valid=true; проверены все ожидаемые секции и count&quot;
+    on_failure: &quot;Не принимать и не передавать набор&quot;
+expected_outputs:
+  - &quot;out/ru-agent/dataset_spec.yaml&quot;
+  - &quot;Готовый набор и отчёты по путям из agent-status&quot;
+requires_human_approval: true
+</code></pre>
+<p>В YAML строки с <code>;</code> описывают последовательность действий, а не готовую shell-команду. Выполняйте каждое действие отдельно. <code>reviewed_spec_sha256</code> отсутствует при планировании и обязателен при approve. Нельзя автоматически взять свежий hash и считать его согласованным человеком.</p>
+<h3 id="postgresql">Профиль PostgreSQL<a class="headerlink" href="#postgresql" title="Permanent link">&para;</a></h3>
+<pre><code class="language-yaml">workflow_id: postgres_profile_review
+title: &quot;Получить разрешённый профиль БД&quot;
+description: &quot;Прочитать ограниченные агрегаты и подготовить spec без source rows&quot;
+preconditions:
+  - &quot;Человек подтвердил endpoint, TLS, read-only роль, schema/table/column scope и бюджеты&quot;
+  - &quot;Extra postgres установлен; secret внедрён runtime и не выводится&quot;
+  - &quot;Выходные файлы отсутствуют; назначение локальное и разрешённое&quot;
+inputs:
+  - name: approved_database_scope
+    type: configuration
+    required: true
+  - name: output_profile
+    type: path
+    required: true
+steps:
+  - id: local_check
+    action: &quot;test-data-agent doctor --require-extra postgres&quot;
+    verification: &quot;exit code 0; проверка локальная, сетевой доступ не доказан&quot;
+    on_failure: &quot;Исправить extra тем же Python&quot;
+  - id: profile
+    action: &quot;test-data-agent profile-postgres --output out/ru-postgres/profile.json&quot;
+    verification: &quot;exit code 0; только согласованные entities/fields и агрегаты&quot;
+    on_failure: &quot;Остановиться; не ослаблять scope/TLS; не возвращать driver text&quot;
+  - id: infer
+    action: &quot;test-data-agent infer-spec out/ru-postgres/profile.json --count 25 --output out/ru-postgres/dataset_spec.yaml&quot;
+    verification: &quot;Spec создан; человек может проверить контракт; исходных строк нет&quot;
+    on_failure: &quot;Уточнить метаданные; не брать row sample&quot;
+expected_outputs:
+  - &quot;out/ru-postgres/profile.json&quot;
+  - &quot;out/ru-postgres/dataset_spec.yaml&quot;
+requires_human_approval: true
+</code></pre>
+<p>Этот workflow не разрешает генерацию по непроверенному spec или запись в БД. Живой пример <strong>не проверен выполнением</strong>. Trino-эквивалент и tool arguments: <a href="../mcp/">MCP-инструкция</a> и <a href="../../../mcp_examples/">MCP Tools</a>.</p>
+<p>Для AI-предложения используйте локальный plan и <a href="../../ai_integration/">advisor exchange</a>. Перед внешней отправкой требуется отдельное согласование назначения и содержимого; после proposal — новый review. Для неопределённого запроса выберите безопасное планирование, остановитесь на первом отсутствующем обязательном факте и сообщите, что именно требуется.</p>
+<h3 id="mixed-origin">Отдельное планирование mixed-origin трансформации<a class="headerlink" href="#mixed-origin" title="Permanent link">&para;</a></h3>
+<pre><code class="language-yaml">workflow_id: transformation_review_only
+title: &quot;Проверить отдельный план трансформации&quot;
+description: &quot;Получить value-free решения и digest без выпуска receipt&quot;
+preconditions:
+  - &quot;Пользователь явно выбрал mixed-origin трансформацию, а не synthetic generation&quot;
+  - &quot;Разрешены точные local source, policy, mappings и новое назначение&quot;
+  - &quot;Версия CLI 1.6.0; бюджеты конечны; входы проверены локально&quot;
+inputs:
+  - name: source
+    type: path
+    required: true
+  - name: policy
+    type: path
+    required: true
+steps:
+  - id: review
+    action: &quot;Выполнить transform-review SOURCE POLICY --json по согласованным локальным путям&quot;
+    verification: &quot;exit 0; result.status=review_only; snapshot_sha256; value-free field decisions&quot;
+    on_failure: &quot;Остановиться; исправить policy или schema; не выдавать старый receipt за новый&quot;
+  - id: classify
+    action: &quot;Проверить выбранные действия и fallback для каждого поля без печати literals&quot;
+    verification: &quot;Preserve/fallback выявлены отдельно; sensitive/unknown/disputed не разрешены для preserve&quot;
+    on_failure: &quot;Запросить конкретное решение человека; не менять классификацию автоматически&quot;
+  - id: human_gate
+    action: &quot;Если требуется сохранение, передать человеку exact digest и локальную команду transform-approve; остановиться до receipt&quot;
+    verification: &quot;Агент не вводил APPROVE, не имитировал TTY и не выпускал receipt; новое исполнение требует отдельного согласованного scope&quot;
+    on_failure: &quot;Не исполнять трансформацию; сообщить недостающую авторизацию&quot;
+expected_outputs:
+  - &quot;Value-free review и exact snapshot digest&quot;
+  - &quot;При необходимости — запрос на local controlling-TTY review человеком, без агентского approval&quot;
+requires_human_approval: true
+</code></pre>
+<p>Исполняемый пример явных замен на вымышленных данных без preserve приведён в <a href="../transformation/">отдельной инструкции</a>. <code>agent-approve</code> для синтетической генерации и <code>transform-approve</code> для сохранения source values — разные границы.</p>
+<h2 id="ai-_1">Правила безопасности AI-агента<a class="headerlink" href="#ai-_1" title="Permanent link">&para;</a></h2>
+<h3 id="_3">Допустимые операции<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>Чтение разрешённых метаданных, локальное профилирование с бюджетами, построение spec, генерация новых значений с seed, валидация и сохранение в согласованную новую папку. Для базы — только allowlisted read-only агрегаты. Для AI — ограниченное metadata proposal после согласования передачи.</p>
+<h3 id="_4">Недопустимые операции<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>Копирование/shuffle исходных строк; сохранение реальных ID или свободного текста как shortcut; произвольный SQL; DDL/DML на источнике; расширение scope для обхода ошибки; выключение TLS; извлечение credentials; source rows в prompts, exceptions, fixtures или MCP responses; auto-approve provider proposal. Не используйте row-returning результаты как synthetic output.</p>
+<h3 id="_5">Файлы и ошибки<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>Читайте только явные разрешённые входы. Выходы размещайте отдельно; не перезаписывайте source, не обходите symlink/workspace guards. Не просматривайте <code>.env</code>, домашнюю папку или системные секреты для «поиска настройки». Для диагностики используйте только имена требуемых настроек и локальные статусы без значений secret.</p>
+<p>При ошибке не выполняйте зависимые этапы. Не повторяйте неверный provider/database payload в сообщении пользователю. Сообщайте код, фиксированную категорию и безопасное действие. При budget exhaustion уменьшите объём; не поднимайте лимиты автоматически.</p>
+<h3 id="_6">Когда требуется человек<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>До доступа к новому внешнему источнику: точные endpoint/scope/read-only роль/бюджеты.</li>
+<li>До передачи метаданных новому внешнему AI или другому получателю.</li>
+<li>До <code>agent-approve</code>: конкретный проверенный spec и SHA-256.</li>
+<li>До local-category: конкретное поле, нечувствительный domain и назначение.</li>
+<li>До исполнения SQL или иной записи в целевую систему.</li>
+<li>Если неоднозначны sensitive flag, identifier, inferred relationship или предметное правило.</li>
+</ul>
+<p>Уже согласованный scope сохраняется, пока входы, контракт и назначение не изменились. Это не повод спрашивать повторно о каждом локальном чтении, но и не разрешение на новую границу доступа.</p>
+<h3 id="_7">Условия остановки и завершения<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>Остановитесь, если неизвестна версия или схема, изменился вход после review, отсутствует необходимый approval, появились чувствительные литералы, противоречивые правила или ошибка проверки. Не подменяйте «Не подтверждено» утверждением об успехе.</p>
+<p>Завершение: spec соответствует задаче и review; count и seed зафиксированы; manifest подтверждает synthetic=true и source_rows_copied=false; проверки включены и прошли; для negative ожидаемые нарушения совпали; назначение и пути известны. Пользователь получает сводку без строк.</p>
+<p>Связанные обязательные guides проекта: <a href="../../../agent-guides/profiling/">профилирование</a>, <a href="../../../agent-guides/generation-and-rules/">генерация</a>, <a href="../../../agent-guides/trino-security/">Trino/MCP</a>, <a href="../../../agent-guides/advisors/">advisor</a>. Читайте guide только для выполняемой задачи.</p>
+<h3 id="160">Отдельная трансформация 1.6.0<a class="headerlink" href="#160" title="Permanent link">&para;</a></h3>
+<p>Запрет копирования относится к source-free generation. Для явно заказанной opt-in трансформации действуют отдельные policy/snapshot/receipt gates; результат mixed-origin. Агент может подготовить value-free review и потребить разрешённый точный receipt в согласованном scope, но не может выпускать receipt, вводить APPROVE за человека или имитировать TTY. Не выбирайте трансформацию вместо генерации автоматически. Согласие на agent-approve синтетического spec не является сохранением source values.</p>
+              
+</div>
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/wa-pis/agent-paranoid-android" class="fa fa-code-fork" style="color: #fcfcfc"> wa-pis/agent-paranoid-android</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../../..";</script>
+    <script src="../../../js/theme_extra.js"></script>
+    <script src="../../../js/theme.js"></script>
+      <script src="../../../js/print-site.js"></script>
+      <script src="../../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
