@@ -3,12 +3,6 @@
 Stable `1.6.0` is the recommended release. Its signed source, packages and
 containers passed [public verification](../release-evidence-1.6.0.md).
 
-The accepted RC5 runtime is the stable promotion source;
-its [acceptance evidence](../acceptance-evidence-1.6.0rc5.md),
-[publication evidence](../release-evidence-1.6.0rc5.md) and
-[release status](../rc5-release-status.md) remain historical candidate records.
-They do not replace checks of the new stable commit.
-
 ## Requirements
 
 - Python 3.11 or newer
@@ -21,7 +15,7 @@ existing environments to upgrade. The notice and release-gate rules for
 changing this matrix are defined in
 [Runtime And Integration Support](../reference/support-policy.md).
 
-Stable `1.6.0` retains the accepted RC1–RC5 generation and validation changes. Read the
+Read the
 [migration notes](../reference/generation-contract-migration.md) before
 regenerating existing fixtures.
 
@@ -53,22 +47,7 @@ python3 -m pip install "agent-paranoid-android[openai]==1.6.0"
 python3 -m pip install "agent-paranoid-android[gigachat]==1.6.0"
 ```
 
-The CI dependency ceilings are intentionally small enough to catch accidental
-growth:
-
-| Profile | Capability | Maximum installed distributions |
-| --- | --- | ---: |
-| base | CSV and JSON | 10 |
-| `parquet` | Parquet files | 11 |
-| `mcp` | Generator MCP server | 35 |
-| `openai` | Optional structured-output advisor | 20 |
-| `gigachat` | Experimental GigaChat advisor | 20 |
-| `trino` | Trino client and safe SQL parser | 25 |
-| `postgres` | Read-only PostgreSQL profiling driver | 12 |
-
-These are regression budgets, not a guarantee that every platform installs the
-same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
-environments that do not produce Parquet files.
+Dependency footprint budgets live in [Dependency Compatibility](../reference/dependency-compatibility.md#installation-footprint).
 
 The `all` extra remains available for development, demos, and container builds.
 It is not the recommended user installation. Use
@@ -80,13 +59,10 @@ explicit `gigachat` extra. Follow
 TLS verification, and the review-first workflow. The default provider remains
 OpenAI.
 
-## Accepted Candidate Baseline
+<a id="accepted-candidate-baseline"></a>
 
-Stable `1.6.0` is the recommended default. It promotes
-the accepted `1.6.0rc5` runtime without further behavior or dependency changes.
-The stable commit passed fresh exact-commit checks and artifact verification;
-RC5 evidence remains bound to RC5.
-Add an optional extra to the same exact stable pin only when needed.
+Stable `1.6.0` is the recommended default. Add an optional extra to the same
+exact stable pin only when needed.
 
 ### Windows PowerShell
 
@@ -110,60 +86,17 @@ quickstart smoke: ok
 doctor passed
 ```
 
-`doctor` creates its sample input and output under a temporary directory. It
-does not need a repository checkout and does not contact Trino or another
-external system. `doctor --require-extra parquet` also writes and reads a
-temporary Parquet bundle to verify that capability rather than only importing
-PyArrow. `doctor --require-extra mcp` verifies local generator tool
-registration without starting a server or opening a network connection.
-`doctor --require-extra trino` parses an allowlisted read-only query and
-constructs then closes a local client object without executing SQL or
-contacting a Trino coordinator.
-`doctor --require-extra postgres` verifies that the optional PostgreSQL driver
-is installed without opening a connection.
-`doctor --require-extra openai` constructs and closes a local SDK client with
-a non-secret placeholder, then verifies the structured Responses API and
-advisor adapter without contacting the provider.
-`doctor --require-extra gigachat` validates strict structured-response mapping
-and cleanup through a local fake SDK client. It does not resolve credentials,
-obtain an access token, or contact GigaChat.
+`doctor` uses a temporary fictional fixture and makes no external calls.
+Use `doctor --require-extra parquet` (or another installed extra) for an offline
+capability check. See [Troubleshooting](../operations/troubleshooting.md) for
+individual checks and [CLI automation](../reference/cli-automation.md) for JSON
+output.
 
-For CI, add `--json` to receive one versioned stdout document. For interactive
-shells, generate completion from the installed command inventory:
+<a id="install-for-development"></a>
 
-```bash
-test-data-agent completion bash
-test-data-agent completion zsh
-test-data-agent completion fish
-test-data-agent completion powershell
-```
-
-The command prints a script; it does not modify shell startup files.
-
-## Install For Development
-
-Clone the repository and install the locked development environment:
-
-```bash
-git clone https://github.com/wa-pis/agent-paranoid-android.git
-cd agent-paranoid-android
-python3 -m pip install "uv==0.11.23"
-uv sync --frozen --all-extras --no-install-project
-uv sync --frozen --all-extras --no-editable --no-build-isolation
-```
-
-Run the release-quality checks:
-
-```bash
-uv run --no-sync scripts/check_release.sh
-```
-
-Build the documentation in its isolated dependency group:
-
-```bash
-uv sync --frozen --only-group docs --no-install-project
-uv run --no-sync mkdocs build --strict
-```
+For development setup use [Contributing](https://github.com/wa-pis/agent-paranoid-android/blob/main/CONTRIBUTING.md).
+For documentation builds use [Publishing Documentation](../development/documentation.md).
+Shell completion has its own [reference](../reference/shell-completion.md).
 
 ## Confirm The Installed Version
 

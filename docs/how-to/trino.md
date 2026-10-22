@@ -1,9 +1,7 @@
 # Profile Through Trino
 
-!!! note "Availability"
-    Stable `1.5.0` includes the exact allowlist Trino workflow, credential-free
-    JDBC-style endpoints, qualified column wildcards, and the aggregate-only
-    `profile-query` command. These are retained in stable `1.6.0`; see [release status](../1.6.0-release-status.md).
+Database profiling is available in stable `1.6.0` and requires explicit
+read-only configuration, allowlists and resource budgets.
 
 Install the optional Trino client and, when using MCP, the MCP SDK:
 
@@ -12,8 +10,7 @@ pip install "agent-paranoid-android[trino]"
 pip install "agent-paranoid-android[mcp,trino]"
 ```
 
-Authentication settings in the accepted RC5 runtime are retained unchanged for
-stable 1.6.0. Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
+Stable `1.6.0` supports Basic, JWT, Kerberos, GSSAPI, OAuth2 and client
 certificates are documented in the
 [configuration reference](../reference/configuration.md#trino-connection). Follow its
 runtime secret-indirection, HTTPS verification and local OAuth opt-in rules.

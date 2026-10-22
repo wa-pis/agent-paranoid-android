@@ -9,19 +9,27 @@ on:
 permissions:
   contents: read
 
+# Serialize complete main publications, including mike state retention.
+concurrency:
+  group: docs-publication-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     name: Build documentation
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    concurrency:
-      group: docs-build-${{ github.ref }}
-      cancel-in-progress: true
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      identity: ${{ steps.identity.outputs.identity }}
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
@@ -36,13 +44,43 @@ jobs:
           prune-cache: true
 
       - name: Install locked documentation environment
-        run: uv sync --frozen --only-group docs --python python --no-install-project
+        run: uv sync --frozen --group docs --extra dev --python python --no-install-project
 
       - name: Verify documentation dependency licenses
         run: uv run --no-sync python scripts/check_dependency_licenses.py
 
+      - name: Check documentation contracts
+        run: uv run --no-sync pytest tests/test_documentation.py tests/test_documentation_build.py -q
+
       - name: Build documentation with strict validation
         run: uv run --no-sync mkdocs build --strict
+
+      - name: Build versioned documentation and offline formats
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --no-sync python -m scripts.build_documentation
+          --output site --verify-release --state-bundle site.bundle
+
+      - name: Preserve native mike publication state
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: documentation-mike-state
+          path: site.bundle
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Read documentation identity
+        id: identity
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          identity = json.loads(Path("site/documentation.json").read_text())
+          with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+              output.write("identity=" + json.dumps(identity) + "\n")
+          PY
 
       - name: Preserve rendered documentation
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -50,7 +88,7 @@ jobs:
           name: documentation-site
           path: site/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
 
       - name: Upload GitHub Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -82,33 +120,59 @@ jobs:
 
   verify:
     name: Verify public documentation
-    needs: deploy
+    needs: [build, deploy]
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    permissions: {}
+    permissions:
+      contents: read
     steps:
+      - name: Check out verification code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
       - name: Wait for the public site
         env:
           DOCS_URL: ${{ needs.deploy.outputs.page_url }}
+          EXPECTED_IDENTITY: ${{ needs.build.outputs.identity }}
         run: |
           set -euo pipefail
           for attempt in {1..15}; do
-            page="$(
-              curl \
-                --fail \
-                --location \
-                --max-time 5 \
-                --silent \
-                --show-error \
-                "${DOCS_URL}" || true
-            )"
-            if grep -Fq "Agent Paranoid Android" <<< "${page}"; then
-              echo "Documentation is available at ${DOCS_URL}"
+            if python3 -m scripts.verify_documentation \
+              --url "${DOCS_URL}" --expected-json "${EXPECTED_IDENTITY}"; then
+              echo "Versioned Agent Paranoid Android documentation is available."
               exit 0
             fi
             if [[ "${attempt}" -eq 15 ]]; then
               echo "Documentation did not become available at ${DOCS_URL}" >&2
               exit 1
             fi
-            sleep 10
+            sleep 5
           done
+
+  retain:
+    name: Retain verified mike versions
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Download native mike state
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: documentation-mike-state
+          path: docs-state
+
+      - name: Retain verified versions without rewriting branch history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh auth setup-git
+          git fetch docs-state/site.bundle gh-pages:refs/heads/docs-site-candidate
+          git push origin refs/heads/docs-site-candidate:refs/heads/gh-pages

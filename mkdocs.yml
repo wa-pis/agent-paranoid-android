@@ -1,3 +1,4 @@
+strict: true
 site_name: Agent Paranoid Android
 site_description: Reproducible synthetic test data for CSV and database workflows
 site_url: https://wa-pis.github.io/agent-paranoid-android/
@@ -7,10 +8,30 @@ edit_uri: edit/main/docs/
 
 theme:
   name: readthedocs
-  highlightjs: true
+  highlightjs: false
+  custom_dir: docs/theme
+
+hooks:
+  - scripts/documentation_hooks.py
 
 plugins:
   - search
+  - mike:
+      alias_type: copy
+      deploy_prefix: versions
+      version_selector: false
+  - print-site:
+      print_page_title: User Handbook
+      print_page_basename: handbook
+      add_cover_page: false
+      add_table_of_contents: false
+      toc_depth: 2
+      enumerate_headings: false
+      exclude:
+        - history.md
+        - downloads.md
+        - versions.md
+        - roadmap.md
 
 markdown_extensions:
   - admonition
@@ -30,12 +51,15 @@ validation:
 
 exclude_docs: |
   implementation_map.md
+  theme/
+
+extra_css:
+  - stylesheets/handbook.css
 
 nav:
-  - Home: index.md
-  - Getting Started:
+  - Start Here:
+      - Overview: index.md
       - Installation: getting-started/installation.md
-      - Product Validation Pilot: getting-started/product-validation-pilot.md
       - First CSV Dataset: getting-started/first-csv.md
       - Related Tables: getting-started/related-tables.md
       - Review The Output: getting-started/review-output.md
@@ -43,57 +67,21 @@ nav:
       - Add Business Rules: how-to/business-rules.md
       - Profile PostgreSQL: how-to/postgresql.md
       - Profile Through Trino: how-to/trino.md
+      - Transform Local Data: how-to/transformation.md
   - Integrations:
       - Connect An MCP Client: how-to/mcp.md
       - Connect An AI Client: ai_integration.md
-      - Use The GigaChat Advisor: how-to/gigachat.md
-      - Build A Provider Adapter: how-to/custom-advisor-provider.md
-      - Build A Semantic Provider: how-to/custom-semantic-provider.md
-      - Run The Reference Agent: how-to/reference-agent.md
-  - Safety And Concepts:
-      - Safety Model: concepts/safety-model.md
-      - Threat Model: concepts/threat-model.md
+      - Containers: operations/containers.md
+  - Reference:
+      - Reference Index: reference/index.md
       - Choose An Approach: concepts/choosing-an-approach.md
       - Profiles And Specs: concepts/profiles-and-specs.md
-      - Relational Synthesis Contract: concepts/relational-synthesis-contract.md
-      - DatasetSpec Compatibility: concepts/dataset-spec-compatibility.md
-      - Dataset Workflow: domain_agnostic_workflow.md
-  - Reference:
-      - CLI Command Index: reference/cli.md
-      - CLI Workflows: reference/cli-workflows.md
-      - CLI Automation And JSON: reference/cli-automation.md
-      - CLI Errors And Exit Codes: reference/cli-errors.md
-      - Shell Completion: reference/shell-completion.md
-      - Public Stability: reference/stability.md
-      - Runtime And Integration Support: reference/support-policy.md
-      - Dependency Compatibility: reference/dependency-compatibility.md
-      - Compatibility Surfaces: reference/compatibility.md
-      - Configuration: reference/configuration.md
-      - Source And Output Matrix: reference/source-output-matrix.md
-      - DatasetSpec: dataset_profile_and_spec.md
-      - Advisor API: reference/advisor.md
-      - MCP Tools: mcp_examples.md
-      - MCP Permissions: reference/mcp-permissions.md
-  - Operations:
+      - Safety Model: concepts/safety-model.md
+  - Help:
       - Troubleshooting: operations/troubleshooting.md
       - Known Issues: known-issues.md
-      - Resource Budgets: operations/resource-budgets.md
-      - MCP Audit Logging: operations/audit-logging.md
-      - Container Deployment: operations/containers.md
-  - Roadmap: roadmap.md
-  - Maintainers:
-      - Architecture Decisions: adr/index.md
-      - Open Decisions And Discrepancies: adr/open-questions.md
-      - Architecture: agent_design.md
-      - Development: development.md
-      - Final Acceptance Matrix: acceptance-matrix.md
-      - Stable 1.6.0 Release Status: 1.6.0-release-status.md
-      - Stable 1.6.0 Publication Evidence: release-evidence-1.6.0.md
-      - RC5 Release Status: rc5-release-status.md
-      - Cross-Interface Acceptance Evidence: acceptance-evidence-1.6.0rc5.md
-      - RC5 Publication Evidence: release-evidence-1.6.0rc5.md
-      - Release Process: release.md
-      - Manual Release Runbook: manual-release-runbook.md
-      - Release Evidence: release-evidence.md
-      - Security Review History: security-history.md
-      - OpenSpec Archive: openspec-archive.md
+  - Documentation:
+      - Downloads: downloads.md
+      - Versions: versions.md
+      - Roadmap: roadmap.md
+  - History And Maintenance: history.md

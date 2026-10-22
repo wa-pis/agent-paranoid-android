@@ -1,10 +1,8 @@
 # CLI Command Index
 
-Stable `1.6.0` promotes the publicly accepted `1.6.0rc5`
-runtime with the same commands and safety boundaries. Existing “RC” headings
-and anchors identify that baseline. Exact-commit gates, public verification and
-the finite fictional transformation/session campaign completed; see the
-[1.6.0 release evidence](../release-evidence-1.6.0.md) for bindings and limits.
+This reference describes stable `1.6.0`. For complete tasks start with
+[the user guide](../index.md) or [Transform Local Data](../how-to/transformation.md).
+Historical anchors are retained so existing links keep working.
 
 Generation retains supported intentionally invalid output and its validation
 report, but returns exit `1` / JSON status `validation_failed` when validation
@@ -58,7 +56,7 @@ The policy's `input_format` selects CSV, Parquet or an already captured
 PostgreSQL/Trino query-result envelope. Configured query capture is a separate `transform-batch query-execute`
 operation; this review command neither imports SQL scripts as data nor connects
 to a database.
-Installed fictional candidate acceptance covers all four inputs and three outputs
+Installed fictional acceptance covers all four inputs and three outputs
 using the same saved policy and review digest, including public command execution.
 Native Parquet/captured-result input supports nullable strings, signed integers,
 float64, BOOLEAN, date32 and declared decimal128. Native Arrow timestamps,
@@ -94,13 +92,15 @@ not copied. This is debugging metadata, not a preview of output or approval.
 Review alone does not authorize source preservation. The separate local
 approval and execution entrances below enforce the exact reviewed snapshot.
 
-### Implemented RC execution candidate
+<a id="implemented-rc-execution-candidate"></a>
 
-The registered RC implementation uses the same saved policy and reviewed
+### Transformation Execution
+
+The registered implementation uses the same saved policy and reviewed
 `snapshot_sha256` for `transform-execute SOURCE POLICY DESTINATION
 --snapshot-sha256 SHA`. Output format comes from the policy; destination must
 be a new bundle, never an existing directory or an input file. Success reports
-digest, provenance counts and output-budget metadata, not rows. The candidate
+digest, provenance counts and output-budget metadata, not rows. The consumer
 uses `transformation_completed` inside the existing JSON `result` envelope;
 errors retain the existing `error` envelope and exit code.
 
@@ -120,14 +120,14 @@ source, policy, classification or referenced mapping/generation-policy bytes
 requires review and approval again. Sensitive, unknown or conflicting fields
 remain ineligible for preservation.
 
-Candidate run caps are `--max-total-input-bytes` and `--max-output-bytes`.
+Run caps are `--max-total-input-bytes` and `--max-output-bytes`.
 They may lower, not silently raise, effective session/profile limits. A request
 above the ceiling and actual exhaustion are distinct typed failures with safe
 counters and supported recovery keys. Cleanup-incomplete errors require local
 inspection of destination/staging before retry; they do not permit overwrite.
 Database capture and private `derive` are not enabled by this entrance.
 
-Stable `1.6.0` retains these commands from `1.6.0rc5`; stable `1.5.0` does not include them.
+These commands are available in stable `1.6.0`.
 The finite fictional transformation/session campaign completed for stable;
 see the [current evidence and limits](../release-evidence-1.6.0.md).
 Command discovery, fictional tests and release acceptance do not authorize a
@@ -146,11 +146,12 @@ invalid initial policy or turn a sensitivity answer into approval.
 
 <a id="closed-common-profile-workflow-candidate"></a>
 
-### Common profile workflow (1.6 RC)
+<a id="common-profile-workflow-16-rc"></a>
 
-Stable `1.6.0` retains the RC5 `transform-batch` registration in the CLI and
-`common_transformation` in the running generator MCP server. Published 1.5.0
-does not provide these additions. Their operations are:
+### Common profile workflow
+
+Stable `1.6.0` provides `transform-batch` in the CLI and
+`common_transformation` in the running generator MCP server. Their operations are:
 
 | Operation | Required local arguments | Effect |
 | --- | --- | --- |
@@ -171,12 +172,11 @@ not approved decisions. `--edit-actions`/`--edit-formats` require `--decide`, an
 CSV creation with interactive decisions requires explicit action editing.
 Saving configuration changes reference paths and requires a fresh reviewed digest.
 Existing files, unsafe references and output destinations are not overwritten.
-Registration is distinct from authorization to process a dataset and from the
-still-open transformation/session acceptance campaign. The
-[RC5 release record](../release-evidence-1.6.0rc5.md) records completed release
-gates without closing that campaign or issuing preservation authority.
+Registration is not authorization to process a dataset. The finite fictional
+stable campaign completed with [recorded limits](../release-evidence-1.6.0.md);
+it does not issue preservation authority or clear changed activation.
 
-The RC composition exposes these operations under `transform-batch`. Its
+Stable `1.6.0` exposes these operations under `transform-batch`. Its
 machine-readable success and error responses use CLI schema version `1.0`;
 success metadata is inside `result`, not flattened into the envelope. Runtime
 `--json`/`--debug` flags are accepted before the command, before the operation,
@@ -191,8 +191,7 @@ same digest and receipt. Editing an input, policy, mapping or output setting
 requires a fresh review; a receipt is not a reusable blanket approval. Agents
 can consume a matching receipt but cannot issue one.
 
-Migration from published `1.5.0` uses an explicitly accepted release from the
-1.6 line; stable 1.6.0 retains the RC5 command contract.
+For these workflows install stable `1.6.0` or a compatible later release.
 Installing `1.5.0` does not expose `transform-batch`. Keep ordinary source-free
 generation workflows separate and retain their existing schemas. A transformed
 bundle may deliberately contain preserved or explicitly mapped source values;
@@ -325,7 +324,9 @@ Aliases:
 - `generate-from-csv-folder` is an alias for `generate-from-example`.
 
 
-### Configured SQL Sessions (1.6 RC)
+<a id="configured-sql-sessions-16-rc"></a>
+
+### Configured SQL Sessions
 
 `test-data-agent transform-batch query-execute` completes a single
 owned session. It reads a saved batch profile and a bounded reference file,

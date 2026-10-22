@@ -99,10 +99,11 @@ metadata, schema drift, or budget exhaustion fails closed and leaves no
 profile. Errors intentionally omit SQL text, literals, endpoints, and backend
 messages; inspect the local reviewed file and allowlists instead.
 
-## Transformation Candidate Rejected
+<a id="transformation-candidate-rejected"></a>
 
-The published RC5 runtime already registers the common-profile CLI/MCP
-workflow; stable `1.6.0` retains it unchanged. See the [CLI workflow](../reference/cli.md#common-profile-workflow-16-rc).
+## Transformation Rejected
+
+Stable `1.6.0` provides the common-profile CLI/MCP workflow. See the [CLI workflow](../reference/cli.md#common-profile-workflow-16-rc).
 Published `1.5.0` does not include this command. Registration grants no dataset
 permission. The finite fictional transformation/session campaign is recorded in
 [stable evidence](../release-evidence-1.6.0.md); it grants no blanket dataset consent.

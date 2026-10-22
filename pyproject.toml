@@ -84,6 +84,9 @@ dev = [
 [dependency-groups]
 docs = [
     "mkdocs>=1.6.1,<2.0.0",
+    "mike>=2.1.3,<3.0.0",
+    "mkdocs-print-site-plugin>=2.7.3,<3.0.0",
+    "htmlark>=1.0.0,<2.0.0",
 ]
 
 [tool.uv]

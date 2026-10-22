@@ -217,7 +217,7 @@ def test_ci_covers_supported_python_versions() -> None:
 def test_documentation_workflow_builds_strict_site() -> None:
     workflow = (ROOT / ".github" / "workflows" / "docs.yml").read_text()
 
-    assert "uv sync --frozen --only-group docs" in workflow
+    assert "uv sync --frozen --group docs --extra dev" in workflow
     assert "scripts/check_dependency_licenses.py" in workflow
     assert "mkdocs build --strict" in workflow
     assert "name: documentation-site" in workflow

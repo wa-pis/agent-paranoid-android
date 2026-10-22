@@ -127,3 +127,22 @@ hashed dependency evidence in a generated manifest.
 A newly discovered incompatibility must first be reproduced by a focused
 contract test. Narrowing a range then requires a user-facing changelog entry
 and a package release; an unreviewed speculative bound is not accepted.
+
+## Installation Footprint
+
+The CI dependency ceilings are intentionally small enough to catch accidental
+growth:
+
+| Profile | Capability | Maximum installed distributions |
+| --- | --- | ---: |
+| base | CSV and JSON | 10 |
+| `parquet` | Parquet files | 11 |
+| `mcp` | Generator MCP server | 35 |
+| `openai` | Optional structured-output advisor | 20 |
+| `gigachat` | Experimental GigaChat advisor | 20 |
+| `trino` | Trino client and safe SQL parser | 25 |
+| `postgres` | Read-only PostgreSQL profiling driver | 12 |
+
+These are regression budgets, not a guarantee that every platform installs the
+same count. `PyArrow` is the largest optional wheel, so keep `parquet` out of
+environments that do not produce Parquet files.

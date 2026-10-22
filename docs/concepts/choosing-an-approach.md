@@ -6,9 +6,7 @@ primary interfaces are the CLI and Python library. Database clients, MCP, and
 AI providers are optional integrations around the same review and validation
 boundaries.
 
-Exact component and database allowlist workflows, credential-free JDBC-style
-endpoint input, qualified column wildcards and reviewed aggregate-only SQL query
-sources are already available in stable `1.5.0`. They remain in stable `1.6.0`; see [release status](../1.6.0-release-status.md).
+The database workflows below are available in stable `1.6.0`.
 
 ## Quick Comparison
 
