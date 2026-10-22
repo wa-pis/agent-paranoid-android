@@ -134,7 +134,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation bcfaaf94dc3c6e7f97c5af779a34f4da94035558
+  <br>Documentation d57bed7897f23410cb817c6d0f66789f618a24fa
   <br><a href="../../../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -164,6 +164,25 @@ seed <code>20260801</code>, and no network or optional integration.</p>
 <p>See <a href="../../getting-started/related-tables/">Related Tables</a> for relationship and
 business-rule guidance.</p>
 <h2 id="reviewed-datasetspec">Reviewed DatasetSpec<a class="headerlink" href="#reviewed-datasetspec" title="Permanent link">&para;</a></h2>
+<p>For unequal table sizes, set counts while preparing the specification:</p>
+<pre><code class="language-bash">test-data-agent infer-spec out/profile.json --output out/dataset_spec.yaml \
+  --count 100 \
+  --entity-count warehouse.crm.customers=30 \
+  --entity-count warehouse.public.orders=200 \
+  --max-total-rows 230
+</code></pre>
+<p>Use exact entity names from the profile. Repeat <code>--entity-count ENTITY=COUNT</code>
+for different entities; duplicate or unknown names and nonpositive counts reject.
+An entity-specific count takes precedence over <code>--count</code>; other entities use
+<code>--count</code>, or their profiled row count (at least one) when it is omitted.
+This does not scale counts by a factor or infer relationships.</p>
+<p><code>--max-total-rows</code> is an optional inference-time ceiling on the resolved sum.
+Oversized plans reject before field inference or spec publication. The ceiling
+is not persisted as a generation setting: review the saved counts, then generate
+without overriding them. A later <code>generate --count</code> or <code>load_test</code> multiplier
+changes the requested volume and requires a new size review. Existing generation
+row, byte and work limits still apply. Neither option changes DatasetSpec schema
+1.1 or source access.</p>
 <p><code>infer-spec</code> expects a profiling-command artifact, not an existing DatasetSpec.
 JSON keys <code>schema_version</code>, <code>privacy_rules</code>, <code>privacy_settings</code>,
 <code>generation_settings</code> and <code>validation_settings</code> select spec parsing even if
