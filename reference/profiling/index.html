@@ -133,7 +133,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br>Documentation 05abb21d0325156ba99fb3c4b81d2180573d4801
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -162,6 +162,11 @@ decimal/exponent identifiers remain potentially sensitive, regardless of an
 amount-like column name. Explicit sensitive names and secrets retain protection;
 sensitive profiles omit ranges as well as source categories. Ambiguous financial
 columns require review; local category permission is not declassification.</p>
+<p>NaN, infinity and overflowing exponent text are not finite numeric evidence.
+A column containing them is not inferred as a complete numeric distribution.
+Folder cache format 7 recomputes older cached profiles. Reprofile saved standalone
+artifacts and review the new specification rather than trusting old nonfinite
+extrema; existing approved plans are not silently rewritten.</p>
 <p>Generated string identifiers use the <code>synthetic_</code> prefix. This changes exact
 seeded identifier output relative to earlier releases, without changing the
 profile or specification schema version.

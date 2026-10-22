@@ -73,6 +73,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#safety-restrictions">Safety Restrictions</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generation-ranges-and-business-invariants">Generation ranges and business invariants</a>
+    </li>
     </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../postgresql/">Profile PostgreSQL</a>
@@ -150,7 +152,7 @@
 
 <aside class="documentation-identity" aria-label="Documentation version">
   <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br>Documentation 05abb21d0325156ba99fb3c4b81d2180573d4801
   <br><a href="../../versions/stable/">Stable version selector</a> · <a href="../../downloads/">Downloads</a>
 </aside>
 
@@ -335,6 +337,21 @@ literals are rejected by CLI and MCP entry points.</p>
 <p>Formula syntax is a bounded arithmetic subset, not Python or SQL. Rule payload
 size, expression complexity, and estimated row/rule evaluations are limited.</p>
 <p>See <a href="../../reference/configuration/">Configuration</a> for adjustable limits.</p>
+<h2 id="generation-ranges-and-business-invariants">Generation ranges and business invariants<a class="headerlink" href="#generation-ranges-and-business-invariants" title="Permanent link">&para;</a></h2>
+<p>A field's distribution describes sampling. A formula in <code>assign</code> mode computes
+and replaces its target; its result may leave that sampling range. The report
+records assignment-domain checks and violations separately from business-rule
+validity. Declare a field rule with <code>min_value</code>/<code>max_value</code> when the result must
+obey an invariant. Formula <code>check</code> mode validates existing values without
+assigning them; use it when replacement would hide the condition you intend to
+test. The complete runnable reference linked above includes both modes and
+conditional predicates, including null and inclusive range checks.</p>
+<p>Scenario weights are relative probabilities, not exact row quotas or predicates
+that automatically bind a scenario to source rows. A passing rule report checks
+declared rules; it does not establish source fidelity or discover missing rules.
+Entity-attribute-value inputs are not automatically pivoted into business fields.
+Model the desired entities and declare relationships/rules explicitly before
+using the generation command above.</p>
               
 
             </div>

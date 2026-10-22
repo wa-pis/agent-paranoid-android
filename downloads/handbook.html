@@ -38,7 +38,7 @@
 <div class="section" itemprop="articleBody">
 <aside aria-label="Documentation version" class="documentation-identity">
 <strong>Maintained stable guidance</strong> · Package 1.6.0
-  <br/>Documentation d10145be9f01085eb1648b7192045ab020095b20
+  <br/>Documentation 05abb21d0325156ba99fb3c4b81d2180573d4801
   <br/><a href="https://wa-pis.github.io/agent-paranoid-android/versions/stable/">Stable version selector</a> · <a href="https://wa-pis.github.io/agent-paranoid-android/downloads/">Downloads</a>
 </aside>
 <section class="handbook-cover"><h1>Agent Paranoid Android</h1><p>User Handbook</p><p>Reproducible synthetic test data for CSV and database workflows</p></section>
@@ -674,7 +674,22 @@ tokens, or other production literals into rule files. Sensitive-looking
 literals are rejected by CLI and MCP entry points.</p>
 <p>Formula syntax is a bounded arithmetic subset, not Python or SQL. Rule payload
 size, expression complexity, and estimated row/rule evaluations are limited.</p>
-<p>See <a href="https://wa-pis.github.io/agent-paranoid-android/reference/configuration/">Configuration</a> for adjustable limits.</p></section><section class="print-page" heading-number="2.2" id="how-to-postgresql"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">¶</a></h1>
+<p>See <a href="https://wa-pis.github.io/agent-paranoid-android/reference/configuration/">Configuration</a> for adjustable limits.</p>
+<h2 id="how-to-business-rules-generation-ranges-and-business-invariants">Generation ranges and business invariants<a class="headerlink" href="#how-to-business-rules-generation-ranges-and-business-invariants" title="Permanent link">¶</a></h2>
+<p>A field's distribution describes sampling. A formula in <code>assign</code> mode computes
+and replaces its target; its result may leave that sampling range. The report
+records assignment-domain checks and violations separately from business-rule
+validity. Declare a field rule with <code>min_value</code>/<code>max_value</code> when the result must
+obey an invariant. Formula <code>check</code> mode validates existing values without
+assigning them; use it when replacement would hide the condition you intend to
+test. The complete runnable reference linked above includes both modes and
+conditional predicates, including null and inclusive range checks.</p>
+<p>Scenario weights are relative probabilities, not exact row quotas or predicates
+that automatically bind a scenario to source rows. A passing rule report checks
+declared rules; it does not establish source fidelity or discover missing rules.
+Entity-attribute-value inputs are not automatically pivoted into business fields.
+Model the desired entities and declare relationships/rules explicitly before
+using the generation command above.</p></section><section class="print-page" heading-number="2.2" id="how-to-postgresql"><h1 id="how-to-postgresql-profile-postgresql">Profile PostgreSQL<a class="headerlink" href="#how-to-postgresql-profile-postgresql" title="Permanent link">¶</a></h1>
 <p>Database profiling is available in stable <code>1.6.0</code> and requires explicit
 read-only configuration, allowlists and resource budgets.</p>
 <p>Install the optional driver:</p>
@@ -2469,11 +2484,27 @@ symlink resolves outside it.</p>
 <p>Do not open a public issue containing exploit details, source data, PII, or
 credentials. Follow the repository
 <a href="https://github.com/wa-pis/agent-paranoid-android/security/policy">security policy</a>.</p></section><section class="print-page" heading-number="5.2" id="known-issues"><h1 id="known-issues-known-issues">Known Issues<a class="headerlink" href="#known-issues-known-issues" title="Permanent link">¶</a></h1>
-<p>No currently accepted product-level issues are documented for the publicly
-verified RC5 runtime selected for stable <code>1.6.0</code>. The promotion scope audit found
-no new confirmed product defect; fresh stable review and publication checks are
-still pending. See
-<a href="https://wa-pis.github.io/agent-paranoid-android/1.6.0-release-status/">stable status</a>.</p>
+<p>Stable <code>1.6.0</code> completed <a href="https://wa-pis.github.io/agent-paranoid-android/release-evidence-1.6.0/">public verification</a>.
+External acceptance feedback was reconciled against current main on 2026-10-22;
+the <a href="https://github.com/wa-pis/agent-paranoid-android/tree/main/openspec/changes/external-feedback-1-6">feedback work plan</a>
+separates historical fixes, current limitations and unverified observations.</p>
+<ul>
+<li>CSV numeric strings can remain phone-like and sensitive. Do not bypass privacy
+  checks or switch exact measures to float to suppress an error; reviewed numeric
+  profiling is planned. Exact decimal generation keeps its existing reviewed
+  <code>--decimal-fields</code> contract.</li>
+<li>Trino already supports explicit runtime authentication over verified HTTPS.
+  The external authentication failure still needs configuration/version evidence;
+  fake-driver tests do not establish acceptance against a particular server.</li>
+<li>Numeric shape supports optional zero/subunit frequencies and a minimum subunit
+  exponent. Older profiles can omit that evidence; reprofile before assuming it
+  exists. A negative exponent is valid for values below one. Parquet distinct
+  counts can be unavailable; missing statistics do not mean zero distinct values.</li>
+<li>Relationship validation checks declared relationships. Missing logical edges,
+  source orphan rates and temporal granularity are not established by a passing
+  validation report. Use reviewed declarations and explicit entity row counts.</li>
+</ul>
+<p>These are development follow-ups, not changes already published in <code>1.6.0</code>.</p>
 <p>The <a href="https://wa-pis.github.io/agent-paranoid-android/acceptance-matrix/">separate transformation/session acceptance campaign</a>
 remains open, including genuine local-terminal preservation acceptance where
 required. Existing automated and historical RC results do not establish its
@@ -2548,4 +2579,4 @@ resource and artifact durability limits remain in their respective guides.</p>
         });
     </script>
 </body>
-</html><!--Generated by HTMLArk 2026-10-22 19:43:06.347378. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-s1_g09a8/current/handbook/attachment.html-->
+</html><!--Generated by HTMLArk 2026-10-22 19:58:39.288455. Original URL /home/runner/work/agent-paranoid-android/agent-paranoid-android/.apa-docs-6fi_3n1l/current/handbook/attachment.html-->
