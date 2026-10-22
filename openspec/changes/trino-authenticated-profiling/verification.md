@@ -1,6 +1,6 @@
 # Current authentication verification
 
-All production Trino DB-API connections converge in `TrinoClient._stream_rows`.
+All production Trino DB-API connections converge in `TrinoClient._query_rows`.
 Callers include SQL-query adapters, MCP construction and the existing gated
 transformation streaming adapter. `TrinoConfig.from_env` supplies runtime auth
 configuration. The client builds the auth object before connection, requires
