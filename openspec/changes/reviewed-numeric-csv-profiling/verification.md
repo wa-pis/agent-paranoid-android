@@ -30,6 +30,9 @@ users must reprofile affected sources and review the resulting specification.
   creating the default profile cache. The identical source passes in the
   disposable copy; no path-policy relaxation was made.
 - Ruff and strict OpenSpec validation passed. Strict MkDocs build passed.
+- Mypy passed for all 155 production source files with a disposable cache.
+- Separate existing authentication/CLI/SQL-query regressions: 259 passed,
+  one isolated registration-candidate test skipped; no live calls.
 
 ## Still pending
 
