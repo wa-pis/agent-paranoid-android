@@ -9,6 +9,9 @@ All notable changes to this project are documented here.
 - Versioned documentation on GitHub Pages using mike, with separate development
   guidance and PDF, standalone HTML, Markdown and offline-site downloads.
   Documentation revisions remain distinct from package versions.
+- Complete annotated business-rules example with a runnable DatasetSpec,
+  condition/formula/aggregate/scenario reference and a generated standalone
+  JSON Schema checked against the runtime contract.
 
 ### Changed
 

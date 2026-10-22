@@ -51,6 +51,10 @@ if generated != checked_in:
     raise SystemExit("checked-in DatasetSpec schema is stale; run scripts/export_dataset_schema.py")
 PY
 
+echo "==> Business rules schema freshness"
+python3 scripts/export_business_rules_schema.py "$TMP_DIR/business_rules.schema.json"
+cmp "$TMP_DIR/business_rules.schema.json" schemas/business_rules.schema.json
+
 echo "==> Quickstart smoke"
 python3 -m test_data_agent.cli generate-from-example tests/fixtures/example_dataset \
   --count 25 \

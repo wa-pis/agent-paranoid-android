@@ -4,6 +4,13 @@ Use structured YAML or JSON when generated rows must satisfy domain rules.
 The deterministic rule engine applies and validates the rules; an LLM is not
 the enforcement mechanism.
 
+For a complete annotated format, see
+[the runnable business-rules reference](https://github.com/wa-pis/agent-paranoid-android/tree/main/examples/business_rules),
+including all rule families, condition operators, formula modes, aggregates,
+scenarios and a matching DatasetSpec. The standalone
+[JSON Schema](https://github.com/wa-pis/agent-paranoid-android/blob/main/schemas/business_rules.schema.json)
+is generated from the runtime model.
+
 ## Create A Rule File
 
 The checked-in example at `examples/orders_rules.yaml` contains:
