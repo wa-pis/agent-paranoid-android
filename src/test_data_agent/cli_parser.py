@@ -297,6 +297,15 @@ def register_dataset_commands(
     profile_example_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing profile JSON.")
     add_local_category_option(profile_example_parser)
 
+    discovery_parser = subparsers.add_parser(
+        "discover-relationships", help="Save metadata-only relationship hypotheses for human review.",
+        description="Use a saved profile only. No database access, provider call or relationship activation.",
+        formatter_class=PublicHelpFormatter,
+    )
+    discovery_parser.add_argument("profile", type=Path, help="Safe profile JSON containing authorized entities only.")
+    discovery_parser.add_argument("--output", "-o", type=Path, required=True, help="Review-only candidate JSON report.")
+    discovery_parser.add_argument("--overwrite", action="store_true", help="Allow replacing an existing candidate report.")
+
     infer_spec_parser = subparsers.add_parser(
         "infer-spec",
         help="Infer a reusable DatasetSpec YAML from a safe profile.",

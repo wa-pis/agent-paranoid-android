@@ -69,3 +69,21 @@ successful source-fidelity check.
 #### Scenario: Entity sizing input is ambiguous or invalid
 - **WHEN** a CLI override repeats an entity, refers to an unknown entity or supplies a nonpositive/noninteger count
 - **THEN** inference rejects without publishing a spec or reflecting rejected values
+
+#### Scenario: Saved metadata supplies relationship hypotheses for review
+- **GIVEN** a saved profile containing authorized entity and field metadata
+- **WHEN** relationship discovery exports a candidate report
+- **THEN** the report binds candidates to the profile fingerprint and marks human review required
+- **AND** no source values, database/provider queries or generation authority are introduced
+- **AND** only entities and fields already in the profile may be referenced
+
+#### Scenario: Names and counts do not establish key-domain identity
+- **GIVEN** same-named compatible fields, possibly with competing parents or different underlying domains
+- **WHEN** metadata-only discovery produces candidates
+- **THEN** domain overlap and source integrity remain explicitly untested
+- **AND** accepting a discovery proposal does not modify the generation specification
+- **AND** absent parent tables are not looked up or invented
+
+#### Scenario: Discovery exceeds its bounded allowance
+- **WHEN** metadata mining exceeds its shared work/deadline allowance, 1,000-candidate cap or report byte ceiling
+- **THEN** discovery fails without publishing a partial trusted report

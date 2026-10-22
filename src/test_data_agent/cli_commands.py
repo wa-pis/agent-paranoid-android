@@ -113,6 +113,10 @@ def run_dataset_command(
     if args.command in {"profile-example", "profile-csv-folder"}:
         return profile_example_command(args)
 
+    if args.command == "discover-relationships":
+        from test_data_agent.io.commands import discover_relationships_command
+        return discover_relationships_command(args)
+
     if args.command == "infer-spec":
         return infer_dataset_spec_command(args)
 

@@ -36,3 +36,24 @@ output-byte and work budgets remain authoritative. Later count overrides or
 load multiplication require reviewing volume again. This additive planning
 contract changes no schema, default counts, seed behavior or MCP registration;
 callers with no new options retain their previous behavior.
+
+R4 exposes existing deterministic discovery through a saved-profile-only CLI.
+A typed JSON report binds candidates to the existing canonical profile
+fingerprint and explicitly denies generation authority. Candidate evidence and
+field references exclude distribution literals. Same names/types and aggregate
+counts do not establish overlap or domain identity; competing parents remain
+unresolved. Only references already in the supplied profile are considered;
+there is no database/provider lookup or additional authorization surface.
+
+The existing LocalProfileBudget is shared across metadata iteration, foreign-key
+and temporal candidate comparisons. Candidate count is capped at 1,000; input
+profile and output report use the existing profile-payload byte ceiling. A
+budget/cap failure publishes no partial report. Existing direct mining calls
+retain their candidate identity/order but gain bounded execution and explicit
+untested-domain assumptions. Review remains separate from DatasetSpec authoring
+and cannot approve or activate generation.
+
+The report has an explicit `relationship_discovery` artifact type. DatasetSpec
+validation rejects this type across direct and file/CLI consumers instead of
+silently interpreting it as an empty spec. The shared local deadline is checked
+again by the atomic writer immediately before report publication.

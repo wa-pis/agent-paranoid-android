@@ -2,7 +2,7 @@
 - [x] R1: Verify repeated-key pool coverage across adapters and exact/unknown/censored count cases with synthetic profiles.
 - [x] R2: Verify metadata PK names not ending in id; explicitly support or reject composite PKs without selecting a component silently.
 - [x] R3: Specify additive per-entity sizing and total row budgets; retain --count compatibility and reject oversized plans before allocation.
-- [ ] R4: Reuse metadata-only relationship discovery as reviewable candidates; test ambiguous names, absent parents, different domains and unauthorized tables.
+- [x] R4: Reuse metadata-only relationship discovery as reviewable candidates; test ambiguous names, absent parents, different domains and unauthorized tables.
 - [ ] R5: Add utility/coverage evidence for declared checks, unmodeled relationships, key-domain size and temporal evidence; distinguish unknown from measured zero.
 - [ ] R6: Specify optional controlled orphan/fan-out scenarios independently from valid FK generation; never infer source row mappings.
 - [ ] R7: Evaluate EAV conditional-formula/pivot requests and record support or an explicit separate proposal.
@@ -50,3 +50,20 @@
   spec serialization and deterministic unequal parent/child generation with
   nullable foreign keys and validation. R8 remains open for its broader CLI and
   empty-relation acceptance matrix.
+
+## R4 implementation evidence
+
+- Reuse deterministic discovery in a saved-profile-only `discover-relationships`
+  CLI and typed fingerprint-bound report. No database/provider call or table
+  authorization expansion is added. Source distribution literals are excluded.
+- Hypotheses retain explicit untrusted/review-required status and no generation
+  authority. Ambiguous parents stay separate; names/types/counts cannot certify
+  source overlap or domain identity. Accepted review does not mutate a spec.
+- Share bounded local inference work/deadline across foreign-key and temporal
+  discovery, cap candidates at 1,000 and bound profile/report payload bytes.
+  Failures leave existing reports unchanged or publish no new artifact.
+- Synthetic tests cover absent parents, independent domains, incompatible types,
+  ambiguous names, lower-bound/unknown evidence, deterministic offline export,
+  no source values, unchanged generation and work/candidate/report limits.
+- Report kind rejects DatasetSpec parsing and CLI generation; an expired
+  deadline at atomic publication rolls back instead of replacing an existing report.

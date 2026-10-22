@@ -22,6 +22,10 @@ from test_data_agent.core.distribution import (
     DateTimeRangeDistribution,
 )
 from test_data_agent.core.field import FieldProfile, FieldType
+from test_data_agent.core.limits import InputLimitError
+from test_data_agent.profiling.budget import LocalProfileBudget
+
+MAX_RELATIONSHIP_CANDIDATES = 1000
 
 
 @runtime_checkable
@@ -45,21 +49,45 @@ class RelationshipDiscoveryReview(BaseModel):
     generation_authorized: Literal[False] = False
 
 
+class RelationshipDiscoveryReport(BaseModel):
+    """Saved hypotheses that cannot activate relationships or generation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    artifact_type: Literal["relationship_discovery"] = "relationship_discovery"
+    schema_version: Literal["1.0"] = "1.0"
+    profile_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    candidates: list[RelationshipDiscoveryCandidate] = Field(max_length=MAX_RELATIONSHIP_CANDIDATES)
+    review_status: Literal["requires_human_review"] = "requires_human_review"
+    generation_authorized: Literal[False] = False
+
+
+def _check_candidate_count(count: int) -> None:
+    if count >= MAX_RELATIONSHIP_CANDIDATES:
+        raise InputLimitError("relationship discovery exceeds candidate limit")
+
+
 def mine_relationship_candidates(
-    profile: DatasetProfile,
+    profile: DatasetProfile, *, budget: LocalProfileBudget | None = None,
 ) -> list[RelationshipDiscoveryCandidate]:
     """Mine deterministic foreign-key candidates from safe profile metadata."""
 
+    budget = budget or LocalProfileBudget()
+    budget.check_deadline("relationship discovery")
     candidates: list[RelationshipDiscoveryCandidate] = []
     for parent in profile.entities:
+        budget.consume_inference_evaluation()
         for parent_field_name in parent.primary_key_candidates:
+            budget.consume_inference_evaluation()
             parent_field = parent.field(parent_field_name)
             if parent_field.unique_ratio_kind == "lower_bound" or parent_field.unique_ratio is None:
                 continue
             for child in profile.entities:
+                budget.consume_inference_evaluation()
                 if child.name == parent.name:
                     continue
                 for child_field in child.fields:
+                    budget.consume_inference_evaluation()
                     if child_field.null_ratio is None or child_field.unique_ratio is None:
                         continue
                     if child_field.name != parent_field.name:
@@ -113,6 +141,7 @@ def mine_relationship_candidates(
                         + parent_field.unique_ratio
                         + (1.0 - child_field.null_ratio)
                     ) / 3.0
+                    _check_candidate_count(len(candidates))
                     candidates.append(
                         RelationshipDiscoveryCandidate(
                             candidate_id=candidate_id,
@@ -121,11 +150,14 @@ def mine_relationship_candidates(
                             confidence=round(confidence, 6),
                             evidence=evidence,
                             assumptions=[
-                                "Matching field names may represent a foreign key."
+                                "Matching field names may represent a foreign key.",
+                                "Value overlap, domain identity and source foreign-key integrity are untested.",
+                                "Competing parents remain unresolved; no relationship is applied.",
                             ],
                         )
                     )
-    candidates.extend(_mine_temporal_candidates(profile))
+    candidates.extend(_mine_temporal_candidates(profile, budget, len(candidates)))
+    budget.check_deadline("relationship discovery finalization")
     return sorted(candidates, key=lambda candidate: candidate.candidate_id)
 
 
@@ -174,14 +206,18 @@ def _cardinality_ratio(parent_rows: int, child_rows: int) -> float:
 
 
 def _mine_temporal_candidates(
-    profile: DatasetProfile,
+    profile: DatasetProfile, budget: LocalProfileBudget, existing_count: int,
 ) -> list[RelationshipDiscoveryCandidate]:
     candidates: list[RelationshipDiscoveryCandidate] = []
     for entity in profile.entities:
+        budget.consume_inference_evaluation()
+        for _ in entity.fields:
+            budget.consume_inference_evaluation()
         starts = [field for field in entity.fields if _temporal_role(field) == "start"]
         ends = [field for field in entity.fields if _temporal_role(field) == "end"]
         for start in starts:
             for end in ends:
+                budget.consume_inference_evaluation()
                 if start.data_type != end.data_type:
                     continue
                 overlap = _temporal_range_overlap(start, end)
@@ -209,6 +245,7 @@ def _mine_temporal_candidates(
                         identity, sort_keys=True, separators=(",", ":")
                     ).encode("utf-8")
                 ).hexdigest()
+                _check_candidate_count(existing_count + len(candidates))
                 candidates.append(
                     RelationshipDiscoveryCandidate(
                         candidate_id=candidate_id,

@@ -7,6 +7,42 @@ normalized zero-to-one evidence metrics, confidence, bounded assumptions, and
 an opaque SHA-256 candidate identifier. It cannot contain rows, categories, raw
 values, SQL, credentials, or generation authority.
 
+Save deterministic metadata-only candidates from an existing profile:
+
+```bash
+test-data-agent discover-relationships out/profile.json --output out/relationship_candidates.json
+```
+
+This command reads only the saved profile. It makes no database or provider
+request and does not expand table/column authorization. Only entities and
+fields already present in that profile can be referenced; source profiling
+remains responsible for authorization. Raw categories, samples and source values
+are not copied into the report.
+
+The report is labelled `artifact_type: relationship_discovery` and cannot be
+loaded as a generation specification. It contains the profile fingerprint, candidate identities and normalized
+evidence, with `review_status: requires_human_review` and
+`generation_authorized: false`. Matching names, compatible types and similar
+counts do not prove common key domains or value overlap. Competing parents stay
+unresolved, including generic names such as `id`. Confidence is a heuristic
+ranking, not a measured source-integrity score. Missing parents are not probed
+or invented; unknown or censored uniqueness cannot certify a parent key.
+
+Review candidates separately, then explicitly author the intended relationships
+in a reviewed DatasetSpec. Recording an accepted discovery proposal does not
+apply it, approve generation or establish source fidelity. Generation continues
+to use only relationships already present in the reviewed specification.
+
+Mining shares the existing local profiling deadline and
+`TEST_DATA_AGENT_MAX_BUSINESS_RULE_EVALUATIONS` allowance across foreign-key and
+temporal hypotheses. At most 1,000 candidates are admitted. Exceeding a limit
+rejects the invocation instead of publishing a truncated report. The same
+deadline is checked immediately before atomic report publication. Input-profile
+and output-report JSON are also checked against
+`TEST_DATA_AGENT_MAX_PROFILE_PAYLOAD_BYTES` (default 4 MiB); existing bounded-file
+and artifact-writing limits apply. The work/deadline guards are cooperative,
+not a hard process-memory or filesystem-time ceiling.
+
 `RelationshipDiscoveryProposal` lets any provider rank an existing candidate
 and add bounded evidence or assumptions. It cannot invent a candidate, change
 its kind or fields, approve it, or run generation. Every proposal remains

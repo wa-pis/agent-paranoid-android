@@ -85,6 +85,13 @@ class DatasetSpec(BaseModel):
     generation_settings: GenerationSettings = Field(default_factory=GenerationSettings)
     validation_settings: ValidationSettings = Field(default_factory=ValidationSettings)
 
+    @model_validator(mode="before")
+    @classmethod
+    def reject_discovery_report(cls, value: Any) -> Any:
+        if isinstance(value, Mapping) and value.get("artifact_type") == "relationship_discovery":
+            raise ValueError("relationship discovery reports are not generation specifications")
+        return value
+
     @model_serializer(mode="wrap")
     def serialize_optional_fields(self, handler: Any) -> dict[str, Any]:
         payload: dict[str, Any] = handler(self)
