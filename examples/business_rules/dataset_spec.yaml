@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=../../schemas/dataset_spec.schema.json
+# Fully source-free companion to rules.yaml. No source files or DB required.
+schema_version: "1.1"
+entities:
+  - name: customers
+    row_count: 4
+    primary_key: customer_id
+    fields:
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+  - name: orders
+    row_count: 24
+    primary_key: order_id
+    fields:
+      - name: order_id
+        data_type: integer
+        is_identifier: true
+      - name: customer_id
+        data_type: integer
+        is_identifier: true
+      - name: status
+        data_type: string
+        distribution:
+          kind: categorical
+          categories: [{value: paid}, {value: cancelled}]
+      - name: delivery_method
+        data_type: string
+        distribution:
+          kind: categorical
+          categories: [{value: ground}, {value: air}]
+      - name: reason
+        data_type: string
+        nullable: true
+      - name: note
+        data_type: string
+        nullable: true
+      - name: marker
+        data_type: string
+      - name: size_band
+        data_type: string
+      - name: quantity
+        data_type: integer
+        distribution: {kind: numeric, min_value: 1, max_value: 3}
+      - name: unit_price
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: "1.00"
+          max: "10.00"
+      - name: discount
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: "0.00"
+          max: "1.00"
+      - name: fee
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: "0.00"
+          max: "1.00"
+      - name: subtotal
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: "1.00"
+          max: "30.00"
+      - name: total
+        data_type: decimal
+        distribution:
+          kind: decimal_range
+          precision: 6
+          scale: 2
+          min: "0.00"
+          max: "40.00"
+      - name: created_at
+        data_type: datetime
+        distribution:
+          kind: datetime_range
+          min: "2025-01-01T00:00:00"
+          max: "2025-01-01T23:59:59"
+      - name: fulfilled_at
+        data_type: datetime
+        distribution:
+          kind: datetime_range
+          min: "2025-01-02T00:00:00"
+          max: "2025-01-03T23:59:59"
+relationships:
+  - parent_entity: customers
+    parent_field: customer_id
+    child_entity: orders
+    child_field: customer_id
+    relationship_type: many_to_one
+    confidence: 1.0
+    status: confirmed
+generation_settings:
+  seed: 12345
+  mode: valid
+  invalid_ratio: 0
+  output_format: json
